@@ -1,0 +1,106 @@
+const fs = require('fs');
+const path = require('path');
+
+const writePageComponentsFromTemplate = async (config, compilation) => {
+  const createPageComponent = async (file) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let data;
+        if(fs.existsSync(config.templatesDir)) {
+          data = await fs.readFileSync(path.join(process.cwd(), config.templatesDir, file.template, '-template.js'));
+        } else {
+          data = await fs.readFileSync(path.join('./templates/' + file.template + '-template.js'));
+        }
+       
+        let result = data.toString().replace(/entry/g, 'wc-md-' + file.label);
+
+        result = result.replace(/page-template/g, 'eve-' + file.label);
+        result = result.replace(/MDIMPORT/, 'import \'' + file.import + '\';');
+
+        resolve(result);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+
+  return Promise.all(compilation.graph.map(file => {
+    if (file.label !== 'index') {
+      return new Promise(async(resolve, reject) => {
+        try {
+          let result = await createPageComponent(file);
+
+          await fs.writeFileSync(path.resolve(process.cwd(), './src/pages/' + file.label + '.js'), result);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+  }));
+
+};
+
+const writeImportFile = async (config, compilation) => {
+  let arr = compilation.graph.map(file => {
+    if (file.label !== 'index') {
+      return 'import \'../pages/' + file.label + '.js\';\n';
+    }
+  });
+
+  return await fs.writeFileSync(path.join(config.scratchDir, './list.js'), arr.join(''));
+};
+
+const writeRoutes = async(config, compilation) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let data;
+
+      if (fs.existsSync(config.templatesDir)) {
+        data = await fs.readFileSync(path.join(config.templatesDir, './app-template.js'));
+      } else {
+        data = await fs.readFileSync(path.join(__dirname, '..', './templates', './app-template.js'));
+      }
+
+      const routes = compilation.graph.map(file => {
+        if (file.label !== 'index') {
+          return '<lit-route ' + 'path=\"' + file.path + '\" component=\"eve-' + file.label + '\"></lit-route>\n\t\t\t\t';
+        }
+      });
+
+      const result = data.toString().replace(/MYROUTES/g, routes.join(''));
+
+      await fs.writeFileSync(path.join(config.scratchDir, './app.js'), result);
+
+      resolve();
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+module.exports = generateScaffolding = async (config, compilation) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log('Generate scaffolding...');
+      
+      console.log('Generate pages components from templates...');
+      /* Write MD Components with template */
+      await writePageComponentsFromTemplate(config, compilation);
+
+      console.log('Writing imports...');
+      /* Write import file for all MDs */
+      await writeImportFile(config, compilation);
+
+      // console.log('Writing routes...');
+      /* Write Lit Routes */
+      await writeRoutes(config, compilation);
+      
+      console.log('Scaffolding complete.');
+      resolve();
+    } catch (err) {
+      reject(err);
+    }
+
+  });
+};
