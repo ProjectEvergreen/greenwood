@@ -1,10 +1,10 @@
 import { html, LitElement } from 'lit-element';
 import { connectRouter } from 'lit-redux-router';
-import store from './store.js';
-import '../pages/index';
+// import store from './store.js';
+// import '../pages/index';
 import './list';
 
-connectRouter(store);
+// connectRouter(store);
 
 class AppComponent extends LitElement {
   render() {

@@ -79,22 +79,35 @@ const writeRoutes = async(config, compilation) => {
   });
 };
 
+const setupIndex = async(config, compilation) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      fs.copyFileSync(path.join(config.pagesDir, './index.js'), path.join(config.scratchDir, 'index.js'));
+      fs.copyFileSync(path.join(config.templatesDir, './index.html'), path.join(config.scratchDir, 'index.html'));
+      resolve();
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+
 module.exports = generateScaffolding = async (config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
       console.log('Generate scaffolding...');
       
-      console.log('Generate pages components from templates...');
-      /* Write MD Components with template */
+      console.log('Generate page as web components from templates...');
       await writePageComponentsFromTemplate(config, compilation);
 
-      console.log('Writing imports...');
-      /* Write import file for all MDs */
+      console.log('Writing imports for md...');
       await writeImportFile(config, compilation);
 
-      // console.log('Writing routes...');
-      /* Write Lit Routes */
+      console.log('Writing Lit routes...');
       await writeRoutes(config, compilation);
+
+      console.log('setup index page and html');
+      await setupIndex(config, compilation);
       
       console.log('Scaffolding complete.');
       resolve();
