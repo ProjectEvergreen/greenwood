@@ -2,14 +2,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
 module.exports = {
-  context: path.join(process.cwd(), './.greenwood'),
 
   entry: {
-    index: './index.js'
+    index: path.join(process.cwd(), '.greenwood', 'app.js')
   },
 
   output: {
-    path: path.join(process.cwd(), './.greenwood'),
+    path: path.join(process.cwd(), 'public'),
     filename: '[name].[chunkhash].bundle.js',
     publicPath: '/'
   },
@@ -53,7 +52,7 @@ module.exports = {
 
   plugins: [
     new HtmlWebpackPlugin({
-      template: './index.html',
+      template: path.join(process.cwd(), '.greenwood', 'index.html'),
       chunksSortMode: 'dependency'
     })
   ]

@@ -1,5 +1,5 @@
 import { html, LitElement } from 'lit-element';
-import css from '../templates/theme.css';
+// import css from '../templates/theme.css';
 MDIMPORT
 
 class PageTemplate extends LitElement {

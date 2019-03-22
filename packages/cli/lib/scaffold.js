@@ -10,7 +10,8 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
         let result = data.toString().replace(/entry/g, 'wc-md-' + file.label);
 
         result = result.replace(/page-template/g, 'eve-' + file.label);
-        result = result.replace(/MDIMPORT/, 'import \'' + file.import + '\';');
+        // result = result.replace(/MDIMPORT/, 'import \'' + file.import + '\';');
+        result = result.replace(/MDIMPORT/, '');
 
         resolve(result);
       } catch (err) {
@@ -50,13 +51,13 @@ const writeImportFile = async (config, compilation) => {
 const writeRoutes = async(config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let data;
+      let data = await fs.readFileSync(path.join(config.templatesDir, './app-template.js'));
 
-      if (fs.existsSync(config.templatesDir)) {
-        data = await fs.readFileSync(path.join(config.templatesDir, './app-template.js'));
-      } else {
-        data = await fs.readFileSync(path.join(__dirname, '..', './templates', './app-template.js'));
-      }
+      // if (fs.existsSync(config.templatesDir)) {
+      //   data = await fs.readFileSync(path.join(config.templatesDir, './app-template.js'));
+      // } else {
+      //   data = await fs.readFileSync(path.join(__dirname, '..', './templates', './app-template.js'));
+      // }
 
       const routes = compilation.graph.map(file => {
         if (file.label !== 'index') {

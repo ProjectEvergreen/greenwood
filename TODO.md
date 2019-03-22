@@ -1,6 +1,6 @@
 TODO
 1. Default + configurations
-  - Home page (recreate POC)
+  - Home page (recreate POC) double .md?
   - pages
   - templates
   - meta data in index.html
@@ -9,6 +9,7 @@ TODO
 1. Unit testing
 1. User configurations
 1. Add a "develop" mode
+1. Define contracts / APIs between graph -> scaffold -> compile -> serialize
 1. Plugins
   - favicon
   - bundle analyzer

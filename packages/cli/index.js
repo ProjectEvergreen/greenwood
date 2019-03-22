@@ -36,7 +36,8 @@ const run = async() => {
     await generateScaffolding(CONFIG, compilation);
 
     // build our SPA application first
-    // await buildCompilation(CONFIG, compilation);
+    console.log('Build SPA from scaffolding...');
+    await buildCompilation(CONFIG, compilation);
 
     // turn our SPA into a static site
     // await serializeBuild(CONFIG, compilation);
