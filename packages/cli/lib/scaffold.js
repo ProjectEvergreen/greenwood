@@ -3,15 +3,10 @@ const path = require('path');
 
 const writePageComponentsFromTemplate = async (config, compilation) => {
   const createPageComponent = async (file) => {
+    console.log('file', file);
     return new Promise(async (resolve, reject) => {
       try {
-        let data;
-        if(fs.existsSync(config.templatesDir)) {
-          data = await fs.readFileSync(path.join(process.cwd(), config.templatesDir, file.template, '-template.js'));
-        } else {
-          data = await fs.readFileSync(path.join('./templates/' + file.template + '-template.js'));
-        }
-       
+        let data = await fs.readFileSync(path.join(config.templatesDir, `${file.template}-template.js`));
         let result = data.toString().replace(/entry/g, 'wc-md-' + file.label);
 
         result = result.replace(/page-template/g, 'eve-' + file.label);
@@ -29,8 +24,9 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
       return new Promise(async(resolve, reject) => {
         try {
           let result = await createPageComponent(file);
+          await fs.mkdirSync(path.join(config.scratchDir, file.label))
 
-          await fs.writeFileSync(path.resolve(process.cwd(), './src/pages/' + file.label + '.js'), result);
+          await fs.writeFileSync(path.join(config.scratchDir, `${file.label}/${file.label}.js`), result);
           resolve();
         } catch (err) {
           reject(err);
@@ -44,7 +40,7 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
 const writeImportFile = async (config, compilation) => {
   let arr = compilation.graph.map(file => {
     if (file.label !== 'index') {
-      return 'import \'../pages/' + file.label + '.js\';\n';
+      return `import './${file.label}/${file.label}.js';\n`;
     }
   });
 
@@ -94,10 +90,8 @@ const setupIndex = async(config, compilation) => {
 
 module.exports = generateScaffolding = async (config, compilation) => {
   return new Promise(async (resolve, reject) => {
-    try {
-      console.log('Generate scaffolding...');
-      
-      console.log('Generate page as web components from templates...');
+    try {      
+      console.log('Generate pages from templates...');
       await writePageComponentsFromTemplate(config, compilation);
 
       console.log('Writing imports for md...');

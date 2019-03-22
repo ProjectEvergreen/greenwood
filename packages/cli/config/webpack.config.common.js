@@ -9,7 +9,7 @@ module.exports = {
   },
 
   output: {
-    path: path.join(process.cwd(), './public'),
+    path: path.join(process.cwd(), './.greenwood'),
     filename: '[name].[chunkhash].bundle.js',
     publicPath: '/'
   },

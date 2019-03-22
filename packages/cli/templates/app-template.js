@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit-element';
-import { connectRouter } from 'lit-redux-router';
+// import { connectRouter } from 'lit-redux-router';
 // import store from './store.js';
-// import '../pages/index';
+import './index.js';
 import './list';
 
 // connectRouter(store);

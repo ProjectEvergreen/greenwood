@@ -1,39 +1,16 @@
+require('colors');
 const fs = require('fs');
 const path = require('path');
 
 const generateGraph = require('./lib/graph');
 const generateScaffolding = require('./lib/scaffold');
 const buildCompilation = require('./lib/build');
-// const path = require('path');
-// const serverRender = require('./renderer');
-// const LocalWebServer = require('local-web-server');
-// const localWebServer = new LocalWebServer();
-// const staticGen = require('./generator');
-// const webpack = require('webpack');
-// const webpackConfig = require(path.join(process.cwd(), 'webpack.config.prod.js'));
-
-// const host = '127.0.0.1', port = '8000';
-
-// const startServer = async () => {
-
-//   const cache = require(path.join(process.cwd(), './cache.json'));
-
-//   try {
-//     return await Promise.all(cache.map(file => {
-//       return serverRender('http://' + host + ':' + port + file.path, file.label);
-//     }));
-//   } catch (err) {
-//     // eslint-disable-next-line no-console
-//     console.log(err);
-//     return false;
-//   }
-// };
+const serializeBuild = require('./lib/serialize');
 
 const run = async() => {
   // TODO override if these exist from the user, by default
-  console.log('__dirname', __dirname);
   const CONFIG = {
-    pagesDir: path.join(__dirname, './templates/'),
+    pagesDir: path.join(__dirname, './pages/'),
     scratchDir: path.join(process.cwd(), './.greenwood/'),
     templatesDir: path.join(__dirname, './templates/')
   };
@@ -49,38 +26,27 @@ const run = async() => {
     console.log('---Evergreen Static Site Generator---'.green);
     console.log('-------------------------------------'.green);
 
-    // generate a graph
-    compilation.graph = await generateGraph(CONFIG, compilation);
-  
+    // generate a graph of all pages / components to build
+    console.log('Generating graph of project files...');
+    let graph = await generateGraph(CONFIG, compilation);
+    compilation.graph = compilation.graph.concat(graph);
+    
     // generate scaffolding
-    // TODO stream this back?
+    console.log('Scaffolding out application files...');
     await generateScaffolding(CONFIG, compilation);
 
     // build our SPA application first
-    await buildCompilation(); 
+    // await buildCompilation(CONFIG, compilation);
+
+    // turn our SPA into a static site
+    // await serializeBuild(CONFIG, compilation);
     
-    // serve and serialize all pages
+    // console.log('...................................'.yellow);
+    // console.log('Static site generation complete!');
+    // console.log('Serve with: '.cyan + 'npm run serve'.green);
+    // console.log('...................................'.yellow);
 
-    // ().then(() => {
-      // console.log('webpack build success?');
-
-      //     const server = localWebServer.listen({
-      //       port: 8000,
-      //       https: false,
-      //       directory: 'public',
-      //       spa: 'index.html'
-      //     });
-
-      //     await startServer();
-      //     server.close();
-      //     // eslint-disable-next-line no-process-exit
-      //     console.log('...................................'.yellow);
-      //     console.log('Static site generation complete!');
-      //     console.log('Serve with: '.cyan + 'npm run serve'.green);
-      //     console.log('...................................'.yellow);
-
-      //     process.exit(0);
-    // });
+    process.exit(0);
   } catch (err) {
     console.log(err);
   }
