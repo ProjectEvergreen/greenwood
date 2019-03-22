@@ -7,7 +7,7 @@ module.exports = buildCompilation = async (config, compilation) => {
     
     try {
       return webpack(webpackConfig, (err) => {
-        console.log(err);
+        // TODO webpack errors don't break this task
         if (err) {
           console.log(err);
           reject(err);

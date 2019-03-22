@@ -1,6 +1,6 @@
 TODO
-1. Home (JS) / Hello (.md) page (recreate POC) 
-1. double md?
+1. ~~Home (JS) / Hello (.md) page (recreate POC)~~ w/ serialization
+1. ~~double md?~~
 1. Defaults (if directory exists)
   - pages (src/pages)
   - templates (src/pages)
@@ -10,9 +10,9 @@ TODO
 1. babel polyfill / regenerate runtime?
 1. Unit testing
 1. Logging
-1. Add a "develop" mode
+1. Add a "develop" mode (SPA mode, dev server, no serialization?)
 1. move eslint to devDependency / webpack develop config?
-1.  `./node_modules/.bin/webpack --config ./packages/cli/config/webpack.config.prod.js --progress`
+1. `./node_modules/.bin/webpack --config ./packages/cli/config/webpack.config.prod.js --progress`
 
 Use Cases
 1. LitElement components (header)
@@ -20,6 +20,7 @@ Use Cases
 1. Mix of md with LitElement components?
 
 Technical Architecture
+1. Error handling / user feedback
 1. Lifecycles API
 1. Define contracts / APIs between graph -> scaffold -> compile -> serialize
 1. Plugins (our plugins are wrappers around webpack plugins)

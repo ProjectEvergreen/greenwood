@@ -3,7 +3,6 @@ const path = require('path');
 
 const writePageComponentsFromTemplate = async (config, compilation) => {
   const createPageComponent = async (file) => {
-    console.log('file', file);
     return new Promise(async (resolve, reject) => {
       try {
         let data = await fs.readFileSync(path.join(config.templatesDir, `${file.template}-template.js`));
@@ -90,12 +89,12 @@ const copyMarkdownForPages = async(config, compilation) => {
     try {
       compilation.graph.map((file) => {
         if(file.label !== 'index') {
-          console.log('copyMarkdownForPages', file);
-          fs.copyFileSync(path.join(config.pagesDir, `${file.label}.md`), path.join(config.scratchDir, `${file.label}/${file.label}.md`));
+          fs.copyFileSync(
+            path.join(config.pagesDir, `${file.label}.md`), 
+            path.join(config.scratchDir, `${file.label}/${file.label}.md`)
+          );
         }
       })
-      // fs.copyFileSync(path.join(config.pagesDir, './index.js'), path.join(config.scratchDir, 'index.js'));
-      // fs.copyFileSync(path.join(config.templatesDir, './index.html'), path.join(config.scratchDir, 'index.html'));
       resolve();
     } catch (err) {
       reject(err);
