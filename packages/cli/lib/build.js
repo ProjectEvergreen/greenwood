@@ -4,15 +4,17 @@ const webpackConfig = require(path.join(__dirname, '..', './config/webpack.confi
 
 module.exports = buildCompilation = async (config, compilation) => {
   return new Promise(async (resolve, reject) => {
-    console.log('webpackConfig', webpackConfig);
     
     try {
-      // TODO Allow hooks into webpack configuration?
-      // to add plugins loaders? 
-      // our plugins are wrappers around access to webpack
-      return webpack(webpackConfig, () => {
-        console.log('webpack built!');
-        resolve();
+      return webpack(webpackConfig, (err) => {
+        console.log(err);
+        if (err) {
+          console.log(err);
+          reject(err);
+        } else {
+          console.log('webpack build complete');
+          resolve();
+        }
       });
     } catch (err) {
       reject(err);

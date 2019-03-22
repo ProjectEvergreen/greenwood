@@ -1,3 +1,4 @@
+*.log
 .greenwood/
 node_modules/
 public/

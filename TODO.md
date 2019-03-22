@@ -1,17 +1,33 @@
 TODO
-1. Default + configurations
-  - Home page (recreate POC) double .md?
-  - pages
-  - templates
-  - meta data in index.html
-  - move eslint to devDependency, develop config
-  - ~~Clean up userland~~
+1. Home (JS) / Hello (.md) page (recreate POC) 
+1. double md?
+1. Defaults (if directory exists)
+  - pages (src/pages)
+  - templates (src/pages)
+  - index.html (src/index.html)
+1. ~~Clean up userland~~
+1. CSS
+1. babel polyfill / regenerate runtime?
 1. Unit testing
-1. User configurations
+1. Logging
 1. Add a "develop" mode
+1. move eslint to devDependency / webpack develop config?
+1.  `./node_modules/.bin/webpack --config ./packages/cli/config/webpack.config.prod.js --progress`
+
+Use Cases
+1. LitElement components (header)
+1. LitElement pages
+1. Mix of md with LitElement components?
+
+Technical Architecture
+1. Lifecycles API
 1. Define contracts / APIs between graph -> scaffold -> compile -> serialize
-1. Plugins
+1. Plugins (our plugins are wrappers around webpack plugins)
   - favicon
   - bundle analyzer
-1. Lifecycles
-1. If we can figure out how to make this a single "stream": _HTTP Request (graph) -> Response Body (build / scaffold) -> HTTP Response (serialize)_, we basically have our next.js.
+1. User configurations / overrides?
+ - pages
+ - templates
+ - index.html
+
+If we can figure out how to make this a single "stream": _HTTP Request (graph) -> Response Body (build / scaffold) -> HTTP Response (serialize)_, we basically have our next.js.

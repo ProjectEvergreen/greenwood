@@ -5,7 +5,7 @@ const webpackMerge = require('webpack-merge');
 
 module.exports = webpackMerge(commonConfig, {
 
-  // mode: 'production',
+  mode: 'production',
 
   performance: {
     hints: 'error'

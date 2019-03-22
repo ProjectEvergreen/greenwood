@@ -17,8 +17,7 @@ const createGraphFromPages = async (pagesDir) => {
           const { attributes } = fm(data);
           const { label, path, template } = attributes;
 
-          // TOOD probably dont want to hardcode pages do we?
-          pages.push({ import: `./${file}/${file}`, label, path, template });
+          pages.push({ import: `./${label}.md`, label, path, template });
         }
       });
 

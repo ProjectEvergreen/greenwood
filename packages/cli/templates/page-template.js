@@ -5,9 +5,6 @@ MDIMPORT
 class PageTemplate extends LitElement {
   render() {
     return html`
-      <style>
-      ${css}
-      </style>
       <div class='wrapper'>
         <div class='page-template content'>
           <entry></entry>
@@ -18,3 +15,7 @@ class PageTemplate extends LitElement {
 }
 
 customElements.define('page-template', PageTemplate);
+
+// <!-- <style>
+// ${css}
+// </style> -->

@@ -40,7 +40,17 @@ module.exports = {
       ]
     }, {
       test: /\.css$/,
-      use: ['css-to-string-loader', 'css-loader', 'postcss-loader']
+      loaders: [
+        { loader: 'css-to-string-loader' },
+        { loader: 'css-loader' }, 
+        { loader: 'postcss-loader', options: 
+          {
+            config: {
+              path: path.join(__dirname) 
+            }
+          } 
+        }
+      ]
     }, {
       test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
       loader: 'url-loader?limit=10000&mimetype=application/font-woff'
