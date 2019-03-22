@@ -8,7 +8,8 @@ const buildCompilation = require('./lib/build');
 const serializeBuild = require('./lib/serialize');
 
 const run = async() => {
-  // TODO override if these exist from the user, by default
+  // TODO override pages and templates if these exist from the user
+  // by default assumes src/
   const CONFIG = {
     pagesDir: path.join(__dirname, './pages/'),
     scratchDir: path.join(process.cwd(), './.greenwood/'),
@@ -23,7 +24,7 @@ const run = async() => {
       fs.mkdirSync(CONFIG.scratchDir);
 
     console.log('-------------------------------------'.green);
-    console.log('---Evergreen Static Site Generator---'.green);
+    console.log('---Greenwood Static Site Generator---'.green);
     console.log('-------------------------------------'.green);
 
     // generate a graph of all pages / components to build
@@ -39,12 +40,12 @@ const run = async() => {
     console.log('Build SPA from scaffolding...');
     await buildCompilation(CONFIG, compilation);
 
-    // turn our SPA into a static site
+    // "serialize" our SPA into a static site
     // await serializeBuild(CONFIG, compilation);
     
     // console.log('...................................'.yellow);
     // console.log('Static site generation complete!');
-    // console.log('Serve with: '.cyan + 'npm run serve'.green);
+    // console.log('Serve with: '.cyan + 'greenwood --serve'.green);
     // console.log('...................................'.yellow);
 
     process.exit(0);

@@ -13,13 +13,16 @@ TODO
 1. Add a "develop" mode (SPA mode, dev server, no serialization?)
 1. move eslint to devDependency / webpack develop config?
 1. `./node_modules/.bin/webpack --config ./packages/cli/config/webpack.config.prod.js --progress`
+1. README
 
 Use Cases
+1. Nested pages
 1. LitElement components (header)
 1. LitElement pages
 1. Mix of md with LitElement components?
 
 Technical Architecture
+1. local server
 1. Error handling / user feedback
 1. Lifecycles API
 1. Define contracts / APIs between graph -> scaffold -> compile -> serialize
