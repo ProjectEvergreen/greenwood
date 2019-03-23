@@ -8,27 +8,32 @@ TODO
 1. ~~Clean up userland~~
 1. CSS
 1. babel polyfill / regenerate runtime?
-1. Unit testing
-1. Logging
-1. Add a "develop" mode (SPA mode, dev server, no serialization?)
+1. browserslist
+1. Unit testing / Project linting
 1. move eslint to devDependency / webpack develop config?
 1. `./node_modules/.bin/webpack --config ./packages/cli/config/webpack.config.prod.js --progress`
 1. README
 
 Use Cases
 1. Nested pages
+1. Page Links
 1. LitElement components (header)
 1. LitElement pages
 1. Mix of md with LitElement components?
 
 Technical Architecture
-1. local server
+1. Add a "develop" mode (SPA mode, dev server, no serialization?)
+1. Logging
+1. move config into compilation
+1. local server vs **webpack-dev-server** (do everything in memory)
 1. Error handling / user feedback
+1. Benchmarking
 1. Lifecycles API
 1. Define contracts / APIs between graph -> scaffold -> compile -> serialize
 1. Plugins (our plugins are wrappers around webpack plugins)
   - favicon
   - bundle analyzer
+  - ESLint?
 1. User configurations / overrides?
  - pages
  - templates

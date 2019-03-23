@@ -4,28 +4,22 @@ const { Renderer } = require('./renderer');
 const fs = require('fs');
 const path = require('path');
 
-module.exports = async (absPath, label) => {
-  console.log('absPath', absPath);
-  
+module.exports = async (url, label, outputDirectory) => {  
   const browser = await puppeteer.launch({
     headless: true,
     args: ['--no-sandbox']
   });
 
   const renderer = new Renderer(browser);
-
-  let result = await renderer.serialize(absPath);
-  console.log('result', result);
-
+  const result = await renderer.serialize(url);
+  
   const dom = new JSDOM(result.content);
-  // console.log('dom', dom);
-
-  const target = path.resolve(process.cwd(), './.greenwood', label);
-  console.log('target', target);
+  const html = dom.serialize();
+  const target = path.join(outputDirectory, label);
 
   if (label !== 'index') {
     await fs.mkdirSync(target, { recursive: true });
-    return await fs.writeFileSync(path.resolve(process.cwd(), './public/', label, 'index.html'), dom.serialize());
+    return await fs.writeFileSync(path.join(outputDirectory, label, 'index.html'), html);
   }
-  return await fs.writeFileSync(path.resolve(process.cwd(), './public/', 'index.html'), dom.serialize());
+  return await fs.writeFileSync(path.join(outputDirectory, 'index.html'), html);
 };

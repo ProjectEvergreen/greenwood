@@ -9,7 +9,7 @@
   "scripts": {
     "clean": "rimraf ./.greenwood && rimraf ./public",
     "build": "node ./packages/cli/index.js",
-    "serve": "yarn clean && yarn build && cd ./public && ws --spa index.html"
+    "serve": "yarn clean && yarn build && cd ./public && ws"
   },
   "dependencies": {
     "@babel/core": "^7.4.0",

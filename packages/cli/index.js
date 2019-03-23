@@ -13,7 +13,8 @@ const run = async() => {
   const CONFIG = {
     pagesDir: path.join(__dirname, './pages/'),
     scratchDir: path.join(process.cwd(), './.greenwood/'),
-    templatesDir: path.join(__dirname, './templates/')
+    templatesDir: path.join(__dirname, './templates/'),
+    publicDir: path.join(process.cwd(), './public')
   };
   let compilation = {
     graph: [{ label: 'index', path: '/', template: 'page' }]
@@ -41,12 +42,12 @@ const run = async() => {
     await buildCompilation(CONFIG, compilation);
 
     // "serialize" our SPA into a static site
-    // await serializeBuild(CONFIG, compilation);
+    await serializeBuild(CONFIG, compilation);
     
-    // console.log('...................................'.yellow);
-    // console.log('Static site generation complete!');
+    console.log('...................................'.yellow);
+    console.log('Static site generation complete!');
     // console.log('Serve with: '.cyan + 'greenwood --serve'.green);
-    // console.log('...................................'.yellow);
+    console.log('...................................'.yellow);
 
     process.exit(0);
   } catch (err) {
