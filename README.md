@@ -1,15 +1,28 @@
-By default, Greenwood will generate a page for you in _public/_.
+By default, Greenwood will generate a site for you in _public/_.
 ```shell
-// basic command and output
+$ greenwood
 ```
 
-Fun!  But naturally you'll want to make your own pages.  So simply add some markdown and off you go.
+Fun!  But naturally you'll want to make your own pages.  So create a folder called _src/pages/_ and create a page called _index.md_.
 ```shell
-create src/pages
- - about
- - contact
-```
+---
+path: '/hello'
+label: 'hello'
+template: 'page'
+---
 
+
+you want your own template
+create src/templates/page-template, src/templates/app-template
+
+
+really need to reach for a config file (assets - CopyWebpackPlugin we make our greenwood call out to webpack, more advanced)
+
+
+### Hello World
+
+This is an example page built by Greenwood.  Make your own in _src/pages_!
+```
 
 Create a page component
 
