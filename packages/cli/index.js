@@ -11,7 +11,7 @@ const run = async() => {
   // TODO override pages and templates if these exist from the user
   // by default assumes src/
   const CONFIG = {
-    pagesDir: path.join(__dirname, './pages/'),
+    pagesDir: path.join(__dirname, './templates/'),
     scratchDir: path.join(process.cwd(), './.greenwood/'),
     templatesDir: path.join(__dirname, './templates/'),
     publicDir: path.join(process.cwd(), './public')
