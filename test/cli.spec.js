@@ -12,14 +12,14 @@ const CONFIG = {
     scratchDir: path.join(__dirname, '..', './.greenwood/'),
     templatesDir: path.join(__dirname, '../packages/cli/templates/'),
     publicDir: path.join(__dirname, '..', './public')
-  };
-
-before(async () => {
-    setup = new TestSetup();
-    await setup.run(['./packages/cli/index.js', '']);
-});  
+};
 
 describe('after building greenwood', () => {
+
+    before(async () => {
+        setup = new TestSetup();
+        await setup.run(['./packages/cli/index.js', '']);
+    });  
 
     it('should create a new public directory', () => {
         expect(fs.existsSync(CONFIG.publicDir)).to.be.true;
@@ -46,8 +46,7 @@ describe('after building greenwood', () => {
         const server = localWebServer.listen({
             port: '8081',
             https: false,
-            directory: CONFIG.publicDir,
-            spa: 'index.html'
+            directory: CONFIG.publicDir
           });
 
         before(async() => {
@@ -64,10 +63,15 @@ describe('after building greenwood', () => {
             const head = await page.$eval('div', el => el.innerText);
             expect(head).to.equal('\n        This is the home page built by Greenwood. Make your own pages in src/pages/index.js!\n      ');
         });
+
+        after(async() => {
+            await server.close();
+        });
+    });
+
+    after(async() => {
+        await fs.remove(CONFIG.publicDir);
+        await fs.remove(CONFIG.scratchDir);
     });
 });
 
-after(async() => {
-    await fs.remove(CONFIG.publicDir);
-    await fs.remove(CONFIG.scratchDir);
-});
