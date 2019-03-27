@@ -1,8 +1,8 @@
 {
   "name": "greenwood",
   "version": "0.1.0",
-  "description": "A static site generator for Web Components",
-  "main": "index.js",
+  "description": "A modern and performant static site generator, supporting Web Component based development.",
+  "main": "packages/cli/index.js",
   "repository": "git@github.com:thescientist13/greenwood.git",
   "author": "Owen Bucklwy <owen@thegreenhouse.io>",
   "license": "MIT",
