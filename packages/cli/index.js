@@ -6,8 +6,6 @@ const generateGraph = require('./lib/graph');
 const generateScaffolding = require('./lib/scaffold');
 const buildCompilation = require('./lib/build');
 const serializeBuild = require('./lib/serialize');
-const webpackDevConfig = require('./config/webpack.config.develop.js');
-const webpack = require('webpack');
 
 const run = async() => {
   // TODO override pages and templates if these exist from the user
