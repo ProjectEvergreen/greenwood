@@ -39,7 +39,7 @@ describe('after building greenwood', () => {
         });
     });
 
-    describe('when rendered', async () => {
+    describe('when serialized', async () => {
         let dom;
 
         before(async() => {
