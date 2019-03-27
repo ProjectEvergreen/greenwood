@@ -6,10 +6,12 @@ module.exports = buildCompilation = async (config, compilation) => {
   return new Promise(async (resolve, reject) => {
     
     try {
-      return webpack(webpackConfig, (err) => {
+      return webpack(webpackConfig, (err, stats) => {
         // TODO webpack errors don't break this task
-        if (err) {
-          console.log(err);
+        if (err || stats.hasErrors()) {
+          if(stats.hasErrors()) {
+             err = stats.toJson('minimal').errors[0];
+          }
           reject(err);
         } else {
           console.log('webpack build complete');
