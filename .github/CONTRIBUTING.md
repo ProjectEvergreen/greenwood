@@ -21,5 +21,5 @@ To develop for the project, you'll want to follow these steps:
 ## Unit Testing
 Unit tests have been written that can be run using
 ```shell
-$ npm test
+$ yarn test
 ```
