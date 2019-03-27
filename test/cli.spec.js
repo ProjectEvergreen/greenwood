@@ -1,11 +1,10 @@
 const expect = require('chai').expect;
-const chai = require('chai').use(require('chai-as-promised'));
-const should = chai.should(); // eslint-disable-line
 const fs = require('fs-extra');
 const path = require('path');
 const glob = require('glob-promise');
 const TestSetup = require('./setup');
-const LocalWebServer = require('local-web-server');
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
 
 const CONFIG = {
     pagesDir: path.join(__dirname, '../packages/cli/templates/'),
@@ -40,32 +39,23 @@ describe('after building greenwood', () => {
         });
     });
 
-    describe('when rendered', () => {
-        let page;
-        const localWebServer = new LocalWebServer();
-        const server = localWebServer.listen({
-            port: '8081',
-            https: false,
-            directory: CONFIG.publicDir
-          });
+    describe('when rendered', async () => {
+        let dom;
 
         before(async() => {
-            page = await browser.newPage();
-            await page.goto('http://127.0.0.1:8081');
+            dom = await JSDOM.fromFile(path.resolve(__dirname, '..', './public/hello/index.html'));
         });
 
         it('should display the hello world heading', async () => {
-            const head = await page.$eval('h1', el => el.innerHTML);
-            expect(head).to.equal('Greenwood');
+            let heading = dom.window.document.querySelector('h3.wc-md-hello').textContent;
+
+            expect(heading).to.equal('Hello World');
         });
 
         it('should display the hello world text', async () => {
-            const head = await page.$eval('div', el => el.innerText);
-            expect(head).to.equal('\n        This is the home page built by Greenwood. Make your own pages in src/pages/index.js!\n      ');
-        });
+            let paragraph = dom.window.document.querySelector('p.wc-md-hello').textContent;
 
-        after(async() => {
-            await server.close();
+            expect(paragraph).to.equal('This is an example page built by Greenwood.  Make your own in src/pages!');
         });
     });
 
