@@ -1,7 +1,7 @@
 # Greenwood
 
 ## Overview
-A modern and performant static site generator, supporting Web Component based development.
+A modern and performant static site generator supporting Web Component based development.
 
 > ⛔ WARNING: This project is not ready for use yet! 🛠️
 
