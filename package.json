@@ -8,8 +8,10 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf ./.greenwood && rimraf ./public",
-    "build": "node ./packages/cli/index.js",
-    "serve": "yarn clean && yarn build && cd ./public && ws"
+    "build": "yarn clean && node ./packages/cli/index.js",
+    "serve": "yarn build && cd ./public && ws",
+    "dev": "export NODE_ENV=development && yarn build && yarn dev-serve",
+    "dev-serve": "webpack-dev-server --config ./packages/cli/config/webpack.config.develop.js --open"
   },
   "dependencies": {
     "@babel/core": "^7.4.0",
@@ -39,6 +41,8 @@
     "wc-markdown-loader": "^0.0.6",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
+    "webpack-dev-server": "^3.2.1",
+    "webpack-manifest-plugin": "^2.0.4",
     "webpack-merge": "^4.2.1"
   },
   "devDependencies": {

@@ -3,7 +3,7 @@ const webpackMerge = require('webpack-merge');
 const ManifestPlugin = require('webpack-manifest-plugin');
 
 module.exports = webpackMerge(commonConfig, {
-
+  
   mode: 'development',
 
   devServer: {

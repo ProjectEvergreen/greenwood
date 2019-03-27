@@ -6,6 +6,8 @@ const generateGraph = require('./lib/graph');
 const generateScaffolding = require('./lib/scaffold');
 const buildCompilation = require('./lib/build');
 const serializeBuild = require('./lib/serialize');
+const webpackDevConfig = require('./config/webpack.config.develop.js');
+const webpack = require('webpack');
 
 const run = async() => {
   // TODO override pages and templates if these exist from the user
@@ -37,18 +39,20 @@ const run = async() => {
     console.log('Scaffolding out application files...');
     await generateScaffolding(CONFIG, compilation);
 
-    // build our SPA application first
-    console.log('Build SPA from scaffolding...');
-    await buildCompilation(CONFIG, compilation);
+    if (process.env.NODE_ENV !== 'development') {
 
-    // "serialize" our SPA into a static site
-    await serializeBuild(CONFIG, compilation);
-    
-    console.log('...................................'.yellow);
-    console.log('Static site generation complete!');
-    // console.log('Serve with: '.cyan + 'greenwood --serve'.green);
-    console.log('...................................'.yellow);
+      // build our SPA application first
+      console.log('Build SPA from scaffolding...');
+      await buildCompilation(CONFIG, compilation);
 
+      // "serialize" our SPA into a static site
+      await serializeBuild(CONFIG, compilation);
+
+      console.log('...................................'.yellow);
+      console.log('Static site generation complete!');
+      // console.log('Serve with: '.cyan + 'greenwood --serve'.green);
+      console.log('...................................'.yellow);
+    }   
     process.exit(0);
   } catch (err) {
     console.log(err);
