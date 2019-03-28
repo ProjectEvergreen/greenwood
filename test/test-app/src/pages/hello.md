@@ -4,6 +4,6 @@ label: 'hello'
 template: 'page'
 ---
 
-### Hello World
+### Test App
 
-This is an example page built by Greenwood.  Make your own in _src/pages_!
+This is a test app using a custom user template!

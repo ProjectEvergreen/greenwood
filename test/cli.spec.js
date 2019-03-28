@@ -100,22 +100,23 @@ describe('after building greenwood', () => {
 
     describe('using default greenwood template', () => {
         whenSerialized('Hello World', 'This is an example page built by Greenwood.  Make your own in src/pages!');
+        after(async() => {
+            await fs.remove(CONFIG.publicDir);
+            await fs.remove(CONFIG.scratchDir);
+        });
     });
 
     describe('with a correct user templates directory', () => {
         before(async() => {
             // copy test app
             await fs.copy(CONFIG.testApp, CONFIG.usrSrc);
+            await setup.run(['./packages/cli/index.js', '']);
         });
-        whenSerialized('Hello World', 'This is an example page built by Greenwood.  Make your own in src/pages!');
+        whenSerialized('Test App', 'This is a test app using a custom user template!');
         after(async() => {
-            // remove test app
             await fs.remove(CONFIG.usrSrc);
+            await fs.remove(CONFIG.publicDir);
+            await fs.remove(CONFIG.scratchDir);
         })
     }); 
-
-    after(async() => {
-        await fs.remove(CONFIG.publicDir);
-        await fs.remove(CONFIG.scratchDir);
-    });
 });
