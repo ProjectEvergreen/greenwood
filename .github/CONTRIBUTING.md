@@ -9,7 +9,11 @@ Please make sure to have the following prepared (where applicable)
 1. Links / references
 
 ## Pull Requests
-Please make sure an issue exists when submitting a PR that can be referenced and used to complete the PR template, as well as provided contextual information for reviewers.
+Pull requests are the best!  To best help facililate contributions to the project, here are some requests:
+- We generally we prefer an issue be opened first, to help faciliate general discussion outside of the code review process itself.
+- For bugs, please consider reviewing the issue tracker
+- For branch naming conventions, we generally follow the convention `<issue-type>/issue-<number>-issue-title`, e.g. _bug/issue-12-fixed-bug-with-yada-yada-yada_
+- To test the CI build scripts locally, run any of the `yarn` commands in _.circleci/config.yml_
 
 ## Making Changes
 To develop for the project, you'll want to follow these steps:
