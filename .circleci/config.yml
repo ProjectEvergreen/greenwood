@@ -24,8 +24,10 @@ jobs:
           name: Install Project Dependencies
           command: yarn install
 
-      # tasks this was part of the lint npm task but was moved out
-      # since tasks/* isn't part of the npx install and so lint would fail on the user's machine
+      - run:
+        name: Run Unit Tests
+        command: yarn test
+
       - run:
           name: Run CLI Script (index.js)
           command: yarn clean && yarn build
