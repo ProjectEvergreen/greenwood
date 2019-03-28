@@ -1,3 +1,11 @@
+# Greenwood
+
+## Overview
+A modern and performant static site generator supporting Web Component based development.
+
+> ⛔ WARNING: This project is not ready for use yet! 🛠️
+
+## Usage
 By default, Greenwood will generate a site for you in _public/_.
 ```shell
 $ greenwood
@@ -8,25 +16,4 @@ Fun!  But naturally you'll want to make your own pages.  So create a folder call
 ---
 path: '/hello'
 label: 'hello'
-template: 'page'
 ---
-
-
-you want your own template
-create src/templates/page-template, src/templates/app-template
-
-
-really need to reach for a config file (assets - CopyWebpackPlugin we make our greenwood call out to webpack, more advanced)
-
-
-### Hello World
-
-This is an example page built by Greenwood.  Make your own in _src/pages_!
-```
-
-Create a page component
-
-
-why?
-
-Create a header component
