@@ -79,7 +79,7 @@ const writeRoutes = async(config, compilation) => {
 const setupIndex = async(config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const componentDir = !config.default ? 'components' : '' ;
+      const componentDir = !config.default ? 'components' : 'app' ;
       const homeCompPath = path.join(config.scratchDir, componentDir)
       
       if(!config.default) {
