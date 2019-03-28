@@ -39,14 +39,14 @@ By default, Greenwood will supply its own [app-template](https://github.com/Proj
 
 ### App Template
 
-An app-template.js must follow the [default template](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js#L1-L13) in that it must include the lit-redux-router, redux, redux-thunk, lazy-reducer-enhancer and it must create a redux store.  You may import any additional components or tools you wish but the `import './list';` [must be included](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js#L16) in order to import all your generated static page components. Do not change the path and you can ignore the fact that this file doesn't exist, it will be created on build in memory.  In the [render function](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js#L21-L26), it must include somewhere:
+An `app-template.js` must follow the [default template](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js#L1-L13) in that it must include the lit-redux-router, redux, redux-thunk, lazy-reducer-enhancer and it must create a redux store.  You may import any additional components or tools you wish but the `import './list';` [must be included](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js#L16) in order to import all your generated static page components. Do not change the path and you can ignore the fact that this file doesn't exist, it will be created on build in memory.  In the [render function](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js#L21-L26), it must include somewhere:
 
 ```html
 <lit-route path="/" component="home-page"></lit-route>
 MYROUTES
 ```
 
-`MYROUTES` is a placeholder for where all your generated page routes will be automatically placed. It must be present beneath a default root directory. You may change the component of this root route but not the path.
+`MYROUTES` is a placeholder for where all your generated page routes will be automatically placed. It must be present beneath a default root route. You may change the component of this root route but not the path.
 
 ### Page Template
 
@@ -57,6 +57,8 @@ All page templates must be placed in the `src/templates` directory. All page tem
     <entry></entry>
 </div>
 ```
+
+**Note**: For now, you must include an app-template.js in your templates folder, if you wish to use custom page-templates.
 
 ### Components
 
