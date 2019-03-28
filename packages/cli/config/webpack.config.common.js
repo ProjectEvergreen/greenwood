@@ -4,7 +4,7 @@ const path = require('path');
 module.exports = {
 
   entry: {
-    index: path.join(process.cwd(), '.greenwood', 'app.js')
+    index: path.join(process.cwd(), '.greenwood', 'app', 'app.js')
   },
 
   output: {
