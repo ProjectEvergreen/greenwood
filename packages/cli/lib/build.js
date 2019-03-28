@@ -7,7 +7,6 @@ module.exports = buildCompilation = async (config, compilation) => {
     
     try {
       return webpack(webpackConfig, (err, stats) => {
-        // TODO webpack errors don't break this task
         if (err || stats.hasErrors()) {
           if(stats.hasErrors()) {
              err = stats.toJson('minimal').errors[0];
