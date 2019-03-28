@@ -10,8 +10,67 @@ const CONFIG = {
     pagesDir: path.join(__dirname, '../packages/cli/templates/'),
     scratchDir: path.join(__dirname, '..', './.greenwood/'),
     templatesDir: path.join(__dirname, '../packages/cli/templates/'),
-    publicDir: path.join(__dirname, '..', './public')
+    publicDir: path.join(__dirname, '..', './public'),
+    testApp: path.join(__dirname, 'test-app', 'src'),
+    usrSrc: path.join(__dirname, '..', 'src'),
+    usrTemplate: path.join(__dirname, '..', 'src', 'templates')
 };
+
+const whenSerialized = (head, par) => {
+    describe('when serialized', async () => {
+        let dom;
+
+        before(async() => {
+            dom = await JSDOM.fromFile(path.resolve(__dirname, '..', './public/hello/index.html'));
+        });
+
+        it('should display the hello world heading', async () => {
+            let heading = dom.window.document.querySelector('h3.wc-md-hello').textContent;
+
+            expect(heading).to.equal(head);
+        });
+
+        it('should display the hello world text', async () => {
+            let paragraph = dom.window.document.querySelector('p.wc-md-hello').textContent;
+
+            expect(paragraph).to.equal(par);
+        });
+    });
+}
+
+describe('after building greenwood', () => {
+
+    before(async () => {
+        setup = new TestSetup();
+    });  
+    describe('with an empty user templates directory', () => {
+        beforeEach(async() => {
+            // create empty template directory
+            await fs.mkdirSync(CONFIG.usrSrc);
+            await fs.mkdirSync(CONFIG.usrTemplate);
+        });
+
+        it('should display an error if page-template.js is missing', async() => {
+            await setup.run(['./packages/cli/index.js'], '').catch((err) => {
+                expect(err).to.contain("It looks like you don't have a page template defined. ");
+            });
+        });
+
+        it('should display an error if app-template.js is missing', async () => {
+            // add blank page-template
+            await fs.writeFileSync(path.join(CONFIG.usrTemplate, 'page-template.js'), '');
+            await setup.run(['./packages/cli/index.js'], '').catch((err) => {
+                expect(err).to.contain("It looks like you don't have an app template defined. ");            
+            });
+        });
+
+        afterEach(async () => {
+            await fs.remove(CONFIG.usrSrc);
+            await fs.remove(CONFIG.scratchDir);
+        });
+    });
+
+});
 
 describe('after building greenwood', () => {
 
@@ -39,29 +98,24 @@ describe('after building greenwood', () => {
         });
     });
 
-    describe('when serialized', async () => {
-        let dom;
-
-        before(async() => {
-            dom = await JSDOM.fromFile(path.resolve(__dirname, '..', './public/hello/index.html'));
-        });
-
-        it('should display the hello world heading', async () => {
-            let heading = dom.window.document.querySelector('h3.wc-md-hello').textContent;
-
-            expect(heading).to.equal('Hello World');
-        });
-
-        it('should display the hello world text', async () => {
-            let paragraph = dom.window.document.querySelector('p.wc-md-hello').textContent;
-
-            expect(paragraph).to.equal('This is an example page built by Greenwood.  Make your own in src/pages!');
-        });
+    describe('using default greenwood template', () => {
+        whenSerialized('Hello World', 'This is an example page built by Greenwood.  Make your own in src/pages!');
     });
+
+    describe('with a correct user templates directory', () => {
+        before(async() => {
+            // copy test app
+            await fs.copy(CONFIG.testApp, CONFIG.usrSrc);
+        });
+        whenSerialized('Hello World', 'This is an example page built by Greenwood.  Make your own in src/pages!');
+        after(async() => {
+            // remove test app
+            await fs.remove(CONFIG.usrSrc);
+        })
+    }); 
 
     after(async() => {
         await fs.remove(CONFIG.publicDir);
         await fs.remove(CONFIG.scratchDir);
     });
 });
-
