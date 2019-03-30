@@ -9,7 +9,7 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
         let result = data.toString().replace(/entry/g, `wc-md-${file.label}`);
 
         result = result.replace(/page-template/g, `eve-${file.label}`);
-        result = result.replace(/MDIMPORT/, `import '${file.import}';`);
+        result = result.replace(/MDIMPORT;/, `import '${file.import}';`);
 
         resolve(result);
       } catch (err) {
@@ -25,7 +25,7 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
           let result = await createPageComponent(file);
 
           // create page directory
-          await fs.mkdirSync(path.join(config.scratchDir, file.label))
+          await fs.mkdirSync(path.join(config.scratchDir, file.label));
 
           // create page in page directory
           await fs.writeFileSync(path.join(config.scratchDir, `${file.label}/${file.label}.js`), result);
@@ -76,6 +76,7 @@ const writeRoutes = async(config, compilation) => {
   });
 };
 
+// eslint-disable-next-line no-unused-vars
 const setupIndex = async(config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -98,20 +99,19 @@ const copyMarkdownForPages = async(config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
       compilation.graph.map((file) => {
-        if(file.label !== 'index') {
+        if (file.label !== 'index') {
           fs.copyFileSync(
             path.join(config.pagesDir, `${file.label}.md`), 
             path.join(config.scratchDir, `${file.label}/${file.label}.md`)
           );
         }
-      })
+      });
       resolve();
     } catch (err) {
       reject(err);
     }
   });
 };
-
 
 module.exports = generateScaffolding = async (config, compilation) => {
   return new Promise(async (resolve, reject) => {
