@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf ./.greenwood && rimraf ./public",
-    "lint": "eslint \"./packages/**/**/*.js\"",
+    "lint": "eslint \"./packages/**/**/*.js\" \"./test/**/**/*.js\"",
     "build": "node ./packages/cli/index.js",
     "serve": "yarn clean && yarn build && cd ./public && ws",
     "test": "mocha test --timeout 15000"
