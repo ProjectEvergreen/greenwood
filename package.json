@@ -10,7 +10,7 @@
     "clean": "rimraf ./.greenwood && rimraf ./public",
     "build": "node ./packages/cli/index.js",
     "serve": "yarn clean && yarn build && cd ./public && ws",
-    "test": "mocha --timeout 15000 --recursive test"
+    "test": "mocha test --timeout 15000"
   },
   "dependencies": {
     "@babel/core": "^7.4.0",

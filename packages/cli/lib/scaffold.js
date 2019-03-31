@@ -43,11 +43,15 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
 const writeListImportFile = async (config, compilation) => {
   let arr = compilation.graph.map(file => {
     if (file.label !== 'index') {
-      return `import './${file.label}/${file.label}.js';\n`;
+      return `import '../${file.label}/${file.label}.js';\n`;
     }
   });
 
-  return await fs.writeFileSync(path.join(config.scratchDir, './list.js'), arr.join(''));
+  /// Create app directory so that app-template relative imports are correct
+  const appDir = path.join(config.scratchDir, 'app');
+  await fs.mkdirSync(appDir);
+  
+  return await fs.writeFileSync(path.join(appDir, './list.js'), arr.join(''));
 };
 
 const writeRoutes = async(config, compilation) => {
@@ -63,7 +67,7 @@ const writeRoutes = async(config, compilation) => {
 
       const result = data.toString().replace(/MYROUTES/g, routes.join(''));
 
-      await fs.writeFileSync(path.join(config.scratchDir, './app.js'), result);
+      await fs.writeFileSync(path.join(config.scratchDir, 'app', './app.js'), result);
 
       resolve();
     } catch (err) {
@@ -75,8 +79,14 @@ const writeRoutes = async(config, compilation) => {
 const setupIndex = async(config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
-      fs.copyFileSync(path.join(config.pagesDir, './index.js'), path.join(config.scratchDir, 'index.js'));
-      fs.copyFileSync(path.join(config.templatesDir, './index.html'), path.join(config.scratchDir, 'index.html'));
+      const componentDir = !config.default ? 'components' : 'app' ;
+      const homeCompPath = path.join(config.scratchDir, componentDir)
+      
+      if(!config.default) {
+        fs.mkdirSync(homeCompPath);
+      }
+      fs.copyFileSync(config.rootComponent, path.join(homeCompPath, 'index.js'));
+      fs.copyFileSync(config.rootIndex, path.join(config.scratchDir, 'index.html'));
       resolve();
     } catch (err) {
       reject(err);
