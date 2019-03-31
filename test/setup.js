@@ -24,6 +24,7 @@ module.exports = class Setup {
         if (this.enableStdOut) {
           console.log(err); // eslint-disable-line
         }
+        reject(err);
       });
       npm.stdout.on('data', (data) => {
         if (this.enableStdOut) {
