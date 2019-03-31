@@ -85,7 +85,7 @@ const setupIndex = async(config, compilation) => {
       if(!config.default) {
         fs.mkdirSync(homeCompPath);
       }
-      fs.copyFileSync(config.homeComponent, path.join(homeCompPath, 'index.js'));
+      fs.copyFileSync(config.rootComponent, path.join(homeCompPath, 'index.js'));
       fs.copyFileSync(config.rootIndex, path.join(config.scratchDir, 'index.html'));
       resolve();
     } catch (err) {

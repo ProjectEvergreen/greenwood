@@ -11,7 +11,7 @@ const CONFIG = {
     scratchDir: path.join(__dirname, '..', './.greenwood/'),
     templatesDir: path.join(__dirname, '../packages/cli/templates/'),
     publicDir: path.join(__dirname, '..', './public'),
-    testApp: path.join(__dirname, 'test-app', 'src'),
+    testApp: path.join(__dirname, 'fixtures', 'mock-app', 'src'),
     usrSrc: path.join(__dirname, '..', 'src'),
     usrTemplate: path.join(__dirname, '..', 'src', 'templates')
 };

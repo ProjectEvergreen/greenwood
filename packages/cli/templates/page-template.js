@@ -1,5 +1,4 @@
 import { html, LitElement } from 'lit-element';
-// import css from '../templates/theme.css';
 MDIMPORT
 
 class PageTemplate extends LitElement {
@@ -15,7 +14,3 @@ class PageTemplate extends LitElement {
 }
 
 customElements.define('page-template', PageTemplate);
-
-// <!-- <style>
-// ${css}
-// </style> -->
