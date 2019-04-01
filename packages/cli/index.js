@@ -27,9 +27,6 @@ const run = async() => {
   };
 
   try {
-    if (!fs.existsSync(CONFIG.scratchDir)) {
-      fs.mkdirSync(CONFIG.scratchDir);
-    }
 
     console.log('-------------------------------------'.green);
     console.log('---Greenwood Static Site Generator---'.green);
