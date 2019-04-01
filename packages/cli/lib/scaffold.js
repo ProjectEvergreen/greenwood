@@ -49,6 +49,7 @@ const writeListImportFile = async (config, compilation) => {
 
   /// Create app directory so that app-template relative imports are correct
   const appDir = path.join(config.scratchDir, 'app');
+
   await fs.mkdirSync(appDir);
   
   return await fs.writeFileSync(path.join(appDir, './list.js'), arr.join(''));
@@ -80,10 +81,10 @@ const writeRoutes = async(config, compilation) => {
 const setupIndex = async(config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const componentDir = !config.default ? 'components' : 'app' ;
-      const homeCompPath = path.join(config.scratchDir, componentDir)
+      const componentDir = !config.default ? 'components' : 'app';
+      const homeCompPath = path.join(config.scratchDir, componentDir);
       
-      if(!config.default) {
+      if (!config.default) {
         fs.mkdirSync(homeCompPath);
       }
       fs.copyFileSync(config.rootComponent, path.join(homeCompPath, 'index.js'));
