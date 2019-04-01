@@ -1,5 +1,4 @@
 require('colors');
-const fs = require('fs');
 const path = require('path');
 
 const initDirectories = require('./lib/init');
