@@ -59,8 +59,8 @@ describe('after building greenwood', () => {
         it('should display an error if app-template.js is missing', async () => {
             // add blank page-template
             await fs.writeFileSync(path.join(CONFIG.usrTemplate, 'page-template.js'), '');
-            await setup.run(['./packages/cli/index.js'], '').catch((err) => {
-                expect(err).to.contain("It looks like you don't have an app template defined. ");            
+            await setup.run(['./packages/cli/index.js'], '').catch(err => {
+                expect(err).to.contain("It looks like you don't have an app template defined. ");
             });
         });
 
