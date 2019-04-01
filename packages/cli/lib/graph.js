@@ -28,6 +28,7 @@ const createGraphFromPages = async (pagesDir) => {
   });
 };
 
+// eslint-disable-next-line no-unused-vars
 module.exports = generateGraph = async (config, compilation) => {
 
   return new Promise(async (resolve, reject) => {
