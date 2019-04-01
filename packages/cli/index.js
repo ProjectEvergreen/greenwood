@@ -1,5 +1,4 @@
 require('colors');
-const fs = require('fs');
 const path = require('path');
 
 const initDirectories = require('./lib/init');
@@ -39,6 +38,7 @@ const run = async() => {
     // generate a graph of all pages / components to build
     console.log('Generating graph of project files...');
     let graph = await generateGraph(CONFIG, compilation);
+
     compilation.graph = compilation.graph.concat(graph);
     
     // generate scaffolding
@@ -57,7 +57,7 @@ const run = async() => {
     // console.log('Serve with: '.cyan + 'greenwood --serve'.green);
     console.log('...................................'.yellow);
 
-    process.exit(0);
+    process.exit(0); // eslint-disable-line no-process-exit
   } catch (err) {
     console.error(err);
   }
