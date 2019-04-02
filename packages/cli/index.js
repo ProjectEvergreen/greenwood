@@ -54,16 +54,12 @@ const run = async() => {
       // "serialize" our SPA into a static site
       await serializeBuild(CONFIG, compilation);
 
-<<<<<<< HEAD
       console.log('...................................'.yellow);
       console.log('Static site generation complete!');
       // console.log('Serve with: '.cyan + 'greenwood --serve'.green);
       console.log('...................................'.yellow);
     }   
-    process.exit(0);
-=======
     process.exit(0); // eslint-disable-line no-process-exit
->>>>>>> rfc-user-workspace
   } catch (err) {
     console.error(err);
     process.exit(1); // eslint-disable-line no-process-exit

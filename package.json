@@ -8,11 +8,11 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf ./.greenwood && rimraf ./public",
-    "build": "yarn clean && node ./packages/cli/index.js",
-    "serve": "yarn build && cd ./public && ws",
+    "build": "node ./packages/cli/index.js",
+    "serve": "yarn clean && yarn build && cd ./public && ws",
     "dev": "yarn dev-build && concurrently \"yarn dev-serve\" \"yarn dev-watch\"",
     "dev-build": "export NODE_ENV=development && yarn build",
-    "dev-watch": "nodemon -e js,md,css,html --exec 'yarn dev-build'",
+    "dev-watch": "nodemon --watch src --exec 'yarn dev-build'",
     "dev-serve": "webpack-dev-server --config ./packages/cli/config/webpack.config.develop.js --open",
     "test": "mocha --timeout 15000 --recursive test"
   },
