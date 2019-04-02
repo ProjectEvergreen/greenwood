@@ -1,6 +1,7 @@
 import { html, LitElement } from 'lit-element';
-import '../components/header/header';
 import css from '../styles/template.css';
+import css2 from '../styles/theme.css';
+
 MDIMPORT;
 
 class PageTemplate extends LitElement {
@@ -8,10 +9,9 @@ class PageTemplate extends LitElement {
     return html`
       <style>
         ${css}
+        ${css2}
       </style>
       <div class='wrapper'>
-        <eve-header></eve-header>
-        <h1>Page Template Example</h1>
         <div class='page-template content'>
           <entry></entry>
         </div>

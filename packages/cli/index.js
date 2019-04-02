@@ -22,7 +22,7 @@ let CONFIG = {
 const run = async() => {
 
   let compilation = {
-    graph: [{ label: 'index', path: '/', template: 'page' }]
+    graph: []
   };
 
   try {
