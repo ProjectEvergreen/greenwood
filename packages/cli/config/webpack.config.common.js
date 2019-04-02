@@ -1,6 +1,25 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const fs = require('fs-extra');
 const webpack = require('webpack');
+
+const userLand = path.join(process.cwd(), 'src');
+const defaultTemplate = path.join(__dirname, '../templates/');
+let CONFIG = {
+  componentDir: defaultTemplate,
+  assetDir: defaultTemplate,
+  stylesDir: defaultTemplate,
+  pagesDir: defaultTemplate
+};
+
+if (fs.existsSync(userLand)) {
+  CONFIG = {
+    componentDir: path.join(userLand, 'components/'),
+    assetDir: path.join(userLand, 'assets/'),
+    stylesDir: path.join(userLand, 'styles/'),
+    pagesDir: path.join(userLand, 'pages/')
+  };
+}
 
 module.exports = {
 
@@ -65,22 +84,22 @@ module.exports = {
     new webpack.NormalModuleReplacementPlugin(
       /components/,
       (resource) => {
-        resource.request = resource.request.replace(/\.\.\/components/, path.join(process.cwd(), './src/components'));
+        resource.request = resource.request.replace(/\.\.\/components/, CONFIG.componentDir);
       }),
     new webpack.NormalModuleReplacementPlugin(
       /styles/,
       (resource) => {
-        resource.request = resource.request.replace(/\.\.\/styles/, path.join(process.cwd(), './src/styles'));
+        resource.request = resource.request.replace(/\.\.\/styles/, CONFIG.stylesDir);
       }),
     new webpack.NormalModuleReplacementPlugin(
       /assets/,
       (resource) => {
-        resource.request = resource.request.replace(/\.\.\/assets/, path.join(process.cwd(), './src/assets'));
+        resource.request = resource.request.replace(/\.\.\/assets/, CONFIG.assetDir);
       }),
     new webpack.NormalModuleReplacementPlugin(
       /\.md/,
       (resource) => {
-        resource.request = resource.request.replace(/^\.\//, path.join(process.cwd(), './src/pages/'));
+        resource.request = resource.request.replace(/^\.\//, CONFIG.pagesDir);
       }),
     new HtmlWebpackPlugin({
       template: path.join(process.cwd(), '.greenwood', 'index.html'),
