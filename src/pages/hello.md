@@ -3,7 +3,7 @@ path: '/hello'
 label: 'hello'
 template: 'page'
 imports:
-  CSS: '../templates/theme.css'
+  CSS: '../styles/theme.css'
 ---
 
 ### Test App
