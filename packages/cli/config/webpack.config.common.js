@@ -63,22 +63,22 @@ module.exports = {
 
   plugins: [
     new webpack.NormalModuleReplacementPlugin(
-      /components+/gm,
+      /components/,
       (resource) => {
         resource.request = resource.request.replace(/\.\.\/components/, path.join(process.cwd(), './src/components'));
       }),
     new webpack.NormalModuleReplacementPlugin(
-      /styles+/gm,
+      /styles/,
       (resource) => {
         resource.request = resource.request.replace(/\.\.\/styles/, path.join(process.cwd(), './src/styles'));
       }),
     new webpack.NormalModuleReplacementPlugin(
-      /styles+/gm,
+      /assets/,
       (resource) => {
         resource.request = resource.request.replace(/\.\.\/assets/, path.join(process.cwd(), './src/assets'));
       }),
     new webpack.NormalModuleReplacementPlugin(
-      /\.md+/gm,
+      /\.md/,
       (resource) => {
         resource.request = resource.request.replace(/^\.\//, path.join(process.cwd(), './src/pages/'));
       }),
