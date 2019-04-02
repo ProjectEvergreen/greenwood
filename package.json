@@ -15,7 +15,7 @@
     "dev-build": "export NODE_ENV=development && yarn build",
     "dev-watch": "nodemon --watch src --exec 'yarn dev-build'",
     "dev-serve": "webpack-dev-server --config ./packages/cli/config/webpack.config.develop.js --open",
-    "test": "mocha --timeout 15000 --recursive test"
+    "test": "mocha --timeout 15000"
   },
   "dependencies": {
     "@babel/core": "^7.4.0",
