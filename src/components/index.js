@@ -5,7 +5,7 @@ class index extends LitElement {
     return html`
       <h1>Greenwood</h1>
       <div>
-        This22 is the home page built by Greenwood. Make your own pages in <i>src/pages/index.js</i>!
+        This is the home page built by Greenwood. Make your own pages in <i>src/pages/index.js</i>!
       </div>
     `;
   }
