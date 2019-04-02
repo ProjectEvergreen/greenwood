@@ -1,5 +1,5 @@
 import { html, LitElement } from 'lit-element';
-import '../components/header';
+import '../components/header/header';
 import css from '../styles/template.css';
 MDIMPORT;
 
