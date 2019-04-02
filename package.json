@@ -8,6 +8,7 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf ./.greenwood && rimraf ./public",
+    "lint": "eslint \"./packages/**/**/*.js\" \"./test/**/**/*.js\"",
     "build": "node ./packages/cli/index.js",
     "serve": "yarn clean && yarn build && cd ./public && ws",
     "dev": "yarn dev-build && concurrently \"yarn dev-serve\" \"yarn dev-watch\"",
