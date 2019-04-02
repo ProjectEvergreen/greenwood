@@ -1,0 +1,30 @@
+:host {
+  & .navigation {
+    grid-area: nav;
+    background-color: #006400;
+    width: 100%;
+
+    & ul {
+      width: 30%;
+      margin: 0 auto;
+      padding: 5px 0;
+    }
+
+    & ul li {
+      list-style: none;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    & a {
+      color: #0C1824;
+    }
+  }
+  @media (min-width: 500px) {
+    & nav ul {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}
+

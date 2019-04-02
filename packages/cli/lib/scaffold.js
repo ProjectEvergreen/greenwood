@@ -9,7 +9,7 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
         let result = data.toString().replace(/entry/g, `wc-md-${file.label}`);
 
         result = result.replace(/page-template/g, `eve-${file.label}`);
-        result = result.replace(/MDIMPORT/, `import '${file.import}';`);
+        result = result.replace(/MDIMPORT;/, `import '${file.import}';`);
 
         resolve(result);
       } catch (err) {
@@ -19,35 +19,36 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
   };
 
   return Promise.all(compilation.graph.map(file => {
-    if (file.label !== 'index') {
-      return new Promise(async(resolve, reject) => {
-        try {
-          let result = await createPageComponent(file);
+    return new Promise(async(resolve, reject) => {
+      try {
+        let result = await createPageComponent(file);
 
-          // create page directory
-          await fs.mkdirSync(path.join(config.scratchDir, file.label))
+        // create page directory
+        await fs.mkdirSync(path.join(config.scratchDir, file.label));
 
-          // create page in page directory
-          await fs.writeFileSync(path.join(config.scratchDir, `${file.label}/${file.label}.js`), result);
-          
-          resolve();
-        } catch (err) {
-          reject(err);
-        }
-      });
-    }
+        // create page in page directory
+        await fs.writeFileSync(path.join(config.scratchDir, `${file.label}/${file.label}.js`), result);
+        
+        resolve();
+      } catch (err) {
+        reject(err);
+      }
+    });
   }));
 
 };
 
 const writeListImportFile = async (config, compilation) => {
   let arr = compilation.graph.map(file => {
-    if (file.label !== 'index') {
-      return `import './${file.label}/${file.label}.js';\n`;
-    }
+    return `import '../${file.label}/${file.label}.js';\n`;
   });
 
-  return await fs.writeFileSync(path.join(config.scratchDir, './list.js'), arr.join(''));
+  /// Create app directory so that app-template relative imports are correct
+  const appDir = path.join(config.scratchDir, 'app');
+
+  await fs.mkdirSync(appDir);
+  
+  return await fs.writeFileSync(path.join(appDir, './list.js'), arr.join(''));
 };
 
 const writeRoutes = async(config, compilation) => {
@@ -63,7 +64,7 @@ const writeRoutes = async(config, compilation) => {
 
       const result = data.toString().replace(/MYROUTES/g, routes.join(''));
 
-      await fs.writeFileSync(path.join(config.scratchDir, './app.js'), result);
+      await fs.writeFileSync(path.join(config.scratchDir, 'app', './app.js'), result);
 
       resolve();
     } catch (err) {
@@ -72,36 +73,17 @@ const writeRoutes = async(config, compilation) => {
   });
 };
 
+// eslint-disable-next-line no-unused-vars
 const setupIndex = async(config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
-      fs.copyFileSync(path.join(config.pagesDir, './index.js'), path.join(config.scratchDir, 'index.js'));
-      fs.copyFileSync(path.join(config.templatesDir, './index.html'), path.join(config.scratchDir, 'index.html'));
+      fs.copyFileSync(config.rootIndex, path.join(config.scratchDir, 'index.html'));
       resolve();
     } catch (err) {
       reject(err);
     }
   });
 };
-
-const copyMarkdownForPages = async(config, compilation) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      compilation.graph.map((file) => {
-        if(file.label !== 'index') {
-          fs.copyFileSync(
-            path.join(config.pagesDir, `${file.label}.md`), 
-            path.join(config.scratchDir, `${file.label}/${file.label}.md`)
-          );
-        }
-      })
-      resolve();
-    } catch (err) {
-      reject(err);
-    }
-  });
-};
-
 
 module.exports = generateScaffolding = async (config, compilation) => {
   return new Promise(async (resolve, reject) => {
@@ -111,9 +93,6 @@ module.exports = generateScaffolding = async (config, compilation) => {
 
       console.log('Writing imports for md...');
       await writeListImportFile(config, compilation);
-
-      console.log('Copying mardkown for pages');
-      await copyMarkdownForPages(config, compilation);
 
       console.log('Writing Lit routes...');
       await writeRoutes(config, compilation);

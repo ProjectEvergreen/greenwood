@@ -12,6 +12,8 @@ const store = createStore(
   (state, action) => state, // eslint-disable-line
   compose(lazyReducerEnhancer(combineReducers), applyMiddleware(thunk)));
 
+import '../components/header/header';
+import '../components/navigation/navigation';
 import '../index/index.js';
 import './list';
 
@@ -20,6 +22,8 @@ connectRouter(store);
 class AppComponent extends LitElement {
   render() {
     return html`
+        <eve-header></eve-header>
+        <eve-navigation></eve-navigation>
         <lit-route path="/" component="eve-index"></lit-route>
         MYROUTES
     `;
