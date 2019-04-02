@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
 
@@ -61,6 +62,26 @@ module.exports = {
   },
 
   plugins: [
+    new webpack.NormalModuleReplacementPlugin(
+      /components+/gm,
+      (resource) => {
+        resource.request = resource.request.replace(/\.\.\/components/, path.join(process.cwd(), './src/components'));
+      }),
+    new webpack.NormalModuleReplacementPlugin(
+      /styles+/gm,
+      (resource) => {
+        resource.request = resource.request.replace(/\.\.\/styles/, path.join(process.cwd(), './src/styles'));
+      }),
+    new webpack.NormalModuleReplacementPlugin(
+      /styles+/gm,
+      (resource) => {
+        resource.request = resource.request.replace(/\.\.\/assets/, path.join(process.cwd(), './src/assets'));
+      }),
+    new webpack.NormalModuleReplacementPlugin(
+      /\.md+/gm,
+      (resource) => {
+        resource.request = resource.request.replace(/^\.\//, path.join(process.cwd(), './src/pages/'));
+      }),
     new HtmlWebpackPlugin({
       template: path.join(process.cwd(), '.greenwood', 'index.html'),
       chunksSortMode: 'dependency'

@@ -81,13 +81,13 @@ const writeRoutes = async(config, compilation) => {
 const setupIndex = async(config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const componentDir = !config.default ? 'components' : 'app';
-      const homeCompPath = path.join(config.scratchDir, componentDir);
+      // const componentDir = !config.default ? 'components' : 'app';
+      // const homeCompPath = path.join(config.scratchDir, componentDir);
       
       if (!config.default) {
-        fs.mkdirSync(homeCompPath);
+        // fs.mkdirSync(homeCompPath);
       }
-      fs.copyFileSync(config.rootComponent, path.join(homeCompPath, 'index.js'));
+      // fs.copyFileSync(config.rootComponent, path.join(homeCompPath, 'index.js'));
       fs.copyFileSync(config.rootIndex, path.join(config.scratchDir, 'index.html'));
       resolve();
     } catch (err) {
@@ -96,6 +96,7 @@ const setupIndex = async(config, compilation) => {
   });
 };
 
+// eslint-disable-next-line no-unused-vars
 const copyMarkdownForPages = async(config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -123,8 +124,8 @@ module.exports = generateScaffolding = async (config, compilation) => {
       console.log('Writing imports for md...');
       await writeListImportFile(config, compilation);
 
-      console.log('Copying mardkown for pages');
-      await copyMarkdownForPages(config, compilation);
+      // console.log('Copying mardkown for pages');
+      // await copyMarkdownForPages(config, compilation);
 
       console.log('Writing Lit routes...');
       await writeRoutes(config, compilation);
