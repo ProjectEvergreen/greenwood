@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const webpack = require('webpack');
 
-const userLand = path.join(process.cwd(), 'src');
+const userWorkspace = path.join(process.cwd(), 'src');
 const defaultTemplate = path.join(__dirname, '../templates/');
 let CONFIG = {
   componentDir: defaultTemplate,
@@ -12,12 +12,12 @@ let CONFIG = {
   pagesDir: defaultTemplate
 };
 
-if (fs.existsSync(userLand)) {
+if (fs.existsSync(userWorkspace)) {
   CONFIG = {
-    componentDir: path.join(userLand, 'components/'),
-    assetDir: path.join(userLand, 'assets/'),
-    stylesDir: path.join(userLand, 'styles/'),
-    pagesDir: path.join(userLand, 'pages/')
+    componentDir: path.join(userWorkspace, 'components/'),
+    assetDir: path.join(userWorkspace, 'assets/'),
+    stylesDir: path.join(userWorkspace, 'styles/'),
+    pagesDir: path.join(userWorkspace, 'pages/')
   };
 }
 
