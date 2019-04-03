@@ -1,5 +1,32 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const fs = require('fs');
+const webpack = require('webpack');
+
+const isDirectory = source => fs.lstatSync(source).isDirectory();
+const getUserWorkspaceDirectories = (source) => {
+  return fs.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory);
+};
+
+// TODO get userWorkspace and pagesDir from greenwood config?
+// https://github.com/ProjectEvergreen/greenwood/issues/11
+const userWorkspace = fs.existsSync(path.join(process.cwd(), 'src'))
+  ? path.join(process.cwd(), 'src')
+  : path.join(__dirname, '..', 'templates/');
+
+const pagesDir = fs.existsSync(path.join(process.cwd(), 'src', 'pages'))
+  ? path.join(process.cwd(), 'src', 'pages/')
+  : path.join(__dirname, '..', 'templates/');
+
+const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(userWorkspace).map((userPath) => {
+  const directory = userPath.split('/')[userPath.split('/').length - 1];
+
+  return new webpack.NormalModuleReplacementPlugin(
+    new RegExp(`${directory}`),
+    (resource) => {
+      resource.request = resource.request.replace(new RegExp(`\.\.\/${directory}`), userPath);
+    });
+});
 
 module.exports = {
 
@@ -61,6 +88,14 @@ module.exports = {
   },
 
   plugins: [
+    ...mappedUserDirectoriesForWebpack,
+
+    new webpack.NormalModuleReplacementPlugin(
+      /\.md/,
+      (resource) => {
+        resource.request = resource.request.replace(/^\.\//, pagesDir);
+      }),
+    
     new HtmlWebpackPlugin({
       template: path.join(process.cwd(), '.greenwood', 'index.html'),
       chunksSortMode: 'dependency'
