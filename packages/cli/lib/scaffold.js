@@ -23,12 +23,34 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
       try {
         let result = await createPageComponent(file);
 
-        // create page directory
-        await fs.mkdirSync(path.join(config.scratchDir, file.label));
-
-        // create page in page directory
-        await fs.writeFileSync(path.join(config.scratchDir, `${file.label}/${file.label}.js`), result);
+        let relPageDir = file.filePath.substring(config.pagesDir.length, file.filePath.length);
         
+        // console.log(relPageDir);
+
+        if (relPageDir.lastIndexOf('/') !== 0) {
+          let subDir = relPageDir.substring(1, relPageDir.length).split('/');
+          let nestedPath = '';
+
+          await Promise.all(subDir.map(async (dir, it) => {
+            if (it !== subDir.length - 1) {
+              nestedPath = path.join(nestedPath, dir);
+
+              if (!fs.existsSync(path.join(config.scratchDir, nestedPath))) {
+                return await fs.mkdirSync(path.join(config.scratchDir, nestedPath));
+              }
+            }
+          }));
+          // fs.mkdirSync(target, { recursive: true }); possible refactor
+          // create page directory
+          await fs.mkdirSync(path.join(config.scratchDir, nestedPath, file.label));
+          // create page in page directory
+          await fs.writeFileSync(path.join(config.scratchDir, nestedPath, `${file.label}/${file.label}.js`), result);
+        } else {
+          // create page directory
+          await fs.mkdirSync(path.join(config.scratchDir, file.label));
+          // create page in page directory
+          await fs.writeFileSync(path.join(config.scratchDir, `${file.label}/${file.label}.js`), result);
+        }
         resolve();
       } catch (err) {
         reject(err);
@@ -40,7 +62,7 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
 
 const writeListImportFile = async (config, compilation) => {
   let arr = compilation.graph.map(file => {
-    return `import '../${file.label}/${file.label}.js';\n`;
+    return `import ${file.relativeExpectedPath};\n`;
   });
 
   /// Create app directory so that app-template relative imports are correct

@@ -37,7 +37,7 @@ const run = async() => {
 
     // generate a graph of all pages / components to build
     console.log('Generating graph of project files...');
-    let graph = await generateGraph(CONFIG, compilation);
+    let graph = await generateGraph(CONFIG);
 
     compilation.graph = compilation.graph.concat(graph);
     

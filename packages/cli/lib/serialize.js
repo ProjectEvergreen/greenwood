@@ -11,7 +11,7 @@ const runBrowser = async (config, compilation) => {
     return await Promise.all(compilation.graph.map(file => {
       const path = file.path === '/' ? '' : file.path;
       
-      return browserRunner(`http://127.0.0.1:${PORT}${path}`, file.label, config.publicDir);
+      return browserRunner(`http://127.0.0.1:${PORT}${path}`, file.label, file.path, config.publicDir);
     }));
   } catch (err) {
     // eslint-disable-next-line no-console
