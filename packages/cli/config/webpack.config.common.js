@@ -1,25 +1,32 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
-const fs = require('fs-extra');
+const fs = require('fs');
 const webpack = require('webpack');
 
-const userWorkspace = path.join(process.cwd(), 'src');
-const defaultTemplate = path.join(__dirname, '../templates/');
-let CONFIG = {
-  componentDir: defaultTemplate,
-  assetDir: defaultTemplate,
-  stylesDir: defaultTemplate,
-  pagesDir: defaultTemplate
+const isDirectory = source => fs.lstatSync(source).isDirectory();
+const getUserWorkspaceDirectories = (source) => {
+  return fs.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory);
 };
 
-if (fs.existsSync(userWorkspace)) {
-  CONFIG = {
-    componentDir: path.join(userWorkspace, 'components/'),
-    assetDir: path.join(userWorkspace, 'assets/'),
-    stylesDir: path.join(userWorkspace, 'styles/'),
-    pagesDir: path.join(userWorkspace, 'pages/')
-  };
-}
+// TODO get userWorkspace and pagesDir from greenwood config?
+// https://github.com/ProjectEvergreen/greenwood/issues/11
+const userWorkspace = fs.existsSync(path.join(process.cwd(), 'src'))
+  ? path.join(process.cwd(), 'src')
+  : path.join(__dirname, '..', 'templates/');
+
+const pagesDir = fs.existsSync(path.join(process.cwd(), 'src', 'pages'))
+  ? path.join(process.cwd(), 'src', 'pages/')
+  : path.join(__dirname, '..', 'templates/');
+
+const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(userWorkspace).map((userPath) => {
+  const directory = userPath.split('/')[userPath.split('/').length - 1];
+
+  return new webpack.NormalModuleReplacementPlugin(
+    new RegExp(`${directory}`),
+    (resource) => {
+      resource.request = resource.request.replace(new RegExp(`\.\.\/${directory}`), userPath);
+    });
+});
 
 module.exports = {
 
@@ -81,26 +88,14 @@ module.exports = {
   },
 
   plugins: [
-    new webpack.NormalModuleReplacementPlugin(
-      /components/,
-      (resource) => {
-        resource.request = resource.request.replace(/\.\.\/components/, CONFIG.componentDir);
-      }),
-    new webpack.NormalModuleReplacementPlugin(
-      /styles/,
-      (resource) => {
-        resource.request = resource.request.replace(/\.\.\/styles/, CONFIG.stylesDir);
-      }),
-    new webpack.NormalModuleReplacementPlugin(
-      /assets/,
-      (resource) => {
-        resource.request = resource.request.replace(/\.\.\/assets/, CONFIG.assetDir);
-      }),
+    ...mappedUserDirectoriesForWebpack,
+
     new webpack.NormalModuleReplacementPlugin(
       /\.md/,
       (resource) => {
-        resource.request = resource.request.replace(/^\.\//, CONFIG.pagesDir);
+        resource.request = resource.request.replace(/^\.\//, pagesDir);
       }),
+    
     new HtmlWebpackPlugin({
       template: path.join(process.cwd(), '.greenwood', 'index.html'),
       chunksSortMode: 'dependency'
