@@ -9,6 +9,7 @@ const getUserWorkspaceDirectories = (source) => {
 };
 
 // TODO get userWorkspace and pagesDir from greenwood config?
+// https://github.com/ProjectEvergreen/greenwood/issues/11
 const userWorkspace = fs.existsSync(path.join(process.cwd(), 'src'))
   ? path.join(process.cwd(), 'src')
   : path.join(__dirname, '..', 'templates/');

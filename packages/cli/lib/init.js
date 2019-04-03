@@ -22,8 +22,6 @@ module.exports = initDirectories = async(config) => {
           'Please include an app-template.js in your templates directory. \n' +
           'See https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js');
         }
-        /// set homepage component to user's ./src/component directory instead of def templates folder
-        config.homeComponent = path.join(process.cwd(), './src/components', 'index.js');  
         /// set templates directory to user's src/templates directory
         config.templatesDir = usrTemplateDir;
         /// set default flag that we're using a user template
