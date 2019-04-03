@@ -11,8 +11,7 @@
     "lint": "eslint \"./packages/**/**/*.js\" \"./test/**/**/*.js\"",
     "build": "node ./packages/cli/index.js",
     "serve": "yarn clean && yarn build && cd ./public && ws",
-    "test": "mocha test --timeout 15000",
-    "prod-test": "webpack --config ./packages/cli/config/webpack.config.prod.js --progress --debug --display verbose"
+    "test": "mocha test --timeout 15000"
   },
   "dependencies": {
     "@babel/core": "^7.4.0",
