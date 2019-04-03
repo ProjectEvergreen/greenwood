@@ -22,7 +22,7 @@ let CONFIG = {
 const run = async() => {
 
   let compilation = {
-    graph: [{ label: 'index', path: '/', template: 'page' }]
+    graph: []
   };
 
   try {
@@ -60,6 +60,7 @@ const run = async() => {
     process.exit(0); // eslint-disable-line no-process-exit
   } catch (err) {
     console.error(err);
+    process.exit(1); // eslint-disable-line no-process-exit
   }
 };
 

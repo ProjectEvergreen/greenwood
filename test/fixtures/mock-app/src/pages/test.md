@@ -1,12 +1,12 @@
 ---
-path: '/hello'
-label: 'hello'
+path: '/test'
+label: 'test'
 template: 'page'
 imports:
   CSS: '../styles/theme.css'
 ---
 
-### Test App
+### Testing App
 
 This is a test app using a custom user template!
 

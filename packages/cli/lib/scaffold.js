@@ -19,32 +19,28 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
   };
 
   return Promise.all(compilation.graph.map(file => {
-    if (file.label !== 'index') {
-      return new Promise(async(resolve, reject) => {
-        try {
-          let result = await createPageComponent(file);
+    return new Promise(async(resolve, reject) => {
+      try {
+        let result = await createPageComponent(file);
 
-          // create page directory
-          await fs.mkdirSync(path.join(config.scratchDir, file.label));
+        // create page directory
+        await fs.mkdirSync(path.join(config.scratchDir, file.label));
 
-          // create page in page directory
-          await fs.writeFileSync(path.join(config.scratchDir, `${file.label}/${file.label}.js`), result);
-          
-          resolve();
-        } catch (err) {
-          reject(err);
-        }
-      });
-    }
+        // create page in page directory
+        await fs.writeFileSync(path.join(config.scratchDir, `${file.label}/${file.label}.js`), result);
+        
+        resolve();
+      } catch (err) {
+        reject(err);
+      }
+    });
   }));
 
 };
 
 const writeListImportFile = async (config, compilation) => {
   let arr = compilation.graph.map(file => {
-    if (file.label !== 'index') {
-      return `import '../${file.label}/${file.label}.js';\n`;
-    }
+    return `import '../${file.label}/${file.label}.js';\n`;
   });
 
   /// Create app directory so that app-template relative imports are correct
@@ -81,32 +77,7 @@ const writeRoutes = async(config, compilation) => {
 const setupIndex = async(config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const componentDir = !config.default ? 'components' : 'app';
-      const homeCompPath = path.join(config.scratchDir, componentDir);
-      
-      if (!config.default) {
-        fs.mkdirSync(homeCompPath);
-      }
-      fs.copyFileSync(config.rootComponent, path.join(homeCompPath, 'index.js'));
       fs.copyFileSync(config.rootIndex, path.join(config.scratchDir, 'index.html'));
-      resolve();
-    } catch (err) {
-      reject(err);
-    }
-  });
-};
-
-const copyMarkdownForPages = async(config, compilation) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      compilation.graph.map((file) => {
-        if (file.label !== 'index') {
-          fs.copyFileSync(
-            path.join(config.pagesDir, `${file.label}.md`), 
-            path.join(config.scratchDir, `${file.label}/${file.label}.md`)
-          );
-        }
-      });
       resolve();
     } catch (err) {
       reject(err);
@@ -122,9 +93,6 @@ module.exports = generateScaffolding = async (config, compilation) => {
 
       console.log('Writing imports for md...');
       await writeListImportFile(config, compilation);
-
-      console.log('Copying mardkown for pages');
-      await copyMarkdownForPages(config, compilation);
 
       console.log('Writing Lit routes...');
       await writeRoutes(config, compilation);

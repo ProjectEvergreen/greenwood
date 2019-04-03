@@ -1,0 +1,39 @@
+:host {
+    & h1 {
+        color: green;
+    }
+
+    & .content {
+    grid-area: content;
+    min-height: 400px;
+    padding: 10px 30% 0 0;
+
+    & h1 {
+      margin: 5px 0;
+    }
+
+    & a {
+      color: #006400;
+    }
+  }
+
+  & .wrapper {
+    display: grid;
+    grid-template-areas:
+      "header"
+      "nav"
+      "sidebar"
+      "content"
+      "footer";
+  }
+  @media (min-width: 500px) {
+    & .wrapper {
+      grid-template-columns: 1fr 3fr;
+      grid-template-areas:
+        "header  header"
+        "nav     nav"
+        "sidebar content"
+        "footer  footer";
+    }
+  }
+}
