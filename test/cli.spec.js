@@ -106,13 +106,18 @@ describe('after building greenwood', () => {
     });
   });
 
-  describe('with a correct user templates directory', () => {
+  describe('using a user workspace directory', () => {
     before(async() => {
       // copy test app
       await fs.copy(CONFIG.testApp, CONFIG.usrSrc);
       await setup.run(['./packages/cli/index.js', '']);
     });
-    whenSerialized('Test App', 'This is a test app using a custom user template!');
+    describe('with a correct user templates directory', () => {
+      whenSerialized('Test App', 'This is a test app using a custom user template!');
+    });
+    it('should contain a nested blog directory', () => {
+      expect(fs.existsSync(path.join(CONFIG.publicDir, 'blog', '20190326', 'blog'))).to.be.true;
+    });
     after(async() => {
       await fs.remove(CONFIG.usrSrc);
       await fs.remove(CONFIG.publicDir);
