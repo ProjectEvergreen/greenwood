@@ -32,7 +32,9 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
           target = path.join(config.scratchDir, relPageDir.substring(0, i), file.label); // nested path
         } 
 
-        fs.mkdirSync(target, { recursive: true });
+        if (!fs.existsSync(target)) {
+          fs.mkdirSync(target, { recursive: true });
+        }
         await fs.writeFileSync(path.join(target, `${file.label}.js`), result);
 
         resolve();
