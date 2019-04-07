@@ -24,33 +24,17 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
         let result = await createPageComponent(file);
 
         let relPageDir = file.filePath.substring(config.pagesDir.length, file.filePath.length);
-        
-        // console.log(relPageDir);
+        const i = relPageDir.lastIndexOf('/');
 
-        if (relPageDir.lastIndexOf('/') !== 0) {
-          let subDir = relPageDir.substring(1, relPageDir.length).split('/');
-          let nestedPath = '';
+        target = path.join(config.scratchDir, file.label); // non-nested default
 
-          await Promise.all(subDir.map(async (dir, it) => {
-            if (it !== subDir.length - 1) {
-              nestedPath = path.join(nestedPath, dir);
+        if (i !== 0) {
+          target = path.join(config.scratchDir, relPageDir.substring(0, i), file.label); // nested path
+        } 
 
-              if (!fs.existsSync(path.join(config.scratchDir, nestedPath))) {
-                return await fs.mkdirSync(path.join(config.scratchDir, nestedPath));
-              }
-            }
-          }));
-          // fs.mkdirSync(target, { recursive: true }); possible refactor
-          // create page directory
-          await fs.mkdirSync(path.join(config.scratchDir, nestedPath, file.label));
-          // create page in page directory
-          await fs.writeFileSync(path.join(config.scratchDir, nestedPath, `${file.label}/${file.label}.js`), result);
-        } else {
-          // create page directory
-          await fs.mkdirSync(path.join(config.scratchDir, file.label));
-          // create page in page directory
-          await fs.writeFileSync(path.join(config.scratchDir, `${file.label}/${file.label}.js`), result);
-        }
+        fs.mkdirSync(target, { recursive: true });
+        await fs.writeFileSync(path.join(target, `${file.label}.js`), result);
+
         resolve();
       } catch (err) {
         reject(err);
