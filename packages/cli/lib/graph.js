@@ -45,9 +45,8 @@ const createGraphFromPages = async (pagesDir) => {
                   // get all remaining nested page directories
                   completeNestedPath = subDir.substring(0, seperatorIndex);
 
-                  // set route to the nested path with the front-matter path
+                  // set route to the nested pages path and file name(without extension)
                   route = completeNestedPath + route;
-
                   mdFile = `.${completeNestedPath}${fileRoute}.md`;
                   relativeExpectedPath = `'..${completeNestedPath}/${label}/${label}.js'`; 
                 } else {
