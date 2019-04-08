@@ -14,7 +14,6 @@ $ greenwood
 Fun!  But naturally you'll want to make your own pages.  So create a folder called _src/pages/_ and create a page called _index.md_.
 ```shell
 ---
-path: '/hello'
 label: 'hello'
 ---
 ```
@@ -49,7 +48,6 @@ Your project will generally have a structure like this:
 Here's a an example of a page 
 ```md
 ---
-path: '/hello'
 label: 'hello'
 template: 'page'
 ---

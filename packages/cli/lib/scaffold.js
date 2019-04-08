@@ -9,7 +9,7 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
         let result = data.toString().replace(/entry/g, `wc-md-${file.label}`);
 
         result = result.replace(/page-template/g, `eve-${file.label}`);
-        result = result.replace(/MDIMPORT;/, `import '${file.import}';`);
+        result = result.replace(/MDIMPORT;/, `import '${file.mdFile}';`);
 
         resolve(result);
       } catch (err) {
@@ -24,12 +24,12 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
         let result = await createPageComponent(file);
 
         let relPageDir = file.filePath.substring(config.pagesDir.length, file.filePath.length);
-        const i = relPageDir.lastIndexOf('/');
+        const pathLastBackslash = relPageDir.lastIndexOf('/');
 
         target = path.join(config.scratchDir, file.label); // non-nested default
 
-        if (i !== 0) {
-          target = path.join(config.scratchDir, relPageDir.substring(0, i), file.label); // nested path
+        if (pathLastBackslash !== 0) {
+          target = path.join(config.scratchDir, relPageDir.substring(0, pathLastBackslash), file.label); // nested path
         } 
 
         if (!fs.existsSync(target)) {
@@ -66,7 +66,7 @@ const writeRoutes = async(config, compilation) => {
 
       const routes = compilation.graph.map(file => {
         if (file.label !== 'index') {
-          return `<lit-route path="${file.path}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
+          return `<lit-route path="${file.route}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
         }
       });
 

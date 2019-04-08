@@ -17,9 +17,6 @@ module.exports = async (url, label, route, outputDirectory) => {
   const html = dom.serialize();
   const target = path.join(outputDirectory, route);
 
-  if (label !== 'index') {
-    await fs.mkdirSync(target, { recursive: true });
-    return await fs.writeFileSync(path.join(target, 'index.html'), html);
-  }
-  return await fs.writeFileSync(path.join(outputDirectory, 'index.html'), html);
+  await fs.mkdirSync(target, { recursive: true });
+  return await fs.writeFileSync(path.join(target, 'index.html'), html);
 };

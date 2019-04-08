@@ -26,10 +26,11 @@ const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(userWorkspac
     (resource) => {
       resource.request = resource.request.replace(new RegExp(`\.\.\/${directory}`), userPath);
       
-      const i = resource.request.lastIndexOf('..');
+      // remove any additional nests, after replacement with absolute path of user workspace + directory
+      const additionalNestedPathIndex = resource.request.lastIndexOf('..');
       
-      if (i > -1) {
-        resource.request = resource.request.substring(i + 2, resource.request.length);
+      if (additionalNestedPathIndex > -1) {
+        resource.request = resource.request.substring(additionalNestedPathIndex + 2, resource.request.length);
       }
     });
 });

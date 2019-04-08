@@ -8,7 +8,7 @@ const buildCompilation = require('./lib/build');
 const serializeBuild = require('./lib/serialize');
 
 let CONFIG = {
-  pagesDir: path.join(__dirname, './templates/'),
+  pagesDir: path.join(__dirname, './templates'),
   scratchDir: path.join(process.cwd(), './.greenwood/'),
   templatesDir: path.join(__dirname, './templates/'),
   publicDir: path.join(process.cwd(), './public'),

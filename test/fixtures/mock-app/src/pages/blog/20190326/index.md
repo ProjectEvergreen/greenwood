@@ -1,5 +1,4 @@
 ---
-path: '/blog'
 label: 'blog'
 template: 'page'
 imports:

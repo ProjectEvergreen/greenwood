@@ -20,28 +20,55 @@ const createGraphFromPages = async (pagesDir) => {
             try {
               const filePath = path.join(directory, file);
               const stats = await fs.statSync(filePath);
-      
-              if (file.substr(file.length - 2, file.length) === 'md' && !stats.isDirectory()) {
+              const isMdFile = file.substr(file.length - 2, file.length) === 'md';
+
+              if (isMdFile && !stats.isDirectory()) {
                 const data = await readFile(filePath, 'utf8');
                 const { attributes } = fm(data);
-                let { label, path, template } = attributes;
-                let subDir = filePath.substring(pagesDir.length, filePath.length);
-                const folder = subDir.lastIndexOf('/');
-                let fileName = file.substring(folder, file.length);
-                let imprt = '';
+                let { label, template } = attributes;
+                let mdFile = '';
 
-                if (folder > 0) {
-                  subDir = subDir.substring(0, folder);
-                  fileName = file.substring(file.length - folder, file.length);
-                  path = subDir + path;
-                  imprt = `.${subDir}/${label}.md`;
-                  relativeExpectedPath = `'..${subDir}/${label}/${label}.js'`; 
+                // get remaining string after user's pages directory
+                let subDir = filePath.substring(pagesDir.length, filePath.length);
+
+                // get index of seperator between remaining subdirectory and the file's name
+                const seperatorIndex = subDir.lastIndexOf('/');
+
+                // get md file's name without the file extension
+                let fileRoute = subDir.substring(seperatorIndex, subDir.length - 3);
+                
+                // determine if this is an index file, if so set route to '/'
+                let route = fileRoute === '/index' ? '/' : fileRoute;
+      
+                // check if additional nested directories
+                if (seperatorIndex > 0) {
+                  // get all remaining nested page directories
+                  completeNestedPath = subDir.substring(0, seperatorIndex);
+
+                  // set route to the nested path with the front-matter path
+                  route = completeNestedPath + route;
+
+                  mdFile = `.${completeNestedPath}${fileRoute}.md`;
+                  relativeExpectedPath = `'..${completeNestedPath}/${label}/${label}.js'`; 
                 } else {
-                  imprt = `./${label}.md`;
+                  mdFile = `.${fileRoute}.md`;
                   relativeExpectedPath = `'../${label}/${label}.js'`; 
                 }
                 
-                pages.push({ import: imprt, label, path, template, filePath, fileName, relativeExpectedPath });
+                /*
+                * Variable Definitions
+                *----------------------
+                * mdFile: a path for an md file which will be imported in a generated component
+                * label: the unique label we're giving for the generated web component 
+                * e.g. <wc-md-somelabel></wc-md-somelabel>
+                * route: route for a given page's url
+                * template: page template to use as a base for a generated component (auto appended by -template.js)
+                * filePath: complete absolute path to a md file
+                * relativeExpectedPath: a relative import path for the generated component into a list.js file 
+                * to later be imported into app.js root component
+                */
+
+                pages.push({ mdFile, label, route, template, filePath, relativeExpectedPath });
               }
               if (stats.isDirectory()) {
                 await walkDirectory(filePath);

@@ -1,5 +1,4 @@
 ---
-path: '/'
 label: 'index'
 template: 'page'
 imports:

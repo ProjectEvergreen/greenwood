@@ -116,7 +116,7 @@ describe('after building greenwood', () => {
       whenSerialized('Test App', 'This is a test app using a custom user template!');
     });
     it('should contain a nested blog directory', () => {
-      expect(fs.existsSync(path.join(CONFIG.publicDir, 'blog', '20190326', 'blog'))).to.be.true;
+      expect(fs.existsSync(path.join(CONFIG.publicDir, 'blog', '20190326'))).to.be.true;
     });
     after(async() => {
       await fs.remove(CONFIG.usrSrc);
