@@ -65,15 +65,14 @@ const createGraphFromPages = async (pagesDir) => {
                 /*
                 * Variable Definitions
                 *----------------------
-                * mdFile: a path for an md file which will be imported in a generated component
-                * label: the unique label we're giving for the generated web component 
-                * e.g. <wc-md-somelabel></wc-md-somelabel>
+                * mdFile: path for an md file which will be imported in a generated component
+                * label: the unique label given to generated component element e.g. <wc-md-somelabel></wc-md-somelabel>
                 * route: route for a given page's url
                 * template: page template to use as a base for a generated component (auto appended by -template.js)
                 * filePath: complete absolute path to a md file
-                * fileName: file name with extension, so that it can be copied to scratch dir with same name
-                * relativeExpectedPath: a relative import path for the generated component into a list.js file 
-                * to later be imported into app.js root component
+                * fileName: file name without extension/path, so that it can be copied to scratch dir with same name
+                * relativeExpectedPath: relative import path for generated component within a list.js file to later be 
+                * imported into app.js root component
                 */
 
                 pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath });

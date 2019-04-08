@@ -82,7 +82,6 @@ customElements.define('home-page', index);
 You can also render custom html such as a custom style or even a component within your markdown page using `imports` in your front-matter variables at top, as well as utilizing the `render` code block e.g.
 
 ````md
-
 ---
 label: 'hello'
 template: 'page'
