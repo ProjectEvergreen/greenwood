@@ -23,8 +23,8 @@ const createGraphFromPages = async (pagesDir) => {
               const isMdFile = file.substr(file.length - 2, file.length) === 'md';
 
               if (isMdFile && !stats.isDirectory()) {
-                const data = await readFile(filePath, 'utf8');
-                const { attributes } = fm(data);
+                const fileContents = await readFile(filePath, 'utf8');
+                const { attributes } = fm(fileContents);
                 let { label, template } = attributes;
                 let mdFile = '';
 
