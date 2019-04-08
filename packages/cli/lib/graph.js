@@ -8,7 +8,7 @@ const createGraphFromPages = async (pagesDir) => {
   let pages = [];
   const readdir = util.promisify(fs.readdir);
   const readFile = util.promisify(fs.readFile);
-
+  
   return new Promise(async (resolve, reject) => {
     try {
 
@@ -28,6 +28,8 @@ const createGraphFromPages = async (pagesDir) => {
                 let { label, template } = attributes;
                 let mdFile = '';
 
+                // Limitation Note: label must be included in md file front-matter as wc-md-loader requires it
+
                 // if template not set, use default
                 template = template || 'page';
 
@@ -36,6 +38,9 @@ const createGraphFromPages = async (pagesDir) => {
 
                 // get index of seperator between remaining subdirectory and the file's name
                 const seperatorIndex = subDir.lastIndexOf('/');
+
+                // get md file's name with extension (for generating to scratch)
+                let fileName = subDir.substring(seperatorIndex + 1, subDir.length - 3);
 
                 // get md file's name without the file extension
                 let fileRoute = subDir.substring(seperatorIndex, subDir.length - 3);
@@ -51,10 +56,10 @@ const createGraphFromPages = async (pagesDir) => {
                   // set route to the nested pages path and file name(without extension)
                   route = completeNestedPath + route;
                   mdFile = `.${completeNestedPath}${fileRoute}.md`;
-                  relativeExpectedPath = `'..${completeNestedPath}/${label}/${label}.js'`; 
+                  relativeExpectedPath = `'..${completeNestedPath}/${fileName}/${fileName}.js'`; 
                 } else {
                   mdFile = `.${fileRoute}.md`;
-                  relativeExpectedPath = `'../${label}/${label}.js'`; 
+                  relativeExpectedPath = `'../${fileName}/${fileName}.js'`; 
                 }
                 
                 /*
@@ -66,11 +71,12 @@ const createGraphFromPages = async (pagesDir) => {
                 * route: route for a given page's url
                 * template: page template to use as a base for a generated component (auto appended by -template.js)
                 * filePath: complete absolute path to a md file
+                * fileName: file name with extension, so that it can be copied to scratch dir with same name
                 * relativeExpectedPath: a relative import path for the generated component into a list.js file 
                 * to later be imported into app.js root component
                 */
 
-                pages.push({ mdFile, label, route, template, filePath, relativeExpectedPath });
+                pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath });
               }
               if (stats.isDirectory()) {
                 await walkDirectory(filePath);

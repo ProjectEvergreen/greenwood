@@ -26,16 +26,16 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
         let relPageDir = file.filePath.substring(config.pagesDir.length, file.filePath.length);
         const pathLastBackslash = relPageDir.lastIndexOf('/');
 
-        target = path.join(config.scratchDir, file.label); // non-nested default
+        target = path.join(config.scratchDir, file.fileName); // non-nested default
 
         if (pathLastBackslash !== 0) {
-          target = path.join(config.scratchDir, relPageDir.substring(0, pathLastBackslash), file.label); // nested path
-        } 
+          target = path.join(config.scratchDir, relPageDir.substring(0, pathLastBackslash), file.fileName); // nested path
+        }
 
         if (!fs.existsSync(target)) {
           fs.mkdirSync(target, { recursive: true });
         }
-        await fs.writeFileSync(path.join(target, `${file.label}.js`), result);
+        await fs.writeFileSync(path.join(target, `${file.fileName}.js`), result);
 
         resolve();
       } catch (err) {
@@ -65,7 +65,7 @@ const writeRoutes = async(config, compilation) => {
       let data = await fs.readFileSync(path.join(config.templatesDir, './app-template.js'));
 
       const routes = compilation.graph.map(file => {
-        if (file.label !== 'index') {
+        if (file.route !== '/') {
           return `<lit-route path="${file.route}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
         }
       });
