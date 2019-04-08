@@ -28,6 +28,9 @@ const createGraphFromPages = async (pagesDir) => {
                 let { label, template } = attributes;
                 let mdFile = '';
 
+                // if template not set, use default
+                template = template || 'page';
+
                 // get remaining string after user's pages directory
                 let subDir = filePath.substring(pagesDir.length, filePath.length);
 
