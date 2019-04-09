@@ -11,7 +11,7 @@ const scriptPkg = require(path.join(__dirname, 'package.json'));
 let MODE;
 
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
-console.log(`${chalk.rgb(175, 207, 71)('Welcome to Greenwood App ♻️')}`);
+console.log(`${chalk.rgb(175, 207, 71)('Welcome to Greenwood ♻️')}`);
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
 
 const program = new commander.Command(scriptPkg.name)
