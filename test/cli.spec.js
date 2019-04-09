@@ -76,7 +76,7 @@ describe('after building greenwood', () => {
 
   before(async () => {
     setup = new TestSetup();
-    await setup.run(['./packages/cli/index.js', '']);
+    await setup.run(['./packages/cli/index.js', 'build']);
   });  
 
   it('should create a new public directory', () => {
@@ -110,7 +110,7 @@ describe('after building greenwood', () => {
     before(async() => {
       // copy test app
       await fs.copy(CONFIG.testApp, CONFIG.usrSrc);
-      await setup.run(['./packages/cli/index.js', '']);
+      await setup.run(['./packages/cli/index.js', 'build']);
     });
     whenSerialized('Test App', 'This is a test app using a custom user template!');
     after(async() => {

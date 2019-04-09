@@ -1,64 +1,61 @@
 require('colors');
+const chalk = require('chalk');
 const path = require('path');
+const commander = require('commander');
 
-const initDirectories = require('./lib/init');
-const generateGraph = require('./lib/graph');
-const generateScaffolding = require('./lib/scaffold');
-const buildCompilation = require('./lib/build');
+const { buildDevServer } = require('./lib/build');
 const serializeBuild = require('./lib/serialize');
+const generateBuild = require('./lib/generate');
+const scriptPkg = require(path.join(__dirname, 'package.json'));
 
-let CONFIG = {
-  pagesDir: path.join(__dirname, './templates/'),
-  scratchDir: path.join(process.cwd(), './.greenwood/'),
-  templatesDir: path.join(__dirname, './templates/'),
-  publicDir: path.join(process.cwd(), './public'),
-  pageTemplate: 'page-template.js',
-  appTemplate: 'app-template.js',
-  rootComponent: path.join(__dirname, './templates', 'index.js'),
-  rootIndex: path.join(__dirname, './templates/', 'index.html'),
-  default: true
-};
+let MODE;
+
+console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
+console.log(`${chalk.rgb(175, 207, 71)('Welcome to Create Evergreen App ♻️')}`);
+console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
+
+const program = new commander.Command(scriptPkg.name)
+  .version(scriptPkg.version)
+  .arguments('<script-mode>')
+  .usage(`${chalk.green('<script-mode>')} [options]`)
+  .action(name => {
+    MODE = name;
+  });
+
+program.parse(process.argv);
 
 const run = async() => {
 
-  let compilation = {
-    graph: []
-  };
-
   try {
+    switch (MODE) {
 
-    console.log('-------------------------------------'.green);
-    console.log('---Greenwood Static Site Generator---'.green);
-    console.log('-------------------------------------'.green);
+      case 'build':
+        const { config, compilation } = await generateBuild();
 
-    // determine whether to use default template or user directories
-    console.log('Checking src directory');
-    CONFIG = await initDirectories(CONFIG);
+        await serializeBuild(config, compilation);
+        console.log('...................................'.yellow);
+        console.log('Static site generation complete!');
+        console.log('Serve with: '.cyan + 'greenwood serve'.green);
+        console.log('...................................'.yellow);
+        break;
+      case 'dev':
+        console.log('Development Mode Activated');
+        await generateBuild();
+        await buildDevServer();
+        break;
+      case 'create':
+        console.log('Creating Greenwood application...');
+        // Generate Greenwood application
+        break;
+      case 'serve':
+        console.log('Now serving application at http://localhost:8000');
+        // Serve Greenwood application
+        break;
+      default: 
+        console.log('missing script command. try checking --help if you\'re encountering issues');
+        break;
 
-    // generate a graph of all pages / components to build
-    console.log('Generating graph of project files...');
-    let graph = await generateGraph(CONFIG, compilation);
-
-    compilation.graph = compilation.graph.concat(graph);
-    
-    // generate scaffolding
-    console.log('Scaffolding out application files...');
-    await generateScaffolding(CONFIG, compilation);
-
-    if (process.env.NODE_ENV !== 'development') {
-
-      // build our SPA application first
-      console.log('Build SPA from scaffolding...');
-      await buildCompilation(CONFIG, compilation);
-
-      // "serialize" our SPA into a static site
-      await serializeBuild(CONFIG, compilation);
-
-      console.log('...................................'.yellow);
-      console.log('Static site generation complete!');
-      // console.log('Serve with: '.cyan + 'greenwood --serve'.green);
-      console.log('...................................'.yellow);
-    }   
+    }
     process.exit(0); // eslint-disable-line no-process-exit
   } catch (err) {
     console.error(err);

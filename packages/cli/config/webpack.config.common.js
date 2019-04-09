@@ -36,7 +36,7 @@ module.exports = {
 
   output: {
     path: path.join(process.cwd(), 'public'),
-    filename: '[name].[chunkhash].bundle.js',
+    filename: '[name].[hash].bundle.js',
     publicPath: '/'
   },
 

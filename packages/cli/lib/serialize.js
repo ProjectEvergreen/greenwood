@@ -1,6 +1,7 @@
 const LocalWebServer = require('local-web-server');
 const path = require('path');
 const browserRunner = require('./util/browser');
+const { buildCompilation } = require('./build');
 
 const localWebServer = new LocalWebServer();
 const PORT = '8000'; 
@@ -23,7 +24,11 @@ const runBrowser = async (config, compilation) => {
 module.exports = serializeBuild = async (config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
+      // build our SPA application first
+      console.log('Build SPA from scaffolding...');
+      await buildCompilation(config, compilation);
 
+      // "serialize" our SPA into a static site
       const server = localWebServer.listen({
         port: PORT,
         https: false,

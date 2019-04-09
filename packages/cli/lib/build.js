@@ -1,9 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
 const webpackConfig = require(path.join(__dirname, '..', './config/webpack.config.prod.js'));
+const webpackDevConfig = require(path.join(__dirname, '..', './config/webpack.config.develop.js'));
+const WebpackDevServer = require('webpack-dev-server');
 
 // eslint-disable-next-line no-unused-vars
-module.exports = buildCompilation = async (config, compilation) => {
+exports.buildCompilation = async (config, compilation) => {
   return new Promise(async (resolve, reject) => {
     
     try {
@@ -18,6 +20,22 @@ module.exports = buildCompilation = async (config, compilation) => {
           resolve();
         }
       });
+    } catch (err) {
+      reject(err);
+    }
+
+  });
+};
+
+exports.buildDevServer = async () => {
+  return new Promise(async (resolve, reject) => {
+    
+    try {
+      let compiler = webpack(webpackDevConfig);
+      let webpackServer = new WebpackDevServer(compiler);
+
+      webpackServer.listen(1981);
+
     } catch (err) {
       reject(err);
     }
