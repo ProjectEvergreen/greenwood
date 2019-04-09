@@ -11,7 +11,7 @@ const scriptPkg = require(path.join(__dirname, 'package.json'));
 let MODE;
 
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
-console.log(`${chalk.rgb(175, 207, 71)('Welcome to Create Evergreen App ♻️')}`);
+console.log(`${chalk.rgb(175, 207, 71)('Welcome to Greenwood App ♻️')}`);
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
 
 const program = new commander.Command(scriptPkg.name)
@@ -32,6 +32,7 @@ const run = async() => {
       case 'build':
         const { config, compilation } = await generateBuild();
 
+        console.log('Build SPA from scaffolding...');
         await serializeBuild(config, compilation);
         console.log('...................................'.yellow);
         console.log('Static site generation complete!');

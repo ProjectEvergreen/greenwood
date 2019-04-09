@@ -25,7 +25,6 @@ module.exports = serializeBuild = async (config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
       // build our SPA application first
-      console.log('Build SPA from scaffolding...');
       await buildCompilation(config, compilation);
 
       // "serialize" our SPA into a static site
