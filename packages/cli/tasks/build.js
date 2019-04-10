@@ -1,11 +1,27 @@
 const path = require('path');
 const webpack = require('webpack');
 const webpackConfig = require(path.join(__dirname, '..', './config/webpack.config.prod.js'));
-const webpackDevConfig = require(path.join(__dirname, '..', './config/webpack.config.develop.js'));
-const WebpackDevServer = require('webpack-dev-server');
+const serializeBuild = require('../lib/serialize');
+
+module.exports = runProductionBuild = async() => {
+  return new Promise(async (resolve, reject) => {
+    
+    try {
+      const { config, compilation } = await generateBuild();
+      
+      console.log('Build SPA from scaffolding...');
+      // build our SPA application first
+      await buildCompilation(config, compilation);
+      await serializeBuild(config, compilation);
+      resolve();
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
 
 // eslint-disable-next-line no-unused-vars
-exports.buildCompilation = async (config, compilation) => {
+const buildCompilation = async () => {
   return new Promise(async (resolve, reject) => {
     
     try {
@@ -20,22 +36,6 @@ exports.buildCompilation = async (config, compilation) => {
           resolve();
         }
       });
-    } catch (err) {
-      reject(err);
-    }
-
-  });
-};
-
-exports.buildDevServer = async () => {
-  return new Promise(async (resolve, reject) => {
-    
-    try {
-      let compiler = webpack(webpackDevConfig);
-      let webpackServer = new WebpackDevServer(compiler);
-
-      webpackServer.listen(1981);
-
     } catch (err) {
       reject(err);
     }

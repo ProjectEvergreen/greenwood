@@ -1,28 +1,53 @@
+/* eslint-disable no-underscore-dangle */
 require('colors');
 const chalk = require('chalk');
 const path = require('path');
-const commander = require('commander');
+const program = require('commander');
+const runProdBuild = require('./tasks/build');
+const runDevServer = require('./tasks/develop');
+const scriptPkg = require(path.join(__dirname, '../..', 'package.json'));
 
-const { buildDevServer } = require('./lib/build');
-const serializeBuild = require('./lib/serialize');
-const generateBuild = require('./lib/generate');
-const scriptPkg = require(path.join(__dirname, 'package.json'));
-
-let MODE;
+let MODE = '';
 
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
 console.log(`${chalk.rgb(175, 207, 71)('Welcome to Greenwood ♻️')}`);
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
 
-const program = new commander.Command(scriptPkg.name)
+program
   .version(scriptPkg.version)
   .arguments('<script-mode>')
-  .usage(`${chalk.green('<script-mode>')} [options]`)
-  .action(name => {
-    MODE = name;
+  .usage(`${chalk.green('<script-mode>')} [options]`);
+
+program
+  .command('build')
+  .description('build a static site')
+  .action((cmd) => {
+    MODE = cmd._name;
+  });
+program
+  .command('dev')
+  .description('run development environment')
+  .action((cmd) => {
+    MODE = cmd._name;
+  });
+program
+  .command('create')
+  .description('generate a new static site')
+  .action((cmd) => {
+    MODE = cmd._name;
+  });
+program
+  .command('serve')
+  .description('serve a static site')
+  .action((cmd) => {
+    MODE = cmd._name;
   });
 
 program.parse(process.argv);
+
+if (program.parse.length === 0) {
+  program.help();
+}
 
 const run = async() => {
 
@@ -30,10 +55,7 @@ const run = async() => {
     switch (MODE) {
 
       case 'build':
-        const { config, compilation } = await generateBuild();
-
-        console.log('Build SPA from scaffolding...');
-        await serializeBuild(config, compilation);
+        await runProdBuild();
         console.log('...................................'.yellow);
         console.log('Static site generation complete!');
         console.log('Serve with: '.cyan + 'greenwood serve'.green);
@@ -41,8 +63,7 @@ const run = async() => {
         break;
       case 'dev':
         console.log('Development Mode Activated');
-        await generateBuild();
-        await buildDevServer();
+        await runDevServer();
         break;
       case 'create':
         console.log('Creating Greenwood application...');
@@ -53,7 +74,7 @@ const run = async() => {
         // Serve Greenwood application
         break;
       default: 
-        console.log('missing script command. try checking --help if you\'re encountering issues');
+        console.log('Error: missing command. try checking --help if you\'re encountering issues');
         break;
 
     }
