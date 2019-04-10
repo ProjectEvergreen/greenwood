@@ -27,14 +27,20 @@ module.exports = webpackMerge(commonConfig, {
   
   mode: 'development',
 
+  entry: [
+    'webpack-dev-server/client?http://localhost:1981',
+    path.join(process.cwd(), '.greenwood', 'app', 'app.js')
+  ],
+
   devServer: {
     port: 1981,
     host: 'localhost',
+    inline: true,
+    hot: true,
     historyApiFallback: true,
     watchOptions: {
       aggregateTimeout: 300,
-      poll: 1000,
-      ignored: /node_modules/
+      poll: 1000
     }
   },
 
