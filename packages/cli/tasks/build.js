@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const webpackConfig = require(path.join(__dirname, '..', './config/webpack.config.prod.js'));
 const serializeBuild = require('../lib/serialize');
+const generateBuild = require('../lib/generate');
 
 module.exports = runProductionBuild = async() => {
   return new Promise(async (resolve, reject) => {

@@ -12,17 +12,17 @@ let config = {
   pageTemplate: 'page-template.js',
   appTemplate: 'app-template.js',
   rootComponent: path.join(__dirname, '../templates', 'index.js'),
-  rootIndex: path.join(__dirname, '../templates/', 'index.html'),
+  defaultTemplates: path.join(__dirname, '../templates/'), // static
   default: true
-};
-  
-let compilation = {
-  graph: []
 };
 
 module.exports = generateBuild = () => {
   return new Promise(async (resolve, reject) => {
     try {
+
+      let compilation = {
+        graph: []
+      };      
 
       // determine whether to use default template or user directories
       console.log('Checking src directory');

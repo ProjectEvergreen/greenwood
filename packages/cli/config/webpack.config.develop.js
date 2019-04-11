@@ -1,7 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const webpack = require('webpack');
 const commonConfig = require('./webpack.config.common');
 const webpackMerge = require('webpack-merge');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const FilewatcherPlugin = require('filewatcher-webpack-plugin');
 const generateBuild = require('../lib/generate');
@@ -23,6 +25,8 @@ const rebuild = async() => {
   }
 };
 
+const publicPath = '/';
+
 module.exports = webpackMerge(commonConfig, {
   
   mode: 'development',
@@ -32,22 +36,8 @@ module.exports = webpackMerge(commonConfig, {
     path.join(process.cwd(), '.greenwood', 'app', 'app.js')
   ],
 
-  devServer: {
-    port: 1981,
-    host: 'localhost',
-    inline: true,
-    hot: true,
-    historyApiFallback: true,
-    watchOptions: {
-      aggregateTimeout: 300,
-      poll: 1000
-    }
-  },
-
   plugins: [
-    new ManifestPlugin({
-      fileName: 'icons/manifest.json'
-    }),
+    new webpack.HotModuleReplacementPlugin(),
     new FilewatcherPlugin({
       watchFileRegex: [`/${userWorkspace}/`], 
       onReadyCallback: () => { 
@@ -60,6 +50,20 @@ module.exports = webpackMerge(commonConfig, {
       usePolling: true,
       atomic: true,
       ignored: '/node_modules/'
+    }),
+    new ManifestPlugin({
+      fileName: 'manifest.json',
+      publicPath
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: path.resolve(__dirname, '..', 'templates/index.dev.html'),
+      publicPath
+    }),
+    new HtmlWebpackPlugin({
+      filename: '404.html',
+      template: path.resolve(__dirname, '..', 'templates/404.dev.html'),
+      publicPath
     })
   ]
 });
