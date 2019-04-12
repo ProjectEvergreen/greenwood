@@ -6,7 +6,7 @@ const generateBuild = require('../lib/generate');
 
 module.exports = runProductionBuild = async() => {
   return new Promise(async (resolve, reject) => {
-    
+
     try {
       const { config, compilation } = await generateBuild();
       

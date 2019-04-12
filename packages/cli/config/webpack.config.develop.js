@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const webpack = require('webpack');
+// const webpack = require('webpack');
 const commonConfig = require('./webpack.config.common');
 const webpackMerge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -37,7 +37,7 @@ module.exports = webpackMerge(commonConfig, {
   ],
 
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
+    // new webpack.HotModuleReplacementPlugin(),
     new FilewatcherPlugin({
       watchFileRegex: [`/${userWorkspace}/`], 
       onReadyCallback: () => { 
@@ -57,12 +57,12 @@ module.exports = webpackMerge(commonConfig, {
     }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.resolve(__dirname, '..', 'templates/index.dev.html'),
+      template: '.greenwood/index.dev.html',
       publicPath
     }),
     new HtmlWebpackPlugin({
       filename: '404.html',
-      template: path.resolve(__dirname, '..', 'templates/404.dev.html'),
+      template: '.greenwood/404.dev.html',
       publicPath
     })
   ]

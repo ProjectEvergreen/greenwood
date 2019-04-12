@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
+  <head>
+    <title>Create Evergreen App</title>
+
+    <meta charset='utf-8'>
+    <meta name='description' content='Greenwood'/>
+    <meta name='viewport' content='width=device-width, initial-scale=1'/>
+    <meta name='mobile-web-app-capable' content='yes'/>
+    <meta name='apple-mobile-web-app-capable' content='yes'/>
+    <meta name='apple-mobile-web-app-status-bar-style' content='black'/>
+    <meta name="description" content="A modern and performant static site generator supporting Web Component based development."/>
+    <link rel="manifest" href="/manifest.json">
+
+    <meta property="og:title" content="Greenwood" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://project-evergreen.thegreenhouse.io/" />
+    <meta property="og:image" content="https://s3.amazonaws.com/uploads.thegreenhouse.io/project-evergreen/logo.jpg" />
+    <meta property="og:description" content="A modern and performant static site generator supporting Web Component based development." />
+
+    <!-- Load GoogleFonts here -->
+    <!-- <link href="//fonts.googleapis.com/css?family=Raleway" rel="stylesheet"> -->
+
+    <!-- Add forwards compatibility for ES5 transpiled web components -->
+    <!-- https://github.com/Polymer/lit-element/issues/72#issuecomment-390894353 -->
+    <!-- Error is a known issue: https://github.com/webcomponents/webcomponentsjs/issues/749 -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.0.2/custom-elements-es5-adapter.js"></script> -->
+
+    <!-- JavaScript polyfill FOR IE11 -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0/polyfill.js"></script>
+
+    <!-- Web Components poyfill for Firefox -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.2.7/webcomponents-bundle.js"></script>
+    <script>
+      (function(){
+          var redirect = sessionStorage.redirect;
+          delete sessionStorage.redirect;
+          if (redirect && redirect != location.href) {
+          history.replaceState(null, null, redirect);
+          }
+      })();
+    </script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        text-decoration: none;
+      }
+      html {
+        background-color: #f0f0f0;
+      }
+    </style>
+  </head>
+
+  <body>
+  
+    <eve-app></eve-app>
+
+  </body>
+</html>

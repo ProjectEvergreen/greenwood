@@ -81,8 +81,12 @@ const writeRoutes = async(config, compilation) => {
 const setupIndex = async(config, compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
-      fs.copyFileSync(path.resolve(config.defaultTemplates, '404.html'), path.join(config.scratchDir, '404.html'));
-      fs.copyFileSync(path.resolve(config.defaultTemplates, 'index.html'), path.join(config.scratchDir, 'index.html'));
+      if (process.env.NODE_ENV === 'development') {
+        fs.copyFileSync(path.resolve(config.templatesDir, '404.dev.html'), path.join(config.scratchDir, '404.dev.html'));
+        fs.copyFileSync(path.resolve(config.templatesDir, 'index.dev.html'), path.join(config.scratchDir, 'index.dev.html'));
+      }
+      fs.copyFileSync(path.resolve(config.templatesDir, '404.html'), path.join(config.scratchDir, '404.html'));
+      fs.copyFileSync(path.resolve(config.templatesDir, 'index.html'), path.join(config.scratchDir, 'index.html'));
       resolve();
     } catch (err) {
       reject(err);

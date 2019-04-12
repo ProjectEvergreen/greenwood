@@ -7,7 +7,9 @@ const port = 1981;
 
 module.exports = runDevServer = async () => {
   return new Promise(async (resolve, reject) => {
-      
+    
+    process.env.NODE_ENV = 'development';
+
     try {
       await generateBuild();
 
@@ -18,7 +20,6 @@ module.exports = runDevServer = async () => {
         historyApiFallback: true,
         hot: false,
         inline: true
-
       });
       
       webpackServer.listen(port);

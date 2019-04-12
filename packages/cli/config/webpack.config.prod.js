@@ -4,11 +4,7 @@ const commonConfig = require('./webpack.config.common');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const webpackMerge = require('webpack-merge');
-const path = require('path');
 const publicPath = '/';
-
-console.log(process.cwd());
-console.log(path.resolve(process.cwd(), 'packages', 'cli', 'templates', '404.html'));
 
 module.exports = webpackMerge(commonConfig, {
 
@@ -21,7 +17,7 @@ module.exports = webpackMerge(commonConfig, {
   plugins: [
     new HtmlWebpackPlugin({
       filename: '404.html',
-      template: path.join(process.cwd(), '.greenwood', '404.html'),
+      template: '.greenwood/404.html',
       publicPath
     })
     // new FaviconsWebpackPlugin({
