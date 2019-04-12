@@ -61,7 +61,7 @@ const run = async() => {
         console.log('Serve with: '.cyan + 'greenwood serve'.green);
         console.log('...................................'.yellow);
         break;
-      case 'dev':
+      case 'develop':
         console.log('Development Mode Activated');
         await runDevServer();
         break;
