@@ -11,7 +11,7 @@
     "lint": "eslint \"./packages/**/**/*.js\" \"./test/**/**/*.js\"",
     "build": "node ./packages/cli/index.js build",
     "serve": "yarn clean && yarn build && cd ./public && ws",
-    "dev": "node ./packages/cli/index.js dev",
+    "develop": "node ./packages/cli/index.js develop",
     "test": "mocha --timeout 15000"
   },
   "dependencies": {

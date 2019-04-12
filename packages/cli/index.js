@@ -25,7 +25,7 @@ program
     MODE = cmd._name;
   });
 program
-  .command('dev')
+  .command('develop')
   .description('run development environment')
   .action((cmd) => {
     MODE = cmd._name;
