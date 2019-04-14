@@ -1,62 +1,83 @@
+/* eslint-disable no-underscore-dangle */
 require('colors');
+const chalk = require('chalk');
 const path = require('path');
+const program = require('commander');
+const runProdBuild = require('./tasks/build');
+const runDevServer = require('./tasks/develop');
+const scriptPkg = require(path.join(__dirname, '../..', 'package.json'));
 
-const initDirectories = require('./lib/init');
-const generateGraph = require('./lib/graph');
-const generateScaffolding = require('./lib/scaffold');
-const buildCompilation = require('./lib/build');
-const serializeBuild = require('./lib/serialize');
+let MODE = '';
 
-let CONFIG = {
-  pagesDir: path.join(__dirname, './templates/'),
-  scratchDir: path.join(process.cwd(), './.greenwood/'),
-  templatesDir: path.join(__dirname, './templates/'),
-  publicDir: path.join(process.cwd(), './public'),
-  pageTemplate: 'page-template.js',
-  appTemplate: 'app-template.js',
-  rootComponent: path.join(__dirname, './templates', 'index.js'),
-  rootIndex: path.join(__dirname, './templates/', 'index.html'),
-  default: true
-};
+console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
+console.log(`${chalk.rgb(175, 207, 71)('Welcome to Greenwood ♻️')}`);
+console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
+
+program
+  .version(scriptPkg.version)
+  .arguments('<script-mode>')
+  .usage(`${chalk.green('<script-mode>')} [options]`);
+
+program
+  .command('build')
+  .description('build a static site')
+  .action((cmd) => {
+    MODE = cmd._name;
+  });
+program
+  .command('develop')
+  .description('run development environment')
+  .action((cmd) => {
+    MODE = cmd._name;
+  });
+program
+  .command('create')
+  .description('generate a new static site')
+  .action((cmd) => {
+    MODE = cmd._name;
+  });
+program
+  .command('serve')
+  .description('serve a static site')
+  .action((cmd) => {
+    MODE = cmd._name;
+  });
+
+program.parse(process.argv);
+
+if (program.parse.length === 0) {
+  program.help();
+}
 
 const run = async() => {
 
-  let compilation = {
-    graph: []
-  };
-
   try {
+    switch (MODE) {
 
-    console.log('-------------------------------------'.green);
-    console.log('---Greenwood Static Site Generator---'.green);
-    console.log('-------------------------------------'.green);
+      case 'build':
+        await runProdBuild();
+        console.log('...................................'.yellow);
+        console.log('Static site generation complete!');
+        console.log('Serve with: '.cyan + 'greenwood serve'.green);
+        console.log('...................................'.yellow);
+        break;
+      case 'develop':
+        console.log('Development Mode Activated');
+        await runDevServer();
+        break;
+      case 'create':
+        console.log('Creating Greenwood application...');
+        // Generate Greenwood application
+        break;
+      case 'serve':
+        console.log('Now serving application at http://localhost:8000');
+        // Serve Greenwood application
+        break;
+      default: 
+        console.log('Error: missing command. try checking --help if you\'re encountering issues');
+        break;
 
-    // determine whether to use default template or user directories
-    console.log('Checking src directory');
-    CONFIG = await initDirectories(CONFIG);
-
-    // generate a graph of all pages / components to build
-    console.log('Generating graph of project files...');
-    let graph = await generateGraph(CONFIG, compilation);
-
-    compilation.graph = compilation.graph.concat(graph);
-    
-    // generate scaffolding
-    console.log('Scaffolding out application files...');
-    await generateScaffolding(CONFIG, compilation);
-
-    // build our SPA application first
-    console.log('Build SPA from scaffolding...');
-    await buildCompilation(CONFIG, compilation);
-
-    // "serialize" our SPA into a static site
-    await serializeBuild(CONFIG, compilation);
-    
-    console.log('...................................'.yellow);
-    console.log('Static site generation complete!');
-    // console.log('Serve with: '.cyan + 'greenwood --serve'.green);
-    console.log('...................................'.yellow);
-
+    }
     process.exit(0); // eslint-disable-line no-process-exit
   } catch (err) {
     console.error(err);

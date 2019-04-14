@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og:http://ogp.me/ns#">
   <head>
-    <title>Greenwood</title>
+    <title>Create Evergreen App</title>
 
     <meta charset='utf-8'>
     <meta name='description' content='Greenwood'/>
@@ -10,7 +10,7 @@
     <meta name='apple-mobile-web-app-capable' content='yes'/>
     <meta name='apple-mobile-web-app-status-bar-style' content='black'/>
     <meta name="description" content="A modern and performant static site generator supporting Web Component based development."/>
-    <!-- <link rel="manifest" href="/icons/manifest.json"> -->
+    <link rel="manifest" href="/manifest.json">
 
     <meta property="og:title" content="Greenwood" />
     <meta property="og:type" content="website" />
@@ -31,7 +31,15 @@
 
     <!-- Web Components poyfill for Firefox -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.2.7/webcomponents-bundle.js"></script>
-
+    <script>
+      (function(){
+          var redirect = sessionStorage.redirect;
+          delete sessionStorage.redirect;
+          if (redirect && redirect != location.href) {
+          history.replaceState(null, null, redirect);
+          }
+      })();
+    </script>
     <style>
       * {
         margin: 0;

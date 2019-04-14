@@ -1,6 +1,8 @@
 const commonConfig = require('./webpack.config.common');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 // const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 const webpackMerge = require('webpack-merge');
 
 module.exports = webpackMerge(commonConfig, {
@@ -12,6 +14,11 @@ module.exports = webpackMerge(commonConfig, {
   },
 
   plugins: [
+    new HtmlWebpackPlugin({
+      filename: '404.html',
+      template: '.greenwood/404.html',
+      publicPath: commonConfig.publicPath
+    })
     // new FaviconsWebpackPlugin({
     //   logo: './favicon.png',
     //   emitStats: true,
