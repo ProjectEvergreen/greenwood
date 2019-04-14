@@ -5,10 +5,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const webpackMerge = require('webpack-merge');
 
-// TODO use consolidated config for public path and template path
-// https://github.com/ProjectEvergreen/greenwood/issues/11
-const publicPath = '/';
-
 module.exports = webpackMerge(commonConfig, {
 
   mode: 'production',
@@ -21,7 +17,7 @@ module.exports = webpackMerge(commonConfig, {
     new HtmlWebpackPlugin({
       filename: '404.html',
       template: '.greenwood/404.html',
-      publicPath
+      publicPath: commonConfig.publicPath
     })
     // new FaviconsWebpackPlugin({
     //   logo: './favicon.png',

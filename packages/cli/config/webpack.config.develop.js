@@ -1,12 +1,15 @@
 const fs = require('fs');
 const path = require('path');
-// const webpack = require('webpack');
 const commonConfig = require('./webpack.config.common');
 const webpackMerge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const FilewatcherPlugin = require('filewatcher-webpack-plugin');
 const generateBuild = require('../lib/generate');
+
+const host = 'localhost';
+const port = 1981;
+const publicPath = commonConfig.publicPath;
 let isRebuilding = false;
 
 // TODO get userWorkspace and pagesDir from greenwood config?
@@ -28,23 +31,29 @@ const rebuild = async() => {
   }
 };
 
-const publicPath = '/';
-
 module.exports = webpackMerge(commonConfig, {
   
   mode: 'development',
 
   entry: [
-    'webpack-dev-server/client?http://localhost:1981',
+    `webpack-dev-server/client?http://${host}:${port}`,
     path.join(process.cwd(), '.greenwood', 'app', 'app.js')
   ],
+
+  devServer: {
+    port,
+    host,
+    historyApiFallback: true,
+    hot: false,
+    inline: true
+  },
 
   plugins: [
     // new webpack.HotModuleReplacementPlugin(),
     new FilewatcherPlugin({
       watchFileRegex: [`/${userWorkspace}/`], 
       onReadyCallback: () => { 
-        console.log('Now serving Development Server available at http://localhost:1981');
+        console.log(`Now serving Development Server available at http://${host}:${port}`);
       },
       // eslint-disable-next-line no-unused-vars
       onChangeCallback: async (path) => {
