@@ -115,8 +115,13 @@ describe('after building greenwood', () => {
     describe('with a correct user templates directory', () => {
       whenSerialized('Test App', 'This is a test app using a custom user template!');
     });
-    it('should contain a nested blog directory', () => {
-      expect(fs.existsSync(path.join(CONFIG.publicDir, 'blog', '20190326'))).to.be.true;
+    describe('with a nested page directory', () => {
+      it('should contain a nested blog directory', () => {
+        expect(fs.existsSync(path.join(CONFIG.publicDir, 'blog', '20190326'))).to.be.true;
+      });
+      it('should contain a nested blog index html file', () => {
+        expect(fs.existsSync(path.join(CONFIG.publicDir, 'blog', '20190326', 'index.html'))).to.be.true;
+      });
     });
     after(async() => {
       await fs.remove(CONFIG.usrSrc);
