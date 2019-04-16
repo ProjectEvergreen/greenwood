@@ -1,14 +1,16 @@
 ---
-label: 'index'
+label: 'blog'
 template: 'page'
 imports:
-  CSS: '../styles/theme.css'
+  header: '../../../components/header/header.js'
+  CSS: '../../../styles/theme.css'
 ---
 
-### Greenwood
+### Blog
 
 This is the home page built by Greenwood. Make your own pages in src/pages/index.js!
 
 ```render
 <style>${CSS}</style>
+<eve-header></eve-header>
 ```

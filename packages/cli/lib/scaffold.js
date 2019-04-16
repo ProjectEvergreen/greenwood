@@ -9,7 +9,7 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
         let result = data.toString().replace(/entry/g, `wc-md-${file.label}`);
 
         result = result.replace(/page-template/g, `eve-${file.label}`);
-        result = result.replace(/MDIMPORT;/, `import '${file.import}';`);
+        result = result.replace(/MDIMPORT;/, `import '${file.mdFile}';`);
 
         resolve(result);
       } catch (err) {
@@ -23,14 +23,20 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
       try {
         let result = await createPageComponent(file);
 
-        // create page directory
-        if (!fs.existsSync(path.join(config.scratchDir, file.label))) {
-          await fs.mkdirSync(path.join(config.scratchDir, file.label));
+        let relPageDir = file.filePath.substring(config.pagesDir.length, file.filePath.length);
+        const pathLastBackslash = relPageDir.lastIndexOf('/');
+
+        target = path.join(config.scratchDir, file.fileName); // non-nested default
+
+        if (pathLastBackslash !== 0) {
+          target = path.join(config.scratchDir, relPageDir.substring(0, pathLastBackslash), file.fileName); // nested path
         }
 
-        // create page in page directory
-        await fs.writeFileSync(path.join(config.scratchDir, `${file.label}/${file.label}.js`), result);
-        
+        if (!fs.existsSync(target)) {
+          fs.mkdirSync(target, { recursive: true });
+        }
+        await fs.writeFileSync(path.join(target, `${file.fileName}.js`), result);
+
         resolve();
       } catch (err) {
         reject(err);
@@ -42,7 +48,7 @@ const writePageComponentsFromTemplate = async (config, compilation) => {
 
 const writeListImportFile = async (config, compilation) => {
   let arr = compilation.graph.map(file => {
-    return `import '../${file.label}/${file.label}.js';\n`;
+    return `import ${file.relativeExpectedPath};\n`;
   });
 
   /// Create app directory so that app-template relative imports are correct
@@ -61,8 +67,8 @@ const writeRoutes = async(config, compilation) => {
       let data = await fs.readFileSync(path.join(config.templatesDir, './app-template.js'));
 
       const routes = compilation.graph.map(file => {
-        if (file.label !== 'index') {
-          return `<lit-route path="${file.path}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
+        if (file.route !== '/') {
+          return `<lit-route path="${file.route}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
         }
       });
 

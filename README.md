@@ -14,9 +14,10 @@ $ greenwood
 Fun!  But naturally you'll want to make your own pages.  So create a folder called _src/pages/_ and create a page called _index.md_.
 ```shell
 ---
-path: '/hello'
 label: 'hello'
 ---
+
+# Helloworld
 ```
 
 and run `greenwood` again and you should now see a new page called hello!
@@ -49,7 +50,6 @@ Your project will generally have a structure like this:
 Here's a an example of a page 
 ```md
 ---
-path: '/hello'
 label: 'hello'
 template: 'page'
 ---
@@ -77,6 +77,28 @@ class index extends LitElement {
 customElements.define('home-page', index);
 ```
 
+## Advanced Markdown
+
+You can also render custom html such as a custom style or even a component within your markdown page using `imports` in your front-matter variables at top, as well as utilizing the `render` code block e.g.
+
+````md
+---
+label: 'hello'
+template: 'page'
+imports:
+  header: '../components/mycomponent.js'
+  CSS: '../styles/mystyle.css'
+---
+
+### Hello World
+
+This is an example page built by Greenwood.  Make your own in src/pages!
+
+```render
+<style>${CSS}</style>
+<my-component></my-component>
+```
+````
 ## API
 Here are some of the features and capabiliites of Greenwood.
 
