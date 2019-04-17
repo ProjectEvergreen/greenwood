@@ -20,13 +20,13 @@ program
 
 program
   .command('build')
-  .description('build a static site')
+  .description('build a static site for production')
   .action((cmd) => {
     MODE = cmd._name;
   });
 program
   .command('develop')
-  .description('run development environment')
+  .description('start a local development server')
   .action((cmd) => {
     MODE = cmd._name;
   });
@@ -38,7 +38,7 @@ program
   });
 program
   .command('serve')
-  .description('serve a static site')
+  .description('serve a production build locally')
   .action((cmd) => {
     MODE = cmd._name;
   });
