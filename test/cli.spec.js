@@ -127,7 +127,7 @@ xdescribe('building greenwood with a user workspace w/custom and nested pages di
 
 // });
 
-xdescribe('building greenwood with error handling for app and page templates', () => {
+describe('building greenwood with error handling for app and page templates', () => {
   beforeEach(async () => {
     setup = new TestSetup();
 
