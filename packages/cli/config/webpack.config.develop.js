@@ -1,29 +1,22 @@
-const fs = require('fs');
+// const fs = require('fs');
 const path = require('path');
-const commonConfig = require('./webpack.config.common');
-const webpackMerge = require('webpack-merge');
+// const commonConfig = require('./webpack.config.common');
+// const webpackMerge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const FilewatcherPlugin = require('filewatcher-webpack-plugin');
-const generateBuild = require('../lib/generate');
+const generateCompilation = require('../lib/compile');
 
 const host = 'localhost';
 const port = 1981;
-const publicPath = commonConfig.publicPath;
+const publicPath = '/'; // commonConfig.publicPath;
 let isRebuilding = false;
-
-// TODO get userWorkspace and pagesDir from greenwood config?
-// https://github.com/ProjectEvergreen/greenwood/issues/11
-
-const userWorkspace = fs.existsSync(path.join(process.cwd(), 'src'))
-  ? path.join(process.cwd(), 'src')
-  : path.join(__dirname, '..', 'templates/');
 
 const rebuild = async() => {
   if (!isRebuilding) {
     isRebuilding = true;
     // rebuild web components
-    await generateBuild();
+    await generateCompilation();
     // debounce
     setTimeout(() => {
       isRebuilding = false;
@@ -31,51 +24,56 @@ const rebuild = async() => {
   }
 };
 
-module.exports = webpackMerge(commonConfig, {
-  
-  mode: 'development',
+module.exports = getDevelopConfig = (context) => {
 
-  entry: [
-    `webpack-dev-server/client?http://${host}:${port}`,
-    path.join(process.cwd(), '.greenwood', 'app', 'app.js')
-  ],
+  return {
+    mode: 'development',
 
-  devServer: {
-    port,
-    host,
-    historyApiFallback: true,
-    hot: false,
-    inline: true
-  },
+    // TODO magic strings - .greenwood, app, app.js
+    entry: [
+      `webpack-dev-server/client?http://${host}:${port}`,
+      path.join(process.cwd(), '.greenwood', 'app', 'app.js')
+    ],
 
-  plugins: [
-    // new webpack.HotModuleReplacementPlugin(),
-    new FilewatcherPlugin({
-      watchFileRegex: [`/${userWorkspace}/`], 
-      onReadyCallback: () => { 
-        console.log(`Now serving Development Server available at http://${host}:${port}`);
-      },
-      // eslint-disable-next-line no-unused-vars
-      onChangeCallback: async (path) => {
-        rebuild();
-      },
-      usePolling: true,
-      atomic: true,
-      ignored: '/node_modules/'
-    }),
-    new ManifestPlugin({
-      fileName: 'manifest.json',
-      publicPath
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: '.greenwood/index.dev.html',
-      publicPath
-    }),
-    new HtmlWebpackPlugin({
-      filename: '404.html',
-      template: '.greenwood/404.dev.html',
-      publicPath
-    })
-  ]
-});
+    devServer: {
+      port,
+      host,
+      historyApiFallback: true,
+      hot: false,
+      inline: true
+    },
+
+    plugins: [
+      // new webpack.HotModuleReplacementPlugin(),
+      new FilewatcherPlugin({
+        watchFileRegex: [`/${context.userWorkspace}/`], 
+        onReadyCallback: () => { 
+          console.log(`Now serving Development Server available at http://${host}:${port}`);
+        },
+        // eslint-disable-next-line no-unused-vars
+        onChangeCallback: async () => {
+          rebuild();
+        },
+        usePolling: true,
+        atomic: true,
+        ignored: '/node_modules/'
+      }),
+      new ManifestPlugin({
+        fileName: 'manifest.json',
+        publicPath
+      }),
+      // TODO magic string paths (index.html)
+      new HtmlWebpackPlugin({
+        filename: 'index.html',
+        template: '.greenwood/index.dev.html',
+        publicPath
+      }),
+      // TODO magic string paths (404.html)
+      new HtmlWebpackPlugin({
+        filename: '404.html',
+        template: '.greenwood/404.dev.html',
+        publicPath
+      })
+    ]
+  };
+};

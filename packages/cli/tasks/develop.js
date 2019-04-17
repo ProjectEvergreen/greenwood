@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const webpackDevConfig = require(path.join(__dirname, '..', './config/webpack.config.develop.js'));
 const WebpackDevServer = require('webpack-dev-server');
-const generateBuild = require('../lib/generate');
+// const generateCompilation = require('../lib/compile');
 
 module.exports = runDevServer = async () => {
   return new Promise(async (resolve, reject) => {
@@ -10,7 +10,7 @@ module.exports = runDevServer = async () => {
     process.env.NODE_ENV = 'development';
 
     try {
-      await generateBuild();
+      // await generateBuild();
 
       const serverConfig = webpackDevConfig.devServer;
       let compiler = webpack(webpackDevConfig);

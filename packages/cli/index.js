@@ -3,6 +3,7 @@ require('colors');
 const chalk = require('chalk');
 const path = require('path');
 const program = require('commander');
+const generateCompilation = require('./lib/compile');
 const runProdBuild = require('./tasks/build');
 const runDevServer = require('./tasks/develop');
 const scriptPkg = require(path.join(__dirname, '../..', 'package.json'));
@@ -50,12 +51,17 @@ if (program.parse.length === 0) {
 }
 
 const run = async() => {
+  // 1) init context
+  // 2) generate graph
+  // 3) scaffolding
+  // TODO distinguish compilation from scaffolding? 
+  const compilation = await generateCompilation();
 
   try {
     switch (MODE) {
 
       case 'build':
-        await runProdBuild();
+        await runProdBuild(compilation);
         console.log('...................................'.yellow);
         console.log('Static site generation complete!');
         console.log('Serve with: '.cyan + 'greenwood serve'.green);
@@ -63,7 +69,7 @@ const run = async() => {
         break;
       case 'develop':
         console.log('Development Mode Activated');
-        await runDevServer();
+        await runDevServer(compilation);
         break;
       case 'create':
         console.log('Creating Greenwood application...');
