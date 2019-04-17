@@ -8,11 +8,9 @@ const getUserWorkspaceDirectories = (source) => {
   return fs.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory);
 };
 
-let mappedUserDirectoriesForWebpack = [];
-
 module.exports = (cfg) => {
-  config = cfg;
-  mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(cfg.rootContext).map((userPath) => {
+
+  const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(cfg.rootContext).map((userPath) => {
     const directory = userPath.split('/')[userPath.split('/').length - 1];
 
     return new webpack.NormalModuleReplacementPlugin(
