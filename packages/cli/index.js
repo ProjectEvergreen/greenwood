@@ -20,25 +20,25 @@ program
 
 program
   .command('build')
-  .description('build a static site for production')
+  .description('Build a static site for production.')
   .action((cmd) => {
     MODE = cmd._name;
   });
 program
   .command('develop')
-  .description('start a local development server')
+  .description('Start a local development server.')
   .action((cmd) => {
     MODE = cmd._name;
   });
 program
   .command('create')
-  .description('generate a new static site')
+  .description('Generate a new static site.')
   .action((cmd) => {
     MODE = cmd._name;
   });
 program
   .command('serve')
-  .description('serve a production build locally')
+  .description('Serve a production build locally.')
   .action((cmd) => {
     MODE = cmd._name;
   });
