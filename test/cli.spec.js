@@ -42,40 +42,6 @@ describe('after building greenwood', () => {
 
   before(async () => {
     setup = new TestSetup();
-  });  
-  describe('with an empty user templates directory', () => {
-    beforeEach(async() => {
-      // create empty template directory
-      await fs.mkdirSync(CONFIG.usrSrc);
-      await fs.mkdirSync(CONFIG.usrTemplate);
-    });
-
-    it('should display an error if page-template.js is missing', async() => {
-      await setup.run(['./packages/cli/index.js'], '').catch((err) => {
-        expect(err).to.contain("It looks like you don't have a page template defined. ");
-      });
-    });
-
-    it('should display an error if app-template.js is missing', async () => {
-      // add blank page-template
-      await fs.writeFileSync(path.join(CONFIG.usrTemplate, 'page-template.js'), '');
-      await setup.run(['./packages/cli/index.js'], '').catch((err) => {
-        expect(err).to.contain("It looks like you don't have an app template defined. ");            
-      });
-    });
-
-    afterEach(async () => {
-      await fs.remove(CONFIG.usrSrc);
-      await fs.remove(CONFIG.scratchDir);
-    });
-  });
-
-});
-
-describe('after building greenwood', () => {
-
-  before(async () => {
-    setup = new TestSetup();
     await setup.run(['./packages/cli/index.js', 'build']);
   });  
 
