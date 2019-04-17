@@ -15,8 +15,10 @@ let isRebuilding = false;
 const rebuild = async() => {
   if (!isRebuilding) {
     isRebuilding = true;
+    
     // rebuild web components
     await generateCompilation();
+
     // debounce
     setTimeout(() => {
       isRebuilding = false;
