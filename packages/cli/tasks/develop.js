@@ -10,10 +10,10 @@ module.exports = runDevServer = async () => {
     process.env.NODE_ENV = 'development';
 
     try {
-      await generateBuild();
+      const { config } = await generateBuild();
 
-      const serverConfig = webpackDevConfig.devServer;
-      let compiler = webpack(webpackDevConfig);
+      const serverConfig = webpackDevConfig(config).devServer;
+      let compiler = webpack(webpackDevConfig(config));
       let webpackServer = new WebpackDevServer(compiler, serverConfig);
       
       webpackServer.listen(serverConfig.port);

@@ -32,7 +32,12 @@ module.exports = initDirectories = async() => {
           : path.join(defaultTemplatesDir, 'page-template.js'),
         appTemplatePath: userHasWorkspaceAppTemplate 
           ? usrAppTemplate 
-          : path.join(defaultTemplatesDir, 'app-template.js')
+          : path.join(defaultTemplatesDir, 'app-template.js'),
+        devServer: {
+          host: 'localhost',
+          port: 1981
+        },
+        publicPath: '/'
       };
 
       if (!fs.existsSync(scratchDir)) {

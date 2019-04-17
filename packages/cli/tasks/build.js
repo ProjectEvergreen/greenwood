@@ -22,11 +22,11 @@ module.exports = runProductionBuild = async() => {
 };
 
 // eslint-disable-next-line no-unused-vars
-const buildCompilation = async () => {
+const buildCompilation = async (config) => {
   return new Promise(async (resolve, reject) => {
     
     try {
-      return webpack(webpackConfig, (err, stats) => {
+      return webpack(webpackConfig(config), (err, stats) => {
         if (err || stats.hasErrors()) {
           if (stats.hasErrors()) {
             err = stats.toJson('minimal').errors[0];

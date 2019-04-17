@@ -1,7 +1,6 @@
 ---
 path: '/hello'
 label: 'hello'
-template: 'page'
 ---
 
 ### Hello World
