@@ -40,7 +40,7 @@ describe('building greenwood with default context (no user workspace)', () => {
       expect(fs.existsSync(path.join(CONFIG.publicDir, './hello'))).to.be.true;
     });
 
-    xdescribe('default generated hello page contents', () => {
+    describe('default generated hello page directory', () => {
       const defaultHeading = 'Hello World';
       const defaultBody = 'This is an example page built by Greenwood.  Make your own in src/pages!';
       let dom;
@@ -59,7 +59,7 @@ describe('building greenwood with default context (no user workspace)', () => {
         expect(heading).to.equal(defaultHeading);
       });
     
-      it('should have the expected heading text within the hello example page in the hello directory', async() => {
+      it('should have the expected paragraph text within the hello example page in the hello directory', async() => {
         let paragraph = dom.window.document.querySelector('p.wc-md-hello').textContent;
     
         expect(paragraph).to.equal(defaultBody);
