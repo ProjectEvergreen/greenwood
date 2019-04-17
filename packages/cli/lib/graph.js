@@ -32,7 +32,7 @@ const createGraphFromPages = async (pagesDir) => {
 
                 // if template not set, use default
                 template = template || 'page';
-
+                
                 // get remaining string after user's pages directory
                 let subDir = filePath.substring(pagesDir.length, filePath.length);
 
@@ -44,7 +44,7 @@ const createGraphFromPages = async (pagesDir) => {
 
                 // get md file's name without the file extension
                 let fileRoute = subDir.substring(seperatorIndex, subDir.length - 3);
-                
+
                 // determine if this is an index file, if so set route to '/'
                 let route = fileRoute === '/index' ? '/' : fileRoute;
       

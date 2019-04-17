@@ -1,20 +1,7 @@
 require('colors');
-const path = require('path');
 const initDirectories = require('./init');
 const generateGraph = require('./graph');
 const generateScaffolding = require('./scaffold');
-
-let config = {
-  pagesDir: path.join(__dirname, '../templates'),
-  scratchDir: path.join(process.cwd(), './.greenwood/'),
-  templatesDir: path.join(__dirname, '../templates/'),
-  publicDir: path.join(process.cwd(), './public'),
-  pageTemplate: 'page-template.js',
-  appTemplate: 'app-template.js',
-  rootComponent: path.join(__dirname, '../templates', 'index.js'),
-  defaultTemplates: path.join(__dirname, '../templates/'), // static
-  default: true
-};
 
 module.exports = generateBuild = () => {
   return new Promise(async (resolve, reject) => {
@@ -26,7 +13,7 @@ module.exports = generateBuild = () => {
 
       // determine whether to use default template or user directories
       console.log('Checking src directory');
-      config = await initDirectories(config);
+      let config = await initDirectories();
 
       // generate a graph of all pages / components to build
       console.log('Generating graph of project files...');
