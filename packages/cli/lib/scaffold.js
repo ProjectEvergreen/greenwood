@@ -49,7 +49,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
 };
 
 const writeListImportFile = async (compilation) => {
-  let arr = compilation.graph.map(file => {
+  const importList = compilation.graph.map(file => {
     return `import ${file.relativeExpectedPath};\n`;
   });
 
@@ -61,8 +61,9 @@ const writeListImportFile = async (compilation) => {
     await fs.mkdirSync(appDir);
   }
   
+  console.log('importList', importList);
   // TODO magic string - list.js
-  return await fs.writeFileSync(path.join(appDir, './list.js'), arr.join(''));
+  return await fs.writeFileSync(path.join(appDir, './list.js'), importList.join(''));
 };
 
 const writeRoutes = async(compilation) => {

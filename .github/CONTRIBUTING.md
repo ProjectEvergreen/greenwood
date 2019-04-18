@@ -27,3 +27,7 @@ Unit tests have been written that can be run using
 ```shell
 $ yarn test
 ```
+
+Note, you can use the following to adjust how many mocha tests get run:
+- `describe.only` / `it.only`: only run this block
+- `xdescribe` / `xit`: dont run this block

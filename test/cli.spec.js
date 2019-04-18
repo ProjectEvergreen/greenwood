@@ -75,39 +75,49 @@ describe('building greenwood with default context (no user workspace)', () => {
 
 });
 
-xdescribe('building greenwood with a user workspace w/custom and nested pages directories', () => {
+describe('building greenwood with a user workspace w/custom nested pages directories', () => {
 
   beforeEach(async() => {
+    setup = new TestSetup();
     // copy test app
     await fs.copy(CONFIG.testApp, CONFIG.usrSrc);
     await setup.run(['./packages/cli/index.js', 'build']);
   });
 
+  it('should output one JS bundle', async() => {
+    expect(await glob.promise(path.join(CONFIG.publicDir, './**/index.*.bundle.js'))).to.have.lengthOf(1);
+  });
+  
   it('should contain a nested blog page directory', () => {
     expect(fs.existsSync(path.join(CONFIG.publicDir, 'blog', '20190326'))).to.be.true;
   });
 
-  it('should contain a nested blog page with an index html file', () => {
-    expect(fs.existsSync(path.join(CONFIG.publicDir, 'blog', '20190326', 'index.html'))).to.be.true;
-  });
+  describe('nested generated blog page directory', () => {
+    const defaultHeading = 'Blog Page';
+    const defaultBody = 'This is the blog page built by Greenwood.';
+    const blogPageHtmlPath = path.join(CONFIG.publicDir, 'blog', '20190326', 'index.html');
+    let dom;
 
-  it('should have the expected text within the hello world example page in the hello world directory', () => {
-    whenSerialized('Hello World', 'This is an example page built by Greenwood.  Make your own in src/pages!');
-    after(async() => {
-      await fs.remove(CONFIG.publicDir);
-      await fs.remove(CONFIG.scratchDir);
+    beforeEach(async() => {
+      dom = await JSDOM.fromFile(blogPageHtmlPath);
+    });
+
+    it('should contain a nested blog page with an index html file', () => {
+      expect(fs.existsSync(blogPageHtmlPath)).to.be.true;
+    });
+
+    it('should have the expected heading text within the blog page in the blog directory', async() => {
+      const heading = dom.window.document.querySelector('h3.wc-md-blog').textContent;
+  
+      expect(heading).to.equal(defaultHeading);
+    });
+  
+    it('should have the expected paragraph text within the blog page in the blog directory', async() => {
+      let paragraph = dom.window.document.querySelector('p.wc-md-blog').textContent;
+  
+      expect(paragraph).to.equal(defaultBody);
     });
   });
-
-  // TODO
-  // it('should have X number of JS bundles', () => {
-
-  // });
-  
-  // TODO
-  // it('should have other things to test for?', () => {
-
-  // });
 
   afterEach(async() => {
     await fs.remove(CONFIG.usrSrc);
