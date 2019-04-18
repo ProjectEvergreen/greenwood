@@ -1,22 +1,21 @@
 const path = require('path');
 const webpack = require('webpack');
-const webpackDevConfig = require(path.join(__dirname, '..', './config/webpack.config.develop.js'));
 const WebpackDevServer = require('webpack-dev-server');
-// const generateCompilation = require('../lib/compile');
+const webpackMerge = require('webpack-merge');
 
-module.exports = runDevServer = async () => {
+module.exports = runDevServer = async ({ context }) => {
   return new Promise(async (resolve, reject) => {
-    
-    process.env.NODE_ENV = 'development';
 
     try {
-      // await generateBuild();
+      const commonConfig = require(path.join(__dirname, '..', './config/webpack.config.common.js'))(context);
+      const devConfig = require(path.join(__dirname, '..', './config/webpack.config.develop.js'))(context);
+      const webpackConfig = webpackMerge(commonConfig, devConfig);
+      const devServerConfig = webpackConfig.devServer;
 
-      const serverConfig = webpackDevConfig.devServer;
-      let compiler = webpack(webpackDevConfig);
-      let webpackServer = new WebpackDevServer(compiler, serverConfig);
+      let compiler = webpack(webpackConfig);
+      let webpackServer = new WebpackDevServer(compiler, devServerConfig);
       
-      webpackServer.listen(serverConfig.port);
+      webpackServer.listen(devServerConfig.port);
     } catch (err) {
       reject(err);
     }

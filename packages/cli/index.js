@@ -51,25 +51,32 @@ if (program.parse.length === 0) {
 }
 
 const run = async() => {
-  // 1) init context
-  // 2) generate graph
-  // 3) scaffolding
-  // TODO distinguish compilation from scaffolding? 
+  process.env.NODE_ENV = MODE === 'develop' ? 'development' : 'production';
+
   const compilation = await generateCompilation();
 
   try {
+
     switch (MODE) {
 
       case 'build':
+        console.log('Building project for production.'.yellow);
+        
         await runProdBuild(compilation);
+
         console.log('...................................'.yellow);
         console.log('Static site generation complete!');
         console.log('Serve with: '.cyan + 'greenwood serve'.green);
         console.log('...................................'.yellow);
+        
         break;
       case 'develop':
-        console.log('Development Mode Activated');
+        console.log('Starting local development server'.yellow);        
+        
         await runDevServer(compilation);
+        
+        console.log('Development mode activiated'.green);
+
         break;
       case 'create':
         console.log('Creating Greenwood application...');

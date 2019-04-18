@@ -1,7 +1,4 @@
-// const fs = require('fs');
 const path = require('path');
-// const commonConfig = require('./webpack.config.common');
-// const webpackMerge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const FilewatcherPlugin = require('filewatcher-webpack-plugin');
@@ -9,7 +6,7 @@ const generateCompilation = require('../lib/compile');
 
 const host = 'localhost';
 const port = 1981;
-const publicPath = '/'; // commonConfig.publicPath;
+const publicPath = '/';
 let isRebuilding = false;
 
 const rebuild = async() => {
@@ -26,7 +23,7 @@ const rebuild = async() => {
   }
 };
 
-module.exports = getDevelopConfig = (context) => {
+module.exports = (context) => {
 
   return {
     mode: 'development',
@@ -67,13 +64,13 @@ module.exports = getDevelopConfig = (context) => {
       // TODO magic string paths (index.html)
       new HtmlWebpackPlugin({
         filename: 'index.html',
-        template: '.greenwood/index.dev.html',
+        template: path.join(context.scratchDir, 'index.dev.html'),
         publicPath
       }),
       // TODO magic string paths (404.html)
       new HtmlWebpackPlugin({
         filename: '404.html',
-        template: '.greenwood/404.dev.html',
+        template: path.join(context.scratchDir, '404.dev.html'),
         publicPath
       })
     ]

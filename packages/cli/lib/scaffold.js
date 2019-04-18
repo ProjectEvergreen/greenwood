@@ -94,16 +94,20 @@ const setupIndex = async(compilation) => {
     const context = compilation.context;
     let indexHtml = 'index.html';
     let notFoundHtml = '404.html';
+    let devIndexHtml = 'index.dev.html';
+    let devNotFoundHtml = '404.dev.html';
 
     try {
+
+      // create redirect 404 pages for lit-redux-router + SPA fallback for development
       if (process.env.NODE_ENV === 'development') {
-        // TODO magic strings, html files
-        indexHtml = 'index.dev.html';
-        notFoundHtml = '404.dev.html';
+        fs.copyFileSync(path.resolve(context.templatesDir, devNotFoundHtml), path.join(context.scratchDir, devNotFoundHtml));
+        fs.copyFileSync(path.resolve(context.templatesDir, devIndexHtml), path.join(context.scratchDir, devIndexHtml));
       }
 
       fs.copyFileSync(path.resolve(context.templatesDir, notFoundHtml), path.join(context.scratchDir, notFoundHtml));
       fs.copyFileSync(path.resolve(context.templatesDir, indexHtml), path.join(context.scratchDir, indexHtml));
+   
       resolve();
     } catch (err) {
       reject(err);
