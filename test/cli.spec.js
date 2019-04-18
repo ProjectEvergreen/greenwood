@@ -6,7 +6,7 @@ const TestSetup = require('./setup');
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
 
-const CONFIG = {
+const CONTEXT = {
   pagesDir: path.join(__dirname, '../packages/cli/templates/'),
   scratchDir: path.join(__dirname, '..', './.greenwood/'),
   templatesDir: path.join(__dirname, '../packages/cli/templates/'),
@@ -24,20 +24,20 @@ describe('building greenwood with default context (no user workspace)', () => {
   });
 
   it('should create a public directory', () => {
-    expect(fs.existsSync(CONFIG.publicDir)).to.be.true;
+    expect(fs.existsSync(CONTEXT.publicDir)).to.be.true;
   });
 
   describe('public directory output', () => {  
     it('should output a single index.html file (home page)', () => {
-      expect(fs.existsSync(path.join(CONFIG.publicDir, './index.html'))).to.be.true;
+      expect(fs.existsSync(path.join(CONTEXT.publicDir, './index.html'))).to.be.true;
     });
   
     it('should output one JS bundle file', async () => {
-      expect(await glob.promise(path.join(CONFIG.publicDir, './index.*.bundle.js'))).to.have.lengthOf(1);
+      expect(await glob.promise(path.join(CONTEXT.publicDir, './index.*.bundle.js'))).to.have.lengthOf(1);
     });
   
     it('should create a default hello page directory', () => {
-      expect(fs.existsSync(path.join(CONFIG.publicDir, './hello'))).to.be.true;
+      expect(fs.existsSync(path.join(CONTEXT.publicDir, './hello'))).to.be.true;
     });
 
     describe('default generated hello page directory', () => {
@@ -46,11 +46,11 @@ describe('building greenwood with default context (no user workspace)', () => {
       let dom;
 
       beforeEach(async() => {
-        dom = await JSDOM.fromFile(path.resolve(CONFIG.publicDir, 'hello/index.html'));
+        dom = await JSDOM.fromFile(path.resolve(CONTEXT.publicDir, 'hello/index.html'));
       });
 
       it('should output an index.html file within the default hello page directory', () => {
-        expect(fs.existsSync(path.join(CONFIG.publicDir, './hello', './index.html'))).to.be.true;
+        expect(fs.existsSync(path.join(CONTEXT.publicDir, './hello', './index.html'))).to.be.true;
       });
 
       it('should have the expected heading text within the hello example page in the hello directory', async() => {
@@ -68,9 +68,9 @@ describe('building greenwood with default context (no user workspace)', () => {
   });
 
   afterEach(async() => {
-    await fs.remove(CONFIG.usrSrc);
-    await fs.remove(CONFIG.publicDir);
-    await fs.remove(CONFIG.scratchDir);
+    await fs.remove(CONTEXT.usrSrc);
+    await fs.remove(CONTEXT.publicDir);
+    await fs.remove(CONTEXT.scratchDir);
   });
 
 });
@@ -80,22 +80,22 @@ describe('building greenwood with a user workspace w/custom nested pages directo
   beforeEach(async() => {
     setup = new TestSetup();
     // copy test app
-    await fs.copy(CONFIG.testApp, CONFIG.usrSrc);
+    await fs.copy(CONTEXT.testApp, CONTEXT.usrSrc);
     await setup.run(['./packages/cli/index.js', 'build']);
   });
 
   it('should output one JS bundle', async() => {
-    expect(await glob.promise(path.join(CONFIG.publicDir, './**/index.*.bundle.js'))).to.have.lengthOf(1);
+    expect(await glob.promise(path.join(CONTEXT.publicDir, './**/index.*.bundle.js'))).to.have.lengthOf(1);
   });
   
   it('should contain a nested blog page directory', () => {
-    expect(fs.existsSync(path.join(CONFIG.publicDir, 'blog', '20190326'))).to.be.true;
+    expect(fs.existsSync(path.join(CONTEXT.publicDir, 'blog', '20190326'))).to.be.true;
   });
 
   describe('nested generated blog page directory', () => {
     const defaultHeading = 'Blog Page';
     const defaultBody = 'This is the blog page built by Greenwood.';
-    const blogPageHtmlPath = path.join(CONFIG.publicDir, 'blog', '20190326', 'index.html');
+    const blogPageHtmlPath = path.join(CONTEXT.publicDir, 'blog', '20190326', 'index.html');
     let dom;
 
     beforeEach(async() => {
@@ -120,9 +120,9 @@ describe('building greenwood with a user workspace w/custom nested pages directo
   });
 
   afterEach(async() => {
-    await fs.remove(CONFIG.usrSrc);
-    await fs.remove(CONFIG.publicDir);
-    await fs.remove(CONFIG.scratchDir);
+    await fs.remove(CONTEXT.usrSrc);
+    await fs.remove(CONTEXT.publicDir);
+    await fs.remove(CONTEXT.scratchDir);
   });
 
 });
@@ -142,8 +142,8 @@ describe('building greenwood with error handling for app and page templates', ()
     setup = new TestSetup();
 
     // create empty template directory
-    await fs.mkdirSync(CONFIG.usrSrc);
-    await fs.mkdirSync(CONFIG.usrTemplate);
+    await fs.mkdirSync(CONTEXT.usrSrc);
+    await fs.mkdirSync(CONTEXT.usrTemplate);
   });
 
   it('should display an error if page-template.js is missing', async() => {
@@ -154,16 +154,16 @@ describe('building greenwood with error handling for app and page templates', ()
 
   it('should display an error if app-template.js is missing', async () => {
     // add blank page-template
-    await fs.writeFileSync(path.join(CONFIG.usrTemplate, 'page-template.js'), '');
+    await fs.writeFileSync(path.join(CONTEXT.usrTemplate, 'page-template.js'), '');
     await setup.run(['./packages/cli/index.js'], '').catch((err) => {
       expect(err).to.contain("It looks like you don't have an app template defined. ");            
     });
   });
 
   afterEach(async() => {
-    await fs.remove(CONFIG.usrSrc);
-    await fs.remove(CONFIG.publicDir);
-    await fs.remove(CONFIG.scratchDir);
+    await fs.remove(CONTEXT.usrSrc);
+    await fs.remove(CONTEXT.publicDir);
+    await fs.remove(CONTEXT.scratchDir);
   });
 
 });

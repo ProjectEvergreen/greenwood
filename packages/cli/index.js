@@ -31,18 +31,6 @@ program
   .action((cmd) => {
     MODE = cmd._name;
   });
-program
-  .command('create')
-  .description('Generate a new static site.')
-  .action((cmd) => {
-    MODE = cmd._name;
-  });
-program
-  .command('serve')
-  .description('Serve a production build locally.')
-  .action((cmd) => {
-    MODE = cmd._name;
-  });
 
 program.parse(process.argv);
 
@@ -66,7 +54,6 @@ const run = async() => {
 
         console.log('...................................'.yellow);
         console.log('Static site generation complete!');
-        console.log('Serve with: '.cyan + 'greenwood serve'.green);
         console.log('...................................'.yellow);
         
         break;
@@ -77,14 +64,6 @@ const run = async() => {
         
         console.log('Development mode activiated'.green);
 
-        break;
-      case 'create':
-        console.log('Creating Greenwood application...');
-        // Generate Greenwood application
-        break;
-      case 'serve':
-        console.log('Now serving application at http://localhost:8000');
-        // Serve Greenwood application
         break;
       default: 
         console.log('Error: missing command. try checking --help if you\'re encountering issues');

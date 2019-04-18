@@ -7,39 +7,37 @@ const isDirectory = source => fs.lstatSync(source).isDirectory();
 const getUserWorkspaceDirectories = (source) => {
   return fs.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory);
 };
+const mapUserWorkspaceDirectory = (userPath) => {
+  const directory = userPath.split('/')[userPath.split('/').length - 1];
+
+  return new webpack.NormalModuleReplacementPlugin(
+    new RegExp(`${directory}`),
+    (resource) => {
+      resource.request = resource.request.replace(new RegExp(`\.\.\/${directory}`), userPath);
+      
+      // remove any additional nests, after replacement with absolute path of user workspace + directory
+      const additionalNestedPathIndex = resource.request.lastIndexOf('..');
+      
+      if (additionalNestedPathIndex > -1) {
+        resource.request = resource.request.substring(additionalNestedPathIndex + 2, resource.request.length);
+      }
+    }
+  );
+};
 
 module.exports = (context) => {
   // dynamically map all the user's workspace directories for resolution by webpack
   // this essentially helps us keep watch over changes from the user, and greenwood's build pipeline
-  // TODO make a function ?
-  const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map((userPath) => {
-    const directory = userPath.split('/')[userPath.split('/').length - 1];
-
-    return new webpack.NormalModuleReplacementPlugin(
-      new RegExp(`${directory}`),
-      (resource) => {
-        resource.request = resource.request.replace(new RegExp(`\.\.\/${directory}`), userPath);
-        
-        // remove any additional nests, after replacement with absolute path of user workspace + directory
-        const additionalNestedPathIndex = resource.request.lastIndexOf('..');
-        
-        if (additionalNestedPathIndex > -1) {
-          resource.request = resource.request.substring(additionalNestedPathIndex + 2, resource.request.length);
-        }
-      }
-    );
-  });
+  const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map(mapUserWorkspaceDirectory);
 
   return {
 
     entry: {
-      // TODO magic string - greenwood, app, app.js
-      index: path.join(process.cwd(), '.greenwood', 'app', 'app.js')
+      index: path.join(context.scratchDir, 'app', 'app.js')
     },
 
     output: {
-      // TODO magic string - public
-      path: path.join(process.cwd(), 'public'),
+      path: context.publicDir,
       filename: '[name].[hash].bundle.js',
       publicPath: '/'
     },
@@ -102,7 +100,7 @@ module.exports = (context) => {
       ),
       
       new HtmlWebpackPlugin({
-        template: path.join(process.cwd(), '.greenwood', 'index.html'),
+        template: path.join(context.scratchDir, 'index.html'),
         chunksSortMode: 'dependency'
       })
     ]

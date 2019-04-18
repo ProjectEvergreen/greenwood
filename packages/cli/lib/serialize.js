@@ -26,7 +26,7 @@ module.exports = serializeBuild = async (compilation) => {
         port: PORT,
         https: false,
         directory: compilation.context.publicDir,
-        spa: 'index.html' // TODO magic string
+        spa: 'index.html'
       });
 
       await runBrowser(compilation);

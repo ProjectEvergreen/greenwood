@@ -54,14 +54,12 @@ const writeListImportFile = async (compilation) => {
   });
 
   // Create app directory so that app-template relative imports are correct
-  // TODO magic string - app
   const appDir = path.join(compilation.context.scratchDir, 'app');
 
   if (!fs.existsSync(appDir)) {
     await fs.mkdirSync(appDir);
   }
   
-  // TODO magic string - list.js
   return await fs.writeFileSync(path.join(appDir, './list.js'), importList.join(''));
 };
 
@@ -78,7 +76,6 @@ const writeRoutes = async(compilation) => {
 
       const result = data.toString().replace(/MYROUTES/g, routes.join(''));
 
-      // TODO magic strings, app and app.js
       await fs.writeFileSync(path.join(compilation.context.scratchDir, 'app', './app.js'), result);
 
       resolve();

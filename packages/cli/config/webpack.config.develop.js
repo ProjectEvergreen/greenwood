@@ -31,7 +31,7 @@ module.exports = (context) => {
     // TODO magic strings - .greenwood, app, app.js
     entry: [
       `webpack-dev-server/client?http://${host}:${port}`,
-      path.join(process.cwd(), '.greenwood', 'app', 'app.js')
+      path.join(context.scratchDir, 'app', 'app.js')
     ],
 
     devServer: {

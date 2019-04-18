@@ -26,7 +26,6 @@ module.exports = initContexts = async() => {
         publicDir: path.join(process.cwd(), './public'),
         pageTemplate: 'page-template.js',
         appTemplate: 'app-template.js'
-        // default: true
       };
     
       // TODO allow per template overrides
@@ -45,9 +44,6 @@ module.exports = initContexts = async() => {
           'Please include an app-template.js in your templates directory. \n' +
           'See https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js');
         }
-
-        // set default flag that we're using a user template
-        // config.default = false;
       }
       if (!fs.existsSync(context.scratchDir)) {
         fs.mkdirSync(context.scratchDir);
