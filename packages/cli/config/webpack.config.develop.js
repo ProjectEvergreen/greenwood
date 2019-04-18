@@ -3,10 +3,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const FilewatcherPlugin = require('filewatcher-webpack-plugin');
 const generateCompilation = require('../lib/compile');
+const webpackMerge = require('webpack-merge');
 
 const host = 'localhost';
 const port = 1981;
-const publicPath = '/';
 let isRebuilding = false;
 
 const rebuild = async() => {
@@ -24,11 +24,13 @@ const rebuild = async() => {
 };
 
 module.exports = (context) => {
+  const commonConfig = require(path.join(__dirname, '..', './config/webpack.config.common.js'))(context);
+  const publicPath = commonConfig.output.publicPath;
 
-  return {
+  return webpackMerge(commonConfig, {
+
     mode: 'development',
 
-    // TODO magic strings - .greenwood, app, app.js
     entry: [
       `webpack-dev-server/client?http://${host}:${port}`,
       path.join(context.scratchDir, 'app', 'app.js')
@@ -74,5 +76,5 @@ module.exports = (context) => {
         publicPath
       })
     ]
-  };
+  });
 };
