@@ -61,7 +61,6 @@ const writeListImportFile = async (compilation) => {
     await fs.mkdirSync(appDir);
   }
   
-  console.log('importList', importList);
   // TODO magic string - list.js
   return await fs.writeFileSync(path.join(appDir, './list.js'), importList.join(''));
 };
