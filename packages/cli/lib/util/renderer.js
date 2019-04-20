@@ -46,9 +46,7 @@ class Renderer {
       return { status: 400, content: '' };
     }
     // Serialize page.
-    let result = '<!DOCTYPE html>';
-
-    result += await page.evaluate('document.firstElementChild.outerHTML');
+    const result = await page.content();
 
     await page.close();
 
