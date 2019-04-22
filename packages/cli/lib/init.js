@@ -1,23 +1,27 @@
 const fs = require('fs');
 const path = require('path');
 const greenwoodWorkspace = path.join(__dirname, '..');
+const defaultTemplateDir = path.join(greenwoodWorkspace, 'templates/');
+const defaultSrc = path.join(process.cwd(), 'src');
 
-const userWorkspace = fs.existsSync(path.join(process.cwd(), 'src'))
-  ? path.join(process.cwd(), 'src')
-  : path.join(greenwoodWorkspace, 'templates/');
+const userWorkspace = fs.existsSync(defaultSrc)
+  ? defaultSrc
+  : defaultTemplateDir;
 
 const pagesDir = fs.existsSync(path.join(userWorkspace, 'pages'))
   ? path.join(userWorkspace, 'pages/')
-  : path.join(greenwoodWorkspace, 'templates/');
+  : defaultTemplateDir;
 
 const templatesDir = fs.existsSync(path.join(userWorkspace, 'templates'))
   ? path.join(userWorkspace, 'templates/')
-  : path.join(greenwoodWorkspace, 'templates/');
+  : defaultTemplateDir;
 
 module.exports = initContexts = async() => {
-
+  
   return new Promise((resolve, reject) => {
+    
     try {
+      
       const context = {
         userWorkspace,
         pagesDir,

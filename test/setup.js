@@ -1,9 +1,29 @@
 const os = require('os');
 const { spawn } = require('child_process');
+const path = require('path');
+const initContext = require('../packages/cli/lib/init');
 
 module.exports = class Setup {
   constructor(enableStdOut) {
     this.enableStdOut = enableStdOut; // debugging tests
+  }
+
+  init() {
+    return new Promise(async(resolve, reject) => {
+      try {
+        const ctx = await initContext();
+        const context = { 
+          ...ctx,
+          userSrc: path.join(__dirname, '..', 'src'), // static src
+          userTemplates: path.join(__dirname, '..', 'src', 'templates'), // static src/templates for testing empty templates dir, redundant in #38
+          testApp: path.join(__dirname, 'fixtures', 'mock-app', 'src')
+        };
+  
+        resolve(context);
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   run(args) {

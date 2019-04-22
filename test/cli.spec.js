@@ -6,20 +6,12 @@ const TestSetup = require('./setup');
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
 
-const CONTEXT = {
-  pagesDir: path.join(__dirname, '../packages/cli/templates/'),
-  scratchDir: path.join(__dirname, '..', './.greenwood/'),
-  templatesDir: path.join(__dirname, '../packages/cli/templates/'),
-  publicDir: path.join(__dirname, '..', './public'),
-  testApp: path.join(__dirname, 'fixtures', 'mock-app', 'src'),
-  usrSrc: path.join(__dirname, '..', 'src'),
-  usrTemplate: path.join(__dirname, '..', 'src', 'templates')
-};
-
 describe('building greenwood with default context (no user workspace)', () => {
-  
-  beforeEach(async () => {
+
+  before(async () => {
     setup = new TestSetup();
+    CONTEXT = await setup.init();
+
     await setup.run(['./packages/cli/index.js', 'build']);
   });
 
@@ -67,8 +59,7 @@ describe('building greenwood with default context (no user workspace)', () => {
     });
   });
 
-  afterEach(async() => {
-    await fs.remove(CONTEXT.usrSrc);
+  after(async() => {
     await fs.remove(CONTEXT.publicDir);
     await fs.remove(CONTEXT.scratchDir);
   });
@@ -76,14 +67,17 @@ describe('building greenwood with default context (no user workspace)', () => {
 });
 
 describe('building greenwood with a user workspace w/custom nested pages directories', () => {
-
-  beforeEach(async() => {
+  
+  before(async() => {
     setup = new TestSetup();
+    CONTEXT = await setup.init();
     // copy test app
-    await fs.copy(CONTEXT.testApp, CONTEXT.usrSrc);
+    await fs.copy(CONTEXT.testApp, CONTEXT.userSrc);
     await setup.run(['./packages/cli/index.js', 'build']);
+    
+    blogPageHtmlPath = path.join(CONTEXT.publicDir, 'blog', '20190326', 'index.html'); 
   });
-
+  
   it('should output one JS bundle', async() => {
     expect(await glob.promise(path.join(CONTEXT.publicDir, './**/index.*.bundle.js'))).to.have.lengthOf(1);
   });
@@ -91,13 +85,12 @@ describe('building greenwood with a user workspace w/custom nested pages directo
   it('should contain a nested blog page directory', () => {
     expect(fs.existsSync(path.join(CONTEXT.publicDir, 'blog', '20190326'))).to.be.true;
   });
-
+  
   describe('nested generated blog page directory', () => {
     const defaultHeading = 'Blog Page';
     const defaultBody = 'This is the blog page built by Greenwood.';
-    const blogPageHtmlPath = path.join(CONTEXT.publicDir, 'blog', '20190326', 'index.html');
     let dom;
-
+    
     beforeEach(async() => {
       dom = await JSDOM.fromFile(blogPageHtmlPath);
     });
@@ -119,31 +112,32 @@ describe('building greenwood with a user workspace w/custom nested pages directo
     });
   });
 
-  afterEach(async() => {
-    await fs.remove(CONTEXT.usrSrc);
+  after(async() => {
+    await fs.remove(CONTEXT.userSrc);
     await fs.remove(CONTEXT.publicDir);
     await fs.remove(CONTEXT.scratchDir);
   });
 
 });
 
-// TODO - https://github.com/ProjectEvergreen/greenwood/issues/32
-// describe('building greenwood with a user workspace w/custom app-template override', () => {
+// // TODO - https://github.com/ProjectEvergreen/greenwood/issues/32
+// // describe('building greenwood with a user workspace w/custom app-template override', () => {
 
-// });
+// // });
 
-// TODO - https://github.com/ProjectEvergreen/greenwood/issues/30
-// describe('building greenwood with a user workspace w/custom page-template override', () => {
+// // TODO - https://github.com/ProjectEvergreen/greenwood/issues/30
+// // describe('building greenwood with a user workspace w/custom page-template override', () => {
 
-// });
+// // });
 
 describe('building greenwood with error handling for app and page templates', () => {
-  beforeEach(async () => {
+  before(async () => {
     setup = new TestSetup();
+    CONTEXT = await setup.init();
 
     // create empty template directory
-    await fs.mkdirSync(CONTEXT.usrSrc);
-    await fs.mkdirSync(CONTEXT.usrTemplate);
+    await fs.mkdirSync(CONTEXT.userSrc);
+    await fs.mkdirSync(CONTEXT.userTemplates);
   });
 
   it('should display an error if page-template.js is missing', async() => {
@@ -154,14 +148,14 @@ describe('building greenwood with error handling for app and page templates', ()
 
   it('should display an error if app-template.js is missing', async () => {
     // add blank page-template
-    await fs.writeFileSync(path.join(CONTEXT.usrTemplate, 'page-template.js'), '');
+    await fs.writeFileSync(path.join(CONTEXT.userTemplates, 'page-template.js'), '');
     await setup.run(['./packages/cli/index.js'], '').catch((err) => {
       expect(err).to.contain("It looks like you don't have an app template defined. ");            
     });
   });
 
-  afterEach(async() => {
-    await fs.remove(CONTEXT.usrSrc);
+  after(async() => {
+    await fs.remove(CONTEXT.userSrc);
     await fs.remove(CONTEXT.publicDir);
     await fs.remove(CONTEXT.scratchDir);
   });
