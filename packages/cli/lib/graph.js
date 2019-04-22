@@ -55,10 +55,10 @@ const createGraphFromPages = async (pagesDir) => {
 
                   // set route to the nested pages path and file name(without extension)
                   route = completeNestedPath + route;
-                  mdFile = `.${completeNestedPath}${fileRoute}.md`;
-                  relativeExpectedPath = `'..${completeNestedPath}/${fileName}/${fileName}.js'`; 
+                  mdFile = `./${completeNestedPath}${fileRoute}.md`;
+                  relativeExpectedPath = `'../${completeNestedPath}/${fileName}/${fileName}.js'`; 
                 } else {
-                  mdFile = `.${fileRoute}.md`;
+                  mdFile = `./${fileRoute}.md`;
                   relativeExpectedPath = `'../${fileName}/${fileName}.js'`; 
                 }
                 
@@ -97,11 +97,11 @@ const createGraphFromPages = async (pagesDir) => {
   });
 };
 
-module.exports = generateGraph = async (config) => {
+module.exports = generateGraph = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const graph = await createGraphFromPages(config.pagesDir);
+      const graph = await createGraphFromPages(compilation.context.pagesDir);
 
       resolve(graph);
     } catch (err) {

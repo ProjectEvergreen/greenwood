@@ -1,36 +1,58 @@
 const fs = require('fs');
 const path = require('path');
+const greenwoodWorkspace = path.join(__dirname, '..');
+const defaultTemplateDir = path.join(greenwoodWorkspace, 'templates/');
+const defaultSrc = path.join(process.cwd(), 'src');
 
-module.exports = initDirectories = async(config) => {
+const userWorkspace = fs.existsSync(defaultSrc)
+  ? defaultSrc
+  : defaultTemplateDir;
 
+const pagesDir = fs.existsSync(path.join(userWorkspace, 'pages'))
+  ? path.join(userWorkspace, 'pages/')
+  : defaultTemplateDir;
+
+const templatesDir = fs.existsSync(path.join(userWorkspace, 'templates'))
+  ? path.join(userWorkspace, 'templates/')
+  : defaultTemplateDir;
+
+module.exports = initContexts = async() => {
+  
   return new Promise((resolve, reject) => {
-    try {
-      const usrPagesDir = path.join(process.cwd(), './src/pages');
-      const usrTemplateDir = path.join(process.cwd(), './src/templates');
     
-      if (fs.existsSync(usrPagesDir)) {
-        config.pagesDir = usrPagesDir;
-      }
-      if (fs.existsSync(usrTemplateDir)) {
-        if (!fs.existsSync(path.join(usrTemplateDir, config.pageTemplate))) {
+    try {
+      
+      const context = {
+        userWorkspace,
+        pagesDir,
+        scratchDir: path.join(process.cwd(), './.greenwood/'),
+        templatesDir,
+        publicDir: path.join(process.cwd(), './public'),
+        pageTemplate: 'page-template.js',
+        appTemplate: 'app-template.js'
+      };
+    
+      // TODO allow per template overrides
+      if (fs.existsSync(context.templatesDir)) {
+        
+        // https://github.com/ProjectEvergreen/greenwood/issues/30
+        if (!fs.existsSync(path.join(context.templatesDir, context.pageTemplate))) {
           reject('It looks like you don\'t have a page template defined. \n' +
           'Please include a page-template.js in your templates directory. \n' +
           'See https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/page-template.js');
         }
-        if (!fs.existsSync(path.join(usrTemplateDir, config.appTemplate))) {
+
+        // https://github.com/ProjectEvergreen/greenwood/issues/32
+        if (!fs.existsSync(path.join(context.templatesDir, context.appTemplate))) {
           reject('It looks like you don\'t have an app template defined. \n' +
           'Please include an app-template.js in your templates directory. \n' +
           'See https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js');
         }
-        /// set templates directory to user's src/templates directory
-        config.templatesDir = usrTemplateDir;
-        /// set default flag that we're using a user template
-        config.default = false;
       }
-      if (!fs.existsSync(config.scratchDir)) {
-        fs.mkdirSync(config.scratchDir);
+      if (!fs.existsSync(context.scratchDir)) {
+        fs.mkdirSync(context.scratchDir);
       }
-      resolve(config);
+      resolve(context);
     } catch (err) {
       reject(err);
     }

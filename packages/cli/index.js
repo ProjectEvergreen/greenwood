@@ -3,6 +3,7 @@ require('colors');
 const chalk = require('chalk');
 const path = require('path');
 const program = require('commander');
+const generateCompilation = require('./lib/compile');
 const runProdBuild = require('./tasks/build');
 const runDevServer = require('./tasks/develop');
 const scriptPkg = require(path.join(__dirname, '../..', 'package.json'));
@@ -30,18 +31,6 @@ program
   .action((cmd) => {
     MODE = cmd._name;
   });
-program
-  .command('create')
-  .description('Generate a new static site.')
-  .action((cmd) => {
-    MODE = cmd._name;
-  });
-program
-  .command('serve')
-  .description('Serve a production build locally.')
-  .action((cmd) => {
-    MODE = cmd._name;
-  });
 
 program.parse(process.argv);
 
@@ -50,28 +39,31 @@ if (program.parse.length === 0) {
 }
 
 const run = async() => {
+  process.env.NODE_ENV = MODE === 'develop' ? 'development' : 'production';
+
+  const compilation = await generateCompilation();
 
   try {
+
     switch (MODE) {
 
       case 'build':
-        await runProdBuild();
+        console.log('Building project for production.'.yellow);
+        
+        await runProdBuild(compilation);
+
         console.log('...................................'.yellow);
         console.log('Static site generation complete!');
-        console.log('Serve with: '.cyan + 'greenwood serve'.green);
         console.log('...................................'.yellow);
+        
         break;
       case 'develop':
-        console.log('Development Mode Activated');
-        await runDevServer();
-        break;
-      case 'create':
-        console.log('Creating Greenwood application...');
-        // Generate Greenwood application
-        break;
-      case 'serve':
-        console.log('Now serving application at http://localhost:8000');
-        // Serve Greenwood application
+        console.log('Starting local development server'.yellow);        
+        
+        await runDevServer(compilation);
+        
+        console.log('Development mode activiated'.green);
+
         break;
       default: 
         console.log('Error: missing command. try checking --help if you\'re encountering issues');
