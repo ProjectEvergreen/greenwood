@@ -86,11 +86,11 @@ const writeRoutes = async(compilation) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-const setupIndex = async(compilation) => {
+const setupIndex = async({ context }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      fs.copyFileSync(path.resolve(config.templatesDir, '404.html'), path.join(config.scratchDir, '404.html'));
-      fs.copyFileSync(path.resolve(config.templatesDir, 'index.html'), path.join(config.scratchDir, 'index.html'));
+      fs.copyFileSync(path.resolve(context.templatesDir, '404.html'), path.join(context.scratchDir, '404.html'));
+      fs.copyFileSync(path.resolve(context.templatesDir, 'index.html'), path.join(context.scratchDir, 'index.html'));
       resolve();
     } catch (err) {
       reject(err);
