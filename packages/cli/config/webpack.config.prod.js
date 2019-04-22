@@ -1,49 +1,27 @@
-const commonConfig = require('./webpack.config.common');
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-// const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
+const path = require('path');
 const webpackMerge = require('webpack-merge');
+const commonConfig = require(path.join(__dirname, '..', './config/webpack.config.common.js'));
 
-module.exports = webpackMerge(commonConfig, {
+module.exports = (context) => {
+  const configWithContext = commonConfig(context);
 
-  mode: 'production',
+  return webpackMerge(configWithContext, {
 
-  performance: {
-    hints: 'error'
-  },
+    mode: 'production',
 
-  plugins: [
-    new HtmlWebpackPlugin({
-      filename: '404.html',
-      template: '.greenwood/404.html',
-      publicPath: commonConfig.publicPath
-    })
-    // new FaviconsWebpackPlugin({
-    //   logo: './favicon.png',
-    //   emitStats: true,
-    //   prefix: 'icons/',
-    //   statsFilename: 'icons/stats.json',
-    //   inject: true,
-    //   title: 'Create Evergreen App',
-    //   background: '#466628',
-    //   icons: {
-    //     android: true,
-    //     appleIcon: false,
-    //     appleStartup: false,
-    //     coast: false,
-    //     favicons: true,
-    //     firefox: true,
-    //     opengraph: true,
-    //     twitter: true,
-    //     yandex: false,
-    //     windows: false
-    //   }
-    // }),
+    performance: {
+      hints: 'error'
+    },
 
-    // new BundleAnalyzerPlugin({
-    //   analyzerMode: 'static',
-    //   openAnalyzer: false
-    // })
-  ]
-});
+    plugins: [  
+      new HtmlWebpackPlugin({
+        filename: '404.html',
+        template: path.join(context.scratchDir, '404.html'),
+        publicPath: configWithContext.output.publicPath
+      })
+    ]
+
+  });
+
+};
