@@ -6,8 +6,6 @@ const generateCompilation = require('../lib/compile');
 const webpackMerge = require('webpack-merge');
 const commonConfig = require(path.join(__dirname, '..', './config/webpack.config.common.js'));
 
-const host = 'localhost';
-const port = 1981;
 let isRebuilding = false;
 
 const rebuild = async() => {
