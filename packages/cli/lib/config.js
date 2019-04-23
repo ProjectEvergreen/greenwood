@@ -29,6 +29,5 @@ module.exports = readAndMergeConfig = async() => {
   
     config = { ...config, ...userCfgFile };
   }
-  console.log(config);
   return config;
 };
