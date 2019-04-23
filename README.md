@@ -8,7 +8,7 @@ A modern and performant static site generator supporting Web Component based dev
 ## Getting Started
 By default, Greenwood will generate a site for you in _public/_.
 ```shell
-$ greenwood
+$ greenwood build
 ```
 
 Fun!  But naturally you'll want to make your own pages.  So create a folder called _src/pages/_ and create a page called _index.md_.
@@ -77,6 +77,14 @@ class index extends LitElement {
 customElements.define('home-page', index);
 ```
 
+### Development Mode
+
+You can launch a development server with live-reload by running:
+
+```bash
+$ greenwood develop
+```
+
 ## Advanced Markdown
 
 You can also render custom html such as a custom style or even a component within your markdown page using `imports` in your front-matter variables at top, as well as utilizing the `render` code block e.g.
@@ -101,6 +109,40 @@ This is an example page built by Greenwood.  Make your own in src/pages!
 ````
 ## API
 Here are some of the features and capabiliites of Greenwood.
+
+### Configure
+
+Custom greenwood configurations can be added to a `greenwood.config.js` file in your root directory. For example, you may want to change the `src` folder to something else such as `www`.
+
+```js
+{
+    "source": "www"
+}
+
+```
+
+#### PublicPath
+
+If you're hosting at yourdomain.com/mysite/ as the root to your site, you can change the public path by adding it within a `greenwood.config.js`:
+
+```js
+{
+    "publicPath": "/mysite/",
+}
+```
+
+#### Dev Server
+
+You can adjust your dev server host and port, if you prefer to use something other than the default by adding it with a `greenwood.config.js`
+
+```js
+{
+    "devServer": {
+      "port": 1984,
+      "host": "localhost"
+    }
+}
+```
 
 ### Global CSS / Assets
 > TODO 
