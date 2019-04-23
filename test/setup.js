@@ -11,12 +11,14 @@ module.exports = class Setup {
   init() {
     return new Promise(async(resolve, reject) => {
       try {
-        const ctx = await initContext();
+        const ctx = await initContext({ config: {} });
         const context = { 
           ...ctx,
           userSrc: path.join(__dirname, '..', 'src'), // static src
           userTemplates: path.join(__dirname, '..', 'src', 'templates'), // static src/templates for testing empty templates dir, redundant in #38
-          testApp: path.join(__dirname, 'fixtures', 'mock-app', 'src')
+          testApp: path.join(__dirname, 'fixtures', 'mock-app', 'src'),
+          userCfgPath: path.join(__dirname, 'fixtures', 'greenwood.config.json'),
+          userCfgRootPath: path.join(__dirname, '..', 'greenwood.config.json')
         };
   
         resolve(context);

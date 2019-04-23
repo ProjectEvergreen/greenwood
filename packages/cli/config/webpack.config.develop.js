@@ -24,9 +24,10 @@ const rebuild = async() => {
   }
 };
 
-module.exports = (context) => {
-  const configWithContext = commonConfig(context);
-  const publicPath = configWithContext.output.publicPath;
+module.exports = ({ context, config }) => {
+  const configWithContext = commonConfig(context, config);
+  const { publicPath, devServer } = config;
+  const { host, port } = devServer;
 
   return webpackMerge(configWithContext, {
 

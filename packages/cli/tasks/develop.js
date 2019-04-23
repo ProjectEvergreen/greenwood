@@ -2,11 +2,11 @@ const path = require('path');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 
-module.exports = runDevServer = async ({ context }) => {
+module.exports = runDevServer = async (compilation) => {
   return new Promise(async (resolve, reject) => {
 
     try {
-      const webpackConfig = require(path.join(__dirname, '..', './config/webpack.config.develop.js'))(context);
+      const webpackConfig = require(path.join(__dirname, '..', './config/webpack.config.develop.js'))(compilation);
       const devServerConfig = webpackConfig.devServer;
 
       let compiler = webpack(webpackConfig);

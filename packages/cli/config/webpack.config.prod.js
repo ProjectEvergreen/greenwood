@@ -3,8 +3,8 @@ const path = require('path');
 const webpackMerge = require('webpack-merge');
 const commonConfig = require(path.join(__dirname, '..', './config/webpack.config.common.js'));
 
-module.exports = (context) => {
-  const configWithContext = commonConfig(context);
+module.exports = ({ context, config }) => {
+  const configWithContext = commonConfig(context, config);
 
   return webpackMerge(configWithContext, {
 
@@ -18,7 +18,7 @@ module.exports = (context) => {
       new HtmlWebpackPlugin({
         filename: '404.html',
         template: path.join(context.scratchDir, '404.html'),
-        publicPath: configWithContext.output.publicPath
+        publicPath: config.publicPath
       })
     ]
 
