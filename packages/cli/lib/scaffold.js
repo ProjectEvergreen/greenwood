@@ -88,7 +88,6 @@ const writeRoutes = async(compilation) => {
 // eslint-disable-next-line no-unused-vars
 const setupIndex = async({ context }) => {
   return new Promise(async (resolve, reject) => {
-    console.log(context);
     try {
       fs.copyFileSync(context.notFoundPageTemplate, context.notFoundPageScratch);
       fs.copyFileSync(context.indexPageTemplate, context.indexPageScratch);
