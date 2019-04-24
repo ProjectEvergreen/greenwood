@@ -3,6 +3,7 @@ const path = require('path');
 const greenwoodWorkspace = path.join(__dirname, '..');
 const defaultTemplateDir = path.join(greenwoodWorkspace, 'templates/');
 const defaultSrc = path.join(process.cwd(), 'src');
+const scratchDir = path.join(process.cwd(), './.greenwood/');
 
 const userWorkspace = fs.existsSync(defaultSrc)
   ? defaultSrc
@@ -25,11 +26,15 @@ module.exports = initContexts = async() => {
       const context = {
         userWorkspace,
         pagesDir,
-        scratchDir: path.join(process.cwd(), './.greenwood/'),
+        scratchDir,
         templatesDir,
         publicDir: path.join(process.cwd(), './public'),
         pageTemplate: 'page-template.js',
-        appTemplate: 'app-template.js'
+        appTemplate: 'app-template.js',
+        indexPageTemplate: path.join(defaultTemplateDir, 'index.html'),
+        notFoundPageTemplate: path.join(defaultTemplateDir, '404.html'),
+        indexPageScratch: path.join(scratchDir, 'index.html'),
+        notFoundPageScratch: path.join(scratchDir, '404.html')
       };
     
       // TODO allow per template overrides
@@ -49,8 +54,8 @@ module.exports = initContexts = async() => {
           'See https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js');
         }
       }
-      if (!fs.existsSync(context.scratchDir)) {
-        fs.mkdirSync(context.scratchDir);
+      if (!fs.existsSync(scratchDir)) {
+        fs.mkdirSync(scratchDir);
       }
       resolve(context);
     } catch (err) {

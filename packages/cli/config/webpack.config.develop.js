@@ -66,8 +66,8 @@ module.exports = (context) => {
       }),
       new HtmlWebpackPlugin({
         filename: 'index.html',
-        template: path.join(context.scratchDir, 'index.dev.html'),
-        redirectScript: `
+        template: context.indexPageScratch,
+        spaIndexFallbackScript: `
         <script>
         (function(){
             var redirect = sessionStorage.redirect;
@@ -81,8 +81,8 @@ module.exports = (context) => {
       }),
       new HtmlWebpackPlugin({
         filename: '404.html',
-        template: path.join(context.scratchDir, '404.dev.html'),
-        redirectScript: `
+        template: context.notFoundPageScratch,
+        spaIndexFallbackScript: `
         <script>
           sessionStorage.redirect = location.href;
         </script>
