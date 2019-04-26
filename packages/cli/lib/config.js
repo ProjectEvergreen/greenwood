@@ -19,8 +19,8 @@ let config = {
 };
 
 module.exports = readAndMergeConfig = async() => {
-  if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.json'))) {
-    const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.json'));
+  if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
+    const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
       
     // prepend paths with current directory
     if (userCfgFile.source) {
