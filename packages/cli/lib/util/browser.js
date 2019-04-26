@@ -18,8 +18,8 @@ module.exports = async (url, label, route, outputDirectory) => {
   const target = path.join(outputDirectory, route);
 
   // Exception for index file in root public directory
-  const endOfPathFolder = target.substring(target.lastIndexOf('/'), target.length);
-  const isRootPublicDirectoryException = endOfPathFolder === '/index';
+  const endOfPathFolder = target.substring(target.lastIndexOf('/public/'), target.length);
+  const isRootPublicDirectoryException = endOfPathFolder === '/public/index';
 
   if (isRootPublicDirectoryException) {
     return await fs.writeFileSync(path.join(outputDirectory, 'index.html'), html);
