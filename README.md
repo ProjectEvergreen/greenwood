@@ -115,9 +115,9 @@ Here are some of the features and capabiliites of Greenwood.
 Custom greenwood configurations can be added to a `greenwood.config.js` file in your root directory. For example, you may want to change the `src` folder to something else such as `www`.
 
 ```js
-{
-    "source": "www"
-}
+module.exports = {
+    source: 'www'
+};
 
 ```
 
@@ -126,9 +126,9 @@ Custom greenwood configurations can be added to a `greenwood.config.js` file in 
 If you're hosting at yourdomain.com/mysite/ as the root to your site, you can change the public path by adding it within a `greenwood.config.js`:
 
 ```js
-{
-    "publicPath": "/mysite/",
-}
+module.exports = {
+    publicPath: '/mysite/',
+};
 ```
 
 #### Dev Server
@@ -136,12 +136,12 @@ If you're hosting at yourdomain.com/mysite/ as the root to your site, you can ch
 You can adjust your dev server host and port, if you prefer to use something other than the default by adding it with a `greenwood.config.js`
 
 ```js
-{
-    "devServer": {
-      "port": 1984,
-      "host": "localhost"
+module.exports = {
+    devServer: {
+      port: 1984,
+      host: 'localhost'
     }
-}
+};
 ```
 
 ### Global CSS / Assets
