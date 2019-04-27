@@ -1,6 +1,4 @@
 ---
-path: '/hello'
-label: 'hello'
 template: 'page'
 ---
 
