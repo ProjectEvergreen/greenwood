@@ -31,10 +31,8 @@ module.exports = initContexts = async() => {
         publicDir: path.join(process.cwd(), './public'),
         pageTemplate: 'page-template.js',
         appTemplate: 'app-template.js',
-        indexPageTemplate: path.join(defaultTemplateDir, 'index.html'),
-        notFoundPageTemplate: path.join(defaultTemplateDir, '404.html'),
-        indexPageScratch: path.join(scratchDir, 'index.html'),
-        notFoundPageScratch: path.join(scratchDir, '404.html')
+        indexPageTemplate: 'index.html',
+        notFoundPageTemplate: '404.html'
       };
     
       // TODO allow per template overrides

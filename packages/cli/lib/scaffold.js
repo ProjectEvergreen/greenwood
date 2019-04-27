@@ -89,8 +89,14 @@ const writeRoutes = async(compilation) => {
 const setupIndex = async({ context }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      fs.copyFileSync(context.notFoundPageTemplate, context.notFoundPageScratch);
-      fs.copyFileSync(context.indexPageTemplate, context.indexPageScratch);
+      fs.copyFileSync(
+        path.join(context.templatesDir, context.indexPageTemplate), 
+        path.join(context.scratchDir, context.indexPageTemplate)
+      );
+      fs.copyFileSync(
+        path.join(context.templatesDir, context.notFoundPageTemplate), 
+        path.join(context.scratchDir, context.notFoundPageTemplate)
+      );
       resolve();
     } catch (err) {
       reject(err);
