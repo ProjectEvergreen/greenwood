@@ -94,7 +94,6 @@ const createGraphFromPages = async (pagesDir) => {
       };
 
       await walkDirectory(pagesDir);
-      console.log(pages);
       resolve(pages);
     } catch (err) {
       reject(err);
