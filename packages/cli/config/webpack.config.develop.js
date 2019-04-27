@@ -65,29 +65,28 @@ module.exports = (context) => {
         publicPath
       }),
       new HtmlWebpackPlugin({
-        filename: 'index.html',
-        template: context.indexPageScratch,
+        template: path.join(context.scratchDir, context.indexPageTemplate),
         spaIndexFallbackScript: `
-        <script>
-        (function(){
-            var redirect = sessionStorage.redirect;
-            delete sessionStorage.redirect;
-            if (redirect && redirect != location.href) {
-            history.replaceState(null, null, redirect);
-            }
-        })();
-        </script>
+          <script>
+          (function(){
+              var redirect = sessionStorage.redirect;
+              delete sessionStorage.redirect;
+              if (redirect && redirect != location.href) {
+              history.replaceState(null, null, redirect);
+              }
+          })();
+          </script>
         `
       }),
       new HtmlWebpackPlugin({
-        filename: '404.html',
-        template: context.notFoundPageScratch,
+        filename: context.notFoundPageTemplate,
+        template: path.join(context.scratchDir, context.notFoundPageTemplate),
         spaIndexFallbackScript: `
-        <script>
-          sessionStorage.redirect = location.href;
-        </script>
-    
-        <meta http-equiv="refresh" content="0;URL='${publicPath}'"></meta>
+          <script>
+            sessionStorage.redirect = location.href;
+          </script>
+      
+          <meta http-equiv="refresh" content="0;URL='${publicPath}'"></meta>
         `
       })
     ]

@@ -16,9 +16,9 @@ module.exports = (context) => {
 
     plugins: [  
       new HtmlWebpackPlugin({
-        filename: '404.html',
-        template: context.notFoundPageScratch,
-        publicPath: configWithContext.output.publicPath
+        filename: context.notFoundPageTemplate,
+        template: path.join(context.scratchDir, context.notFoundPageTemplate),
+        publicPath: configWithContext.publicPath
       })
     ]
 
