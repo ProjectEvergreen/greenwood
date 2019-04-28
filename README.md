@@ -117,7 +117,6 @@ By default, Greenwood will supply its own [app-template](https://github.com/Proj
 An `app-template.js` must follow the [default template](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js#L1-L13) in that it must include the lit-redux-router, redux, redux-thunk, lazy-reducer-enhancer and it must create a redux store.  You may import any additional components or tools you wish but the `import './list';` [must be included](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js#L16) in order to import all your generated static page components. Do not change the path and you can ignore the fact that this file doesn't exist, it will be created on build in memory.  In the [render function](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js#L21-L26), it must include somewhere:
 
 ```html
-<lit-route path="/" component="home-page"></lit-route>
 MYROUTES
 ```
 
