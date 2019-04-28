@@ -100,7 +100,7 @@ module.exports = (context, graph) => {
       ),
       
       new HtmlWebpackPlugin({
-        template: path.join(context.scratchDir, 'index.html'),
+        template: path.join(context.scratchDir, context.indexPageTemplate),
         chunksSortMode: 'dependency'
       })
     ]
