@@ -20,7 +20,6 @@ connectRouter(store);
 class AppComponent extends LitElement {
   render() {
     return html`
-        <lit-route path="/" component="eve-index"></lit-route>
         MYROUTES
         <lit-route><h1>404 Not found</h1></lit-route>
     `;

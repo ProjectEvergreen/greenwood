@@ -74,9 +74,7 @@ const writeRoutes = async(compilation) => {
       let data = await fs.readFileSync(compilation.context.appTemplatePath);
 
       const routes = compilation.graph.map(file => {
-        if (file.route !== '/') {
-          return `<lit-route path="${file.route}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
-        }
+        return `<lit-route path="${file.route}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
       });
 
       const result = data.toString().replace(/MYROUTES/g, routes.join(''));
@@ -91,25 +89,17 @@ const writeRoutes = async(compilation) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-const setupIndex = async(compilation) => {
+const setupIndex = async({ context }) => {
   return new Promise(async (resolve, reject) => {
-    const context = compilation.context;
-    let indexHtml = 'index.html';
-    let notFoundHtml = '404.html';
-    let devIndexHtml = 'index.dev.html';
-    let devNotFoundHtml = '404.dev.html';
-
     try {
-
-      // create redirect 404 pages for lit-redux-router + SPA fallback for development
-      if (process.env.NODE_ENV === 'development') {
-        fs.copyFileSync(path.resolve(context.templatesDir, devNotFoundHtml), path.join(context.scratchDir, devNotFoundHtml));
-        fs.copyFileSync(path.resolve(context.templatesDir, devIndexHtml), path.join(context.scratchDir, devIndexHtml));
-      }
-
-      fs.copyFileSync(path.resolve(context.templatesDir, notFoundHtml), path.join(context.scratchDir, notFoundHtml));
-      fs.copyFileSync(path.resolve(context.templatesDir, indexHtml), path.join(context.scratchDir, indexHtml));
-   
+      fs.copyFileSync(
+        path.join(context.templatesDir, context.indexPageTemplate), 
+        path.join(context.scratchDir, context.indexPageTemplate)
+      );
+      fs.copyFileSync(
+        path.join(context.templatesDir, context.notFoundPageTemplate), 
+        path.join(context.scratchDir, context.notFoundPageTemplate)
+      );
       resolve();
     } catch (err) {
       reject(err);

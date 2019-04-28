@@ -1,6 +1,4 @@
 ---
-label: 'blog'
-template: 'page'
 imports:
   header: '../../../components/header/header.js'
   CSS: '../../../styles/theme.css'
