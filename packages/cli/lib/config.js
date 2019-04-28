@@ -23,7 +23,7 @@ module.exports = readAndMergeConfig = async() => {
     const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
       
     // prepend paths with current directory
-    if (userCfgFile.source) {
+    if (userCfgFile.source && !path.isAbsolute(userCfgFile.source)) {
       userCfgFile.source = path.join(process.cwd(), userCfgFile.source);
     }
   

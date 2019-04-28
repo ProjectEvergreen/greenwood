@@ -11,7 +11,8 @@ module.exports = class Setup {
   init() {
     return new Promise(async(resolve, reject) => {
       try {
-        const ctx = await initContext({ config: {} });
+        const defaultSource = path.join(process.cwd(), 'src');
+        const ctx = await initContext({ config: { source: defaultSource } });
         const context = { 
           ...ctx,
           userSrc: path.join(__dirname, '..', 'src'), // static src
