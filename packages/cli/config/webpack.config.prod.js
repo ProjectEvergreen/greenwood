@@ -3,8 +3,8 @@ const path = require('path');
 const webpackMerge = require('webpack-merge');
 const commonConfig = require(path.join(__dirname, '..', './config/webpack.config.common.js'));
 
-module.exports = (context) => {
-  const configWithContext = commonConfig(context);
+module.exports = ({ context, graph }) => {
+  const configWithContext = commonConfig(context, graph);
 
   return webpackMerge(configWithContext, {
 

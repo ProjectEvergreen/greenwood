@@ -102,6 +102,7 @@ describe('building greenwood with a user workspace w/custom nested pages directo
     await setup.run(['./packages/cli/index.js', 'build']);
     
     blogPageHtmlPath = path.join(CONTEXT.publicDir, 'blog', '20190326', 'index.html'); 
+    customFMPageHtmlPath = path.join(CONTEXT.publicDir, 'customfm', 'index.html'); 
   });
   
   it('should output one JS bundle', async() => {
@@ -126,15 +127,47 @@ describe('building greenwood with a user workspace w/custom nested pages directo
     });
 
     it('should have the expected heading text within the blog page in the blog directory', async() => {
-      const heading = dom.window.document.querySelector('h3.wc-md-blog').textContent;
+      const heading = dom.window.document.querySelector('h3').textContent;
   
       expect(heading).to.equal(defaultHeading);
     });
   
     it('should have the expected paragraph text within the blog page in the blog directory', async() => {
-      let paragraph = dom.window.document.querySelector('p.wc-md-blog').textContent;
+      let paragraph = dom.window.document.querySelector('p').textContent;
   
       expect(paragraph).to.equal(defaultBody);
+    });
+  });
+
+  describe('a custom front-matter override page directory', () => {
+    const defaultPageHeading = 'Custom FM Page';
+    const defaultPageBody = 'This is a custom fm page built by Greenwood.';
+    let dom;
+    
+    beforeEach(async() => {
+      dom = await JSDOM.fromFile(customFMPageHtmlPath);
+    });
+
+    it('should contain a customfm folder with an index html file', () => {
+      expect(fs.existsSync(customFMPageHtmlPath)).to.be.true;
+    });
+
+    it('should have the expected heading text within the customfm page in the customfm directory', async() => {
+      const heading = dom.window.document.querySelector('h3').textContent;
+
+      expect(heading).to.equal(defaultPageHeading);
+    });
+
+    it('should have the expected paragraph text within the customfm page in the customfm directory', async() => {
+      let paragraph = dom.window.document.querySelector('p').textContent;
+
+      expect(paragraph).to.equal(defaultPageBody);
+    });
+
+    it('should have the expected blog-template\'s blog-content class', async() => {
+      let layout = dom.window.document.querySelector('.blog-content');
+
+      expect(layout).to.not.equal(null);
     });
   });
 
@@ -146,15 +179,10 @@ describe('building greenwood with a user workspace w/custom nested pages directo
 
 });
 
-// // TODO - https://github.com/ProjectEvergreen/greenwood/issues/32
-// // describe('building greenwood with a user workspace w/custom app-template override', () => {
+// TODO - https://github.com/ProjectEvergreen/greenwood/issues/32
+// describe('building greenwood with a user workspace w/custom app-template override', () => {
 
-// // });
-
-// // TODO - https://github.com/ProjectEvergreen/greenwood/issues/30
-// // describe('building greenwood with a user workspace w/custom page-template override', () => {
-
-// // });
+// });
 
 describe('building greenwood with error handling for app and page templates', () => {
   before(async () => {
