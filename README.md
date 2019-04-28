@@ -139,11 +139,11 @@ Here are some of the features and capabiliites of Greenwood.
 
 ### Configure
 
-Custom greenwood configurations can be added to a `greenwood.config.js` file in your workspace directory. For example, you may want to change the `src` folder to something else such as `www`. By default, you can use a path relative to the current working directory. You can also use an absolute path.
+Custom greenwood configurations can be added to a `greenwood.config.js` file in your root directory. For example, you may want to change the `src` folder to something else such as `www`. By default, you can use a path relative to the current working directory. You can also use an absolute path.
 
 ```js
 module.exports = {
-    source: 'www'
+    workspace: 'www'
 };
 
 ```
