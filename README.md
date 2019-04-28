@@ -12,9 +12,9 @@ $ greenwood
 ```
 
 Fun!  But naturally you'll want to make your own pages.  So create a folder called _src/pages/_ and create a page called _index.md_.
-````md
+```md
 # Helloworld
-````
+```
 
 and run `greenwood` again and you should now see a new page called hello!
 
@@ -76,7 +76,7 @@ By default, a randomly generated export name will be created. `label` front-matt
 e.g. example below would output `<eve-hello></eve-hello>` with a child of `<wc-md-hello></wc-md-hello>` element containing the markdown
 
 
-````md
+```md
 ---
 label: 'hello'
 ---
@@ -84,7 +84,7 @@ label: 'hello'
 
 This is an example page built by Greenwood.  Make your own in src/pages!
 
-````
+```
 
 ### Front-Matter Template
 
@@ -100,7 +100,7 @@ e.g. `template: 'guides'` will use a `src/template/guides-template.js` file.
 
 [See Page Template section](#page-template) below for an example `page-template.js` file.
 
-````md
+```md
 ---
 label: 'hello'
 template: 'guides'
@@ -109,7 +109,7 @@ template: 'guides'
 
 This is an example page built by Greenwood.  Make your own in src/pages!
 
-````
+```
 
 ### Front-Matter Render
 
