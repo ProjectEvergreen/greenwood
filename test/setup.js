@@ -17,7 +17,7 @@ module.exports = class Setup {
           userSrc: path.join(__dirname, '..', 'src'), // static src
           userTemplates: path.join(__dirname, '..', 'src', 'templates'), // static src/templates for testing empty templates dir, redundant in #38
           testApp: path.join(__dirname, 'fixtures', 'mock-app', 'src'),
-          userCfgPath: path.join(__dirname, 'fixtures', 'greenwood.config.js'),
+          userCfgPath: path.join(__dirname, 'fixtures', 'mock-app', 'greenwood.config.js'),
           userCfgRootPath: path.join(__dirname, '..', 'greenwood.config.js')
         };
   
