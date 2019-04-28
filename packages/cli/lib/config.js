@@ -31,7 +31,7 @@ module.exports = readAndMergeConfig = async() => {
         const { workspace, devServer, publicPath } = userCfgFile;
           
         if (workspace) {
-          if (typeof userCfgFile.workspace !== 'string') {
+          if (typeof workspace !== 'string') {
             reject('Error: greenwood.config.js workspace path must be a string');
           }
 
