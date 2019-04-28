@@ -2,11 +2,16 @@ const fs = require('fs');
 const path = require('path');
 
 const writePageComponentsFromTemplate = async (compilation) => {
-  const createPageComponent = async (file) => {
+  const createPageComponent = async (file, context) => {
     return new Promise(async (resolve, reject) => {
       try {
-        let data = await fs.readFileSync(path.join(compilation.context.templatesDir, `${file.template}-template.js`));
-        let result = data.toString().replace(/entry/g, `wc-md-${file.label}`);
+        const pageTemplatePath = file.template === 'page' 
+          ? context.pageTemplatePath 
+          : path.join(context.templatesDir, `${file.template}-template.js`);
+        
+        const templateData = await fs.readFileSync(pageTemplatePath);
+
+        let result = templateData.toString().replace(/entry/g, `wc-md-${file.label}`);
 
         result = result.replace(/page-template/g, `eve-${file.label}`);
         result = result.replace(/MDIMPORT;/, `import '${file.mdFile}';`);
@@ -23,7 +28,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
 
     return new Promise(async(resolve, reject) => {
       try {
-        let result = await createPageComponent(file);
+        let result = await createPageComponent(file, context);
 
         let relPageDir = file.filePath.substring(context.pagesDir.length, file.filePath.length);
         const pathLastBackslash = relPageDir.lastIndexOf('/');
@@ -66,7 +71,7 @@ const writeListImportFile = async (compilation) => {
 const writeRoutes = async(compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let data = await fs.readFileSync(path.join(compilation.context.templatesDir, `${compilation.context.appTemplate}`));
+      let data = await fs.readFileSync(compilation.context.appTemplatePath);
 
       const routes = compilation.graph.map(file => {
         return `<lit-route path="${file.route}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;

@@ -177,8 +177,6 @@ module.exports = {
 > https://github.com/ProjectEvergreen/greenwood/issues/27
 
 ### Templates
-> TODO
-> https://github.com/ProjectEvergreen/greenwood/issues/32
 
 By default, Greenwood will supply its own [app-template](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js) and [page-template](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/page-template.js).  You can override these files by creating a src/templates directory in your application along with both template files. 
 
