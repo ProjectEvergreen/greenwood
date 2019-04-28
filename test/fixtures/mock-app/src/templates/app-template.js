@@ -24,7 +24,6 @@ class AppComponent extends LitElement {
     return html`
         <eve-header></eve-header>
         <eve-navigation></eve-navigation>
-        <lit-route path="/" component="eve-index"></lit-route>
         MYROUTES
     `;
   }

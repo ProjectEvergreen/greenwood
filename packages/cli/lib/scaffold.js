@@ -69,9 +69,7 @@ const writeRoutes = async(compilation) => {
       let data = await fs.readFileSync(path.join(compilation.context.templatesDir, `${compilation.context.appTemplate}`));
 
       const routes = compilation.graph.map(file => {
-        if (file.route !== '/') {
-          return `<lit-route path="${file.route}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
-        }
+        return `<lit-route path="${file.route}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
       });
 
       const result = data.toString().replace(/MYROUTES/g, routes.join(''));
