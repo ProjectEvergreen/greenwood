@@ -17,6 +17,14 @@ module.exports = async (url, label, route, outputDirectory) => {
   const html = dom.serialize();
   const target = path.join(outputDirectory, route);
 
+  // Exception for index file in root public directory
+  const endOfPathFolder = target.substring(target.lastIndexOf('/public/'), target.length);
+  const isRootPublicDirectoryException = endOfPathFolder === '/public/index';
+
+  if (isRootPublicDirectoryException) {
+    return await fs.writeFileSync(path.join(outputDirectory, 'index.html'), html);
+  }
+
   await fs.mkdirSync(target, { recursive: true });
   return await fs.writeFileSync(path.join(target, 'index.html'), html);
 };
