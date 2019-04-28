@@ -1,5 +1,4 @@
 ---
-label: 'index'
 template: 'page'
 imports:
   CSS: '../styles/theme.css'

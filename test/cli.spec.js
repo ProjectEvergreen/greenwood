@@ -102,6 +102,7 @@ describe('building greenwood with a user workspace w/custom nested pages directo
     await setup.run(['./packages/cli/index.js', 'build']);
     
     blogPageHtmlPath = path.join(CONTEXT.publicDir, 'blog', '20190326', 'index.html'); 
+    customFMPageHtmlPath = path.join(CONTEXT.publicDir, 'customfm', 'index.html'); 
   });
   
   it('should output one JS bundle', async() => {
@@ -126,15 +127,47 @@ describe('building greenwood with a user workspace w/custom nested pages directo
     });
 
     it('should have the expected heading text within the blog page in the blog directory', async() => {
-      const heading = dom.window.document.querySelector('h3.wc-md-blog').textContent;
+      const heading = dom.window.document.querySelector('h3').textContent;
   
       expect(heading).to.equal(defaultHeading);
     });
   
     it('should have the expected paragraph text within the blog page in the blog directory', async() => {
-      let paragraph = dom.window.document.querySelector('p.wc-md-blog').textContent;
+      let paragraph = dom.window.document.querySelector('p').textContent;
   
       expect(paragraph).to.equal(defaultBody);
+    });
+  });
+
+  describe('a custom front-matter override page directory', () => {
+    const defaultPageHeading = 'Custom FM Page';
+    const defaultPageBody = 'This is a custom fm page built by Greenwood.';
+    let dom;
+    
+    beforeEach(async() => {
+      dom = await JSDOM.fromFile(customFMPageHtmlPath);
+    });
+
+    it('should contain a customfm folder with an index html file', () => {
+      expect(fs.existsSync(customFMPageHtmlPath)).to.be.true;
+    });
+
+    it('should have the expected heading text within the customfm page in the customfm directory', async() => {
+      const heading = dom.window.document.querySelector('h3').textContent;
+
+      expect(heading).to.equal(defaultPageHeading);
+    });
+
+    it('should have the expected paragraph text within the customfm page in the customfm directory', async() => {
+      let paragraph = dom.window.document.querySelector('p').textContent;
+
+      expect(paragraph).to.equal(defaultPageBody);
+    });
+
+    it('should have the expected blog-template\'s blog-content class', async() => {
+      let layout = dom.window.document.querySelector('.blog-content');
+
+      expect(layout).to.not.equal(null);
     });
   });
 
@@ -150,85 +183,6 @@ describe('building greenwood with a user workspace w/custom nested pages directo
 // describe('building greenwood with a user workspace w/custom app-template override', () => {
 
 // });
-
-describe('building greenwood with a user workspace w/custom front-matter override', () => {
-
-  before(async () => {
-    setup = new TestSetup();
-    CONTEXT = await setup.init();
-
-    // copy custom-fm app
-    await fs.copy(CONTEXT.customFMApp, CONTEXT.userSrc);
-    await setup.run(['./packages/cli/index.js', 'build']);
-
-    indexPageHtmlPath = path.join(CONTEXT.publicDir, 'index.html'); 
-    blogPageHtmlPath = path.join(CONTEXT.publicDir, 'blog', 'index.html'); 
-  });
-
-  describe('using a custom label', () => {
-    const defaultIndexHeading = 'Home Page';
-    const defaultIndexBody = 'This is the blog home page built by Greenwood.';
-    let dom;
-    
-    beforeEach(async() => {
-      dom = await JSDOM.fromFile(indexPageHtmlPath);
-    });
-    
-    it('should contain an index html file', () => {
-      expect(fs.existsSync(indexPageHtmlPath)).to.be.true;
-    });
-  
-    it('should have the expected heading text within the index page in the public directory', async() => {
-      const heading = dom.window.document.querySelector('h3.wc-md-home').textContent;
-  
-      expect(heading).to.equal(defaultIndexHeading);
-    });
-
-    it('should have the expected paragraph text within the index page in the public directory', async() => {
-      let paragraph = dom.window.document.querySelector('p.wc-md-home').textContent;
-
-      expect(paragraph).to.equal(defaultIndexBody);
-    });
-  });
-  
-  describe('using a custom template with random label', () => {
-    const defaultBlogHeading = 'Blog Page';
-    const defaultBlogBody = 'This is the blog page built by Greenwood.';
-    let dom;
-    
-    beforeEach(async() => {
-      dom = await JSDOM.fromFile(blogPageHtmlPath);
-    });
-    it('should contain a nested blog page with an index html file', () => {
-      expect(fs.existsSync(blogPageHtmlPath)).to.be.true;
-    });
-
-    it('should have the expected heading text within the blog page in the blog directory', async() => {
-      const heading = dom.window.document.querySelector('h3').textContent;
-
-      expect(heading).to.equal(defaultBlogHeading);
-    });
-
-    it('should have the expected paragraph text within the blog page in the blog directory', async() => {
-      let paragraph = dom.window.document.querySelector('p').textContent;
-
-      expect(paragraph).to.equal(defaultBlogBody);
-    });
-
-    it('should have the expected blog-template\'s blog-content class', async() => {
-      let layout = dom.window.document.querySelector('.blog-content');
-
-      expect(layout).to.not.equal(null);
-    });
-
-  });
-
-  after(async() => {
-    await fs.remove(CONTEXT.userSrc);
-    await fs.remove(CONTEXT.publicDir);
-    await fs.remove(CONTEXT.scratchDir);
-  });
-});
 
 describe('building greenwood with error handling for app and page templates', () => {
   before(async () => {

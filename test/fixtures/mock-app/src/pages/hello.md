@@ -1,5 +1,4 @@
 ---
-label: 'hello'
 template: 'page'
 imports:
   CSS: '../styles/theme.css'
