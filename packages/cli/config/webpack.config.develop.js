@@ -24,14 +24,15 @@ const rebuild = async() => {
 
 module.exports = ({ config, context, graph }) => {
   const configWithContext = commonConfig(config, context, graph);
-  const publicPath = configWithContext.output.publicPath;
+  const { devServer, publicPath } = config;
+  const { host, port } = devServer;
 
   return webpackMerge(configWithContext, {
 
     mode: 'development',
 
     entry: [
-      `webpack-dev-server/client?http://${host}:${port}`,
+      `webpack-dev-server/client?${host}:${port}`,
       path.join(context.scratchDir, 'app', 'app.js')
     ],
 
@@ -48,7 +49,7 @@ module.exports = ({ config, context, graph }) => {
       new FilewatcherPlugin({
         watchFileRegex: [`/${context.userWorkspace}/`],
         onReadyCallback: () => { 
-          console.log(`Now serving Development Server available at http://${host}:${port}`);
+          console.log(`Now serving Development Server available at ${host}:${port}`);
         },
         // eslint-disable-next-line no-unused-vars
         onChangeCallback: async (path) => {

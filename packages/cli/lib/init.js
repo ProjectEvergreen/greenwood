@@ -9,7 +9,7 @@ module.exports = initContexts = async({ config }) => {
   return new Promise((resolve, reject) => {
     
     try {
-      const userWorkspace = path.join(config.source);
+      const userWorkspace = path.join(config.workspace);
       const userPagesDir = path.join(userWorkspace, 'pages/');
       const userTemplatesDir = path.join(userWorkspace, 'templates/');
       const userAppTemplate = path.join(userTemplatesDir, 'app-template.js');

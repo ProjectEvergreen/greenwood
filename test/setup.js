@@ -11,8 +11,8 @@ module.exports = class Setup {
   init() {
     return new Promise(async(resolve, reject) => {
       try {
-        const defaultSource = path.join(process.cwd(), 'src');
-        const ctx = await initContext({ config: { source: defaultSource } });
+        const defaultWorkspace = path.join(process.cwd(), 'src');
+        const ctx = await initContext({ config: { workspace: defaultWorkspace } });
         const context = { 
           ...ctx,
           userSrc: path.join(__dirname, '..', 'src'), // static src

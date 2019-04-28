@@ -1,11 +1,12 @@
 const fs = require('fs');
 const path = require('path');
+const url = require('url');
 
 let config = {
-  source: path.join(process.cwd(), 'src'),
+  workspace: path.join(process.cwd(), 'src'),
   devServer: {
     port: 1984,
-    host: 'localhost'
+    host: 'http://localhost'
   },
   publicPath: '/',
   // TODO add global meta data see issue #5
@@ -19,15 +20,46 @@ let config = {
 };
 
 module.exports = readAndMergeConfig = async() => {
-  if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
-    const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
+  return new Promise((resolve, reject) => {
+    try {
+      if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
+        const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
+    
+        // prepend userCfgFile devServer.host with http by default
+        userCfgFile.devServer.host = 'http://' + userCfgFile.devServer.host;
+
+        const { workspace, devServer, publicPath } = userCfgFile;
+          
+        if (workspace && typeof userCfgFile.workspace !== 'string') {
+          reject('Error: greenwood.config.js workspace path must be a string');
+        }
+
+        // prepend paths with current directory
+        if (workspace && !path.isAbsolute(workspace)) {
+          userCfgFile.workspace = path.join(process.cwd(), workspace);
+        }
+
+        if (publicPath && typeof publicPath !== 'string') {
+          reject('Error: greenwood.config.js publicPath must be a string');
+        }
+
+        if (Object.keys(devServer).length > 0) {
+          
+          if (url.parse(devServer.host).hostname === null) {
+            reject('Error: greenwood.config.js devServer host type must be a valid url');
+          }
+
+          if (!Number.isInteger(devServer.port)) {
+            reject('Error: greenwood.config.js devServer port must be an integer');
+          }
+        }
       
-    // prepend paths with current directory
-    if (userCfgFile.source && !path.isAbsolute(userCfgFile.source)) {
-      userCfgFile.source = path.join(process.cwd(), userCfgFile.source);
+        config = { ...config, ...userCfgFile };
+      }
+      resolve(config);
+
+    } catch (err) {
+      reject(err);
     }
-  
-    config = { ...config, ...userCfgFile };
-  }
-  return config;
+  });
 };

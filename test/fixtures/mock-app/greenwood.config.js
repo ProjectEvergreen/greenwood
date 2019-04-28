@@ -1,5 +1,5 @@
 module.exports = {
-  source: 'src2',
+  workspace: 'src2',
   publicPath: '/',
   devServer: {
     port: 1984,
