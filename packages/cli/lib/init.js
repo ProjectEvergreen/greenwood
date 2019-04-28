@@ -34,7 +34,9 @@ module.exports = initContexts = async() => {
           : path.join(defaultTemplatesDir, 'page-template.js'),
         appTemplatePath: userHasWorkspaceAppTemplate 
           ? userAppTemplate 
-          : path.join(defaultTemplatesDir, 'app-template.js')
+          : path.join(defaultTemplatesDir, 'app-template.js'),
+        indexPageTemplate: 'index.html',
+        notFoundPageTemplate: '404.html'
       };
 
       if (!fs.existsSync(scratchDir)) {

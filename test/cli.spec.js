@@ -154,13 +154,13 @@ describe('building greenwood with a user workspace w/custom nested pages directo
     });
 
     it('should have the expected heading text within the customfm page in the customfm directory', async() => {
-      const heading = dom.window.document.querySelector('h3').textContent;
+      const heading = dom.window.document.querySelector('h3.wc-md-customfm').textContent;
 
       expect(heading).to.equal(defaultPageHeading);
     });
 
     it('should have the expected paragraph text within the customfm page in the customfm directory', async() => {
-      let paragraph = dom.window.document.querySelector('p').textContent;
+      let paragraph = dom.window.document.querySelector('p.wc-md-customfm').textContent;
 
       expect(paragraph).to.equal(defaultPageBody);
     });
@@ -222,13 +222,13 @@ describe('building greenwood with user workspace that doesn\'t contain app templ
       });
 
       it('should have the expected heading text within the hello example page in the hello directory', async() => {
-        const heading = dom.window.document.querySelector('h3.wc-md-hello').textContent;
+        const heading = dom.window.document.querySelector('h3').textContent;
     
         expect(heading).to.equal(defaultHeading);
       });
     
       it('should have the expected paragraph text within the hello example page in the hello directory', async() => {
-        let paragraph = dom.window.document.querySelector('p.wc-md-hello').textContent;
+        let paragraph = dom.window.document.querySelector('p').textContent;
     
         expect(paragraph).to.equal(defaultBody);
       });
@@ -253,13 +253,13 @@ describe('building greenwood with user workspace that doesn\'t contain app templ
     });
 
     it('should have the expected heading text within the blog page in the blog directory', async() => {
-      const heading = dom.window.document.querySelector('h3.wc-md-blog').textContent;
+      const heading = dom.window.document.querySelector('h3').textContent;
   
       expect(heading).to.equal(defaultHeading);
     });
   
     it('should have the expected paragraph text within the blog page in the blog directory', async() => {
-      let paragraph = dom.window.document.querySelector('p.wc-md-blog').textContent;
+      let paragraph = dom.window.document.querySelector('p').textContent;
   
       expect(paragraph).to.equal(defaultBody);
     });
@@ -313,13 +313,13 @@ describe('building greenwood with user workspace that doesn\'t contain page temp
       });
 
       it('should have the expected heading text within the hello example page in the hello directory', async() => {
-        const heading = dom.window.document.querySelector('h3.wc-md-hello').textContent;
+        const heading = dom.window.document.querySelector('h3').textContent;
     
         expect(heading).to.equal(defaultHeading);
       });
     
       it('should have the expected paragraph text within the hello example page in the hello directory', async() => {
-        let paragraph = dom.window.document.querySelector('p.wc-md-hello').textContent;
+        let paragraph = dom.window.document.querySelector('p').textContent;
     
         expect(paragraph).to.equal(defaultBody);
       });
@@ -344,13 +344,13 @@ describe('building greenwood with user workspace that doesn\'t contain page temp
     });
 
     it('should have the expected heading text within the blog page in the blog directory', async() => {
-      const heading = dom.window.document.querySelector('h3.wc-md-blog').textContent;
+      const heading = dom.window.document.querySelector('h3').textContent;
   
       expect(heading).to.equal(defaultHeading);
     });
   
     it('should have the expected paragraph text within the blog page in the blog directory', async() => {
-      let paragraph = dom.window.document.querySelector('p.wc-md-blog').textContent;
+      let paragraph = dom.window.document.querySelector('p').textContent;
   
       expect(paragraph).to.equal(defaultBody);
     });
@@ -361,13 +361,3 @@ describe('building greenwood with user workspace that doesn\'t contain page temp
     await fs.remove(CONTEXT.scratchDir);
   });
 });
-
-// TODO - https://github.com/ProjectEvergreen/greenwood/issues/32
-// describe('building greenwood with a user workspace w/custom app-template override', () => {
-
-// });
-
-// TODO - https://github.com/ProjectEvergreen/greenwood/issues/30
-// describe('building greenwood with a user workspace w/custom page-template override', () => {
-
-// });
