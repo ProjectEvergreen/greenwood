@@ -47,12 +47,12 @@ const createGraphFromPages = async (pagesDir) => {
                 
                 // determine if this is an index file, if so set route to '/'
                 let route = fileRoute === '/index' ? '/' : fileRoute;
-      
+                
                 // check if additional nested directories
                 if (seperatorIndex > 0) {
                   // get all remaining nested page directories
                   completeNestedPath = subDir.substring(0, seperatorIndex);
-
+                  
                   // set route to the nested pages path and file name(without extension)
                   route = completeNestedPath + route;
                   mdFile = `./${completeNestedPath}${fileRoute}.md`;
@@ -62,6 +62,9 @@ const createGraphFromPages = async (pagesDir) => {
                   relativeExpectedPath = `'../${fileName}/${fileName}.js'`; 
                 }
                 
+                // generate a random element name
+                label = label || generateRandomElementLabel(6);
+
                 /*
                 * Variable Definitions
                 *----------------------
@@ -73,6 +76,7 @@ const createGraphFromPages = async (pagesDir) => {
                 * fileName: file name without extension/path, so that it can be copied to scratch dir with same name
                 * relativeExpectedPath: relative import path for generated component within a list.js file to later be 
                 * imported into app.js root component
+                * elementLabel: the element name for the generated md page e.g. <wc-md-hello-world></wc-md-hello-world>
                 */
 
                 pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath });
@@ -95,6 +99,19 @@ const createGraphFromPages = async (pagesDir) => {
       reject(err);
     }
   });
+};
+
+const generateRandomElementLabel = (size) => {
+
+  const letters = 'abcedfghijklmnopqrstuvwxyz';
+  let short = [], rand = 0;
+
+  for (let n = 0; n < size; n = n + 1) {
+    rand = Math.floor(Math.random() * 25);
+    short.push(letters.substr(rand, 1));
+  }
+  
+  return short.join('');
 };
 
 module.exports = generateGraph = async (compilation) => {

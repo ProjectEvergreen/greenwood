@@ -24,8 +24,8 @@ const rebuild = async() => {
   }
 };
 
-module.exports = (context) => {
-  const configWithContext = commonConfig(context);
+module.exports = ({ context, graph }) => {
+  const configWithContext = commonConfig(context, graph);
   const publicPath = configWithContext.output.publicPath;
 
   return webpackMerge(configWithContext, {
@@ -48,12 +48,12 @@ module.exports = (context) => {
     plugins: [
       // new webpack.HotModuleReplacementPlugin(),
       new FilewatcherPlugin({
-        watchFileRegex: [`/${context.userWorkspace}/`], 
+        watchFileRegex: [`/${context.userWorkspace}/`],
         onReadyCallback: () => { 
           console.log(`Now serving Development Server available at http://${host}:${port}`);
         },
         // eslint-disable-next-line no-unused-vars
-        onChangeCallback: async () => {
+        onChangeCallback: async (path) => {
           rebuild();
         },
         usePolling: true,
@@ -64,17 +64,30 @@ module.exports = (context) => {
         fileName: 'manifest.json',
         publicPath
       }),
-      // TODO magic string paths (index.html)
       new HtmlWebpackPlugin({
-        filename: 'index.html',
-        template: path.join(context.scratchDir, 'index.dev.html'),
-        publicPath
+        template: path.join(context.scratchDir, context.indexPageTemplate),
+        spaIndexFallbackScript: `
+          <script>
+          (function(){
+              var redirect = sessionStorage.redirect;
+              delete sessionStorage.redirect;
+              if (redirect && redirect != location.href) {
+              history.replaceState(null, null, redirect);
+              }
+          })();
+          </script>
+        `
       }),
-      // TODO magic string paths (404.html)
       new HtmlWebpackPlugin({
-        filename: '404.html',
-        template: path.join(context.scratchDir, '404.dev.html'),
-        publicPath
+        filename: context.notFoundPageTemplate,
+        template: path.join(context.scratchDir, context.notFoundPageTemplate),
+        spaIndexFallbackScript: `
+          <script>
+            sessionStorage.redirect = location.href;
+          </script>
+      
+          <meta http-equiv="refresh" content="0;URL='${publicPath}'"></meta>
+        `
       })
     ]
   });
