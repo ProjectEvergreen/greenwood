@@ -22,8 +22,8 @@ const rebuild = async() => {
   }
 };
 
-module.exports = ({ context, graph }) => {
-  const configWithContext = commonConfig(context, graph);
+module.exports = ({ config, context, graph }) => {
+  const configWithContext = commonConfig(config, context, graph);
   const publicPath = configWithContext.output.publicPath;
 
   return webpackMerge(configWithContext, {

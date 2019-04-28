@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const greenwoodWorkspace = path.join(__dirname, '..');
 const defaultTemplateDir = path.join(greenwoodWorkspace, 'templates/');
+const scratchDir = path.join(process.cwd(), './.greenwood/');
 
 module.exports = initContexts = async({ config }) => {
   

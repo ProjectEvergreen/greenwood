@@ -258,13 +258,13 @@ describe('building greenwood with user provided config file', () => {
     });
 
     it('should have the expected heading text within the blog page in the blog directory', async() => {
-      const heading = dom.window.document.querySelector('h3.wc-md-blog').textContent;
+      const heading = dom.window.document.querySelector('h3').textContent;
   
       expect(heading).to.equal(defaultHeading);
     });
   
     it('should have the expected paragraph text within the blog page in the blog directory', async() => {
-      let paragraph = dom.window.document.querySelector('p.wc-md-blog').textContent;
+      let paragraph = dom.window.document.querySelector('p').textContent;
   
       expect(paragraph).to.equal(defaultBody);
     });
