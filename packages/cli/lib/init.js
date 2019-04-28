@@ -25,11 +25,13 @@ module.exports = initContexts = async({ config }) => {
       const context = {
         userWorkspace,
         pagesDir,
-        scratchDir: path.join(process.cwd(), './.greenwood/'),
+        scratchDir,
         templatesDir,
         publicDir: path.join(process.cwd(), './public'),
         pageTemplate: 'page-template.js',
-        appTemplate: 'app-template.js'
+        appTemplate: 'app-template.js',
+        indexPageTemplate: 'index.html',
+        notFoundPageTemplate: '404.html'
       };
     
       // TODO allow per template overrides
@@ -49,8 +51,8 @@ module.exports = initContexts = async({ config }) => {
           'See https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js');
         }
       }
-      if (!fs.existsSync(context.scratchDir)) {
-        fs.mkdirSync(context.scratchDir);
+      if (!fs.existsSync(scratchDir)) {
+        fs.mkdirSync(scratchDir);
       }
       resolve(context);
     } catch (err) {

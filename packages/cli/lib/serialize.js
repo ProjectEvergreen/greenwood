@@ -6,10 +6,8 @@ const PORT = '8000';
 const runBrowser = async (compilation) => {
 
   try {
-    return await Promise.all(compilation.graph.map(file => {
-      const route = file.route === '/' ? '' : file.route;
-      
-      return browserRunner(`http://127.0.0.1:${PORT}/${route}`, file.label, file.route, compilation.context.publicDir);
+    return await Promise.all(compilation.graph.map(({ route, label }) => {
+      return browserRunner(`http://127.0.0.1:${PORT}${route}`, label, route, compilation.context.publicDir);
     }));
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -26,7 +24,7 @@ module.exports = serializeBuild = async (compilation) => {
         port: PORT,
         https: false,
         directory: compilation.context.publicDir,
-        spa: 'index.html'
+        spa: compilation.context.indexPageTemplate
       });
 
       await runBrowser(compilation);
