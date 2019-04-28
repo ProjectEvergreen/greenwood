@@ -39,6 +39,14 @@ module.exports = readAndMergeConfig = async() => {
           userCfgFile.workspace = path.join(process.cwd(), workspace);
         }
 
+        if (workspace && !fs.existsSync(userCfgFile.workspace)) {
+          reject('Error: greenwood.config.js workspace doesn\'t exist! \n' +
+            'common issues to check might be: \n' + 
+            '- typo in your workspace directory name, or in greenwood.config.js \n' +
+            '- if using relative paths, make sure your workspace is in the same cwd as _greenwood.config.js_ \n' +
+            '- consider using an absolute path, e.g. path.join(__dirname, \'my\', \'custom\', \'path\') // <__dirname>/my/custom/path/ ');
+        }
+
         if (publicPath && typeof publicPath !== 'string') {
           reject('Error: greenwood.config.js publicPath must be a string');
         }
