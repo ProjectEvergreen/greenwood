@@ -1,5 +1,4 @@
 ---
-label: 'blog'
 template: 'blog'
 ---
 

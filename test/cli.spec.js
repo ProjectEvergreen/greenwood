@@ -151,7 +151,6 @@ describe('building greenwood with a user workspace w/custom nested pages directo
 
 // });
 
-// https://github.com/ProjectEvergreen/greenwood/issues/30
 describe('building greenwood with a user workspace w/custom front-matter override', () => {
 
   before(async () => {
@@ -166,7 +165,7 @@ describe('building greenwood with a user workspace w/custom front-matter overrid
     blogPageHtmlPath = path.join(CONTEXT.publicDir, 'blog', 'index.html'); 
   });
 
-  describe('using a custom label the public directory', () => {
+  describe('using a custom label', () => {
     const defaultIndexHeading = 'Home Page';
     const defaultIndexBody = 'This is the blog home page built by Greenwood.';
     let dom;
@@ -192,10 +191,9 @@ describe('building greenwood with a user workspace w/custom front-matter overrid
     });
   });
   
-  describe('using a custom template and custom label the public directory', () => {
+  describe('using a custom template with random label', () => {
     const defaultBlogHeading = 'Blog Page';
     const defaultBlogBody = 'This is the blog page built by Greenwood.';
-    const pageTemplateClasses = 'eve-blog blog-content style-scope';
     let dom;
     
     beforeEach(async() => {
@@ -206,21 +204,22 @@ describe('building greenwood with a user workspace w/custom front-matter overrid
     });
 
     it('should have the expected heading text within the blog page in the blog directory', async() => {
-      const heading = dom.window.document.querySelector('h3.wc-md-blog').textContent;
+      const heading = dom.window.document.querySelector('h3').textContent;
 
       expect(heading).to.equal(defaultBlogHeading);
     });
 
     it('should have the expected paragraph text within the blog page in the blog directory', async() => {
-      let paragraph = dom.window.document.querySelector('p.wc-md-blog').textContent;
+      let paragraph = dom.window.document.querySelector('p').textContent;
 
       expect(paragraph).to.equal(defaultBlogBody);
     });
 
     it('should have the expected blog-template\'s blog-content class', async() => {
-      let paragraph = dom.window.document.querySelector('div.wrapper > div').className;
+      // let paragraph = dom.window.document.querySelector('div.wrapper > div').className;
+      let layout = dom.window.document.querySelector('.blog-content');
 
-      expect(paragraph).to.equal(pageTemplateClasses);
+      expect(layout).to.not.equal(null);
     });
 
   });
