@@ -1,6 +1,5 @@
 ---
 label: 'index'
-template: 'page'
 ---
 ### Greenwood
 

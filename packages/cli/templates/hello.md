@@ -1,6 +1,5 @@
 ---
 label: 'hello'
-template: 'page'
 ---
 ### Hello World
 

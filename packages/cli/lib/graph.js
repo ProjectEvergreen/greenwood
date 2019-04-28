@@ -28,8 +28,6 @@ const createGraphFromPages = async (pagesDir) => {
                 let { label, template } = attributes;
                 let mdFile = '';
 
-                // Limitation Note: label must be included in md file front-matter as wc-md-loader requires it
-
                 // if template not set, use default
                 template = template || 'page';
 
