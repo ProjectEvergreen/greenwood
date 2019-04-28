@@ -160,7 +160,7 @@ module.exports = {
 
 #### Dev Server
 
-You can adjust your dev server host and port, if you prefer to use something other than the default by adding it with a `greenwood.config.js`
+You can adjust your dev server host and port, if you prefer to use something other than the default by adding it with a `greenwood.config.js`. The host url is automatically prepended with `http://` by default.
 
 ```js
 module.exports = {
