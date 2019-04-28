@@ -375,7 +375,7 @@ describe('building greenwood with user provided config file', () => {
     await fs.copy(CONTEXT.userCfgPath, CONTEXT.userCfgRootPath);
 
     // set new user source based on config file
-    CONTEXT.userSrc = path.join(__dirname, '..', userCfgFile.source);
+    CONTEXT.userSrc = path.join(__dirname, '..', userCfgFile.workspace);
 
     // copy test app to configured source
     await fs.copy(CONTEXT.testApp, CONTEXT.userSrc);
