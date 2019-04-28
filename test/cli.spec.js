@@ -216,7 +216,6 @@ describe('building greenwood with a user workspace w/custom front-matter overrid
     });
 
     it('should have the expected blog-template\'s blog-content class', async() => {
-      // let paragraph = dom.window.document.querySelector('div.wrapper > div').className;
       let layout = dom.window.document.querySelector('.blog-content');
 
       expect(layout).to.not.equal(null);
