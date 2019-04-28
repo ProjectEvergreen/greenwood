@@ -34,7 +34,7 @@ const createGraphFromPages = async (pagesDir) => {
                 template = template || 'page';
 
                 // get remaining string after user's pages directory
-                let subDir = filePath.substring(pagesDir.length, filePath.length);
+                let subDir = filePath.substring(pagesDir.length - 1, filePath.length);
 
                 // get index of seperator between remaining subdirectory and the file's name
                 const seperatorIndex = subDir.lastIndexOf('/');
@@ -58,7 +58,7 @@ const createGraphFromPages = async (pagesDir) => {
                   mdFile = `./${completeNestedPath}${fileRoute}.md`;
                   relativeExpectedPath = `'../${completeNestedPath}/${fileName}/${fileName}.js'`; 
                 } else {
-                  mdFile = `./${fileRoute}.md`;
+                  mdFile = `.${fileRoute}.md`;
                   relativeExpectedPath = `'../${fileName}/${fileName}.js'`; 
                 }
                 
