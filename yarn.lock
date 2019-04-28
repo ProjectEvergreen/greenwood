@@ -9431,7 +9431,7 @@ wbuf@^1.1.0, wbuf@^1.7.3:
   dependencies:
     minimalistic-assert "^1.0.0"
 
-wc-markdown-loader@0.0.8:
+wc-markdown-loader@^0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/wc-markdown-loader/-/wc-markdown-loader-0.0.8.tgz#00d0f4f8b5346cd32fa6138dde42f2d859faaea5"
   integrity sha512-5iwsUkrmfZdiACt/y9ujwetvXK/k1VtM6U7HshDOIws4NkunC4Cmhae47ViBUqRnnFRinKcO+wzIP/DyBqBuOg==
