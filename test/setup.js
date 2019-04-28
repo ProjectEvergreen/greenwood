@@ -16,7 +16,8 @@ module.exports = class Setup {
           ...ctx,
           userSrc: path.join(__dirname, '..', 'src'), // static src
           userTemplates: path.join(__dirname, '..', 'src', 'templates'), // static src/templates for testing empty templates dir, redundant in #38
-          testApp: path.join(__dirname, 'fixtures', 'mock-app', 'src')
+          testApp: path.join(__dirname, 'fixtures', 'mock-app', 'src'),
+          customFMApp: path.join(__dirname, 'fixtures', 'custom-fm', 'src')
         };
   
         resolve(context);

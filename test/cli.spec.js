@@ -120,15 +120,91 @@ describe('building greenwood with a user workspace w/custom nested pages directo
 
 });
 
-// // TODO - https://github.com/ProjectEvergreen/greenwood/issues/32
-// // describe('building greenwood with a user workspace w/custom app-template override', () => {
+// TODO - https://github.com/ProjectEvergreen/greenwood/issues/32
+// describe('building greenwood with a user workspace w/custom app-template override', () => {
 
-// // });
+// });
 
-// // TODO - https://github.com/ProjectEvergreen/greenwood/issues/30
-// // describe('building greenwood with a user workspace w/custom page-template override', () => {
+// https://github.com/ProjectEvergreen/greenwood/issues/30
+describe('building greenwood with a user workspace w/custom front-matter override', () => {
 
-// // });
+  before(async () => {
+    setup = new TestSetup();
+    CONTEXT = await setup.init();
+
+    // copy custom-fm app
+    await fs.copy(CONTEXT.customFMApp, CONTEXT.userSrc);
+    await setup.run(['./packages/cli/index.js', 'build']);
+
+    indexPageHtmlPath = path.join(CONTEXT.publicDir, 'index.html'); 
+    blogPageHtmlPath = path.join(CONTEXT.publicDir, 'blog', 'index.html'); 
+  });
+
+  describe('using a custom label the public directory', () => {
+    const defaultIndexHeading = 'Home Page';
+    const defaultIndexBody = 'This is the blog home page built by Greenwood.';
+    let dom;
+    
+    beforeEach(async() => {
+      dom = await JSDOM.fromFile(indexPageHtmlPath);
+    });
+    
+    it('should contain an index html file', () => {
+      expect(fs.existsSync(indexPageHtmlPath)).to.be.true;
+    });
+  
+    it('should have the expected heading text within the index page in the public directory', async() => {
+      const heading = dom.window.document.querySelector('h3.wc-md-home').textContent;
+  
+      expect(heading).to.equal(defaultIndexHeading);
+    });
+
+    it('should have the expected paragraph text within the index page in the public directory', async() => {
+      let paragraph = dom.window.document.querySelector('p.wc-md-home').textContent;
+
+      expect(paragraph).to.equal(defaultIndexBody);
+    });
+  });
+  
+  describe('using a custom template and custom label the public directory', () => {
+    const defaultBlogHeading = 'Blog Page';
+    const defaultBlogBody = 'This is the blog page built by Greenwood.';
+    const pageTemplateClasses = 'eve-blog blog-content style-scope';
+    let dom;
+    
+    beforeEach(async() => {
+      dom = await JSDOM.fromFile(blogPageHtmlPath);
+    });
+    it('should contain a nested blog page with an index html file', () => {
+      expect(fs.existsSync(blogPageHtmlPath)).to.be.true;
+    });
+
+    it('should have the expected heading text within the blog page in the blog directory', async() => {
+      const heading = dom.window.document.querySelector('h3.wc-md-blog').textContent;
+
+      expect(heading).to.equal(defaultBlogHeading);
+    });
+
+    it('should have the expected paragraph text within the blog page in the blog directory', async() => {
+      let paragraph = dom.window.document.querySelector('p.wc-md-blog').textContent;
+
+      expect(paragraph).to.equal(defaultBlogBody);
+    });
+
+    it('should have the expected blog-template\'s blog-content class', async() => {
+      let paragraph = dom.window.document.querySelector('div.wrapper > div').className;
+
+      expect(paragraph).to.equal(pageTemplateClasses);
+    });
+
+  });
+
+  after(async() => {
+    await fs.remove(CONTEXT.userSrc);
+    await fs.remove(CONTEXT.publicDir);
+    await fs.remove(CONTEXT.scratchDir);
+  });
+});
 
 describe('building greenwood with error handling for app and page templates', () => {
   before(async () => {
