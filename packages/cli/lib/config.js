@@ -53,7 +53,7 @@ module.exports = readAndMergeConfig = async() => {
           reject('Error: greenwood.config.js publicPath must be a string');
         }
 
-        if (Object.keys(devServer).length > 0) {
+        if (devServer && Object.keys(devServer).length > 0) {
           
           if (url.parse(devServer.host).hostname === null) {
             reject('Error: greenwood.config.js devServer host type must be a valid url');
