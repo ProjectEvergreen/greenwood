@@ -270,6 +270,7 @@ describe('building greenwood with user workspace that doesn\'t contain app templ
     await fs.remove(CONTEXT.scratchDir);
   });
 });
+
 describe('building greenwood with user workspace that doesn\'t contain page template', () => {
   before(async() => {
     setup = new TestSetup();
@@ -360,4 +361,68 @@ describe('building greenwood with user workspace that doesn\'t contain page temp
     await fs.remove(CONTEXT.publicDir);
     await fs.remove(CONTEXT.scratchDir);
   });
+
+});
+
+describe('building greenwood with user provided config file', () => {
+  before(async () => {
+    setup = new TestSetup();
+    CONTEXT = await setup.init();
+
+    // read user config file and copy it to app root
+    const userCfgFile = require(CONTEXT.userCfgPath);
+
+    await fs.copy(CONTEXT.userCfgPath, CONTEXT.userCfgRootPath);
+
+    // set new user source based on config file
+    CONTEXT.userSrc = path.join(__dirname, '..', userCfgFile.workspace);
+
+    // copy test app to configured source
+    await fs.copy(CONTEXT.testApp, CONTEXT.userSrc);
+    await setup.run(['./packages/cli/index.js', 'build']);
+    
+    blogPageHtmlPath = path.join(CONTEXT.publicDir, 'blog', '20190326', 'index.html'); 
+  });
+  
+  it('should output one JS bundle', async() => {
+    expect(await glob.promise(path.join(CONTEXT.publicDir, './**/index.*.bundle.js'))).to.have.lengthOf(1);
+  });
+  
+  it('should contain a nested blog page directory', () => {
+    expect(fs.existsSync(path.join(CONTEXT.publicDir, 'blog', '20190326'))).to.be.true;
+  });
+  
+  describe('nested generated blog page directory', () => {
+    const defaultHeading = 'Blog Page';
+    const defaultBody = 'This is the blog page built by Greenwood.';
+    let dom;
+    
+    beforeEach(async() => {
+      dom = await JSDOM.fromFile(blogPageHtmlPath);
+    });
+
+    it('should contain a nested blog page with an index html file', () => {
+      expect(fs.existsSync(blogPageHtmlPath)).to.be.true;
+    });
+
+    it('should have the expected heading text within the blog page in the blog directory', async() => {
+      const heading = dom.window.document.querySelector('h3').textContent;
+  
+      expect(heading).to.equal(defaultHeading);
+    });
+  
+    it('should have the expected paragraph text within the blog page in the blog directory', async() => {
+      let paragraph = dom.window.document.querySelector('p').textContent;
+  
+      expect(paragraph).to.equal(defaultBody);
+    });
+  });
+
+  after(async() => {
+    await fs.remove(CONTEXT.userSrc);
+    await fs.remove(CONTEXT.userCfgRootPath);
+    await fs.remove(CONTEXT.publicDir);
+    await fs.remove(CONTEXT.scratchDir);
+  });
+
 });

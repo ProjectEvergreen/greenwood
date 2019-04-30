@@ -6,8 +6,6 @@ const generateCompilation = require('../lib/compile');
 const webpackMerge = require('webpack-merge');
 const commonConfig = require(path.join(__dirname, '..', './config/webpack.config.common.js'));
 
-const host = 'localhost';
-const port = 1981;
 let isRebuilding = false;
 
 const rebuild = async() => {
@@ -24,16 +22,17 @@ const rebuild = async() => {
   }
 };
 
-module.exports = ({ context, graph }) => {
-  const configWithContext = commonConfig(context, graph);
-  const publicPath = configWithContext.output.publicPath;
+module.exports = ({ config, context, graph }) => {
+  const configWithContext = commonConfig(config, context, graph);
+  const { devServer, publicPath } = config;
+  const { host, port } = devServer;
 
   return webpackMerge(configWithContext, {
 
     mode: 'development',
 
     entry: [
-      `webpack-dev-server/client?http://${host}:${port}`,
+      `webpack-dev-server/client?${host}:${port}`,
       path.join(context.scratchDir, 'app', 'app.js')
     ],
 
@@ -50,7 +49,7 @@ module.exports = ({ context, graph }) => {
       new FilewatcherPlugin({
         watchFileRegex: [`/${context.userWorkspace}/`],
         onReadyCallback: () => { 
-          console.log(`Now serving Development Server available at http://${host}:${port}`);
+          console.log(`Now serving Development Server available at ${host}:${port}`);
         },
         // eslint-disable-next-line no-unused-vars
         onChangeCallback: async (path) => {
