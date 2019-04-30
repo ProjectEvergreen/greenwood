@@ -6,8 +6,6 @@ const FilewatcherPlugin = require('filewatcher-webpack-plugin');
 const generateCompilation = require('../lib/compile');
 const webpackMerge = require('webpack-merge');
 const commonConfig = require(path.join(__dirname, '..', './config/webpack.config.common.js'));
-// const CleanWebpackPlugin = require('clean-webpack-plugin');
-// const WebpackBeforeBuildPlugin = require('before-build-webpack');
 
 const host = 'localhost';
 const port = 1981;
@@ -48,16 +46,6 @@ module.exports = ({ context, graph }) => {
 
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
-      // new webpack.ProgressPlugin(function(percentage, msg) {
-      //   if (percentage === 1) {
-      //     rebuild();
-      //   }
-      // }),
-      // new CleanWebpackPlugin()
-      // new WebpackBeforeBuildPlugin(function(stats, callback) {
-      //   rebuild();
-      //   callback(); // don't call it if you do want to stop compilation
-      // }),
       new FilewatcherPlugin({
         watchFileRegex: [`/${context.userWorkspace}/`],
         ignoreInitial: true,
