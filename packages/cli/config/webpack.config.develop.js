@@ -6,8 +6,8 @@ const FilewatcherPlugin = require('filewatcher-webpack-plugin');
 const generateCompilation = require('../lib/compile');
 const webpackMerge = require('webpack-merge');
 const commonConfig = require(path.join(__dirname, '..', './config/webpack.config.common.js'));
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const WebpackBeforeBuildPlugin = require('before-build-webpack');
+// const CleanWebpackPlugin = require('clean-webpack-plugin');
+// const WebpackBeforeBuildPlugin = require('before-build-webpack');
 
 const host = 'localhost';
 const port = 1981;
