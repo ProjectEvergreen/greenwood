@@ -1,10 +1,12 @@
 #!/usr/bin/env node
-const fs = require('fs');
+const fs = require('fs-extra');
 const fm = require('front-matter');
 const path = require('path');
 const util = require('util');
 
-const createGraphFromPages = async (pagesDir) => {
+let pageGraph = [];
+
+const createGraphFromPages = async ({ pagesDir }) => {
   let pages = [];
   const readdir = util.promisify(fs.readdir);
   const readFile = util.promisify(fs.readFile);
@@ -14,7 +16,7 @@ const createGraphFromPages = async (pagesDir) => {
 
       const walkDirectory = async(directory) => {
         let files = await readdir(directory);
-
+        
         return Promise.all(files.map(async (file) => {
           return new Promise(async (resolve, reject) => {
             try {
@@ -78,7 +80,16 @@ const createGraphFromPages = async (pagesDir) => {
                 * imported into app.js root component
                 * elementLabel: the element name for the generated md page e.g. <wc-md-hello-world></wc-md-hello-world>
                 */
+                page = pageGraph.filter(page => page.filePath === filePath)[0];
 
+                if (page && Object.keys(page).length > 0) {
+                  mdFile = page.mdFile;
+                  label = page.label;
+                  route = page.route;
+                  template = page.template;
+                  fileName = page.fileName,
+                  relativeExpectedPath = page.relativeExpectedPath;
+                }
                 pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath });
               }
               if (stats.isDirectory()) {
@@ -114,12 +125,16 @@ const generateRandomElementLabel = (size) => {
   return short.join('');
 };
 
-module.exports = generateGraph = async (compilation) => {
+module.exports = generateGraph = async ({ context }) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const graph = await createGraphFromPages(compilation.context.pagesDir);
+      if (fs.existsSync(context.graph)) {
+        pageGraph = JSON.parse(fs.readFileSync(context.graph, 'utf8'));
+      }
+      const graph = await createGraphFromPages(context);
 
+      await fs.writeJson(context.graph, graph);
       resolve(graph);
     } catch (err) {
       reject(err);

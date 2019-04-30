@@ -3,6 +3,7 @@ const path = require('path');
 const defaultTemplatesDir = path.join(__dirname, '../templates/');
 const scratchDir = path.join(process.cwd(), './.greenwood/');
 const publicDir = path.join(process.cwd(), './public');
+const graph = path.join(scratchDir, 'graph.json');
 
 module.exports = initContexts = async() => {
   
@@ -26,6 +27,7 @@ module.exports = initContexts = async() => {
       let context = {
         scratchDir,
         publicDir,
+        graph,
         pagesDir: userHasWorkspacePages ? userPagesDir : defaultTemplatesDir,
         templatesDir: userHasWorkspaceTemplates ? userTemplatesDir : defaultTemplatesDir,
         userWorkspace: userHasWorkspace ? userWorkspace : defaultTemplatesDir,

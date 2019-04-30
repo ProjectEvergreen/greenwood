@@ -1,10 +1,13 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const FilewatcherPlugin = require('filewatcher-webpack-plugin');
 const generateCompilation = require('../lib/compile');
 const webpackMerge = require('webpack-merge');
 const commonConfig = require(path.join(__dirname, '..', './config/webpack.config.common.js'));
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const WebpackBeforeBuildPlugin = require('before-build-webpack');
 
 const host = 'localhost';
 const port = 1981;
@@ -16,7 +19,6 @@ const rebuild = async() => {
     
     // rebuild web components
     await generateCompilation();
-
     // debounce
     setTimeout(() => {
       isRebuilding = false;
@@ -25,15 +27,14 @@ const rebuild = async() => {
 };
 
 module.exports = ({ context, graph }) => {
+  pageGraph = graph;
   const configWithContext = commonConfig(context, graph);
   const publicPath = configWithContext.output.publicPath;
 
   return webpackMerge(configWithContext, {
 
     mode: 'development',
-
     entry: [
-      `webpack-dev-server/client?http://${host}:${port}`,
       path.join(context.scratchDir, 'app', 'app.js')
     ],
 
@@ -41,14 +42,25 @@ module.exports = ({ context, graph }) => {
       port,
       host,
       historyApiFallback: true,
-      hot: false,
+      hot: true,
       inline: true
     },
 
     plugins: [
-      // new webpack.HotModuleReplacementPlugin(),
+      new webpack.HotModuleReplacementPlugin(),
+      // new webpack.ProgressPlugin(function(percentage, msg) {
+      //   if (percentage === 1) {
+      //     rebuild();
+      //   }
+      // }),
+      // new CleanWebpackPlugin()
+      // new WebpackBeforeBuildPlugin(function(stats, callback) {
+      //   rebuild();
+      //   callback(); // don't call it if you do want to stop compilation
+      // }),
       new FilewatcherPlugin({
         watchFileRegex: [`/${context.userWorkspace}/`],
+        ignoreInitial: true,
         onReadyCallback: () => { 
           console.log(`Now serving Development Server available at http://${host}:${port}`);
         },

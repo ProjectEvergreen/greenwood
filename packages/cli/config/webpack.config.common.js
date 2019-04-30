@@ -65,7 +65,7 @@ module.exports = (context, graph) => {
         test: /\.md$/,
         loader: 'wc-markdown-loader',
         options: {
-          graph
+          graph: path.join(context.scratchDir, 'graph.json')
         }
       }, {
         test: /\.css$/,
