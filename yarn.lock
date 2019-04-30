@@ -9480,10 +9480,10 @@ wbuf@^1.1.0, wbuf@^1.7.3:
   dependencies:
     minimalistic-assert "^1.0.0"
 
-wc-markdown-loader@^0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/wc-markdown-loader/-/wc-markdown-loader-0.0.8.tgz#00d0f4f8b5346cd32fa6138dde42f2d859faaea5"
-  integrity sha512-5iwsUkrmfZdiACt/y9ujwetvXK/k1VtM6U7HshDOIws4NkunC4Cmhae47ViBUqRnnFRinKcO+wzIP/DyBqBuOg==
+wc-markdown-loader@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/wc-markdown-loader/-/wc-markdown-loader-0.0.9.tgz#bfc2278fb8294d295b91dacda46686efadeb873c"
+  integrity sha512-BdUSFm5dvoCaHyqBNNXQWvGWRNggLfPhgGYsJIy2R7a3vZ5XYB7FsoAAKNtkydJoaLz+nqlx7gksvdukNOzqcg==
   dependencies:
     camelize "^1.0.0"
     except "^0.1.3"
