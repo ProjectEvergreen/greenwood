@@ -47,7 +47,6 @@ module.exports = ({ context, graph }) => {
       new webpack.HotModuleReplacementPlugin(),
       new FilewatcherPlugin({
         watchFileRegex: [`/${context.userWorkspace}/`],
-        ignoreInitial: true,
         onReadyCallback: () => { 
           console.log(`Now serving Development Server available at http://${host}:${port}`);
         },
