@@ -83,14 +83,10 @@ const createGraphFromPages = async ({ pagesDir }) => {
                 page = pageGraph.filter(page => page.filePath === filePath)[0];
 
                 if (page && Object.keys(page).length > 0) {
-                  mdFile = page.mdFile;
-                  label = page.label;
-                  route = page.route;
-                  template = page.template;
-                  fileName = page.fileName,
-                  relativeExpectedPath = page.relativeExpectedPath;
+                  pages.push(page);
+                } else {
+                  pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath });
                 }
-                pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath });
               }
               if (stats.isDirectory()) {
                 await walkDirectory(filePath);

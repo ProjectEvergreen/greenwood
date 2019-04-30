@@ -25,7 +25,6 @@ const rebuild = async() => {
 };
 
 module.exports = ({ context, graph }) => {
-  pageGraph = graph;
   const configWithContext = commonConfig(context, graph);
   const publicPath = configWithContext.output.publicPath;
 
