@@ -77,8 +77,6 @@ const createGraphFromPages = async (pagesDir) => {
                 * imported into app.js root component
                 * elementLabel: the element name for the generated md page e.g. <wc-md-hello-world></wc-md-hello-world>
                 */
-                console.log(filePath);
-                console.log(label);
 
                 pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath });
               }

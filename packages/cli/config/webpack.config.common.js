@@ -25,7 +25,7 @@ const mapUserWorkspaceDirectory = (userPath) => {
   );
 };
 
-module.exports = (config, context, graph) => {
+module.exports = (config, context) => {
   // dynamically map all the user's workspace directories for resolution by webpack
   // this essentially helps us keep watch over changes from the user, and greenwood's build pipeline
   const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map(mapUserWorkspaceDirectory);
