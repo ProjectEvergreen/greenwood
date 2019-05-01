@@ -5317,10 +5317,10 @@ lit-html@^1.0.0:
   resolved "https://registry.yarnpkg.com/lit-html/-/lit-html-1.0.0.tgz#3dc3781a8ca68a9b5c2ff2a61e263662b9b2267b"
   integrity sha512-oeWlpLmBW3gFl7979Wol2LKITpmKTUFNn7PnFbh6YNynF61W74l6x5WhwItAwPRSATpexaX1egNnRzlN4GOtfQ==
 
-lit-redux-router@^0.8.3:
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/lit-redux-router/-/lit-redux-router-0.8.3.tgz#7d1e95151ffd4db732c4e36213897e35415a1ede"
-  integrity sha512-wP+MI0Kelai906xFCohYUN0fNM5Vf/xwokyz9YQNJl9lA7IFtEZp9ePxShZQYuV3ZkvIIVl0sak7OsKFg1JKew==
+lit-redux-router@^0.8.5:
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/lit-redux-router/-/lit-redux-router-0.8.5.tgz#2ab3331b6649c79e74ffc696758cda6a7dc3b162"
+  integrity sha512-ykrXwCKRGdkDDi+a5/LaFkJQsfQYw08SmUOEZRcvPRHYwVPM4ULG7RxJY2kohcXkE5uwvZJGtjHUVv0GlamEZQ==
   dependencies:
     regexparam "^1.2.1"
 
@@ -9431,10 +9431,10 @@ wbuf@^1.1.0, wbuf@^1.7.3:
   dependencies:
     minimalistic-assert "^1.0.0"
 
-wc-markdown-loader@^0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/wc-markdown-loader/-/wc-markdown-loader-0.0.8.tgz#00d0f4f8b5346cd32fa6138dde42f2d859faaea5"
-  integrity sha512-5iwsUkrmfZdiACt/y9ujwetvXK/k1VtM6U7HshDOIws4NkunC4Cmhae47ViBUqRnnFRinKcO+wzIP/DyBqBuOg==
+wc-markdown-loader@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/wc-markdown-loader/-/wc-markdown-loader-0.1.0.tgz#5b8dc93621e2b32d3667ef93398b01d7fe342d36"
+  integrity sha512-Opa9sTo9b9p0gN3gx58cEK/naNOG1Ng8je+1ar4PWlOWudA1Wmw1Es+ETffm0dPcUxXGmPiOZWFaOfKJ/FTKYw==
   dependencies:
     camelize "^1.0.0"
     except "^0.1.3"

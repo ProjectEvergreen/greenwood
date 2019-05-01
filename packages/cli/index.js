@@ -71,7 +71,7 @@ const run = async() => {
     }
     process.exit(0); // eslint-disable-line no-process-exit
   } catch (err) {
-    console.error(err.red);
+    console.error(`${err}`.red);
     process.exit(1); // eslint-disable-line no-process-exit
   }
 };

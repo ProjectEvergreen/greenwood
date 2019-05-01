@@ -63,10 +63,7 @@ module.exports = (config, context, graph) => {
         }
       }, {
         test: /\.md$/,
-        loader: 'wc-markdown-loader',
-        options: {
-          graph
-        }
+        loader: 'wc-markdown-loader'
       }, {
         test: /\.css$/,
         loaders: [

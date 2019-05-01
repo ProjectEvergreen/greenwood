@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const fs = require('fs');
+const crypto = require('crypto');
 const fm = require('front-matter');
 const path = require('path');
 const util = require('util');
@@ -61,7 +62,7 @@ const createGraphFromPages = async (pagesDir) => {
                 }
                 
                 // generate a random element name
-                label = label || generateRandomElementLabel(6);
+                label = label || generateLabelHash(filePath);
 
                 /*
                 * Variable Definitions
@@ -76,6 +77,8 @@ const createGraphFromPages = async (pagesDir) => {
                 * imported into app.js root component
                 * elementLabel: the element name for the generated md page e.g. <wc-md-hello-world></wc-md-hello-world>
                 */
+                console.log(filePath);
+                console.log(label);
 
                 pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath });
               }
@@ -99,17 +102,16 @@ const createGraphFromPages = async (pagesDir) => {
   });
 };
 
-const generateRandomElementLabel = (size) => {
+const generateLabelHash = (label) => {
+  const hash = crypto.createHash('sha256');
 
-  const letters = 'abcedfghijklmnopqrstuvwxyz';
-  let short = [], rand = 0;
+  hash.update(label);
 
-  for (let n = 0; n < size; n = n + 1) {
-    rand = Math.floor(Math.random() * 25);
-    short.push(letters.substr(rand, 1));
-  }
+  let elementLabel = hash.digest('hex');
   
-  return short.join('');
+  elementLabel = elementLabel.substring(elementLabel.length - 15, elementLabel.length);
+
+  return elementLabel;
 };
 
 module.exports = generateGraph = async (compilation) => {
