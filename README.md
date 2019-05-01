@@ -199,3 +199,25 @@ All page templates must be placed in the `src/templates` directory. All page tem
 ```
 
 **Note**: For now, you must include an app-template.js in your templates folder, if you wish to use custom page-templates.
+
+
+$ yarn build
+yarn run v1.12.3
+$ node ./packages/cli/index.js build
+-------------------------------------------------------
+Welcome to Greenwood ♻️
+-------------------------------------------------------
+Reading project config
+Error: greenwood.config.js devServer host type must be a valid url
+error Command failed with exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
+
+module.exports = {
+  workspace: 'src2',
+  publicPath: '/',
+  devServer: {
+    port: 1984,
+    host: 'http://localhost'
+  },
+  meta: {}
+};
