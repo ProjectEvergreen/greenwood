@@ -22,12 +22,20 @@ To develop for the project, you'll want to follow these steps:
 1. Run `yarn install`
 
 
-## Unit Testing
-Unit tests have been written that can be run using
+## Testing
+There are a couple various testing strategies used in greenwood
+- _Unit_: Tests for as many "in memory" operations as possible.  Should refrain from filesystem manipulation and focus on trying to test as much of the code in isolation as possible.
+- _Cases_: Integration / E2E like tests that run commands like `build` with various real world use case that Greenwood should support, from the perspective of a user running the tool, and will be concerned with actually creating user workspaces to smiluate a real world environemt.
+
+Run tests using
 ```shell
 $ yarn test
 ```
 
-Note, you can use the following to adjust how many mocha tests get run:
-- `describe.only` / `it.only`: only run this block
-- `xdescribe` / `xit`: dont run this block
+> Note, you can use the following to adjust how many mocha tests get run:
+> - `describe.only` / `it.only`: only run this block
+> - `xdescribe` / `xit`: dont run this block
+
+### Unit Testing
+
+### Case Testing
