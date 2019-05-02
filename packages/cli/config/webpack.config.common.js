@@ -15,7 +15,7 @@ const mapUserWorkspaceDirectory = (userPath, userWorkspace) => {
     (resource) => {
       let regex = new RegExp(`\.\.\/${directory}`);
 
-      if(userWorkspace === path.join(__dirname, '..', 'templates/')) {
+      if (userWorkspace === path.join(__dirname, '..', 'templates/')) {
         regex = new RegExp(`\.\/${directory}`);
       }
       resource.request = resource.request.replace(regex, userPath);

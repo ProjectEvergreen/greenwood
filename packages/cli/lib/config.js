@@ -76,11 +76,11 @@ module.exports = readAndMergeConfig = async() => {
           }
 
         }
-        if(meta && meta.length > 0) {
+        if (meta && meta.length > 0) {
           customConfig.meta = meta;
         }
 
-        if(title) {
+        if (title) {
           customConfig.title = title;
         }
 

@@ -3,7 +3,7 @@ const path = require('path');
 const defaultTemplatesDir = path.join(__dirname, '../templates/');
 const scratchDir = path.join(process.cwd(), './.greenwood/');
 const publicDir = path.join(process.cwd(), './public');
-const metaComponent =  './components/meta'; // intentionally not absolute path until webpack config can accomodate
+const metaComponent = './components/meta'; // intentionally not absolute path until webpack config can accomodate
 
 module.exports = initContexts = async({ config }) => {
   

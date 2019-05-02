@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit-element';
 MDIMPORT;
 METAIMPORT;
-METADATA
+METADATA;
 
 class PageTemplate extends LitElement {
   render() {
