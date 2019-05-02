@@ -3,7 +3,7 @@ module.exports = {
   publicPath: '/',
   devServer: {
     port: 1984,
-    host: 'localhost'
+    host: 'http://localhost'
   },
   meta: {}
 };
