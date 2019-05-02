@@ -1,5 +1,6 @@
 ---
 label: 'index'
+title: 'Greenwood Index Page'
 ---
 ### Greenwood
 

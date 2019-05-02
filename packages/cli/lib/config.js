@@ -9,14 +9,10 @@ let config = {
     host: 'http://localhost'
   },
   publicPath: '/',
+  title: '',
   // TODO add global meta data see issue #5
   // https://github.com/ProjectEvergreen/greenwood/issues/5
-  meta: { 
-    title: '',
-    description: '',
-    author: '',
-    domain: ''
-  }
+  meta: []
 };
 
 module.exports = readAndMergeConfig = async() => {
@@ -27,7 +23,7 @@ module.exports = readAndMergeConfig = async() => {
 
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, publicPath } = userCfgFile;
+        const { workspace, devServer, publicPath, title, meta } = userCfgFile;
           
         if (workspace) {
           if (typeof workspace !== 'string') {
@@ -78,6 +74,14 @@ module.exports = readAndMergeConfig = async() => {
               console.log('custom port provided => ', customConfig.devServer.port);
             }
           }
+
+        }
+        if(meta && meta.length > 0) {
+          customConfig.meta = meta;
+        }
+
+        if(title) {
+          customConfig.title = title;
         }
 
         config = { ...config, ...customConfig };

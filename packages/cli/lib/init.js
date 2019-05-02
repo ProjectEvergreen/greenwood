@@ -3,6 +3,7 @@ const path = require('path');
 const defaultTemplatesDir = path.join(__dirname, '../templates/');
 const scratchDir = path.join(process.cwd(), './.greenwood/');
 const publicDir = path.join(process.cwd(), './public');
+const metaComponent =  './components/meta'; // intentionally not absolute path until webpack config can accomodate
 
 module.exports = initContexts = async({ config }) => {
   
@@ -22,6 +23,7 @@ module.exports = initContexts = async({ config }) => {
       const userHasWorkspaceAppTemplate = fs.existsSync(userAppTemplate);
       
       let context = {
+        defaultTemplatesDir,
         scratchDir,
         publicDir,
         pagesDir: userHasWorkspacePages ? userPagesDir : defaultTemplatesDir,
@@ -34,7 +36,8 @@ module.exports = initContexts = async({ config }) => {
           ? userAppTemplate 
           : path.join(defaultTemplatesDir, 'app-template.js'),
         indexPageTemplate: 'index.html',
-        notFoundPageTemplate: '404.html'
+        notFoundPageTemplate: '404.html',
+        metaComponent
       };
       
       if (!fs.existsSync(scratchDir)) {

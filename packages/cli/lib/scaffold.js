@@ -22,6 +22,50 @@ const writePageComponentsFromTemplate = async (compilation) => {
       }
     });
   };
+  const loadPageMeta = async (file, result, { context, config }) => {
+    return new Promise((resolve, reject) => {
+      try{
+        const metadata = {
+          title: '',
+          meta: []
+        };
+        let title = '', metaComponent = '';
+
+        if(config.meta && config.meta.length > 0) {
+          metadata.meta = config.meta;
+        }
+
+        if(config.title) {
+          title = config.title;
+        }
+        
+        // override title with dynamic title per page if available
+        if(file.title) {
+          title = file.title;
+        }
+        metadata.title = title;
+        metadata.meta["og:title"] = title;
+    
+        // Temporary workaround to webpack config's import path adjustment issue 
+        // when using importing default template components ./ vs ../ for userWorkspace
+
+        // if we're using default page template
+          const isDefaultTemplate = context.userWorkspace === path.join(context.defaultTemplatesDir);
+
+          metaComponent = isDefaultTemplate 
+           ? './components/meta.js'
+           : '../components/meta.js';
+
+        result = result.replace(/METAIMPORT/, `import '${metaComponent}'`);
+        result = result.replace(/METADATA/, `const metadata = ${JSON.stringify(metadata)}`);
+        result = result.replace(/METAELEMENT/, `<eve-meta .attributes=\${metadata}></eve-meta>`);
+
+        resolve(result);
+      } catch(err) {
+        reject(err)
+      }
+    });
+  };
 
   return Promise.all(compilation.graph.map(file => {
     const context = compilation.context;
@@ -29,7 +73,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
     return new Promise(async(resolve, reject) => {
       try {
         let result = await createPageComponent(file, context);
-
+        result = await loadPageMeta(file, result, compilation)
         let relPageDir = file.filePath.substring(context.pagesDir.length, file.filePath.length);
         const pathLastBackslash = relPageDir.lastIndexOf('/');
 

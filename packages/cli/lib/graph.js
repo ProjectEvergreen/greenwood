@@ -26,7 +26,7 @@ const createGraphFromPages = async (pagesDir) => {
               if (isMdFile && !stats.isDirectory()) {
                 const fileContents = await readFile(filePath, 'utf8');
                 const { attributes } = fm(fileContents);
-                let { label, template } = attributes;
+                let { label, template, title } = attributes;
                 let mdFile = '';
 
                 // if template not set, use default
@@ -78,7 +78,7 @@ const createGraphFromPages = async (pagesDir) => {
                 * elementLabel: the element name for the generated md page e.g. <wc-md-hello-world></wc-md-hello-world>
                 */
 
-                pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath });
+                pages.push({ mdFile, label, title, route, template, filePath, fileName, relativeExpectedPath });
               }
               if (stats.isDirectory()) {
                 await walkDirectory(filePath);
