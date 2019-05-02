@@ -1,4 +1,5 @@
 const expect = require('chai').expect;
+const path = require('path');
 const initConfig = require('../../../packages/cli/lib/config');
 
 let defaultConfig = {
@@ -10,7 +11,6 @@ let defaultConfig = {
   publicPath: '/'
 };
 
-// TODO: from config file, or leave for cases?
 describe('Config Lib (Injected', () => {
 
   describe('Default Configuration', () => {
@@ -36,7 +36,7 @@ describe('Config Lib (Injected', () => {
 
     describe('Error Handling', () => {     
       it('should return default configuration when an empty object is passed', async () => {
-        const config = await initConfig({});
+        config = await initConfig({});
 
         expect(config.workspace).to.equal(defaultConfig.workspace);
         expect(config.devServer).to.exist;
@@ -45,8 +45,8 @@ describe('Config Lib (Injected', () => {
         expect(config.publicPath).to.equal(defaultConfig.publicPath);
       });
   
-      xit('should return default configuration when garbage input is provided', async () => {
-        const config = await initConfig({
+      it('should return default configuration when garbage input is provided', async () => {
+        config = await initConfig({
           name: 'joe',
           age: 12
         });
@@ -58,9 +58,14 @@ describe('Config Lib (Injected', () => {
         expect(config.publicPath).to.equal(defaultConfig.publicPath);
       });
     });
+
+    after(async () => {
+      config = {};
+    });
   });
 
   describe('Custom Configuration: Dev Server', () => {
+    let config;
     const customConfig = {
       devServer: {
         port: 1234,
@@ -81,22 +86,16 @@ describe('Config Lib (Injected', () => {
     });
 
     // TODO error handling
+    // 'Error: the string "Error: greenwood.config.js devServer port must be an integer" was thrown, throw an Error :)');
+    // expect(model.get.bind(model, 'z')).to.throw('Property does not exist in model schema.');
+    // expect(model.get.bind(model, 'z')).to.throw(new Error('Property does not exist in model schema.'))
     xdescribe('Error Handling', () => {
       it('should return an error when an invalid value for devServer.port', () => {
-        // config = await readAndMergeConfig({
-        //   devServer: {
-        //     port: 'abc'
-        //   }
-        // });
-
         expect(async () => await readAndMergeConfig({
           devServer: {
             port: 'abc'
           }
         })).to.throw(new Error('abc')); 
-        // 'Error: the string "Error: greenwood.config.js devServer port must be an integer" was thrown, throw an Error :)');
-        // expect(model.get.bind(model, 'z')).to.throw('Property does not exist in model schema.');
-        // expect(model.get.bind(model, 'z')).to.throw(new Error('Property does not exist in model schema.'))
       });
   
       it('should return an error when an invalid value for devServer.port', () => {
@@ -104,41 +103,69 @@ describe('Config Lib (Injected', () => {
       });
     });
 
+    after(async () => {
+      config = {};
+    });
+
   });
 
-  xdescribe('Custom Configuration: Public Path', () => {
+  describe('Custom Configuration: Public Path', () => {
+    let config;
+    const customConfig = {
+      publicPath: '/eve'
+    };
+
     before(async () => {
-      config = readAndMergeConfig();
+      config = await readAndMergeConfig(customConfig);
     });
 
-    it('should have default value for workspace', () => {
-
+    it('should have the expected value for publicPath', () => {
+      expect(config.publicPath).to.exist;
+      expect(config.publicPath).to.equal(customConfig.publicPath);
     });
 
-    it('should have default value for devServer', () => {
-
+    // TODO error handling
+    xdescribe('Error Handling', () => {
+      it('should return an error when a string is not provider', () => {
+        expect(async () => await readAndMergeConfig({
+          publicPath: 2
+        })).to.throw(new Error('abc')); 
+      });
     });
 
-    it('should have default value for publicPath', () => {
-
+    after(async () => {
+      config = {};
     });
   });
 
-  xdescribe('Custom Configuration: Workspace Path', () => {
+  describe('Custom Configuration: Workspace Path', () => {
     before(async () => {
-      config = readAndMergeConfig();
+      config = await readAndMergeConfig({
+        workspace: path.join(__dirname, '.')
+      });
     });
 
-    it('should have default value for workspace', () => {
-
+    it('should return the path provided as publicPath (if it is absolute)', () => {
+      expect(config.workspace).to.equal(defaultConfig.workspace);
     });
 
-    it('should have default value for devServer', () => {
-
+    // TODO error handling
+    xdescribe('Error Handling', () => {
+      it('should return an error when a string is not provided', () => {
+        expect(async () => await readAndMergeConfig({
+          publicPath: 2
+        })).to.throw(new Error('abc')); 
+      });
+      
+      it('should return an error when the directory doesnt exist', () => {
+        expect(async () => await readAndMergeConfig({
+          publicPath: 2
+        })).to.throw(new Error('abc')); 
+      });
     });
 
-    it('should have default value for publicPath', () => {
-
+    after(async () => {
+      config = {};
     });
   });
 

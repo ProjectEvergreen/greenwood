@@ -12,7 +12,6 @@ let defaultConfig = {
 };
 
 module.exports = readAndMergeConfig = async(injectedConfig) => {
-  console.log('readAndMergeConfig here????');
   return new Promise((resolve, reject) => {
     try {
       // deep clone of default config
@@ -47,7 +46,7 @@ module.exports = readAndMergeConfig = async(injectedConfig) => {
             reject('Error: greenwood.config.js publicPath must be a string');
           } else {
             customConfig.publicPath = userCfgFile.publicPath;
-            console.log('custom publicPath provided => ', customConfig.publicPath);
+            // console.log('custom publicPath provided => ', customConfig.publicPath);
           }
         }
 
@@ -60,7 +59,7 @@ module.exports = readAndMergeConfig = async(injectedConfig) => {
               reject(`Error: greenwood.config.js devServer host type must be a valid url, including http://.  Passed value was: ${devServer.host}`);
             } else {
               customConfig.devServer.host = devServer.host;
-              console.log(`custom host provided => ${customConfig.devServer.host}`);
+              // console.log(`custom host provided => ${customConfig.devServer.host}`);
             }
           }
 
@@ -70,15 +69,12 @@ module.exports = readAndMergeConfig = async(injectedConfig) => {
               reject(`Error: greenwood.config.js devServer port must be an integer.  Passed value was: ${devServer.port}`);
             } else {
               customConfig.devServer.port = devServer.port;
-              console.log(`custom port provided => ${customConfig.devServer.port}`);
+              // console.log(`custom port provided => ${customConfig.devServer.port}`);
             }
           }
         }
       }
 
-      // console.log('defaultConfig', defaultConfig);
-      // console.log('customConfig', customConfig);
-      // console.log('resolve config', { ...defaultConfig, ...customConfig });
       resolve({ ...defaultConfig, ...customConfig });
     } catch (err) {
       reject(err);
