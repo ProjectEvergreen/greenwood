@@ -1,18 +1,22 @@
 /*
  * Use Case
- * Run Greenwood with empty config object and default workspace.
+ * Run Greenwood with default config and nested directories in workspace.
  * 
- * Uaer Result
- * TShould generate a bare bones Greenwood build.  (same as build.default.spec.js)
+ * Result
+ * Test for correctly nested generated output.
  * 
- * User Command
+ * Command
  * greenwood build
  * 
  * User Config
- * {}
+ * None (Greenwood default)
  * 
  * User Workspace
- * Greenwood default (src/)
+ * src/
+ *   pages/
+ *     blog/
+ *       2019/
+ *         index.md
  */
 const expect = require('chai').expect;
 const fs = require('fs');
@@ -30,7 +34,7 @@ describe('Build Greenwood With: ', () => {
     context = setup.setupWorkspace(__dirname);
   });
 
-  describe('Empty Configuration and Default Workspace', () => {
+  describe('Default Greenwood Configuration and Default Workspace w/ Nested Directories', () => {
     before(async() => {
       await setup.runCommand('build');
     });
@@ -51,6 +55,7 @@ describe('Build Greenwood With: ', () => {
       describe('default generated index page in public directory', () => {
         const indexPageHeading = 'Greenwood';
         const indexPageBody = 'This is the home page built by Greenwood. Make your own pages in src/pages/index.js!';
+        const hash = 'b7cc564e4c0eaf3';
         let dom;
 
         beforeEach(async() => {
@@ -62,45 +67,46 @@ describe('Build Greenwood With: ', () => {
         });
 
         it('should have the expected heading text within the index page in the public directory', async() => {
-          const heading = dom.window.document.querySelector('h3.wc-md-index').textContent;
+          const heading = dom.window.document.querySelector(`h3.wc-md-${hash}`).textContent;
       
           expect(heading).to.equal(indexPageHeading);
         });
 
         it('should have the expected paragraph text within the index page in the public directory', async() => {
-          let paragraph = dom.window.document.querySelector('p.wc-md-index').textContent;
+          let paragraph = dom.window.document.querySelector(`p.wc-md-${hash}`).textContent;
       
           expect(paragraph).to.equal(indexPageBody);
         });
       });
 
-      it('should create a default hello page directory', () => {
-        expect(fs.existsSync(path.join(context.publicDir, './hello'))).to.be.true;
+      it('should create a default blog page directory', () => {
+        expect(fs.existsSync(path.join(context.publicDir, './blog'))).to.be.true;
       });
 
-      describe('default generated hello page directory', () => {
-        const helloPageHeading = 'Hello World';
-        const helloPageBody = 'This is an example page built by Greenwood.  Make your own in src/pages!';
+      describe('default generated blog page directory', () => {
+        const blogPageHeading = 'Blog Page';
+        const blogPageBody = 'This is the blog page built by Greenwood.';
+        const hash = 'b76b0cb5a83b659';
         let dom;
 
         beforeEach(async() => {
-          dom = await JSDOM.fromFile(path.resolve(context.publicDir, './hello', './index.html'));
+          dom = await JSDOM.fromFile(path.resolve(context.publicDir, 'blog', '2019', './index.html'));
         });
 
         it('should output an index.html file within the default hello page directory', () => {
-          expect(fs.existsSync(path.join(context.publicDir, './hello', './index.html'))).to.be.true;
+          expect(fs.existsSync(path.join(context.publicDir, 'blog', '2019', './index.html'))).to.be.true;
         });
 
         it('should have the expected heading text within the hello example page in the hello directory', async() => {
-          const heading = dom.window.document.querySelector('h3.wc-md-hello').textContent;
+          const heading = dom.window.document.querySelector(`h3.wc-md-${hash}`).textContent;
       
-          expect(heading).to.equal(helloPageHeading);
+          expect(heading).to.equal(blogPageHeading);
         });
       
         it('should have the expected paragraph text within the hello example page in the hello directory', async() => {
-          let paragraph = dom.window.document.querySelector('p.wc-md-hello').textContent;
+          let paragraph = dom.window.document.querySelector(`p.wc-md-${hash}`).textContent;
       
-          expect(paragraph).to.equal(helloPageBody);
+          expect(paragraph).to.equal(blogPageBody);
         });
       });
     });

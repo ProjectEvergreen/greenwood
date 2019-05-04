@@ -1,15 +1,18 @@
 /*
  * Use Case
- * Run Greenwood build command with no config and test for default generated output.
+ * Run Greenwood build command with no config.
  * 
- * Command
+ * User Result
+ * Should generate a bare bones Greenwood build.
+ * 
+ * User Command
  * greenwood build
  * 
- * Config
- * N / A (Greenwood default)
+ * User Config
+ * None (Greenwood Default)
  * 
- * Workspace
- * N / A (Greenwood default)
+ * User Workspace
+ * Greenwood default (src/)
  */
 const expect = require('chai').expect;
 const fs = require('fs');
@@ -18,7 +21,7 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestSetup = require('../../setup');
 
-describe('Build Command With: ', () => {
+describe('Build Greenwood With: ', () => {
   let setup;
   let context;
 
@@ -27,7 +30,7 @@ describe('Build Command With: ', () => {
     context = setup.setupWorkspace();
   });
 
-  describe('Default Greenwood Configuration', () => {
+  describe('Default Greenwood Configuration and Workspace', () => {
     before(async() => {
       await setup.runCommand('build');
     });
