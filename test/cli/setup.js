@@ -1,39 +1,24 @@
 const os = require('os');
 const { spawn } = require('child_process');
-const path = require('path');
-const initContext = require('../packages/cli/lib/init');
 
 module.exports = class Setup {
   constructor(enableStdOut) {
     this.enableStdOut = enableStdOut; // debugging tests
   }
 
-  init() {
-    return new Promise(async(resolve, reject) => {
-      try {
-        const defaultWorkspace = path.join(process.cwd(), 'src');
-        const ctx = await initContext({ config: { workspace: defaultWorkspace } });
-        const context = { 
-          ...ctx,
-          userSrc: path.join(__dirname, '..', 'src'), // static src
-          userTemplates: path.join(__dirname, '..', 'src', 'templates'), // static src/templates for testing empty templates dir, redundant in #38
-          testApp: path.join(__dirname, 'fixtures', 'mock-app', 'src'),
-          userCfgPath: path.join(__dirname, 'fixtures', 'mock-app', 'greenwood.config.js'),
-          userCfgRootPath: path.join(__dirname, '..', 'greenwood.config.js')
-        };
-  
-        resolve(context);
-      } catch (err) {
-        reject(err);
-      }
-    });
+  initContext(cwd) {
+    this.cwd = cwd ? cwd : process.cwd();
+    this.cwdOffset = cwd ? '../../' : './'; // TODO figure this out dynamically?
   }
 
-  run(args) {
+  runCommand(task) {
     return new Promise(async (resolve, reject) => {
-      const command = os.platform() === 'win32' ? 'npm.cmd' : 'node';
-      const npm = spawn(command, args);
+      console.log('this.cwd', this.cwd);
       let err = '';
+      const runner = os.platform() === 'win32' ? 'node.cmd' : 'node';
+      const npm = spawn(runner, [`${this.cwdOffset}packages/cli/index.js`, task], {
+        cwd: this.cwd
+      });
 
       npm.on('close', code => {
         if (code !== 0) {
@@ -42,6 +27,7 @@ module.exports = class Setup {
         }
         resolve();
       });
+
       npm.stderr.on('data', (data) => {
         err = data.toString('utf8');
         if (this.enableStdOut) {
@@ -49,6 +35,7 @@ module.exports = class Setup {
         }
         reject(err);
       });
+
       npm.stdout.on('data', (data) => {
         if (this.enableStdOut) {
           console.log(data.toString('utf8')); // eslint-disable-line

@@ -12,7 +12,7 @@
     "build": "node ./packages/cli/index.js build",
     "serve": "yarn clean && yarn build && cd ./public && ws",
     "develop": "yarn clean && node ./packages/cli/index.js develop",
-    "test": "yarn clean && mocha ./test/**/**/*.spec.js --timeout 15000"
+    "test": "yarn clean && mocha ./test/**/**/**/*.spec.js --timeout 15000"
   },
   "dependencies": {
     "@babel/core": "^7.4.0",

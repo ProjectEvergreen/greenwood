@@ -11,14 +11,14 @@ let defaultConfig = {
   publicPath: '/'
 };
 
-module.exports = readAndMergeConfig = async(injectedConfig) => {
+module.exports = readAndMergeConfig = async() => {
   return new Promise((resolve, reject) => {
     try {
       // deep clone of default config
       let customConfig = JSON.parse(JSON.stringify(defaultConfig));
       
-      if (injectedConfig || fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
-        const userCfgFile = injectedConfig ? injectedConfig : require(path.join(process.cwd(), 'greenwood.config.js'));
+      if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
+        const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
         const { workspace, devServer, publicPath } = userCfgFile;
           
         // workspace validation
