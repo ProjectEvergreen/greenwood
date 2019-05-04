@@ -1,9 +1,16 @@
 /*
- * Use Case: Run Greenwood build command with empty config object and test for default output
- * Command: greenwood build
- * Config: {}
+ * Use Case
+ * Run Greenwood with empty config object and test for default generated output.
+ * 
+ * Command
+ * greenwood build
+ * 
+ * Config
+ * {}
+ * 
+ * Workspace
+ * N / A (Greenwood default)
  */
-
 const expect = require('chai').expect;
 const fs = require('fs');
 const glob = require('glob-promise');
@@ -17,8 +24,7 @@ describe('Build Command With: ', () => {
 
   before(async () => {
     setup = new TestSetup();
-    context = setup.setup(__dirname);
-    setup.tearDown();
+    context = setup.setupWorkspace(__dirname);
   });
 
   describe('Empty (No) Configuration', () => {
@@ -98,7 +104,7 @@ describe('Build Command With: ', () => {
   });
 
   after(() => {
-    setup.tearDown();
+    setup.teardownWorkspace();
   });
 
 });

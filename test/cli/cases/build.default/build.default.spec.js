@@ -1,9 +1,16 @@
 /*
- * Use Case: Run Greenwood build command with no config and test for default output
- * Command: greenwood build
- * Config: None
+ * Use Case
+ * Run Greenwood build command with no config and test for default generated output.
+ * 
+ * Command
+ * greenwood build
+ * 
+ * Config
+ * N / A (Greenwood default)
+ * 
+ * Workspace
+ * N / A (Greenwood default)
  */
-
 const expect = require('chai').expect;
 const fs = require('fs');
 const glob = require('glob-promise');
@@ -17,11 +24,10 @@ describe('Build Command With: ', () => {
 
   before(async () => {
     setup = new TestSetup();
-    context = setup.setup();
-    setup.tearDown();
+    context = setup.setupWorkspace();
   });
 
-  describe('Default Configuration', () => {
+  describe('Default Greenwood Configuration', () => {
     before(async() => {
       await setup.runCommand('build');
     });
@@ -98,7 +104,7 @@ describe('Build Command With: ', () => {
   });
 
   after(() => {
-    setup.tearDown();
+    setup.teardownWorkspace();
   });
 
 });

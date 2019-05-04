@@ -8,7 +8,7 @@ module.exports = class Setup {
     this.enableStdOut = enableStdOut; // debugging tests
   }
 
-  setup(cwd) {
+  setupWorkspace(cwd) {
     this.rootDir = cwd ? cwd : process.cwd();
     this.cwdOffset = cwd ? '../../../../' : './'; // TODO figure this out dynamically?
 
@@ -20,7 +20,7 @@ module.exports = class Setup {
     };
   }
 
-  tearDown() {
+  teardownWorkspace() {
     rimraf.sync(this.buildDir);
     rimraf.sync(this.publicDir);
   }
