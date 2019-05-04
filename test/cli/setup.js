@@ -1,4 +1,6 @@
 const os = require('os');
+const path = require('path');
+const rimraf = require('rimraf');
 const { spawn } = require('child_process');
 
 module.exports = class Setup {
@@ -6,9 +8,18 @@ module.exports = class Setup {
     this.enableStdOut = enableStdOut; // debugging tests
   }
 
-  initContext(cwd) {
+  setup(cwd) {
     this.cwd = cwd ? cwd : process.cwd();
-    this.cwdOffset = cwd ? '../../' : './'; // TODO figure this out dynamically?
+    this.cwdOffset = cwd ? '../../../../' : './'; // TODO figure this out dynamically?
+
+    return {
+      publicDir: path.join(this.cwd, 'public')
+    };
+  }
+
+  tearDown() {
+    rimraf.sync(path.join(this.cwd, '.greenwood'));
+    rimraf.sync(path.join(this.cwd, 'public'));
   }
 
   runCommand(task) {
