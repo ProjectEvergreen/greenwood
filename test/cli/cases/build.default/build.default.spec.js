@@ -16,12 +16,12 @@ describe('Build Command With: ', () => {
   let context;
 
   before(async () => {
-    setup = new TestSetup(true);
+    setup = new TestSetup();
     context = setup.setup();
     setup.tearDown();
   });
 
-  describe('No Configuration', () => {
+  describe('Default Configuration', () => {
     before(async() => {
       await setup.runCommand('build');
     });

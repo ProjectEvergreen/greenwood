@@ -9,26 +9,28 @@ module.exports = class Setup {
   }
 
   setup(cwd) {
-    this.cwd = cwd ? cwd : process.cwd();
+    this.rootDir = cwd ? cwd : process.cwd();
     this.cwdOffset = cwd ? '../../../../' : './'; // TODO figure this out dynamically?
 
+    this.publicDir = path.join(this.rootDir, 'public');
+    this.buildDir = path.join(this.rootDir, '.greenwood');
+    
     return {
-      publicDir: path.join(this.cwd, 'public')
+      publicDir: this.publicDir
     };
   }
 
   tearDown() {
-    rimraf.sync(path.join(this.cwd, '.greenwood'));
-    rimraf.sync(path.join(this.cwd, 'public'));
+    rimraf.sync(this.buildDir);
+    rimraf.sync(this.publicDir);
   }
 
   runCommand(task) {
     return new Promise(async (resolve, reject) => {
-      console.log('this.cwd', this.cwd);
       let err = '';
       const runner = os.platform() === 'win32' ? 'node.cmd' : 'node';
       const npm = spawn(runner, [`${this.cwdOffset}packages/cli/index.js`, task], {
-        cwd: this.cwd
+        cwd: this.rootDir
       });
 
       npm.on('close', code => {

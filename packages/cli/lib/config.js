@@ -18,7 +18,6 @@ module.exports = readAndMergeConfig = async() => {
       let customConfig = JSON.parse(JSON.stringify(defaultConfig));
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
-        console.log('readAndMergeConfig exists!!!', require(path.join(process.cwd(), 'greenwood.config.js')));
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
         const { workspace, devServer, publicPath } = userCfgFile;
           

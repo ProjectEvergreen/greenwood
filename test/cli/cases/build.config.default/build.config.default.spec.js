@@ -16,7 +16,7 @@ describe('Build Command With: ', () => {
   let context;
 
   before(async () => {
-    setup = new TestSetup(true);
+    setup = new TestSetup();
     context = setup.setup(__dirname);
     setup.tearDown();
   });
