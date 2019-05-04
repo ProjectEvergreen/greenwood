@@ -1,6 +1,6 @@
 ### Blog Page
 
-This is the blog page built by Greenwood.
+This is the test blog page built by Greenwood.
 
 ```render
 <style>${CSS}</style>

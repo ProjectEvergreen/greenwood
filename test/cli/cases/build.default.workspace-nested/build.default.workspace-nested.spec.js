@@ -25,6 +25,7 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestSetup = require('../../setup');
 
+// TODO why does this case need a src/pages/index.md?
 describe('Build Greenwood With: ', () => {
   let setup;
   let context;
@@ -54,7 +55,7 @@ describe('Build Greenwood With: ', () => {
 
       describe('default generated index page in public directory', () => {
         const indexPageHeading = 'Greenwood';
-        const indexPageBody = 'This is the home page built by Greenwood. Make your own pages in src/pages/index.js!';
+        const indexPageBody = 'This is the test page built by Greenwood!';
         const hash = 'b7cc564e4c0eaf3';
         let dom;
 
@@ -85,7 +86,7 @@ describe('Build Greenwood With: ', () => {
 
       describe('default generated blog page directory', () => {
         const blogPageHeading = 'Blog Page';
-        const blogPageBody = 'This is the blog page built by Greenwood.';
+        const blogPageBody = 'This is the test blog page built by Greenwood.';
         const hash = 'b76b0cb5a83b659';
         let dom;
 
