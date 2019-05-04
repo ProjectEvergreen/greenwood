@@ -42,15 +42,17 @@ module.exports = (config, context) => {
       publicPath: config.publicPath
     },
 
+    // {
+    //   test: /\.js$/,
+    //   enforce: 'pre',
+    //   loader: 'eslint-loader',
+    //   options: {
+    //     configFile: path.join(__dirname, './.eslintrc')
+    //   }
+    // }
+
     module: {
       rules: [{
-        test: /\.js$/,
-        enforce: 'pre',
-        loader: 'eslint-loader',
-        options: {
-          configFile: path.join(__dirname, './.eslintrc')
-        }
-      }, {
         test: /\.js$/,
         loader: 'babel-loader',
         options: {

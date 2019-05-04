@@ -1,7 +1,7 @@
 /*
- * Use Case: Run Greenwood build command with empty config object and test for default output
+ * Use Case: Run Greenwood build command with no config and test for default output
  * Command: greenwood build
- * Config: {}
+ * Config: None
  */
 
 const expect = require('chai').expect;
@@ -17,11 +17,11 @@ describe('Build Command With: ', () => {
 
   before(async () => {
     setup = new TestSetup(true);
-    context = setup.setup(__dirname);
+    context = setup.setup();
     setup.tearDown();
   });
 
-  describe('Empty (No) Configuration', () => {
+  describe('No Configuration', () => {
     before(async() => {
       await setup.runCommand('build');
     });
