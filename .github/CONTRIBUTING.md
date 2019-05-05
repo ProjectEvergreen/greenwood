@@ -37,9 +37,9 @@ Examples:
 - _build.config.workspace-public-path.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace` and `publicPath` set.
 
 ### Running Tests
-To run tests, use:
+To run tests in watch mode, use:
 ```shell
-$ yarn test
+$ yarn test:tdd
 ```
 
 Below are some tips to help with running / debugging tests
