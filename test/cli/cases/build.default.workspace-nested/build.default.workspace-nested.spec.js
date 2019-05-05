@@ -48,9 +48,6 @@ describe('Build Greenwood With: ', () => {
     });
 
     describe('Custom blog page directory', () => {
-      const blogPageHeading = 'Blog Page';
-      const blogPageBody = 'This is the test blog page built by Greenwood.';
-      const hash = 'b76b0cb5a83b659';
       let dom;
 
       beforeEach(async() => {
@@ -62,15 +59,15 @@ describe('Build Greenwood With: ', () => {
       });
 
       it('should have the expected heading text within the hello example page in the hello directory', async() => {
-        const heading = dom.window.document.querySelector(`h3.wc-md-${hash}`).textContent;
+        const heading = dom.window.document.querySelector('h3').textContent;
     
-        expect(heading).to.equal(blogPageHeading);
+        expect(heading).to.equal('Blog Page');
       });
     
       it('should have the expected paragraph text within the hello example page in the hello directory', async() => {
-        let paragraph = dom.window.document.querySelector(`p.wc-md-${hash}`).textContent;
+        let paragraph = dom.window.document.querySelector('p').textContent;
     
-        expect(paragraph).to.equal(blogPageBody);
+        expect(paragraph).to.equal('This is the test blog page built by Greenwood.');
       });
     });
   });

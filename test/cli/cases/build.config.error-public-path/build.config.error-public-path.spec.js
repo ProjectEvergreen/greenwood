@@ -23,7 +23,7 @@ describe('Build Greenwood With: ', () => {
   let setup;
 
   before(async () => {
-    setup = new TestBed(true);
+    setup = new TestBed();
     setup.setupTestBed(__dirname);
   });
 
