@@ -14,13 +14,8 @@
  * User Workspace
  * Greenwood default (src/)
  */
-// const expect = require('chai').expect;
-// const fs = require('fs');
-// const glob = require('glob-promise');
-// const { JSDOM } = require('jsdom');
-// const path = require('path');
-const TestBed = require('../../test-bed');
 const runSmokeTest = require('../../smoke-test');
+const TestBed = require('../../test-bed');
 
 describe('Build Greenwood With: ', async () => {
   let setup;
@@ -36,8 +31,8 @@ describe('Build Greenwood With: ', async () => {
       await setup.runGreenwoodCommand('build');
     });
 
-    it('should pass the smoke test', async () => {
-      await runSmokeTest(context, setup);
+    it('should pass all smoke tests', async () => {
+      await runSmokeTest(context, setup, 'Empty Configuration and Default Workspace');
     });
   });
 

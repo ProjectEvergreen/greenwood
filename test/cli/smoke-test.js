@@ -4,10 +4,10 @@ const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 
-module.exports = runSmokeTest = (context, setup) => {
+module.exports = runSmokeTest = (context, setup, label) => {
   return new Promise((resolve) => {
     
-    describe('Running Smoke Test', () => {
+    describe(`Running Smoke Tests: ${label}`, () => {
       it('should create a public directory', () => {
         expect(fs.existsSync(context.publicDir)).to.be.true;
       });
