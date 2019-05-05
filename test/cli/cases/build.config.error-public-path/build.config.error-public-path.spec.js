@@ -32,7 +32,6 @@ describe('Build Greenwood With: ', () => {
       try { 
         await setup.runGreenwoodCommand('build');
       } catch (err) {
-        console.log(err);
         expect(err).to.contain('greenwood.config.js publicPath must be a string');
       }
     });

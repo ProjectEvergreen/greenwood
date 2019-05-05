@@ -23,7 +23,7 @@ module.exports = runSmokeTest = (context, setup, label) => {
           expect(fs.existsSync(path.join(context.publicDir, './index.html'))).to.be.true;
         });
 
-        it('should output a single 404.html file (home page)', () => {
+        it('should output a single 404.html file (not found page)', () => {
           expect(fs.existsSync(path.join(context.publicDir, './404.html'))).to.be.true;
         });
     
@@ -31,7 +31,7 @@ module.exports = runSmokeTest = (context, setup, label) => {
           expect(await glob.promise(path.join(context.publicDir, './index.*.bundle.js'))).to.have.lengthOf(1);
         });
     
-        xit('should output a hello page directory', () => {
+        it('should output a hello page directory', () => {
           expect(fs.existsSync(path.join(context.publicDir, './hello'))).to.be.true;
         });
     
@@ -69,13 +69,13 @@ module.exports = runSmokeTest = (context, setup, label) => {
           });
 
           it('should have the expected heading text within the index page in the public directory', () => {
-            const heading = dom.window.document.querySelector('h3.wc-md-index').textContent;
+            const heading = dom.window.document.querySelector('h3').textContent;
         
             expect(heading).to.equal(indexPageHeading);
           });
     
           it('should have the expected paragraph text within the index page in the public directory', () => {
-            let paragraph = dom.window.document.querySelector('p.wc-md-index').textContent;
+            let paragraph = dom.window.document.querySelector('p').textContent;
         
             expect(paragraph).to.equal(indexPageBody);
           });
@@ -121,13 +121,13 @@ module.exports = runSmokeTest = (context, setup, label) => {
           });
     
           it('should have the expected heading text within the hello example page in the hello directory', () => {
-            const heading = dom.window.document.querySelector('h3.wc-md-hello').textContent;
+            const heading = dom.window.document.querySelector('h3').textContent;
         
             expect(heading).to.equal(helloPageHeading);
           });
         
           it('should have the expected paragraph text within the hello example page in the hello directory', () => {
-            let paragraph = dom.window.document.querySelector('p.wc-md-hello').textContent;
+            let paragraph = dom.window.document.querySelector('p').textContent;
         
             expect(paragraph).to.equal(helloPageBody);
           });
