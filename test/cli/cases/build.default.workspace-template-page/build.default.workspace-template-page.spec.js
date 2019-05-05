@@ -32,27 +32,35 @@ describe('Build Greenwood With: ', () => {
   });
 
   describe('Default Greenwood Configuration and Workspace w/Custom Page Template', () => {
-    let dom;
-
     before(async() => {
       await setup.runGreenwoodCommand('build');
-
-      dom = await JSDOM.fromFile(path.resolve(context.publicDir, 'index.html'));
     });
 
-    it('should output a single index.html file using our custom app template', () => {
-      expect(fs.existsSync(path.join(context.publicDir, './index.html'))).to.be.true;
+    xit('should pass all smoke tests', async () => {
+      await runSmokeTest(context, setup, 'Default Greenwood Configuration and Workspace w/Custom Page Template');
     });
 
-    it('should have the specific element we added as part of our custom page template', () => {
-      const customElement = dom.window.document.querySelectorAll('div.owen-test');
-      
-      expect(customElement.length).to.equal(1);
-    });
-  });
-    
-  after(async () => {
-    setup.teardownTestBed();
-  });
+    describe('Custom Page Template', () => {
+      let dom;
+
+      before(async() => {  
+        dom = await JSDOM.fromFile(path.resolve(context.publicDir, 'index.html'));
+      });
+
+      it('should output a single index.html file using our custom app template', () => {
+        expect(fs.existsSync(path.join(context.publicDir, './index.html'))).to.be.true;
+      });
   
+      it('should have the specific element we added as part of our custom page template', () => {
+        const customElement = dom.window.document.querySelectorAll('div.owen-test');
+        
+        expect(customElement.length).to.equal(1);
+      });
+
+      after(async () => {
+        setup.teardownTestBed();
+      });
+
+    });
+  });
 });

@@ -1,7 +1,3 @@
 ### Greenwood
 
-This is the test page built by Greenwood!
-
-```render
-<style>${CSS}</style>
-```
+This is the home page built by Greenwood. Make your own pages in src/pages/index.js!

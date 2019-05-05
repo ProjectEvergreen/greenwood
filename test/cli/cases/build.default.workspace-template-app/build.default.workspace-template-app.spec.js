@@ -34,25 +34,33 @@ describe('Build Greenwood With: ', () => {
   describe('Default Greenwood Configuration and Workspace w/Custom App Template', () => {
     let dom;
 
-    before(async() => {
+    before(async () => {     
       await setup.runGreenwoodCommand('build');
-
-      dom = await JSDOM.fromFile(path.resolve(context.publicDir, 'index.html'));
     });
 
-    it('should output a single index.html file using our custom app template', () => {
-      expect(fs.existsSync(path.join(context.publicDir, './index.html'))).to.be.true;
+    xit('should pass all smoke tests', async () => {
+      await runSmokeTest(context, setup, 'Default Greenwood Configuration and Workspace w/Custom App Template');
     });
 
-    it('should have the specific element we added as part of our custom app template', () => {
-      const customParagraph = dom.window.document.querySelector('p#custom-app-template').textContent;
-      
-      expect(customParagraph).to.equal('My Custom App Template');
+    describe('Custom App Template', () => {
+      before(async() => {
+        dom = await JSDOM.fromFile(path.resolve(context.publicDir, 'index.html'));
+      });
+
+      it('should output a single index.html file using our custom app template', () => {
+        expect(fs.existsSync(path.join(context.publicDir, './index.html'))).to.be.true;
+      });
+  
+      it('should have the specific element we added as part of our custom app template', () => {
+        const customParagraph = dom.window.document.querySelector('p#custom-app-template').textContent;
+        
+        expect(customParagraph).to.equal('My Custom App Template');
+      });
+
+      after(async () => {
+        setup.teardownTestBed();
+      });
     });
-  });
-    
-  after(async () => {
-    setup.teardownTestBed();
   });
   
 });

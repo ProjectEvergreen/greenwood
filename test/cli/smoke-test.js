@@ -27,7 +27,7 @@ module.exports = runSmokeTest = (context, setup, label) => {
           expect(await glob.promise(path.join(context.publicDir, './index.*.bundle.js'))).to.have.lengthOf(1);
         });
     
-        it('should output a hello page directory', () => {
+        xit('should output a hello page directory', () => {
           expect(fs.existsSync(path.join(context.publicDir, './hello'))).to.be.true;
         });
     
