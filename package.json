@@ -7,12 +7,12 @@
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "scripts": {
-    "clean": "rimraf ./.greenwood && rimraf ./public",
+    "clean": "rimraf ./.greenwood && rimraf ./public && rimraf ./coverage",
     "lint": "eslint \"./packages/**/**/*.js\" \"./test/**/**/*.js\"",
     "build": "node ./packages/cli/index.js build",
     "serve": "yarn clean && yarn build && cd ./public && ws",
     "develop": "yarn clean && node ./packages/cli/index.js develop",
-    "test": "mocha ./test/**/**/**/*.spec.js --timeout 15000",
+    "test": "yarn clean && nyc mocha ./test/**/**/**/*.spec.js --timeout 15000",
     "test:tdd": "mocha --watch ./test/**/**/**/*.spec.js --timeout 15000"
   },
   "dependencies": {

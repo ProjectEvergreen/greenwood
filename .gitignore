@@ -1,4 +1,6 @@
 *.log
 .greenwood/
+.nyc_output/
+coverage/
 node_modules/
 public/

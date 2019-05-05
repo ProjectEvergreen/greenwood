@@ -42,6 +42,11 @@ To run tests in watch mode, use:
 $ yarn test:tdd
 ```
 
+To verify compliance with coverage and watermark thresholds (what CI server runs), use:
+```shell
+$ yarn test
+```
+
 Below are some tips to help with running / debugging tests
 - `describe.only` / `it.only`: only runs this block
 - `xdescribe` / `xit`: dont run this block
