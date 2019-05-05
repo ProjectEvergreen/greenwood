@@ -8,20 +8,30 @@ module.exports = runSmokeTest = (context, setup, label) => {
   return new Promise((resolve) => {
     
     describe(`Running Smoke Tests: ${label}`, () => {
-      it('should create a public directory', () => {
-        expect(fs.existsSync(context.publicDir)).to.be.true;
-      });
     
-      describe('public directory output', () => {  
+      describe('Public Directory Generated Output', () => {  
+        
+        it('should create a public directory', () => {
+          expect(fs.existsSync(context.publicDir)).to.be.true;
+        });
+
         it('should output a single index.html file (home page)', () => {
           expect(fs.existsSync(path.join(context.publicDir, './index.html'))).to.be.true;
+        });
+
+        it('should output a single 404.html file (home page)', () => {
+          expect(fs.existsSync(path.join(context.publicDir, './404.html'))).to.be.true;
         });
     
         it('should output one JS bundle file', async () => {
           expect(await glob.promise(path.join(context.publicDir, './index.*.bundle.js'))).to.have.lengthOf(1);
         });
     
-        describe('default generated index page in public directory', () => {
+        it('should output a hello page directory', () => {
+          expect(fs.existsSync(path.join(context.publicDir, './hello'))).to.be.true;
+        });
+    
+        describe('Index (Home) page', () => {
           const indexPageHeading = 'Greenwood';
           const indexPageBody = 'This is the home page built by Greenwood. Make your own pages in src/pages/index.js!';
           let dom;
@@ -29,11 +39,31 @@ module.exports = runSmokeTest = (context, setup, label) => {
           beforeEach(async() => {
             dom = await JSDOM.fromFile(path.resolve(context.publicDir, 'index.html'));
           });
-    
-          it('should output an index.html file within the root public directory', () => {
-            expect(fs.existsSync(path.join(context.publicDir, './index.html'))).to.be.true;
+
+          it('should have a <title> tag in the <head>', () => {
+            const title = dom.window.document.querySelector('head title').textContent;
+
+            expect(title).to.be.equal('My App');
           });
     
+          it('should have a <script> tag in the <body>', () => {
+            const scriptTag = dom.window.document.querySelectorAll('body script');
+
+            expect(scriptTag.length).to.be.equal(1);
+          });
+
+          it('should have a router outlet tag in the <body>', () => {
+            const outlet = dom.window.document.querySelectorAll('body eve-app');
+
+            expect(outlet.length).to.be.equal(1);
+          });
+
+          it('should have the correct route tags in the <body>', () => {
+            const routes = dom.window.document.querySelectorAll('body lit-route');
+
+            expect(routes.length).to.be.equal(3);
+          });
+
           it('should have the expected heading text within the index page in the public directory', () => {
             const heading = dom.window.document.querySelector('h3.wc-md-index').textContent;
         
@@ -46,9 +76,31 @@ module.exports = runSmokeTest = (context, setup, label) => {
             expect(paragraph).to.equal(indexPageBody);
           });
         });
+
+        describe('404 (Not Found) page', () => {
+          let dom;
     
-        it('should create a default hello page directory', () => {
-          expect(fs.existsSync(path.join(context.publicDir, './hello'))).to.be.true;
+          beforeEach(async() => {
+            dom = await JSDOM.fromFile(path.resolve(context.publicDir, '404.html'));
+          });
+    
+          it('should have a <script> tag in the <body>', () => {
+            const scriptTag = dom.window.document.querySelectorAll('body script');
+
+            expect(scriptTag.length).to.be.equal(1);
+          });
+
+          it('should have a <title> tag in the <head>', () => {
+            const title = dom.window.document.querySelector('head title').textContent;
+
+            expect(title).to.be.equal('404 - Not Found');
+          });
+
+          it('should have a <h1> tag in the <body>', () => {
+            const heading = dom.window.document.querySelector('body h1').textContent;
+
+            expect(heading).to.be.equal('404 Not Found');
+          });
         });
     
         describe('default generated hello page directory', () => {

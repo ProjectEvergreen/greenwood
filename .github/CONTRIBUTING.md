@@ -23,19 +23,29 @@ To develop for the project, you'll want to follow these steps:
 
 
 ## Testing
-There are a couple various testing strategies used in greenwood
-- _Unit_: Tests for as many "in memory" operations as possible.  Should refrain from filesystem manipulation and focus on trying to test as much of the code in isolation as possible.
-- _Cases_: Integration / E2E like tests that run commands like `build` with various real world use case that Greenwood should support, from the perspective of a user running the tool, and will be concerned with actually creating user workspaces to smiluate a real world environemt.
+Greenwood follows [BDD style testing](https://en.wikipedia.org/wiki/Behavior-driven_development) through "cases".  Cases are used to capture the capabilities and features of Greenwood when running its various commands in a way that is close to how the user would actually expect the tool to work and so generally revolves around testing the build output of running `greenwood build`.  
 
-Run tests using
+### Guidelines
+Cases follow a convention starting with the command (e.g. `build`) and and the capability and features being tested, like configuration with a particular option (e.g. `publicPath`):
+```shell
+<command>.<capability>.<feature>.spec.js
+```
+
+Examples:
+- _build.default.spec.js_ - Would test `greenwood build` with no config and no workspace.
+- _build.config.workspace-custom.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace`
+- _build.config.workspace-public-path.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace` and `publicPath` set.
+
+### Running Tests
+To run tests, use:
 ```shell
 $ yarn test
 ```
 
-> Note, you can use the following to adjust how many mocha tests get run:
-> - `describe.only` / `it.only`: only run this block
-> - `xdescribe` / `xit`: dont run this block
+Below are some tips to help with running / debugging tests
+- `describe.only` / `it.only`: only runs this block
+- `xdescribe` / `xit`: dont run this block
+- uncomment `setup.teardownTestBed()` in a case to see the build output without it getting cleaned
+- use `new TestBed(true)` get debug output from Greenwood when running tests
 
-### Unit Testing
-
-### Case Testing
+> **PLEASE DO NOT COMMIT ANY OF THESE ABOVE CHANGES THOUGH**
