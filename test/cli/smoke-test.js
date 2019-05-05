@@ -4,6 +4,10 @@ const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 
+// TODO break out smoke tests per feature?
+// home page
+// 404 page
+// <some> page
 module.exports = runSmokeTest = (context, setup, label) => {
   return new Promise((resolve) => {
     
