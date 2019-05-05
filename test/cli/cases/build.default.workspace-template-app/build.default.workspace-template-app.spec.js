@@ -18,12 +18,10 @@
  */
 const expect = require('chai').expect;
 const fs = require('fs');
-const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestSetup = require('../../setup');
 
-// TODO why does this case need a src/templates/{index|404.html}
 describe('Build Greenwood With: ', () => {
   let setup;
   let context;
