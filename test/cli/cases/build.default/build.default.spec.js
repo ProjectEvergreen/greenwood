@@ -19,20 +19,20 @@ const fs = require('fs');
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
-const TestSetup = require('../../setup');
+const TestBed = require('../../test-bed');
 
 describe('Build Greenwood With: ', () => {
   let setup;
   let context;
 
-  before(async () => {
-    setup = new TestSetup();
-    context = setup.setupWorkspace();
+  before(() => {
+    setup = new TestBed();
+    context = setup.setupTestBed(__dirname);
   });
 
   describe('Default Greenwood Configuration and Workspace', () => {
     before(async() => {
-      await setup.runCommand('build');
+      await setup.runGreenwoodCommand('build');
     });
   
     it('should create a public directory', () => {
@@ -107,7 +107,7 @@ describe('Build Greenwood With: ', () => {
   });
 
   after(() => {
-    setup.teardownWorkspace();
+    // setup.teardownTestBed();
   });
 
 });

@@ -23,7 +23,7 @@ const fs = require('fs');
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
-const TestSetup = require('../../setup');
+const TestBed = require('../../test-bed');
 
 // TODO why does this case need a src/pages/index.md?
 describe('Build Greenwood With: ', () => {
@@ -31,13 +31,13 @@ describe('Build Greenwood With: ', () => {
   let context;
 
   before(async () => {
-    setup = new TestSetup();
-    context = setup.setupWorkspace(__dirname);
+    setup = new TestBed();
+    context = setup.setupTestBed(__dirname);
   });
 
   describe('Default Greenwood Configuration and Default Workspace w/ Nested Directories', () => {
     before(async() => {
-      await setup.runCommand('build');
+      await setup.runGreenwoodCommand('build');
     });
   
     it('should create a public directory', () => {
@@ -114,7 +114,7 @@ describe('Build Greenwood With: ', () => {
   });
 
   after(() => {
-    setup.teardownWorkspace();
+    setup.teardownTestBed();
   });
 
 });
