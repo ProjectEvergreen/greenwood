@@ -183,8 +183,8 @@ module.exports = runSmokeTest = async (testCases, context, setup, label) => {
     }
   });
 
-  return Promise.all(testCasePromises).catch(() => {
-    console.log('oops?');
+  return Promise.all(testCasePromises).catch((err) => {
+    console.error('Error running tests', err);
   });
 
 };
