@@ -18,8 +18,8 @@ module.exports = runProductionBuild = async(compilation) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-const runWebpack = async ({ context }) => {
-  const webpackConfig = require(path.join(__dirname, '..', './config/webpack.config.prod.js'))(context);
+const runWebpack = async (compilation) => {
+  const webpackConfig = require(path.join(__dirname, '..', './config/webpack.config.prod.js'))(compilation);
 
   return new Promise(async (resolve, reject) => {
 

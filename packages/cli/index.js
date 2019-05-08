@@ -40,11 +40,10 @@ if (program.parse.length === 0) {
 
 const run = async() => {
   process.env.NODE_ENV = MODE === 'develop' ? 'development' : 'production';
-
-  const compilation = await generateCompilation();
-
+  
   try {
-
+    const compilation = await generateCompilation();
+    
     switch (MODE) {
 
       case 'build':
@@ -72,7 +71,7 @@ const run = async() => {
     }
     process.exit(0); // eslint-disable-line no-process-exit
   } catch (err) {
-    console.error(err);
+    console.error(`${err}`.red);
     process.exit(1); // eslint-disable-line no-process-exit
   }
 };

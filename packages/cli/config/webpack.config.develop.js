@@ -6,8 +6,6 @@ const generateCompilation = require('../lib/compile');
 const webpackMerge = require('webpack-merge');
 const commonConfig = require(path.join(__dirname, '..', './config/webpack.config.common.js'));
 
-const host = 'localhost';
-const port = 1981;
 let isRebuilding = false;
 
 const rebuild = async() => {
@@ -24,16 +22,17 @@ const rebuild = async() => {
   }
 };
 
-module.exports = (context) => {
-  const configWithContext = commonConfig(context);
-  const publicPath = configWithContext.output.publicPath;
+module.exports = ({ config, context, graph }) => {
+  const configWithContext = commonConfig(config, context, graph);
+  const { devServer, publicPath } = config;
+  const { host, port } = devServer;
 
   return webpackMerge(configWithContext, {
 
     mode: 'development',
 
     entry: [
-      `webpack-dev-server/client?http://${host}:${port}`,
+      `webpack-dev-server/client?${host}:${port}`,
       path.join(context.scratchDir, 'app', 'app.js')
     ],
 
@@ -48,12 +47,12 @@ module.exports = (context) => {
     plugins: [
       // new webpack.HotModuleReplacementPlugin(),
       new FilewatcherPlugin({
-        watchFileRegex: [`/${context.userWorkspace}/`], 
+        watchFileRegex: [`/${context.userWorkspace}/`],
         onReadyCallback: () => { 
-          console.log(`Now serving Development Server available at http://${host}:${port}`);
+          console.log(`Now serving Development Server available at ${host}:${port}`);
         },
         // eslint-disable-next-line no-unused-vars
-        onChangeCallback: async () => {
+        onChangeCallback: async (path) => {
           rebuild();
         },
         usePolling: true,
@@ -64,17 +63,30 @@ module.exports = (context) => {
         fileName: 'manifest.json',
         publicPath
       }),
-      // TODO magic string paths (index.html)
       new HtmlWebpackPlugin({
-        filename: 'index.html',
-        template: path.join(context.scratchDir, 'index.dev.html'),
-        publicPath
+        template: path.join(context.scratchDir, context.indexPageTemplate),
+        spaIndexFallbackScript: `
+          <script>
+          (function(){
+              var redirect = sessionStorage.redirect;
+              delete sessionStorage.redirect;
+              if (redirect && redirect != location.href) {
+              history.replaceState(null, null, redirect);
+              }
+          })();
+          </script>
+        `
       }),
-      // TODO magic string paths (404.html)
       new HtmlWebpackPlugin({
-        filename: '404.html',
-        template: path.join(context.scratchDir, '404.dev.html'),
-        publicPath
+        filename: context.notFoundPageTemplate,
+        template: path.join(context.scratchDir, context.notFoundPageTemplate),
+        spaIndexFallbackScript: `
+          <script>
+            sessionStorage.redirect = location.href;
+          </script>
+      
+          <meta http-equiv="refresh" content="0;URL='${publicPath}'"></meta>
+        `
       })
     ]
   });
