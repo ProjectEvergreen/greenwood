@@ -158,7 +158,7 @@ function defaultHelloPage(context, label) {
 
 // TOOD need to find a good Promise based way to call setup.teardownTestBed() after all tests are run
 // right now, test files are left over after tests are run, but are cleaned up before each test run
-module.exports = runSmokeTest = async (testCases, context, setup, label, page) => {
+module.exports = runSmokeTest = async (testCases, context, setup, label) => {
   let testCasePromises = [];
 
   testCases.forEach(async (testCase) => {
