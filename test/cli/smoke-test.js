@@ -4,7 +4,6 @@ const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 
-// test basic folder / file structure of public/
 function publicDirectory(context, label) {
   return new Promise((resolve) => {
     describe(`Running Smoke Tests: ${label}`, () => {
@@ -122,32 +121,34 @@ function defaultNotFound(context, label) {
 function defaultHelloPage(context, label) {
   return new Promise((resolve) => {
     describe(`Running Smoke Tests: ${label}`, () => {
-      const helloPageHeading = 'Hello World';
-      const helloPageBody = 'This is an example page built by Greenwood.  Make your own in src/pages!';
-      let dom;
+      describe('Hello World (dummy) page', () => {
+        const helloPageHeading = 'Hello World';
+        const helloPageBody = 'This is an example page built by Greenwood.  Make your own in src/pages!';
+        let dom;
 
-      beforeEach(async() => {
-        dom = await JSDOM.fromFile(path.resolve(context.publicDir, './hello', './index.html'));
-      });
+        beforeEach(async() => {
+          dom = await JSDOM.fromFile(path.resolve(context.publicDir, './hello', './index.html'));
+        });
 
-      it('should output a hello page directory', () => {
-        expect(fs.existsSync(path.join(context.publicDir, './hello'))).to.be.true;
-      });
+        it('should output a hello page directory', () => {
+          expect(fs.existsSync(path.join(context.publicDir, './hello'))).to.be.true;
+        });
 
-      it('should output an index.html file within the default hello page directory', () => {
-        expect(fs.existsSync(path.join(context.publicDir, './hello', './index.html'))).to.be.true;
-      });
+        it('should output an index.html file within the default hello page directory', () => {
+          expect(fs.existsSync(path.join(context.publicDir, './hello', './index.html'))).to.be.true;
+        });
 
-      it('should have the expected heading text within the hello example page in the hello directory', () => {
-        const heading = dom.window.document.querySelector('h3').textContent;
+        it('should have the expected heading text within the hello example page in the hello directory', () => {
+          const heading = dom.window.document.querySelector('h3').textContent;
 
-        expect(heading).to.equal(helloPageHeading);
-      });
+          expect(heading).to.equal(helloPageHeading);
+        });
 
-      it('should have the expected paragraph text within the hello example page in the hello directory', () => {
-        let paragraph = dom.window.document.querySelector('p').textContent;
+        it('should have the expected paragraph text within the hello example page in the hello directory', () => {
+          let paragraph = dom.window.document.querySelector('p').textContent;
 
-        expect(paragraph).to.equal(helloPageBody);
+          expect(paragraph).to.equal(helloPageBody);
+        });
       });
   
       resolve();
