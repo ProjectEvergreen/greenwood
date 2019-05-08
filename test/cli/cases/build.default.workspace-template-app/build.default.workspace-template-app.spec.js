@@ -23,6 +23,7 @@ const path = require('path');
 const TestBed = require('../../test-bed');
 
 describe('Build Greenwood With: ', () => {
+  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom App Template';
   let setup;
   let context;
 
@@ -31,15 +32,62 @@ describe('Build Greenwood With: ', () => {
     context = setup.setupTestBed(__dirname);
   });
 
-  describe('Default Greenwood Configuration and Workspace w/Custom App Template', () => {
+  describe(LABEL, () => {
     let dom;
 
     before(async () => {     
       await setup.runGreenwoodCommand('build');
     });
 
-    xit('should pass all smoke tests', async () => {
-      await runSmokeTest(context, setup, 'Default Greenwood Configuration and Workspace w/Custom App Template');
+    it('should pass all public, not-found, and hello smoke tests', async () => {
+      await runSmokeTest(['public', 'not-found', 'hello'], context, setup, LABEL);
+    });
+
+    describe('Custom Index (Home) page', () => {
+      const indexPageHeading = 'Greenwood';
+      const indexPageBody = 'This is the home page built by Greenwood. Make your own pages in src/pages/index.js!';
+      let dom;
+
+      beforeEach(async() => {
+        dom = await JSDOM.fromFile(path.resolve(context.publicDir, 'index.html'));
+      });
+
+      it('should have a <title> tag in the <head>', () => {
+        const title = dom.window.document.querySelector('head title').textContent;
+
+        expect(title).to.be.equal('My App');
+      });
+
+      it('should have a <script> tag in the <body>', () => {
+        const scriptTag = dom.window.document.querySelectorAll('body script');
+
+        expect(scriptTag.length).to.be.equal(1);
+      });
+
+      it('should have a router outlet tag in the <body>', () => {
+        const outlet = dom.window.document.querySelectorAll('body eve-app');
+
+        expect(outlet.length).to.be.equal(1);
+      });
+
+      // no 404 route in our custom app-template.js, like greenwood does
+      it('should have the correct route tags in the <body>', () => {
+        const routes = dom.window.document.querySelectorAll('body lit-route');
+
+        expect(routes.length).to.be.equal(2);
+      });
+
+      it('should have the expected heading text within the index page in the public directory', () => {
+        const heading = dom.window.document.querySelector('h3').textContent;
+    
+        expect(heading).to.equal(indexPageHeading);
+      });
+
+      it('should have the expected paragraph text within the index page in the public directory', () => {
+        let paragraph = dom.window.document.querySelector('p').textContent;
+    
+        expect(paragraph).to.equal(indexPageBody);
+      });
     });
 
     describe('Custom App Template', () => {
@@ -55,10 +103,6 @@ describe('Build Greenwood With: ', () => {
         const customParagraph = dom.window.document.querySelector('p#custom-app-template').textContent;
         
         expect(customParagraph).to.equal('My Custom App Template');
-      });
-
-      after(async () => {
-        setup.teardownTestBed();
       });
     });
   });

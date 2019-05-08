@@ -18,6 +18,7 @@ const runSmokeTest = require('../../smoke-test');
 const TestBed = require('../../test-bed');
 
 describe('Build Greenwood With: ', async () => {
+  const LABEL = 'Empty Configuration and Default Workspace';
   let setup;
   let context;
 
@@ -26,13 +27,13 @@ describe('Build Greenwood With: ', async () => {
     context = setup.setupTestBed(__dirname);
   });
   
-  describe('Empty Configuration and Default Workspace', () => {
+  describe(LABEL, () => {
     before(async () => {     
       await setup.runGreenwoodCommand('build');
     });
 
     it('should pass all smoke tests', async () => {
-      await runSmokeTest(context, setup, 'Empty Configuration and Default Workspace');
+      await runSmokeTest(['public', 'index', 'not-found', 'hello'], context, setup, LABEL);
     });
   });
 

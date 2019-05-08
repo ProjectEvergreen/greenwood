@@ -26,6 +26,7 @@ const TestBed = require('../../test-bed');
 
 // TODO why does this case need a src/pages/index.md?
 describe('Build Greenwood With: ', () => {
+  const LABEL = 'Default Greenwood Configuration and Default Workspace w/ Nested Directories';
   let setup;
   let context;
 
@@ -34,13 +35,13 @@ describe('Build Greenwood With: ', () => {
     context = setup.setupTestBed(__dirname);
   });
 
-  describe('Default Greenwood Configuration and Default Workspace w/ Nested Directories', () => {
+  describe(LABEL, () => {
     before(async () => {     
       await setup.runGreenwoodCommand('build');
     });
 
-    xit('should pass all smoke tests', async () => {
-      await runSmokeTest(context, setup, 'Default Greenwood Configuration and Default Workspace w/ Nested Directories');
+    it('should pass smoke tests for public, not found, and index', async () => {
+      await runSmokeTest(['public', 'not-found', 'index'], context, setup, LABEL);
     });
 
     it('should create a default blog page directory', () => {
@@ -70,10 +71,6 @@ describe('Build Greenwood With: ', () => {
         expect(paragraph).to.equal('This is the test blog page built by Greenwood.');
       });
     });
-  });
-
-  after(() => {
-    setup.teardownTestBed();
   });
 
 });
