@@ -28,7 +28,7 @@ describe('Build Greenwood With: ', () => {
   });
 
   describe('Custom Configuration with a bad value for Workspace', () => {
-    it('should throw an error that workspace path must be a dtring', async () => {
+    it('should throw an error that workspace path must be a string', async () => {
       try { 
         await setup.runGreenwoodCommand('build');
       } catch (err) {

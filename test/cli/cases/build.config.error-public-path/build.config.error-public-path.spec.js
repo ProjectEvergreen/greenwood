@@ -28,7 +28,7 @@ describe('Build Greenwood With: ', () => {
   });
 
   describe('Custom Configuration with a bad value for Public Path', () => {
-    it('should throw an error that publicPath must be a dtring', async () => {
+    it('should throw an error that publicPath must be a string', async () => {
       try { 
         await setup.runGreenwoodCommand('build');
       } catch (err) {

@@ -23,6 +23,7 @@ const path = require('path');
 const TestBed = require('../../test-bed');
 
 describe('Build Greenwood With: ', () => {
+  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom Page Template';
   let setup;
   let context;
 
@@ -31,13 +32,13 @@ describe('Build Greenwood With: ', () => {
     context = setup.setupTestBed(__dirname);
   });
 
-  describe('Default Greenwood Configuration and Workspace w/Custom Page Template', () => {
+  describe(LABEL, () => {
     before(async() => {
       await setup.runGreenwoodCommand('build');
     });
 
-    xit('should pass all smoke tests', async () => {
-      await runSmokeTest(context, setup, 'Default Greenwood Configuration and Workspace w/Custom Page Template');
+    it('should pass all smoke tests', async () => {
+      await runSmokeTest(['public', 'index', 'not-found', 'hello'], context, setup, LABEL);
     });
 
     describe('Custom Page Template', () => {
@@ -56,11 +57,7 @@ describe('Build Greenwood With: ', () => {
         
         expect(customElement.length).to.equal(1);
       });
-
-      after(async () => {
-        setup.teardownTestBed();
-      });
-
     });
+
   });
 });
