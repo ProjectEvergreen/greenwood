@@ -23,7 +23,6 @@ module.exports = initContexts = async({ config }) => {
       const userHasWorkspaceAppTemplate = fs.existsSync(userAppTemplate);
       
       let context = {
-        defaultTemplatesDir,
         scratchDir,
         publicDir,
         pagesDir: userHasWorkspacePages ? userPagesDir : defaultTemplatesDir,

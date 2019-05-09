@@ -26,18 +26,16 @@ const writePageComponentsFromTemplate = async (compilation) => {
   const loadPageMeta = async (file, result, context) => {
     return new Promise((resolve, reject) => {
       try {
-        const { title, meta } = file;
+        const { title, meta, route } = file;
         const metadata = {
           title,
           meta
         };
 
         metadata.meta.push({ property: 'og:title', content: title });
-        metadata.meta.push({ property: 'og:url', content: file.route });
-        
-        let metaComponent = context.metaComponent;
+        metadata.meta.push({ property: 'og:url', content: route });
 
-        result = result.replace(/METAIMPORT/, `import '${metaComponent}'`);
+        result = result.replace(/METAIMPORT/, `import '${context.metaComponent}'`);
         result = result.replace(/METADATA/, `const metadata = ${JSON.stringify(metadata)}`);
         result = result.replace(/METAELEMENT/, '<eve-meta .attributes=\${metadata}></eve-meta>');
 
