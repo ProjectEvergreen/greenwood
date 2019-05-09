@@ -9,6 +9,7 @@ let config = {
     host: 'http://localhost'
   },
   publicPath: '/',
+  title: 'Greenwood App',
   meta: []
 };
 

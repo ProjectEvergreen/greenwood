@@ -1,5 +1,13 @@
 import { html, LitElement } from 'lit-element';
 
+/*
+* Take an array of meta objects, add them to an element and replace/add the element to DOM
+*   meta: [
+*     { property: 'og:site', content: 'greenwood' },
+*     { name: 'twitter:site', content: '@PrjEvergreen ' }
+*   ]
+*/
+
 class meta extends LitElement {
 
   static get properties() {
@@ -18,21 +26,19 @@ class meta extends LitElement {
       this.attributes.meta.map(attr => {
         meta = document.createElement('meta');
 
-        const metaKey1 = Object.keys(attr)[0];
-        const metaVal1 = Object.values(attr)[0];
-
-        const metaKey2 = Object.keys(attr)[1];
-        let metaVal2 = Object.values(attr)[1];
+        const metaPropertyOrName = Object.keys(attr)[0];
+        const metaPropValue = Object.values(attr)[0];
+        let metaContentVal = Object.values(attr)[1];
         
         // insert origin domain into url
-        if (metaVal1 === 'og:url') {
-          metaVal2 = window.location.origin + metaVal2;
+        if (metaPropValue === 'og:url') {
+          metaContentVal = window.location.origin + metaContentVal;
         }
 
-        meta.setAttribute(metaKey1, metaVal1);
-        meta.setAttribute(metaKey2, metaVal2);
+        meta.setAttribute(metaPropertyOrName, metaPropValue);
+        meta.setAttribute('content', metaContentVal);
 
-        const oldmeta = header.querySelector(`[${Object.keys(attr)[0]}="${Object.values(attr)[0]}"]`);
+        const oldmeta = header.querySelector(`[${metaPropertyOrName}="${metaPropValue}"]`);
         
         // rehydration
         if (oldmeta) {
