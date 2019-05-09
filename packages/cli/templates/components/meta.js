@@ -1,11 +1,14 @@
 import { html, LitElement } from 'lit-element';
 
 /*
-* Take an array of meta objects, add them to an element and replace/add the element to DOM
+* Take an attributes object with an array of meta objects, add them to an element and replace/add the element to DOM
+*  {
+*   title: 'my title',
 *   meta: [
 *     { property: 'og:site', content: 'greenwood' },
 *     { name: 'twitter:site', content: '@PrjEvergreen ' }
 *   ]
+*  }
 */
 
 class meta extends LitElement {
