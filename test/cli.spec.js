@@ -425,6 +425,7 @@ describe('building greenwood with user provided config file', () => {
       { property: 'og:site', content: 'greenwood' },
       { name: 'twitter:site', content: '@PrjEvergreen ' }
     ];
+    const url = '/blog/20190326/';
 
     beforeEach(async() => {
       dom = await JSDOM.fromFile(blogPageHtmlPath);
@@ -432,6 +433,12 @@ describe('building greenwood with user provided config file', () => {
 
     it('should contain the correct title in head', () => {
       const title = dom.window.document.head.querySelector('title').textContent;
+  
+      expect(title).to.equal(appTitle);
+    }); 
+
+    it('should contain the meta element with correct og:title', () => {
+      const title = dom.window.document.head.querySelector('[property="og:title"]').getAttribute('content');
   
       expect(title).to.equal(appTitle);
     }); 
@@ -446,6 +453,12 @@ describe('building greenwood with user provided config file', () => {
       const content = dom.window.document.head.querySelector('[name="twitter:site"]').getAttribute('content');
   
       expect(content).to.equal(appMeta[1].content);
+    }); 
+
+    it('should contain the meta element with correct og:url', () => {
+      const content = dom.window.document.head.querySelector('[property="og:url"]').getAttribute('content');
+  
+      expect(content).to.contain(url);
     }); 
   });
 
