@@ -9,8 +9,6 @@ let config = {
     host: 'http://localhost'
   },
   publicPath: '/',
-  // TODO add global meta data see issue #5
-  // https://github.com/ProjectEvergreen/greenwood/issues/5
   meta: { 
     title: '',
     description: '',
@@ -27,7 +25,7 @@ module.exports = readAndMergeConfig = async() => {
 
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, publicPath } = userCfgFile;
+        const { workspace, devServer, publicPath, meta, title } = userCfgFile;
           
         if (workspace) {
           if (typeof workspace !== 'string') {
@@ -48,6 +46,13 @@ module.exports = readAndMergeConfig = async() => {
           }
         }
 
+        if (title) {
+          if (typeof title !== 'string') {
+            reject('Error: greenwood.config.js title must be a string');
+          }
+          customConfig.title = title;
+        }
+
         if (publicPath) {
           if (typeof publicPath !== 'string') {
             reject('Error: greenwood.config.js publicPath must be a string');
@@ -55,6 +60,10 @@ module.exports = readAndMergeConfig = async() => {
             customConfig.publicPath = userCfgFile.publicPath;
             console.log('custom publicPath provided => ', customConfig.publicPath);
           }
+        }
+
+        if (meta && meta.length > 0) {
+          customConfig.meta = meta;
         }
 
         if (devServer && Object.keys(devServer).length > 0) {

@@ -23,6 +23,32 @@ const writePageComponentsFromTemplate = async (compilation) => {
     });
   };
 
+  const loadPageMeta = async (file, result, context) => {
+    return new Promise((resolve, reject) => {
+      try {
+        const { title, meta } = file;
+        const metadata = {
+          title,
+          meta
+        };
+
+        metadata.meta['og:title'] = title;
+        
+        let metaComponent = context.metaComponent;
+        
+        console.log(metaComponent);
+
+        result = result.replace(/METAIMPORT/, `import '${metaComponent}'`);
+        result = result.replace(/METADATA/, `const metadata = ${JSON.stringify(metadata)}`);
+        result = result.replace(/METAELEMENT/, '<eve-meta .attributes=\${metadata}></eve-meta>');
+
+        resolve(result);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+
   return Promise.all(compilation.graph.map(file => {
     const context = compilation.context;
 
@@ -30,6 +56,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
       try {
         let result = await createPageComponent(file, context);
 
+        result = await loadPageMeta(file, result, context);
         let relPageDir = file.filePath.substring(context.pagesDir.length, file.filePath.length);
         const pathLastBackslash = relPageDir.lastIndexOf('/');
 
