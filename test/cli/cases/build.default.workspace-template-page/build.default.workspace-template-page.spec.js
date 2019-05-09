@@ -22,42 +22,43 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../test-bed');
 
-describe('Build Greenwood With: ', () => {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace w/Custom Page Template';
   let setup;
-  let context;
 
-  before(async () => {
+  before(async function() {
     setup = new TestBed();
-    context = setup.setupTestBed(__dirname);
+    this.context = setup.setupTestBed(__dirname);
   });
 
-  describe(LABEL, () => {
-    before(async() => {
+  describe(LABEL, function() {
+    before(async function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    it('should pass all smoke tests', async () => {
-      await runSmokeTest(['public', 'index', 'not-found', 'hello'], context, setup, LABEL);
-    });
+    runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
 
-    describe('Custom Page Template', () => {
+    describe('Custom Page Template', function() {
       let dom;
 
-      before(async() => {  
-        dom = await JSDOM.fromFile(path.resolve(context.publicDir, 'index.html'));
+      before(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
-      it('should output a single index.html file using our custom app template', () => {
-        expect(fs.existsSync(path.join(context.publicDir, './index.html'))).to.be.true;
+      it('should output a single index.html file using our custom app template', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
   
-      it('should have the specific element we added as part of our custom page template', () => {
+      it('should have the specific element we added as part of our custom page template', function() {
         const customElement = dom.window.document.querySelectorAll('div.owen-test');
         
         expect(customElement.length).to.equal(1);
       });
     });
 
+  });
+  
+  after(function() {
+    setup.teardownTestBed();
   });
 });

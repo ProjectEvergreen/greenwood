@@ -19,24 +19,23 @@
 const runSmokeTest = require('../../smoke-test');
 const TestBed = require('../../test-bed');
 
-describe('Build Greenwood With: ', () => {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Configuration for Workspace (www) and Default Greenwood configuration';
   let setup;
-  let context;
 
-  before(async () => {
+  before(async function() {
     setup = new TestBed();
-    context = setup.setupTestBed(__dirname);
+    this.context = setup.setupTestBed(__dirname);
   });
 
-  describe(LABEL, () => {
-    before(async () => {     
+  describe(LABEL, function() {
+    before(async function() {    
       await setup.runGreenwoodCommand('build');
     });
-
-    it('should pass all smoke tests', async () => {
-      await runSmokeTest(['public', 'index', 'not-found'], context, setup, LABEL);
-    });
+    runSmokeTest(['public', 'index', 'not-found'], LABEL);
   });
 
+  after(function() {
+    setup.teardownTestBed();
+  });
 });
