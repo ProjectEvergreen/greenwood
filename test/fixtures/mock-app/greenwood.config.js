@@ -5,5 +5,9 @@ module.exports = {
     port: 1984,
     host: 'http://localhost'
   },
-  meta: {}
+  title: 'Mock App',
+  meta: [
+    { property: 'og:site', content: 'greenwood' },
+    { name: 'twitter:site', content: '@PrjEvergreen ' }
+  ]
 };

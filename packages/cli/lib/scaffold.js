@@ -22,39 +22,20 @@ const writePageComponentsFromTemplate = async (compilation) => {
       }
     });
   };
-  const loadPageMeta = async (file, result, { context, config }) => {
+
+  const loadPageMeta = async (file, result, context) => {
     return new Promise((resolve, reject) => {
       try {
+        const { title, meta } = file;
         const metadata = {
-          title: '',
-          meta: []
+          title,
+          meta
         };
-        let title = '', metaComponent = '';
 
-        if (config.meta && config.meta.length > 0) {
-          metadata.meta = config.meta;
-        }
-
-        if (config.title) {
-          title = config.title;
-        }
+        metadata.meta.push({ property: 'og:title', content: title });
+        metadata.meta.push({ property: 'og:url', content: file.route });
         
-        // override title with dynamic title per page if available
-        if (file.title) {
-          title = file.title;
-        }
-        metadata.title = title;
-        metadata.meta['og:title'] = title;
-    
-        // Temporary workaround to webpack config's import path adjustment issue 
-        // when using importing default template components ./ vs ../ for userWorkspace
-
-        // if we're using default page template
-        const isDefaultTemplate = context.userWorkspace === path.join(context.defaultTemplatesDir);
-
-        metaComponent = isDefaultTemplate 
-          ? './components/meta.js'
-          : '../components/meta.js';
+        let metaComponent = context.metaComponent;
 
         result = result.replace(/METAIMPORT/, `import '${metaComponent}'`);
         result = result.replace(/METADATA/, `const metadata = ${JSON.stringify(metadata)}`);
@@ -74,7 +55,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
       try {
         let result = await createPageComponent(file, context);
 
-        result = await loadPageMeta(file, result, compilation);
+        result = await loadPageMeta(file, result, context);
         let relPageDir = file.filePath.substring(context.pagesDir.length, file.filePath.length);
         const pathLastBackslash = relPageDir.lastIndexOf('/');
 

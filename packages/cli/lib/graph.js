@@ -5,7 +5,7 @@ const fm = require('front-matter');
 const path = require('path');
 const util = require('util');
 
-const createGraphFromPages = async (pagesDir) => {
+const createGraphFromPages = async (pagesDir, config) => {
   let pages = [];
   const readdir = util.promisify(fs.readdir);
   const readFile = util.promisify(fs.readFile);
@@ -27,6 +27,7 @@ const createGraphFromPages = async (pagesDir) => {
                 const fileContents = await readFile(filePath, 'utf8');
                 const { attributes } = fm(fileContents);
                 let { label, template, title } = attributes;
+                let { meta } = config;
                 let mdFile = '';
 
                 // if template not set, use default
@@ -54,8 +55,8 @@ const createGraphFromPages = async (pagesDir) => {
                   
                   // set route to the nested pages path and file name(without extension)
                   route = completeNestedPath + route;
-                  mdFile = `./${completeNestedPath}${fileRoute}.md`;
-                  relativeExpectedPath = `'../${completeNestedPath}/${fileName}/${fileName}.js'`; 
+                  mdFile = `.${completeNestedPath}${fileRoute}.md`;
+                  relativeExpectedPath = `'..${completeNestedPath}/${fileName}/${fileName}.js'`; 
                 } else {
                   mdFile = `.${fileRoute}.md`;
                   relativeExpectedPath = `'../${fileName}/${fileName}.js'`; 
@@ -63,6 +64,11 @@ const createGraphFromPages = async (pagesDir) => {
                 
                 // generate a random element name
                 label = label || generateLabelHash(filePath);
+
+                // set <title></title> element text, override with markdown title
+                title = title || config.title;
+
+                // TODO: Allow for other, per page, dynamic, meta data, merge meta array
 
                 /*
                 * Variable Definitions
@@ -75,10 +81,11 @@ const createGraphFromPages = async (pagesDir) => {
                 * fileName: file name without extension/path, so that it can be copied to scratch dir with same name
                 * relativeExpectedPath: relative import path for generated component within a list.js file to later be 
                 * imported into app.js root component
-                * elementLabel: the element name for the generated md page e.g. <wc-md-hello-world></wc-md-hello-world>
+                * title: the head <title></title> text
+                * meta: og graph meta array of objects { property/name, content }
                 */
 
-                pages.push({ mdFile, label, title, route, template, filePath, fileName, relativeExpectedPath });
+                pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath, title, meta });
               }
               if (stats.isDirectory()) {
                 await walkDirectory(filePath);
@@ -116,9 +123,11 @@ module.exports = generateGraph = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const graph = await createGraphFromPages(compilation.context.pagesDir);
+      const { context, config } = compilation;
 
-      resolve(graph);
+      compilation.graph = await createGraphFromPages(context.pagesDir, config);
+
+      resolve(compilation);
     } catch (err) {
       reject(err);
     }

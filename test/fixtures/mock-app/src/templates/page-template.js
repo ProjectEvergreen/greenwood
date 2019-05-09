@@ -1,8 +1,9 @@
 import { html, LitElement } from 'lit-element';
 import css from '../styles/template.css';
 import css2 from '../styles/theme.css';
-
 MDIMPORT;
+METAIMPORT;
+METADATA;
 
 class PageTemplate extends LitElement {
   render() {
@@ -11,6 +12,7 @@ class PageTemplate extends LitElement {
         ${css}
         ${css2}
       </style>
+      METAELEMENT
       <div class='wrapper'>
         <div class='page-template content'>
           <entry></entry>

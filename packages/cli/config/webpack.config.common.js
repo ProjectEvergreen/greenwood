@@ -7,22 +7,20 @@ const isDirectory = source => fs.lstatSync(source).isDirectory();
 const getUserWorkspaceDirectories = (source) => {
   return fs.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory);
 };
-const mapUserWorkspaceDirectory = (userPath, userWorkspace) => {
+const mapUserWorkspaceDirectory = (userPath) => {
   const directory = userPath.split('/')[userPath.split('/').length - 1];
 
   return new webpack.NormalModuleReplacementPlugin(
     new RegExp(`${directory}`),
     (resource) => {
-      let regex = new RegExp(`\.\.\/${directory}`);
-
-      if (userWorkspace === path.join(__dirname, '..', 'templates/')) {
-        regex = new RegExp(`\.\/${directory}`);
-      }
-      resource.request = resource.request.replace(regex, userPath);
       
+      // workaround to ignore cli/templates default imports when rewriting
+      if (!new RegExp('\/cli\/templates').test(resource.request)) {
+        resource.request = resource.request.replace(new RegExp(`\.\.\/${directory}`), userPath);
+      }
       // remove any additional nests, after replacement with absolute path of user workspace + directory
       const additionalNestedPathIndex = resource.request.lastIndexOf('..');
-      
+
       if (additionalNestedPathIndex > -1) {
         resource.request = resource.request.substring(additionalNestedPathIndex + 2, resource.request.length);
       }
@@ -30,11 +28,10 @@ const mapUserWorkspaceDirectory = (userPath, userWorkspace) => {
   );
 };
 
-module.exports = (config, context) => {
-  
+module.exports = ({ config, context }) => {
   // dynamically map all the user's workspace directories for resolution by webpack
   // this essentially helps us keep watch over changes from the user, and greenwood's build pipeline
-  const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map(userPath => mapUserWorkspaceDirectory(userPath, context.userWorkspace));
+  const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map(mapUserWorkspaceDirectory);
 
   return {
 

@@ -14,18 +14,41 @@ class meta extends LitElement {
     let header = document.head;
     let meta;
 
-    this.attributes.meta.map(attr => {
-      meta = document.createElement('meta');
-      meta.setAttribute(Object.keys(attr)[0], Object.values(attr)[0]);
-      meta.setAttribute(Object.keys(attr)[1], Object.values(attr)[1]);
-      header.appendChild(meta);
-    });
-    let title = document.createElement('title');
+    if (this.attributes) {        
+      this.attributes.meta.map(attr => {
+        meta = document.createElement('meta');
 
-    title.innerText = this.attributes.title;
-    const oldTitle = document.head.querySelector('title');
+        const metaKey1 = Object.keys(attr)[0];
+        const metaVal1 = Object.values(attr)[0];
 
-    header.replaceChild(title, oldTitle);
+        const metaKey2 = Object.keys(attr)[1];
+        let metaVal2 = Object.values(attr)[1];
+        
+        // insert origin domain into url
+        if (metaVal1 === 'og:url') {
+          metaVal2 = window.location.origin + metaVal2;
+        }
+
+        meta.setAttribute(metaKey1, metaVal1);
+        meta.setAttribute(metaKey2, metaVal2);
+
+        const oldmeta = header.querySelector(`[${Object.keys(attr)[0]}="${Object.values(attr)[0]}"]`);
+        
+        // rehydration
+        if (oldmeta) {
+          header.replaceChild(meta, oldmeta);
+        } else {
+          header.appendChild(meta);
+        }
+      });
+      let title = document.createElement('title');
+
+      title.innerText = this.attributes.title;
+      const oldTitle = document.head.querySelector('title');
+
+      header.replaceChild(title, oldTitle);
+    }
+
   }
 
   render() {

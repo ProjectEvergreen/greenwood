@@ -13,7 +13,6 @@ const store = createStore(
   compose(lazyReducerEnhancer(combineReducers), applyMiddleware(thunk)));
 
 import '../index/index.js';
-import './components/header/header';
 import './list';
 
 connectRouter(store);
@@ -21,7 +20,6 @@ connectRouter(store);
 class AppComponent extends LitElement {
   render() {
     return html`
-        <eve-header></eve-header>
         MYROUTES
         <lit-route><h1>404 Not found</h1></lit-route>
     `;
