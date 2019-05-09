@@ -418,6 +418,37 @@ describe('building greenwood with user provided config file', () => {
     });
   });
 
+  describe('array of meta objects and title', () => {
+
+    const appTitle = 'Mock App';
+    const appMeta = [
+      { property: 'og:site', content: 'greenwood' },
+      { name: 'twitter:site', content: '@PrjEvergreen ' }
+    ];
+
+    beforeEach(async() => {
+      dom = await JSDOM.fromFile(blogPageHtmlPath);
+    });
+
+    it('should contain the correct title in head', () => {
+      const title = dom.window.document.head.querySelector('title').textContent;
+  
+      expect(title).to.equal(appTitle);
+    }); 
+
+    it('should contain the meta element with correct property and content', () => {
+      const content = dom.window.document.head.querySelector('[property="og:site"]').getAttribute('content');
+  
+      expect(content).to.equal(appMeta[0].content);
+    }); 
+
+    it('should contain the meta element with correct name and content', () => {
+      const content = dom.window.document.head.querySelector('[name="twitter:site"]').getAttribute('content');
+  
+      expect(content).to.equal(appMeta[1].content);
+    }); 
+  });
+
   after(async() => {
     await fs.remove(CONTEXT.userSrc);
     await fs.remove(CONTEXT.userCfgRootPath);
