@@ -49,7 +49,7 @@
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
     "rimraf": "^2.6.3",
-    "wc-markdown-loader": "^0.1.0",
+    "wc-markdown-loader": "^0.1.1",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.2.1",
