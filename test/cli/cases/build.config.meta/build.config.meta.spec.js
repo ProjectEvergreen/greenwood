@@ -9,7 +9,13 @@
  * greenwood build
  * 
  * User Config
- * {}
+ * {
+ *   title: 'My Custom Greenwood App',
+ *   meta: [
+ *     { property: 'og:site', content: 'greenwood' },
+ *     { name: 'twitter:site', content: '@PrjEvergreen' }
+ *   ]
+ * }
  * 
  * User Workspace
  * Greenwood default 
@@ -67,7 +73,7 @@ describe('Build Greenwood With: ', async function() {
         expect(metaElement.getAttribute('content')).to.be.equal('greenwood');
       });
 
-      it('should have our custom config <meta> tag with og:site property in the <head>', function() {
+      it('should have our custom config <meta> tag with twitter:site name in the <head>', function() {
         const metaElement = dom.window.document.querySelector('head meta[name="twitter:site"]');
 
         expect(metaElement.getAttribute('content')).to.be.equal('@PrjEvergreen');
