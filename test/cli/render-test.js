@@ -19,7 +19,8 @@ module.exports = class RenderTest {
         const content = fs.readFileSync(filePath, 'utf8');
         
         this.browser = await puppeteer.launch({
-          headless: this.headless
+          headless: this.headless,
+          args: ['--no-sandbox']
         });
         this.page = await this.browser.newPage();
         await this.page.setContent(content);
