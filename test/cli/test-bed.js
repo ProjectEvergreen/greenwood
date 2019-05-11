@@ -35,6 +35,8 @@ module.exports = class TestBed {
     this.publicDir = path.join(this.rootDir, 'public');
     this.buildDir = path.join(this.rootDir, '.greenwood');
 
+    this.teardownTestBed();
+    
     return {
       publicDir: this.publicDir
     };
@@ -78,42 +80,3 @@ module.exports = class TestBed {
     });
   }
 };
-
-//   describe('a custom front-matter override page directory', () => {
-//     const defaultPageHeading = 'Custom FM Page';
-//     const defaultPageBody = 'This is a custom fm page built by Greenwood.';
-//     let dom;
-    
-//     beforeEach(async() => {
-//       dom = await JSDOM.fromFile(customFMPageHtmlPath);
-//     });
-
-//     it('should contain a customfm folder with an index html file', () => {
-//       expect(fs.existsSync(customFMPageHtmlPath)).to.be.true;
-//     });
-
-//     it('should have the expected heading text within the customfm page in the customfm directory', async() => {
-//       const heading = dom.window.document.querySelector('h3.wc-md-customfm').textContent;
-
-//       expect(heading).to.equal(defaultPageHeading);
-//     });
-
-//     it('should have the expected paragraph text within the customfm page in the customfm directory', async() => {
-//       let paragraph = dom.window.document.querySelector('p.wc-md-customfm').textContent;
-
-//       expect(paragraph).to.equal(defaultPageBody);
-//     });
-
-//     it('should have the expected blog-template\'s blog-content class', async() => {
-//       let layout = dom.window.document.querySelector('.blog-content');
-
-//       expect(layout).to.not.equal(null);
-//     });
-//   });
-
-//   after(async() => {
-//     await fs.remove(CONTEXT.userSrc);
-//     await fs.remove(CONTEXT.publicDir);
-//     await fs.remove(CONTEXT.scratchDir);
-//   });
-// });

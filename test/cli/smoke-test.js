@@ -4,141 +4,162 @@ const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 
-// TODO break out smoke tests per feature?
-// home page
-// 404 page
-// <some> page
-module.exports = runSmokeTest = (context, setup, label) => {
-  return new Promise((resolve) => {
-    
-    describe(`Running Smoke Tests: ${label}`, () => {
-    
-      describe('Public Directory Generated Output', () => {  
-        
-        it('should create a public directory', () => {
-          expect(fs.existsSync(context.publicDir)).to.be.true;
-        });
+function publicDirectory(label) {
+  describe(`Running Smoke Tests: ${label}`, function() {
+    describe('Public Directory Generated Output', function() {
+      it('should create a public directory', function() {
+        expect(fs.existsSync(this.context.publicDir)).to.be.true;
+      });
 
-        it('should output a single index.html file (home page)', () => {
-          expect(fs.existsSync(path.join(context.publicDir, './index.html'))).to.be.true;
-        });
+      it('should output a single index.html file (home page)', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
+      });
 
-        it('should output a single 404.html file (not found page)', () => {
-          expect(fs.existsSync(path.join(context.publicDir, './404.html'))).to.be.true;
-        });
-    
-        it('should output one JS bundle file', async () => {
-          expect(await glob.promise(path.join(context.publicDir, './index.*.bundle.js'))).to.have.lengthOf(1);
-        });
-    
-        it('should output a hello page directory', () => {
-          expect(fs.existsSync(path.join(context.publicDir, './hello'))).to.be.true;
-        });
-    
-        describe('Index (Home) page', () => {
-          const indexPageHeading = 'Greenwood';
-          const indexPageBody = 'This is the home page built by Greenwood. Make your own pages in src/pages/index.js!';
-          let dom;
-    
-          beforeEach(async() => {
-            dom = await JSDOM.fromFile(path.resolve(context.publicDir, 'index.html'));
-          });
-
-          it('should have a <title> tag in the <head>', () => {
-            const title = dom.window.document.querySelector('head title').textContent;
-
-            expect(title).to.be.equal('My App');
-          });
-    
-          it('should have a <script> tag in the <body>', () => {
-            const scriptTag = dom.window.document.querySelectorAll('body script');
-
-            expect(scriptTag.length).to.be.equal(1);
-          });
-
-          it('should have a router outlet tag in the <body>', () => {
-            const outlet = dom.window.document.querySelectorAll('body eve-app');
-
-            expect(outlet.length).to.be.equal(1);
-          });
-
-          it('should have the correct route tags in the <body>', () => {
-            const routes = dom.window.document.querySelectorAll('body lit-route');
-
-            expect(routes.length).to.be.equal(3);
-          });
-
-          it('should have the expected heading text within the index page in the public directory', () => {
-            const heading = dom.window.document.querySelector('h3').textContent;
-        
-            expect(heading).to.equal(indexPageHeading);
-          });
-    
-          it('should have the expected paragraph text within the index page in the public directory', () => {
-            let paragraph = dom.window.document.querySelector('p').textContent;
-        
-            expect(paragraph).to.equal(indexPageBody);
-          });
-        });
-
-        describe('404 (Not Found) page', () => {
-          let dom;
-    
-          beforeEach(async() => {
-            dom = await JSDOM.fromFile(path.resolve(context.publicDir, '404.html'));
-          });
-    
-          it('should have a <script> tag in the <body>', () => {
-            const scriptTag = dom.window.document.querySelectorAll('body script');
-
-            expect(scriptTag.length).to.be.equal(1);
-          });
-
-          it('should have a <title> tag in the <head>', () => {
-            const title = dom.window.document.querySelector('head title').textContent;
-
-            expect(title).to.be.equal('404 - Not Found');
-          });
-
-          it('should have a <h1> tag in the <body>', () => {
-            const heading = dom.window.document.querySelector('body h1').textContent;
-
-            expect(heading).to.be.equal('404 Not Found');
-          });
-        });
-    
-        describe('default generated hello page directory', () => {
-          const helloPageHeading = 'Hello World';
-          const helloPageBody = 'This is an example page built by Greenwood.  Make your own in src/pages!';
-          let dom;
-    
-          beforeEach(async() => {
-            dom = await JSDOM.fromFile(path.resolve(context.publicDir, './hello', './index.html'));
-          });
-    
-          it('should output an index.html file within the default hello page directory', () => {
-            expect(fs.existsSync(path.join(context.publicDir, './hello', './index.html'))).to.be.true;
-          });
-    
-          it('should have the expected heading text within the hello example page in the hello directory', () => {
-            const heading = dom.window.document.querySelector('h3').textContent;
-        
-            expect(heading).to.equal(helloPageHeading);
-          });
-        
-          it('should have the expected paragraph text within the hello example page in the hello directory', () => {
-            let paragraph = dom.window.document.querySelector('p').textContent;
-        
-            expect(paragraph).to.equal(helloPageBody);
-          });
-        });
+      it('should output a single 404.html file (not found page)', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, './404.html'))).to.be.true;
+      });
+  
+      it('should output one JS bundle file', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, './index.*.bundle.js'))).to.have.lengthOf(1);
       });
     });
+  });
+}
 
-    resolve();
+function defaultNotFound(label) {
+  describe(`Running Smoke Tests: ${label}`, function() {
+    describe('404 (Not Found) page', function() {
+      let dom;
 
-    after(() => {
-      setup.teardownTestBed();
+      beforeEach(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, '404.html'));
+      });
+
+      it('should have a <script> tag in the <body>', function() {
+        const scriptTag = dom.window.document.querySelectorAll('body script');
+
+        expect(scriptTag.length).to.be.equal(1);
+      });
+
+      it('should have a <title> tag in the <head>', function() {
+        const title = dom.window.document.querySelector('head title').textContent;
+
+        expect(title).to.be.equal('404 - Not Found');
+      });
+
+      it('should have a <h1> tag in the <body>', function() {
+        const heading = dom.window.document.querySelector('body h1').textContent;
+
+        expect(heading).to.be.equal('404 Not Found');
+      });
     });
+  });
+}
+
+function defaultIndex(label) {
+  describe(`Running Smoke Tests: ${label}`, function() {
+    describe('Index (Home) page', function() {
+      const indexPageHeading = 'Greenwood';
+      const indexPageBody = 'This is the home page built by Greenwood. Make your own pages in src/pages/index.js!';
+      let dom;
+
+      beforeEach(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+      });
+
+      it('should have a <title> tag in the <head>', function() {
+        const title = dom.window.document.querySelector('head title').textContent;
+
+        expect(title).to.be.equal('My App');
+      });
+
+      it('should have a <script> tag in the <body>', function() {
+        const scriptTag = dom.window.document.querySelectorAll('body script');
+
+        expect(scriptTag.length).to.be.equal(1);
+      });
+
+      it('should have a router outlet tag in the <body>', function() {
+        const outlet = dom.window.document.querySelectorAll('body eve-app');
+
+        expect(outlet.length).to.be.equal(1);
+      });
+
+      it('should have the correct route tags in the <body>', function() {
+        const routes = dom.window.document.querySelectorAll('body lit-route');
+
+        expect(routes.length).to.be.equal(3);
+      });
+
+      it('should have the expected heading text within the index page in the public directory', function() {
+        const heading = dom.window.document.querySelector('h3').textContent;
+
+        expect(heading).to.equal(indexPageHeading);
+      });
+
+      it('should have the expected paragraph text within the index page in the public directory', function() {
+        let paragraph = dom.window.document.querySelector('p').textContent;
+
+        expect(paragraph).to.equal(indexPageBody);
+      });
+    });
+  });
+}
+
+function defaultHelloPage(label) {
+  describe(`Running Smoke Tests: ${label}`, function() {
+    describe('Hello World (dummy) page', function() {
+      const helloPageHeading = 'Hello World';
+      const helloPageBody = 'This is an example page built by Greenwood.  Make your own in src/pages!';
+      let dom;
+
+      beforeEach(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './hello', './index.html'));
+      });
+      
+      it('should output a hello page directory', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, './hello'))).to.be.true;
+      });
+      it('should output an index.html file within the default hello page directory', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, './hello', './index.html'))).to.be.true;
+      });
+
+      it('should have the expected heading text within the hello example page in the hello directory', function() {
+        const heading = dom.window.document.querySelector('h3').textContent;
+
+        expect(heading).to.equal(helloPageHeading);
+      });
+
+      it('should have the expected paragraph text within the hello example page in the hello directory', function() {
+        let paragraph = dom.window.document.querySelector('p').textContent;
+
+        expect(paragraph).to.equal(helloPageBody);
+      });
+    });
+  });
+}
+
+module.exports = runSmokeTest = async function(testCases, label) {
+
+  testCases.forEach(async (testCase) => {
+    switch (testCase) {
+
+      case 'not-found':
+        defaultNotFound(label);
+        break;
+      case 'index':
+        defaultIndex(label);
+        break;
+      case 'hello':
+        defaultHelloPage(label);
+        break;
+      case 'public':
+        publicDirectory(label);
+        break;
+      default:
+        console.log(`unknown case ${testCase}`); // eslint-disable-line console
+        break;
+
+    }
   });
 };
