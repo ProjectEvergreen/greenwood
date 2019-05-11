@@ -93,11 +93,11 @@ const setupIndex = async({ context }) => {
   return new Promise(async (resolve, reject) => {
     try {
       fs.copyFileSync(
-        path.join(context.templatesDir, context.indexPageTemplate), 
+        context.indexPageTemplatePath, 
         path.join(context.scratchDir, context.indexPageTemplate)
       );
       fs.copyFileSync(
-        path.join(context.templatesDir, context.notFoundPageTemplate), 
+        context.notFoundPageTemplatePath, 
         path.join(context.scratchDir, context.notFoundPageTemplate)
       );
       resolve();

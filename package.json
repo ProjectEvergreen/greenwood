@@ -7,33 +7,29 @@
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "scripts": {
-    "clean": "rimraf ./.greenwood && rimraf ./public",
+    "clean": "rimraf ./**/.greenwood/** && rimraf ./**/public/** && rimraf ./coverage",
     "lint": "eslint \"./packages/**/**/*.js\" \"./test/**/**/*.js\"",
     "build": "node ./packages/cli/index.js build",
     "serve": "yarn clean && yarn build && cd ./public && ws",
     "develop": "yarn clean && node ./packages/cli/index.js develop",
-    "test": "yarn clean && mocha --timeout 15000"
+    "test": "yarn clean && nyc mocha ./test/**/**/**/*.spec.js --timeout 30000",
+    "test:tdd": "yarn clean && mocha --watch ./test/**/**/**/*.spec.js --timeout 15000"
   },
   "dependencies": {
     "@babel/core": "^7.4.0",
     "@babel/preset-env": "^7.4.1",
     "babel-loader": "^8.0.5",
     "babel-plugin-transform-builtin-classes": "^0.6.1",
-    "chai": "^4.2.0",
-    "chai-as-promised": "^7.1.1",
     "chalk": "^2.4.2",
     "colors": "^1.3.3",
     "commander": "^2.20.0",
-    "concurrently": "^4.1.0",
     "css-loader": "^2.1.1",
     "css-to-string-loader": "^0.1.3",
     "cssnano": "^4.1.10",
     "eslint": "^5.15.3",
-    "eslint-loader": "^2.1.2",
     "file-loader": "^3.0.1",
     "filewatcher-webpack-plugin": "^1.2.0",
     "front-matter": "^3.0.1",
-    "fs-extra": "^7.0.1",
     "glob": "^7.1.3",
     "glob-promise": "^3.4.0",
     "html-webpack-plugin": "^3.2.0",
@@ -41,7 +37,6 @@
     "lit-element": "^2.0.1",
     "lit-redux-router": "^0.8.5",
     "local-web-server": "^2.6.1",
-    "mocha": "^6.0.2",
     "postcss-cssnext": "^3.1.0",
     "postcss-loader": "^3.0.0",
     "puppeteer": "^1.13.0",
@@ -57,6 +52,10 @@
     "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
-    "http-server": "^0.11.1"
+    "chai": "^4.2.0",
+    "http-server": "^0.11.1",
+    "mocha": "^6.1.4",
+    "nyc": "^14.0.0",
+    "rimraf": "^2.6.3"
   }
 }
