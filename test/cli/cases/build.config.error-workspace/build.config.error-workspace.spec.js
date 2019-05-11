@@ -37,4 +37,8 @@ describe('Build Greenwood With: ', () => {
     });
   });
 
+  after(function() {
+    setup.teardownTestBed();
+  });
+
 });
