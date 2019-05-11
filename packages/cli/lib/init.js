@@ -15,12 +15,16 @@ module.exports = initContexts = async({ config }) => {
       const userTemplatesDir = path.join(userWorkspace, 'templates/');
       const userAppTemplate = path.join(userTemplatesDir, 'app-template.js');
       const userPageTemplate = path.join(userTemplatesDir, 'page-template.js');
+      const indexPageTemplate = 'index.html';
+      const notFoundPageTemplate = '404.html';
       
       const userHasWorkspace = fs.existsSync(userWorkspace);
       const userHasWorkspacePages = fs.existsSync(userPagesDir);
       const userHasWorkspaceTemplates = fs.existsSync(userTemplatesDir);
       const userHasWorkspacePageTemplate = fs.existsSync(userPageTemplate);
       const userHasWorkspaceAppTemplate = fs.existsSync(userAppTemplate);
+      const userHasWorkspaceIndexTemplate = fs.existsSync(path.join(userTemplatesDir, 'index.html'));
+      const userHasWorkspaceNotFoundTemplate = fs.existsSync(path.join(userTemplatesDir, '404.html'));
       
       let context = {
         scratchDir,
@@ -28,14 +32,20 @@ module.exports = initContexts = async({ config }) => {
         pagesDir: userHasWorkspacePages ? userPagesDir : defaultTemplatesDir,
         templatesDir: userHasWorkspaceTemplates ? userTemplatesDir : defaultTemplatesDir,
         userWorkspace: userHasWorkspace ? userWorkspace : defaultTemplatesDir,
-        pageTemplatePath: userHasWorkspacePageTemplate 
+        pageTemplatePath: userHasWorkspacePageTemplate
           ? userPageTemplate 
           : path.join(defaultTemplatesDir, 'page-template.js'),
         appTemplatePath: userHasWorkspaceAppTemplate 
           ? userAppTemplate 
           : path.join(defaultTemplatesDir, 'app-template.js'),
-        indexPageTemplate: 'index.html',
-        notFoundPageTemplate: '404.html',
+        indexPageTemplatePath: userHasWorkspaceIndexTemplate
+          ? path.join(userTemplatesDir, indexPageTemplate)
+          : path.join(defaultTemplatesDir, indexPageTemplate),
+        notFoundPageTemplatePath: userHasWorkspaceNotFoundTemplate
+          ? path.join(userTemplatesDir, notFoundPageTemplate)
+          : path.join(defaultTemplatesDir, notFoundPageTemplate),
+        indexPageTemplate,
+        notFoundPageTemplate,
         metaComponent
       };
       

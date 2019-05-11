@@ -39,7 +39,6 @@ if (program.parse.length === 0) {
 }
 
 const run = async() => {
-  process.env.NODE_ENV = MODE === 'develop' ? 'development' : 'production';
   
   try {
     const compilation = await generateCompilation();

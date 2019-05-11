@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
-let config = {
+let defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {
     port: 1984,
@@ -18,13 +18,14 @@ module.exports = readAndMergeConfig = async() => {
   return new Promise((resolve, reject) => {
     try {
       // deep clone of default config
-      let customConfig = JSON.parse(JSON.stringify(config));
+      let customConfig = JSON.parse(JSON.stringify(defaultConfig));
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
         
         const { workspace, devServer, publicPath, title, meta } = userCfgFile;
           
+        // workspace validation
         if (workspace) {
           if (typeof workspace !== 'string') {
             reject('Error: greenwood.config.js workspace path must be a string');
@@ -56,7 +57,7 @@ module.exports = readAndMergeConfig = async() => {
             reject('Error: greenwood.config.js publicPath must be a string');
           } else {
             customConfig.publicPath = userCfgFile.publicPath;
-            console.log('custom publicPath provided => ', customConfig.publicPath);
+            // console.log('custom publicPath provided => ', customConfig.publicPath);
           }
         }
 
@@ -69,30 +70,27 @@ module.exports = readAndMergeConfig = async() => {
           if (devServer.host) {
             // eslint-disable-next-line max-depth
             if (url.parse(devServer.host).hostname === null) {
-              reject('Error: greenwood.config.js devServer host type must be a valid url');
+              reject(`Error: greenwood.config.js devServer host type must be a valid url, including http://.  Passed value was: ${devServer.host}`);
             } else {
               customConfig.devServer.host = devServer.host;
-              console.log('custom host provided => ', customConfig.devServer.host);
+              // console.log(`custom host provided => ${customConfig.devServer.host}`);
             }
           }
 
           if (devServer.port) {
             // eslint-disable-next-line max-depth
             if (!Number.isInteger(devServer.port)) {
-              reject('Error: greenwood.config.js devServer port must be an integer');
+              reject(`Error: greenwood.config.js devServer port must be an integer.  Passed value was: ${devServer.port}`);
             } else {
               customConfig.devServer.port = devServer.port;
-              console.log('custom port provided => ', customConfig.devServer.port);
+              // console.log(`custom port provided => ${customConfig.devServer.port}`);
             }
           }
 
         }
-
-        config = { ...config, ...customConfig };
       }
 
-      resolve(config);
-
+      resolve({ ...defaultConfig, ...customConfig });
     } catch (err) {
       reject(err);
     }

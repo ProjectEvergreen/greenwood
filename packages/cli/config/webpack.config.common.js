@@ -48,13 +48,6 @@ module.exports = ({ config, context }) => {
     module: {
       rules: [{
         test: /\.js$/,
-        enforce: 'pre',
-        loader: 'eslint-loader',
-        options: {
-          configFile: path.join(__dirname, './.eslintrc')
-        }
-      }, {
-        test: /\.js$/,
         loader: 'babel-loader',
         options: {
           presets: ['@babel/preset-env'],
