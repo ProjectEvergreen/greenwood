@@ -59,8 +59,7 @@ module.exports = (config, context) => {
         loader: 'wc-markdown-loader',
         options: {
           defaultStyle: false,
-          shadowRoot: false,
-          customStyle: 'prismjs/themes/prism-funky.css'
+          shadowRoot: false
         }
       }, {
         test: /\.css$/,
