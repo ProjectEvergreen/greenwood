@@ -21,16 +21,15 @@
 const expect = require('chai').expect;
 const fs = require('fs');
 const path = require('path');
+const { JSDOM } = require('jsdom');
 const TestBed = require('../../test-bed');
-const RenderTest = require('../../render-test');
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace w/Custom Style Page Template';
-  let setup, render;
+  let setup;
 
   before(async function() {
     setup = new TestBed();
-    render = new RenderTest(false);
     this.context = setup.setupTestBed(__dirname);
   });
 
@@ -42,9 +41,11 @@ describe('Build Greenwood With: ', function() {
     
     runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
     describe('Custom Styled Page Template', function() {
-      
+
+      let dom;
+
       before(async function() {
-        await render.runPuppeteer(path.resolve(this.context.publicDir, 'index.html'));
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
       it('should output a single index.html file using our custom styled page template', function() {
@@ -53,26 +54,24 @@ describe('Build Greenwood With: ', function() {
 
       it('should have the specific style in the page template that we added as part of our custom style', async function() {
 
-        const customElement = await render.getPuppeteerSelectorAndStyle('.owen-test');
+        const customElement = dom.window.document.querySelector('.owen-test');
+        const computedStyle = dom.window.getComputedStyle(customElement);
 
-        expect(customElement.color).to.equal('rgb(0, 0, 255)');
+        expect(computedStyle.color).to.equal('rgb(0, 0, 255)');
       });
 
       it('should have the specific style in the markdown that we added as part of our custom style', async function() {
 
-        const header = await render.getPuppeteerSelectorAndStyle('h3');
+        const customHeader = dom.window.document.querySelector('h3');
+        const computedStyle = dom.window.getComputedStyle(customHeader);
 
-        expect(header.color).to.equal('rgb(0, 128, 0)');
+        expect(computedStyle.color).to.equal('green');
       });
-    });
-
-    after(() => {
     });
     
   });
   
   after(function() {
-    render.closePuppeteer();
     setup.teardownTestBed();
   });
 });
