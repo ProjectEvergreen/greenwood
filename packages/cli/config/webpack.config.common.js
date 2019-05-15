@@ -59,7 +59,11 @@ module.exports = ({ config, context }) => {
         }
       }, {
         test: /\.md$/,
-        loader: 'wc-markdown-loader'
+        loader: 'wc-markdown-loader',
+        options: {
+          defaultStyle: false,
+          shadowRoot: false
+        }
       }, {
         test: /\.css$/,
         loaders: [

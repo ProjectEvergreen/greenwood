@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood build command with no config and custom app template.
+ * Run Greenwood build command with no config and custom page template.
  * 
  * User Result
- * Should generate a bare bones Greenwood build with custom app template.
+ * Should generate a bare bones Greenwood build with custom page template.
  * 
  * User Command
  * greenwood build
@@ -45,7 +45,7 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
-      it('should output a single index.html file using our custom app template', function() {
+      it('should output a single index.html file using our custom page template', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
   
