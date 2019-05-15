@@ -8,10 +8,13 @@ let defaultConfig = {
     port: 1984,
     host: 'http://localhost'
   },
-  publicPath: '/'
+  publicPath: '/',
+  title: 'Greenwood App',
+  meta: []
 };
 
 module.exports = readAndMergeConfig = async() => {
+  // eslint-disable-next-line complexity
   return new Promise((resolve, reject) => {
     try {
       // deep clone of default config
@@ -19,7 +22,8 @@ module.exports = readAndMergeConfig = async() => {
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, publicPath } = userCfgFile;
+        
+        const { workspace, devServer, publicPath, title, meta } = userCfgFile;
           
         // workspace validation
         if (workspace) {
@@ -41,6 +45,13 @@ module.exports = readAndMergeConfig = async() => {
           }
         }
 
+        if (title) {
+          if (typeof title !== 'string') {
+            reject('Error: greenwood.config.js title must be a string');
+          }
+          customConfig.title = title;
+        }
+
         if (publicPath) {
           if (typeof publicPath !== 'string') {
             reject('Error: greenwood.config.js publicPath must be a string');
@@ -50,7 +61,10 @@ module.exports = readAndMergeConfig = async() => {
           }
         }
 
-        // devServer checks
+        if (meta && meta.length > 0) {
+          customConfig.meta = meta;
+        }
+
         if (devServer && Object.keys(devServer).length > 0) {
           
           if (devServer.host) {
@@ -72,6 +86,7 @@ module.exports = readAndMergeConfig = async() => {
               // console.log(`custom port provided => ${customConfig.devServer.port}`);
             }
           }
+
         }
       }
 

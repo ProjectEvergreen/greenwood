@@ -1,60 +1,68 @@
 /*
  * Use Case
- * Run Greenwood build command with no config and custom app template.
+ * Run Greenwood with string title in config and default workspace.
  * 
  * User Result
- * Should generate a bare bones Greenwood build with custom app template.
+ * Should generate a bare bones Greenwood build.  (same as build.default.spec.js) with custom title in header
  * 
  * User Command
  * greenwood build
  * 
  * User Config
- * None (Greenwood Default)
+ * {
+ *   title: 'My Custom Greenwood App'
+ * }
  * 
  * User Workspace
- * src/
- *   templates/
- *     app-template.js
+ * Greenwood default 
+ *  src/
+ *   pages/
+ *     index.md
+ *     hello.md
  */
-const expect = require('chai').expect;
 const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const path = require('path');
+const expect = require('chai').expect;
+const runSmokeTest = require('../../smoke-test');
 const TestBed = require('../../test-bed');
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom App Template';
+describe('Build Greenwood With: ', async function() {
+  const LABEL = 'Custom Title Configuration and Default Workspace';
   let setup;
 
   before(async function() {
     setup = new TestBed();
     this.context = setup.setupTestBed(__dirname);
   });
-
+  
   describe(LABEL, function() {
-    let dom;
-
-    before(async () => {     
+    before(async function() {     
       await setup.runGreenwoodCommand('build');
     });
-
     runSmokeTest(['public', 'not-found', 'hello', 'meta'], LABEL);
 
-    describe('Custom Index (Home) page', function() {
+    describe('Custom Title', function() {
+      const indexPageTitle = 'My Custom Greenwood App';
       const indexPageHeading = 'Greenwood';
       const indexPageBody = 'This is the home page built by Greenwood. Make your own pages in src/pages/index.js!';
       let dom;
 
       beforeEach(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      it('should have a <title> tag in the <head>', function() {
+      it('should output an index.html file within the default public directory', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
+      });
+      
+      it('should have our custom config meta <title> tag in the <head>', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
-        expect(title).to.be.equal('Greenwood App');
+        expect(title).to.be.equal(indexPageTitle);
       });
 
+      // rest of index smoke-test because <title></title> is changed for this case
       it('should have a <script> tag in the <body>', function() {
         const scriptTag = dom.window.document.querySelectorAll('body script');
 
@@ -67,43 +75,45 @@ describe('Build Greenwood With: ', function() {
         expect(outlet.length).to.be.equal(1);
       });
 
-      // no 404 route in our custom app-template.js, like greenwood does
       it('should have the correct route tags in the <body>', function() {
         const routes = dom.window.document.querySelectorAll('body lit-route');
 
-        expect(routes.length).to.be.equal(2);
+        expect(routes.length).to.be.equal(3);
       });
 
       it('should have the expected heading text within the index page in the public directory', function() {
         const heading = dom.window.document.querySelector('h3').textContent;
-    
+
         expect(heading).to.equal(indexPageHeading);
       });
 
       it('should have the expected paragraph text within the index page in the public directory', function() {
         let paragraph = dom.window.document.querySelector('p').textContent;
-    
+
         expect(paragraph).to.equal(indexPageBody);
       });
     });
 
-    describe('Custom App Template', function() {
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+    describe('Custom Front-Matter Title', function() {
+      const helloPageTitle = 'Hello Page';
+      let dom;
+
+      beforeEach(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'hello', './index.html'));
       });
 
-      it('should output a single index.html file using our custom app template', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
+      it('should output an index.html file within the hello page directory', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, 'hello', './index.html'))).to.be.true;
       });
-  
-      it('should have the specific element we added as part of our custom app template', function() {
-        const customParagraph = dom.window.document.querySelector('p#custom-app-template').textContent;
-        
-        expect(customParagraph).to.equal('My Custom App Template');
+
+      it('should have a overridden meta <title> tag in the <head> using markdown front-matter', function() {
+        const title = dom.window.document.querySelector('head title').textContent;
+
+        expect(title).to.be.equal(helloPageTitle);
       });
     });
   });
-  
+
   after(function() {
     setup.teardownTestBed();
   });

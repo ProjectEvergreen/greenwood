@@ -13,11 +13,14 @@ const mapUserWorkspaceDirectory = (userPath) => {
   return new webpack.NormalModuleReplacementPlugin(
     new RegExp(`${directory}`),
     (resource) => {
-      resource.request = resource.request.replace(new RegExp(`\.\.\/${directory}`), userPath);
       
+      // workaround to ignore cli/templates default imports when rewriting
+      if (!new RegExp('\/cli\/templates').test(resource.request)) {
+        resource.request = resource.request.replace(new RegExp(`\.\.\/${directory}`), userPath);
+      }
       // remove any additional nests, after replacement with absolute path of user workspace + directory
       const additionalNestedPathIndex = resource.request.lastIndexOf('..');
-      
+
       if (additionalNestedPathIndex > -1) {
         resource.request = resource.request.substring(additionalNestedPathIndex + 2, resource.request.length);
       }
@@ -25,7 +28,7 @@ const mapUserWorkspaceDirectory = (userPath) => {
   );
 };
 
-module.exports = (config, context) => {
+module.exports = ({ config, context }) => {
   // dynamically map all the user's workspace directories for resolution by webpack
   // this essentially helps us keep watch over changes from the user, and greenwood's build pipeline
   const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map(mapUserWorkspaceDirectory);

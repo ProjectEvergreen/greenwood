@@ -3,6 +3,7 @@ const path = require('path');
 const defaultTemplatesDir = path.join(__dirname, '../templates/');
 const scratchDir = path.join(process.cwd(), './.greenwood/');
 const publicDir = path.join(process.cwd(), './public');
+const metaComponent = path.join(__dirname, '..', 'templates', './components/meta');
 
 module.exports = initContexts = async({ config }) => {
   
@@ -44,7 +45,8 @@ module.exports = initContexts = async({ config }) => {
           ? path.join(userTemplatesDir, notFoundPageTemplate)
           : path.join(defaultTemplatesDir, notFoundPageTemplate),
         indexPageTemplate,
-        notFoundPageTemplate
+        notFoundPageTemplate,
+        metaComponent
       };
       
       if (!fs.existsSync(scratchDir)) {

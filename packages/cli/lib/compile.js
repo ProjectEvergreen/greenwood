@@ -24,7 +24,7 @@ module.exports = generateCompilation = () => {
 
       // generate a graph of all pages / components to build
       console.log('Generating graph of workspace files...');
-      compilation.graph = await generateGraph(compilation);
+      compilation = await generateGraph(compilation);
     
       // generate scaffolding
       console.log('Scaffolding out project files...');

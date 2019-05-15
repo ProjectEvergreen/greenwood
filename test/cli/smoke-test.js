@@ -26,6 +26,24 @@ function publicDirectory(label) {
   });
 }
 
+function defaultMeta(label) {
+  describe(`Running Smoke Tests: ${label}`, function() {
+    describe('Default Meta ', function() {
+      let dom;
+
+      beforeEach(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+      });
+
+      it('should have our default config <meta> tag with og:url property in the <head>', function() {
+        const metaElement = dom.window.document.querySelector('head meta[property="og:url"]');
+
+        expect(metaElement.getAttribute('content')).to.be.equal('http://127.0.0.1:8000/');
+      });
+    });
+  });
+}
+
 function defaultNotFound(label) {
   describe(`Running Smoke Tests: ${label}`, function() {
     describe('404 (Not Found) page', function() {
@@ -70,7 +88,7 @@ function defaultIndex(label) {
       it('should have a <title> tag in the <head>', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
-        expect(title).to.be.equal('My App');
+        expect(title).to.be.equal('Greenwood App');
       });
 
       it('should have a <script> tag in the <body>', function() {
@@ -155,6 +173,9 @@ module.exports = runSmokeTest = async function(testCases, label) {
         break;
       case 'public':
         publicDirectory(label);
+        break;
+      case 'meta':
+        defaultMeta(label);
         break;
       default:
         console.log(`unknown case ${testCase}`); // eslint-disable-line console
