@@ -1,20 +1,16 @@
 /*
  * Use Case
- * Run Greenwood with meta config object and default workspace.
+ * Run Greenwood with string title in config and default workspace.
  * 
  * User Result
- * Should generate a bare bones Greenwood build.  (same as build.default.spec.js) with meta data
+ * Should generate a bare bones Greenwood build.  (same as build.default.spec.js) with custom title in header
  * 
  * User Command
  * greenwood build
  * 
  * User Config
  * {
- *   title: 'My Custom Greenwood App',
- *   meta: [
- *     { property: 'og:site', content: 'greenwood' },
- *     { name: 'twitter:site', content: '@PrjEvergreen' }
- *   ]
+ *   title: 'My Custom Greenwood App'
  * }
  * 
  * User Workspace

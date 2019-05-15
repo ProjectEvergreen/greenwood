@@ -40,12 +40,6 @@ function defaultMeta(label) {
 
         expect(metaElement.getAttribute('content')).to.be.equal('http://127.0.0.1:8000/');
       });
-
-      it('should have our default config <meta> tag with og:url property in the <head>', function() {
-        const metaElement = dom.window.document.querySelector('head meta[property="og:url"]');
-
-        expect(metaElement.getAttribute('content')).to.be.equal('http://127.0.0.1:8000/');
-      });
     });
   });
 }
