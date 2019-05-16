@@ -3,7 +3,7 @@ const path = require('path');
 const defaultTemplatesDir = path.join(__dirname, '../templates/');
 const scratchDir = path.join(process.cwd(), './.greenwood/');
 const publicDir = path.join(process.cwd(), './public');
-const metaComponent = path.join(__dirname, '..', 'templates', './components/meta');
+const metaComponent = path.join(__dirname, '..', 'templates', '../plugins/meta');
 
 module.exports = initContexts = async({ config }) => {
   
