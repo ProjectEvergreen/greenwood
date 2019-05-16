@@ -21,8 +21,7 @@ module.exports = readAndMergeConfig = async() => {
       let customConfig = JSON.parse(JSON.stringify(defaultConfig));
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
-        const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        
+        const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));        
         const { workspace, devServer, publicPath, title, meta } = userCfgFile;
           
         // workspace validation
@@ -34,6 +33,11 @@ module.exports = readAndMergeConfig = async() => {
           if (!path.isAbsolute(workspace)) {
             // prepend relative path with current directory
             customConfig.workspace = path.join(process.cwd(), workspace);
+          }
+
+          if (path.isAbsolute(workspace)) {
+            // use the users provided path
+            customConfig.workspace = workspace;
           }
 
           if (!fs.existsSync(workspace)) {
