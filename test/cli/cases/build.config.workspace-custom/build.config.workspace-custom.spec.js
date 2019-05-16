@@ -19,7 +19,10 @@
  *     about.md
  *     index.md
  */
+const expect = require('chai').expect;
+const fs = require('fs');
 const { JSDOM } = require('jsdom');
+const path = require('path');
 const runSmokeTest = require('../../smoke-test');
 const TestBed = require('../../test-bed');
 
@@ -46,17 +49,17 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'about', './index.html'));
       });
 
-      it('should output an index.html file within the default hello page directory', function() {
+      it('should output an index.html file within the custom about page directory', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'about', './index.html'))).to.be.true;
       });
 
-      it('should have the expected heading text within the about page in the about directory', async function() {
+      it('should have the expected heading text within the custom about page in the about directory', async function() {
         const heading = dom.window.document.querySelector('h3').textContent;
     
-        expect(heading).to.equal('About Page');
+        expect(heading).to.equal('Nested Custom About Page');
       });
     
-      it('should have the expected paragraph text within the hello example page in the hello directory', async function() {
+      it('should have the expected paragraph text within the custom about page in the about directory', async function() {
         let paragraph = dom.window.document.querySelector('p').textContent;
     
         expect(paragraph).to.equal('This is a custom about page built by Greenwood.');
