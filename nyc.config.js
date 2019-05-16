@@ -3,7 +3,9 @@ module.exports = {
   all: true,
   
   include: [
-    'packages/cli/lib/**/*.js',
+    'packages/cli/lib/*.js',
+    'packages/cli/lifecycles/*.js',
+    'packages/cli/plugins/*.js',
     'packages/cli/tasks/*.js'
   ],
 
@@ -16,10 +18,10 @@ module.exports = {
 
   checkCoverage: true,
 
-  statements: 85,
-  branches: 70,
-  functions: 90,
-  lines: 85,
+  statements: 80,
+  branches: 65,
+  functions: 85,
+  lines: 80,
 
   watermarks: {
     statements: [75, 85],

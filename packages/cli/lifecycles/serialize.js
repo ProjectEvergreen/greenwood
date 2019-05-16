@@ -1,5 +1,5 @@
 const LocalWebServer = require('local-web-server');
-const browserRunner = require('./util/browser');
+const browserRunner = require('../lib/browser');
 const localWebServer = new LocalWebServer();
 const PORT = '8000'; 
 

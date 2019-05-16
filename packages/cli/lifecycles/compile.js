@@ -1,6 +1,6 @@
 require('colors');
 const initConfig = require('./config');
-const initContext = require('./init');
+const initContext = require('./context');
 const generateGraph = require('./graph');
 const generateScaffolding = require('./scaffold');
 

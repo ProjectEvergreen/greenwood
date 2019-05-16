@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const serializeBuild = require('../lib/serialize');
+const serializeBuild = require('../lifecycles/serialize');
 
 module.exports = runProductionBuild = async(compilation) => {
   return new Promise(async (resolve, reject) => {
