@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood with meta config object and default workspace.
+ * Run Greenwood with favicon config object and default workspace.
  * 
  * User Result
- * Should generate a bare bones Greenwood build.  (same as build.default.spec.js) with meta data
+ * Should generate a bare bones Greenwood build.  (same as build.default.spec.js) with favicon data
  * 
  * User Command
  * greenwood build
