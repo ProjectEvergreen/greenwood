@@ -92,7 +92,7 @@ module.exports = readAndMergeConfig = async() => {
           customConfig.meta = meta;
         }
 
-        if (favicon) {
+        if (favicon && Object.keys(favicon).length > 0) {
           customConfig.favicon = { ...defaultConfig.favicon, ...favicon };
         }
 
