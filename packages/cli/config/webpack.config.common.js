@@ -1,7 +1,7 @@
 const fs = require('fs');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const isDirectory = source => fs.lstatSync(source).isDirectory();
 const getUserWorkspaceDirectories = (source) => {

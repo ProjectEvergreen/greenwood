@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
+const defaultTitle = 'Greenwood App';
+
 let defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {
@@ -9,8 +11,29 @@ let defaultConfig = {
     host: 'http://localhost'
   },
   publicPath: '/',
-  title: 'Greenwood App',
-  meta: []
+  title: defaultTitle,
+  meta: [],
+  favicon: {
+    logo: path.join(__dirname, '../templates', './favicon.png'),
+    emitStats: true,
+    prefix: 'icons/',
+    statsFilename: 'icons/stats.json',
+    inject: true,
+    title: defaultTitle,
+    background: '#466628',
+    icons: {
+      android: true,
+      appleIcon: false,
+      appleStartup: false,
+      coast: false,
+      favicons: true,
+      firefox: true,
+      opengraph: true,
+      twitter: true,
+      yandex: false,
+      windows: false
+    }
+  }
 };
 
 module.exports = readAndMergeConfig = async() => {
@@ -22,7 +45,7 @@ module.exports = readAndMergeConfig = async() => {
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));        
-        const { workspace, devServer, publicPath, title, meta } = userCfgFile;
+        const { workspace, devServer, publicPath, title, meta, favicon } = userCfgFile;
           
         // workspace validation
         if (workspace) {
@@ -67,6 +90,10 @@ module.exports = readAndMergeConfig = async() => {
 
         if (meta && meta.length > 0) {
           customConfig.meta = meta;
+        }
+
+        if (favicon) {
+          customConfig.favicon = { ...defaultConfig.favicon, ...favicon };
         }
 
         if (devServer && Object.keys(devServer).length > 0) {

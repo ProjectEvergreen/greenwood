@@ -26,7 +26,7 @@ const runWebpack = async (compilation) => {
     try {
       return webpack(webpackConfig, (err, stats) => {
         if (err || stats.hasErrors()) {
-          if (stats.hasErrors()) {
+          if (stats && stats.hasErrors()) {
             err = stats.toJson('minimal').errors[0];
           }
           reject(err);

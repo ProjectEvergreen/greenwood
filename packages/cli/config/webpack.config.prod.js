@@ -1,6 +1,7 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpackMerge = require('webpack-merge');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const commonConfig = require(path.join(__dirname, '..', './config/webpack.config.common.js'));
 
 module.exports = ({ config, context, graph }) => {
@@ -19,9 +20,8 @@ module.exports = ({ config, context, graph }) => {
         filename: context.notFoundPageTemplate,
         template: path.join(context.scratchDir, context.notFoundPageTemplate),
         publicPath: configWithContext.publicPath
-      })
+      }),
+      new FaviconsWebpackPlugin(config.favicon)
     ]
-
   });
-
 };
