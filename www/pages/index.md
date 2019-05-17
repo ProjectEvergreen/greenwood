@@ -1,5 +1,6 @@
 ---
 label: 'home'
+template: 'home'
 ---
 
 ### Home Page
