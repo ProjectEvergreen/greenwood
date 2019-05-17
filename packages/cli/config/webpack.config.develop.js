@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const FilewatcherPlugin = require('filewatcher-webpack-plugin');
-const generateCompilation = require('../lib/compile');
+const generateCompilation = require('../lifecycles/compile');
 const webpackMerge = require('webpack-merge');
 const commonConfig = require(path.join(__dirname, '..', './config/webpack.config.common.js'));
 
