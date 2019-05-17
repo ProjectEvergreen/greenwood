@@ -14,6 +14,7 @@ const store = createStore(
 
 import '../components/header/header';
 import '../components/navigation/navigation';
+import '../components/footer/footer';
 import '../index/index.js';
 import './list';
 
@@ -26,6 +27,7 @@ class AppComponent extends LitElement {
         <eve-navigation></eve-navigation>
         MYROUTES
         <lit-route><h1>404 Not found</h1></lit-route>
+        <eve-footer></eve-footer>
     `;
   }
 }

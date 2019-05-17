@@ -1,0 +1,12 @@
+
+:host .btn {
+  color: white;
+  border-radius:5px;
+  font-size:1.5rem;
+  border:1px solid black;
+  background-color: darkgreen;
+}
+:host .btn:hover {
+  color: darkgreen;
+  background-color: white;
+}

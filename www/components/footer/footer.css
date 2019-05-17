@@ -1,6 +1,6 @@
 :host {
-  & .header {
-    background-color: #111511;
+  & .footer {
+    background-color: #1d2418;
     min-height: 30px;
     padding-top: 10px;
 
@@ -8,6 +8,7 @@
       width: 90%;
       margin: 0 auto;
       padding: 0;
+      text-align: center;
     }
 
     & a {

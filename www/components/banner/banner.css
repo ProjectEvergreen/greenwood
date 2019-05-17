@@ -1,0 +1,46 @@
+:host {
+  & .banner {
+    height: 60vh;
+    background-color:#e9ffe9;
+    padding:40px 120px;
+
+    & .content {
+      margin-top:5vh;
+      padding: 120px 10px;
+      font-size:1.7rem;
+      color: white;
+      text-align:center;
+      background-color:#283c28;
+
+      & h1 {
+        font-size:3.5rem;
+        outline:
+      }
+    }
+  }
+  @media (max-width: 990px) {
+    & .banner {
+      height: 40vh;
+      padding:40px 60px;
+
+      & .content {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        padding: 60px 5px;
+
+        & h1 {
+          font-size: 2rem;
+        }
+      }
+    }
+  }
+  @media (max-width: 720px) {
+    & .banner {
+       padding:0px;
+
+       & .content {
+         margin-top: 0;
+       }
+    }
+  }
+}

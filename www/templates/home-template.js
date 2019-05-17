@@ -1,4 +1,5 @@
 import { html, LitElement } from 'lit-element';
+import '../components/banner/banner';
 import css from '../styles/theme.css';
 import css2 from '../styles/home.css';
 
@@ -14,8 +15,9 @@ class HomeTemplate extends LitElement {
         ${css2}
       </style>
       METAELEMENT
+      <eve-banner></eve-banner>
       <div class='wrapper'>
-        <div class='home-template content'>
+        <div class='page-template content'>
           <entry></entry>
         </div>
       </div>
