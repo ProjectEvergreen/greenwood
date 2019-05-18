@@ -4,36 +4,30 @@
     }
 
     & .content {
-    grid-area: content;
-    min-height: 400px;
-    padding: 10px 30% 0 0;
+      margin: 0 auto;
+      min-height: 400px;
+      padding: 20px 0 10px 0;
+      background-color:white;
+      font-size:1.2rem;
 
-    & h1 {
-      margin: 5px 0;
+      & h3 {
+        font-size:2rem;
+        margin: 5px 0;
+      }
+
+      & a {
+        color: #006400;
+      }
     }
 
-    & a {
-      color: #006400;
+    & .content-wrapper {
+      background-color:white;
     }
-  }
+    
 
   & .wrapper {
-    display: grid;
-    grid-template-areas:
-      "header"
-      "nav"
-      "sidebar"
-      "content"
-      "footer";
-  }
-  @media (min-width: 500px) {
-    & .wrapper {
-      grid-template-columns: 1fr 3fr;
-      grid-template-areas:
-        "header  header"
-        "nav     nav"
-        "sidebar content"
-        "footer  footer";
-    }
+    background: #56ab2f;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #a8e063, #56ab2f);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #a8e063, #56ab2f); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   }
 }

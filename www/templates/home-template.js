@@ -1,5 +1,8 @@
 import { html, LitElement } from 'lit-element';
 import '../components/banner/banner';
+import '../components/header/header';
+import '../components/footer/footer';
+import '@evergreen-wc/eve-container';
 import css from '../styles/theme.css';
 import css2 from '../styles/home.css';
 
@@ -15,11 +18,16 @@ class HomeTemplate extends LitElement {
         ${css2}
       </style>
       METAELEMENT
-      <eve-banner></eve-banner>
       <div class='wrapper'>
-        <div class='page-template content'>
-          <entry></entry>
-        </div>
+        <eve-header></eve-header>
+        <eve-banner></eve-banner>
+        <div class='content-wrapper'>
+        <eve-container>
+          <div class='page-template content'>
+            <entry></entry>
+          </div>
+        </eve-container>
+        <eve-footer></eve-footer>
       </div>
     `;
   }

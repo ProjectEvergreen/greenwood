@@ -1,18 +1,59 @@
 :host {
+  grid-area: header;
   & .header {
     background-color: #111511;
     min-height: 30px;
-    padding-top: 10px;
-
-    & h4 {
-      width: 90%;
-      margin: 0 auto;
-      padding: 0;
-    }
+    padding: 10px;
+    font-size: 1.2rem;
 
     & a {
       color: white;
       text-decoration:none;
+    }
+
+    & h4 {
+      margin: 0 auto;
+      padding:0;
+      padding-top:4px;
+      display:inline-block;
+    }
+
+    & .head-wrap {
+      display: flex;
+      align-items:center;
+      justify-items: left;
+      flex-wrap:wrap;
+    }
+
+    & nav {
+      width: 55%;
+      & ul {
+        padding:0;
+        margin:0;
+        list-style: none;
+        & li {
+          color:white;
+          display: inline-block;
+          padding:10px;
+          &:hover {
+            background-color:white;
+
+            & a {
+              color:green;
+
+            }
+          }
+        }
+      }
+    }
+    & .brand {
+      padding: 10px;
+      & img {
+        float:left;
+      }
+    }
+    & .social {
+      text-align: right;
     }
   }
 }
