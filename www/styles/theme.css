@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+
+.wrapper {
+  width: 90%;
+  margin: 0 auto;
+
+
+  & .content {
+    font-family: 'Source Sans Pro', sans-serif;
+    width: 60%;
+    margin: inherit;
+  }
+}
+
