@@ -4,7 +4,7 @@ MDIMPORT;
 METAIMPORT;
 METADATA;
 
-class PageTemplate extends LitElement {
+class HomeTemplate extends LitElement {
   render() {
     return html`
       <style>
@@ -12,7 +12,7 @@ class PageTemplate extends LitElement {
       </style>
       METAELEMENT
       <div class='wrapper'>
-        <div class='page-template content two-column'>
+        <div class='home-template content single-column'>
           <entry></entry>
         </div>
       </div>
@@ -20,4 +20,4 @@ class PageTemplate extends LitElement {
   }
 }
 
-customElements.define('page-template', PageTemplate);
+customElements.define('page-template', HomeTemplate);
