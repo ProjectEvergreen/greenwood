@@ -13,21 +13,11 @@ const fs = require('fs');
 const glob = require('glob');
 const yargs = require('yargs').argv;
 
-const s3 = new AWS.S3(); // eslint-disable-line no-unused-vars
-const cloudfront = new AWS.CloudFront();
-
 // AWS CONFIGURATIONS
 const AWS_REGION = 'us-east-1';
 const AWS_S3_BUCKET = {
   PROD: 'TODO',
   STAGE: 'greenwood-dev'
-};
-
-const AWS_CLOUDFRONT_DISTRIBUTION = {
-  PROD: process.env.AWS_CLOUDFRONT_DISTRIBUTION_ID_PROD,
-  STAGE: process.env.AWS_CLOUDFRONT_DISTRIBUTION_ID_STAGE,
-  INVALIDATION_KEY: 'index.html',
-  INVALIDATION_PATHS: ['/*']
 };
 
 // used to determine whether to deploy to prod or stage
@@ -85,38 +75,6 @@ function httpUploadProgress(evt) {
 function httpUploadSend(err, data) {
   console.log(err, data); // eslint-disable-line no-console
   // trigger an invalidation to cache bust the site on each release
-  if (!err && data.key === AWS_CLOUDFRONT_DISTRIBUTION.INVALIDATION_KEY) {
-    invalidateCloudfrontDistribution();
-  }
-}
-
-// creates an invalidatation in cloudfront for /index.html for cache busting on each release
-function invalidateCloudfrontDistribution() {
-  const timestamp = new Date().getTime();
-  const paths = AWS_CLOUDFRONT_DISTRIBUTION.INVALIDATION_PATHS;
-
-  const params = {
-    DistributionId: AWS_CLOUDFRONT_DISTRIBUTION[RELEASE_ENVIRONMENT],
-    InvalidationBatch: {
-      CallerReference: `jenkins-release-${RELEASE_ENVIRONMENT}-${timestamp}`,
-      Paths: { 
-        Quantity: paths.length, 
-        Items: paths
-      }
-    }
-  };
-  
-  cloudfront.createInvalidation(params, function(err, data) {
-    const invalidationObjectKey = AWS_CLOUDFRONT_DISTRIBUTION.INVALIDATION_KEY;
-
-    if (err) {
-      console.log(`FAILED: on ${invalidationObjectKey} invalidation request`); // eslint-disable-line no-console
-      console.log(err, err.stack); // eslint-disable-line no-console
-      console.log(data); // eslint-disable-line no-console
-    } else { 
-      console.log(`SUCCESS: for ${invalidationObjectKey} invalidation request`); // eslint-disable-line no-console
-    }
-  });
 }
 
 // appropriately set objects content-type when uploading build to S3
