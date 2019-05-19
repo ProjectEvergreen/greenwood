@@ -35,3 +35,13 @@ jobs:
       - run:
           name: Run CLI Script (index.js)
           command: yarn clean && yarn build
+
+      - run:
+          name: Deploy to Stage
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              
+              echo "releasing to stage (AWS)"
+              node ./scripts/release.js
+
+            fi
