@@ -16,7 +16,7 @@ module.exports = ({ config, context, graph }) => {
 
     plugins: [  
       new HtmlWebpackPlugin({
-        filename: context.notFoundPageTemplate,
+        filename: path.join(context.publicDir, context.notFoundPageTemplate),
         template: path.join(context.scratchDir, context.notFoundPageTemplate),
         publicPath: configWithContext.publicPath
       })

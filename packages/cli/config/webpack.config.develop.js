@@ -23,6 +23,7 @@ const rebuild = async() => {
 };
 
 module.exports = ({ config, context, graph }) => {
+  config.publicPath = '/';
   const configWithContext = commonConfig({ config, context, graph });
   const { devServer, publicPath } = config;
   const { host, port } = devServer;
