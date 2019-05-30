@@ -1,9 +1,9 @@
 :host {
-    & h1 {
-        color: green;
-    }
+  & h1 {
+      color: green;
+  }
 
-    & .content {
+  & .content {
     grid-area: content;
     min-height: 400px;
     padding: 10px 30% 0 0;
