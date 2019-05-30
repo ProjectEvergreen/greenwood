@@ -60,7 +60,7 @@ module.exports = readAndMergeConfig = async() => {
           if (typeof publicPath !== 'string') {
             reject('Error: greenwood.config.js publicPath must be a string');
           } else {
-            customConfig.publicPath = userCfgFile.publicPath;
+            customConfig.publicPath = publicPath;
             // console.log('custom publicPath provided => ', customConfig.publicPath);
           }
         }

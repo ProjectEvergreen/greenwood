@@ -40,7 +40,7 @@ module.exports = ({ config, context }) => {
     },
 
     output: {
-      path: context.publicDir,
+      path: path.join(context.publicDir, '.', config.publicPath),
       filename: '[name].[hash].bundle.js',
       publicPath: config.publicPath
     },
@@ -97,6 +97,7 @@ module.exports = ({ config, context }) => {
       ),
       
       new HtmlWebpackPlugin({
+        filename: path.join(context.publicDir, context.indexPageTemplate),
         template: path.join(context.scratchDir, context.indexPageTemplate),
         chunksSortMode: 'dependency'
       })
