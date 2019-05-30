@@ -20,7 +20,7 @@ const expect = require('chai').expect;
 const runSmokeTest = require('../../smoke-test');
 const TestBed = require('../../test-bed');
 
-describe.only('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', async function() {
   const LABEL = 'Custom Title Configuration and Default Workspace';
   let setup;
 
