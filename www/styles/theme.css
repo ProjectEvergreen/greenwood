@@ -1,18 +1,66 @@
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+table {
+  background-color: #334a5a;
+  border-radius: 5px;
+  padding: 10px!important;
 
+  & tr {
+    padding: 10px;
+  }
+
+  & td, & a, & th {
+    color: #efefef!important;
+  }
+}
+
+img {
+  width: 100%;
+}
+
+h2, h3, h4, h5 {
+  color: #1d337a;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+p {
+  margin: 20px 0;
+}
+
+ul > li {
+  margin: 10px 0;
+}
+
+a {
+  & .title {
+    text-decoration: underline;
+  }
+
+  & .step {
+    margin: 2px;
+  }
+}
+
+.content-wrapper {
+  background-color:white;
+}
+  
 .wrapper {
   font-family: 'Source Sans Pro', sans-serif;
-  width: 90%;
-  margin: 0 auto;
-
+  background: #56ab2f;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #a8e063, #56ab2f);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #a8e063, #56ab2f); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  
   & .single-column {
     width: 50%;
     margin: inherit;
-    color: red;
+    color: #000;
   }
-
-  & .two-column {
+  /* Needs work */
+  /* & .two-column {
     float: right;
-    color: orange;
-  }
+    color: #000;
+  } */
 }

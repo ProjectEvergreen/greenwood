@@ -1,0 +1,20 @@
+:host {
+  grid-area: footer;
+  & .footer {
+    background-color: #1d2418;
+    min-height: 30px;
+    padding-top: 10px;
+
+    & h4 {
+      width: 90%;
+      margin: 0 auto;
+      padding: 0;
+      text-align: center;
+    }
+
+    & a {
+      color: white;
+      text-decoration:none;
+    }
+  }
+}

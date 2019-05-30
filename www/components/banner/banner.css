@@ -1,0 +1,53 @@
+:host {
+  grid-area: banner;
+  & .banner {
+    min-height: 60vh;
+
+    & .content {
+      padding: 15vh 10px;
+      font-size:1.7rem;
+      color: white;
+      text-align:center;
+
+      & hr {
+        border-radius:25px;
+        border-style:none;
+        height:3px;
+        margin:0 auto;
+        background-color:white;
+        border:1px solid rgba(0, 0, 0, 0.6);
+        width: 160px;
+      }
+
+      & h1 {
+        font-size:3.5rem;
+        text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
+      }
+      & h3 {
+        text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
+      }
+    }
+  }
+  @media (max-width: 980px) {
+    & .banner {
+      min-height: 40vh;
+
+      & .content {
+        font-size: 1.5rem;
+
+        & h1 {
+          font-size: 3rem;
+        }
+      }
+    }
+  }
+  @media (max-width: 756px) {
+    & .banner {
+       padding:0px;
+
+       & .content {
+         margin-top: 0;
+       }
+    }
+  }
+}
