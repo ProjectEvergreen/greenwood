@@ -37,10 +37,6 @@ module.exports = ({ config, context, graph }) => {
       path.join(context.scratchDir, 'app', 'app.js')
     ],
 
-    output: {
-      publicPath: '/'
-    },
-
     devServer: {
       port,
       host,
