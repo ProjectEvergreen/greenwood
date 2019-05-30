@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit-element';
-import css from '../styles/theme.css';
-import pageTheme from '../styles/page.css';
+import themeCss from '../styles/theme.css';
+import pageCss from '../styles/page.css';
 import '../components/header/header';
 import '../components/footer/footer';
 import '@evergreen-wc/eve-container';
@@ -13,8 +13,8 @@ class PageTemplate extends LitElement {
   render() {
     return html`
       <style>
-        ${css}
-        ${pageTheme}
+        ${themeCss}
+        ${pageCss}
       </style>
       METAELEMENT
       <div class='wrapper'>

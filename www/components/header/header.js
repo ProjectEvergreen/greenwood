@@ -1,13 +1,13 @@
 import { html, LitElement } from 'lit-element';
 import '@evergreen-wc/eve-container';
-import css from './header.css';
+import headerCss from './header.css';
 import brand from '../../assets/brand.png';
 
 class HeaderComponent extends LitElement {
   render() {
     return html`
       <style>
-        ${css}
+        ${headerCss}
       </style>
       <header class="header">
         <eve-container>

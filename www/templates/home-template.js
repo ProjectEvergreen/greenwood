@@ -3,8 +3,8 @@ import '../components/banner/banner';
 import '../components/header/header';
 import '../components/footer/footer';
 import '@evergreen-wc/eve-container';
-import css from '../styles/theme.css';
-import homeTheme from '../styles/home.css';
+import themeCss from '../styles/theme.css';
+import homeCss from '../styles/home.css';
 
 MDIMPORT;
 METAIMPORT;
@@ -14,8 +14,8 @@ class HomeTemplate extends LitElement {
   render() {
     return html`
       <style>
-        ${css}
-        ${homeTheme}
+        ${themeCss}
+        ${homeCss}
       </style>
       METAELEMENT
       <div class='wrapper'>

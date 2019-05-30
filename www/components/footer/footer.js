@@ -1,11 +1,11 @@
 import { html, LitElement } from 'lit-element';
-import css from './footer.css';
+import footerCss from './footer.css';
 
 class FooterComponent extends LitElement {
   render() {
     return html`
       <style>
-        ${css}
+        ${footerCss}
       </style>
       <footer class="footer">
         <h4>

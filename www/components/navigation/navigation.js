@@ -1,11 +1,11 @@
 import { html, LitElement } from 'lit-element';
-import css from './navigation.css';
+import navCss from './navigation.css';
 
 class NavigationComponent extends LitElement {
   render() {
     return html`
     <style>
-      ${css}
+      ${navCss}
     </style>
       <nav class="navigation">
         <ul>
