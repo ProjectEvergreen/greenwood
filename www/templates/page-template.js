@@ -1,6 +1,9 @@
 import { html, LitElement } from 'lit-element';
 import css from '../styles/theme.css';
-import css2 from '../styles/page.css';
+import pageTheme from '../styles/page.css';
+import '../components/header/header';
+import '../components/footer/footer';
+import '@evergreen-wc/eve-container';
 
 MDIMPORT;
 METAIMPORT;
@@ -11,13 +14,19 @@ class PageTemplate extends LitElement {
     return html`
       <style>
         ${css}
-        ${css2}
+        ${pageTheme}
       </style>
       METAELEMENT
       <div class='wrapper'>
-        <div class='page-template content'>
-          <entry></entry>
+        <eve-header></eve-header>
+        <div class='content-wrapper'>
+          <eve-container>
+            <div class='page-template content two-column'>
+              <entry></entry>
+            </div>
+          </eve-container>       
         </div>
+        <eve-footer></eve-footer>
       </div>
     `;
   }

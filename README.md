@@ -39,8 +39,7 @@ Your project will generally have a structure like this:
 - Pages: The markdown (or JavaScript) you want to use to render the contents of your page.  (examples below)
 - Templates: Every markdown page will get run through a page template, that can be defined in the pages frontmatter
 
-> TODO: make app-template provided by default https://github.com/ProjectEvergreen/greenwood/issues/32
-> Customize
+> Note: All files in your workspace _must_ reside be in a directory.  e.g. [_src/theme.css_ will **not** work](https://github.com/ProjectEvergreen/greenwood/issues/85).
 
 ### Creating A Page
 

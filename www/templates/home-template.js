@@ -4,7 +4,7 @@ import '../components/header/header';
 import '../components/footer/footer';
 import '@evergreen-wc/eve-container';
 import css from '../styles/theme.css';
-import css2 from '../styles/home.css';
+import homeTheme from '../styles/home.css';
 
 MDIMPORT;
 METAIMPORT;
@@ -15,7 +15,7 @@ class HomeTemplate extends LitElement {
     return html`
       <style>
         ${css}
-        ${css2}
+        ${homeTheme}
       </style>
       METAELEMENT
       <div class='wrapper'>
@@ -23,10 +23,11 @@ class HomeTemplate extends LitElement {
         <eve-banner></eve-banner>
         <div class='content-wrapper'>
         <eve-container>
-          <div class='page-template content'>
+          <div class='page-template content single-column'>
             <entry></entry>
           </div>
         </eve-container>
+        </div>
         <eve-footer></eve-footer>
       </div>
     `;

@@ -1,39 +1,22 @@
 :host {
-  & h1 {
+  & h3 {
       color: green;
   }
 
   & .content {
-    grid-area: content;
+    margin: 0 auto;
     min-height: 400px;
-    padding: 10px 30% 0 0;
+    padding: 20px 0 10px 0;
+    background-color:white;
+    font-size:1.2rem;
 
-    & h1 {
+    & h3 {
+      font-size:2rem;
       margin: 5px 0;
     }
 
     & a {
       color: #006400;
-    }
-  }
-
-  & .wrapper {
-    display: grid;
-    grid-template-areas:
-      "header"
-      "nav"
-      "sidebar"
-      "content"
-      "footer";
-  }
-  @media (min-width: 500px) {
-    & .wrapper {
-      grid-template-columns: 2fr 10fr;
-      grid-template-areas:
-        "header"
-        "nav"
-        "content"
-        "footer";
     }
   }
 }
