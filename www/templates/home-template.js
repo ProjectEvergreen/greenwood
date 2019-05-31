@@ -22,11 +22,11 @@ class HomeTemplate extends LitElement {
         <eve-header></eve-header>
         <eve-banner></eve-banner>
         <div class='content-wrapper'>
-        <eve-container>
-          <div class='page-template content single-column'>
-            <entry></entry>
-          </div>
-        </eve-container>
+          <eve-container>
+            <div class='page-template content single-column'>
+              <entry></entry>
+            </div>
+          </eve-container>
         </div>
         <eve-footer></eve-footer>
       </div>

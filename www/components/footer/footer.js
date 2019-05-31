@@ -1,6 +1,5 @@
 import { html, LitElement } from 'lit-element';
-
-// make sure version gets bumped first when building for a release
+// make sure version gets bumped first when building for release
 import { version } from '../../../package.json';
 import footerCss from './footer.css';
 

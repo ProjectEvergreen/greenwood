@@ -1,10 +1,10 @@
 :host {
   grid-area: banner;
   & .banner {
-    min-height: 60vh;
+    min-height: 50vh;
 
     & .content {
-      padding: 15vh 10px;
+      padding: 5vh 10px;
       font-size:1.7rem;
       color: white;
       text-align:center;
