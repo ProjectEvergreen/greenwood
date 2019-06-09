@@ -4,6 +4,7 @@ import pageCss from '../styles/page.css';
 import '../components/header/header';
 import '../components/footer/footer';
 import '@evergreen-wc/eve-container';
+import '../components/shelf/shelf';
 
 MDIMPORT;
 METAIMPORT;
@@ -20,12 +21,15 @@ class PageTemplate extends LitElement {
       <div class='wrapper'>
         <eve-header></eve-header>
         <div class='content-wrapper'>
-          <eve-container>
-            <div class='page-template content two-column'>
+          <div class="sidebar">
+            <eve-shelf></eve-shelf>
+          </div>
+          <div class="content">
+            <eve-container fluid>
               <entry></entry>
-            </div>
-          </eve-container>       
-        </div>
+            </eve-container>
+          </div>
+          </div>
         <eve-footer></eve-footer>
       </div>
     `;
