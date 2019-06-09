@@ -24,18 +24,15 @@ class shelf extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
-    // check for querystring
-    // display selected item list in shelf
-    console.log(window.location);
+    // based on path, display selected list
     const path = window.location.pathname;
 
     if (path.substring(0, 5) === '/docs') {
-      shelfList = require('./document-list.json');
+      shelfList = require('./documentation-list.json');
     } else {
       shelfList = require('./getting-started-list.json');
     }
 
-    console.log(shelfList);
     this.collapseAll();
   }
 
@@ -61,8 +58,6 @@ class shelf extends LitElement {
     const previousSelected = this.selected;
 
     this.selected = parseInt(evt.target.id.substring(6, evt.target.id.length), 10);
-
-    console.log(this.selected);
 
     if (this.selected === previousSelected) {
       this.toggleSelectedItem();
@@ -113,7 +108,6 @@ class shelf extends LitElement {
   }
 
   render() {
-    console.log('rendered');
     return html`
     <style>
       ${css}
