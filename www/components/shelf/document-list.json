@@ -1,0 +1,68 @@
+[
+  {
+    "index": 0,
+    "name": "List 1",
+    "items": [
+      {
+        "index": 0,
+        "name": "item A"
+      },
+      {
+        "index": 1,
+        "name": "item B"
+      },
+      {
+        "index": 2,
+        "name": "item C"
+      },
+      {
+        "index": 3,
+        "name": "item D"
+      }
+    ]
+  },
+  {
+    "index": 1,
+    "name": "List 2",
+    "items": [
+      {
+        "index": 0,
+        "name": "item A"
+      },
+      {
+        "index": 1,
+        "name": "item B"
+      },
+      {
+        "index": 2,
+        "name": "item C"
+      },
+      {
+        "index": 3,
+        "name": "item D"
+      }
+    ]
+  },
+  {
+    "index": 2,
+    "name": "List 3",
+    "items": [
+      {
+        "index": 0,
+        "name": "item A"
+      },
+      {
+        "index": 1,
+        "name": "item B"
+      },
+      {
+        "index": 2,
+        "name": "item C"
+      },
+      {
+        "index": 3,
+        "name": "item D"
+      }
+    ]
+  }
+]

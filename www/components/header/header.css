@@ -21,11 +21,11 @@
     & .head-wrap {
       display: flex;
       align-items:center;
-      justify-items: left;
       flex-wrap:wrap;
     }
 
     & nav {
+      justify-items: left;
       width: 55%;
       & ul {
         padding:0;
@@ -47,12 +47,14 @@
       }
     }
     & .brand {
+      justify-items: left;
       padding: 10px;
       & img {
         float:left;
       }
     }
     & .social {
+      margin-left:auto;
       text-align: right;
     }
   }

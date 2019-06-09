@@ -54,6 +54,7 @@
     "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.9.0",
     "aws-sdk": "^2.458.0",
     "chai": "^4.2.0",
     "http-server": "^0.11.1",

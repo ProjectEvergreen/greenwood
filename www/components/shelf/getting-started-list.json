@@ -1,0 +1,55 @@
+[
+  {
+    "index": 0,
+    "name": "System Requirements",
+    "items": [
+      {
+        "index": 0,
+        "name": "NodeJS"
+      },
+      {
+        "index": 1,
+        "name": "npm / yarn"
+      },
+      {
+        "index": 2,
+        "name": "git"
+      }
+    ]
+  },
+  {
+    "index": 2,
+    "name": "Installing Greenwood",
+    "items": []
+  },
+  {
+    "index": 3,
+    "name": "Project Structure",
+    "items": []
+  },
+  {
+    "index": 4,
+    "name": "Development",
+    "items": []
+  },
+  {
+    "index": 5,
+    "name": "Creating Pages",
+    "items": []
+  },
+  {
+    "index": 6,
+    "name": "Configuration",
+    "items": []
+  },
+  {
+    "index": 7,
+    "name": "Custom Page Template",
+    "items": []
+  },
+  {
+    "index": 8,
+    "name": "Building for Production",
+    "items": []
+  }
+]
