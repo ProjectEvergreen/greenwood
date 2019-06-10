@@ -22,6 +22,10 @@
     margin-inline-start: 0px;
     margin-inline-end: 0px;
     font-weight: bold;
+    @media (max-width: 768px) {
+      padding-left:10px;
+      padding-right:10px;
+    }
   }
   & hr {
     display: block;
@@ -51,6 +55,9 @@
       margin-block-end: 1em;
       margin-inline-start: 0px;
       margin-inline-end: 0px;
+    }
+    @media (max-width: 768px) {
+      padding-left:10px;
     }
   }
 

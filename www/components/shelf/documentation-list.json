@@ -1,68 +1,59 @@
 [
   {
     "index": 0,
-    "name": "List 1",
+    "name": "Configuration",
+    "path": "/docs/configuration",
     "items": [
       {
         "index": 0,
-        "name": "item A"
+        "name": "Workspace",
+        "id": "workspace"
       },
       {
         "index": 1,
-        "name": "item B"
+        "name": "Title",
+        "id": "title"
       },
       {
         "index": 2,
-        "name": "item C"
+        "name": "PublicPath",
+        "id": "publicpath"
       },
       {
         "index": 3,
-        "name": "item D"
+        "name": "Meta",
+        "id": "meta"
       }
     ]
   },
   {
     "index": 1,
-    "name": "List 2",
-    "items": [
-      {
-        "index": 0,
-        "name": "item A"
-      },
-      {
-        "index": 1,
-        "name": "item B"
-      },
-      {
-        "index": 2,
-        "name": "item C"
-      },
-      {
-        "index": 3,
-        "name": "item D"
-      }
-    ]
+    "name": "Markdown",
+    "path": "/docs/markdown",
+    "items": []
   },
   {
     "index": 2,
-    "name": "List 3",
-    "items": [
-      {
-        "index": 0,
-        "name": "item A"
-      },
-      {
-        "index": 1,
-        "name": "item B"
-      },
-      {
-        "index": 2,
-        "name": "item C"
-      },
-      {
-        "index": 3,
-        "name": "item D"
-      }
-    ]
+    "name": "Component Model",
+    "path": "/docs/components",
+    "items": []
+  },
+  {
+    "index": 3,
+    "name": "Templates",
+    "path": "/docs/templates",
+    "items": []
+  },
+  {
+    "index": 4,
+    "name": "Front Matter",
+    "path": "/docs/front-matter",
+    "items": []
+  },
+  {
+    "index": 5,
+    "name": "Tech Stack",
+    "path": "/docs/stack",
+    "items": []
   }
 ]

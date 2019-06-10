@@ -15,7 +15,7 @@
     width: 400px;
     background-color: rgb(242, 236, 239);
     height: 100vh;
-    overflow: scroll;
+    overflow: auto;
     padding: 2rem;
 
     @media (max-width: 768px) {

@@ -2,18 +2,22 @@
   {
     "index": 0,
     "name": "System Requirements",
+    "path": "/getting-started/system-requirements",
     "items": [
       {
         "index": 0,
-        "name": "NodeJS"
+        "name": "NodeJS",
+        "id": "nodejs"
       },
       {
         "index": 1,
-        "name": "npm / yarn"
+        "name": "npm / yarn",
+        "id": "npm"
       },
       {
         "index": 2,
-        "name": "git"
+        "name": "git",
+        "id": "git"
       }
     ]
   },
