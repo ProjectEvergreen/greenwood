@@ -1,0 +1,59 @@
+[
+  {
+    "index": 0,
+    "name": "Configuration",
+    "path": "/docs/configuration",
+    "items": [
+      {
+        "index": 0,
+        "name": "Workspace",
+        "id": "workspace"
+      },
+      {
+        "index": 1,
+        "name": "Title",
+        "id": "title"
+      },
+      {
+        "index": 2,
+        "name": "PublicPath",
+        "id": "publicpath"
+      },
+      {
+        "index": 3,
+        "name": "Meta",
+        "id": "meta"
+      }
+    ]
+  },
+  {
+    "index": 1,
+    "name": "Markdown",
+    "path": "/docs/markdown",
+    "items": []
+  },
+  {
+    "index": 2,
+    "name": "Component Model",
+    "path": "/docs/components",
+    "items": []
+  },
+  {
+    "index": 3,
+    "name": "Templates",
+    "path": "/docs/templates",
+    "items": []
+  },
+  {
+    "index": 4,
+    "name": "Front Matter",
+    "path": "/docs/front-matter",
+    "items": []
+  },
+  {
+    "index": 5,
+    "name": "Tech Stack",
+    "path": "/docs/stack",
+    "items": []
+  }
+]

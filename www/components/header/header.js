@@ -10,7 +10,7 @@ class HeaderComponent extends LitElement {
         ${headerCss}
       </style>
       <header class="header">
-        <eve-container>
+        <eve-container fluid>
           <div class="head-wrap">
             <div class="brand">
               <img src="${brand}" height="30px" width="30px" />
@@ -21,6 +21,7 @@ class HeaderComponent extends LitElement {
             <nav>
               <ul>
                 <li><a href="/about">About</a></li>
+                <li><a href="/getting-started">Getting Started</a></li>
                 <li><a href="/docs">Docs</a></li>
               </ul>
             </nav>
@@ -30,7 +31,7 @@ class HeaderComponent extends LitElement {
                   <img src="https://img.shields.io/github/stars/ProjectEvergreen/create-evergreen-app.svg?style=social&logo=github&label=github" />
                 </a>
               </a>
-            </div>          
+            </div>
           </div>
         </eve-container>
         <!-- <div class="head-wrap">
