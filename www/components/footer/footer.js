@@ -1,4 +1,7 @@
 import { html, LitElement } from 'lit-element';
+
+// make sure version gets bumped first when building for a release
+import { version } from '../../../package.json';
 import footerCss from './footer.css';
 
 class FooterComponent extends LitElement {
@@ -9,7 +12,7 @@ class FooterComponent extends LitElement {
       </style>
       <footer class="footer">
         <h4>
-          <a href="/">PROJECT EVERGREEN</a>
+          <a href="/">Greenwood v${version}</a>
         </h4>
       </footer>
     `;

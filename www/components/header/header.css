@@ -51,6 +51,8 @@
       padding: 10px;
       & img {
         float:left;
+        height: 30px;
+        width: 30px;
       }
     }
     & .social {
