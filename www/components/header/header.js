@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit-element';
 import '@evergreen-wc/eve-container';
 
 import headerCss from './header.css';
-import evergreenLogo from '../../assets/project-evergreen-logo.png';
+import brand from '../../assets/brand.png';
 
 class HeaderComponent extends LitElement {
   render() {
@@ -14,7 +14,7 @@ class HeaderComponent extends LitElement {
         <eve-container fluid>
           <div class="head-wrap">
             <div class="brand">
-              <img src="${evergreenLogo}" />
+              <img src="${brand}" />
                 <h4>
                   <a href="/">Greenwood</a>
                 </h4>
