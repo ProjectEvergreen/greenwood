@@ -1,6 +1,7 @@
 import { html, LitElement } from 'lit-element';
 import bannerCss from './banner.css';
 import buttonCss from './button.css';
+import greenwoodLogo from '../../assets/greenwood-logo.png';
 import '@evergreen-wc/eve-button';
 import '@evergreen-wc/eve-container';
 
@@ -46,9 +47,8 @@ class Banner extends LitElement {
       <div class='banner'>
         <eve-container>
           <div class='content'>
-            <h1>Welcome to Greenwood!</h1>
-            <hr />
-            <h3>A modern and easy to use static site generator for your. . . ${project}.</h3>
+            <img src="${greenwoodLogo}" alt="Greenwood Logo"/>
+            <h3>The static site generator for your . . . ${project}.</h3>
             <eve-button size="md" href="/about" style="${buttonCss}">Get Started</eve-button>
           </div>
         </eve-container>

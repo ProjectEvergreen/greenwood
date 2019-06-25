@@ -1,12 +1,13 @@
 :host {
   grid-area: banner;
+
   & .banner {
+    background-color: rgba(238, 231, 235);
     min-height: 50vh;
 
     & .content {
       padding: 5vh 10px;
       font-size:1.7rem;
-      color: white;
       text-align:center;
 
       & hr {
