@@ -32,8 +32,6 @@ class PageTemplate extends LitElement {
       list = require('../components/shelf/getting-started-list.json');
     }
 
-    console.log('list', list);
-
     this.shelfList = list;
   }
 
