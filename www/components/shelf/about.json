@@ -1,0 +1,17 @@
+[
+  {
+    "index": 0,
+    "name": "Goals",
+    "path": "/about/goals"
+  },
+  {
+    "index": 1,
+    "name": "Roadmap",
+    "path": "/about/roadmap"
+  },
+  {
+    "index": 2,
+    "name": "Community",
+    "path": "/about/community"
+  }
+]

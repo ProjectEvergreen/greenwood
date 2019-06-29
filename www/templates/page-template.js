@@ -22,12 +22,19 @@ class PageTemplate extends LitElement {
   setupShelf() {
     // based on path, display selected list
     const url = window.location.pathname;
+    let list = [];
 
-    if (url.indexOf('/docs') >= 0) {
-      this.shelfList = require('../components/shelf/documentation-list.json');
+    if (url.indexOf('/about') >= 0) {
+      list = require('../components/shelf/about.json');
+    } else if (url.indexOf('/docs') >= 0) {
+      list = require('../components/shelf/documentation-list.json');
     } else if (url.indexOf('/getting-started') >= 0) {
-      this.shelfList = require('../components/shelf/getting-started-list.json');
+      list = require('../components/shelf/getting-started-list.json');
     }
+
+    console.log('list', list);
+
+    this.shelfList = list;
   }
 
   render() {
