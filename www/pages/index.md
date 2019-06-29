@@ -5,6 +5,6 @@ template: 'home'
 
 ## Greenwood is a modern and performant static site generator.
 
-Greenwood hopes to show how accessible and productive modern JavaScript and CSS web development can be through first class support of features like Web Components, FlexBox / CSS Grid, and Modules.  Greenwood leverages some of the greatest tools in the JavaScript ecosystem to provide a developer experience that is as modern and permformant as the resulting user experience, and so we hope that you'll be just as happy building your own site as we are building Greenwood.
+Greenwood focuses on providing an accessible and productive modern development workflow supporting modern JavaScript and CSS features like Web Components, FlexBox, CSS Grid, and Modules.  We we hope that development experience is as modern and permformant as the resulting user experience and that you'll be just as happy building your own site as we were with building Greenwood.
 
-Learn more with our [Getting Started](/getting-started), or for more advanced topics please head over to our [Documentation](/docs).
+Click [here](/about) to learn more about the project, or for more advanced topics please head over to our [Documentation page](/docs).

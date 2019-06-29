@@ -6,10 +6,11 @@ import '@evergreen-wc/eve-button';
 import '@evergreen-wc/eve-container';
 
 class Banner extends LitElement {
-
   constructor() {
     super();
+
     this.currentProjectIndex = 0;
+    this.animateState = 'on';
     this.projectTypes = [
       'blog',
       'portfolio',
@@ -21,7 +22,6 @@ class Banner extends LitElement {
   }
 
   cycleProjectTypes() {
-    console.log('cycleProjectTypes', this.projectTypes);
     this.currentProjectIndex = this.currentProjectIndex += 1;
 
     if (this.currentProjectIndex >= this.projectTypes.length) {
@@ -31,13 +31,19 @@ class Banner extends LitElement {
 
   firstUpdated() {
     setInterval(() => {
-      this.cycleProjectTypes();
+      this.animateState = 'off';
       this.update();
+
+      setTimeout(() => {
+        this.cycleProjectTypes();
+        this.animateState = 'on';
+        this.update();
+      }, 1000);
     }, 3000);
   }
 
   render() {
-    const project = this.projectTypes[this.currentProjectIndex];
+    const currentProjectType = this.projectTypes[this.currentProjectIndex];
 
     return html`
       <style>
@@ -49,7 +55,7 @@ class Banner extends LitElement {
           <div class='content'>
             <img src="${greenwoodLogo}" alt="Greenwood Logo"/>
             
-            <h3>The static site generator for your. . . ${project}.</h3>
+            <h3>The static site generator for your. . . <span class="${this.animateState}">${currentProjectType}.</span></h3>
             
             <eve-button size="md" href="/getting-started" style="${buttonCss}">Get Started</eve-button>
           </div>

@@ -1,3 +1,23 @@
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 :host {
   grid-area: banner;
 
@@ -28,7 +48,16 @@
         text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
       }
     }
+
+    & span.off {
+      animation: 1s fadeOut ease-in-out;
+    }
+
+    & span.on {
+      animation: 1s fadeIn linear;
+    }
   }
+
   @media (max-width: 980px) {
     & .banner {
       min-height: 40vh;
@@ -42,6 +71,7 @@
       }
     }
   }
+
   @media (max-width: 756px) {
     & .banner {
        padding:0px;
