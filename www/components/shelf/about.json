@@ -5,14 +5,9 @@
     "path": "/about/goals"
   },
   {
-    "index": 0,
+    "index": 1,
     "name": "Features",
     "path": "/about/features"
-  },
-  {
-    "index": 1,
-    "name": "Roadmap",
-    "path": "/about/roadmap"
   },
   {
     "index": 2,
