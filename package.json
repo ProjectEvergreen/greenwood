@@ -18,8 +18,8 @@
   "dependencies": {
     "@babel/core": "^7.4.0",
     "@babel/preset-env": "^7.4.1",
-    "@evergreen-wc/eve-button": "^0.0.7",
-    "@evergreen-wc/eve-container": "^0.0.7",
+    "@evergreen-wc/eve-button": "^0.0.9",
+    "@evergreen-wc/eve-container": "^0.0.9",
     "babel-loader": "^8.0.5",
     "babel-plugin-transform-builtin-classes": "^0.6.1",
     "chalk": "^2.4.2",

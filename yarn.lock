@@ -650,17 +650,17 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
-"@evergreen-wc/eve-button@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@evergreen-wc/eve-button/-/eve-button-0.0.7.tgz#214f5e354856f64e778a59b8823deba2dc40d0a1"
-  integrity sha512-CNpQwGQ6ZccfQQy7x3uBOwE/stLreY6iPRc//Pgrqpp1Xglzno7hEkxpZxuJPtgAxvsBaKb4M5TeLV02yhhFGA==
+"@evergreen-wc/eve-button@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@evergreen-wc/eve-button/-/eve-button-0.0.9.tgz#831eb39bbfc2990205edf4bb2b2ef8a92e86574c"
+  integrity sha512-peNYzu9/3a2glSBncOAJgb7o+C1KkHJefg/aOxfqS1SxPOVh/x30+uQ43iLJUkygg6ApyRoaka5E6ruLjQiylQ==
   dependencies:
     lit-element "^2.0.1"
 
-"@evergreen-wc/eve-container@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@evergreen-wc/eve-container/-/eve-container-0.0.7.tgz#084fc15ab22421e2553e78065c2ea349d909591f"
-  integrity sha512-0Pq+IRHl6Dma7qixxFGiVYvHTeAxpX5zPbbRYtKjKAF+YNDCku+4Rcpz8ZTIksI5qwikxRHuozdhwElITSIPeA==
+"@evergreen-wc/eve-container@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@evergreen-wc/eve-container/-/eve-container-0.0.9.tgz#1e6dcb9bd21e70c35c75be0a1e5b63883efe1baa"
+  integrity sha512-RMXdd8UpmbVa+rJw67CTsx5sJ01WvKzc5JN6FXyIxd8AijU8NiHWlq0feMIGyLKpVbr7wy9T5QWdXB9p8EXw7w==
   dependencies:
     lit-element "^2.0.1"
 
