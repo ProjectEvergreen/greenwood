@@ -1,13 +1,13 @@
 :host {
   & h3 {
-      color: green;
+    color: green;
   }
 
   & .content {
     margin: 0 auto;
-    min-height: 400px;
-    padding: 20px 0 10px 0;
-    background-color:white;
+    min-height: 300px;
+    background-color: #efefef;
+    padding: 0 15%;
     font-size:1.2rem;
 
     & h3 {
