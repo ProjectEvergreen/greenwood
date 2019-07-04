@@ -5,7 +5,9 @@
   font-size:1.5rem;
   border:1px solid #020202;
 }
+
 :host .btn:hover {
   color: #1d337a;
-  background-color: #efefef;
+  background-color: white;
+  border:1px dotted #1d337a;
 }
