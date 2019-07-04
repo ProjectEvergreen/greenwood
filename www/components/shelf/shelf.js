@@ -108,7 +108,7 @@ class shelf extends LitElement {
     const renderListItems = (list) => {
       let listItems = '';
 
-      if(list && list.length > 0) {
+      if(list.items && list.items.length > 0) {
         listItems = html`
           <ul>
             ${list.items.map(item => {
