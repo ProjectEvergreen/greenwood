@@ -1,6 +1,6 @@
 :host {
   & h3 {
-      color: green;
+    color: green;
   }
 
   & .content-wrapper {
