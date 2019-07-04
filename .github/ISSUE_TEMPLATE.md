@@ -12,5 +12,5 @@
 <!-- 
 Include relevant code samples, example snippets, benefits, complexity, etc.
 
-For bug reports, please include your configration and a simple of your workspace with minimum amount of code needed.  You can use our testing setup to reproduce as part of a PR, or for more complex examples, a sample repo code snippet, steps to reproduce, etc 
+For bug reports, please include your configuration file and a simple of your workspace with minimum amount of code needed to reproduce.  For alternative debugging approaches, you can use our test cases as a format to follow for reproducing bugs.
 -->
