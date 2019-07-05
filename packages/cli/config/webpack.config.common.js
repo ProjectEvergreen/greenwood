@@ -102,9 +102,7 @@ module.exports = ({ config, context }) => {
         template: path.join(context.scratchDir, context.indexPageTemplate),
         chunksSortMode: 'dependency'
       }),
-      new CopyPlugin([
-        { from: `${context.userWorkspace}/assets`, to: 'assets' }
-      ])
-    ]
+      fs.existsSync(context.assetDir) && new CopyPlugin([{ from: context.assetDir, to: 'assets' }])
+    ].filter(function(plugin) { return plugin !== false; })
   };
 };
