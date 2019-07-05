@@ -19,7 +19,7 @@ const runSmokeTest = require('../../smoke-test');
 const TestBed = require('../../test-bed');
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom Configuration for Workspace (www) and Default Greenwood configuration';
+  const LABEL = 'A Custom Assets Folder';
   let setup;
 
   before(async function() {
