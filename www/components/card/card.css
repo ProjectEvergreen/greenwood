@@ -13,6 +13,7 @@
     border-radius: .25rem;
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),
       0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+    text-align: center;
 
     & .body {
       padding:10px;
@@ -26,6 +27,10 @@
     margin: 0.25rem;
     flex: 1 1 16.666%;
     max-width: 250px;
+
+    @media (max-width: 1024px) {
+      max-width: 100%;
+    }
   }
   & .card-sm {
     -webkit-box-flex: 1;
@@ -33,6 +38,10 @@
     margin: 0.25rem;
     flex: 1 1 25%;
     max-width: 380px;
+
+    @media (max-width: 1024px) {
+      max-width: 100%;
+    }
   }
   & .card-md {
     -webkit-box-flex: 1;
@@ -40,6 +49,16 @@
     margin: 0.25rem;
     flex: 1 1 33.333%;
     max-width: 450px;
+
+    @media (max-width: 1024px) {
+      max-width: 100%;
+    }
+  }
+  & .card-full {
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 33.333%;
+    margin: 0.25rem;
+    flex: 1;
   }
 
   & .card-img-top {
