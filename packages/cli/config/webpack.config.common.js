@@ -2,6 +2,7 @@ const fs = require('fs');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const isDirectory = source => fs.lstatSync(source).isDirectory();
 const getUserWorkspaceDirectories = (source) => {
@@ -13,7 +14,7 @@ const mapUserWorkspaceDirectory = (userPath) => {
   return new webpack.NormalModuleReplacementPlugin(
     new RegExp(`${directory}`),
     (resource) => {
-      
+
       // workaround to ignore cli/templates default imports when rewriting
       if (!new RegExp('\/cli\/templates').test(resource.request)) {
         resource.request = resource.request.replace(new RegExp(`\.\.\/${directory}`), userPath);
@@ -68,13 +69,13 @@ module.exports = ({ config, context }) => {
         test: /\.css$/,
         loaders: [
           { loader: 'css-to-string-loader' },
-          { loader: 'css-loader' }, 
-          { loader: 'postcss-loader', options: 
+          { loader: 'css-loader' },
+          { loader: 'postcss-loader', options:
             {
               config: {
-                path: path.join(__dirname) 
+                path: path.join(__dirname)
               }
-            } 
+            }
           }
         ]
       }, {
@@ -95,12 +96,15 @@ module.exports = ({ config, context }) => {
           resource.request = resource.request.replace(/^\.\//, context.pagesDir);
         }
       ),
-      
+
       new HtmlWebpackPlugin({
         filename: path.join(context.publicDir, context.indexPageTemplate),
         template: path.join(context.scratchDir, context.indexPageTemplate),
         chunksSortMode: 'dependency'
-      })
+      }),
+      new CopyPlugin([
+        { from: `${context.userWorkspace}/assets`, to: 'assets' }
+      ])
     ]
   };
 };
