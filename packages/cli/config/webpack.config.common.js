@@ -1,8 +1,8 @@
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const fs = require('fs');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
-const CopyPlugin = require('copy-webpack-plugin');
 
 const isDirectory = source => fs.lstatSync(source).isDirectory();
 const getUserWorkspaceDirectories = (source) => {
@@ -33,6 +33,12 @@ module.exports = ({ config, context }) => {
   // dynamically map all the user's workspace directories for resolution by webpack
   // this essentially helps us keep watch over changes from the user, and greenwood's build pipeline
   const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map(mapUserWorkspaceDirectory);
+  
+  // if user has an assets/ directory in their workspace, automatically copy it for them
+  const userAssetsDirectoryForWebpack = fs.existsSync(context.assetDir) ? [{
+    from: context.assetDir, 
+    to: path.join(context.publicDir, 'assets')
+  }] : [];
 
   return {
 
@@ -90,6 +96,8 @@ module.exports = ({ config, context }) => {
     plugins: [
       ...mappedUserDirectoriesForWebpack,
 
+      new CopyWebpackPlugin(userAssetsDirectoryForWebpack),
+
       new webpack.NormalModuleReplacementPlugin(
         /\.md/,
         (resource) => {
@@ -101,8 +109,7 @@ module.exports = ({ config, context }) => {
         filename: path.join(context.publicDir, context.indexPageTemplate),
         template: path.join(context.scratchDir, context.indexPageTemplate),
         chunksSortMode: 'dependency'
-      }),
-      fs.existsSync(context.assetDir) && new CopyPlugin([{ from: context.assetDir, to: 'assets' }])
-    ].filter(function(plugin) { return plugin !== false; })
+      })
+    ]
   };
 };
