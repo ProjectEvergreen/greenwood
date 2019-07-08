@@ -45,7 +45,7 @@ Your project will generally have a structure like this:
 
 Pages should be placed in your `src/pages/` directory. Page filenames will become the page's generated path. e.g.
 
-Here's a an example of a `src/pages/mypage.md`
+Here's an example of a `src/pages/mypage.md`
 ```md
 ### Hello World
 
