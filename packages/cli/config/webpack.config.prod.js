@@ -11,7 +11,7 @@ module.exports = ({ config, context, graph }) => {
     mode: 'production',
 
     performance: {
-      hints: 'error'
+      hints: 'warning'
     },
 
     plugins: [  
