@@ -5,11 +5,13 @@ import { lazyReducerEnhancer } from 'pwa-helpers/lazy-reducer-enhancer.js';
 import thunk from 'redux-thunk';
 import { navigate } from 'lit-redux-router';
 
+// TODO make this a component
 const chevronRt = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
 <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505
 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373
 24.568.001 33.941z"/></svg>`;
 
+// TODO make this a component
 const chevronDwn = html`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
 <path d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224
 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373
@@ -34,8 +36,8 @@ class shelf extends LitElement {
 
   constructor() {
     super();
-    this.selectedIndex = '';
-    this.selectedSubIndex = '';
+    this.selectedIndex = 0;
+    this.selectedSubIndex = 0;
 
   }
 
@@ -71,7 +73,7 @@ class shelf extends LitElement {
 
   toggleSelectedItem() {
     let selectedShelfListIndex = this.shelfList.findIndex(list => {
-      return list.index === this.selected;
+      return list.index === this.selectedIndex;
     });
 
     this.shelfList[selectedShelfListIndex].selected = !this.shelfList[selectedShelfListIndex].selected;
@@ -102,22 +104,31 @@ class shelf extends LitElement {
 
   renderList() {
 
-    /* eslint-disable */
+    /* eslint-disable indent */
     const renderListItems = (list) => {
-      return html`
-        <ul>
-          ${list.items.map(item => {
-            return html`
-              <li id="index_${item.index}" class="${list.selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`#${item.id}`)}">${item.name}</a></li>
-            `;
-          })}
-        </ul>`;
-    }
+      let listItems = '';
+
+      if (list.items && list.items.length > 0) {
+        listItems = html`
+          <ul>
+            ${list.items.map(item => {
+              return html`
+                <li id="index_${item.index}" class="${list.selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`#${item.id}`)}">${item.name}</a></li>
+              `;
+            })}
+          </ul>
+        `;
+      }
+
+      return listItems;
+    };
     /* eslint-enable */
 
     return this.shelfList.map((list) => {
       let id = `index_${list.index}`;
-      let chevron = list.selected === true ? chevronDwn : chevronRt;
+      let chevron = list.items && list.items.length > 0 
+        ? list.selected === true ? chevronDwn : chevronRt
+        : '';
 
       return html`
         <li class="list-wrap">
