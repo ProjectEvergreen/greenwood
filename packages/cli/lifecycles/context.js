@@ -6,9 +6,9 @@ const publicDir = path.join(process.cwd(), './public');
 const metaComponent = path.join(__dirname, '..', 'templates', '../plugins/meta');
 
 module.exports = initContexts = async({ config }) => {
-  
+
   return new Promise((resolve, reject) => {
-    
+
     try {
       const userWorkspace = path.join(config.workspace);
       const userPagesDir = path.join(userWorkspace, 'pages/');
@@ -17,7 +17,7 @@ module.exports = initContexts = async({ config }) => {
       const userPageTemplate = path.join(userTemplatesDir, 'page-template.js');
       const indexPageTemplate = 'index.html';
       const notFoundPageTemplate = '404.html';
-      
+
       const userHasWorkspace = fs.existsSync(userWorkspace);
       const userHasWorkspacePages = fs.existsSync(userPagesDir);
       const userHasWorkspaceTemplates = fs.existsSync(userTemplatesDir);
@@ -25,7 +25,7 @@ module.exports = initContexts = async({ config }) => {
       const userHasWorkspaceAppTemplate = fs.existsSync(userAppTemplate);
       const userHasWorkspaceIndexTemplate = fs.existsSync(path.join(userTemplatesDir, 'index.html'));
       const userHasWorkspaceNotFoundTemplate = fs.existsSync(path.join(userTemplatesDir, '404.html'));
-      
+
       let context = {
         scratchDir,
         publicDir,
@@ -33,10 +33,10 @@ module.exports = initContexts = async({ config }) => {
         templatesDir: userHasWorkspaceTemplates ? userTemplatesDir : defaultTemplatesDir,
         userWorkspace: userHasWorkspace ? userWorkspace : defaultTemplatesDir,
         pageTemplatePath: userHasWorkspacePageTemplate
-          ? userPageTemplate 
+          ? userPageTemplate
           : path.join(defaultTemplatesDir, 'page-template.js'),
-        appTemplatePath: userHasWorkspaceAppTemplate 
-          ? userAppTemplate 
+        appTemplatePath: userHasWorkspaceAppTemplate
+          ? userAppTemplate
           : path.join(defaultTemplatesDir, 'app-template.js'),
         indexPageTemplatePath: userHasWorkspaceIndexTemplate
           ? path.join(userTemplatesDir, indexPageTemplate)
@@ -46,9 +46,10 @@ module.exports = initContexts = async({ config }) => {
           : path.join(defaultTemplatesDir, notFoundPageTemplate),
         indexPageTemplate,
         notFoundPageTemplate,
-        metaComponent
+        metaComponent,
+        assetDir: path.join(userHasWorkspace ? userWorkspace : defaultTemplatesDir, 'assets')
       };
-      
+
       if (!fs.existsSync(scratchDir)) {
         fs.mkdirSync(scratchDir);
       }

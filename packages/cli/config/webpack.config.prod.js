@@ -14,14 +14,13 @@ module.exports = ({ config, context, graph }) => {
       hints: 'warning'
     },
 
-    plugins: [  
+    plugins: [
       new HtmlWebpackPlugin({
         filename: path.join(context.publicDir, context.notFoundPageTemplate),
         template: path.join(context.scratchDir, context.notFoundPageTemplate),
-        publicPath: configWithContext.publicPath
+        publicPath: configWithContext.output.publicPath
       })
     ]
-
   });
 
 };
