@@ -11,24 +11,28 @@ MDIMPORT;
 METAIMPORT;
 METADATA;
 
-let shelfList = [];
-
 class PageTemplate extends LitElement {
 
   constructor() {
     super();
+    this.shelfList = [];
     this.setupShelf();
   }
 
   setupShelf() {
     // based on path, display selected list
-    const path = window.location.pathname;
+    const url = window.location.pathname;
+    let list = [];
 
-    if (path.substring(0, 5) === '/docs') {
-      shelfList = require('../components/shelf/documentation-list.json');
-    } else {
-      shelfList = require('../components/shelf/getting-started-list.json');
+    if (url.indexOf('/about') >= 0) {
+      list = require('../components/shelf/about.json');
+    } else if (url.indexOf('/docs') >= 0) {
+      list = require('../components/shelf/documentation-list.json');
+    } else if (url.indexOf('/getting-started') >= 0) {
+      list = require('../components/shelf/getting-started-list.json');
     }
+
+    this.shelfList = list;
   }
 
   render() {
@@ -42,7 +46,7 @@ class PageTemplate extends LitElement {
         <eve-header></eve-header>
         <div class='content-wrapper'>
           <div class="sidebar">
-            <eve-shelf .shelfList="${shelfList}"></eve-shelf>
+            <eve-shelf .shelfList="${this.shelfList}"></eve-shelf>
           </div>
           <div class="content">
             <eve-container fluid>
