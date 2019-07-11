@@ -202,3 +202,6 @@ All page templates must be placed in the `src/templates` directory. All page tem
 ```
 
 **Note**: For now, you must include an app-template.js in your templates folder, if you wish to use custom page-templates.
+
+License
+See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
