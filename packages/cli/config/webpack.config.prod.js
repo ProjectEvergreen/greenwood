@@ -11,17 +11,16 @@ module.exports = ({ config, context, graph }) => {
     mode: 'production',
 
     performance: {
-      hints: 'error'
+      hints: 'warning'
     },
 
-    plugins: [  
+    plugins: [
       new HtmlWebpackPlugin({
         filename: path.join(context.publicDir, context.notFoundPageTemplate),
         template: path.join(context.scratchDir, context.notFoundPageTemplate),
-        publicPath: configWithContext.publicPath
+        publicPath: configWithContext.output.publicPath
       })
     ]
-
   });
 
 };
