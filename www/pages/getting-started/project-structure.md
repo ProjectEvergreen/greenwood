@@ -1,0 +1,27 @@
+# Project Structure
+
+Your project will generally have a structure like this:
+```shell
+├── src
+│   ├── pages
+│   │   ├── index.md
+│   │   ├── page.md
+│   │   └── another-page.md
+│   └── templates
+│   │    ├── app-template.js
+│   │   └── page-template.js
+│   └── components
+│   │   └── my-component.js
+│   └── styles
+│   │   └── style.css
+│   └── assets
+│       └── image.jpg
+```
+
+- Pages: The markdown (or JavaScript) you want to use to render the contents of your page.  (examples below)
+- Templates: Every markdown page will get run through a page template, that can be defined in the pages frontmatter
+- Components: Every component you want to render either in your templates or markdown pages
+- Styles: All template styles
+- Assets: All assets you want copied to your site's public path at e.g. /assets/yourimage.jpg
+
+> Note: All files in your workspace _must_ reside be in a directory.  e.g. [_src/theme.css_ will **not** work](https://github.com/ProjectEvergreen/greenwood/issues/85).

@@ -24,11 +24,13 @@
   {
     "index": 2,
     "name": "Installing Greenwood",
+    "path": "/getting-started/install",
     "items": []
   },
   {
     "index": 3,
     "name": "Project Structure",
+    "path": "/getting-started/project-structure",
     "items": []
   },
   {
