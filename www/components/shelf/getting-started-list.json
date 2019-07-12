@@ -36,26 +36,31 @@
   {
     "index": 4,
     "name": "Development",
+    "path": "/getting-started/development",
     "items": []
   },
   {
     "index": 5,
     "name": "Creating Pages",
+    "path": "/getting-started/create-page",
     "items": []
   },
   {
     "index": 6,
     "name": "Configuration",
+    "path": "/getting-started/configuration",
     "items": []
   },
   {
     "index": 7,
     "name": "Custom Page Template",
+    "path": "/getting-started/page-template",
     "items": []
   },
   {
     "index": 8,
     "name": "Building for Production",
+    "path": "/getting-started/production",
     "items": []
   }
 ]
