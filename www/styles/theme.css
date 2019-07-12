@@ -65,7 +65,7 @@ a {
 code[class*="language-"],
 pre[class*="language-"] {
 	color: lightgreen;
-	background: black;
+	background: none;
 	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 	text-align: left;
 	white-space: pre;
@@ -93,7 +93,7 @@ pre[class*="language-"] {
 
 pre[class*="language-"],
 :not(pre) > code[class*="language-"] {
-	background: hsl(30, 20%, 25%);
+	background: #000000;
 }
 
 /* Code blocks */
@@ -101,7 +101,7 @@ pre[class*="language-"] {
 	padding: 1em;
 	margin: .5em 0;
 	overflow: auto;
-	border: .3em solid hsl(30, 20%, 40%);
+	border: .3em solid #101610;
 	border-radius: .5em;
 	box-shadow: 1px 1px .5em black inset;
 }

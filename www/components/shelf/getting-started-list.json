@@ -31,7 +31,13 @@
     "index": 3,
     "name": "Project Structure",
     "path": "/getting-started/project-structure",
-    "items": []
+    "items": [
+      {
+        "index": 0,
+        "name": "Assets",
+        "id": "assets"
+      }
+    ]
   },
   {
     "index": 4,

@@ -3,7 +3,7 @@
 Pages should be placed in your `src/pages/` directory. Page filenames will become the page's generated path. e.g.
 
 Here's an example of a `src/pages/mypage.md`
-```md
+```render md
 ### Hello World
 
 This is an example page built by Greenwood.  Make your own in _src/pages_!
