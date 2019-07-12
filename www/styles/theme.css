@@ -19,6 +19,8 @@ img {
 }
 
 h2, h3, h4, h5 {
+  margin-top:1.5rem !important;
+  margin-bottom:1.5rem !important;
   color: #1d337a;
 }
 
@@ -54,6 +56,10 @@ a {
   & .single-column {
     color: #000;
   }
+}
+
+code {
+  color: green;
 }
 
 /**
