@@ -55,7 +55,18 @@
     "index": 6,
     "name": "Configuration",
     "path": "/getting-started/configuration",
-    "items": []
+    "items": [
+      {
+        "index": 0,
+        "name": "Workspace",
+        "id": "workspace"
+      },
+      {
+        "index": 2,
+        "name": "Meta",
+        "id": "meta"
+      }
+    ]
   },
   {
     "index": 7,
