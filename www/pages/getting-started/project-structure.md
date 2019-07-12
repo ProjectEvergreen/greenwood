@@ -1,4 +1,4 @@
-# Project Structure
+## Project Structure
 
 Your project will generally have a structure like this:
 ```render shell

@@ -1,4 +1,4 @@
-# Installing Greenwood
+## Installing Greenwood
 
 To install greenwood you'll need all the [prerequisites](/getting-started/system-requirements) preinstalled. Then you can simply clone the repository:
 

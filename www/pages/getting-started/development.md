@@ -1,4 +1,4 @@
-# Development
+## Development
 
 You can compile your static site in development mode using:
 
@@ -18,3 +18,5 @@ module.exports = {
     }
 };
 ```
+
+See [configuration](/getting-started/configuration) for more information about configuration settings.

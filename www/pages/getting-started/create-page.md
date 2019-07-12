@@ -1,4 +1,4 @@
-### Creating A Page
+## Creating A Page
 
 Pages should be placed in your `src/pages/` directory. Page filenames will become the page's generated path. e.g.
 
