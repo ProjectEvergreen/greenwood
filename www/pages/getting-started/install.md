@@ -2,19 +2,19 @@
 
 To install greenwood you'll need all the [prerequisites](/getting-started/system-requirements) preinstalled. Then you can simply clone the repository:
 
-```bash
+```render bash
 git clone https://github.com/ProjectEvergreen/greenwood
 ```
 
 Browse to directory:
 
-```bash
+```render bash
 cd greenwood
 ```
 
 Create a new custom workspace
 
-```bash
+```render bash
 mkdir src
 ```
 
