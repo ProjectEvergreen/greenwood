@@ -46,7 +46,6 @@
     "pwa-helpers": "^0.9.1",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
-    "rimraf": "^2.6.3",
     "wc-markdown-loader": "^0.1.2",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
