@@ -76,6 +76,12 @@
   },
   {
     "index": 8,
+    "name": "Custom App Template",
+    "path": "/getting-started/app-template",
+    "items": []
+  },
+  {
+    "index": 9,
     "name": "Building for Production",
     "path": "/getting-started/production",
     "items": []

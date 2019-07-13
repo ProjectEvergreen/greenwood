@@ -25,3 +25,5 @@ class PageTemplate extends LitElement {
 
 customElements.define('page-template', PageTemplate);
 ```
+
+See [create page](/getting-started/create-page) guide for how to use a custom template with any given page.
