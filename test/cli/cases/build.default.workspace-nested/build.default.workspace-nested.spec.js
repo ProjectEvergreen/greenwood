@@ -24,7 +24,6 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../test-bed');
 
-// TODO why does this case need a src/pages/index.md?
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Default Workspace w/ Nested Directories';
   let setup;
