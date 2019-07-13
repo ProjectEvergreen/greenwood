@@ -13,6 +13,7 @@
  *   title: 'My Custom Greenwood App',
  *   meta: [
  *     { property: 'og:site', content: 'greenwood' },
+ *     { name: 'og:url', content: 'https://www.greenwoodjs.io' }
  *     { name: 'twitter:site', content: '@PrjEvergreen' }
  *   ]
  * }
@@ -25,6 +26,7 @@
  *     hello.md
  */
 const fs = require('fs');
+const greenwoodConfig = require('./greenwood.config');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const expect = require('chai').expect;
@@ -33,7 +35,7 @@ const TestBed = require('../../test-bed');
 
 describe('Build Greenwood With: ', async function() {
   const LABEL = 'Custom Meta Configuration and Default Workspace';
-  let setup;
+  const meta = greenwoodConfig.meta;
 
   before(async function() {
     setup = new TestBed();
@@ -49,6 +51,14 @@ describe('Build Greenwood With: ', async function() {
     describe('Custom Meta Index Page', function() {
       let dom;
 
+      const metaFilter = (metaKey) => {
+        return meta.filter((item) => {
+          if (item.property === metaKey || item.name === metaKey) {
+            return item;
+          }
+        })[0];
+      };
+
       beforeEach(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
@@ -58,19 +68,25 @@ describe('Build Greenwood With: ', async function() {
       });
 
       it('should have our custom config <meta> tag with og:site property in the <head>', function() {
-        const metaElement = dom.window.document.querySelector('head meta[property="og:site"]');
+        const ogSiteMeta = metaFilter('og:site');
+        const metaElement = dom.window.document.querySelector(`head meta[property="${ogSiteMeta.property}`);
 
-        expect(metaElement.getAttribute('content')).to.be.equal('greenwood');
+        expect(metaElement.getAttribute('content')).to.be.equal(ogSiteMeta.content);
       });
 
       it('should have our custom config <meta> tag with twitter:site name in the <head>', function() {
-        const metaElement = dom.window.document.querySelector('head meta[name="twitter:site"]');
+        const twitterSiteMeta = metaFilter('twitter:site');
+        const metaElement = dom.window.document.querySelector(`head meta[name="${twitterSiteMeta.name}"]`);
 
-        expect(metaElement.getAttribute('content')).to.be.equal('@PrjEvergreen');
+        console.log('twitterSiteMeta', twitterSiteMeta);
+
+        expect(metaElement.getAttribute('content')).to.be.equal(twitterSiteMeta.content);
       });
     });
-  });  
+  });
+
   after(function() {
     setup.teardownTestBed();
   });
+
 });
