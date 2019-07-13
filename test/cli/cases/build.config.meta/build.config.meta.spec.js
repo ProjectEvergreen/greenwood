@@ -36,6 +36,7 @@ const TestBed = require('../../test-bed');
 describe('Build Greenwood With: ', async function() {
   const LABEL = 'Custom Meta Configuration and Default Workspace';
   const meta = greenwoodConfig.meta;
+  let setup;
 
   before(async function() {
     setup = new TestBed();

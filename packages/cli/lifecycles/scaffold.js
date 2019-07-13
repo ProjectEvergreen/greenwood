@@ -26,7 +26,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
   const loadPageMeta = async (file, result, { metaComponent }) => {
     return new Promise((resolve, reject) => {
       try {
-        const { meta, title } = file;
+        const { title, meta } = file;
         const metadata = {
           title,
           meta
