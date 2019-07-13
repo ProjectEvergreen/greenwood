@@ -33,11 +33,6 @@ class meta extends LitElement {
         const metaPropValue = Object.values(attr)[0];
         let metaContentVal = Object.values(attr)[1];
         
-        // insert origin domain into url
-        if (metaPropValue === 'og:url') {
-          metaContentVal = window.location.origin + metaContentVal;
-        }
-
         meta.setAttribute(metaPropertyOrName, metaPropValue);
         meta.setAttribute('content', metaContentVal);
 

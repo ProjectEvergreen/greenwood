@@ -40,7 +40,7 @@ describe('Build Greenwood With: ', async function() {
     before(async function() {     
       await setup.runGreenwoodCommand('build');
     });
-    runSmokeTest(['public', 'not-found', 'hello', 'meta'], LABEL);
+    runSmokeTest(['public', 'not-found', 'hello'], LABEL);
 
     describe('Custom Title', function() {
       const indexPageTitle = 'My Custom Greenwood App';

@@ -33,7 +33,7 @@ describe('Build Greenwood With: ', async function() {
     before(async function() {     
       await setup.runGreenwoodCommand('build');
     });
-    runSmokeTest(['not-found', 'hello', 'meta'], LABEL);
+    runSmokeTest(['not-found', 'hello'], LABEL);
 
     describe('Custom Configuration with a custom public path', () => {
 

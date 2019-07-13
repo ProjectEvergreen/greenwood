@@ -26,14 +26,11 @@ const writePageComponentsFromTemplate = async (compilation) => {
   const loadPageMeta = async (file, result, { metaComponent }) => {
     return new Promise((resolve, reject) => {
       try {
-        const { title, meta, route } = file;
+        const { meta, title } = file;
         const metadata = {
           title,
           meta
         };
-
-        metadata.meta.push({ property: 'og:title', content: title });
-        metadata.meta.push({ property: 'og:url', content: route });
 
         result = result.replace(/METAIMPORT/, `import '${metaComponent}'`);
         result = result.replace(/METADATA/, `const metadata = ${JSON.stringify(metadata)}`);

@@ -46,7 +46,7 @@ describe('Build Greenwood With: ', async function() {
     before(async function() {     
       await setup.runGreenwoodCommand('build');
     });
-    runSmokeTest(['public', 'index', 'not-found', 'hello', 'meta'], LABEL);
+    runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
 
     describe('Custom Meta Index Page', function() {
       let dom;
@@ -74,11 +74,16 @@ describe('Build Greenwood With: ', async function() {
         expect(metaElement.getAttribute('content')).to.be.equal(ogSiteMeta.content);
       });
 
+      it('should have our custom config <meta> tag with og:url property in the <head>', function() {
+        const ogUrlMeta = metaFilter('og:url');
+        const metaElement = dom.window.document.querySelector(`head meta[property="${ogUrlMeta.property}"]`);
+
+        expect(metaElement.getAttribute('content')).to.be.equal(ogUrlMeta.content);
+      });
+
       it('should have our custom config <meta> tag with twitter:site name in the <head>', function() {
         const twitterSiteMeta = metaFilter('twitter:site');
         const metaElement = dom.window.document.querySelector(`head meta[name="${twitterSiteMeta.name}"]`);
-
-        console.log('twitterSiteMeta', twitterSiteMeta);
 
         expect(metaElement.getAttribute('content')).to.be.equal(twitterSiteMeta.content);
       });
