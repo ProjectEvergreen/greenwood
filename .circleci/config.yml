@@ -42,7 +42,7 @@ jobs:
         - checkout
         - run:
             name: Deploy to Stage
-            command: node ./scripts/release.js
+            command: yarn install && yarn build && node ./scripts/release.js
 
 workflows:
   version: 2
