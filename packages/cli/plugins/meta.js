@@ -33,6 +33,11 @@ class meta extends LitElement {
         const metaPropValue = Object.values(attr)[0];
         let metaContentVal = Object.values(attr)[1];
         
+        // join hostname and route together
+        if (metaPropValue === 'og:url') {
+          metaContentVal = `${metaContentVal}${this.attributes.route}`;
+        }
+
         meta.setAttribute(metaPropertyOrName, metaPropValue);
         meta.setAttribute('content', metaContentVal);
 

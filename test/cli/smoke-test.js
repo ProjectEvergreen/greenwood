@@ -98,7 +98,7 @@ function defaultIndex(label) {
       });
 
       it('should have the expected paragraph text within the index page in the public directory', function() {
-        let paragraph = dom.window.document.querySelector('p').textContent;
+        const paragraph = dom.window.document.querySelector('p').textContent;
 
         expect(paragraph).to.equal(indexPageBody);
       });
