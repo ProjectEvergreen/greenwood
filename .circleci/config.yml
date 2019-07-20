@@ -17,15 +17,11 @@ jobs:
           - v1-dependencies-
 
       - run:
-          name: Debug environment
-          command: node -v && npm -v && yarn -v
-
-      - run:
           name: Install Project Dependencies
-          command: yarn install
+          command: yarn install --frozen-lockfile
 
       - run:
-          name: Run Linting
+          name: Run Linter
           command: yarn lint
 
       - run:
@@ -36,12 +32,26 @@ jobs:
           name: Run CLI Script (index.js)
           command: yarn clean && yarn build
 
-      - run:
-          name: Deploy to Stage
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              
-              echo "releasing to stage (AWS)"
-              node ./scripts/release.js
+  deploy_stage:
+      docker:
+        - image: thegreenhouse/nodejs-dev:0.4.0
 
-            fi
+      working_directory: ~/repo
+
+      steps:
+        - checkout
+        - run:
+            name: Deploy to Stage
+            command: node ./scripts/release.js
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build
+      - deploy_stage:
+          filters:
+            branches:
+              only: master
+          requires:
+            - build
