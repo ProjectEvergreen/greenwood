@@ -1,3 +1,4 @@
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const fs = require('fs');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
@@ -13,7 +14,7 @@ const mapUserWorkspaceDirectory = (userPath) => {
   return new webpack.NormalModuleReplacementPlugin(
     new RegExp(`${directory}`),
     (resource) => {
-      
+
       // workaround to ignore cli/templates default imports when rewriting
       if (!new RegExp('\/cli\/templates').test(resource.request)) {
         resource.request = resource.request.replace(new RegExp(`\.\.\/${directory}`), userPath);
@@ -32,6 +33,12 @@ module.exports = ({ config, context }) => {
   // dynamically map all the user's workspace directories for resolution by webpack
   // this essentially helps us keep watch over changes from the user, and greenwood's build pipeline
   const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map(mapUserWorkspaceDirectory);
+  
+  // if user has an assets/ directory in their workspace, automatically copy it for them
+  const userAssetsDirectoryForWebpack = fs.existsSync(context.assetDir) ? [{
+    from: context.assetDir, 
+    to: path.join(context.publicDir, 'assets')
+  }] : [];
 
   return {
 
@@ -68,13 +75,13 @@ module.exports = ({ config, context }) => {
         test: /\.css$/,
         loaders: [
           { loader: 'css-to-string-loader' },
-          { loader: 'css-loader' }, 
-          { loader: 'postcss-loader', options: 
+          { loader: 'css-loader' },
+          { loader: 'postcss-loader', options:
             {
               config: {
-                path: path.join(__dirname) 
+                path: path.join(__dirname)
               }
-            } 
+            }
           }
         ]
       }, {
@@ -89,13 +96,15 @@ module.exports = ({ config, context }) => {
     plugins: [
       ...mappedUserDirectoriesForWebpack,
 
+      new CopyWebpackPlugin(userAssetsDirectoryForWebpack),
+
       new webpack.NormalModuleReplacementPlugin(
         /\.md/,
         (resource) => {
           resource.request = resource.request.replace(/^\.\//, context.pagesDir);
         }
       ),
-      
+
       new HtmlWebpackPlugin({
         filename: path.join(context.publicDir, context.indexPageTemplate),
         template: path.join(context.scratchDir, context.indexPageTemplate),

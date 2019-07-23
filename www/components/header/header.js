@@ -14,10 +14,12 @@ class HeaderComponent extends LitElement {
         <eve-container fluid>
           <div class="head-wrap">
             <div class="brand">
-              <img src="${brand}" />
-                <h4>
-                  <a href="/">Greenwood</a>
-                </h4>
+              <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer">
+                <img src="${brand}" />
+              </a>
+              <h4>
+                <a href="/">Greenwood</a>
+              </h4>
             </div>
             <nav>
               <ul>

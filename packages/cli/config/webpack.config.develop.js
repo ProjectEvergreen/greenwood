@@ -11,7 +11,7 @@ let isRebuilding = false;
 const rebuild = async() => {
   if (!isRebuilding) {
     isRebuilding = true;
-    
+
     // rebuild web components
     await generateCompilation();
 
@@ -49,7 +49,7 @@ module.exports = ({ config, context, graph }) => {
       // new webpack.HotModuleReplacementPlugin(),
       new FilewatcherPlugin({
         watchFileRegex: [`/${context.userWorkspace}/`],
-        onReadyCallback: () => { 
+        onReadyCallback: () => {
           console.log(`Now serving Development Server available at ${host}:${port}`);
         },
         // eslint-disable-next-line no-unused-vars
@@ -85,7 +85,7 @@ module.exports = ({ config, context, graph }) => {
           <script>
             sessionStorage.redirect = location.href;
           </script>
-      
+
           <meta http-equiv="refresh" content="0;URL='${publicPath}'"></meta>
         `
       })

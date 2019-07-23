@@ -1,12 +1,33 @@
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 :host {
   grid-area: banner;
+
   & .banner {
-    min-height: 60vh;
+    background-color: rgba(238, 231, 235);
+    min-height: 50vh;
 
     & .content {
-      padding: 15vh 10px;
+      padding: 5vh 10px;
       font-size:1.7rem;
-      color: white;
       text-align:center;
 
       & hr {
@@ -27,7 +48,16 @@
         text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
       }
     }
+
+    & span.off {
+      animation: 1s fadeOut ease-in-out;
+    }
+
+    & span.on {
+      animation: 1s fadeIn linear;
+    }
   }
+
   @media (max-width: 980px) {
     & .banner {
       min-height: 40vh;
@@ -41,6 +71,7 @@
       }
     }
   }
+
   @media (max-width: 756px) {
     & .banner {
        padding:0px;

@@ -6,16 +6,20 @@ imports:
   Card: '../components/card/card.js'
 ---
 
-### Home Page
-
-```render
-<eve-row>
-  <eve-card img="https://evergreen-wc.hutchdev.ca/ebf0f11fdb6186dde66c63b5c54038de.png" size="full">Testing</eve-card>
-  <eve-card img="https://evergreen-wc.hutchdev.ca/ebf0f11fdb6186dde66c63b5c54038de.png" size="full">Testing</eve-card>
-  <eve-card img="https://evergreen-wc.hutchdev.ca/ebf0f11fdb6186dde66c63b5c54038de.png" size="full">Testing</eve-card>
-</eve-row>
-```
+## Greenwood is a modern and performant static site generator.
 
 This is the Greenwood website's home page!  🌱
 
 Visit our [about page](/about) to learn more!
+Greenwood is focused on providing an intuitive and accessible development workflow supporting modern JavaScript and CSS features like Web Components, FlexBox, CSS Grid, and Modules.  We hope that the development experience is as pleasant and performant as the resulting user experience and that you'll be just as happy building your own site as we are with building Greenwood.
+
+Click [here](/about) to learn more about the project, or for more advanced topics please head over to our [Documentation page](/docs).
+
+
+```render
+<eve-row>
+  <eve-card img="/assets/webpack.png" size="full">Testing</eve-card>
+  <eve-card img="/assets/webpack.png" size="full">Testing</eve-card>
+  <eve-card img="/assets/webpack.png" size="full">Testing</eve-card>
+</eve-row>
+```
