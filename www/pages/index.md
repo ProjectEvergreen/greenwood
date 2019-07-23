@@ -17,9 +17,17 @@ Click [here](/about) to learn more about the project, or for more advanced topic
 
 
 ```render
-<eve-row>
-  <eve-card img="/assets/webpack.png" size="full">Testing</eve-card>
-  <eve-card img="/assets/webpack.png" size="full">Testing</eve-card>
-  <eve-card img="/assets/webpack.png" size="full">Testing</eve-card>
+<div class="cards">
+  <eve-row>
+    <eve-card img="/assets/webpack.png" size="full">
+    Frankfurter chuck beef ribs turducken tongue. Boudin turkey landjaeger kielbasa burgdoggen bacon porchetta frankfurter beef ribs buffalo pork chop swine capicola. Boudin kevin drumstick venison tenderloin, picanha filet mignon rump ground round pancetta. Landjaeger tri-tip biltong, pork belly tail filet mignon ham jowl tenderloin. Picanha filet mignon burgdoggen doner. Pork turkey frankfurter chicken short loin meatloaf.
+    </eve-card>
+  <eve-card img="/assets/webcomponents.png" size="full">
+    Frankfurter chuck beef ribs turducken tongue. Boudin turkey landjaeger kielbasa burgdoggen bacon porchetta frankfurter beef ribs buffalo pork chop swine capicola. Boudin kevin drumstick venison tenderloin, picanha filet mignon rump ground round pancetta. Landjaeger tri-tip biltong, pork belly tail filet mignon ham jowl tenderloin. Picanha filet mignon burgdoggen doner. Pork turkey frankfurter chicken short loin meatloaf.
+  </eve-card>
+  <eve-card img="/assets/nodejs.png" size="full">
+  Frankfurter chuck beef ribs turducken tongue. Boudin turkey landjaeger kielbasa burgdoggen bacon porchetta frankfurter beef ribs buffalo pork chop swine capicola. Boudin kevin drumstick venison tenderloin, picanha filet mignon rump ground round pancetta. Landjaeger tri-tip biltong, pork belly tail filet mignon ham jowl tenderloin. Picanha filet mignon burgdoggen doner. Pork turkey frankfurter chicken short loin meatloaf.
+  </eve-card>
 </eve-row>
+</div>
 ```

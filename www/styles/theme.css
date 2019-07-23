@@ -52,7 +52,7 @@ a {
   font-family: 'Source Sans Pro', sans-serif;
 
   & .single-column {
-        margin: inherit;
+    margin: inherit;
     color: #000;
   }
 }
