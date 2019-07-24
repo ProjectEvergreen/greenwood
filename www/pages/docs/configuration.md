@@ -1,110 +1,105 @@
 ### Configuration
 
-Configuration of greenwood using `greenwood.config.js`
+Custom configurations for your static site can be managed from a `greenwood.config.js` file in your project's base folder. From here you can add/edit the workspace, title, meta data for your site.
 
-Configuration of greenwood using `greenwood.config.js`
+An example configuration `greenwood.config.js` file:
 
-Configuration of greenwood using `greenwood.config.js`
+```render js
+const path = require('path');
 
-Configuration of greenwood using `greenwood.config.js`
+const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 
-Configuration of greenwood using `greenwood.config.js`
-
-Configuration of greenwood using `greenwood.config.js`
-
-Configuration of greenwood using `greenwood.config.js`
-
-Configuration of greenwood using `greenwood.config.js`
+module.exports = {
+  workspace: path.join(__dirname, 'www'),
+  title: 'Greenwood',
+  meta: [
+    { name: 'description', content: META_DESCRIPTION },
+    { name: 'twitter:site', content: '@PrjEvergreen' },
+    { property: 'og:title', content: 'Greenwood' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: 'https://www.greenwoodjs.io' },
+    { property: 'og:image', content: 'https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png' },
+    { property: 'og:description', content: META_DESCRIPTION }
+  ]
+};
+```
 
 ### Workspace
 
-Configuration of workspace within `greenwood.config.js`
+Workspace path for your project can be configured manually within your `greenwood.config.js` file.  For example, using the path library:
 
-Configuration of workspace within `greenwood.config.js`
+```render js
+const path = require('path');
 
-Configuration of workspace within `greenwood.config.js`
+module.exports = {
+  workspace: path.join(__dirname, 'www'),
+}
+```
 
-Configuration of workspace within `greenwood.config.js`
-
-Configuration of workspace within `greenwood.config.js`
-
-Configuration of workspace within `greenwood.config.js`
-
-Configuration of workspace within `greenwood.config.js`
-
-Configuration of workspace within `greenwood.config.js`
-
-Configuration of workspace within `greenwood.config.js`
-
-Configuration of workspace within `greenwood.config.js`
-
+The default workspace path is `./src`.
 
 
 ### Title
 
-Configuration of title within `greenwood.config.js`
+A title element for all pages can be configured via the `greenwood.config.js`
 
-Configuration of title within `greenwood.config.js`
+For example:
 
-Configuration of title within `greenwood.config.js`
+```render js
+const path = require('path');
 
-Configuration of title within `greenwood.config.js`
+module.exports = {
+  title: 'Greenwood Static Site'
+}
+```
 
-Configuration of title within `greenwood.config.js`
-
-Configuration of title within `greenwood.config.js`
-
-Configuration of title within `greenwood.config.js`
-
-Configuration of title within `greenwood.config.js`
-
-Configuration of title within `greenwood.config.js`
-
-Configuration of title within `greenwood.config.js`
+The default workspace path is `./src`.
 
 ### PublicPath
 
-Configuration of public path within `greenwood.config.js`
+The public path from which you want to serve your pages and assets (e.g. mysite.com/mysubsection/staticpage ) can be configured via the `greenwood.config.js`
 
-Configuration of public path within `greenwood.config.js`
+For example:
 
-Configuration of public path within `greenwood.config.js`
+```render js
+const path = require('path');
 
-Configuration of public path within `greenwood.config.js`
+module.exports = {
+  publicpath: '/some-section/'
+}
+```
 
-Configuration of public path within `greenwood.config.js`
+The default public path is `/`.
 
-Configuration of public path within `greenwood.config.js`
-
-Configuration of public path within `greenwood.config.js`
-
-Configuration of public path within `greenwood.config.js`
-
-Configuration of public path within `greenwood.config.js`
-
-Configuration of public path within `greenwood.config.js`
 
 ### Meta
 
-Configuration of meta tags within `greenwood.config.js`
+You can set the configuration of meta tags within `greenwood.config.js` using an array of meta tag element objects.
 
-Configuration of meta tags within `greenwood.config.js`
+For example:
 
-Configuration of meta tags within `greenwood.config.js`
+```render js
 
-Configuration of meta tags within `greenwood.config.js`
+const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 
-Configuration of meta tags within `greenwood.config.js`
+module.exports = {
+  meta: [
+    { name: 'description', content: META_DESCRIPTION },
+    { name: 'twitter:site', content: '@PrjEvergreen' },
+    { property: 'og:title', content: 'Greenwood' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: 'https://www.greenwoodjs.io' },
+    { property: 'og:image', content: 'https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png' },
+    { property: 'og:description', content: META_DESCRIPTION }
+  ]
+};
+```
 
-Configuration of meta tags within `greenwood.config.js`
+Which would be equivalent to:
 
-Configuration of meta tags within `greenwood.config.js`
-
-Configuration of meta tags within `greenwood.config.js`
-
-Configuration of meta tags within `greenwood.config.js`
-
-Configuration of meta tags within `greenwood.config.js`
-
-Configuration of meta tags within `greenwood.config.js`
-
+```render html
+<meta name="description" content="A modern and performant static..." />
+<meta name="twitter:site" content="@PrjEvergreen" />
+<meta property="og:title" content="Greenwood" />
+<meta property="og:type" content="website" />
+```
