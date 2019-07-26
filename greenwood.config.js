@@ -8,7 +8,7 @@ module.exports = {
   meta: [
     { name: 'description', content: META_DESCRIPTION },
     { name: 'twitter:site', content: '@PrjEvergreen' },
-    { property: 'og:tile', content: 'Greenwood' },
+    { property: 'og:title', content: 'Greenwood' },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: 'https://www.greenwoodjs.io' },
     { property: 'og:image', content: 'https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png' },
