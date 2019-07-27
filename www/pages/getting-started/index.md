@@ -55,6 +55,8 @@ Here are some resources and docs that we think might be useful as part of a broa
 - [MDN](https://developer.mozilla.org/) - Mozilla's (Web) Developer Docs.  A must have resource for web development
 - [CanIUse.com](https://caniuse.com/) - Find out what browser support various JS / CSS features have
 - [LitElement](https://lit-element.polymer-project.org/) / [LitHtml](https://lit-html.polymer-project.org/) - Helper libraries for working with Web Components, available through Greenwood
+- [VSCode](https://code.visualstudio.com/) - A very popular IDE for JavaScript development with a lot of great plugins and integrations for web development related tools
+- [Git](https://git-scm.com/) / [GitHub](https://github.com/): Although git != GitHub, version control plays a very important part in modern software development.  GitHub in particular provides a lot of great integrations with tools like [CircleCI](https://circleci.com/) and [Netlify](https://www.netlify.com/) that can greatly automate a lot of the deployment process like building and deploying your apps.  (We plan to provide guides for these in the future, so stay tuned!)
 
 
 Ready to get started?  [Let's go](/getting-started/project-setup/)!
