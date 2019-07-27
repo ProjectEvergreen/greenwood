@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf ./**/.greenwood/** && rimraf ./**/public/** && rimraf ./coverage",
-    "lint": "eslint \"./packages/**/**/*.js\" \"./scripts/*.js\" \"./test/**/**/*.js\"",
+    "lint": "eslint \"./packages/**/**/*.js\" \"./test/**/**/*.js\"",
     "build": "yarn clean && node ./packages/cli/index.js build",
     "serve": "yarn build && cd ./public && ws",
     "develop": "yarn clean && node ./packages/cli/index.js develop",
@@ -53,7 +53,6 @@
     "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
-    "aws-sdk": "^2.458.0",
     "chai": "^4.2.0",
     "eslint": "^5.15.3",
     "mocha": "^6.1.4",

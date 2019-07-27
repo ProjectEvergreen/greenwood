@@ -38,7 +38,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
     
-    runSmokeTest(['public', 'not-found', 'index', 'meta'], LABEL);
+    runSmokeTest(['public', 'not-found', 'index'], LABEL);
 
     it('should create a default blog page directory', function() {
       expect(fs.existsSync(path.join(this.context.publicDir, './blog'))).to.be.true;
