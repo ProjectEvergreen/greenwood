@@ -4,7 +4,9 @@
   }
 
   & .content {
+    background-color:white !important;
     margin: 0 auto;
+    margin-top: 20px;
     min-height: 300px;
     background-color: #efefef;
     padding: 0 15%;

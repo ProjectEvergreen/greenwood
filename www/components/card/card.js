@@ -8,6 +8,9 @@ class Card extends LitElement {
       img: {
         type: String
       },
+      title: {
+        type: String
+      },
       size: {
         type: String
       }
@@ -17,7 +20,17 @@ class Card extends LitElement {
   renderImage() {
     if (this.img) {
       return html`
-        <img src="${this.img}" class="card-img-top" />
+        <div class="card-img-top">
+          <img src="${this.img}"/>
+        </div>
+      `;
+    }
+  }
+
+  renderTitle() {
+    if (this.title) {
+      return html`
+        <h3>${this.title}</h3>
       `;
     }
   }
@@ -29,6 +42,7 @@ class Card extends LitElement {
     </style>
       <div class="card ${this.size ? `card-${this.size}` : ''}">
         ${this.renderImage()}
+        ${this.renderTitle()}
         <div class="body">
           <slot></slot>
         </div>
