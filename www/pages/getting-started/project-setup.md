@@ -1,7 +1,3 @@
----
-label: 'project-setup'
----
-
 ## Overview
 In the [previous section](/getting-started/), we shared a little bit about what Greenwood is and the high level goals of this guide.  Now we are ready to start your first project!  
 
