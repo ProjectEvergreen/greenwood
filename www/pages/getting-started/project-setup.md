@@ -10,7 +10,7 @@ In this section, we will get to kick off our Greenwood project by:
 1. Installing Greenwood and setting up some `npm` scripts for local development
 1. Setting up the needed project structure
 
-> This guide assumes you are starting from an _empty_ directory (`git init` being the exception).  We recommend going through this guide once to get the basic and from there, you can explore our [documentation](/docs/) to learn more about all of Greenwood's capabilities.
+> _This guide assumes you are starting from an **empty** directory (`git init` being the exception).  We recommend going through this guide once to understand the basics and from there, you can explore our [documentation](/docs/) to learn more about all of Greenwood's capabilities._
 
 ## Installing Greenwood
 First thing we need to do is setup our project for installing Greenwood.  With Greenwood installed, you will be able to use its CLI to power the development of your project though automated scripts and configuration.
@@ -23,12 +23,12 @@ $ npm init
 
 Now we can install Greenwood
 ```shell
-$ npm install @greenwood/cli
+$ npm install @greenwood/cli --save-dev
 ```
 
 All set!  
 
-> At this point, if you are in `git` repository, it might be a good time to create a _.gitignore_ and add `_ node_modules` to it.
+> _At this point, if you are in `git` repository, it might be a good time to create a _.gitignore_ and add `_ node_modules` to it._
 
 
 ## Configuring Development Workflows
@@ -50,14 +50,17 @@ In _package.json_, edit the `scripts` section accordingly:
 ```
 
 Now, you'll be able to do two things:
-1. Run `npm start` - Will start a local development server with file watching and reloading.
+1. `npm start` - Will start a local development server with file watching and reloading.
 1. `npm run build` - Will generate a static version of the project that you can then upload to a web server.
 
-> You can rename `develop` and `build` to whatever you like, but this is what will be used for the sake of this guide.
+You can go ahead and try out both of these tasks now, and you should see Greenwood's default generated output, letting you know you've set everything up correctly.
+
+
+> _You can rename `develop` and `build` to whatever you like, but this is what will be used for the sake of this guide._
 
 
 ## Project Structure
-OK, almost there!  Last thing to go over is what a basic project structure for Greenwood will look like.  At this point, your project will probably looks something like this:
+OK, almost there!  Last thing to go over is what a basic project structure for Greenwood will look like.  At this point, your project should look something like this:
 ```shell
 $ tree
 .
@@ -66,7 +69,7 @@ $ tree
 └── package.json
 ```
 
-As we get ready to move on the next section, your project will need a "workspace", which is basically just the name of the directory where your project files will go in.  For now, let's just use Greenwood's default, which is _src/_.  After creating that directory, this is what your project structure should look like now:
+As we get ready to move on the next section, your project will need a "workspace", which is basically just the name of the directory where your project files will go in.  For now, let's just use Greenwood's default, which is a _src/_ directoey.  After creating that directory, this is what your project structure should look like now:
 
 ```shell
 $ tree
@@ -80,4 +83,4 @@ $ tree
 > At this point, if you are in `git` repository, it might be a good time to create a _.gitignore_ file and add `node_modules/` and `public/` to it.
 
 
-Ok, now what we have our project ready, there's just one last thing to review, but it's quick!  Please head on over to the next section in our guide on Greenwood's [Concepts](/getting-started/concepts), to understand how to get your project started.
+Ok, now what we have our project ready, there's just one last thing to review, but it's quick!  Please head on over to the next section in our guide on Greenwood's [Key Concepts](/getting-started/key-concepts).
