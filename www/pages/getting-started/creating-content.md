@@ -12,7 +12,9 @@ What we'll build:
 1. CSS - Some basic styles for our site
 
 To go along with this guide, check out the [getting started repo](https://github.com/thescientist13/greenwood-getting-started) that has a working example of all the issue covered in this Getting Started guide, including the code for this sample project.  In the end, what you will end up with a project looking something like this:
-```shell
+```render shell
+.
+├── package-lock.json
 ├── package.json
 └── src
     ├── components
@@ -28,7 +30,6 @@ To go along with this guide, check out the [getting started repo](https://github
     └── templates
         ├── blog-template.js
         └── page-template.js
-
 ```
 
 ## 1) Creating The Home Page
@@ -38,30 +39,28 @@ Out of the box, Greenwood provides some default content, so even if we use our n
 Neat!  But naturally you're here to learn how to make your own site, and this is goal here!  The first step towards making your site is to create a home page.  For this site, the home page will be a "full width" page.  
 
 1) For the template, create a _page-template.js_ in _src/templates/_ and include this code in it.
-```javascript
+```render javascript
 TBD
 ```
 
 2) For the content, create a markdown file called _index.md_ in _src/pages/_ and add some content to it, for example
-```md
+```render md
 # My Blog - Home Page
 This is the home page for my blog, thank you for visiting!
 ``` 
-
 
 ## 2) Development Server
 At this point we have two page templates and some home page content, so let's fire up the development server and see what things look like!
 
 1) Run our development command
-```shell
+```render bash
 # using the npm script we made during project setup
 $ npm start
 ```
 
 2) Once the development server is ready, it will let you know that you can now open `localhost:1984` in your web browser.  Doing so should yield you a page like this!
-```
+
 image TODO
-```
 
 
 Congrats, you've got your first Greenwood site running!  Now let's add some more content, styles, and a little branding to enhance things a little  bit more!
@@ -75,9 +74,11 @@ Congrats, you've got your first Greenwood site running!  Now let's add some more
 OK, so we've made some content now, but things look a little plain.  Adding some styles and images is easy in Greenwood.  
 
 #### CSS
+theme.css
 
 #### Assets
-
+logo
 
 ## 5) Reusable Components (Header / Footer)
+Any
 

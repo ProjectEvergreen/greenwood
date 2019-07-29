@@ -12,13 +12,13 @@ In this section, we will get to kick off our Greenwood project by:
 First thing we need to do is setup our project for installing Greenwood.  With Greenwood installed, you will be able to use its CLI to power the development of your project though automated scripts and configuration.
 
 First thing we need to do is generate a _package.json_ file so we can install Greenwood.  Easist way to do that is by running `npm init`:
-```shell
+```render shell
 # hit enter to accept all defaults, or provide your own values
 $ npm init
 ```
 
 Now we can install Greenwood
-```shell
+```render bash
 $ npm install @greenwood/cli --save-dev
 ```
 
@@ -31,13 +31,13 @@ All set!
 With Greenwood installed, let's create a couple of **npm** scripts so that we can automate our development workflows with easy to remember commands.
 
 In _package.json_, edit the `scripts` section accordingly:
-```shell
-# before
+```render json
+// before
 "scripts": {
   "test": "echo \"Error: no test specified\" && exit 1"
 },
 
-# after
+// after
 "scripts": {
   "build": "greenwood build",
   "start": "greenwood develop",
@@ -57,8 +57,7 @@ You can go ahead and try out both of these tasks now, and you should see Greenwo
 
 ## Project Structure
 OK, almost there!  Last thing to go over is what a basic project structure for Greenwood will look like.  At this point, your project should look something like this:
-```shell
-$ tree
+```render bash
 .
 ├── node_modules/
 ├── package-lock.json
@@ -67,8 +66,7 @@ $ tree
 
 As we get ready to move on the next section, your project will need a "workspace", which is basically just the name of the directory where your project files will go in.  For now, let's just use Greenwood's default, which is a _src/_ directoey.  After creating that directory, this is what your project structure should look like now:
 
-```shell
-$ tree
+```render bash
 .
 ├── node_modules/
 ├── package-lock.json

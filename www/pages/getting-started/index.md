@@ -21,7 +21,7 @@ Before going into the setup section of the tutorial, we want to make sure that e
 - Running scripts from the command line
 
 You can test that both are installed correctly from the command line by testing the output of the following commands:
-```shell
+```render bash
 $ node -v
 $ npm -v
 
@@ -33,7 +33,7 @@ $ npm -v
 ```
 
 Along with this, familiarity of the command line / terminal is also assumed as Greenwood is a command line tool, so all examples will assume a bash / shell like environment.  Example commands used in this guide are:
-```shell
+```render bash
 # create a directory for your project and change into it
 $ mkdir my-project
 $ cd my-project
