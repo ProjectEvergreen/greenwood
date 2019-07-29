@@ -1,82 +1,19 @@
 ## System Requirements
 
-This is the system requirements
-
-This is the system requirements
+Greenwood requires nodejs v10+ and depending on your method of install, you may require yarn v1.12+ , npm/npx v6+, and/or git.
 
 
-This is the system requirements
-This is the system requirements
+### NodeJS
 
-
-
-This is the system requirements
-
-
-This is the system requirements
-vThis is the system requirements
-
-
-
-This is the system requirements
-
-
-
-This is the system requirements
-
-This is the system requirements
-
-
-This is the system requirements
-This is the system requirements
-
-
-
-This is the system requirements
-
-
-This is the system requirements
-vThis is the system requirements
-
-
-
-This is the system requirements
-
-
-
-### NPM
-
-Instructions for NPM
-Instructions for NPM
-Instructions for NPM
-Instructions for NPM
-Instructions for NPM
-Instructions for NPM
-Instructions for NPM
-Instructions for NPM
-Instructions for NPM
-Instructions for NPM
+See [nodejs.org](https://nodejs.org/en/) for official instructions on installing nodejs for windows/mac/linux
 
 ### Yarn
 
-Instructions for yarn
-Instructions for yarn
-Instructions for yarn
-Instructions for yarn
-Instructions for yarn
-Instructions for yarn
-Instructions for yarn
-Instructions for yarn
-Instructions for yarn
-Instructions for yarn
-Instructions for yarn
-Instructions for yarn
-Instructions for yarn
+See [yarnpkg.com](https://yarnpkg.com/en/docs/install) for official instructions in installing yarn for your OS.
 
 ### Git
 
-Instructions for git
-Instructions for git
-Instructions for git
-Instructions for git
-Instructions for git
+See [GitHub help](https://help.github.com/en/articles/set-up-git) for instructions in installing and setting up github desktop client.
+
+---
+[Next Step: Installation](/getting-started/install)

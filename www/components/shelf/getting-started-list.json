@@ -24,36 +24,43 @@
   {
     "index": 2,
     "name": "Installing Greenwood",
-    "items": []
+    "items": [],
+    "path": "/getting-started/install"
   },
   {
     "index": 3,
     "name": "Project Structure",
-    "items": []
+    "items": [],
+    "path": "/getting-started/project-structure"
   },
   {
     "index": 4,
     "name": "Development",
-    "items": []
+    "items": [],
+    "path": "/getting-started/development"
   },
   {
     "index": 5,
     "name": "Creating Pages",
-    "items": []
+    "items": [],
+    "path": "/getting-started/creating-pages"
   },
   {
     "index": 6,
     "name": "Configuration",
-    "items": []
+    "items": [],
+    "path": "/getting-started/configuration"
   },
   {
     "index": 7,
     "name": "Custom Page Template",
-    "items": []
+    "items": [],
+    "path": "/getting-started/custom-page-templates"
   },
   {
     "index": 8,
     "name": "Building for Production",
-    "items": []
+    "items": [],
+    "path": "/getting-started/production"
   }
 ]

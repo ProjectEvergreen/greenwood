@@ -5,6 +5,7 @@ import '../components/footer/footer';
 import '@evergreen-wc/eve-container';
 import themeCss from '../styles/theme.css';
 import homeCss from '../styles/home.css';
+import syntaxCss from '../styles/syntax.css';
 
 MDIMPORT;
 METAIMPORT;
@@ -16,6 +17,7 @@ class HomeTemplate extends LitElement {
       <style>
         ${themeCss}
         ${homeCss}
+        ${syntaxCss}
       </style>
       METAELEMENT
       <div class='wrapper'>

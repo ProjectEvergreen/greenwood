@@ -1,6 +1,7 @@
 import { html, LitElement } from 'lit-element';
 import themeCss from '../styles/theme.css';
 import pageCss from '../styles/page.css';
+import syntaxCss from '../styles/syntax.css';
 import '../components/header/header';
 import '../components/footer/footer';
 import '@evergreen-wc/eve-container';
@@ -40,6 +41,7 @@ class PageTemplate extends LitElement {
       <style>
         ${themeCss}
         ${pageCss}
+        ${syntaxCss}
       </style>
       METAELEMENT
       <div class='wrapper'>
