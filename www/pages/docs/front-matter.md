@@ -14,7 +14,7 @@ title: 'Hello World'
 
 ```
 
-### Define Rendered Markdown Page Component
+### Define Markdown Page Component
 
 When this markdown file is compiled to a component it will automatically generate a component definition. If you want to use a pre-determined component name, you can give the component a label using the predefined variable `label`.
 

@@ -30,7 +30,18 @@
     "index": 1,
     "name": "Markdown",
     "path": "/docs/markdown",
-    "items": []
+    "items": [
+      {
+        "index": 0,
+        "name": "Syntax Highlighting",
+        "id": "syntax-highlighting"
+      },
+      {
+        "index": 0,
+        "name": "Components",
+        "id": "components"
+      }
+    ]
   },
   {
     "index": 2,
@@ -41,14 +52,41 @@
   {
     "index": 3,
     "name": "Templates",
-    "path": "/docs/templates",
-    "items": []
+    "path": "/docs/template",
+    "items": [
+      {
+        "index": 0,
+        "name": "App Templates",
+        "id": "app-templates"
+      },
+      {
+        "index": 0,
+        "name": "Page Templates",
+        "id": "page-templates"
+      }
+    ]
   },
   {
     "index": 4,
     "name": "Front Matter",
     "path": "/docs/front-matter",
-    "items": []
+    "items": [
+      {
+        "index": 0,
+        "name": "Define Markdown Page Component",
+        "id": "define-markdown-page-component"
+      },
+      {
+        "index": 0,
+        "name": "Define Template",
+        "id": "define-template"
+      },
+      {
+        "index": 0,
+        "name": "Import Files",
+        "id": "import-files"
+      }
+    ]
   },
   {
     "index": 5,

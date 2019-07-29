@@ -30,7 +30,7 @@ const hello = "world";
 
 ### Components
 
-From within the markdown, you can also render components, not just their syntax, by importing them via [front-matter](/docs/front-matter).
+From within the markdown you can also render components, not just their syntax, by importing them via [front-matter](/docs/front-matter).
 
 At the top of a `.md` file add:
 
@@ -42,7 +42,7 @@ imports:
 ```
 
 
-Below the front-matter, you can then render the component within html(assuming the component has a defined element name)
+Below the front-matter you can then render the component within html(assuming the component has a defined element name)
 
 ```render
 <hello text='world'></hello-world>
