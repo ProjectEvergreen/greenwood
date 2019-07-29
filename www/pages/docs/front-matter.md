@@ -10,11 +10,13 @@ Example:
 title: 'Hello World'
 ---
 
+# Hello World
+
 ```
 
 ### Define Rendered Markdown Page Component
 
-When this markdown file is compiled to a component it will automatically generate a component definition. If you want to use a pre-determined component name, you can give the component a label.
+When this markdown file is compiled to a component it will automatically generate a component definition. If you want to use a pre-determined component name, you can give the component a label using the predefined variable `label`.
 
 ```render md
 ---
@@ -27,7 +29,7 @@ Which will compile to the element: `<wc-md-mypage></wc-md-mypage>`
 
 ### Define Template
 
-If you want to define a custom page template that this markdown file will be rendered in, use the predefined variable 'template'
+If you want to define a custom page template that this markdown file will be rendered in, use the predefined variable `template`
 
 ```render md
 ---
@@ -43,7 +45,7 @@ By default, greenwood will look for a `templates/page-template.js` in your works
 
 ### Import files
 
-If you want to import custom files such as custom components you can do the following:
+If you want to import custom files such as custom components you can use the predefiend variable `imports` in the following way:
 
 ```render md
 ---
