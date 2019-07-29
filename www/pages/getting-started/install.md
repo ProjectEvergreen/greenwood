@@ -1,6 +1,6 @@
 ## Installation
 
-Make sure you have the pre-requsite [system requirements](/getting-started/system-requirements) already installed before installing greenwood.
+Make sure you have the prerequisite [system requirements](/getting-started/system-requirements) already installed before installing greenwood.
 
 Greenwood can be installed by cloning the repository or via package managers such as npm/yarn/npx.
 

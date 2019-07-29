@@ -33,3 +33,6 @@ Your project's directory should appear like this:
     ├── styles
     └── templates
 ```
+
+---
+[Next Step: Development](/getting-started/development)
