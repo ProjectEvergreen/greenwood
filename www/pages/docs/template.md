@@ -49,6 +49,8 @@ This imports the default greenwood meta component which handles all your configu
 
 The complete example can be found in the [greenwood source](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/page-template.js) which is the default page-template.js if no other is defined.
 
+With a completed page-template.js present in your `src/templates/` folder you can define which page uses it via front-matter at the top of any markdown file.  See [Front Matter Docs](/docs/front-matter#define-template) for more information
+
 ### App Templates
 
 In order to make an app template, you need to create a LitElement component that contains a number of pre-defined variables, elements, and imports. You need to do this in a file within your `src/templates/` directory named `app-template.js`.  **Note**: The filename must be named `app-template.js` to differentiate between app and page templates.
