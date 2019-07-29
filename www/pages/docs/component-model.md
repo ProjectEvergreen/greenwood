@@ -42,7 +42,9 @@ A simple example of a web component utilizing a basic [LitElement](https://lit-e
 **hello-world.js**
 ```render js
 
-class HelloWorld extends HTMLElement { {
+import { html, LitElement } from 'lit-element';
+
+class HelloWorld extends LitElement {
 
   constructor() {
     super();
