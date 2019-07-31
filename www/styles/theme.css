@@ -45,13 +45,15 @@ a {
 }
 
 .content-wrapper {
-  background-color: #efefef;
+  background-color: white;
 }
-  
+
 .wrapper {
+  background-color: white;
   font-family: 'Source Sans Pro', sans-serif;
-  
+
   & .single-column {
+    margin: inherit;
     color: #000;
   }
 }

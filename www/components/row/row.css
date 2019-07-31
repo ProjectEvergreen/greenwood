@@ -1,0 +1,20 @@
+:host {
+  margin-left: -0.25rem;
+  margin-right: -0.25rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  /* -ms-flex-flow: row wrap;
+  flex-flow: row wrap; */
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  /* justify-content: center; */
+  justify-content: space-around;
+  flex-direction: row;
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
+}
