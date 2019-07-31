@@ -36,7 +36,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public', 'index', 'not-found', 'hello', 'meta'], LABEL);
+    runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
 
     describe('Custom Page Template', function() {
       let dom;

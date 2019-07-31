@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf ./**/.greenwood/** && rimraf ./**/public/** && rimraf ./coverage",
-    "lint": "eslint \"./packages/**/**/*.js\" \"./scripts/*.js\" \"./test/**/**/*.js\"",
+    "lint": "eslint \"./packages/**/**/*.js\" \"./test/**/**/*.js\"",
     "build": "yarn clean && node ./packages/cli/index.js build",
     "serve": "yarn build && cd ./public && ws",
     "develop": "yarn clean && node ./packages/cli/index.js develop",
@@ -29,7 +29,6 @@
     "css-loader": "^2.1.1",
     "css-to-string-loader": "^0.1.3",
     "cssnano": "^4.1.10",
-    "eslint": "^5.15.3",
     "file-loader": "^3.0.1",
     "filewatcher-webpack-plugin": "^1.2.0",
     "front-matter": "^3.0.1",
@@ -46,7 +45,6 @@
     "pwa-helpers": "^0.9.1",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
-    "rimraf": "^2.6.3",
     "wc-markdown-loader": "^0.1.2",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
@@ -55,9 +53,8 @@
     "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
-    "aws-sdk": "^2.458.0",
     "chai": "^4.2.0",
-    "http-server": "^0.11.1",
+    "eslint": "^5.15.3",
     "mocha": "^6.1.4",
     "nyc": "^14.0.0",
     "rimraf": "^2.6.3"

@@ -33,9 +33,9 @@ class meta extends LitElement {
         const metaPropValue = Object.values(attr)[0];
         let metaContentVal = Object.values(attr)[1];
         
-        // insert origin domain into url
+        // join hostname and route together
         if (metaPropValue === 'og:url') {
-          metaContentVal = window.location.origin + metaContentVal;
+          metaContentVal = `${metaContentVal}${this.attributes.route}`;
         }
 
         meta.setAttribute(metaPropertyOrName, metaPropValue);

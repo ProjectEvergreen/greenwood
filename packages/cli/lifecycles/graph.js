@@ -68,8 +68,6 @@ const createGraphFromPages = async (pagesDir, config) => {
                 // set <title></title> element text, override with markdown title
                 title = title || config.title;
 
-                // TODO: Allow for other, per page, dynamic, meta data, merge meta array
-
                 /*
                 * Variable Definitions
                 *----------------------

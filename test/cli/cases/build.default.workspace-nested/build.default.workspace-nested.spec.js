@@ -24,7 +24,6 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../test-bed');
 
-// TODO why does this case need a src/pages/index.md?
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Default Workspace w/ Nested Directories';
   let setup;
@@ -39,7 +38,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
     
-    runSmokeTest(['public', 'not-found', 'index', 'meta'], LABEL);
+    runSmokeTest(['public', 'not-found', 'index'], LABEL);
 
     it('should create a default blog page directory', function() {
       expect(fs.existsSync(path.join(this.context.publicDir, './blog'))).to.be.true;

@@ -38,7 +38,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public', 'not-found', 'hello', 'meta'], LABEL);
+    runSmokeTest(['public', 'not-found', 'hello'], LABEL);
 
     describe('Custom Index (Home) page', function() {
       const indexPageHeading = 'Greenwood';
