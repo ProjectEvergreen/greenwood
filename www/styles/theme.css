@@ -1,5 +1,15 @@
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
 
+* {
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+}
+
+html {
+  background-color: #f0f0f0;
+}
+
 table {
   background-color: #334a5a;
   border-radius: 5px;
