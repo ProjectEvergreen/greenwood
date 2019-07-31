@@ -1,7 +1,9 @@
 import { html, LitElement } from 'lit-element';
 import '../components/banner/banner';
+import '../components/card/card.js';
 import '../components/header/header';
 import '../components/footer/footer';
+import '../components/row/row';
 import '@evergreen-wc/eve-container';
 import themeCss from '../styles/theme.css';
 import homeCss from '../styles/home.css';
