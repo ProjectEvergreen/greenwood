@@ -40,8 +40,18 @@ module.exports = ({ config, context }) => {
     to: path.join(context.publicDir, 'assets')
   }] : [];
 
-  return {
+  const commonCssLoaders = [
+    { loader: 'css-loader' },
+    { loader: 'postcss-loader', options:
+      {
+        config: {
+          path: path.join(__dirname)
+        }
+      }
+    }
+  ];
 
+  return {
     entry: {
       index: path.join(context.scratchDir, 'app', 'app.js')
     },
@@ -73,30 +83,16 @@ module.exports = ({ config, context }) => {
         }
       }, {
         test: /\.css$/,
-        exclude: /theme\.css/,
+        exclude: new RegExp(`${config.themeFile}`),
         loaders: [
           { loader: 'css-to-string-loader' },
-          { loader: 'css-loader' },
-          { loader: 'postcss-loader', options:
-            {
-              config: {
-                path: path.join(__dirname)
-              }
-            }
-          }
+          ...commonCssLoaders
         ]
       }, {
-        test: /theme\.css$/,
+        test: new RegExp(`${config.themeFile}`),
         loaders: [
           { loader: 'style-loader' },
-          { loader: 'css-loader' },
-          { loader: 'postcss-loader', options:
-            {
-              config: {
-                path: path.join(__dirname)
-              }
-            }
-          }
+          ...commonCssLoaders
         ]
       }, {
         test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
