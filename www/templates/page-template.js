@@ -1,5 +1,5 @@
 import { html, LitElement } from 'lit-element';
-import themeCss from '../styles/theme.css';
+import '../styles/theme.css';
 import pageCss from '../styles/page.css';
 import '../components/header/header';
 import '../components/footer/footer';
@@ -38,7 +38,6 @@ class PageTemplate extends LitElement {
   render() {
     return html`
       <style>
-        ${themeCss}
         ${pageCss}
       </style>
       METAELEMENT

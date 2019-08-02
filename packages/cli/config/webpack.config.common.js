@@ -73,8 +73,22 @@ module.exports = ({ config, context }) => {
         }
       }, {
         test: /\.css$/,
+        exclude: /theme\.css/,
         loaders: [
           { loader: 'css-to-string-loader' },
+          { loader: 'css-loader' },
+          { loader: 'postcss-loader', options:
+            {
+              config: {
+                path: path.join(__dirname)
+              }
+            }
+          }
+        ]
+      }, {
+        test: /theme\.css$/,
+        loaders: [
+          { loader: 'style-loader' },
           { loader: 'css-loader' },
           { loader: 'postcss-loader', options:
             {

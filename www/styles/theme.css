@@ -1,4 +1,17 @@
-@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+@import url('//fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+}
+html {
+  background-color: #f0f0f0;
+}
+
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+}
 
 table {
   background-color: #334a5a;
@@ -50,7 +63,6 @@ a {
 
 .wrapper {
   background-color: white;
-  font-family: 'Source Sans Pro', sans-serif;
 
   & .single-column {
     margin: inherit;
