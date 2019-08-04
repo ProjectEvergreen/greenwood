@@ -1,6 +1,5 @@
-
 ## Overview
-In the [previous section](/getting-started/project-setup) we setup our local development environment and installed Greenwood.  We also made a "workspace" for our project files as a directory called _src/_.
+In the [previous section](/getting-started/project-setup) we setup our local development environment and installed Greenwood.  We also made a "workspace" for our project files in a directory called _src/_.
 
 Although Greenwood works without any configuration or setup, (go ahead, run `npm run build`, you'll get a default site right out of the box!), you will of course want to create your own site with your own content.  
 
@@ -9,7 +8,7 @@ For this reason, the minimum requirements for a site that you will need to provi
 1. Template(s)
 1. Page(s)
 
-In this section, we hope you'll get a better understanding of these two key concepts and how they can be used to create as many layouts and pages as you need to build out your site however you need.
+In this section, we hope you'll get a better understanding of key concepts and how they can be used to create as many layouts and pages as you need to build out your own site however you need.
 
 ## Workspace
 In the project setup section, we created a _src/_ directory at the root of the directory of the project.  To Greenwood, this is called your workspace, and where are the files for your project need to reside, including the next two key concepts; templates and pages.
@@ -62,11 +61,11 @@ class PageTemplate extends LitElement {
 customElements.define('page-template', PageTemplate);
 ```
 
-> Don't worry too much about the lines after the `import`, this is discussed in more detail in our [docs](/docs/).
+> Don't worry too much about the capitalized expressions, this is discussed in more detail in our [docs](/docs/).
 
 
 ## Pages
-Pages are how you will create the content for your site by (generally) creating markdown files.  Simply make a _pages/_ directory in your workspace and Greenwood will start building them automatically.  By default, pages will build using the default page template (_page-template.js_).
+Pages are how you will create the content for your site by (generally) creating markdown files.  Simply make a _pages/_ directory in your workspace and Greenwood will start building them automatically.  By default, pages will build using the default page template: _page-template.js_.
 
 By adding our home page (index.md), our directory sturcture for a basic Greenwood application now looks like this:
 ```render bash
@@ -88,4 +87,4 @@ This is the home page built by Greenwood. Make your own pages in src/pages/index
 ```
 
 
-Ok, so with the key concepts of templates and page covered, you're now [ready to start](/getting-started/creating-content/) creating content and developing your first Greenwood site!
+Ok, so with the key concepts of workspaces, templates and pages covered, you're now ready to start [creating content](/getting-started/creating-content/) and developing your first Greenwood site!

@@ -1,30 +1,36 @@
 [
   {
     "index": 0,
+    "name": "Quick Start",
+    "path": "/getting-started/quick-start",
+    "items": []
+  }, {
+    "index": 1,
     "name": "Project Setup",
     "path": "/getting-started/project-setup",
     "items": []
-  },
-  {
-    "index": 1,
+  }, {
+    "index": 2,
     "name": "Key Concepts",
     "path": "/getting-started/key-concepts",
     "items": []
-  },
-  {
-    "index": 2,
+  }, {
+    "index": 3,
     "name": "Creating Content",
     "path": "/getting-started/creating-content",
     "items": []
-  },
-  {
-    "index": 3,
+  }, {
+    "index": 4,
+    "name": "Components and Styles",
+    "path": "/getting-started/branding",
+    "items": []
+  }, {
+    "index": 5,
     "name": "Production",
     "path": "/getting-started/production",
     "items": []
-  },
-  {
-    "index": 4,
+  }, {
+    "index": 6,
     "name": "Next Steps",
     "path": "/getting-started/next-steps",
     "items": []

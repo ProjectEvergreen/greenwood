@@ -27,7 +27,7 @@ All set!
 > _At this point, if you are in `git` repository, it might be a good time to create a _.gitignore_ and add `_ node_modules` to it._
 
 
-## Configuring Development Workflows
+## Configuring Workflows
 With Greenwood installed, let's create a couple of **npm** scripts so that we can automate our development workflows with easy to remember commands.
 
 In _package.json_, edit the `scripts` section accordingly:
@@ -40,8 +40,7 @@ In _package.json_, edit the `scripts` section accordingly:
 // after
 "scripts": {
   "build": "greenwood build",
-  "start": "greenwood develop",
-  "test": "echo \"Error: no test specified\" && exit 1"
+  "start": "greenwood develop"
 },
 ```
 
@@ -52,7 +51,7 @@ Now, you'll be able to do two things:
 You can go ahead and try out both of these tasks now, and you should see Greenwood's default generated output, letting you know you've set everything up correctly.
 
 
-> _You can rename `develop` and `build` to whatever you like, but this is what will be used for the sake of this guide._
+> _You can rename `build` and `start` to whatever you like, but this is what will be used for the sake of this guide._
 
 
 ## Project Structure
@@ -74,7 +73,7 @@ As we get ready to move on the next section, your project will need a "workspace
 └── src/
 ```
 
-> At this point, if you are in `git` repository, it might be a good time to create a _.gitignore_ file and add `node_modules/` and `public/` to it.
+> At this point, if you are in `git` repository, it might be a good time to create a _.gitignore_ file and add the following directories: `.greenwood/`, `node_modules/` and `public/`.
 
 
-Ok, now what we have our project ready, there's just one last thing to review, but it's quick!  Please head on over to the next section in our guide on Greenwood's [Key Concepts](/getting-started/key-concepts).
+Ok, now what we have our project ready, there's just one last thing to review, but it's quick!  Please head on over to the next section in our guide to learn about Greenwood's [key concepts](/getting-started/key-concepts).

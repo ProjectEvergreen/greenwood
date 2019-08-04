@@ -13,7 +13,7 @@ However, to get things started, we first want to make sure everyone can get thei
 1. Building for production, and hosting
 
 ## Prequisites
-Before going into the setup section of the tutorial, we want to make sure that everyone is aware of the expectations and assumptions this guide (and Greenwood) make about you the user.  
+Before going into the setup section of the tutorial, we want to make sure that everyone is aware of the expectations and assumptions this guide (and Greenwood) make.
 
 #### NodeJS and the Command Line (CLI)
 [NodeJS](https://nodejs.org/) is the environment used for running Greenwood (from the command line).  We recommend installing the _LTS_ version of NodeJS onto your machine and being familliar with [**npm**](https://www.npmjs.com/), the package manager that comes with NodeJS.  The command line will be the primary mechanism for:
