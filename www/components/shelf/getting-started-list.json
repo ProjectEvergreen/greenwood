@@ -21,13 +21,13 @@
     "items": []
   }, {
     "index": 4,
-    "name": "Components and Styles",
+    "name": "Styles and Web Components",
     "path": "/getting-started/branding",
     "items": []
   }, {
     "index": 5,
-    "name": "Production",
-    "path": "/getting-started/production",
+    "name": "Build and Deploy",
+    "path": "/getting-started/build-and-deploy",
     "items": []
   }, {
     "index": 6,

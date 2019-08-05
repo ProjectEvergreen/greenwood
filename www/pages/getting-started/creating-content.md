@@ -9,7 +9,7 @@ What we'll build in this section:
 1. Blog Page Template: Two column layout for our blog posts
 1. Blog Posts - A few sample pages of content to get you going
 
-To go along with this guide, check out the [getting started repo](https://github.com/thescientist13/greenwood-getting-started) that has a working example of all the issue covered in this Getting Started guide, including the code for this sample project.  In the end, what you will end up with a project looking something like this:
+To go along with this guide, check out our [companion repo](https://github.com/thescientist13/greenwood-getting-started) that has a working example of all the code covered in this Getting Started guide.  In the end, what you will end up with a project looking something like this:
 ```render shell
 .
 ├── package-lock.json
@@ -30,7 +30,7 @@ To go along with this guide, check out the [getting started repo](https://github
         └── page-template.js
 ```
 
-## 1) Creating The Home Page (Template)
+## 1) Creating The Home Page Template
 Out of the box, Greenwood provides some default content, so even if we use our npm build script, `npm build` right now, we will get a working site in the public directory.  (go ahead and try it out!)
 
 
@@ -38,39 +38,99 @@ Neat!  But naturally you're here to learn how to make your own site, and this is
 
 1) For the template, create a _page-template.js_ in _src/templates/_ and include this code in it.
 ```render javascript
-TBD
+import { html, LitElement } from 'lit-element';
+MDIMPORT;
+
+class PageTemplate extends LitElement {
+
+  constructor() {
+    super();
+  }
+
+  render() {
+    return html\`
+      <div>
+        <entry></entry>
+      </div>
+    \`;
+  }
+}
+
+customElements.define('page-template', PageTemplate);
 ```
 
-2) For the content, create a markdown file called _index.md_ in _src/pages/_ and add some content to it, for example
-```render md
-# My Blog - Home Page
-This is the home page for my blog, thank you for visiting!
-``` 
+We'll use this and our blog post template momentarily.
 
+## 2) Creating The Blog Page Template
+We just made a template for our home page, but for our blog posts, we're going to want a different layout for that.  So what do we do?   Just create a new template!
 
-## 2) Creating The Blog Page (Template)
-Aside fromOut of the box, Greenwood provides some default content, so even if we use our npm build script, `npm build` right now, we will get a working site in the public directory.  (go ahead and try it out!)
-
-
-Neat!  But naturally you're here to learn how to make your own site, and this is goal here!  The first step towards making your site is to create a home page.  For this site, the home page will be a "full width" page.  
-
-1) For the template, create a _page-template.js_ in _src/templates/_ and include this code in it.
+Create a _blog-template.js_ in _src/templates/_ and include this code in it.
 ```render javascript
-TBD
+import { html, LitElement } from 'lit-element';
+MDIMPORT;
+
+class BlogTemplate extends LitElement {
+
+  constructor() {
+    super();
+  }
+
+  render() {
+    return html\`
+      <div>
+        <entry></entry>
+      </div>
+    \`;
+  }
+}
+
+customElements.define('blog-template', BlogTemplate);
 ```
 
-2) For the content, create a markdown file called _index.md_ in _src/pages/_ and add some content to it, for example
+## 3) Creating Pages
+To make our home page which will use the default page-template.js layout we just created, create an _index.md_ file in the _src/pages/_ directory.
+
 ```render md
-# My Blog - Home Page
-This is the home page for my blog, thank you for visiting!
-``` 
+## Home Page
+
+This is the Getting Started home page!
+
+### My Posts
+- [my-second-post](/blog/second-post/)
+- [my-first-post](/blog/first-post/)
+```
 
 
-## 3) Creating Blog Posts (Pages)
+For your blog posts, we can give them their own unique URLs by simply putting them in their own directoy and so by default Greenwood will "slugify" based on that filepath.  
 
+First you'll want to create a folder called _blog/_ in _src/pages/_ and then create two markdown files called _first-post.md_ and _second-post.md_.  We are using something called ["front matter"](/) to specify that these pages should use the _blog-template.js_ we just created.
+
+_first-post.md_
+```render md
+---
+template: 'blog'
+---
+
+## My First Blog Post
+Lorem Ipsum
+
+[back](/)
+```
+
+_second-post.md_
+```render md
+---
+template: 'blog'
+---
+
+## My Second Blog Post
+Lorem Ipsum
+
+[back](/)
+```
 
 ## 4) Development Server
-At this point we have two page templates and some home page content, so let's fire up the development server and see what things look like!
+At this point we have two page templates and content, so let's fire up the development server and see what things look like!
 
 1) Run our development command
 ```render bash
@@ -83,6 +143,4 @@ $ npm start
 image TODO
 
 
-Congrats, you've got your first Greenwood site running!  Now let's add some more content, styles, and a little branding to enhance things a little  bit more!
-
-
+Congrats, you've got your first Greenwood site running!  It's coming along but still needs a  little work.  In the section, we'll add create resuable Web Components for our header and footer as well as some CSS for styling.

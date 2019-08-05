@@ -10,6 +10,7 @@ However, to get things started, we first want to make sure everyone can get thei
 1. Setting up your workspace and installing Greenwood
 1. Reviewing the concepts of "pages" and "templates"
 1. Creating content and developing locally
+1. CSS and Web Components
 1. Building for production, and hosting
 
 ## Prequisites
@@ -28,6 +29,7 @@ $ npm -v
 # for example
 $ node -v
 v10.15.1
+
 $ npm -v
 6.4.1
 ```
