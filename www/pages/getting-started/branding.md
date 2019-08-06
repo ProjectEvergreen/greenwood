@@ -1,11 +1,13 @@
 ## CSS and Web Components
 
-So now that we've made some [content](/getting-started/creating-content/) for our site, I think we can agree it's not quite all "there" yet.
-1. Header / Footer - A great case for creating some reusble components. With Custom Elements, we can create self contained reusable components for our site.
+So now that we've made some [content](/getting-started/creating-content/) for our site, I think we can agree it's not quite all "there" yet and could benefit from a little styling and branding.  
+
+In this section, we will create the following:
+1. Header / Footer - The elements provide a great case for creating some reusble components and with Custom Elements, we can create self contained reusable components for our site.
 1. Styles - Of course we want things to look nice too!  We'll add some CSS to help hang things in just right the place.
 
 ## Web Components
-Web Components are supported out of the box with Greenwood using `HTMLElement` or **LitElement**.  For this guide, we'll use a "vanilla" custom element for our header, at _src/components/header.js_.  
+Web Components are supported out of the box with Greenwood using `HTMLElement` or **LitElement**.  For this guide, we'll use a "vanilla" custom element for our header, in _src/components/header.js_.  
 ```render javascript
 class HeaderComponent extends HTMLElement {
   constructor() {
@@ -70,10 +72,11 @@ customElements.define('page-template', PageTemplate);
 You can also do the same for a footer.
 
 ## CSS
-OK, so we've made some content and some custom component, but what about the look and feel? Yes, of course, let's add some CSS!
+OK, so we've made some content and some custom components, but what about the look and feel? Yes, of course, let's add some CSS!
 
-For global styles, Greenwood provides a simple mechanism by simply creating a file called _src/styles/theme.css_ and put any truly global styles we want to apply to our site, like Google fonts, background colors, or browser resets.  Here are some styles we can add to our site to snap things into place a little bit.
+For global styles like  like Google fonts, background colors, or browser resets, create a file called _src/styles/theme.css_ and Greenwood will make sure these styles get applied in the `<head>` of the doucment, outside of any Shadow roots. 
 
+Here are some styles you can add to your site to snap things into place a little bit.
 _theme.css_
 ```render css
 @import url('//fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
@@ -89,7 +92,7 @@ body {
 }
 ```
 
-Now we can `import` this CSS into our templates.
+Now we can `import` this CSS file into our templates.
 ```render javascript
 import { html, LitElement } from 'lit-element';
 import '../components/header';
@@ -104,7 +107,7 @@ class PageTemplate extends LitElement {
 }
 ```
 
-Within our components, we can easily add some styles right within our component definintion itself, for example in our header component, we can style it like this and take advantage of the [Shadow DOM]().
+Within our components, we can easily add some styles right within the component definintion itself. For example in our header component, we can style it like this and take advantage of the Shadow DOM.
 
 ```render javascript
 class HeaderComponent extends HTMLElement {
@@ -121,7 +124,7 @@ class HeaderComponent extends HTMLElement {
   getTemplate() {
     return \`
       <style>
-        :host{
+        header {
           color: blue;
         }
       </style>

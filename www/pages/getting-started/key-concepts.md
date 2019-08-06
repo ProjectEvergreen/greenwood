@@ -13,7 +13,7 @@ In this section, we hope you'll get a better understanding of key concepts and h
 ## Workspace
 In the project setup section, we created a _src/_ directory at the root of the directory of the project.  To Greenwood, this is called your workspace, and where are the files for your project need to reside, including the next two key concepts; templates and pages.
 
-This starts our project with this structure:
+This gives our project the following structure:
 ```render bash
 .
 ├── package-lock.json
@@ -28,7 +28,7 @@ This starts our project with this structure:
 Templates are used to define the various layouts you will need for your site and should be put into a _templates/_ directory in your workspace directory.  You will need to define at least one page template for your project in order to get control over the output of your site, called _page-tempate.js_. 
 
 
-So using the project structure we setup previously, with a default template to handle page generation would now look like this:
+So using the project structure we setup previously, adding your own custom page layout would leave you with a directory layout ike this:
 ```render bash
 .
 ├── package-lock.json
@@ -67,7 +67,7 @@ customElements.define('page-template', PageTemplate);
 ## Pages
 Pages are how you will create the content for your site by (generally) creating markdown files.  Simply make a _pages/_ directory in your workspace and Greenwood will start building them automatically.  By default, pages will build using the default page template: _page-template.js_.
 
-By adding our home page (index.md), our directory sturcture for a basic Greenwood application now looks like this:
+By adding a home page (_index.md_), your directory sturcture for a basic Greenwood application would now look like this:
 ```render bash
 .
 ├── package-lock.json
@@ -79,7 +79,7 @@ By adding our home page (index.md), our directory sturcture for a basic Greenwoo
         └── page-template.js
 ```
 
-And the sample home page provided by Greenwood out of the box looks like this
+And the sample home page provided by Greenwood out of the box looks like this:
 ```render md
 ### Greenwood
 
