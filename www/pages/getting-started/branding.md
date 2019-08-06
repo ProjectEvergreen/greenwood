@@ -74,7 +74,7 @@ You can also do the same for a footer.
 ## CSS
 OK, so we've made some content and some custom components, but what about the look and feel? Yes, of course, let's add some CSS!
 
-For global styles like  like Google fonts, background colors, or browser resets, create a file called _src/styles/theme.css_ and Greenwood will make sure these styles get applied in the `<head>` of the doucment, outside of any Shadow roots. 
+For global styles like Google fonts, background colors, or browser resets, create a file called _src/styles/theme.css_ and Greenwood will make sure these styles get applied in the `<head>` of the doucment, outside of any Shadow roots. 
 
 Here are some styles you can add to your site to snap things into place a little bit.
 _theme.css_
