@@ -2,28 +2,79 @@
   {
     "index": 0,
     "name": "Quick Start",
-    "path": "/getting-started/quick-start",
-    "items": []
+    "path": "/getting-started/quick-start"
   }, {
     "index": 1,
     "name": "Project Setup",
     "path": "/getting-started/project-setup",
-    "items": []
+    "items": [{
+      "index": 0,
+      "name": "Installing Greenwood",
+      "id": "installing-greenwood"
+    }, {
+      "index": 1,
+      "name": "Configuring Workflows",
+      "id": "configuring-workflows"
+    }, {
+      "index": 2,
+      "name": "Project Structures",
+      "id": "project-structures"
+    }]
   }, {
     "index": 2,
     "name": "Key Concepts",
     "path": "/getting-started/key-concepts",
-    "items": []
+    "items": [{
+      "index": 0,
+      "name": "Workspaces",
+      "id": "workspaces"
+    }, {
+      "index": 1,
+      "name": "Templates",
+      "id": "templates"
+    }, {
+      "index": 2,
+      "name": "Pages",
+      "id": "pages"
+    }]
   }, {
     "index": 3,
     "name": "Creating Content",
     "path": "/getting-started/creating-content",
-    "items": []
+    "items": [{
+      "index": 0,
+      "name": "Objectives",
+      "id": "objectives"
+    }, {
+      "index": 1,
+      "name": "Home Page",
+      "id": "home-page"
+    }, {
+      "index": 2,
+      "name": "Blog Page",
+      "id": "blog-page"
+    }, {
+      "index": 3,
+      "name": "Creating Pages",
+      "id": "creating-pages"
+    }, {
+      "index": 4,
+      "name": "Development Server",
+      "id": "development-server"
+    }]
   }, {
     "index": 4,
     "name": "Styles and Web Components",
     "path": "/getting-started/branding",
-    "items": []
+    "items": [{
+      "index": 0,
+      "name": "Web Components",
+      "id": "web-components"
+    }, {
+      "index": 1,
+      "name": "CSS",
+      "id": "css"
+    }]
   }, {
     "index": 5,
     "name": "Build and Deploy",

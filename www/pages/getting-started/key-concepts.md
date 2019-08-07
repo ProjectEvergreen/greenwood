@@ -10,7 +10,7 @@ For this reason, the minimum requirements for a site that you will need to provi
 
 In this section, we hope you'll get a better understanding of key concepts and how they can be used to create as many layouts and pages as you need to build out your own site however you need.
 
-## Workspace
+### Workspace
 In the project setup section, we created a _src/_ directory at the root of the directory of the project.  To Greenwood, this is called your workspace, and where are the files for your project need to reside, including the next two key concepts; templates and pages.
 
 This gives our project the following structure:
@@ -24,7 +24,7 @@ This gives our project the following structure:
 > Aside from these templates and pages directories, you can use any name you want for your other directories since your templates will be able to use `import` to pull in anything you need.  This will be demonstrated more fully in the next section.
 
 
-## Templates
+### Templates
 Templates are used to define the various layouts you will need for your site and should be put into a _templates/_ directory in your workspace directory.  You will need to define at least one page template for your project in order to get control over the output of your site, called _page-tempate.js_. 
 
 
@@ -64,7 +64,7 @@ customElements.define('page-template', PageTemplate);
 > Don't worry too much about the capitalized expressions, this is discussed in more detail in our [docs](/docs/).
 
 
-## Pages
+### Pages
 Pages are how you will create the content for your site by (generally) creating markdown files.  Simply make a _pages/_ directory in your workspace and Greenwood will start building them automatically.  By default, pages will build using the default page template: _page-template.js_.
 
 By adding a home page (_index.md_), your directory sturcture for a basic Greenwood application would now look like this:

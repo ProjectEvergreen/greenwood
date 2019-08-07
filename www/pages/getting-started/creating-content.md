@@ -1,7 +1,7 @@
 ## Overview
 After setting up our [project workspace](/getting-started/project-setup/) and reviewing some of Greenwood's [key concepts](/getting-started/key-concepts/), it's now time to get to the good stuff: writing some content and building your first site!
 
-## Objectives
+### Objectives
 In this section, we'll walk through developing a site with Greenwood, and making some content.  We'll provide all the content, so you can just follow along.  By the end, you'll have a simple blog starter that you can build and deploy to any web server you like, be it Netlify, Apache, Express, or S3.  What you do from there, is all up to you!  
 
 What we'll build in this section:
@@ -30,7 +30,7 @@ To go along with this guide, check out our [companion repo](https://github.com/t
         └── page-template.js
 ```
 
-## 1) Creating The Home Page Template
+### Home Page
 Out of the box, Greenwood provides some default content, so even if we use our npm build script, `npm build` right now, we will get a working site in the public directory.  (go ahead and try it out!)
 
 
@@ -61,7 +61,7 @@ customElements.define('page-template', PageTemplate);
 
 > We'll use this and our blog post template momentarily.
 
-## 2) Creating The Blog Page Template
+### Blog Page
 We just made a template for our home page, but for our blog posts, we're going to want a different layout for that.  So what do we do?   Just create a new template!
 
 Create a _blog-template.js_ in _src/templates/_ and include this code in it.
@@ -87,7 +87,7 @@ class BlogTemplate extends LitElement {
 customElements.define('blog-template', BlogTemplate);
 ```
 
-## 3) Creating Pages
+### Creating Pages
 To make our home page which will use the default _page-template.js_ layout we just created, create an _index.md_ file in the _src/pages/_ directory.
 
 ```render md
@@ -129,7 +129,7 @@ Lorem Ipsum
 [back](/)
 ```
 
-## 4) Development Server
+### Development Server
 At this point we have two page templates and three pages of content, so let's fire up the Greenwood development server and see what things look like!
 
 1) Run our development command

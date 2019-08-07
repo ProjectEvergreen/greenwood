@@ -8,7 +8,7 @@ In this section, we will kick off our Greenwood project by:
 
 > _This guide assumes you are starting from an **empty** directory (`git init` being the exception).  We recommend going through this guide once to understand the basics and from there, you can explore our [documentation](/docs/) to learn more about all of Greenwood's capabilities._
 
-## Installing Greenwood
+### Installing Greenwood
 First thing we need to do is setup our project for installing Greenwood.  With Greenwood installed, you will be able to use its CLI to power the development of your project though automated scripts and configuration.
 
 First thing we need to do is generate a _package.json_ file so we can install Greenwood.  The easist way to do that is by running `npm init` from the root directory of where you want to start your project :
@@ -24,7 +24,7 @@ $ npm install @greenwood/cli --save-dev
 
 All set!
 
-## Configuring Workflows
+### Configuring Workflows
 With Greenwood installed, let's create a couple of **npm** scripts so that we can automate our development workflows with easy to remember commands.
 
 In _package.json_, edit the `scripts` section accordingly:
@@ -51,7 +51,7 @@ You can go ahead and try out both of these tasks now, and you should see Greenwo
 > _You can rename `build` and `start` to whatever you like, but this is what will be used for the sake of this guide._
 
 
-## Project Structure
+### Project Structure
 OK, almost there!  Let's quickly review what a basic project structure for Greenwood will look like.  At this point, your project should look something like this:
 ```render bash
 .

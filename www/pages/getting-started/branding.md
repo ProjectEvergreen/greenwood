@@ -6,7 +6,7 @@ In this section, we will create the following:
 1. Header / Footer - The elements provide a great case for creating some reusble components and with Custom Elements, we can create self contained reusable components for our site.
 1. Styles - Of course we want things to look nice too!  We'll add some CSS to help hang things in just right the place.
 
-## Web Components
+### Web Components
 Web Components are supported out of the box with Greenwood using `HTMLElement` or **LitElement**.  For this guide, we'll use a "vanilla" custom element for our header, in _src/components/header.js_.  
 ```render javascript
 class HeaderComponent extends HTMLElement {
@@ -71,7 +71,7 @@ customElements.define('page-template', PageTemplate);
 
 You can also do the same for a footer.
 
-## CSS
+### CSS
 OK, so we've made some content and some custom components, but what about the look and feel? Yes, of course, let's add some CSS!
 
 For global styles like Google fonts, background colors, or browser resets, create a file called _src/styles/theme.css_ and Greenwood will make sure these styles get applied in the `<head>` of the doucment, outside of any Shadow roots. 
