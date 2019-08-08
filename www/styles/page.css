@@ -1,3 +1,6 @@
+/* https://prismjs.com/examples.html */
+@import url('../../node_modules/prismjs/themes/prism-tomorrow.css');
+
 :host {
   & h3 {
     color: green;

@@ -1,11 +1,12 @@
 import { html, LitElement } from 'lit-element';
-import '../styles/theme.css';
-import pageCss from '../styles/page.css';
+import Prism from 'prismjs'; // eslint-disable-line no-unused-vars
 import '../components/header/header';
 import '../components/footer/footer';
 import '@evergreen-wc/eve-container';
 import '../components/shelf/shelf';
 import '../components/scroll/scroll';
+import pageCss from '../styles/page.css';
+import '../styles/theme.css';
 
 MDIMPORT;
 METAIMPORT;

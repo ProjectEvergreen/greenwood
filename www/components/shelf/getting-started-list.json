@@ -1,59 +1,89 @@
 [
   {
     "index": 0,
-    "name": "System Requirements",
-    "path": "/getting-started/system-requirements",
-    "items": [
-      {
-        "index": 0,
-        "name": "NodeJS",
-        "id": "nodejs"
-      },
-      {
-        "index": 1,
-        "name": "npm / yarn",
-        "id": "npm"
-      },
-      {
-        "index": 2,
-        "name": "git",
-        "id": "git"
-      }
-    ]
-  },
-  {
+    "name": "Quick Start",
+    "path": "/getting-started/quick-start"
+  }, {
+    "index": 1,
+    "name": "Project Setup",
+    "path": "/getting-started/project-setup",
+    "items": [{
+      "index": 0,
+      "name": "Installing Greenwood",
+      "id": "installing-greenwood"
+    }, {
+      "index": 1,
+      "name": "Configuring Workflows",
+      "id": "configuring-workflows"
+    }, {
+      "index": 2,
+      "name": "Project Structures",
+      "id": "project-structures"
+    }]
+  }, {
     "index": 2,
-    "name": "Installing Greenwood",
-    "items": []
-  },
-  {
+    "name": "Key Concepts",
+    "path": "/getting-started/key-concepts",
+    "items": [{
+      "index": 0,
+      "name": "Workspaces",
+      "id": "workspaces"
+    }, {
+      "index": 1,
+      "name": "Templates",
+      "id": "templates"
+    }, {
+      "index": 2,
+      "name": "Pages",
+      "id": "pages"
+    }]
+  }, {
     "index": 3,
-    "name": "Project Structure",
-    "items": []
-  },
-  {
+    "name": "Creating Content",
+    "path": "/getting-started/creating-content",
+    "items": [{
+      "index": 0,
+      "name": "Objectives",
+      "id": "objectives"
+    }, {
+      "index": 1,
+      "name": "Home Page",
+      "id": "home-page"
+    }, {
+      "index": 2,
+      "name": "Blog Page",
+      "id": "blog-page"
+    }, {
+      "index": 3,
+      "name": "Creating Pages",
+      "id": "creating-pages"
+    }, {
+      "index": 4,
+      "name": "Development Server",
+      "id": "development-server"
+    }]
+  }, {
     "index": 4,
-    "name": "Development",
-    "items": []
-  },
-  {
+    "name": "Styles and Web Components",
+    "path": "/getting-started/branding",
+    "items": [{
+      "index": 0,
+      "name": "Web Components",
+      "id": "web-components"
+    }, {
+      "index": 1,
+      "name": "CSS",
+      "id": "css"
+    }]
+  }, {
     "index": 5,
-    "name": "Creating Pages",
+    "name": "Build and Deploy",
+    "path": "/getting-started/build-and-deploy",
     "items": []
-  },
-  {
+  }, {
     "index": 6,
-    "name": "Configuration",
-    "items": []
-  },
-  {
-    "index": 7,
-    "name": "Custom Page Template",
-    "items": []
-  },
-  {
-    "index": 8,
-    "name": "Building for Production",
+    "name": "Next Steps",
+    "path": "/getting-started/next-steps",
     "items": []
   }
 ]
