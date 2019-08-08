@@ -5,7 +5,7 @@ import '../components/header/header';
 import '../components/footer/footer';
 import '../components/row/row';
 import '@evergreen-wc/eve-container';
-import themeCss from '../styles/theme.css';
+import '../styles/theme.css';
 import homeCss from '../styles/home.css';
 
 MDIMPORT;
@@ -16,7 +16,6 @@ class HomeTemplate extends LitElement {
   render() {
     return html`
       <style>
-        ${themeCss}
         ${homeCss}
       </style>
       METAELEMENT

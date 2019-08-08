@@ -12,8 +12,9 @@ module.exports = async (url, label, route, outputDirectory) => {
 
   const renderer = new Renderer(browser);
   const result = await renderer.serialize(url);
-  
-  const dom = new JSDOM(result.content);
+
+  // need url: https://github.com/jsdom/jsdom/issues/2005
+  const dom = new JSDOM(result.content, { url });
   const html = dom.serialize();
   const target = path.join(outputDirectory, route);
 

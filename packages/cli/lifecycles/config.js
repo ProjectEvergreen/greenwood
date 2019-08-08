@@ -10,7 +10,8 @@ let defaultConfig = {
   },
   publicPath: '/',
   title: 'Greenwood App',
-  meta: []
+  meta: [],
+  themeFile: 'theme.css'
 };
 
 module.exports = readAndMergeConfig = async() => {
@@ -22,7 +23,7 @@ module.exports = readAndMergeConfig = async() => {
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));        
-        const { workspace, devServer, publicPath, title, meta } = userCfgFile;
+        const { workspace, devServer, publicPath, title, meta, themeFile } = userCfgFile;
           
         // workspace validation
         if (workspace) {
@@ -67,6 +68,13 @@ module.exports = readAndMergeConfig = async() => {
 
         if (meta && meta.length > 0) {
           customConfig.meta = meta;
+        }
+
+        if (themeFile) {
+          if (typeof themeFile !== 'string' && themeFile.indexOf('.') < 1) {
+            reject(`Error: greenwood.config.js themeFile must be a valid filename. got ${themeFile} instead.`);
+          }
+          customConfig.themeFile = themeFile;
         }
 
         if (devServer && Object.keys(devServer).length > 0) {

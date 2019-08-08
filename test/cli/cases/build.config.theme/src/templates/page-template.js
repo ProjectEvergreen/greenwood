@@ -1,6 +1,5 @@
 import { html, LitElement } from 'lit-element';
-import '../styles/theme.css';
-import css from '../styles/style.css';
+import '../styles/my-brand.css';
 MDIMPORT;
 METAIMPORT;
 METADATA;
@@ -8,9 +7,6 @@ METADATA;
 class PageTemplate extends LitElement {
   render() {
     return html`
-      <style>
-        ${css}
-      </style>
       METAELEMENT
       <div class='wrapper'>
         <div class='page-template content owen-test'>
