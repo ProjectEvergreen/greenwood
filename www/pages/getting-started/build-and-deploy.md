@@ -16,7 +16,7 @@ If you'll recall from the project setup section, we created an npm script for ru
 
 And from the command line, run `npm run build`.  That's it!
 
-If you look in your project directory, you will now have a _public/_ directory that will contain all the static assets you will need to deploy your site.  At this point, you can now put these assets on any web server like Apache, S3, Express, or Netlify (which is what this website uses)
+If you look in your project directory, you will now have a _public/_ directory that will contain all the static assets (HTML / CSS / JS / fonts / images) you will need to deploy your site.  At this point, you can now put these assets on any web server like Apache, S3, Express, or Netlify (which is what this website uses).
 
 ### Deploying and Hosting
 There are many ways to host and deploy a web site, but essentially any static hosting or web server will work for Greenwood, which keeps things simple and easy to setup.  No servers needed if you don't need them!  
@@ -27,3 +27,5 @@ For the Greenwood website, our code is in [GitHub](https://github.com/ProjectEve
 
 
 We hope to add more guides for common hosting solutions but the beauty of Greenwood and static sites is that they can run just about anywhere with little or no configuration at all.
+
+Ok, let's [wrap this all up](/getting-started/next-steps/) and let you get on with building the rest of your site!

@@ -8,9 +8,9 @@ First off, thank you for taking the time to check out Greenwood!  As a tool, we 
 ## Your First Project
 To get things started, we first want to make sure everyone can get their first project up and running as easily and quickly as possible, and so through this guide, we will help walk you through everything you need to get started with your first project, including:
 1. Setting up your workspace and installing Greenwood
-1. Reviewing key concepts of a Greenwood
+1. Reviewing key concepts of Greenwood
 1. Creating content and developing locally
-1. CSS and Web Components
+1. Authoring Web Components and adding CSS
 1. Building and hosting for production
 
 ## Prequisites
@@ -35,7 +35,7 @@ $ npm -v
 6.4.1
 ```
 
-Along with this, familiarity of the command line / terminal is also assumed as Greenwood is a command line tool, so all examples will assume a bash / shell like environment.  Example commands used in this guide are:
+Along with this, familiarity of the command line / terminal is also assumed as Greenwood is a command line tool, and so all examples will assume a bash / shell like environment.  Example commands used in this guide are:
 ```render bash
 # create a directory for your project and change into it
 $ mkdir my-project
@@ -52,3 +52,6 @@ $ npm run develop
 No advanced JavaScript / CSS experience is needed for using Greenwood.  Just knowing some [markdown](https://daringfireball.net/projects/markdown/) and following some basic steps from the command line will be enough to get you up and running quickly.  
 
 We like to think that that as your experience grows, so can the way you build your site.  Greenwood has very few opinions on how you structure your site or what you're trying to build or how and so our hope is to provide you a developer experience that is conduscive to modern web development.
+
+## Tutorials
+So if you're ready to get started, let's get [your first project setup](/getting-started/project-setup/)!  Or if you just want to "code and go", check out our [quick start](/getting-started/quick-start/).

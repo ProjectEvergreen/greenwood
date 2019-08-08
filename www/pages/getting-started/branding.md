@@ -1,8 +1,8 @@
 ## CSS and Web Components
 
-So now that we've made some [content](/getting-started/creating-content/) for our site, I think we can agree it's not quite all "there" yet and could benefit from a little styling and branding.  
+So now that we've made some [content](/getting-started/creating-content/) for your site, I think we can agree it's not quite all "there" yet and could benefit from a little styling and branding.  
 
-In this section, we will create the following:
+In this section, we will add the following to your project:
 1. Header / Footer - The elements provide a great case for creating some reusble components and with Custom Elements, we can create self contained reusable components for our site.
 1. Styles - Of course we want things to look nice too!  We'll add some CSS to help hang things in just right the place.
 
@@ -69,12 +69,12 @@ customElements.define('page-template', PageTemplate);
 ```
 
 
-You can also do the same for a footer.
+> You now do the same for your footer.
 
 ### CSS
 OK, so we've made some content and some custom components, but what about the look and feel? Yes, of course, let's add some CSS!
 
-For global styles like Google fonts, background colors, or browser resets, create a file called _src/styles/theme.css_ and Greenwood will make sure these styles get applied in the `<head>` of the doucment, outside of any Shadow roots. 
+For global styles like Google fonts, Bootstrap, background colors, or browser resets, create a file called _src/styles/theme.css_ and Greenwood will make sure these styles get applied in the `<head>` of the doucment, outside of any Shadow DOMs. 
 
 Here are some styles you can add to your site to snap things into place a little bit.
 _theme.css_
@@ -136,4 +136,4 @@ class HeaderComponent extends HTMLElement {
 customElements.define('app-header', HeaderComponent);
 ```
 
-Phew!!  What a journey, but now we have a our blog ready to go!  The last step is to build  and host your project, so let's move on to the [next section](/getting-started/build-and-deploy/) and make it happen!
+Phew!!  What a journey, but now you have a blog ready to publish!  The last step is to build  and host your project, so let's move on to the [build and deploy section](/getting-started/build-and-deploy/) and make it happen!

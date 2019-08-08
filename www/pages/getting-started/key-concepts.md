@@ -3,7 +3,7 @@ In the [previous section](/getting-started/project-setup) we setup our local dev
 
 Although Greenwood works without any configuration or setup, (go ahead, run `npm run build`, you'll get a default site right out of the box!), you will of course want to create your own site with your own content.  
 
-For this reason, the minimum requirements for a site that you will need to provide are:
+For this reason, the minimum requirements for a site that you will want to be familiar with are:
 1. Workspace
 1. Template(s)
 1. Page(s)
@@ -11,7 +11,7 @@ For this reason, the minimum requirements for a site that you will need to provi
 In this section, we hope you'll get a better understanding of key concepts and how they can be used to create as many layouts and pages as you need to build out your own site however you need.
 
 ### Workspace
-In the project setup section, we created a _src/_ directory at the root of the directory of the project.  To Greenwood, this is called your workspace, and where are the files for your project need to reside, including the next two key concepts; templates and pages.
+In the project setup section, we created a _src/_ directory at the root of the directory of the project.  To Greenwood, this is called your workspace and where are the files for your project need to reside, including the next two key concepts: templates and pages.
 
 This gives our project the following structure:
 ```render bash
@@ -21,7 +21,7 @@ This gives our project the following structure:
 └── src/
 ```
 
-> Aside from these templates and pages directories, you can use any name you want for your other directories since your templates will be able to use `import` to pull in anything you need.  This will be demonstrated more fully in the next section.
+> Aside from these templates and pages directories, you can use any name you want for your other directories since your templates will be able to use JavaScript module with `import` to pull in anything you need.  This will be demonstrated more fully in the next section.
 
 
 ### Templates
@@ -61,13 +61,13 @@ class PageTemplate extends LitElement {
 customElements.define('page-template', PageTemplate);
 ```
 
-> Don't worry too much about the capitalized expressions, this is discussed in more detail in our [docs](/docs/).
+> Don't worry too much about the capitalized expressions, this is discussed in more detail in our [docs](/docs/template/).
 
 
 ### Pages
 Pages are how you will create the content for your site by (generally) creating markdown files.  Simply make a _pages/_ directory in your workspace and Greenwood will start building them automatically.  By default, pages will build using the default page template: _page-template.js_.
 
-By adding a home page (_index.md_), your directory sturcture for a basic Greenwood application would now look like this:
+By adding a home page (_index.md_), your directory structure for a basic Greenwood application would now look like this:
 ```render bash
 .
 ├── package-lock.json
