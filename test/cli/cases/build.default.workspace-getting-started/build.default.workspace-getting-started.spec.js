@@ -35,7 +35,7 @@ const path = require('path');
 const TestBed = require('../../test-bed');
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom Workspace based on the Getting Started guide';
+  const LABEL = 'Custom Workspace based on the Getting Started guide and repo';
   let setup;
 
   before(async function() {
@@ -89,7 +89,19 @@ describe('Build Greenwood With: ', function() {
         expect(footer.length).to.be.equal(1);
       });
 
-      // TODO global styles
+      it('should have the expected font import', async function() {
+        const styles = '@import url(//fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap);';
+        const styleTags = dom.window.document.querySelectorAll('head style');
+        let importCount = 0;
+
+        styleTags.forEach((tag) => {
+          if (tag.textContent.indexOf(styles) >= 0) {
+            importCount += 1;
+          }
+        });
+
+        expect(importCount).to.equal(1);
+      });
     });
 
     describe('Blog Posts', function() {
@@ -123,7 +135,19 @@ describe('Build Greenwood With: ', function() {
         expect(footer.length).to.be.equal(1);
       });
 
-      // TODO global styles
+      it('should have the expected font import', async function() {
+        const styles = '@import url(//fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap);';
+        const styleTags = dom.window.document.querySelectorAll('head style');
+        let importCount = 0;
+
+        styleTags.forEach((tag) => {
+          if (tag.textContent.indexOf(styles) >= 0) {
+            importCount += 1;
+          }
+        });
+
+        expect(importCount).to.equal(1);
+      });
     });
 
   });
