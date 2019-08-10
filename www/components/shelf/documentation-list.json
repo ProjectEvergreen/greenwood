@@ -5,24 +5,29 @@
     "path": "/docs/configuration",
     "items": [
       {
-        "index": 0,
-        "name": "Workspace",
-        "id": "workspace"
+        "index": 1,
+        "name": "Dev Server",
+        "id": "dev-server"
       },
       {
         "index": 1,
+        "name": "Meta",
+        "id": "meta"
+      },
+      {
+        "index": 2,
+        "name": "Public Path",
+        "id": "public-path"
+      },
+      {
+        "index": 3,
         "name": "Title",
         "id": "title"
       },
       {
-        "index": 2,
-        "name": "PublicPath",
-        "id": "publicpath"
-      },
-      {
-        "index": 3,
-        "name": "Meta",
-        "id": "meta"
+        "index": 4,
+        "name": "Workspace",
+        "id": "workspace"
       }
     ]
   },
