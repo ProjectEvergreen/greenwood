@@ -1,38 +1,24 @@
 ## Tech Stack
 
-#### NodeJS
+Greenwood uses a variety of open source JavaScript tools to help faciliate development and production building of Greenwood projects.  By putting all these tools together and configuring them for you, Greenwood helps you focus more on what matters; building your project.  Greenwood takes are of performance and optimizions for you and provides a static build of your project that you can host on any web server or cloud host, be it Netlify, S3 / CloudFront, Express, Apache, etc.  It's entirely up to you and what fit your workflow the best.
 
-* [JSDOM](https://github.com/jsdom/jsdom)
-* [puppeteer](https://developers.google.com/web/tools/puppeteer/)
-* [Commander](https://www.npmjs.com/package/commander)
+### NodeJS
+For development, Greenwood requires NodeJS (LTS) to be available on the command line. This allows us (and you!) to tap into all the amazing web development tools and libraries available on npm.
 
-#### Web Components
+To generate your site, we use [puppeteer](https://developers.google.com/web/tools/puppeteer/).
 
-Greenwood uses [LitElement](https://lit-element.polymer-project.org/) by default for all included templates and components
+### Web Components
+In addition to the native `HTMLElement`, Greenwood provides [LitElement](https://lit-element.polymer-project.org/) out of the box.  Although not tested, Greenwood should be compatible with just about any modern library on npm.
 
-Other related libraries
+To assist with development, Greenwood alos provides the following by default:
+- [lit-redux-router](https://github.com/fernandopasik/lit-redux-router): Routing library
+- [@evergreen-wc](https://github.com/hutchgrant/evergreen-web-components) Custom Elements component library
 
-* [lit-redux-router](https://github.com/fernandopasik/lit-redux-router) - for all routing
-* [@evergreen-wc](https://github.com/hutchgrant/evergreen-web-components) component library
+### Webpack
+Greenwood makes use of **webpack** for the local development workflow and building your application for production.  This is done through a combination of tools like Babel and PostCSS, which results in an optimized and performant site for you and your users.
 
-#### Webpack
-
-Greenwood makes use of webpack and webpack server, along with several webpack plugins.
-
-* babel
-* webpack-dev-server
-* webpack.NormalModuleReplacementPlugin
-* [wc-markdown-loader](https://github.com/hutchgrant/wc-markdown-loader)
-* copy-webpack-plugin
-* html-webpack-plugin
-* postcss-loader
-* webpack-merge
-
-#### Development
-
-* [circleci](https://circleci.com/)
-* [netlify](https://www.netlify.com/)
-* [eslint](https://eslint.org/)
-* [mocha](https://mochajs.org/)
-* [chai](https://www.chaijs.com/)
-* [istanbul](https://istanbul.js.org/)
+### Development
+To assist in the project's development and maintance, we also use these tools:
+- [CircleCI](https://circleci.com/): Continuous Integration
+- [Netlify](https://www.netlify.com/): Website hosting and branch previews
+- [mocha](https://mochajs.org/): Test runner

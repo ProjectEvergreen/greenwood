@@ -57,7 +57,7 @@
   {
     "index": 3,
     "name": "Templates",
-    "path": "/docs/template",
+    "path": "/docs/templates",
     "items": [
       {
         "index": 0,
@@ -78,18 +78,18 @@
     "items": [
       {
         "index": 0,
-        "name": "Define Markdown Page Component",
-        "id": "define-markdown-page-component"
+        "name": "Page Configuration",
+        "id": "page-configuration"
       },
       {
         "index": 0,
-        "name": "Define Template",
+        "name": "Template",
         "id": "define-template"
       },
       {
         "index": 0,
-        "name": "Import Files",
-        "id": "import-files"
+        "name": "Imports",
+        "id": "imports"
       }
     ]
   },

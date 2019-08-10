@@ -46,4 +46,4 @@ imports:
 \`\`\`
 ```
 
-> See our [component model docs](/docs/component-model) for more information on authoring custom elements / components.
+> See our [component model docs](/docs/component-model) for more information on authoring custom elements / components.  For information on configuring additional page meta data, see our section on [front-matter](/docs/front-matter/).
