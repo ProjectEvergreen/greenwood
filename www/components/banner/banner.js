@@ -49,14 +49,14 @@ class Banner extends LitElement {
       <style>
         ${bannerCss}
       </style>
-      
+
       <div class='banner'>
         <eve-container>
           <div class='content'>
             <img src="${greenwoodLogo}" alt="Greenwood Logo"/>
-            
-            <h3>The static site generator for your. . . <span class="${this.animateState}">${currentProjectType}.</span></h3>
-            
+
+            <h3>The static site generator for your. . . <br /><span class="${this.animateState}">${currentProjectType}.</span></h3>
+
             <eve-button size="md" href="/getting-started" style="${buttonCss}">Get Started</eve-button>
           </div>
         </eve-container>

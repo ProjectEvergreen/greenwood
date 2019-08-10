@@ -8,7 +8,7 @@
 
   & a {
     text-decoration: none;
-    color: green;
+    color: #2D3D3A;
 
     &:hover {
       color:black;
