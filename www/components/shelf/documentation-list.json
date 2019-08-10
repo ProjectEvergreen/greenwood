@@ -1,6 +1,12 @@
 [
   {
     "index": 0,
+    "name": "Component Model",
+    "path": "/docs/component-model",
+    "items": []
+  },
+  {
+    "index": 1,
     "name": "Configuration",
     "path": "/docs/configuration",
     "items": [
@@ -32,47 +38,7 @@
     ]
   },
   {
-    "index": 1,
-    "name": "Markdown",
-    "path": "/docs/markdown",
-    "items": [
-      {
-        "index": 0,
-        "name": "Syntax Highlighting",
-        "id": "syntax-highlighting"
-      },
-      {
-        "index": 0,
-        "name": "Imports",
-        "id": "imports"
-      }
-    ]
-  },
-  {
     "index": 2,
-    "name": "Component Model",
-    "path": "/docs/component-model",
-    "items": []
-  },
-  {
-    "index": 3,
-    "name": "Templates",
-    "path": "/docs/templates",
-    "items": [
-      {
-        "index": 0,
-        "name": "App Template",
-        "id": "app-template"
-      },
-      {
-        "index": 0,
-        "name": "Page Template",
-        "id": "page-template"
-      }
-    ]
-  },
-  {
-    "index": 4,
     "name": "Front Matter",
     "path": "/docs/front-matter",
     "items": [
@@ -94,7 +60,63 @@
     ]
   },
   {
+    "index": 3,
+    "name": "Markdown",
+    "path": "/docs/markdown",
+    "items": [
+      {
+        "index": 0,
+        "name": "Syntax Highlighting",
+        "id": "syntax-highlighting"
+      },
+      {
+        "index": 0,
+        "name": "Imports",
+        "id": "imports"
+      }
+    ]
+  },
+  {
+    "index": 4,
+    "name": "Styles and Assets",
+    "path": "/docs/css-and-images",
+    "items": [
+      {
+        "index": 0,
+        "name": "Global Styles",
+        "id": "syntax-highlighting"
+      },
+      {
+        "index": 1,
+        "name": "Shadow DOM",
+        "id": "shadow-dom"
+      },
+      {
+        "index": 2,
+        "name": "Assets and Images",
+        "id": "css-and-images"
+      }
+    ]
+  },
+  {
     "index": 5,
+    "name": "Templates",
+    "path": "/docs/layouts",
+    "items": [
+      {
+        "index": 0,
+        "name": "App Template",
+        "id": "app-template"
+      },
+      {
+        "index": 0,
+        "name": "Page Template",
+        "id": "page-template"
+      }
+    ]
+  },
+  {
+    "index": 6,
     "name": "Tech Stack",
     "path": "/docs/tech-stack",
     "items": []

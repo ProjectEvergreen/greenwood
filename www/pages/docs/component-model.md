@@ -4,7 +4,7 @@ In this section we'll review a little bit about how you can use Web Components i
 ### HTMLElement
 
 _footer.js_
-```render js
+```render javascript
 class FooterComponent extends HTMLElement {
   constructor() {
     super();
@@ -22,7 +22,7 @@ class FooterComponent extends HTMLElement {
   getTemplate() {
     const year = new Date().getFullYear();
 
-    return `<header>This is the header component.  &copy; ${year}</header>`;
+    return \`<header>This is the header component.  &copy; ${year}</header>\`;
   }
 }
 
@@ -31,7 +31,7 @@ customElements.define('x-footer', FooterComponent);
 
 You can then import it in a template and use it within your templates `render` function.
 
-```javascript
+```render javascript
 import { html, LitElement } from 'lit-element';
 import '../components/footer';
 
@@ -42,7 +42,7 @@ class PageTemplate extends LitElement {
   }
 
   render() {
-    return html`
+    return html\`
       <section class='container'>
         <entry></entry>
       </section>
@@ -50,20 +50,19 @@ class PageTemplate extends LitElement {
       <section
         <x-footer></x-footer>
       </section>
-    `;
+    \`;
   }
 }
 
-customElements.define('page-template', BlogTemplate);
+customElements.define('page-template', PageTemplate);
 ```
 
 
 ### LitElement
 A simple example of a web component utilizing a basic [LitElement](https://lit-element.polymer-project.org/) base class
 
-**hello-world.js**
-```render js
-
+_hello-world.js_
+```render javascript
 import { html, LitElement } from 'lit-element';
 
 class HelloWorld extends LitElement {
@@ -82,17 +81,18 @@ class HelloWorld extends LitElement {
 }
 
 customElements.define('hello-world', HelloWorld);
-
 ```
 
 Which can then imported and used with
 
-```render js
-
+```render javascript
 import './hello-world.js
 
-<hello-world></hello-world>
-
+render() {
+  return html\`
+    <hello-world></hello-world>
+  \`
+}
 ```
 
 ## References

@@ -19,11 +19,9 @@ To get the result:
 
 
 ```render js
-
 const hello = "world";
 
 <p>${hello}</p>
-
 ```
 
 > See our [website theme](https://github.com/ProjectEvergreen/greenwood/blob/master/www/styles/page.css#L1) for more examples on how to style PrismJS.
