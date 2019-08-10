@@ -63,8 +63,6 @@ Which would be equivalent to:
 <meta property="og:description" content="A modern and performant static site generator supporting Web Component based development">
 ```
 
-> **Note:** You can also use this to configure a [favicon](https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML#Adding_custom_icons_to_your_site) for your site as well.
-
 ### Public Path
 The `publicPath` options allows configuring additional URL segements to customize the [`<base href="/">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) for your site.
 

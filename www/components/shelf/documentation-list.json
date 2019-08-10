@@ -43,8 +43,8 @@
       },
       {
         "index": 0,
-        "name": "Components",
-        "id": "components"
+        "name": "Imports",
+        "id": "imports"
       }
     ]
   },
@@ -61,13 +61,13 @@
     "items": [
       {
         "index": 0,
-        "name": "App Templates",
-        "id": "app-templates"
+        "name": "App Template",
+        "id": "app-template"
       },
       {
         "index": 0,
-        "name": "Page Templates",
-        "id": "page-templates"
+        "name": "Page Template",
+        "id": "page-template"
       }
     ]
   },

@@ -1,11 +1,9 @@
 ## Markdown
-
-Greenwood supports the [CommonMark](https://commonmark.org/help/) specification.
+In this section we'll cover some of the Markdown related feature of Greenwood, which by default supports the [CommonMark](https://commonmark.org/help/) specification.
 
 
 ### Syntax Highlighting
-
-When rendering code fencing, if you add the word render before the language, [prismjs](https://prismjs.com/) will add syntax highlighting.
+When rendering code fencing, if you add the word `render` before the language, the included [prismjs](https://prismjs.com/) library will add syntax highlighting.
 
 e.g. use:
 
@@ -28,28 +26,14 @@ const hello = "world";
 
 ```
 
-### Components
+> See our [website theme](https://github.com/ProjectEvergreen/greenwood/blob/master/www/styles/page.css#L1) for more examples on how to style PrismJS.
 
+
+### Imports
 From within the markdown you can also render components, not just their syntax, by importing them via [front-matter](/docs/front-matter).
 
-At the top of a `.md` file add:
-
-```render md
-----
-imports:
-  HelloWorld: '../components/helloworld/helloworld.js'
----
-```
-
-
-Below the front-matter you can then render the component within html(assuming the component has a defined element name)
-
-```render
-<hello text='world'></hello-world>
-```
-
-Completed file:
-
+#### Example
+At the top of a `.md` file add an `import` section to render a component inline to the page itself.  This can be helpful if there are situations where you may want to `import` a component for a specific set of pages, as opposed to through a page or app template.:
 
 ```render md
 ----
@@ -61,3 +45,5 @@ imports:
 <hello text='world'>World</hello>
 \`\`\`
 ```
+
+> See our [component model docs](/docs/component-model) for more information on authoring custom elements / components.
