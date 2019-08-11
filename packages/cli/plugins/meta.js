@@ -7,7 +7,7 @@ import { LitElement } from 'lit-element';
 *   meta: [
 *     { property: 'og:site', content: 'greenwood' },
 *     { name: 'twitter:site', content: '@PrjEvergreen' },
-*     { rel: 'icon', content: '/assets/favicon.ico ' }
+*     { rel: 'icon', href: '/assets/favicon.ico ' }
 *   ]
 *  }
 */
