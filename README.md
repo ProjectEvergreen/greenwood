@@ -6,14 +6,14 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ProjectEvergreen/greenwood/master/LICENSE.md)
 
 ## Overview
-Greenwood is a modern and performant static site generator supporting Web Component based development.  For more information about Getting Started, API docs and more, check out our [website](https://www.greenwoodjs.io/).
+Greenwood is a modern and performant static site generator supporting Web Component based development.  For more information about how to get started, review our docs, or learn more about our project please visit our [website](https://www.greenwoodjs.io/).
 
-> Greenwood is currently a work in progress and we would love any help getting it to a 1.0 release.  Check out our [roadmap](https://github.com/ProjectEvergreen/greenwood/projects) to see what we're working on next and feel free to reach out through our [issue tracker](https://github.com/ProjectEvergreen/greenwood/issues) if you have any issues.
+> Greenwood is currently a work in progress and we would love any help getting it to a 1.0 release.  Check out our [roadmap](https://github.com/ProjectEvergreen/greenwood/projects) to see what we're working on next and feel free to reach out through our [issue tracker](https://github.com/ProjectEvergreen/greenwood/issues) if you have any issues or would like to request a feature!
 
 ## Getting Started
 Our website has a complete Getting Started section that will walk you through creating a Greenwood project scratch.
 
-You can follow along with, or clone and go, the [companion repo]().
+You can follow along with, or clone and go, the [companion repo](https://github.com/thescientist13/greenwood-getting-started).
 
 ## Installation
 Greenwood can be installed with your favorite JavaScript package manager.
@@ -26,7 +26,7 @@ yarn add @greenwood/cli --dev
 ```
 
 ## Documentation
-All of our documentation is on our [website](https://www.greenwoodjs.io/) (built by Greenwood!).  See our website documentation to learn more about:
+All of our documentation is on our [website](https://www.greenwoodjs.io/) (which itself is built by Greenwood!).  See our website documentation to learn more about:
 - Configuration
 - Pages
 - Templates
