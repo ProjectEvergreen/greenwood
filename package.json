@@ -6,6 +6,9 @@
   "repository": "git@github.com:ProjectEvergreen/greenwood.git",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
+  "files": [
+    "packages/cli/"
+  ],
   "scripts": {
     "clean": "rimraf ./**/.greenwood/** && rimraf ./**/public/** && rimraf ./coverage",
     "lint": "eslint \"./packages/**/**/*.js\" \"./test/**/**/*.js\" \"./www/**/**/*.js\"",
