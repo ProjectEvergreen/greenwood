@@ -28,18 +28,25 @@ class meta extends LitElement {
     if (this.attributes) {        
       // handle <meta> + <link> tags
       this.attributes.meta.forEach(metaItem => {
-        meta = document.createElement('meta');
-
         const metaType = Object.keys(metaItem)[0]; // property or name attribute
         const metaTypeValue = metaItem[metaType]; // value of the type attribute
         let metaContent = metaItem.content; // value of the content attribute
 
-        if (metaTypeValue === 'og:url') {
-          metaContent = `${metaContent}${this.attributes.route}`;
-        }
+        if (metaType === 'rel') {
+          meta = document.createElement('link');
 
-        meta.setAttribute(metaType, metaTypeValue);
-        meta.setAttribute('content', metaContent);
+          meta.setAttribute(metaType, metaTypeValue);
+          meta.setAttribute('href', metaContent);
+        } else {
+          meta = document.createElement('meta');
+
+          if (metaTypeValue === 'og:url') {
+            metaContent = `${metaContent}${this.attributes.route}`;
+          }
+  
+          meta.setAttribute(metaType, metaTypeValue);
+          meta.setAttribute('content', metaContent);
+        }
 
         const oldmeta = header.querySelector(`[${metaType}="${metaTypeValue}"]`);
         
