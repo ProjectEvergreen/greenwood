@@ -29,7 +29,7 @@ class meta extends LitElement {
       // handle <meta> + <link> tags
       this.attributes.meta.forEach(metaItem => {
         const metaType = Object.keys(metaItem)[0]; // property or name attribute
-        const metaTypeValue = metaItem[metaType]; // value of the type attribute
+        const metaTypeValue = metaItem[metaType]; // value of the attribute
         let meta = document.createElement('meta');
 
         if (metaType === 'rel') {

@@ -50,7 +50,7 @@ describe('Build Greenwood With: ', async function() {
   describe(LABEL, function() {
     const metaFilter = (metaKey) => {
       return meta.filter((item) => {
-        if (item.property === metaKey || item.name === metaKey || Object.keys(item)[0] === 'rel') {
+        if (item.property === metaKey || item.name === metaKey || item.rel === metaKey) {
           return item;
         }
       })[0];
@@ -175,14 +175,14 @@ describe('Build Greenwood With: ', async function() {
       });
 
       it('should have our custom config <link> tag with shortcut icon in the <head>', function() {
-        const shortcutIconLink = metaFilter('rel');
+        const shortcutIconLink = metaFilter('shortcut icon');
         const linkElement = dom.window.document.querySelector(`head link[rel="${shortcutIconLink.rel}"]`);
 
         expect(linkElement.getAttribute('href')).to.be.equal(shortcutIconLink.href);
       });
 
       it('should have our custom config <link> tag with icon in the <head>', function() {
-        const iconLink = metaFilter('rel');
+        const iconLink = metaFilter('icon');
         const linkElement = dom.window.document.querySelector(`head link[rel="${iconLink.rel}"]`);
 
         expect(linkElement.getAttribute('href')).to.be.equal(iconLink.href);
