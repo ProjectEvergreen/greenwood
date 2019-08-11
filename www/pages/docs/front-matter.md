@@ -27,7 +27,7 @@ label: 'mypage'
 Which will compile to the element: `<wc-md-mypage></wc-md-mypage>`
 
 ### Template
-When creating multiple page templates, you can use `template` front-matter to configuration Greenwood to use that template for a given page.
+When creating multiple page templates, you can use the `template` front-matter to configre Greenwood to use that template for a given page.
 
 #### Example
 ```render md

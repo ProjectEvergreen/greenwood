@@ -67,9 +67,9 @@ Which would be equivalent to:
 The `publicPath` options allows configuring additional URL segements to customize the [`<base href="/">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) for your site.
 
 #### Example
-As an example, given a :
+As an example, given:
 - Top level domain like: `http(s)://www.my-domain.com`
-- A deployment path of: `/web`
+- Deployment path of: `/web`
 - For a full URL of: `http(s)://www.my-domain.com/web`
 
 Your `publicPath` configuration would be:
