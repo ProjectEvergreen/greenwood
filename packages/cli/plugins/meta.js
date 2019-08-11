@@ -26,22 +26,22 @@ class meta extends LitElement {
     let meta;
 
     if (this.attributes) {        
-      this.attributes.meta.map(attr => {
+      // handle <meta> + <link> tags
+      this.attributes.meta.forEach(metaItem => {
         meta = document.createElement('meta');
 
-        const metaPropertyOrName = Object.keys(attr)[0];
-        const metaPropValue = Object.values(attr)[0];
-        let metaContentVal = Object.values(attr)[1];
-        
-        // join hostname and route together
-        if (metaPropValue === 'og:url') {
-          metaContentVal = `${metaContentVal}${this.attributes.route}`;
+        const metaType = Object.keys(metaItem)[0]; // property or name attribute
+        const metaTypeValue = metaItem[metaType]; // value of the type attribute
+        let metaContent = metaItem.content; // value of the content attribute
+
+        if (metaTypeValue === 'og:url') {
+          metaContent = `${metaContent}${this.attributes.route}`;
         }
 
-        meta.setAttribute(metaPropertyOrName, metaPropValue);
-        meta.setAttribute('content', metaContentVal);
+        meta.setAttribute(metaType, metaTypeValue);
+        meta.setAttribute('content', metaContent);
 
-        const oldmeta = header.querySelector(`[${metaPropertyOrName}="${metaPropValue}"]`);
+        const oldmeta = header.querySelector(`[${metaType}="${metaTypeValue}"]`);
         
         // rehydration
         if (oldmeta) {
@@ -50,6 +50,8 @@ class meta extends LitElement {
           header.appendChild(meta);
         }
       });
+
+      // handle <title> tag
       let title = document.createElement('title');
 
       title.innerText = this.attributes.title;
@@ -57,7 +59,6 @@ class meta extends LitElement {
 
       header.replaceChild(title, oldTitle);
     }
-
   }
 
   render() {
