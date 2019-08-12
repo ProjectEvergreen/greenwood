@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit-element';
+import { LitElement } from 'lit-element';
 
 /*
 * Take an attributes object with an array of meta objects, add them to an element and replace/add the element to DOM
@@ -6,7 +6,8 @@ import { html, LitElement } from 'lit-element';
 *   title: 'my title',
 *   meta: [
 *     { property: 'og:site', content: 'greenwood' },
-*     { name: 'twitter:site', content: '@PrjEvergreen ' }
+*     { name: 'twitter:site', content: '@PrjEvergreen' },
+*     { rel: 'icon', href: '/assets/favicon.ico ' }
 *   ]
 *  }
 */
@@ -22,26 +23,31 @@ class meta extends LitElement {
   }
 
   firstUpdated() {
-    let header = document.head;
-    let meta;
+    if (this.attributes) {      
+      let header = document.head;
 
-    if (this.attributes) {        
-      this.attributes.meta.map(attr => {
-        meta = document.createElement('meta');
+      // handle <meta> + <link> tags
+      this.attributes.meta.forEach(metaItem => {
+        const metaType = Object.keys(metaItem)[0]; // property or name attribute
+        const metaTypeValue = metaItem[metaType]; // value of the attribute
+        let meta = document.createElement('meta');
 
-        const metaPropertyOrName = Object.keys(attr)[0];
-        const metaPropValue = Object.values(attr)[0];
-        let metaContentVal = Object.values(attr)[1];
-        
-        // join hostname and route together
-        if (metaPropValue === 'og:url') {
-          metaContentVal = `${metaContentVal}${this.attributes.route}`;
+        if (metaType === 'rel') {
+          // change to a <link> tag instead
+          meta = document.createElement('link');
+
+          meta.setAttribute(metaType, metaTypeValue);
+          meta.setAttribute('href', metaItem.href);
+        } else {
+          const metaContent = metaTypeValue === 'og:url' 
+            ? `${metaItem.content}${this.attributes.route}` 
+            : metaItem.content;
+  
+          meta.setAttribute(metaType, metaTypeValue);
+          meta.setAttribute('content', metaContent);
         }
 
-        meta.setAttribute(metaPropertyOrName, metaPropValue);
-        meta.setAttribute('content', metaContentVal);
-
-        const oldmeta = header.querySelector(`[${metaPropertyOrName}="${metaPropValue}"]`);
+        const oldmeta = header.querySelector(`[${metaType}="${metaTypeValue}"]`);
         
         // rehydration
         if (oldmeta) {
@@ -50,6 +56,8 @@ class meta extends LitElement {
           header.appendChild(meta);
         }
       });
+
+      // handle <title> tag
       let title = document.createElement('title');
 
       title.innerText = this.attributes.title;
@@ -57,15 +65,6 @@ class meta extends LitElement {
 
       header.replaceChild(title, oldTitle);
     }
-
-  }
-
-  render() {
-    return html`
-      <div>
-        
-      </div>
-    `;
   }
 }
 
