@@ -38,6 +38,7 @@ You can use the `meta` option for the configuration of [`<meta>` tags](https://d
 This is an example of the `meta` configuration for the Greenwood website.
 
 ```render js
+const FAVICON_HREF = '/assets/favicon.ico';
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 
 module.exports = {
@@ -48,7 +49,9 @@ module.exports = {
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: 'https://www.greenwoodjs.io' },
     { property: 'og:image', content: 'https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png' },
-    { property: 'og:description', content: META_DESCRIPTION }
+    { property: 'og:description', content: META_DESCRIPTION },
+    { rel: 'shortcut icon', href: FAVICON_HREF },
+    { rel: 'icon', href: FAVICON_HREF }
   ]
 };
 ```
@@ -61,6 +64,8 @@ Which would be equivalent to:
 <meta property="og:type" content="website"><meta property="og:url" content="https://www.greenwoodjs.io/docs/">
 <meta property="og:image" content="https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png">
 <meta property="og:description" content="A modern and performant static site generator supporting Web Component based development">
+<link rel="shortcut icon" href="/assets/favicon.ico">
+<link rel="icon" href="/assets/favicon.ico">
 ```
 
 ### Public Path
