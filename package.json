@@ -1,5 +1,5 @@
 {
-  "name": "greenwood",
+  "name": "@greenwood/cli",
   "version": "0.2.0",
   "description": "A modern and performant static site generator supporting Web Component based development.",
   "main": "packages/cli/index.js",
