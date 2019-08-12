@@ -1,6 +1,5 @@
 ## Documentation
-
-This is the documentation space for Greenwood that we hope will help you get the most out of Greenwood.  If this is your first time with Greenwood, we recommend checking out our [Getting Started](/getting-started/) guide to get more familiar with setting up your first Greenwood project.
+This is the documentation space for Greenwood that we hope will help you get the most out of using it.  If this is your first time with Greenwood, we recommend checking out our [Getting Started](/getting-started/) guide to get more familiar with setting up your first Greenwood project.
 
 
 ### Installation
@@ -17,11 +16,11 @@ $ yarn add @greeenwood/cli --dev
 > You can install Greenwood globally as well, though we enourage local installation of Greenwood as documented above.
 
 ### CLI
-With Greenwood installed, you can run its CLI to generate your site.  The commands available are
+With Greenwood installed, you can run its CLI to generate your site.  The commands available are:
 - `develop`: Develop your project with a local development server.
 - `build`: For generating a production ready static site.
 
-As mentioend above, it is recommended installing Greenwood locally into your project. From there, you can define npm scripts in _package.json_:
+As mentioned above, it is recommended to install Greenwood locally into your project. From there, you can define npm scripts in _package.json_:
 
 ```render json
 "scripts": {
