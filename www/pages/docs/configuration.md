@@ -91,7 +91,7 @@ module.exports = {
 ```
 
 ### Workspace
-Workspace path for your project where all your project files will be located.  You can change it by passing a string.  Using an absolute URL is recommened.  
+Workspace path for your project where all your project files will be located.  You can change it by passing a string.  Using an absolute path is recommened.  
 
 #### Example
 ```render js

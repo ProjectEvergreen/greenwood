@@ -2,7 +2,7 @@
 Greenwood provides a couple ways to help style and theme your site.
 
 By default Greenwood supports directory detection for the following folder names within your workspace
-- _src/assets/_ - Location for all your site images, fonts, JSON, etc and will be bundled automatically for you by Greenwood.
+- _src/assets_ - Location for all your site images, fonts, JSON, etc and will be bundled automatically for you by Greenwood.
 - _src/styles_ - Recommended location for your template and theme CSS files
 
 > Be aware of the [limitations of the Shadow DOM](https://css-tricks.com/web-standards-meet-user-land-using-css-in-js-to-style-custom-elements/) with regard to which styles you can expect to apply globally vs. within a Shadow DOM.
