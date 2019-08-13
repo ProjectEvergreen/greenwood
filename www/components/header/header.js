@@ -31,7 +31,7 @@ class HeaderComponent extends LitElement {
             <div class="social">
               <a href="">
                 <a href="https://github.com/ProjectEvergreen/greenwood">
-                  <img src="https://img.shields.io/github/stars/ProjectEvergreen/create-evergreen-app.svg?style=social&logo=github&label=github" />
+                  <img src="https://img.shields.io/github/stars/ProjectEvergreen/greenwood.svg?style=social&logo=github&label=github" />
                 </a>
               </a>
             </div>

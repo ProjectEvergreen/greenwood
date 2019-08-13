@@ -15,6 +15,8 @@
  *     { property: 'og:site', content: 'The Greenhouse I/O' },
  *     { property: 'og:url', content: 'https://www.thegreenhouse.io' },
  *     { name: 'twitter:site', content: '@thegreenhouseio' }
+ *     { rel: 'shortcut icon', href: '/assets/images/favicon.ico' }
+ *     { rel: 'icon', href: '/assets/images/favicon.ico' }
  *   ]
  * }
  * 
@@ -48,7 +50,7 @@ describe('Build Greenwood With: ', async function() {
   describe(LABEL, function() {
     const metaFilter = (metaKey) => {
       return meta.filter((item) => {
-        if (item.property === metaKey || item.name === metaKey) {
+        if (item.property === metaKey || item.name === metaKey || item.rel === metaKey) {
           return item;
         }
       })[0];
@@ -162,6 +164,28 @@ describe('Build Greenwood With: ', async function() {
         const metaElement = dom.window.document.querySelector(`head meta[name="${twitterSiteMeta.name}"]`);
 
         expect(metaElement.getAttribute('content')).to.be.equal(twitterSiteMeta.content);
+      });
+    });
+
+    describe('favicon', function() {
+      let dom;
+
+      beforeEach(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+      });
+
+      it('should have our custom config <link> tag with shortcut icon in the <head>', function() {
+        const shortcutIconLink = metaFilter('shortcut icon');
+        const linkElement = dom.window.document.querySelector(`head link[rel="${shortcutIconLink.rel}"]`);
+
+        expect(linkElement.getAttribute('href')).to.be.equal(shortcutIconLink.href);
+      });
+
+      it('should have our custom config <link> tag with icon in the <head>', function() {
+        const iconLink = metaFilter('icon');
+        const linkElement = dom.window.document.querySelector(`head link[rel="${iconLink.rel}"]`);
+
+        expect(linkElement.getAttribute('href')).to.be.equal(iconLink.href);
       });
     });
   });

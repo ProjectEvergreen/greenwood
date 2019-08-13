@@ -1,4 +1,10 @@
+#!/usr/bin/env node
+
 /* eslint-disable no-underscore-dangle */
+
+// https://github.com/ProjectEvergreen/greenwood/issues/141
+process.setMaxListeners(0);
+
 require('colors');
 const chalk = require('chalk');
 const path = require('path');
