@@ -2,7 +2,7 @@
 If you want to code and go then we welcome you to check out the ["companion" repository](https://github.com/thescientist13/greenwood-getting-started) we made to accompany this guide.
 
 
-To get he code from this walkthrough, you can simply clone the repo, install dependencies, and off you go!
+To get the code from this walkthrough, you can simply clone the repo, install dependencies, and off you go!
 ```render bash
 $ git clone https://github.com/thescientist13/greenwood-getting-started
 $ cd greenwood-getting-started

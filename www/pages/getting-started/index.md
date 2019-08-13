@@ -3,7 +3,7 @@ label: 'getting-started'
 ---
 
 ## Introduction
-First off, thank you for taking the time to check out Greenwood!  As a tool, we hope that you find Greenwood to provide a productive and frictionless developer experience for you that results in performant and engaging experiences for your users.  Under the hood Greenwood is using NodeJS, webpack, babel and a lot of other amazing JavaScript tools to power a modern development workflow based on first class support for the modern web, like Web Components, FlexBox, CSS Grid, ECMAScript modules, and all your favorite features!
+First off, thank you for taking the time to check out Greenwood!  As a tool, we hope that you find Greenwood to provide a productive and frictionless developer experience for you that results in performant and engaging experiences for your users.  Under the hood Greenwood is using NodeJS, webpack, babel and a lot of other amazing JavaScript tools to power a modern development workflow based on first class support for the modern web like Web Components, FlexBox, CSS Grid, ECMAScript modules, and all your favorite features!
 
 ## Your First Project
 To get things started, we first want to make sure everyone can get their first project up and running as easily and quickly as possible, and so through this guide, we will help walk you through everything you need to get started with your first project, including:
@@ -11,7 +11,9 @@ To get things started, we first want to make sure everyone can get their first p
 1. Reviewing key concepts of Greenwood
 1. Creating content and developing locally
 1. Authoring Web Components and adding CSS
+1. Configuration
 1. Building and hosting for production
+
 
 ## Prequisites
 Before going into the setup section of the tutorial, we want to make sure that you are familiar with some of the expectations and assumptions this guide (and Greenwood) make.

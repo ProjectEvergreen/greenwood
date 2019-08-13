@@ -69,7 +69,7 @@ customElements.define('page-template', PageTemplate);
 ```
 
 
-> You now do the same for your footer.
+> You now do the same for your `<footer>`.  See the [companion repo](https://github.com/thescientist13/greenwood-getting-started/) for a complete working example.
 
 ### CSS
 OK, so we've made some content and some custom components, but what about the look and feel? Yes, of course, let's add some CSS!
@@ -135,5 +135,8 @@ class HeaderComponent extends HTMLElement {
 
 customElements.define('app-header', HeaderComponent);
 ```
+
+Taking this all the way with [the code from companion repo](https://vuejs.org/v2/guide/single-file-components.html), you should be able to get a result that looks like this:
+![greenwood-getting-started-styled](https://s3.amazonaws.com/hosted.greenwoodjs.io/getting-started-repo-styled.png)
 
 Phew!!  What a journey, but now you have a blog ready to publish!  The last step is to build  and host your project, so let's move on to the [build and deploy section](/getting-started/build-and-deploy/) and make it happen!
