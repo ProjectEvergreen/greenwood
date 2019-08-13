@@ -32,7 +32,7 @@ module.exports = {
 
 
 ### Meta
-You can use the `meta` option for the configuration of [`<meta>` tags](https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML) within the `<head>` tag of the generated _index.html_ file.  This is epecially useful for providing text and images for social sharing and link previews like for Slack, text messages, and social media shares, in particular when using the [Open Graph](https://ogp.me/) set of tags.
+You can use the `meta` option for the configuration of [`<meta>` tags](https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML) within the `<head>` tag of the generated _index.html_ file.  This is especially useful for providing text and images for social sharing and link previews like for Slack, text messages, and social media shares, in particular when using the [Open Graph](https://ogp.me/) set of tags.
 
 #### Example
 This is an example of the `meta` configuration for the Greenwood website.
@@ -96,7 +96,7 @@ module.exports = {
 ```
 
 ### Workspace
-Workspace path for your project where all your project files will be located.  You can change it by passing a string.  Using an absolute path is recommened.  
+Workspace path for your project where all your project files will be located.  You can change it by passing a string.  Using an absolute path is recommended.
 
 #### Example
 ```render js
