@@ -21,13 +21,18 @@
       color: #1d337a;
     }
   }
+
   & .cards {
-    margin: 4rem -15%
+    margin: 0 -15%
   }
+  
   & .message {
     padding: 4rem;
     text-align:center;
-    margin-bottom:4rem;
+
+    & hr {
+      margin-top: 4rem;
+    }
 
     @media(max-width:768px) {
       padding:0;

@@ -4,15 +4,13 @@ template: 'home'
 
 ```render
 <div class="message">
-<h2>Greenwood is a modern and performant static site generator.</h2>
-This is the Greenwood website's home page!  🌱
+  <h2>Greenwood is a modern and performant static site generator for Web Component based development.</h2>
 
-Visit our <a href="/about">about page</a> to learn more!
-Greenwood is focused on providing an intuitive and accessible development workflow supporting modern JavaScript and CSS features like Web Components, FlexBox, CSS Grid, and Modules.  We hope that the development experience is as pleasant and performant as the resulting user experience and that you'll be just as happy building your own site as we are with building Greenwood.
+  <p>Greenwood is focused on providing an intuitive and accessible development workflow supporting modern JavaScript and CSS features like Web Components, FlexBox, CSS Grid, and Modules aimed at delivering not just great user experiences, but alo great developer experiences too.  To learn more about the project click <a href="/about">here</a>, or for our documentation please click <a href="/docs">here</a>.</p>
 
-Click <a href="/about">here</a> to learn more about the project, or for more advanced topics please head over to our <a href="/docs">Documentation page</a>.
+  <hr/>
 </div>
-<hr />
+
 <div class="cards">
   <eve-row>
 
