@@ -39,7 +39,7 @@ customElements.define('app-header', HeaderComponent);
 ```
 
 Now we can use it in both our templates, like so:
-```
+```render javascript
 import { html, LitElement } from 'lit-element';
 import '../components/header'; // import our custom element
 
