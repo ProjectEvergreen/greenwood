@@ -140,5 +140,7 @@ $ npm start
 
 2) Once the development server is ready, it will let you know that you can now open `localhost:1984` in your web browser.  Doing so should yield you a page like this!
 
+![greenwood-getting-started-unstyled](https://s3.amazonaws.com/hosted.greenwoodjs.io/getting-started-repo-unstyled-partial.png)
 
-Congrats, you've got your first Greenwood site running!  It's coming along but still needs a  little work.  In the [next section](/getting-started/branding/) we'll create some resuable Web Components for the site's header and footer as well as some CSS for styling.
+
+Congrats, you've got your first Greenwood site running!  It's coming along but still needs a little work.  In the [next section](/getting-started/branding/) we'll create some resuable Web Components for the site's header and footer as well as some CSS for styling.
