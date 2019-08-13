@@ -27,7 +27,7 @@ label: 'mypage'
 Which will compile to the element: `<wc-md-mypage></wc-md-mypage>`
 
 ### Template
-When creating multiple page templates, you can use the `template` front-matter to configre Greenwood to use that template for a given page.
+When creating multiple page templates, you can use the `template` front-matter to configure Greenwood to use that template for a given page.
 
 #### Example
 ```render md
@@ -41,12 +41,12 @@ This is the home page
 
 In this example, the _src/templates/home-template.js_ will be used to render the current markdown page.
 
-> **Note:** By default, Greenwood will usage `src/templates/page-template.js` for all undefined template pages.
+> **Note:** By default, Greenwood will use `src/templates/page-template.js` for all undefined template pages.
 
 
 ### Imports
 
-If you want to import custom files such as a custom element, you can use the predefiend variable `imports`.
+If you want to import custom files such as a custom element, you can use the predefined variable `imports`.
 
 #### Example
 ```render md
