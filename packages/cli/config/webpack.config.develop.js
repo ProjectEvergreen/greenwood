@@ -24,6 +24,7 @@ const rebuild = async() => {
 
 module.exports = ({ config, context, graph }) => {
   config.publicPath = '/';
+  
   const configWithContext = commonConfig({ config, context, graph });
   const { devServer, publicPath } = config;
   const { host, port } = devServer;
@@ -33,7 +34,7 @@ module.exports = ({ config, context, graph }) => {
     mode: 'development',
 
     entry: [
-      `webpack-dev-server/client?${host}:${port}`,
+      `webpack-dev-server/client?http://${host}:${port}`,
       path.join(context.scratchDir, 'app', 'app.js')
     ],
 
@@ -46,7 +47,6 @@ module.exports = ({ config, context, graph }) => {
     },
 
     plugins: [
-      // new webpack.HotModuleReplacementPlugin(),
       new FilewatcherPlugin({
         watchFileRegex: [`/${context.userWorkspace}/`],
         onReadyCallback: () => {

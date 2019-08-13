@@ -7,7 +7,7 @@ module.exports = {
   workspace: 'src',  // path.join(process.cwd(), 'src')
   devServer: {
     port: 1984,
-    host: 'http://localhost'
+    host: 'localhost'
   },
   publicPath: '/',
   title: 'Greenwood App',
@@ -25,7 +25,7 @@ Configration for Greenwood's development server are available using the `devServ
 module.exports = {
   devServer: {
     port: 8181,
-    host: 'http://local.my-domain.com'
+    host: 'local.my-domain.com'
   },
 }
 ```
