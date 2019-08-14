@@ -72,7 +72,7 @@ class PageTemplate extends LitElement {
         :host {
           h1 {
             color: blue;
-            boder: 1px solid #020202;
+            border: 1px solid #020202;
           }
         }
       </style>
@@ -90,7 +90,7 @@ customElements.define('page-template', PageTemplate);
 ```
 
 ### Assets and Images
-They say a picture is worth 1000 words, so by default Greenwood will look for an _assets/_ folder in your workspace and automtically copy / bundle whatever it sees there.
+They say a picture is worth 1000 words, so by default Greenwood will look for an _assets/_ folder in your workspace and automatically copy / bundle whatever it sees there.
 
 #### Example
 To use an image in a markdown file, you would reference it as so using standard markdown syntax:

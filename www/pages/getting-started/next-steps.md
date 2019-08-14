@@ -21,7 +21,7 @@ You may have noticed that the Getting Started [companion repo](https://github.co
 
 This is was intentional for a couple of reasons:
 - _Education_: There is always more than one way to solve a problem, and so we felt that the SFC approach was best for the guide so as to keep the number of steps needed as few and direct as possible.
-- _Development_: The other side of the coin is that for us having the CSS in an external file helps with development and maintanence.  _This is just a preference_.  Please choose what fits your workflow best.
+- _Development_: The other side of the coin is that for us having the CSS in an external file helps with development and maintenance.  _This is just a preference_.  Please choose what fits your workflow best.
 - _Maintenance_: We want to keep a loose coupling between the guide and the repository to avoid additional overhead maintaining the two and keeping them in sync.  The goal of this guide is to focus on the overall experience of creating your first Greenwood project, not worrying about theming or project structure, since Greenwood generally supports just about any folder organization you could want and has no opinions on styles.
 
 ## Resources

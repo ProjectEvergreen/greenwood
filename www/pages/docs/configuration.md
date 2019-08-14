@@ -16,7 +16,7 @@ module.exports = {
 ```
 
 ### Dev Server
-Configration for Greenwood's development server are available using the `devServer` option.  Two options are available:
+Configuration for Greenwood's development server are available using the `devServer` option.  Two options are available:
 - `port`: Pick a different port when starting the dev server
 - `host`: If you need to use a custom domain when developing locally (generally used along with editing an `/etc/hosts` file)
 
@@ -69,7 +69,7 @@ Which would be equivalent to:
 ```
 
 ### Public Path
-The `publicPath` options allows configuring additional URL segements to customize the [`<base href="/">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) for your site.
+The `publicPath` options allows configuring additional URL segments to customize the [`<base href="/">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) for your site.
 
 #### Example
 As an example, given:
