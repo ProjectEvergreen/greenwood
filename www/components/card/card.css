@@ -22,8 +22,6 @@
 
 
   & .card-xs {
-    -webkit-box-flex: 1;
-    -ms-flex: 1 1 16.666%;
     margin: 0.25rem;
     flex: 1 1 16.666%;
     max-width: 250px;
@@ -33,8 +31,6 @@
     }
   }
   & .card-sm {
-    -webkit-box-flex: 1;
-    -ms-flex: 1 1 25%;
     margin: 0.25rem;
     flex: 1 1 25%;
     max-width: 380px;
@@ -44,8 +40,6 @@
     }
   }
   & .card-md {
-    -webkit-box-flex: 1;
-    -ms-flex: 1 1 33.333%;
     margin: 0.25rem;
     flex: 1 1 33.333%;
     max-width: 450px;
@@ -55,8 +49,6 @@
     }
   }
   & .card-full {
-    -webkit-box-flex: 1;
-    -ms-flex: 1 1 33.333%;
     margin: 0.25rem;
     flex: 1 1 33.333%;
   }

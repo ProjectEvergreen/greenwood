@@ -1,13 +1,7 @@
 :host {
   margin-left: -0.25rem;
   margin-right: -0.25rem;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
   justify-content: space-around;
   flex-direction: row;
 
