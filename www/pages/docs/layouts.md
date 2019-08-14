@@ -1,5 +1,5 @@
 ## Templates
-Greenwood has two types of templates: 
+Greenwood has two types of templates:
 - App Template: The [app shell](https://developers.google.com/web/fundamentals/architecture/app-shell) if you will, that wraps all pages.  This is provided for you by Greenwood, but you can override if needed. (though not recommended)
 - Page Template:.  Nested within the app template, and how you define different pages / layouts for your site.  Common layouts would be used for a home page, documentation pages, blog posts, etc.
 
@@ -58,9 +58,9 @@ With a completed page-template.js present in your `src/templates/` folder you ca
 
 In order to make an app template, you need to create a `LitElement` component that contains a number of pre-defined variables, elements, and imports. You need to do this in a file called  your _<workspace>templates/app-template.js_.
 
-First, we need our app template to use routes, by default greenwood uses [**lit-redux-router**](https://github.com/fernandopasik/lit-redux-router). 
+First, we need our app template to use routes, by default greenwood uses [**lit-redux-router**](https://github.com/fernandopasik/lit-redux-router).
 
-Here is Greenwood's app-template, which yuo can copy / paste as a starting point for your own custom app template, _though it is recommended to let Greenwood manage this for you_.
+Here is Greenwood's app-template, which you can copy / paste as a starting point for your own custom app template, _though it is recommended to let Greenwood manage this for you_.
 
 ```render js
 import { html, LitElement } from 'lit-element';
@@ -83,7 +83,7 @@ import './list';
 // Finally we can connect to our store and define our component.
 connectRouter(store);
 
-// Add a \`MYROUTES\` predefined hook. This is where all your routes will be loaded. 
+// Add a \`MYROUTES\` predefined hook. This is where all your routes will be loaded.
 // You may also opt to define a custom 404 route here.
 class AppComponent extends LitElement {
   render() {

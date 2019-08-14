@@ -13,7 +13,7 @@ $ npm install @greenwood/cli --save-dev
 $ yarn add @greeenwood/cli --dev
 ```
 
-> You can install Greenwood globally as well, though we enourage local installation of Greenwood as documented above.
+> You can install Greenwood globally as well, though we encourage local installation of Greenwood as documented above.
 
 ### CLI
 With Greenwood installed, you can run its CLI to generate your site.  The commands available are:
@@ -34,10 +34,10 @@ Then you can run
 - `npm start` - to fire up the local dev server
 
 ### Sections
-- [Component Model](/docs/component-model/): Examples of using custom elements in Greenwod.
+- [Component Model](/docs/component-model/): Examples of using custom elements in Greenwood.
 - [Configuration](/docs/configuration/): Available configuration options for the Greenwood CLI.
 - [Front Matter](/docs/front-matter/): Page level configurations through page markdown.
-- [Markdown](/docs/markdown/): Using markdown and related authoring capabiliies supported by Greenwood.
+- [Markdown](/docs/markdown/): Using markdown and related authoring capabilities supported by Greenwood.
 - [Styles and Assets](/docs/css-and-images/): How to style and theme your project with CSS.
 - [Templates](/docs/layouts/): Controlling the layout of your pages.
 - [Tech Stack](/docs/tech-stack/): What's under the hood.
