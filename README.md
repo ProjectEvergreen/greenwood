@@ -33,7 +33,7 @@ All of our documentation is on our [website](https://www.greenwoodjs.io/) (which
 - Component Model
 - Styes and Assets
 
-## Contritbuting
+## Contributing
 We would love your contribution to Greenwood!  Please check out our issue tracker for "good first issue" label or feel to reach out to us on Gitter in the room "Greenwood" or on [Twitter](https://twitter.com/PrjEvergreen).
 
 ## License

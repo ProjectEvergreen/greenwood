@@ -8,7 +8,7 @@
 
   & a {
     text-decoration: none;
-    color: green;
+    color: #2D3D3A;
 
     &:hover {
       color:black;
@@ -56,6 +56,9 @@
       margin-block-end: 1em;
       margin-inline-start: 0px;
       margin-inline-end: 0px;
+      & a {
+        cursor: pointer;
+      }
     }
     @media (max-width: 768px) {
       padding-left:10px;

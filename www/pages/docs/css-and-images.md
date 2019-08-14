@@ -9,7 +9,7 @@ By default Greenwood supports directory detection for the following folder names
 
 
 ### Theming
-To enable theming through global styles, create a file in your workspace styles directoy called _theme.css_,  e.g. _src/styles/theme.css_ and import it into your page templates.  Greenwood will include this in a `<style>` tag in the `<head>` of the generated pages.
+To enable theming through global styles, create a file in your workspace styles directory called _theme.css_,  e.g. _src/styles/theme.css_ and import it into your page templates.  Greenwood will include this in a `<style>` tag in the `<head>` of the generated pages.
 
 
 #### Example
@@ -46,7 +46,7 @@ customElements.define('page-template', PageTemplate);
 ```
 
 ### Shadow DOM
-For any of your components and page templates, it is recommend to use the [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM) within your LitElement's `render` function.  You can also import the CSS too.
+For any of your components and page templates, it is recommended to use the [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM) within your LitElement's `render` function.  You can also import the CSS too.
 
 #### Example
 ```render javascript
@@ -93,7 +93,7 @@ customElements.define('page-template', PageTemplate);
 They say a picture is worth 1000 words, so by default Greenwood will look for an _assets/_ folder in your workspace and automtically copy / bundle whatever it sees there.
 
 #### Example
-So to use an image in a markdown file, you would reference it as so using standard markdown syntax:
+To use an image in a markdown file, you would reference it as so using standard markdown syntax:
 
 ```render md
 # This is my page

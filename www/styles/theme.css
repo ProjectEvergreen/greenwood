@@ -7,11 +7,12 @@
 }
 
 html {
-  background-color: #f0f0f0;
+  background-color: white;
 }
 
 body {
   font-family: 'Source Sans Pro', sans-serif;
+  line-height:1.4;
 }
 
 table {

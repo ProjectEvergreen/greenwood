@@ -1,7 +1,7 @@
 :host {
   grid-area: header;
   & .header {
-    background-color: #111511;
+    background-color: #192a27;
     min-height: 30px;
     padding: 10px;
     font-size: 1.2rem;
@@ -36,8 +36,7 @@
           display: inline-block;
           padding:10px;
           &:hover {
-            background-color:white;
-
+          color: #F9E7CA;
             & a {
               color:green;
 
@@ -58,6 +57,9 @@
     & .social {
       margin-left:auto;
       text-align: right;
+    }
+    & .project-name {
+      margin-top: -2px;
     }
   }
 }

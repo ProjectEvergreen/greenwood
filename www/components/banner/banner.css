@@ -22,8 +22,8 @@
   grid-area: banner;
 
   & .banner {
-    background-color: rgba(238, 231, 235);
-    min-height: 50vh;
+    background-color: #F6F2F4;
+    min-height: 60vh;
 
     & .content {
       padding: 5vh 10px;

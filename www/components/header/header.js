@@ -17,15 +17,15 @@ class HeaderComponent extends LitElement {
               <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer">
                 <img src="${brand}" />
               </a>
-              <h4>
+              <h4 class="project-name">
                 <a href="/">Greenwood</a>
               </h4>
             </div>
             <nav>
               <ul>
-                <li><a href="/about">About</a></li>
-                <li><a href="/getting-started">Getting Started</a></li>
-                <li><a href="/docs">Docs</a></li>
+                <a href="/about"><li>About</li></a>
+                <a href="/getting-started"><li>Getting Started</li></a>
+                <a href="/docs"><li>Docs</li></a>
               </ul>
             </nav>
             <div class="social">
