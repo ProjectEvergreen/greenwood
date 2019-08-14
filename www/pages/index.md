@@ -6,7 +6,7 @@ template: 'home'
 <div class="message">
   <h2>Greenwood is a modern and performant static site generator for Web Component based development.</h2>
 
-  <p>Greenwood is focused on providing an intuitive and accessible development workflow supporting modern JavaScript and CSS features like Web Components, FlexBox, CSS Grid, and Modules aimed at delivering not just great user experiences, but alo great developer experiences too.  To learn more about the project click <a href="/about">here</a>, or for our documentation please click <a href="/docs">here</a>.</p>
+  <p>Greenwood is focused on providing an intuitive and accessible development workflow supporting modern JavaScript and CSS features like Web Components, FlexBox, CSS Grid, and Modules aimed at delivering not just great user experiences, but alo great developer experiences too.  You can To learn more about the project you can review our <a href="/about">about page</a> and for our documentation please click <a href="/docs">docs page</a>.</p>
 
   <hr/>
 </div>

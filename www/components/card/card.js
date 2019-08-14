@@ -21,7 +21,7 @@ class Card extends LitElement {
     if (this.img) {
       return html`
         <div class="card-img-top">
-          <img src="${this.img}"/>
+          <img src="${this.img}" alt="${this.title}"/>
         </div>
       `;
     }
