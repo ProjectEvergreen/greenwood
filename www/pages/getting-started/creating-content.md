@@ -101,7 +101,7 @@ This is the Getting Started home page!
 ```
 
 
-For your blog posts, we can give them their own unique URLs by simply putting them in their own directoy and by default Greenwood will "slugify" based on that filepath.  
+For your blog posts, we can give them their own unique URLs by simply putting them in their own directory and by default Greenwood will "slugify" based on that file path.  
 
 First you'll want to create a folder called _blog/_ in _src/pages/_ and then create two markdown files called _first-post.md_ and _second-post.md_.  We are using something called ["front matter"](/docs/front-matter) to specify that these pages should use the _blog-template.js_ you just created.
 
@@ -143,4 +143,4 @@ $ npm start
 ![greenwood-getting-started-unstyled](https://s3.amazonaws.com/hosted.greenwoodjs.io/getting-started-repo-unstyled-partial.png)
 
 
-Congrats, you've got your first Greenwood site running!  It's coming along but still needs a little work.  In the [next section](/getting-started/branding/) we'll create some resuable Web Components for the site's header and footer as well as some CSS for styling.
+Congrats, you've got your first Greenwood site running!  It's coming along but still needs a little work.  In the [next section](/getting-started/branding/) we'll create some reusable Web Components for the site's header and footer as well as some CSS for styling.
