@@ -31,7 +31,7 @@ class PageTemplate extends LitElement {
 customElements.define('page-template', PageTemplate);
 ```
 
-> **Note**: the filename must be appended with `-templates.js`.
+> **Note**: the filename must be in the format `<label>-templates.js` and the `customElements` name must be `page-template`.
 
 #### Template Hooks
 A number of hook variables are defined that tell greenwood to do different things

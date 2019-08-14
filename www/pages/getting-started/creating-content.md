@@ -84,8 +84,10 @@ class BlogTemplate extends LitElement {
   }
 }
 
-customElements.define('blog-template', BlogTemplate);
+customElements.define('page-template', BlogTemplate);
 ```
+
+> **Note**: in both cases, our custom element name is `page-template`.
 
 ### Creating Pages
 To make our home page which will use the default _page-template.js_ layout we just created, create an _index.md_ file in the _src/pages/_ directory.
