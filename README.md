@@ -1,4 +1,5 @@
 # Greenwood
+[![Netlify Status](https://api.netlify.com/api/v1/badges/6758148c-5c38-44d8-b908-ca0a1dad0f7c/deploy-status)](https://app.netlify.com/sites/elastic-blackwell-3aef44/deploys)
 [![GitHub release](https://img.shields.io/github/tag/ProjectEvergreen/greenwood.svg)](https://github.com/ProjectEvergreen/greenwood/tags)
 ![CircleCI branch](https://img.shields.io/circleci/project/github/ProjectEvergreen/greenwood/master.svg?style=plastic)
 [![GitHub issues](https://img.shields.io/github/issues-raw/ProjectEvergreen/greenwood.svg)](https://github.com/ProjectEvergreen/greenwood/issues)
