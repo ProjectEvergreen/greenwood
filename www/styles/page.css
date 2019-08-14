@@ -51,6 +51,10 @@
       color: #1d337a;
     }
 
+    & img {
+      width: 100%;
+    }
+
     & blockquote {
       margin:0.5em;
       padding:15px;
