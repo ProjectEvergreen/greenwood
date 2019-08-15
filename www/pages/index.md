@@ -6,8 +6,7 @@ template: 'home'
 <div class="message">
   <h2>Greenwood is a modern and performant static site generator for Web Component based development.</h2>
 
-  <p>Greenwood is focused on providing an intuitive and accessible development workflow supporting modern JavaScript and CSS features like Web Components, FlexBox, CSS Grid, and Modules aimed at delivering not just great user experiences, but also great developer experiences too.  You can To learn more about the project you can review our <a href="/about">about page</a> and for our documentation please click <a href="/docs">docs page</a>.</p>
-
+  <p>Greenwood is focused on providing an intuitive and accessible development workflow supporting modern JavaScript and CSS features like Web Components, FlexBox, CSS Grid, and Modules.  Greenwood strives to deliver not only great user experiences, but also great developer experiences.  To learn more about the project we encourage everyone to first go through our <a href="/getting-started/">Getting Started</a> guide.  You can learn more about the project itself at our <a href="/about">about page</a> or see our <a href="/docs"/>documentation</a> to learn more about how to use Greenwood.</p>
   <hr/>
 </div>
 
@@ -24,7 +23,7 @@ template: 'home'
     </eve-card>
 
     <eve-card title="NodeJS" img="/assets/nodejs.png" size="full" style="width:100%">
-      Although Greenwood generates a static site that you can host just about anywhere (Netlify, S3, Apache, etc), for developing and building your site, Greenwood requires NodeJS to be available on the command line.  This allows us to tap into all the amazing web development tools and libraries available on npm and also means you can use those packages too when developing your own site!  Greenwood will aim to support the latest LTS release of NodeJS and the version of npm that comes with.
+      Although Greenwood generates a static site that you can host just about anywhere (Netlify, S3, Apache, etc), for developing and building your site Greenwood requires NodeJS to be available on the command line.  This allows us to tap into all the amazing web development tools and libraries available on npm and also means you can use those packages too when developing your own site!  Greenwood will aim to support the latest LTS release of NodeJS and the version of npm that comes with.
     </eve-card>
 
   </eve-row>
