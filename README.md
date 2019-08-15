@@ -37,8 +37,6 @@ Then in your _package.json_, you can run the CLI like so:
 - `npm run build`: generates a static build of your project
 - `npm start`: starts a local development server for your project
 
-> Read more about [Greenwood's documention](https://www.greenwoodjs.io/docs/) on our website.
-
 ## Documentation
 All of our documentation is on our [website](https://www.greenwoodjs.io/) (which itself is built by Greenwood!).  See our website documentation to learn more about:
 - Configuration
