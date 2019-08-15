@@ -12,12 +12,11 @@
     }
 
     & .project-name {
-      margin: -4px 0 auto;
+      margin: -2px 0 auto;
       padding:0;
       padding-top:4px;
       display:inline-block;
       color: #1d337a;
-      font-size: 1.1em;
       font-weight: bold;
     }
 
@@ -42,7 +41,6 @@
           color: #F9E7CA;
             & a {
               color:green;
-
             }
           }
         }
