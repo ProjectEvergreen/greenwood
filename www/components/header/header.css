@@ -33,6 +33,7 @@
         margin:0;
         list-style: none;
         & li {
+          margin:0;
           color:white;
           display: inline-block;
           padding:10px;
