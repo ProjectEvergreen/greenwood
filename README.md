@@ -26,8 +26,8 @@ npm -i @greenwood/cli --save-dev
 yarn add @greenwood/cli --dev
 ```
 
-Then in your package.json, you can run the CLI like so:
-```json
+Then in your _package.json_, you can run the CLI like so:
+```javascript
 "scripts": {
   "build": "greenwood build",
   "start": "greenwood develop"
@@ -48,7 +48,7 @@ All of our documentation is on our [website](https://www.greenwoodjs.io/) (which
 - Styes and Assets
 
 ## Contributing
-We would love your contribution to Greenwood!  Please check out our issue tracker for "good first issue" label or feel to reach out to us on Gitter in the room "Greenwood" or on [Twitter](https://twitter.com/PrjEvergreen).
+We would love your [contribution](.github/CONTRIBUTING.md) to Greenwood!  Please check out our issue tracker for "good first issue" labels or feel to reach out to us on Gitter in the room "Greenwood" or on [Twitter](https://twitter.com/PrjEvergreen).
 
 ## License
 See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
