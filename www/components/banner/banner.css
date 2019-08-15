@@ -19,7 +19,6 @@
 }
 
 :host {
-  grid-area: banner;
 
   & .banner {
     background-color: #F6F2F4;
@@ -49,7 +48,6 @@
       }
 
       & img {
-        min-height:300px;
         max-width: 300px;
         max-height: 300px;
       }

@@ -1,5 +1,4 @@
 :host {
-  grid-area: header;
   & .header {
     background-color: #192a27;
     min-height: 30px;
