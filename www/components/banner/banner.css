@@ -44,12 +44,13 @@
         text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
       }
       & h3 {
+        padding-top: 10px;
         text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
       }
 
       & img {
-        max-width: 300px;
-        max-height: 300px;
+        width: 300px;
+        height: 300px;
       }
     }
 
@@ -68,9 +69,12 @@
 
       & .content {
         font-size: 1.5rem;
-
         & h1 {
           font-size: 3rem;
+        }
+        & img {
+          width: 250px;
+          height: 250px;
         }
       }
     }
