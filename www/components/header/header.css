@@ -48,7 +48,6 @@
     & .brand {
       justify-items: left;
       padding: 10px;
-      max-height:50px;
       & img {
         float:left;
         height: 30px;
