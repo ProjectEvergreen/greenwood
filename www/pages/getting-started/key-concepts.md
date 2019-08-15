@@ -61,7 +61,7 @@ class PageTemplate extends LitElement {
 customElements.define('page-template', PageTemplate);
 ```
 
-> Don't worry too much about the capitalized expressions, this is discussed in more detail in our [docs](/docs/template/).
+> Don't worry too much about the capitalized expressions, this is discussed in more detail in our [docs](/docs/template/).  Also, as seen here, Greenwood provides a version of [**LitElement**](https://lit-element.polymer-project.org/) by default that you can use for your own components if you would like.
 
 
 ### Pages
