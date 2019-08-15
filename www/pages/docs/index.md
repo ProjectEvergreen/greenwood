@@ -13,9 +13,9 @@ $ npm install @greenwood/cli --save-dev
 $ yarn add @greeenwood/cli --dev
 ```
 
-You can also run Greenwood globally as well.  For global usage we recommend using `npx`
+Though we recommend installing it locally to your project, you can also run Greenwood globally.  For global usage we recommend using `npx`
 ```render bash
-npx @greenwood/cli build
+$ npx @greenwood/cli <build>
 ```
 
 ### CLI
