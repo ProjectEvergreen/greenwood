@@ -12,7 +12,7 @@
     }
 
     & .project-name {
-      margin: 0 auto;
+      margin: -4px 0 auto;
       padding:0;
       padding-top:4px;
       display:inline-block;
@@ -65,9 +65,6 @@
         width:84px;
         height:20px;
       }
-    }
-    & .project-name {
-      margin-top: -2px;
     }
   }
 }
