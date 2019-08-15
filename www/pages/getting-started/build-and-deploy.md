@@ -21,7 +21,7 @@ If you look in your project directory, you will now have a _public/_ directory t
 ### Deploying and Hosting
 There are many ways to host and deploy a web site, but essentially any static hosting or web server will work for Greenwood, which keeps things simple and easy to setup.  No servers needed if you don't need them!  
 
-For the Greenwood website, our code is in [GitHub](https://github.com/ProjectEvergreen/greenwood) and we use [Netlify](https://www.netlify.com to deploy from our GitHub repo.  With Netlify, Greenwood configuration is straightforward.  Here is what our Netlify configuration looks like.
+For the Greenwood website, our code is in [GitHub](https://github.com/ProjectEvergreen/greenwood) and we use [Netlify](https://www.netlify.com) to deploy from our GitHub repo.  With Netlify, Greenwood configuration is straightforward.  Here is what our Netlify configuration looks like.
 
 ![getting-started-netlify-config](/assets/getting-started-netlify-config.png)
 
