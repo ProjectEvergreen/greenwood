@@ -1,5 +1,4 @@
 :host {
-  grid-area: header;
   & .header {
     background-color: #192a27;
     min-height: 30px;
@@ -11,11 +10,13 @@
       text-decoration:none;
     }
 
-    & h4 {
-      margin: 0 auto;
+    & .project-name {
+      margin: -2px 0 auto;
       padding:0;
       padding-top:4px;
       display:inline-block;
+      color: #1d337a;
+      font-weight: bold;
     }
 
     & .head-wrap {
@@ -32,6 +33,7 @@
         margin:0;
         list-style: none;
         & li {
+          margin:0;
           color:white;
           display: inline-block;
           padding:10px;
@@ -39,7 +41,6 @@
           color: #F9E7CA;
             & a {
               color:green;
-
             }
           }
         }
@@ -57,9 +58,10 @@
     & .social {
       margin-left:auto;
       text-align: right;
-    }
-    & .project-name {
-      margin-top: -2px;
+      & img {
+        width:84px;
+        height:20px;
+      }
     }
   }
 }
