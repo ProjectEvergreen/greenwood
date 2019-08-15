@@ -36,7 +36,7 @@ Out of the box, Greenwood provides some default content, so even if we use our n
 
 Neat!  But naturally you're here to learn how to make your own site, and this is our goal!  The first step towards making your site is to create a home page.  For this site, the home page will be a "full width" page.  
 
-1) For the template, create a _page-template.js_ in _src/templates/_ and include this code in it.
+1) For the template, create a _page-template.js_ in a directory located at _src/templates/_ (make the _templates/_ directory if it doesn't exist) and include this code in it:
 ```render javascript
 import { html, LitElement } from 'lit-element';
 MDIMPORT;
@@ -105,7 +105,7 @@ This is the Getting Started home page!
 
 For your blog posts, we can give them their own unique URLs by simply putting them in their own directory and by default Greenwood will "slugify" based on that file path.  
 
-First you'll want to create a folder called _blog/_ in _src/pages/_ and then create two markdown files called _first-post.md_ and _second-post.md_.  We are using something called ["front matter"](/docs/front-matter) to specify that these pages should use the _blog-template.js_ you just created.
+First you'll want to create a folder called _blog/_ in _src/pages/_ (make that _pages/_ directory if it doesn't exist) and then create two markdown files called _first-post.md_ and _second-post.md_.  We are using something called ["front matter"](/docs/front-matter) to specify that these pages should use the _blog-template.js_ you just created.
 
 _first-post.md_
 ```render md

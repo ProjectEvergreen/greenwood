@@ -23,7 +23,7 @@ There are many ways to host and deploy a web site, but essentially any static ho
 
 For the Greenwood website, our code is in [GitHub](https://github.com/ProjectEvergreen/greenwood) and we use [Netlify](https://www.netlify.com to deploy from our GitHub repo.  With Netlify, Greenwood configuration is straightforward.  Here is what our Netlify configuration looks like.
 
-![greenwood-netlify-config](/assets/greenwood-netlify-config.png)
+![getting-started-netlify-config](/assets/getting-started-netlify-config.png)
 
 
 We hope to add more guides for common hosting solutions but the beauty of Greenwood and static sites is that they can run just about anywhere with little or no configuration at all.
