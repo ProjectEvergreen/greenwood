@@ -11,11 +11,14 @@
       text-decoration:none;
     }
 
-    & h4 {
+    & .project-name {
       margin: 0 auto;
       padding:0;
       padding-top:4px;
       display:inline-block;
+      color: #1d337a;
+      font-size: 1.1em;
+      font-weight: bold;
     }
 
     & .head-wrap {
@@ -48,6 +51,7 @@
     & .brand {
       justify-items: left;
       padding: 10px;
+      max-height:50px;
       & img {
         float:left;
         height: 30px;
@@ -57,6 +61,10 @@
     & .social {
       margin-left:auto;
       text-align: right;
+      & img {
+        width:84px;
+        height:20px;
+      }
     }
     & .project-name {
       margin-top: -2px;

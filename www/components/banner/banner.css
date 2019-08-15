@@ -47,6 +47,11 @@
       & h3 {
         text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
       }
+
+      & img {
+        max-width: 300px;
+        max-height: 300px;
+      }
     }
 
     & span.off {

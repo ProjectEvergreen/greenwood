@@ -17,9 +17,9 @@ class HeaderComponent extends LitElement {
               <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer">
                 <img src="${brand}" alt="Greenwood logo"/>
               </a>
-              <h4 class="project-name">
+              <div class="project-name">
                 <a href="/">Greenwood</a>
-              </h4>
+              </div>
             </div>
             <nav>
               <ul>
@@ -30,7 +30,7 @@ class HeaderComponent extends LitElement {
             </nav>
             <div class="social">
               <a href="https://github.com/ProjectEvergreen/greenwood">
-                <img 
+                <img
                   src="https://img.shields.io/github/stars/ProjectEvergreen/greenwood.svg?style=social&logo=github&label=github"
                   alt="Greenwood GitHub Star Counter"
                 />
