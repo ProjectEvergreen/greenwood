@@ -26,6 +26,19 @@ npm -i @greenwood/cli --save-dev
 yarn add @greenwood/cli --dev
 ```
 
+Then in your package.json, you can run the CLI like so:
+```json
+"scripts": {
+  "build": "greenwood build",
+  "start": "greenwood develop"
+}
+```
+
+- `npm run build`: generates a static build of your project
+- `npm start`: starts a local development server for your project
+
+> Read more about [Greenwood's documention](https://www.greenwoodjs.io/docs/) on our website.
+
 ## Documentation
 All of our documentation is on our [website](https://www.greenwoodjs.io/) (which itself is built by Greenwood!).  See our website documentation to learn more about:
 - Configuration

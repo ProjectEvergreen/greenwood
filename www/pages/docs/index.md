@@ -13,7 +13,10 @@ $ npm install @greenwood/cli --save-dev
 $ yarn add @greeenwood/cli --dev
 ```
 
-> You can install Greenwood globally as well, though we encourage local installation of Greenwood as documented above.
+You can also run Greenwood globally as well.  For global usage we recommend using `npx`
+```render bash
+npx @greenwood/cli build
+```
 
 ### CLI
 With Greenwood installed, you can run its CLI to generate your site.  The commands available are:
@@ -29,9 +32,9 @@ As mentioned above, it is recommended to install Greenwood locally into your pro
 },
 ```
 
-Then you can run
-- `npm run build` - build your project
-- `npm start` - to fire up the local dev server
+Then you can run:
+- `npm run build` - generate a static build of your project for production
+- `npm start` - starts a development server for local development
 
 ### Sections
 - [Component Model](/docs/component-model/): Examples of using custom elements in Greenwood.
