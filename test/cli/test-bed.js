@@ -4,7 +4,7 @@
  *   workspace: path.join(process.cwd(), 'src'),
  *   devServer: {
        port: 1984,
-       host: 'http://localhost'
+       host: 'localhost'
      },
      publicPath: '/'
  * } 
