@@ -81,7 +81,7 @@ module.exports = readAndMergeConfig = async() => {
           
           if (devServer.host) {
             // eslint-disable-next-line max-depth
-            if (url.parse(devServer.host).hostname === null) {
+            if (url.parse(devServer.host).pathname === null) {
               reject(`Error: greenwood.config.js devServer host type must be a valid url, including http://.  Passed value was: ${devServer.host}`);
             } else {
               customConfig.devServer.host = devServer.host;
