@@ -77,8 +77,8 @@ OK, so we've made some content and some custom components, but what about the lo
 For global styles like Google fonts, Bootstrap, background colors, or browser resets, create a file called _src/styles/theme.css_ and Greenwood will make sure these styles get applied in the `<head>` of the doucment, outside of any Shadow DOMs.
 
 Here are some styles you can add to your site to snap things into place a little bit.
-_theme.css_
 ```render css
+/* theme.css */
 @import url('//fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
 
 * {

@@ -47,12 +47,12 @@
       "id": "objectives"
     }, {
       "index": 1,
-      "name": "Home Page",
-      "id": "home-page"
+      "name": "Home Page Template",
+      "id": "home-page-template"
     }, {
       "index": 2,
-      "name": "Blog Page",
-      "id": "blog-page"
+      "name": "Blog Posts Template",
+      "id": "blog-posts-template"
     }, {
       "index": 3,
       "name": "Creating Pages",
