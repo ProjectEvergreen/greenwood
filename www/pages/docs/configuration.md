@@ -18,7 +18,7 @@ module.exports = {
 ### Dev Server
 Configuration for Greenwood's development server are available using the `devServer` option.  Two options are available:
 - `port`: Pick a different port when starting the dev server
-- `host`: If you need to use a custom domain when developing locally (generally used along with editing an `/etc/hosts` file)
+- `host`: If you need to use a custom domain (using [pathname](https://nodejs.org/api/url.html#url_url_pathname)) when developing locally and generally used along with editing an `/etc/hosts` file.
 
 #### Example
 ```render js
