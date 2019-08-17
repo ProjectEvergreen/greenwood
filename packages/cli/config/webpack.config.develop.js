@@ -41,6 +41,7 @@ module.exports = ({ config, context, graph }) => {
     devServer: {
       port,
       host,
+      disableHostCheck: true,
       historyApiFallback: true,
       hot: false,
       inline: true
