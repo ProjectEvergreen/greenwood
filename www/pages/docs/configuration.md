@@ -60,8 +60,10 @@ Which would be equivalent to:
 
 ```render html
 <meta name="description" content="A modern and performant static site generator supporting Web Component based development">
-<meta name="twitter:site" content="@PrjEvergreen"><meta property="og:title" content="Greenwood">
-<meta property="og:type" content="website"><meta property="og:url" content="https://www.greenwoodjs.io/docs/">
+<meta name="twitter:site" content="@PrjEvergreen">
+<meta property="og:title" content="Greenwood">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.greenwoodjs.io/docs/">
 <meta property="og:image" content="https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png">
 <meta property="og:description" content="A modern and performant static site generator supporting Web Component based development">
 <link rel="shortcut icon" href="/assets/favicon.ico">
