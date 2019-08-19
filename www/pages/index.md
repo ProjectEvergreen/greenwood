@@ -7,6 +7,9 @@ template: 'home'
   <h2>Greenwood is a modern and performant static site generator for Web Component based development.</h2>
 
   <p>Greenwood is focused on providing an intuitive and accessible development workflow supporting modern JavaScript and CSS features like Web Components, FlexBox, CSS Grid, and Modules.  Greenwood strives to deliver not only great user experiences, but also great developer experiences.  To learn more about the project we encourage everyone to first go through our <a href="/getting-started/">Getting Started</a> guide.  You can learn more about the project itself at our <a href="/about">about page</a> or see our <a href="/docs"/>documentation</a> to learn more about how to use Greenwood.</p>
+
+  <p>Greenwood works great within the <a href="https://jamstack.org/" target="_blank" rel="noopener">JAMStack paradigm</a>.  Not familiar with it?  Check out <a href="<a href="https://www.youtube.com/watch?v=grSxHfGoaeg" target="_blank" rel="noopener">this talk on the topic</a> from <a href="https://jamstackconf.com/" target="_blank" rel="noopener">JAMStack Conf.</a</p>
+
   <hr/>
 </div>
 

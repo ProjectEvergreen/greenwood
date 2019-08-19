@@ -9,6 +9,8 @@
 ## Overview
 Greenwood is a modern and performant static site generator supporting Web Component based development.  For more information about how to get started, review our docs, or learn more about our project please visit our [website](https://www.greenwoodjs.io/).
 
+Greenwood works great within the [JAMStack](https://jamstack.org/) paradigm.  Not familiar with it?  Check out [this talk on the topic](https://www.youtube.com/watch?v=grSxHfGoaeg) from [JAMStack Conf](https://jamstackconf.com/).
+
 > Greenwood is currently a work in progress and we would love any help getting it to a 1.0 release.  Check out our [roadmap](https://github.com/ProjectEvergreen/greenwood/projects) to see what we're working on next and feel free to reach out through our [issue tracker](https://github.com/ProjectEvergreen/greenwood/issues) if you have any issues or would like to request a feature!
 
 ## Getting Started
