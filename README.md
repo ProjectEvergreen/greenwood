@@ -43,7 +43,7 @@ All of our documentation is on our [website](https://www.greenwoodjs.io/) (which
 - Pages
 - Templates
 - Component Model
-- Styes and Assets
+- Styles and Assets
 
 ## Contributing
 We would love your [contribution](.github/CONTRIBUTING.md) to Greenwood!  Please check out our issue tracker for "good first issue" labels or feel to reach out to us on Gitter in the room "Greenwood" or on [Twitter](https://twitter.com/PrjEvergreen).
