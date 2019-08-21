@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/cli",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "A modern and performant static site generator supporting Web Component based development.",
   "repository": "git@github.com:ProjectEvergreen/greenwood.git",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
