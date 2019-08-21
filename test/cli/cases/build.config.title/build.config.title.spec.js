@@ -66,7 +66,7 @@ describe('Build Greenwood With: ', async function() {
       it('should have a <script> tag in the <body>', function() {
         const scriptTag = dom.window.document.querySelectorAll('body script');
 
-        expect(scriptTag.length).to.be.equal(1);
+        expect(scriptTag.length).to.be.equal(3);
       });
 
       it('should have a router outlet tag in the <body>', function() {

@@ -42,10 +42,16 @@ describe('Build Greenwood With: ', async function() {
       });
 
       it('should serve assets from the configured publicPath', async () => {
-        const asset = dom.window.document.querySelector('body > script').getAttribute('src');
         const publicPath = '/assets/';
+        const scriptTags = dom.window.document.querySelectorAll('body script');
+        const bundledScripts = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src;
 
-        expect(asset.substring(0, 8)).to.be.equal(publicPath);
+          return src.indexOf('index.') >= 0 && src.indexOf('.bundle.js') >= 0;
+        });
+
+        console.log('src', bundledScripts[0].src);
+        expect(bundledScripts[0].src.indexOf(publicPath) >= 0).to.be.equal(true);
       });
     });
 

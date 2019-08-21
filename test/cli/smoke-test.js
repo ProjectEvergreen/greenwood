@@ -35,10 +35,15 @@ function defaultNotFound(label) {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, '404.html'));
       });
 
-      it('should have a <script> tag in the <body>', function() {
-        const scriptTag = dom.window.document.querySelectorAll('body script');
+      it('should have one bundle <script> tag in the <body>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body script');
+        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src;
 
-        expect(scriptTag.length).to.be.equal(1);
+          return src.indexOf('index.') >= 0 && src.indexOf('.bundle.js') >= 0;
+        });
+
+        expect(bundleScripts.length).to.be.equal(1);
       });
 
       it('should have a <title> tag in the <head>', function() {
@@ -73,10 +78,30 @@ function defaultIndex(label) {
         expect(title).to.be.equal('Greenwood App');
       });
 
-      it('should have a <script> tag in the <body>', function() {
+      it('should have three <script> tags in the <body>', function() {
         const scriptTag = dom.window.document.querySelectorAll('body script');
 
-        expect(scriptTag.length).to.be.equal(1);
+        expect(scriptTag.length).to.be.equal(3);
+      });
+
+      it('should have two polyfill <script> tags in the <body>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body script');
+        const polyfillScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
+          return script.src.indexOf('//cdnjs.cloudflare.com') >= 0;
+        });
+
+        expect(polyfillScriptTags.length).to.be.equal(2);
+      });
+
+      it('should have one bundle <script> tag in the <body>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body script');
+        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src;
+
+          return src.indexOf('index.') >= 0 && src.indexOf('.bundle.js') >= 0;
+        });
+
+        expect(bundleScripts.length).to.be.equal(1);
       });
 
       it('should have a router outlet tag in the <body>', function() {
