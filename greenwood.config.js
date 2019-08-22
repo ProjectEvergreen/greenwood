@@ -1,4 +1,5 @@
 const path = require('path');
+const MetaPlugin = require('./plugins/meta-plugin');
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
@@ -16,5 +17,8 @@ module.exports = {
     { property: 'og:description', content: META_DESCRIPTION },
     { rel: 'shortcut icon', href: FAVICON_HREF },
     { rel: 'icon', href: FAVICON_HREF }
+  ],
+  plugins: [
+    MetaPlugin
   ]
 };

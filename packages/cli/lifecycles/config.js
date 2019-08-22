@@ -20,11 +20,11 @@ module.exports = readAndMergeConfig = async() => {
     try {
       // deep clone of default config
       let customConfig = JSON.parse(JSON.stringify(defaultConfig));
-      
+
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
-        const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));        
-        const { workspace, devServer, publicPath, title, meta, themeFile } = userCfgFile;
-          
+        const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
+        const { workspace, devServer, publicPath, title, meta, plugins, themeFile } = userCfgFile;
+
         // workspace validation
         if (workspace) {
           if (typeof workspace !== 'string') {
@@ -43,7 +43,7 @@ module.exports = readAndMergeConfig = async() => {
 
           if (!fs.existsSync(customConfig.workspace)) {
             reject('Error: greenwood.config.js workspace doesn\'t exist! \n' +
-              'common issues to check might be: \n' + 
+              'common issues to check might be: \n' +
               '- typo in your workspace directory name, or in greenwood.config.js \n' +
               '- if using relative paths, make sure your workspace is in the same cwd as _greenwood.config.js_ \n' +
               '- consider using an absolute path, e.g. path.join(__dirname, \'my\', \'custom\', \'path\') // <__dirname>/my/custom/path/ ');
@@ -70,6 +70,10 @@ module.exports = readAndMergeConfig = async() => {
           customConfig.meta = meta;
         }
 
+        if (plugins && plugins.length > 0) {
+          customConfig.plugins = plugins;
+        }
+
         if (themeFile) {
           if (typeof themeFile !== 'string' && themeFile.indexOf('.') < 1) {
             reject(`Error: greenwood.config.js themeFile must be a valid filename. got ${themeFile} instead.`);
@@ -78,7 +82,7 @@ module.exports = readAndMergeConfig = async() => {
         }
 
         if (devServer && Object.keys(devServer).length > 0) {
-          
+
           if (devServer.host) {
             // eslint-disable-next-line max-depth
             if (url.parse(devServer.host).hostname === null) {
