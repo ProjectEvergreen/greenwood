@@ -37,9 +37,11 @@ module.exports = class TestBed {
   runGreenwoodCommand(task) {
     return new Promise(async (resolve, reject) => {
       let err = '';
-
+      
+      const cliPath = path.join(process.cwd(), './packages/cli/src/index.js');
+      
       const runner = os.platform() === 'win32' ? 'node.cmd' : 'node';
-      const npm = spawn(runner, ['../../../../../packages/cli/src/index.js', task], {
+      const npm = spawn(runner, [cliPath, task], {
         cwd: this.rootDir
       });
 
