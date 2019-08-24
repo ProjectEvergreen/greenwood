@@ -1,3 +1,11 @@
+/*
+ * This module can be used to run a suite of smoke tests for any CLI based test case to
+ * verify default behavior and output.  Can be run a-la carte to help reduce duplication and 
+ * boilerplate when writing tests.
+ * 
+ * There are a number of examples in the CLI package you can use as a reference.
+ *
+ */
 const expect = require('chai').expect;
 const fs = require('fs');
 const glob = require('glob-promise');

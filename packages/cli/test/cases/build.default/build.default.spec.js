@@ -14,7 +14,7 @@
  * User Workspace
  * Greenwood default (src/)
  */
-const runSmokeTest = require('../../smoke-test');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {

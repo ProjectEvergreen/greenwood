@@ -15,7 +15,7 @@
 const expect = require('chai').expect;
 const fs = require('fs');
 const path = require('path');
-const runSmokeTest = require('../../smoke-test');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {

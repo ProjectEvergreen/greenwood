@@ -17,7 +17,7 @@
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const expect = require('chai').expect;
-const runSmokeTest = require('../../smoke-test');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', async function() {
