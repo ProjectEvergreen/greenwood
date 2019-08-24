@@ -18,7 +18,7 @@ jobs:
 
       - run:
           name: Install Project Dependencies
-          command: yarn install --frozen-lockfile
+          command: yarn install --frozen-lockfile && yarn lerna boostrap
 
       - run:
           name: Run Linter
@@ -29,5 +29,5 @@ jobs:
           command: yarn test
 
       - run:
-          name: Run CLI Script (index.js)
+          name: Build Greenwood Website
           command: yarn clean && yarn build
