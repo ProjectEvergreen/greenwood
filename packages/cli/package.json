@@ -9,12 +9,7 @@
     "greenwood": "./index.js"
   },
   "files": [
-    "config/",
-    "lib/",
-    "lifecycles/",
-    "plugins/",
-    "tasks/",
-    "templates/",
+    "src/",
     "index.js"
   ],
   "publishConfig": {
