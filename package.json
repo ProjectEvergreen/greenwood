@@ -15,12 +15,12 @@
   "scripts": {
     "lerna": "lerna",
     "clean": "rimraf ./**/.greenwood/** && rimraf ./**/public/** && rimraf ./coverage",
-    "lint": "eslint \"./packages/**/**/*.js\" \"./test/**/**/*.js\" \"./www/**/**/*.js\"",
+    "lint": "eslint \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
     "build": "yarn clean && node . build",
     "serve": "yarn build && cd ./public && ws",
     "develop": "yarn clean && node . develop",
-    "test": "yarn clean && nyc mocha ./test/**/**/**/*.spec.js --timeout 30000",
-    "test:tdd": "yarn clean && mocha --watch ./test/**/**/**/*.spec.js --timeout 15000"
+    "test": "yarn clean && nyc mocha ./packages/**/test/**/**/*.spec.js --timeout 30000",
+    "test:tdd": "yarn clean && mocha --watch ./packages/**/test/**/**/*.spec.js --timeout 15000"
   },
   "devDependencies": {
     "chai": "^4.2.0",
