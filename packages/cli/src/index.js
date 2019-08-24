@@ -9,10 +9,10 @@ require('colors');
 const chalk = require('chalk');
 const path = require('path');
 const program = require('commander');
-const generateCompilation = require('./src/lifecycles/compile');
-const runProdBuild = require('./src/tasks/build');
-const runDevServer = require('./src/tasks/develop');
-const scriptPkg = require(path.join(__dirname, 'package.json'));
+const generateCompilation = require('./lifecycles/compile');
+const runProdBuild = require('./tasks/build');
+const runDevServer = require('./tasks/develop');
+const scriptPkg = require(path.join(__dirname, '..', 'package.json'));
 
 let MODE = '';
 

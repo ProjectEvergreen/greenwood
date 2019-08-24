@@ -6,11 +6,10 @@
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "bin": {
-    "greenwood": "./index.js"
+    "greenwood": "./src/index.js"
   },
   "files": [
-    "src/",
-    "index.js"
+    "src/"
   ],
   "publishConfig": {
     "access": "public"

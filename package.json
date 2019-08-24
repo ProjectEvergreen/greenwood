@@ -5,7 +5,7 @@
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
-  "main": "./packages/cli/index.js",
+  "main": "./packages/cli/src/index.js",
   "workspaces": {
     "packages": [
       "packages/*",
