@@ -4,7 +4,7 @@ const ManifestPlugin = require('webpack-manifest-plugin');
 const FilewatcherPlugin = require('filewatcher-webpack-plugin');
 const generateCompilation = require('../lifecycles/compile');
 const webpackMerge = require('webpack-merge');
-const commonConfig = require(path.join(__dirname, './webpack.config.common.js'));
+const commonConfig = require('./webpack.config.common.js');
 
 let isRebuilding = false;
 

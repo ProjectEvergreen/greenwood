@@ -1,7 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpackMerge = require('webpack-merge');
-const commonConfig = require(path.join(__dirname, './webpack.config.common.js'));
+const commonConfig = require('./webpack.config.common.js');
 
 module.exports = ({ config, context, graph }) => {
   const configWithContext = commonConfig({ config, context, graph });

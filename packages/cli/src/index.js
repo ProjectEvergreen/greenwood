@@ -6,13 +6,13 @@
 process.setMaxListeners(0);
 
 require('colors');
+
 const chalk = require('chalk');
-const path = require('path');
 const program = require('commander');
 const generateCompilation = require('./lifecycles/compile');
 const runProdBuild = require('./tasks/build');
 const runDevServer = require('./tasks/develop');
-const scriptPkg = require(path.join(__dirname, '..', 'package.json'));
+const scriptPkg = require('../package.json');
 
 let MODE = '';
 
