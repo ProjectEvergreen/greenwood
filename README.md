@@ -5,6 +5,7 @@
 [![GitHub issues](https://img.shields.io/github/issues-raw/ProjectEvergreen/greenwood.svg)](https://github.com/ProjectEvergreen/greenwood/issues)
 [![GitHub issues](https://img.shields.io/github/issues-pr-raw/ProjectEvergreen/greenwood.svg)](https://github.com/ProjectEvergreen/greenwood/issues)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ProjectEvergreen/greenwood/master/LICENSE.md)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
 ## Overview
 Greenwood is a modern and performant static site generator supporting Web Component based development.  For more information about how to get started, review our docs, or learn more about our project please visit our [website](https://www.greenwoodjs.io/).
