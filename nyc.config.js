@@ -3,10 +3,10 @@ module.exports = {
   all: true,
   
   include: [
-    'packages/cli/lib/*.js',
-    'packages/cli/lifecycles/*.js',
-    'packages/cli/plugins/*.js',
-    'packages/cli/tasks/*.js'
+    'packages/cli/src/lib/*.js',
+    'packages/cli/src/lifecycles/*.js',
+    'packages/cli/src/plugins/*.js',
+    'packages/cli/src/tasks/*.js'
   ],
 
   reporter: [
