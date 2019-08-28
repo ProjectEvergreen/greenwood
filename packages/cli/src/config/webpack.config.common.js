@@ -51,6 +51,24 @@ module.exports = ({ config, context }) => {
     }
   ];
 
+  const customHooks = config.plugins
+    .filter((plugin) => plugin.type === 'hook')
+    .map((plugin) => {
+      const supportedHooks = ['hookAnalytics', 'hookPolyfills'];
+      const providerResult = plugin.provider();
+
+      return Object.keys(providerResult).map((key) => {
+        if (key !== 'type' && supportedHooks.indexOf(key) >= 0 && providerResult[key]) {
+          return new HtmlWebpackPlugin({
+            // filename: context.indexPageTemplate,
+            template: path.join(context.scratchDir, context.indexPageTemplate),
+            [key]: providerResult[key]
+          });
+        }
+      })[0];
+
+    });
+
   return {
     entry: {
       index: path.join(context.scratchDir, 'app', 'app.js')
@@ -119,7 +137,9 @@ module.exports = ({ config, context }) => {
         filename: path.join(context.publicDir, context.indexPageTemplate),
         template: path.join(context.scratchDir, context.indexPageTemplate),
         chunksSortMode: 'dependency'
-      })
+      }),
+
+      ...customHooks
     ]
   };
 };

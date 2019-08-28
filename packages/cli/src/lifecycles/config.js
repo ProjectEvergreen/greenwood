@@ -11,6 +11,7 @@ let defaultConfig = {
   publicPath: '/',
   title: 'Greenwood App',
   meta: [],
+  plugins: [],
   themeFile: 'theme.css'
 };
 
@@ -23,7 +24,7 @@ module.exports = readAndMergeConfig = async() => {
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));        
-        const { workspace, devServer, publicPath, title, meta, themeFile } = userCfgFile;
+        const { workspace, devServer, publicPath, title, meta, plugins, themeFile } = userCfgFile;
           
         // workspace validation
         if (workspace) {
@@ -68,6 +69,20 @@ module.exports = readAndMergeConfig = async() => {
 
         if (meta && meta.length > 0) {
           customConfig.meta = meta;
+        }
+
+        if (plugins && plugins.length > 0) {
+          const types = ['hook', 'puck'];
+
+          plugins.forEach(plugin => {
+            if (!plugin.type || types.indexOf(plugin.type) < 0) {
+              reject(`Error: greenwood.config.js plugins must be one of type "${types.join(',')}". got "${plugin.type}" instead.`);
+            }
+
+            // TODO test for provider type
+          });
+
+          customConfig.plugins = plugins;
         }
 
         if (themeFile) {

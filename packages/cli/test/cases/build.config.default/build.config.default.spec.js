@@ -3,7 +3,7 @@
  * Run Greenwood with empty config object and default workspace.
  * 
  * Uaer Result
- * TShould generate a bare bones Greenwood build.  (same as build.default.spec.js)
+ * Should generate a bare bones Greenwood build.  (same as build.default.spec.js)
  * 
  * User Command
  * greenwood build
