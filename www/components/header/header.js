@@ -26,6 +26,7 @@ class HeaderComponent extends LitElement {
                 <li><a href="/about">About</a></li>
                 <li><a href="/getting-started">Getting Started</a></li>
                 <li><a href="/docs">Docs</a></li>
+                <li><a href="/plugins">Plugins</a></li>
               </ul>
             </nav>
             <div class="social">
