@@ -50,7 +50,6 @@ describe('Build Greenwood With: ', async function() {
           return src.indexOf('index.') >= 0 && src.indexOf('.bundle.js') >= 0;
         });
 
-        console.log('src', bundledScripts[0].src);
         expect(bundledScripts[0].src.indexOf(publicPath) >= 0).to.be.equal(true);
       });
     });
