@@ -36,7 +36,7 @@ module.exports = {
 ```
 
 ### Custom Index File
-It should be noted that if these specific hook types are too limiting Greenwood supports users providing their own _index.html_ in the root of their workspace directory that can either be used to define your own hooks or just hardcode everything you need instead of using plugins.  
+It should be noted that if these specific hook types are too limiting Greenwood supports providing your own _index.html_ in the root of your workspace directory.  This can either be used to define your own hooks or just hardcode everything you need instead of using plugins.  
 
 The minimum recommended markup for a custom _index.html_ would be this following:
 ```render html
@@ -60,6 +60,45 @@ The minimum recommended markup for a custom _index.html_ would be this following
 
   </body>
   
+</html>
+```
+
+To add your own hook, define it in a _greenwood.config.js_
+```render javascript
+module.exports = {
+
+  ...
+  
+  plugins: [{
+    type: 'hook',
+    provider: (compilation) => {
+      // you can access things like config, context if you need from compilation
+      return {
+        myCustomHook: \`
+          <div>My custom HTML here</div>
+        \`
+      ]
+    }
+  }]
+
+}
+```
+
+
+And updated _index.html_
+```render html
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
+
+  ...
+
+  <body>
+  
+    <eve-app></eve-app>
+
+    <%= htmlWebpackPlugin.options.myCustomHook %>
+
+  </body>
 </html>
 ```
 
