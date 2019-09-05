@@ -51,6 +51,17 @@ module.exports = ({ config, context }) => {
     }
   ];
 
+  const customOptions = Object.assign({}, ...config.plugins
+    .filter((plugin) => plugin.type === 'index')
+    .map((plugin) => plugin.provider())
+    .filter((providerResult) => {
+      return Object.keys(providerResult).map((key) => {
+        if (key !== 'type') {
+          return providerResult[key];
+        }
+      });
+    }));
+
   return {
     entry: {
       index: path.join(context.scratchDir, 'app', 'app.js')
@@ -118,7 +129,8 @@ module.exports = ({ config, context }) => {
       new HtmlWebpackPlugin({
         filename: path.join(context.publicDir, context.indexPageTemplate),
         template: path.join(context.scratchDir, context.indexPageTemplate),
-        chunksSortMode: 'dependency'
+        chunksSortMode: 'dependency',
+        ...customOptions
       })
     ]
   };
