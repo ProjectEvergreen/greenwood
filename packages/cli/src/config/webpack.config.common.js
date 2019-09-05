@@ -51,8 +51,8 @@ module.exports = ({ config, context }) => {
     }
   ];
 
-  const customHooks = Object.assign({}, ...config.plugins
-    .filter((plugin) => plugin.type === 'hook')
+  const customOptions = Object.assign({}, ...config.plugins
+    .filter((plugin) => plugin.type === 'index')
     .map((plugin) => plugin.provider())
     .filter((providerResult) => {
       return Object.keys(providerResult).map((key) => {
@@ -130,7 +130,7 @@ module.exports = ({ config, context }) => {
         filename: path.join(context.publicDir, context.indexPageTemplate),
         template: path.join(context.scratchDir, context.indexPageTemplate),
         chunksSortMode: 'dependency',
-        ...customHooks
+        ...customOptions
       })
     ]
   };

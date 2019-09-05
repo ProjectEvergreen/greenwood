@@ -72,7 +72,7 @@ module.exports = readAndMergeConfig = async() => {
         }
 
         if (plugins && plugins.length > 0) {
-          const types = ['hook'];
+          const types = ['index'];
 
           plugins.forEach(plugin => {
             if (!plugin.type || types.indexOf(plugin.type) < 0) {

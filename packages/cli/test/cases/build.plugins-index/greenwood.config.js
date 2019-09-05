@@ -1,7 +1,7 @@
 module.exports = {
   
   plugins: [{
-    type: 'hook',
+    type: 'index',
     provider: () => {
       return {
         hookAnalytics: `
@@ -12,7 +12,7 @@ module.exports = {
       };
     }
   }, {
-    type: 'hook',
+    type: 'index',
     provider: () => {
       return {
         hookPolyfills: `

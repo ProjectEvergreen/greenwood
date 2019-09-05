@@ -14,5 +14,5 @@ Greenwood aims to cater to all these use cases through two ways:
 ### APIs
 While each API has its own documentation section on the left sidebar of this page, here is a quick overview of the current set of Plugin APIs Greenwood supports.
 
-#### Template Hooks
+#### Index Hooks
 It is common when working with certain libraries (3rd party or otherwise) that scripts _must_ be loaded globally and / or unbundled.  Good examples of these are analytics libraries and polyfills.  With a template hook plugin, users can leverage predefined "injection" sites to add this code to their project's _index.html_.

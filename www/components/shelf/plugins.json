@@ -1,7 +1,7 @@
 [
   {
     "index": 0,
-    "name": "Template Hooks",
-    "path": "/plugins/hooks"
+    "name": "Index Hooks",
+    "path": "/plugins/index-hooks"
   }
 ]

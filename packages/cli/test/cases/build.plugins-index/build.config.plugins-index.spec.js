@@ -11,7 +11,7 @@
  * User Config
  * {
  *   plugins: [{
- *     type: 'hook',
+ *     type: 'index',
  *     provider: () => {
  *       return {
  *         hookAnalytics: `
@@ -20,7 +20,7 @@
  *       };
  *     }
  *   }, {
- *     type: 'hook',
+ *     type: 'index',
  *     provider: () => {
  *       return {
  *         hookPolyfills: `
@@ -42,11 +42,11 @@ const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', async function() {
-  const LABEL = 'Custom Hook Plugins and Default Workspace';
+  const LABEL = 'Custom Index Plugin and Default Workspace';
   let setup;
 
   before(async function() {
-    setup = new TestBed(true);
+    setup = new TestBed();
     this.context = setup.setupTestBed(__dirname);
   });
   
@@ -57,7 +57,7 @@ describe('Build Greenwood With: ', async function() {
     
     runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
 
-    describe('Custom Hooks', function() {
+    describe('Custom Index Hooks', function() {
       let dom;
 
       beforeEach(async function() {
