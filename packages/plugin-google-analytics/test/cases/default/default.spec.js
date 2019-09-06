@@ -29,6 +29,8 @@ const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', async function() {
   const LABEL = 'Google Analytics Plugin and Default Workspace';
+  const analyticsId = 'UA-123456-1';
+
   let setup;
 
   before(async function() {
@@ -48,7 +50,7 @@ describe('Build Greenwood With: ', async function() {
 
       beforeEach(async function() {
         const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-        const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
+        const scriptTags = dom.window.document.querySelectorAll('head script');
 
         inlineScript = Array.prototype.slice.call(scriptTags).filter(script => {
           return !script.src;
@@ -62,9 +64,11 @@ describe('Build Greenwood With: ', async function() {
 
       it('should have the expected code with users analyicsId', function() {
         const expectedContent = `
-            window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-            ga('create', 'UA-123456', 'auto');
-            ga('send', 'pageview');
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', '${analyticsId}');
         `;
 
         expect(inlineScript[0].textContent).to.contain(expectedContent);
@@ -76,10 +80,10 @@ describe('Build Greenwood With: ', async function() {
 
       beforeEach(async function() {
         const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-        const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
+        const scriptTags = dom.window.document.querySelectorAll('head script');
         
         trackingScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.src === 'https://www.google-analytics.com/analytics.js';
+          return script.src === `https://www.googletagmanager.com/gtag/js?id=${analyticsId}`;
         });
       });
 

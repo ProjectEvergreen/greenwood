@@ -1,3 +1,4 @@
+const googleAnalyticsPlugin = require('./packages/plugin-google-analytics/src/index');
 const path = require('path');
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
@@ -16,5 +17,8 @@ module.exports = {
     { property: 'og:description', content: META_DESCRIPTION },
     { rel: 'shortcut icon', href: FAVICON_HREF },
     { rel: 'icon', href: FAVICON_HREF }
+  ],
+  plugins: [
+    ...googleAnalyticsPlugin('UA-147204327-1')
   ]
 };

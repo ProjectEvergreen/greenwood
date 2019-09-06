@@ -86,6 +86,12 @@ function defaultIndex(label) {
         expect(title).to.be.equal('Greenwood App');
       });
 
+      it('should have three <script> tags in the <body>', function() {
+        const scriptTag = dom.window.document.querySelectorAll('body script');
+
+        expect(scriptTag.length).to.be.equal(3);
+      });
+      
       it('should have two <script> tags for polyfills loaded at the end of the <body> tag', function() {
         const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
         const polyfillScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
