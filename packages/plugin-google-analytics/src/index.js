@@ -1,4 +1,10 @@
 module.exports = (analyticsId) => {
+  const validId = analyticsId && typeof analyticsId === 'string';
+
+  if (!validId) {
+    throw new Error(`Error: analyticsId should be of type string.  get "${typeof analyticsId}" instead.`);
+  }
+
   return [{
     type: 'index',
     provider: () => {

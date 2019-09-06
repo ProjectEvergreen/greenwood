@@ -9,16 +9,11 @@
  * greenwood build
  * 
  * User Config
+ * const googleAnalyticsPlugin = require('@greenwod/plugin-google-analytics');
+ * 
  * {
  *   plugins: [{
- *     type: 'index',
- *     provider: () => {
- *       return {
- *         hookAnalytics: `
- *           <!-- Google Analytics setup script -->
- *         `
- *       };
- *     }
+ *     ...googleAnalyticsPlugin()
  *  }]
  * 
  * }
@@ -32,7 +27,7 @@ const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-describe.only('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', async function() {
   const LABEL = 'Google Analytics Plugin and Default Workspace';
   let setup;
 
