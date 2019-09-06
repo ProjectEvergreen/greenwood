@@ -6,7 +6,7 @@
   },
   {
     "index": 1,
-    "name": "Custom Plugins",
-    "path": "/plugins/custom-plugins"
+    "name": "Composite Plugins",
+    "path": "/plugins/composite-plugins"
   }
 ]
