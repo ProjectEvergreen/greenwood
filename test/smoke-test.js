@@ -86,14 +86,8 @@ function defaultIndex(label) {
         expect(title).to.be.equal('Greenwood App');
       });
 
-      it('should have three <script> tags in the <body>', function() {
-        const scriptTag = dom.window.document.querySelectorAll('body script');
-
-        expect(scriptTag.length).to.be.equal(3);
-      });
-
-      it('should have two polyfill <script> tags in the <body>', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body script');
+      it('should have two <script> tags for polyfills loaded at the end of the <body> tag', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
         const polyfillScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.src.indexOf('//cdnjs.cloudflare.com') >= 0;
         });
@@ -101,8 +95,8 @@ function defaultIndex(label) {
         expect(polyfillScriptTags.length).to.be.equal(2);
       });
 
-      it('should have one bundle <script> tag in the <body>', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body script');
+      it('should have <script> tag for loading main JavaScript bundle at the end of the <body> tag', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
         const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src;
 
