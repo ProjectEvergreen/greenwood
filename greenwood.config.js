@@ -19,6 +19,8 @@ module.exports = {
     { rel: 'icon', href: FAVICON_HREF }
   ],
   plugins: [
-    ...googleAnalyticsPlugin('UA-147204327-1')
+    ...googleAnalyticsPlugin({
+      analyticsId: 'UA-147204327-1'
+    })
   ]
 };

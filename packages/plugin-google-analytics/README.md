@@ -29,9 +29,15 @@ module.exports = {
   ...
 
   plugins: [
-    ...googleAnalyticsPlugin('UA-XXXXXX')
+    ...googleAnalyticsPlugin({
+      analyticsId: 'UA-XXXXXX'
+    })
   ]
 }
 ```
 
 This will then add the Google Analytics [JavaScript tracker snippet](https://developers.google.com/analytics/devguides/collection/analyticsjs/) to your project's _index.html_.
+
+### Options
+- `analyticsId` (required) - Your Google Analytics ID
+- `anonymous` (optional) - If tracking of IPs should be done anonymously.  Defaults to `true`

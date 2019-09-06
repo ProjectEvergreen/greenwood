@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with Google Analytics composite plugin with default options.
+ * Run Greenwood with Google Analytics composite plugin with IP anonymization set to false.
  * 
  * Uaer Result
  * Should generate a bare bones Greenwood build with certain plugins injected into index.html.
@@ -14,7 +14,8 @@
  * {
  *   plugins: [{
  *     ...googleAnalyticsPlugin({
- *       analyticsId: 'UA-123456-1'
+ *       analyticsId: 'UA-123456-1',
+ *       anonymouse: false
  *     })
  *  }]
  * 
@@ -30,7 +31,7 @@ const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', async function() {
-  const LABEL = 'Google Analytics Plugin with default options and Default Workspace';
+  const LABEL = 'Google Analytics Plugin with IP Anonymization tracking set to false and Default Workspace';
   const mockAnalyticsId = 'UA-123456-1';
 
   let setup;
@@ -70,7 +71,7 @@ describe('Build Greenwood With: ', async function() {
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
 
-            gtag('config', '${mockAnalyticsId}', { 'anonymize_ip': true });
+            gtag('config', '${mockAnalyticsId}', { 'anonymize_ip': false });
             gtag('config', '${mockAnalyticsId}');
         `;
 
