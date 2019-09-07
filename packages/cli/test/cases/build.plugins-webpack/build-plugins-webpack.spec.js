@@ -63,7 +63,7 @@ describe('Build Greenwood With: ', async function() {
         bundleFile = bundleScripts[0].src.replace('file:///', '');
       });
 
-      it('should have placeholder for hookAnalytics', function() {        
+      it('should have the banner text in index.js', function() {        
         const fileContents = fs.readFileSync(path.resolve(this.context.publicDir, bundleFile), 'utf8');
         
         expect(fileContents).to.contain(mockBanner);
