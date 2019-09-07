@@ -17,7 +17,7 @@ module.exports = {
   
   plugins: [{
     type: 'webpack',
-    provider: (compilation) => {
+    provider: () => {
       return new webpack.BannerPlugin(\`My App v${version}\`);
     }
   }]
