@@ -1,12 +1,17 @@
 [
   {
     "index": 0,
+    "name": "Composite Plugins",
+    "path": "/plugins/composite-plugins"
+  },
+  {
+    "index": 1,
     "name": "Index Hooks",
     "path": "/plugins/index-hooks"
   },
   {
-    "index": 1,
-    "name": "Composite Plugins",
-    "path": "/plugins/composite-plugins"
+    "index": 2,
+    "name": "Webpack Plugins",
+    "path": "/plugins/webpack"
   }
 ]
