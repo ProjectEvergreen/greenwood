@@ -16,7 +16,8 @@ module.exports = {
     { property: 'og:image', content: 'https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png' },
     { property: 'og:description', content: META_DESCRIPTION },
     { rel: 'shortcut icon', href: FAVICON_HREF },
-    { rel: 'icon', href: FAVICON_HREF }
+    { rel: 'icon', href: FAVICON_HREF },
+    { name: 'google-site-verification', content: '4rYd8k5aFD0jDnN0CCFgUXNe4eakLP4NnA18mNnK5P0' }
   ],
   plugins: [
     ...googleAnalyticsPlugin({
