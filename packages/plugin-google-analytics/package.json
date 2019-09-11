@@ -1,0 +1,18 @@
+{
+  "name": "@greenwood/plugin-google-analytics",
+  "version": "0.3.6",
+  "description": "A composite plugin for Greenwood for adding support for Google Analytics.",
+  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-google-analytics",
+  "author": "Owen Buckley <owen@thegreenhouse.io>",
+  "license": "MIT",
+  "main": "src/index.js",
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@greenwood/cli": "^0.3.6"
+  }
+}
