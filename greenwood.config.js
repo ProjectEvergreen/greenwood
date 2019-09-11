@@ -1,3 +1,4 @@
+const googleAnalyticsPlugin = require('./packages/plugin-google-analytics/src/index');
 const path = require('path');
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
@@ -15,6 +16,12 @@ module.exports = {
     { property: 'og:image', content: 'https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png' },
     { property: 'og:description', content: META_DESCRIPTION },
     { rel: 'shortcut icon', href: FAVICON_HREF },
-    { rel: 'icon', href: FAVICON_HREF }
+    { rel: 'icon', href: FAVICON_HREF },
+    { name: 'google-site-verification', content: '4rYd8k5aFD0jDnN0CCFgUXNe4eakLP4NnA18mNnK5P0' }
+  ],
+  plugins: [
+    ...googleAnalyticsPlugin({
+      analyticsId: 'UA-147204327-1'
+    })
   ]
 };
