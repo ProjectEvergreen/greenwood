@@ -51,6 +51,7 @@ module.exports = ({ config, context }) => {
     }
   ];
 
+  // gets Index Hooks to pass as options to HtmlWebpackPlugin
   const customOptions = Object.assign({}, ...config.plugins
     .filter((plugin) => plugin.type === 'index')
     .map((plugin) => plugin.provider())
@@ -61,6 +62,11 @@ module.exports = ({ config, context }) => {
         }
       });
     }));
+
+  // gets webpack plugins passed in directly by fhe user
+  const customWebpackPlugins = config.plugins
+    .filter((plugin) => plugin.type === 'webpack')
+    .map((plugin) => plugin.provider());
 
   return {
     entry: {
@@ -131,7 +137,9 @@ module.exports = ({ config, context }) => {
         template: path.join(context.scratchDir, context.indexPageTemplate),
         chunksSortMode: 'dependency',
         ...customOptions
-      })
+      }),
+
+      ...customWebpackPlugins
     ]
   };
 };

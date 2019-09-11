@@ -38,7 +38,7 @@ describe('Build Greenwood With: ', () => {
       try { 
         await setup.runGreenwoodCommand('build');
       } catch (err) {
-        expect(err).to.contain('Error: greenwood.config.js plugins must be one of type "index". got "indexxx" instead.');
+        expect(err).to.contain('Error: greenwood.config.js plugins must be one of type "index, webpack". got "indexxx" instead.');
       }
     });
   });

@@ -72,11 +72,11 @@ module.exports = readAndMergeConfig = async() => {
         }
 
         if (plugins && plugins.length > 0) {
-          const types = ['index'];
+          const types = ['index', 'webpack'];
 
           plugins.forEach(plugin => {
             if (!plugin.type || types.indexOf(plugin.type) < 0) {
-              reject(`Error: greenwood.config.js plugins must be one of type "${types.join(',')}". got "${plugin.type}" instead.`);
+              reject(`Error: greenwood.config.js plugins must be one of type "${types.join(', ')}". got "${plugin.type}" instead.`);
             }
 
             if (!plugin.provider || typeof plugin.provider !== 'function') {
