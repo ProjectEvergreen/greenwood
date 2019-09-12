@@ -15,8 +15,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@babel/core": "^7.4.0",
-    "@babel/preset-env": "^7.4.1",
+    "@babel/core": "^7.6.0",
+    "@babel/preset-env": "^7.6.0",
     "babel-loader": "^8.0.5",
     "babel-plugin-transform-builtin-classes": "^0.6.1",
     "chalk": "^2.4.2",

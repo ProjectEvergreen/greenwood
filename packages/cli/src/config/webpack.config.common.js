@@ -82,15 +82,7 @@ module.exports = ({ config, context }) => {
     module: {
       rules: [{
         test: /\.js$/,
-        loader: 'babel-loader',
-        options: {
-          presets: ['@babel/preset-env'],
-          plugins: [
-            ['babel-plugin-transform-builtin-classes', {
-              globals: ['LitElement']
-            }]
-          ]
-        }
+        loader: 'babel-loader'
       }, {
         test: /\.md$/,
         loader: 'wc-markdown-loader',
