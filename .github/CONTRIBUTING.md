@@ -98,3 +98,14 @@ The Greenwood website is currently built by Greenwood and all files are located 
 1. Open `localhost:1984` in your browser
 
 From there, the dev server will watch for changes and reload as needed.
+
+## Internet Explorer
+For situations that require testing Internet Explorer or Edge browser, Microsoft [provides Virtual Machines](https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/) for various combinations of Windows and Internet Explorer versions.  [VirtualBox](https://www.virtualbox.org/) is a good platform to use for these VMs.
+
+To test from a VM, you can
+1. Run `yarn serve`
+1. From the VM, open `http://10.0.2.2:8000` in the browser
+
+You can disable plugins in _webpack.config.prod.js_ to remove production optimizations for testing purposes.
+
+> Note: `yarn develop` does not work right now with IE11 and Edge.
