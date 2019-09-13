@@ -45,6 +45,17 @@ Greenwood is organized into packages as a monorepo, managed by [Lerna](https://l
 
 Lerna (specifically `lerna publish`) will be used to release all packagess under a single version.  Lerna configuration can be found in _lerna.json_.
 
+### Dependencies
+To `yarn add` / `yarn remove` packages from anything in _packages/_ or _www/_, please make sure you `cd` into the directory with the _package.json_ first.
+
+For example
+```shell
+$ cd packages/cli
+$ yarn add <package>
+```
+
+Yarn workspaces will automatically handle installing _node_modules_ in the appropriate directory.
+
 ### Testing
 [TDD](https://en.wikipedia.org/wiki/Test-driven_development) is the recommended approach for developing for Greenwood and for the style of test writing we use [BDD style testing](https://en.wikipedia.org/wiki/Behavior-driven_development); "cases".  Cases are used to capture the various configurations and expected outputs of Greenwood when running its  commands, in a way that is closer to how a user would be expecting Greenwood to work.
 

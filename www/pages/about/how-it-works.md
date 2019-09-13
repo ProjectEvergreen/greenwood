@@ -44,7 +44,7 @@ _In this way, as browsers and usage matures, so will the generated JavaScript co
 
 
 ### Browser Support
-As discussed above, Greenwood is able to leverage a build that can intelligently transpile projects to meet the widest use case of modern evergreen browsers as well as IE11!  This means users will get the right polyfills and syntax (courtesy of [**core-js**](https://babeljs.io/docs/en/babel-preset-env#corejs)), while allowing developers to write modern code.
+As discussed above, Greenwood is able to leverage a build that can intelligently transpile projects to meet the widest use case of modern evergreen browsers as well as IE11!  This means users will get the right polyfills and syntax (courtesy of [**core-js**](https://babeljs.io/docs/en/babel-preset-env#corejs)), while allowing developers to write modern code.  (Stage 2+ with some exceptions.)
 
 
 The full list of support browsers supported right now is:
