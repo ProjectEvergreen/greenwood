@@ -86,19 +86,19 @@ function defaultIndex(label) {
         expect(title).to.be.equal('Greenwood App');
       });
 
-      it('should have three <script> tags in the <body>', function() {
+      it('should have two <script> tags in the <body>', function() {
         const scriptTag = dom.window.document.querySelectorAll('body script');
 
-        expect(scriptTag.length).to.be.equal(3);
+        expect(scriptTag.length).to.be.equal(2);
       });
       
-      it('should have two <script> tags for polyfills loaded at the end of the <body> tag', function() {
+      it('should have one <script> tas for polyfills loaded at the end of the <body> tag', function() {
         const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
         const polyfillScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.src.indexOf('//cdnjs.cloudflare.com') >= 0;
         });
 
-        expect(polyfillScriptTags.length).to.be.equal(2);
+        expect(polyfillScriptTags.length).to.be.equal(1);
       });
 
       it('should have <script> tag for loading main JavaScript bundle at the end of the <body> tag', function() {

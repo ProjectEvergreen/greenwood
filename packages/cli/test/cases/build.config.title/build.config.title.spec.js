@@ -63,10 +63,10 @@ describe('Build Greenwood With: ', async function() {
       });
 
       // rest of index smoke-test because <title></title> is changed for this case
-      it('should have a <script> tag in the <body>', function() {
+      it('should have two <script> tag in the <body>', function() {
         const scriptTag = dom.window.document.querySelectorAll('body script');
 
-        expect(scriptTag.length).to.be.equal(3);
+        expect(scriptTag.length).to.be.equal(2);
       });
 
       it('should have a router outlet tag in the <body>', function() {

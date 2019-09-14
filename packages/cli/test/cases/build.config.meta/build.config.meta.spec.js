@@ -80,10 +80,10 @@ describe('Build Greenwood With: ', async function() {
         expect(title).to.be.equal('My Custom Greenwood App');
       });
 
-      it('should have a <script> tag in the <body>', function() {
+      it('should have two <script> tag in the <body>', function() {
         const scriptTag = dom.window.document.querySelectorAll('body script');
 
-        expect(scriptTag.length).to.be.equal(3);
+        expect(scriptTag.length).to.be.equal(2);
       });
 
       it('should have a router outlet tag in the <body>', function() {
