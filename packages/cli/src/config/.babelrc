@@ -10,13 +10,5 @@
         }
       }
     ]
-  ],
-  "plugins": [
-    [
-      "babel-plugin-transform-builtin-classes", 
-      {
-        "globals": ["LitElement"]
-      }
-    ]
   ]
 }
