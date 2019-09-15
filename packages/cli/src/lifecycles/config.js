@@ -1,3 +1,4 @@
+const pluginPolyfills = require('@greenwood/plugin-polyfills');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
@@ -11,7 +12,9 @@ let defaultConfig = {
   publicPath: '/',
   title: 'Greenwood App',
   meta: [],
-  plugins: [],
+  plugins: [
+    ...pluginPolyfills()
+  ],
   themeFile: 'theme.css'
 };
 
@@ -20,8 +23,8 @@ module.exports = readAndMergeConfig = async() => {
   return new Promise((resolve, reject) => {
     try {
       // deep clone of default config
-      let customConfig = JSON.parse(JSON.stringify(defaultConfig));
-      
+      let customConfig = Object.assign({}, defaultConfig);
+
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));        
         const { workspace, devServer, publicPath, title, meta, plugins, themeFile } = userCfgFile;
@@ -86,7 +89,7 @@ module.exports = readAndMergeConfig = async() => {
             }
           });
 
-          customConfig.plugins = plugins;
+          customConfig.plugins = customConfig.plugins.concat(plugins);
         }
 
         if (themeFile) {
