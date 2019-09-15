@@ -55,7 +55,7 @@ module.exports = ({ config, context }) => {
   // gets Index Hooks to pass as options to HtmlWebpackPlugin
   const customOptions = Object.assign({}, ...config.plugins
     .filter((plugin) => plugin.type === 'index')
-    .map((plugin) => plugin.provider())
+    .map((plugin) => plugin.provider({ config, context }))
     .filter((providerResult) => {
       return Object.keys(providerResult).map((key) => {
         if (key !== 'type') {
@@ -67,7 +67,7 @@ module.exports = ({ config, context }) => {
   // gets webpack plugins passed in directly by fhe user
   const customWebpackPlugins = config.plugins
     .filter((plugin) => plugin.type === 'webpack')
-    .map((plugin) => plugin.provider());
+    .map((plugin) => plugin.provider({ config, context }));
 
   return {
     entry: {

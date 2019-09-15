@@ -6,10 +6,17 @@
  * There are a number of examples in the CLI package you can use as a reference.
  *
  */
+const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const rimraf = require('rimraf');
 const { spawn } = require('child_process');
+
+// TODO create github issue for why this is needed, because polyfills are needed
+const setupFiles = [{
+  dir: 'node_modules/@webcomponents/webcomponentsjs',
+  name: 'webcomponents-bundle.js'
+}];
 
 module.exports = class TestBed {
   constructor(enableStdOut) {
@@ -24,6 +31,18 @@ module.exports = class TestBed {
 
     this.teardownTestBed();
     
+    setupFiles.forEach((file) => {
+      const targetSrc = path.join(process.cwd(), file.dir, file.name);
+      const targetDir = path.join(cwd, file.dir);
+      const targetPath = path.join(cwd, file.dir, file.name);
+
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+
+      fs.copyFileSync(targetSrc, targetPath);
+    });
+
     return {
       publicDir: this.publicDir
     };
@@ -32,6 +51,10 @@ module.exports = class TestBed {
   teardownTestBed() {
     rimraf.sync(path.join(this.rootDir, '.greenwood'));
     rimraf.sync(path.join(this.rootDir, 'public'));
+    
+    setupFiles.forEach((file) => {
+      rimraf.sync(path.join(this.rootDir, file.dir.split('/')[0]));
+    });
   }
 
   runGreenwoodCommand(task) {
