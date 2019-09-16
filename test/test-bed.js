@@ -12,7 +12,8 @@ const path = require('path');
 const rimraf = require('rimraf');
 const { spawn } = require('child_process');
 
-// TODO create github issue for why this is needed, because polyfills are needed
+// can be removed if https://github.com/ProjectEvergreen/greenwood/issues/193 is solved
+// though being able to pass in files ad-hoc from node_modules my be helpful
 const setupFiles = [{
   dir: 'node_modules/@webcomponents/webcomponentsjs',
   name: 'webcomponents-bundle.js'
