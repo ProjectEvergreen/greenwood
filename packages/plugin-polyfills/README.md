@@ -4,9 +4,9 @@
 > _**NOTE: This package is currently installed by default by Greenwood so you don't need to install it yourself.**_
 
 A composite plugin for Greenwood for adding support for adding Web Component related polyfills for browser that need support for it.  So if you need to support these browsers, you will want to use this plugin:
-- Internet Explorer E11
+
 - Microsoft Edge
-- Puppeteer
+- Internet Explorer 11
 
 > See Greenwood's [browser support](https://www.greenwoodjs.io/about/how-it-works#browser-support) and [evergreen build](https://www.greenwoodjs.io/about/how-it-works#evergreen-build) docs for more information on how Greenwood handles browser support out of the box.
 
