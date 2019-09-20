@@ -70,8 +70,12 @@
   & table {
     border: 1px solid #020202;
     width: 100%;
-    text-align: center;
+    text-align: left;
     margin-bottom: 20px;
+  }
+
+  & table th:first-child {
+    min-width: 150px;
   }
 
   & table th {
