@@ -42,10 +42,11 @@ module.exports = ({ config, context }) => {
 
   const commonCssLoaders = [
     { loader: 'css-loader' },
-    { loader: 'postcss-loader', options:
-      {
+    { 
+      loader: 'postcss-loader', 
+      options: {
         config: {
-          path: path.join(__dirname)
+          path: path.join(__dirname, 'postcss.config.js')
         }
       }
     }
@@ -54,7 +55,7 @@ module.exports = ({ config, context }) => {
   // gets Index Hooks to pass as options to HtmlWebpackPlugin
   const customOptions = Object.assign({}, ...config.plugins
     .filter((plugin) => plugin.type === 'index')
-    .map((plugin) => plugin.provider())
+    .map((plugin) => plugin.provider({ config, context }))
     .filter((providerResult) => {
       return Object.keys(providerResult).map((key) => {
         if (key !== 'type') {
@@ -66,7 +67,7 @@ module.exports = ({ config, context }) => {
   // gets webpack plugins passed in directly by fhe user
   const customWebpackPlugins = config.plugins
     .filter((plugin) => plugin.type === 'webpack')
-    .map((plugin) => plugin.provider());
+    .map((plugin) => plugin.provider({ config, context }));
 
   return {
     entry: {
@@ -82,15 +83,7 @@ module.exports = ({ config, context }) => {
     module: {
       rules: [{
         test: /\.js$/,
-        loader: 'babel-loader',
-        options: {
-          presets: ['@babel/preset-env'],
-          plugins: [
-            ['babel-plugin-transform-builtin-classes', {
-              globals: ['LitElement']
-            }]
-          ]
-        }
+        loader: 'babel-loader'
       }, {
         test: /\.md$/,
         loader: 'wc-markdown-loader',

@@ -45,6 +45,17 @@ Greenwood is organized into packages as a monorepo, managed by [Lerna](https://l
 
 Lerna (specifically `lerna publish`) will be used to release all packagess under a single version.  Lerna configuration can be found in _lerna.json_.
 
+### Dependencies
+To `yarn add` / `yarn remove` packages from anything in _packages/_ or _www/_, please make sure you `cd` into the directory with the _package.json_ first.
+
+For example
+```shell
+$ cd packages/cli
+$ yarn add <package>
+```
+
+Yarn workspaces will automatically handle installing _node_modules_ in the appropriate directory.
+
 ### Testing
 [TDD](https://en.wikipedia.org/wiki/Test-driven_development) is the recommended approach for developing for Greenwood and for the style of test writing we use [BDD style testing](https://en.wikipedia.org/wiki/Behavior-driven_development); "cases".  Cases are used to capture the various configurations and expected outputs of Greenwood when running its  commands, in a way that is closer to how a user would be expecting Greenwood to work.
 
@@ -87,3 +98,14 @@ The Greenwood website is currently built by Greenwood and all files are located 
 1. Open `localhost:1984` in your browser
 
 From there, the dev server will watch for changes and reload as needed.
+
+## Internet Explorer
+For situations that require testing Internet Explorer or Edge browser, Microsoft [provides Virtual Machines](https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/) for various combinations of Windows and Internet Explorer versions.  [VirtualBox](https://www.virtualbox.org/) is a good platform to use for these VMs.
+
+To test from a VM, you can
+1. Run `yarn serve`
+1. From the VM, open `http://10.0.2.2:8000` in the browser
+
+You can disable plugins in _webpack.config.prod.js_ to remove production optimizations for testing purposes.
+
+> Note: `yarn develop` does not work right now with IE11 and Edge.

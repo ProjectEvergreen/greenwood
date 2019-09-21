@@ -12,7 +12,7 @@ module.exports = (options = {}) => {
     type: 'index',
     provider: () => {
       return {
-        hookAnalytics: `
+        hookGreenwoodAnalytics: `
           <script async src="https://www.googletagmanager.com/gtag/js?id=${analyticsId}"></script>
           
           <script>
