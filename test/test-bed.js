@@ -12,7 +12,7 @@ const path = require('path');
 const rimraf = require('rimraf');
 const { spawn } = require('child_process');
 
-// needed for puppeteer #193
+// needed for puppeteer - #193
 const setupFiles = [{
   dir: 'node_modules/@webcomponents/webcomponentsjs',
   name: 'webcomponents-bundle.js'

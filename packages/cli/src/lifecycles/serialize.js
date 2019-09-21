@@ -21,7 +21,7 @@ const runBrowser = async (compilation) => {
 module.exports = serializeBuild = async (compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // puppeteer specific polyfills #193
+      // puppeteer specific polyfills - #193
       const polyfillPath = path.join(process.cwd(), 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js');
       const polyfill = await fs.readFileSync(polyfillPath, 'utf8');
       const indexContentsPath = path.join(compilation.context.publicDir, compilation.context.indexPageTemplate);
