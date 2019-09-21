@@ -29,7 +29,8 @@ module.exports = {
 Although we can't promise all webpack plugins will work, we will try and document which ones we have had success with either as part of the CLI or one of our composite plugins.
 | Name  | Notes  |
 |---|---|
-| [Banner Plugin](https://webpack.js.org/plugins/banner-plugin/) | Used as an example in unit tests for `@greenwood/cli`. |
+| [BannerPlugin](https://webpack.js.org/plugins/banner-plugin/) | Used as an example in unit tests for `@greenwood/cli`. |
+| [CopyWebpackPlugin](https://github.com/webpack-contrib/copy-webpack-plugin/) | Used as part of our [Polyfills Plugin (`@greenwood/plugin-polyfills`)](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-polyfills) to copy `@webcomponentsjs/*` polyflls files to Greenwood's output directory. (`publicDir`).
 
 
 ## Known Issues

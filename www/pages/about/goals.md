@@ -1,7 +1,3 @@
----
-label: 'goals'
----
-
 ## Goals
 
 #### It's Not About Us
@@ -16,4 +12,4 @@ In addition, we want Greenwood to be a project where developers can have access 
 #### Collaborative
 We greatly encourage contributions to our documentation and website to make sure everything is as clear and useful as possible so as to ensure we're providing the the best developer experience possible.  Please feel free to engage us in GitHub, Twitter, or any of our other outlets.  (check out the site header for ways you can connect with the team, we'd love to hear from you!  ❤️)
 
-Please see our [Roadmap](/about/roadmap) to checkout what we have planned next!
+Please see our [roadmap](https://github.com/ProjectEvergreen/greenwood/projects) to checkout what we have planned next!

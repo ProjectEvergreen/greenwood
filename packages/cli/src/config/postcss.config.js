@@ -1,6 +1,7 @@
 module.exports = {
   plugins: {
-    'postcss-cssnext': {},
+    'postcss-preset-env': {}, // stage 2+
+    'postcss-nested': {},
     'cssnano': {}
   }
 };

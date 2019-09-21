@@ -9,27 +9,18 @@
     <meta name='apple-mobile-web-app-capable' content='yes'/>
     <meta name='apple-mobile-web-app-status-bar-style' content='black'/>
 
-    <!-- Add forwards compatibility for ES5 transpiled web components -->
-    <!-- https://github.com/Polymer/lit-element/issues/72#issuecomment-390894353 -->
-    <!-- Error is a known issue: https://github.com/webcomponents/webcomponentsjs/issues/749 -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.0.2/custom-elements-es5-adapter.js"></script> -->
+    <%= htmlWebpackPlugin.options.hookGreenwoodPolyfills %>
 
-    <%= htmlWebpackPlugin.options.hookAnalytics %>
+    <%= htmlWebpackPlugin.options.hookGreenwoodAnalytics %>
     
-    <%= htmlWebpackPlugin.options.hookSpaIndexFallback %>
+    <%= htmlWebpackPlugin.options.hookGreenwoodSpaIndexFallback %>
+
   </head>
 
   <body>
   
     <eve-app></eve-app>
 
-    <%= htmlWebpackPlugin.options.hookPolyfills %>
-
-    <!-- JavaScript polyfill FOR IE11 -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0/polyfill.min.js"></script>
-
-    <!-- Web Components poyfill for Firefox -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.2.7/webcomponents-bundle.js"></script>
-    
   </body>
+  
 </html>
