@@ -44,10 +44,6 @@ class Renderer {
     try {
       // Navigate to page. Wait until there are no oustanding network requests.
       response = await page.goto(requestUrl, { timeout: 10000 });
-      
-      page.addScriptTag({
-        content: polyfill
-      });
     } catch (e) {
       console.error(e);
     }
@@ -63,7 +59,7 @@ class Renderer {
     const content = await page.content();
     const result = content
       .replace(polyfill, '')
-      .replace('<script type=""></script>', '');
+      .replace('<script></script>', '');
 
     await page.close();
 

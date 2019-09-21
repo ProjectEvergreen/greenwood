@@ -1,6 +1,8 @@
 const LocalWebServer = require('local-web-server');
 const browserRunner = require('../lib/browser');
+const fs = require('fs');
 const localWebServer = new LocalWebServer();
+const path = require('path');
 const PORT = '8000'; 
 
 const runBrowser = async (compilation) => {
@@ -19,6 +21,15 @@ const runBrowser = async (compilation) => {
 module.exports = serializeBuild = async (compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
+      // puppeteer specific polyfills #193
+      const polyfillPath = path.join(process.cwd(), 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js');
+      const polyfill = await fs.readFileSync(polyfillPath, 'utf8');
+      const indexContentsPath = path.join(compilation.context.publicDir, compilation.context.indexPageTemplate);
+      const indexContents = fs.readFileSync(indexContentsPath, 'utf8');
+      const indexContentsPolyfilled = indexContents.replace('<body>', `<script>${polyfill}</script><body>`);
+
+      fs.writeFileSync(indexContentsPath, indexContentsPolyfilled);
+
       // "serialize" our SPA into a static site
       const server = localWebServer.listen({
         port: PORT,
