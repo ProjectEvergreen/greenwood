@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 /*
 * Rendertron - Modified
 * Repo: https://github.com/Goo./rendererndertron
@@ -13,15 +16,19 @@ class Renderer {
   constructor(browser) {
     this.browser = browser;
   }
+
   async serialize(requestUrl) {
-
+    // puppeteer specific polyfills #193
+    const polyfillPath = path.join(process.cwd(), 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js');
+    const polyfill = await fs.readFileSync(polyfillPath, 'utf8');
     const page = await this.browser.newPage();
-
+    
     // Page may reload when setting isMobile
     // https://github.com/GoogleChrome/puppeteer/blob/v1.10.0/docs/api.md#pagesetviewportviewport
     page.evaluateOnNewDocument('customElements.forcePolyfill = true');
     page.evaluateOnNewDocument('ShadyDOM = {force: true}');
     page.evaluateOnNewDocument('ShadyCSS = {shimcssproperties: true}');
+    
     let response = null;
 
     // Capture main frame response. This is used in the case that rendering
@@ -33,24 +40,36 @@ class Renderer {
         response = r;
       }
     });
+    
     try {
       // Navigate to page. Wait until there are no oustanding network requests.
       response = await page.goto(requestUrl, { timeout: 10000 });
+      
+      page.addScriptTag({
+        content: polyfill
+      });
     } catch (e) {
       console.error(e);
     }
+
     if (!response) {
       console.error('response does not exist');
       // This should only occur when the page is about:blank. See
       // https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md#pagegotourl-options.
       return { status: 400, content: '' };
     }
+
     // Serialize page.
-    const result = await page.content();
+    const content = await page.content();
+    const result = content
+      .replace(polyfill, '')
+      .replace('<script type=""></script>', '');
 
     await page.close();
 
-    return { content: result };
+    return result;
   }
+
 }
+
 exports.Renderer = Renderer;

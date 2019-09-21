@@ -10,8 +10,7 @@ module.exports = async (url, label, route, outputDirectory) => {
   });
 
   const renderer = new Renderer(browser);
-  const result = await renderer.serialize(url);
-  const html = result.content;
+  const html = await renderer.serialize(url);
   const target = path.join(outputDirectory, route);
   
   await fs.mkdirSync(target, { recursive: true });
