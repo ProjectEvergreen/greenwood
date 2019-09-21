@@ -7,7 +7,6 @@ const path = require('path');
 * License: Apache 2.0
 */
 
-Object.defineProperty(exports, '"__esModule', { value: true });
 /**
  * Wraps Puppeteer's interface to Headless Chrome to expose high level rendering
  * APIs that are able to handle web components and PWAs.
