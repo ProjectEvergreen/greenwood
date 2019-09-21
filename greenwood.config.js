@@ -1,6 +1,7 @@
 const path = require('path');
 const pluginGoogleAnalytics = require('./packages/plugin-google-analytics/src/index');
 const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
+
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
 
@@ -23,7 +24,7 @@ module.exports = {
     ...pluginGoogleAnalytics({
       analyticsId: 'UA-147204327-1'
     }),
-    
+
     ...pluginPolyfills()
   ]
 };
