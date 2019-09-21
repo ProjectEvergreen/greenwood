@@ -14,7 +14,7 @@
  *     type: 'index',
  *     provider: () => {
  *       return {
- *         hookAnalytics: `
+ *         hookGreenwoodAnalytics: `
  *           <!-- some analytics code -->
  *         `
  *       };
@@ -23,7 +23,7 @@
  *     type: 'index',
  *     provider: () => {
  *       return {
- *         hookPolyfills: `
+ *         hookGreenwoodPolyfills: `
  *           <!-- some polyfills code -->
  *         `
  *       };
@@ -64,13 +64,13 @@ describe('Build Greenwood With: ', async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
-      it('should have placeholder for hookAnalytics', function() {
+      it('should have placeholder for hookGreenwoodAnalytics', function() {
         const placeholder = dom.window.document.querySelectorAll('body div.hook-analytics');
         
         expect(placeholder.length).to.be.equal(1);
       });
 
-      it('should have placeholder for hookPolyfills', function() {
+      it('should have placeholder for hookGreenwoodPolyfills', function() {
         const placeholder = dom.window.document.querySelectorAll('body div.hook-polyfills');
 
         expect(placeholder.length).to.be.equal(1);

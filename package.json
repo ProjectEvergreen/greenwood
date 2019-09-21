@@ -15,6 +15,7 @@
   "scripts": {
     "lerna": "lerna",
     "clean": "rimraf ./**/.greenwood/** && rimraf ./**/public/** && rimraf ./coverage",
+    "clean:deps": "rimraf **/node_modules/**",
     "lint": "eslint \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
     "build": "yarn clean && node . build",
     "serve": "yarn build && cd ./public && ws",

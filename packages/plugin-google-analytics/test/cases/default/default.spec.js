@@ -3,7 +3,7 @@
  * Run Greenwood with Google Analytics composite plugin with default options.
  * 
  * Uaer Result
- * Should generate a bare bones Greenwood build with certain plugins injected into index.html.
+ * Should generate a bare bones Greenwood build with Google Analytics tracking snippet injected into index.html.
  * 
  * User Command
  * greenwood build

@@ -67,7 +67,7 @@ module.exports = ({ config, context, graph }) => {
       }),
       new HtmlWebpackPlugin({
         template: path.join(context.scratchDir, context.indexPageTemplate),
-        hookSpaIndexFallback: `
+        hookGreenwoodSpaIndexFallback: `
           <script>
           (function(){
               var redirect = sessionStorage.redirect;
@@ -82,7 +82,7 @@ module.exports = ({ config, context, graph }) => {
       new HtmlWebpackPlugin({
         filename: context.notFoundPageTemplate,
         template: path.join(context.scratchDir, context.notFoundPageTemplate),
-        hookSpaIndexFallback: `
+        hookGreenwoodSpaIndexFallback: `
           <script>
             sessionStorage.redirect = location.href;
           </script>
