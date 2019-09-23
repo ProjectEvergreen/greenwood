@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/cli",
-  "version": "0.3.6",
+  "version": "0.4.0-alpha.0",
   "description": "Greenwood CLI.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -17,7 +17,7 @@
   "dependencies": {
     "@babel/core": "^7.6.0",
     "@babel/preset-env": "^7.6.0",
-    "@greenwood/plugin-polyfills": "^0.3.6",
+    "@greenwood/plugin-polyfills": "^0.4.0-alpha.0",
     "babel-loader": "^8.0.5",
     "chalk": "^2.4.2",
     "colors": "^1.3.3",
