@@ -41,3 +41,16 @@ This will then add the Google Analytics [JavaScript tracker snippet](https://dev
 ### Options
 - `analyticsId` (required) - Your Google Analytics ID
 - `anonymous` (optional) - If tracking of IPs should be done anonymously.  Defaults to `true`
+
+### Outbound Links
+For links that go outside of your domain, the global function [`getOutboundLink`](https://support.google.com/analytics/answer/7478520) is available for you to use.  
+
+Example:
+```html
+<a 
+  target="_blank" 
+  rel="noopener" 
+  @onclick="getOutboundLink('www.mylink.com'); return false;" 
+  href="www.mylink.com">My Link
+</a>
+```
