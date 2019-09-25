@@ -53,6 +53,7 @@
     "pwa-helpers": "^0.9.1",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
+    "request-promise": "^4.2.4",
     "style-loader": "^0.23.1",
     "wc-markdown-loader": "^0.1.2",
     "webpack": "^4.29.6",

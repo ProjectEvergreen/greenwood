@@ -6,6 +6,7 @@ const FAVICON_HREF = '/assets/favicon.ico';
 module.exports = {
   workspace: path.join(__dirname, 'www'),
   title: 'Greenwood',
+  wpSource: 'http://127.0.0.1/wp',
   meta: [
     { name: 'description', content: META_DESCRIPTION },
     { name: 'twitter:site', content: '@PrjEvergreen' },

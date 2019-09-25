@@ -9,6 +9,7 @@ let defaultConfig = {
     host: 'localhost'
   },
   publicPath: '/',
+  wpSource: '',
   title: 'Greenwood App',
   meta: [],
   themeFile: 'theme.css'
@@ -20,11 +21,11 @@ module.exports = readAndMergeConfig = async() => {
     try {
       // deep clone of default config
       let customConfig = JSON.parse(JSON.stringify(defaultConfig));
-      
+
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
-        const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));        
-        const { workspace, devServer, publicPath, title, meta, themeFile } = userCfgFile;
-          
+        const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
+        const { workspace, devServer, publicPath, title, meta, themeFile, wpSource } = userCfgFile;
+
         // workspace validation
         if (workspace) {
           if (typeof workspace !== 'string') {
@@ -43,7 +44,7 @@ module.exports = readAndMergeConfig = async() => {
 
           if (!fs.existsSync(customConfig.workspace)) {
             reject('Error: greenwood.config.js workspace doesn\'t exist! \n' +
-              'common issues to check might be: \n' + 
+              'common issues to check might be: \n' +
               '- typo in your workspace directory name, or in greenwood.config.js \n' +
               '- if using relative paths, make sure your workspace is in the same cwd as _greenwood.config.js_ \n' +
               '- consider using an absolute path, e.g. path.join(__dirname, \'my\', \'custom\', \'path\') // <__dirname>/my/custom/path/ ');
@@ -66,6 +67,14 @@ module.exports = readAndMergeConfig = async() => {
           }
         }
 
+        if (wpSource) {
+          if (typeof wpSource !== 'string') {
+            reject('Error: greenwood.config.js wpSource must be a string');
+          } else {
+            customConfig.wpSource = wpSource;
+          }
+        }
+
         if (meta && meta.length > 0) {
           customConfig.meta = meta;
         }
@@ -78,7 +87,7 @@ module.exports = readAndMergeConfig = async() => {
         }
 
         if (devServer && Object.keys(devServer).length > 0) {
-          
+
           if (devServer.host) {
             // eslint-disable-next-line max-depth
             if (url.parse(devServer.host).pathname === null) {
