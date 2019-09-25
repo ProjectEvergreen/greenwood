@@ -5,10 +5,10 @@ const writePageComponentsFromTemplate = async (compilation) => {
   const createPageComponent = async (file, context) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const pageTemplatePath = file.template === 'page' 
-          ? context.pageTemplatePath 
+        const pageTemplatePath = file.template === 'page'
+          ? context.pageTemplatePath
           : path.join(context.templatesDir, `${file.template}-template.js`);
-        
+
         const templateData = await fs.readFileSync(pageTemplatePath);
 
         let result = templateData.toString().replace(/entry/g, `wc-md-${file.label}`);
@@ -45,26 +45,29 @@ const writePageComponentsFromTemplate = async (compilation) => {
   };
 
   return Promise.all(compilation.graph.map(file => {
+
     const context = compilation.context;
 
     return new Promise(async(resolve, reject) => {
       try {
-        let result = await createPageComponent(file, context);
+        if (file.type === 'md') {
+          let result = await createPageComponent(file, context);
 
-        result = await loadPageMeta(file, result, context);
-        let relPageDir = file.filePath.substring(context.pagesDir.length, file.filePath.length);
-        const pathLastBackslash = relPageDir.lastIndexOf('/');
+          result = await loadPageMeta(file, result, context);
+          let relPageDir = file.filePath.substring(context.pagesDir.length, file.filePath.length);
+          const pathLastBackslash = relPageDir.lastIndexOf('/');
 
-        target = path.join(context.scratchDir, file.fileName); // non-nested default
+          target = path.join(context.scratchDir, file.fileName); // non-nested default
 
-        if (pathLastBackslash !== 0) {
-          target = path.join(context.scratchDir, relPageDir.substring(0, pathLastBackslash), file.fileName); // nested path
+          if (pathLastBackslash !== 0) {
+            target = path.join(context.scratchDir, relPageDir.substring(0, pathLastBackslash), file.fileName); // nested path
+          }
+
+          if (!fs.existsSync(target)) {
+            fs.mkdirSync(target, { recursive: true });
+          }
+          await fs.writeFileSync(path.join(target, `${file.fileName}.js`), result);
         }
-
-        if (!fs.existsSync(target)) {
-          fs.mkdirSync(target, { recursive: true });
-        }
-        await fs.writeFileSync(path.join(target, `${file.fileName}.js`), result);
 
         resolve();
       } catch (err) {
@@ -86,7 +89,7 @@ const writeListImportFile = async (compilation) => {
   if (!fs.existsSync(appDir)) {
     await fs.mkdirSync(appDir);
   }
-  
+
   return await fs.writeFileSync(path.join(appDir, './list.js'), importList.join(''));
 };
 
@@ -115,11 +118,11 @@ const setupIndex = async({ context }) => {
   return new Promise(async (resolve, reject) => {
     try {
       fs.copyFileSync(
-        context.indexPageTemplatePath, 
+        context.indexPageTemplatePath,
         path.join(context.scratchDir, context.indexPageTemplate)
       );
       fs.copyFileSync(
-        context.notFoundPageTemplatePath, 
+        context.notFoundPageTemplatePath,
         path.join(context.scratchDir, context.notFoundPageTemplate)
       );
       resolve();
@@ -131,7 +134,7 @@ const setupIndex = async({ context }) => {
 
 module.exports = generateScaffolding = async (compilation) => {
   return new Promise(async (resolve, reject) => {
-    try {      
+    try {
       console.log('Generate pages from templates...');
       await writePageComponentsFromTemplate(compilation);
 
@@ -143,7 +146,7 @@ module.exports = generateScaffolding = async (compilation) => {
 
       console.log('setup index page and html');
       await setupIndex(compilation);
-      
+
       console.log('Scaffolding complete.');
       resolve();
     } catch (err) {

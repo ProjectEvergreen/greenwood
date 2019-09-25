@@ -9,7 +9,7 @@ const createGraphFromPages = async (pagesDir, config) => {
   let pages = [];
   const readdir = util.promisify(fs.readdir);
   const readFile = util.promisify(fs.readFile);
-  
+
   return new Promise(async (resolve, reject) => {
     try {
 
@@ -44,24 +44,24 @@ const createGraphFromPages = async (pagesDir, config) => {
 
                 // get md file's name without the file extension
                 let fileRoute = subDir.substring(seperatorIndex, subDir.length - 3);
-                
+
                 // determine if this is an index file, if so set route to '/'
                 let route = fileRoute === '/index' ? '/' : fileRoute;
-                
+
                 // check if additional nested directories
                 if (seperatorIndex > 0) {
                   // get all remaining nested page directories
                   completeNestedPath = subDir.substring(0, seperatorIndex);
-                  
+
                   // set route to the nested pages path and file name(without extension)
                   route = completeNestedPath + route;
                   mdFile = `.${completeNestedPath}${fileRoute}.md`;
-                  relativeExpectedPath = `'..${completeNestedPath}/${fileName}/${fileName}.js'`; 
+                  relativeExpectedPath = `'..${completeNestedPath}/${fileName}/${fileName}.js'`;
                 } else {
                   mdFile = `.${fileRoute}.md`;
-                  relativeExpectedPath = `'../${fileName}/${fileName}.js'`; 
+                  relativeExpectedPath = `'../${fileName}/${fileName}.js'`;
                 }
-                
+
                 // generate a random element name
                 label = label || generateLabelHash(filePath);
 
@@ -77,13 +77,13 @@ const createGraphFromPages = async (pagesDir, config) => {
                 * template: page template to use as a base for a generated component (auto appended by -template.js)
                 * filePath: complete absolute path to a md file
                 * fileName: file name without extension/path, so that it can be copied to scratch dir with same name
-                * relativeExpectedPath: relative import path for generated component within a list.js file to later be 
+                * relativeExpectedPath: relative import path for generated component within a list.js file to later be
                 * imported into app.js root component
                 * title: the head <title></title> text
                 * meta: og graph meta array of objects { property/name, content }
                 */
 
-                pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath, title, meta });
+                pages.push({ type: 'md', mdFile, label, route, template, filePath, fileName, relativeExpectedPath, title, meta });
               }
               if (stats.isDirectory()) {
                 await walkDirectory(filePath);
@@ -111,7 +111,7 @@ const generateLabelHash = (label) => {
   hash.update(label);
 
   let elementLabel = hash.digest('hex');
-  
+
   elementLabel = elementLabel.substring(elementLabel.length - 15, elementLabel.length);
 
   return elementLabel;

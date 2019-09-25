@@ -24,15 +24,15 @@ module.exports = generateCompilation = () => {
       compilation.context = await initContext(compilation);
 
       // generate a graph of all pages / components to build
-      // console.log('Generating graph of workspace files...');
-      // compilation = await generateGraph(compilation);
+      console.log('Generating graph of workspace files...');
+      compilation = await generateGraph(compilation);
 
       console.log('Scaffolding from sources....');
-      await generateFromSources(compilation);
+      compilation = await generateFromSources(compilation);
 
       // generate scaffolding
-      // console.log('Scaffolding out project files...');
-      // await generateScaffolding(compilation);
+      console.log('Scaffolding out project files...');
+      await generateScaffolding(compilation);
 
       resolve(compilation);
     } catch (err) {
