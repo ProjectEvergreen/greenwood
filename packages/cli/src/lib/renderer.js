@@ -1,6 +1,3 @@
-const fs = require('fs');
-const path = require('path');
-
 /*
 * Rendertron - Modified
 * Repo: https://github.com/Goo./rendererndertron
@@ -12,14 +9,12 @@ const path = require('path');
  * APIs that are able to handle web components and PWAs.
  */
 class Renderer {
+
   constructor(browser) {
     this.browser = browser;
   }
 
   async serialize(requestUrl) {
-    // puppeteer specific polyfills - #193
-    const polyfillPath = path.join(process.cwd(), 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js');
-    const polyfill = await fs.readFileSync(polyfillPath, 'utf8');
     const page = await this.browser.newPage();
     
     // Page may reload when setting isMobile
@@ -56,13 +51,10 @@ class Renderer {
 
     // Serialize page.
     const content = await page.content();
-    const result = content
-      .replace(polyfill, '')
-      .replace('<script></script>', '');
 
     await page.close();
 
-    return result;
+    return content;
   }
 
 }

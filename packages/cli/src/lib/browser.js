@@ -1,19 +1,12 @@
 const puppeteer = require('puppeteer');
 const { Renderer } = require('./renderer');
-const fs = require('fs');
-const path = require('path');
 
-module.exports = async (url, label, route, outputDirectory) => {  
+module.exports = async (url) => {  
   const browser = await puppeteer.launch({
     headless: true,
     args: ['--no-sandbox']
   });
-
   const renderer = new Renderer(browser);
-  const html = await renderer.serialize(url);
-  const target = path.join(outputDirectory, route);
-  
-  await fs.mkdirSync(target, { recursive: true });
 
-  return await fs.writeFileSync(path.join(target, 'index.html'), html);
+  return await renderer.serialize(url);
 };
