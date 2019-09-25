@@ -3,21 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const rp = require('request-promise');
 
-// insert home page
-// const fileName = 'index';
-
-// const indexGraph = {
-//   type: 'wp',
-//   meta: compilation.config.meta,
-//   template: 'page',
-//   title: 'Home Page',
-//   content: '<h1>Home Page</h1>',
-//   route: '/',
-//   relativeExpectedPath: `'../${fileName}/${fileName}.js'`,
-//   label: generateLabel(fileName),
-//   fileName
-// };
-
 let optionsList = {
   method: 'GET',
   json: true
@@ -34,6 +19,7 @@ const fetchWPPosts = async (compilation) => {
   return await rp.get(optionsList);
 };
 
+// Future amendments for more of wordpress API
 // const fetchWPPages = async (compilation) => {
 
 //   optionsList.uri = compilation.config.wpSource + '/wp-json/wp/v2/pages';
@@ -48,6 +34,7 @@ const fetchWPPosts = async (compilation) => {
 //   return await rp.get(optionsList);
 // };
 
+// Generate a random hash based on slug
 const generateLabel = (slug) => {
   const labelHash = {
     algo: 'sha256',
@@ -69,7 +56,7 @@ const generateWPGraph = async(wpJSON, config) => {
     return new Promise((resolve, reject) => {
       try {
         let { title, content, slug } = post;
-        let fileName = slug.substring(0, 100);
+        let fileName = slug.substring(0, 100); // needs to be trimmed better this is hacky
         let graphPost = {
           type: 'wp',
           meta: config.meta,
@@ -90,6 +77,9 @@ const generateWPGraph = async(wpJSON, config) => {
   }));
 };
 
+/*
+* Note: This is the same function from our scaffold.js, with small modifications
+*/
 const writePageComponentsFromTemplate = async (compilation) => {
   const createPageComponent = async (file, context) => {
     return new Promise(async (resolve, reject) => {
@@ -100,7 +90,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
 
         const templateData = await fs.readFileSync(pageTemplatePath);
 
-        let result = templateData.toString().replace(/<entry><\/entry>/g, file.content);
+        let result = templateData.toString().replace(/<entry><\/entry>/g, file.content); // modified from scaffold.js
 
         result = result.replace(/page-template/g, `eve-${file.label}`);
         result = result.replace(/MDIMPORT;/, '');
@@ -139,12 +129,13 @@ const writePageComponentsFromTemplate = async (compilation) => {
 
     return new Promise(async(resolve, reject) => {
       try {
+        // modified from scaffold.js
         if (file.type === 'wp') {
           let result = await createPageComponent(file, context);
 
           result = await loadPageMeta(file, result, context);
 
-          target = path.join(context.scratchDir, file.fileName);
+          target = path.join(context.scratchDir, file.fileName); // modified from scaffold.js
 
           if (!fs.existsSync(target)) {
             fs.mkdirSync(target, { recursive: true });
