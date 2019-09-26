@@ -4,24 +4,25 @@
 * License: Apache 2.0
 */
 
-Object.defineProperty(exports, '"__esModule', { value: true });
 /**
  * Wraps Puppeteer's interface to Headless Chrome to expose high level rendering
  * APIs that are able to handle web components and PWAs.
  */
 class Renderer {
+
   constructor(browser) {
     this.browser = browser;
   }
+
   async serialize(requestUrl) {
-
     const page = await this.browser.newPage();
-
+    
     // Page may reload when setting isMobile
     // https://github.com/GoogleChrome/puppeteer/blob/v1.10.0/docs/api.md#pagesetviewportviewport
     page.evaluateOnNewDocument('customElements.forcePolyfill = true');
     page.evaluateOnNewDocument('ShadyDOM = {force: true}');
     page.evaluateOnNewDocument('ShadyCSS = {shimcssproperties: true}');
+    
     let response = null;
 
     // Capture main frame response. This is used in the case that rendering
@@ -33,24 +34,29 @@ class Renderer {
         response = r;
       }
     });
+    
     try {
       // Navigate to page. Wait until there are no oustanding network requests.
       response = await page.goto(requestUrl, { timeout: 10000 });
     } catch (e) {
       console.error(e);
     }
+
     if (!response) {
       console.error('response does not exist');
       // This should only occur when the page is about:blank. See
       // https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md#pagegotourl-options.
       return { status: 400, content: '' };
     }
+
     // Serialize page.
-    const result = await page.content();
+    const content = await page.content();
 
     await page.close();
 
-    return { content: result };
+    return content;
   }
+
 }
+
 exports.Renderer = Renderer;
