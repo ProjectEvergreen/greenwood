@@ -66,6 +66,15 @@ describe('Build Greenwood With: ', async function() {
 
       it('should have the expected code with users analyicsId', function() {
         const expectedContent = `
+            var getOutboundLink = function(url) {
+              gtag('event', 'click', {
+                'event_category': 'outbound',
+                'event_label': url,
+                'transport_type': 'beacon',
+                'event_callback': function(){document.location = url;}
+              });
+            }
+
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
