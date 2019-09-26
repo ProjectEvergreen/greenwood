@@ -12,8 +12,7 @@ const path = require('path');
 const rimraf = require('rimraf');
 const { spawn } = require('child_process');
 
-// can be removed if https://github.com/ProjectEvergreen/greenwood/issues/193 is solved
-// though being able to pass in files ad-hoc from node_modules my be helpful
+// needed for puppeteer - #193
 const setupFiles = [{
   dir: 'node_modules/@webcomponents/webcomponentsjs',
   name: 'webcomponents-bundle.js'
