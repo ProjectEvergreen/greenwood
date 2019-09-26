@@ -14,8 +14,17 @@ module.exports = (options = {}) => {
       return {
         hookGreenwoodAnalytics: `
           <script async src="https://www.googletagmanager.com/gtag/js?id=${analyticsId}"></script>
-          
+
           <script>
+            var getOutboundLink = function(url) {
+              gtag('event', 'click', {
+                'event_category': 'outbound',
+                'event_label': url,
+                'transport_type': 'beacon',
+                'event_callback': function(){document.location = url;}
+              });
+            }
+
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
