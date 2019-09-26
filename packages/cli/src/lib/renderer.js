@@ -23,14 +23,14 @@ class Renderer {
     page.evaluateOnNewDocument('customElements.forcePolyfill = true');
     page.evaluateOnNewDocument('ShadyDOM = {force: true}');
     page.evaluateOnNewDocument('ShadyCSS = {shimcssproperties: true}');
-
+    
     await page.setRequestInterception(true);
 
     page.on('request', interceptedRequest => {
       const interceptedRequestUrl = interceptedRequest.url();
 
       if (
-        interceptedRequestUrl.indexOf('bundle.js') >= 0 || // webpack bundles, webcomponents-bundle.js
+        interceptedRequestUrl.indexOf('bundle.js') >= 0 || // webpack bundles, webcomponentsjs-bundle.js
         interceptedRequestUrl === requestUrl // pages / routes
       ) {
         interceptedRequest.continue();

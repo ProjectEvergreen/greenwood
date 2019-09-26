@@ -55,7 +55,8 @@ describe('Build Greenwood With: ', async function() {
       it('should have one <script> tag for polyfills loaded in the <head> tag', function() {
         const scriptTags = dom.window.document.querySelectorAll('head > script');
         const polyfillScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.src.indexOf('/webcomponents-bundle.js') >= 0;
+          // hyphen is used to make sure no other bundles get loaded by accident (#9)
+          return script.src.indexOf('/webcomponents-') >= 0;
         });
 
         expect(polyfillScriptTags.length).to.be.equal(1);

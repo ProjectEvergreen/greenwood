@@ -2,7 +2,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin'); // part of @greeenwood
 const path = require('path');
 
 module.exports = () => {
-  const filename = 'webcomponents-bundle.js';
+  const filename = 'webcomponents-loader.js';
+  const nodeModuleRoot = 'node_modules/@webcomponents/webcomponentsjs';
 
   return [{
     type: 'index',
@@ -17,9 +18,16 @@ module.exports = () => {
   }, {
     type: 'webpack',
     provider: (compilation) => {
+      const cwd = process.cwd();
+      const { publicDir } = compilation.context;
+    
       return new CopyWebpackPlugin([{
-        from: path.join(process.cwd(), `node_modules/@webcomponents/webcomponentsjs/${filename}`),
-        to: compilation.context.publicDir
+        from: path.join(cwd, nodeModuleRoot, filename),
+        to: publicDir
+      }, {
+        context: path.join(cwd, nodeModuleRoot),
+        from: 'bundles/*.js',
+        to: publicDir
       }]);
     }
   }];
