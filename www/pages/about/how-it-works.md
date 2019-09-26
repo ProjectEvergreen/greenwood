@@ -46,7 +46,6 @@ _In this way, as browsers and usage matures, so will the generated JavaScript co
 ### Browser Support
 As discussed above, Greenwood is able to leverage a build that can intelligently transpile projects to meet the widest use case of modern evergreen browsers as well as IE11!  This means your users will get the syntax theior browsers understand (courtesy of [**core-js**](https://babeljs.io/docs/en/babel-preset-env#corejs)) while allowing developers to write modern code.  (Stage 2+ with some exceptions.)
 
-
 The full list of support browsers supported right now is:
 ```render shell
 $ npx browserslist
@@ -62,6 +61,8 @@ ios_saf 12.0-12.1
 safari 12.1
 samsung 9.2
 ```
+
+This is all essentially made possible by the amazing work of the [caniuse.com](https://caniuse.com/) which you can visit to get up to date information on what features major browsers now.  The more you know! ⭐
 
 > _It is our goal to make IE11 / legacy browser support opt-in through [differential loading](https://github.com/ProjectEvergreen/greenwood/issues/9) so that by default Greenwood would be exclusively "evergreen"._
 
