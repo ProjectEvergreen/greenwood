@@ -1,5 +1,6 @@
-const googleAnalyticsPlugin = require('./packages/plugin-google-analytics/src/index');
 const path = require('path');
+const pluginGoogleAnalytics = require('./packages/plugin-google-analytics/src/index');
+const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
@@ -20,8 +21,10 @@ module.exports = {
     { name: 'google-site-verification', content: '4rYd8k5aFD0jDnN0CCFgUXNe4eakLP4NnA18mNnK5P0' }
   ],
   plugins: [
-    ...googleAnalyticsPlugin({
+    ...pluginGoogleAnalytics({
       analyticsId: 'UA-147204327-1'
-    })
+    }),
+
+    ...pluginPolyfills()
   ]
 };

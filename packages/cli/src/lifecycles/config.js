@@ -1,4 +1,3 @@
-const pluginPolyfills = require('@greenwood/plugin-polyfills');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
@@ -12,9 +11,7 @@ let defaultConfig = {
   publicPath: '/',
   title: 'Greenwood App',
   meta: [],
-  plugins: [
-    ...pluginPolyfills()
-  ],
+  plugins: [],
   themeFile: 'theme.css'
 };
 
