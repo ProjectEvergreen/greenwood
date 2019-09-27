@@ -13,7 +13,6 @@ const runBrowser = async (compilation) => {
 
   try {
     const browser = await puppeteer.launch({
-      headless: true,
       args: ['--no-sandbox']
     });
 
