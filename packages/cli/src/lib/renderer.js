@@ -26,11 +26,12 @@ class Renderer {
     
     await page.setRequestInterception(true);
 
+    // only allow puppeteer to only load necessary scripts needed for pre-rendering
     page.on('request', interceptedRequest => {
       const interceptedRequestUrl = interceptedRequest.url();
 
       if (
-        interceptedRequestUrl.indexOf('bundle.js') >= 0 || // webpack bundles, webcomponentsjs-bundle.js
+        interceptedRequestUrl.indexOf('bundle.js') >= 0 || // webpack bundles, webcomponents-bundle.js
         interceptedRequestUrl === requestUrl // pages / routes
       ) {
         interceptedRequest.continue();
