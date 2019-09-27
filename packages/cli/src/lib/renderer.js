@@ -14,7 +14,7 @@ class Renderer {
     this.browser = browser;
   }
 
-  async serialize(requestUrl) {
+  async serializePage(requestUrl) {
     const page = await this.browser.newPage();
     
     // Page may reload when setting isMobile
