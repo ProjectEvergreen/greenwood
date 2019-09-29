@@ -6,7 +6,7 @@ const path = require('path');
 const util = require('util');
 
 const createGraphFromPages = async (pagesDir, config) => {
-  let pages = [];
+  let graph = [];
   const readdir = util.promisify(fs.readdir);
   const readFile = util.promisify(fs.readFile);
   
@@ -83,11 +83,11 @@ const createGraphFromPages = async (pagesDir, config) => {
                 * meta: og graph meta array of objects { property/name, content }
                 */
 
-                pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath, title, meta });
+                graph.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath, title, meta });
               }
               if (stats.isDirectory()) {
                 await walkDirectory(filePath);
-                resolve();
+                // resolve();
               }
               resolve();
             } catch (err) {
@@ -98,7 +98,8 @@ const createGraphFromPages = async (pagesDir, config) => {
       };
 
       await walkDirectory(pagesDir);
-      resolve(pages);
+      
+      resolve(graph);
     } catch (err) {
       reject(err);
     }
