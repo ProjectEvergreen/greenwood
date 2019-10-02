@@ -64,7 +64,7 @@ module.exports = ({ config, context }) => {
       });
     }));
 
-  // utlizes webpack plugins passed in directly by the user
+  // utilizes webpack plugins passed in directly by the user
   // const customWebpackPlugins = config.plugins
   //   .filter((plugin) => plugin.type === 'webpack')
   //   .map((plugin) => plugin.provider({ config, context }));
