@@ -1,13 +1,13 @@
 /*
  * Use Case
  * Run Greenwood with some plugins and default workspace.
- * 
+ *
  * Uaer Result
  * Should generate a bare bones Greenwood build with certain plugins injected into index.html.
- * 
+ *
  * User Command
  * greenwood build
- * 
+ *
  * User Config
  * {
  *   plugins: [{
@@ -29,9 +29,9 @@
  *       };
  *     }
  *  }]
- * 
+ *
  * }
- * 
+ *
  * User Workspace
  * Greenwood default (src/)
  */
@@ -47,14 +47,14 @@ describe('Build Greenwood With: ', async function() {
 
   before(async function() {
     setup = new TestBed();
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
-  
+
   describe(LABEL, function() {
-    before(async function() {     
+    before(async function() {
       await setup.runGreenwoodCommand('build');
     });
-    
+
     runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
 
     describe('Custom Index Hooks', function() {
@@ -66,18 +66,18 @@ describe('Build Greenwood With: ', async function() {
 
       it('should have placeholder for hookGreenwoodAnalytics', function() {
         const placeholder = dom.window.document.querySelectorAll('body div.hook-analytics');
-        
-        expect(placeholder.length).to.be.equal(1);
-      });
-
-      it('should have placeholder for hookGreenwoodPolyfills', function() {
-        const placeholder = dom.window.document.querySelectorAll('body div.hook-polyfills');
 
         expect(placeholder.length).to.be.equal(1);
       });
+
+      // it('should have placeholder for hookGreenwoodPolyfills', function() {
+      //   const placeholder = dom.window.document.querySelectorAll('body div.hook-polyfills');
+
+      //   expect(placeholder.length).to.be.equal(1);
+      // });
     });
   });
-  
+
   after(function() {
     setup.teardownTestBed();
   });

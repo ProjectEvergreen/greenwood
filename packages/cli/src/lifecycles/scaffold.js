@@ -1,15 +1,15 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 
 const writePageComponentsFromTemplate = async (compilation) => {
   const createPageComponent = async (file, context) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const pageTemplatePath = file.template === 'page' 
-          ? context.pageTemplatePath 
+        const pageTemplatePath = file.template === 'page'
+          ? context.pageTemplatePath
           : path.join(context.templatesDir, `${file.template}-template.js`);
-        
-        const templateData = await fs.readFileSync(pageTemplatePath);
+
+        const templateData = await fs.readFile(pageTemplatePath, 'utf8');
 
         let result = templateData.toString().replace(/entry/g, `wc-md-${file.label}`);
 
@@ -44,7 +44,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
     });
   };
 
-  return Promise.all(compilation.graph.map(file => {
+  return await Promise.all(compilation.graph.map(file => {
     const context = compilation.context;
 
     return new Promise(async(resolve, reject) => {
@@ -64,7 +64,8 @@ const writePageComponentsFromTemplate = async (compilation) => {
         if (!fs.existsSync(target)) {
           fs.mkdirSync(target, { recursive: true });
         }
-        await fs.writeFileSync(path.join(target, `${file.fileName}.js`), result);
+
+        await fs.writeFile(path.join(target, `${file.fileName}.js`), result);
 
         resolve();
       } catch (err) {
@@ -84,16 +85,16 @@ const writeListImportFile = async (compilation) => {
   const appDir = path.join(compilation.context.scratchDir, 'app');
 
   if (!fs.existsSync(appDir)) {
-    await fs.mkdirSync(appDir);
+    await fs.mkdirs(appDir);
   }
-  
-  return await fs.writeFileSync(path.join(appDir, './list.js'), importList.join(''));
+
+  return await fs.writeFile(path.join(appDir, './list.js'), importList.join(''));
 };
 
 const writeRoutes = async(compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let data = await fs.readFileSync(compilation.context.appTemplatePath);
+      let data = await fs.readFile(compilation.context.appTemplatePath, 'utf8');
 
       const routes = compilation.graph.map(file => {
         return `<lit-route path="${file.route}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
@@ -101,7 +102,7 @@ const writeRoutes = async(compilation) => {
 
       const result = data.toString().replace(/MYROUTES/g, routes.join(''));
 
-      await fs.writeFileSync(path.join(compilation.context.scratchDir, 'app', './app.js'), result);
+      await fs.writeFile(path.join(compilation.context.scratchDir, 'app', './app.js'), result);
 
       resolve();
     } catch (err) {
@@ -114,12 +115,12 @@ const writeRoutes = async(compilation) => {
 const setupIndex = async({ context }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      fs.copyFileSync(
-        context.indexPageTemplatePath, 
+      await fs.copy(
+        context.indexPageTemplatePath,
         path.join(context.scratchDir, context.indexPageTemplate)
       );
-      fs.copyFileSync(
-        context.notFoundPageTemplatePath, 
+      await fs.copy(
+        context.notFoundPageTemplatePath,
         path.join(context.scratchDir, context.notFoundPageTemplate)
       );
       resolve();
@@ -131,7 +132,7 @@ const setupIndex = async({ context }) => {
 
 module.exports = generateScaffolding = async (compilation) => {
   return new Promise(async (resolve, reject) => {
-    try {      
+    try {
       console.log('Generate pages from templates...');
       await writePageComponentsFromTemplate(compilation);
 
@@ -143,7 +144,7 @@ module.exports = generateScaffolding = async (compilation) => {
 
       console.log('setup index page and html');
       await setupIndex(compilation);
-      
+
       console.log('Scaffolding complete.');
       resolve();
     } catch (err) {

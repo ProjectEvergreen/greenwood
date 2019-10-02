@@ -12,11 +12,13 @@ module.exports = generateCompilation = () => {
         graph: [],
         context: {},
         config: {}
-      };      
+      };
 
       // read from defaults/config file
       console.log('Reading project config');
       compilation.config = await initConfig();
+
+      console.log(compilation.config);
 
       // determine whether to use default template or user detected workspace
       console.log('Initializing project workspace contexts');
@@ -25,7 +27,7 @@ module.exports = generateCompilation = () => {
       // generate a graph of all pages / components to build
       console.log('Generating graph of workspace files...');
       compilation = await generateGraph(compilation);
-    
+
       // generate scaffolding
       console.log('Scaffolding out project files...');
       await generateScaffolding(compilation);

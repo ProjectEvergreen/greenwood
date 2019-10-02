@@ -1,18 +1,18 @@
 /*
  * Use Case
  * Run Greenwood build command with custom workspace directory (absolute path) and custom pages.
- * 
+ *
  * User Result
  * Should generate a Greenwood build from www directory with about and index pages.
- * 
+ *
  * User Command
  * greenwood build
- * 
+ *
  * User Config
  * {
  *   workspace: path.join(__dirname, 'www')
  * }
- * 
+ *
  * User Workspace
  * www/
  *   pages/
@@ -32,11 +32,11 @@ describe('Build Greenwood With: ', function() {
 
   before(async function() {
     setup = new TestBed();
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
 
   describe(LABEL, function() {
-    before(async function() {    
+    before(async function() {
       await setup.runGreenwoodCommand('build');
     });
 
@@ -55,13 +55,13 @@ describe('Build Greenwood With: ', function() {
 
       it('should have the expected heading text within the custom about page in the about directory', async function() {
         const heading = dom.window.document.querySelector('h3').textContent;
-    
+
         expect(heading).to.equal('Nested Custom About Page');
       });
-    
+
       it('should have the expected paragraph text within the custom about page in the about directory', async function() {
         let paragraph = dom.window.document.querySelector('p').textContent;
-    
+
         expect(paragraph).to.equal('This is a custom about page built by Greenwood.');
       });
     });

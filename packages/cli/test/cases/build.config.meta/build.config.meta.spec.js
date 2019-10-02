@@ -1,13 +1,13 @@
 /*
  * Use Case
  * Run Greenwood with meta in Greenwood config and a default workspace with a nested route.
- * 
+ *
  * User Result
  * Should generate a bare bones Greenwood build with one nested About page w/ custom meta data.
- * 
+ *
  * User Command
  * greenwood build
- * 
+ *
  * User Config
  * {
  *   title: 'My Custom Greenwood App',
@@ -19,9 +19,9 @@
  *     { rel: 'icon', href: '/assets/images/favicon.ico' }
  *   ]
  * }
- * 
+ *
  * User Workspace
- * Greenwood default w/ nested page 
+ * Greenwood default w/ nested page
  *  src/
  *   pages/
  *     about/
@@ -44,9 +44,9 @@ describe('Build Greenwood With: ', async function() {
 
   before(async function() {
     setup = new TestBed();
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
-  
+
   describe(LABEL, function() {
     const metaFilter = (metaKey) => {
       return meta.filter((item) => {
@@ -56,10 +56,10 @@ describe('Build Greenwood With: ', async function() {
       })[0];
     };
 
-    before(async function() {     
+    before(async function() {
       await setup.runGreenwoodCommand('build');
     });
-    
+
     runSmokeTest(['public', 'not-found', 'hello'], LABEL);
 
     // hardcoding index smoke test here because of the nested route
@@ -80,10 +80,10 @@ describe('Build Greenwood With: ', async function() {
         expect(title).to.be.equal('My Custom Greenwood App');
       });
 
-      it('should have one <script> tag in the <body>', function() {
+      it('should have two <script> tag in the <body>', function() {
         const scriptTag = dom.window.document.querySelectorAll('body script');
 
-        expect(scriptTag.length).to.be.equal(1);
+        expect(scriptTag.length).to.be.equal(2); /// polyfill fix
       });
 
       it('should have a router outlet tag in the <body>', function() {

@@ -1,20 +1,20 @@
 /*
  * Use Case
  * Run Greenwood with string title in config and default workspace.
- * 
+ *
  * User Result
  * Should generate a bare bones Greenwood build.  (same as build.default.spec.js) with custom title in header
- * 
+ *
  * User Command
  * greenwood build
- * 
+ *
  * User Config
  * {
  *   title: 'My Custom Greenwood App'
  * }
- * 
+ *
  * User Workspace
- * Greenwood default 
+ * Greenwood default
  *  src/
  *   pages/
  *     index.md
@@ -33,11 +33,11 @@ describe('Build Greenwood With: ', async function() {
 
   before(async function() {
     setup = new TestBed();
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
-  
+
   describe(LABEL, function() {
-    before(async function() {     
+    before(async function() {
       await setup.runGreenwoodCommand('build');
     });
     runSmokeTest(['public', 'not-found', 'hello'], LABEL);
@@ -55,7 +55,7 @@ describe('Build Greenwood With: ', async function() {
       it('should output an index.html file within the default public directory', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
-      
+
       it('should have our custom config meta <title> tag in the <head>', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
@@ -63,10 +63,10 @@ describe('Build Greenwood With: ', async function() {
       });
 
       // rest of index smoke-test because <title></title> is changed for this case
-      it('should have one <script> tag in the <body>', function() {
+      it('should have two <script> tag in the <body>', function() {
         const scriptTag = dom.window.document.querySelectorAll('body script');
 
-        expect(scriptTag.length).to.be.equal(1);
+        expect(scriptTag.length).to.be.equal(2);
       });
 
       it('should have a router outlet tag in the <body>', function() {

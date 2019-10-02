@@ -9,18 +9,17 @@
     <meta name='apple-mobile-web-app-capable' content='yes'/>
     <meta name='apple-mobile-web-app-status-bar-style' content='black'/>
 
-    <%= htmlWebpackPlugin.options.hookGreenwoodPolyfills %>
 
     <%= htmlWebpackPlugin.options.hookGreenwoodAnalytics %>
-    
+
     <%= htmlWebpackPlugin.options.hookGreenwoodSpaIndexFallback %>
 
   </head>
 
   <body>
-  
-    <eve-app></eve-app>
 
+    <eve-app></eve-app>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.2.7/webcomponents-bundle.js"></script>
   </body>
-  
+
 </html>

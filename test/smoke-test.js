@@ -1,8 +1,8 @@
 /*
  * This module can be used to run a suite of smoke tests for any CLI based test case to
- * verify default behavior and output.  Can be run a-la carte to help reduce duplication and 
+ * verify default behavior and output.  Can be run a-la carte to help reduce duplication and
  * boilerplate when writing tests.
- * 
+ *
  * There are a number of examples in the CLI package you can use as a reference.
  *
  */
@@ -26,7 +26,7 @@ function publicDirectory(label) {
       it('should output a single 404.html file (not found page)', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './404.html'))).to.be.true;
       });
-  
+
       it('should output one JS bundle file', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, './index.*.bundle.js'))).to.have.lengthOf(1);
       });
@@ -134,7 +134,7 @@ function defaultHelloPage(label) {
       beforeEach(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './hello', './index.html'));
       });
-      
+
       it('should output a hello page directory', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './hello'))).to.be.true;
       });
