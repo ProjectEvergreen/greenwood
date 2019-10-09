@@ -21,10 +21,10 @@
  * User Workspace
  * Greenwood default (src/)
  */
-// const expect = require('chai').expect;
+const expect = require('chai').expect;
 const TestBed = require('../../../../../test/test-bed');
 
-describe.skip('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', async function() {
   let setup;
 
   before(async function() {

@@ -27,7 +27,7 @@
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-describe.skip('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', async function() {
   const LABEL = 'Polyfill Plugin with default options and Default Workspace';
 
   let setup;
@@ -45,7 +45,7 @@ describe.skip('Build Greenwood With: ', async function() {
 
     runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
 
-    describe('Script tag in the <head> tag', function() {
+    describe.skip('Script tag in the <head> tag', function() {
       let dom;
 
       beforeEach(async function() {

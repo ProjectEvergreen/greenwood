@@ -24,15 +24,15 @@
  * User Workspace
  * Greenwood default (src/)
  */
-// const expect = require('chai').expect;
-// const { JSDOM } = require('jsdom');
-// const path = require('path');
+const expect = require('chai').expect;
+const { JSDOM } = require('jsdom');
+const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-describe.skip('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', async function() {
   const LABEL = 'Google Analytics Plugin with IP Anonymization tracking set to false and Default Workspace';
-  // const mockAnalyticsId = 'UA-123456-1';
+  const mockAnalyticsId = 'UA-123456-1';
 
   let setup;
 
