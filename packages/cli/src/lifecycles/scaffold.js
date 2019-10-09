@@ -23,7 +23,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
     });
   };
 
-  const loadPageMeta = async (file, result, { metaComponent }) => {
+  const loadPageMeta = (file, result, { metaComponent }) => {
     const { title, meta, route } = file;
     const metadata = {
       title,
@@ -71,7 +71,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
         let result = await createPageComponent(file, context);
 
         // Add Meta Data based on config
-        result = await loadPageMeta(file, result, context);
+        result = loadPageMeta(file, result, context);
 
         // Determine target path for newly scaffolded component
         target = determineTarget(file, context);
