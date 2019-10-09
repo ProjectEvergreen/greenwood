@@ -5,10 +5,9 @@ const localWebServer = new LocalWebServer();
 const path = require('path');
 const PORT = '8000';
 const polyfillPath = path.join(process.cwd(), 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js');
-
-console.log(polyfillPath);
-browserRunner = new BrowserRunner();
 let polyfill = '';
+
+browserRunner = new BrowserRunner();
 
 const runBrowser = async (compilation) => {
   try {
