@@ -24,49 +24,60 @@ const writePageComponentsFromTemplate = async (compilation) => {
   };
 
   const loadPageMeta = async (file, result, { metaComponent }) => {
-    return new Promise((resolve, reject) => {
+    const { title, meta, route } = file;
+    const metadata = {
+      title,
+      meta,
+      route
+    };
+
+    result = result.replace(/METAIMPORT/, `import '${metaComponent}'`);
+    result = result.replace(/METADATA/, `const metadata = ${JSON.stringify(metadata)}`);
+    result = result.replace(/METAELEMENT/, '<eve-meta .attributes=\${metadata}></eve-meta>');
+
+    return result;
+  };
+
+  const writeComponentToFile = async (target, filename, result) => {
+    return new Promise(async(resolve, reject) => {
       try {
-        const { title, meta, route } = file;
-        const metadata = {
-          title,
-          meta,
-          route
-        };
-
-        result = result.replace(/METAIMPORT/, `import '${metaComponent}'`);
-        result = result.replace(/METADATA/, `const metadata = ${JSON.stringify(metadata)}`);
-        result = result.replace(/METAELEMENT/, '<eve-meta .attributes=\${metadata}></eve-meta>');
-
-        resolve(result);
+        await fs.ensureDir(target, { recursive: true });
+        await fs.writeFile(path.join(target, `${filename}.js`), result);
+        resolve();
       } catch (err) {
         reject(err);
       }
     });
   };
 
-  return await Promise.all(compilation.graph.map(file => {
+  const determineTarget = (file, context) => {
+    let relPageDir = file.filePath.substring(context.pagesDir.length, file.filePath.length);
+    const pathLastBackslash = relPageDir.lastIndexOf('/');
+
+    target = path.join(context.scratchDir, file.fileName); // non-nested default
+
+    if (pathLastBackslash !== 0) {
+      target = path.join(context.scratchDir, relPageDir.substring(0, pathLastBackslash), file.fileName); // nested path
+    }
+    return target;
+  };
+
+  return Promise.all(compilation.graph.map(file => {
     const context = compilation.context;
 
     return new Promise(async(resolve, reject) => {
       try {
+        // Create Standard Component from Markdown File
         let result = await createPageComponent(file, context);
 
+        // Add Meta Data based on config
         result = await loadPageMeta(file, result, context);
-        let relPageDir = file.filePath.substring(context.pagesDir.length, file.filePath.length);
-        const pathLastBackslash = relPageDir.lastIndexOf('/');
 
-        target = path.join(context.scratchDir, file.fileName); // non-nested default
+        // Determine target path for newly scaffolded component
+        target = determineTarget(file, context);
 
-        if (pathLastBackslash !== 0) {
-          target = path.join(context.scratchDir, relPageDir.substring(0, pathLastBackslash), file.fileName); // nested path
-        }
-
-        if (!fs.existsSync(target)) {
-          fs.mkdirSync(target, { recursive: true });
-        }
-
-        await fs.writeFile(path.join(target, `${file.fileName}.js`), result);
-
+        // Write finished component
+        await writeComponentToFile(target, file.fileName, result);
         resolve();
       } catch (err) {
         reject(err);
