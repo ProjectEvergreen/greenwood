@@ -27,7 +27,7 @@
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', async function() {
+describe.skip('Build Greenwood With: ', async function() {
   const LABEL = 'Polyfill Plugin with default options and Default Workspace';
 
   let setup;
@@ -45,23 +45,23 @@ describe('Build Greenwood With: ', async function() {
 
     runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
 
-    // describe('Script tag in the <head> tag', function() {
-    //   let dom;
+    describe('Script tag in the <head> tag', function() {
+      let dom;
 
-    //   beforeEach(async function() {
-    //     dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-    //   });
+      beforeEach(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+      });
 
-    //   it('should have one <script> tag for polyfills loaded in the <head> tag', function() {
-    //     const scriptTags = dom.window.document.querySelectorAll('head > script');
-    //     const polyfillScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
-    //       return script.src.indexOf('/webcomponents-bundle.js') >= 0;
-    //     });
+      it('should have one <script> tag for polyfills loaded in the <head> tag', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script');
+        const polyfillScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
+          return script.src.indexOf('/webcomponents-bundle.js') >= 0;
+        });
 
-    //     expect(polyfillScriptTags.length).to.be.equal(1);
-    //   });
+        expect(polyfillScriptTags.length).to.be.equal(1);
+      });
 
-    // });
+    });
   });
 
   after(function() {

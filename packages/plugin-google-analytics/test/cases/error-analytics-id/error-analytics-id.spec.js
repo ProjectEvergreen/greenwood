@@ -24,7 +24,7 @@
 // const expect = require('chai').expect;
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', async function() {
+describe.skip('Build Greenwood With: ', async function() {
   let setup;
 
   before(async function() {
@@ -32,15 +32,15 @@ describe('Build Greenwood With: ', async function() {
     this.context = await setup.setupTestBed(__dirname);
   });
 
-  // describe('Google Analytics Plugin with a bad value for analyticsId', () => {
-  //   it('should throw an error that analyticsId must be a string', async () => {
-  //     try {
-  //       await setup.runGreenwoodCommand('build');
-  //     } catch (err) {
-  //       expect(err).to.contain('analyticsId should be of type string.  get "undefined" instead.');
-  //     }
-  //   });
-  // });
+  describe('Google Analytics Plugin with a bad value for analyticsId', () => {
+    it('should throw an error that analyticsId must be a string', async () => {
+      try {
+        await setup.runGreenwoodCommand('build');
+      } catch (err) {
+        expect(err).to.contain('analyticsId should be of type string.  get "undefined" instead.');
+      }
+    });
+  });
 
   after(function() {
     setup.teardownTestBed();
