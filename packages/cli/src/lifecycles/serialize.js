@@ -1,22 +1,22 @@
 const LocalWebServer = require('local-web-server');
-const browserRunner = require('../lib/browser');
+const BrowserRunner = require('../lib/browser');
 const fs = require('fs-extra');
 const localWebServer = new LocalWebServer();
 const path = require('path');
 const PORT = '8000';
 
-const runBrowser = async (compilation) => {
+browserRunner = new BrowserRunner();
 
+const runBrowser = async (compilation) => {
   try {
-    return Promise.all(compilation.graph.map(({ route, label }) => {
+    return Promise.all(compilation.graph.map(async({ route }) => {
       const { publicDir } = compilation.context;
 
-      return browserRunner(`http://127.0.0.1:${PORT}${route}`, label, route, publicDir).then(async (content) => {
+      return await browserRunner.serialize(`http://127.0.0.1:${PORT}${route}`).then(async (content) => {
         const target = path.join(publicDir, route);
 
         await fs.mkdirs(target, { recursive: true });
         await fs.writeFile(path.join(target, 'index.html'), content);
-
       });
     }));
   } catch (err) {
@@ -40,6 +40,7 @@ module.exports = serializeBuild = async (compilation) => {
 
       await runBrowser(compilation);
 
+      browserRunner.close();
       server.close();
 
       resolve();

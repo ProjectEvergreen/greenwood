@@ -65,9 +65,9 @@ module.exports = ({ config, context }) => {
     }));
 
   // utilizes webpack plugins passed in directly by the user
-  // const customWebpackPlugins = config.plugins
-  //   .filter((plugin) => plugin.type === 'webpack')
-  //   .map((plugin) => plugin.provider({ config, context }));
+  const customWebpackPlugins = config.plugins
+    .filter((plugin) => plugin.type === 'webpack')
+    .map((plugin) => plugin.provider({ config, context }));
 
   return {
     entry: {
@@ -130,9 +130,9 @@ module.exports = ({ config, context }) => {
         template: path.join(context.scratchDir, context.indexPageTemplate),
         chunksSortMode: 'dependency',
         ...customOptions
-      })
+      }),
 
-      // ...customWebpackPlugins
+      ...customWebpackPlugins
     ]
   };
 };
