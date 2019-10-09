@@ -21,9 +21,9 @@
  * User Workspace
  * Greenwood default (src/)
  */
-// const expect = require('chai').expect;
-// const { JSDOM } = require('jsdom');
-// const path = require('path');
+const expect = require('chai').expect;
+const { JSDOM } = require('jsdom');
+const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
@@ -45,7 +45,7 @@ describe('Build Greenwood With: ', async function() {
 
     runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
 
-    describe.skip('Script tag in the <head> tag', function() {
+    describe('Script tag in the <head> tag', function() {
       let dom;
 
       beforeEach(async function() {

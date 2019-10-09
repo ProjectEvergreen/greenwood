@@ -16,14 +16,29 @@ class Renderer {
 
   async serialize(requestUrl) {
     const page = await this.browser.newPage();
-    
+    let response = null;
+
     // Page may reload when setting isMobile
     // https://github.com/GoogleChrome/puppeteer/blob/v1.10.0/docs/api.md#pagesetviewportviewport
     page.evaluateOnNewDocument('customElements.forcePolyfill = true');
     page.evaluateOnNewDocument('ShadyDOM = {force: true}');
     page.evaluateOnNewDocument('ShadyCSS = {shimcssproperties: true}');
-    
-    let response = null;
+
+    await page.setRequestInterception(true);
+
+    // only allow puppeteer to only load necessary scripts needed for pre-rendering
+    page.on('request', interceptedRequest => {
+      const interceptedRequestUrl = interceptedRequest.url();
+
+      if (
+        interceptedRequestUrl.indexOf('bundle.js') >= 0 || // webpack bundles, webcomponents-bundle.js
+        interceptedRequestUrl === requestUrl // pages / routes
+      ) {
+        interceptedRequest.continue();
+      } else {
+        interceptedRequest.abort();
+      }
+    });
 
     // Capture main frame response. This is used in the case that rendering
     // times out, which results in puppeteer throwing an error. This allows us
@@ -34,7 +49,7 @@ class Renderer {
         response = r;
       }
     });
-    
+
     try {
       // Navigate to page. Wait until there are no oustanding network requests.
       response = await page.goto(requestUrl, { timeout: 10000 });

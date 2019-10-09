@@ -4,8 +4,11 @@ const fs = require('fs-extra');
 const localWebServer = new LocalWebServer();
 const path = require('path');
 const PORT = '8000';
+const polyfillPath = path.join(process.cwd(), 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js');
 
+console.log(polyfillPath);
 browserRunner = new BrowserRunner();
+let polyfill = '';
 
 const runBrowser = async (compilation) => {
   try {
@@ -14,9 +17,12 @@ const runBrowser = async (compilation) => {
 
       return await browserRunner.serialize(`http://127.0.0.1:${PORT}${route}`).then(async (content) => {
         const target = path.join(publicDir, route);
+        const html = content
+          .replace(polyfill, '')
+          .replace('<script></script>', '');
 
         await fs.mkdirs(target, { recursive: true });
-        await fs.writeFile(path.join(target, 'index.html'), content);
+        await fs.writeFile(path.join(target, 'index.html'), html);
       });
     }));
   } catch (err) {
@@ -29,6 +35,13 @@ const runBrowser = async (compilation) => {
 module.exports = serializeBuild = async (compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
+      polyfill = await fs.readFile(polyfillPath, 'utf8');
+
+      const indexContentsPath = path.join(compilation.context.publicDir, compilation.context.indexPageTemplate);
+      const indexContents = await fs.readFile(indexContentsPath, 'utf8');
+      const indexContentsPolyfilled = indexContents.replace('<body>', `<script>${polyfill}</script><body>`);
+
+      await fs.writeFile(indexContentsPath, indexContentsPolyfilled);
 
       // "serialize" our SPA into a static site
       const server = localWebServer.listen({

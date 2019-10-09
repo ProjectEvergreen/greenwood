@@ -39,11 +39,16 @@ module.exports = class TestBed {
               const targetDir = path.join(cwd, file.dir);
               const targetPath = path.join(cwd, file.dir, file.name);
 
-              if (!fs.existsSync(targetDir)) {
-                fs.mkdirSync(targetDir, { recursive: true });
-              }
+              await new Promise(async(resolve, reject) => {
+                try {
+                  await fs.ensureDir(targetDir, { recursive: true });
+                  await fs.copy(targetSrc, targetPath);
+                  resolve();
+                } catch (err) {
+                  reject();
+                }
+              });
 
-              await fs.copy(targetSrc, targetPath);
               resolve();
             } catch (err) {
               reject(err);
