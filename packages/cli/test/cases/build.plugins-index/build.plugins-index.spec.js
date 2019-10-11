@@ -70,11 +70,11 @@ describe('Build Greenwood With: ', async function() {
         expect(placeholder.length).to.be.equal(1);
       });
 
-      // it('should have placeholder for hookGreenwoodPolyfills', function() {
-      //   const placeholder = dom.window.document.querySelectorAll('body div.hook-polyfills');
+      it('should have placeholder for hookGreenwoodPolyfills', function() {
+        const placeholder = dom.window.document.querySelectorAll('body div.hook-polyfills');
 
-      //   expect(placeholder.length).to.be.equal(1);
-      // });
+        expect(placeholder.length).to.be.equal(1);
+      });
     });
   });
 
