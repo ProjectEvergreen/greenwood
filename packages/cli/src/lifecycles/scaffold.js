@@ -94,11 +94,8 @@ const writeListImportFile = async (compilation) => {
 
   // Create app directory so that app-template relative imports are correct
   const appDir = path.join(compilation.context.scratchDir, 'app');
-
-  if (!fs.existsSync(appDir)) {
-    await fs.mkdirs(appDir);
-  }
-
+  
+  await fs.ensureDir(appDir);
   return await fs.writeFile(path.join(appDir, './list.js'), importList.join(''));
 };
 
