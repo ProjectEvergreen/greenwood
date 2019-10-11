@@ -45,7 +45,7 @@ module.exports = class TestBed {
                   await fs.copy(targetSrc, targetPath);
                   resolve();
                 } catch (err) {
-                  reject();
+                  reject(err);
                 }
               });
 

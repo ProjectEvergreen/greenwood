@@ -4,7 +4,7 @@ const { Renderer } = require('./renderer');
 class BrowserRunner {
 
   constructor() {
-    this.browser = '', this.renderer = '';
+    this.browser = {}, this.renderer = {};
     this.init();
   }
 

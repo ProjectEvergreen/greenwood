@@ -50,7 +50,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
     });
   };
 
-  const determineTarget = (file, context) => {
+  const setCachedComponentPath = (file, context) => {
     let relPageDir = file.filePath.substring(context.pagesDir.length, file.filePath.length);
     const pathLastBackslash = relPageDir.lastIndexOf('/');
 
@@ -74,7 +74,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
         result = loadPageMeta(file, result, context);
 
         // Determine target path for newly scaffolded component
-        target = determineTarget(file, context);
+        target = setCachedComponentPath(file, context);
 
         // Write finished component
         await writeComponentToFile(target, file.fileName, result);
