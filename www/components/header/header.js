@@ -14,7 +14,8 @@ class HeaderComponent extends LitElement {
         <eve-container fluid>
           <div class="head-wrap">
             <div class="brand">
-              <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer">
+              <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer"
+                @onclick="getOutboundLink('https://projectevergreen.github.io'); return false;" >
                 <img src="${brand}" alt="Greenwood logo"/>
               </a>
               <div class="project-name">

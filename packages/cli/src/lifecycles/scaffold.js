@@ -1,15 +1,15 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 
 const writePageComponentsFromTemplate = async (compilation) => {
   const createPageComponent = async (file, context) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const pageTemplatePath = file.template === 'page' 
-          ? context.pageTemplatePath 
+        const pageTemplatePath = file.template === 'page'
+          ? context.pageTemplatePath
           : path.join(context.templatesDir, `${file.template}-template.js`);
-        
-        const templateData = await fs.readFileSync(pageTemplatePath);
+
+        const templateData = await fs.readFile(pageTemplatePath, 'utf8');
 
         let result = templateData.toString().replace(/entry/g, `wc-md-${file.label}`);
 
@@ -23,25 +23,45 @@ const writePageComponentsFromTemplate = async (compilation) => {
     });
   };
 
-  const loadPageMeta = async (file, result, { metaComponent }) => {
-    return new Promise((resolve, reject) => {
+  const loadPageMeta = (file, result, { metaComponent }) => {
+    const { title, meta, route } = file;
+    const metadata = {
+      title,
+      meta,
+      route
+    };
+
+    result = result.replace(/METAIMPORT/, `import '${metaComponent}'`);
+    result = result.replace(/METADATA/, `const metadata = ${JSON.stringify(metadata)}`);
+    result = result.replace(/METAELEMENT/, '<eve-meta .attributes=\${metadata}></eve-meta>');
+
+    return result;
+  };
+
+  const writePageComponentToFile = async (target, filename, result) => {
+    return new Promise(async(resolve, reject) => {
       try {
-        const { title, meta, route } = file;
-        const metadata = {
-          title,
-          meta,
-          route
-        };
-
-        result = result.replace(/METAIMPORT/, `import '${metaComponent}'`);
-        result = result.replace(/METADATA/, `const metadata = ${JSON.stringify(metadata)}`);
-        result = result.replace(/METAELEMENT/, '<eve-meta .attributes=\${metadata}></eve-meta>');
-
-        resolve(result);
+        await fs.ensureDir(target, { recursive: true });
+        await fs.writeFile(path.join(target, `${filename}.js`), result);
+        resolve();
       } catch (err) {
         reject(err);
       }
     });
+  };
+
+  const getPageComponentPath = (file, context) => {
+    let relPageDir = file.filePath.substring(context.pagesDir.length, file.filePath.length);
+    let pagePath = '';
+    const pathLastBackslash = relPageDir.lastIndexOf('/');
+    
+    pagePath = path.join(context.scratchDir, file.fileName); // non-nested default
+
+    if (pathLastBackslash !== 0) {
+      pagePath = path.join(context.scratchDir, relPageDir.substring(0, pathLastBackslash), file.fileName); // nested path
+    }
+
+    return pagePath;
   };
 
   return Promise.all(compilation.graph.map(file => {
@@ -49,23 +69,17 @@ const writePageComponentsFromTemplate = async (compilation) => {
 
     return new Promise(async(resolve, reject) => {
       try {
+        // Create Standard Page Component from Markdown File
         let result = await createPageComponent(file, context);
 
-        result = await loadPageMeta(file, result, context);
-        let relPageDir = file.filePath.substring(context.pagesDir.length, file.filePath.length);
-        const pathLastBackslash = relPageDir.lastIndexOf('/');
+        // Add Meta Data based on config
+        result = loadPageMeta(file, result, context);
 
-        target = path.join(context.scratchDir, file.fileName); // non-nested default
+        // Determine path to newly scaffolded component
+        const filePath = getPageComponentPath(file, context);
 
-        if (pathLastBackslash !== 0) {
-          target = path.join(context.scratchDir, relPageDir.substring(0, pathLastBackslash), file.fileName); // nested path
-        }
-
-        if (!fs.existsSync(target)) {
-          fs.mkdirSync(target, { recursive: true });
-        }
-        await fs.writeFileSync(path.join(target, `${file.fileName}.js`), result);
-
+        // Write finished component
+        await writePageComponentToFile(filePath, file.fileName, result);
         resolve();
       } catch (err) {
         reject(err);
@@ -82,18 +96,15 @@ const writeListImportFile = async (compilation) => {
 
   // Create app directory so that app-template relative imports are correct
   const appDir = path.join(compilation.context.scratchDir, 'app');
-
-  if (!fs.existsSync(appDir)) {
-    await fs.mkdirSync(appDir);
-  }
   
-  return await fs.writeFileSync(path.join(appDir, './list.js'), importList.join(''));
+  await fs.ensureDir(appDir);
+  return await fs.writeFile(path.join(appDir, './list.js'), importList.join(''));
 };
 
 const writeRoutes = async(compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let data = await fs.readFileSync(compilation.context.appTemplatePath);
+      let data = await fs.readFile(compilation.context.appTemplatePath, 'utf8');
 
       const routes = compilation.graph.map(file => {
         return `<lit-route path="${file.route}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
@@ -101,7 +112,7 @@ const writeRoutes = async(compilation) => {
 
       const result = data.toString().replace(/MYROUTES/g, routes.join(''));
 
-      await fs.writeFileSync(path.join(compilation.context.scratchDir, 'app', './app.js'), result);
+      await fs.writeFile(path.join(compilation.context.scratchDir, 'app', './app.js'), result);
 
       resolve();
     } catch (err) {
@@ -110,16 +121,15 @@ const writeRoutes = async(compilation) => {
   });
 };
 
-// eslint-disable-next-line no-unused-vars
 const setupIndex = async({ context }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      fs.copyFileSync(
-        context.indexPageTemplatePath, 
+      await fs.copy(
+        context.indexPageTemplatePath,
         path.join(context.scratchDir, context.indexPageTemplate)
       );
-      fs.copyFileSync(
-        context.notFoundPageTemplatePath, 
+      await fs.copy(
+        context.notFoundPageTemplatePath,
         path.join(context.scratchDir, context.notFoundPageTemplate)
       );
       resolve();
@@ -131,7 +141,7 @@ const setupIndex = async({ context }) => {
 
 module.exports = generateScaffolding = async (compilation) => {
   return new Promise(async (resolve, reject) => {
-    try {      
+    try {
       console.log('Generate pages from templates...');
       await writePageComponentsFromTemplate(compilation);
 
@@ -143,7 +153,7 @@ module.exports = generateScaffolding = async (compilation) => {
 
       console.log('setup index page and html');
       await setupIndex(compilation);
-      
+
       console.log('Scaffolding complete.');
       resolve();
     } catch (err) {

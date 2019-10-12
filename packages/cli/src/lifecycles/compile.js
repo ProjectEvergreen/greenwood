@@ -12,7 +12,7 @@ module.exports = generateCompilation = () => {
         graph: [],
         context: {},
         config: {}
-      };      
+      };
 
       // read from defaults/config file
       console.log('Reading project config');
@@ -25,7 +25,7 @@ module.exports = generateCompilation = () => {
       // generate a graph of all pages / components to build
       console.log('Generating graph of workspace files...');
       compilation = await generateGraph(compilation);
-    
+
       // generate scaffolding
       console.log('Scaffolding out project files...');
       await generateScaffolding(compilation);

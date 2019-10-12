@@ -16,6 +16,6 @@
     "@greenwood/cli": "^0.3.6"
   },
   "dependencies": {
-    "@webcomponents/webcomponentsjs": "^2.2.10"
+    "@webcomponents/webcomponentsjs": "^2.3.0"
   }
 }

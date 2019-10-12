@@ -1,5 +1,4 @@
-const pluginPolyfills = require('@greenwood/plugin-polyfills');
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const url = require('url');
 
@@ -12,23 +11,21 @@ let defaultConfig = {
   publicPath: '/',
   title: 'Greenwood App',
   meta: [],
-  plugins: [
-    ...pluginPolyfills()
-  ],
+  plugins: [],
   themeFile: 'theme.css'
 };
 
 module.exports = readAndMergeConfig = async() => {
   // eslint-disable-next-line complexity
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
       // deep clone of default config
       let customConfig = Object.assign({}, defaultConfig);
 
-      if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
-        const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));        
+      if (await fs.exists(path.join(process.cwd(), 'greenwood.config.js'))) {
+        const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
         const { workspace, devServer, publicPath, title, meta, plugins, themeFile } = userCfgFile;
-          
+
         // workspace validation
         if (workspace) {
           if (typeof workspace !== 'string') {
@@ -45,9 +42,9 @@ module.exports = readAndMergeConfig = async() => {
             customConfig.workspace = workspace;
           }
 
-          if (!fs.existsSync(customConfig.workspace)) {
+          if (!await fs.exists(customConfig.workspace)) {
             reject('Error: greenwood.config.js workspace doesn\'t exist! \n' +
-              'common issues to check might be: \n' + 
+              'common issues to check might be: \n' +
               '- typo in your workspace directory name, or in greenwood.config.js \n' +
               '- if using relative paths, make sure your workspace is in the same cwd as _greenwood.config.js_ \n' +
               '- consider using an absolute path, e.g. path.join(__dirname, \'my\', \'custom\', \'path\') // <__dirname>/my/custom/path/ ');
@@ -100,7 +97,7 @@ module.exports = readAndMergeConfig = async() => {
         }
 
         if (devServer && Object.keys(devServer).length > 0) {
-          
+
           if (devServer.host) {
             // eslint-disable-next-line max-depth
             if (url.parse(devServer.host).pathname === null) {
@@ -120,10 +117,8 @@ module.exports = readAndMergeConfig = async() => {
               // console.log(`custom port provided => ${customConfig.devServer.port}`);
             }
           }
-
         }
       }
-
       resolve({ ...defaultConfig, ...customConfig });
     } catch (err) {
       reject(err);

@@ -1,20 +1,20 @@
 /*
  * Use Case
  * Run Greenwood with a custom themeFile file in config and default workspace with a page template.
- * 
+ *
  * User Result
  * Should generate a bare bones Greenwood build.  (same as build.default.spec.js) with custom theme styles
- * 
+ *
  * User Command
  * greenwood build
- * 
+ *
  * User Config
  * {
  *   title: 'My Custom Greenwood App'
  * }
- * 
+ *
  * User Workspace
- * Greenwood default 
+ * Greenwood default
  *  src/
  *   templates/
  *     page-template.js
@@ -35,11 +35,11 @@ describe('Build Greenwood With: ', async function() {
   before(async function() {
     setup = new TestBed();
 
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
-  
+
   describe(LABEL, function() {
-    before(async function() {     
+    before(async function() {
       await setup.runGreenwoodCommand('build');
     });
 
@@ -85,11 +85,11 @@ describe('Build Greenwood With: ', async function() {
       });
 
     });
-    
+
   });
 
   after(function() {
     setup.teardownTestBed();
   });
-  
+
 });

@@ -33,17 +33,17 @@ module.exports = ({ config, context }) => {
   // dynamically map all the user's workspace directories for resolution by webpack
   // this essentially helps us keep watch over changes from the user, and greenwood's build pipeline
   const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map(mapUserWorkspaceDirectory);
-  
+
   // if user has an assets/ directory in their workspace, automatically copy it for them
   const userAssetsDirectoryForWebpack = fs.existsSync(context.assetDir) ? [{
-    from: context.assetDir, 
+    from: context.assetDir,
     to: path.join(context.publicDir, 'assets')
   }] : [];
 
   const commonCssLoaders = [
     { loader: 'css-loader' },
-    { 
-      loader: 'postcss-loader', 
+    {
+      loader: 'postcss-loader',
       options: {
         config: {
           path: path.join(__dirname, 'postcss.config.js')
@@ -64,7 +64,7 @@ module.exports = ({ config, context }) => {
       });
     }));
 
-  // gets webpack plugins passed in directly by fhe user
+  // utilizes webpack plugins passed in directly by the user
   const customWebpackPlugins = config.plugins
     .filter((plugin) => plugin.type === 'webpack')
     .map((plugin) => plugin.provider({ config, context }));
