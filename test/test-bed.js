@@ -23,7 +23,7 @@ module.exports = class TestBed {
     this.enableStdOut = enableStdOut; // debugging tests
   }
 
-  setupTestBed(cwd) {
+  setupTestBed(cwd, testFiles = []) {
     return new Promise(async (resolve, reject) => {
       try {
         this.rootDir = cwd;
@@ -32,7 +32,7 @@ module.exports = class TestBed {
 
         await this.teardownTestBed();
 
-        await Promise.all(setupFiles.map((file) => {
+        await Promise.all(setupFiles.concat(testFiles).map((file) => {
           return new Promise(async (resolve, reject) => {
             try {
               const targetSrc = path.join(process.cwd(), file.dir, file.name);

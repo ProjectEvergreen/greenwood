@@ -35,7 +35,10 @@ describe('Build Greenwood With: ', async function() {
   before(async function() {
     setup = new TestBed();
 
-    this.context = await setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname, [{
+      dir: 'node_modules/@webcomponents/webcomponentsjs',
+      name: 'webcomponents-loader.js'
+    }]);
   });
 
   describe(LABEL, function() {
