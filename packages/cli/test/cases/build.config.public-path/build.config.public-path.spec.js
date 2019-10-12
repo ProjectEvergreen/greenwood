@@ -1,14 +1,14 @@
 /*
  * Use Case
  * Run Greenwood with string publicPath in config and default workspace.
- * 
+ *
  * User Result
  * Should generate a bare bones Greenwood build.  (same as build.default.spec.js) with custom publicPath
  * from which assets will be served
- * 
+ *
  * User Command
  * greenwood build
- * 
+ *
  * User Config
  * {
  *   publicPath: '/assets/'
@@ -26,11 +26,11 @@ describe('Build Greenwood With: ', async function() {
 
   before(async function() {
     setup = new TestBed();
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
-  
+
   describe(LABEL, function() {
-    before(async function() {     
+    before(async function() {
       await setup.runGreenwoodCommand('build');
     });
     runSmokeTest(['not-found', 'hello'], LABEL);
@@ -55,7 +55,7 @@ describe('Build Greenwood With: ', async function() {
     });
 
   });
-    
+
   after(function() {
     setup.teardownTestBed();
   });

@@ -1,16 +1,16 @@
 /*
  * Use Case
  * Run Greenwood build command with no config and custom app template.
- * 
+ *
  * User Result
  * Should generate a bare bones Greenwood build with custom app template.
- * 
+ *
  * User Command
  * greenwood build
- * 
+ *
  * User Config
  * None (Greenwood Default)
- * 
+ *
  * User Workspace
  * src/
  *   templates/
@@ -28,13 +28,13 @@ describe('Build Greenwood With: ', function() {
 
   before(async function() {
     setup = new TestBed();
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
 
   describe(LABEL, function() {
     let dom;
 
-    before(async () => {     
+    before(async () => {
       await setup.runGreenwoodCommand('build');
     });
 
@@ -76,13 +76,13 @@ describe('Build Greenwood With: ', function() {
 
       it('should have the expected heading text within the index page in the public directory', function() {
         const heading = dom.window.document.querySelector('h3').textContent;
-    
+
         expect(heading).to.equal(indexPageHeading);
       });
 
       it('should have the expected paragraph text within the index page in the public directory', function() {
         let paragraph = dom.window.document.querySelector('p').textContent;
-    
+
         expect(paragraph).to.equal(indexPageBody);
       });
     });
@@ -95,15 +95,15 @@ describe('Build Greenwood With: ', function() {
       it('should output a single index.html file using our custom app template', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
-  
+
       it('should have the specific element we added as part of our custom app template', function() {
         const customParagraph = dom.window.document.querySelector('p#custom-app-template').textContent;
-        
+
         expect(customParagraph).to.equal('My Custom App Template');
       });
     });
   });
-  
+
   after(function() {
     setup.teardownTestBed();
   });

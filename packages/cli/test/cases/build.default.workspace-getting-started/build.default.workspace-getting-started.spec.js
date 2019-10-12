@@ -40,7 +40,7 @@ describe('Build Greenwood With: ', function() {
 
   before(async function() {
     setup = new TestBed();
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
 
   describe(LABEL, function() {
@@ -68,11 +68,11 @@ describe('Build Greenwood With: ', function() {
       it('should output an index.html file (home page)', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
-  
+
       it('should output a single 404.html file (not found page)', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './404.html'))).to.be.true;
       });
-    
+
       it('should output one JS bundle file', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, './index.*.bundle.js'))).to.have.lengthOf(1);
       });
@@ -108,15 +108,15 @@ describe('Build Greenwood With: ', function() {
       it('should create a blog directory', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'blog'))).to.be.true;
       });
-  
+
       it('should output an index.html file (home page)', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'blog', 'first-post', './index.html'))).to.be.true;
       });
-  
+
       it('should output a single 404.html file (not found page)', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'blog', 'second-post', './index.html'))).to.be.true;
       });
-    
+
       it('should output one JS bundle file', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, './index.*.bundle.js'))).to.have.lengthOf(1);
       });

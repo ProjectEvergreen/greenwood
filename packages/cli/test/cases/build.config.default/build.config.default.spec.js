@@ -1,16 +1,16 @@
 /*
  * Use Case
  * Run Greenwood with empty config object and default workspace.
- * 
+ *
  * Uaer Result
  * Should generate a bare bones Greenwood build.  (same as build.default.spec.js)
- * 
+ *
  * User Command
  * greenwood build
- * 
+ *
  * User Config
  * {}
- * 
+ *
  * User Workspace
  * Greenwood default (src/)
  */
@@ -23,16 +23,16 @@ describe('Build Greenwood With: ', async function() {
 
   before(async function() {
     setup = new TestBed();
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
-  
+
   describe(LABEL, function() {
-    before(async function() {     
+    before(async function() {
       await setup.runGreenwoodCommand('build');
     });
     runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
   });
-  
+
   after(function() {
     setup.teardownTestBed();
   });

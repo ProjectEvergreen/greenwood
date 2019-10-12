@@ -1,16 +1,16 @@
 /*
  * Use Case
  * Run Greenwood build command with no config.
- * 
+ *
  * User Result
  * Should generate a bare bones Greenwood build.
- * 
+ *
  * User Command
  * greenwood build
- * 
+ *
  * User Config
  * None (Greenwood Default)
- * 
+ *
  * User Workspace
  * Greenwood default (src/)
  */
@@ -21,14 +21,14 @@ describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   let setup;
 
-  before(function() {
+  before(async function() {
     setup = new TestBed();
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
 
   describe(LABEL, function() {
 
-    before(async function() {     
+    before(async function() {
       await setup.runGreenwoodCommand('build');
     });
     runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);

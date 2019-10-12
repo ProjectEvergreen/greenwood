@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const defaultTemplatesDir = path.join(__dirname, '../templates/');
 const scratchDir = path.join(process.cwd(), './.greenwood/');
@@ -7,7 +7,7 @@ const metaComponent = path.join(__dirname, '../plugins/meta');
 
 module.exports = initContexts = async({ config }) => {
 
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
 
     try {
       const userWorkspace = path.join(config.workspace);
@@ -18,13 +18,13 @@ module.exports = initContexts = async({ config }) => {
       const indexPageTemplate = 'index.html';
       const notFoundPageTemplate = '404.html';
 
-      const userHasWorkspace = fs.existsSync(userWorkspace);
-      const userHasWorkspacePages = fs.existsSync(userPagesDir);
-      const userHasWorkspaceTemplates = fs.existsSync(userTemplatesDir);
-      const userHasWorkspacePageTemplate = fs.existsSync(userPageTemplate);
-      const userHasWorkspaceAppTemplate = fs.existsSync(userAppTemplate);
-      const userHasWorkspaceIndexTemplate = fs.existsSync(path.join(userTemplatesDir, 'index.html'));
-      const userHasWorkspaceNotFoundTemplate = fs.existsSync(path.join(userTemplatesDir, '404.html'));
+      const userHasWorkspace = await fs.exists(userWorkspace);
+      const userHasWorkspacePages = await fs.exists(userPagesDir);
+      const userHasWorkspaceTemplates = await fs.exists(userTemplatesDir);
+      const userHasWorkspacePageTemplate = await fs.exists(userPageTemplate);
+      const userHasWorkspaceAppTemplate = await fs.exists(userAppTemplate);
+      const userHasWorkspaceIndexTemplate = await fs.exists(path.join(userTemplatesDir, 'index.html'));
+      const userHasWorkspaceNotFoundTemplate = await fs.exists(path.join(userTemplatesDir, '404.html'));
 
       let context = {
         scratchDir,
@@ -50,11 +50,12 @@ module.exports = initContexts = async({ config }) => {
         assetDir: path.join(userHasWorkspace ? userWorkspace : defaultTemplatesDir, 'assets')
       };
 
-      if (!fs.existsSync(scratchDir)) {
-        fs.mkdirSync(scratchDir);
+      if (!await fs.ensureDir(scratchDir)) {
+        await fs.mkdirs(scratchDir);
       }
       resolve(context);
     } catch (err) {
+      console.log(err);
       reject(err);
     }
   });

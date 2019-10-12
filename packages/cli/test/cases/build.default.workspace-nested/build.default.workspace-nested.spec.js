@@ -1,16 +1,16 @@
 /*
  * Use Case
  * Run Greenwood with default config and nested directories in workspace.
- * 
+ *
  * Result
  * Test for correctly nested generated output.
- * 
+ *
  * Command
  * greenwood build
- * 
+ *
  * User Config
  * None (Greenwood default)
- * 
+ *
  * User Workspace
  * src/
  *   pages/
@@ -30,14 +30,14 @@ describe('Build Greenwood With: ', function() {
 
   before(async function() {
     setup = new TestBed();
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
 
   describe(LABEL, function() {
-    before(async function() {   
+    before(async function() {
       await setup.runGreenwoodCommand('build');
     });
-    
+
     runSmokeTest(['public', 'not-found', 'index'], LABEL);
 
     it('should create a default blog page directory', function() {
@@ -57,13 +57,13 @@ describe('Build Greenwood With: ', function() {
 
       it('should have the expected heading text within the hello example page in the hello directory', async function() {
         const heading = dom.window.document.querySelector('h3').textContent;
-    
+
         expect(heading).to.equal('Blog Page');
       });
-    
+
       it('should have the expected paragraph text within the hello example page in the hello directory', async function() {
         let paragraph = dom.window.document.querySelector('p').textContent;
-    
+
         expect(paragraph).to.equal('This is the test blog page built by Greenwood.');
       });
     });
