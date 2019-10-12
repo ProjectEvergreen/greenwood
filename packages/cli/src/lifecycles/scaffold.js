@@ -38,7 +38,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
     return result;
   };
 
-  const writeComponentToFile = async (target, filename, result) => {
+  const writePageComponentToFile = async (target, filename, result) => {
     return new Promise(async(resolve, reject) => {
       try {
         await fs.ensureDir(target, { recursive: true });
@@ -50,16 +50,18 @@ const writePageComponentsFromTemplate = async (compilation) => {
     });
   };
 
-  const setCachedComponentPath = (file, context) => {
+  const getPageComponentPath = (file, context) => {
     let relPageDir = file.filePath.substring(context.pagesDir.length, file.filePath.length);
+    let pagePath = '';
     const pathLastBackslash = relPageDir.lastIndexOf('/');
-
-    target = path.join(context.scratchDir, file.fileName); // non-nested default
+    
+    pagePath = path.join(context.scratchDir, file.fileName); // non-nested default
 
     if (pathLastBackslash !== 0) {
-      target = path.join(context.scratchDir, relPageDir.substring(0, pathLastBackslash), file.fileName); // nested path
+      pagePath = path.join(context.scratchDir, relPageDir.substring(0, pathLastBackslash), file.fileName); // nested path
     }
-    return target;
+
+    return pagePath;
   };
 
   return Promise.all(compilation.graph.map(file => {
@@ -67,17 +69,17 @@ const writePageComponentsFromTemplate = async (compilation) => {
 
     return new Promise(async(resolve, reject) => {
       try {
-        // Create Standard Component from Markdown File
+        // Create Standard Page Component from Markdown File
         let result = await createPageComponent(file, context);
 
         // Add Meta Data based on config
         result = loadPageMeta(file, result, context);
 
-        // Determine target path for newly scaffolded component
-        target = setCachedComponentPath(file, context);
+        // Determine path to newly scaffolded component
+        const filePath = getPageComponentPath(file, context);
 
         // Write finished component
-        await writeComponentToFile(target, file.fileName, result);
+        await writePageComponentToFile(filePath, file.fileName, result);
         resolve();
       } catch (err) {
         reject(err);
@@ -119,7 +121,6 @@ const writeRoutes = async(compilation) => {
   });
 };
 
-// eslint-disable-next-line no-unused-vars
 const setupIndex = async({ context }) => {
   return new Promise(async (resolve, reject) => {
     try {
