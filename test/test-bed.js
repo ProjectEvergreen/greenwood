@@ -104,7 +104,7 @@ module.exports = class TestBed {
       npm.stderr.on('data', (data) => {
         err = data.toString('utf8');
         if (this.enableStdOut) {
-          console.log(err); // eslint-disable-line
+          console.error(err); // eslint-disable-line
         }
         reject(err);
       });
