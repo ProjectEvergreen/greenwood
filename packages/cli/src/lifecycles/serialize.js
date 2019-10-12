@@ -1,27 +1,27 @@
 const LocalWebServer = require('local-web-server');
-const browserRunner = require('../lib/browser');
-const fs = require('fs');
+const BrowserRunner = require('../lib/browser');
+const fs = require('fs-extra');
 const localWebServer = new LocalWebServer();
 const path = require('path');
 const PORT = '8000';
-// puppeteer specific polyfills - #193
 const polyfillPath = path.join(process.cwd(), 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js');
-const polyfill = fs.readFileSync(polyfillPath, 'utf8');
-      
-const runBrowser = async (compilation) => {
+let polyfill = '';
 
+browserRunner = new BrowserRunner();
+
+const runBrowser = async (compilation) => {
   try {
-    return await Promise.all(compilation.graph.map(({ route, label }) => {
+    return Promise.all(compilation.graph.map(async({ route }) => {
       const { publicDir } = compilation.context;
 
-      return browserRunner(`http://127.0.0.1:${PORT}${route}`, label, route, publicDir).then((content) => {
-        const target = path.join(publicDir, route);       
+      return await browserRunner.serialize(`http://127.0.0.1:${PORT}${route}`).then(async (content) => {
+        const target = path.join(publicDir, route);
         const html = content
           .replace(polyfill, '')
           .replace('<script></script>', '');
- 
-        fs.mkdirSync(target, { recursive: true });
-        fs.writeFileSync(path.join(target, 'index.html'), html);
+
+        await fs.mkdirs(target, { recursive: true });
+        await fs.writeFile(path.join(target, 'index.html'), html);
       });
     }));
   } catch (err) {
@@ -34,11 +34,13 @@ const runBrowser = async (compilation) => {
 module.exports = serializeBuild = async (compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
+      polyfill = await fs.readFile(polyfillPath, 'utf8');
+
       const indexContentsPath = path.join(compilation.context.publicDir, compilation.context.indexPageTemplate);
-      const indexContents = fs.readFileSync(indexContentsPath, 'utf8');
+      const indexContents = await fs.readFile(indexContentsPath, 'utf8');
       const indexContentsPolyfilled = indexContents.replace('<body>', `<script>${polyfill}</script><body>`);
 
-      fs.writeFileSync(indexContentsPath, indexContentsPolyfilled);
+      await fs.writeFile(indexContentsPath, indexContentsPolyfilled);
 
       // "serialize" our SPA into a static site
       const server = localWebServer.listen({
@@ -50,6 +52,7 @@ module.exports = serializeBuild = async (compilation) => {
 
       await runBrowser(compilation);
 
+      browserRunner.close();
       server.close();
 
       resolve();

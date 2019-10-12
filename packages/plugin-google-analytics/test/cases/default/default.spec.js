@@ -1,25 +1,25 @@
 /*
  * Use Case
  * Run Greenwood with Google Analytics composite plugin with default options.
- * 
+ *
  * Uaer Result
  * Should generate a bare bones Greenwood build with Google Analytics tracking snippet injected into index.html.
- * 
+ *
  * User Command
  * greenwood build
- * 
+ *
  * User Config
  * const googleAnalyticsPlugin = require('@greenwod/plugin-google-analytics');
- * 
+ *
  * {
  *   plugins: [{
  *     ...googleAnalyticsPlugin({
  *       analyticsId: 'UA-123456-1'
  *     })
  *  }]
- * 
+ *
  * }
- * 
+ *
  * User Workspace
  * Greenwood default (src/)
  */
@@ -37,14 +37,14 @@ describe('Build Greenwood With: ', async function() {
 
   before(async function() {
     setup = new TestBed();
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
-  
+
   describe(LABEL, function() {
-    before(async function() {     
+    before(async function() {
       await setup.runGreenwoodCommand('build');
     });
-    
+
     runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
 
     describe('Initialization script at the end of the <body> tag', function() {
@@ -88,12 +88,12 @@ describe('Build Greenwood With: ', async function() {
     });
 
     describe('Tracking script at the end of the <body> tag', function() {
-      let trackingScript; 
+      let trackingScript;
 
       beforeEach(async function() {
         const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
         const scriptTags = dom.window.document.querySelectorAll('head script');
-        
+
         trackingScript = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.src === `https://www.googletagmanager.com/gtag/js?id=${mockAnalyticsId}`;
         });
@@ -110,7 +110,7 @@ describe('Build Greenwood With: ', async function() {
       });
     });
   });
-  
+
   after(function() {
     setup.teardownTestBed();
   });

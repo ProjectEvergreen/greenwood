@@ -24,7 +24,7 @@ describe('Build Greenwood With: ', function() {
 
   before(async function() {
     setup = new TestBed();
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
 
   describe(LABEL, function() {

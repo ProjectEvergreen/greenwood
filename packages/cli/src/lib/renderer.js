@@ -16,13 +16,13 @@ class Renderer {
 
   async serialize(requestUrl) {
     const page = await this.browser.newPage();
-    
+
     // Page may reload when setting isMobile
     // https://github.com/GoogleChrome/puppeteer/blob/v1.10.0/docs/api.md#pagesetviewportviewport
     page.evaluateOnNewDocument('customElements.forcePolyfill = true');
     page.evaluateOnNewDocument('ShadyDOM = {force: true}');
     page.evaluateOnNewDocument('ShadyCSS = {shimcssproperties: true}');
-    
+
     let response = null;
 
     // Capture main frame response. This is used in the case that rendering
@@ -34,7 +34,7 @@ class Renderer {
         response = r;
       }
     });
-    
+
     try {
       // Navigate to page. Wait until there are no oustanding network requests.
       response = await page.goto(requestUrl, { timeout: 10000 });

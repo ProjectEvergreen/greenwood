@@ -1,16 +1,16 @@
 /*
  * Use Case
  * Run Greenwood build command with no config and custom styled page template.
- * 
+ *
  * User Result
  * Should generate a bare bones Greenwood build with custom styled page template.
- * 
+ *
  * User Command
  * greenwood build
- * 
+ *
  * User Config
  * None (Greenwood Default)
- * 
+ *
  * User Workspace
  * src/
  *   styles/
@@ -31,17 +31,17 @@ describe('Build Greenwood With: ', function() {
 
   before(async function() {
     setup = new TestBed();
-    this.context = setup.setupTestBed(__dirname);
+    this.context = await setup.setupTestBed(__dirname);
   });
 
   describe(LABEL, function() {
-    
+
     before(async function() {
       await setup.runGreenwoodCommand('build');
     });
-    
+
     runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
-    
+
     describe('Custom Styled Page Template', function() {
       let dom;
 
@@ -106,9 +106,9 @@ describe('Build Greenwood With: ', function() {
       });
 
     });
-    
+
   });
-  
+
   after(function() {
     setup.teardownTestBed();
   });
