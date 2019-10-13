@@ -102,4 +102,4 @@ And updated _index.html_
 </html>
 ```
 
-> For reference, here is the [default _index.html_](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/src/templates/index.html) prpvided by Greenwood.  You can mix and match with your own hooks and Greenwood's hooks to support whatever best suits your needs.
+> For reference, here is the [default _index.html_](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/src/templates/index.html) provided by Greenwood.  You can mix and match with your own hooks and Greenwood's hooks to support whatever best suits your needs.

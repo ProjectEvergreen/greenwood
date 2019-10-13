@@ -1,12 +1,14 @@
 ## Plugins
 
-At it's core, Greenwood provides a CLI and some configuration options to enable users to develop and build their projects quickly and simply from markdown.  However, more complex sites and use cases there will come a need to be able to extend the default functionality of Greenwood to support additional capabilities like:
+At its core, Greenwood provides a CLI to drive all the development related workflows for a Greenwood project.  It aims to provide a simple interface for quickly and simply building sites from as little as markdown files.  
+
+However, for more complex sites and use cases, there will come a need to extend the default functionality of Greenwood for additional capabilities like:
 - Site Analytics (Google, Snowplow)
 - Progressive Web App experiences (PWA)
 - Consuming content from a CMS (like Wordpress, Drupal)
 - Whatever you can think of!
 
-Greenwood aims to cater to all these use cases through two ways:
+Greenwood aims to cater to these use cases through two approaches:
 1. A plugin based architecture exposing low level "primitives" of the Greenwood build that anyone can extend.
 1. A set of pre-built plugins to help facilitate some of the most common uses cases and workflows, that don't require needing to know anything about the low level APIs.
 
@@ -14,7 +16,7 @@ Greenwood aims to cater to all these use cases through two ways:
 ### API
 Each plugin type requires two properties.  
 - `type`: Used for configuring the plugin type for usage within Greenwood.  Can be one of value: 'index' or 'webpack'
-- `provider`: A function that will be invoked by Greenwood during the build, determined by the `type`.  Can accept  a `compilation` param the provides read only access to parts of Greenwood's state and configuration that can be used by a plugin. 
+- `provider`: A function that will be invoked by Greenwood during the build, determined by the `type`.  Can accept  a `compilation` param that provides read-only access to parts of Greenwood's state and configuration that can be used by a plugin. 
 
 Here is an example of creating a plugin in a _greenwood.config.js_.
 ```render javascript
