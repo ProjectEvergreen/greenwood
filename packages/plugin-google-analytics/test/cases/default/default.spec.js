@@ -48,7 +48,8 @@ describe('Build Greenwood With: ', async function() {
     runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
 
     describe('Initialization script at the end of the <body> tag', function() {
-      let inlineScript;
+      let inlineScript = [];
+      let scriptSrcTags = [];
 
       beforeEach(async function() {
         const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
@@ -56,6 +57,10 @@ describe('Build Greenwood With: ', async function() {
 
         inlineScript = Array.prototype.slice.call(scriptTags).filter(script => {
           return !script.src;
+        });
+
+        scriptSrcTags = Array.prototype.slice.call(scriptTags).filter(script => {
+          return script.src && script.src.indexOf('google') >= 0;
         });
 
       });
@@ -84,6 +89,10 @@ describe('Build Greenwood With: ', async function() {
         `;
 
         expect(inlineScript[0].textContent).to.contain(expectedContent);
+      });
+
+      it('should only have one external Google script tag', function() {
+        expect(scriptSrcTags.length).to.be.equal(1);
       });
     });
 
