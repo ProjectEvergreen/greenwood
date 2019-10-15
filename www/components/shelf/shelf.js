@@ -51,21 +51,25 @@ class shelf extends LitElement {
   }
 
   expandRoute(path) {
-    // find list item containing current window.location.pathname
-    let routeShelfListIndex = this.shelfList.findIndex(list => {
-      return list.path === path;
-    });
+    if (this.shelfList) {
+      // find list item containing current window.location.pathname
+      let routeShelfListIndex = this.shelfList.findIndex(list => {
+        return list.path === path;
+      });
 
-    if (routeShelfListIndex > -1) {
-      this.shelfList[routeShelfListIndex].selected = true;
-      // force re-render
-      this.requestUpdate();
+      if (routeShelfListIndex > -1) {
+        this.shelfList[routeShelfListIndex].selected = true;
+        // force re-render
+        this.requestUpdate();
+      }
     }
   }
 
   collapseAll() {
-    for (let i = 0; i < this.shelfList.length; i = i + 1) {
-      this.shelfList[i].selected = false;
+    if (this.shelfList) {
+      for (let i = 0; i < this.shelfList.length; i = i + 1) {
+        this.shelfList[i].selected = false;
+      }
     }
   }
 
@@ -120,23 +124,24 @@ class shelf extends LitElement {
 
       return listItems;
     };
+
     /* eslint-enable */
+    if (this.shelfList) {
+      return this.shelfList.map((list) => {
+        let id = `index_${list.index}`;
+        let chevron = list.items && list.items.length > 0
+          ? list.selected === true ? chevronDwn : chevronRt
+          : '';
 
-    return this.shelfList.map((list) => {
-      let id = `index_${list.index}`;
-      let chevron = list.items && list.items.length > 0 
-        ? list.selected === true ? chevronDwn : chevronRt
-        : '';
-
-      return html`
-        <li class="list-wrap">
-          <a href="${list.path}" @click="${this.handleClick}"><h2 id="${id}">${list.name} <span>${chevron}</span></h2></a>
-          <hr>
-          ${renderListItems(list)}
-        </li>
-      `;
-    });
-
+        return html`
+          <li class="list-wrap">
+            <a href="${list.path}" @click="${this.handleClick}"><h2 id="${id}">${list.name} <span>${chevron}</span></h2></a>
+            <hr>
+            ${renderListItems(list)}
+          </li>
+        `;
+      });
+    }
   }
 
   render() {
