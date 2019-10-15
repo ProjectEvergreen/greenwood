@@ -1,6 +1,6 @@
 ## Index Hooks
 
-It is common when working with certain libraries (3rd party or otherwise) that scripts _must_ be loaded globally and / or unbundled.  Greenwood provides some prefined places in its _index.html_ that can be used to inject custom HTML which can be used to inject scripts for things like polyfills, analytics.
+It is common when working with certain libraries (3rd party or otherwise) that scripts _must_ be loaded globally and / or unbundled.  Greenwood provides some prefined places in its _index.html_ that can be used to inject custom HTML which can be used to inject scripts for things like polyfills and analytics.
 
 ## Hook Types
 Right now Greenwood supports the following hook types:
@@ -9,7 +9,7 @@ Right now Greenwood supports the following hook types:
 
 
 ## Usage
-Below is an example of creating a template hook for Google Analytics from a _greenwood.config.js_.
+Below is an example of creating an index hook for loading Google Analytics from a _greenwood.config.js_.
 ```render javascript
 module.exports = {
 
@@ -102,4 +102,4 @@ And updated _index.html_
 </html>
 ```
 
-> For reference, here is the [default _index.html_](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/src/templates/index.html) prpvided by Greenwood.  You can mix and match with your own hooks and Greenwood's hooks to support whatever best suits your needs.
+> For reference, here is the [default _index.html_](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/src/templates/index.html) provided by Greenwood.  You can mix and match with your own hooks and Greenwood's hooks to support whatever best suits your needs.
