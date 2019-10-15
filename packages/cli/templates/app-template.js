@@ -20,8 +20,7 @@ connectRouter(store);
 class AppComponent extends LitElement {
   render() {
     return html`
-        MYROUTES
-        <lit-route><h1>404 Not found</h1></lit-route>
+      MYROUTES
     `;
   }
 }

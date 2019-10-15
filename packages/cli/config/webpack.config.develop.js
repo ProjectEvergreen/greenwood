@@ -1,5 +1,4 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const FilewatcherPlugin = require('filewatcher-webpack-plugin');
 const generateCompilation = require('../lifecycles/compile');
@@ -24,7 +23,7 @@ const rebuild = async() => {
 
 module.exports = ({ config, context, graph }) => {
   config.publicPath = '/';
-  
+
   const configWithContext = commonConfig({ config, context, graph });
   const { devServer, publicPath } = config;
   const { host, port } = devServer;
@@ -64,31 +63,6 @@ module.exports = ({ config, context, graph }) => {
       new ManifestPlugin({
         fileName: 'manifest.json',
         publicPath
-      }),
-      new HtmlWebpackPlugin({
-        template: path.join(context.scratchDir, context.indexPageTemplate),
-        spaIndexFallbackScript: `
-          <script>
-          (function(){
-              var redirect = sessionStorage.redirect;
-              delete sessionStorage.redirect;
-              if (redirect && redirect != location.href) {
-              history.replaceState(null, null, redirect);
-              }
-          })();
-          </script>
-        `
-      }),
-      new HtmlWebpackPlugin({
-        filename: context.notFoundPageTemplate,
-        template: path.join(context.scratchDir, context.notFoundPageTemplate),
-        spaIndexFallbackScript: `
-          <script>
-            sessionStorage.redirect = location.href;
-          </script>
-
-          <meta http-equiv="refresh" content="0;URL='${publicPath}'"></meta>
-        `
       })
     ]
   });

@@ -1,15 +1,17 @@
 const path = require('path');
 const webpack = require('webpack');
 const serializeBuild = require('../lifecycles/serialize');
+const postSerialize = require('../lifecycles/postSerialize');
 
 module.exports = runProductionBuild = async(compilation) => {
   return new Promise(async (resolve, reject) => {
 
-    try {      
+    try {
       console.log('Building SPA from compilation...');
       await runWebpack(compilation);
       await serializeBuild(compilation);
-      
+      await postSerialize(compilation);
+
       resolve();
     } catch (err) {
       reject(err);

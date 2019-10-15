@@ -18,7 +18,7 @@
     "clean": "rimraf ./**/.greenwood/** && rimraf ./**/public/** && rimraf ./coverage",
     "lint": "eslint \"./packages/**/**/*.js\" \"./test/**/**/*.js\" \"./www/**/**/*.js\"",
     "build": "yarn clean && node ./packages/cli/index.js build",
-    "serve": "yarn build && cd ./public && ws",
+    "serve": "yarn build && cd ./public && http-server -o -p 8000",
     "develop": "yarn clean && node ./packages/cli/index.js develop",
     "test": "yarn clean && nyc mocha ./test/**/**/**/*.spec.js --timeout 30000",
     "test:tdd": "yarn clean && mocha --watch ./test/**/**/**/*.spec.js --timeout 15000"
@@ -43,6 +43,7 @@
     "glob": "^7.1.3",
     "glob-promise": "^3.4.0",
     "html-webpack-plugin": "^3.2.0",
+    "http-server": "^0.11.1",
     "jsdom": "^14.0.0",
     "lit-element": "^2.0.1",
     "lit-redux-router": "^0.9.3",
