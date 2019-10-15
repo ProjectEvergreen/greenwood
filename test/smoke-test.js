@@ -91,7 +91,7 @@ function defaultIndex(label) {
         const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src;
 
-          return src.indexOf('index.') >= 0 && src.indexOf('.bundle.js') >= 0;
+          return src.indexOf('index') >= 0 && src.indexOf('bundle') >= 0;
         });
 
         expect(bundleScripts.length).to.be.equal(1);
