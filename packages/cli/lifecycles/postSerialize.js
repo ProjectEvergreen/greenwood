@@ -8,9 +8,6 @@ const copySerialized404 = async () => {
       const serialized404 = path.join(publicDir, '404', 'index.html');
       const target404Dir = path.join(publicDir, '404.html');
 
-      console.log(serialized404);
-      console.log(target404Dir);
-
       if (await fs.exists(serialized404)) {
         await fs.copyFile(serialized404, target404Dir);
       }
