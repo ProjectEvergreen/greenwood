@@ -16,7 +16,7 @@ const mapUserWorkspaceDirectory = (userPath) => {
     (resource) => {
 
       // workaround to ignore cli/templates default imports when rewriting
-      if (!new RegExp('\/cli\/templates').test(resource.request)) {
+      if (!new RegExp('\/cli\/src\/templates').test(resource.request)) {
         resource.request = resource.request.replace(new RegExp(`\.\.\/${directory}`), userPath);
       }
       // remove any additional nests, after replacement with absolute path of user workspace + directory

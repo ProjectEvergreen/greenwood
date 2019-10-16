@@ -54,12 +54,6 @@ function defaultNotFound(label) {
         expect(bundleScripts.length).to.be.equal(1);
       });
 
-      it('should have a <title> tag in the <head>', function() {
-        const title = dom.window.document.querySelector('head title').textContent;
-
-        expect(title).to.be.equal('404 - Not Found');
-      });
-
       it('should have a <h1> tag in the <body>', function() {
         const heading = dom.window.document.querySelector('body h1').textContent;
 

@@ -4,8 +4,10 @@ const crypto = require('crypto');
 const fm = require('front-matter');
 const path = require('path');
 
-const createGraphFromPages = async (pagesDir, config) => {
+const createGraphFromPages = async (context, config) => {
   let pages = [];
+
+  let { pagesDir, userHasWorkspaceNotFoundTemplate, notFoundPageTemplatePath } = context;
 
   return new Promise(async (resolve, reject) => {
     try {
@@ -94,7 +96,36 @@ const createGraphFromPages = async (pagesDir, config) => {
         }));
       };
 
+      const addDefault404ToGraph = async (pages) => {
+        if (!userHasWorkspaceNotFoundTemplate) {
+          const fileContents = await fs.readFile(notFoundPageTemplatePath, 'utf8');
+          const { attributes } = fm(fileContents);
+          let { label, template, title } = attributes;
+          let { meta } = config;
+          let fileName = '404';
+          let relativeExpectedPath = `'../${fileName}/${fileName}.js'`;
+          let page = {
+            mdFile: notFoundPageTemplatePath,
+            label: label || generateLabelHash(notFoundPageTemplatePath),
+            route: '/404',
+            template: template || 'page',
+            filePath: notFoundPageTemplatePath,
+            fileName,
+            relativeExpectedPath,
+            title: title || config.title,
+            meta
+          };
+
+          pages.push(page);
+        }
+        return pages;
+      };
+
       await walkDirectory(pagesDir);
+
+      // check 404 is present in workspace, if not add one to graph
+      pages = addDefault404ToGraph(pages);
+
       resolve(pages);
     } catch (err) {
       reject(err);
@@ -120,7 +151,7 @@ module.exports = generateGraph = async (compilation) => {
     try {
       const { context, config } = compilation;
 
-      compilation.graph = await createGraphFromPages(context.pagesDir, config);
+      compilation.graph = await createGraphFromPages(context, config);
 
       resolve(compilation);
     } catch (err) {

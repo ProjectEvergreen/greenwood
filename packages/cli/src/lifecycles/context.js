@@ -16,20 +16,21 @@ module.exports = initContexts = async({ config }) => {
       const userAppTemplate = path.join(userTemplatesDir, 'app-template.js');
       const userPageTemplate = path.join(userTemplatesDir, 'page-template.js');
       const indexPageTemplate = 'index.html';
-      const notFoundPageTemplate = '404.html';
+      const notFoundPageTemplate = '404.md';
 
       const userHasWorkspace = await fs.exists(userWorkspace);
       const userHasWorkspacePages = await fs.exists(userPagesDir);
+      const userPagesOrDefaultTemplateDir = userHasWorkspacePages ? userPagesDir : defaultTemplatesDir;
       const userHasWorkspaceTemplates = await fs.exists(userTemplatesDir);
       const userHasWorkspacePageTemplate = await fs.exists(userPageTemplate);
       const userHasWorkspaceAppTemplate = await fs.exists(userAppTemplate);
       const userHasWorkspaceIndexTemplate = await fs.exists(path.join(userTemplatesDir, 'index.html'));
-      const userHasWorkspaceNotFoundTemplate = await fs.exists(path.join(userTemplatesDir, '404.html'));
+      const userHasWorkspaceNotFoundTemplate = await fs.exists(path.join(userPagesOrDefaultTemplateDir, '404.md'));
 
       let context = {
         scratchDir,
         publicDir,
-        pagesDir: userHasWorkspacePages ? userPagesDir : defaultTemplatesDir,
+        pagesDir: userPagesOrDefaultTemplateDir,
         templatesDir: userHasWorkspaceTemplates ? userTemplatesDir : defaultTemplatesDir,
         userWorkspace: userHasWorkspace ? userWorkspace : defaultTemplatesDir,
         pageTemplatePath: userHasWorkspacePageTemplate
@@ -42,8 +43,9 @@ module.exports = initContexts = async({ config }) => {
           ? path.join(userTemplatesDir, indexPageTemplate)
           : path.join(defaultTemplatesDir, indexPageTemplate),
         notFoundPageTemplatePath: userHasWorkspaceNotFoundTemplate
-          ? path.join(userTemplatesDir, notFoundPageTemplate)
+          ? path.join(userPagesDir, notFoundPageTemplate)
           : path.join(defaultTemplatesDir, notFoundPageTemplate),
+        userHasWorkspaceNotFoundTemplate,
         indexPageTemplate,
         notFoundPageTemplate,
         metaComponent,

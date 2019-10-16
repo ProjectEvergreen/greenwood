@@ -60,6 +60,10 @@ const writePageComponentsFromTemplate = async (compilation) => {
     if (pathLastBackslash !== 0) {
       pagePath = path.join(context.scratchDir, relPageDir.substring(0, pathLastBackslash), file.fileName); // nested path
     }
+    // exception for 404 file, use absolute path to md
+    if (!context.userHasWorkspaceNotFoundTemplate && file.fileName === '404') {
+      pagePath = path.join(context.scratchDir, file.fileName);
+    }
 
     return pagePath;
   };
@@ -112,7 +116,7 @@ const writeRoutes = async(compilation) => {
         if (file.route !== '/404') {
           routePath = `path="${file.route}"`;
         }
-        return `<lit-route ${routePath}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
+        return `<lit-route ${routePath} component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
       });
 
       const result = data.toString().replace(/MYROUTES/g, routes.join(''));
@@ -132,10 +136,6 @@ const setupIndex = async({ context }) => {
       await fs.copy(
         context.indexPageTemplatePath,
         path.join(context.scratchDir, context.indexPageTemplate)
-      );
-      await fs.copy(
-        context.notFoundPageTemplatePath,
-        path.join(context.scratchDir, context.notFoundPageTemplate)
       );
       resolve();
     } catch (err) {

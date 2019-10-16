@@ -1,5 +1,3 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const path = require('path');
 const webpackMerge = require('webpack-merge');
 const commonConfig = require('./webpack.config.common.js');
 
@@ -14,13 +12,7 @@ module.exports = ({ config, context, graph }) => {
       hints: 'warning'
     },
 
-    plugins: [
-      new HtmlWebpackPlugin({
-        filename: path.join(context.publicDir, context.notFoundPageTemplate),
-        template: path.join(context.scratchDir, context.notFoundPageTemplate),
-        publicPath: configWithContext.output.publicPath
-      })
-    ]
+    plugins: []
   });
 
 };
