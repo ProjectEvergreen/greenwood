@@ -66,4 +66,20 @@
       height: 100%;
     }
   }
+
+  & table {
+    border: 1px solid #020202;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 20px;
+  }
+
+  & table th:first-child {
+    min-width: 150px;
+  }
+
+  & table th {
+    background-color: #f9e7ca;
+    text-decoration: underline;
+  }
 }

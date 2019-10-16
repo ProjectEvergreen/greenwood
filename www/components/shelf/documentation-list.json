@@ -11,7 +11,7 @@
     "path": "/docs/configuration",
     "items": [
       {
-        "index": 1,
+        "index": 0,
         "name": "Dev Server",
         "id": "dev-server"
       },

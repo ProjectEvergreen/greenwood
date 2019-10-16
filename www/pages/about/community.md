@@ -1,7 +1,3 @@
----
-label: 'community'
----
-
 ## Community
 
 Greenwood understands the role of community in open source, technology, and learning and we want to embrace that in this project as well.  There are many great tools and projects available in the web ecosystem and we want to highlight those projects here, that have been important in the development of Greenwood (in no particular order).

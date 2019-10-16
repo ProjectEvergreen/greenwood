@@ -1,7 +1,3 @@
----
-label: 'features'
----
-
 ## Features
 
 #### Onboarding
