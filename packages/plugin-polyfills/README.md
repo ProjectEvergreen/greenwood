@@ -3,7 +3,9 @@
 ## Overview
 > _**NOTE: This package is currently installed by default by Greenwood so you don't need to install it yourself.**_
 
-A composite plugin for Greenwood for adding support for adding Web Component related polyfills for browser that need support for it.  So if you need to support these browsers, you will want to use this plugin:
+A composite plugin for Greenwood for adding support for adding Web Component related polyfills for browser that need support for it.  It uses [feature detection]()https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs#using-webcomponents-loaderjs to determine what polyfills are actually needed based on the user's browser, to ensure only the minumum extra code is needed.
+
+As of right now, you will likely need this plugin to load additional polyfills if you want to support these browsers:
 
 - Microsoft Edge
 - Internet Explorer 11
