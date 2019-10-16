@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit-element';
 // make sure version gets bumped first when building for release
-import { version } from '../../../package.json';
+import { version } from '../../package.json';
 import footerCss from './footer.css';
 
 class FooterComponent extends LitElement {

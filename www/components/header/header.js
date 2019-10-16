@@ -14,7 +14,8 @@ class HeaderComponent extends LitElement {
         <eve-container fluid>
           <div class="head-wrap">
             <div class="brand">
-              <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer">
+              <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer"
+                @onclick="getOutboundLink('https://projectevergreen.github.io'); return false;" >
                 <img src="${brand}" alt="Greenwood logo"/>
               </a>
               <div class="project-name">
@@ -26,6 +27,7 @@ class HeaderComponent extends LitElement {
                 <li><a href="/about">About</a></li>
                 <li><a href="/getting-started">Getting Started</a></li>
                 <li><a href="/docs">Docs</a></li>
+                <li><a href="/plugins">Plugins</a></li>
               </ul>
             </nav>
             <div class="social">

@@ -6,11 +6,36 @@
   },
   {
     "index": 1,
+    "name": "How It Works",
+    "path": "/about/how-it-works",
+    "items": [{
+      "index": 0,
+      "name": "CLI",
+      "id": "cli"
+    },
+    {
+      "index": 1,
+      "name": "Evergreen Build",
+      "id": "evergreen-build"
+    },
+    {
+      "index": 2,
+      "name": "Browser Support",
+      "id": "browser-support"
+    }, 
+    {
+      "index": 3,
+      "name": "Polyfills",
+      "id": "polyfills"
+    }]
+  },
+  {
+    "index": 2,
     "name": "Features",
     "path": "/about/features"
   },
   {
-    "index": 2,
+    "index": 3,
     "name": "Community",
     "path": "/about/community"
   }

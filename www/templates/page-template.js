@@ -31,6 +31,8 @@ class PageTemplate extends LitElement {
       list = require('../components/shelf/documentation-list.json');
     } else if (url.indexOf('/getting-started') >= 0) {
       list = require('../components/shelf/getting-started-list.json');
+    } else if (url.indexOf('/plugins') >= 0) {
+      list = require('../components/shelf/plugins.json');
     }
 
     this.shelfList = list;
