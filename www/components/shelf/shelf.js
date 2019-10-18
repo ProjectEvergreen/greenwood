@@ -25,7 +25,7 @@ class shelf extends LitElement {
     super();
     this.selectedIndex = 0;
     this.selectedSubIndex = 0;
-
+    this.shelfList = [];
   }
 
   connectedCallback() {
@@ -53,9 +53,10 @@ class shelf extends LitElement {
   }
 
   collapseAll() {
-    for (let i = 0; i < this.shelfList.length; i = i + 1) {
-      this.shelfList[i].selected = false;
-    }
+    this.shelfList = this.shelfList.map(item => {
+      item.selected = false;
+      return item;
+    });
   }
 
   toggleSelectedItem() {
@@ -109,8 +110,8 @@ class shelf extends LitElement {
 
       return listItems;
     };
-    /* eslint-enable */
 
+    /* eslint-enable */
     return this.shelfList.map((list) => {
       let id = `index_${list.index}`;
       let chevron = list.items && list.items.length > 0
@@ -125,7 +126,6 @@ class shelf extends LitElement {
         </li>
       `;
     });
-
   }
 
   render() {
