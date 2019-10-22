@@ -112,8 +112,8 @@ class shelf extends LitElement {
     };
 
     /* eslint-enable */
-    return this.shelfList.map((list) => {
-      let id = `index_${list.index}`;
+    return this.shelfList.map((list, index) => {
+      let id = `index_${index}`;
       let chevron = list.items && list.items.length > 0
         ? list.selected === true ? chevronDwn : chevronRt
         : '';
