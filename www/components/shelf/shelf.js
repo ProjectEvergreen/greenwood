@@ -99,9 +99,9 @@ class shelf extends LitElement {
       if (list.items && list.items.length > 0) {
         listItems = html`
           <ul>
-            ${list.items.map(item => {
+            ${list.items.map((item, index) => {
               return html`
-                <li id="index_${item.index}" class="${list.selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`#${item.id}`)}">${item.name}</a></li>
+                <li id="index_${index}" class="${list.selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`#${item.id}`)}">${item.name}</a></li>
               `;
             })}
           </ul>
