@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit-element';
 import css from './shelf.css';
-import { chevronRt, chevronDwn } from '../svgs'
+import { chevronRt, chevronDwn } from '../svgs';
 
 class shelf extends LitElement {
 
