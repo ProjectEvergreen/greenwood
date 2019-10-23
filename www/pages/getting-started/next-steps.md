@@ -17,7 +17,7 @@ module.exports = {
 That's it!  You can learn more about configuring Greenwood [here](/docs/configuration).
 
 ## Companion Repo
-You may have noticed that the Getting Started [companion repo](https://github.com/thescientist13/greenwood-getting-started/) itself is a bit more of a full fledged example then captured in this guide, like with the use use of ["Single File Components"](https://vuejs.org/v2/guide/single-file-components.html) (SFCs).  
+You may have noticed that the Getting Started [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started/) itself is a bit more of a full fledged example then captured in this guide, like with the use use of ["Single File Components"](https://vuejs.org/v2/guide/single-file-components.html) (SFCs).  
 
 This is was intentional for a couple of reasons:
 - _Education_: There is always more than one way to solve a problem, and so we felt that the SFC approach was best for the guide so as to keep the number of steps needed as few and direct as possible.
