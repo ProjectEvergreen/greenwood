@@ -19,8 +19,9 @@ class scroll extends LitElement {
     // on hash change child event, scroll content
     const contains = (selector, text) => {
       const elements = this.querySelectorAll(selector);
-
-      return Array.prototype.filter.call(elements, (element) =>{
+      //convert NodeList to Array
+      const elementsArray = Array.from(elements);
+      return Array.prototype.filter.call(elementsArray, (element) =>{
         return RegExp(text, 'gmi').test(element.textContent);
       });
     };
@@ -28,9 +29,11 @@ class scroll extends LitElement {
     let { hash } = window.location;
 
     // clean hash string, remove # and replace - with spaces
-    hash = hash.replace('#', '');
-    hash = hash.replace('-', ' ').toLowerCase();
-
+    hash = hash.replace('#', '').toLowerCase();
+    //for cases of multiple hyphens
+    while (hash.indexOf('-') !== -1) {
+      hash = hash.replace('-', ' ');
+    };
     // query text
     const heading = contains('h3', hash)[0];
 
