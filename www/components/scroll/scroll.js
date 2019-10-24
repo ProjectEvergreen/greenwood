@@ -21,8 +21,8 @@ class scroll extends LitElement {
       const elements = this.querySelectorAll(selector);
       // convert NodeList to Array
       const elementsArray = Array.from(elements);
-      
-      return Array.prototype.filter.call(elementsArray, (element) =>{
+
+      return Array.prototype.filter.call(elementsArray, (element) => {
         return RegExp(text, 'gmi').test(element.textContent);
       });
     };
@@ -38,7 +38,10 @@ class scroll extends LitElement {
     // query text
     const heading = contains('h3', hash)[0];
 
-    heading.scrollIntoView(true);
+    if (heading !== undefined) {
+      heading.scrollIntoView(true);
+    }
+
   }
 
   render() {
