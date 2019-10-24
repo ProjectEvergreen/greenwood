@@ -8,10 +8,12 @@ class scroll extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener('hashchange', this.handleHashChange.bind(this), false);
+    window.addEventListener('load', this.handleHashChange.bind(this), false);
   }
 
   disconnectedCallback() {
     window.removeEventListener('hashchange', this.handleHashChange.bind(this), false);
+    window.removeEventListener('load', this.handleHashChange.bind(this), false);
     super.disconnectedCallback();
   }
 
@@ -32,7 +34,7 @@ class scroll extends LitElement {
     // clean hash string, remove # and replace - with spaces
     hash = hash.replace('#', '').toLowerCase();
     // for cases of multiple hyphens
-    hash = hash.replace(/-/g, " ");
+    hash = hash.replace(/-/g, ' ');
     // query text
     const heading = contains('h3', hash)[0];
 
