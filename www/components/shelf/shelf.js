@@ -52,8 +52,8 @@ class shelf extends LitElement {
   }
 
   toggleSelectedItem() {
-    let selectedShelfListIndex = this.shelfList.findIndex(list => {
-      return list.index === this.selectedIndex;
+    let selectedShelfListIndex = this.shelfList.findIndex((list, index) => {
+      return index === this.selectedIndex;
     });
 
     this.shelfList[selectedShelfListIndex].selected = !this.shelfList[selectedShelfListIndex].selected;
@@ -91,9 +91,9 @@ class shelf extends LitElement {
       if (list.items && list.items.length > 0) {
         listItems = html`
           <ul>
-            ${list.items.map(item => {
+            ${list.items.map((item, index) => {
               return html`
-                <li id="index_${item.index}" class="${list.selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`#${item.id}`)}">${item.name}</a></li>
+                <li id="index_${index}" class="${list.selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`#${item.id}`)}">${item.name}</a></li>
               `;
             })}
           </ul>
@@ -104,8 +104,8 @@ class shelf extends LitElement {
     };
 
     /* eslint-enable */
-    return this.shelfList.map((list) => {
-      let id = `index_${list.index}`;
+    return this.shelfList.map((list, index) => {
+      let id = `index_${index}`;
       let chevron = list.items && list.items.length > 0
         ? list.selected === true ? chevronDwn : chevronRt
         : '';
