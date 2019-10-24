@@ -32,9 +32,7 @@ class scroll extends LitElement {
     // clean hash string, remove # and replace - with spaces
     hash = hash.replace('#', '').toLowerCase();
     // for cases of multiple hyphens
-    while (hash.indexOf('-') !== -1) {
-      hash = hash.replace('-', ' ');
-    }
+    hash = hash.replace(/-/g, " ");
     // query text
     const heading = contains('h3', hash)[0];
 
