@@ -69,7 +69,7 @@ customElements.define('page-template', PageTemplate);
 ```
 
 
-> You now do the same for your `<footer>`.  See the [companion repo](https://github.com/thescientist13/greenwood-getting-started/) for a complete working example.
+> You now do the same for your `<footer>`.  See the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started/) for a complete working example.
 
 ### CSS
 OK, so we've made some content and some custom components, but what about the look and feel? Yes, of course, let's add some CSS!
