@@ -3,6 +3,7 @@ import '@evergreen-wc/eve-container';
 
 import headerCss from './header.css';
 import brand from '../../assets/brand.png';
+import '../components/social-icons/social-icons';
 
 class HeaderComponent extends LitElement {
   render() {
@@ -30,14 +31,7 @@ class HeaderComponent extends LitElement {
                 <li><a href="/plugins">Plugins</a></li>
               </ul>
             </nav>
-            <div class="social">
-              <a href="https://github.com/ProjectEvergreen/greenwood">
-                <img
-                  src="https://img.shields.io/github/stars/ProjectEvergreen/greenwood.svg?style=social&logo=github&label=github"
-                  alt="Greenwood GitHub Star Counter"
-                />
-              </a>
-            </div>
+            <eve-socialicons></eve-socialicons>
           </div>
         </eve-container>
       </header>
