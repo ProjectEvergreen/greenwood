@@ -1,6 +1,6 @@
-import { html } from 'lit-element';
+import { svg } from 'lit-element';
 
-const twitterIcon = html`<svg style="fill:white;max-width:80px;max-height:60px;" version="1.1"
+const twitterIcon = svg`<svg style="fill:white;max-width:40px;max-height:40px;" version="1.1"
 xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 400 400">
       <rect width="380" height="398" fill="transparent" rx="15%" ry="15%" x="10"></rect>
       <path d="M350,400H50c-27.6,0-50-22.4-50-50V50C0,22.4,22.4,0,50,0h300c27.6,0,50,22.4,50,50v300

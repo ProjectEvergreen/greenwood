@@ -1,7 +1,9 @@
-import { html } from 'lit-element';
+import { svg } from 'lit-element';
 
-const slackIcon = html`<svg style="fill:white;max-width:60px;max-height:60px;" version="1.1"
-xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="-257.2 245.2 125.1 125.1">
+const slackIcon = svg`<svg style="fill:white;max-width:40px;max-height:40px;" version="1.1"
+xmlns="http://www.w3.org/2000/svg"
+x="0px" y="0px"
+viewBox="-257.2 245.2 125.1 125.1">
       <g id="Layer_2"></g>
       <g id="Layer_1">
         <g>

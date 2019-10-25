@@ -1,6 +1,6 @@
-import { html } from 'lit-element';
+import { svg } from 'lit-element';
 
-const githubIcon = html`<svg style="fill:white;max-width:60px;max-height:60px;"
+const githubIcon = svg`<svg style="fill:white;max-width:40px;max-height:40px;"
 xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
 width="400px" height="400px"
 viewBox="0 0 438.536 438.536"
