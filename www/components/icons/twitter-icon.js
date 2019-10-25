@@ -1,8 +1,9 @@
 import { html } from 'lit-element';
 
-const twitterIcon = html`<svg style="fill:white;max-width:80px;max-height:60px;" version="1.1" className="twitter-icon" x="0px" y="0px" viewBox="0 0 400 400">
-      <rect className="rect" width="380" height="398" fill="transparent" rx="15%" ry="15%" x="10"></rect>
-      <path className="st0" d="M350,400H50c-27.6,0-50-22.4-50-50V50C0,22.4,22.4,0,50,0h300c27.6,0,50,22.4,50,50v300
+const twitterIcon = html`<svg style="fill:white;max-width:80px;max-height:60px;" version="1.1"
+xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 400 400">
+      <rect width="380" height="398" fill="transparent" rx="15%" ry="15%" x="10"></rect>
+      <path d="M350,400H50c-27.6,0-50-22.4-50-50V50C0,22.4,22.4,0,50,0h300c27.6,0,50,22.4,50,50v300
       C400,377.6,377.6,400,350,400z M153.6,301.6c94.3,0,145.9-78.2,145.9-145.9c0-2.2,0-4.4-0.1-6.6c10-7.2,18.7-16.3,25.6-26.6
       c-9.2,4.1-19.1,6.8-29.5,8.1c10.6-6.3,18.7-16.4,22.6-28.4c-9.9,5.9-20.9,10.1-32.6,12.4c-9.4-10-22.7-16.2-37.4-16.2
       c-28.3,0-51.3,23-51.3,51.3c0,4,0.5,7.9,1.3,11.7c-42.6-2.1-80.4-22.6-105.7-53.6c-4.4,7.6-6.9,16.4-6.9,25.8
