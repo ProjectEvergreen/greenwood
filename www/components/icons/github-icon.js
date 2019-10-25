@@ -1,6 +1,10 @@
 import { html } from 'lit-element';
 
-const githubIcon = html`<svg style="fill:white;max-width:60px;max-height:60px;" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="400px" height="400px" viewBox="0 0 438.536 438.536" className="github-icon">
+const githubIcon = html`<svg style="fill:white;max-width:60px;max-height:60px;"
+xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+width="400px" height="400px"
+viewBox="0 0 438.536 438.536"
+className="github-icon">
       <path d="M158.173,352.599c-3.049,0.568-4.381,1.999-3.999,4.281c0.38,2.283,2.093,3.046,5.138,2.283
       c3.049-0.76,4.38-2.095,3.997-3.997C162.931,353.074,161.218,352.216,158.173,352.599z" />
       <path d="M141.898,354.885c-3.046,0-4.568,1.041-4.568,3.139c0,2.474,1.619,3.518,4.853,3.138c3.046,0,4.57-1.047,4.57-3.138
@@ -37,4 +41,4 @@ const githubIcon = html`<svg style="fill:white;max-width:60px;max-height:60px;" 
       c1.524-1.519,1.143-3.326-1.142-5.42C109.068,341.751,107.164,341.463,105.641,343.174z" />
     </svg>`;
 
-    export default githubIcon
+export default githubIcon;

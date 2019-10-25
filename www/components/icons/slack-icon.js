@@ -1,4 +1,4 @@
-import { html } from 'lit-element'
+import { html } from 'lit-element';
 
 const slackIcon = html`<svg style="fill:white;max-width:60px;max-height:60px;" version="1.1" x="0px" y="0px" viewBox="-257.2 245.2 125.1 125.1" className="slack-icon">
       <g id="Layer_2"></g>
@@ -20,4 +20,4 @@ const slackIcon = html`<svg style="fill:white;max-width:60px;max-height:60px;" v
       </g>
     </svg>`;
 
-  export default slackIcon;
+export default slackIcon;

@@ -11,4 +11,4 @@ const twitterIcon = html`<svg style="fill:white;max-width:80px;max-height:60px;"
       C97.7,293.1,124.7,301.6,153.6,301.6"/>
     </svg>`;
 
-  export default twitterIcon;
+export default twitterIcon;
