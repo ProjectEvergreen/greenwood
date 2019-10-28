@@ -1,8 +1,8 @@
 import { svg } from 'lit-element';
 
 const slackIcon = svg`<svg
-width="40"
-height="40"
+width="35"
+height="35"
 style="fill:white;"
 viewBox="0 0 54 54"
 xmlns="http://www.w3.org/2000/svg">

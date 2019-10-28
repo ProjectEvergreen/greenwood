@@ -3,12 +3,14 @@
   justify-content: space-around;
   flex-direction: row;
 
-  & #slack-icon {
-    margin: 0 .5rem;
+  & .icons {
+    margin: auto;
+  }
+  & .slack-icon {
+    padding: 0 .5rem 0 .75rem;
   }
 
   @media (max-width: 768px) {
     flex-direction: row;
-    width:100%;
   }
 }

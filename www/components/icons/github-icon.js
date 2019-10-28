@@ -1,10 +1,10 @@
 import { svg } from 'lit-element';
 
 const githubIcon = svg`<svg
-height="40"
+height="35"
 viewBox="0 0 16 16"
 version="1.1"
-width="40"
+width="35"
 aria-hidden="true">
   <path
   fill-rule="evenodd"
