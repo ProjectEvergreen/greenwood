@@ -1,9 +1,6 @@
 import { svg } from 'lit-element';
 
 const twitterIcon = svg`<svg
-version="1.1" xmlns="http://www.w3.org/2000/svg"
-xmlns:xlink="http://www.w3.org/1999/xlink"
-x="0px" y="0px"
 viewBox="0 0 400 400"
 style="enable-background:new 0 0 40 40;max-width:40px;max-height:40px;" >
 <style type="text/css">
