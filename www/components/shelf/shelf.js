@@ -15,8 +15,7 @@ class shelf extends LitElement {
 
   constructor() {
     super();
-    this.selectedIndex = 0;
-    this.selectedSubIndex = 0;
+    this.selectedIndex = '';
     this.shelfList = [];
   }
 
@@ -34,11 +33,12 @@ class shelf extends LitElement {
   expandRoute(path) {
     // find list item containing current window.location.pathname
     let routeShelfListIndex = this.shelfList.findIndex(list => {
-      return list.path === path;
+      return list.path.indexOf(path) >= 0;
     });
 
     if (routeShelfListIndex > -1) {
       this.shelfList[routeShelfListIndex].selected = true;
+      this.selectedIndex = routeShelfListIndex;
       // force re-render
       this.requestUpdate();
     }
@@ -56,18 +56,18 @@ class shelf extends LitElement {
       return index === this.selectedIndex;
     });
 
-    this.shelfList[selectedShelfListIndex].selected = !this.shelfList[selectedShelfListIndex].selected;
+    if (selectedShelfListIndex > -1) {
+      this.shelfList[selectedShelfListIndex].selected = !this.shelfList[selectedShelfListIndex].selected;
+    }
   }
 
   setSelectedItem(evt) {
-    const previousSelected = this.selected;
+    const previousSelected = this.selectedIndex;
 
-    this.selected = parseInt(evt.target.id.substring(6, evt.target.id.length), 10);
+    this.selectedIndex = parseInt(evt.target.id.substring(6, evt.target.id.length), 10);
 
-    if (this.selected === previousSelected) {
-      this.toggleSelectedItem();
-      this.selected = '';
-      return;
+    if (this.selectedIndex === previousSelected) {
+      this.selectedIndex = '';
     }
 
     this.toggleSelectedItem();
