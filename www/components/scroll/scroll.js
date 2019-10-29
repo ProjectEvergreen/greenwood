@@ -21,10 +21,8 @@ class scroll extends LitElement {
     // on hash change child event, scroll content
     const contains = (selector, text) => {
       const elements = this.querySelectorAll(selector);
-      // convert NodeList to Array
-      const elementsArray = Array.from(elements);
 
-      return Array.prototype.filter.call(elementsArray, (element) => {
+      return Array.from(elements).filter((element) => {
         return RegExp(text, 'gmi').test(element.textContent);
       });
     };
