@@ -30,16 +30,9 @@ class shelf extends LitElement {
   }
 
   expandRoute(path) {
-    // remove / if at the end of the path in order to match our shelf paths
-    const lastPathCharacter = path.length - 1;
-
-    if (path.lastIndexOf('/') === lastPathCharacter) {
-      path = path.substring(0, lastPathCharacter);
-    }
-
     // find list item containing current window.location.pathname
     let routeShelfListIndex = this.shelfList.findIndex(list => {
-      return list.path === path;
+      return list.path.indexOf(path) >= 0;
     });
 
     if (routeShelfListIndex > -1) {
