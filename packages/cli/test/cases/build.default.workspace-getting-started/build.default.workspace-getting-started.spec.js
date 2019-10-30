@@ -1,7 +1,7 @@
 /*
  * Use Case
  * Run Greenwood build command and reproduce building the Getting Started docs companion repo
- * https://github.com/thescientist13/greenwood-getting-started
+ * https://github.com/ProjectEvergreen/greenwood-getting-started
  *
  * User Result
  * Should generate a Greenwood build that generally reproduces the Getting Started guide

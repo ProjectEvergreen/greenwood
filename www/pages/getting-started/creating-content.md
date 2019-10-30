@@ -10,7 +10,7 @@ What we'll cover in this section:
 1. Blog Posts: A couple sample pages of content to get you going written in markdown
 1. Using Greenwood's development server
 
-To go along with this guide, check out our [companion repo](https://github.com/thescientist13/greenwood-getting-started) that has a working example of all the code covered in this Getting Started guide.  In the end, what you will end up with is a project looking something like this:
+To go along with this guide, check out our [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started) that has a working example of all the code covered in this Getting Started guide.  In the end, what you will end up with is a project looking something like this:
 ```render shell
 .
 ├── package-lock.json

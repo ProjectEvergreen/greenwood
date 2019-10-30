@@ -5,6 +5,13 @@
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
+  "keywords": [
+    "Greenwood",
+    "Web Components",
+    "Lit Element",
+    "Lit Html",
+    "Static Site Generator"
+  ],
   "bin": {
     "greenwood": "./src/index.js"
   },
