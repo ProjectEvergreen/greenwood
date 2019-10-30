@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+
+  & .icons {
+    margin: auto;
+  }
+  & .slack-icon {
+    padding: 0 1rem 0 1.25rem;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+  }
+}
