@@ -15,7 +15,7 @@ Greenwood is a modern and performant static site generator supporting Web Compon
 ## Getting Started
 Our website has a complete [Getting Started](http://www.greenwoodjs.io/getting-started) section that will walk you through creating a Greenwood project from scratch.
 
-You can follow along with, or clone and go, the [companion repo](https://github.com/thescientist13/greenwood-getting-started).
+You can follow along with, or clone and go, the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started).
 
 ## Installation
 Greenwood can be installed with your favorite JavaScript package manager.
