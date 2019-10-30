@@ -24,6 +24,18 @@ const rebuild = async() => {
 
 module.exports = ({ config, context, graph }) => {
   config.publicPath = '/';
+
+  // gets Index Hooks to pass as options to HtmlWebpackPlugin
+  const customOptions = Object.assign({}, ...config.plugins
+    .filter((plugin) => plugin.type === 'index')
+    .map((plugin) => plugin.provider({ config, context }))
+    .filter((providerResult) => {
+      return Object.keys(providerResult).map((key) => {
+        if (key !== 'type') {
+          return providerResult[key];
+        }
+      });
+    }));
   
   const configWithContext = commonConfig({ config, context, graph });
   const { devServer, publicPath } = config;
@@ -66,29 +78,36 @@ module.exports = ({ config, context, graph }) => {
         publicPath
       }),
       new HtmlWebpackPlugin({
+        filename: path.join(context.publicDir, context.indexPageTemplate),
         template: path.join(context.scratchDir, context.indexPageTemplate),
+        chunksSortMode: 'dependency',
         hookGreenwoodSpaIndexFallback: `
           <script>
           (function(){
-              var redirect = sessionStorage.redirect;
-              delete sessionStorage.redirect;
-              if (redirect && redirect != location.href) {
+            var redirect = sessionStorage.redirect;
+            
+            delete sessionStorage.redirect;
+            
+            if (redirect && redirect != location.href) {
               history.replaceState(null, null, redirect);
-              }
+            }
           })();
           </script>
-        `
+        `,
+        ...customOptions
       }),
       new HtmlWebpackPlugin({
-        filename: context.notFoundPageTemplate,
+        filename: path.join(context.publicDir, context.notFoundPageTemplate),
         template: path.join(context.scratchDir, context.notFoundPageTemplate),
+        chunksSortMode: 'dependency',
         hookGreenwoodSpaIndexFallback: `
           <script>
             sessionStorage.redirect = location.href;
           </script>
 
           <meta http-equiv="refresh" content="0;URL='${publicPath}'"></meta>
-        `
+        `,
+        ...customOptions
       })
     ]
   });
