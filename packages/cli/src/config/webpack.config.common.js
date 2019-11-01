@@ -30,6 +30,16 @@ const mapUserWorkspaceDirectory = (userPath) => {
 };
 
 module.exports = ({ config, context }) => {
+  // dynamically map all the user's workspace directories for resolution by webpack
+  // this essentially helps us keep watch over changes from the user, and greenwood's build pipeline
+  const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map(mapUserWorkspaceDirectory);
+
+  // if user has an assets/ directory in their workspace, automatically copy it for them
+  const userAssetsDirectoryForWebpack = fs.existsSync(context.assetDir) ? [{
+    from: context.assetDir,
+    to: path.join(context.publicDir, 'assets')
+  }] : [];
+
   // gets Index Hooks to pass as options to HtmlWebpackPlugin
   const customOptions = Object.assign({}, ...config.plugins
     .filter((plugin) => plugin.type === 'index')
@@ -41,17 +51,7 @@ module.exports = ({ config, context }) => {
         }
       });
     }));
-
-  // dynamically map all the user's workspace directories for resolution by webpack
-  // this essentially helps us keep watch over changes from the user, and greenwood's build pipeline
-  const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map(mapUserWorkspaceDirectory);
-
-  // if user has an assets/ directory in their workspace, automatically copy it for them
-  const userAssetsDirectoryForWebpack = fs.existsSync(context.assetDir) ? [{
-    from: context.assetDir,
-    to: path.join(context.publicDir, 'assets')
-  }] : [];
-
+      
   const commonCssLoaders = [
     { loader: 'css-loader' },
     {
