@@ -28,6 +28,30 @@ module.exports = ({ config, context, graph }) => {
   const { devServer, publicPath } = config;
   const { host, port } = devServer;
 
+  // decorate HtmlWebpackPlugin instance with devServer specific SPA handling for index.html
+  configWithContext.plugins[0].options.hookGreenwoodSpaIndexFallback = `
+    <script>
+      (function(){
+        var redirect = sessionStorage.redirect;
+        
+        delete sessionStorage.redirect;
+        
+        if (redirect && redirect != location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
+  `,
+
+  // decorate HtmlWebpackPlugin instance with devServer specific SPA handling for 404.html
+  configWithContext.plugins[1].options.hookGreenwoodSpaIndexFallback = `
+    <script>
+      sessionStorage.redirect = location.href;
+    </script>
+
+    <meta http-equiv="refresh" content="0;URL='${publicPath}'"></meta>
+  `;
+
   return webpackMerge(configWithContext, {
 
     mode: 'development',
@@ -52,8 +76,7 @@ module.exports = ({ config, context, graph }) => {
         onReadyCallback: () => {
           console.log(`Now serving Development Server available at ${host}:${port}`);
         },
-        // eslint-disable-next-line no-unused-vars
-        onChangeCallback: async (path) => {
+        onChangeCallback: async () => {
           rebuild();
         },
         usePolling: true,
@@ -64,31 +87,7 @@ module.exports = ({ config, context, graph }) => {
       new ManifestPlugin({
         fileName: 'manifest.json',
         publicPath
-      }),
-      
-      // decorate HtmlWebpackPlugin instance with devServer specific SPA handling for index.html
-      configWithContext.plugins[0].hookGreenwoodSpaIndexFallback = `
-        <script>
-          (function(){
-            var redirect = sessionStorage.redirect;
-            
-            delete sessionStorage.redirect;
-            
-            if (redirect && redirect != location.href) {
-              history.replaceState(null, null, redirect);
-            }
-          })();
-        </script>
-      `,
-
-      // decorate HtmlWebpackPlugin instance with devServer specific SPA handling for 404.html
-      configWithContext.plugins[0].hookGreenwoodSpaIndexFallback = `
-        <script>
-          sessionStorage.redirect = location.href;
-        </script>
-  
-        <meta http-equiv="refresh" content="0;URL='${publicPath}'"></meta>
-      `
+      })
     ]
   });
 };
