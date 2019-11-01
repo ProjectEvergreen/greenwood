@@ -1,5 +1,4 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const FilewatcherPlugin = require('filewatcher-webpack-plugin');
 const generateCompilation = require('../lifecycles/compile');
@@ -24,18 +23,6 @@ const rebuild = async() => {
 
 module.exports = ({ config, context, graph }) => {
   config.publicPath = '/';
-
-  // gets Index Hooks to pass as options to HtmlWebpackPlugin
-  const customOptions = Object.assign({}, ...config.plugins
-    .filter((plugin) => plugin.type === 'index')
-    .map((plugin) => plugin.provider({ config, context }))
-    .filter((providerResult) => {
-      return Object.keys(providerResult).map((key) => {
-        if (key !== 'type') {
-          return providerResult[key];
-        }
-      });
-    }));
   
   const configWithContext = commonConfig({ config, context, graph });
   const { devServer, publicPath } = config;
@@ -73,16 +60,15 @@ module.exports = ({ config, context, graph }) => {
         atomic: true,
         ignored: '/node_modules/'
       }),
+      
       new ManifestPlugin({
         fileName: 'manifest.json',
         publicPath
       }),
-      new HtmlWebpackPlugin({
-        filename: path.join(context.publicDir, context.indexPageTemplate),
-        template: path.join(context.scratchDir, context.indexPageTemplate),
-        chunksSortMode: 'dependency',
-        hookGreenwoodSpaIndexFallback: `
-          <script>
+      
+      // decorate HtmlWebpackPlugin instance with devServer specific SPA handling for index.html
+      configWithContext.plugins[0].hookGreenwoodSpaIndexFallback = `
+        <script>
           (function(){
             var redirect = sessionStorage.redirect;
             
@@ -92,23 +78,17 @@ module.exports = ({ config, context, graph }) => {
               history.replaceState(null, null, redirect);
             }
           })();
-          </script>
-        `,
-        ...customOptions
-      }),
-      new HtmlWebpackPlugin({
-        filename: path.join(context.publicDir, context.notFoundPageTemplate),
-        template: path.join(context.scratchDir, context.notFoundPageTemplate),
-        chunksSortMode: 'dependency',
-        hookGreenwoodSpaIndexFallback: `
-          <script>
-            sessionStorage.redirect = location.href;
-          </script>
+        </script>
+      `,
 
-          <meta http-equiv="refresh" content="0;URL='${publicPath}'"></meta>
-        `,
-        ...customOptions
-      })
+      // decorate HtmlWebpackPlugin instance with devServer specific SPA handling for 404.html
+      configWithContext.plugins[0].hookGreenwoodSpaIndexFallback = `
+        <script>
+          sessionStorage.redirect = location.href;
+        </script>
+  
+        <meta http-equiv="refresh" content="0;URL='${publicPath}'"></meta>
+      `
     ]
   });
 };

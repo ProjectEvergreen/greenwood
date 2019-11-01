@@ -1,5 +1,6 @@
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const fs = require('fs');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
@@ -29,6 +30,18 @@ const mapUserWorkspaceDirectory = (userPath) => {
 };
 
 module.exports = ({ config, context }) => {
+  // gets Index Hooks to pass as options to HtmlWebpackPlugin
+  const customOptions = Object.assign({}, ...config.plugins
+    .filter((plugin) => plugin.type === 'index')
+    .map((plugin) => plugin.provider({ config, context }))
+    .filter((providerResult) => {
+      return Object.keys(providerResult).map((key) => {
+        if (key !== 'type') {
+          return providerResult[key];
+        }
+      });
+    }));
+
   // dynamically map all the user's workspace directories for resolution by webpack
   // this essentially helps us keep watch over changes from the user, and greenwood's build pipeline
   const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map(mapUserWorkspaceDirectory);
@@ -101,6 +114,20 @@ module.exports = ({ config, context }) => {
     },
 
     plugins: [
+      new HtmlWebpackPlugin({
+        filename: path.join(context.publicDir, context.indexPageTemplate),
+        template: path.join(context.scratchDir, context.indexPageTemplate),
+        chunksSortMode: 'dependency',
+        ...customOptions
+      }),
+
+      new HtmlWebpackPlugin({
+        filename: path.join(context.publicDir, context.notFoundPageTemplate),
+        template: path.join(context.scratchDir, context.notFoundPageTemplate),
+        chunksSortMode: 'dependency',
+        ...customOptions
+      }),
+
       ...mappedUserDirectoriesForWebpack,
 
       new CopyWebpackPlugin(userAssetsDirectoryForWebpack),
