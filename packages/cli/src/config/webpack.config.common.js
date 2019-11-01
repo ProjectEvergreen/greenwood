@@ -39,7 +39,7 @@ module.exports = ({ config, context }) => {
     from: context.assetDir,
     to: path.join(context.publicDir, 'assets')
   }] : [];
-      
+
   const commonCssLoaders = [
     { loader: 'css-loader' },
     {
