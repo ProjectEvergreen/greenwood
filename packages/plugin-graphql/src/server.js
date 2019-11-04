@@ -1,4 +1,3 @@
-// GraphQL-Express middleware
 const { ApolloServer } = require('apollo-server');
 const { typeDefs, resolvers } = require('./schema');
 
@@ -12,7 +11,6 @@ module.exports = (graph) => {
     playground: {
       endpoint: '/graphql',
       settings: {
-        'request.credentials': 'include',
         'editor.theme': 'light'
       }
     },

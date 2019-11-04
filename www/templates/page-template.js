@@ -33,7 +33,7 @@ class PageTemplate extends LitElement {
     // based on path, display selected menu
     const url = window.location.pathname;
     const urlLastSlash = url.slice(1, url.length).indexOf('/');
-    const menuName = url.substring(1, urlLastSlash !== -1 ? urlLastSlash : url.length);
+    const menuName = url.substring(1, urlLastSlash !== -1 ? urlLastSlash + 1 : url.length);
 
     let { data } = await client.query({
       query: gql`
@@ -58,6 +58,12 @@ class PageTemplate extends LitElement {
     }
   }
 
+  renderShelf() {
+    if (this.shelfList.length > 0) {
+      return html`<eve-shelf .shelfList="${this.shelfList}"></eve-shelf>`;
+    }
+  }
+
   render() {
     return html`
       <style>
@@ -68,7 +74,7 @@ class PageTemplate extends LitElement {
         <eve-header></eve-header>
         <div class='content-wrapper'>
           <div class="sidebar">
-            <eve-shelf .shelfList="${this.shelfList}"></eve-shelf>
+            ${this.renderShelf()}
           </div>
           <div class="content">
             <eve-container fluid>

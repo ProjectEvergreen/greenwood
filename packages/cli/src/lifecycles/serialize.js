@@ -6,6 +6,7 @@ const path = require('path');
 const PORT = '8000';
 const polyfillPath = path.join(process.cwd(), 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js');
 let polyfill = '';
+const runGraphQLServer = require('../../../plugin-graphql/src/server.js');
 
 browserRunner = new BrowserRunner();
 
@@ -24,6 +25,7 @@ const runBrowser = async (compilation) => {
         await fs.writeFile(path.join(target, 'index.html'), html);
       });
     }));
+
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err);
@@ -41,6 +43,8 @@ module.exports = serializeBuild = async (compilation) => {
       const indexContentsPolyfilled = indexContents.replace('<body>', `<script>${polyfill}</script><body>`);
 
       await fs.writeFile(indexContentsPath, indexContentsPolyfilled);
+
+      runGraphQLServer(compilation.graph);
 
       // "serialize" our SPA into a static site
       const server = localWebServer.listen({
