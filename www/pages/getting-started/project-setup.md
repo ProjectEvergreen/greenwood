@@ -1,5 +1,10 @@
+---
+menu: getting-started
+title: Project Setup
+---
+
 ## Overview
-In the [previous section](/getting-started/), we shared a little bit about what Greenwood is and the high level goals of this guide.  Now we are ready to help you start your first project!  
+In the [previous section](/getting-started/), we shared a little bit about what Greenwood is and the high level goals of this guide.  Now we are ready to help you start your first project!
 
 In this section, we will kick off our Greenwood project by:
 1. Initializing our project for development with **npm**

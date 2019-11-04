@@ -1,3 +1,8 @@
+---
+menu: docs
+title: Styles and Assets
+---
+
 ## Styles and Assets
 Greenwood provides a couple ways to help style and theme your site.
 

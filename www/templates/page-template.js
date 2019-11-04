@@ -1,5 +1,6 @@
 import { html, LitElement } from 'lit-element';
-import Prism from 'prismjs'; // eslint-disable-line no-unused-vars
+import ApolloClient from 'apollo-boost';
+import gql from 'graphql-tag';
 import '../components/header/header';
 import '../components/footer/footer';
 import '@evergreen-wc/eve-container';
@@ -12,30 +13,49 @@ MDIMPORT;
 METAIMPORT;
 METADATA;
 
+const client = new ApolloClient({
+  uri: 'http://localhost:4000'
+});
+
 class PageTemplate extends LitElement {
 
   constructor() {
     super();
     this.shelfList = [];
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
     this.setupShelf();
   }
 
-  setupShelf() {
-    // based on path, display selected list
+  async setupShelf() {
+    // based on path, display selected menu
     const url = window.location.pathname;
-    let list = [];
+    const urlLastSlash = url.slice(1, url.length).indexOf('/');
+    const menuName = url.substring(1, urlLastSlash !== -1 ? urlLastSlash : url.length);
 
-    if (url.indexOf('/about') >= 0) {
-      list = require('../components/shelf/about.json');
-    } else if (url.indexOf('/docs') >= 0) {
-      list = require('../components/shelf/documentation-list.json');
-    } else if (url.indexOf('/getting-started') >= 0) {
-      list = require('../components/shelf/getting-started-list.json');
-    } else if (url.indexOf('/plugins') >= 0) {
-      list = require('../components/shelf/plugins.json');
+    let { data } = await client.query({
+      query: gql`
+        query($name: String!) {
+          getMenu(name: $name) {
+            name
+            items {
+              name
+              path
+            }
+          }
+        }
+      `,
+      variables: {
+        name: menuName
+      }
+    });
+
+    if (data && data.getMenu) {
+      this.shelfList = data.getMenu.items;
+      this.requestUpdate();
     }
-
-    this.shelfList = list;
   }
 
   render() {

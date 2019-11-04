@@ -1,3 +1,8 @@
+---
+menu: docs
+title: Configuration
+---
+
 ## Configuration
 These are all the supported configuration options in Greenwood, which you can define in a _greenwood.config.js_ file in your project's root directory.
 

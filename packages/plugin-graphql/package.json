@@ -1,0 +1,34 @@
+{
+  "name": "@greenwood/plugin-graphql",
+  "version": "0.4.0",
+  "description": "A plugin for Greenwood to enable use of GraphQL",
+  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql",
+  "author": "Grant Hutchinson <grant@hutchdev.ca>",
+  "license": "MIT",
+  "keywords": [
+    "Greenwood",
+    "Web Components",
+    "Lit Element",
+    "Lit Html",
+    "Static Site Generator",
+    "GraphQL"
+  ],
+  "main": "src/index.js",
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@greenwood/cli": "^0.4.0"
+  },
+  "devDependencies": {
+    "@greenwood/cli": "^0.4.0"
+  },
+  "dependencies": {
+    "apollo-server": "^2.9.7",
+    "graphql": "^14.5.8",
+    "lodash": "^4.17.15"
+  }
+}

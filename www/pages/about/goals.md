@@ -1,3 +1,8 @@
+---
+menu: about
+title: Goals
+---
+
 ## Goals
 
 #### It's Not About Us

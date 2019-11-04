@@ -1,3 +1,8 @@
+---
+menu: getting-started
+title: Quick Start
+---
+
 ## Quick Start
 If you want to code and go then we welcome you to check out the ["companion" repository](https://github.com/ProjectEvergreen/greenwood-getting-started) we made to accompany this guide.
 

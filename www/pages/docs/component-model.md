@@ -1,3 +1,8 @@
+---
+menu: docs
+title: Component Model
+---
+
 ## Component Model
 In this section we'll review a little bit about how you can use Web Components in Greenwood.  Both the native `HTMLElement` and `LitElement` are available by default.
 

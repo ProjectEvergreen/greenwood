@@ -1,3 +1,8 @@
+---
+menu: plugins
+title: Index Hooks
+---
+
 ## Index Hooks
 
 It is common when working with certain libraries (3rd party or otherwise) that scripts _must_ be loaded globally and / or unbundled.  Greenwood provides some prefined places in its _index.html_ that can be used to inject custom HTML which can be used to inject scripts for things like polyfills and analytics.
@@ -14,7 +19,7 @@ Below is an example of creating an index hook for loading Google Analytics from 
 module.exports = {
 
   ...
-  
+
   plugins: [{
     type: 'index',
     provider: (compilation) => {
@@ -36,7 +41,7 @@ module.exports = {
 ```
 
 ### Custom Index File
-It should be noted that if these specific hook types are too limiting Greenwood supports providing your own _index.html_ in the root of your workspace directory.  This can either be used to define your own hooks or just hardcode everything you need instead of using plugins.  
+It should be noted that if these specific hook types are too limiting Greenwood supports providing your own _index.html_ in the root of your workspace directory.  This can either be used to define your own hooks or just hardcode everything you need instead of using plugins.
 
 The minimum recommended markup for a custom _index.html_ would be this following:
 ```render html
@@ -55,11 +60,11 @@ The minimum recommended markup for a custom _index.html_ would be this following
   </head>
 
   <body>
-  
+
     <eve-app></eve-app>
 
   </body>
-  
+
 </html>
 ```
 
@@ -68,7 +73,7 @@ To add your own hook, define it in a _greenwood.config.js_
 module.exports = {
 
   ...
-  
+
   plugins: [{
     type: 'index',
     provider: (compilation) => {
@@ -93,7 +98,7 @@ And updated _index.html_
   ...
 
   <body>
-  
+
     <eve-app></eve-app>
 
     <%= htmlWebpackPlugin.options.myCustomHook %>

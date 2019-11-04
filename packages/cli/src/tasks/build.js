@@ -1,15 +1,17 @@
 const path = require('path');
 const webpack = require('webpack');
 const serializeBuild = require('../lifecycles/serialize');
+const runGraphQLServer = require('../../../plugin-graphql/src/server.js');
 
 module.exports = runProductionBuild = async(compilation) => {
   return new Promise(async (resolve, reject) => {
 
-    try {      
+    try {
+      runGraphQLServer(compilation.graph);
       console.log('Building SPA from compilation...');
       await runWebpack(compilation);
       await serializeBuild(compilation);
-      
+
       resolve();
     } catch (err) {
       reject(err);

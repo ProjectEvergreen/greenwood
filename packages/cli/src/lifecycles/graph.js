@@ -23,7 +23,7 @@ const createGraphFromPages = async (pagesDir, config) => {
               if (isMdFile && !stats.isDirectory()) {
                 const fileContents = await fs.readFile(filePath, 'utf8');
                 const { attributes } = fm(fileContents);
-                let { label, template, title } = attributes;
+                let { label, template, title, menu } = attributes;
                 let { meta } = config;
                 let mdFile = '';
 
@@ -65,6 +65,8 @@ const createGraphFromPages = async (pagesDir, config) => {
                 // set <title></title> element text, override with markdown title
                 title = title || config.title;
 
+                // set specific menu to place this page
+                menu = menu;
                 /*
                 * Variable Definitions
                 *----------------------
@@ -77,10 +79,11 @@ const createGraphFromPages = async (pagesDir, config) => {
                 * relativeExpectedPath: relative import path for generated component within a list.js file to later be
                 * imported into app.js root component
                 * title: the head <title></title> text
+                * menu: the name of the menu this item should be placed in
                 * meta: og graph meta array of objects { property/name, content }
                 */
 
-                pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath, title, meta });
+                pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath, title, menu, meta });
               }
               if (stats.isDirectory()) {
                 await walkDirectory(filePath);
