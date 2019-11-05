@@ -1,4 +1,5 @@
 import { html, LitElement } from 'lit-element';
+import { InMemoryCache } from 'apollo-cache-inmemory';
 import ApolloClient from 'apollo-boost';
 import gql from 'graphql-tag';
 import '../components/header/header';
@@ -14,7 +15,9 @@ METAIMPORT;
 METADATA;
 
 const client = new ApolloClient({
-  uri: 'http://localhost:4000'
+  uri: 'http://localhost:4000',
+  // eslint-disable-next-line no-underscore-dangle
+  cache: new InMemoryCache().restore(window.__APOLLO_STATE__)
 });
 
 class PageTemplate extends LitElement {
@@ -58,10 +61,10 @@ class PageTemplate extends LitElement {
     }
   }
 
-  renderShelf() {
-    if (this.shelfList.length > 0) {
-      return html`<eve-shelf .shelfList="${this.shelfList}"></eve-shelf>`;
-    }
+  renderScript() {
+    const cache = JSON.stringify(client.extract());
+
+    return `window.__APOLLO_STATE__ = ${cache};`;
   }
 
   render() {
@@ -70,11 +73,14 @@ class PageTemplate extends LitElement {
         ${pageCss}
       </style>
       METAELEMENT
+      <script>
+        ${this.renderScript()}
+      </script>
       <div class='wrapper'>
         <eve-header></eve-header>
         <div class='content-wrapper'>
           <div class="sidebar">
-            ${this.renderShelf()}
+            <eve-shelf .shelfList="${this.shelfList}"></eve-shelf>
           </div>
           <div class="content">
             <eve-container fluid>
