@@ -32,6 +32,17 @@ class PageTemplate extends LitElement {
     }
   }
 
+  validatePath() {
+    const pathname = window.location.pathname;
+    const pattern = new RegExp(/^[a-z0-9_&\-\/]+$/gi);
+
+    if (pattern.test(pathname)) {
+      return pathname;
+    } else {
+      throw new Error('invalid pathname');
+    }
+  }
+
   async performQuery() {
     // initialize client
     this.client = new ApolloClient({
@@ -45,15 +56,16 @@ class PageTemplate extends LitElement {
   async setCache() {
     return new Promise(async(resolve, reject) => {
       try {
-        // reminder sanitize pathname
-        const staticCacheUrl = window.location.pathname + '/cache.json';
+        const staticCacheUrl = this.validatePath() + '/cache.json';
 
-        // better solution to this condition preferred
+        // better solution perhaps a mutation?
         let anyScripts = document.querySelector('script[state=apollo]'); // exists in document
         let script = this.querySelector('script[state=apollo]'); // exists in component
 
         if (!script && !anyScripts) {
+          // query and set cache during serialize
           await this.performQuery();
+          // create client cache
           this.createClientCache(this.client.extract());
         }
         if (!script && anyScripts) {
@@ -61,7 +73,7 @@ class PageTemplate extends LitElement {
           let staticCache = await getCache(staticCacheUrl);
 
           if (staticCache) {
-            // create cache
+            // create client cache
             this.createClientCache(staticCache);
             await this.performQuery();
           }
@@ -74,7 +86,7 @@ class PageTemplate extends LitElement {
   }
 
   createClientCache(cache) {
-    const state = JSON.stringify(cache);
+    let state = JSON.stringify(cache);
 
     let script = document.createElement('script');
 
@@ -90,8 +102,7 @@ class PageTemplate extends LitElement {
 
       try {
         // based on path, display selected menu
-        // reminder sanitize pathname
-        const url = window.location.pathname;
+        const url = this.validatePath();
         const urlLastSlash = url.slice(1, url.length).indexOf('/');
         const menuName = url.substring(1, urlLastSlash !== -1 ? urlLastSlash + 1 : url.length);
 
