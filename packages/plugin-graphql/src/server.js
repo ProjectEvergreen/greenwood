@@ -1,10 +1,10 @@
 const { ApolloServer } = require('apollo-server');
+const { createCache } = require('./lib/menu-queries');
 const { typeDefs, resolvers } = require('./schema');
 
-module.exports = (graph) => {
+module.exports = ({ graph, context }) => {
 
   // Create schema
-  // disable playground in prod
   const server = new ApolloServer({
     typeDefs,
     resolvers,
@@ -14,9 +14,12 @@ module.exports = (graph) => {
         'editor.theme': 'light'
       }
     },
-    context: () => ({
-      graph
-    })
+    context: async({ req }) => {
+      if (req.query.q !== 'internal') {
+        await createCache(req, context);
+      }
+      return { graph };
+    }
   });
 
   // The `listen` method launches a web server.

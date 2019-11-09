@@ -7,7 +7,7 @@ module.exports = runDevServer = async (compilation) => {
   return new Promise(async (resolve, reject) => {
 
     try {
-      runGraphQLServer(compilation.graph);
+      runGraphQLServer(compilation);
       const webpackConfig = require(path.join(__dirname, '..', './config/webpack.config.develop.js'))(compilation);
       const devServerConfig = webpackConfig.devServer;
 

@@ -44,7 +44,7 @@ module.exports = serializeBuild = async (compilation) => {
 
       await fs.writeFile(indexContentsPath, indexContentsPolyfilled);
 
-      runGraphQLServer(compilation.graph);
+      runGraphQLServer(compilation);
 
       // "serialize" our SPA into a static site
       const server = localWebServer.listen({
