@@ -19,69 +19,70 @@ class PageTemplate extends LitElement {
   constructor() {
     super();
     this.shelfList = [];
-    this.state = {};
   }
 
   async connectedCallback() {
     super.connectedCallback();
+
     try {
       await this.setCache();
-      this.client = new ApolloClient({
-        uri: 'http://localhost:4000',
-        // eslint-disable-next-line no-underscore-dangle
-        cache: new InMemoryCache().restore(window.__APOLLO_STATE__)
-      });
-      await this.setupShelf();
-      this.setInitialCache();
+      this.requestUpdate();
     } catch (err) {
       console.log(err);
     }
   }
 
+  async performQuery() {
+    // initialize client
+    this.client = new ApolloClient({
+      uri: 'http://localhost:4000',
+      // eslint-disable-next-line no-underscore-dangle
+      cache: new InMemoryCache().restore(window.__APOLLO_STATE__)
+    });
+    return this.setupShelf();
+  }
+
   async setCache() {
     return new Promise(async(resolve, reject) => {
       try {
-        // sanitize pathname
-        const cacheUrl = window.location.pathname + '/cache.json';
-        let script = this.shadowRoot.querySelector('script[state=apollo]');
+        // reminder sanitize pathname
+        const staticCacheUrl = window.location.pathname + '/cache.json';
 
-        if (!script) {
-          let cache = await getCache(cacheUrl);
+        // better solution to this condition preferred
+        let anyScripts = document.querySelector('script[state=apollo]'); // exists in document
+        let script = this.querySelector('script[state=apollo]'); // exists in component
 
-          if (cache) {
-            this.state = JSON.stringify(cache);
-            const altScript = document.createElement('script');
-
-            altScript.setAttribute('type', 'text/javascript');
-            altScript.setAttribute('state', 'apollo');
-            altScript.innerText = `window.__APOLLO_STATE__ = ${this.state};`;
-
-            this.shadowRoot.appendChild(altScript);
-          }
-          resolve();
-
+        if (!script && !anyScripts) {
+          await this.performQuery();
+          this.createClientCache(this.client.extract());
         }
+        if (!script && anyScripts) {
+          // fetch static cache
+          let staticCache = await getCache(staticCacheUrl);
+
+          if (staticCache) {
+            // create cache
+            this.createClientCache(staticCache);
+            await this.performQuery();
+          }
+        }
+        resolve();
       } catch (err) {
-        reject();
+        reject(err);
       }
     });
   }
 
-  setInitialCache() {
-    let script = this.shadowRoot.querySelector('script[state=apollo]');
+  createClientCache(cache) {
+    const state = JSON.stringify(cache);
 
-    if (!script) {
-      const cache = JSON.stringify(this.client.extract());
+    let script = document.createElement('script');
 
-      script = document.createElement('script');
+    script.setAttribute('type', 'text/javascript');
+    script.setAttribute('state', 'apollo');
+    script.innerText = `window.__APOLLO_STATE__ = ${state};`;
 
-      script.setAttribute('type', 'text/javascript');
-      script.setAttribute('state', 'apollo');
-      this.state = `window.__APOLLO_STATE__ = ${cache};`;
-      script.innerText = this.state;
-
-      this.shadowRoot.appendChild(script);
-    }
+    this.shadowRoot.appendChild(script);
   }
 
   async setupShelf() {
@@ -89,6 +90,7 @@ class PageTemplate extends LitElement {
 
       try {
         // based on path, display selected menu
+        // reminder sanitize pathname
         const url = window.location.pathname;
         const urlLastSlash = url.slice(1, url.length).indexOf('/');
         const menuName = url.substring(1, urlLastSlash !== -1 ? urlLastSlash + 1 : url.length);
@@ -102,7 +104,6 @@ class PageTemplate extends LitElement {
 
         if (data && data.getMenu) {
           this.shelfList = data.getMenu.items;
-          this.requestUpdate();
           resolve();
         }
       } catch (err) {
