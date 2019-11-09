@@ -26,7 +26,6 @@ class PageTemplate extends LitElement {
 
     try {
       await this.setCache();
-      this.requestUpdate();
     } catch (err) {
       console.log(err);
     }
@@ -37,6 +36,10 @@ class PageTemplate extends LitElement {
     const pattern = new RegExp(/^[a-z0-9_&\-\/]+$/gi);
 
     if (pattern.test(pathname)) {
+      // netlify
+      if (pathname.indexOf('/') === pathname.length - 1) {
+        pathname = pathname.substring(0, pathname.length - 1);
+      }
       return pathname;
     } else {
       throw new Error('invalid pathname');
@@ -67,6 +70,8 @@ class PageTemplate extends LitElement {
           await this.performQuery();
           // create client cache
           this.createClientCache(this.client.extract());
+          this.requestUpdate();
+
         }
         if (!script && anyScripts) {
           // fetch static cache
@@ -76,6 +81,8 @@ class PageTemplate extends LitElement {
             // create client cache
             this.createClientCache(staticCache);
             await this.performQuery();
+            this.requestUpdate();
+
           }
         }
         resolve();
