@@ -1,0 +1,25 @@
+name: Continous Integration
+
+on: [pull_request]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-18.04
+    container: docker://thegreenhouse/nodejs-dev:0.4.0
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: install, build, and test
+      run: |
+        yarn install && yarn lint && yarn test && yarn build
+      env:
+        CI: true
