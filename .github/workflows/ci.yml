@@ -18,8 +18,17 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: install, build, and test
+    - name: Installing project dependencies
       run: |
-        yarn install && yarn lint && yarn test && yarn build
+        yarn install  --frozen-lockfile && yarn lerna bootstrap
+    - name: Linting project
+      run: |
+        yarn lint
+    - name: Run Unit Tests
+      run: |
+        yarn lint
+    - name: Run The Build Tests
+      run: |
+        yarn clean && yarn build
       env:
         CI: true
