@@ -83,7 +83,11 @@ module.exports = ({ config, context }) => {
     module: {
       rules: [{
         test: /\.js$/,
-        loader: 'babel-loader'
+        loader: 'babel-loader',
+        include: [
+          path.resolve(__dirname, 'node_modules/lit-element'),
+          path.resolve(__dirname, 'node_modules/lit-html')
+        ]
       }, {
         test: /\.md$/,
         loader: 'wc-markdown-loader',

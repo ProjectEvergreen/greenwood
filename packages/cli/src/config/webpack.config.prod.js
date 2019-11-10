@@ -8,6 +8,8 @@ module.exports = ({ config, context, graph }) => {
 
     mode: 'production',
 
+    devtool: 'none',
+    
     performance: {
       hints: 'warning'
     }
