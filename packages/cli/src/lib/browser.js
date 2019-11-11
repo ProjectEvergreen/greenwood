@@ -1,6 +1,6 @@
 /*
 * Rendertron - Modified
-* Repo: https://github.com/Goo./rendererndertron
+* Repo: https://github.com/GoogleChrome/rendertron
 * License: Apache 2.0
 */
 
