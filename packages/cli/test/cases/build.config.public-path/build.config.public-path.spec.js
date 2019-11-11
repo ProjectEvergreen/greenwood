@@ -21,7 +21,7 @@ const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', async function() {
-  const LABEL = 'Custom Title Configuration and Default Workspace';
+  const LABEL = 'Custom Public Path Configuration and Default Workspace';
   let setup;
 
   before(async function() {

@@ -1,0 +1,34 @@
+name: Continous Integration
+
+on: [pull_request]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-18.04
+    container: docker://thegreenhouse/nodejs-dev:0.4.0
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Installing project dependencies
+      run: |
+        yarn install  --frozen-lockfile && yarn lerna bootstrap
+    - name: Linting project
+      run: |
+        yarn lint
+    - name: Run Unit Tests
+      run: |
+        yarn lint
+    - name: Run The Build Tests
+      run: |
+        yarn clean && yarn build
+      env:
+        CI: true
