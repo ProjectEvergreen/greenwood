@@ -115,7 +115,7 @@ A Docker container is available within the project to use as a development envir
 
 First make sure you have [Docker installed](https://www.docker.com/products/docker-desktop).
 
-Then from the root of this repository run:
+Then from the root of this repository do the following:
 1. Build the container: `$ docker build -t nodejs-dev .`
 1. Connect to the container: `$ docker run --name greenwood -v $(pwd):/workspace -i -t nodejs-dev`
 1. Now you can run all the usual commands, e.g.  
