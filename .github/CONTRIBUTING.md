@@ -121,7 +121,7 @@ Then from the root of this repository do the following:
 1. Now you can run all the usual commands, e.g.  
   - `$ yarn install`
   - `$ yarn build`
-  - `$ yarn test`)
+  - `$ yarn test`
 
 > _This will create a 2 way binding between your host and the container, so file changes will go both ways between the [host and container](https://gist.github.com/falvarez/71298b07603d32374ceb2845c3eec997)._
 
