@@ -121,10 +121,12 @@ Then from the root of this repository run:
 1. Now you can run all the usual commands, e.g.  
   - `$ yarn install`
   - `$ yarn build`
-  - `$ yarn test`
+  - `$ yarn test`)
 
 > _This will create a 2 way binding between your host and the container, so file changes will go both ways between the [host and container](https://gist.github.com/falvarez/71298b07603d32374ceb2845c3eec997)._
 
 When you're done with the container:
 1. Exit the container: `$ exit`
 1. Destroy the container: `$ docker rm greenwood`
+
+Note: If you have issues running tests due to timeouts, you can increase the setting in [package.json](https://github.com/ProjectEvergreen/greenwood/blob/master/package.json#L23)
