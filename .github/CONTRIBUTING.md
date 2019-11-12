@@ -111,13 +111,15 @@ You can disable plugins in _webpack.config.prod.js_ to remove production optimiz
 > Note: `yarn develop` does not work right now with IE11 and Edge.
 
 ## Docker
-A Docker container is available within the project to use as a development environment if you like.  It is configured to use the same image that runs as part of the project's Continuous Integration environment, so can be a useful way to run some of the basic commands of the project.
+A Docker container is available within the project to use as a development environment if you like.  It is configured to use the same image that runs as part of the project's [Continuous Integration environment](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/ci.yml#L9).
 
-First make sure you have [Docker installed](https://www.docker.com/products/docker-desktop), then from the root of this repository run:
+First make sure you have [Docker installed](https://www.docker.com/products/docker-desktop).
+
+Then from the root of this repository run:
 1. Build the container: `$ docker build -t nodejs-dev .`
 1. Connect to the container: `$ docker run --name greenwood -v $(pwd):/workspace -i -t nodejs-dev`
 1. Now you can run all the usual commands, e.g.  
-  - `$ yarn install` (will be for you by the container on startup)
+  - `$ yarn install`
   - `$ yarn build`
   - `$ yarn test`
 
