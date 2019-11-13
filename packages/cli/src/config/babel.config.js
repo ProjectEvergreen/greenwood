@@ -13,8 +13,8 @@ module.exports = {
       {
         useBuiltIns: 'entry', // usage?
         corejs: { 
-          version: 3
-          // proposals: true
+          version: 3,
+          proposals: true
         }
       }
     ]
