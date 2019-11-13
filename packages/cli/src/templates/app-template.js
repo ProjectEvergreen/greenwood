@@ -3,8 +3,6 @@ import { connectRouter } from 'lit-redux-router';
 import { applyMiddleware, createStore, compose as origCompose, combineReducers } from 'redux';
 import { lazyReducerEnhancer } from 'pwa-helpers/lazy-reducer-enhancer.js';
 import thunk from 'redux-thunk';
-// import 'core-js/stable';
-// import 'regenerator-runtime/runtime';
 
 // eslint-disable-next-line no-underscore-dangle
 const compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || origCompose;
