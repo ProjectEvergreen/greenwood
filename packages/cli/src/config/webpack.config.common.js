@@ -74,6 +74,12 @@ module.exports = ({ config, context }) => {
       index: path.join(context.scratchDir, 'app', 'app.js')
     },
 
+    resolve: {
+      alias: {
+        core: path.join(process.cwd(), 'core-js')
+      }
+    },
+
     output: {
       path: path.join(context.publicDir, '.', config.publicPath),
       filename: '[name].[hash].bundle.js',
@@ -84,10 +90,11 @@ module.exports = ({ config, context }) => {
       rules: [{
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [
-          path.resolve(__dirname, 'node_modules/lit-element'),
-          path.resolve(__dirname, 'node_modules/lit-html')
-        ]
+        options: {
+          configFile: path.join(__dirname, 'babel.config.js'),
+          // https://github.com/babel/babel/issues/9937#issuecomment-498350032
+          exclude: path.resolve(process.cwd(), 'node_modules/@babel/runtime')
+        }
       }, {
         test: /\.md$/,
         loader: 'wc-markdown-loader',
