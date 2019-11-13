@@ -26,7 +26,7 @@ jobs:
         yarn lint
     - name: Run Unit Tests
       run: |
-        yarn lint
+        yarn test
     - name: Run The Build Tests
       run: |
         yarn clean && yarn build
