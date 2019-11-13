@@ -24,13 +24,13 @@ jobs:
     - name: Installing project dependencies
       run: |
         yarn install  --frozen-lockfile && yarn lerna bootstrap
-    - name: Linting project
+    - name: Lint
       run: |
         yarn lint
-    - name: Run Unit Tests
+    - name: Test
       run: |
         yarn test
-    - name: Run The Build Tests
+    - name: Build
       run: |
         yarn clean && yarn build
       env:
