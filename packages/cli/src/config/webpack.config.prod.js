@@ -7,7 +7,7 @@ module.exports = ({ config, context, graph }) => {
   return webpackMerge(configWithContext, {
 
     mode: 'production',
-    
+
     performance: {
       hints: 'warning'
     }
