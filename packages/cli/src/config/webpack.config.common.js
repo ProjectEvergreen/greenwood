@@ -74,12 +74,6 @@ module.exports = ({ config, context }) => {
       index: path.join(context.scratchDir, 'app', 'app.js')
     },
 
-    resolve: {
-      alias: {
-        core: path.join(process.cwd(), 'core-js')
-      }
-    },
-
     output: {
       path: path.join(context.publicDir, '.', config.publicPath),
       filename: '[name].[hash].bundle.js',
