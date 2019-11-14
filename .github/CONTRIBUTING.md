@@ -18,7 +18,7 @@ Pull requests are the best!  To best help facililate contributions to the projec
 - To test the CI build scripts locally, run the `yarn` commands mentioned in the below section on CI.
 
 ## Continuous Integration
-Greenwood makes active use of testing tools like [CircleCI](https://circleci.com/) and [Netlify deploy previews](https://www.netlify.com/blog/2016/07/20/introducing-deploy-previews-in-netlify/) as part of the workflow.  Each time a PR is opened, a sequence of build steps defined _.circleci/config.yml_ are run:
+Greenwood makes active use of testing tools like [GitHub Actions](https://github.com/features/actions) and [Netlify deploy previews](https://www.netlify.com/blog/2016/07/20/introducing-deploy-previews-in-netlify/) as part of the workflow.  Each time a PR is opened, a sequence of build steps defined _.github/workflows/ci..yml_ are run:
 1. Linting: `yarn lint`
 1. Running unit tests: `yarn test`
 1. Building the Greenwood website:  `yarn build`
