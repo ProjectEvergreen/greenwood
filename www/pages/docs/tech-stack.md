@@ -19,6 +19,6 @@ Greenwood makes use of **webpack** for the local development workflow and buildi
 
 ### Development
 To assist in the project's development and maintenance, we also use these tools:
-- [CircleCI](https://circleci.com/): Continuous Integration
+- [GitHub Actions](https://github.com/features/actions): Continuous Integration
 - [Netlify](https://www.netlify.com/): Website hosting and branch previews
 - [mocha](https://mochajs.org/): Test runner
