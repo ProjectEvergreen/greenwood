@@ -109,3 +109,24 @@ To test from a VM, you can
 You can disable plugins in _webpack.config.prod.js_ to remove production optimizations for testing purposes.
 
 > Note: `yarn develop` does not work right now with IE11 and Edge.
+
+## Docker
+A Docker container is available within the project to use as a development environment if you like.  It is configured to use the same image that runs as part of the project's [Continuous Integration environment](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/ci.yml#L9).
+
+First make sure you have [Docker installed](https://www.docker.com/products/docker-desktop).
+
+Then from the root of this repository do the following:
+1. Build the container: `$ docker build -t nodejs-dev .`
+1. Connect to the container: `$ docker run --name greenwood -v $(pwd):/workspace -i -t nodejs-dev`
+1. Now you can run all the usual commands, e.g.  
+  - `$ yarn install`
+  - `$ yarn build`
+  - `$ yarn test`
+
+> _This will create a 2 way binding between your host and the container, so file changes will go both ways between the [host and container](https://gist.github.com/falvarez/71298b07603d32374ceb2845c3eec997)._
+
+When you're done with the container:
+1. Exit the container: `$ exit`
+1. Destroy the container: `$ docker rm greenwood`
+
+Note: If you have issues running tests due to timeouts, you can increase the setting in [package.json](https://github.com/ProjectEvergreen/greenwood/blob/master/package.json#L23)
