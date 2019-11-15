@@ -31,7 +31,7 @@ const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 const { version } = require('../../../package.json');
 
-describe('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', function() {
   const mockBanner = `My Banner - v${version}`;
   const LABEL = 'Custom Webpack Plugin and Default Workspace';
   let setup;

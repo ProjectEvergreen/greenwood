@@ -24,7 +24,7 @@
 const expect = require('chai').expect;
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', function() {
   let setup;
 
   before(async function() {

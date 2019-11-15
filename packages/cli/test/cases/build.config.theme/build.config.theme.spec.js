@@ -28,7 +28,7 @@ const expect = require('chai').expect;
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Theme Configuration and Default Workspace';
   let setup;
 
