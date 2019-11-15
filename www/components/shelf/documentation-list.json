@@ -81,7 +81,7 @@
     ]
   },
   {
-    "name": "Templates",
+    "name": "Templates and Pages",
     "path": "/docs/layouts",
     "items": [
       {
@@ -91,6 +91,10 @@
       {
         "name": "Page Template",
         "id": "page-template"
+      }, 
+      {
+        "name": "Pages",
+        "id": "pages"
       }
     ]
   },
