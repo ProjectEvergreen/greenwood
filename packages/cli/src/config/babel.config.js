@@ -14,7 +14,7 @@ module.exports = {
       {
         
         // https://babeljs.io/docs/en/babel-preset-env#usebuiltins
-        useBuiltIns: 'entry', // usage?
+        useBuiltIns: 'entry',
         
         // https://babeljs.io/docs/en/babel-preset-env#corejs
         corejs: { 
