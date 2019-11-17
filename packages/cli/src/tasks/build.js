@@ -1,3 +1,4 @@
+const chalk = require('chalk');
 const path = require('path');
 const webpack = require('webpack');
 const serializeBuild = require('../lifecycles/serialize');
@@ -32,6 +33,11 @@ const runWebpack = async (compilation) => {
           reject(err);
         } else {
           console.log('webpack build complete');
+
+          if (stats && stats.hasWarnings()) {
+            console.log(`${chalk.rgb(255, 255, 71)(stats.toJson('minimal').warnings[0])}`);
+          }
+
           resolve();
         }
       });

@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const webpackMerge = require('webpack-merge');
 const commonConfig = require('./webpack.config.common.js');
 
@@ -10,7 +11,11 @@ module.exports = ({ config, context, graph }) => {
 
     performance: {
       hints: 'warning'
-    }
+    },
+
+    plugins: [
+      new webpack.ProgressPlugin()
+    ]
 
   });
 
