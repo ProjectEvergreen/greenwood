@@ -9,13 +9,21 @@ module.exports = {
   // https://github.com/zloirock/core-js/blob/master/docs/2019-03-19-core-js-3-babel-and-a-look-into-the-future.md#babelpreset-env
   presets: [
     [
+      // https://babeljs.io/docs/en/babel-preset-env
       '@babel/preset-env',
       {
+        
+        // https://babeljs.io/docs/en/babel-preset-env#usebuiltins
         useBuiltIns: 'entry', // usage?
+        
+        // https://babeljs.io/docs/en/babel-preset-env#corejs
         corejs: { 
           version: 3,
           proposals: true
-        }
+        },
+
+        // https://babeljs.io/docs/en/babel-preset-env#configpath
+        configPath: __dirname
       }
     ]
   ],
