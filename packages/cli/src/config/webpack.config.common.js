@@ -114,6 +114,20 @@ module.exports = ({ config, context }) => {
     },
 
     plugins: [
+      new HtmlWebpackPlugin({
+        filename: path.join(context.publicDir, context.indexPageTemplate),
+        template: path.join(context.scratchDir, context.indexPageTemplate),
+        chunksSortMode: 'dependency',
+        ...customOptions
+      }),
+
+      new HtmlWebpackPlugin({
+        filename: path.join(context.publicDir, context.notFoundPageTemplate),
+        template: path.join(context.scratchDir, context.notFoundPageTemplate),
+        chunksSortMode: 'dependency',
+        ...customOptions
+      }),
+
       ...mappedUserDirectoriesForWebpack,
 
       new CopyWebpackPlugin(userAssetsDirectoryForWebpack),
@@ -124,13 +138,6 @@ module.exports = ({ config, context }) => {
           resource.request = resource.request.replace(/^\.\//, context.pagesDir);
         }
       ),
-
-      new HtmlWebpackPlugin({
-        filename: path.join(context.publicDir, context.indexPageTemplate),
-        template: path.join(context.scratchDir, context.indexPageTemplate),
-        chunksSortMode: 'dependency',
-        ...customOptions
-      }),
 
       ...customWebpackPlugins
     ]

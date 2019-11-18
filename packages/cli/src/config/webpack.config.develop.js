@@ -1,5 +1,4 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const FilewatcherPlugin = require('filewatcher-webpack-plugin');
 const generateCompilation = require('../lifecycles/compile');
@@ -29,6 +28,30 @@ module.exports = ({ config, context, graph }) => {
   const { devServer, publicPath } = config;
   const { host, port } = devServer;
 
+  // decorate HtmlWebpackPlugin instance with devServer specific SPA handling for index.html
+  configWithContext.plugins[0].options.hookGreenwoodSpaIndexFallback = `
+    <script>
+      (function(){
+        var redirect = sessionStorage.redirect;
+        
+        delete sessionStorage.redirect;
+        
+        if (redirect && redirect != location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
+  `,
+
+  // decorate HtmlWebpackPlugin instance with devServer specific SPA handling for 404.html
+  configWithContext.plugins[1].options.hookGreenwoodSpaIndexFallback = `
+    <script>
+      sessionStorage.redirect = location.href;
+    </script>
+
+    <meta http-equiv="refresh" content="0;URL='${publicPath}'"></meta>
+  `;
+
   return webpackMerge(configWithContext, {
 
     mode: 'development',
@@ -53,42 +76,17 @@ module.exports = ({ config, context, graph }) => {
         onReadyCallback: () => {
           console.log(`Now serving Development Server available at ${host}:${port}`);
         },
-        // eslint-disable-next-line no-unused-vars
-        onChangeCallback: async (path) => {
+        onChangeCallback: async () => {
           rebuild();
         },
         usePolling: true,
         atomic: true,
         ignored: '/node_modules/'
       }),
+      
       new ManifestPlugin({
         fileName: 'manifest.json',
         publicPath
-      }),
-      new HtmlWebpackPlugin({
-        template: path.join(context.scratchDir, context.indexPageTemplate),
-        hookGreenwoodSpaIndexFallback: `
-          <script>
-          (function(){
-              var redirect = sessionStorage.redirect;
-              delete sessionStorage.redirect;
-              if (redirect && redirect != location.href) {
-              history.replaceState(null, null, redirect);
-              }
-          })();
-          </script>
-        `
-      }),
-      new HtmlWebpackPlugin({
-        filename: context.notFoundPageTemplate,
-        template: path.join(context.scratchDir, context.notFoundPageTemplate),
-        hookGreenwoodSpaIndexFallback: `
-          <script>
-            sessionStorage.redirect = location.href;
-          </script>
-
-          <meta http-equiv="refresh" content="0;URL='${publicPath}'"></meta>
-        `
       })
     ]
   });
