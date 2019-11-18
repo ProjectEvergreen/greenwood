@@ -75,16 +75,6 @@ class BrowserRunner {
       return { status: 400, content: '' };
     }
 
-    // flag that we've already serialized
-    await page.evaluate(() => {
-      let script = document.createElement('script');
-
-      script.setAttribute('type', 'text/javascript');
-      script.setAttribute('state', 'init');
-
-      document.head.appendChild(script);
-    });
-
     // Serialize page.
     const content = await page.content();
 

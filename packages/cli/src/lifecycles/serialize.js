@@ -17,7 +17,8 @@ const runBrowser = async (compilation) => {
 
       return await browserRunner.serialize(`http://127.0.0.1:${PORT}${route}`).then(async (content) => {
         const target = path.join(publicDir, route);
-        const html = content
+        let html = content
+          .replace('preinit', 'init')
           .replace(polyfill, '')
           .replace('<script></script>', '');
 

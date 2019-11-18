@@ -111,7 +111,6 @@ class PageTemplate extends LitElement {
     script.innerText = `window.__APOLLO_STATE__ = ${state};`;
 
     this.shadowRoot.appendChild(script);
-    this.cacheWritten = true;
   }
 
   async setupShelf() {
