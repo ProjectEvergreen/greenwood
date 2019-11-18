@@ -65,8 +65,8 @@ describe('Build Greenwood With: ', async function() {
 
       });
 
-      it('should be one inline <script> tag', function() {
-        expect(inlineScript.length).to.be.equal(1);
+      it('should be two inline <script> tags', function() {
+        expect(inlineScript.length).to.be.equal(2);
       });
 
       it('should have the expected code with users analyicsId', function() {
@@ -88,7 +88,7 @@ describe('Build Greenwood With: ', async function() {
             gtag('config', '${mockAnalyticsId}');
         `;
 
-        expect(inlineScript[0].textContent).to.contain(expectedContent);
+        expect(inlineScript[1].textContent).to.contain(expectedContent);
       });
 
       it('should only have one external Google script tag', function() {
