@@ -34,7 +34,7 @@ class BrowserRunner {
     page.evaluateOnNewDocument('customElements.forcePolyfill = true');
     page.evaluateOnNewDocument('ShadyDOM = {force: true}');
     page.evaluateOnNewDocument('ShadyCSS = {shimcssproperties: true}');
-    
+
     await page.setRequestInterception(true);
 
     // only allow puppeteer to load necessary scripts needed for pre-rendering of the site itself
@@ -43,7 +43,8 @@ class BrowserRunner {
 
       if (
         interceptedRequestUrl.indexOf('bundle.js') >= 0 || // webpack bundles, webcomponents-bundle.js
-        interceptedRequestUrl === requestUrl // pages / routes
+        interceptedRequestUrl === requestUrl || // pages / routes
+        interceptedRequestUrl.indexOf('localhost:4000') >= 0 // GraphQL server
       ) {
         interceptedRequest.continue();
       } else {
