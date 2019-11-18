@@ -22,7 +22,6 @@ class BrowserRunner {
       headless: true,
       args: ['--no-sandbox']
     });
-    // this.renderer = new Renderer(this.browser);
   }
 
   async serialize(requestUrl) {
@@ -75,6 +74,16 @@ class BrowserRunner {
       // https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md#pagegotourl-options.
       return { status: 400, content: '' };
     }
+
+    // flag that we've already serialized
+    await page.evaluate(() => {
+      let script = document.createElement('script');
+
+      script.setAttribute('type', 'text/javascript');
+      script.setAttribute('state', 'init');
+
+      document.head.appendChild(script);
+    });
 
     // Serialize page.
     const content = await page.content();

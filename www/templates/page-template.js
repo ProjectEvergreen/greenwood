@@ -23,11 +23,10 @@ class PageTemplate extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
-
     try {
       await this.setCache();
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   }
 
@@ -59,35 +58,45 @@ class PageTemplate extends LitElement {
   async setCache() {
     return new Promise(async(resolve, reject) => {
       try {
-        const staticCacheUrl = this.validatePath() + '/cache.json';
 
-        // better solution perhaps a mutation?
-        let anyScripts = document.querySelector('script[state=apollo]'); // exists in document
-        let script = this.querySelector('script[state=apollo]'); // exists in component
+        let shadowCacheElement = this.querySelector('[state="apollo"]'); // cache exists in component
+        let alreadyInitialized = document.querySelector('script[state=init]'); // already serialized build
 
-        if (!script && !anyScripts) {
-          // query and set cache during serialize
+        if (shadowCacheElement) {
+          // rehydrate from cached script element
           await this.performQuery();
-          // create client cache
-          this.createClientCache(this.client.extract());
-          this.requestUpdate();
-
-        }
-        if (!script && anyScripts) {
-          // fetch static cache
-          let staticCache = await getCache(staticCacheUrl);
-
-          if (staticCache) {
-            // create client cache
-            this.createClientCache(staticCache);
+        } else {
+          if (!alreadyInitialized) {
+            // perform gql query and set cache during serialize
             await this.performQuery();
-            this.requestUpdate();
-
+            // create client cache script element
+            this.createClientCache(this.client.extract());
+          } else {
+            // fetch pre-rendered static gql cache and hydrate
+            await this.fetchStaticCache();
           }
         }
+        this.requestUpdate();
         resolve();
       } catch (err) {
         reject(err);
+      }
+    });
+  }
+
+  fetchStaticCache() {
+    return new Promise(async(resolve, reject) => {
+      const staticCacheUrl = this.validatePath() + '/cache.json';
+      let staticCache = await getCache(staticCacheUrl);
+
+      if (staticCache) {
+        // create client cache
+        this.createClientCache(staticCache);
+        await this.performQuery();
+        this.requestUpdate();
+        resolve();
+      } else {
+        reject();
       }
     });
   }
@@ -102,6 +111,7 @@ class PageTemplate extends LitElement {
     script.innerText = `window.__APOLLO_STATE__ = ${state};`;
 
     this.shadowRoot.appendChild(script);
+    this.cacheWritten = true;
   }
 
   async setupShelf() {
