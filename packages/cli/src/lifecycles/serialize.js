@@ -6,7 +6,7 @@ const path = require('path');
 const PORT = '8000';
 const polyfillPath = path.join(process.cwd(), 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js');
 let polyfill = '';
-const runGraphQLServer = require('../../../plugin-graphql/src/server.js');
+const runGraphQLServer = require('../graphql/server.js');
 
 browserRunner = new BrowserRunner();
 

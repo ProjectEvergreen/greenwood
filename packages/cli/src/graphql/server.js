@@ -1,6 +1,6 @@
 const { ApolloServer } = require('apollo-server');
-const { createCache } = require('./lib/menu-queries');
-const { typeDefs, resolvers } = require('./schema');
+const createCache = require('./cache');
+const { typeDefs, resolvers } = require('./schemas');
 
 module.exports = ({ graph, context }) => {
 

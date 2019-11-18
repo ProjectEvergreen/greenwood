@@ -6,19 +6,8 @@ const { gql } = require('apollo-server-express');
 const InMemoryCache = require('apollo-cache-inmemory').InMemoryCache;
 const path = require('path');
 
-/* Queries */
-exports.getMenu = async (root, { name }, { graph }) => {
-  const items = graph
-    .filter((page) => page.menu === name)
-    .map(async({ title, route }) => {
-      return { path: route, name: title, items: [] };
-    });
-
-  return { name, items };
-};
-
 /* Extract cache server-side */
-exports.createCache = async (req, { publicDir }) => {
+module.exports = async (req, { publicDir }) => {
   let cache = '';
 
   return new Promise(async(resolve, reject) => {

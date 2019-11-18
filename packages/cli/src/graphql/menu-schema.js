@@ -1,7 +1,5 @@
 const { gql } = require('apollo-server-express');
-const {
-  getMenu
-} = require('../lib/menu-queries');
+const { getMenu } = require('./queries');
 
 exports.menuTypeDefs = gql`
   type Menu {

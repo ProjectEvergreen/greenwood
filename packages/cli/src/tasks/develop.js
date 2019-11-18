@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
-const runGraphQLServer = require('../../../plugin-graphql/src/server.js');
+const runGraphQLServer = require('../graphql/server.js');
 
 module.exports = runDevServer = async (compilation) => {
   return new Promise(async (resolve, reject) => {
