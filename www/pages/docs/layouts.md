@@ -103,3 +103,26 @@ customElements.define('app-root', AppComponent);
 ```
 
 > A working example can be found in the [greenwood source](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js) which is the default _app-template.js_ if no other is defined.
+
+
+### Pages
+You can create all your pages in a _pages/_ directory in your projects workspace.  You can also create nested pages and the page paths will map accordingly.
+
+For example, given this folder structure:
+```render shell
+.
+└── src
+    ├── pages
+        ├── blog
+        │   ├── first-post.md
+        │   └── second-post.md
+        └── index.md
+
+```
+
+You will have the following page URLs:
+- _/_
+- _/blog/first-post/_
+- _/blog/second-post/_
+
+> Note: there is a [known issue](https://github.com/ProjectEvergreen/greenwood/issues/132) where certain reserved words with Greenwood are not allowed as pages names.  These words are: _styles_, _templates_, and _pages_.
