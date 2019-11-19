@@ -6,19 +6,42 @@ import slackIcon from '../icons/slack-icon';
 
 class SocialIcons extends LitElement {
   render() {
+    const urls = {
+      github: 'https://github.com/ProjectEvergreen/greenwood',
+      slack: 'https://join.slack.com/t/thegreenhouseio/shared_invite/enQtMzcyMzE2Mjk1MjgwLTU5YmM1MDJiMTg0ODk4MjA4NzUwNWFmZmMxNDY5MTcwM2I0MjYxN2VhOTEwNDU2YWQwOWQzZmY1YzY4MWRlOGI',
+      twitter: 'https://twitter.com/PrjEvergreen'
+    };
+
     return html`
-    <style>
-      ${css}
-    </style>
-        <a class="icons" href="https://github.com/ProjectEvergreen" target="_blank" rel=”noreferrer noopener” aria-label="open github page">${githubIcon}</a>
-        <a href="https://join.slack.com/t/thegreenhouseio/shared_invite/enQtMzcyMzE2Mjk1MjgwLTU5YmM1MDJiMTg0ODk4MjA4NzUwNWFmZmMxNDY5MTcwM2I0MjYxN2VhOTEwNDU2YWQwOWQzZmY1YzY4MWRlOGI"
-         class="icons slack-icon"
-         target="_blank"
-         rel=”noreferrer noopener”
-         aria-label="slack">${slackIcon}</a>
-        <a href="https://twitter.com/PrjEvergreen" target="_blank" rel=”noreferrer noopener” aria-label="open twitter page">${twitterIcon}</a>
+      <style>
+        ${css}
+      </style>
+
+
+        <a class="icons" 
+          href="${urls.github}"
+          target="_blank" 
+          rel="noreferrer noopener" 
+          aria-label="open github page"
+          @onclick="getOutboundLink('${urls.github}'); return false;" 
+        >${githubIcon}</a>
+        
+        <a href="${urls.slack}"
+         class="icons slack-icon" 
+         target="_blank" 
+         rel="noreferrer noopener"
+         aria-label="slack"
+         @onclick="getOutboundLink('${urls.slack}'); return false;" 
+        >${slackIcon}</a>
+        
+        <a href="${urls.twitter}" 
+          target="_blank" 
+          rel="noreferrer noopener" 
+          aria-label="open twitter page"
+          @onclick="getOutboundLink('${urls.twitter}'); return false;" 
+        >${twitterIcon}</a>
     `;
   }
 }
 
-customElements.define('eve-socialicons', SocialIcons);
+customElements.define('eve-social-icons', SocialIcons);
