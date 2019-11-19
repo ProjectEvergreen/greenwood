@@ -17,29 +17,28 @@ class SocialIcons extends LitElement {
         ${css}
       </style>
 
-
-        <a class="icons" 
-          href="${urls.github}"
-          target="_blank" 
-          rel="noreferrer noopener" 
-          aria-label="open github page"
-          @onclick="getOutboundLink('${urls.github}'); return false;" 
-        >${githubIcon}</a>
-        
-        <a href="${urls.slack}"
-         class="icons slack-icon" 
-         target="_blank" 
-         rel="noreferrer noopener"
-         aria-label="slack"
-         @onclick="getOutboundLink('${urls.slack}'); return false;" 
-        >${slackIcon}</a>
-        
-        <a href="${urls.twitter}" 
-          target="_blank" 
-          rel="noreferrer noopener" 
-          aria-label="open twitter page"
-          @onclick="getOutboundLink('${urls.twitter}'); return false;" 
-        >${twitterIcon}</a>
+      <a class="icons" 
+        href="${urls.github}"
+        target="_blank" 
+        rel="noreferrer noopener" 
+        aria-label="open github page"
+        @onclick="getOutboundLink('${urls.github}'); return false;" 
+      >${githubIcon}</a>
+      
+      <a href="${urls.slack}"
+        class="icons slack-icon" 
+        target="_blank" 
+        rel="noreferrer noopener"
+        aria-label="slack"
+        @onclick="getOutboundLink('${urls.slack}'); return false;" 
+      >${slackIcon}</a>
+      
+      <a href="${urls.twitter}" 
+        target="_blank" 
+        rel="noreferrer noopener" 
+        aria-label="open twitter page"
+        @onclick="getOutboundLink('${urls.twitter}'); return false;" 
+      >${twitterIcon}</a>
     `;
   }
 }
