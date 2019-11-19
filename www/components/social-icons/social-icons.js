@@ -6,7 +6,7 @@ import slackIcon from '../icons/slack-icon';
 
 class SocialIcons extends LitElement {
   render() {
-    const urls = {
+    const socialUrls = {
       github: 'https://github.com/ProjectEvergreen/greenwood',
       slack: 'https://join.slack.com/t/thegreenhouseio/shared_invite/enQtMzcyMzE2Mjk1MjgwLTU5YmM1MDJiMTg0ODk4MjA4NzUwNWFmZmMxNDY5MTcwM2I0MjYxN2VhOTEwNDU2YWQwOWQzZmY1YzY4MWRlOGI',
       twitter: 'https://twitter.com/PrjEvergreen'
@@ -18,26 +18,26 @@ class SocialIcons extends LitElement {
       </style>
 
       <a class="icons" 
-        href="${urls.github}"
+        href="${socialUrls.github}"
         target="_blank" 
         rel="noreferrer noopener" 
         aria-label="open github page"
-        @onclick="getOutboundLink('${urls.github}'); return false;" 
+        @onclick="getOutboundLink('${socialUrls.github}'); return false;" 
       >${githubIcon}</a>
       
-      <a href="${urls.slack}"
+      <a href="${socialUrls.slack}"
         class="icons slack-icon" 
         target="_blank" 
         rel="noreferrer noopener"
         aria-label="slack"
-        @onclick="getOutboundLink('${urls.slack}'); return false;" 
+        @onclick="getOutboundLink('${socialUrls.slack}'); return false;" 
       >${slackIcon}</a>
       
-      <a href="${urls.twitter}" 
+      <a href="${socialUrls.twitter}" 
         target="_blank" 
         rel="noreferrer noopener" 
         aria-label="open twitter page"
-        @onclick="getOutboundLink('${urls.twitter}'); return false;" 
+        @onclick="getOutboundLink('${socialUrls.twitter}'); return false;" 
       >${twitterIcon}</a>
     `;
   }
