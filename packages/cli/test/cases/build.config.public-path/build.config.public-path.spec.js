@@ -41,7 +41,7 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      it('should serve assets from the configured publicPath', async () => {
+      it('should serve assets from the configured publicPath', () => {
         const publicPath = '/assets/';
         const scriptTags = dom.window.document.querySelectorAll('body script');
         const bundledScripts = Array.prototype.slice.call(scriptTags).filter(script => {

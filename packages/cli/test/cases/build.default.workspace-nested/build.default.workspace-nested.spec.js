@@ -24,7 +24,7 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Default Workspace w/ Nested Directories';
   let setup;
 
@@ -55,13 +55,13 @@ describe('Build Greenwood With: ', async function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'blog', '2019', './index.html'))).to.be.true;
       });
 
-      it('should have the expected heading text within the hello example page in the hello directory', async function() {
+      it('should have the expected heading text within the hello example page in the hello directory', function() {
         const heading = dom.window.document.querySelector('h3').textContent;
 
         expect(heading).to.equal('Blog Page');
       });
 
-      it('should have the expected paragraph text within the hello example page in the hello directory', async function() {
+      it('should have the expected paragraph text within the hello example page in the hello directory', function() {
         let paragraph = dom.window.document.querySelector('p').textContent;
 
         expect(paragraph).to.equal('This is the test blog page built by Greenwood.');

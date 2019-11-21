@@ -56,7 +56,7 @@ describe('Build Greenwood With: ', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
 
-      it('should have the expected font import', async function() {
+      it('should have the expected font import', function() {
         const styles = '@import url(//fonts.googleapis.com/css?family=Roboto';
         const styleTags = dom.window.document.querySelectorAll('head style');
         let importCount = 0;
@@ -70,7 +70,7 @@ describe('Build Greenwood With: ', function() {
         expect(importCount).to.equal(1);
       });
 
-      it('should have the expected font family', async function() {
+      it('should have the expected font family', function() {
         const styles = 'body{font-family:Roboto,sans-serif}';
         const styleTags = dom.window.document.querySelectorAll('head style');
         let fontCount = 0;
