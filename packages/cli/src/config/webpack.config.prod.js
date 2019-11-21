@@ -11,11 +11,11 @@ module.exports = ({ config, context, graph }) => {
 
     performance: {
       hints: 'warning'
-    },
+    }
 
-    plugins: [
-      new webpack.ProgressPlugin()
-    ]
+    // plugins: [
+    //   new webpack.ProgressPlugin()
+    // ]
 
   });
 

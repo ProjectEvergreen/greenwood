@@ -90,10 +90,11 @@ module.exports = readAndMergeConfig = async() => {
         }
 
         if (themeFile) {
-          if (typeof themeFile !== 'string' && themeFile.indexOf('.') < 1) {
+          if (typeof themeFile === 'string' && themeFile.indexOf('.') > 0) {
+            customConfig.themeFile = themeFile;
+          } else {
             reject(`Error: greenwood.config.js themeFile must be a valid filename. got ${themeFile} instead.`);
           }
-          customConfig.themeFile = themeFile;
         }
 
         if (devServer && Object.keys(devServer).length > 0) {
@@ -119,6 +120,7 @@ module.exports = readAndMergeConfig = async() => {
           }
         }
       }
+
       resolve({ ...defaultConfig, ...customConfig });
     } catch (err) {
       reject(err);
