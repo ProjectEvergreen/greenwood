@@ -7,11 +7,11 @@ import thunk from 'redux-thunk';
 // eslint-disable-next-line no-underscore-dangle
 const compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || origCompose;
 
-// eslint-disable-next-line
-const store = createStore(
-  (state, action) => state, // eslint-disable-line
-  compose(lazyReducerEnhancer(combineReducers), applyMiddleware(thunk)));
+const store = createStore((state) => state,
+  compose(lazyReducerEnhancer(combineReducers), applyMiddleware(thunk))
+);
 
+import '/lib/graphql-client'; // webpack alias to packages/cli/lib directory
 import '../index/index.js';
 import './list';
 

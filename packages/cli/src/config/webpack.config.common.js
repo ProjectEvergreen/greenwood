@@ -80,6 +80,13 @@ module.exports = ({ config, context }) => {
     .map((plugin) => plugin.provider({ config, context }));
 
   return {
+    
+    resolve: {
+      alias: {
+        '/lib/graphql-client': path.join(__dirname, '..', 'lib/graphql-client')
+      }
+    },
+
     entry: {
       index: path.join(context.scratchDir, 'app', 'app.js')
     },
