@@ -42,7 +42,8 @@ class BrowserRunner {
 
       if (
         interceptedRequestUrl.indexOf('bundle.js') >= 0 || // webpack bundles, webcomponents-bundle.js
-        interceptedRequestUrl === requestUrl // pages / routes
+        interceptedRequestUrl === requestUrl || // pages / routes
+        interceptedRequestUrl.indexOf('localhost:4000') >= 0 // Apollo GraphQL server
       ) {
         interceptedRequest.continue();
       } else {

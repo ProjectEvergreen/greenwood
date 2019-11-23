@@ -1,6 +1,7 @@
 const LocalWebServer = require('local-web-server');
 const BrowserRunner = require('../lib/browser');
 const fs = require('fs-extra');
+const graphServer = require('../lib/graphql-server');
 const path = require('path');
 
 module.exports = serializeBuild = async (compilation) => {
@@ -43,6 +44,9 @@ module.exports = serializeBuild = async (compilation) => {
       const indexContentsPolyfilled = indexContents.replace('<body>', `<script>${polyfill}</script><body>`);
 
       await fs.writeFile(indexContentsPath, indexContentsPolyfilled);
+
+      // TODO how does this get closed out?
+      graphServer(compilation);
 
       // "serialize" our SPA into a static site
       const server = localWebServer.listen({
