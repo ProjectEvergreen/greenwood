@@ -1,12 +1,31 @@
-import { html, LitElement } from 'lit-element';
+import { ApolloQuery, html } from '@apollo-elements/lit-apollo';
+import gql from 'graphql-tag';
 import '@evergreen-wc/eve-container';
+import client from '/lib/graphql-client';
 
 import headerCss from './header.css';
 import brand from '../../assets/brand.png';
 import '../components/social-icons/social-icons';
 
-class HeaderComponent extends LitElement {
+// TODO load queries via webpack
+// https://www.apollographql.com/docs/react/integrations/webpack/
+const query = gql`
+  query Query {
+    hello
+  }
+`;
+
+class HeaderComponent extends ApolloQuery {
+  
+  constructor() {
+    super();
+    this.client = client;
+    this.query = query;
+  }
+
   render() {
+    console.log('render header????', this.data);
+
     return html`
       <style>
         ${headerCss}
