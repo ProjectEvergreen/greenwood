@@ -10,8 +10,8 @@ const getUserWorkspaceDirectories = (source) => {
   return fs.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory);
 };
 
-const mapUserWorkspaceDirectories = (directoryPath, userWorkspaceDirectory) => {
-  // TODO undo naming / logic ?
+const mapUserWorkspaceDirectories = (directoryPath) => {
+  // TODO differentlogic ?
   // const directoryName = directoryPath.replace(`${userWorkspaceDirectory}/`, '');
   const directoryName = directoryPath.split('/')[directoryPath.split('/').length - 1];
   
@@ -55,6 +55,7 @@ module.exports = ({ config, context }) => {
   // this essentially helps us keep watch over changes from the user's workspace forgreenwood's build pipeline
   const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(userWorkspace)
     .map((directory) => {
+      // TODO confirm userWorkspace needed or not?
       return mapUserWorkspaceDirectories(directory, userWorkspace);
     });
 
