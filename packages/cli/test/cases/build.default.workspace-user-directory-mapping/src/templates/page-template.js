@@ -13,6 +13,7 @@ class PageTemplate extends LitElement {
         <div class='page-template blog-content content owen-test'>
           <entry></entry>
         </div>
+        <x-header></x-header>
       </div>
     `;
   }

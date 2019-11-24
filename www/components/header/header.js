@@ -4,10 +4,6 @@ import '@evergreen-wc/eve-container';
 import headerCss from './header.css';
 import brand from '../../assets/brand.png';
 import '../components/social-icons/social-icons';
-import service from '../../services/pages';
-// import '../../services/pages/pages'; TODO
-
-service('hello world');
 
 class HeaderComponent extends LitElement {
   render() {
