@@ -4,35 +4,59 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
+// TODO refactor
 const isDirectory = source => fs.lstatSync(source).isDirectory();
 const getUserWorkspaceDirectories = (source) => {
   return fs.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory);
 };
-const mapUserWorkspaceDirectory = (userPath) => {
-  const directory = userPath.split('/')[userPath.split('/').length - 1];
+
+const mapUserWorkspaceDirectories = (directoryPath, userWorkspaceDirectory) => {
+  // TODO undo naming / logic ?
+  // const directoryName = directoryPath.replace(`${userWorkspaceDirectory}/`, '');
+  const directoryName = directoryPath.split('/')[directoryPath.split('/').length - 1];
+  
+  // console.log('userWorkspaceDirectory', userWorkspaceDirectory);
+  // console.log('directoryPath', directoryPath);
+  // console.log('relativeDirectoryPath', relativeDirectoryPath);
 
   return new webpack.NormalModuleReplacementPlugin(
-    new RegExp(`${directory}`),
+    new RegExp(`${directoryName}\/`), 
     (resource) => {
-
+      // TODO cli/templates magic string - default? - scope to within userWorkspaceDirectory?
       // workaround to ignore cli/templates default imports when rewriting
+      // console.log('userWorkspaceDirectory', userWorkspaceDirectory);
       if (!new RegExp('\/cli\/templates').test(resource.request)) {
-        resource.request = resource.request.replace(new RegExp(`\.\.\/${directory}`), userPath);
+        // if (resource.request.indexOf('queries') >= 0) {
+        //   console.log('resource BEFORE????', resource);
+        // }
+        resource.request = resource.request.replace(new RegExp(`\.\.\/${directoryName}`), directoryPath);
       }
+
       // remove any additional nests, after replacement with absolute path of user workspace + directory
       const additionalNestedPathIndex = resource.request.lastIndexOf('..');
 
       if (additionalNestedPathIndex > -1) {
+        // console.log('relativeDirectoryPath', relativeDirectoryPath);
+        // console.log('resource AFTER????', resource);
+        // console.log('additionalNestedPathIndex????', additionalNestedPathIndex);
         resource.request = resource.request.substring(additionalNestedPathIndex + 2, resource.request.length);
+        // console.log('final answer !!!!!!!!!!!', resource.request);
+        // console.log('=========================');
       }
     }
+
   );
 };
 
 module.exports = ({ config, context }) => {
+  const { userWorkspace } = context;
+
   // dynamically map all the user's workspace directories for resolution by webpack
-  // this essentially helps us keep watch over changes from the user, and greenwood's build pipeline
-  const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map(mapUserWorkspaceDirectory);
+  // this essentially helps us keep watch over changes from the user's workspace forgreenwood's build pipeline
+  const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(userWorkspace)
+    .map((directory) => {
+      return mapUserWorkspaceDirectories(directory, userWorkspace);
+    });
 
   // if user has an assets/ directory in their workspace, automatically copy it for them
   const userAssetsDirectoryForWebpack = fs.existsSync(context.assetDir) ? [{
