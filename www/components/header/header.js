@@ -1,7 +1,7 @@
 import { ApolloQuery, html } from '@apollo-elements/lit-apollo';
 import gql from 'graphql-tag';
 import '@evergreen-wc/eve-container';
-import client from '/lib/graphql-client';
+import client from '/lib/graphql-client'; // TODO @greenwood/cli/???
 
 import headerCss from './header.css';
 import brand from '../../assets/brand.png';
