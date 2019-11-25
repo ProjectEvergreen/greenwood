@@ -9,26 +9,27 @@ const isDirectory = source => fs.lstatSync(source).isDirectory();
 const getUserWorkspaceDirectories = (source) => {
   return fs.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory);
 };
-
-const mapUserWorkspaceDirectories = (directoryPath) => {
+const mapUserWorkspaceDirectories = (directoryPath, userWorkspaceDirectory) => {
   // TODO differentlogic ?
-  // const directoryName = directoryPath.replace(`${userWorkspaceDirectory}/`, '');
+  // const directoryName = directoryPath.replace(`${userWorkspaceDirectory}`, '');
   const directoryName = directoryPath.split('/')[directoryPath.split('/').length - 1];
+  const userWorkspaceDirectoryRoot = userWorkspaceDirectory.split('/')[userWorkspaceDirectory.split('/').length - 1];
   
   // console.log('userWorkspaceDirectory', userWorkspaceDirectory);
+  // console.log('userWorkspaceDirectoryRoot', userWorkspaceDirectoryRoot);
   // console.log('directoryPath', directoryPath);
-  // console.log('relativeDirectoryPath', relativeDirectoryPath);
-
+  // console.log('directoryName', directoryName);
+  
   return new webpack.NormalModuleReplacementPlugin(
-    new RegExp(`${directoryName}\/`), 
+    // new RegExp(/^[^.]+$|\.(?!md$)([^.]+$)/),
+    new RegExp(`\\.\\.\\/${directoryName}|${userWorkspaceDirectoryRoot}\\/${directoryName}`),
+    // new RegExp(`\.\.\/${directoryName}`), 
     (resource) => {
       // TODO cli/templates magic string - default? - scope to within userWorkspaceDirectory?
       // workaround to ignore cli/templates default imports when rewriting
       // console.log('userWorkspaceDirectory', userWorkspaceDirectory);
-      if (!new RegExp('\/cli\/templates').test(resource.request)) {
-        // if (resource.request.indexOf('queries') >= 0) {
-        //   console.log('resource BEFORE????', resource);
-        // }
+      // console.log('resource.request!!!!!!', resource.request);
+      if (!new RegExp('\/cli\/templates').test(resource.content)) {
         resource.request = resource.request.replace(new RegExp(`\.\.\/${directoryName}`), directoryPath);
       }
 
@@ -36,7 +37,7 @@ const mapUserWorkspaceDirectories = (directoryPath) => {
       const additionalNestedPathIndex = resource.request.lastIndexOf('..');
 
       if (additionalNestedPathIndex > -1) {
-        // console.log('relativeDirectoryPath', relativeDirectoryPath);
+        // console.log('directoryName', directoryName);
         // console.log('resource AFTER????', resource);
         // console.log('additionalNestedPathIndex????', additionalNestedPathIndex);
         resource.request = resource.request.substring(additionalNestedPathIndex + 2, resource.request.length);
@@ -55,7 +56,6 @@ module.exports = ({ config, context }) => {
   // this essentially helps us keep watch over changes from the user's workspace forgreenwood's build pipeline
   const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(userWorkspace)
     .map((directory) => {
-      // TODO confirm userWorkspace needed or not?
       return mapUserWorkspaceDirectories(directory, userWorkspace);
     });
 

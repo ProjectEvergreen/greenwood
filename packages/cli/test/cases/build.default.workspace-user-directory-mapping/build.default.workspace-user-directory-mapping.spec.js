@@ -14,18 +14,19 @@
  *
  * User Workspace
  * src/
+ *   components/
+ *     header/
+ *       header.js
+ *   pages/
+ *     about.md
+ *     index.md
  *   services/
- *     pages.js
+ *     components.js
+ *     pages/
+ *       pages.js
  *   templates/
  *     page-template.js
  */
-// const expect = require('chai').expect;
-// const fs = require('fs');
-// const { JSDOM } = require('jsdom');
-// const path = require('path');
-
-// TODO get working / failing
-// TODO import '../../services/pages/pages';
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
