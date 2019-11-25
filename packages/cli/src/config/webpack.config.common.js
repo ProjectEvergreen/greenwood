@@ -4,16 +4,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
-// TODO refactor
-const isDirectory = source => fs.lstatSync(source).isDirectory();
 const getUserWorkspaceDirectories = (source) => {
-  return fs.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory);
+  return fs.readdirSync(source)
+    .map(name => path.join(source, name))
+    .filter(path => fs.lstatSync(path).isDirectory());
 };
 const mapUserWorkspaceDirectories = (directoryPath, userWorkspaceDirectory) => {
-  // TODO differentlogic ?
-  // const directoryName = directoryPath.replace(`${userWorkspaceDirectory}`, '');
-  const directoryName = directoryPath.split('/')[directoryPath.split('/').length - 1];
-  const userWorkspaceDirectoryRoot = userWorkspaceDirectory.split('/')[userWorkspaceDirectory.split('/').length - 1];
+  const directoryName = directoryPath.replace(`${userWorkspaceDirectory}/`, '');
+  const userWorkspaceDirectoryRoot = userWorkspaceDirectory.split('/').slice(-1);
   
   // console.log('userWorkspaceDirectory', userWorkspaceDirectory);
   // console.log('userWorkspaceDirectoryRoot', userWorkspaceDirectoryRoot);
@@ -28,7 +26,7 @@ const mapUserWorkspaceDirectories = (directoryPath, userWorkspaceDirectory) => {
       // TODO cli/templates magic string - default? - scope to within userWorkspaceDirectory?
       // workaround to ignore cli/templates default imports when rewriting
       // console.log('userWorkspaceDirectory', userWorkspaceDirectory);
-      // console.log('resource.request!!!!!!', resource.request);
+      // console.log('resource.request!!!!!!', resource.content);
       if (!new RegExp('\/cli\/templates').test(resource.content)) {
         resource.request = resource.request.replace(new RegExp(`\.\.\/${directoryName}`), directoryPath);
       }
