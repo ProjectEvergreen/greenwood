@@ -13,34 +13,21 @@ const mapUserWorkspaceDirectories = (directoryPath, userWorkspaceDirectory) => {
   const directoryName = directoryPath.replace(`${userWorkspaceDirectory}/`, '');
   const userWorkspaceDirectoryRoot = userWorkspaceDirectory.split('/').slice(-1);
   
-  // console.log('userWorkspaceDirectory', userWorkspaceDirectory);
-  // console.log('userWorkspaceDirectoryRoot', userWorkspaceDirectoryRoot);
-  // console.log('directoryPath', directoryPath);
-  // console.log('directoryName', directoryName);
-  
   return new webpack.NormalModuleReplacementPlugin(
-    // new RegExp(/^[^.]+$|\.(?!md$)([^.]+$)/),
-    new RegExp(`\\.\\.\\/${directoryName}|${userWorkspaceDirectoryRoot}\\/${directoryName}`),
-    // new RegExp(`\.\.\/${directoryName}`), 
+    // https://github.com/ProjectEvergreen/greenwood/issues/132
+    new RegExp(`\\.\\.\\/${directoryName}.+$(?<!\.js)|${userWorkspaceDirectoryRoot}\\/${directoryName}.+$(?<!\.js)`),
     (resource) => {
-      // TODO cli/templates magic string - default? - scope to within userWorkspaceDirectory?
+      
       // workaround to ignore cli/templates default imports when rewriting
-      // console.log('userWorkspaceDirectory', userWorkspaceDirectory);
-      // console.log('resource.request!!!!!!', resource.content);
       if (!new RegExp('\/cli\/templates').test(resource.content)) {
-        resource.request = resource.request.replace(new RegExp(`\.\.\/${directoryName}`), directoryPath);
+        resource.request = resource.request.replace(new RegExp(`\\.\\.\\/${directoryName}`), directoryPath);
       }
 
       // remove any additional nests, after replacement with absolute path of user workspace + directory
       const additionalNestedPathIndex = resource.request.lastIndexOf('..');
 
       if (additionalNestedPathIndex > -1) {
-        // console.log('directoryName', directoryName);
-        // console.log('resource AFTER????', resource);
-        // console.log('additionalNestedPathIndex????', additionalNestedPathIndex);
         resource.request = resource.request.substring(additionalNestedPathIndex + 2, resource.request.length);
-        // console.log('final answer !!!!!!!!!!!', resource.request);
-        // console.log('=========================');
       }
     }
 
