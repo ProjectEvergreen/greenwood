@@ -31,7 +31,7 @@ class HeaderComponent extends LitElement {
                 <li><a href="/plugins">Plugins</a></li>
               </ul>
             </nav>
-            <eve-socialicons></eve-socialicons>
+            <eve-social-icons></eve-social-icons>
           </div>
         </eve-container>
       </header>

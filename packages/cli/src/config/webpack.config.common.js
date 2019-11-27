@@ -93,7 +93,10 @@ module.exports = ({ config, context }) => {
     module: {
       rules: [{
         test: /\.js$/,
-        loader: 'babel-loader'
+        loader: 'babel-loader',
+        options: {
+          configFile: path.join(__dirname, 'babel.config.js')
+        }
       }, {
         test: /\.md$/,
         loader: 'wc-markdown-loader',
