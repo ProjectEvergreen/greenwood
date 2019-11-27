@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/cli",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Greenwood CLI.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -12,8 +12,8 @@
     "Lit Html",
     "Static Site Generator"
   ],
-  "engines" : { 
-    "node" : ">=10.x" 
+  "engines": {
+    "node": ">=10.x"
   },
   "bin": {
     "greenwood": "./src/index.js"
