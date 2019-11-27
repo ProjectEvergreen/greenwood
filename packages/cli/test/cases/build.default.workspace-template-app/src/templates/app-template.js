@@ -12,7 +12,7 @@ const store = createStore(
   (state, action) => state, // eslint-disable-line
   compose(lazyReducerEnhancer(combineReducers), applyMiddleware(thunk)));
 
-import '../index/index.js';
+import '../index/index';
 import './list';
 
 connectRouter(store);

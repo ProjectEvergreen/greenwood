@@ -11,8 +11,8 @@ const store = createStore((state) => state,
   compose(lazyReducerEnhancer(combineReducers), applyMiddleware(thunk))
 );
 
-import '/lib/graphql-client'; // webpack alias to packages/cli/lib directory
-import '../index/index.js';
+import '/lib/graphql-client'; // TODO webpack alias to packages/cli/lib directory
+import '../index/index';
 import './list';
 
 connectRouter(store);
