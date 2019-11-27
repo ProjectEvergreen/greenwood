@@ -5,6 +5,7 @@ import { lazyReducerEnhancer } from 'pwa-helpers/lazy-reducer-enhancer.js';
 import thunk from 'redux-thunk';
 import '../components/header/header';
 import '../components/footer/footer';
+import '../components/loading/loading';
 
 // eslint-disable-next-line no-underscore-dangle
 const compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || origCompose;
