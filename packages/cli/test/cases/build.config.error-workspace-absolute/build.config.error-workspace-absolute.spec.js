@@ -22,13 +22,13 @@ const TestBed = require('../../../../../test/test-bed');
 describe('Build Greenwood With: ', function() {
   let setup;
 
-  before(async () => {
+  before(async function() {
     setup = new TestBed();
     await setup.setupTestBed(__dirname);
   });
 
-  describe('Custom Configuration with a bad value (absolute path) for Workspace', () => {
-    it('should throw an error that workspace path must exist', async () => {
+  describe('Custom Configuration with a bad value (absolute path) for Workspace', function() {
+    it('should throw an error that workspace path must exist', async function() {
       try {
         await setup.runGreenwoodCommand('build');
       } catch (err) {

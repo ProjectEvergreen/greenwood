@@ -12,7 +12,7 @@
  * {
  *   plugins: [{
  *     type: 'index',
- *     provider: () => {
+ *     provider: function() {
  *       return {
  *         hookGreenwoodAnalytics: `
  *           <!-- some analytics code -->
@@ -21,7 +21,7 @@
  *     }
  *   }, {
  *     type: 'index',
- *     provider: () => {
+ *     provider: function() {
  *       return {
  *         hookGreenwoodPolyfills: `
  *           <!-- some polyfills code -->

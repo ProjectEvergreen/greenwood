@@ -32,8 +32,8 @@ describe('Build Greenwood With: ', function() {
     this.context = await setup.setupTestBed(__dirname);
   });
 
-  describe('Google Analytics Plugin with a bad value for analyticsId', () => {
-    it('should throw an error that analyticsId must be a string', async () => {
+  describe('Google Analytics Plugin with a bad value for analyticsId', function() {
+    it('should throw an error that analyticsId must be a string', async function() {
       try {
         await setup.runGreenwoodCommand('build');
       } catch (err) {

@@ -2,7 +2,7 @@ module.exports = {
   
   plugins: [{
     type: 'indexxx',
-    provider: () => { }
+    provider: function() { }
   }]
   
 };

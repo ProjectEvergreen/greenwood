@@ -101,7 +101,7 @@ Examples:
 Here are some thigns to keep in mind while writing your tests, due to the asynchronous nature of Greenwwood:
 - Make sure to wrap all calls to `TestBed` with `async`
 - All usages of `JSDOM` should be wrapped in `async`
-- If you need access to `this` to access mocha's contet in your test, _**don't**_ use an arrow function (e.g. `() => `) as this [can cause unexpected behaviors.](https://mochajs.org/#arrow-functions).  Just use `function` instead.
+- Avoid arrow functions in mocha tests (e.g. `() => `) as this [can cause unexpected behaviors.](https://mochajs.org/#arrow-functions).  Just use `function` instead.
 
 ## Internet Explorer
 For situations that require testing Internet Explorer or Edge browser, Microsoft [provides Virtual Machines](https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/) for various combinations of Windows and Internet Explorer versions.  [VirtualBox](https://www.virtualbox.org/) is a good platform to use for these VMs.

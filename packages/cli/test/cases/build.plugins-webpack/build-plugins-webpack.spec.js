@@ -14,7 +14,7 @@
  * {
  *   plugins: [{
  *     type: 'weboack',
- *     provider: () => {
+ *     provider: function() {
  *       return new webpack.BannerPlugin('Some custom text')
  *     }
  *   }]
