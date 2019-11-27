@@ -24,7 +24,6 @@
     "test:tdd": "yarn clean && mocha --watch ./packages/**/test/**/**/*.spec.js --timeout 15000"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.3",
     "chai": "^4.2.0",
     "eslint": "^5.15.3",
     "jsdom": "^14.0.0",
@@ -32,6 +31,5 @@
     "mocha": "^6.1.4",
     "nyc": "^14.0.0",
     "rimraf": "^2.6.3"
-  },
-  "dependencies": {}
+  }
 }
