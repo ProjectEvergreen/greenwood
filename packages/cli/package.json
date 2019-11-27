@@ -12,6 +12,9 @@
     "Lit Html",
     "Static Site Generator"
   ],
+  "engines" : { 
+    "node" : ">=10.x" 
+  },
   "bin": {
     "greenwood": "./src/index.js"
   },
