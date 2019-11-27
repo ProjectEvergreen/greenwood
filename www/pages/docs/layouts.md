@@ -119,5 +119,3 @@ You will have the following page URLs:
 - _/_
 - _/blog/first-post/_
 - _/blog/second-post/_
-
-> Note: there is a [known issue](https://github.com/ProjectEvergreen/greenwood/issues/132) where certain reserved words with Greenwood are not allowed as pages names.  These words are: _styles_, _templates_, and _pages_.
