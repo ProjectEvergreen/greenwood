@@ -1,7 +1,4 @@
 import { html, LitElement } from 'lit-element';
-import Prism from 'prismjs'; // eslint-disable-line no-unused-vars
-import '../components/header/header';
-import '../components/footer/footer';
 import '@evergreen-wc/eve-container';
 import '../components/shelf/shelf';
 import '../components/scroll/scroll';
@@ -44,8 +41,6 @@ class PageTemplate extends LitElement {
         ${pageCss}
       </style>
       METAELEMENT
-      <div class='wrapper'>
-        <eve-header></eve-header>
         <div class='content-wrapper'>
           <div class="sidebar">
             <eve-shelf .shelfList="${this.shelfList}"></eve-shelf>
@@ -58,8 +53,6 @@ class PageTemplate extends LitElement {
             </eve-container>
           </div>
         </div>
-        <eve-footer></eve-footer>
-      </div>
     `;
   }
 }

@@ -26,10 +26,10 @@
   },
   "dependencies": {
     "@babel/core": "^7.6.0",
-    "@babel/plugin-syntax-dynamic-import": "^7.7.4",
     "@babel/plugin-transform-runtime": "^7.6.2",
     "@babel/preset-env": "^7.6.0",
     "@babel/runtime": "^7.7.2",
+    "@greenwood/cli": "^0.4.2",
     "@webcomponents/webcomponentsjs": "^2.3.0",
     "babel-loader": "^8.0.5",
     "chalk": "^2.4.2",
