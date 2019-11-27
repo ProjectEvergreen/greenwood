@@ -87,7 +87,7 @@ module.exports = ({ config, context }) => {
     output: {
       path: path.join(context.publicDir, '.', config.publicPath),
       filename: '[name].[hash].bundle.js',
-      chunkFilename: '[name].bundle.js',
+      chunkFilename: '[name].[hash].bundle.js',
       publicPath: config.publicPath
     },
 
