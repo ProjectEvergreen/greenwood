@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit-element';
 import '../components/banner/banner';
-import '../components/card/card.js';
+import '../components/card/card';
 import '../components/header/header';
 import '../components/footer/footer';
 import '../components/row/row';

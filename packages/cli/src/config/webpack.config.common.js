@@ -4,21 +4,25 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
-const isDirectory = source => fs.lstatSync(source).isDirectory();
 const getUserWorkspaceDirectories = (source) => {
-  return fs.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory);
+  return fs.readdirSync(source)
+    .map(name => path.join(source, name))
+    .filter(path => fs.lstatSync(path).isDirectory());
 };
-const mapUserWorkspaceDirectory = (userPath) => {
-  const directory = userPath.split('/')[userPath.split('/').length - 1];
-
+const mapUserWorkspaceDirectories = (directoryPath, userWorkspaceDirectory) => {
+  const directoryName = directoryPath.replace(`${userWorkspaceDirectory}/`, '');
+  const userWorkspaceDirectoryRoot = userWorkspaceDirectory.split('/').slice(-1);
+  
   return new webpack.NormalModuleReplacementPlugin(
-    new RegExp(`${directory}`),
+    // https://github.com/ProjectEvergreen/greenwood/issues/132
+    new RegExp(`\\.\\.\\/${directoryName}.+$(?<!\.js)|${userWorkspaceDirectoryRoot}\\/${directoryName}.+$(?<!\.js)`),
     (resource) => {
-
+      
       // workaround to ignore cli/templates default imports when rewriting
-      if (!new RegExp('\/cli\/templates').test(resource.request)) {
-        resource.request = resource.request.replace(new RegExp(`\.\.\/${directory}`), userPath);
+      if (!new RegExp('\/cli\/templates').test(resource.content)) {
+        resource.request = resource.request.replace(new RegExp(`\\.\\.\\/${directoryName}`), directoryPath);
       }
+
       // remove any additional nests, after replacement with absolute path of user workspace + directory
       const additionalNestedPathIndex = resource.request.lastIndexOf('..');
 
@@ -26,13 +30,19 @@ const mapUserWorkspaceDirectory = (userPath) => {
         resource.request = resource.request.substring(additionalNestedPathIndex + 2, resource.request.length);
       }
     }
+
   );
 };
 
 module.exports = ({ config, context }) => {
+  const { userWorkspace } = context;
+
   // dynamically map all the user's workspace directories for resolution by webpack
-  // this essentially helps us keep watch over changes from the user, and greenwood's build pipeline
-  const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(context.userWorkspace).map(mapUserWorkspaceDirectory);
+  // this essentially helps us keep watch over changes from the user's workspace forgreenwood's build pipeline
+  const mappedUserDirectoriesForWebpack = getUserWorkspaceDirectories(userWorkspace)
+    .map((directory) => {
+      return mapUserWorkspaceDirectories(directory, userWorkspace);
+    });
 
   // if user has an assets/ directory in their workspace, automatically copy it for them
   const userAssetsDirectoryForWebpack = fs.existsSync(context.assetDir) ? [{
