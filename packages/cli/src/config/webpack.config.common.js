@@ -81,9 +81,12 @@ module.exports = ({ config, context }) => {
 
   return {
     
+    // TODO less specific alias, e.g. @greenwood/cli/data/*
+    // TODO resolve .gql automatically?
     resolve: {
       alias: {
-        '/lib/graphql-client': path.join(__dirname, '..', 'lib/graphql-client')
+        '@greenwood/cli/data/client': path.join(__dirname, '..', 'data/apollo-client'),
+        '@greenwood/cli/data/queries/hello': path.join(__dirname, '..', 'data/queries/hello.gql')
       }
     },
 
@@ -130,6 +133,10 @@ module.exports = ({ config, context }) => {
       }, {
         test: /\.(ttf|eot|svg|jpe?g|png|gif|otf)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: 'file-loader'
+      }, {
+        test: /\.(graphql|gql)$/,
+        exclude: /node_modules/,
+        loader: 'graphql-tag/loader'
       }]
     },
 

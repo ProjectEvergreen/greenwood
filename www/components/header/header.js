@@ -1,26 +1,18 @@
 import { ApolloQuery, html } from '@apollo-elements/lit-apollo';
-import gql from 'graphql-tag';
+import client from '@greenwood/cli/data/client';
+import HelloQuery from '@greenwood/cli/data/queries/hello';
 import '@evergreen-wc/eve-container';
-import client from '/lib/graphql-client'; // TODO @greenwood/cli/???
 
 import headerCss from './header.css';
 import brand from '../../assets/brand.png';
 import '../components/social-icons/social-icons';
-
-// TODO load queries via webpack
-// https://www.apollographql.com/docs/react/integrations/webpack/
-const query = gql`
-  query Query {
-    hello
-  }
-`;
 
 class HeaderComponent extends ApolloQuery {
   
   constructor() {
     super();
     this.client = client;
-    this.query = query;
+    this.query = HelloQuery;
   }
 
   render() {

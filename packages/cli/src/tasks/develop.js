@@ -1,4 +1,4 @@
-const graphServer = require('../lib/graphql-server');
+const graphServer = require('../data/apollo-server');
 const path = require('path');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');

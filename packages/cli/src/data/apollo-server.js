@@ -1,17 +1,6 @@
-const { ApolloServer, gql } = require('apollo-server');
+const { ApolloServer } = require('apollo-server');
+const { typeDefs, resolvers } = require('./schemas/schemas');
 // const createCache = require('./cache');
-
-const typeDefs = gql`
-  type Query {
-    hello: String
-  }
-`;
-
-const resolvers = {
-  Query: {
-    hello: () => 'Hello world!'
-  }
-};
 
 module.exports = ({ graph }) => {
 
@@ -38,4 +27,4 @@ module.exports = ({ graph }) => {
     console.log(`🚀  Server ready at ${url}`);
   });
 
-}; 
+};

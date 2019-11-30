@@ -1,7 +1,7 @@
 const LocalWebServer = require('local-web-server');
 const BrowserRunner = require('../lib/browser');
 const fs = require('fs-extra');
-const graphServer = require('../lib/graphql-server');
+const graphServer = require('../data/apollo-server');
 const path = require('path');
 
 module.exports = serializeBuild = async (compilation) => {

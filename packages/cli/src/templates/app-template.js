@@ -11,7 +11,7 @@ const store = createStore((state) => state,
   compose(lazyReducerEnhancer(combineReducers), applyMiddleware(thunk))
 );
 
-import '/lib/graphql-client'; // TODO webpack alias to packages/cli/lib directory
+import '@greenwood/cli/data/client';
 import '../index/index';
 import './list';
 
