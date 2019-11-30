@@ -1,13 +1,12 @@
 const { ApolloServer } = require('apollo-server');
-const { typeDefs, resolvers } = require('./schemas/schemas');
+const schema = require('./schema/schema');
 // const createCache = require('./cache');
 
 module.exports = ({ graph }) => {
 
   // Create schema
   const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema,
     playground: {
       endpoint: '/graphql',
       settings: {
