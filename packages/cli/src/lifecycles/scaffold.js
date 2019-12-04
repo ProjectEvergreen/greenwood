@@ -95,7 +95,11 @@ const writeRoutes = async(compilation) => {
       let data = await fs.readFile(compilation.context.appTemplatePath, 'utf8');
 
       const routes = compilation.graph.map(file => {
-        return `<lit-route path="${file.route}" component="eve-${file.label}" .resolve="\${() => import(${file.relativeExpectedPath})}" loading="eve-loading"></lit-route>\n\t\t\t\t`;
+        return `<lit-route
+          path="${file.route}"
+          component="eve-${file.label}"
+          .resolve="\${() => import(/* webpackChunkName: "${file.chunkName}" */ ${file.relativeExpectedPath})}"
+          loading="eve-loading"></lit-route>\n\t\t\t\t`;
       });
 
       const result = data.toString().replace(/MYROUTES/g, routes.join(''));
