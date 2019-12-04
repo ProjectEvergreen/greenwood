@@ -23,13 +23,6 @@ module.exports = {
   optimization: {
     splitChunks: {
       chunks: 'all',
-      minSize: 30000,
-      maxSize: 0,
-      minChunks: 1,
-      maxAsyncRequests: 6,
-      maxInitialRequests: 4,
-      automaticNameDelimiter: '~',
-      automaticNameMaxLength: 30,
       cacheGroups: {
         about: {
           test(module, chunks) {
@@ -38,8 +31,7 @@ module.exports = {
 
             return result;
           },
-          name: 'about',
-          chunks: 'all'
+          name: 'about'
         },
         docs: {
           test(module, chunks) {
@@ -48,8 +40,7 @@ module.exports = {
 
             return result;
           },
-          name: 'docs',
-          chunks: 'all'
+          name: 'docs'
         },
         gettingStarted: {
           test(module, chunks) {
@@ -58,8 +49,7 @@ module.exports = {
 
             return result;
           },
-          name: 'getting-started',
-          chunks: 'all'
+          name: 'getting-started'
         },
         plugins: {
           test(module, chunks) {
@@ -68,8 +58,7 @@ module.exports = {
 
             return result;
           },
-          name: 'plugins',
-          chunks: 'all'
+          name: 'plugins'
         }
       }
     }
