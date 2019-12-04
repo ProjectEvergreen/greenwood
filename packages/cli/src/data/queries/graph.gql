@@ -1,0 +1,6 @@
+query {
+  graph {
+    name
+    path
+  }
+}

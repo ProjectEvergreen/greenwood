@@ -86,7 +86,8 @@ module.exports = ({ config, context }) => {
     resolve: {
       alias: {
         '@greenwood/cli/data/client': path.join(__dirname, '..', 'data/apollo-client'),
-        '@greenwood/cli/data/queries/hello': path.join(__dirname, '..', 'data/queries/hello.gql')
+        '@greenwood/cli/data/queries/hello': path.join(__dirname, '..', 'data/queries/hello.gql'),
+        '@greenwood/cli/data/queries/graph': path.join(__dirname, '..', 'data/queries/graph.gql')
       }
     },
 

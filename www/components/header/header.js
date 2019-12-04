@@ -1,7 +1,10 @@
 import { ApolloQuery, html } from '@apollo-elements/lit-apollo';
 import client from '@greenwood/cli/data/client';
-import HelloQuery from '@greenwood/cli/data/queries/hello';
+// import HelloQuery from '@greenwood/cli/data/queries/hello';
+import NavigationQuery from '@greenwood/cli/data/queries/graph';
 import '@evergreen-wc/eve-container';
+
+console.log(NavigationQuery);
 
 import headerCss from './header.css';
 import brand from '../../assets/brand.png';
@@ -12,7 +15,7 @@ class HeaderComponent extends ApolloQuery {
   constructor() {
     super();
     this.client = client;
-    this.query = HelloQuery;
+    this.query = NavigationQuery;
   }
 
   render() {

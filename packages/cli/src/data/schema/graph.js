@@ -1,39 +1,40 @@
 const { gql } = require('apollo-server-express');
-// const { getMenu } = require('./queries');
 
-const graph = (root, { graph }) => {
-  return graph;
-  // .filter((page) => page.menu === name)
-  // .map(({ title, route }) => {
-  //   return { path: route, name: title, items: [] };
-  // });
+// TODO name needed?
+const graph = async (root, { name }, { graph }) => { // eslint-disable-line no-unused-vars
+  const pages = [];
+
+  graph
+    .forEach(async(node) => {
+      const { title, route } = node;
+
+      pages.push({
+        path: route, 
+        name: title
+      });
+    });
+
+  return pages;
 }; 
 
-exports.graphTypeDef = gql`
-  # type Page {
-  #   name: String!
-  #   path: String!
-  #   items: [MenuItem]
-  # }
+const graphTypeDef = gql`
+  type Page {
+    name: String
+    path: String
+  }
 
-  # type Pages {
-  #   name: String!
-  #   path: String!
-  #   items: [SubMenuItem]
-  # }
-
-  # type SubMenuItem {
-  #   name: String!
-  #   id: String!
-  # }
-
-  type GraphQuery {
-    graph
+  type Query {
+    graph: [Page]
   }
 `;
 
-exports.graphResolver = {
-  GraphQuery: {
+const graphResolver = {
+  Query: {
     graph
   }
-}; 
+};
+
+module.exports = {
+  graphTypeDef,
+  graphResolver
+};
