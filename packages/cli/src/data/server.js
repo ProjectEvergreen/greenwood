@@ -2,7 +2,8 @@ const { ApolloServer } = require('apollo-server');
 const schema = require('./schema/schema');
 // const createCache = require('./cache');
 
-module.exports = ({ graph }) => {
+module.exports = (compilation) => {
+  const { config, graph } = compilation;
 
   // Create schema
   const server = new ApolloServer({
@@ -17,13 +18,17 @@ module.exports = ({ graph }) => {
       if (req.query.q !== 'internal') {
         // await createCache(req, context);
       }
-      return { graph };
+
+      return { 
+        config,
+        graph 
+      };
     }
   });
 
   // The `listen` method launches a web server.
   server.listen().then(({ url }) => {
-    console.log(`🚀  Server ready at ${url}`);
+    console.log(`🚀 Data Server ready at ${url}`);
   });
 
 };

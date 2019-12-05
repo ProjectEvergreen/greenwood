@@ -1,8 +1,8 @@
 const { gql } = require('apollo-server-express');
 
-// TODO name needed?
-const graph = async (root, { name }, { graph }) => { // eslint-disable-line no-unused-vars
+const graph = async (root, params, context) => {
   const pages = [];
+  const { graph } = context;
 
   graph
     .forEach(async(node) => {
