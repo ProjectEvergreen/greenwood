@@ -11,6 +11,7 @@ const store = createStore((state) => state,
   compose(lazyReducerEnhancer(combineReducers), applyMiddleware(thunk))
 );
 
+// TODO is this working?
 import '@greenwood/cli/data/client';
 import '../index/index';
 import './list';

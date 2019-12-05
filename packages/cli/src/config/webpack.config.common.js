@@ -81,13 +81,10 @@ module.exports = ({ config, context }) => {
 
   return {
     
-    // TODO less specific alias, e.g. @greenwood/cli/data/*
-    // TODO resolve .gql automatically?
     resolve: {
+      extensions: ['.js', '.json', '.gql', '.graphql'],
       alias: {
-        '@greenwood/cli/data/client': path.join(__dirname, '..', 'data/apollo-client'),
-        '@greenwood/cli/data/queries/hello': path.join(__dirname, '..', 'data/queries/hello.gql'),
-        '@greenwood/cli/data/queries/graph': path.join(__dirname, '..', 'data/queries/graph.gql')
+        '@greenwood/cli/data': path.join(__dirname, '..', './data')
       }
     },
 

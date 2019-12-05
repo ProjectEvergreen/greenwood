@@ -1,7 +1,7 @@
 const LocalWebServer = require('local-web-server');
 const BrowserRunner = require('../lib/browser');
 const fs = require('fs-extra');
-const graphServer = require('../data/apollo-server');
+const dataServer = require('../data/server');
 const path = require('path');
 
 module.exports = serializeBuild = async (compilation) => {
@@ -46,7 +46,7 @@ module.exports = serializeBuild = async (compilation) => {
       await fs.writeFile(indexContentsPath, indexContentsPolyfilled);
 
       // TODO how does this get closed out?
-      graphServer(compilation);
+      dataServer(compilation);
 
       // "serialize" our SPA into a static site
       const server = localWebServer.listen({
