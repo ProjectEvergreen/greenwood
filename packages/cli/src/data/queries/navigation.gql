@@ -1,0 +1,6 @@
+query {
+  navigation{
+    title,
+    path
+  }
+}

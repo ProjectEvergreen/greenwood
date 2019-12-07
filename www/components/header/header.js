@@ -1,11 +1,7 @@
 import { ApolloQuery, html } from '@apollo-elements/lit-apollo';
 import client from '@greenwood/cli/data/client';
-// import HelloQuery from '@greenwood/cli/data/queries/hello';
-import NavigationQuery from '@greenwood/cli/data/queries/graph';
-import '@evergreen-wc/eve-container';
-
-console.log(NavigationQuery);
-
+import NavigationQuery from '@greenwood/cli/data/queries/navigation';
+import '@evergreen-wc/eve-container'
 import headerCss from './header.css';
 import brand from '../../assets/brand.png';
 import '../components/social-icons/social-icons';
@@ -18,8 +14,9 @@ class HeaderComponent extends ApolloQuery {
     this.query = NavigationQuery;
   }
 
+  /* eslint-disable indent */
   render() {
-    console.log('render header????', this.data);
+    const { navigation } = this.data;
 
     return html`
       <style>
@@ -39,10 +36,11 @@ class HeaderComponent extends ApolloQuery {
             </div>
             <nav>
               <ul>
-                <li><a href="/about">About</a></li>
-                <li><a href="/getting-started">Getting Started</a></li>
-                <li><a href="/docs">Docs</a></li>
-                <li><a href="/plugins">Plugins</a></li>
+                ${navigation.map((item) => {
+                  return html`
+                    <li><a href="${item.path}" title="Click to visit the ${item.title} page">${item.title}</a></li>
+                  `;
+                })}
               </ul>
             </nav>
             <eve-social-icons></eve-social-icons>
@@ -50,6 +48,7 @@ class HeaderComponent extends ApolloQuery {
         </eve-container>
       </header>
     `;
+    /* eslint-enable */
   }
 }
 
