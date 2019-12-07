@@ -53,18 +53,12 @@ const getNavigationFromGraph = async (root, query, context) => {
   return Object.keys(navigation).map((key) => {
     return navigation[key];
   });
-}; 
+};
 
-// TODO fully define Page schema definition
 const graphTypeDefs = gql`
   type Page {
     path: String
     title: String
-  }
-
-  type Navigation {
-    label: String
-    page: Page
   }
 
   type Query {

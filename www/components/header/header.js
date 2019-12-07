@@ -1,7 +1,7 @@
 import { ApolloQuery, html } from '@apollo-elements/lit-apollo';
 import client from '@greenwood/cli/data/client';
 import NavigationQuery from '@greenwood/cli/data/queries/navigation';
-import '@evergreen-wc/eve-container'
+import '@evergreen-wc/eve-container';
 import headerCss from './header.css';
 import brand from '../../assets/brand.png';
 import '../components/social-icons/social-icons';

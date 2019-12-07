@@ -1,18 +1,18 @@
 const { gql } = require('apollo-server');
 
-const helloTypeDef = gql`
-  type Query {
+const helloTypeDefs = gql`
+  type HelloQuery {
     hello: String
   }
 `;
 
-const helloResolver = {
-  Query: {
+const helloResolvers = {
+  HelloQuery: {
     hello: () => 'Hello world!'
   }
 };
 
 module.exports = {
-  helloTypeDef,
-  helloResolver
+  helloTypeDefs,
+  helloResolvers
 };

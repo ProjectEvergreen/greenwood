@@ -1,17 +1,16 @@
-// TODO Top Level Navigation query
 // TODO Sub navigation query
 const { makeExecutableSchema } = require('apollo-server-express');
-// const { helloTypeDef, helloResolver } = require('./hello');
+const { helloTypeDefs, helloResolvers } = require('./hello');
 const { graphTypeDefs, graphResolvers } = require('./graph');
 
 const schema = makeExecutableSchema({
   typeDefs: [
-    graphTypeDefs
-    // helloTypeDef
+    graphTypeDefs,
+    helloTypeDefs
   ],
   resolvers: Object.assign({}, 
-    graphResolvers
-    // helloResolver
+    graphResolvers,
+    helloResolvers
   )
 });
 
