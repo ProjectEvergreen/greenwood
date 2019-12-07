@@ -1,6 +1,6 @@
 query {
   graph {
-    path,
-    title
+    title,
+    link
   }
 }

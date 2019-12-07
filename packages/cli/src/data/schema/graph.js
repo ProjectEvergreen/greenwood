@@ -1,8 +1,8 @@
 const { gql } = require('apollo-server-express');
 
-const getTitleFromRoute = (route) => {
+const getDeriveMetaFromRoute = (route) => {
   const root = route.split('/')[1] || '';
-  const title = root
+  const label = root
     .replace('/', '')
     .replace('-', ' ')
     .split(' ')
@@ -10,7 +10,7 @@ const getTitleFromRoute = (route) => {
     .join(' ');
 
   return {
-    title,
+    label,
     root
   }; 
 };
@@ -22,10 +22,11 @@ const getPagesFromGraph = async (root, query, context) => {
   graph
     .forEach(async(page) => {
       const { route } = page;
+      const { label } = getDeriveMetaFromRoute(route);
 
       pages.push({
-        path: route, 
-        title: getTitleFromRoute(route).title
+        title: label,
+        link: route
       });
     });
 
@@ -39,12 +40,12 @@ const getNavigationFromGraph = async (root, query, context) => {
   graph
     .forEach(async(page) => {
       const { route } = page;
-      const root = getTitleFromRoute(route).root;
+      const { root, label } = getDeriveMetaFromRoute(route);
 
       if (root !== '' && !navigation[root]) {
         navigation[root] = {
-          title: getTitleFromRoute(route).title,
-          path: `/${root}/`
+          label,
+          link: `/${root}/`
         };
       }
     });
@@ -57,13 +58,18 @@ const getNavigationFromGraph = async (root, query, context) => {
 
 const graphTypeDefs = gql`
   type Page {
-    path: String
-    title: String
+    link: String
+    title: String,
+  }
+
+  type Navigation {
+    label: String,
+    link: String
   }
 
   type Query {
     graph: [Page]
-    navigation: [Page]
+    navigation: [Navigation]
   }
 `;
 

@@ -1,6 +1,6 @@
 query {
   navigation{
-    title,
-    path
+    label,
+    link
   }
 }
