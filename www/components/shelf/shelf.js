@@ -1,14 +1,16 @@
-import { html, LitElement } from 'lit-element';
+import { LitElement, html } from 'lit-element';
+import client from '@greenwood/cli/data/client';
+import ChildrenQuery from '@greenwood/cli/data/queries/children';
 import css from './shelf.css';
 import chevronRt from '../icons/chevron-right/chevron-right';
 import chevronDwn from '../icons/chevron-down/chevron-down';
 
-class shelf extends LitElement {
+class Shelf extends LitElement {
 
   static get properties() {
     return {
-      shelfList: {
-        type: Array
+      page: {
+        type: String
       }
     };
   }
@@ -17,12 +19,20 @@ class shelf extends LitElement {
     super();
     this.selectedIndex = '';
     this.shelfList = [];
+    this.page = '';
   }
 
   connectedCallback() {
     super.connectedCallback();
     this.collapseAll();
     this.expandRoute(window.location.pathname);
+  }
+
+  setupShelf(page) {
+    // console.log('setupShelf for page =>', page);
+    if (page !== '' && page !== '/') {
+      this.shelfList = require(`./${page}.json`);
+    }
   }
 
   goTo(path) {
@@ -102,8 +112,8 @@ class shelf extends LitElement {
 
       return listItems;
     };
-
     /* eslint-enable */
+
     return this.shelfList.map((list, index) => {
       let id = `index_${index}`;
       let chevron = list.items && list.items.length > 0
@@ -120,11 +130,28 @@ class shelf extends LitElement {
     });
   }
 
+  // TODO ApolloQuery?
+  updated() {
+    client.query({ 
+      query: ChildrenQuery, 
+      variables: {
+        parent: this.page
+      } 
+    }).then((response) => {
+      console.log('updated children ', response);
+    });
+  }
+
   render() {
+    const { page } = this;
+
+    this.setupShelf(page);
+
     return html`
-    <style>
-      ${css}
-    </style>
+      <style>
+        ${css}
+      </style>
+
       <div>
         <ul>
           ${this.renderList()}
@@ -134,4 +161,4 @@ class shelf extends LitElement {
   }
 }
 
-customElements.define('eve-shelf', shelf);
+customElements.define('eve-shelf', Shelf);

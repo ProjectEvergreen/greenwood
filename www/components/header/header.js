@@ -38,7 +38,7 @@ class HeaderComponent extends ApolloQuery {
               <ul>
                 ${navigation.map((item) => {
                   return html`
-                    <li><a href="${item.path}" title="Click to visit the ${item.label} page">${item.label}</a></li>
+                    <li><a href="${item.link}" title="Click to visit the ${item.label} page">${item.label}</a></li>
                   `;
                 })}
               </ul>

@@ -20,7 +20,7 @@ const getPagesFromGraph = async (root, query, context) => {
   const { graph } = context;
 
   graph
-    .forEach(async(page) => {
+    .forEach((page) => {
       const { route } = page;
       const { label } = getDeriveMetaFromRoute(route);
 
@@ -38,7 +38,7 @@ const getNavigationFromGraph = async (root, query, context) => {
   const { graph } = context;
 
   graph
-    .forEach(async(page) => {
+    .forEach((page) => {
       const { route } = page;
       const { root, label } = getDeriveMetaFromRoute(route);
 
@@ -56,6 +56,29 @@ const getNavigationFromGraph = async (root, query, context) => {
   });
 };
 
+const getChildrenFromParentRoute = async (root, query, context) => {
+  const pages = [];
+  const { parent } = query;
+  const { graph } = context;
+
+  graph
+    .forEach((page) => {
+      const { route } = page;
+      const root = route.split('/')[1];
+
+      if (root.indexOf(parent) >= 0) {
+        const { label } = getDeriveMetaFromRoute(route);
+
+        pages.push({
+          title: label,
+          link: route
+        });
+      }
+    });
+  
+  return pages;
+};
+
 const graphTypeDefs = gql`
   type Page {
     link: String
@@ -70,13 +93,15 @@ const graphTypeDefs = gql`
   type Query {
     graph: [Page]
     navigation: [Navigation]
+    children(parent: String): [Page]
   }
 `;
 
 const graphResolvers = {
   Query: {
     graph: getPagesFromGraph,
-    navigation: getNavigationFromGraph
+    navigation: getNavigationFromGraph,
+    children: getChildrenFromParentRoute
   }
 };
 

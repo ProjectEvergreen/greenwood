@@ -1,0 +1,6 @@
+query($parent: String!) {
+  children(parent: $parent) {
+    title,
+    link
+  }
+}
