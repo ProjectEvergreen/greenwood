@@ -129,8 +129,7 @@ class Shelf extends LitElement {
       `;
     });
   }
-
-  // TODO ApolloQuery?
+  
   updated() {
     client.query({ 
       query: ChildrenQuery, 

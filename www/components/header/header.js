@@ -1,4 +1,4 @@
-import { ApolloQuery, html } from '@apollo-elements/lit-apollo';
+import { LitElement, html } from 'lit-element';
 import client from '@greenwood/cli/data/client';
 import NavigationQuery from '@greenwood/cli/data/queries/navigation';
 import '@evergreen-wc/eve-container';
@@ -6,17 +6,34 @@ import headerCss from './header.css';
 import brand from '../../assets/brand.png';
 import '../components/social-icons/social-icons';
 
-class HeaderComponent extends ApolloQuery {
+class HeaderComponent extends LitElement {
   
+  static get properties() {
+    return {
+      navigation: {
+        type: Array
+      }
+    };
+  }
+
   constructor() {
     super();
-    this.client = client;
-    this.query = NavigationQuery;
+    this.navigation = [];
+  }
+
+  async connectedCallback() {
+    super.connectedCallback();
+
+    const response = await client.query({
+      query: NavigationQuery
+    });
+
+    this.navigation = response.data.navigation;
   }
 
   /* eslint-disable indent */
   render() {
-    const { navigation } = this.data;
+    const { navigation } = this;
 
     return html`
       <style>
@@ -25,6 +42,7 @@ class HeaderComponent extends ApolloQuery {
       <header class="header">
         <eve-container fluid>
           <div class="head-wrap">
+            
             <div class="brand">
               <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer"
                 @onclick="getOutboundLink('https://projectevergreen.github.io'); return false;" >
@@ -34,6 +52,7 @@ class HeaderComponent extends ApolloQuery {
                 <a href="/">Greenwood</a>
               </div>
             </div>
+
             <nav>
               <ul>
                 ${navigation.map((item) => {
@@ -43,7 +62,9 @@ class HeaderComponent extends ApolloQuery {
                 })}
               </ul>
             </nav>
+
             <eve-social-icons></eve-social-icons>
+
           </div>
         </eve-container>
       </header>
