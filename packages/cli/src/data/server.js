@@ -1,9 +1,9 @@
 const { ApolloServer } = require('apollo-server');
 const schema = require('./schema/schema');
-// const createCache = require('./cache');
+const createCache = require('./cache');
 
 module.exports = (compilation) => {
-  const { config, graph } = compilation;
+  const { config, graph, context } = compilation;
 
   // Create schema
   const server = new ApolloServer({
@@ -16,7 +16,8 @@ module.exports = (compilation) => {
     },
     context: async({ req }) => {
       if (req.query.q !== 'internal') {
-        // await createCache(req, context);
+        // TODO do we need a cache during development?
+        await createCache(req, context);
       }
 
       return { 
