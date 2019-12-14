@@ -3,7 +3,7 @@ const schema = require('./schema/schema');
 const createCache = require('./cache');
 
 module.exports = (compilation) => {
-  const { config, graph, context } = compilation;
+  const { graph, context } = compilation;
 
   // Create schema
   const server = new ApolloServer({
@@ -21,8 +21,7 @@ module.exports = (compilation) => {
         await createCache(req, context);
       }
       
-      return { 
-        config,
+      return {
         graph 
       };
     }
