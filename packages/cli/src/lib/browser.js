@@ -65,7 +65,7 @@ class BrowserRunner {
       // Navigate to page. Wait until there are no oustanding network requests.
       response = await page.goto(requestUrl, { timeout: 10000 });
     } catch (e) {
-      console.error(e);
+      console.error('browser error', e);
     }
 
     if (!response) {

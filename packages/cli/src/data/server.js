@@ -14,12 +14,13 @@ module.exports = (compilation) => {
         'editor.theme': 'light'
       }
     },
-    context: async({ req }) => {
+    context: async (integrationContext) => {
+      const { req } = integrationContext;
+
       if (req.query.q !== 'internal') {
-        // TODO do we need a cache during development?
         await createCache(req, context);
       }
-
+      
       return { 
         config,
         graph 
@@ -27,9 +28,5 @@ module.exports = (compilation) => {
     }
   });
 
-  // The `listen` method launches a web server.
-  server.listen().then(({ url }) => {
-    console.log(`🚀 Data Server ready at ${url}`);
-  });
-
+  return server;
 };
