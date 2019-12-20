@@ -16,9 +16,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Setup Chromium Library Dependencies
+    - name: Install Chromium Library Dependencies
       run: |
-        apt-get update \
+        sudo apt-get update \
         # See https://crbug.com/795759
         && apt-get install -yq libgconf-2-4 \
         # Install latest chrome dev package, which installs the necessary libs to
