@@ -15,10 +15,12 @@ const setDataForPages = async (context) => {
     const cacheRoot = pageRoot === 'index.html'
       ? ''
       : `${pageRoot}/`;
-    
-    const cacheFile = require(`${publicDir}/${cacheRoot}cache.json`);
+    const cacheFileLocation = `${publicDir}/${cacheRoot}cache.json`;
+    const cacheFileContents = fs.existsSync(cacheFileLocation)
+      ? require(cacheFileLocation)
+      : {};
 
-    fs.writeFileSync(pagePath, contents.replace('___DATA___', JSON.stringify(cacheFile)));
+    fs.writeFileSync(pagePath, contents.replace('___DATA___', JSON.stringify(cacheFileContents)));
   });
 };
 
@@ -42,7 +44,7 @@ module.exports = serializeBuild = async (compilation) => {
           const html = content
             .replace(polyfill, '')
             .replace('<script></script>', `
-              <script>
+              <script data-state="apollo">
                 window.__APOLLO_STATE__=___DATA___;
               </script> 
             `);
