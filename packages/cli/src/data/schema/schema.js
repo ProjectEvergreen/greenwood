@@ -1,4 +1,4 @@
-// TODO Sub navigation query
+// TODO merging resolvers not actually working, resolve as part of #21
 const { makeExecutableSchema } = require('apollo-server-express');
 const { helloTypeDefs, helloResolvers } = require('./hello');
 const { graphTypeDefs, graphResolvers } = require('./graph');
