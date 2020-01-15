@@ -19,7 +19,7 @@ client.query = (params) => {
   if (state) {
     // __APOLLO_STATE__ defined, in "SSG" mode...
 
-    // TODO do this wihtout the failure call?
+    // TODO do this witHout the failure call
     return backupQuery(params)
       .catch((err) => {
         console.log('efr', err);

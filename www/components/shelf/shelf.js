@@ -32,8 +32,10 @@ class Shelf extends LitElement {
     console.log('setupShelf for page =>', page);
 
     if (page && page !== '' && page !== '/') {
+      // TODO remove require call
       this.shelfList = require(`./${page}.json`);
 
+      // TODO not actually integrated, still using .json files
       const response = await client.query({
         query: ChildrenQuery,
         variables: {
@@ -138,17 +140,6 @@ class Shelf extends LitElement {
         </li>
       `;
     });
-  }
-  
-  updated() {
-    // client.query({ 
-    //   query: ChildrenQuery, 
-    //   variables: {
-    //     parent: this.page
-    //   } 
-    // }).then((response) => {
-    //   console.log('updated children ', response);
-    // });
   }
 
   render() {
