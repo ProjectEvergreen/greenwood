@@ -1,5 +1,6 @@
 const BrowserRunner = require('../lib/browser');
 const dataServer = require('../data/server');
+const deepmerge = require('deepmerge');
 const fs = require('fs-extra');
 const glob = require('glob-promise');
 const LocalWebServer = require('local-web-server');
@@ -14,13 +15,15 @@ const setDataForPages = async (context) => {
     const pageRoot = pagePath.replace(publicDir, '').split('/')[1];
     const cacheRoot = pageRoot === 'index.html'
       ? ''
-      : `${pageRoot}/`;
-    const cacheFileLocation = `${publicDir}/${cacheRoot}cache.json`;
-    const cacheFileContents = fs.existsSync(cacheFileLocation)
-      ? require(cacheFileLocation)
-      : {};
+      : `${pageRoot}`;
+    let cacheContents = {};
+   
+    // TODO avoid having to do this per page / root, each time
+    glob.sync(`${publicDir}/${cacheRoot}/*-cache.json`).forEach((file) => {
+      cacheContents = deepmerge(cacheContents, require(file));
+    });
 
-    fs.writeFileSync(pagePath, contents.replace('___DATA___', JSON.stringify(cacheFileContents)));
+    fs.writeFileSync(pagePath, contents.replace('___DATA___', JSON.stringify(cacheContents)));
   });
 };
 

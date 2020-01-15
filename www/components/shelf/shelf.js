@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit-element';
-// import client from '@greenwood/cli/data/client';
-// import ChildrenQuery from '@greenwood/cli/data/queries/children';
+import client from '@greenwood/cli/data/client';
+import ChildrenQuery from '@greenwood/cli/data/queries/children';
 import css from './shelf.css';
 import chevronRt from '../icons/chevron-right/chevron-right';
 import chevronDwn from '../icons/chevron-down/chevron-down';
@@ -28,10 +28,20 @@ class Shelf extends LitElement {
     this.expandRoute(window.location.pathname);
   }
 
-  setupShelf(page) {
-    // console.log('setupShelf for page =>', page);
-    if (page !== '' && page !== '/') {
+  async setupShelf(page) {
+    console.log('setupShelf for page =>', page);
+
+    if (page && page !== '' && page !== '/') {
       this.shelfList = require(`./${page}.json`);
+
+      const response = await client.query({
+        query: ChildrenQuery,
+        variables: {
+          parent: page
+        }
+      });
+
+      console.log('response', response.data);
     }
   }
 
