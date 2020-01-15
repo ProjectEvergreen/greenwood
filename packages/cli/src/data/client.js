@@ -11,5 +11,28 @@ const client = new ApolloClient({
   cache,
   link
 });
+const backupQuery = client.query;
+
+client.query = (params) => {
+  const state = window.__APOLLO_STATE__; // eslint-disable-line no-underscore-dangle
+
+  if (state) {
+    // __APOLLO_STATE__ defined, in "SSG" mode...
+
+    // TODO do this wihtout the failure call?
+    return backupQuery(params)
+      .catch((err) => {
+        console.log('efr', err);
+        console.log('error handling!  fetch from disk');
+        return fetch('./cache.json')
+          .then((data) => {
+            return new InMemoryCache().restore(data);
+          });
+      });
+  } else {
+    // __APOLLO_STATE__ NOT defined, in SPA mode
+    return backupQuery(params);
+  }
+};
 
 export default client;
