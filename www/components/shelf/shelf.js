@@ -32,7 +32,7 @@ class Shelf extends LitElement {
     console.log('setupShelf for page =>', page);
 
     if (page && page !== '' && page !== '/') {
-      // TODO remove require call
+      // TODO remove require call - #275
       this.shelfList = require(`./${page}.json`);
 
       // TODO not actually integrated, still using .json files

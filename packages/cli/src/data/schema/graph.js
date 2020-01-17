@@ -1,6 +1,7 @@
 const { gql } = require('apollo-server-express');
 
 const getDeriveMetaFromRoute = (route) => {
+  // TODO hardcoded root / depth - #273
   const root = route.split('/')[1] || '';
   const label = root
     .replace('/', '')
@@ -50,7 +51,7 @@ const getNavigationFromGraph = async (root, query, context) => {
       }
     });
 
-  // TODO best format for users, hash map?
+  // TODO best format for users, hash map? #271
   return Object.keys(navigation).map((key) => {
     return navigation[key];
   });
