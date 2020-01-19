@@ -43,7 +43,7 @@ class Shelf extends LitElement {
         }
       });
 
-      console.log('response from the shelf', response.data);
+      console.log('response from the shelf (data.children)', response.data.children);
     }
   }
 

@@ -2,35 +2,34 @@ import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { HttpLink } from 'apollo-link-http';
 
-const cache = new InMemoryCache().restore(window.__APOLLO_STATE__); // eslint-disable-line no-underscore-dangle
-const link = new HttpLink({
-  uri: 'http://localhost:4000'
-});
-
+const APOLLO_STATE = window.__APOLLO_STATE__; // eslint-disable-line no-underscore-dangle
 const client = new ApolloClient({
-  cache,
-  link
+  cache: new InMemoryCache().restore(APOLLO_STATE),
+  link: new HttpLink({
+    uri: 'http://localhost:4000'
+  })
 });
 const backupQuery = client.query;
 
 client.query = (params) => {
-  const state = window.__APOLLO_STATE__; // eslint-disable-line no-underscore-dangle
 
-  if (state) {
+  if (APOLLO_STATE) {
     // __APOLLO_STATE__ defined, in "SSG" mode...
-
     // TODO do this without the failure call
     return backupQuery(params)
       .catch((err) => {
-        console.log('efr', err);
-        console.log('error handling!  fetch from disk');
+        console.log('error handling!  fetch from disk', err);
         return fetch('./cache.json')
-          .then((data) => {
-            return new InMemoryCache().restore(data);
+          .then(response => response.json())
+          .then((response) => {
+            // mock client.query response
+            return {
+              data: new InMemoryCache().restore(response).readQuery(params)
+            };
           });
       });
   } else {
-    // __APOLLO_STATE__ NOT defined, in SPA mode
+    // __APOLLO_STATE__ NOT defined, in "SPA" mode
     return backupQuery(params);
   }
 };
