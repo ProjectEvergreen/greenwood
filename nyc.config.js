@@ -3,6 +3,7 @@ module.exports = {
   all: true,
   
   include: [
+    'packages/cli/src/data/*.js',
     'packages/cli/src/lib/*.js',
     'packages/cli/src/lifecycles/*.js',
     'packages/cli/src/plugins/*.js',
@@ -20,7 +21,7 @@ module.exports = {
   checkCoverage: true,
 
   statements: 80,
-  branches: 65,
+  branches: 70,
   functions: 85,
   lines: 80,
 

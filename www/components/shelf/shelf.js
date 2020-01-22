@@ -35,7 +35,7 @@ class Shelf extends LitElement {
       // TODO remove require call - #275
       this.shelfList = require(`./${page}.json`);
 
-      // TODO not actually integrated, still using .json files
+      // TODO not actually integrated, still using .json files - #271
       const response = await client.query({
         query: ChildrenQuery,
         variables: {
