@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood build command with GraphQL calls to get data about the projects graph
+ * Run Greenwood build command with GraphQL calls to get data about the projects graph.
  *
  * User Result
- * Should generate a Greenwood build that dynamically serializes data from the graph from the header
+ * Should generate a Greenwood build that dynamically serializes data from the graph from the header and in the page-template.
  * 
  * User Command
  * greenwood build
@@ -23,14 +23,19 @@
  *     app-template.js
  *     blog-template.js
  */
-const expect = require('chai').expect;
+const deepEqualInAnyOrder = require('deep-equal-in-any-order');
+const chai = require('chai');
+
+chai.use(deepEqualInAnyOrder);
+
+const { expect } = chai;
 const fs = require('fs');
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', function() {
+describe.only('Build Greenwood With: ', function() {
   const LABEL = 'Data from GraphQL';
   let setup;
 
@@ -48,7 +53,7 @@ describe('Build Greenwood With: ', function() {
     runSmokeTest(['public', 'not-found'], LABEL);
 
     describe('Home (Page Template) w/ Navigation Query', function() {
-      const cacheString = '{"ROOT_QUERY.navigation.0":{"label":"Blog","link":"/blog/","__typename":"Navigation"},"ROOT_QUERY":{"navigation":[{"type":"id","generated":true,"id":"ROOT_QUERY.navigation.0","typename":"Navigation"}]}}';
+      const expectedCache = {"ROOT_QUERY.navigation.0":{"label":"Blog","link":"/blog/","__typename":"Navigation"},"ROOT_QUERY":{"navigation":[{"type":"id","generated":true,"id":"ROOT_QUERY.navigation.0","typename":"Navigation"}]}};  // eslint-disable-line
 
       beforeEach(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
@@ -77,7 +82,7 @@ describe('Build Greenwood With: ', function() {
       it('should output one cache.json file with expected cache contents', async function() {
         const cacheContents = require(path.join(this.context.publicDir, './cache.json'));
 
-        expect(JSON.stringify(cacheContents)).to.equal(cacheString);
+        expect(cacheContents).to.be.deep.equalInAnyOrder(expectedCache);
       });
 
       it('should have one window.__APOLLO_STATE__ <script> tag set in index.html', () => {
@@ -87,7 +92,7 @@ describe('Build Greenwood With: ', function() {
         });
 
         expect(apolloScriptTags.length).to.be.equal(1);
-        expect(apolloScriptTags[0].innerHTML).to.contain(`window.__APOLLO_STATE__=${cacheString}`);
+        expect(apolloScriptTags[0].innerHTML).to.contain(`window.__APOLLO_STATE__=${JSON.stringify(expectedCache)}`);
       });
 
       it('should have a <header> tag in the <body>', function() {
@@ -107,9 +112,9 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('Blog Page (Template) w/ Navigation adn Children Query', function() {
-      const cacheString = '{"ROOT_QUERY.children({\"parent\":\"blog\"}).0":{"title":"Blog","link":"/blog/first-post","__typename":"Page"},"ROOT_QUERY.children({\"parent\":\"blog\"}).1":{"title":"Blog","link":"/blog/second-post","__typename":"Page"},"ROOT_QUERY":{"children({\"parent\":\"blog\"})":[{"type":"id","generated":true,"id":"ROOT_QUERY.children({\"parent\":\"blog\"}).0","typename":"Page"},{"type":"id","generated":true,"id":"ROOT_QUERY.children({\"parent\":\"blog\"}).1","typename":"Page"}]}';
-
+    describe('Blog Page (Template) w/ Navigation and Children Query', function() {
+      const expectedCache = {"ROOT_QUERY.children({\"parent\":\"blog\"}).0":{"title":"Blog","link":"/blog/first-post","__typename":"Page"},"ROOT_QUERY.children({\"parent\":\"blog\"}).1":{"title":"Blog","link":"/blog/second-post","__typename":"Page"},"ROOT_QUERY":{"children({\"parent\":\"blog\"})":[{"type":"id","generated":true,"id":"ROOT_QUERY.children({\"parent\":\"blog\"}).0","typename":"Page"},{"type":"id","generated":true,"id":"ROOT_QUERY.children({\"parent\":\"blog\"}).1","typename":"Page"}],"navigation":[{"type":"id","generated":true,"id":"ROOT_QUERY.navigation.0","typename":"Navigation"}]},"ROOT_QUERY.navigation.0":{"label":"Blog","link":"/blog/","__typename":"Navigation"}}; // eslint-disable-line
+      
       beforeEach(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'blog', 'first-post', 'index.html'));
       });
@@ -122,12 +127,10 @@ describe('Build Greenwood With: ', function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'blog', 'cache.json'))).to.have.lengthOf(1);
       });
 
-      xit('should output one cache.json file with expected cache contents', function() {
+      it('should output one cache.json file with expected cache contents', function() {
         const cacheContents = require(path.join(this.context.publicDir, 'blog', 'cache.json'));
 
-        console.log('cacheContents', JSON.stringify(cacheContents));
-        console.log('cacheString', cacheString);
-        expect(JSON.stringify(cacheContents)).to.equal(cacheString);
+        expect(cacheContents).to.be.deep.equalInAnyOrder(expectedCache);
       });
 
       xit('should have one window.__APOLLO_STATE__ <script> tag set in index.html', () => {
@@ -137,7 +140,7 @@ describe('Build Greenwood With: ', function() {
         });
 
         expect(apolloScriptTags.length).to.be.equal(1);
-        expect(apolloScriptTags[0].innerHTML).to.contain(`window.__APOLLO_STATE__=${cacheString}`);
+        expect(apolloScriptTags[0].innerHTML).to.contain(`window.__APOLLO_STATE__=${expectedCache}`);
       });
 
       xit('should have a <header> tag in the <body>', function() {

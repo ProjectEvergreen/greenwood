@@ -23,6 +23,7 @@ class BlogTemplate extends LitElement {
   }
 
   async connectedCallback() {
+    super.connectedCallback();
     const response = await client.query({
       query: ChildrenQuery,
       variables: {
