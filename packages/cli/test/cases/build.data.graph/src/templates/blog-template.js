@@ -46,16 +46,19 @@ class BlogTemplate extends LitElement {
 
         <entry></entry>
 
-        <h1>More Posts</h1>
-        <ul>
-          ${posts.map((item) => {
-            return html`
-              <li>
-                <a href="${item.link}" title="Click to read my ${item.label} blog post">${item.label}</a>
-              </li>
-            `;
-          })}
-        </ul>
+        <div class="posts">
+          <h1>More Posts</h1>
+
+          <ul>
+            ${posts.map((item) => {
+              return html`
+                <li>
+                  <a href="${item.link}/" title="Click to read my ${item.title} blog post">${item.title}</a>
+                </li>
+              `;
+            })}
+          </ul>
+        </div>
 
       </div>
     `;
