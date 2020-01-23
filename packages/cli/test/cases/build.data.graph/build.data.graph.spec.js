@@ -23,12 +23,7 @@
  *     app-template.js
  *     blog-template.js
  */
-const deepEqualInAnyOrder = require('deep-equal-in-any-order');
-const chai = require('chai');
-
-chai.use(deepEqualInAnyOrder);
-
-const { expect } = chai;
+const expect = require('chai').expect;
 const fs = require('fs');
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');

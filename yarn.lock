@@ -2,31 +2,6 @@
 # yarn lockfile v1
 
 
-"@apollo-elements/lib@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@apollo-elements/lib/-/lib-1.1.1.tgz#acca9f65b9f5fc1d1177fb358eed5ed491c4fa10"
-  integrity sha512-LHE6Hjk+X8ryDSZ9GdqfXWzFUSjtf1hyuew5zgvXA63usd7MgEZHaSL5hLUC7r5jr291wr3ifxCC5AQdsWv7eg==
-  dependencies:
-    crocks "^0.11.1"
-    graphql "^14.4.1"
-    graphql-tag "^2.10.1"
-
-"@apollo-elements/lit-apollo@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@apollo-elements/lit-apollo/-/lit-apollo-1.1.1.tgz#053d644b43c71d75a67ee33468648ef1f91032e5"
-  integrity sha512-p3cAIYe/lip0kOe5zHyOaaQD8iZG88rbWmSBg1CQHQ4qcjGBtyjq4OXaBCNI0hDyWEY9W2oHUyrmhqqwQvO59Q==
-  dependencies:
-    "@apollo-elements/mixins" "^1.1.1"
-
-"@apollo-elements/mixins@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@apollo-elements/mixins/-/mixins-1.1.1.tgz#6039c0659665526a04548891ab57df7cfb4157ca"
-  integrity sha512-0kkzNODLNPg7QkHBbFcEl6oUoK9vJLvSD6AN1sglOn1870rOWzQNT04jySQ0eDSbvg70nowMyldAAGeUDfbWFQ==
-  dependencies:
-    "@apollo-elements/lib" "^1.1.1"
-    apollo-client "^2.6.0"
-    crocks "^0.11.1"
-
 "@apollo/protobufjs@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@apollo/protobufjs/-/protobufjs-1.0.3.tgz#02c655aedd4ba7c7f64cbc3d2b1dd9a000a391ba"
@@ -2257,7 +2232,7 @@ apollo-cache@1.3.2, apollo-cache@^1.3.2:
     apollo-utilities "^1.3.2"
     tslib "^1.9.3"
 
-apollo-client@^2.6.0, apollo-client@^2.6.4:
+apollo-client@^2.6.4:
   version "2.6.4"
   resolved "https://registry.yarnpkg.com/apollo-client/-/apollo-client-2.6.4.tgz#872c32927263a0d34655c5ef8a8949fbb20b6140"
   integrity sha512-oWOwEOxQ9neHHVZrQhHDbI6bIibp9SHgxaLRVPoGvOFy7OH5XUykZE7hBQAVxq99tQjBzgytaZffQkeWo1B4VQ==
@@ -3973,11 +3948,6 @@ create-hmac@^1.1.0, create-hmac@^1.1.2, create-hmac@^1.1.4:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-crocks@^0.11.1:
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/crocks/-/crocks-0.11.1.tgz#58a59e0a565258ece048540f6f287525e129f08c"
-  integrity sha512-MSaMHvzKugK4iX97VzUty+bdhDN+3MVfGrllye/P7qKGeHnRU7/ich+j0YzIN3SP4cEIFnQplTuAat0c1pLiCg==
-
 cross-spawn@6.0.5, cross-spawn@^6.0.0, cross-spawn@^6.0.5:
   version "6.0.5"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-6.0.5.tgz#4a5ec7c64dfae22c3a14124dbacdee846d80cbc4"
@@ -4375,14 +4345,6 @@ deep-eql@^3.0.1:
   integrity sha512-+QeIQyN5ZuO+3Uk5DYh6/1eKO0m0YmJFGNmFHGACpf1ClL1nmlV/p4gNgbl2pJGxgXb4faqo6UE+M5ACEMyVcw==
   dependencies:
     type-detect "^4.0.0"
-
-deep-equal-in-any-order@^1.0.21:
-  version "1.0.21"
-  resolved "https://registry.yarnpkg.com/deep-equal-in-any-order/-/deep-equal-in-any-order-1.0.21.tgz#3d357e22caa894507210c42108a5e0cd162375b5"
-  integrity sha512-hIWy3f/G54z9He08FGWIxAm4XmBRVax/tf8HI+9mNXJeDq7B/JUXcdBKTspQcBYAZoUTg5ipZtznEi1/Qv0nxQ==
-  dependencies:
-    lodash "^4.17.15"
-    sort-any "^1.1.19"
 
 deep-equal@^1.0.1, deep-equal@~1.0.1:
   version "1.0.1"
@@ -5964,7 +5926,7 @@ graphql-upload@^8.0.2:
     http-errors "^1.7.3"
     object-path "^0.11.4"
 
-graphql@^14.4.1, graphql@^14.5.3, graphql@^14.5.8:
+graphql@^14.5.3, graphql@^14.5.8:
   version "14.5.8"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-14.5.8.tgz#504f3d3114cb9a0a3f359bbbcf38d9e5bf6a6b3c"
   integrity sha512-MMwmi0zlVLQKLdGiMfWkgQD7dY/TUKt4L+zgJ/aR0Howebod3aNgP5JkgvAULiR2HPVZaP2VEElqtdidHweLkg==
@@ -7652,7 +7614,7 @@ lodash@3.10.1, lodash@^3.10.1, lodash@^3.2.0:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
   integrity sha1-W/Rejkm6QYnhfUgnid/RW9FAt7Y=
 
-"lodash@>=3.5 <5", lodash@^4.17.11, lodash@^4.17.12, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.2, lodash@^4.17.3, lodash@^4.17.5, lodash@^4.2.1:
+"lodash@>=3.5 <5", lodash@^4.17.11, lodash@^4.17.12, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.2, lodash@^4.17.3, lodash@^4.17.5, lodash@^4.2.1:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
@@ -11158,13 +11120,6 @@ socks@~2.3.2:
   dependencies:
     ip "^1.1.5"
     smart-buffer "4.0.2"
-
-sort-any@^1.1.19:
-  version "1.1.19"
-  resolved "https://registry.yarnpkg.com/sort-any/-/sort-any-1.1.19.tgz#028488cc2340e7cca6da85fd4c0f9270c9798320"
-  integrity sha512-RbbHSbTg7b9K+89nj/Fyv7WpGMAIEvqvmS6B3RzsSIVn0eDpCWJuvLGB8vjCisLtWeN3FYwfYg5EGEQO+oOtvQ==
-  dependencies:
-    lodash "^4.17.15"
 
 sort-keys@^2.0.0:
   version "2.0.0"
