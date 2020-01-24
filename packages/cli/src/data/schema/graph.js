@@ -22,10 +22,15 @@ const getPagesFromGraph = async (root, query, context) => {
 
   graph
     .forEach((page) => {
-      const { route } = page;
+      const { route, mdFile, fileName, template } = page;
+      const id = page.label;
       const { label } = getDeriveMetaFromRoute(route);
 
       pages.push({
+        id,
+        filePath: mdFile,
+        fileName,
+        template,
         title: label,
         link: route
       });
@@ -64,13 +69,18 @@ const getChildrenFromParentRoute = async (root, query, context) => {
 
   graph
     .forEach((page) => {
-      const { route } = page;
+      const { route, mdFile, fileName, template } = page;
       const root = route.split('/')[1];
 
       if (root.indexOf(parent) >= 0) {
         const { label } = getDeriveMetaFromRoute(route);
+        const id = page.label;
 
         pages.push({
+          id,
+          filePath: mdFile,
+          fileName,
+          template,
           title: label,
           link: route
         });
@@ -82,8 +92,12 @@ const getChildrenFromParentRoute = async (root, query, context) => {
 
 const graphTypeDefs = gql`
   type Page {
-    link: String
-    title: String,
+    id: String,
+    filePath: String,
+    fileName: String,
+    template: String,
+    link: String,
+    title: String
   }
 
   type Navigation {

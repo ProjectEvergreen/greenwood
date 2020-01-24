@@ -1,6 +1,10 @@
 query {
   graph {
+    id,
     title,
-    link
+    link,
+    filePath,
+    fileName,
+    template
   }
 }
