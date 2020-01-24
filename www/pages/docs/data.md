@@ -1,9 +1,7 @@
 ## Data Sources
-
-### Overview
 Having to repeat things when programming is no fun, and that's why (web) component based development is so useful!  As websites start to grow, there comes a point where being able to have access to the content and structure of your site's layout and configuration as part of the development process becomes essential towards maintainability, performance, and scalability.
 
-As an example, if you are developing a blog site, like in our [Getting Started](/getting-started/) guide, having to list a couple blogs posts isn't so bad.
+As an example, if you are developing a blog site, like in our [Getting Started](/getting-started/) guide, having to list a couple blogs posts by hand isn't so bad.
 
 ```render html
 <ul>
@@ -41,8 +39,17 @@ To kick things off, let's review what is availalble to you from.  Currently, the
 This is that the schema looks like:
 ```render javascript
 graph {
+  id, // (string) the unique ID given to the generated component as it's selector e.g. \`<wc-md-id></wc-md-id>\`
+
   link,  // (string) A URL link, typically derived from the filesystem path, e.g. /blog/2019/first-post/ 
-  title  // (string) Useful for a page's <title> tag or the title attribute for an <a> tag, inferred from the filesystem path, e.g. "First Post"
+  
+  title,  // (string) Useful for a page's <title> tag or the title attribute for an <a> tag, inferred from the filesystem path, e.g. "First Post"
+  
+  filePath, // (string) path to file
+
+  fileName, // (string) file name without extension/path, so that it can be copied to scratch dir with same name
+
+  template // (string) page template used for the page 
 }
 ```
 
@@ -60,8 +67,12 @@ The Graph query returns an array of all pages.
 ```render javascript
 query {
   graph {
+    id,
+    title,
     link,
-    title
+    filePath,
+    fileName,
+    template
   }
 }
 ```
@@ -69,21 +80,42 @@ query {
 ##### Usage
 `import` the query in your component
 ```render javascript
+import client from '@greenwood/cli/data/client';
 import GraphQuery from '@greenwood/cli/data/queries/graph';
-```
 
+.
+.
+.
+
+async connectedCallback() {
+  super.connectedCallback();
+  const response = await client.query({
+    query: GraphQuery
+  });
+
+  this.posts = response.data.graph;
+}
+```
 
 ##### Response
 This will return the full `graph` of all pages as an array
 ```render javascript
 [
   {
+    id: "dd1ec2ef00cc386",
     title: "Blog",
-    link: "/blog/2019/first-post/"
+    link: "/blog/2019/first-post",
+    filePath: "./blog/2019/first-post.md",
+    fileName: "first-post",
+    template: "blog"
   },
   {
+    id: "9d2b98c69ab0867"
     title: "Blog",
-    link: "/blog/2019/second-post/"
+    link: "/blog/2019/second-post",
+    filePath: "./blog/2019/second-post.md",
+    fileName: "second-post",
+    template: "blog"
   }
 ]
 ```
@@ -104,7 +136,22 @@ query {
 ##### Usage
 `import` the query in your component
 ```render javascript
+import client from '@greenwood/cli/data/client';
 import NavigationQuery from '@greenwood/cli/data/queries/navigation';
+
+.
+.
+.
+
+async connectedCallback() {
+  super.connectedCallback();
+
+  const response = await client.query({
+    query: NavigationQuery
+  });
+
+  this.navigation = response.data.navigation;
+}
 ```
 
 
@@ -115,6 +162,69 @@ This will return the full `graph` of all top level routes as a Page array
   {
     label: "Blog",
     link: "/blog/"
+  }
+]
+```
+
+#### Children
+The Children query returns an array of all pages below a given top level route.
+
+##### Defintion
+```render javascript
+query {
+  children {
+    id,
+    title,
+    link,
+    filePath,
+    fileName,
+    template
+  }
+}
+```
+
+##### Usage
+`import` the query in your component
+```render javascript
+import client from '@greenwood/cli/data/client';
+import ChildrenQuery from '@greenwood/cli/data/queries/cnildren';
+
+.
+.
+.
+
+async connectedCallback() {
+  super.connectedCallback();
+  const response = await client.query({
+    query: ChildrenQuery,
+    variables: {
+      parent: 'blog'
+    }
+  });
+
+  this.posts = response.data.children;
+}
+```
+
+##### Response
+This will return the full `graph` of all pages as an array that are under a given root, e.g. _/blog_.
+```render javascript
+[
+  {
+    id: "dd1ec2ef00cc386",
+    title: "Blog",
+    link: "/blog/2019/first-post",
+    filePath: "./blog/2019/first-post.md",
+    fileName: "first-post",
+    template: "blog"
+  },
+  {
+    id: "9d2b98c69ab0867"
+    title: "Blog",
+    link: "/blog/2019/second-post",
+    filePath: "./blog/2019/first-post.md",
+    fileName: "second-post",
+    template: "blog"
   }
 ]
 ```
@@ -148,42 +258,63 @@ const query = gql\`
 
 Then you can use `import` anywhere in your components!
 
-#### Connected Components
-Now of course comes the fun part, actually using it within your component!  In this case, you'll want to have your component [`extend ApolloQuery`](https://www.npmjs.com/package/@apollo-elements/lit-apollo) and include Greenwood's client module for connecting your component to the graph.
+#### Complete Example
+Now of course comes the fun part, actually seeing it all come together.  Here is an example from the Greenwood website's own [header component](https://github.com/ProjectEvergreen/greenwood/blob/master/www/components/header/header.js).
 
 ```render javascript
-import { ApolloQuery, html } from '@apollo-elements/lit-apollo';
+import { LitElement, html } from 'lit-element';
 import client from '@greenwood/cli/data/client';
 import NavigationQuery from '@greenwood/cli/data/queries/navigation';
 
-class NavigationComponent extends ApolloQuery {
+class HeaderComponent extends LitElement {
   
+  static get properties() {
+    return {
+      navigation: {
+        type: Array
+      }
+    };
+  }
+
   constructor() {
     super();
-    this.client = client;
-    this.query = NavigationQuery;
+    this.navigation = [];
+  }
+
+  async connectedCallback() {
+    super.connectedCallback();
+
+    const response = await client.query({
+      query: NavigationQuery
+    });
+
+    this.navigation = response.data.navigation;
   }
 
   render() {
-    const { navigation } = this.data;
+    const { navigation } = this;
 
     return html\`
-      <nav>
-        <ul>
-          ${navigation.map((item) => {
-            return html\`
-              <li>
-                <a href=\"${item.path}\">${item.label}</a>
-              </li>
-            \`;
-          })}
-        </ul>
-      </nav>
+      <header class="header">
+
+        <nav>
+          <ul>
+            ${navigation.map((item) => {
+              return html\`
+                <li>
+                  <a href=\"${item.link}\" title=\"Click to visit the ${item.label} page\">${item.label}</a>
+                </li>
+              \`;
+            })}
+          </ul>
+        </nav>
+        
+      </header>
     \`;
   }
 }
 
-customElements.define('x-navigation', NavigationComponent);
+customElements.define('app-header', HeaderComponent);
 ```
 
 ### External Sources
