@@ -15,18 +15,13 @@ client.query = (params) => {
 
   if (APOLLO_STATE) {
     // __APOLLO_STATE__ defined, in "SSG" mode...
-    // TODO do this without the failure call
-    return backupQuery(params)
-      .catch((err) => {
-        console.log('error handling!  fetch from disk', err);
-        return fetch('./cache.json')
-          .then(response => response.json())
-          .then((response) => {
-            // mock client.query response
-            return {
-              data: new InMemoryCache().restore(response).readQuery(params)
-            };
-          });
+    return fetch('./cache.json')
+      .then(response => response.json())
+      .then((response) => {
+        // mock client.query response
+        return {
+          data: new InMemoryCache().restore(response).readQuery(params)
+        };
       });
   } else {
     // __APOLLO_STATE__ NOT defined, in "SPA" mode
