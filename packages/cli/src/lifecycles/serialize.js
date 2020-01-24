@@ -77,7 +77,6 @@ module.exports = serializeBuild = async (compilation) => {
 
       await fs.writeFile(indexContentsPath, indexContentsPolyfilled);
 
-      // TODO how does this get closed out?
       await dataServer(compilation).listen().then((server) => {
         console.log(`dataServer started at ${server.url}`);
       });
