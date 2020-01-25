@@ -8,6 +8,7 @@ const polyfillPath = path.join(process.cwd(), 'node_modules/@webcomponents/webco
 let polyfill = '';
 
 browserRunner = new BrowserRunner();
+browserRunner.init();
 
 const runBrowser = async (compilation) => {
   try {
