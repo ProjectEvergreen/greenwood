@@ -5,10 +5,10 @@
 
 A composite plugin for Greenwood for adding support for adding Web Component related polyfills for browser that need support for it.  It uses [feature detection]()https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs#using-webcomponents-loaderjs to determine what polyfills are actually needed based on the user's browser, to ensure only the minumum extra code is needed.
 
-As of right now, you will likely need this plugin to load additional polyfills if you want to support these browsers:
+As of right now, you will likely need this plugin to load additional polyfills if you want to support these browser(s):
 
-- Microsoft Edge
-- Internet Explorer 11
+- Internet Explorer <= 11
+- Mobile Browsers
 
 > See Greenwood's [browser support](https://www.greenwoodjs.io/about/how-it-works#browser-support) and [evergreen build](https://www.greenwoodjs.io/about/how-it-works#evergreen-build) docs for more information on how Greenwood handles browser support out of the box.
 
@@ -45,4 +45,4 @@ module.exports = {
 
 This will then add the necessary Polyfills to have your project work in those browsers.
 
-> Note: we would like to add support for [differntial loading]() to avoid the cost of this for newer browsers.
+> Note: we would like to add support for [differntial loading](https://github.com/ProjectEvergreen/greenwood/issues/224) to avoid the cost of this for newer browsers.
