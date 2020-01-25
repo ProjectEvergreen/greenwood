@@ -10,7 +10,7 @@ As of right now, you will likely need this plugin to load additional polyfills i
 - Internet Explorer <= 11
 - Mobile Browsers
 
-> See Greenwood's [browser support](https://www.greenwoodjs.io/about/how-it-works#browser-support) and [evergreen build](https://www.greenwoodjs.io/about/how-it-works#evergreen-build) docs for more information on how Greenwood handles browser support out of the box.
+> See Greenwood's [browser support](https://www.greenwoodjs.io/about/how-it-works#browser-support) and [evergreen build](https://www.greenwoodjs.io/about/how-it-works#evergreen-build) docs for more information on how Greenwood handles browser support out of the box.  Or visit [caniuse.com](https://caniuse.com/) to look up specific support for specific browsers.
 
 > This package assumes you already have `@greenwood/cli` installed.
 
