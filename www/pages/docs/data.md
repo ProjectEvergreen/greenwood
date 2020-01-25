@@ -29,14 +29,14 @@ render() {
 ```
 
 ### Internal Sources
-Greenwood exposes a [GraphQL](https://graphql.org/) + [Apollo](https://www.apollographql.com/docs/apollo-server/) server locally when developing available at `localhost:4000` that can be used to get information about your local content like path, "slug", title and other useful information that will be dynamic to the content you have.  Programmatic access to this data can provide the oppourtunirty to share your content with your users in a way that supports sorting, filter, organizing, and more!
+Greenwood exposes a [GraphQL](https://graphql.org/) + [Apollo](https://www.apollographql.com/docs/apollo-server/) server locally when developing available at `localhost:4000` that can be used to get information about your local content like path, "slug", title and other useful information that will be dynamic to the content you have.  Programmatic access to this data can provide the oppourtunity to share your content with your users in a way that supports sorting, filter, organizing, and more!
 
 ![graphql-playground](/assets/graphql-playground.png)
 
 #### Schema
 To kick things off, let's review what is availalble to you from.  Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type defintion](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's `graph`.
 
-This is that the schema looks like:
+This is what the schema looks like:
 ```render javascript
 graph {
   id, // (string) the unique ID given to the generated component as it's selector e.g. \`<wc-md-id></wc-md-id>\`
@@ -60,10 +60,10 @@ To help facilitiate development, Greenwood provides a couple queries out of the 
 
 Below are the queries available:
 
-#### Graph
+##### Graph
 The Graph query returns an array of all pages.
 
-##### Defintion
+###### Defintion
 ```render javascript
 query {
   graph {
@@ -77,7 +77,7 @@ query {
 }
 ```
 
-##### Usage
+###### Usage
 `import` the query in your component
 ```render javascript
 import client from '@greenwood/cli/data/client';
@@ -97,7 +97,7 @@ async connectedCallback() {
 }
 ```
 
-##### Response
+###### Response
 This will return the full `graph` of all pages as an array
 ```render javascript
 [
@@ -120,10 +120,10 @@ This will return the full `graph` of all pages as an array
 ]
 ```
 
-#### Navigation
+##### Navigation
 The Navigation query returns an array of Page "like" objects, representing the top most root pages of your project.
 
-##### Defintion
+###### Defintion
 ```render javascript
 query {
   navigation {
@@ -133,7 +133,7 @@ query {
 }
 ```
 
-##### Usage
+###### Usage
 `import` the query in your component
 ```render javascript
 import client from '@greenwood/cli/data/client';
@@ -155,7 +155,7 @@ async connectedCallback() {
 ```
 
 
-##### Response
+###### Response
 This will return the full `graph` of all top level routes as a Page array
 ```render javascript
 [
@@ -166,10 +166,10 @@ This will return the full `graph` of all top level routes as a Page array
 ]
 ```
 
-#### Children
+##### Children
 The Children query returns an array of all pages below a given top level route.
 
-##### Defintion
+###### Defintion
 ```render javascript
 query {
   children {
@@ -183,7 +183,7 @@ query {
 }
 ```
 
-##### Usage
+###### Usage
 `import` the query in your component
 ```render javascript
 import client from '@greenwood/cli/data/client';
@@ -206,7 +206,7 @@ async connectedCallback() {
 }
 ```
 
-##### Response
+###### Response
 This will return the full `graph` of all pages as an array that are under a given root, e.g. _/blog_.
 ```render javascript
 [
@@ -229,10 +229,10 @@ This will return the full `graph` of all pages as an array that are under a give
 ]
 ```
 
-#### Custom
+##### Custom
 You can of course come up with your own as needed!  Greenwood provides the [`gql-tag`](https://github.com/apollographql/graphql-tag) module and will also resolve _.gql_ or _.graphql_ file extensions!
 
-##### example:
+###### example:
 ```render javascript
 /* src/data/my-query.gql */
 query {
@@ -258,7 +258,7 @@ const query = gql\`
 
 Then you can use `import` anywhere in your components!
 
-#### Complete Example
+##### Complete Example
 Now of course comes the fun part, actually seeing it all come together.  Here is an example from the Greenwood website's own [header component](https://github.com/ProjectEvergreen/greenwood/blob/master/www/components/header/header.js).
 
 ```render javascript
@@ -317,5 +317,5 @@ class HeaderComponent extends LitElement {
 customElements.define('app-header', HeaderComponent);
 ```
 
-### External Sources
+#### External Sources
 Coming [soon](https://github.com/ProjectEvergreen/greenwood/issues/21)!
