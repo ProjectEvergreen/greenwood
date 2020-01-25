@@ -187,7 +187,7 @@ query {
 `import` the query in your component
 ```render javascript
 import client from '@greenwood/cli/data/client';
-import ChildrenQuery from '@greenwood/cli/data/queries/cnildren';
+import ChildrenQuery from '@greenwood/cli/data/queries/children';
 
 .
 .
