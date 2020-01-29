@@ -34,7 +34,7 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
     let dom;
 
-    before(async () => {
+    before(async function() {
       await setup.runGreenwoodCommand('build');
     });
 

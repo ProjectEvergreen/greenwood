@@ -13,8 +13,8 @@ const puppeteer = require('puppeteer');
 class BrowserRunner {
 
   constructor() {
-    this.browser = {}, this.renderer = {};
-    this.init();
+    this.browser = {};
+    this.renderer = {};
   }
 
   async init() {
@@ -22,7 +22,6 @@ class BrowserRunner {
       headless: true,
       args: ['--no-sandbox']
     });
-    // this.renderer = new Renderer(this.browser);
   }
 
   async serialize(requestUrl) {
