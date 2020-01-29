@@ -1,12 +1,17 @@
-import { html, LitElement } from 'lit-element';
+import { LitElement, html } from 'lit-element';
+import client from '@greenwood/cli/data/client';
+import ChildrenQuery from '@greenwood/cli/data/queries/children';
 import css from './shelf.css';
 import chevronRt from '../icons/chevron-right/chevron-right';
 import chevronDwn from '../icons/chevron-down/chevron-down';
 
-class shelf extends LitElement {
+class Shelf extends LitElement {
 
   static get properties() {
     return {
+      page: {
+        type: String
+      },
       shelfList: {
         type: Array
       }
@@ -17,12 +22,54 @@ class shelf extends LitElement {
     super();
     this.selectedIndex = '';
     this.shelfList = [];
+    this.page = '';
   }
 
   async connectedCallback() {
     super.connectedCallback();
     this.collapseAll();
     this.expandRoute(window.location.pathname);
+  }
+
+  async setupShelf(page) {
+    console.log('setupShelf for page =>', page);
+    let list = [];
+
+    if (page && page !== '' && page !== '/') {
+      // TODO remove require call - #275
+      // this.shelfList = require(`./${page}.json`);
+      switch (page) {
+
+        case 'about':
+          list = await import(/* webpackChunkName: 'about' */ '../components/shelf/about.json').then(({ default: data }) => data);
+          break;
+        case 'docs':
+          list = await import(/* webpackChunkName: 'documentation-list' */ '../components/shelf/docs.json').then(({ default: data }) => data);
+          break;
+        case 'getting-started':
+          list = await import(/* webpackChunkName: 'getting-started' */ '../components/shelf/getting-started.json').then(({ default: data }) => data);
+          break;
+        case 'plugins':
+          list = await import(/* webpackChunkName: 'plugins' */ '../components/shelf/plugins.json').then(({ default: data }) => data);
+          break;
+        default:
+          list = [];
+
+      }
+      
+      // TODO not actually integrated, still using .json files - #271
+      const response = await client.query({
+        query: ChildrenQuery,
+        variables: {
+          parent: page
+        }
+      });
+
+      console.log('response from the shelf (data.children)', response.data.children);
+
+      this.shelfList = list;
+      console.log('shelf list', this.shelfList);
+    }
   }
 
   goTo(path) {
@@ -83,7 +130,7 @@ class shelf extends LitElement {
   }
 
   renderList() {
-
+    console.log('renderlist', this.shelfList);
     /* eslint-disable indent */
     const renderListItems = (list) => {
       let listItems = '';
@@ -102,8 +149,8 @@ class shelf extends LitElement {
 
       return listItems;
     };
-
     /* eslint-enable */
+
     return this.shelfList.map((list, index) => {
       let id = `index_${index}`;
       let chevron = list.items && list.items.length > 0
@@ -121,10 +168,17 @@ class shelf extends LitElement {
   }
 
   render() {
+    const { page } = this;
+
+    this.setupShelf(page);
+
+    console.log('render()', this.shelfList);
+    
     return html`
       <style>
         ${css}
       </style>
+
       <div>
         <ul>
           ${this.renderList()}
@@ -134,4 +188,4 @@ class shelf extends LitElement {
   }
 }
 
-customElements.define('eve-shelf', shelf);
+customElements.define('eve-shelf', Shelf);
