@@ -64,6 +64,7 @@ class Shelf extends LitElement {
           parent: page
         }
       });
+
       console.log('response from the shelf (data.children)', response.data.children);
 
       this.shelfList = list;
