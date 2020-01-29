@@ -3,6 +3,7 @@
 ## Welcome!
 We're excited for your interest in Greenwood, and maybe even your contribution!
 
+
 ## Issues
 Please make sure to have the following prepared (where applicable)
 1. High Level Overview
@@ -10,12 +11,14 @@ Please make sure to have the following prepared (where applicable)
 1. Code Sample
 1. Links / references
 
+
 ## Pull Requests
 Pull requests are the best!  To best help facililate contributions to the project, here are some requests:
 - We generally we prefer an issue be opened first, to help faciliate general discussion outside of the code review process itself and align on the ask and any expections.  However, for typos in docs and minor "chore" like tasks a PR is usually sufficient.  When in doubt, open an issue.
 - For bugs, please consider reviewing the issue tracker.
 - For branching, we generally follow the convention `<issue-label>/issue-<number>-<issue-title>`, e.g. _bug/issue-12-fixed-bug-with-yada-yada-yada_
 - To test the CI build scripts locally, run the `yarn` commands mentioned in the below section on CI.
+
 
 ## Continuous Integration
 Greenwood makes active use of testing tools like [GitHub Actions](https://github.com/features/actions) and [Netlify deploy previews](https://www.netlify.com/blog/2016/07/20/introducing-deploy-previews-in-netlify/) as part of the workflow.  Each time a PR is opened, a sequence of build steps defined _.github/workflows/ci..yml_ are run:
@@ -25,6 +28,7 @@ Greenwood makes active use of testing tools like [GitHub Actions](https://github
 
 A preview is also made available within the status checks section of the PR in GitHub and can be used to validate work in a live environment before having to merge.
 
+
 ## Local Development
 To develop for the project, you'll want to follow these steps:
 1. Have [NodeJS LTS](https://nodejs.org) installed (>= 10.x) and [Yarn](https://yarnpkg.com/)
@@ -32,10 +36,13 @@ To develop for the project, you'll want to follow these steps:
 1. Run `yarn install`
 1. Run `yarn lerna bootstrap`
 
-To test that everything was setep correctly, run `yarn build` to build a production version of the Greenwood website locally.  (website source located in _www/_) 
+### Tasks
+The Greenwood website is currently built by Greenwood itself, and all files for it are located in this repository in the _www/_ directory.  In addition to unit tests, you will want to verify all changes by running the website locally.
 
-> Run `yarn serve` to serve a production build locally.
-
+Below are the development tasks available for working on this project:
+- `yarn develop` - Develop for the website locally using the dev server at `localhost:1984` in your browser.
+- `yarn build` - Builds the website for production.
+- `yarn serve` - Builds the website for production and runs it on a local webserver at `localhost:8000`
 
 ### Packages
 Greenwood is organized into packages as a monorepo, managed by [Lerna](https://lerna.js.org/) and [Yarn Workspaces](https://yarnpkg.com/lang/en/docs/workspaces/).  You can find all of these in the _packages/_ directory.  Each package will manage its own:
@@ -56,23 +63,11 @@ $ yarn add <package>
 
 Yarn workspaces will automatically handle installing _node_modules_ in the appropriate directory.
 
-### Testing
+
+## Unit Testing
 [TDD](https://en.wikipedia.org/wiki/Test-driven_development) is the recommended approach for developing for Greenwood and for the style of test writing we use [BDD style testing](https://en.wikipedia.org/wiki/Behavior-driven_development); "cases".  Cases are used to capture the various configurations and expected outputs of Greenwood when running its  commands, in a way that is closer to how a user would be expecting Greenwood to work.
 
-
-#### Guidelines
-Cases follow a convention starting with the command (e.g. `build`) and and the capability and features being tested, like configuration with a particular option (e.g. `publicPath`):
-```shell
-<command>.<capability>.<feature>.spec.js
-```
-
-Examples:
-- _build.default.spec.js_ - Would test `greenwood build` with no config and no workspace.
-- _build.config.workspace-custom.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace`
-- _build.config.workspace-public-path.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace` and `publicPath` set.
-
-
-#### Running Tests
+### Running Tests
 To run tests in watch mode, use:
 ```shell
 $ yarn test:tdd
@@ -91,13 +86,22 @@ Below are some tips to help with running / debugging tests:
 
 > **PLEASE DO NOT COMMIT ANY OF THESE ABOVE CHANGES THOUGH**
 
+### Writing Tests
+Cases follow a convention starting with the command (e.g. `build`) and and the capability and features being tested, like configuration with a particular option (e.g. `publicPath`):
+```shell
+<command>.<capability>.<feature>.spec.js
+```
 
-### Website / Dev Server
-The Greenwood website is currently built by Greenwood and all files are located in this repository (_www/_).  To develop for the website (and to test changes to packages), you can run the following
-1. `yarn develop`
-1. Open `localhost:1984` in your browser
+Examples:
+- _build.default.spec.js_ - Would test `greenwood build` with no config and no workspace.
+- _build.config.workspace-custom.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace`
+- _build.config.workspace-public-path.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace` and `publicPath` set.
 
-From there, the dev server will watch for changes and reload as needed.
+### Notes
+Here are some thigns to keep in mind while writing your tests, due to the asynchronous nature of Greenwwood:
+- Make sure to wrap all calls to `TestBed` with `async`
+- All usages of `JSDOM` should be wrapped in `async`
+- Avoid arrow functions in mocha tests (e.g. `() => `) as this [can cause unexpected behaviors.](https://mochajs.org/#arrow-functions).  Just use `function` instead.
 
 ## Internet Explorer
 For situations that require testing Internet Explorer or Edge browser, Microsoft [provides Virtual Machines](https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/) for various combinations of Windows and Internet Explorer versions.  [VirtualBox](https://www.virtualbox.org/) is a good platform to use for these VMs.
@@ -108,7 +112,6 @@ To test from a VM, you can
 
 You can disable plugins in _webpack.config.prod.js_ to remove production optimizations for testing purposes.
 
-> Note: `yarn develop` does not work right now with IE11 and Edge.
 
 ## Docker
 A Docker container is available within the project to use as a development environment if you like.  It is configured to use the same image that runs as part of the project's [Continuous Integration environment](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/ci.yml#L9).

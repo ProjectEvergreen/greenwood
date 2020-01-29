@@ -53,13 +53,13 @@ describe('Build Greenwood With: ', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'about', './index.html'))).to.be.true;
       });
 
-      it('should have the expected heading text within the custom about page in the about directory', async function() {
+      it('should have the expected heading text within the custom about page in the about directory', function() {
         const heading = dom.window.document.querySelector('h3').textContent;
 
         expect(heading).to.equal('Nested Custom About Page');
       });
 
-      it('should have the expected paragraph text within the custom about page in the about directory', async function() {
+      it('should have the expected paragraph text within the custom about page in the about directory', function() {
         let paragraph = dom.window.document.querySelector('p').textContent;
 
         expect(paragraph).to.equal('This is a custom about page built by Greenwood.');
