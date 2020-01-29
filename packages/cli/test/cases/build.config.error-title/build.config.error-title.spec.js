@@ -19,16 +19,16 @@
 const expect = require('chai').expect;
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', () => {
+describe('Build Greenwood With: ', function() {
   let setup;
 
-  before(async () => {
+  before(async function() {
     setup = new TestBed();
     await setup.setupTestBed(__dirname);
   });
 
-  describe('Custom Configuration with a bad value for Title', () => {
-    it('should throw an error that title must be a string', async () => {
+  describe('Custom Configuration with a bad value for Title', function() {
+    it('should throw an error that title must be a string', async function() {
       try {
         await setup.runGreenwoodCommand('build');
       } catch (err) {

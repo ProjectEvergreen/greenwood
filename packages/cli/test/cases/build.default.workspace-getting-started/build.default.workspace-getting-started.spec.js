@@ -89,7 +89,7 @@ describe('Build Greenwood With: ', function() {
         expect(footer.length).to.be.equal(1);
       });
 
-      it('should have the expected font import', async function() {
+      it('should have the expected font import', function() {
         const styles = '@import url(//fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap);';
         const styleTags = dom.window.document.querySelectorAll('head style');
         let importCount = 0;
@@ -135,7 +135,7 @@ describe('Build Greenwood With: ', function() {
         expect(footer.length).to.be.equal(1);
       });
 
-      it('should have the expected font import', async function() {
+      it('should have the expected font import', function() {
         const styles = '@import url(//fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap);';
         const styleTags = dom.window.document.querySelectorAll('head style');
         let importCount = 0;

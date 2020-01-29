@@ -24,7 +24,7 @@
 const expect = require('chai').expect;
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', function() {
   let setup;
 
   before(async function() {
@@ -32,8 +32,8 @@ describe('Build Greenwood With: ', async function() {
     this.context = await setup.setupTestBed(__dirname);
   });
 
-  describe('Google Analytics Plugin with a bad value for analyticsId', () => {
-    it('should throw an error that analyticsId must be a string', async () => {
+  describe('Google Analytics Plugin with a bad value for analyticsId', function() {
+    it('should throw an error that analyticsId must be a string', async function() {
       try {
         await setup.runGreenwoodCommand('build');
       } catch (err) {
