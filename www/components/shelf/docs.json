@@ -31,6 +31,24 @@
     ]
   },
   {
+    "name": "Data Sources",
+    "path": "/docs/data",
+    "items": [
+      {
+        "name": "Overview",
+        "id": "overview"
+      },
+      {
+        "name": "Internal Sources",
+        "id": "internal-sources"
+      },
+      {
+        "name": "External Sources",
+        "id": "external-sources"
+      }
+    ]
+  },
+  {
     "name": "Front Matter",
     "path": "/docs/front-matter",
     "items": [

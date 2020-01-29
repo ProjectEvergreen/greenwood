@@ -1,0 +1,10 @@
+query {
+  graph {
+    id,
+    title,
+    link,
+    filePath,
+    fileName,
+    template
+  }
+}
