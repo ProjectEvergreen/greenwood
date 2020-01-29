@@ -14,50 +14,51 @@ METADATA;
 
 class PageTemplate extends LitElement {
 
-  constructor() {
-    super();
-    this.shelfList = [];
-    this.setupShelf();
+  static get properties() {
+    return {
+      route: {
+        type: String
+      }
+    };
   }
 
-  setupShelf() {
-    // based on path, display selected list
-    const url = window.location.pathname;
-    let list = [];
+  constructor() {
+    super();
+    this.route = '';
+  }
 
-    if (url.indexOf('/about') >= 0) {
-      list = () => import(/* webpackChunkName: 'about' */ '../components/shelf/about.json').then(({ default: data }) => data);
-    } else if (url.indexOf('/docs') >= 0) {
-      list = () => import(/* webpackChunkName: 'documentation-list' */ '../components/shelf/documentation-list.json').then(({ default: data }) => data);
-    } else if (url.indexOf('/getting-started') >= 0) {
-      list = () => import(/* webpackChunkName: 'getting-started' */ '../components/shelf/getting-started-list.json').then(({ default: data }) => data);
-    } else if (url.indexOf('/plugins') >= 0) {
-      list = () => import(/* webpackChunkName: 'plugins' */ '../components/shelf/plugins.json').then(({ default: data }) => data);
-    }
-
-    this.shelfList = list;
+  updated() {
+    this.route = window.location.pathname;
   }
 
   render() {
+    const { route } = this;
+    const page = route.split('/')[1];
+
     return html`
       <style>
         ${pageCss}
       </style>
+
       METAELEMENT
+     
       <div class='wrapper'>
         <eve-header></eve-header>
+        
         <div class='content-wrapper'>
           <div class="sidebar">
-            <eve-shelf .list="${this.shelfList}"></eve-shelf>
+            <eve-shelf .page="${page}"></eve-shelf>
           </div>
+
           <div class="content">
             <eve-container fluid>
               <eve-scroll>
                 <entry></entry>
               </eve-scroll>
             </eve-container>
-          </div>
+          </div> 
         </div>
+        
         <eve-footer></eve-footer>
       </div>
     `;
