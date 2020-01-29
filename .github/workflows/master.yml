@@ -9,7 +9,6 @@ jobs:
 
   build:
     runs-on: ubuntu-18.04
-    container: docker://thegreenhouse/nodejs-dev:0.4.0
 
     strategy:
       matrix:
@@ -17,6 +16,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: Install Chromium Library Dependencies
+      run: |
+        sh ./.github/workflows/chromium-lib-install.sh
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
