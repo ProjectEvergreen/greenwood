@@ -1,5 +1,7 @@
 ---
 label: 'getting-started'
+menu: navigation
+title: 'Getting Started'
 ---
 
 ## Introduction
@@ -51,7 +53,7 @@ $ npm run develop
 ```
 
 #### Experience
-No advanced JavaScript / CSS experience is needed for using Greenwood.  Just knowing some [markdown](https://daringfireball.net/projects/markdown/) and following some basic steps from the command line will be enough to get you up and running quickly.  
+No advanced JavaScript / CSS experience is needed for using Greenwood.  Just knowing some [markdown](https://daringfireball.net/projects/markdown/) and following some basic steps from the command line will be enough to get you up and running quickly.
 
 We like to think that that as your experience grows, so can the way you build your site.  Greenwood has very few opinions on how you structure your site or what you're trying to build or how and so our hope is to provide you a developer experience that is conducive to modern web development.
 

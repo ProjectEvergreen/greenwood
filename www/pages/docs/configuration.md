@@ -1,3 +1,11 @@
+---
+label: 'configuration'
+menu: side
+title: 'Configuration'
+index: 2
+linkheadings: true
+---
+
 ## Configuration
 These are all the supported configuration options in Greenwood, which you can define in a _greenwood.config.js_ file in your project's root directory.
 

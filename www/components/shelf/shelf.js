@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit-element';
 import client from '@greenwood/cli/data/client';
-import ChildrenQuery from '@greenwood/cli/data/queries/children';
+import MenuQuery from '@greenwood/cli/data/queries/menu';
 import css from './shelf.css';
 import chevronRt from '../icons/chevron-right/chevron-right';
 import chevronDwn from '../icons/chevron-down/chevron-down';
@@ -29,21 +29,17 @@ class Shelf extends LitElement {
   }
 
   async setupShelf(page) {
-    console.log('setupShelf for page =>', page);
-
     if (page && page !== '' && page !== '/') {
-      // TODO remove require call - #275
-      this.shelfList = require(`./${page}.json`);
-
-      // TODO not actually integrated, still using .json files - #271
       const response = await client.query({
-        query: ChildrenQuery,
+        query: MenuQuery,
         variables: {
-          parent: page
+          menu: 'side',
+          route: window.location.pathname
         }
       });
 
-      console.log('response from the shelf (data.children)', response.data.children);
+      console.log('shelf =>', response.data.menu.children);
+      this.shelfList = response.data.menu.children;
     }
   }
 

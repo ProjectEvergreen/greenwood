@@ -1,13 +1,21 @@
+---
+label: 'css-components'
+menu: side
+title: 'Styles and Web Components'
+index: 5
+linkheadings: true
+---
+
 ## CSS and Web Components
 
-So now that we've made some [content](/getting-started/creating-content/) for your site, I think we can agree it's not quite all "there" yet and could benefit from a little styling and branding.  
+So now that we've made some [content](/getting-started/creating-content/) for your site, I think we can agree it's not quite all "there" yet and could benefit from a little styling and branding.
 
 In this section, we will add the following to your project:
 1. Header / Footer - The elements provide a great case for creating some reusable components and with Custom Elements, we can create self contained reusable components for our site.
 1. Styles - Of course we want things to look nice too!  We'll add some CSS to help hang things in just right the place.
 
 ### Web Components
-Web Components are supported out of the box with Greenwood using `HTMLElement` or **LitElement**.  For this guide, we'll use a "vanilla" custom element for our header, in _src/components/header.js_.  
+Web Components are supported out of the box with Greenwood using `HTMLElement` or **LitElement**.  For this guide, we'll use a "vanilla" custom element for our header, in _src/components/header.js_.
 ```render javascript
 class HeaderComponent extends HTMLElement {
   constructor() {

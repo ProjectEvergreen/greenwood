@@ -1,3 +1,12 @@
+---
+label: 'data-sources'
+menu: side
+title: 'Data Sources'
+index: 7
+linkheadings: true
+---
+
+
 ## Data Sources
 Having to repeat things when programming is no fun, and that's why (web) component based development is so useful!  As websites start to grow, there comes a point where being able to have access to the content and structure of your site's layout and configuration as part of the development process becomes essential towards maintainability, performance, and scalability.
 
@@ -41,15 +50,15 @@ This is what the schema looks like:
 graph {
   id, // (string) the unique ID given to the generated component as it's selector e.g. \`<wc-md-id></wc-md-id>\`
 
-  link,  // (string) A URL link, typically derived from the filesystem path, e.g. /blog/2019/first-post/ 
-  
+  link,  // (string) A URL link, typically derived from the filesystem path, e.g. /blog/2019/first-post/
+
   title,  // (string) Useful for a page's <title> tag or the title attribute for an <a> tag, inferred from the filesystem path, e.g. "First Post"
-  
+
   filePath, // (string) path to file
 
   fileName, // (string) file name without extension/path, so that it can be copied to scratch dir with same name
 
-  template // (string) page template used for the page 
+  template // (string) page template used for the page
 }
 ```
 
@@ -267,7 +276,7 @@ import client from '@greenwood/cli/data/client';
 import NavigationQuery from '@greenwood/cli/data/queries/navigation';
 
 class HeaderComponent extends LitElement {
-  
+
   static get properties() {
     return {
       navigation: {
@@ -308,7 +317,7 @@ class HeaderComponent extends LitElement {
             })}
           </ul>
         </nav>
-        
+
       </header>
     \`;
   }

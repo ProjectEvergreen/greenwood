@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const crypto = require('crypto');
 const fm = require('front-matter');
 const path = require('path');
+const toc = require('markdown-toc');
 
 const createGraphFromPages = async (pagesDir, config) => {
   let pages = [];
@@ -23,9 +24,9 @@ const createGraphFromPages = async (pagesDir, config) => {
               if (isMdFile && !stats.isDirectory()) {
                 const fileContents = await fs.readFile(filePath, 'utf8');
                 const { attributes } = fm(fileContents);
-                let { label, template, title } = attributes;
+                let { label, template, title, menu, index, linkheadings } = attributes;
                 let { meta } = config;
-                let mdFile = '';
+                let mdFile = '', tableOfContents = [];
 
                 // if template not set, use default
                 template = template || 'page';
@@ -65,6 +66,20 @@ const createGraphFromPages = async (pagesDir, config) => {
                 // set <title></title> element text, override with markdown title
                 title = title || config.title;
 
+                // set specific menu to place this page
+                menu = menu || '';
+
+                // set specific index list priority of this item within a menu
+                index = index || '';
+
+                // set flag whether to gather a list of headings on a page as menu items
+                linkheadings = linkheadings || false;
+
+                if (linkheadings) {
+                  // parse markdown for table of contents and output to json
+                  tableOfContents = toc(fileContents).json;
+                }
+
                 /*
                 * Variable Definitions
                 *----------------------
@@ -77,10 +92,14 @@ const createGraphFromPages = async (pagesDir, config) => {
                 * relativeExpectedPath: relative import path for generated component within a list.js file to later be
                 * imported into app.js root component
                 * title: the head <title></title> text
+                * menu: the name of the menu in which this item can be listed and queried
+                * index: the index of this list item within a menu
+                * tableOfContents: json object containing page's table of contents(list of headings)
                 * meta: og graph meta array of objects { property/name, content }
                 */
 
-                pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath, title, meta });
+                pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath,
+                  title, menu, index, tableOfContents, meta });
               }
               if (stats.isDirectory()) {
                 await walkDirectory(filePath);
