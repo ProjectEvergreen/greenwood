@@ -4,15 +4,12 @@ const getMenuFromGraph = async (root, { pathname, filter = '' }, context) => {
   const { graph } = context;
   let items = [];
 
-  // TODO: Issue #271 sorting ascending/descending label/index
-  // https://github.com/ProjectEvergreen/greenwood/issues/271
   graph
     .forEach((page) => {
       const { route, menu, title, tableOfContents } = page;
       let children = [];
 
       if (menu && menu.search(filter) > -1) {
-
         if (menu === 'side') {
           // check we're querying only pages that contain base route
           let baseRouteIndex = pathname.substring(1, pathname.length).indexOf('/');
@@ -20,8 +17,10 @@ const getMenuFromGraph = async (root, { pathname, filter = '' }, context) => {
 
           if (route.includes(baseRoute)) {
             if (tableOfContents.length > 0) {
-              children = tableOfContents.map(({ content, slug }) => {
-                return { item: { label: content, link: '#' + slug }, children: [] };
+              tableOfContents.forEach(({ content, slug, lvl }) => {
+                if (lvl === 3) {
+                  children.push({ item: { label: content, link: '#' + slug }, children: [] });
+                }
               });
             }
             items.push({ item: { link: route, label: title }, children });
@@ -32,7 +31,7 @@ const getMenuFromGraph = async (root, { pathname, filter = '' }, context) => {
       }
     });
 
-  return { label: menu, link: 'na', children: items };
+  return { label: filter, link: 'na', children: items };
 };
 
 const getDeriveMetaFromRoute = (route) => {

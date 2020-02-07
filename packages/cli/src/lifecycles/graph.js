@@ -78,6 +78,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                 if (linkheadings) {
                   // parse markdown for table of contents and output to json
                   tableOfContents = toc(fileContents).json;
+                  tableOfContents.shift();
                 }
 
                 /*
