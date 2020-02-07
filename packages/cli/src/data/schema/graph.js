@@ -4,6 +4,8 @@ const getMenuFromGraph = async (root, { pathname, filter = '' }, context) => {
   const { graph } = context;
   let items = [];
 
+  // TODO Issue #271 https://github.com/ProjectEvergreen/greenwood/issues/271
+  // Sort menus by label/index asc/desc
   graph
     .forEach((page) => {
       const { route, menu, title, tableOfContents } = page;
@@ -16,13 +18,7 @@ const getMenuFromGraph = async (root, { pathname, filter = '' }, context) => {
           let baseRoute = pathname.substring(0, baseRouteIndex + 1);
 
           if (route.includes(baseRoute)) {
-            if (tableOfContents.length > 0) {
-              tableOfContents.forEach(({ content, slug, lvl }) => {
-                if (lvl === 3) {
-                  children.push({ item: { label: content, link: '#' + slug }, children: [] });
-                }
-              });
-            }
+            children = getFormattedHeadings(tableOfContents);
             items.push({ item: { link: route, label: title }, children });
           }
         } else {
@@ -32,6 +28,20 @@ const getMenuFromGraph = async (root, { pathname, filter = '' }, context) => {
     });
 
   return { label: filter, link: 'na', children: items };
+};
+
+const getFormattedHeadings = (tableOfContents) => {
+  let children = [];
+
+  if (tableOfContents.length > 0) {
+    tableOfContents.forEach(({ content, slug, lvl }) => {
+      // make sure we only add h3 links to menu
+      if (lvl === 3) {
+        children.push({ item: { label: content, link: '#' + slug }, children: [] });
+      }
+    });
+  }
+  return children;
 };
 
 const getDeriveMetaFromRoute = (route) => {
