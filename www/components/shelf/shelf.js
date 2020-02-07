@@ -22,14 +22,9 @@ class Shelf extends LitElement {
     this.page = '';
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
-    this.collapseAll();
-    this.expandRoute(window.location.pathname);
-  }
-
-  async setupShelf(page) {
-    if (page && page !== '' && page !== '/') {
+    if (this.page !== '' && this.page !== '/') {
       const response = await client.query({
         query: MenuQuery,
         variables: {
@@ -40,7 +35,11 @@ class Shelf extends LitElement {
 
       console.log('shelf =>', response.data.menu.children);
       this.shelfList = response.data.menu.children;
+      this.requestUpdate();
     }
+
+    this.collapseAll();
+    // this.expandRoute(window.location.pathname);
   }
 
   goTo(path) {
@@ -106,12 +105,12 @@ class Shelf extends LitElement {
     const renderListItems = (list) => {
       let listItems = '';
 
-      if (list.items && list.items.length > 0) {
+      if (list && list.length > 0) {
         listItems = html`
           <ul>
-            ${list.items.map((item, index) => {
+            ${list.map(({ item }, index) => {
               return html`
-                <li id="index_${index}" class="${list.selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`#${item.id}`)}">${item.name}</a></li>
+                <li id="index_${index}" class="${item.selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`${item.link}`)}">${item.label}</a></li>
               `;
             })}
           </ul>
@@ -120,29 +119,27 @@ class Shelf extends LitElement {
 
       return listItems;
     };
-    /* eslint-enable */
 
-    return this.shelfList.map((list, index) => {
+    /* eslint-enable */
+    console.log(this.shelfList);
+
+    return this.shelfList.map(({ item, children, selected }, index) => {
       let id = `index_${index}`;
-      let chevron = list.items && list.items.length > 0
-        ? list.selected === true ? chevronDwn : chevronRt
+      let chevron = children && children.length > 0
+        ? selected === true ? chevronDwn : chevronRt
         : '';
 
       return html`
         <li class="list-wrap">
-          <a href="${list.path}" @click="${this.handleClick}"><h2 id="${id}">${list.name} <span>${chevron}</span></h2></a>
+          <a href="${item.link}" @click="${this.handleClick}"><h2 id="${id}">${item.label} <span>${chevron}</span></h2></a>
           <hr>
-          ${renderListItems(list)}
+          ${renderListItems(children)}
         </li>
       `;
     });
   }
 
   render() {
-    const { page } = this;
-
-    this.setupShelf(page);
-
     return html`
       <style>
         ${css}

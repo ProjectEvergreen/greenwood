@@ -18,8 +18,7 @@ const getMenuFromGraph = async (root, { pathname, filter = '' }, context) => {
           let baseRoute = pathname.substring(0, baseRouteIndex + 1);
 
           if (route.includes(baseRoute)) {
-            children = getFormattedHeadings(tableOfContents);
-            items.push({ item: { link: route, label: title }, children });
+            items.push({ item: { link: route, label: title }, children: getParsedHeadingsFromPage(tableOfContents) });
           }
         } else {
           items.push({ item: { link: route, label: title }, children });
@@ -30,7 +29,7 @@ const getMenuFromGraph = async (root, { pathname, filter = '' }, context) => {
   return { label: filter, link: 'na', children: items };
 };
 
-const getFormattedHeadings = (tableOfContents) => {
+const getParsedHeadingsFromPage = (tableOfContents) => {
   let children = [];
 
   if (tableOfContents.length > 0) {
