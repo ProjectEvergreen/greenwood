@@ -1,6 +1,6 @@
 const { gql } = require('apollo-server-express');
 
-const menu = async (root, { pathname, filter = '' }, context) => {
+const getMenuFromGraph = async (root, { pathname, filter = '' }, context) => {
   const { graph } = context;
   let items = [];
 
@@ -124,7 +124,7 @@ const graphTypeDefs = gql`
 
   type Query {
     graph: [Page]
-    menu(filter: String, pathname: String): Menu
+    menu(filter: String, pathname: String, orderBy: MenuOrderBy): Menu
     children(parent: String): [Page]
   }
 
@@ -136,12 +136,10 @@ const graphTypeDefs = gql`
   }
 `;
 
-//  menu(filter: String, orderBy: MenuOrderBy): Menu
-
 const graphResolvers = {
   Query: {
     graph: getPagesFromGraph,
-    menu: menu,
+    menu: getMenuFromGraph,
     children: getChildrenFromParentRoute
   }
 };
