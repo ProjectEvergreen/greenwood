@@ -1,5 +1,5 @@
 const GRAPH_MOCK = { 
-  graph:[ 
+  graph: [ 
     { mdFile: './index.md',
       label: '37b24fd9f163e7b',
       route: '/',
