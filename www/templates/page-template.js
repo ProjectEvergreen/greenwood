@@ -20,7 +20,7 @@ class PageTemplate extends LitElement {
     this.setupShelf();
   }
 
-  async setupShelf() {
+  setupShelf() {
     // based on path, display selected list
     const url = window.location.pathname;
     let list = [];
