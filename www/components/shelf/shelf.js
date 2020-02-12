@@ -16,6 +16,7 @@ class shelf extends LitElement {
   constructor() {
     super();
     this.selectedIndex = '';
+    this.list = () => [];
     this.shelfList = [];
   }
 
