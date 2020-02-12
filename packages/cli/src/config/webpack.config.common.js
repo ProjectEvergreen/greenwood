@@ -87,6 +87,7 @@ module.exports = ({ config, context }) => {
     output: {
       path: path.join(context.publicDir, '.', config.publicPath),
       filename: '[name].[hash].bundle.js',
+      chunkFilename: '[name].bundle.js',
       publicPath: config.publicPath
     },
 
@@ -126,6 +127,12 @@ module.exports = ({ config, context }) => {
       }]
     },
 
+    optimization: {
+      splitChunks: {
+        chunks: 'all',
+      }
+    },
+
     plugins: [
       new HtmlWebpackPlugin({
         filename: path.join(context.publicDir, context.indexPageTemplate),
@@ -154,5 +161,5 @@ module.exports = ({ config, context }) => {
 
       ...customWebpackPlugins
     ]
-  };
-};
+  }
+}

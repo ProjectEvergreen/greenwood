@@ -31,9 +31,10 @@ module.exports = {
   // https://github.com/babel/babel/issues/8829#issuecomment-456524916
   plugins: [
     [
-      '@babel/plugin-transform-runtime', { 
-        regenerator: true 
-      }
+      '@babel/plugin-transform-runtime', {
+        regenerator: true
+      },
+      '@babel/plugin-syntax-dynamic-import'
     ]
   ]
 
