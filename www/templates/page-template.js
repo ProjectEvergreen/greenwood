@@ -26,13 +26,13 @@ class PageTemplate extends LitElement {
     let list = [];
 
     if (url.indexOf('/about') >= 0) {
-      list = () => import(/* webpackChunkName: 'about' */ '../components/shelf/about.json').then(({default: data}) => data);
+      list = () => import(/* webpackChunkName: 'about' */ '../components/shelf/about.json').then(({ default: data }) => data);
     } else if (url.indexOf('/docs') >= 0) {
-      list = () => import(/* webpackChunkName: 'documentation-list' */ '../components/shelf/documentation-list.json').then(({default: data}) => data);
+      list = () => import(/* webpackChunkName: 'documentation-list' */ '../components/shelf/documentation-list.json').then(({ default: data }) => data);
     } else if (url.indexOf('/getting-started') >= 0) {
-      list = () => import(/* webpackChunkName: 'getting-started' */ '../components/shelf/getting-started-list.json').then(({default: data}) => data);
+      list = () => import(/* webpackChunkName: 'getting-started' */ '../components/shelf/getting-started-list.json').then(({ default: data }) => data);
     } else if (url.indexOf('/plugins') >= 0) {
-      list = () => import(/* webpackChunkName: 'plugins' */ '../components/shelf/plugins.json').then(({default: data}) => data);
+      list = () => import(/* webpackChunkName: 'plugins' */ '../components/shelf/plugins.json').then(({ default: data }) => data);
     }
 
     this.shelfList = list;
