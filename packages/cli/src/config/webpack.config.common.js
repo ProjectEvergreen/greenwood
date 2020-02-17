@@ -12,12 +12,12 @@ const getUserWorkspaceDirectories = (source) => {
 const mapUserWorkspaceDirectories = (directoryPath, userWorkspaceDirectory) => {
   const directoryName = directoryPath.replace(`${userWorkspaceDirectory}/`, '');
   const userWorkspaceDirectoryRoot = userWorkspaceDirectory.split('/').slice(-1);
-  
+
   return new webpack.NormalModuleReplacementPlugin(
     // https://github.com/ProjectEvergreen/greenwood/issues/132
     new RegExp(`\\.\\.\\/${directoryName}.+$(?<!\.js)|${userWorkspaceDirectoryRoot}\\/${directoryName}.+$(?<!\.js)`),
     (resource) => {
-      
+
       // workaround to ignore cli/templates default imports when rewriting
       if (!new RegExp('\/cli\/templates').test(resource.content)) {
         resource.request = resource.request.replace(new RegExp(`\\.\\.\\/${directoryName}`), directoryPath);
@@ -87,7 +87,7 @@ module.exports = ({ config, context }) => {
     output: {
       path: path.join(context.publicDir, '.', config.publicPath),
       filename: '[name].[hash].bundle.js',
-      chunkFilename: '[name].bundle.js',
+      chunkFilename: '[name].[hash].bundle.js',
       publicPath: config.publicPath
     },
 
