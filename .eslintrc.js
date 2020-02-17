@@ -1,7 +1,13 @@
+const path = require('path');
+
 module.exports = {
+  parser: 'babel-eslint',
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: 'module'
+    sourceType: 'module',
+    babelOptions: {
+      configFile: path.join(__dirname, './packages/cli/src/config/babel.config.js')
+    }
   },
   env: {
     browser: true,
@@ -141,7 +147,10 @@ module.exports = {
     'id-length': 0,
     'indent': [2, 2, {
       'VariableDeclarator': 1,
-      'SwitchCase': 1
+      'SwitchCase': 1,
+      'ignoredNodes': [
+        'TemplateLiteral'
+      ]
     }],
     'key-spacing': [2, {
       'beforeColon': false,
@@ -152,7 +161,6 @@ module.exports = {
     'max-nested-callbacks': [2, { 'maximum': 8 }],
     'new-cap': 2,
     'new-parens': 2,
-    'newline-after-var': 2,
     'no-array-constructor': 2,
     'no-continue': 0,
     'no-inline-comments': 0,
