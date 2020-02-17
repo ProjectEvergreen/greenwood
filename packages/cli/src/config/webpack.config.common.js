@@ -129,7 +129,7 @@ module.exports = ({ config, context }) => {
 
     optimization: {
       splitChunks: {
-        chunks: 'all',
+        chunks: 'all'
       }
     },
 
@@ -161,5 +161,5 @@ module.exports = ({ config, context }) => {
 
       ...customWebpackPlugins
     ]
-  }
-}
+  };
+};
