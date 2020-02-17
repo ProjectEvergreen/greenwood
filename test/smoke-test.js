@@ -43,7 +43,7 @@ function defaultNotFound(label) {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, '404.html'));
       });
 
-      it('should have one bundle <script> tag in the <body>', function() {
+      it('should have two bundle <script> tag in the <body>', function() {
         const scriptTags = dom.window.document.querySelectorAll('body script');
         const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src;
@@ -51,7 +51,7 @@ function defaultNotFound(label) {
           return src.indexOf('index.') >= 0 && src.indexOf('.bundle.js') >= 0;
         });
 
-        expect(bundleScripts.length).to.be.equal(1);
+        expect(bundleScripts.length).to.be.equal(2);
       });
 
       it('should have a <title> tag in the <head>', function() {
@@ -86,7 +86,7 @@ function defaultIndex(label) {
         expect(title).to.be.equal('Greenwood App');
       });
 
-      it('should have one <script> tag for loading main JavaScript bundle at the end of the <body> tag', function() {
+      it('should have two <script> tag for loading main JavaScript bundle at the end of the <body> tag', function() {
         const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
         const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src;
@@ -94,7 +94,7 @@ function defaultIndex(label) {
           return src.indexOf('index') >= 0 && src.indexOf('bundle') >= 0;
         });
 
-        expect(bundleScripts.length).to.be.equal(1);
+        expect(bundleScripts.length).to.be.equal(2);
       });
 
       it('should have a router outlet tag in the <body>', function() {
