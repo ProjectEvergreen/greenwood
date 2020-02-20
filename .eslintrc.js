@@ -7,9 +7,6 @@ module.exports = {
     browser: true,
     node: false
   },
-  overrides: [{
-    files: ['.eslintrc.js']
-  }],
   rules: {
     'comma-dangle': [2, 'never'],
     'no-cond-assign': 2,
