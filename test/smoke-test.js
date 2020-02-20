@@ -175,7 +175,7 @@ module.exports = runSmokeTest = async function(testCases, label) {
         publicDirectory(label);
         break;
       default:
-        console.log(`unknown case ${testCase}`); // eslint-disable-line console
+        console.log(`unknown case ${testCase}`); // eslint-disable-line no-console
         break;
 
     }
