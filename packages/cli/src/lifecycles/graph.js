@@ -21,7 +21,7 @@ const createGraphFromPages = async (pagesDir, config) => {
           const stats = fs.statSync(filePath);
           const isMdFile = file.substr(file.length - 2, file.length) === 'md';
 
-          // map each page to its 0 based index order in the fileystem
+          // map each page to a (0 based) index based on filesystem order
           if (isMdFile) {
             pagesIndexMap.set(filenameHash, pagesIndex);
             pagesIndex += 1;
@@ -94,7 +94,6 @@ const createGraphFromPages = async (pagesDir, config) => {
 
               if (stats.isDirectory()) {
                 await walkDirectory(filePath);
-                
                 resolve();
               }
               
@@ -107,7 +106,6 @@ const createGraphFromPages = async (pagesDir, config) => {
       };
 
       await walkDirectory(pagesDir);
-
       resolve(pages);
     } catch (err) {
       reject(err);
