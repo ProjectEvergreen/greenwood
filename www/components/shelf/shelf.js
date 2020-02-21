@@ -58,7 +58,7 @@ class Shelf extends LitElement {
 
       }
 
-      // TODO not actually integrated, still using .json files - #271
+      // TODO not actually integrated, still using .json files - #288
       const response = await client.query({
         query: ChildrenQuery,
         variables: {

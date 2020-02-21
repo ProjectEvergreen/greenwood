@@ -74,11 +74,10 @@ describe('Build Greenwood With: ', function() {
         expect(await glob.promise(path.join(this.context.publicDir, './cache.json'))).to.have.lengthOf(1);
       });
 
-      // TODO fixing the ordering issue would help make this test case more reliable - #271
-      xit('should output one cache.json file with expected cache contents', async function() {
+      it('should output one cache.json file with expected cache contents', async function() {
         const cacheContents = require(path.join(this.context.publicDir, './cache.json'));
 
-        expect(cacheContents).to.be.deep.equalInAnyOrder(expectedCache);
+        expect(cacheContents).to.be.deep.equal(expectedCache);
       });
 
       it('should have one window.__APOLLO_STATE__ <script> tag set in index.html', () => {
@@ -109,7 +108,7 @@ describe('Build Greenwood With: ', function() {
     });
 
     describe('Blog Page (Template) w/ Navigation and Children Query', function() {
-      const expectedCache = {"ROOT_QUERY.children({\"parent\":\"blog\"}).0":{"title":"Blog","link":"/blog/first-post","__typename":"Page"},"ROOT_QUERY.children({\"parent\":\"blog\"}).1":{"title":"Blog","link":"/blog/second-post","__typename":"Page"},"ROOT_QUERY":{"children({\"parent\":\"blog\"})":[{"type":"id","generated":true,"id":"ROOT_QUERY.children({\"parent\":\"blog\"}).0","typename":"Page"},{"type":"id","generated":true,"id":"ROOT_QUERY.children({\"parent\":\"blog\"}).1","typename":"Page"}],"navigation":[{"type":"id","generated":true,"id":"ROOT_QUERY.navigation.0","typename":"Navigation"}]},"ROOT_QUERY.navigation.0":{"label":"Blog","link":"/blog/","__typename":"Navigation"}}; // eslint-disable-line
+      const expectedCache = {"ROOT_QUERY.navigation.0":{"label":"Blog","link":"/blog/","__typename":"Navigation"},"ROOT_QUERY":{"navigation":[{"type":"id","generated":true,"id":"ROOT_QUERY.navigation.0","typename":"Navigation"}],"children({\"parent\":\"blog\"})":[{"type":"id","generated":false,"id":"Page:f3f1bb94286324a","typename":"Page"},{"type":"id","generated":false,"id":"Page:9a4ce9aeeb41a94","typename":"Page"}]},"Page:f3f1bb94286324a":{"id":"f3f1bb94286324a","title":"Blog","link":"/blog/first-post","filePath":"./blog/first-post.md","fileName":"first-post","template":"blog","__typename":"Page"},"Page:9a4ce9aeeb41a94":{"id":"9a4ce9aeeb41a94","title":"Blog","link":"/blog/second-post","filePath":"./blog/second-post.md","fileName":"second-post","template":"blog","__typename":"Page"}}; // eslint-disable-line
       
       beforeEach(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'blog', 'first-post', 'index.html'));
@@ -123,11 +122,10 @@ describe('Build Greenwood With: ', function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'blog', 'cache.json'))).to.have.lengthOf(1);
       });
 
-      // TODO fixing the ordering issue would help make this test case more reliable - #271
-      xit('should output one cache.json file with expected cache contents', function() {
+      it('should output one cache.json file with expected cache contents', function() {
         const cacheContents = require(path.join(this.context.publicDir, 'blog', 'cache.json'));
 
-        expect(cacheContents).to.be.deep.equalInAnyOrder(expectedCache);
+        expect(cacheContents).to.be.deep.equal(expectedCache);
       });
 
       it('should have one window.__APOLLO_STATE__ <script> tag set in index.html', () => {
@@ -137,8 +135,7 @@ describe('Build Greenwood With: ', function() {
         });
 
         expect(apolloScriptTags.length).to.be.equal(1);
-        // TODO fixing the ordering issue would help make this test case more reliable - #271
-        // expect(apolloScriptTags[0].innerHTML).to.contain(`window.__APOLLO_STATE__=${JSON.stringify(expectedCache)}`);
+        expect(apolloScriptTags[0].innerHTML).to.contain(`window.__APOLLO_STATE__=${JSON.stringify(expectedCache)}`);
       });
 
       it('should have a <header> tag in the <body>', function() {
@@ -164,18 +161,15 @@ describe('Build Greenwood With: ', function() {
         expect(listItems.length).to.be.equal(2);
         expect(linkItems.length).to.be.equal(2);
 
-        // TODO fixing the ordering issue would remove need to rely on ordering for testing - #371
-        // e.g. these should be .equal, not .contain
         const link1 = linkItems[0];
-
-        expect(link1.href.replace('file://', '')).to.be.contain('/blog/');
-        expect(link1.title).to.be.contain('Click to read my');
-        expect(link1.innerHTML).to.contain('Blog');
-
         const link2 = linkItems[1];
 
-        expect(link2.href.replace('file://', '')).to.be.contain('/blog/');
-        expect(link2.title).to.be.contain('Click to read my');
+        expect(link1.href.replace('file://', '')).to.be.equal('/blog/first-post/');
+        expect(link1.title).to.be.equal('Click to read my Blog blog post');
+        expect(link1.innerHTML).to.contain('Blog');
+
+        expect(link2.href.replace('file://', '')).to.be.equal('/blog/second-post/');
+        expect(link2.title).to.be.equal('Click to read my Blog blog post');
         expect(link2.innerHTML).to.contain('Blog');
       });
     });

@@ -1,7 +1,6 @@
 const { gql } = require('apollo-server-express');
 
 const getDeriveMetaFromRoute = (route) => {
-  console.log('getDeriveMetaFromRoute route', route);
   // TODO hardcoded root / depth - #273
   const root = route.split('/')[1] || '';
   const label = root
@@ -18,9 +17,6 @@ const getDeriveMetaFromRoute = (route) => {
 };
 
 const getPagesFromGraph = async (root, query, context) => {
-  console.log('getPagesFromGraph root', root);
-  console.log('getPagesFromGraph query', query);
-  console.log('getPagesFromGraph context', context);
   const pages = [];
   const { graph } = context;
 
@@ -44,9 +40,6 @@ const getPagesFromGraph = async (root, query, context) => {
 };
 
 const getNavigationFromGraph = async (root, query, context) => {
-  console.log('getNavigationFromGraph root', root);
-  console.log('getNavigationFromGraph query', query);
-  console.log('getNavigationFromGraph context', context);
   const navigation = {};
   const { graph } = context;
 
@@ -70,10 +63,6 @@ const getNavigationFromGraph = async (root, query, context) => {
 };
 
 const getChildrenFromParentRoute = async (root, query, context) => {
-  console.log('getChildrenFromParentRoute root', root);
-  console.log('getChildrenFromParentRoute query', query);
-  console.log('getChildrenFromParentRoute context', context);
-  
   const pages = [];
   const { parent } = query;
   const { graph } = context;
