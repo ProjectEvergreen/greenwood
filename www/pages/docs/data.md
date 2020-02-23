@@ -34,7 +34,7 @@ Greenwood exposes a [GraphQL](https://graphql.org/) + [Apollo](https://www.apoll
 ![graphql-playground](/assets/graphql-playground.png)
 
 #### Schema
-To kick things off, let's review what is availalble to you from.  Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type defintion](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's `graph`.
+To kick things off, let's review what is availalble to you.  Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type defintion](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's `graph`.
 
 This is what the schema looks like:
 ```render javascript
@@ -56,9 +56,11 @@ graph {
 > All queries return subsets and / or derivitives of the `graph`.
 
 #### Queries
-To help facilitiate development, Greenwood provides a couple queries out of the box that you can use to get access to the `graph` and start using it in your components, which we'll get to next.
+To help facilitiate development, Greenwood provides a couple queries out of the box that you can use to get access to the `graph` and to start using them in your components. (which we'll get to next)
 
 Below are the queries available:
+
+> Note: the default return order for pages will be exactly as you have it in your local filesystem.
 
 ##### Graph
 The Graph query returns an array of all pages.
