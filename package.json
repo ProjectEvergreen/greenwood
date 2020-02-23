@@ -19,7 +19,6 @@
     "lint": "eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
     "build": "yarn clean && node . build",
     "serve": "yarn build && cd ./public && ws",
-    "develop": "yarn clean && node . develop",
     "test": "export BROWSERSLIST_IGNORE_OLD_DATA=true && yarn clean && nyc mocha",
     "test:tdd": "yarn test --watch"
   },
