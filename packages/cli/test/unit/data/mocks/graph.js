@@ -183,7 +183,7 @@ const GRAPH_MOCK = {
       title: 'Greenwood',
       meta: [Array] },
     { mdFile: './getting-started/index.md',
-      label: 'getting-started',
+      label: '0f09ddfde58fbc3',
       route: '/getting-started/',
       template: 'page',
       filePath:
