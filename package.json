@@ -20,8 +20,8 @@
     "build": "yarn clean && node . build",
     "serve": "yarn build && cd ./public && ws",
     "develop": "yarn clean && node . develop",
-    "test": "export BROWSERSLIST_IGNORE_OLD_DATA=true && yarn clean && nyc mocha ./packages/**/test/**/**/*.spec.js --timeout 30000",
-    "test:tdd": "export BROWSERSLIST_IGNORE_OLD_DATA=true  && yarn clean && mocha --watch ./packages/**/test/**/**/*.spec.js --timeout 15000"
+    "test": "export BROWSERSLIST_IGNORE_OLD_DATA=true && yarn clean && nyc mocha",
+    "test:tdd": "export BROWSERSLIST_IGNORE_OLD_DATA=true  && yarn clean && mocha --watch"
   },
   "devDependencies": {
     "chai": "^4.2.0",
