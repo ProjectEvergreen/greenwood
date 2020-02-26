@@ -21,7 +21,7 @@
     "serve": "yarn build && cd ./public && ws",
     "develop": "yarn clean && node . develop",
     "test": "export BROWSERSLIST_IGNORE_OLD_DATA=true && yarn clean && nyc mocha",
-    "test:tdd": "export BROWSERSLIST_IGNORE_OLD_DATA=true  && yarn clean && mocha --watch"
+    "test:tdd": "yarn test --watch"
   },
   "devDependencies": {
     "chai": "^4.2.0",
