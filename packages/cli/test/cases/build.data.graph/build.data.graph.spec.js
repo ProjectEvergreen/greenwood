@@ -32,6 +32,7 @@ const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Data from GraphQL';
+  const apolloStateLabel = 'window.__APOLLO_STATE__=';
   let setup;
 
   before(async function() {
@@ -48,8 +49,6 @@ describe('Build Greenwood With: ', function() {
     runSmokeTest(['public', 'not-found'], LABEL);
 
     describe('Home (Page Template) w/ Navigation Query', function() {
-      const expectedCache = {"ROOT_QUERY.navigation.0":{"label":"Blog","link":"/blog/","__typename":"Navigation"},"ROOT_QUERY":{"navigation":[{"type":"id","generated":true,"id":"ROOT_QUERY.navigation.0","typename":"Navigation"}]}};  // eslint-disable-line
-
       beforeEach(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
@@ -74,20 +73,25 @@ describe('Build Greenwood With: ', function() {
         expect(await glob.promise(path.join(this.context.publicDir, './cache.json'))).to.have.lengthOf(1);
       });
 
-      it('should output one cache.json file with expected cache contents', async function() {
+      it('should output one cache.json file with expected cache contents for ROOT_QUERY', function() {
         const cacheContents = require(path.join(this.context.publicDir, './cache.json'));
 
-        expect(cacheContents).to.be.deep.equal(expectedCache);
+        expect(cacheContents).to.contain.key('ROOT_QUERY.navigation.0');
+        expect(cacheContents).to.contain.key('ROOT_QUERY');
       });
 
-      it('should have one window.__APOLLO_STATE__ <script> tag set in index.html', () => {
+      it('should have one window.__APOLLO_STATE__ <script> with expected QUERY keys', () => {
         const scriptTags = dom.window.document.querySelectorAll('head > script');
         const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';
         });
+        const innerHTML = apolloScriptTags[0].innerHTML;
+        const json = JSON.parse(innerHTML.replace(apolloStateLabel, '').replace(';', ''));
 
-        expect(apolloScriptTags.length).to.be.equal(1);
-        expect(apolloScriptTags[0].innerHTML).to.contain(`window.__APOLLO_STATE__=${JSON.stringify(expectedCache)}`);
+        expect(json).to.contain.key('ROOT_QUERY.navigation.0');
+        expect(json).to.contain.key('ROOT_QUERY');
+
+        expect(innerHTML).to.contain(apolloStateLabel);
       });
 
       it('should have a <header> tag in the <body>', function() {
@@ -108,8 +112,6 @@ describe('Build Greenwood With: ', function() {
     });
 
     describe('Blog Page (Template) w/ Navigation and Children Query', function() {
-      const expectedCache = {"ROOT_QUERY.navigation.0":{"label":"Blog","link":"/blog/","__typename":"Navigation"},"ROOT_QUERY":{"navigation":[{"type":"id","generated":true,"id":"ROOT_QUERY.navigation.0","typename":"Navigation"}],"children({\"parent\":\"blog\"})":[{"type":"id","generated":false,"id":"Page:f3f1bb94286324a","typename":"Page"},{"type":"id","generated":false,"id":"Page:9a4ce9aeeb41a94","typename":"Page"}]},"Page:f3f1bb94286324a":{"id":"f3f1bb94286324a","title":"Blog","link":"/blog/first-post","filePath":"./blog/first-post.md","fileName":"first-post","template":"blog","__typename":"Page"},"Page:9a4ce9aeeb41a94":{"id":"9a4ce9aeeb41a94","title":"Blog","link":"/blog/second-post","filePath":"./blog/second-post.md","fileName":"second-post","template":"blog","__typename":"Page"}}; // eslint-disable-line
-      
       beforeEach(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'blog', 'first-post', 'index.html'));
       });
@@ -122,10 +124,20 @@ describe('Build Greenwood With: ', function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'blog', 'cache.json'))).to.have.lengthOf(1);
       });
 
-      it('should output one cache.json file with expected cache contents', function() {
+      it('should output one cache.json file with expected cache contents for ROOT_QUERY', function() {
         const cacheContents = require(path.join(this.context.publicDir, 'blog', 'cache.json'));
 
-        expect(cacheContents).to.be.deep.equal(expectedCache);
+        expect(cacheContents).to.contain.key('ROOT_QUERY.navigation.0');
+        expect(cacheContents).to.contain.key('ROOT_QUERY');
+      });
+
+      it('should output one cache.json file with expected cache length for Pages', function() {
+        const cacheContents = require(path.join(this.context.publicDir, 'blog', 'cache.json'));
+        const pages = Object.keys(cacheContents).filter((key) => {
+          return key.includes('Page:');
+        });
+
+        expect(pages.length).to.equal(2);
       });
 
       it('should have one window.__APOLLO_STATE__ <script> tag set in index.html', () => {
@@ -135,7 +147,35 @@ describe('Build Greenwood With: ', function() {
         });
 
         expect(apolloScriptTags.length).to.be.equal(1);
-        expect(apolloScriptTags[0].innerHTML).to.contain(`window.__APOLLO_STATE__=${JSON.stringify(expectedCache)}`);
+        expect(apolloScriptTags[0].innerHTML).to.contain('window.__APOLLO_STATE__={');
+      });
+
+      it('should have one window.__APOLLO_STATE__ <script> with expected QUERY keys', () => {
+        const scriptTags = dom.window.document.querySelectorAll('head > script');
+        const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
+          return script.getAttribute('data-state') === 'apollo';
+        });
+        const innerHTML = apolloScriptTags[0].innerHTML;
+        const json = JSON.parse(innerHTML.replace(apolloStateLabel, '').replace(';', ''));
+
+        expect(json).to.contain.key('ROOT_QUERY.navigation.0');
+        expect(json).to.contain.key('ROOT_QUERY');
+
+        expect(innerHTML).to.contain(apolloStateLabel);
+      });
+
+      it('should have one window.__APOLLO_STATE__ <script> with expected Pages: keys', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script');
+        const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
+          return script.getAttribute('data-state') === 'apollo';
+        });
+        const innerHTML = apolloScriptTags[0].innerHTML;
+        const json = JSON.parse(innerHTML.replace(apolloStateLabel, '').replace(';', ''));
+        const pages = Object.keys(json).filter((key) => {
+          return key.includes('Page:');
+        });
+
+        expect(pages.length).to.equal(2);
       });
 
       it('should have a <header> tag in the <body>', function() {
