@@ -63,12 +63,34 @@ describe('Build Greenwood With: ', function() {
       });
 
       // rest of index smoke-test because <title></title> is changed for this case
-      it('should have two <script> tag in the <body>', function() {
-        const scriptTag = dom.window.document.querySelectorAll('body script');
+      it('should have two <script> tags in the <body>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body script');
 
-        expect(scriptTag.length).to.be.equal(2);
+        expect(scriptTags.length).to.be.equal(2);
       });
 
+      it('should have one <script> tag in the <body> for the main bundle', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body script');
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+ 
+          return src.indexOf('index.') === 0 && src.indexOf('.bundle.js') >= 0;
+        });
+
+        expect(bundledScript.length).to.be.equal(1);
+      });
+
+      it('should have one <script> tag in the <body> for the split chunks (vendor) bundle', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body script');
+        const vendorScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+ 
+          return src.indexOf('vendors~index.') === 0 && src.indexOf('.bundle.js') >= 0;
+        });
+
+        expect(vendorScript.length).to.be.equal(1);
+      });
+      
       it('should have a router outlet tag in the <body>', function() {
         const outlet = dom.window.document.querySelectorAll('body eve-app');
 
