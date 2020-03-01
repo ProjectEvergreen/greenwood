@@ -12,6 +12,9 @@ const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 
+const mainBundleScriptRegex = /index.*.bundle\.js/;
+const vendorBundleScriptRegex = /vendors~index.*.bundle\.js/;
+
 function publicDirectory(label) {
   describe(`Running Smoke Tests: ${label}`, function() {
     describe('Public Directory Generated Output', function() {
@@ -43,15 +46,45 @@ function defaultNotFound(label) {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, '404.html'));
       });
 
-      it('should have two bundle <script> tag in the <body>', function() {
+      it('should have two <script> tags in the <body>', function() {
         const scriptTags = dom.window.document.querySelectorAll('body script');
-        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src;
-
-          return src.indexOf('index.') >= 0 && src.indexOf('.bundle.js') >= 0;
+        const bundledScripts = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+          console.log('src', src);
+          // console.log('src test', mainBundleScriptRegex.test(src));
+          // return mainBundleScriptRegex.test(src) && !vendorBundleScriptRegex.test(src);
         });
 
-        expect(bundleScripts.length).to.be.equal(2);
+        console.log('bundled scripts', bundledScripts);
+        console.log('length', scriptTags.length);
+        // console.log('matched scripts', bundledScript);
+        // expect(bundledScript.length).to.be.equal(1);
+      });
+
+      it('should have one <script> tag in the <body> for the main bundle', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body script');
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+          console.log('src', src);
+          console.log('src test', mainBundleScriptRegex.test(src));
+          return mainBundleScriptRegex.test(src) && !vendorBundleScriptRegex.test(src);
+        });
+
+        console.log('length', bundledScript.length);
+        console.log('matched scripts', bundledScript);
+        expect(bundledScript.length).to.be.equal(1);
+      });
+
+      it('should have one <script> tag in the <body> for the split chunks (vendor) bundle', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body script');
+        const vendorScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+          console.log('src', src);
+          console.log('src test', vendorBundleScriptRegex.test(src) && !mainBundleScriptRegex.test(src));
+          return vendorBundleScriptRegex.test(src);
+        });
+
+        expect(vendorScript.length).to.be.equal(1);
       });
 
       it('should have a <title> tag in the <head>', function() {
@@ -86,15 +119,36 @@ function defaultIndex(label) {
         expect(title).to.be.equal('Greenwood App');
       });
 
-      it('should have two <script> tag for loading main JavaScript bundle at the end of the <body> tag', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
-        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src;
+      xit('should have two <script> tags in the <body>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body script');
 
-          return src.indexOf('index') >= 0 && src.indexOf('bundle') >= 0;
+        expect(scriptTags.length).to.be.equal(2);
+      });
+
+      it('should have one <script> tag in the <body> for the main bundle', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+          console.log('src', src);
+          console.log('src test', mainBundleScriptRegex.test(src));
+          return mainBundleScriptRegex.test(src) && !vendorBundleScriptRegex.test(src);
         });
 
-        expect(bundleScripts.length).to.be.equal(2);
+        console.log('length', bundledScript.length);
+        console.log('matched scripts', bundledScript);
+        expect(bundledScript.length).to.be.equal(1);
+      });
+
+      it('should have one <script> tag in the <body> for the split chunks (vendor) bundle', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
+        const vendorScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+          console.log('src', src);
+          console.log('src test', vendorBundleScriptRegex.test(src) && !mainBundleScriptRegex.test(src));
+          return vendorBundleScriptRegex.test(src);
+        });
+
+        expect(vendorScript.length).to.be.equal(1);
       });
 
       it('should have a router outlet tag in the <body>', function() {
@@ -138,6 +192,7 @@ function defaultHelloPage(label) {
       it('should output a hello page directory', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './hello'))).to.be.true;
       });
+
       it('should output an index.html file within the default hello page directory', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './hello', './index.html'))).to.be.true;
       });
