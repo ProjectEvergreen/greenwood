@@ -48,30 +48,18 @@ function defaultNotFound(label) {
 
       it('should have two <script> tags in the <body>', function() {
         const scriptTags = dom.window.document.querySelectorAll('body script');
-        const bundledScripts = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
-          console.log('src', src);
-          // console.log('src test', mainBundleScriptRegex.test(src));
-          // return mainBundleScriptRegex.test(src) && !vendorBundleScriptRegex.test(src);
-        });
 
-        console.log('bundled scripts', bundledScripts);
-        console.log('length', scriptTags.length);
-        // console.log('matched scripts', bundledScript);
-        // expect(bundledScript.length).to.be.equal(1);
+        expect(scriptTags.length).to.be.equal(2);
       });
 
       it('should have one <script> tag in the <body> for the main bundle', function() {
         const scriptTags = dom.window.document.querySelectorAll('body script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
-          console.log('src', src);
-          console.log('src test', mainBundleScriptRegex.test(src));
+
           return mainBundleScriptRegex.test(src) && !vendorBundleScriptRegex.test(src);
         });
 
-        console.log('length', bundledScript.length);
-        console.log('matched scripts', bundledScript);
         expect(bundledScript.length).to.be.equal(1);
       });
 
@@ -79,8 +67,7 @@ function defaultNotFound(label) {
         const scriptTags = dom.window.document.querySelectorAll('body script');
         const vendorScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
-          console.log('src', src);
-          console.log('src test', vendorBundleScriptRegex.test(src) && !mainBundleScriptRegex.test(src));
+
           return vendorBundleScriptRegex.test(src);
         });
 
@@ -119,8 +106,8 @@ function defaultIndex(label) {
         expect(title).to.be.equal('Greenwood App');
       });
 
-      xit('should have two <script> tags in the <body>', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body script');
+      it('should have two <script> tags in the <body>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
 
         expect(scriptTags.length).to.be.equal(2);
       });
@@ -129,13 +116,10 @@ function defaultIndex(label) {
         const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
-          console.log('src', src);
-          console.log('src test', mainBundleScriptRegex.test(src));
+
           return mainBundleScriptRegex.test(src) && !vendorBundleScriptRegex.test(src);
         });
 
-        console.log('length', bundledScript.length);
-        console.log('matched scripts', bundledScript);
         expect(bundledScript.length).to.be.equal(1);
       });
 
@@ -143,8 +127,7 @@ function defaultIndex(label) {
         const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
         const vendorScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
-          console.log('src', src);
-          console.log('src test', vendorBundleScriptRegex.test(src) && !mainBundleScriptRegex.test(src));
+
           return vendorBundleScriptRegex.test(src);
         });
 
