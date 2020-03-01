@@ -22,6 +22,9 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
+const mainBundleScriptRegex = /index.*.bundle\.js/;
+const vendorBundleScriptRegex = /vendors~index.*.bundle\.js/;
+
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace w/Custom App Template';
   let setup;
@@ -65,8 +68,8 @@ describe('Build Greenwood With: ', function() {
         const scriptTags = dom.window.document.querySelectorAll('body script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
- 
-          return src.indexOf('index.') === 0 && src.indexOf('.bundle.js') >= 0;
+
+          return mainBundleScriptRegex.test(src) && !vendorBundleScriptRegex.test(src);
         });
 
         expect(bundledScript.length).to.be.equal(1);
@@ -76,8 +79,8 @@ describe('Build Greenwood With: ', function() {
         const scriptTags = dom.window.document.querySelectorAll('body script');
         const vendorScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
- 
-          return src.indexOf('vendors~index.') === 0 && src.indexOf('.bundle.js') >= 0;
+
+          return vendorBundleScriptRegex.test(src);
         });
 
         expect(vendorScript.length).to.be.equal(1);
