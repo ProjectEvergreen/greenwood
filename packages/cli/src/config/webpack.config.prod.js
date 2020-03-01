@@ -10,6 +10,12 @@ module.exports = ({ config, context, graph }) => {
 
     performance: {
       hints: 'warning'
+    },
+
+    optimization: {
+      splitChunks: {
+        chunks: 'all'
+      }
     }
 
   });

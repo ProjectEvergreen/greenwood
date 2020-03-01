@@ -127,12 +127,6 @@ module.exports = ({ config, context }) => {
       }]
     },
 
-    optimization: {
-      splitChunks: {
-        chunks: 'all'
-      }
-    },
-
     plugins: [
       new HtmlWebpackPlugin({
         filename: path.join(context.publicDir, context.indexPageTemplate),
