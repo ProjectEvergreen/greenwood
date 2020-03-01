@@ -38,7 +38,6 @@ const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 const mainBundleScriptRegex = /index.*.bundle\.js/;
-const vendorBundleScriptRegex = /vendors~index.*.bundle\.js/;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Meta Configuration and Nested Workspace';
@@ -83,32 +82,15 @@ describe('Build Greenwood With: ', function() {
         expect(title).to.be.equal('My Custom Greenwood App');
       });
 
-      it('should have two <script> tags in the <body>', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body script');
-
-        expect(scriptTags.length).to.be.equal(2);
-      });
-
       it('should have one <script> tag in the <body> for the main bundle', function() {
         const scriptTags = dom.window.document.querySelectorAll('body script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
 
-          return mainBundleScriptRegex.test(src) && !vendorBundleScriptRegex.test(src);
+          return mainBundleScriptRegex.test(src);
         });
 
         expect(bundledScript.length).to.be.equal(1);
-      });
-
-      it('should have one <script> tag in the <body> for the split chunks (vendor) bundle', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body script');
-        const vendorScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
-
-          return vendorBundleScriptRegex.test(src);
-        });
-
-        expect(vendorScript.length).to.be.equal(1);
       });
 
       it('should have a router outlet tag in the <body>', function() {
