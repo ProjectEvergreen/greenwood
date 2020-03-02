@@ -22,6 +22,8 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
+const mainBundleScriptRegex = /index.*.bundle\.js/;
+
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace w/Custom App Template';
   let setup;
@@ -55,10 +57,15 @@ describe('Build Greenwood With: ', function() {
         expect(title).to.be.equal('Greenwood App');
       });
 
-      it('should have one <script> tag in the <body>', function() {
-        const scriptTag = dom.window.document.querySelectorAll('body script');
+      it('should have one <script> tag in the <body> for the main bundle', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body script');
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
 
-        expect(scriptTag.length).to.be.equal(1);
+          return mainBundleScriptRegex.test(src);
+        });
+
+        expect(bundledScript.length).to.be.equal(1);
       });
 
       it('should have a router outlet tag in the <body>', function() {

@@ -7,8 +7,8 @@ class shelf extends LitElement {
 
   static get properties() {
     return {
-      shelfList: {
-        type: Array
+      list: {
+        type: Function
       }
     };
   }
@@ -16,11 +16,13 @@ class shelf extends LitElement {
   constructor() {
     super();
     this.selectedIndex = '';
+    this.list = () => [];
     this.shelfList = [];
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
+    this.shelfList = await this.list();
     this.collapseAll();
     this.expandRoute(window.location.pathname);
   }

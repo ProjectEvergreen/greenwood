@@ -12,6 +12,8 @@ const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 
+const mainBundleScriptRegex = /index.*.bundle\.js/;
+
 function publicDirectory(label) {
   describe(`Running Smoke Tests: ${label}`, function() {
     describe('Public Directory Generated Output', function() {
@@ -43,15 +45,15 @@ function defaultNotFound(label) {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, '404.html'));
       });
 
-      it('should have one bundle <script> tag in the <body>', function() {
+      it('should have one <script> tag in the <body> for the main bundle', function() {
         const scriptTags = dom.window.document.querySelectorAll('body script');
-        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src;
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
 
-          return src.indexOf('index.') >= 0 && src.indexOf('.bundle.js') >= 0;
+          return mainBundleScriptRegex.test(src);
         });
 
-        expect(bundleScripts.length).to.be.equal(1);
+        expect(bundledScript.length).to.be.equal(1);
       });
 
       it('should have a <title> tag in the <head>', function() {
@@ -86,15 +88,15 @@ function defaultIndex(label) {
         expect(title).to.be.equal('Greenwood App');
       });
 
-      it('should have one <script> tag for loading main JavaScript bundle at the end of the <body> tag', function() {
+      it('should have one <script> tag in the <body> for the main bundle', function() {
         const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
-        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src;
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
 
-          return src.indexOf('index') >= 0 && src.indexOf('bundle') >= 0;
+          return mainBundleScriptRegex.test(src);
         });
 
-        expect(bundleScripts.length).to.be.equal(1);
+        expect(bundledScript.length).to.be.equal(1);
       });
 
       it('should have a router outlet tag in the <body>', function() {
@@ -138,6 +140,7 @@ function defaultHelloPage(label) {
       it('should output a hello page directory', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './hello'))).to.be.true;
       });
+
       it('should output an index.html file within the default hello page directory', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './hello', './index.html'))).to.be.true;
       });

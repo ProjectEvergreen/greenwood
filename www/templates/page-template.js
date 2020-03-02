@@ -26,13 +26,13 @@ class PageTemplate extends LitElement {
     let list = [];
 
     if (url.indexOf('/about') >= 0) {
-      list = require('../components/shelf/about.json');
+      list = () => import(/* webpackChunkName: 'about' */ '../components/shelf/about.json').then(({ default: data }) => data);
     } else if (url.indexOf('/docs') >= 0) {
-      list = require('../components/shelf/documentation-list.json');
+      list = () => import(/* webpackChunkName: 'documentation-list' */ '../components/shelf/documentation-list.json').then(({ default: data }) => data);
     } else if (url.indexOf('/getting-started') >= 0) {
-      list = require('../components/shelf/getting-started-list.json');
+      list = () => import(/* webpackChunkName: 'getting-started' */ '../components/shelf/getting-started-list.json').then(({ default: data }) => data);
     } else if (url.indexOf('/plugins') >= 0) {
-      list = require('../components/shelf/plugins.json');
+      list = () => import(/* webpackChunkName: 'plugins' */ '../components/shelf/plugins.json').then(({ default: data }) => data);
     }
 
     this.shelfList = list;
@@ -48,7 +48,7 @@ class PageTemplate extends LitElement {
         <eve-header></eve-header>
         <div class='content-wrapper'>
           <div class="sidebar">
-            <eve-shelf .shelfList="${this.shelfList}"></eve-shelf>
+            <eve-shelf .list="${this.shelfList}"></eve-shelf>
           </div>
           <div class="content">
             <eve-container fluid>
