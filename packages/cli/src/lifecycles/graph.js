@@ -9,17 +9,26 @@ const createGraphFromPages = async (pagesDir, config) => {
 
   return new Promise(async (resolve, reject) => {
     try {
+      const pagesIndexMap = new Map();
+      let pagesIndex = 0;
 
       const walkDirectory = async(directory) => {
         let files = await fs.readdir(directory);
 
-        return Promise.all(files.map(async (file) => {
+        return Promise.all(files.map((file) => {
+          const filenameHash = crypto.createHash('md5').update(`${directory}/${file}`).digest('hex');
+          const filePath = path.join(directory, file);
+          const stats = fs.statSync(filePath);
+          const isMdFile = file.substr(file.length - 2, file.length) === 'md';
+
+          // map each page to a (0 based) index based on filesystem order
+          if (isMdFile) {
+            pagesIndexMap.set(filenameHash, pagesIndex);
+            pagesIndex += 1;
+          }
+
           return new Promise(async (resolve, reject) => {
             try {
-              const filePath = path.join(directory, file);
-              const stats = await fs.stat(filePath);
-              const isMdFile = file.substr(file.length - 2, file.length) === 'md';
-
               if (isMdFile && !stats.isDirectory()) {
                 const fileContents = await fs.readFile(filePath, 'utf8');
                 const { attributes } = fm(fileContents);
@@ -80,12 +89,14 @@ const createGraphFromPages = async (pagesDir, config) => {
                 * meta: og graph meta array of objects { property/name, content }
                 */
 
-                pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath, title, meta });
+                pages[pagesIndexMap.get(filenameHash)] = { mdFile, label, route, template, filePath, fileName, relativeExpectedPath, title, meta };
               }
+
               if (stats.isDirectory()) {
                 await walkDirectory(filePath);
                 resolve();
               }
+              
               resolve();
             } catch (err) {
               reject(err);

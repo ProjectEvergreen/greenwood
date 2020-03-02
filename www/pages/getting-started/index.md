@@ -1,7 +1,3 @@
----
-label: 'getting-started'
----
-
 ## Introduction
 First off, thank you for taking the time to check out Greenwood!  As a tool, we hope that you find Greenwood to provide a productive and frictionless developer experience for you that results in performant and engaging experiences for your users.  Under the hood Greenwood is using NodeJS, webpack, babel and a lot of other amazing JavaScript tools to power a modern development workflow based on first class support for the modern web like Web Components, FlexBox, CSS Grid, ECMAScript modules, and all your favorite features!
 
