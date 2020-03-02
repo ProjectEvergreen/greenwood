@@ -16,7 +16,7 @@
     "lerna": "lerna",
     "clean": "rimraf ./**/.greenwood/** && rimraf ./**/public/** && rimraf ./coverage",
     "clean:deps": "rimraf **/node_modules/**",
-    "lint": "eslint \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
+    "lint": "eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
     "build": "yarn clean && node . build",
     "serve": "yarn build && cd ./public && ws",
     "develop": "yarn clean && node . develop",
@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^5.15.3",
+    "eslint": "^6.8.0",
     "jsdom": "^14.0.0",
     "lerna": "^3.16.4",
     "mocha": "^6.1.4",
