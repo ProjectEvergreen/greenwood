@@ -56,7 +56,7 @@ const getNavigationFromGraph = async (root, query, context) => {
       }
     });
 
-  // TODO best format for users, hash map? #271
+  // TODO best format for users, hash map? #288
   return Object.keys(navigation).map((key) => {
     return navigation[key];
   });

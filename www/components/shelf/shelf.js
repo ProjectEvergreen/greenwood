@@ -56,19 +56,17 @@ class Shelf extends LitElement {
           list = [];
 
       }
-      
-      // TODO not actually integrated, still using .json files - #271
+
+      // TODO not actually integrated, still using .json files - #288
       const response = await client.query({
         query: ChildrenQuery,
         variables: {
           parent: page
         }
       });
-
       console.log('response from the shelf (data.children)', response.data.children);
 
       this.shelfList = list;
-      console.log('shelf list', this.shelfList);
     }
   }
 

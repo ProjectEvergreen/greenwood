@@ -24,9 +24,11 @@ const setDataForPages = async (context) => {
       cacheContents = deepmerge(cacheContents, require(file));
     });
 
+    const serialzedCacheContents = JSON.stringify(cacheContents);
+
     // TODO could optimize this probably - #277
-    fs.writeFileSync(`${publicDir}/${cacheRoot}/cache.json`, JSON.stringify(cacheContents));
-    fs.writeFileSync(pagePath, contents.replace('___DATA___', JSON.stringify(cacheContents)));
+    fs.writeFileSync(`${publicDir}/${cacheRoot}/cache.json`, serialzedCacheContents);
+    fs.writeFileSync(pagePath, contents.replace('___DATA___', serialzedCacheContents));
   });
 };
 
