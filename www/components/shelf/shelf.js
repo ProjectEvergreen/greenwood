@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit-element';
 import client from '@greenwood/cli/data/client';
-import ChildrenQuery from '@greenwood/cli/data/queries/children';
+import MenuQuery from '@greenwood/cli/data/queries/menu';
 import css from './shelf.css';
 import chevronRt from '../icons/chevron-right/chevron-right';
 import chevronDwn from '../icons/chevron-down/chevron-down';
@@ -11,9 +11,6 @@ class Shelf extends LitElement {
     return {
       page: {
         type: String
-      },
-      shelfList: {
-        type: Array
       }
     };
   }
@@ -21,54 +18,28 @@ class Shelf extends LitElement {
   constructor() {
     super();
     this.selectedIndex = '';
-    this.list = () => [];
     this.shelfList = [];
     this.page = '';
   }
 
   async connectedCallback() {
     super.connectedCallback();
-    this.collapseAll();
-    this.expandRoute(window.location.pathname);
-  }
-
-  async setupShelf(page) {
-    console.log('setupShelf for page =>', page);
-    let list = [];
-
-    if (page && page !== '' && page !== '/') {
-      // TODO remove require call - #275
-      // this.shelfList = require(`./${page}.json`);
-      switch (page) {
-
-        case 'about':
-          list = await import(/* webpackChunkName: 'about' */ '../components/shelf/about.json').then(({ default: data }) => data);
-          break;
-        case 'docs':
-          list = await import(/* webpackChunkName: 'documentation-list' */ '../components/shelf/docs.json').then(({ default: data }) => data);
-          break;
-        case 'getting-started':
-          list = await import(/* webpackChunkName: 'getting-started' */ '../components/shelf/getting-started.json').then(({ default: data }) => data);
-          break;
-        case 'plugins':
-          list = await import(/* webpackChunkName: 'plugins' */ '../components/shelf/plugins.json').then(({ default: data }) => data);
-          break;
-        default:
-          list = [];
-
-      }
-
-      // TODO not actually integrated, still using .json files - #288
+    if (this.page !== '' && this.page !== '/') {
       const response = await client.query({
-        query: ChildrenQuery,
+        query: MenuQuery,
         variables: {
-          parent: page
+          menu: 'side',
+          route: window.location.pathname
         }
       });
-      console.log('response from the shelf (data.children)', response.data.children);
 
-      this.shelfList = list;
+      console.log('shelf =>', response.data.menu.children);
+      this.shelfList = response.data.menu.children;
+      this.requestUpdate();
     }
+
+    this.collapseAll();
+    // this.expandRoute(window.location.pathname);
   }
 
   goTo(path) {
@@ -129,17 +100,17 @@ class Shelf extends LitElement {
   }
 
   renderList() {
-    console.log('renderlist', this.shelfList);
+
     /* eslint-disable indent */
     const renderListItems = (list) => {
       let listItems = '';
 
-      if (list.items && list.items.length > 0) {
+      if (list && list.length > 0) {
         listItems = html`
           <ul>
-            ${list.items.map((item, index) => {
+            ${list.map(({ item }, index) => {
               return html`
-                <li id="index_${index}" class="${list.selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`#${item.id}`)}">${item.name}</a></li>
+                <li id="index_${index}" class="${item.selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`${item.link}`)}">${item.label}</a></li>
               `;
             })}
           </ul>
@@ -148,29 +119,27 @@ class Shelf extends LitElement {
 
       return listItems;
     };
-    /* eslint-enable */
 
-    return this.shelfList.map((list, index) => {
+    /* eslint-enable */
+    console.log(this.shelfList);
+
+    return this.shelfList.map(({ item, children, selected }, index) => {
       let id = `index_${index}`;
-      let chevron = list.items && list.items.length > 0
-        ? list.selected === true ? chevronDwn : chevronRt
+      let chevron = children && children.length > 0
+        ? selected === true ? chevronDwn : chevronRt
         : '';
 
       return html`
         <li class="list-wrap">
-          <a href="${list.path}" @click="${this.handleClick}"><h2 id="${id}">${list.name} <span>${chevron}</span></h2></a>
+          <a href="${item.link}" @click="${this.handleClick}"><h2 id="${id}">${item.label} <span>${chevron}</span></h2></a>
           <hr>
-          ${renderListItems(list)}
+          ${renderListItems(children)}
         </li>
       `;
     });
   }
 
   render() {
-    const { page } = this;
-
-    this.setupShelf(page);
-
     return html`
       <style>
         ${css}

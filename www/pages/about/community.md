@@ -1,3 +1,10 @@
+---
+label: 'community'
+menu: side
+title: 'Community'
+index: 3
+---
+
 ## Community
 
 Greenwood understands the role of community in open source, technology, and learning and we want to embrace that in this project as well.  There are many great tools and projects available in the web ecosystem and we want to highlight those projects here, that have been important in the development of Greenwood (in no particular order).
@@ -6,6 +13,7 @@ Greenwood understands the role of community in open source, technology, and lear
 - [**puppeteer**](https://github.com/GoogleChrome/puppeteer) - Headless Chrome browser used for serializtion.
 - [**WC Markdown Loader**](https://github.com/hutchgrant/wc-markdown-loader/) - A webpack plugin that transforms a markdown file into a Web Component! 🤯
 - [**LitReduxRouter**](https://github.com/fernandopasik/lit-redux-router) - Declarative client side routing library.
+- [**LitApollo**](https://www.npmjs.com/package/@apollo-elements/lit-apollo) - Base component class for connecting to Greenwood's build time GraphQL server.
 
 And of course we can't forget our [Contributors](https://github.com/ProjectEvergreen/greenwood/graphs/contributors)!
 

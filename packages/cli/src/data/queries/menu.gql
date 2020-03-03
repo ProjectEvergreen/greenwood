@@ -1,0 +1,20 @@
+query($menu: String!, $route: String) {
+  menu(filter: $menu, pathname: $route) {
+    item {
+      label,
+      link
+    }
+    children {
+      item {
+        label,
+        link
+      },
+      children {
+        item {
+          label,
+          link
+        }
+      }
+    }
+  }
+}
