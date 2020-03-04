@@ -36,6 +36,7 @@ Greenwood exposes a [GraphQL](https://graphql.org/) + [Apollo](https://www.apoll
 #### Schema
 To kick things off, let's review what is available to you.  Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type definition](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's `graph`.
 
+
 This is what the schema looks like:
 ```render javascript
 graph {
