@@ -1,13 +1,10 @@
 const { gql } = require('apollo-server');
 
-const getConfiguration = async () => {
-  // context.config; root, query, context
-  return {
-    title: 'My App'
-  };
+const getConfiguration = async (root, query, context) => {
+  return context.config;
 };
 
-// https://www.greenwoodjs.io/docs/configuratio
+// https://www.greenwoodjs.io/docs/configuration
 const configTypeDefs = gql`
   type DevServer {
     port: Int,
