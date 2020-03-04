@@ -1,4 +1,4 @@
-const GRAPH_MOCK = { 
+const MOCK_GRAPH = {
   graph: [ 
     { mdFile: './index.md',
       label: '37b24fd9f163e7b',
@@ -276,4 +276,4 @@ const GRAPH_MOCK = {
   ]
 };
 
-module.exports = GRAPH_MOCK;
+module.exports = MOCK_GRAPH;

@@ -1,21 +1,5 @@
-/*
- * Use Case
- * Run Greenwood with empty config object and default workspace.
- *
- * Uaer Result
- * Should generate a bare bones Greenwood build.  (same as build.default.spec.js)
- *
- * User Command
- * greenwood build
- *
- * User Config
- * {}
- *
- * User Workspace
- * Greenwood default (src/)
- */
 const expect = require('chai').expect;
-const GRAPH_MOCK = require('../mocks/graph');
+const MOCK_GRAPH = require('../mocks/graph');
 const { graphResolvers } = require('../../../../src/data/schema/graph');
 
 describe('Unit Test: Data', function() {
@@ -28,7 +12,7 @@ describe('Unit Test: Data', function() {
         let pages = [];
 
         before(async function() {
-          pages = await graphResolvers.Query.graph(undefined, {}, GRAPH_MOCK);
+          pages = await graphResolvers.Query.graph(undefined, {}, MOCK_GRAPH);
         });
 
         it('should have 27 pages', function() {
@@ -51,7 +35,7 @@ describe('Unit Test: Data', function() {
         let navigation = [];
 
         before(async function() {
-          navigation = await graphResolvers.Query.navigation(undefined, {}, GRAPH_MOCK);
+          navigation = await graphResolvers.Query.navigation(undefined, {}, MOCK_GRAPH);
         });
 
         it('should have 4 children', function() {
@@ -91,7 +75,7 @@ describe('Unit Test: Data', function() {
         let children = [];
 
         before(async function() {
-          children = await graphResolvers.Query.children(undefined, { parent: 'getting-started' }, GRAPH_MOCK);
+          children = await graphResolvers.Query.children(undefined, { parent: 'getting-started' }, MOCK_GRAPH);
         });
 
         it('should have 8 children', function() {
