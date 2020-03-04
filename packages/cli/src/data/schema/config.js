@@ -23,7 +23,6 @@ const configTypeDefs = gql`
     devServer: DevServer,
     meta: [Meta],
     publicPath: String,
-    themeFile: String,
     title: String,
     workspace: String
   }
