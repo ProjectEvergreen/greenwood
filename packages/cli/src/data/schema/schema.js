@@ -1,17 +1,22 @@
-// TODO merging resolvers not actually working, resolve as part of #21 or #270
 const { makeExecutableSchema } = require('apollo-server-express');
 const { helloTypeDefs, helloResolvers } = require('./hello');
 const { graphTypeDefs, graphResolvers } = require('./graph');
 
+const mergedResolvers = Object.assign({}, {
+  Query: {
+    ...graphResolvers.Query,
+    ...helloResolvers.Query
+  }
+});
+
 const schema = makeExecutableSchema({
   typeDefs: [
-    graphTypeDefs,
-    helloTypeDefs
+    helloTypeDefs,
+    graphTypeDefs
   ],
-  resolvers: Object.assign({}, 
-    graphResolvers,
-    helloResolvers
-  )
+  resolvers: [
+    mergedResolvers
+  ]
 });
 
 module.exports = schema;
