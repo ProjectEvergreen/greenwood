@@ -12,7 +12,6 @@ query {
       value
     },
     publicPath,
-    themeFile,
     title,
     workspace
   }
