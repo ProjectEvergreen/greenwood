@@ -1,13 +1,13 @@
 const { gql } = require('apollo-server');
 
 const helloTypeDefs = gql`
-  type HelloQuery {
+  extend type Query {
     hello: String
   }
 `;
 
 const helloResolvers = {
-  HelloQuery: {
+  Query: {
     hello: () => 'Hello world!'
   }
 };
