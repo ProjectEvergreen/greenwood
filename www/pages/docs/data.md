@@ -34,7 +34,7 @@ Greenwood exposes a [GraphQL](https://graphql.org/) + [Apollo](https://www.apoll
 ![graphql-playground](/assets/graphql-playground.png)
 
 #### Schema
-To kick things off, let's review what is availalble to you.  Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type defintion](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's `graph`.
+To kick things off, let's review what is availalble to you.  Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type definition](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's `graph`.
 
 
 This is what the schema looks like:
@@ -66,7 +66,7 @@ Below are the queries available:
 ##### Graph
 The Graph query returns an array of all pages.
 
-###### Defintion
+###### Definition
 ```render javascript
 query {
   graph {
@@ -126,7 +126,7 @@ This will return the full `graph` of all pages as an array
 ##### Navigation
 The Navigation query returns an array of Page "like" objects, representing the top most root pages of your project.
 
-###### Defintion
+###### Definition
 ```render javascript
 query {
   navigation {
@@ -172,7 +172,7 @@ This will return the full `graph` of all top level routes as a Page array
 ##### Children
 The Children query returns an array of all pages below a given top level route.
 
-###### Defintion
+###### Definition
 ```render javascript
 query {
   children {
@@ -230,6 +230,69 @@ This will return the full `graph` of all pages as an array that are under a give
     template: "blog"
   }
 ]
+```
+
+##### Config
+The Config query returns the configuration values from your _greenwood.config.js_.  Useful for populating tags like `<title>` and `<meta>`.
+
+###### Definition
+```render javascript
+query {
+  config {
+  	devServer {
+      port,
+      host
+    },
+    meta {
+      name,
+      rel,
+      content,
+      property,
+      value
+    },
+    publicPath,
+    title,
+    workspace
+  }
+}
+```
+
+###### Usage
+`import` the query in your component
+```render javascript
+import client from '@greenwood/cli/data/client';
+import ConfigQuery from '@greenwood/cli/data/queries/config';
+
+.
+.
+.
+
+async connectedCallback() {
+  super.connectedCallback();
+  const response = await client.query({
+    query: GraphQuery
+  });
+
+  this.meta = response.data.config.meta;
+}
+```
+
+###### Response
+This will return an object of youf _greenwood.config.js_ as an object.  Example:
+```render javascript
+{
+  devServer: {
+    port: 1984,
+    host: 'localhost'
+  },
+  meta: [
+    { name: 'twitter:site', content: '@PrjEvergreen' },
+    { rel: 'icon', href: '/assets/favicon.ico' }
+  ],
+  publicPath: '/some-dir',
+  title: 'My App',
+  workspace: 'src'
+}
 ```
 
 ##### Custom
