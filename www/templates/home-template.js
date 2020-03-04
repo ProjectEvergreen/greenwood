@@ -28,17 +28,13 @@ class HomeTemplate extends LitElement {
 
   render() {
     return html`
-      
       <style>
         ${homeCss}
       </style>
-      
       METAELEMENT
-      
       <div class='wrapper'>
         <eve-header></eve-header>
         <eve-banner></eve-banner>
-
         <div class='content-wrapper'>
           <eve-container fluid>
             <div class='page-template content single-column'>
@@ -46,11 +42,9 @@ class HomeTemplate extends LitElement {
             </div>
           </eve-container>
         </div>
-
         <eve-footer></eve-footer>
       </div>
     `;
-
   }
 }
 
