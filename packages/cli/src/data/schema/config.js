@@ -12,14 +12,18 @@ const configTypeDefs = gql`
   }
 
   type Meta {
-    key: String,
-    value: String
+    name: String,
+    value: String,
+    content: String,
+    rel: String,
+    property: String
   }
 
   type Config {
     devServer: DevServer,
-    meta: [Meta]
+    meta: [Meta],
     publicPath: String,
+    themeFile: String,
     title: String,
     workspace: String
   }
