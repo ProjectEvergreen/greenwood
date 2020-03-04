@@ -1,9 +1,11 @@
 const { makeExecutableSchema } = require('apollo-server-express');
-const { helloTypeDefs, helloResolvers } = require('./hello');
+const { configTypeDefs, configResolvers } = require('./config');
 const { graphTypeDefs, graphResolvers } = require('./graph');
+const { helloTypeDefs, helloResolvers } = require('./hello');
 
 const mergedResolvers = Object.assign({}, {
   Query: {
+    ...configResolvers.Query,
     ...graphResolvers.Query,
     ...helloResolvers.Query
   }
@@ -11,8 +13,9 @@ const mergedResolvers = Object.assign({}, {
 
 const schema = makeExecutableSchema({
   typeDefs: [
-    helloTypeDefs,
-    graphTypeDefs
+    configTypeDefs,
+    graphTypeDefs,
+    helloTypeDefs
   ],
   resolvers: [
     mergedResolvers
