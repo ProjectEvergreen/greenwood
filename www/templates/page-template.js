@@ -14,28 +14,42 @@ METADATA;
 
 class PageTemplate extends LitElement {
 
+  static get properties() {
+    return {
+      shelfList: {
+        type: Array
+      }
+    };
+  }
+
   constructor() {
     super();
     this.shelfList = [];
     this.setupShelf();
   }
 
-  setupShelf() {
+  async setupShelf() {
     // based on path, display selected list
     const url = window.location.pathname;
     let list = [];
 
+    console.log('url', url);
+    
     if (url.indexOf('/about') >= 0) {
-      list = () => import(/* webpackChunkName: 'about' */ '../components/shelf/about.json').then(({ default: data }) => data);
+      list = await import(/* webpackChunkName: 'about' */ '../components/shelf/about.json').then(({ default: data }) => data);
     } else if (url.indexOf('/docs') >= 0) {
-      list = () => import(/* webpackChunkName: 'documentation-list' */ '../components/shelf/documentation-list.json').then(({ default: data }) => data);
+      list = await import(/* webpackChunkName: 'documentation-list' */ '../components/shelf/documentation-list.json').then(({ default: data }) => data);
     } else if (url.indexOf('/getting-started') >= 0) {
-      list = () => import(/* webpackChunkName: 'getting-started' */ '../components/shelf/getting-started-list.json').then(({ default: data }) => data);
+      list = await import(/* webpackChunkName: 'getting-started' */ '../components/shelf/getting-started-list.json').then(({ default: data }) => data);
     } else if (url.indexOf('/plugins') >= 0) {
-      list = () => import(/* webpackChunkName: 'plugins' */ '../components/shelf/plugins.json').then(({ default: data }) => data);
+      list = await import(/* webpackChunkName: 'plugins' */ '../components/shelf/plugins.json').then(({ default: data }) => data);
     }
 
+    console.log('list', list);
+
     this.shelfList = list;
+
+    console.log('this.shelfList', this.shelfList);
   }
 
   render() {
@@ -48,7 +62,7 @@ class PageTemplate extends LitElement {
         <eve-header></eve-header>
         <div class='content-wrapper'>
           <div class="sidebar">
-            <eve-shelf .list="${this.shelfList}"></eve-shelf>
+            <eve-shelf .shelfList="${this.shelfList}"></eve-shelf>
           </div>
           <div class="content">
             <eve-container fluid>
