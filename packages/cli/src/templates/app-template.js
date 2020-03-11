@@ -5,6 +5,7 @@ import { lazyReducerEnhancer } from 'pwa-helpers/lazy-reducer-enhancer.js';
 import thunk from 'redux-thunk';
 import client from '@greenwood/cli/data/client';
 import ConfigQuery from '@greenwood/cli/data/queries/config';
+import GraphQuery from '@greenwood/cli/data/queries/graph';
 
 // eslint-disable-next-line no-underscore-dangle
 const compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || origCompose;
@@ -22,14 +23,24 @@ class AppComponent extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
+    const route = window.location.pathname;
+    const response = await Promise.all([
+      await client.query({
+        query: ConfigQuery
+      }),
+      await client.query({
+        query: GraphQuery
+      })
+    ]);
+    const { config } = response[0].data;
+    const currentPage = response[1].data.graph.filter((page) => {
+      return route === page.link;
+    })[0];
+    const currentPageTitle = currentPage.link === '/'
+      ? ''
+      : ` - ${currentPage.title}`;
 
-    const response = await client.query({
-      query: ConfigQuery
-    });
-    const { config } = response.data;
-
-    console.log('app template config', response.data.config);
-    this.setDocoumentTitle(config.title);
+    this.setDocoumentTitle(`${config.title}${currentPageTitle}`);
   }
 
   setDocoumentTitle(title) {
