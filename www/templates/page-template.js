@@ -32,8 +32,6 @@ class PageTemplate extends LitElement {
     // based on path, display selected list
     const url = window.location.pathname;
     let list = [];
-
-    console.log('url', url);
     
     if (url.indexOf('/about') >= 0) {
       list = await import(/* webpackChunkName: 'about' */ '../components/shelf/about.json').then(({ default: data }) => data);
@@ -45,11 +43,7 @@ class PageTemplate extends LitElement {
       list = await import(/* webpackChunkName: 'plugins' */ '../components/shelf/plugins.json').then(({ default: data }) => data);
     }
 
-    console.log('list', list);
-
     this.shelfList = list;
-
-    console.log('this.shelfList', this.shelfList);
   }
 
   render() {

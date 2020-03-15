@@ -121,11 +121,10 @@ class shelf extends LitElement {
   }
 
   render() {
-    console.log('render()', this.shelfList);
     return html`
-    <style>
-      ${css}
-    </style>
+      <style>
+        ${css}
+      </style>
       <div>
         <ul>
           ${this.renderList()}
