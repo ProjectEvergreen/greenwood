@@ -44,7 +44,7 @@ graph {
 
   link,  // (string) A URL link, typically derived from the filesystem path, e.g. /blog/2019/first-post/ 
   
-  title,  // (string) Useful for a page's <title> tag or the title attribute for an <a> tag, inferred from the filesystem path, e.g. "First Post"
+  title,  // (string) Useful for a page's <title> tag or the title attribute for an <a> tag, inferred from the filesystem path, e.g. "First Post" or provided through front matter.
   
   filePath, // (string) path to file
 
