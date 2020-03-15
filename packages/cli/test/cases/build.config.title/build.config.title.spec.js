@@ -113,7 +113,7 @@ describe('Build Greenwood With: ', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'hello', './index.html'))).to.be.true;
       });
 
-      xit('should have a overridden meta <title> tag in the <head> using markdown front-matter', function() {
+      it('should have a overridden meta <title> tag in the <head> using markdown front-matter', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
         expect(title).to.be.equal(`${configTitle} - ${helloPageTitle}`);
