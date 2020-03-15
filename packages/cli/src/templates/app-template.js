@@ -45,7 +45,6 @@ class AppComponent extends LitElement {
   }
 
   setDocoumentTitle(title) {
-    console.log('setDocoumentTitle', title);
     const head = document.head;
     const titleElement = head.getElementsByTagName('title')[0];
 
