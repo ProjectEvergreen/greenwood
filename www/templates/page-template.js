@@ -16,9 +16,6 @@ class PageTemplate extends LitElement {
 
   static get properties() {
     return {
-      shelfList: {
-        type: Array
-      },
       route: {
         type: String
       }

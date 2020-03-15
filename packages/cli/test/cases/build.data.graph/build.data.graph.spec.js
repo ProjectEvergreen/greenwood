@@ -78,6 +78,7 @@ describe('Build Greenwood With: ', function() {
         const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';
         });
+
         const innerHTML = apolloScriptTags[0].innerHTML;
 
         expect(apolloScriptTags.length).to.equal(1);
