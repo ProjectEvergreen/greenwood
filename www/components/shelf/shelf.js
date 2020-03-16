@@ -171,11 +171,8 @@ class Shelf extends LitElement {
 
     this.setupShelf(page);
 
-<<<<<<< HEAD
-=======
     console.log('render()', this.shelfList);
 
->>>>>>> ad9515ba7ef3b09fbf61a26a7a7d1ba542102278
     return html`
       <style>
         ${css}
