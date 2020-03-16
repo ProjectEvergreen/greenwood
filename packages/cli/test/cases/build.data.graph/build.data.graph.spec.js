@@ -4,7 +4,7 @@
  *
  * User Result
  * Should generate a Greenwood build that dynamically serializes data from the graph from the header and in the page-template.
- * 
+ *
  * User Command
  * greenwood build
  *

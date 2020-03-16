@@ -1,5 +1,5 @@
-const GRAPH_MOCK = { 
-  graph: [ 
+const MOCK_GRAPH = {
+  graph: [
     { mdFile: './index.md',
       label: '37b24fd9f163e7b',
       route: '/',
@@ -271,9 +271,9 @@ const GRAPH_MOCK = {
       fileName: 'index',
       relativeExpectedPath: '\'../plugins/index/index.js\'',
       title: 'Greenwood',
-      meta: [Array] 
-    } 
+      meta: [Array]
+    }
   ]
 };
 
-module.exports = GRAPH_MOCK;
+module.exports = MOCK_GRAPH;

@@ -21,7 +21,6 @@ class Shelf extends LitElement {
   constructor() {
     super();
     this.selectedIndex = '';
-    this.list = () => [];
     this.shelfList = [];
     this.page = '';
   }
@@ -68,6 +67,7 @@ class Shelf extends LitElement {
       console.log('response from the shelf (data.children)', response.data.children);
 
       this.shelfList = list;
+      console.log('shelf list', this.shelfList);
     }
   }
 
@@ -171,6 +171,11 @@ class Shelf extends LitElement {
 
     this.setupShelf(page);
 
+<<<<<<< HEAD
+=======
+    console.log('render()', this.shelfList);
+
+>>>>>>> ad9515ba7ef3b09fbf61a26a7a7d1ba542102278
     return html`
       <style>
         ${css}
