@@ -2,7 +2,7 @@ module.exports = {
   
   plugins: [{
     type: 'index',
-    provider: () => {
+    provider: function() {
       return {
         hookGreenwoodAnalytics: `
           <div class="hook-analytics">
@@ -13,7 +13,7 @@ module.exports = {
     }
   }, {
     type: 'index',
-    provider: () => {
+    provider: function() {
       return {
         hookGreenwoodPolyfills: `
           <!-- 

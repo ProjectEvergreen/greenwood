@@ -40,7 +40,7 @@ describe('Build Greenwood With: ', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'assets'))).to.be.true;
       });
 
-      it('should contain files from the asset directory', async function() {
+      it('should contain files from the asset directory', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'assets', './brand.png'))).to.be.true;
       });
     });

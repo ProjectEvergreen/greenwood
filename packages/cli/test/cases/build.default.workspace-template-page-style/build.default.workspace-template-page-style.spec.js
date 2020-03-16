@@ -53,7 +53,7 @@ describe('Build Greenwood With: ', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
 
-      it('should have the color style for the .owen-test element in the page template that we added as part of our custom style', async function() {
+      it('should have the color style for the .owen-test element in the page template that we added as part of our custom style', function() {
 
         const customElement = dom.window.document.querySelector('.owen-test');
         const computedStyle = dom.window.getComputedStyle(customElement);
@@ -61,7 +61,7 @@ describe('Build Greenwood With: ', function() {
         expect(computedStyle.color).to.equal('rgb(0, 0, 255)');
       });
 
-      it('should have the color styles for the h3 element that we defined as part of our custom style', async function() {
+      it('should have the color styles for the h3 element that we defined as part of our custom style', function() {
 
         const customHeader = dom.window.document.querySelector('h3');
         const computedStyle = dom.window.getComputedStyle(customHeader);
@@ -91,7 +91,7 @@ describe('Build Greenwood With: ', function() {
         expect(importCount).to.equal(1);
       });
 
-      it('should have the expected font family', async function() {
+      it('should have the expected font family', function() {
         const styles = 'body{font-family:Source Sans Pro,sans-serif}';
         const styleTags = dom.window.document.querySelectorAll('head style');
         let fontCount = 0;

@@ -37,7 +37,9 @@ const expect = require('chai').expect;
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', async function() {
+const mainBundleScriptRegex = /index.*.bundle\.js/;
+
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Meta Configuration and Nested Workspace';
   const meta = greenwoodConfig.meta;
   let setup;
@@ -80,10 +82,15 @@ describe('Build Greenwood With: ', async function() {
         expect(title).to.be.equal('My Custom Greenwood App');
       });
 
-      it('should have one <script> tag in the <body>', function() {
-        const scriptTag = dom.window.document.querySelectorAll('body script');
+      it('should have one <script> tag in the <body> for the main bundle', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body script');
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
 
-        expect(scriptTag.length).to.be.equal(1);
+          return mainBundleScriptRegex.test(src);
+        });
+
+        expect(bundledScript.length).to.be.equal(1);
       });
 
       it('should have a router outlet tag in the <body>', function() {

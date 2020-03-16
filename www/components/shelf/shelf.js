@@ -19,7 +19,7 @@ class shelf extends LitElement {
     this.shelfList = [];
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
     this.collapseAll();
     this.expandRoute(window.location.pathname);
@@ -122,9 +122,9 @@ class shelf extends LitElement {
 
   render() {
     return html`
-    <style>
-      ${css}
-    </style>
+      <style>
+        ${css}
+      </style>
       <div>
         <ul>
           ${this.renderList()}

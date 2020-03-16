@@ -20,7 +20,7 @@ const expect = require('chai').expect;
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Public Path Configuration and Default Workspace';
   let setup;
 
@@ -35,13 +35,13 @@ describe('Build Greenwood With: ', async function() {
     });
     runSmokeTest(['not-found', 'hello'], LABEL);
 
-    describe('Custom Configuration with a custom public path', () => {
+    describe('Custom Configuration with a custom public path', function() {
 
       beforeEach(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      it('should serve assets from the configured publicPath', async () => {
+      it('should serve assets from the configured publicPath', function() {
         const publicPath = '/assets/';
         const scriptTags = dom.window.document.querySelectorAll('body script');
         const bundledScripts = Array.prototype.slice.call(scriptTags).filter(script => {

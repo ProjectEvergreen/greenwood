@@ -12,7 +12,7 @@
  * {
  *   plugins: [{
  *     type: 'index',
- *     provider: () => {
+ *     provider: function() {
  *       return {
  *         hookGreenwoodAnalytics: `
  *           <!-- some analytics code -->
@@ -21,7 +21,7 @@
  *     }
  *   }, {
  *     type: 'index',
- *     provider: () => {
+ *     provider: function() {
  *       return {
  *         hookGreenwoodPolyfills: `
  *           <!-- some polyfills code -->
@@ -41,7 +41,7 @@ const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Index Plugin and Default Workspace';
   let setup;
 
