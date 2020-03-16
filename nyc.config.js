@@ -6,7 +6,6 @@ module.exports = {
     'packages/cli/src/data/*.js',
     'packages/cli/src/lib/*.js',
     'packages/cli/src/lifecycles/*.js',
-    'packages/cli/src/plugins/*.js',
     'packages/cli/src/tasks/*.js',
     'packages/plugin-*/src/*.js'
   ],
