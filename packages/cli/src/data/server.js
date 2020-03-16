@@ -3,7 +3,7 @@ const schema = require('./schema/schema');
 const createCache = require('./cache');
 
 module.exports = (compilation) => {
-  const { graph, context } = compilation;
+  const { config, graph, context } = compilation;
 
   // Create schema
   const server = new ApolloServer({
@@ -20,9 +20,10 @@ module.exports = (compilation) => {
       if (req.query.q !== 'internal') {
         await createCache(req, context);
       }
-      
+
       return {
-        graph 
+        config,
+        graph
       };
     }
   });
