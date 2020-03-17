@@ -33,13 +33,12 @@ class Shelf extends LitElement {
         }
       });
 
-      console.log('shelf =>', response.data.menu.children);
       this.shelfList = response.data.menu.children;
       this.requestUpdate();
     }
 
     this.collapseAll();
-    // this.expandRoute(window.location.pathname);
+    this.expandRoute(window.location.pathname);
   }
 
   goTo(path) {
@@ -50,7 +49,7 @@ class Shelf extends LitElement {
   expandRoute(path) {
     // find list item containing current window.location.pathname
     let routeShelfListIndex = this.shelfList.findIndex(list => {
-      return list.path.indexOf(path) >= 0;
+      return list.item.link.indexOf(path) >= 0;
     });
 
     if (routeShelfListIndex > -1) {
@@ -72,7 +71,6 @@ class Shelf extends LitElement {
     let selectedShelfListIndex = this.shelfList.findIndex((list, index) => {
       return index === this.selectedIndex;
     });
-
     if (selectedShelfListIndex > -1) {
       this.shelfList[selectedShelfListIndex].selected = !this.shelfList[selectedShelfListIndex].selected;
     }
@@ -102,7 +100,7 @@ class Shelf extends LitElement {
   renderList() {
 
     /* eslint-disable indent */
-    const renderListItems = (list) => {
+    const renderListItems = (list, selected) => {
       let listItems = '';
 
       if (list && list.length > 0) {
@@ -110,7 +108,7 @@ class Shelf extends LitElement {
           <ul>
             ${list.map(({ item }, index) => {
               return html`
-                <li id="index_${index}" class="${item.selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`${item.link}`)}">${item.label}</a></li>
+                <li id="index_${index}" class="${selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`${item.link}`)}">${item.label}</a></li>
               `;
             })}
           </ul>
@@ -121,8 +119,6 @@ class Shelf extends LitElement {
     };
 
     /* eslint-enable */
-    console.log(this.shelfList);
-
     return this.shelfList.map(({ item, children, selected }, index) => {
       let id = `index_${index}`;
       let chevron = children && children.length > 0
@@ -133,7 +129,7 @@ class Shelf extends LitElement {
         <li class="list-wrap">
           <a href="${item.link}" @click="${this.handleClick}"><h2 id="${id}">${item.label} <span>${chevron}</span></h2></a>
           <hr>
-          ${renderListItems(children)}
+          ${renderListItems(children, selected)}
         </li>
       `;
     });
