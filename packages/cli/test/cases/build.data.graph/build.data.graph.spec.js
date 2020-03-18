@@ -94,10 +94,10 @@ describe('Build Greenwood With: ', function() {
         const listItems = dom.window.document.querySelectorAll('body header ul li');
         const link = listItems[0].querySelector('a');
 
-        expect(listItems.length).to.be.equal(1);
-        expect(link.href.replace('file://', '')).to.be.equal('/blog/');
-        expect(link.title).to.be.equal('Click to visit the Blog page');
-        expect(link.innerHTML).to.contain('Blog');
+        expect(listItems.length).to.be.equal(2);
+        expect(link.href.replace('file://', '')).to.be.equal('/blog/first-post');
+        expect(link.title).to.be.equal('Click to visit the First page');
+        expect(link.innerHTML).to.contain('First');
       });
     });
 
@@ -140,10 +140,10 @@ describe('Build Greenwood With: ', function() {
         const listItems = dom.window.document.querySelectorAll('body header ul li');
         const link = listItems[0].querySelector('a');
 
-        expect(listItems.length).to.be.equal(1);
-        expect(link.href.replace('file://', '')).to.be.equal('/blog/');
-        expect(link.title).to.be.equal('Click to visit the Blog page');
-        expect(link.innerHTML).to.contain('Blog');
+        expect(listItems.length).to.be.equal(2);
+        expect(link.href.replace('file://', '')).to.be.equal('/blog/first-post');
+        expect(link.title).to.be.equal('Click to visit the First page');
+        expect(link.innerHTML).to.contain('First');
       });
 
       it('should have expected ChildrenQuery output in the <body> tag', function() {
@@ -157,11 +157,11 @@ describe('Build Greenwood With: ', function() {
         const link2 = linkItems[1];
 
         expect(link1.href.replace('file://', '')).to.be.equal('/blog/first-post/');
-        expect(link1.title).to.be.equal('Click to read my Blog blog post');
+        expect(link1.title).to.be.equal('Click to read my Blog page');
         expect(link1.innerHTML).to.contain('Blog');
 
         expect(link2.href.replace('file://', '')).to.be.equal('/blog/second-post/');
-        expect(link2.title).to.be.equal('Click to read my Blog blog post');
+        expect(link2.title).to.be.equal('Click to read my Blog page');
         expect(link2.innerHTML).to.contain('Blog');
       });
     });

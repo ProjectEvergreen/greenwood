@@ -141,7 +141,7 @@ module.exports = generateGraph = async (compilation) => {
       const { context, config } = compilation;
 
       compilation.graph = await createGraphFromPages(context.pagesDir, config);
-
+      // console.dir(JSON.stringify(compilation.graph));
       resolve(compilation);
     } catch (err) {
       reject(err);
