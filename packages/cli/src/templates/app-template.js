@@ -41,11 +41,11 @@ class AppComponent extends LitElement {
       : ` - ${currentPage.title}`;
     const fullTitle = `${config.title}${currentPageTitleSuffix}`;
 
-    this.setDocoumentTitle(fullTitle);
+    this.setDocumentTitle(fullTitle);
     this.setMeta(config.meta, currentPage);
   }
 
-  setDocoumentTitle(title = '') {
+  setDocumentTitle(title = '') {
     const head = document.head;
     const titleElement = head.getElementsByTagName('title')[0];
 
