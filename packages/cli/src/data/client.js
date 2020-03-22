@@ -15,7 +15,13 @@ client.query = (params) => {
 
   if (APOLLO_STATE) {
     // __APOLLO_STATE__ defined, in "SSG" mode...
-    return fetch('./cache.json')
+    // TODO dont hardoce depth - #273
+    const root = window.location.pathname.split('/')[1];
+    const rootSuffix = root === ''
+      ? ''
+      : '/';
+
+    return fetch(`/${root}${rootSuffix}cache.json`)
       .then(response => response.json())
       .then((response) => {
         // mock client.query response
