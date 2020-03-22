@@ -34,7 +34,7 @@ Greenwood exposes a [GraphQL](https://graphql.org/) + [Apollo](https://www.apoll
 ![graphql-playground](/assets/graphql-playground.png)
 
 #### Schema
-To kick things off, let's review what is availalble to you.  Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type definition](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's `graph`.
+To kick things off, let's review what is available to you.  Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type definition](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's `graph`.
 
 
 This is what the schema looks like:
@@ -44,7 +44,7 @@ graph {
 
   link,  // (string) A URL link, typically derived from the filesystem path, e.g. /blog/2019/first-post/ 
   
-  title,  // (string) Useful for a page's <title> tag or the title attribute for an <a> tag, inferred from the filesystem path, e.g. "First Post"
+  title,  // (string) Useful for a page's <title> tag or the title attribute for an <a> tag, inferred from the filesystem path, e.g. "First Post" or provided through front matter.
   
   filePath, // (string) path to file
 

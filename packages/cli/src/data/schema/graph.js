@@ -22,16 +22,16 @@ const getPagesFromGraph = async (root, query, context) => {
 
   graph
     .forEach((page) => {
-      const { route, mdFile, fileName, template } = page;
-      const id = page.label;
+      const { route, mdFile, fileName, template, title } = page;
       const { label } = getDeriveMetaFromRoute(route);
+      const id = page.label;
 
       pages.push({
         id,
         filePath: mdFile,
         fileName,
         template,
-        title: label,
+        title: title !== '' ? title : label,
         link: route
       });
     });
@@ -69,11 +69,11 @@ const getChildrenFromParentRoute = async (root, query, context) => {
 
   graph
     .forEach((page) => {
-      const { route, mdFile, fileName, template } = page;
+      const { route, mdFile, fileName, template, title } = page;
+      const { label } = getDeriveMetaFromRoute(route);
       const root = route.split('/')[1];
 
       if (root.indexOf(parent) >= 0) {
-        const { label } = getDeriveMetaFromRoute(route);
         const id = page.label;
 
         pages.push({
@@ -81,7 +81,7 @@ const getChildrenFromParentRoute = async (root, query, context) => {
           filePath: mdFile,
           fileName,
           template,
-          title: label,
+          title: title !== '' ? title : label,
           link: route
         });
       }

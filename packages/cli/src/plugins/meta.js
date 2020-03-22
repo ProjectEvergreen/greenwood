@@ -56,14 +56,6 @@ class meta extends LitElement {
           header.appendChild(meta);
         }
       });
-
-      // handle <title> tag
-      let title = document.createElement('title');
-
-      title.innerText = this.attributes.title;
-      const oldTitle = document.head.querySelector('title');
-
-      header.replaceChild(title, oldTitle);
     }
   }
 }
