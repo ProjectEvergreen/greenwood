@@ -32,7 +32,6 @@ class Shelf extends LitElement {
   }
 
   async setupShelf(page) {
-    console.log('setupShelf for page =>', page);
     let list = [];
 
     if (page && page !== '' && page !== '/') {
@@ -68,7 +67,6 @@ class Shelf extends LitElement {
       console.log('response from the shelf (data.children)', response.data.children);
 
       this.shelfList = list;
-      console.log('shelf list', this.shelfList);
     }
   }
 
@@ -130,7 +128,6 @@ class Shelf extends LitElement {
   }
 
   renderList() {
-    console.log('renderlist', this.shelfList);
     /* eslint-disable indent */
     const renderListItems = (list) => {
       let listItems = '';
@@ -171,8 +168,6 @@ class Shelf extends LitElement {
     const { page } = this;
 
     this.setupShelf(page);
-
-    console.log('render()', this.shelfList);
     
     return html`
       <style>
