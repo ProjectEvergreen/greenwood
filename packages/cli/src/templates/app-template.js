@@ -41,14 +41,53 @@ class AppComponent extends LitElement {
       : ` - ${currentPage.title}`;
     const fullTitle = `${config.title}${currentPageTitleSuffix}`;
 
-    this.setDocoumentTitle(fullTitle);
+    this.setDocumentTitle(fullTitle);
+    this.setMeta(config.meta, currentPage);
   }
 
-  setDocoumentTitle(title) {
+  setDocumentTitle(title = '') {
     const head = document.head;
     const titleElement = head.getElementsByTagName('title')[0];
 
     titleElement.innerHTML = title;
+  }
+
+  setMeta(meta = [], currentPage = {}) {
+    let header = document.head;
+
+    meta.forEach(metaItem => {
+      const metaType = metaItem.rel // type of meta
+        ? 'rel'
+        : metaItem.name 
+          ? 'name'
+          : 'property';
+      const metaTypeValue = metaItem[metaType]; // value of the meta
+      let meta = document.createElement('meta');
+
+      if (metaType === 'rel') {
+        // change to a <link> tag instead
+        meta = document.createElement('link');
+
+        meta.setAttribute('rel', metaTypeValue);
+        meta.setAttribute('href', metaItem.href);
+      } else {
+        const metaContent = metaItem.property === 'og:url' 
+          ? `${metaItem.content}${currentPage.link}` 
+          : metaItem.content;
+
+        meta.setAttribute(metaType, metaItem[metaType]);
+        meta.setAttribute('content', metaContent);
+      }
+
+      const oldmeta = header.querySelector(`[${metaType}="${metaTypeValue}"]`);
+      
+      // rehydration
+      if (oldmeta) {
+        header.replaceChild(meta, oldmeta);
+      } else {
+        header.appendChild(meta);
+      }
+    });
   }
 
   render() {

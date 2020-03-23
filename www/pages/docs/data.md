@@ -248,7 +248,8 @@ query {
       rel,
       content,
       property,
-      value
+      value,
+      href
     },
     publicPath,
     title,

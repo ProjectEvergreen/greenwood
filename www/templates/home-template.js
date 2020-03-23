@@ -11,8 +11,6 @@ import '../styles/theme.css';
 import homeCss from '../styles/home.css';
 
 MDIMPORT;
-METAIMPORT;
-METADATA;
 
 class HomeTemplate extends LitElement {
   
@@ -31,7 +29,6 @@ class HomeTemplate extends LitElement {
       <style>
         ${homeCss}
       </style>
-      METAELEMENT
       <div class='wrapper'>
         <eve-header></eve-header>
         <eve-banner></eve-banner>
