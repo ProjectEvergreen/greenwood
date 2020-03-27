@@ -62,6 +62,10 @@
     "path": "/getting-started/build-and-deploy",
     "items": []
   }, {
+    "name": "Adding Netlify CMS",
+    "path": "/getting-started/netlify-cms",
+    "items": []
+  }, {
     "name": "Next Steps",
     "path": "/getting-started/next-steps",
     "items": []
