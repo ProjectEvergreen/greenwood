@@ -35,6 +35,7 @@ class scroll extends LitElement {
     hash = hash.replace(/-/g, ' ');
     // query text
     const heading = contains('h3', hash)[0];
+
     if (heading !== undefined) {
       heading.scrollIntoView(true);
     }
