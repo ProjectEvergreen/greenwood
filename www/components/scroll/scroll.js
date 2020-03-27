@@ -29,17 +29,16 @@ class scroll extends LitElement {
 
     let { hash } = window.location;
 
-    if (hash) {
-      // clean hash string, remove # and replace - with spaces
-      hash = hash.replace('#', '').toLowerCase();
-      // for cases of multiple hyphens
-      hash = hash.replace(/-/g, ' ');
-      // query text
-      const heading = contains('h3', hash)[0];
-      if (heading !== undefined) {
-        heading.scrollIntoView(true);
-      }
+    // clean hash string, remove # and replace - with spaces
+    hash = hash.replace('#', '').toLowerCase();
+    // for cases of multiple hyphens
+    hash = hash.replace(/-/g, ' ');
+    // query text
+    const heading = contains('h3', hash)[0];
+    if (heading !== undefined) {
+      heading.scrollIntoView(true);
     }
+
   }
 
   render() {
