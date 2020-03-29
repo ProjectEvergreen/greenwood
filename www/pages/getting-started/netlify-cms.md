@@ -4,19 +4,21 @@ To make your life easier creating content, you can use content management system
 
 This guide builds off the previous guides. If you haven't been following along, you can simply fork the [greenwood-getting-started](https://github.com/ProjectEvergreen/greenwood-getting-started) repo and continue from there.
 
-You will also need a [netlify account](www.netlify.com) it's free.
+You will also need a free [netlify account](www.netlify.com).
 
-![netlify-cms](/assets/netlify-cms.png)
+```render
+<img src="/assets/netlify-cms.png" alt="netlify-cms" style="max-width:800px;"/>
+```
 
 ### Setup Netlify CMS
 
 Assuming you've forked the getting-started repo and cloned it or you've continued from the previous guides, we first need to create a configuration file.
 
-Within your project's directory, create a folder `public` and within it create another folder `public/admin`
+Within your project's directory, create a folder `public` and within it create another folder `admin`
 
 #### Configure
 
-Inside the `public/admin/` directory create a file called `config.yml` this will contain the necessary Netlify configuration for each individual project. You can read more about these configuration options on [Netlify's guide](https://www.netlifycms.org/docs/add-to-your-site/#configuration):
+Inside the `public/admin/` directory create a file called `config.yml` this will contain the necessary Netlify configuration for each individual project.
 
 ```render yaml
 backend:
@@ -36,6 +38,7 @@ collections:
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Body", name: "body", widget: "markdown"}
 ```
+> You can read more about these configuration options on [Netlify's guide](https://www.netlifycms.org/docs/add-to-your-site/#configuration)
 
 This will provide us with the bare minimum needed to configure the admin UI of the netlify CMS within our project.
 
@@ -75,7 +78,11 @@ Along with the admin UI, we also need to readd the identity widget script elemen
   }
 ```
 
-With that completed, make sure you save and recommit all your changes to your repository. IF you haven't already pushed your code to a repository on github, you must do so in order to mirror it on netlify.
+> Later, when you're doing this with a your own projects, make sure you either:
+>* a) add this line to all of your custom page templates or
+>* b) add this line to your app template
+
+With that completed, save and recommit all your changes to your repository. If you haven't already pushed your code to a repository on github, you must do so in order to mirror it on netlify.
 
 ### Netlify Your Project
 
@@ -84,13 +91,17 @@ With that completed, make sure you save and recommit all your changes to your re
 
 Now we can return to Netlify.com make sure you register, login, and click "new site from git" button.
 
-![netlify-create-new](/assets/netlify-create-new.png)
+```render
+<img src="/assets/netlify-create-new.png" alt="netlify-create-new" style="max-width:800px;"/>
+```
 
 Click GitHub and then you must authorize netlify to read your repositories.
 
-Finally, select your project's repository then and the build command: `npm run build` and the publish directory: 'public' like this:
+Finally, select your project's repository then and the build command: `npm run build` and the publish directory: `public` like this:
 
-![netlify-deploy](/assets/netlify-deploy.png)
+```render
+<img src="/assets/netlify-deploy.png" alt="netlify-deploy" style="max-width:700px;"/>
+```
 
 Click **Deploy Site** and you're site will now be deployed to a randomly generated url at netlfy.com
 
@@ -102,21 +113,27 @@ Click the **Enable Identity** button
 
 It's up to you if you want registration to be open/invite only.  Click **Edit Settings** Under the **Registration preferences** subheading to change between open/invite.
 
-![netlify-registration](/assets/netlify-registration.png)
+```render
+<img src="/assets/netlify-registration.png" alt="netlify-registration" style="max-width:800px;"/>
+```
 
 Under **External Providers** in the drop down menu click "Add Provider" -> "GitHub" and then **Enable Github**
 
-If you chose **invite only** are you registration method, you need to invite yourself and others using the "Identity" page which is linked at the top navigation bar. From here you cna click **Invite Users** to invite any email address you need.
+If you chose **invite only** are you registration method, you need to invite yourself and others using the "Identity" page which is linked at the top navigation bar. From here you can click **Invite Users** to invite any email address you need.
 
-![netlify-invite](/assets/netlify-invite.png)
+```render
+<img src="/assets/netlify-invite.png" alt="netlify-invite" style="max-width:700px;"/>
+```
 
 #### Configure Services
 
-The final step is to **Eable Git Gateway** from the **Services** Menu
+The final step is to **Enable Git Gateway** from the **Services** Menu
 
 Click **Edit Settings** then click "Generate access token in Github"
 
-![netlify-git-gateway](/assets/netlify-git-gateway.png)
+```render
+<img src="/assets/netlify-git-gateway.png" alt="netlify--git-gateway" style="max-width:800px;"/>
+```
 
 To automatically generate an access token from and for the GitHub API
 
