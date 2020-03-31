@@ -16,7 +16,8 @@ const configTypeDefs = gql`
     value: String,
     content: String,
     rel: String,
-    property: String
+    property: String,
+    href: String
   }
 
   type Config {

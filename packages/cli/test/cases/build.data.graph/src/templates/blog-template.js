@@ -4,8 +4,6 @@ import ChildrenQuery from '@greenwood/cli/data/queries/children';
 import '../components/header';
 
 MDIMPORT;
-METAIMPORT;
-METADATA;
 
 class BlogTemplate extends LitElement {
 
@@ -39,7 +37,6 @@ class BlogTemplate extends LitElement {
     const { posts } = this;
 
     return html`
-      METAELEMENT
 
       <div class='container'>
         <app-header></app-header>
