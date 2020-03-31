@@ -1,5 +1,5 @@
-query($menu: String!, $route: String) {
-  menu(filter: $menu, pathname: $route) {
+query($menu: String!, $route: String, $order: MenuOrderBy) {
+  menu(filter: $menu, pathname: $route, orderBy: $order) {
     item {
       label,
       link

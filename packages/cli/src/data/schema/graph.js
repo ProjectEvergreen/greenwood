@@ -1,11 +1,9 @@
 const { gql } = require('apollo-server-express');
 
-const getMenuFromGraph = async (root, { pathname, filter = '' }, context) => {
+const getMenuFromGraph = async (root, { pathname, filter = '', orderBy = '' }, context) => {
   const { graph } = context;
   let items = [];
 
-  // TODO Issue #288 https://github.com/ProjectEvergreen/greenwood/issues/288
-  // Sort menus by label/index asc/desc
   graph
     .forEach((page) => {
       const { route, menu, title, tableOfContents } = page;
@@ -25,8 +23,40 @@ const getMenuFromGraph = async (root, { pathname, filter = '' }, context) => {
         }
       }
     });
-
+  if (orderBy !== '') {
+    items = sortMenuItems(items, orderBy);
+  }
   return { label: filter, link: 'na', children: items };
+};
+
+const sortMenuItems = (menuItems, order) => {
+  const compare = (a, b) => {
+    if (order === 'label_asc' || order === 'label_desc') {
+      a = a.item.label, b = b.item.label;
+    }
+    if (order === 'index_asc' || order === 'index_desc') {
+      a = a.index, b = b.index;
+    }
+    if (order === 'label_asc' || order === 'index_asc') {
+      if (a < b) {
+        return -1;
+      }
+      if (a > b) {
+        return 1;
+      }
+    } else if (order === 'label_desc' || order === 'index_desc') {
+      if (a > b) {
+        return -1;
+      }
+      if (a < b) {
+        return 1;
+      }
+    }
+    return 0;
+  };
+
+  menuItems.sort(compare);
+  return menuItems;
 };
 
 const getParsedHeadingsFromPage = (tableOfContents) => {
@@ -130,17 +160,17 @@ const graphTypeDefs = gql`
     children: [Menu]
   }
 
-  type Query {
-    graph: [Page]
-    menu(filter: String, pathname: String, orderBy: MenuOrderBy): Menu
-    children(parent: String): [Page]
-  }
-
   enum MenuOrderBy {
     label_asc,
     label_desc
     index_asc,
     index_desc
+  }
+
+  type Query {
+    graph: [Page]
+    menu(filter: String, pathname: String, orderBy: MenuOrderBy): Menu
+    children(parent: String): [Page]
   }
 `;
 
