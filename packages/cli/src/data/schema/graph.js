@@ -36,7 +36,6 @@ const sortMenuItems = (menuItems, order) => {
     }
     if (order === 'index_asc' || order === 'index_desc') {
       a = a.item.index, b = b.item.index;
-      console.log('a =' + a + ' b=' + b);
     }
     if (order === 'label_asc' || order === 'index_asc') {
       if (a < b) {
