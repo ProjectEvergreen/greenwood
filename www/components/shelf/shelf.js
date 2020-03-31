@@ -99,7 +99,6 @@ class Shelf extends LitElement {
   }
 
   renderList() {
-
     /* eslint-disable indent */
     const renderListItems = (list, selected) => {
       let listItems = '';

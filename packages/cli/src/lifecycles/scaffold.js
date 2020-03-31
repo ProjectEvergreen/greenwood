@@ -23,21 +23,6 @@ const writePageComponentsFromTemplate = async (compilation) => {
     });
   };
 
-  const loadPageMeta = (file, result, { metaComponent }) => {
-    const { title, meta, route } = file;
-    const metadata = {
-      title,
-      meta,
-      route
-    };
-
-    result = result.replace(/METAIMPORT/, `import '${metaComponent}'`);
-    result = result.replace(/METADATA/, `const metadata = ${JSON.stringify(metadata)}`);
-    result = result.replace(/METAELEMENT/, '<eve-meta .attributes=\${metadata}></eve-meta>');
-
-    return result;
-  };
-
   const writePageComponentToFile = async (target, filename, result) => {
     return new Promise(async(resolve, reject) => {
       try {
@@ -70,10 +55,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
     return new Promise(async(resolve, reject) => {
       try {
         // Create Standard Page Component from Markdown File
-        let result = await createPageComponent(file, context);
-
-        // Add Meta Data based on config
-        result = loadPageMeta(file, result, context);
+        const result = await createPageComponent(file, context);
 
         // Determine path to newly scaffolded component
         const filePath = getPageComponentPath(file, context);

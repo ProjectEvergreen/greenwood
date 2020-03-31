@@ -2,8 +2,6 @@ import { html, LitElement } from 'lit-element';
 import '../components/header';
 
 MDIMPORT;
-METAIMPORT;
-METADATA;
 
 class PageTemplate extends LitElement {
 

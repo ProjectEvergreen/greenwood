@@ -6,7 +6,6 @@ module.exports = {
     'packages/cli/src/data/*.js',
     'packages/cli/src/lib/*.js',
     'packages/cli/src/lifecycles/*.js',
-    'packages/cli/src/plugins/*.js',
     'packages/cli/src/tasks/*.js',
     'packages/plugin-*/src/*.js'
   ],
@@ -20,10 +19,10 @@ module.exports = {
 
   checkCoverage: true,
 
-  statements: 80,
-  branches: 70,
-  functions: 85,
-  lines: 80,
+  statements: 85,
+  branches: 75,
+  functions: 90,
+  lines: 85,
 
   watermarks: {
     statements: [75, 85],

@@ -20,13 +20,10 @@ Here is an example `page-template.js` (the [default](https://github.com/ProjectE
 ```render js
 import { html, LitElement } from 'lit-element';
 MDIMPORT;
-METAIMPORT;
-METADATA;
 
 class PageTemplate extends LitElement {
   render() {
     return html\`
-      METAELEMENT
       <div class='wrapper'>
         <div class='page-template content'>
           <entry></entry>
@@ -50,13 +47,6 @@ MDIMPORT;
 
 `MDIMPORT;` Tells Greenwood to import a markdown file into this component.  But we also have to define where the compiled markdown element(page) will be placed within our page-template.  Hence below within our `render()` method you will see the `<entry></entry>` element. That defines exactly where to place it.
 
-
-```render js
-METAIMPORT;
-METADATA;
-```
-
-`METAIMPORT;` and `METADATA;` hook variables import the default greenwood meta component and data which handles all your configured meta data.  You can then render this component within the `render()` method using the `METAELEMENT` variable hook.
 
 The complete example can be found in the [greenwood source](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/page-template.js) which is the default page-template.js if no other is defined.
 

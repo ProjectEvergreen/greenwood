@@ -9,8 +9,6 @@ import pageCss from '../styles/page.css';
 import '../styles/theme.css';
 
 MDIMPORT;
-METAIMPORT;
-METADATA;
 
 class PageTemplate extends LitElement {
 
@@ -39,8 +37,6 @@ class PageTemplate extends LitElement {
       <style>
         ${pageCss}
       </style>
-
-      METAELEMENT
      
       <div class='wrapper'>
         <eve-header></eve-header>

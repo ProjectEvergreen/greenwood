@@ -85,7 +85,7 @@ function defaultIndex(label) {
       it('should have a <title> tag in the <head>', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
-        expect(title).to.be.equal('Greenwood App');
+        expect(title).to.be.equal('My App');
       });
 
       it('should have one <script> tag in the <body> for the main bundle', function() {

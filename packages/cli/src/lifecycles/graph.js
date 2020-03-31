@@ -64,7 +64,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                 label = label || generateLabelHash(filePath);
 
                 // set <title></title> element text, override with markdown title
-                title = title || config.title;
+                title = title || '';
 
                 // set specific menu to place this page
                 menu = menu || '';
