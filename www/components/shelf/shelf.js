@@ -30,7 +30,7 @@ class Shelf extends LitElement {
         variables: {
           menu: 'side',
           route: window.location.pathname,
-          order: 'label_desc'
+          order: 'index_asc'
         }
       });
 

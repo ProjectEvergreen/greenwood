@@ -6,7 +6,7 @@ const getMenuFromGraph = async (root, { pathname, filter = '', orderBy = '' }, c
 
   graph
     .forEach((page) => {
-      const { route, menu, title, tableOfContents } = page;
+      const { route, menu, title, index, tableOfContents } = page;
       let children = [];
 
       if (menu && menu.search(filter) > -1) {
@@ -16,10 +16,10 @@ const getMenuFromGraph = async (root, { pathname, filter = '', orderBy = '' }, c
           let baseRoute = pathname.substring(0, baseRouteIndex + 1);
 
           if (route.includes(baseRoute)) {
-            items.push({ item: { link: route, label: title }, children: getParsedHeadingsFromPage(tableOfContents) });
+            items.push({ item: { link: route, label: title, index }, children: getParsedHeadingsFromPage(tableOfContents) });
           }
         } else {
-          items.push({ item: { link: route, label: title }, children });
+          items.push({ item: { link: route, label: title, index }, children });
         }
       }
     });
@@ -35,7 +35,8 @@ const sortMenuItems = (menuItems, order) => {
       a = a.item.label, b = b.item.label;
     }
     if (order === 'index_asc' || order === 'index_desc') {
-      a = a.index, b = b.index;
+      a = a.item.index, b = b.item.index;
+      console.log('a =' + a + ' b=' + b);
     }
     if (order === 'label_asc' || order === 'index_asc') {
       if (a < b) {
