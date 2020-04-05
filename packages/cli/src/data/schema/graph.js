@@ -34,7 +34,7 @@ const getPagesFromGraph = async (root, query, context) => {
         title: title !== '' ? title : label,
         link: route,
         data: {
-          date: data.date || ''
+          ...data
         }
       });
     });
@@ -87,7 +87,7 @@ const getChildrenFromParentRoute = async (root, query, context) => {
           title: title !== '' ? title : label,
           link: route,
           data: {
-            date: data.date || ''
+            ...data
           }
         });
       }
