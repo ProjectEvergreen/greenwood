@@ -19,8 +19,10 @@ module.exports = (graph) => {
     `;
   });
 
+  // use noop as a default key since type Data cannot be empty
   const mergedGraphTypeDefs = gql`
     type Data {
+      noop: String
       ${customDataDefs}
     }
 

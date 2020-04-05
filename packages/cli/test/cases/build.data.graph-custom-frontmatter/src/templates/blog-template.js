@@ -1,6 +1,7 @@
 import { html, LitElement } from 'lit-element';
 import client from '@greenwood/cli/data/client';
-import ChildrenQuery from '@greenwood/cli/data/queries/children';
+// import ChildrenQuery from '@greenwood/cli/data/queries/children';
+import gql from 'graphql-tag';
 
 MDIMPORT;
 
@@ -22,7 +23,19 @@ class BlogTemplate extends LitElement {
   async connectedCallback() {
     super.connectedCallback();
     const response = await client.query({
-      query: ChildrenQuery,
+      query: gql`query($parent: String!) {
+        children(parent: $parent) {
+          id,
+          title,
+          link,
+          filePath,
+          fileName,
+          template,
+          data {
+            date
+          }
+        }
+      }`,
       variables: {
         parent: 'blog'
       }

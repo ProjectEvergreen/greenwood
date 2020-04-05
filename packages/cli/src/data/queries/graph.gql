@@ -5,9 +5,6 @@ query {
     link,
     filePath,
     fileName,
-    template,
-    data {
-      date
-    }
+    template
   }
 }
