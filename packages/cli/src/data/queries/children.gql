@@ -5,6 +5,9 @@ query($parent: String!) {
     link,
     filePath,
     fileName,
-    template
+    template,
+    data {
+      date
+    }
   }
 }

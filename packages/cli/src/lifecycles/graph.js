@@ -77,6 +77,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                 /*
                 * Variable Definitions
                 *----------------------
+                * data: custom frontmatter set per page within frontmatter
                 * mdFile: path for an md file which will be imported in a generated component
                 * label: the unique label given to generated component element e.g. <wc-md-somelabel></wc-md-somelabel>
                 * route: route for a given page's url
@@ -88,8 +89,24 @@ const createGraphFromPages = async (pagesDir, config) => {
                 * title: the head <title></title> text
                 * meta: og graph meta array of objects { property/name, content }
                 */
+                const customData = attributes;
 
-                pages[pagesIndexMap.get(filenameHash)] = { mdFile, label, route, template, filePath, fileName, relativeExpectedPath, title, meta };
+                delete customData.label;
+                delete customData.title;
+                delete customData.template;
+
+                pages[pagesIndexMap.get(filenameHash)] = {
+                  data: customData || {},
+                  mdFile,
+                  label,
+                  route,
+                  template,
+                  filePath,
+                  fileName,
+                  relativeExpectedPath,
+                  title,
+                  meta
+                };
               }
 
               if (stats.isDirectory()) {

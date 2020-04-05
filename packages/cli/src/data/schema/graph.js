@@ -22,7 +22,7 @@ const getPagesFromGraph = async (root, query, context) => {
 
   graph
     .forEach((page) => {
-      const { route, mdFile, fileName, template, title } = page;
+      const { route, mdFile, fileName, template, title, data } = page;
       const { label } = getDeriveMetaFromRoute(route);
       const id = page.label;
 
@@ -32,7 +32,10 @@ const getPagesFromGraph = async (root, query, context) => {
         fileName,
         template,
         title: title !== '' ? title : label,
-        link: route
+        link: route,
+        data: {
+          date: data.date || ''
+        }
       });
     });
 
@@ -69,7 +72,7 @@ const getChildrenFromParentRoute = async (root, query, context) => {
 
   graph
     .forEach((page) => {
-      const { route, mdFile, fileName, template, title } = page;
+      const { route, mdFile, fileName, template, title, data } = page;
       const { label } = getDeriveMetaFromRoute(route);
       const root = route.split('/')[1];
 
@@ -82,7 +85,10 @@ const getChildrenFromParentRoute = async (root, query, context) => {
           fileName,
           template,
           title: title !== '' ? title : label,
-          link: route
+          link: route,
+          data: {
+            date: data.date || ''
+          }
         });
       }
     });
@@ -91,7 +97,12 @@ const getChildrenFromParentRoute = async (root, query, context) => {
 };
 
 const graphTypeDefs = gql`
+  type Data {
+    date: String
+  }
+
   type Page {
+    data: Data,
     id: String,
     filePath: String,
     fileName: String,
