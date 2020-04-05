@@ -27,7 +27,7 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', function() {
+describe.only('Build Greenwood With: ', function() {
   const LABEL = 'Data from GraphQL and using Custom Frontmatter';
   const apolloStateRegex = /window.__APOLLO_STATE__=({.*?});/;
   let setup;

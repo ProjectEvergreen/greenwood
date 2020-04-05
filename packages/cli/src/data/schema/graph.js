@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server-express');
+const gql = require('graphql-tag');
 
 const getDeriveMetaFromRoute = (route) => {
   // TODO hardcoded root / depth - #273
@@ -97,10 +97,6 @@ const getChildrenFromParentRoute = async (root, query, context) => {
 };
 
 const graphTypeDefs = gql`
-  type Data {
-    date: String
-  }
-
   type Page {
     data: Data,
     id: String,

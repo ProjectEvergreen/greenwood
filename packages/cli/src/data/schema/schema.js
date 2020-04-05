@@ -1,22 +1,48 @@
 const { makeExecutableSchema } = require('apollo-server-express');
 const { configTypeDefs, configResolvers } = require('./config');
 const { graphTypeDefs, graphResolvers } = require('./graph');
+const gql = require('graphql-tag');
 
-const mergedResolvers = Object.assign({}, {
-  Query: {
-    ...configResolvers.Query,
-    ...graphResolvers.Query
-  }
-});
+module.exports = (graph) => {
+  let uniqueCustomDataDefKeys = {};
+  let customDataDefs = '';
 
-const schema = makeExecutableSchema({
-  typeDefs: [
-    configTypeDefs,
-    graphTypeDefs
-  ],
-  resolvers: [
-    mergedResolvers
-  ]
-});
+  graph.forEach((page) => {
+    Object.keys(page.data).forEach(key => {
+      uniqueCustomDataDefKeys[key] = 'String';
+    });
+  });
 
-module.exports = schema;
+  Object.keys(uniqueCustomDataDefKeys).forEach((key) => {
+    customDataDefs += `
+      ${key}: ${uniqueCustomDataDefKeys[key]}
+    `;
+  });
+
+  const mergedGraphTypeDefs = gql`
+    type Data {
+      ${customDataDefs}
+    }
+
+    ${graphTypeDefs}
+  `;
+
+  const mergedResolvers = Object.assign({}, {
+    Query: {
+      ...configResolvers.Query,
+      ...graphResolvers.Query
+    }
+  });
+
+  const schema = makeExecutableSchema({
+    typeDefs: [
+      configTypeDefs,
+      mergedGraphTypeDefs
+    ],
+    resolvers: [
+      mergedResolvers
+    ]
+  });
+
+  return schema;
+};

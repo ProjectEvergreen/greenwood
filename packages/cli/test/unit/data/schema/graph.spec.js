@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const MOCK_GRAPH = require('../mocks/graph');
 const { graphResolvers } = require('../../../../src/data/schema/graph');
 
-describe('Unit Test: Data', function() {
+describe.only('Unit Test: Data', function() {
 
   describe('Schema', function() {
 
