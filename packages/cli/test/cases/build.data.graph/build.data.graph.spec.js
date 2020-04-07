@@ -96,7 +96,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(listItems.length).to.be.equal(2);
         expect(link.href.replace('file://', '')).to.be.equal('/blog/first-post');
-        expect(link.title).to.be.equal('Click to visit the First page');
+        expect(link.title).to.be.equal('Click to visit the First blog post');
         expect(link.innerHTML).to.contain('First');
       });
     });
@@ -142,7 +142,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(listItems.length).to.be.equal(2);
         expect(link.href.replace('file://', '')).to.be.equal('/blog/first-post');
-        expect(link.title).to.be.equal('Click to visit the First page');
+        expect(link.title).to.be.equal('Click to visit the First blog post');
         expect(link.innerHTML).to.contain('First');
       });
 
@@ -157,11 +157,11 @@ describe('Build Greenwood With: ', function() {
         const link2 = linkItems[1];
 
         expect(link1.href.replace('file://', '')).to.be.equal('/blog/first-post/');
-        expect(link1.title).to.be.equal('Click to read my First page');
+        expect(link1.title).to.be.equal('Click to read my First blog post');
         expect(link1.innerHTML).to.contain('First');
 
         expect(link2.href.replace('file://', '')).to.be.equal('/blog/second-post/');
-        expect(link2.title).to.be.equal('Click to read my Second page');
+        expect(link2.title).to.be.equal('Click to read my Second blog post');
         expect(link2.innerHTML).to.contain('Second');
       });
     });

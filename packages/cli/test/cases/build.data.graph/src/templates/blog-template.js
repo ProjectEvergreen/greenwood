@@ -50,7 +50,7 @@ class BlogTemplate extends LitElement {
             ${posts.map((item) => {
               return html`
                 <li>
-                  <a href="${item.link}/" title="Click to read my ${item.title} page">${item.title}</a>
+                  <a href="${item.link}/" title="Click to read my ${item.title} blog post">${item.title}</a>
                 </li>
               `;
             })}

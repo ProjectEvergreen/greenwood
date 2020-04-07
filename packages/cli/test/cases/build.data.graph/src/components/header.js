@@ -42,7 +42,7 @@ class HeaderComponent extends LitElement {
             ${navigation.map(({ item }) => {
               return html`
                 <li>
-                  <a href="${item.link}" title="Click to visit the ${item.label} page">${item.label}</a>
+                  <a href="${item.link}" title="Click to visit the ${item.label} blog post">${item.label}</a>
                 </li>
               `;
             })}
