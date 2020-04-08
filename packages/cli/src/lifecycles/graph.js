@@ -68,7 +68,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                   relativeExpectedPath = `'../${fileName}/${fileName}.js'`;
                 }
 
-                // generate a random element name
+                // generate a random element tag name
                 label = label || generateLabelHash(filePath);
 
                 // set <title></title> element text, override with markdown title
@@ -91,7 +91,10 @@ const createGraphFromPages = async (pagesDir, config) => {
                 */
                 const customData = attributes;
 
+                // prune "reserved" attributes that are supported by Greenwood
+                // https://www.greenwoodjs.io/docs/front-matter
                 delete customData.label;
+                delete customData.imports;
                 delete customData.title;
                 delete customData.template;
 
