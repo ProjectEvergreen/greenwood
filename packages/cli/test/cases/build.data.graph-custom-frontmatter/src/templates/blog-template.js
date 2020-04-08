@@ -1,6 +1,5 @@
 import { html, LitElement } from 'lit-element';
 import client from '@greenwood/cli/data/client';
-// import ChildrenQuery from '@greenwood/cli/data/queries/children';
 import gql from 'graphql-tag';
 
 MDIMPORT;
@@ -32,7 +31,8 @@ class BlogTemplate extends LitElement {
           fileName,
           template,
           data {
-            date
+            date,
+            author
           }
         }
       }`,
@@ -64,6 +64,7 @@ class BlogTemplate extends LitElement {
                   <a href="${post.link}/" title="Click to read my ${post.title} blog post">
                     ${post.title} posted: ${post.data.date}
                   </a>
+                  <span>Author: ${post.data.author}</span>
                 </li>
               `;
             })}

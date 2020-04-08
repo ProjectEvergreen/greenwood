@@ -28,7 +28,7 @@ const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Data from GraphQL and using Custom Frontmatter';
+  const LABEL = 'Data from GraphQL and using Custom Frontmatter Data';
   const apolloStateRegex = /window.__APOLLO_STATE__=({.*?});/;
   let setup;
 
@@ -77,20 +77,26 @@ describe('Build Greenwood With: ', function() {
       it('should have expected blog posts links in the <body> tag when using ChildrenQuery', function() {
         const listItems = dom.window.document.querySelectorAll('body div.posts ul li');
         const linkItems = dom.window.document.querySelectorAll('body div.posts ul li a');
+        const spanItems = dom.window.document.querySelectorAll('body div.posts ul li span');
 
         expect(listItems.length).to.be.equal(2);
         expect(linkItems.length).to.be.equal(2);
+        expect(spanItems.length).to.be.equal(2);
 
         const link1 = linkItems[0];
         const link2 = linkItems[1];
+        const span1 = spanItems[0];
+        const span2 = spanItems[1];
 
         expect(link1.href.replace('file://', '')).to.be.equal('/blog/first-post/');
         expect(link1.title).to.be.equal('Click to read my Blog blog post');
         expect(link1.innerHTML).to.contain('Blog posted: 2020/04/05');
+        expect(span1.innerHTML).to.contain('Author: Lorum');
 
         expect(link2.href.replace('file://', '')).to.be.equal('/blog/second-post/');
         expect(link2.title).to.be.equal('Click to read my Blog blog post');
         expect(link2.innerHTML).to.contain('Blog posted: 2020/04/06');
+        expect(span2.innerHTML).to.contain('Author: Ipsum');
       });
     });
 
