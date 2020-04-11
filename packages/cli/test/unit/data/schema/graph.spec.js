@@ -129,6 +129,12 @@ describe('Unit Test: Data', function() {
             expect(child.title).to.equal('Getting Started');
           });
         });
+
+        it('should have expected custom front matter data if it is set', function() {
+          children.forEach(function(child, index) {
+            expect(child.data.foo).to.equal(`bar${index + 1}`);
+          });
+        });
       });
     });
 

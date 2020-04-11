@@ -68,7 +68,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                   relativeExpectedPath = `'../${fileName}/${fileName}.js'`;
                 }
 
-                // generate a random element name
+                // generate a random element tag name
                 label = label || generateLabelHash(filePath);
 
                 // set <title></title> element text, override with markdown title
@@ -77,6 +77,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                 /*
                 * Variable Definitions
                 *----------------------
+                * data: custom frontmatter set per page within frontmatter
                 * mdFile: path for an md file which will be imported in a generated component
                 * label: the unique label given to generated component element e.g. <wc-md-somelabel></wc-md-somelabel>
                 * route: route for a given page's url
@@ -88,8 +89,27 @@ const createGraphFromPages = async (pagesDir, config) => {
                 * title: the head <title></title> text
                 * meta: og graph meta array of objects { property/name, content }
                 */
+                const customData = attributes;
 
-                pages[pagesIndexMap.get(filenameHash)] = { mdFile, label, route, template, filePath, fileName, relativeExpectedPath, title, meta };
+                // prune "reserved" attributes that are supported by Greenwood
+                // https://www.greenwoodjs.io/docs/front-matter
+                delete customData.label;
+                delete customData.imports;
+                delete customData.title;
+                delete customData.template;
+
+                pages[pagesIndexMap.get(filenameHash)] = {
+                  data: customData || {},
+                  mdFile,
+                  label,
+                  route,
+                  template,
+                  filePath,
+                  fileName,
+                  relativeExpectedPath,
+                  title,
+                  meta
+                };
               }
 
               if (stats.isDirectory()) {

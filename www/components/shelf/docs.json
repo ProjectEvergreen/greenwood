@@ -53,16 +53,24 @@
     "path": "/docs/front-matter",
     "items": [
       {
-        "name": "Page Configuration",
-        "id": "page-configuration"
-      },
-      {
-        "name": "Template",
-        "id": "define-template"
+        "name": "Element Label",
+        "id": "element-label"
       },
       {
         "name": "Imports",
         "id": "imports"
+      },
+      {
+        "name": "Template",
+        "id": "template"
+      },
+      {
+        "name": "Title",
+        "id": "title"
+      },
+      {
+        "name": "Custom Data",
+        "id": "custom-data"
       }
     ]
   },
