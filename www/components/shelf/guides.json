@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Add Netlify CMS",
+    "path": "/guides/netlify-cms",
+    "items": [{
+      "name": "Setup Netlify CMS",
+      "id": "setup-netlify-cms"
+    },
+    {
+      "name": "Netlif Your Project",
+      "id": "netlify-your-project"
+    },
+    {
+      "name": "Configure Authentication",
+      "id": "configure-authentication"
+    },
+    {
+      "name": "Access Netlify CMS",
+      "id": "access-netlify-cms"
+    },
+    {
+      "name": "Using Netlify CMS",
+      "id": "using-netlify-cms"
+    }]
+  }
+]

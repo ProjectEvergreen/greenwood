@@ -142,3 +142,39 @@ To automatically generate an access token from and for the GitHub API
 Your site is now deployed and configured, you can now login and access your Netlify CMS from:
  `https://yourgeneratedurl-ads6387.netlify.com/admin`
 
+### Using Netlify CMS
+
+If you've been following along, you should now be viewing the netlify CMS admin gui at your netlify domain `https://yourgeneratedurl-ads6387.netlify.com/admin`.
+
+From this page, you can see the default `blog` content type that we added in our netlify cms configuration file. When we create and publish a new `blog` page it will publish to the /public/blog folder of your repository.
+
+```render
+<img src="/assets/netlify-admin.png" alt="netlify-cms" style="max-width:800px;"/>
+```
+#### Create Content
+
+Click **New Blog** button and you will be greeted with a WYSIWYG(what you see is what you get) content form.  From here we can add a title which will be used for our page's URL, as defiend by our configuration.
+
+Add a **title** of `example`.
+
+Add whatever content you'd like.  If you wish to upload images through netlify's CMS they will be placed in `/public/assets` as defined in our netlify configuration.
+
+When completed hit **Save** at the top.  A pull request will automatically be submitted to your repository of your draft page.
+
+#### Review Your Content
+
+You can change the **status** to "In Review". NEtlify CMS will then tag that same pull request as `netlify-cms/pending_review`.  Pending reviews can be read by selecting **Workflow** from netlify CMS navigation menu.
+
+```render
+<img src="/assets/netlify-workflow.png" alt="netlify-cms" style="max-width:800px;"/>
+```
+
+If you select your example page from the `In Review` section you can edit/update/delete the page.
+
+#### Publish Your Content
+
+From the top of the page select **Publish** and then from the drop-down select **Publish now**
+
+Your pull request will now be merged to the master branch. The entire site will be recompiled on netlify, in a few moments your new page will be live at your netlify domain `https://yourgeneratedurl-ads6387.netlify.com/example`.
+
+More information about Netlify CMS can be found on the [Netlify CMS project website](https://www.netlifycms.org/).
