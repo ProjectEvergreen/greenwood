@@ -155,9 +155,9 @@ From this page, you can see the default `blog` content type that we added in our
 
 Click **New Blog** button and you will be greeted with a WYSIWYG(what you see is what you get) content form.
 
-Add a **title** of `example` which will be used for our page's URL, as defiend by our configuration. For example the title `Hello World Howdy` would be available at the url https://yourgeneratedurl-ads6387.netlify.com/blog/hello-world-howdy when publsihed.
+Add a **title** of `example` which will be used for our page's URL, as defined by our configuration. For example the title `Hello World Howdy` would be available at the url https://yourgeneratedurl-ads6387.netlify.com/blog/hello-world-howdy when publsihed.
 
-Add whatever content you'd like.  If you wish to upload images through netlify's CMS they will be placed in `/public/assets` as defined in our netlify configuration.
+Add whatever content you would like.  If you wish to upload images through netlify's CMS they will be placed in `/public/assets` as defined by our netlify configuration.
 
 When completed hit **Save** at the top.  A pull request will automatically be submitted to your repository of your draft page.
 
