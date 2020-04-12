@@ -153,17 +153,21 @@ From this page, you can see the default `blog` content type that we added in our
 ```
 #### Create Content
 
-Click **New Blog** button and you will be greeted with a WYSIWYG(what you see is what you get) content form.
+Click **New Blog** button. You will be greeted with a WYSIWYG(what you see is what you get) content form.
+
+```render
+<img src="/assets/netlify-cms.png" alt="netlify-cms" style="max-width:800px;"/>
+```
 
 Add a **title** of `example` which will be used for our page's URL, as defined by our configuration. For example the title `Hello World Howdy` would be available at the url https://yourgeneratedurl-ads6387.netlify.com/blog/hello-world-howdy when publsihed.
 
-Add whatever content you would like.  If you wish to upload images through netlify's CMS they will be placed in `/public/assets` as defined by our netlify configuration.
+Add whatever content you would like.  If you wish to upload images through netlify's CMS they will be placed in `/public/assets` as defined by your netlify configuration.
 
-When completed hit **Save** at the top.  A pull request will automatically be submitted to your repository of your draft page.
+When completed click **Save** at the top.  A pull request will automatically be submitted to your repository of your draft page.
 
 #### Review Your Content
 
-You can change the **status** to "In Review". NEtlify CMS will then tag that same pull request as `netlify-cms/pending_review`.  Pending reviews can be read by selecting **Workflow** from netlify CMS navigation menu.
+You can change the **status** to "In Review". Netlify CMS will then tag that same pull request as `netlify-cms/pending_review`.  Pending reviews can be read by selecting **Workflow** from netlify CMS navigation menu.
 
 ```render
 <img src="/assets/netlify-workflow.png" alt="netlify-cms" style="max-width:800px;"/>
@@ -175,6 +179,6 @@ If you select your example page from the `In Review` section you can edit/update
 
 From the top of the page select **Publish** and then from the drop-down select **Publish now**
 
-Your pull request will now be merged to the master branch. The entire site will be recompiled on netlify, in a few moments your new page will be live at your netlify domain `https://yourgeneratedurl-ads6387.netlify.com/blog/example`.
+Your pull request will now be merged to the master branch. The entire site will be recompiled on netlify. In a few moments your new page will be live at your netlify domain `https://yourgeneratedurl-ads6387.netlify.com/blog/example`.
 
 More information about Netlify CMS can be found on the [Netlify CMS project website](https://www.netlifycms.org/).
