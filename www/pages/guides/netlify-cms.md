@@ -146,16 +146,16 @@ Your site is now deployed and configured, you can now login and access your Netl
 
 If you've been following along, you should now be viewing the netlify CMS admin gui at your netlify domain `https://yourgeneratedurl-ads6387.netlify.com/admin`.
 
-From this page, you can see the default `blog` content type that we added in our netlify cms configuration file. When we create and publish a new `blog` page it will publish to the /public/blog folder of your repository.
+From this page, you can see the default `blog` content type that we added in our netlify cms configuration file. When we create and publish a new `blog` page it will publish to the `/public/blog` folder in your repository.
 
 ```render
 <img src="/assets/netlify-admin.png" alt="netlify-cms" style="max-width:800px;"/>
 ```
 #### Create Content
 
-Click **New Blog** button and you will be greeted with a WYSIWYG(what you see is what you get) content form.  From here we can add a title which will be used for our page's URL, as defiend by our configuration.
+Click **New Blog** button and you will be greeted with a WYSIWYG(what you see is what you get) content form.
 
-Add a **title** of `example`.
+Add a **title** of `example` which will be used for our page's URL, as defiend by our configuration. For example the title `Hello World Howdy` would be available at the url https://yourgeneratedurl-ads6387.netlify.com/blog/hello-world-howdy when publsihed.
 
 Add whatever content you'd like.  If you wish to upload images through netlify's CMS they will be placed in `/public/assets` as defined in our netlify configuration.
 
@@ -175,6 +175,6 @@ If you select your example page from the `In Review` section you can edit/update
 
 From the top of the page select **Publish** and then from the drop-down select **Publish now**
 
-Your pull request will now be merged to the master branch. The entire site will be recompiled on netlify, in a few moments your new page will be live at your netlify domain `https://yourgeneratedurl-ads6387.netlify.com/example`.
+Your pull request will now be merged to the master branch. The entire site will be recompiled on netlify, in a few moments your new page will be live at your netlify domain `https://yourgeneratedurl-ads6387.netlify.com/blog/example`.
 
 More information about Netlify CMS can be found on the [Netlify CMS project website](https://www.netlifycms.org/).

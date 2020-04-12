@@ -32,7 +32,7 @@ class PageTemplate extends LitElement {
     // based on path, display selected list
     const url = window.location.pathname;
     let list = [];
-    
+
     if (url.indexOf('/about') >= 0) {
       list = await import(/* webpackChunkName: 'about' */ '../components/shelf/about.json').then(({ default: data }) => data);
     } else if (url.indexOf('/docs') >= 0) {
@@ -41,6 +41,8 @@ class PageTemplate extends LitElement {
       list = await import(/* webpackChunkName: 'getting-started' */ '../components/shelf/getting-started-list.json').then(({ default: data }) => data);
     } else if (url.indexOf('/plugins') >= 0) {
       list = await import(/* webpackChunkName: 'plugins' */ '../components/shelf/plugins.json').then(({ default: data }) => data);
+    } else if (url.indexOf('/guides') >= 0) {
+      list = await import(/* webpackChunkName: 'guides' */ '../components/shelf/guides.json').then(({ default: data }) => data);
     }
 
     this.shelfList = list;
