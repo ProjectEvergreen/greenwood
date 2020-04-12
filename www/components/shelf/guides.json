@@ -7,16 +7,12 @@
       "id": "setup-netlify-cms"
     },
     {
-      "name": "Netlif Your Project",
+      "name": "Netlify Your Project",
       "id": "netlify-your-project"
     },
     {
       "name": "Configure Authentication",
       "id": "configure-authentication"
-    },
-    {
-      "name": "Access Netlify CMS",
-      "id": "access-netlify-cms"
     },
     {
       "name": "Using Netlify CMS",

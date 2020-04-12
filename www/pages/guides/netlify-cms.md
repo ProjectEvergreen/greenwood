@@ -137,7 +137,7 @@ Click **Edit Settings** then click "Generate access token in Github"
 
 To automatically generate an access token from and for the GitHub API
 
-### Access Netlify CMS
+#### Access Netlify CMS
 
 Your site is now deployed and configured, you can now login and access your Netlify CMS from:
  `https://yourgeneratedurl-ads6387.netlify.com/admin`
