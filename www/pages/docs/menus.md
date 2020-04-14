@@ -143,7 +143,7 @@ The following sorts are available.
 
 ### Filtering By Path
 
-Say for example you want only want specific menu items to show of a specific subdirectory. You can also include the `route` variable to specify a specific path the menu will be displaying on.  This would be useful for a shelf menu for example.
+Say for example you only want specific menu items to show within specific subdirectory. You can also include the `route` variable to specify a specific path the menu will be displaying on.  This would be useful for a shelf menu for example.
 
 ```render js
 const response = await client.query({
