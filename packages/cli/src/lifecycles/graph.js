@@ -179,10 +179,10 @@ module.exports = generateGraph = async (compilation) => {
 
       compilation.graph = await createGraphFromPages(context.pagesDir, config);
 
-      // Uncomment to export output mock graph
+      // Uncomment to export mock graph
       // const targetDir = path.join(__dirname, '../..', 'test/unit/data/mocks');
       // const targetFile = path.join(targetDir, 'graph.js');
-      // let mockGraph = 'module.exports = { \n'
+      // const mockGraph = 'module.exports = { \n'
       // + '  // eslint-disable-next-line \n graph: '
       //   + JSON.stringify(compilation.graph)
       //   + '\n};';
