@@ -88,10 +88,7 @@ class Shelf extends LitElement {
 
       const sortedChildren = response.data.children
         .filter((child) => {
-          // return child.index?
-          // shouldn't index be exluded from a child query? 
-          // e.g. /about/ ==== pages/about/index.md
-          return child.fileName !== 'index';
+          return child.data.index;
         }).sort((a, b) => {
           return a.data.index - b.data.index;
         });
