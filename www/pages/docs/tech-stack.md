@@ -1,3 +1,7 @@
+---
+index: 7
+---
+
 ## Tech Stack
 
 Greenwood uses a variety of open source JavaScript tools to help faciliate development and production building of Greenwood projects.  By putting all these tools together and configuring them for you, Greenwood helps you focus more on what matters; building your project.  Greenwood takes are of performance and optimizations for you and provides a static build of your project that you can host on any web server or cloud host, be it Netlify, S3 / CloudFront, Express, Apache, etc.  It's entirely up to you and what fits your workflow the best.

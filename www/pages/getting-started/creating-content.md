@@ -1,3 +1,7 @@
+---
+index: 3
+---
+
 ## Overview
 After setting up our [project workspace](/getting-started/project-setup/) and reviewing some of Greenwood's [key concepts](/getting-started/key-concepts/), it's now time to get to the good stuff: writing some content and building your first site!
 

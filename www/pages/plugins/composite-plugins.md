@@ -1,3 +1,7 @@
+---
+index: 0
+---
+
 ## Composite Plugins
 Greenwood provides some custom "composite" plugins that are tasked with providing specific functionality to your project, built using the [available plugin types](/plugins/) already provided by Greenwood.  
 

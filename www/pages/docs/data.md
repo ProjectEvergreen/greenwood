@@ -1,3 +1,7 @@
+---
+index: 2
+---
+
 ## Data Sources
 Having to repeat things when programming is no fun, and that's why (web) component based development is so useful!  As websites start to grow, there comes a point where being able to have access to the content and structure of your site's layout and configuration as part of the development process becomes essential towards maintainability, performance, and scalability.
 

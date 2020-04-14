@@ -1,3 +1,7 @@
+---
+index: 3
+---
+
 ## Front Matter
 
 "Front matter" is a [YAML](https://yaml.org/) block at the top of any markdown file.  It gives you the ability to define variables that are made available to Greenwood's build process. You can also use it to `import` additional files.

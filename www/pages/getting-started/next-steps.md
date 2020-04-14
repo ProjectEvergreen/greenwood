@@ -1,3 +1,7 @@
+---
+index: 6
+---
+
 ## Next Steps
 
 ## About Greenwood

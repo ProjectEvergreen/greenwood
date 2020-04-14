@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit-element';
 import client from '@greenwood/cli/data/client';
-import ChildrenQuery from '@greenwood/cli/data/queries/children';
+// import ChildrenQuery from '@greenwood/cli/data/queries/children';
+import gql from 'graphql-tag';
 import css from './shelf.css';
 import chevronRt from '../icons/chevron-right/chevron-right';
 import chevronDwn from '../icons/chevron-down/chevron-down';
@@ -31,6 +32,13 @@ class Shelf extends LitElement {
     this.expandRoute(window.location.pathname);
   }
 
+  /*
+   * About
+   * - Goals
+   * - How it Works w/ children
+   * - Features
+   * - Community
+   */
   async setupShelf(page) {
     let list = [];
 
@@ -58,13 +66,37 @@ class Shelf extends LitElement {
 
       // TODO not actually integrated, still using .json files - #288
       const response = await client.query({
-        query: ChildrenQuery,
+        query: gql`
+          query($parent: String!) {
+            children(parent: $parent) {
+              id,
+              title,
+              link,
+              filePath,
+              fileName,
+              template,
+              data {
+                index
+              }
+            }
+          },
+        `,
         variables: {
           parent: page
         }
       });
 
-      console.log('response from the shelf (data.children)', response.data.children);
+      const sortedChildren = response.data.children
+        .filter((child) => {
+          // return child.index?
+          // shouldn't index be exluded from a child query? 
+          // e.g. /about/ ==== pages/about/index.md
+          return child.fileName !== 'index';
+        }).sort((a, b) => {
+          return a.data.index - b.data.index;
+        });
+
+      console.log('sortedChildren', sortedChildren);
 
       this.shelfList = list;
     }

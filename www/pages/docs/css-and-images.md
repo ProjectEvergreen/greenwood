@@ -1,3 +1,7 @@
+---
+index: 5
+---
+
 ## Styles and Assets
 Greenwood provides a couple ways to help style and theme your site.
 

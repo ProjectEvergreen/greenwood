@@ -1,3 +1,7 @@
+---
+index: 2
+---
+
 ## Overview
 In the [previous section](/getting-started/project-setup) we setup our local development environment and installed Greenwood.  We also made a "workspace" for our project files in a directory called _src/_.
 

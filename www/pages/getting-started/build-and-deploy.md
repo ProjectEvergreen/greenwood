@@ -1,3 +1,7 @@
+---
+index: 5
+---
+
 ## Build and Deploy
 
 Congrats!  After all your good work making your first site with Greenwood, it's now time to take it live!
