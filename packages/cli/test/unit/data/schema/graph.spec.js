@@ -134,6 +134,10 @@ describe('Unit Test: Data', function() {
           expect(children[6].title).to.equal('Project Setup');
           expect(children[7].title).to.equal('Quick Start');
         });
+
+        it('should have expected custom front matter data if it is set', function() {
+          expect(children[0].data.menu).to.equal('side');
+        });
       });
     });
 

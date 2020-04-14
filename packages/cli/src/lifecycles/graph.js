@@ -10,23 +10,33 @@ const createGraphFromPages = async (pagesDir, config) => {
 
   return new Promise(async (resolve, reject) => {
     try {
+      const pagesIndexMap = new Map();
+      let pagesIndex = 0;
 
       const walkDirectory = async(directory) => {
         let files = await fs.readdir(directory);
 
-        return Promise.all(files.map(async (file) => {
+        return Promise.all(files.map((file) => {
+          const filenameHash = crypto.createHash('md5').update(`${directory}/${file}`).digest('hex');
+          const filePath = path.join(directory, file);
+          const stats = fs.statSync(filePath);
+          const isMdFile = file.substr(file.length - 2, file.length) === 'md';
+
+          // map each page to a (0 based) index based on filesystem order
+          if (isMdFile) {
+            pagesIndexMap.set(filenameHash, pagesIndex);
+            pagesIndex += 1;
+          }
+
           return new Promise(async (resolve, reject) => {
             try {
-              const filePath = path.join(directory, file);
-              const stats = await fs.stat(filePath);
-              const isMdFile = file.substr(file.length - 2, file.length) === 'md';
 
               if (isMdFile && !stats.isDirectory()) {
                 const fileContents = await fs.readFile(filePath, 'utf8');
                 const { attributes } = fm(fileContents);
-                let { label, template, title, menu, index, linkheadings } = attributes;
+                let { label, template, title } = attributes;
                 let { meta } = config;
-                let mdFile = '', tableOfContents = [];
+                let mdFile = '';
 
                 // if template not set, use default
                 template = template || 'page';
@@ -60,30 +70,16 @@ const createGraphFromPages = async (pagesDir, config) => {
                   relativeExpectedPath = `'../${fileName}/${fileName}.js'`;
                 }
 
-                // generate a random element name
+                // generate a random element tag name
                 label = label || generateLabelHash(filePath);
 
                 // set <title></title> element text, override with markdown title
                 title = title || '';
 
-                // set specific menu to place this page
-                menu = menu || '';
-
-                // set specific index list priority of this item within a menu
-                index = index || '';
-
-                // set flag whether to gather a list of headings on a page as menu items
-                linkheadings = linkheadings || false;
-
-                if (linkheadings) {
-                  // parse markdown for table of contents and output to json
-                  tableOfContents = toc(fileContents).json;
-                  tableOfContents.shift();
-                }
-
                 /*
                 * Variable Definitions
                 *----------------------
+                * data: custom frontmatter set per page within frontmatter
                 * mdFile: path for an md file which will be imported in a generated component
                 * label: the unique label given to generated component element e.g. <wc-md-somelabel></wc-md-somelabel>
                 * route: route for a given page's url
@@ -93,15 +89,56 @@ const createGraphFromPages = async (pagesDir, config) => {
                 * relativeExpectedPath: relative import path for generated component within a list.js file to later be
                 * imported into app.js root component
                 * title: the head <title></title> text
+                * meta: og graph meta array of objects { property/name, content }
+                */
+                const customData = attributes;
+
+                // prune "reserved" attributes that are supported by Greenwood
+                // https://www.greenwoodjs.io/docs/front-matter
+                delete customData.label;
+                delete customData.imports;
+                delete customData.title;
+                delete customData.template;
+
+                /* Menu Query
+                * Custom front matter - Variable Definitions
+                * --------------------------------------------------
                 * menu: the name of the menu in which this item can be listed and queried
                 * index: the index of this list item within a menu
                 * tableOfContents: json object containing page's table of contents(list of headings)
-                * meta: og graph meta array of objects { property/name, content }
+                *
                 */
+                // set specific menu to place this page
+                customData.menu = customData.menu || '';
 
-                pages.push({ mdFile, label, route, template, filePath, fileName, relativeExpectedPath,
-                  title, menu, index, tableOfContents, meta });
+                // set specific index list priority of this item within a menu
+                customData.index = customData.index || '';
+
+                // set flag whether to gather a list of headings on a page as menu items
+                customData.linkheadings = customData.linkheadings || false;
+                customData.tableOfContents = [];
+
+                if (customData.linkheadings) {
+                  // parse markdown for table of contents and output to json
+                  customData.tableOfContents = toc(fileContents).json;
+                  customData.tableOfContents.shift();
+                }
+                /* ---------End Menu Query-------------------- */
+
+                pages[pagesIndexMap.get(filenameHash)] = {
+                  data: customData || {},
+                  mdFile,
+                  label,
+                  route,
+                  template,
+                  filePath,
+                  fileName,
+                  relativeExpectedPath,
+                  title,
+                  meta
+                };
               }
+
               if (stats.isDirectory()) {
                 await walkDirectory(filePath);
                 resolve();
@@ -141,6 +178,17 @@ module.exports = generateGraph = async (compilation) => {
       const { context, config } = compilation;
 
       compilation.graph = await createGraphFromPages(context.pagesDir, config);
+
+      // Uncomment to export output mock graph
+      // const targetDir = path.join(__dirname, '../..', 'test/unit/data/mocks');
+      // const targetFile = path.join(targetDir, 'graph.js');
+      // let mockGraph = 'module.exports = { \n'
+      // + '  // eslint-disable-next-line \n graph: '
+      //   + JSON.stringify(compilation.graph)
+      //   + '\n};';
+
+      // await fs.writeFile(path.join(targetFile), mockGraph, 'utf8');
+
       resolve(compilation);
     } catch (err) {
       reject(err);

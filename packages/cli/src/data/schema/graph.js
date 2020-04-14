@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server-express');
+const gql = require('graphql-tag');
 
 const getMenuFromGraph = async (root, { pathname, filter = '', orderBy = '' }, context) => {
   const { graph } = context;
@@ -6,7 +6,8 @@ const getMenuFromGraph = async (root, { pathname, filter = '', orderBy = '' }, c
 
   graph
     .forEach((page) => {
-      const { route, menu, title, index, tableOfContents } = page;
+      const { route, data, title } = page;
+      const { menu, index, tableOfContents } = data;
       let children = [];
 
       if (menu && menu.search(filter) > -1) {
@@ -95,7 +96,7 @@ const getPagesFromGraph = async (root, query, context) => {
 
   graph
     .forEach((page) => {
-      const { route, mdFile, fileName, template, title } = page;
+      const { route, mdFile, fileName, template, title, data } = page;
       const { label } = getDeriveMetaFromRoute(route);
       const id = page.label;
 
@@ -105,7 +106,10 @@ const getPagesFromGraph = async (root, query, context) => {
         fileName,
         template,
         title: title !== '' ? title : label,
-        link: route
+        link: route,
+        data: {
+          ...data
+        }
       });
     });
 
@@ -119,7 +123,7 @@ const getChildrenFromParentRoute = async (root, query, context) => {
 
   graph
     .forEach((page) => {
-      const { route, mdFile, fileName, template, title } = page;
+      const { route, mdFile, fileName, template, title, data } = page;
       const { label } = getDeriveMetaFromRoute(route);
       const root = route.split('/')[1];
 
@@ -132,7 +136,10 @@ const getChildrenFromParentRoute = async (root, query, context) => {
           fileName,
           template,
           title: title !== '' ? title : label,
-          link: route
+          link: route,
+          data: {
+            ...data
+          }
         });
       }
     });
@@ -142,6 +149,7 @@ const getChildrenFromParentRoute = async (root, query, context) => {
 
 const graphTypeDefs = gql`
   type Page {
+    data: Data,
     id: String,
     filePath: String,
     fileName: String,
