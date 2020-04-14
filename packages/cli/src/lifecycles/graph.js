@@ -107,7 +107,6 @@ const createGraphFromPages = async (pagesDir, config) => {
                 * index: the index of this list item within a menu
                 * linkheadings: flag to tell us where to add page's table of contents as menu items
                 * tableOfContents: json object containing page's table of contents(list of headings)
-                *
                 */
                 // set specific menu to place this page
                 customData.menu = customData.menu || '';
@@ -119,7 +118,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                 customData.linkheadings = customData.linkheadings || false;
                 customData.tableOfContents = [];
 
-                if (customData.linkheadings) {
+                if (customData.linkheadings === true) {
                   // parse markdown for table of contents and output to json
                   customData.tableOfContents = toc(fileContents).json;
                   customData.tableOfContents.shift();

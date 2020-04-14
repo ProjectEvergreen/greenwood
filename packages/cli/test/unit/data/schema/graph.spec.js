@@ -31,46 +31,6 @@ describe('Unit Test: Data', function() {
         });
       });
 
-      describe('getMenuFromGraph', function() {
-        let navigation = [];
-
-        before(async function() {
-          navigation = await graphResolvers.Query.menu(undefined, { pathname: '/', filter: 'navigation' }, MOCK_GRAPH);
-        });
-
-        it('should have 4 children', function() {
-          expect(navigation.children.length).to.equal(4);
-        });
-
-        it('should have About as the first item', function() {
-          const item = navigation.children[0].item;
-
-          expect(item.label).to.be.equal('About');
-          expect(item.link).to.be.equal('/about/');
-        });
-
-        it('should have Docs as the second item', function() {
-          const item = navigation.children[1].item;
-
-          expect(item.label).to.be.equal('Docs');
-          expect(item.link).to.be.equal('/docs/');
-        });
-
-        it('should have Getting Started as the third item', function() {
-          const item = navigation.children[2].item;
-
-          expect(item.label).to.be.equal('Getting Started');
-          expect(item.link).to.be.equal('/getting-started/');
-        });
-
-        it('should have Plugins as the fourth item', function() {
-          const item = navigation.children[3].item;
-
-          expect(item.label).to.be.equal('Plugins');
-          expect(item.link).to.be.equal('/plugins/');
-        });
-      });
-
       describe('getChildrenFromParentRoute for (mock) Getting Started', function() {
         let children = [];
 
