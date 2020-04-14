@@ -22,6 +22,7 @@ For this example, let's say we want "about", "docs", "contact us", all linked wi
 | title       |  The title/label of the page link within the menu |
 | menu        |  The name of the menu, cannot have spaces or special characters.                             |
 | index       | The position of the page within a menu. Custom set the position higher or lower than default. You can sort these positions alphabetically or by index   |
+| linkheadings | Boolean. If you want to parse the page for all h3 headings and include them as children of the page link, add `linkheadings: true`
 
 e.g.
 
@@ -111,8 +112,7 @@ class HeaderComponent extends LitElement {
     \`;
   }
 }
-customElements.define('page-template', PageTemplate);
-
+customElements.define('eve-header', HeaderComponent);
 ```
 
 
