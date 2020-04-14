@@ -140,3 +140,18 @@ The following sorts are available.
 |index_desc | Sort by index, descending order |
 |label_asc  | Sort by label, ascending order |
 |label_desc | Sort by label, descending order |
+
+### Filtering By Path
+
+Say for example you want only want specific menu items to show of a specific subdirectory. You can also include the `route` variable to specify a specific path the menu will be displaying on.  This would be useful for a shelf menu for example.
+
+```render js
+const response = await client.query({
+  query: MenuQuery,
+  variables: {
+    menu: 'shelf',
+    order: 'index_asc',
+    route: window.location.pathname
+  }
+});
+```
