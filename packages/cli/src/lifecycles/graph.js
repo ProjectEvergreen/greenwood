@@ -105,6 +105,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                 * --------------------------------------------------
                 * menu: the name of the menu in which this item can be listed and queried
                 * index: the index of this list item within a menu
+                * linkheadings: flag to tell us where to add page's table of contents as menu items
                 * tableOfContents: json object containing page's table of contents(list of headings)
                 *
                 */
@@ -171,6 +172,20 @@ const generateLabelHash = (label) => {
   return elementLabel;
 };
 
+const generateMockGraph = async (graph, debug) => {
+  if (debug) {
+    const targetDir = path.join(__dirname, '../..', 'test/unit/data/mocks');
+    const targetFile = path.join(targetDir, 'graph.js');
+    const mockGraph = 'module.exports = { \n'
+    + '  // eslint-disable-next-line \n graph: '
+      + JSON.stringify(graph)
+      + '\n};';
+
+    await fs.writeFile(path.join(targetFile), mockGraph, 'utf8');
+  }
+
+};
+
 module.exports = generateGraph = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
@@ -179,15 +194,8 @@ module.exports = generateGraph = async (compilation) => {
 
       compilation.graph = await createGraphFromPages(context.pagesDir, config);
 
-      // Uncomment to export mock graph
-      // const targetDir = path.join(__dirname, '../..', 'test/unit/data/mocks');
-      // const targetFile = path.join(targetDir, 'graph.js');
-      // const mockGraph = 'module.exports = { \n'
-      // + '  // eslint-disable-next-line \n graph: '
-      //   + JSON.stringify(compilation.graph)
-      //   + '\n};';
-
-      // await fs.writeFile(path.join(targetFile), mockGraph, 'utf8');
+      // Set to true to export mock graph to src/test/unit/data/mocks/graph.js
+      generateMockGraph(compilation.graph, false);
 
       resolve(compilation);
     } catch (err) {
