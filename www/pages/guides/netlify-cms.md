@@ -7,7 +7,7 @@ This guide builds off the previous guides. If you haven't been following along, 
 You will also need a free [netlify account](www.netlify.com).
 
 ```render
-<img src="/assets/netlify-cms.png" alt="netlify-cms" style="max-width:800px;"/>
+<img src="/assets/netlify-cms.jpg" alt="netlify-cms" style="max-width:800px;"/>
 ```
 
 ### Setup Netlify CMS
@@ -156,7 +156,7 @@ From this page, you can see the default `blog` content type that we added in our
 Click **New Blog** button. You will be greeted with a WYSIWYG(what you see is what you get) content form.
 
 ```render
-<img src="/assets/netlify-cms.png" alt="netlify-cms" style="max-width:800px;"/>
+<img src="/assets/netlify-cms.jpg" alt="netlify-cms" style="max-width:800px;"/>
 ```
 
 Add a **title** of `example` which will be used for our page's URL, as defined by our configuration. For example the title `Hello World Howdy` would be available at the url https://yourgeneratedurl-ads6387.netlify.com/blog/hello-world-howdy when publsihed.
