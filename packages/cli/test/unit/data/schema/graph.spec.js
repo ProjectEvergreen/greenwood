@@ -15,8 +15,8 @@ describe('Unit Test: Data', function() {
           pages = await graphResolvers.Query.graph(undefined, {}, MOCK_GRAPH);
         });
 
-        it('should have 27 pages', function() {
-          expect(pages.length).to.equal(27);
+        it('should have 28 pages', function() {
+          expect(pages.length).to.equal(28);
         });
 
         it('should have all expected properties for each page', function() {
