@@ -130,51 +130,9 @@ This will return the full `graph` of all pages as an array
 ]
 ```
 
-##### Navigation
-The Navigation query returns an array of Page "like" objects, representing the top most root pages of your project.
+##### Menu Query
 
-###### Definition
-```render javascript
-query {
-  navigation {
-    label,
-    link
-  }
-}
-```
-
-###### Usage
-`import` the query in your component
-```render javascript
-import client from '@greenwood/cli/data/client';
-import NavigationQuery from '@greenwood/cli/data/queries/navigation';
-
-.
-.
-.
-
-async connectedCallback() {
-  super.connectedCallback();
-
-  const response = await client.query({
-    query: NavigationQuery
-  });
-
-  this.navigation = response.data.navigation;
-}
-```
-
-
-###### Response
-This will return the full `graph` of all top level routes as a Page array
-```render javascript
-[
-  {
-    label: "Blog",
-    link: "/blog/"
-  }
-]
-```
+See [Menus](/docs/menu) for documentation on querying for custom menus.
 
 ##### Children
 The Children query returns an array of all pages below a given top level route.

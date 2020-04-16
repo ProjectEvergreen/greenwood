@@ -194,7 +194,7 @@ module.exports = generateGraph = async (compilation) => {
       compilation.graph = await createGraphFromPages(context.pagesDir, config);
 
       // Set to true to export mock graph to src/test/unit/data/mocks/graph.js
-      generateMockGraph(compilation.graph, true);
+      generateMockGraph(compilation.graph, false);
 
       resolve(compilation);
     } catch (err) {

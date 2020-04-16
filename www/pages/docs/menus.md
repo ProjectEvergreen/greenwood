@@ -22,7 +22,7 @@ For this example, let's say we want "about", "docs", "contact us", all linked wi
 | title       |  The title/label of the page link within the menu |
 | menu        |  The name of the menu, cannot have spaces or special characters.                             |
 | index       | The position of the page within a menu. Custom set the position higher or lower than default. You can sort these positions alphabetically or by index   |
-| linkheadings | Integer. If you want to parse the page for headings and include them as children of the page link, add `linkheadings: 3` |
+| linkheadings | Integer. If you want to parse the page for headings and include them as children of the page link, add `linkheadings: 3` to parse for `<h3>` headings. Set integer to the heading level you want to parse. e.g. `h1, h2, h3` |
 
 e.g.
 
