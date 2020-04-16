@@ -8,7 +8,7 @@ const getMenuFromGraph = async (root, { name, pathname, orderBy, headingLevel = 
     .forEach((page) => {
       const { route, data, title } = page;
       const { menu, index, tableOfContents } = data;
-      let children = [];
+      let children = getParsedHeadingsFromPage(tableOfContents, headingLevel);
 
       if (menu && menu.search(name) > -1) {
         if (pathname) {
@@ -20,7 +20,7 @@ const getMenuFromGraph = async (root, { name, pathname, orderBy, headingLevel = 
           }
 
           if (route.includes(baseRoute)) {
-            items.push({ item: { link: route, label: title, index }, children: getParsedHeadingsFromPage(tableOfContents, headingLevel) });
+            items.push({ item: { link: route, label: title, index }, children });
           }
         } else {
           items.push({ item: { link: route, label: title, index }, children });
