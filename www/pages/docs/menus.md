@@ -89,7 +89,7 @@ class HeaderComponent extends LitElement {
     const response = await client.query({
       query: MenuQuery,
       variables: {
-        menu: 'navigation'
+        name: 'navigation'
       }
     });
 
@@ -124,7 +124,7 @@ The position of items within a menu can be sorted by simply adding the `order` v
 const response = await client.query({
   query: MenuQuery,
   variables: {
-    menu: 'navigation',
+    name: 'navigation',
     order: 'index_asc'
   }
 });
@@ -143,15 +143,33 @@ The following sorts are available.
 
 ### Filtering By Path
 
-Say for example you only want specific menu items to show within specific subdirectory. You can also include the `route` variable to specify a specific path the menu will be displaying on.  This would be useful for a shelf menu for example.
+If you only want specific menu items to show within a specific subdirectory. You can also include the `route` variable to specify a specific path the menu will be displaying on.  This would be useful for a shelf menu for example.
 
 ```render js
 const response = await client.query({
   query: MenuQuery,
   variables: {
-    menu: 'shelf',
+    name: 'shelf',
     order: 'index_asc',
     route: window.location.pathname
   }
 });
 ```
+
+### Child Heading Level
+
+If your menus contain [linkheadings](#declare-menu) then you may want to set the level of heading element to use as child items.  By default, only h3 elements are used as child elements, but this is easily changed by adding `headingLevel` variable to your menu query.
+
+```render js
+const response = await client.query({
+  query: MenuQuery,
+  variables: {
+    name: 'shelf',
+    order: 'index_asc',
+    route: window.location.pathname,
+    headingLevel: 2
+  }
+});
+```
+
+In this example `<h2></h2>` elements would by made into child items within your menu.
