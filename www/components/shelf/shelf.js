@@ -28,9 +28,10 @@ class Shelf extends LitElement {
       const response = await client.query({
         query: MenuQuery,
         variables: {
-          menu: 'side',
+          name: 'side',
           route: window.location.pathname,
-          order: 'index_asc'
+          order: 'index_asc',
+          headingLevel: 3
         }
       });
 

@@ -1,6 +1,6 @@
 const gql = require('graphql-tag');
 
-const getMenuFromGraph = async (root, { pathname, filter = '', orderBy = '' }, context) => {
+const getMenuFromGraph = async (root, { name, pathname, orderBy, headingLevel = 3 }, context) => {
   const { graph } = context;
   let items = [];
 
@@ -10,14 +10,17 @@ const getMenuFromGraph = async (root, { pathname, filter = '', orderBy = '' }, c
       const { menu, index, tableOfContents } = data;
       let children = [];
 
-      if (menu && menu.search(filter) > -1) {
-        if (menu === 'side') {
+      if (menu && menu.search(name) > -1) {
+        if (pathname) {
           // check we're querying only pages that contain base route
+          let baseRoute = pathname;
           let baseRouteIndex = pathname.substring(1, pathname.length).indexOf('/');
-          let baseRoute = pathname.substring(0, baseRouteIndex + 1);
+          if (baseRouteIndex > -1) {
+            baseRoute = pathname.substring(0, baseRouteIndex + 1);
+          }
 
           if (route.includes(baseRoute)) {
-            items.push({ item: { link: route, label: title, index }, children: getParsedHeadingsFromPage(tableOfContents) });
+            items.push({ item: { link: route, label: title, index }, children: getParsedHeadingsFromPage(tableOfContents, headingLevel) });
           }
         } else {
           items.push({ item: { link: route, label: title, index }, children });
@@ -27,7 +30,7 @@ const getMenuFromGraph = async (root, { pathname, filter = '', orderBy = '' }, c
   if (orderBy !== '') {
     items = sortMenuItems(items, orderBy);
   }
-  return { label: filter, link: 'na', children: items };
+  return { label: name, link: 'na', children: items };
 };
 
 const sortMenuItems = (menuItems, order) => {
@@ -60,13 +63,13 @@ const sortMenuItems = (menuItems, order) => {
   return menuItems;
 };
 
-const getParsedHeadingsFromPage = (tableOfContents) => {
+const getParsedHeadingsFromPage = (tableOfContents, headingLevel) => {
   let children = [];
 
-  if (tableOfContents.length > 0) {
+  if (tableOfContents.length > 0 && headingLevel > 0) {
     tableOfContents.forEach(({ content, slug, lvl }) => {
-      // make sure we only add h3 links to menu
-      if (lvl === 3) {
+      // make sure we only add heading elements of the same level (h1, h2, h3)
+      if (lvl === headingLevel) {
         children.push({ item: { label: content, link: '#' + slug }, children: [] });
       }
     });
@@ -177,7 +180,7 @@ const graphTypeDefs = gql`
 
   type Query {
     graph: [Page]
-    menu(filter: String, pathname: String, orderBy: MenuOrderBy): Menu
+    menu(name: String, orderBy: MenuOrderBy, pathname: String, headingLevel: Int): Menu
     children(parent: String): [Page]
   }
 `;
