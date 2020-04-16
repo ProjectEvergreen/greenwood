@@ -3,7 +3,7 @@ label: 'templates'
 menu: side
 title: 'Templates and Pages'
 index: 6
-linkheadings: true
+linkheadings: 3
 ---
 
 ## Templates

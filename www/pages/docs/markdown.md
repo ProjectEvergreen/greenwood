@@ -3,7 +3,7 @@ label: 'markdown'
 menu: side
 title: 'Markdown'
 index: 4
-linkheadings: true
+linkheadings: 3
 ---
 
 ## Markdown

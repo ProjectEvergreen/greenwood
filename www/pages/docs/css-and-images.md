@@ -3,7 +3,7 @@ label: 'styles-assets'
 menu: side
 title: 'Styles and Assets'
 index: 5
-linkheadings: true
+linkheadings: 3
 ---
 
 ## Styles and Assets

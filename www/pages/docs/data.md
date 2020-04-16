@@ -3,7 +3,7 @@ label: 'data-sources'
 menu: side
 title: 'Data Sources'
 index: 7
-linkheadings: true
+linkheadings: 3
 ---
 
 

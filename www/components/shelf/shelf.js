@@ -30,8 +30,7 @@ class Shelf extends LitElement {
         variables: {
           name: 'side',
           route: window.location.pathname,
-          order: 'index_asc',
-          headingLevel: 3
+          order: 'index_asc'
         }
       });
 

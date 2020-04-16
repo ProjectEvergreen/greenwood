@@ -3,7 +3,7 @@ label: 'concepts'
 menu: side
 title: 'Key Concepts'
 index: 2
-linkheadings: true
+linkheadings: 3
 ---
 
 ## Overview

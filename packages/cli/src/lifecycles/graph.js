@@ -115,10 +115,10 @@ const createGraphFromPages = async (pagesDir, config) => {
                 customData.index = customData.index || '';
 
                 // set flag whether to gather a list of headings on a page as menu items
-                customData.linkheadings = customData.linkheadings || false;
+                customData.linkheadings = customData.linkheadings || 0;
                 customData.tableOfContents = [];
 
-                if (customData.linkheadings === true) {
+                if (customData.linkheadings > 0) {
                   // parse markdown for table of contents and output to json
                   customData.tableOfContents = toc(fileContents).json;
                   customData.tableOfContents.shift();
@@ -194,7 +194,7 @@ module.exports = generateGraph = async (compilation) => {
       compilation.graph = await createGraphFromPages(context.pagesDir, config);
 
       // Set to true to export mock graph to src/test/unit/data/mocks/graph.js
-      generateMockGraph(compilation.graph, false);
+      generateMockGraph(compilation.graph, true);
 
       resolve(compilation);
     } catch (err) {

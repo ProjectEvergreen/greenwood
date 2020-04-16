@@ -3,7 +3,7 @@ label: 'configuration'
 menu: side
 title: 'Configuration'
 index: 2
-linkheadings: true
+linkheadings: 3
 ---
 
 ## Configuration

@@ -3,7 +3,7 @@ label: 'menus'
 menu: side
 title: 'Menus'
 index: 5
-linkheadings: true
+linkheadings: 3
 ---
 
 ## Menus
@@ -22,7 +22,7 @@ For this example, let's say we want "about", "docs", "contact us", all linked wi
 | title       |  The title/label of the page link within the menu |
 | menu        |  The name of the menu, cannot have spaces or special characters.                             |
 | index       | The position of the page within a menu. Custom set the position higher or lower than default. You can sort these positions alphabetically or by index   |
-| linkheadings | Boolean. If you want to parse the page for all h3 headings and include them as children of the page link, add `linkheadings: true`
+| linkheadings | Integer. If you want to parse the page for headings and include them as children of the page link, add `linkheadings: 3` |
 
 e.g.
 
@@ -155,21 +155,3 @@ const response = await client.query({
   }
 });
 ```
-
-### Child Heading Level
-
-If your menus contain [linkheadings](#declare-menu) then you may want to set the level of heading element to use as child items.  By default, only h3 elements are used as child elements, but this is easily changed by adding `headingLevel` variable to your menu query.
-
-```render js
-const response = await client.query({
-  query: MenuQuery,
-  variables: {
-    name: 'shelf',
-    order: 'index_asc',
-    route: window.location.pathname,
-    headingLevel: 2
-  }
-});
-```
-
-In this example `<h2></h2>` elements would by made into child items within your menu.

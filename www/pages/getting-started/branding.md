@@ -3,7 +3,7 @@ label: 'css-components'
 menu: side
 title: 'Styles and Web Components'
 index: 5
-linkheadings: true
+linkheadings: 3
 ---
 
 ## CSS and Web Components

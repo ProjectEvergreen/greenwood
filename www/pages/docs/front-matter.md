@@ -3,7 +3,7 @@ label: 'front-matter'
 menu: side
 title: 'Front Matter'
 index: 3
-linkheadings: true
+linkheadings: 3
 ---
 
 ## Front Matter
@@ -77,12 +77,12 @@ In this example, the `<title>` tag will be the `title`.
 <title>My Blog Post</title>
 ```
 
-> Note: If you set `title` from your [configuration file](/docs/configuration#title), the output would be 
+> Note: If you set `title` from your [configuration file](/docs/configuration#title), the output would be
 > ```render html
 > <title>{ConfigTitle} - My Blog Post</title>
 > ```
 
-### Custom Data 
+### Custom Data
 
 You can also pass custom data from your markdown file and extract that through the GraphQL server.
 

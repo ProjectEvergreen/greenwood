@@ -3,7 +3,7 @@ label: 'project-setup'
 menu: side
 title: 'Project Setup'
 index: 2
-linkheadings: true
+linkheadings: 3
 ---
 
 ## Overview

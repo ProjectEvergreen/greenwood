@@ -3,7 +3,7 @@ label: 'how-it-works'
 menu: side
 title: 'How It Works'
 index: 1
-linkheadings: true
+linkheadings: 3
 ---
 
 ## How It Works

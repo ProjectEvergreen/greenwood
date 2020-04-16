@@ -1,14 +1,14 @@
 const gql = require('graphql-tag');
 
-const getMenuFromGraph = async (root, { name, pathname, orderBy, headingLevel = 3 }, context) => {
+const getMenuFromGraph = async (root, { name, pathname, orderBy }, context) => {
   const { graph } = context;
   let items = [];
 
   graph
     .forEach((page) => {
       const { route, data, title } = page;
-      const { menu, index, tableOfContents } = data;
-      let children = getParsedHeadingsFromPage(tableOfContents, headingLevel);
+      const { menu, index, tableOfContents, linkheadings } = data;
+      let children = getParsedHeadingsFromPage(tableOfContents, linkheadings);
 
       if (menu && menu.search(name) > -1) {
         if (pathname) {

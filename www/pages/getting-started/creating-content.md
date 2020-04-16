@@ -3,7 +3,7 @@ label: 'create-content'
 menu: side
 title: 'Creating Content'
 index: 4
-linkheadings: true
+linkheadings: 3
 ---
 
 ## Overview

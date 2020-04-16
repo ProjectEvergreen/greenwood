@@ -16,7 +16,7 @@ describe('Unit Test: Data', function() {
           before(async function() {
             navigation = await graphResolvers.Query.menu(undefined, {
               pathname: '/',
-              filter: 'navigation'
+              name: 'navigation'
             }, MOCK_GRAPH);
           });
 
@@ -61,7 +61,7 @@ describe('Unit Test: Data', function() {
           before(async function() {
             shelf = await graphResolvers.Query.menu(undefined, {
               pathname: '/getting-started/',
-              filter: 'side'
+              name: 'side'
             }, MOCK_GRAPH);
           });
 
@@ -121,7 +121,7 @@ describe('Unit Test: Data', function() {
           before(async function() {
             shelf = await graphResolvers.Query.menu(undefined, {
               pathname: '/getting-started/',
-              filter: 'side',
+              name: 'side',
               orderBy: 'index_asc'
             }, MOCK_GRAPH);
           });
@@ -186,7 +186,7 @@ describe('Unit Test: Data', function() {
           before(async function() {
             shelf = await graphResolvers.Query.menu(undefined, {
               pathname: '/getting-started/',
-              filter: 'side',
+              name: 'side',
               orderBy: 'index_desc'
             }, MOCK_GRAPH);
           });
@@ -238,7 +238,7 @@ describe('Unit Test: Data', function() {
           before(async function() {
             shelf = await graphResolvers.Query.menu(undefined, {
               pathname: '/getting-started/',
-              filter: 'side',
+              name: 'side',
               orderBy: 'label_asc'
             }, MOCK_GRAPH);
           });
@@ -292,7 +292,7 @@ describe('Unit Test: Data', function() {
           before(async function() {
             shelf = await graphResolvers.Query.menu(undefined, {
               pathname: '/getting-started/',
-              filter: 'side',
+              name: 'side',
               orderBy: 'label_desc'
             }, MOCK_GRAPH);
           });

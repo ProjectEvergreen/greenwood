@@ -3,7 +3,7 @@ label: 'stack'
 menu: side
 title: 'Tech Stack'
 index: 8
-linkheadings: true
+linkheadings: 3
 ---
 
 ## Tech Stack
