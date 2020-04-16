@@ -171,20 +171,6 @@ const generateLabelHash = (label) => {
   return elementLabel;
 };
 
-const generateMockGraph = async (graph, debug) => {
-  if (debug) {
-    const targetDir = path.join(__dirname, '../..', 'test/unit/data/mocks');
-    const targetFile = path.join(targetDir, 'graph.js');
-    const mockGraph = 'module.exports = { \n'
-    + '  // eslint-disable-next-line \n graph: '
-      + JSON.stringify(graph)
-      + '\n};';
-
-    await fs.writeFile(path.join(targetFile), mockGraph, 'utf8');
-  }
-
-};
-
 module.exports = generateGraph = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
@@ -192,9 +178,6 @@ module.exports = generateGraph = async (compilation) => {
       const { context, config } = compilation;
 
       compilation.graph = await createGraphFromPages(context.pagesDir, config);
-
-      // Set to true to export mock graph to src/test/unit/data/mocks/graph.js
-      generateMockGraph(compilation.graph, false);
 
       resolve(compilation);
     } catch (err) {
