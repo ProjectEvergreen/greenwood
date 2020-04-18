@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server');
+const gql = require('graphql-tag');
 
 const getConfiguration = async (root, query, context) => {
   return context.config;

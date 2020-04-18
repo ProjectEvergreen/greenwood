@@ -137,7 +137,7 @@ describe('Build Greenwood With: ', function() {
         expect(header.length).to.be.equal(1);
       });
 
-      it('should have a expected NavigationQuery output in the <header> tag', function() {
+      it('should have expected navigation links in the <header> tag tag when using NavigationQuery', function() {
         const listItems = dom.window.document.querySelectorAll('body header ul li');
         const link = listItems[0].querySelector('a');
 
@@ -147,7 +147,7 @@ describe('Build Greenwood With: ', function() {
         expect(link.innerHTML).to.contain('Blog');
       });
 
-      it('should have expected ChildrenQuery output in the <body> tag', function() {
+      it('should have expected blog posts links in the <body> tag when using ChildrenQuery', function() {
         const listItems = dom.window.document.querySelectorAll('body div.posts ul li');
         const linkItems = dom.window.document.querySelectorAll('body div.posts ul li a');
 
