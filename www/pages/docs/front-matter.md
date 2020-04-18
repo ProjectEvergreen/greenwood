@@ -95,7 +95,7 @@ You would then need to create a `graph` GraphQL query and use that with Greenwoo
 ```render gql
 query {
   graph {
-    data: {
+    data {
       author,
       date
     }
