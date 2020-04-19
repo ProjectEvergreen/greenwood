@@ -24,9 +24,9 @@ For this example, let's say we want "about", "docs", "contact us", all linked wi
 | index       | The position of the page within a menu. Custom set the position higher or lower than default. You can sort these positions alphabetically or by index   |
 | linkheadings | Integer. If you want to parse the page for headings and include them as children of the page link, add `linkheadings: 3` to parse for `<h3>` headings. Set integer to the heading level you want to parse. e.g. `h1, h2, h3` |
 
-e.g.
+e.g. create the following in a new directory within your `/pages` directory.
 
-`about.md`
+`index.md`
 
 ```render md
 ---
@@ -58,12 +58,19 @@ index: 2
 title: 'Contact'
 menu: 'navigation'
 index: 3
+linkheadings: 3
 ---
 
 # Contact
+
+### Online
+
+### Offline
+
+### Locations
 ```
 
-
+> **Note:** the front-matter variable `linkheadings: 3` will add all the `<h3>` headings as children subitems within a menu item.  So in this example the menu item `Contact`, will have the children: `Online`(linked to #online), `Offline`(linked to #offline), and `Locations`(linked to #locations).  You can set `linkheadings:` to any header level you require not just `3` e.g. `linkheadings: 2` for `<h2>` elements.
 
 ### Retrieve Menu
 
@@ -115,6 +122,31 @@ class HeaderComponent extends LitElement {
 customElements.define('eve-header', HeaderComponent);
 ```
 
+The query will result in the object(default sort by filename):
+```render js
+menu: {
+  children:[
+    {
+      children: [
+        { item: {label: "Online", link: "#online"}},
+        { item: {label: "Offline", link: "#offline"}},
+        { item: {label: "Locations", link: "#locations"}},
+      ],
+      item: {label: "Contact", link: "/mydirectory/contact"}
+    },
+    {
+      children: []
+      item: {label: "Docs", link: "/mydirectory/docs"}
+    },
+    {
+      children: []
+      item: {label: "About", link: "/mydirectory/"}
+    }
+  ],
+  item: {label: "navigation", link: "na"}
+]
+```
+
 
 ### Sorting
 
@@ -138,12 +170,12 @@ The following sorts are available.
 |           | no order declared, sorts by alphabetical file name |
 |index_asc  | Sort by index, ascending order |
 |index_desc | Sort by index, descending order |
-|label_asc  | Sort by label, ascending order |
-|label_desc | Sort by label, descending order |
+|title_asc  | Sort by title, ascending order |
+|title_desc | Sort by title, descending order |
 
 ### Filtering By Path
 
-If you only want specific menu items to show within a specific subdirectory. You can also include the `route` variable to specify a specific path the menu will be displaying on.  This would be useful for a shelf menu for example.
+If you only want specific menu items to show within a specific subdirectory. You can also include the `route` variable to specify a specific path the menu will be displaying on.  By doing so, only pages with a menu that matches the base path of the route provided would be included in the query.  This would be useful for a shelf menu, for example if path is `/docs/somepage` and you only want to include pages within the `/docs` directory in your menu. You would set your `route:` variable to `window.location.pathname`.
 
 ```render js
 const response = await client.query({
@@ -155,3 +187,102 @@ const response = await client.query({
   }
 });
 ```
+
+#### Filter By Path Example.
+
+You have 2 directories: `/docs` and `/about`.
+
+Each directory has two pages and you have one single menu declared within all your pages front-matter called: **shelf**
+
+`/docs/index.md`:
+```render md
+---
+title: 'documentation'
+menu: 'shelf'
+---
+
+# Documentation
+```
+
+`/docs/components.md`:
+```render md
+---
+title: 'components'
+menu: 'shelf'
+---
+
+# components
+```
+
+`/about/index.md`:
+```render md
+---
+title: 'about'
+menu: 'shelf'
+---
+
+# About
+```
+
+`/about/stuff.md`:
+```render md
+---
+title: 'stuff'
+menu: 'shelf'
+---
+
+# Stuff
+```
+
+#### Query the example
+
+Now when you query by **route** for the **shelf** menu, you will only see menu items associated with the base path of either `/docs` (if you're viewing /docs) or `/about`(if you're viewing /about).
+
+
+```render js
+const response = await client.query({
+  query: MenuQuery,
+  variables: {
+    name: 'shelf',
+    order: 'index_asc',
+    route: window.location.pathname
+  }
+});
+```
+
+Despite having the same menu declared in all 4 pages, by including `route:` variable we're filtering our menus based on the basePath(subdirectory).
+
+The object result for `/docs` is:
+
+```render js
+"menu":{
+  "item": {"label": "shelf", "link": "na"},
+  "children":[{
+      "item":{"label":"Components","link":"/docs/components"},
+      "children":[]
+    },
+    {
+      "item":{"label":"Docs","link":"/docs/""},
+      "children":[]
+    }
+  ]
+}
+```
+
+The object result for `/about` is:
+
+```render js
+"menu":{
+  "item": {"label": "shelf", "link": "na""},
+  "children":[{
+      "item":{"label":"stuff","link":"/about/stuff"},
+      "children":[]
+    },
+    {
+      "item":{"label":"about","link":"/about/"},
+      "children":[]
+    }
+  ]
+}
+```
+
