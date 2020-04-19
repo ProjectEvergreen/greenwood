@@ -8,6 +8,9 @@ linkheadings: 3
 
 
 ## Data Sources
+
+### Overview
+
 Having to repeat things when programming is no fun, and that's why (web) component based development is so useful!  As websites start to grow, there comes a point where being able to have access to the content and structure of your site's layout and configuration as part of the development process becomes essential towards maintainability, performance, and scalability.
 
 As an example, if you are developing a blog site, like in our [Getting Started](/getting-started/) guide, having to list a couple blogs posts by hand isn't so bad.
@@ -296,7 +299,7 @@ Now of course comes the fun part, actually seeing it all come together.  Here is
 ```render javascript
 import { LitElement, html } from 'lit-element';
 import client from '@greenwood/cli/data/client';
-import NavigationQuery from '@greenwood/cli/data/queries/navigation';
+import MenuQuery from '@greenwood/cli/data/queries/menu';
 
 class HeaderComponent extends LitElement {
 
@@ -317,10 +320,13 @@ class HeaderComponent extends LitElement {
     super.connectedCallback();
 
     const response = await client.query({
-      query: NavigationQuery
+      query: MenuQuery,
+      variables: {
+        name: 'navigation'
+      }
     });
 
-    this.navigation = response.data.navigation;
+    this.navigation = response.data.menu.children;
   }
 
   render() {
@@ -331,11 +337,9 @@ class HeaderComponent extends LitElement {
 
         <nav>
           <ul>
-            ${navigation.map((item) => {
+            ${navigation.map(({ item }) => {
               return html\`
-                <li>
-                  <a href=\"${item.link}\" title=\"Click to visit the ${item.label} page\">${item.label}</a>
-                </li>
+                <li><a href="\${item.link}" title="Click to visit the \${item.label} page">\${item.label}</a></li>
               \`;
             })}
           </ul>
@@ -349,5 +353,5 @@ class HeaderComponent extends LitElement {
 customElements.define('app-header', HeaderComponent);
 ```
 
-#### External Sources
+### External Sources
 Coming [soon](https://github.com/ProjectEvergreen/greenwood/issues/21)!
