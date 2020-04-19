@@ -83,7 +83,6 @@ module.exports = ({ config, context }) => {
     
     resolve: {
       extensions: ['.js', '.json', '.gql', '.graphql'],
-      // TODO - determine alias change (e.g. @greenwood/data) and / or seperate package - #278
       alias: {
         '@greenwood/cli/data': path.join(__dirname, '..', './data')
       }

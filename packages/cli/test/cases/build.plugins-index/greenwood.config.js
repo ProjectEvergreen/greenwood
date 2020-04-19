@@ -6,7 +6,7 @@ module.exports = {
       return {
         hookGreenwoodAnalytics: `
           <div class="hook-analytics">
-            <!-- TODO analytics code here -->
+            <!-- analytics code goes here -->
           </div>
         `
       };
