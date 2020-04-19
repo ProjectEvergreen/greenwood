@@ -30,25 +30,25 @@ const getMenuFromGraph = async (root, { name, pathname, orderBy }, context) => {
   if (orderBy !== '') {
     items = sortMenuItems(items, orderBy);
   }
-  return { label: name, link: 'na', children: items };
+  return { item: { label: name, link: 'na' }, children: items };
 };
 
 const sortMenuItems = (menuItems, order) => {
   const compare = (a, b) => {
-    if (order === 'label_asc' || order === 'label_desc') {
+    if (order === 'title_asc' || order === 'title_desc') {
       a = a.item.label, b = b.item.label;
     }
     if (order === 'index_asc' || order === 'index_desc') {
       a = a.item.index, b = b.item.index;
     }
-    if (order === 'label_asc' || order === 'index_asc') {
+    if (order === 'title_asc' || order === 'index_asc') {
       if (a < b) {
         return -1;
       }
       if (a > b) {
         return 1;
       }
-    } else if (order === 'label_desc' || order === 'index_desc') {
+    } else if (order === 'title_desc' || order === 'index_desc') {
       if (a > b) {
         return -1;
       }
@@ -172,15 +172,15 @@ const graphTypeDefs = gql`
   }
 
   enum MenuOrderBy {
-    label_asc,
-    label_desc
+    title_asc,
+    title_desc
     index_asc,
     index_desc
   }
 
   type Query {
     graph: [Page]
-    menu(name: String, orderBy: MenuOrderBy, pathname: String, headingLevel: Int): Menu
+    menu(name: String, orderBy: MenuOrderBy, pathname: String): Menu
     children(parent: String): [Page]
   }
 `;

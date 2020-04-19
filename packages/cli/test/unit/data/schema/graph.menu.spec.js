@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const MOCK_GRAPH = require('../mocks/graph');
 const { graphResolvers } = require('../../../../src/data/schema/graph');
 
-describe('Unit Test: Data', function() {
+describe.only('Unit Test: Data', function() {
 
   describe('Schema', function() {
 
@@ -232,14 +232,14 @@ describe('Unit Test: Data', function() {
           });
         });
 
-        describe('with custom front matter label ascending', function() {
+        describe('with custom front matter title ascending', function() {
           let shelf = [];
 
           before(async function() {
             shelf = await graphResolvers.Query.menu(undefined, {
               pathname: '/getting-started/',
               name: 'side',
-              orderBy: 'label_asc'
+              orderBy: 'title_asc'
             }, MOCK_GRAPH);
           });
 
@@ -286,14 +286,14 @@ describe('Unit Test: Data', function() {
           });
         });
 
-        describe('with custom front matter label descending', function() {
+        describe('with custom front matter title descending', function() {
           let shelf = [];
 
           before(async function() {
             shelf = await graphResolvers.Query.menu(undefined, {
               pathname: '/getting-started/',
               name: 'side',
-              orderBy: 'label_desc'
+              orderBy: 'title_desc'
             }, MOCK_GRAPH);
           });
 
