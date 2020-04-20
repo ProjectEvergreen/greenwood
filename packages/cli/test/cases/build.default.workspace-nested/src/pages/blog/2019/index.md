@@ -2,7 +2,7 @@
 
 This is the test blog page built by Greenwood.
 
-```render
+```html
 <style>${CSS}</style>
 <eve-header></eve-header>
 ```
