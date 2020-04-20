@@ -2,7 +2,7 @@
 These are all the supported configuration options in Greenwood, which you can define in a _greenwood.config.js_ file in your project's root directory.
 
 A _greenwood.config.js_ file with default values would be:
-```render js
+```js
 module.exports = {
   workspace: 'src',  // path.join(process.cwd(), 'src')
   devServer: {
@@ -21,7 +21,7 @@ Configuration for Greenwood's development server are available using the `devSer
 - `host`: If you need to use a custom domain (using [pathname](https://nodejs.org/api/url.html#url_url_pathname)) when developing locally and generally used along with editing an `/etc/hosts` file.
 
 #### Example
-```render js
+```js
 module.exports = {
   devServer: {
     port: 8181,
@@ -37,7 +37,7 @@ You can use the `meta` option for the configuration of [`<meta>` tags](https://d
 #### Example
 This is an example of the `meta` configuration for the Greenwood website.
 
-```render js
+```js
 const FAVICON_HREF = '/assets/favicon.ico';
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 
@@ -58,7 +58,7 @@ module.exports = {
 
 Which would be equivalent to:
 
-```render html
+```html
 <meta name="description" content="A modern and performant static site generator supporting Web Component based development">
 <meta name="twitter:site" content="@PrjEvergreen">
 <meta property="og:title" content="Greenwood">
@@ -80,7 +80,7 @@ As an example, given:
 - For a full URL of: `http(s)://www.my-domain.com/web`
 
 Your `publicPath` configuration would be:
-```render js
+```js
 module.exports = {
   publicPath: '/web'
 }
@@ -91,7 +91,7 @@ A `<title>` element for all pages can be configured with the `title` option.
 
 #### Example
 An example of configuring your app's title:
-```render js
+```js
 module.exports = {
   title: 'My Static Site'
 }
@@ -101,7 +101,7 @@ module.exports = {
 Workspace path for your project where all your project files will be located.  You can change it by passing a string.  Using an absolute path is recommended.
 
 #### Example
-```render js
+```js
 const path = require('path');
 
 module.exports = {

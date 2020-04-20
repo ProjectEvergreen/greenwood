@@ -9,7 +9,7 @@ In order to make a page template, you need to create a `LitElement` based custom
 
 Here is an example `page-template.js` (the [default](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/page-template.js) one included with Greenwood).  You can just copy / paste this to start your own page template.
 
-```render js
+```js
 import { html, LitElement } from 'lit-element';
 MDIMPORT;
 METAIMPORT;
@@ -36,14 +36,14 @@ customElements.define('page-template', PageTemplate);
 #### Template Hooks
 A number of hook variables are defined that tell greenwood to do different things
 
-```render js
+```js
 MDIMPORT;
 ```
 
 `MDIMPORT;` Tells Greenwood to import a markdown file into this component.  But we also have to define where the compiled markdown element(page) will be placed within our page-template.  Hence below within our `render()` method you will see the `<entry></entry>` element. That defines exactly where to place it.
 
 
-```render js
+```js
 METAIMPORT;
 METADATA;
 ```
@@ -62,7 +62,7 @@ First, we need our app template to use routes, by default greenwood uses [**lit-
 
 Here is Greenwood's app-template, which you can copy / paste as a starting point for your own custom app template, _though it is recommended to let Greenwood manage this for you_.
 
-```render js
+```js
 import { html, LitElement } from 'lit-element';
 import { connectRouter } from 'lit-redux-router';
 import { applyMiddleware, createStore, compose as origCompose, combineReducers } from 'redux';
@@ -104,7 +104,7 @@ customElements.define('app-root', AppComponent);
 You can create all your pages in a _pages/_ directory in your projects workspace.  You can also create nested pages and the page paths will map accordingly.
 
 For example, given this folder structure:
-```render shell
+```shell
 .
 └── src
     ├── pages

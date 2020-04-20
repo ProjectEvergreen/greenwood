@@ -14,7 +14,7 @@ To enable theming through global styles, create a file in your workspace styles 
 
 #### Example
 The below is an example of using _theme.css_ to load a Google font and apply a global browser reset for all pages.
-```render css
+```css
 /* theme.css */
 @import url('//fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
 
@@ -25,7 +25,7 @@ The below is an example of using _theme.css_ to load a Google font and apply a g
 }
 ```
 
-```render javascript
+```javascript
 // page-template.js
 import { html, LitElement } from 'lit-element';
 import '../styles/theme.css';
@@ -49,7 +49,8 @@ customElements.define('page-template', PageTemplate);
 For any of your components and page templates, it is recommended to use the [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM) within your LitElement's `render` function.  You can also import the CSS too.
 
 #### Example
-```render javascript
+
+```javascript
 import { html, LitElement } from 'lit-element';
 import pageTemplateCss '../styles/page-template.css';  // if you like your CSS-in-JS
 
@@ -95,14 +96,15 @@ They say a picture is worth 1000 words, so by default Greenwood will look for an
 #### Example
 To use an image in a markdown file, you would reference it as so using standard markdown syntax:
 
-```render md
+```md
 # This is my page
 
 ![my-image](/assets/images/my-image.png)
 ```
 
 If you like your all-the-things-in-JS, you can also use `import` in a custom element.
-```render javascript
+
+```javascript
 import { html, LitElement } from 'lit-element';
 import logo from '../../assets/images/logo.png';
 
@@ -120,7 +122,7 @@ class HeaderComponent extends LitElement {
 
       <header>
         <h1>Welcome!</h1>
-        <img alt="brand logo" src=\"${logo}\" />
+        <img alt="brand logo" src="\${logo}" />
       </header>
     \`;
   }

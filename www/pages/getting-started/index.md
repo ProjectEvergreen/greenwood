@@ -25,7 +25,7 @@ Before going into the setup section of the tutorial, we want to make sure that y
 - Running scripts from the command line
 
 You can test that both are installed correctly from the command line by verifying the output of the following commands:
-```render bash
+```bash
 $ node -v
 $ npm -v
 
@@ -38,7 +38,7 @@ $ npm -v
 ```
 
 Along with this, familiarity of the command line / terminal is also assumed as Greenwood is a command line tool, and so all examples will assume a bash / shell like environment.  Example commands used in this guide are:
-```render bash
+```bash
 # create a directory for your project and change into it
 $ mkdir my-project
 $ cd my-project
@@ -51,7 +51,7 @@ $ npm run develop
 ```
 
 #### Experience
-No advanced JavaScript / CSS experience is needed for using Greenwood.  Just knowing some [markdown](https://daringfireball.net/projects/markdown/) and following some basic steps from the command line will be enough to get you up and running quickly.  
+No advanced JavaScript / CSS experience is needed for using Greenwood.  Just knowing some [markdown](https://daringfireball.net/projects/markdown/) and following some basic steps from the command line will be enough to get you up and running quickly.
 
 We like to think that that as your experience grows, so can the way you build your site.  Greenwood has very few opinions on how you structure your site or what you're trying to build or how and so our hope is to provide you a developer experience that is conducive to modern web development.
 

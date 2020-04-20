@@ -4,7 +4,8 @@ In this section we'll review a little bit about how you can use Web Components i
 ### HTMLElement
 
 _footer.js_
-```render javascript
+
+```js
 class FooterComponent extends HTMLElement {
   constructor() {
     super();
@@ -22,7 +23,7 @@ class FooterComponent extends HTMLElement {
   getTemplate() {
     const year = new Date().getFullYear();
 
-    return \`<header>This is the header component.  &copy; ${year}</header>\`;
+    return \`<header>This is the header component.  &copy; \${year}</header>\`;
   }
 }
 
@@ -31,7 +32,7 @@ customElements.define('x-footer', FooterComponent);
 
 You can then import it in a template and use it within your templates `render` function.
 
-```render javascript
+```javascript
 import { html, LitElement } from 'lit-element';
 import '../components/footer';
 
@@ -62,7 +63,7 @@ customElements.define('page-template', PageTemplate);
 A simple example of a web component utilizing a basic [LitElement](https://lit-element.polymer-project.org/) base class
 
 _hello-world.js_
-```render javascript
+```javascript
 import { html, LitElement } from 'lit-element';
 
 class HelloWorld extends LitElement {
@@ -85,8 +86,8 @@ customElements.define('hello-world', HelloWorld);
 
 Which can then imported and used with
 
-```render javascript
-import './hello-world.js
+```javascript
+import './hello-world.js'
 
 render() {
   return html\`

@@ -3,7 +3,7 @@
 "Front matter" is a [YAML](https://yaml.org/) block at the top of any markdown file.  It gives you the ability to define variables that are made available to Greenwood's build process. You can also use it to `import` additional files.
 
 #### Example:
-```render md
+```md
 ---
 title: 'Hello World'
 ---
@@ -17,7 +17,7 @@ The is a markdown file with title defined in front-matter.
 When this markdown file is compiled to a component it will automatically generate a component definition. If you want to use a custom element name for your component, you can give the component a label using the predefined variable `label`.
 
 #### Example
-```render md
+```md
 ---
 label: 'mypage'
 ---
@@ -30,7 +30,7 @@ Which will compile to the element: `<wc-md-mypage></wc-md-mypage>`
 When creating multiple page templates, you can use the `template` front-matter to configure Greenwood to use that template for a given page.
 
 #### Example
-```render md
+```md
 ---
 template: 'home'
 ---
@@ -49,7 +49,7 @@ In this example, the _src/templates/home-template.js_ will be used to render the
 If you want to import custom files such as a custom element, you can use the predefined variable `imports`.
 
 #### Example
-```render md
+```md
 ---
 imports:
   MyFile: '../components/MyFile/myfile.js'

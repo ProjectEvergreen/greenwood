@@ -3,7 +3,7 @@ If you want to code and go then we welcome you to check out the ["companion" rep
 
 
 To get the code from this walkthrough, you can simply clone the repo, install dependencies, and off you go!
-```render bash
+```bash
 $ git clone https://github.com/ProjectEvergreen/greenwood-getting-started
 $ cd greenwood-getting-started
 

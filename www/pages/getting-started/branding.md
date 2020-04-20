@@ -1,14 +1,14 @@
 ## CSS and Web Components
 
-So now that we've made some [content](/getting-started/creating-content/) for your site, I think we can agree it's not quite all "there" yet and could benefit from a little styling and branding.  
+So now that we've made some [content](/getting-started/creating-content/) for your site, I think we can agree it's not quite all "there" yet and could benefit from a little styling and branding.
 
 In this section, we will add the following to your project:
 1. Header / Footer - The elements provide a great case for creating some reusable components and with Custom Elements, we can create self contained reusable components for our site.
 1. Styles - Of course we want things to look nice too!  We'll add some CSS to help hang things in just right the place.
 
 ### Web Components
-Web Components are supported out of the box with Greenwood using `HTMLElement` or **LitElement**.  For this guide, we'll use a "vanilla" custom element for our header, in _src/components/header.js_.  
-```render javascript
+Web Components are supported out of the box with Greenwood using `HTMLElement` or **LitElement**.  For this guide, we'll use a "vanilla" custom element for our header, in _src/components/header.js_.
+```javascript
 class HeaderComponent extends HTMLElement {
   constructor() {
     super();
@@ -39,7 +39,7 @@ customElements.define('app-header', HeaderComponent);
 ```
 
 Now we can use it in both our templates, like so:
-```render javascript
+```javascript
 import { html, LitElement } from 'lit-element';
 import '../components/header'; // import our custom element
 
@@ -77,7 +77,7 @@ OK, so we've made some content and some custom components, but what about the lo
 For global styles like Google fonts, Bootstrap, background colors, or browser resets, create a file called _src/styles/theme.css_ and Greenwood will make sure these styles get applied in the `<head>` of the doucment, outside of any Shadow DOMs.
 
 Here are some styles you can add to your site to snap things into place a little bit.
-```render css
+```css
 /* theme.css */
 @import url('//fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
 
@@ -93,7 +93,7 @@ body {
 ```
 
 Now we can `import` this CSS file into our templates.
-```render javascript
+```javascript
 import { html, LitElement } from 'lit-element';
 import '../components/header';
 import '../styles/theme.css'; // add this line
@@ -109,7 +109,7 @@ class PageTemplate extends LitElement {
 
 Within our components, we can easily add some styles right within the component definition itself. For example in our header component, we can style it like this and take advantage of the Shadow DOM.
 
-```render javascript
+```javascript
 class HeaderComponent extends HTMLElement {
   constructor() {
     super();

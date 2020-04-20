@@ -1,5 +1,5 @@
 ## Overview
-In the [previous section](/getting-started/), we shared a little bit about what Greenwood is and the high level goals of this guide.  Now we are ready to help you start your first project!  
+In the [previous section](/getting-started/), we shared a little bit about what Greenwood is and the high level goals of this guide.  Now we are ready to help you start your first project!
 
 In this section, we will kick off our Greenwood project by:
 1. Initializing our project for development with **npm**
@@ -12,13 +12,13 @@ In this section, we will kick off our Greenwood project by:
 First thing we need to do is setup our project for installing Greenwood.  With Greenwood installed, you will be able to use its CLI to power the development of your project though automated scripts and configuration.
 
 First thing we need to do is generate a _package.json_ file so we can install Greenwood.  The easist way to do that is by running `npm init` from the root directory of where you want to start your project:
-```render shell
+```shell
 # hit enter to accept all defaults, or provide your own values
 $ npm init
 ```
 
 Now we can install Greenwood
-```render bash
+```bash
 $ npm install @greenwood/cli --save-dev
 ```
 
@@ -28,7 +28,7 @@ All set!
 With Greenwood installed, let's create a couple of **npm** scripts so that we can automate our development workflows with easy to remember commands.
 
 In _package.json_, edit the `scripts` section accordingly:
-```render json
+```json
 // before
 "scripts": {
   "test": "echo \"Error: no test specified\" && exit 1"
@@ -53,7 +53,7 @@ You can go ahead and try out both of these tasks now, and you should see Greenwo
 
 ### Project Structure
 OK, almost there!  Let's quickly review what a basic project structure will look like.  At this point, your project should look something like this:
-```render bash
+```bash
 .
 ├── node_modules/
 ├── package-lock.json
@@ -62,7 +62,7 @@ OK, almost there!  Let's quickly review what a basic project structure will look
 
 As we get ready to move onto the next section, your project will need a "workspace", which is basically just the name of the directory where your project files will go.  For now, let's just use Greenwood's default, which is _src/_.  After creating that directory, this is what your project structure should look like:
 
-```render bash
+```bash
 .
 ├── node_modules/
 ├── package-lock.json

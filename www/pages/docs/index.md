@@ -5,7 +5,7 @@ This is the documentation space for Greenwood that we hope will help you get the
 ### Installation
 Greenwood can be installed with any of the common package managers available today.
 
-```render bash
+```bash
 # npm
 $ npm install @greenwood/cli --save-dev
 
@@ -14,7 +14,7 @@ $ yarn add @greeenwood/cli --dev
 ```
 
 Though we recommend installing it locally to your project, you can also run Greenwood globally.  For global usage we recommend using `npx`
-```render bash
+```bash
 $ npx @greenwood/cli <build>
 ```
 
@@ -25,7 +25,7 @@ With Greenwood installed, you can run its CLI to generate your site.  The comman
 
 As mentioned above, it is recommended to install Greenwood locally into your project. From there, you can define npm scripts in _package.json_:
 
-```render json
+```json
 "scripts": {
   "build": "greenwood build",
   "start": "greenwood develop"
