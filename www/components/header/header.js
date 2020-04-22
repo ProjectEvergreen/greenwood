@@ -1,13 +1,13 @@
 import { LitElement, html } from 'lit-element';
 import client from '@greenwood/cli/data/client';
-import NavigationQuery from '@greenwood/cli/data/queries/navigation';
+import MenuQuery from '@greenwood/cli/data/queries/menu';
 import '@evergreen-wc/eve-container';
 import headerCss from './header.css';
 import brand from '../../assets/brand.png';
 import '../components/social-icons/social-icons';
 
 class HeaderComponent extends LitElement {
-  
+
   static get properties() {
     return {
       navigation: {
@@ -25,10 +25,13 @@ class HeaderComponent extends LitElement {
     super.connectedCallback();
 
     const response = await client.query({
-      query: NavigationQuery
+      query: MenuQuery,
+      variables: {
+        name: 'navigation'
+      }
     });
 
-    this.navigation = response.data.navigation;
+    this.navigation = response.data.menu.children;
   }
 
   /* eslint-disable indent */
@@ -42,7 +45,7 @@ class HeaderComponent extends LitElement {
       <header class="header">
         <eve-container fluid>
           <div class="head-wrap">
-            
+
             <div class="brand">
               <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer"
                 @onclick="getOutboundLink('https://projectevergreen.github.io'); return false;" >
@@ -55,7 +58,7 @@ class HeaderComponent extends LitElement {
 
             <nav>
               <ul>
-                ${navigation.map((item) => {
+                ${navigation.map(({ item }) => {
                   return html`
                     <li><a href="${item.link}" title="Click to visit the ${item.label} page">${item.label}</a></li>
                   `;

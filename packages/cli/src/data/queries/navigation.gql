@@ -1,6 +1,0 @@
-query {
-  navigation{
-    label,
-    link
-  }
-}

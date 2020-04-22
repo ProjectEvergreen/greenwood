@@ -1,3 +1,11 @@
+---
+label: 'templates'
+menu: side
+title: 'Templates and Pages'
+index: 6
+linkheadings: 3
+---
+
 ## Templates
 Greenwood has two types of templates:
 - App Template: The [app shell](https://developers.google.com/web/fundamentals/architecture/app-shell) if you will, that wraps all pages.  This is provided for you by Greenwood, but you can override if needed. (though not recommended)
