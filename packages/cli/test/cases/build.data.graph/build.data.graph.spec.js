@@ -4,7 +4,7 @@
  *
  * User Result
  * Should generate a Greenwood build that dynamically serializes data from the graph from the header and in the page-template.
- * 
+ *
  * User Command
  * greenwood build
  *
@@ -78,7 +78,6 @@ describe('Build Greenwood With: ', function() {
         const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';
         });
-
         const innerHTML = apolloScriptTags[0].innerHTML;
 
         expect(apolloScriptTags.length).to.equal(1);
@@ -95,10 +94,10 @@ describe('Build Greenwood With: ', function() {
         const listItems = dom.window.document.querySelectorAll('body header ul li');
         const link = listItems[0].querySelector('a');
 
-        expect(listItems.length).to.be.equal(1);
-        expect(link.href.replace('file://', '')).to.be.equal('/blog/');
-        expect(link.title).to.be.equal('Click to visit the Blog page');
-        expect(link.innerHTML).to.contain('Blog');
+        expect(listItems.length).to.be.equal(2);
+        expect(link.href.replace('file://', '')).to.be.equal('/blog/first-post');
+        expect(link.title).to.be.equal('Click to visit the First blog post');
+        expect(link.innerHTML).to.contain('First');
       });
     });
 
@@ -141,10 +140,10 @@ describe('Build Greenwood With: ', function() {
         const listItems = dom.window.document.querySelectorAll('body header ul li');
         const link = listItems[0].querySelector('a');
 
-        expect(listItems.length).to.be.equal(1);
-        expect(link.href.replace('file://', '')).to.be.equal('/blog/');
-        expect(link.title).to.be.equal('Click to visit the Blog page');
-        expect(link.innerHTML).to.contain('Blog');
+        expect(listItems.length).to.be.equal(2);
+        expect(link.href.replace('file://', '')).to.be.equal('/blog/first-post');
+        expect(link.title).to.be.equal('Click to visit the First blog post');
+        expect(link.innerHTML).to.contain('First');
       });
 
       it('should have expected blog posts links in the <body> tag when using ChildrenQuery', function() {
@@ -158,12 +157,12 @@ describe('Build Greenwood With: ', function() {
         const link2 = linkItems[1];
 
         expect(link1.href.replace('file://', '')).to.be.equal('/blog/first-post/');
-        expect(link1.title).to.be.equal('Click to read my Blog blog post');
-        expect(link1.innerHTML).to.contain('Blog');
+        expect(link1.title).to.be.equal('Click to read my First blog post');
+        expect(link1.innerHTML).to.contain('First');
 
         expect(link2.href.replace('file://', '')).to.be.equal('/blog/second-post/');
-        expect(link2.title).to.be.equal('Click to read my Blog blog post');
-        expect(link2.innerHTML).to.contain('Blog');
+        expect(link2.title).to.be.equal('Click to read my Second blog post');
+        expect(link2.innerHTML).to.contain('Second');
       });
     });
 

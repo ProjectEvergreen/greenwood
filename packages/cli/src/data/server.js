@@ -19,10 +19,10 @@ module.exports = (compilation) => {
       if (req.query.q !== 'internal') {
         await createCache(req, context);
       }
-      
+
       return {
         config,
-        graph 
+        graph
       };
     }
   });

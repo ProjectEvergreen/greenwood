@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit-element';
 import client from '@greenwood/cli/data/client';
-import ChildrenQuery from '@greenwood/cli/data/queries/children';
+import MenuQuery from '@greenwood/cli/data/queries/menu';
 import css from './shelf.css';
 import chevronRt from '../icons/chevron-right/chevron-right';
 import chevronDwn from '../icons/chevron-down/chevron-down';
@@ -11,9 +11,6 @@ class Shelf extends LitElement {
     return {
       page: {
         type: String
-      },
-      shelfList: {
-        type: Array
       }
     };
   }
@@ -27,47 +24,22 @@ class Shelf extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
-    this.collapseAll();
-    this.expandRoute(window.location.pathname);
-  }
-
-  async setupShelf(page) {
-    let list = [];
-
-    if (page && page !== '' && page !== '/') {
-      // TODO remove require call - #275
-      // this.shelfList = require(`./${page}.json`);
-      switch (page) {
-
-        case 'about':
-          list = await import(/* webpackChunkName: 'about' */ '../components/shelf/about.json').then(({ default: data }) => data);
-          break;
-        case 'docs':
-          list = await import(/* webpackChunkName: 'documentation-list' */ '../components/shelf/docs.json').then(({ default: data }) => data);
-          break;
-        case 'getting-started':
-          list = await import(/* webpackChunkName: 'getting-started' */ '../components/shelf/getting-started.json').then(({ default: data }) => data);
-          break;
-        case 'plugins':
-          list = await import(/* webpackChunkName: 'plugins' */ '../components/shelf/plugins.json').then(({ default: data }) => data);
-          break;
-        default:
-          list = [];
-
-      }
-
-      // TODO not actually integrated, still using .json files - #288
+    if (this.page !== '' && this.page !== '/') {
       const response = await client.query({
-        query: ChildrenQuery,
+        query: MenuQuery,
         variables: {
-          parent: page
+          name: 'side',
+          route: window.location.pathname,
+          order: 'index_asc'
         }
       });
 
-      console.log('response from the shelf (data.children)', response.data.children);
-
-      this.shelfList = list;
+      this.shelfList = response.data.menu.children;
+      this.requestUpdate();
     }
+
+    this.collapseAll();
+    this.expandRoute(window.location.pathname);
   }
 
   goTo(path) {
@@ -78,7 +50,7 @@ class Shelf extends LitElement {
   expandRoute(path) {
     // find list item containing current window.location.pathname
     let routeShelfListIndex = this.shelfList.findIndex(list => {
-      return list.path.indexOf(path) >= 0;
+      return list.item.link.indexOf(path) >= 0;
     });
 
     if (routeShelfListIndex > -1) {
@@ -100,7 +72,6 @@ class Shelf extends LitElement {
     let selectedShelfListIndex = this.shelfList.findIndex((list, index) => {
       return index === this.selectedIndex;
     });
-
     if (selectedShelfListIndex > -1) {
       this.shelfList[selectedShelfListIndex].selected = !this.shelfList[selectedShelfListIndex].selected;
     }
@@ -129,15 +100,15 @@ class Shelf extends LitElement {
 
   renderList() {
     /* eslint-disable indent */
-    const renderListItems = (list) => {
+    const renderListItems = (list, selected) => {
       let listItems = '';
 
-      if (list.items && list.items.length > 0) {
+      if (list && list.length > 0) {
         listItems = html`
           <ul>
-            ${list.items.map((item, index) => {
+            ${list.map(({ item }, index) => {
               return html`
-                <li id="index_${index}" class="${list.selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`#${item.id}`)}">${item.name}</a></li>
+                <li id="index_${index}" class="${selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`${item.link}`)}">${item.label}</a></li>
               `;
             })}
           </ul>
@@ -146,29 +117,25 @@ class Shelf extends LitElement {
 
       return listItems;
     };
-    /* eslint-enable */
 
-    return this.shelfList.map((list, index) => {
+    /* eslint-enable */
+    return this.shelfList.map(({ item, children, selected }, index) => {
       let id = `index_${index}`;
-      let chevron = list.items && list.items.length > 0
-        ? list.selected === true ? chevronDwn : chevronRt
+      let chevron = children && children.length > 0
+        ? selected === true ? chevronDwn : chevronRt
         : '';
 
       return html`
         <li class="list-wrap">
-          <a href="${list.path}" @click="${this.handleClick}"><h2 id="${id}">${list.name} <span>${chevron}</span></h2></a>
+          <a href="${item.link}" @click="${this.handleClick}"><h2 id="${id}">${item.label} <span>${chevron}</span></h2></a>
           <hr>
-          ${renderListItems(list)}
+          ${renderListItems(children, selected)}
         </li>
       `;
     });
   }
 
   render() {
-    const { page } = this;
-
-    this.setupShelf(page);
-    
     return html`
       <style>
         ${css}

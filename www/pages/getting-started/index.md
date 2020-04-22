@@ -1,3 +1,9 @@
+---
+label: 'getting-started'
+menu: navigation
+title: 'Getting Started'
+---
+
 ## Introduction
 First off, thank you for taking the time to check out Greenwood!  As a tool, we hope that you find Greenwood to provide a productive and frictionless developer experience for you that results in performant and engaging experiences for your users.  Under the hood Greenwood is using NodeJS, webpack, babel and a lot of other amazing JavaScript tools to power a modern development workflow based on first class support for the modern web like Web Components, FlexBox, CSS Grid, ECMAScript modules, and all your favorite features!
 
@@ -47,7 +53,7 @@ $ npm run develop
 ```
 
 #### Experience
-No advanced JavaScript / CSS experience is needed for using Greenwood.  Just knowing some [markdown](https://daringfireball.net/projects/markdown/) and following some basic steps from the command line will be enough to get you up and running quickly.  
+No advanced JavaScript / CSS experience is needed for using Greenwood.  Just knowing some [markdown](https://daringfireball.net/projects/markdown/) and following some basic steps from the command line will be enough to get you up and running quickly.
 
 We like to think that that as your experience grows, so can the way you build your site.  Greenwood has very few opinions on how you structure your site or what you're trying to build or how and so our hope is to provide you a developer experience that is conducive to modern web development.
 

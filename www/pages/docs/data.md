@@ -1,4 +1,16 @@
+---
+label: 'data-sources'
+menu: side
+title: 'Data Sources'
+index: 7
+linkheadings: 3
+---
+
+
 ## Data Sources
+
+### Overview
+
 Having to repeat things when programming is no fun, and that's why (web) component based development is so useful!  As websites start to grow, there comes a point where being able to have access to the content and structure of your site's layout and configuration as part of the development process becomes essential towards maintainability, performance, and scalability.
 
 As an example, if you are developing a blog site, like in our [Getting Started](/getting-started/) guide, having to list a couple blogs posts by hand isn't so bad.
@@ -42,26 +54,24 @@ This is what the schema looks like:
 graph {
   id, // (string) the unique ID given to the generated component as it's selector e.g. \`<wc-md-id></wc-md-id>\`
 
-  link,  // (string) A URL link, typically derived from the filesystem path, e.g. /blog/2019/first-post/ 
-  
+  link,  // (string) A URL link, typically derived from the filesystem path, e.g. /blog/2019/first-post/
+
   title,  // (string) Useful for a page's <title> tag or the title attribute for an <a> tag, inferred from the filesystem path, e.g. "First Post" or provided through front matter.
-  
+
   filePath, // (string) path to file
 
   fileName, // (string) file name without extension/path, so that it can be copied to scratch dir with same name
 
-  template // (string) page template used for the page 
+  template // (string) page template used for the page
 }
 ```
 
 > All queries return subsets and / or derivitives of the `graph`.
 
 #### Queries
-To help facilitiate development, Greenwood provides a couple queries out of the box that you can use to get access to the `graph` and to start using them in your components. (which we'll get to next)
+To help facilitiate development, Greenwood provides a couple queries out of the box that you can use to get access to the `graph` and start using it in your components, which we'll get to next.
 
 Below are the queries available:
-
-> Note: the default return order for pages will be exactly as you have it in your local filesystem.
 
 ##### Graph
 The Graph query returns an array of all pages.
@@ -123,51 +133,9 @@ This will return the full `graph` of all pages as an array
 ]
 ```
 
-##### Navigation
-The Navigation query returns an array of Page "like" objects, representing the top most root pages of your project.
+##### Menu Query
 
-###### Definition
-```render javascript
-query {
-  navigation {
-    label,
-    link
-  }
-}
-```
-
-###### Usage
-`import` the query in your component
-```render javascript
-import client from '@greenwood/cli/data/client';
-import NavigationQuery from '@greenwood/cli/data/queries/navigation';
-
-.
-.
-.
-
-async connectedCallback() {
-  super.connectedCallback();
-
-  const response = await client.query({
-    query: NavigationQuery
-  });
-
-  this.navigation = response.data.navigation;
-}
-```
-
-
-###### Response
-This will return the full `graph` of all top level routes as a Page array
-```render javascript
-[
-  {
-    label: "Blog",
-    link: "/blog/"
-  }
-]
-```
+See [Menus](/docs/menu) for documentation on querying for custom menus.
 
 ##### Children
 The Children query returns an array of all pages below a given top level route.
@@ -331,10 +299,10 @@ Now of course comes the fun part, actually seeing it all come together.  Here is
 ```render javascript
 import { LitElement, html } from 'lit-element';
 import client from '@greenwood/cli/data/client';
-import NavigationQuery from '@greenwood/cli/data/queries/navigation';
+import MenuQuery from '@greenwood/cli/data/queries/menu';
 
 class HeaderComponent extends LitElement {
-  
+
   static get properties() {
     return {
       navigation: {
@@ -352,10 +320,13 @@ class HeaderComponent extends LitElement {
     super.connectedCallback();
 
     const response = await client.query({
-      query: NavigationQuery
+      query: MenuQuery,
+      variables: {
+        name: 'navigation'
+      }
     });
 
-    this.navigation = response.data.navigation;
+    this.navigation = response.data.menu.children;
   }
 
   render() {
@@ -366,16 +337,14 @@ class HeaderComponent extends LitElement {
 
         <nav>
           <ul>
-            ${navigation.map((item) => {
+            ${navigation.map(({ item }) => {
               return html\`
-                <li>
-                  <a href=\"${item.link}\" title=\"Click to visit the ${item.label} page\">${item.label}</a>
-                </li>
+                <li><a href="\${item.link}" title="Click to visit the \${item.label} page">\${item.label}</a></li>
               \`;
             })}
           </ul>
         </nav>
-        
+
       </header>
     \`;
   }
@@ -384,5 +353,5 @@ class HeaderComponent extends LitElement {
 customElements.define('app-header', HeaderComponent);
 ```
 
-#### External Sources
+### External Sources
 Coming [soon](https://github.com/ProjectEvergreen/greenwood/issues/21)!
