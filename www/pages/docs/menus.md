@@ -19,7 +19,7 @@ For this example, let's say we want "about", "docs", "contact us", all linked wi
 
 | Variable    |  Description                                      |
 |-------------|:--------------------------------------------------|
-| title       |  The title/label of the page link within the menu |
+| title       |  The title of the page link within the menu |
 | menu        |  The name of the menu, cannot have spaces or special characters.                             |
 | index       | The position of the page within a menu. Custom set the position higher or lower than default. You can sort these positions alphabetically or by index   |
 | linkheadings | Integer. If you want to parse the page for headings and include them as children of the page link, add `linkheadings: 3` to parse for `<h3>` headings. Set integer to the heading level you want to parse. e.g. `h1, h2, h3` |
@@ -70,7 +70,7 @@ linkheadings: 3
 ### Locations
 ```
 
-> **Note:** the front-matter variable `linkheadings: 3` will add all the `<h3>` headings as children subitems within a menu item.  So in this example the menu item `Contact`, will have the children: `Online`(linked to #online), `Offline`(linked to #offline), and `Locations`(linked to #locations).  You can set `linkheadings:` to any header level you require not just `3` e.g. `linkheadings: 2` for `<h2>` elements.
+> **Note:** the front-matter variable `linkheadings: 3` will add all the `<h3>` headings as children subitems within a menu item.  So in this example the menu item `Contact`, will have the children: `Online`(linked to #online), `Offline`(linked to #offline), and `Locations`(linked to #locations).  You can set `linkheadings:` to any header level you require not just `3` e.g. `linkheadings: 2` for `<h2>` elements.  An example of the [linkheadings query result](#query-result) can be found below.
 
 ### Retrieve Menu
 
@@ -121,6 +121,8 @@ class HeaderComponent extends LitElement {
 }
 customElements.define('eve-header', HeaderComponent);
 ```
+
+### Query Result
 
 The query will result in the object(default sort by filename):
 ```render js
@@ -273,7 +275,7 @@ The object result for `/about` is:
 
 ```render js
 "menu":{
-  "item": {"label": "shelf", "link": "na""},
+  "item": {"label": "shelf", "link": "na"},
   "children":[{
       "item":{"label":"stuff","link":"/about/stuff"},
       "children":[]
