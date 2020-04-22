@@ -109,5 +109,3 @@ sudo apt-get update \\
 ```
 
 Push your updates to your repo and the action will begin automatically. This will create a new worker with the name from the toml file -production (IE demo-production), make sure custom url is attached to this worker.
-
-Netlify & Now does this automatically.
