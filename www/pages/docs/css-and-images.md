@@ -1,3 +1,11 @@
+---
+label: 'styles-assets'
+menu: side
+title: 'Styles and Assets'
+index: 5
+linkheadings: 3
+---
+
 ## Styles and Assets
 Greenwood provides a couple ways to help style and theme your site.
 

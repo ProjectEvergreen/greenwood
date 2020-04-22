@@ -1,3 +1,10 @@
+---
+label: 'goals'
+menu: side
+title: 'Goals'
+index: 0
+---
+
 ## Goals
 
 #### It's Not About Us

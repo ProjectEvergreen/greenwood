@@ -1,0 +1,20 @@
+query($name: String, $route: String, $order: MenuOrderBy) {
+  menu(name: $name, pathname: $route, orderBy: $order) {
+    item {
+      label,
+      link
+    }
+    children {
+      item {
+        label,
+        link
+      },
+      children {
+        item {
+          label,
+          link
+        }
+      }
+    }
+  }
+}
