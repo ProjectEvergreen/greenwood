@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const crypto = require('crypto');
 const fm = require('front-matter');
 const path = require('path');
+const toc = require('markdown-toc');
 
 const createGraphFromPages = async (pagesDir, config) => {
   let pages = [];
@@ -29,6 +30,7 @@ const createGraphFromPages = async (pagesDir, config) => {
 
           return new Promise(async (resolve, reject) => {
             try {
+
               if (isMdFile && !stats.isDirectory()) {
                 const fileContents = await fs.readFile(filePath, 'utf8');
                 const { attributes } = fm(fileContents);
@@ -98,6 +100,31 @@ const createGraphFromPages = async (pagesDir, config) => {
                 delete customData.title;
                 delete customData.template;
 
+                /* Menu Query
+                * Custom front matter - Variable Definitions
+                * --------------------------------------------------
+                * menu: the name of the menu in which this item can be listed and queried
+                * index: the index of this list item within a menu
+                * linkheadings: flag to tell us where to add page's table of contents as menu items
+                * tableOfContents: json object containing page's table of contents(list of headings)
+                */
+                // set specific menu to place this page
+                customData.menu = customData.menu || '';
+
+                // set specific index list priority of this item within a menu
+                customData.index = customData.index || '';
+
+                // set flag whether to gather a list of headings on a page as menu items
+                customData.linkheadings = customData.linkheadings || 0;
+                customData.tableOfContents = [];
+
+                if (customData.linkheadings > 0) {
+                  // parse markdown for table of contents and output to json
+                  customData.tableOfContents = toc(fileContents).json;
+                  customData.tableOfContents.shift();
+                }
+                /* ---------End Menu Query-------------------- */
+
                 pages[pagesIndexMap.get(filenameHash)] = {
                   data: customData || {},
                   mdFile,
@@ -116,7 +143,6 @@ const createGraphFromPages = async (pagesDir, config) => {
                 await walkDirectory(filePath);
                 resolve();
               }
-              
               resolve();
             } catch (err) {
               reject(err);

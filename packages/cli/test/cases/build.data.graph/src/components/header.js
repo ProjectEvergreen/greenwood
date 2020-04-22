@@ -1,9 +1,9 @@
 import { LitElement, html } from 'lit-element';
 import client from '@greenwood/cli/data/client';
-import NavigationQuery from '@greenwood/cli/data/queries/navigation';
+import MenuQuery from '@greenwood/cli/data/queries/menu';
 
 class HeaderComponent extends LitElement {
-  
+
   static get properties() {
     return {
       navigation: {
@@ -21,10 +21,13 @@ class HeaderComponent extends LitElement {
     super.connectedCallback();
 
     const response = await client.query({
-      query: NavigationQuery
+      query: MenuQuery,
+      variables: {
+        menu: 'navigation'
+      }
     });
 
-    this.navigation = response.data.navigation;
+    this.navigation = response.data.menu.children;
   }
 
   /* eslint-disable indent */
@@ -36,10 +39,10 @@ class HeaderComponent extends LitElement {
 
         <nav>
           <ul>
-            ${navigation.map((item) => {
+            ${navigation.map(({ item }) => {
               return html`
                 <li>
-                  <a href="${item.link}" title="Click to visit the ${item.label} page">${item.label}</a>
+                  <a href="${item.link}" title="Click to visit the ${item.label} blog post">${item.label}</a>
                 </li>
               `;
             })}

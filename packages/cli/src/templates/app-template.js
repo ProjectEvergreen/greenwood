@@ -36,7 +36,8 @@ class AppComponent extends LitElement {
     const currentPage = response[1].data.graph.filter((page) => {
       return route === page.link;
     })[0];
-    const currentPageTitleSuffix = currentPage.link === '/'
+
+    const currentPageTitleSuffix = !currentPage || currentPage.link === '/'
       ? ''
       : ` - ${currentPage.title}`;
     const fullTitle = `${config.title}${currentPageTitleSuffix}`;

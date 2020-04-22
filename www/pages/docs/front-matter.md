@@ -1,3 +1,11 @@
+---
+label: 'front-matter'
+menu: side
+title: 'Front Matter'
+index: 3
+linkheadings: 3
+---
+
 ## Front Matter
 
 "Front matter" is a [YAML](https://yaml.org/) block at the top of any markdown file.  It gives you the ability to define variables that are made available to Greenwood's build process. You can also use it to `import` additional files.
@@ -69,12 +77,12 @@ In this example, the `<title>` tag will be the `title`.
 <title>My Blog Post</title>
 ```
 
-> Note: If you set `title` from your [configuration file](/docs/configuration#title), the output would be 
+> Note: If you set `title` from your [configuration file](/docs/configuration#title), the output would be
 > ```render html
 > <title>{ConfigTitle} - My Blog Post</title>
 > ```
 
-### Custom Data 
+### Custom Data
 
 You can also pass custom data from your markdown file and extract that through the GraphQL server.
 

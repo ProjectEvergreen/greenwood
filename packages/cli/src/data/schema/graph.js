@@ -1,5 +1,82 @@
 const gql = require('graphql-tag');
 
+const getMenuFromGraph = async (root, { name, pathname, orderBy }, context) => {
+  const { graph } = context;
+  let items = [];
+
+  graph
+    .forEach((page) => {
+      const { route, data, title } = page;
+      const { menu, index, tableOfContents, linkheadings } = data;
+      let children = getParsedHeadingsFromPage(tableOfContents, linkheadings);
+
+      if (menu && menu.search(name) > -1) {
+        if (pathname) {
+          // check we're querying only pages that contain base route
+          let baseRoute = pathname;
+          let baseRouteIndex = pathname.substring(1, pathname.length).indexOf('/');
+          if (baseRouteIndex > -1) {
+            baseRoute = pathname.substring(0, baseRouteIndex + 1);
+          }
+
+          if (route.includes(baseRoute)) {
+            items.push({ item: { link: route, label: title, index }, children });
+          }
+        } else {
+          items.push({ item: { link: route, label: title, index }, children });
+        }
+      }
+    });
+  if (orderBy !== '') {
+    items = sortMenuItems(items, orderBy);
+  }
+  return { item: { label: name, link: 'na' }, children: items };
+};
+
+const sortMenuItems = (menuItems, order) => {
+  const compare = (a, b) => {
+    if (order === 'title_asc' || order === 'title_desc') {
+      a = a.item.label, b = b.item.label;
+    }
+    if (order === 'index_asc' || order === 'index_desc') {
+      a = a.item.index, b = b.item.index;
+    }
+    if (order === 'title_asc' || order === 'index_asc') {
+      if (a < b) {
+        return -1;
+      }
+      if (a > b) {
+        return 1;
+      }
+    } else if (order === 'title_desc' || order === 'index_desc') {
+      if (a > b) {
+        return -1;
+      }
+      if (a < b) {
+        return 1;
+      }
+    }
+    return 0;
+  };
+
+  menuItems.sort(compare);
+  return menuItems;
+};
+
+const getParsedHeadingsFromPage = (tableOfContents, headingLevel) => {
+  let children = [];
+
+  if (tableOfContents.length > 0 && headingLevel > 0) {
+    tableOfContents.forEach(({ content, slug, lvl }) => {
+      // make sure we only add heading elements of the same level (h1, h2, h3)
+      if (lvl === headingLevel) {
+        children.push({ item: { label: content, link: '#' + slug }, children: [] });
+      }
+    });
+  }
+  return children;
+};
+
 const getDeriveMetaFromRoute = (route) => {
   // TODO hardcoded root / depth - #273
   const root = route.split('/')[1] || '';
@@ -13,7 +90,7 @@ const getDeriveMetaFromRoute = (route) => {
   return {
     label,
     root
-  }; 
+  };
 };
 
 const getPagesFromGraph = async (root, query, context) => {
@@ -40,29 +117,6 @@ const getPagesFromGraph = async (root, query, context) => {
     });
 
   return pages;
-};
-
-const getNavigationFromGraph = async (root, query, context) => {
-  const navigation = {};
-  const { graph } = context;
-
-  graph
-    .forEach((page) => {
-      const { route } = page;
-      const { root, label } = getDeriveMetaFromRoute(route);
-
-      if (root !== '' && !navigation[root]) {
-        navigation[root] = {
-          label,
-          link: `/${root}/`
-        };
-      }
-    });
-
-  // TODO best format for users, hash map? #288
-  return Object.keys(navigation).map((key) => {
-    return navigation[key];
-  });
 };
 
 const getChildrenFromParentRoute = async (root, query, context) => {
@@ -92,7 +146,7 @@ const getChildrenFromParentRoute = async (root, query, context) => {
         });
       }
     });
-  
+
   return pages;
 };
 
@@ -107,14 +161,26 @@ const graphTypeDefs = gql`
     title: String
   }
 
-  type Navigation {
+  type Link {
     label: String,
     link: String
   }
 
+  type Menu {
+    item: Link
+    children: [Menu]
+  }
+
+  enum MenuOrderBy {
+    title_asc,
+    title_desc
+    index_asc,
+    index_desc
+  }
+
   type Query {
     graph: [Page]
-    navigation: [Navigation]
+    menu(name: String, orderBy: MenuOrderBy, pathname: String): Menu
     children(parent: String): [Page]
   }
 `;
@@ -122,7 +188,7 @@ const graphTypeDefs = gql`
 const graphResolvers = {
   Query: {
     graph: getPagesFromGraph,
-    navigation: getNavigationFromGraph,
+    menu: getMenuFromGraph,
     children: getChildrenFromParentRoute
   }
 };
