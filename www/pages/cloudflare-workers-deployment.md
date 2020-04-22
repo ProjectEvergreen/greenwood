@@ -59,7 +59,7 @@ To have automatic deployments whenever you push updates to your repo, you will n
 
 Add the email address associated with your account and your global api key from Cloudflare to the repositories GitHub secrets.
 
-At the root of your project add 'github/workflows/main.yml'
+At the root of your project add '.github/workflows/main.yml'
 
 ```render yml
 name: Deploy production site
@@ -75,6 +75,9 @@ jobs:
       - uses: actions/checkout@v1
       - name: Navigate to repo
         run: cd $GITHUB_WORKSPACE
+      - name: Install Chromium Library Dependencies
+        run: |
+         sh ./.github/workflows/chromium-lib-install.sh
       - uses: actions/setup-node@v1
         with:
            node-version: "10.x"
@@ -85,9 +88,24 @@ jobs:
       - name: Publish
         uses: cloudflare/wrangler-action@1.1.0
         with:
-           apiKey: // your key from github secrets
-           email: // your email from github secrets
+           apiKey: \$\{\{ secrets\.\CF_WORKERS_KEY \}\} // your key from github secrets
+           email: \$\{\{ secrets\.\CF_WORKERS_EMAIL \}\} // your email from github secrets
            environment: "production"
+```
+
+In the same directory as main.yml create a file 'chromium-lib-install.sh'
+
+```render sh
+#!/usr/bin/bash
+
+sudo apt-get update \\
+  && sudo apt-get install -yq libgconf-2-4 \\
+  && sudo apt-get install -y wget --no-install-recommends \\
+  && sudo wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - \\
+  && sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \\
+  && sudo apt-get update \\
+  && sudo apt-get install -y google-chrome-unstable --no-install-recommends \\
+  && sudo rm -rf /var/lib/apt/lists/*
 ```
 
 Push your updates to your repo and the action will begin automatically. This will create a new worker with the name from the toml file -production (IE demo-production), make sure custom url is attached to this worker.
