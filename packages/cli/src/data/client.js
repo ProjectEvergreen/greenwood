@@ -15,7 +15,6 @@ client.query = (params) => {
 
   if (APOLLO_STATE) {
     // __APOLLO_STATE__ defined, in "SSG" mode...
-    // TODO dont hardoce depth - #273
     const root = window.location.pathname.split('/')[1];
     const rootSuffix = root === ''
       ? ''

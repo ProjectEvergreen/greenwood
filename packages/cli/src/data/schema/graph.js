@@ -78,7 +78,6 @@ const getParsedHeadingsFromPage = (tableOfContents, headingLevel) => {
 };
 
 const getDeriveMetaFromRoute = (route) => {
-  // TODO hardcoded root / depth - #273
   const root = route.split('/')[1] || '';
   const label = root
     .replace('/', '')

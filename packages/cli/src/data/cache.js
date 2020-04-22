@@ -12,7 +12,6 @@ module.exports = async (req, context) => {
 
   return new Promise(async(resolve, reject) => {
     try {
-      // TODO avoid having to duplicate / replay calls - #272
       const client = await new ApolloClient({
         link: createHttpLink({
           uri: 'http://localhost:4000?q=internal', /* internal flag to prevent looping cache on request */

@@ -1,6 +1,4 @@
 import { html, LitElement } from 'lit-element';
-import client from '@greenwood/cli/data/client';
-import ConfigQuery from '@greenwood/cli/data/queries/config';
 import '../components/banner/banner';
 import '../components/card/card';
 import '../components/header/header';
@@ -13,16 +11,6 @@ import homeCss from '../styles/home.css';
 MDIMPORT;
 
 class HomeTemplate extends LitElement {
-  
-  async connectedCallback() {
-    super.connectedCallback();
-
-    const response = await client.query({
-      query: ConfigQuery
-    });
-
-    console.log('config', response.data.config);
-  }
 
   render() {
     return html`
