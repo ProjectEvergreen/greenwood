@@ -2,6 +2,7 @@
 label: 'guides'
 title: 'Guides'
 menu: navigation
+index: 5
 ---
 
 ## Guides

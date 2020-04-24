@@ -16,12 +16,13 @@ describe('Unit Test: Data', function() {
           before(async function() {
             navigation = await graphResolvers.Query.menu(undefined, {
               pathname: '/',
-              name: 'navigation'
+              name: 'navigation',
+              orderBy: 'index_asc'
             }, MOCK_GRAPH);
           });
 
-          it('should have 4 children', function() {
-            expect(navigation.children.length).to.equal(4);
+          it('should have 5 children', function() {
+            expect(navigation.children.length).to.equal(5);
           });
 
           it('should have About as the first item', function() {
@@ -50,6 +51,13 @@ describe('Unit Test: Data', function() {
 
             expect(item.label).to.be.equal('Plugins');
             expect(item.link).to.be.equal('/plugins/');
+          });
+
+          it('should have Guides as the fifth item', function() {
+            const item = navigation.children[4].item;
+
+            expect(item.label).to.be.equal('Guides');
+            expect(item.link).to.be.equal('/guides/');
           });
         });
       });

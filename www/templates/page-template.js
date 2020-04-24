@@ -37,10 +37,10 @@ class PageTemplate extends LitElement {
       <style>
         ${pageCss}
       </style>
-
+     
       <div class='wrapper'>
         <eve-header></eve-header>
-
+        
         <div class='content-wrapper'>
           <div class="sidebar">
             <eve-shelf .page="${page}"></eve-shelf>
@@ -52,9 +52,9 @@ class PageTemplate extends LitElement {
                 <entry></entry>
               </eve-scroll>
             </eve-container>
-          </div>
+          </div> 
         </div>
-
+        
         <eve-footer></eve-footer>
       </div>
     `;
