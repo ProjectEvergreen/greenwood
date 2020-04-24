@@ -1,14 +1,16 @@
-import { html, LitElement } from 'lit-element';
+import { LitElement, html } from 'lit-element';
+import client from '@greenwood/cli/data/client';
+import MenuQuery from '@greenwood/cli/data/queries/menu';
 import css from './shelf.css';
 import chevronRt from '../icons/chevron-right/chevron-right';
 import chevronDwn from '../icons/chevron-down/chevron-down';
 
-class shelf extends LitElement {
+class Shelf extends LitElement {
 
   static get properties() {
     return {
-      shelfList: {
-        type: Array
+      page: {
+        type: String
       }
     };
   }
@@ -17,10 +19,25 @@ class shelf extends LitElement {
     super();
     this.selectedIndex = '';
     this.shelfList = [];
+    this.page = '';
   }
 
   async connectedCallback() {
     super.connectedCallback();
+    if (this.page !== '' && this.page !== '/') {
+      const response = await client.query({
+        query: MenuQuery,
+        variables: {
+          name: 'side',
+          route: window.location.pathname,
+          order: 'index_asc'
+        }
+      });
+
+      this.shelfList = response.data.menu.children;
+      this.requestUpdate();
+    }
+
     this.collapseAll();
     this.expandRoute(window.location.pathname);
   }
@@ -33,7 +50,7 @@ class shelf extends LitElement {
   expandRoute(path) {
     // find list item containing current window.location.pathname
     let routeShelfListIndex = this.shelfList.findIndex(list => {
-      return list.path.indexOf(path) >= 0;
+      return list.item.link.indexOf(path) >= 0;
     });
 
     if (routeShelfListIndex > -1) {
@@ -55,7 +72,6 @@ class shelf extends LitElement {
     let selectedShelfListIndex = this.shelfList.findIndex((list, index) => {
       return index === this.selectedIndex;
     });
-
     if (selectedShelfListIndex > -1) {
       this.shelfList[selectedShelfListIndex].selected = !this.shelfList[selectedShelfListIndex].selected;
     }
@@ -83,17 +99,16 @@ class shelf extends LitElement {
   }
 
   renderList() {
-
     /* eslint-disable indent */
-    const renderListItems = (list) => {
+    const renderListItems = (list, selected) => {
       let listItems = '';
 
-      if (list.items && list.items.length > 0) {
+      if (list && list.length > 0) {
         listItems = html`
           <ul>
-            ${list.items.map((item, index) => {
+            ${list.map(({ item }, index) => {
               return html`
-                <li id="index_${index}" class="${list.selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`#${item.id}`)}">${item.name}</a></li>
+                <li id="index_${index}" class="${selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`${item.link}`)}">${item.label}</a></li>
               `;
             })}
           </ul>
@@ -104,17 +119,17 @@ class shelf extends LitElement {
     };
 
     /* eslint-enable */
-    return this.shelfList.map((list, index) => {
+    return this.shelfList.map(({ item, children, selected }, index) => {
       let id = `index_${index}`;
-      let chevron = list.items && list.items.length > 0
-        ? list.selected === true ? chevronDwn : chevronRt
+      let chevron = children && children.length > 0
+        ? selected === true ? chevronDwn : chevronRt
         : '';
 
       return html`
         <li class="list-wrap">
-          <a href="${list.path}" @click="${this.handleClick}"><h2 id="${id}">${list.name} <span>${chevron}</span></h2></a>
+          <a href="${item.link}" @click="${this.handleClick}"><h2 id="${id}">${item.label} <span>${chevron}</span></h2></a>
           <hr>
-          ${renderListItems(list)}
+          ${renderListItems(children, selected)}
         </li>
       `;
     });
@@ -125,6 +140,7 @@ class shelf extends LitElement {
       <style>
         ${css}
       </style>
+
       <div>
         <ul>
           ${this.renderList()}
@@ -134,4 +150,4 @@ class shelf extends LitElement {
   }
 }
 
-customElements.define('eve-shelf', shelf);
+customElements.define('eve-shelf', Shelf);
