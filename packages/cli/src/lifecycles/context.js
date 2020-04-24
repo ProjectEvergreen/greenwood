@@ -3,7 +3,6 @@ const path = require('path');
 const defaultTemplatesDir = path.join(__dirname, '../templates/');
 const scratchDir = path.join(process.cwd(), './.greenwood/');
 const publicDir = path.join(process.cwd(), './public');
-const metaComponent = path.join(__dirname, '../plugins/meta');
 
 module.exports = initContexts = async({ config }) => {
 
@@ -46,7 +45,6 @@ module.exports = initContexts = async({ config }) => {
           : path.join(defaultTemplatesDir, notFoundPageTemplate),
         indexPageTemplate,
         notFoundPageTemplate,
-        metaComponent,
         assetDir: path.join(userHasWorkspace ? userWorkspace : defaultTemplatesDir, 'assets')
       };
 
