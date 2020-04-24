@@ -9,7 +9,7 @@ let defaultConfig = {
     host: 'localhost'
   },
   publicPath: '/',
-  title: 'Greenwood App',
+  title: 'My App',
   meta: [],
   optimization: {},
   plugins: [],
