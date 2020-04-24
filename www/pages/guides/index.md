@@ -1,6 +1,7 @@
 ---
 label: 'guides'
-title: 'guides'
+title: 'Guides'
+menu: navigation
 ---
 
 ## Guides

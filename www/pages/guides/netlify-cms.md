@@ -1,3 +1,9 @@
+---
+title: 'Netlify CMS'
+menu: side
+linkheadings: 3
+---
+
 ## Using a CMS
 
 To make your life easier creating content, you can use content management systems such as [Netlify CMS](https://www.netlifycms.org/).  We've created a guide here to help make things easy to setup.
