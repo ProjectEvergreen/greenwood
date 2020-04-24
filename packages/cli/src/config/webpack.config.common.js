@@ -80,6 +80,14 @@ module.exports = ({ config, context }) => {
     .map((plugin) => plugin.provider({ config, context }));
 
   return {
+    
+    resolve: {
+      extensions: ['.js', '.json', '.gql', '.graphql'],
+      alias: {
+        '@greenwood/cli/data': path.join(__dirname, '..', './data')
+      }
+    },
+
     entry: {
       index: path.join(context.scratchDir, 'app', 'app.js')
     },
@@ -124,6 +132,9 @@ module.exports = ({ config, context }) => {
       }, {
         test: /\.(ttf|eot|svg|jpe?g|png|gif|otf)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: 'file-loader'
+      }, {
+        test: /\.(graphql|gql)$/,
+        loader: 'graphql-tag/loader'
       }]
     },
 

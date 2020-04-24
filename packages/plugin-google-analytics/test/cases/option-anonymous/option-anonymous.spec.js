@@ -48,7 +48,7 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
 
-    describe('Initialization script at the end of the <body> tag', function() {
+    describe('Initialization script', function() {
       let inlineScript;
 
       beforeEach(async function() {
@@ -56,7 +56,7 @@ describe('Build Greenwood With: ', function() {
         const scriptTags = dom.window.document.querySelectorAll('head script');
 
         inlineScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          return !script.src;
+          return !script.src && !script.getAttribute('data-state');
         });
 
       });
@@ -79,7 +79,7 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('Tracking script at the end of the <body> tag', function() {
+    describe('Tracking script', function() {
       let trackingScript;
 
       beforeEach(async function() {

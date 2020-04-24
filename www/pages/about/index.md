@@ -1,5 +1,7 @@
 ---
 label: 'about'
+menu: navigation
+title: About
 ---
 
 ## About Greenwood

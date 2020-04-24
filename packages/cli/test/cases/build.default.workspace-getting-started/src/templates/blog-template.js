@@ -3,8 +3,6 @@ import '../components/footer';
 import '../components/header';
 
 MDIMPORT;
-METAIMPORT;
-METADATA;
 
 class BlogTemplate extends LitElement {
 
@@ -17,8 +15,6 @@ class BlogTemplate extends LitElement {
       <style>
 
       </style>
-      
-      METAELEMENT
 
       <div class='container'>
         <app-header></app-header>
