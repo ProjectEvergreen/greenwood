@@ -1,0 +1,10 @@
+query($parent: String!) {
+  children(parent: $parent) {
+    id,
+    title,
+    link,
+    filePath,
+    fileName,
+    template
+  }
+}

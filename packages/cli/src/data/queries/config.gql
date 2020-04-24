@@ -1,0 +1,19 @@
+query {
+  config {
+  	devServer {
+      port,
+      host
+    },
+    meta {
+      name,
+      rel,
+      content,
+      property,
+      value,
+      href
+    },
+    publicPath,
+    title,
+    workspace
+  }
+}

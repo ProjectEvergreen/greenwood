@@ -27,6 +27,7 @@ const expect = require('chai').expect;
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
+const configTitle = require('./greenwood.config').title;
 const mainBundleScriptRegex = /index.*.bundle\.js/;
 
 describe('Build Greenwood With: ', function() {
@@ -45,7 +46,6 @@ describe('Build Greenwood With: ', function() {
     runSmokeTest(['public', 'not-found', 'hello'], LABEL);
 
     describe('Custom Title', function() {
-      const indexPageTitle = 'My Custom Greenwood App';
       const indexPageHeading = 'Greenwood';
       const indexPageBody = 'This is the home page built by Greenwood. Make your own pages in src/pages/index.js!';
       let dom;
@@ -61,7 +61,7 @@ describe('Build Greenwood With: ', function() {
       it('should have our custom config meta <title> tag in the <head>', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
-        expect(title).to.be.equal(indexPageTitle);
+        expect(title).to.be.equal(configTitle);
       });
 
       // rest of index smoke-test because <title></title> is changed for this case
@@ -116,7 +116,7 @@ describe('Build Greenwood With: ', function() {
       it('should have a overridden meta <title> tag in the <head> using markdown front-matter', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
-        expect(title).to.be.equal(helloPageTitle);
+        expect(title).to.be.equal(`${configTitle} - ${helloPageTitle}`);
       });
     });
   });
