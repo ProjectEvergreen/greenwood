@@ -42,7 +42,8 @@ class BrowserRunner {
 
       if (
         interceptedRequestUrl.indexOf('bundle.js') >= 0 || // webpack bundles, webcomponents-bundle.js
-        interceptedRequestUrl === requestUrl // pages / routes
+        interceptedRequestUrl === requestUrl || // pages / routes
+        interceptedRequestUrl.indexOf('localhost:4000') >= 0 // Apollo GraphQL server
       ) {
         interceptedRequest.continue();
       } else {
@@ -50,21 +51,15 @@ class BrowserRunner {
       }
     });
 
-    // Capture main frame response. This is used in the case that rendering
-    // times out, which results in puppeteer throwing an error. This allows us
-    // to return a partial response for what was able to be rendered in that
-    // time frame.
-    page.addListener('response', (r) => {
-      if (!response) {
-        response = r;
-      }
-    });
-
     try {
       // Navigate to page. Wait until there are no oustanding network requests.
-      response = await page.goto(requestUrl, { timeout: 10000 });
+      // https://pptr.dev/#?product=Puppeteer&version=v1.8.0&show=api-pagegotourl-options
+      response = await page.goto(requestUrl, {
+        waitUntil: 'networkidle0',
+        timeout: 0
+      });
     } catch (e) {
-      console.error(e);
+      console.error('browser error', e);
     }
 
     if (!response) {
