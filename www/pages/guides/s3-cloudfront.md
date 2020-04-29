@@ -1,3 +1,9 @@
+---
+title: 'AWS S3 & CloudFront Deployment'
+menu: side
+linkheadings: 3
+---
+
 ## Deployment from AWS S3 & CloudFront
 
 This requires an [AWS](https://aws.amazon.com/) account and compiled code for your project from running `greenwood build`.

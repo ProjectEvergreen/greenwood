@@ -1,3 +1,9 @@
+---
+title: 'Cloudflare Workers Deployment'
+menu: side
+linkheadings: 3
+---
+
 ## Cloudflare Workers Deployment
 
 [Cloudflare Workers](https://workers.cloudflare.com/) is an excellent option as a CDN for deploying your Greenwood site, though if you are new to using this service consider deploying with [Netlify](https://www.netlify.com) as it is a simpler process.

@@ -1,4 +1,10 @@
-## Deploy on Firebase
+---
+title: 'Firebase Deployment'
+menu: side
+linkheadings: 3
+---
+
+### Deploy on Firebase
 
 You will need an account, go to [https://firebase.google.com/](https://firebase.google.com/) get everything setup.
 
@@ -40,7 +46,7 @@ then
 firebase use --add
 ```
 
-select the targeted project, add an alias for the deployment, then
+select the targeted project, add an alias (referenced in the .firebaserc file at the root of your project, you can just use 'default') for the deployment, then
 
  ```render bash
 firebase deploy
@@ -48,7 +54,7 @@ firebase deploy
 
 Your application will be accessible now at the domain <YOUR-FIREBASE-APP>.firebaseapp.com
 
-## Auto Deployment with GitHub Actions
+### Auto Deployment with GitHub Actions
 
 Add your firebase token to GitHub Secrets as 'FIREBASE_TOKEN'; to get this run:
 
