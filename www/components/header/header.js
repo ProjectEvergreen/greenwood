@@ -27,7 +27,8 @@ class HeaderComponent extends LitElement {
     const response = await client.query({
       query: MenuQuery,
       variables: {
-        name: 'navigation'
+        name: 'navigation',
+        order: 'index_asc'
       }
     });
 
