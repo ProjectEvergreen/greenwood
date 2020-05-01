@@ -50,7 +50,8 @@ class Shelf extends LitElement {
   expandRoute(path) {
     // find list item containing current window.location.pathname
     let routeShelfListIndex = this.shelfList.findIndex(list => {
-      return list.item.link.indexOf(path) >= 0;
+      let expRoute = new RegExp(`^${path}$`);
+      return expRoute.test(list.item.link);
     });
 
     if (routeShelfListIndex > -1) {
