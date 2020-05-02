@@ -58,7 +58,7 @@ class AppComponent extends LitElement {
     meta.forEach(metaItem => {
       const metaType = metaItem.rel // type of meta
         ? 'rel'
-        : metaItem.name
+        : metaItem.name 
           ? 'name'
           : 'property';
       const metaTypeValue = metaItem[metaType]; // value of the meta
@@ -71,8 +71,8 @@ class AppComponent extends LitElement {
         meta.setAttribute('rel', metaTypeValue);
         meta.setAttribute('href', metaItem.href);
       } else {
-        const metaContent = metaItem.property === 'og:url'
-          ? `${metaItem.content}${currentPage.link}`
+        const metaContent = metaItem.property === 'og:url' 
+          ? `${metaItem.content}${currentPage.link}` 
           : metaItem.content;
 
         meta.setAttribute(metaType, metaItem[metaType]);
@@ -80,7 +80,7 @@ class AppComponent extends LitElement {
       }
 
       const oldmeta = header.querySelector(`[${metaType}="${metaTypeValue}"]`);
-
+      
       // rehydration
       if (oldmeta) {
         header.replaceChild(meta, oldmeta);
