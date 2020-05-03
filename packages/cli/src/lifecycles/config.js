@@ -11,7 +11,6 @@ let defaultConfig = {
   publicPath: '/',
   title: 'My App',
   meta: [],
-  optimization: {},
   plugins: [],
   themeFile: 'theme.css'
 };
@@ -25,7 +24,7 @@ module.exports = readAndMergeConfig = async() => {
 
       if (await fs.exists(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, publicPath, title, meta, plugins, themeFile, optimization } = userCfgFile;
+        const { workspace, devServer, publicPath, title, meta, plugins, themeFile } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -95,10 +94,6 @@ module.exports = readAndMergeConfig = async() => {
             reject(`Error: greenwood.config.js themeFile must be a valid filename. got ${themeFile} instead.`);
           }
           customConfig.themeFile = themeFile;
-        }
-
-        if (optimization && Object.keys(optimization).length > 0) {
-          customConfig.optimization = optimization;
         }
 
         if (devServer && Object.keys(devServer).length > 0) {

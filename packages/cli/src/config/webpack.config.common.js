@@ -138,8 +138,6 @@ module.exports = ({ config, context }) => {
       }]
     },
 
-    optimization: config.optimization,
-
     plugins: [
       new HtmlWebpackPlugin({
         filename: path.join(context.publicDir, context.indexPageTemplate),
