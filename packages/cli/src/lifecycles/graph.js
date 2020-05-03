@@ -82,7 +82,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                   : route.substring(1, route.length).split('/');
                 let chunkName = 'page';
 
-                routes.map(subDir => {
+                routes.forEach(subDir => {
                   chunkName += '--' + subDir;
                 });
 
