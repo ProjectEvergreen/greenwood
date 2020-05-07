@@ -16,6 +16,7 @@
   }
 
   & h2 {
+    pointer-events: none;
     display: block;
     font-size: 1.5em;
     margin-block-start: 0.83em;
@@ -65,11 +66,14 @@
     }
   }
 
-  & span > svg {
-    margin-top:5px;
-    float:right;
-    margin-left: auto;
-    height:20px;
+  & span {
+    pointer-events: none;
+    > svg {
+      margin-top:5px;
+      float:right;
+      margin-left: auto;
+      height:20px;
+    }
   }
 
   & .hidden {
