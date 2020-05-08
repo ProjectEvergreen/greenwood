@@ -128,7 +128,7 @@ class Shelf extends LitElement {
 
       return html`
         <li class="list-wrap">
-        <a id="${id}" href="${item.link}" @click="${this.handleClick}"><h2>${item.label}</h2><span>${chevron}</span></a>
+          <a id="${id}" href="${item.link}" @click="${this.handleClick}"><span>${item.label}</span><span>${chevron}</span></a>
           <hr>
           ${renderListItems(children, selected)}
         </li>
