@@ -15,6 +15,12 @@
     }
   }
 
+  & .list-wrap a {
+    display: grid;
+    grid-template-columns: auto 20px;
+    align-items: center;
+  }
+
   & h2 {
     pointer-events: none;
     display: block;
@@ -70,7 +76,6 @@
     pointer-events: none;
     > svg {
       margin-top:5px;
-      float:right;
       margin-left: auto;
       height:20px;
     }
