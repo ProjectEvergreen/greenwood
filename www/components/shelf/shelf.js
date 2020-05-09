@@ -17,29 +17,32 @@ class Shelf extends LitElement {
 
   constructor() {
     super();
+    this.page = '';
     this.selectedIndex = '';
     this.shelfList = [];
-    this.page = '';
   }
 
   async connectedCallback() {
     super.connectedCallback();
-    if (this.page !== '' && this.page !== '/') {
-      const response = await client.query({
-        query: MenuQuery,
-        variables: {
-          name: 'side',
-          route: window.location.pathname,
-          order: 'index_asc'
-        }
-      });
-
-      this.shelfList = response.data.menu.children;
-      this.requestUpdate();
-    }
-
     this.collapseAll();
-    this.expandRoute(window.location.pathname);
+    //   console.log('shelf page', this.page);
+    //   console.log('shelf window.location.pathname', window.location.pathname);
+    //   if (this.page && this.page !== '' && this.page !== '/') {
+    //     const response = await client.query({
+    //       query: MenuQuery,
+    //       variables: {
+    //         name: 'side',
+    //         route: window.location.pathname,
+    //         order: 'index_asc'
+    //       }
+    //     });
+
+    //     this.shelfList = response.data.menu.children;
+    //     this.requestUpdate();
+    //   }
+
+    //   this.collapseAll();
+    //   this.expandRoute(window.location.pathname);
   }
 
   goTo(path) {
@@ -48,21 +51,26 @@ class Shelf extends LitElement {
   }
 
   expandRoute(path) {
+    console.log('expandRoute', path);
+    console.log('this.shelfList', this.shelfList);
     // find list item containing current window.location.pathname
     let routeShelfListIndex = this.shelfList.findIndex(list => {
       let expRoute = new RegExp(`^${path}$`);
+      console.log('list.item.link', list.item.link);
       return expRoute.test(list.item.link);
     });
+    console.log('routeShelfListIndex', routeShelfListIndex);
 
     if (routeShelfListIndex > -1) {
       this.shelfList[routeShelfListIndex].selected = true;
       this.selectedIndex = routeShelfListIndex;
       // force re-render
-      this.requestUpdate();
+      // this.requestUpdate();
     }
   }
 
   collapseAll() {
+    console.log('collapseAll');
     this.shelfList = this.shelfList.map(item => {
       item.selected = false;
       return item;
@@ -99,7 +107,45 @@ class Shelf extends LitElement {
     this.requestUpdate();
   }
 
+  async fetchShelfData() {
+    console.log('shelf page', this.page);
+    console.log('shelf window.location.pathname', window.location.pathname);
+    // if (this.page && this.page !== '' && this.page !== '/') {
+    const response = await client.query({
+      query: MenuQuery,
+      variables: {
+        name: 'side',
+        route: this.page,
+        order: 'index_asc'
+      }
+    });
+
+    this.shelfList = response.data.menu.children;
+    // console.log('this.shelfList', this.shelfList);
+    // this.requestUpdate();
+    // this.requestUpdate();
+    // this.expandRoute(window.location.pathname);
+    // }
+
+    // this.collapseAll();
+    // this.expandRoute(window.location.pathname);
+  }
+
+  async updated(changedProperties) {
+    console.log('updated.changedProperties', changedProperties);
+    if (changedProperties.has('page') && this.page !== '' && this.page !== '/') {
+      console.log('page changed');
+      console.log('this.page', this.page);
+      await this.fetchShelfData();
+      // this.collapseAll();
+      this.expandRoute(window.location.pathname);
+      // this.expandRoute(`/${this.page}/`);
+      this.requestUpdate();
+    }
+  }
+
   renderList() {
+    console.log('renderList', this.shelfList);
     /* eslint-disable indent */
     const renderListItems = (list, selected) => {
       let listItems = '';
@@ -137,6 +183,8 @@ class Shelf extends LitElement {
   }
 
   render() {
+    console.log('shelf render', this.page);
+
     return html`
       <style>
         ${css}

@@ -30,7 +30,7 @@ module.exports = async (req, context) => {
 
       if (data) {
         const cache = JSON.stringify(client.extract());
-        const md5 = crypto.createHash('md5').update(query).digest('hex');
+        const md5 = crypto.createHash('md5').update(query + JSON.stringify(variables)).digest('hex');
 
         /* Get the requests entire (full) route and rootRoute to use as reference for designated cache directory */
         const { origin, referer } = req.headers;
