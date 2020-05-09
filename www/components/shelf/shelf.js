@@ -43,7 +43,7 @@ class Shelf extends LitElement {
       this.shelfList[routeShelfListIndex].selected = true;
       this.selectedIndex = routeShelfListIndex;
     }
-    console.log('expand route - selectedIndex', selectedIndex);
+    console.log('expand route - selectedIndex', this.selectedIndex);
   }
 
   collapseAll() {
