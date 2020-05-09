@@ -26,14 +26,14 @@ class PageTemplate extends LitElement {
   }
 
   updated() {
+    console.log('ENTER page template updated', window.location.pathname);
     this.route = window.location.pathname;
   }
 
   render() {
-    console.log('ENTER page template render');
     const { route } = this;
     const page = route.split('/')[1];
-    console.log('page template render - page', page);
+    console.log('ENTER page template  template render - page', page);
 
     return html`
       <style>

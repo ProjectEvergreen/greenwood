@@ -23,6 +23,7 @@ class AppComponent extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
+    console.log('ENTER app-template connectCallback');
     const route = window.location.pathname;
     const response = await Promise.all([
       await client.query({
@@ -92,6 +93,7 @@ class AppComponent extends LitElement {
   }
 
   render() {
+    console.log('ENTER app-template render');
     return html`
         MYROUTES
         <lit-route><h1>404 Not found</h1></lit-route>
