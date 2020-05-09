@@ -86,7 +86,7 @@ class Shelf extends LitElement {
       query: MenuQuery,
       variables: {
         name: 'side',
-        route: this.page,
+        route: `/${this.page}/`,
         order: 'index_asc'
       }
     });
