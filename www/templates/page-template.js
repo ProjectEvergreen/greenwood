@@ -30,8 +30,10 @@ class PageTemplate extends LitElement {
   }
 
   render() {
+    console.log('ENTER page template render');
     const { route } = this;
     const page = route.split('/')[1];
+    console.log('page template render - page', page);
 
     return html`
       <style>

@@ -33,15 +33,17 @@ class Shelf extends LitElement {
   }
 
   expandRoute(path) {
+    console.log('ENTER expand route - path (winwdow.location.pathname)', path);
     let routeShelfListIndex = this.shelfList.findIndex(list => {
       let expRoute = new RegExp(`^${path}$`);
       return expRoute.test(list.item.link);
     });
-
+    console.log('expand route - routeShelfListIndex', routeShelfListIndex);
     if (routeShelfListIndex > -1) {
       this.shelfList[routeShelfListIndex].selected = true;
       this.selectedIndex = routeShelfListIndex;
     }
+    console.log('expand route - selectedIndex', selectedIndex);
   }
 
   collapseAll() {
@@ -82,6 +84,7 @@ class Shelf extends LitElement {
   }
 
   async fetchShelfData() {
+    console.log('ENTER fetchShelfData');
     const response = await client.query({
       query: MenuQuery,
       variables: {
@@ -92,9 +95,12 @@ class Shelf extends LitElement {
     });
 
     this.shelfList = response.data.menu.children;
+    console.log('fetchShelfData - ', this.shelfList);
   }
 
   async updated(changedProperties) {
+    console.log('ENTER updated - changedProperties', changedProperties);
+    console.log('updated - this.page', this.page);
     if (changedProperties.has('page') && this.page !== '' && this.page !== '/') {
       await this.fetchShelfData();
 
@@ -141,6 +147,7 @@ class Shelf extends LitElement {
   }
 
   render() {
+    console.log('ENTER shelf render');
     return html`
       <style>
         ${css}
