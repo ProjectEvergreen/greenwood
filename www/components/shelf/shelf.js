@@ -85,7 +85,16 @@ class Shelf extends LitElement {
 
   async fetchShelfData() {
     console.log('ENTER fetchShelfData');
-    const response = await client.query({
+    // await client.query({
+    //   query: MenuQuery,
+    //   variables: {
+    //     name: 'side',
+    //     route: `/${this.page}/`,
+    //     order: 'index_asc'
+    //   }
+    // });
+
+    return await client.query({
       query: MenuQuery,
       variables: {
         name: 'side',
@@ -93,16 +102,15 @@ class Shelf extends LitElement {
         order: 'index_asc'
       }
     });
-
-    this.shelfList = response.data.menu.children;
-    console.log('fetchShelfData - ', this.shelfList);
   }
 
   async updated(changedProperties) {
     console.log('ENTER updated - changedProperties', changedProperties);
     console.log('updated - this.page', this.page);
     if (changedProperties.has('page') && this.page !== '' && this.page !== '/') {
-      await this.fetchShelfData();
+      const response = await this.fetchShelfData();
+      this.shelfList = response.data.menu.children;
+      console.log('fetchShelfData - ', this.shelfList);
 
       this.expandRoute(window.location.pathname);
       this.requestUpdate();
