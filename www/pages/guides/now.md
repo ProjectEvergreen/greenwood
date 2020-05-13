@@ -13,27 +13,27 @@ After you have created your Greenwood project and pushed your code to a GitHub r
 
 1. Log in to your Vercel account and proceed to the dashboard.
 
-2. Click the 'Import Project' button
+1. Click the **Import Project** button
 
-3. In the 'From Git Repository' block, click 'continue'
+1. In the **From Git Repository** block, click **continue**
 
-4. The default tab is for GitHub (what we will be using), GitLab & Bitbucket are also supported but not tested for this guide.
+1. The default tab is for GitHub (what we will be using), GitLab & Bitbucket are also supported but not tested for this guide.
 
-5. Click 'Import Project from GitHub'
+1. Click **Import Project from GitHub**
 
-6. Find an click 'select' next to the relevant Repository, then click 'Import'
+1. Find an click **select** next to the relevant Repository, then click **Import**
 
-7. Next you can change the projects name (optional) then click 'continue'
+1. Next you can change the projects name (optional) then click **continue**
 
-8. the next screen asks for the path to the root directory, leave blank for the root and click 'continue'
+1. the next screen asks for the path to the root directory, leave blank for the root and click **continue**
 
-9. next, the selection for framework should be automatically set to 'other', if not select it
+1. next, the selection for framework should be automatically set to **other**, if not select it
 
-10. In 'build command' enter `yarn build`
+1. In **build command** enter `yarn build`
 
-11. In 'output directory' enter `public`
+1. In **output directory** enter `public`
 
-12. Click 'deploy'
+1. Click **deploy**
 
 
 Done. It will start building your first deployment and will update each time you make changes to the master branch of your repo.

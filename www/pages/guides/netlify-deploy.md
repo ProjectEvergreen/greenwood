@@ -13,16 +13,16 @@ After you have created your Greenwood project and pushed your code to a GitHub r
 
 1. Log in to your Netlify account and proceed to the dashboard.
 
-2. Click the 'Import new site from Git' button in the upper right corner of the screen.
+1. Click the **Import new site from Git** button in the upper right corner of the screen.
 
-3. Click the 'GitHub' button.
+1. Click the **GitHub** button.
 
-4. Find and select the relevant repository.
+1. Find and select the relevant repository.
 
-5. In 'build command' enter  `yarn build`
+1. In **build command** enter  `yarn build`
 
-6. In 'output directory' enter  `public`
+1. In **output directory** enter  `public`
 
-7. Click 'deploy site'
+1. Click **deploy site**
 
 Done. It will start building your first deployment and will update each time you make changes to the master branch of your repo.
