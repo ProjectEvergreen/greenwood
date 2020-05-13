@@ -25,8 +25,9 @@ class PageTemplate extends LitElement {
     this.route = '';
   }
 
-  updated() {
+  connectedCallback() {
     console.log('ENTER page template updated', window.location.pathname);
+    super.connectedCallback();
     this.route = window.location.pathname;
   }
 
