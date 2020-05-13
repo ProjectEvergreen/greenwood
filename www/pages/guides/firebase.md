@@ -96,7 +96,7 @@ jobs:
 
 In the same directory as main.yml create a file 'chromium-lib-install.sh'
 
-```sh
+```bash
 #!/usr/bin/bash
 
 sudo apt-get update \\

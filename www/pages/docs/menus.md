@@ -28,7 +28,7 @@ e.g. create the following in a new directory within your `/pages` directory.
 
 `index.md`
 
-```render md
+```md
 ---
 title: 'About'
 menu: 'navigation'
@@ -41,7 +41,7 @@ index: 1
 
 `docs.md`
 
-```render md
+```md
 ---
 title: 'Docs'
 menu: 'navigation'
@@ -53,7 +53,7 @@ index: 2
 
 `contact.md`
 
-```render md
+```md
 ---
 title: 'Contact'
 menu: 'navigation'
@@ -78,7 +78,7 @@ Now in order to use our navigation menu within a component we need to query it v
 
 `navigation.js`
 
-```render js
+```js
 import { LitElement, html } from 'lit-element';
 import client from '@greenwood/cli/data/client';
 import MenuQuery from '@greenwood/cli/data/queries/menu';
@@ -125,7 +125,7 @@ customElements.define('eve-header', HeaderComponent);
 ### Query Result
 
 The query will result in the object(default sort by filename):
-```render js
+```js
 menu: {
   children:[
     {
@@ -154,7 +154,7 @@ menu: {
 
 The position of items within a menu can be sorted by simply adding the `order` variable to our query.
 
-```render js
+```js
 const response = await client.query({
   query: MenuQuery,
   variables: {
@@ -179,7 +179,7 @@ The following sorts are available.
 
 If you only want specific menu items to show within a specific subdirectory. You can also include the `route` variable to specify a specific path the menu will be displaying on.  By doing so, only pages with a menu that matches the base path of the route provided would be included in the query.  This would be useful for a shelf menu, for example if path is `/docs/somepage` and you only want to include pages within the `/docs` directory in your menu. You would set your `route:` variable to `window.location.pathname`.
 
-```render js
+```js
 const response = await client.query({
   query: MenuQuery,
   variables: {
@@ -197,7 +197,7 @@ You have 2 directories: `/docs` and `/about`.
 Each directory has two pages and you have one single menu declared within all your pages front-matter called: **shelf**
 
 `/docs/index.md`:
-```render md
+```md
 ---
 title: 'documentation'
 menu: 'shelf'
@@ -207,7 +207,7 @@ menu: 'shelf'
 ```
 
 `/docs/components.md`:
-```render md
+```md
 ---
 title: 'components'
 menu: 'shelf'
@@ -217,7 +217,7 @@ menu: 'shelf'
 ```
 
 `/about/index.md`:
-```render md
+```md
 ---
 title: 'about'
 menu: 'shelf'
@@ -227,7 +227,7 @@ menu: 'shelf'
 ```
 
 `/about/stuff.md`:
-```render md
+```md
 ---
 title: 'stuff'
 menu: 'shelf'
@@ -241,7 +241,7 @@ menu: 'shelf'
 Now when you query by **route** for the **shelf** menu, you will only see menu items associated with the base path of either `/docs` (if you're viewing /docs) or `/about`(if you're viewing /about).
 
 
-```render js
+```js
 const response = await client.query({
   query: MenuQuery,
   variables: {
@@ -256,7 +256,7 @@ Despite having the same menu declared in all 4 pages, by including `route:` vari
 
 The object result for `/docs` is:
 
-```render js
+```js
 "menu":{
   "item": {"label": "shelf", "link": "na"},
   "children":[{
@@ -273,7 +273,7 @@ The object result for `/docs` is:
 
 The object result for `/about` is:
 
-```render js
+```js
 "menu":{
   "item": {"label": "shelf", "link": "na"},
   "children":[{

@@ -68,7 +68,7 @@ Add the email address associated with your account and your global api key from 
 
 At the root of your project add '.github/workflows/main.yml'
 
-```yml
+```bash
 name: Deploy production site
 
 on:
@@ -102,7 +102,7 @@ jobs:
 
 In the same directory as main.yml create a file 'chromium-lib-install.sh'
 
-```sh
+```bash
 #!/usr/bin/bash
 
 sudo apt-get update \\

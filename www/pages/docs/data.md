@@ -15,7 +15,7 @@ Having to repeat things when programming is no fun, and that's why (web) compone
 
 As an example, if you are developing a blog site, like in our [Getting Started](/getting-started/) guide, having to list a couple blogs posts by hand isn't so bad.
 
-```render html
+```html
 <ul>
   <li><a href="/blog/2019/first-post.md">First Post</li></a>
   <li><a href="/blog/2019/second-post.md">Second Post</li></a>
@@ -26,7 +26,7 @@ But what happens over time, when that list grows to 10, 50, 100+ posts?  Imagine
 
 Instead, Greenwood uses GraphQL + Apollo to make that a reality!  So instead of a static list, you can do something like this!
 
-```render javascript
+```javascript
 render() {
   return html\`
     <ul>
@@ -50,7 +50,7 @@ To kick things off, let's review what is available to you.  Currently, the main 
 
 
 This is what the schema looks like:
-```render javascript
+```javascript
 graph {
   id, // (string) the unique ID given to the generated component as it's selector e.g. \`<wc-md-id></wc-md-id>\`
 
@@ -77,7 +77,7 @@ Below are the queries available:
 The Graph query returns an array of all pages.
 
 ###### Definition
-```render javascript
+```javascript
 query {
   graph {
     id,
@@ -92,7 +92,7 @@ query {
 
 ###### Usage
 `import` the query in your component
-```render javascript
+```javascript
 import client from '@greenwood/cli/data/client';
 import GraphQuery from '@greenwood/cli/data/queries/graph';
 
@@ -112,7 +112,7 @@ async connectedCallback() {
 
 ###### Response
 This will return the full `graph` of all pages as an array
-```render javascript
+```javascript
 [
   {
     id: "dd1ec2ef00cc386",
@@ -141,7 +141,7 @@ See [Menus](/docs/menu) for documentation on querying for custom menus.
 The Children query returns an array of all pages below a given top level route.
 
 ###### Definition
-```render javascript
+```javascript
 query {
   children {
     id,
@@ -156,7 +156,7 @@ query {
 
 ###### Usage
 `import` the query in your component
-```render javascript
+```javascript
 import client from '@greenwood/cli/data/client';
 import ChildrenQuery from '@greenwood/cli/data/queries/children';
 
@@ -179,7 +179,7 @@ async connectedCallback() {
 
 ###### Response
 This will return the full `graph` of all pages as an array that are under a given root, e.g. _/blog_.
-```render javascript
+```javascript
 [
   {
     id: "dd1ec2ef00cc386",
@@ -204,7 +204,7 @@ This will return the full `graph` of all pages as an array that are under a give
 The Config query returns the configuration values from your _greenwood.config.js_.  Useful for populating tags like `<title>` and `<meta>`.
 
 ###### Definition
-```render javascript
+```javascript
 query {
   config {
   	devServer {
@@ -228,7 +228,7 @@ query {
 
 ###### Usage
 `import` the query in your component
-```render javascript
+```javascript
 import client from '@greenwood/cli/data/client';
 import ConfigQuery from '@greenwood/cli/data/queries/config';
 
@@ -248,7 +248,7 @@ async connectedCallback() {
 
 ###### Response
 This will return an object of youf _greenwood.config.js_ as an object.  Example:
-```render javascript
+```javascript
 {
   devServer: {
     port: 1984,
@@ -268,7 +268,7 @@ This will return an object of youf _greenwood.config.js_ as an object.  Example:
 You can of course come up with your own as needed!  Greenwood provides the [`gql-tag`](https://github.com/apollographql/graphql-tag) module and will also resolve _.gql_ or _.graphql_ file extensions!
 
 ###### example:
-```render javascript
+```javascript
 /* src/data/my-query.gql */
 query {
   graph {
@@ -278,7 +278,7 @@ query {
 ```
 
 Or within your component
-```render javascript
+```javascript
 import gql from 'graphql-tag';  // comes with Greenwood
 
 const query = gql\`
@@ -296,7 +296,7 @@ Then you can use `import` anywhere in your components!
 ##### Complete Example
 Now of course comes the fun part, actually seeing it all come together.  Here is an example from the Greenwood website's own [header component](https://github.com/ProjectEvergreen/greenwood/blob/master/www/components/header/header.js).
 
-```render javascript
+```javascript
 import { LitElement, html } from 'lit-element';
 import client from '@greenwood/cli/data/client';
 import MenuQuery from '@greenwood/cli/data/queries/menu';
