@@ -2,7 +2,7 @@
 title: 'Netlify CMS'
 menu: side
 linkheadings: 3
-index: 4
+index: 6
 ---
 
 ## Using a CMS
