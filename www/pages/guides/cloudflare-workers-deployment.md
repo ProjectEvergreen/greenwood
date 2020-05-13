@@ -15,25 +15,25 @@ This will require a paid account with Cloudflare (currently $5 per month) with a
 
 You will need to globally install Cloudflare's CLI tool _Wrangler_
 
-```render bash
+```bash
 yarn add global @cloudflare/wrangler
 ```
 
 In the root of your project directory initialize _Wrangler_
 
-```render bash
+```bash
 wrangler init
 ```
 
 Authenticate your cloudflare account with:
 
-```render bash
+```bash
 wrangler config
 ```
 
 A _wrangler.toml_ file was generated at the root of your project directory, update it like this...
 
-```render toml
+```toml
 name = "demo" //workers.dev subdomain name automatically named for the directory
 type = "webpack"
 account_id = "abcd12345...." //your account id
@@ -48,13 +48,13 @@ entry-point = "workers-site"
 
 Compile your code
 
-```render bash
+```bash
 greenwood build
 ```
 
 Then push your code to Cloudflare workers
 
-```render bash
+```bash
 wrangler publish
 ```
 
@@ -68,7 +68,7 @@ Add the email address associated with your account and your global api key from 
 
 At the root of your project add '.github/workflows/main.yml'
 
-```render yml
+```yml
 name: Deploy production site
 
 on:
@@ -102,7 +102,7 @@ jobs:
 
 In the same directory as main.yml create a file 'chromium-lib-install.sh'
 
-```render sh
+```sh
 #!/usr/bin/bash
 
 sudo apt-get update \\

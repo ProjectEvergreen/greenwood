@@ -22,7 +22,7 @@ If you did not set your permissions to open when you created the bucket, go to "
 
 Still in (or click on) the "Permissions" tab, click "Bucket Policy" and add the following snippet (putting in your buckets name)
 
-```render json
+```json
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -51,7 +51,7 @@ Add your AWS Secret KEY and KEY ID to the repositories GitHub secrets.
 
 At the root of your project add '.github/workflows/main.yml'
 
-```render yml
+```yml
 name: Upload Website to S3
 
 on:
@@ -89,7 +89,7 @@ jobs:
 
 In the same directory as main.yml create a file 'chromium-lib-install.sh'
 
-```render sh
+```sh
 #!/usr/bin/bash
 
 sudo apt-get update \\

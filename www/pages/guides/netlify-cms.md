@@ -27,7 +27,7 @@ Within your project's directory, create a folder `public` and within it create a
 
 Inside the `public/admin/` directory create a file called `config.yml` this will contain the necessary Netlify configuration for each individual project.
 
-```render yaml
+```yaml
 backend:
   name: git-gateway
   branch: master # Branch to update (optional; defaults to master)
@@ -54,7 +54,7 @@ This will provide us with the bare minimum needed to configure the admin UI of t
 
 Inside the `public/admin/` directory create another file called `index.html` this will contain the necessary Netlify CMS interface and identity widget.
 
-```render html
+```html
 <!doctype html>
 <html>
 <head>
@@ -73,9 +73,9 @@ Inside the `public/admin/` directory create another file called `index.html` thi
 
 #### Identity Widget
 
-Along with the admin UI, we also need to readd the identity widget script element within our page-template.js so that it will be accessible from any page.  Within our `src/components/templates/page-template.js` you need to add the following script element within the render function:
+Along with the admin UI, we also need to readd the identity widget script element within our page-template.js so that it will be accessible from any page.  Within our `src/components/templates/page-template.js` you need to add the following script element within the function:
 
-```render javascript
+```javascript
   render() {
     return html\`
       ...
