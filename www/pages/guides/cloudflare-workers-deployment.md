@@ -68,7 +68,7 @@ Add the email address associated with your account and your global api key from 
 
 At the root of your project add '.github/workflows/main.yml'
 
-```bash
+```yml
 name: Deploy production site
 
 on:
