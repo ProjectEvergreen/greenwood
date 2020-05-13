@@ -26,7 +26,6 @@ class PageTemplate extends LitElement {
   }
 
   connectedCallback() {
-    console.log('ENTER page template updated', window.location.pathname);
     super.connectedCallback();
     this.route = window.location.pathname;
   }
@@ -34,7 +33,6 @@ class PageTemplate extends LitElement {
   render() {
     const { route } = this;
     const page = route.split('/')[1];
-    console.log('ENTER page template  template render - page', page);
 
     return html`
       <style>

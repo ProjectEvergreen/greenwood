@@ -13,7 +13,6 @@ MDIMPORT;
 class HomeTemplate extends LitElement {
 
   render() {
-    console.log('ENTER home template render');
     return html`
       <style>
         ${homeCss}

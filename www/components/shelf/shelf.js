@@ -33,17 +33,15 @@ class Shelf extends LitElement {
   }
 
   expandRoute(path) {
-    console.log('ENTER expand route - path (winwdow.location.pathname)', path);
     let routeShelfListIndex = this.shelfList.findIndex(list => {
       let expRoute = new RegExp(`^${path}$`);
       return expRoute.test(list.item.link);
     });
-    console.log('expand route - routeShelfListIndex', routeShelfListIndex);
+
     if (routeShelfListIndex > -1) {
       this.shelfList[routeShelfListIndex].selected = true;
       this.selectedIndex = routeShelfListIndex;
     }
-    console.log('expand route - selectedIndex', this.selectedIndex);
   }
 
   collapseAll() {
@@ -84,16 +82,6 @@ class Shelf extends LitElement {
   }
 
   async fetchShelfData() {
-    console.log('ENTER fetchShelfData');
-    // await client.query({
-    //   query: MenuQuery,
-    //   variables: {
-    //     name: 'side',
-    //     route: `/${this.page}/`,
-    //     order: 'index_asc'
-    //   }
-    // });
-
     return await client.query({
       query: MenuQuery,
       variables: {
@@ -105,12 +93,9 @@ class Shelf extends LitElement {
   }
 
   async updated(changedProperties) {
-    console.log('ENTER updated - changedProperties', changedProperties);
-    console.log('updated - this.page', this.page);
     if (changedProperties.has('page') && this.page !== '' && this.page !== '/') {
       const response = await this.fetchShelfData();
       this.shelfList = response.data.menu.children;
-      console.log('fetchShelfData - ', this.shelfList);
 
       this.expandRoute(window.location.pathname);
       this.requestUpdate();
@@ -155,7 +140,6 @@ class Shelf extends LitElement {
   }
 
   render() {
-    console.log('ENTER shelf render');
     return html`
       <style>
         ${css}
