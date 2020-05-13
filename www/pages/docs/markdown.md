@@ -1,3 +1,11 @@
+---
+label: 'markdown'
+menu: side
+title: 'Markdown'
+index: 4
+linkheadings: 3
+---
+
 ## Markdown
 In this section we'll cover some of the Markdown related feature of Greenwood, which by default supports the [CommonMark](https://commonmark.org/help/) specification.
 

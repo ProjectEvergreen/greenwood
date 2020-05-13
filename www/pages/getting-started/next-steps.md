@@ -1,3 +1,10 @@
+---
+label: 'next'
+menu: side
+title: 'Next Steps'
+index: 7
+---
+
 ## Next Steps
 
 ## About Greenwood

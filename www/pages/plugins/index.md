@@ -1,3 +1,10 @@
+---
+label: 'plugins'
+menu: navigation
+title: Plugins
+index: 4
+---
+
 ## Plugins
 
 At its core, Greenwood provides a CLI to drive all the development related workflows for a Greenwood project.  The CLI aims to provide a simple interface for quickly and simply building sites from as little as markdown files.

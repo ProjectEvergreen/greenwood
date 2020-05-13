@@ -1,3 +1,11 @@
+---
+label: 'templates'
+menu: side
+title: 'Templates and Pages'
+index: 6
+linkheadings: 3
+---
+
 ## Templates
 Greenwood has two types of templates:
 - App Template: The [app shell](https://developers.google.com/web/fundamentals/architecture/app-shell) if you will, that wraps all pages.  This is provided for you by Greenwood, but you can override if needed. (though not recommended)
@@ -12,13 +20,10 @@ Here is an example `page-template.js` (the [default](https://github.com/ProjectE
 ```js
 import { html, LitElement } from 'lit-element';
 MDIMPORT;
-METAIMPORT;
-METADATA;
 
 class PageTemplate extends LitElement {
   render() {
     return html\`
-      METAELEMENT
       <div class='wrapper'>
         <div class='page-template content'>
           <entry></entry>
@@ -43,6 +48,7 @@ MDIMPORT;
 `MDIMPORT;` Tells Greenwood to import a markdown file into this component.  But we also have to define where the compiled markdown element(page) will be placed within our page-template.  Hence below within our `render()` method you will see the `<entry></entry>` element. That defines exactly where to place it.
 
 
+<<<<<<< HEAD
 ```js
 METAIMPORT;
 METADATA;
@@ -50,6 +56,8 @@ METADATA;
 
 `METAIMPORT;` and `METADATA;` hook variables import the default greenwood meta component and data which handles all your configured meta data.  You can then render this component within the `render()` method using the `METAELEMENT` variable hook.
 
+=======
+>>>>>>> 43258fffccb21770e3e46bb8b37216ff482b7fb5
 The complete example can be found in the [greenwood source](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/page-template.js) which is the default page-template.js if no other is defined.
 
 With a completed page-template.js present in your `src/templates/` folder you can define which page uses it via front-matter at the top of any markdown file.  See [Front Matter Docs](/docs/front-matter#define-template) for more information.  Simply including a file named `page-template.js` will overwrite the greenwood default template for all markdown files, without needing to declare the template at the top of markdown file.

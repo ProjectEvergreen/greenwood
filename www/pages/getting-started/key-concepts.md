@@ -1,3 +1,11 @@
+---
+label: 'concepts'
+menu: side
+title: 'Key Concepts'
+index: 2
+linkheadings: 3
+---
+
 ## Overview
 In the [previous section](/getting-started/project-setup) we setup our local development environment and installed Greenwood.  We also made a "workspace" for our project files in a directory called _src/_.
 
@@ -42,13 +50,10 @@ For reference, here's what the default page template included by Greenwood looks
 ```javascript
 import { html, LitElement } from 'lit-element';
 MDIMPORT;
-METAIMPORT;
-METADATA;
 
 class PageTemplate extends LitElement {
   render() {
     return html\`
-      METAELEMENT
       <div class='wrapper'>
         <div class='page-template content'>
           <entry></entry>
@@ -61,7 +66,7 @@ class PageTemplate extends LitElement {
 customElements.define('page-template', PageTemplate);
 ```
 
-> Don't worry too much about the capitalized expressions, this is discussed in more detail in our [docs](/docs/template/).  Also, as seen here, Greenwood provides a version of [**LitElement**](https://lit-element.polymer-project.org/) by default that you can use for your own components if you would like.
+> Don't worry too much about the capitalized expression, this is discussed in more detail in our [docs](/docs/template/).  Also, as seen here, Greenwood provides a version of [**LitElement**](https://lit-element.polymer-project.org/) by default that you can use for your own components if you would like.
 
 
 ### Pages

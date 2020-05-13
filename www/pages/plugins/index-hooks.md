@@ -1,3 +1,10 @@
+---
+label: 'index-hooks'
+menu: side
+title: 'Index Hooks'
+index: 2
+---
+
 ## Index Hooks
 
 It is common when working with certain libraries (3rd party or otherwise) that scripts _must_ be loaded globally and / or unbundled.  Greenwood provides some prefined places in its _index.html_ that can be used to inject custom HTML which can be used to inject scripts for things like polyfills and analytics.

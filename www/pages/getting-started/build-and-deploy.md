@@ -1,3 +1,10 @@
+---
+label: 'deploy'
+menu: side
+title: 'Build and Deploy'
+index: 6
+---
+
 ## Build and Deploy
 
 Congrats!  After all your good work making your first site with Greenwood, it's now time to take it live!

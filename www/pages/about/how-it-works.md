@@ -1,3 +1,11 @@
+---
+label: 'how-it-works'
+menu: side
+title: 'How It Works'
+index: 1
+linkheadings: 3
+---
+
 ## How It Works
 Following similar motivations and inspirations as other [Project Evergreen](https://github.com/ProjectEvergreen/) projects like [Create Evergreen App](https://github.com/ProjectEvergreen/create-evergreen-app), Greenwood aims to provide a build and development workflow designed for the modern web and leveraging great open source projects in the NodeJS ecosystem.
 

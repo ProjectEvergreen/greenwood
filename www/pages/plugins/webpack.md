@@ -1,3 +1,10 @@
+---
+label: 'webpack'
+menu: side
+title: 'Webpack Plugins'
+index: 3
+---
+
 ## Webpack Plugins
 
 > This is an experimental API! [YMMV](http://onlineslangdictionary.com/meaning-definition-of/your-mileage-may-vary)

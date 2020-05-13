@@ -1,3 +1,11 @@
+---
+label: 'css-components'
+menu: side
+title: 'Styles and Web Components'
+index: 5
+linkheadings: 3
+---
+
 ## CSS and Web Components
 
 So now that we've made some [content](/getting-started/creating-content/) for your site, I think we can agree it's not quite all "there" yet and could benefit from a little styling and branding.
