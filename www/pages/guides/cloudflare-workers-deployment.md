@@ -2,7 +2,7 @@
 title: 'Cloudflare Workers Deployment'
 menu: side
 linkheadings: 3
-index: 2
+index: 4
 ---
 
 ## Cloudflare Workers Deployment
