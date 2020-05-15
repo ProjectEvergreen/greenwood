@@ -23,14 +23,14 @@ module.exports = async (req, context) => {
       /* Take the same query from request, and repeat the query for our server side cache */
       const { query, variables } = req.body;
 
-      let { data } = await client.query({
+      const { data } = await client.query({
         query: gql`${query}`,
         variables
       });
 
       if (data) {
         const cache = JSON.stringify(client.extract());
-        const md5 = crypto.createHash('md5').update(cache).digest('hex');
+        const md5 = crypto.createHash('md5').update(query + JSON.stringify(variables)).digest('hex');
 
         /* Get the requests entire (full) route and rootRoute to use as reference for designated cache directory */
         const { origin, referer } = req.headers;
@@ -39,8 +39,10 @@ module.exports = async (req, context) => {
         const targetDir = path.join(context.publicDir, rootRoute);
         const targetFile = path.join(targetDir, `${md5}-cache.json`);
 
-        await fs.mkdirs(targetDir, { recursive: true });
-        await fs.writeFile(path.join(targetFile), cache, 'utf8');
+        if (!fs.existsSync(targetFile)) {
+          fs.mkdirsSync(targetDir, { recursive: true });
+          fs.writeFileSync(path.join(targetFile), cache, 'utf8');
+        }
       }
       resolve();
     } catch (err) {
