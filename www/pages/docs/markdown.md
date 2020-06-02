@@ -14,6 +14,13 @@ When rendering code fencing, if you add the language after the fencing, the incl
 
 e.g. use:
 
+````js
+\`\`\`js
+const hello = "world";
+
+<p>\${hello}</p>
+\`\`\`
+````
 
 To get the result:
 

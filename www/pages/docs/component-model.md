@@ -16,12 +16,12 @@ _footer.js_
 class FooterComponent extends HTMLElement {
   constructor() {
     super();
-
-		// create a closed Shadow DOM
+    
+    // create a closed Shadow DOM
     this.root = this.attachShadow({ mode: 'closed' });
   }
-
-	// run some code when the component is ready
+  
+  // run some code when the component is ready
   connectedCallback() {
     this.root.innerHTML = this.getTemplate();
   }
