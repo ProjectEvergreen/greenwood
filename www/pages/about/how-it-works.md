@@ -29,14 +29,14 @@ Greenwood promotes an "evergreen" build that ensures that the code delivered to 
 Greenwood builds off of **Babel** and **PostCSS** by leveraging the `env` presets available for [**Babel**](https://babeljs.io/docs/en/babel-preset-env) and [**PostCSS**](https://preset-env.cssdb.org/), which are made possible courtesy of an awesome tool called [**Browserslist**](https://github.com/browserslist/browserslist).  Essentially, **Browserlist** allows querying of [CanIUse](https://caniuse.com/) data to determine, based on the browser query provided, what features are / aren't needed for transpilation.  This in turn allows **Babel** and **PostCSS** to intelligenty transpile only what's needed for the features that are missing, thus ensuring an "evergreen" experience for users _and_ developers.  Nice. 😎
 
 So to [target modern evergreen browsers](https://github.com/babel/babel/issues/7789) for example, a _.browserslistrc_ would look like this:
-```render shell
+```shell
 > 1%
 not op_mini all
 not ie 11
 ```
 
 When run against the `browserslist`, we can see what the support will be for that configuration will be:
-```render shell
+```shell
 $ npx browserslist
 and_chr 67
 and_uc 11.8
@@ -55,7 +55,7 @@ _In this way, as browsers and usage matures, so will the generated JavaScript co
 As discussed above, Greenwood is able to leverage a build that can intelligently transpile projects to meet the widest use case of modern evergreen browsers as well as IE11!  This means your users will get the syntax their browsers understand (courtesy of [**core-js**](https://babeljs.io/docs/en/babel-preset-env#corejs)) while allowing developers to write modern code.  (Stage 2+ with some exceptions.)
 
 The full list of support browsers supported right now is:
-```render shell
+```shell
 $ npx browserslist
 and_chr 75
 and_uc 12.12

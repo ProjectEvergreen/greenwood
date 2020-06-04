@@ -19,7 +19,7 @@ What we'll cover in this section:
 1. Using Greenwood's development server
 
 To go along with this guide, check out our [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started) that has a working example of all the code covered in this Getting Started guide.  In the end, what you will end up with is a project looking something like this:
-```render shell
+``` shell
 .
 ├── package-lock.json
 ├── package.json
@@ -46,7 +46,7 @@ Out of the box, Greenwood provides some default content, so even if we use our n
 Neat!  But naturally you're here to learn how to make your own site, and this is our goal!  The first step towards making your site is to create a home page.  For this site, the home page will be a "full width" page.
 
 For this template, create a _page-template.js_ in a directory located at _src/templates/_ (make the _templates/_ directory if it doesn't exist) and include this code in it:
-```render javascript
+```javascript
 import { html, LitElement } from 'lit-element';
 MDIMPORT;
 
@@ -74,7 +74,7 @@ customElements.define('page-template', PageTemplate);
 We just made a template for our home page, but for our blog posts, we're going to want a different layout for that.  So what do we do?   Just create a new template!
 
 Create a _blog-template.js_ in _src/templates/_ and include this code in it.
-```render javascript
+```javascript
 import { html, LitElement } from 'lit-element';
 MDIMPORT;
 
@@ -101,7 +101,7 @@ customElements.define('page-template', BlogTemplate);
 ### Creating Pages
 To make our home page which will use the default _page-template.js_ layout we just created, create an _index.md_ file in the _src/pages/_ directory.
 
-```render md
+```md
 ## Home Page
 
 This is the Getting Started home page!
@@ -117,7 +117,7 @@ For your blog posts, we can give them their own unique URLs by simply putting th
 You'll want to create a folder called _blog/_ in _src/pages/_ (make that _pages/_ directory if it doesn't exist) and then create two markdown files called _first-post.md_ and _second-post.md_.
 
 _first-post.md_
-```render md
+```md
 ---
 template: 'blog'
 ---
@@ -129,7 +129,7 @@ Lorem Ipsum
 ```
 
 _second-post.md_
-```render md
+```md
 ---
 template: 'blog'
 ---
@@ -145,7 +145,7 @@ We are using something called ["front matter"](/docs/front-matter) to specify th
 ### Development Server
 At this point we have two page templates and three pages of content, so let's fire up the Greenwood development server and see what things look like!
 
-```render bash
+```bash
 # using the npm script we made during project setup
 $ npm start
 ```

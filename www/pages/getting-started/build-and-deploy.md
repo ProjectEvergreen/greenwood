@@ -12,7 +12,7 @@ Congrats!  After all your good work making your first site with Greenwood, it's 
 ### Building For Production
 If you'll recall from the project setup section, we created an npm script for running Greenwood's build command.  If you don't already have it in your _package.json_ you will want to add this to your scripts section.
 
-```render bash
+```bash
 // after
 "scripts": {
   ...

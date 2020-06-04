@@ -26,7 +26,7 @@ Each plugin type requires two properties.
 - `provider`: A function that will be invoked by Greenwood during the build, determined by the `type`.  Can accept  a `compilation` param that provides read-only access to parts of Greenwood's state and configuration that can be used by a plugin.
 
 Here is an example of creating a plugin in a _greenwood.config.js_.
-```render javascript
+```javascript
 module.exports = {
 
   ...
@@ -46,7 +46,7 @@ module.exports = {
 #### Config
 This is Greenwood's default configuration options merged with any user provided configuration options in _greenwood.config.js_.  See the [configuration docs](/docs/configuration/) for more info.
 
-```render javascript
+```javascript
 module.exports = {
 
   title: 'My Blog',
@@ -73,7 +73,7 @@ Here are paths you can get from `context`, all of which are absolute URLs:
 - `assetDir`: Path to the _assets/_ directory in the workspace
 
 Example using `context` to write to `publicDir` from _greenwood.config.js_
-```render javascript
+```javascript
 const fs = require('fs');
 const path = require('path');
 

@@ -17,7 +17,8 @@ Right now Greenwood supports the following hook types:
 
 ## Usage
 Below is an example of creating an index hook for loading Google Analytics from a _greenwood.config.js_.
-```render javascript
+
+```js
 module.exports = {
 
   ...
@@ -35,18 +36,16 @@ module.exports = {
           </script>
           <script async src='https://www.google-analytics.com/analytics.js'></script>
         \`
-      ]
+      }
     }
   }]
-
 }
 ```
-
 ### Custom Index File
 It should be noted that if these specific hook types are too limiting Greenwood supports providing your own _index.html_ in the root of your workspace directory.  This can either be used to define your own hooks or just hardcode everything you need instead of using plugins.
 
 The minimum recommended markup for a custom _index.html_ would be this following:
-```render html
+```html
 <!DOCTYPE html>
 <html lang="en" prefix="og:http://ogp.me/ns#">
   <head>
@@ -71,7 +70,7 @@ The minimum recommended markup for a custom _index.html_ would be this following
 ```
 
 To add your own hook, define it in a _greenwood.config.js_
-```render javascript
+```js
 module.exports = {
 
   ...
@@ -93,7 +92,7 @@ module.exports = {
 
 
 And updated _index.html_
-```render html
+```html
 <!DOCTYPE html>
 <html lang="en" prefix="og:http://ogp.me/ns#">
 

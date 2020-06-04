@@ -11,7 +11,7 @@ You will need an account, go to [https://firebase.google.com/](https://firebase.
 
 Install the Firebase CLI tool:
 
-```render bash
+```bash
 npm i -g firebase-tools
 ```
 
@@ -23,13 +23,13 @@ In your browser go to your firebase console
 
 In your Terminal, log into your firebase account
 
-```render bash
+```bash
 firebase login
 ```
 
 Initialize your project
 
-```render bash
+```bash
 firebase init
 ```
 
@@ -37,19 +37,19 @@ Use the arrows to highlight 'Hosting: Configure and deploy Firebase Hosting site
 
 Compile your code:
 
-```render bash
+```bash
 yarn build
 ```
 
 then
 
-```render bash
+```bash
 firebase use --add
 ```
 
 select the targeted project, add an alias (referenced in the .firebaserc file at the root of your project, you can just use 'default') for the deployment, then
 
- ```render bash
+ ```bash
 firebase deploy
 ```
 
@@ -59,14 +59,14 @@ Your application will be accessible now at the domain <YOUR-FIREBASE-APP>.fireba
 
 Add your firebase token to GitHub Secrets as 'FIREBASE_TOKEN'; to get this run:
 
-```render bash
+```bash
 firebase login:ci
 ```
 
 
 At the root of your project add '.github/workflows/main.yml'
 
-```render yml
+```yml
 name: Firebase Deployment
 
 on:
@@ -96,7 +96,7 @@ jobs:
 
 In the same directory as main.yml create a file 'chromium-lib-install.sh'
 
-```render sh
+```bash
 #!/usr/bin/bash
 
 sudo apt-get update \\

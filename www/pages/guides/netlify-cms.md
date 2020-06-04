@@ -13,9 +13,7 @@ This guide builds off the previous guides. If you haven't been following along, 
 
 You will also need a free [netlify account](www.netlify.com).
 
-```render
 <img src="/assets/netlify-cms.jpg" alt="netlify-cms" style="max-width:800px;"/>
-```
 
 ### Setup Netlify CMS
 
@@ -27,7 +25,7 @@ Within your project's directory, create a folder `public` and within it create a
 
 Inside the `public/admin/` directory create a file called `config.yml` this will contain the necessary Netlify configuration for each individual project.
 
-```render yaml
+```yaml
 backend:
   name: git-gateway
   branch: master # Branch to update (optional; defaults to master)
@@ -54,7 +52,7 @@ This will provide us with the bare minimum needed to configure the admin UI of t
 
 Inside the `public/admin/` directory create another file called `index.html` this will contain the necessary Netlify CMS interface and identity widget.
 
-```render html
+```html
 <!doctype html>
 <html>
 <head>
@@ -73,9 +71,9 @@ Inside the `public/admin/` directory create another file called `index.html` thi
 
 #### Identity Widget
 
-Along with the admin UI, we also need to readd the identity widget script element within our page-template.js so that it will be accessible from any page.  Within our `src/components/templates/page-template.js` you need to add the following script element within the render function:
+Along with the admin UI, we also need to readd the identity widget script element within our page-template.js so that it will be accessible from any page.  Within our `src/components/templates/page-template.js` you need to add the following script element within the function:
 
-```render javascript
+```javascript
   render() {
     return html\`
       ...
@@ -98,17 +96,14 @@ With that completed, save and recommit all your changes to your repository. If y
 
 Now we can return to Netlify.com make sure you register, login, and click "new site from git" button.
 
-```render
 <img src="/assets/netlify-create-new.png" alt="netlify-create-new" style="max-width:800px;"/>
-```
+
 
 Click GitHub and then you must authorize netlify to read your repositories.
 
 Finally, select your project's repository then and the build command: `npm run build` and the publish directory: `public` like this:
 
-```render
 <img src="/assets/netlify-deploy.png" alt="netlify-deploy" style="max-width:700px;"/>
-```
 
 Click **Deploy Site** and you're site will now be deployed to a randomly generated url at netlfy.com
 
@@ -120,17 +115,14 @@ Click the **Enable Identity** button
 
 It's up to you if you want registration to be open/invite only.  Click **Edit Settings** Under the **Registration preferences** subheading to change between open/invite.
 
-```render
 <img src="/assets/netlify-registration.png" alt="netlify-registration" style="max-width:800px;"/>
-```
 
 Under **External Providers** in the drop down menu click "Add Provider" -> "GitHub" and then **Enable Github**
 
 If you chose **invite only** are you registration method, you need to invite yourself and others using the "Identity" page which is linked at the top navigation bar. From here you can click **Invite Users** to invite any email address you need.
 
-```render
 <img src="/assets/netlify-invite.png" alt="netlify-invite" style="max-width:700px;"/>
-```
+
 
 #### Configure Services
 
@@ -138,9 +130,7 @@ The final step is to **Enable Git Gateway** from the **Services** Menu
 
 Click **Edit Settings** then click "Generate access token in Github"
 
-```render
 <img src="/assets/netlify-git-gateway.png" alt="netlify--git-gateway" style="max-width:800px;"/>
-```
 
 To automatically generate an access token from and for the GitHub API
 
@@ -155,16 +145,13 @@ If you've been following along, you should now be viewing the netlify CMS admin 
 
 From this page, you can see the default `blog` content type that we added in our netlify cms configuration file. When we create and publish a new `blog` page it will publish to the `/public/blog` folder in your repository.
 
-```render
 <img src="/assets/netlify-admin.png" alt="netlify-cms" style="max-width:800px;"/>
-```
+
 #### Create Content
 
 Click **New Blog** button. You will be greeted with a WYSIWYG(what you see is what you get) content form.
 
-```render
 <img src="/assets/netlify-cms.jpg" alt="netlify-cms" style="max-width:800px;"/>
-```
 
 Add a **title** of `example` which will be used for our page's URL, as defined by our configuration. For example the title `Hello World Howdy` would be available at the url https://yourgeneratedurl-ads6387.netlify.com/blog/hello-world-howdy when publsihed.
 
@@ -176,9 +163,7 @@ When completed click **Save** at the top.  A pull request will automatically be 
 
 You can change the **status** to "In Review". Netlify CMS will then tag that same pull request as `netlify-cms/pending_review`.  Pending reviews can be read by selecting **Workflow** from netlify CMS navigation menu.
 
-```render
 <img src="/assets/netlify-workflow.png" alt="netlify-cms" style="max-width:800px;"/>
-```
 
 If you select your example page from the `In Review` section you can edit/update/delete the page.
 
