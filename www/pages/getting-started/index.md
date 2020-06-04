@@ -10,6 +10,7 @@ First off, thank you for taking the time to check out Greenwood!  As a tool, we 
 
 ## Your First Project
 To get things started, we first want to make sure everyone can get their first project up and running as easily and quickly as possible, and so through this guide, we will help walk you through everything you need to get started with your first project, including:
+
 1. Setting up your workspace and installing Greenwood
 1. Reviewing key concepts of Greenwood
 1. Creating content and developing locally
