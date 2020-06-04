@@ -13,6 +13,7 @@ After setting up our [project workspace](/getting-started/project-setup/) and re
 In this section, we'll walk through developing a site with Greenwood, and making some content.  We'll provide all the code, so you can just follow along.  By the end, you'll have a simple blog starter that you can build and deploy to any web server you like, be it Netlify, Apache, Express, or S3.  What you do from there, is all up to you!
 
 What we'll cover in this section:
+
 1. Home Page Template: Single column layout for our home page
 1. Blog Page Template: Two column layout for our blog posts
 1. Blog Posts: A couple sample pages of content to get you going written in markdown

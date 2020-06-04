@@ -2,7 +2,7 @@
 label: 'concepts'
 menu: side
 title: 'Key Concepts'
-index: 2
+index: 3
 linkheadings: 3
 ---
 
@@ -12,6 +12,7 @@ In the [previous section](/getting-started/project-setup) we setup our local dev
 Although Greenwood works without any configuration or setup, (go ahead, run `npm run build`, you'll get a default site right out of the box!), you will of course want to create your own site with your own content.
 
 For this reason, the minimum requirements for a site that you will want to be familiar with are:
+
 1. Workspace
 1. Template(s)
 1. Page(s)
