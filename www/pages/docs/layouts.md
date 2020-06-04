@@ -83,13 +83,13 @@ const store = createStore(
 
 // Next we need to import a list of files that will be generated when Greenwood is run
 import '../index/index.js';
-import './list';
 
 // Finally we can connect to our store and define our component.
 connectRouter(store);
 
-// Add a \`MYROUTES\` predefined hook. This is where all your routes will be loaded.
+// Add the MY-ROUTES(without dash) predefined hook. This is where all your routes will be loaded.
 // You may also opt to define a custom 404 route here.
+// You must define the app-template with the element name eve-app
 class AppComponent extends LitElement {
   render() {
     return html\`
@@ -99,7 +99,7 @@ class AppComponent extends LitElement {
   }
 }
 
-customElements.define('app-root', AppComponent);
+customElements.define('eve-app', AppComponent);
 ```
 
 > A working example can be found in the [greenwood source](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js) which is the default _app-template.js_ if no other is defined.
