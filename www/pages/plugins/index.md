@@ -2,6 +2,7 @@
 label: 'plugins'
 menu: navigation
 title: Plugins
+index: 4
 ---
 
 ## Plugins
