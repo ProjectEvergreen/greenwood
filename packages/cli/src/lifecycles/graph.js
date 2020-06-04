@@ -76,6 +76,16 @@ const createGraphFromPages = async (pagesDir, config) => {
                 // set <title></title> element text, override with markdown title
                 title = title || '';
 
+                // create webpack chunk name based on route and page name
+                const routes = route.lastIndexOf('/') === route.length - 1 && route.lastIndexOf('/') > 0
+                  ? route.substring(1, route.length - 1).split('/')
+                  : route.substring(1, route.length).split('/');
+                let chunkName = 'page';
+
+                routes.forEach(subDir => {
+                  chunkName += '--' + subDir;
+                });
+
                 /*
                 * Variable Definitions
                 *----------------------
@@ -90,6 +100,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                 * imported into app.js root component
                 * title: the head <title></title> text
                 * meta: og graph meta array of objects { property/name, content }
+                * chunkName: generated chunk name for webpack bundle
                 */
                 const customData = attributes;
 
@@ -135,7 +146,8 @@ const createGraphFromPages = async (pagesDir, config) => {
                   fileName,
                   relativeExpectedPath,
                   title,
-                  meta
+                  meta,
+                  chunkName
                 };
               }
 

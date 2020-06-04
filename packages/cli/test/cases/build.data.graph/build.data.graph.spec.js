@@ -69,8 +69,28 @@ describe('Build Greenwood With: ', function() {
         expect(await glob.promise(path.join(this.context.publicDir, './index.*.bundle.js'))).to.have.lengthOf(1);
       });
 
-      it('should output one cache.json file', async function() {
+      it('should output one (unified) cache.json file', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, './cache.json'))).to.have.lengthOf(1);
+      });
+
+      it('should output one (unified) cache.json file that is defined', function() {
+        const cacheContents = require(path.join(this.context.publicDir, 'cache.json'));
+
+        expect(cacheContents).to.not.be.undefined;
+      });
+
+      it('should output three (partial) *-cache.json files, one per query made', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, './*-cache.json'))).to.have.lengthOf(3);
+      });
+
+      it('should output three (partial) *-cache.json files that are all defined', async function() {
+        const cacheFiles = await glob.promise(path.join(this.context.publicDir, './*-cache.json'));
+
+        cacheFiles.forEach(file => {
+          const cache = require(file);
+
+          expect(cache).to.not.be.undefined;
+        });
       });
 
       it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {
@@ -110,14 +130,28 @@ describe('Build Greenwood With: ', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'blog', 'first-post', 'index.html'))).to.be.true;
       });
 
-      it('should output one cache.json file', async function() {
+      it('should output one (unified) cache.json file', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'blog', 'cache.json'))).to.have.lengthOf(1);
       });
 
-      it('should output one cache.json file to be defined', function() {
+      it('should output one (unified) cache.json file that is defined', function() {
         const cacheContents = require(path.join(this.context.publicDir, 'blog', 'cache.json'));
 
         expect(cacheContents).to.not.be.undefined;
+      });
+
+      it('should output four ("partial") *-cache.json files, one per query made', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'blog', './*-cache.json'))).to.have.lengthOf(4);
+      });
+
+      it('should output four (partial) *-cache.json files that are defined', async function() {
+        const cacheFiles = await glob.promise(path.join(this.context.publicDir, 'blog', './*-cache.json'));
+
+        cacheFiles.forEach(file => {
+          const cache = require(file);
+
+          expect(cache).to.not.be.undefined;
+        });
       });
 
       it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {

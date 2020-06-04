@@ -17,29 +17,14 @@ class Shelf extends LitElement {
 
   constructor() {
     super();
+    this.page = '';
     this.selectedIndex = '';
     this.shelfList = [];
-    this.page = '';
   }
 
   async connectedCallback() {
     super.connectedCallback();
-    if (this.page !== '' && this.page !== '/') {
-      const response = await client.query({
-        query: MenuQuery,
-        variables: {
-          name: 'side',
-          route: window.location.pathname,
-          order: 'index_asc'
-        }
-      });
-
-      this.shelfList = response.data.menu.children;
-      this.requestUpdate();
-    }
-
     this.collapseAll();
-    this.expandRoute(window.location.pathname);
   }
 
   goTo(path) {
@@ -48,7 +33,6 @@ class Shelf extends LitElement {
   }
 
   expandRoute(path) {
-    // find list item containing current window.location.pathname
     let routeShelfListIndex = this.shelfList.findIndex(list => {
       let expRoute = new RegExp(`^${path}$`);
       return expRoute.test(list.item.link);
@@ -57,8 +41,6 @@ class Shelf extends LitElement {
     if (routeShelfListIndex > -1) {
       this.shelfList[routeShelfListIndex].selected = true;
       this.selectedIndex = routeShelfListIndex;
-      // force re-render
-      this.requestUpdate();
     }
   }
 
@@ -97,6 +79,27 @@ class Shelf extends LitElement {
     this.setSelectedItem(evt);
     // force re-render
     this.requestUpdate();
+  }
+
+  async fetchShelfData() {
+    return await client.query({
+      query: MenuQuery,
+      variables: {
+        name: 'side',
+        route: `/${this.page}/`,
+        order: 'index_asc'
+      }
+    });
+  }
+
+  async updated(changedProperties) {
+    if (changedProperties.has('page') && this.page !== '' && this.page !== '/') {
+      const response = await this.fetchShelfData();
+      this.shelfList = response.data.menu.children;
+
+      this.expandRoute(window.location.pathname);
+      this.requestUpdate();
+    }
   }
 
   renderList() {

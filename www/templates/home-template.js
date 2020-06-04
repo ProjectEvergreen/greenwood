@@ -17,8 +17,6 @@ class HomeTemplate extends LitElement {
       <style>
         ${homeCss}
       </style>
-      <div class='wrapper'>
-        <eve-header></eve-header>
         <eve-banner></eve-banner>
         <div class='content-wrapper'>
           <eve-container fluid>
@@ -26,8 +24,6 @@ class HomeTemplate extends LitElement {
               <entry></entry>
             </div>
           </eve-container>
-        </div>
-        <eve-footer></eve-footer>
       </div>
     `;
   }
