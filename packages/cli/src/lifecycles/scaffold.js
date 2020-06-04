@@ -39,7 +39,7 @@ const writePageComponentsFromTemplate = async (compilation) => {
     let relPageDir = file.filePath.substring(context.pagesDir.length, file.filePath.length);
     let pagePath = '';
     const pathLastBackslash = relPageDir.lastIndexOf('/');
-    
+
     pagePath = path.join(context.scratchDir, file.fileName); // non-nested default
 
     if (pathLastBackslash !== 0) {
@@ -71,30 +71,25 @@ const writePageComponentsFromTemplate = async (compilation) => {
 
 };
 
-const writeListImportFile = async (compilation) => {
-  const importList = compilation.graph.map(file => {
-    return `import ${file.relativeExpectedPath};\n`;
-  });
-
-  // Create app directory so that app-template relative imports are correct
-  const appDir = path.join(compilation.context.scratchDir, 'app');
-  
-  await fs.ensureDir(appDir);
-  return await fs.writeFile(path.join(appDir, './list.js'), importList.join(''));
-};
-
 const writeRoutes = async(compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
       let data = await fs.readFile(compilation.context.appTemplatePath, 'utf8');
 
       const routes = compilation.graph.map(file => {
-        return `<lit-route path="${file.route}" component="eve-${file.label}"></lit-route>\n\t\t\t\t`;
+        return `<lit-route
+          path="${file.route}"
+          component="eve-${file.label}"
+          .resolve="\${() => import(/* webpackChunkName: "${file.chunkName}" */ ${file.relativeExpectedPath})}"
+          ></lit-route>`;
       });
 
       const result = data.toString().replace(/MYROUTES/g, routes.join(''));
+      // Create app directory so that app-template relative imports are correct
+      const appDir = path.join(compilation.context.scratchDir, 'app');
 
-      await fs.writeFile(path.join(compilation.context.scratchDir, 'app', './app.js'), result);
+      await fs.ensureDir(appDir);
+      await fs.writeFile(path.join(appDir, './app.js'), result);
 
       resolve();
     } catch (err) {
@@ -126,9 +121,6 @@ module.exports = generateScaffolding = async (compilation) => {
     try {
       console.log('Generate pages from templates...');
       await writePageComponentsFromTemplate(compilation);
-
-      console.log('Writing imports for md...');
-      await writeListImportFile(compilation);
 
       console.log('Writing Lit routes...');
       await writeRoutes(compilation);

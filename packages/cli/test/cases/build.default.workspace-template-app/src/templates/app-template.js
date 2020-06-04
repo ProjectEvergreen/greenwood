@@ -15,7 +15,6 @@ const store = createStore(
   compose(lazyReducerEnhancer(combineReducers), applyMiddleware(thunk)));
 
 import '../index/index';
-import './list';
 
 connectRouter(store);
 

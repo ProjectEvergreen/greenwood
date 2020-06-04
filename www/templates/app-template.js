@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit-element';
+import { html, css, LitElement } from 'lit-element';
 import { connectRouter } from 'lit-redux-router';
 import { applyMiddleware, createStore, compose as origCompose, combineReducers } from 'redux';
 import { lazyReducerEnhancer } from 'pwa-helpers/lazy-reducer-enhancer.js';
@@ -6,19 +6,29 @@ import thunk from 'redux-thunk';
 import client from '@greenwood/cli/data/client';
 import ConfigQuery from '@greenwood/cli/data/queries/config';
 import GraphQuery from '@greenwood/cli/data/queries/graph';
+import '../components/header/header';
+import '../components/footer/footer';
 
 // eslint-disable-next-line no-underscore-dangle
 const compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || origCompose;
 
-const store = createStore((state) => state,
-  compose(lazyReducerEnhancer(combineReducers), applyMiddleware(thunk))
-);
+// eslint-disable-next-line
+const store = createStore(
+  (state, action) => state, // eslint-disable-line
+  compose(lazyReducerEnhancer(combineReducers), applyMiddleware(thunk)));
 
 import '../index/index';
 
 connectRouter(store);
 
 class AppComponent extends LitElement {
+
+  static get styles() {
+    return css`
+    .content-outlet {
+      min-height: 100vh
+    }`;
+  }
 
   async connectedCallback() {
     super.connectedCallback();
@@ -58,7 +68,7 @@ class AppComponent extends LitElement {
     meta.forEach(metaItem => {
       const metaType = metaItem.rel // type of meta
         ? 'rel'
-        : metaItem.name 
+        : metaItem.name
           ? 'name'
           : 'property';
       const metaTypeValue = metaItem[metaType]; // value of the meta
@@ -71,8 +81,8 @@ class AppComponent extends LitElement {
         meta.setAttribute('rel', metaTypeValue);
         meta.setAttribute('href', metaItem.href);
       } else {
-        const metaContent = metaItem.property === 'og:url' 
-          ? `${metaItem.content}${currentPage.link}` 
+        const metaContent = metaItem.property === 'og:url'
+          ? `${metaItem.content}${currentPage.link}`
           : metaItem.content;
 
         meta.setAttribute(metaType, metaItem[metaType]);
@@ -80,7 +90,7 @@ class AppComponent extends LitElement {
       }
 
       const oldmeta = header.querySelector(`[${metaType}="${metaTypeValue}"]`);
-      
+
       // rehydration
       if (oldmeta) {
         header.replaceChild(meta, oldmeta);
@@ -92,8 +102,14 @@ class AppComponent extends LitElement {
 
   render() {
     return html`
-        MYROUTES
+      <div class='wrapper'>
+        <eve-header></eve-header>
+        <div class="content-outlet">
+          MYROUTES
+        </div>
         <lit-route><h1>404 Not found</h1></lit-route>
+        <eve-footer></eve-footer>
+      </div>
     `;
   }
 }
