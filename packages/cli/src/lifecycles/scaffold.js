@@ -81,7 +81,7 @@ const writeRoutes = async(compilation) => {
           path="${file.route}"
           component="eve-${file.label}"
           .resolve="\${() => import(/* webpackChunkName: "${file.chunkName}" */ ${file.relativeExpectedPath})}"
-          ></lit-route>\n\t\t\t\t`;
+          ></lit-route>`;
       });
 
       const result = data.toString().replace(/MYROUTES/g, routes.join(''));
