@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit-element';
+import { html, css, LitElement } from 'lit-element';
 import { connectRouter } from 'lit-redux-router';
 import { applyMiddleware, createStore, compose as origCompose, combineReducers } from 'redux';
 import { lazyReducerEnhancer } from 'pwa-helpers/lazy-reducer-enhancer.js';
@@ -22,6 +22,13 @@ import '../index/index';
 connectRouter(store);
 
 class AppComponent extends LitElement {
+
+  static get styles() {
+    return css`
+    .content-outlet {
+      min-height: 100vh
+    }`;
+  }
 
   async connectedCallback() {
     super.connectedCallback();
@@ -97,7 +104,9 @@ class AppComponent extends LitElement {
     return html`
       <div class='wrapper'>
         <eve-header></eve-header>
-        MYROUTES
+        <div class="content-outlet">
+          MYROUTES
+        </div>
         <lit-route><h1>404 Not found</h1></lit-route>
         <eve-footer></eve-footer>
       </div>
