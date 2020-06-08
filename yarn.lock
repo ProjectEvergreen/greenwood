@@ -856,10 +856,10 @@
   dependencies:
     lit-element "^2.0.1"
 
-"@evergreen-wc/eve-container@^0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@evergreen-wc/eve-container/-/eve-container-0.0.9.tgz#1e6dcb9bd21e70c35c75be0a1e5b63883efe1baa"
-  integrity sha512-RMXdd8UpmbVa+rJw67CTsx5sJ01WvKzc5JN6FXyIxd8AijU8NiHWlq0feMIGyLKpVbr7wy9T5QWdXB9p8EXw7w==
+"@evergreen-wc/eve-container@^0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@evergreen-wc/eve-container/-/eve-container-0.0.10.tgz#f27f9db8fc1e7ebdbd4e6afdfe3993189c00cfd8"
+  integrity sha512-ZkHhKcjcgKeUAbcjYowTmD6DYGu0mZoJtWef8qF/1XAbIZPsZhs+6QgQEuvergCOdm8SlBypjB0FjDOcYDY5Cw==
   dependencies:
     lit-element "^2.0.1"
 
