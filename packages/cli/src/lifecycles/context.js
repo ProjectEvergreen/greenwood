@@ -27,8 +27,8 @@ module.exports = initContexts = async({ config }) => {
       const userHasWorkspaceAppTemplate = await fs.exists(userAppTemplate);
       const userHasWorkspaceIndexTemplate = await fs.exists(path.join(userTemplatesDir, 'index.html'));
       const userHasWorkspaceNotFoundTemplate = await fs.exists(path.join(userTemplatesDir, '404.html'));
-      const userHasWorkspaceBabel = await fs.exists(path.join(process.cwd(), './', babelConfig));
-      const userHasWorkspacePostCSS = await fs.exists(path.join(process.cwd(), './', postcssConfig));
+      const userHasWorkspaceBabel = await fs.exists(path.join(process.cwd(), babelConfig));
+      const userHasWorkspacePostCSS = await fs.exists(path.join(process.cwd(), postcssConfig));
 
       let context = {
         scratchDir,
