@@ -10,11 +10,9 @@
  * greenwood build
  *
  * User Workspace
- * Greenwood default w/ nested page
+ * Greenwood default
  *  src/
  *   pages/
- *     about/
- *       index.md
  *     hello.md
  *     index.md
  */
@@ -41,7 +39,6 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
 
-    // hardcoding index smoke test here because of the nested route
     describe('Hello page with working @custom-media queries', function() {
       let dom;
 
