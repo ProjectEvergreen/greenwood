@@ -13,7 +13,7 @@ A number of core build configuration files can be overridden by creating each fi
 
 ### PostCSS
 
-To override the default **postcss.config.js** with your own preferred configuration, create a new postcss.config.js file within your project's root directory.
+To override the default **postcss.config.js** with your own configuration, create a new postcss.config.js file within your project's root directory.
 
 By default, the postcss.config.js being used:
 
@@ -82,13 +82,13 @@ module.exports = {
 
 ### Browserslist
 
-By default, the **.browserslist** file is found in the same directory as the babel.config.js.  IF you want to override it, include a **.browserslist** file within your project's root directory. You can specify an alternative path to the browserslist using the `configPath` setting of your `babel-preset-env` options within your **babel.config.js** file. 
+By default, the **.browserslist** file is found in the same directory as the babel.config.js.  If you want to override it, include a **.browserslist** file within your project's root directory. You can specify an alternative path to the browserslist using the `configPath` setting of your `babel-preset-env` options within your **babel.config.js** file. 
 
 > Note: If you use a default babel.config.js you need to include your own .browserslist file within the project's root directory
 
 By default, .browserslist is:
 
-```
+```js
 > 1%
 not op_mini all
 ie 11
