@@ -27,8 +27,8 @@ module.exports = initContexts = async({ config }) => {
       const userHasWorkspaceAppTemplate = await fs.exists(userAppTemplate);
       const userHasWorkspaceIndexTemplate = await fs.exists(path.join(userTemplatesDir, 'index.html'));
       const userHasWorkspaceNotFoundTemplate = await fs.exists(path.join(userTemplatesDir, '404.html'));
-      const userHasWorkspaceBabel = await fs.exists(path.join(config.workspace, babelConfig));
-      const userHasWorkspacePostCSS = await fs.exists(path.join(config.workspace, postcssConfig));
+      const userHasWorkspaceBabel = await fs.exists(path.join(process.cwd(), './', babelConfig));
+      const userHasWorkspacePostCSS = await fs.exists(path.join(process.cwd(), './', postcssConfig));
 
       let context = {
         scratchDir,
@@ -52,10 +52,10 @@ module.exports = initContexts = async({ config }) => {
         notFoundPageTemplate,
         assetDir: path.join(userHasWorkspace ? userWorkspace : defaultTemplatesDir, 'assets'),
         babelConfig: userHasWorkspaceBabel
-          ? path.join(config.workspace, babelConfig)
+          ? path.join(process.cwd(), './', babelConfig)
           : path.join(defaultConfigDir, babelConfig),
         postcssConfig: userHasWorkspacePostCSS
-          ? path.join(config.workspace, postcssConfig)
+          ? path.join(process.cwd(), './', postcssConfig)
           : path.join(defaultConfigDir, postcssConfig)
       };
 
