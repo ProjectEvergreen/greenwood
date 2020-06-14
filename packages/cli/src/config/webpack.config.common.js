@@ -111,7 +111,14 @@ module.exports = ({ config, context }) => {
         loader: 'wc-markdown-loader',
         options: {
           defaultStyle: false,
-          shadowRoot: false
+          shadowRoot: false,
+          preset: {
+            settings: { commonmark: true, bullet: '*', emphasis: '*', fences: true },
+            plugins: [
+              require('rehype-slug'),
+              require('rehype-autolink-headings')
+            ]
+          }
         }
       }, {
         test: /\.css$/,
