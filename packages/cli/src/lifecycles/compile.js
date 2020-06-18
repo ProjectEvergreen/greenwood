@@ -18,8 +18,6 @@ module.exports = generateCompilation = () => {
       console.log('Reading project config');
       compilation.config = await initConfig();
 
-      console.log(compilation.config);
-
       // determine whether to use default template or user detected workspace
       console.log('Initializing project workspace contexts');
       compilation.context = await initContext(compilation);
