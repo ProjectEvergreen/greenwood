@@ -25,7 +25,7 @@ const expect = require('chai').expect;
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-describe.only('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Markdown Configuration and Default Workspace';
   let setup;
 
