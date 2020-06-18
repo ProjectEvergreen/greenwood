@@ -30,7 +30,8 @@ module.exports = {
     settings: { commonmark: true },
     plugins: [
       require('rehype-slug'),
-      require('rehype-autolink-headings')
+      require('rehype-autolink-headings'),
+      require('remark-github')
     ]
   }
 };
