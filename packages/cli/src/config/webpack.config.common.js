@@ -111,7 +111,8 @@ module.exports = ({ config, context }) => {
         loader: 'wc-markdown-loader',
         options: {
           defaultStyle: false,
-          shadowRoot: false
+          shadowRoot: false,
+          preset: { ...config.markdown }
         }
       }, {
         test: /\.css$/,

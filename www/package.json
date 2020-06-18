@@ -8,6 +8,8 @@
   "license": "MIT",
   "dependencies": {
     "@evergreen-wc/eve-button": "^0.0.9",
-    "@evergreen-wc/eve-container": "^0.0.9"
+    "@evergreen-wc/eve-container": "^0.0.9",
+    "rehype-autolink-headings": "^3.0.0",
+    "rehype-slug": "^3.0.0"
   }
 }

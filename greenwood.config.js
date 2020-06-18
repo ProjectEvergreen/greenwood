@@ -24,7 +24,13 @@ module.exports = {
     ...pluginGoogleAnalytics({
       analyticsId: 'UA-147204327-1'
     }),
-
     ...pluginPolyfills()
-  ]
+  ],
+  markdown: {
+    settings: { commonmark: true },
+    plugins: [
+      require('rehype-slug'),
+      require('rehype-autolink-headings')
+    ]
+  }
 };
