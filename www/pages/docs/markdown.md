@@ -52,7 +52,7 @@ imports:
 
 > See our [component model docs](/docs/component-model) for more information on authoring custom elements / components.  For information on configuring additional page meta data, see our section on [front-matter](/docs/front-matter/).
 
-### Customize markdown
+### Customize Configuration
 Using your `greenwood.config.js`, within your project's root directory, you can add additional [unifiedjs presets](https://github.com/unifiedjs/unified#preset) and settings to the [wc-markdown-loader](https://github.com/hutchgrant/wc-markdown-loader/blob/master/src/parser.js#L30).
 
 For example:
