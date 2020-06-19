@@ -12,8 +12,10 @@ const program = require('commander');
 const generateCompilation = require('./lifecycles/compile');
 const runProdBuild = require('./tasks/build');
 const runDevServer = require('./tasks/develop');
+const ejectConfigFiles = require('./tasks/eject');
 const scriptPkg = require('../package.json');
-
+const compilation = {};
+let cmdOption = {};
 let MODE = '';
 
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
@@ -38,6 +40,15 @@ program
     MODE = cmd._name;
   });
 
+program
+  .command('eject')
+  .option('-a, --all', 'eject all configurations including babel, postcss, browserslistrc')
+  .description('Eject greenwood configurations.')
+  .action((cmd) => {
+    MODE = cmd._name;
+    cmdOption.all = cmd.all;
+  });
+
 program.parse(process.argv);
 
 if (program.parse.length === 0) {
@@ -47,11 +58,12 @@ if (program.parse.length === 0) {
 const run = async() => {
   
   try {
-    const compilation = await generateCompilation();
     
     switch (MODE) {
-
+      
       case 'build':
+        compilation = await generateCompilation();
+
         console.log('Building project for production.'.yellow);
         
         await runProdBuild(compilation);
@@ -62,11 +74,21 @@ const run = async() => {
         
         break;
       case 'develop':
+        compilation = await generateCompilation();
+
         console.log('Starting local development server'.yellow);        
         
         await runDevServer(compilation);
         
         console.log('Development mode activiated'.green);
+
+        break;
+      case 'eject':
+        console.log('Ejecting configurations'.yellow);
+
+        await ejectConfigFiles(cmdOption.all);
+        
+        console.log(`Configurations ejected successfully to ${process.cwd()}`.green);
 
         break;
       default: 
