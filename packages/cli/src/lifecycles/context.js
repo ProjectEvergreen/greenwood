@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const defaultTemplatesDir = path.join(__dirname, '../templates/');
+const defaultConfigDir = path.join(__dirname, '../config');
 const scratchDir = path.join(process.cwd(), './.greenwood/');
 const publicDir = path.join(process.cwd(), './public');
 
@@ -16,6 +17,8 @@ module.exports = initContexts = async({ config }) => {
       const userPageTemplate = path.join(userTemplatesDir, 'page-template.js');
       const indexPageTemplate = 'index.html';
       const notFoundPageTemplate = '404.html';
+      const webpackProd = 'webpack.config.prod.js';
+      const webpackDev = 'webpack.config.develop.js';
 
       const userHasWorkspace = await fs.exists(userWorkspace);
       const userHasWorkspacePages = await fs.exists(userPagesDir);
@@ -24,6 +27,8 @@ module.exports = initContexts = async({ config }) => {
       const userHasWorkspaceAppTemplate = await fs.exists(userAppTemplate);
       const userHasWorkspaceIndexTemplate = await fs.exists(path.join(userTemplatesDir, 'index.html'));
       const userHasWorkspaceNotFoundTemplate = await fs.exists(path.join(userTemplatesDir, '404.html'));
+      const userHasWorkspaceWebpackProd = await fs.exists(path.join(process.cwd(), webpackProd));
+      const userHasWorkspaceWebpackDevelop = await fs.exists(path.join(process.cwd(), webpackDev));
 
       let context = {
         scratchDir,
@@ -45,7 +50,13 @@ module.exports = initContexts = async({ config }) => {
           : path.join(defaultTemplatesDir, notFoundPageTemplate),
         indexPageTemplate,
         notFoundPageTemplate,
-        assetDir: path.join(userHasWorkspace ? userWorkspace : defaultTemplatesDir, 'assets')
+        assetDir: path.join(userHasWorkspace ? userWorkspace : defaultTemplatesDir, 'assets'),
+        webpackProd: userHasWorkspaceWebpackProd
+          ? path.join(process.cwd(), './', webpackProd)
+          : path.join(defaultConfigDir, webpackProd),
+        webpackDevelop: userHasWorkspaceWebpackDevelop
+          ? path.join(process.cwd(), './', webpackDev)
+          : path.join(defaultConfigDir, webpackDev)
       };
 
       if (!await fs.ensureDir(scratchDir)) {
