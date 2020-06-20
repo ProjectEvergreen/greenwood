@@ -14,7 +14,7 @@ const runProdBuild = require('./tasks/build');
 const runDevServer = require('./tasks/develop');
 const ejectConfigFiles = require('./tasks/eject');
 const scriptPkg = require('../package.json');
-const compilation = {};
+let compilation = {};
 let cmdOption = {};
 let MODE = '';
 
