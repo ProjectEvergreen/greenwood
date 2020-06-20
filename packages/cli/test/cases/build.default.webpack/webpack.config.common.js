@@ -57,7 +57,7 @@ module.exports = ({ config, context }) => {
       loader: 'postcss-loader',
       options: {
         config: {
-          path: path.join(__dirname, 'postcss.config.js')
+          path: path.join(__dirname, '../../..', './src/config', 'postcss.config.js')
         }
       }
     }
@@ -105,7 +105,7 @@ module.exports = ({ config, context }) => {
         test: /\.js$/,
         loader: 'babel-loader',
         options: {
-          configFile: path.join(__dirname, 'babel.config.js')
+          configFile: path.join(__dirname, '../../..', './src/config', 'babel.config.js')
         }
       }, {
         test: /\.md$/,

@@ -19,7 +19,7 @@ const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 const { version } = require('../../../package.json');
 
-describe('Build Greenwood With: ', function() {
+describe.only('Build Greenwood With: ', function() {
   const mockBanner = `My Banner - v${version}`;
   const LABEL = 'Custom Webpack Configuration';
   let setup;
