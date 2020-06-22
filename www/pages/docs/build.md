@@ -12,7 +12,7 @@ A number of core build configuration files can be overridden by creating each fi
 
 ### Eject Configurations
 
-From greenwood CLI you can eject core configuration files(webpack, postcss, babel, browserslistrc) into your project's working directory which will make it easier to add your own customizations.  To do so, add the following to your package.json `scripts` object:
+From greenwood CLI you can eject [core configuration files(webpack, postcss, babel, browserslistrc)](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/config) into your project's working directory which will make it easier to add your own customizations.  To do so, add the following to your package.json `scripts` object:
 
 **package.json**
 
@@ -30,7 +30,7 @@ From greenwood CLI you can eject core configuration files(webpack, postcss, babe
 You can then run:
 
 ```bash
-$ yarn eject
+$ npm run eject
 ```
 
 To run the eject task which copies all the configuration files into your project's working directory.
