@@ -26,5 +26,12 @@ module.exports = {
     }),
 
     ...pluginPolyfills()
-  ]
+  ],
+  markdown: {
+    plugins: [
+      require('rehype-slug'),
+      require('rehype-autolink-headings'),
+      require('remark-github')
+    ]
+  }
 };
