@@ -8,7 +8,7 @@ linkheadings: 3
 
 # Build Configurations
 
-A number of core build configuration files can be overridden by creating each file within the root path of your project. You can also automate this task in a single command [see eject configurations](#eject-configurations).
+A number of [core build configuration files](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/config) can be overridden by creating each file within the root path of your project. You can also automate this task in a single command [see eject configurations](#eject-configurations).
 
 ### Eject Configurations
 
