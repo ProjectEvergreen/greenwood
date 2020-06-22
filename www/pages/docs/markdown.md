@@ -52,22 +52,5 @@ imports:
 
 > See our [component model docs](/docs/component-model) for more information on authoring custom elements / components.  For information on configuring additional page meta data, see our section on [front-matter](/docs/front-matter/).
 
-### Customize Configuration
-Using your `greenwood.config.js`, within your project's root directory, you can add additional [unifiedjs presets](https://github.com/unifiedjs/unified#preset) and settings to the [wc-markdown-loader](https://github.com/hutchgrant/wc-markdown-loader/blob/master/src/parser.js#L30).
-
-For example:
-
-*greenwood.config.js*
-```js
-module.exports = {
-  markdown: {
-    settings: { commonmark: true },
-    plugins: [
-      require('rehype-slug'),
-      require('rehype-autolink-headings')
-    ]
-  }
-}
-```
-
-Keep in mind, the point in the chain in which [these configured presets will be inserted](https://github.com/hutchgrant/wc-markdown-loader/blob/master/src/parser.js#L30) is in rehype and ends with converting rehype to html.  Any conversion from rehype to retext must convert first from rehype and end with being converted back to rehype. 
+### Configuration
+Using your `greenwood.config.js`, within your project's root directory, you can have additional [markdown customizations and configurations](/docs/configuration#markdown) using unified presets.

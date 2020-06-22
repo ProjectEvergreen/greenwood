@@ -116,3 +116,23 @@ module.exports = {
   workspace: path.join(__dirname, 'www'),
 }
 ```
+
+### Markdown
+Using your `greenwood.config.js`, within your project's root directory, you can add additional [unifiedjs presets](https://github.com/unifiedjs/unified#preset) and settings to the [wc-markdown-loader](https://github.com/hutchgrant/wc-markdown-loader/blob/master/src/parser.js#L30).
+
+#### Example
+
+*greenwood.config.js*
+```js
+module.exports = {
+  markdown: {
+    settings: { commonmark: true },
+    plugins: [
+      require('rehype-slug'),
+      require('rehype-autolink-headings')
+    ]
+  }
+}
+```
+
+Keep in mind, the point in the chain in which [these configured presets will be inserted](https://github.com/hutchgrant/wc-markdown-loader/blob/master/src/parser.js#L30) is in rehype and ends with converting rehype to html.
