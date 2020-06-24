@@ -19,6 +19,8 @@ module.exports = initContexts = async({ config }) => {
       const notFoundPageTemplate = '404.html';
       const webpackProd = 'webpack.config.prod.js';
       const webpackDev = 'webpack.config.develop.js';
+      const babelConfig = 'babel.config.js';
+      const postcssConfig = 'postcss.config.js';
 
       const userHasWorkspace = await fs.exists(userWorkspace);
       const userHasWorkspacePages = await fs.exists(userPagesDir);
@@ -29,6 +31,8 @@ module.exports = initContexts = async({ config }) => {
       const userHasWorkspaceNotFoundTemplate = await fs.exists(path.join(userTemplatesDir, '404.html'));
       const userHasWorkspaceWebpackProd = await fs.exists(path.join(process.cwd(), webpackProd));
       const userHasWorkspaceWebpackDevelop = await fs.exists(path.join(process.cwd(), webpackDev));
+      const userHasWorkspaceBabel = await fs.exists(path.join(process.cwd(), babelConfig));
+      const userHasWorkspacePostCSS = await fs.exists(path.join(process.cwd(), postcssConfig));
 
       let context = {
         scratchDir,
@@ -56,7 +60,13 @@ module.exports = initContexts = async({ config }) => {
           : path.join(defaultConfigDir, webpackProd),
         webpackDevelop: userHasWorkspaceWebpackDevelop
           ? path.join(process.cwd(), './', webpackDev)
-          : path.join(defaultConfigDir, webpackDev)
+          : path.join(defaultConfigDir, webpackDev),
+        babelConfig: userHasWorkspaceBabel
+          ? path.join(process.cwd(), './', babelConfig)
+          : path.join(defaultConfigDir, babelConfig),
+        postcssConfig: userHasWorkspacePostCSS
+          ? path.join(process.cwd(), './', postcssConfig)
+          : path.join(defaultConfigDir, postcssConfig)
       };
 
       if (!await fs.ensureDir(scratchDir)) {
