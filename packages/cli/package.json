@@ -72,5 +72,9 @@
     "webpack-dev-server": "^3.2.1",
     "webpack-manifest-plugin": "^2.0.4",
     "webpack-merge": "^4.2.1"
+  },
+  "devDependencies": {
+    "rehype-autolink-headings": "^4.0.0",
+    "rehype-slug": "^3.0.0"
   }
 }
