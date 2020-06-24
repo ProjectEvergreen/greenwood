@@ -56,7 +56,7 @@ module.exports = ({ config, context }) => {
       loader: 'postcss-loader',
       options: {
         config: {
-          path: path.join(__dirname, 'postcss.config.js')
+          path: context.postcssConfig
         }
       }
     }
@@ -104,14 +104,15 @@ module.exports = ({ config, context }) => {
         test: /\.js$/,
         loader: 'babel-loader',
         options: {
-          configFile: path.join(__dirname, 'babel.config.js')
+          configFile: context.babelConfig
         }
       }, {
         test: /\.md$/,
         loader: 'wc-markdown-loader',
         options: {
           defaultStyle: false,
-          shadowRoot: false
+          shadowRoot: false,
+          preset: { ...config.markdown }
         }
       }, {
         test: /\.css$/,
