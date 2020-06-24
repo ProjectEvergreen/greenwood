@@ -12,7 +12,8 @@ let defaultConfig = {
   title: 'My App',
   meta: [],
   plugins: [],
-  themeFile: 'theme.css'
+  themeFile: 'theme.css',
+  markdown: { plugins: [], settings: {} }
 };
 
 module.exports = readAndMergeConfig = async() => {
@@ -24,7 +25,7 @@ module.exports = readAndMergeConfig = async() => {
 
       if (await fs.exists(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, publicPath, title, meta, plugins, themeFile } = userCfgFile;
+        const { workspace, devServer, publicPath, title, meta, plugins, themeFile, markdown } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -117,6 +118,11 @@ module.exports = readAndMergeConfig = async() => {
               // console.log(`custom port provided => ${customConfig.devServer.port}`);
             }
           }
+        }
+
+        if (markdown && Object.keys(markdown).length > 0) {
+          customConfig.markdown.plugins = markdown.plugins && markdown.plugins.length > 0 ? markdown.plugins : [];
+          customConfig.markdown.settings = markdown.settings ? markdown.settings : {};
         }
       }
       resolve({ ...defaultConfig, ...customConfig });

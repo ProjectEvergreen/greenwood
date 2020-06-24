@@ -24,7 +24,6 @@ module.exports = {
     ...pluginGoogleAnalytics({
       analyticsId: 'UA-147204327-1'
     }),
-
     ...pluginPolyfills()
   ]
 };
