@@ -1,4 +1,3 @@
-const path = require('path');
 const webpack = require('webpack');
 const serializeBuild = require('../lifecycles/serialize');
 
@@ -19,7 +18,7 @@ module.exports = runProductionBuild = async(compilation) => {
 
 // eslint-disable-next-line no-unused-vars
 const runWebpack = async (compilation) => {
-  const webpackConfig = require(path.join(__dirname, '..', './config/webpack.config.prod.js'))(compilation);
+  const webpackConfig = require(compilation.context.webpackProd)(compilation);
 
   return new Promise(async (resolve, reject) => {
 

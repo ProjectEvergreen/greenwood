@@ -17,6 +17,8 @@ module.exports = initContexts = async({ config }) => {
       const userPageTemplate = path.join(userTemplatesDir, 'page-template.js');
       const indexPageTemplate = 'index.html';
       const notFoundPageTemplate = '404.html';
+      const webpackProd = 'webpack.config.prod.js';
+      const webpackDev = 'webpack.config.develop.js';
       const babelConfig = 'babel.config.js';
       const postcssConfig = 'postcss.config.js';
 
@@ -27,6 +29,8 @@ module.exports = initContexts = async({ config }) => {
       const userHasWorkspaceAppTemplate = await fs.exists(userAppTemplate);
       const userHasWorkspaceIndexTemplate = await fs.exists(path.join(userTemplatesDir, 'index.html'));
       const userHasWorkspaceNotFoundTemplate = await fs.exists(path.join(userTemplatesDir, '404.html'));
+      const userHasWorkspaceWebpackProd = await fs.exists(path.join(process.cwd(), webpackProd));
+      const userHasWorkspaceWebpackDevelop = await fs.exists(path.join(process.cwd(), webpackDev));
       const userHasWorkspaceBabel = await fs.exists(path.join(process.cwd(), babelConfig));
       const userHasWorkspacePostCSS = await fs.exists(path.join(process.cwd(), postcssConfig));
 
@@ -51,6 +55,12 @@ module.exports = initContexts = async({ config }) => {
         indexPageTemplate,
         notFoundPageTemplate,
         assetDir: path.join(userHasWorkspace ? userWorkspace : defaultTemplatesDir, 'assets'),
+        webpackProd: userHasWorkspaceWebpackProd
+          ? path.join(process.cwd(), './', webpackProd)
+          : path.join(defaultConfigDir, webpackProd),
+        webpackDevelop: userHasWorkspaceWebpackDevelop
+          ? path.join(process.cwd(), './', webpackDev)
+          : path.join(defaultConfigDir, webpackDev),
         babelConfig: userHasWorkspaceBabel
           ? path.join(process.cwd(), './', babelConfig)
           : path.join(defaultConfigDir, babelConfig),
