@@ -50,7 +50,7 @@ Example:
 <a 
   target="_blank" 
   rel="noopener" 
-  @onclick="getOutboundLink('www.mylink.com'); return false;" 
+  onclick="getOutboundLink('www.mylink.com');" 
   href="www.mylink.com">My Link
 </a>
 ```

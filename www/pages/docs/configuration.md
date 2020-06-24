@@ -9,7 +9,7 @@ linkheadings: 3
 ## Configuration
 These are all the supported configuration options in Greenwood, which you can define in a _greenwood.config.js_ file in your project's root directory.
 
-A _greenwood.config.js_ file with default values would be:
+A **greenwood.config.js** file with default values would be:
 ```js
 module.exports = {
   workspace: 'src',  // path.join(process.cwd(), 'src')

@@ -2,7 +2,7 @@
 label: 'front-matter'
 menu: side
 title: 'Front Matter'
-index: 3
+index: 4
 linkheadings: 3
 ---
 
