@@ -3,6 +3,7 @@ const fs = require('fs');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
+const { version } = require('../../../package.json');
 
 const getUserWorkspaceDirectories = (source) => {
   return fs.readdirSync(source)
@@ -56,7 +57,7 @@ module.exports = ({ config, context }) => {
       loader: 'postcss-loader',
       options: {
         config: {
-          path: context.postcssConfig
+          path: path.join(__dirname, '../../..', './src/config', 'postcss.config.js')
         }
       }
     }
@@ -84,7 +85,7 @@ module.exports = ({ config, context }) => {
     resolve: {
       extensions: ['.js', '.json', '.gql', '.graphql'],
       alias: {
-        '@greenwood/cli/data': path.join(__dirname, '..', './data')
+        '@greenwood/cli/data': path.join(__dirname, '../../..', './src', './data')
       }
     },
 
@@ -104,15 +105,14 @@ module.exports = ({ config, context }) => {
         test: /\.js$/,
         loader: 'babel-loader',
         options: {
-          configFile: context.babelConfig
+          configFile: path.join(__dirname, '../../..', './src/config', 'babel.config.js')
         }
       }, {
         test: /\.md$/,
         loader: 'wc-markdown-loader',
         options: {
           defaultStyle: false,
-          shadowRoot: false,
-          preset: { ...config.markdown }
+          shadowRoot: false
         }
       }, {
         test: /\.css$/,
@@ -164,7 +164,8 @@ module.exports = ({ config, context }) => {
           resource.request = resource.request.replace(/^\.\//, context.pagesDir);
         }
       ),
-
+      /// Custom plugin added to prove custom config is being used
+      new webpack.BannerPlugin(`My Banner - v${version}`),
       ...customWebpackPlugins
     ]
   };
