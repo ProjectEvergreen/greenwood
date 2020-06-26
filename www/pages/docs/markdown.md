@@ -2,7 +2,7 @@
 label: 'markdown'
 menu: side
 title: 'Markdown'
-index: 4
+index: 5
 linkheadings: 3
 ---
 
@@ -51,3 +51,6 @@ imports:
 ```
 
 > See our [component model docs](/docs/component-model) for more information on authoring custom elements / components.  For information on configuring additional page meta data, see our section on [front-matter](/docs/front-matter/).
+
+### Configuration
+Using your `greenwood.config.js`, within your project's root directory, you can have additional [markdown customizations and configurations](/docs/configuration#markdown) using unified presets.

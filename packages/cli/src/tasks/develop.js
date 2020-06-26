@@ -1,5 +1,4 @@
 const dataServer = require('../data/server');
-const path = require('path');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 
@@ -11,7 +10,7 @@ module.exports = runDevServer = async (compilation) => {
         console.log(`dataServer started at ${server.url}`);
       });
 
-      const webpackConfig = require(path.join(__dirname, '..', './config/webpack.config.develop.js'))(compilation);
+      const webpackConfig = require(compilation.context.webpackDevelop)(compilation);
       const devServerConfig = webpackConfig.devServer;
 
       let compiler = webpack(webpackConfig);

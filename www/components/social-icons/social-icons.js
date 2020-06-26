@@ -22,7 +22,7 @@ class SocialIcons extends LitElement {
         target="_blank" 
         rel="noreferrer noopener" 
         aria-label="open github page"
-        @onclick="getOutboundLink('${socialUrls.github}'); return false;" 
+        onclick="getOutboundLink('${socialUrls.github}');" 
       >${githubIcon}</a>
       
       <a href="${socialUrls.slack}"
@@ -30,14 +30,14 @@ class SocialIcons extends LitElement {
         target="_blank" 
         rel="noreferrer noopener"
         aria-label="slack"
-        @onclick="getOutboundLink('${socialUrls.slack}'); return false;" 
+        onclick="getOutboundLink('${socialUrls.slack}')" 
       >${slackIcon}</a>
       
       <a href="${socialUrls.twitter}" 
         target="_blank" 
         rel="noreferrer noopener" 
         aria-label="open twitter page"
-        @onclick="getOutboundLink('${socialUrls.twitter}'); return false;" 
+        onclick="getOutboundLink('${socialUrls.twitter}')" 
       >${twitterIcon}</a>
     `;
   }
