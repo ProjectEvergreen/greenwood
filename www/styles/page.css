@@ -8,6 +8,18 @@
     padding-top: 4rem;
   }
 
+  & h1, h2, h3, h4, h5 {
+    & a > span.icon {
+      width:24px;
+      height:24px;
+      float:left;
+      padding:2px;
+      background-image: url(/assets/link.png);
+      background-size: 24px 24px;
+      background-repeat: no-repeat;
+    }
+  }
+
   & .content-wrapper {
     display:flex;
 
