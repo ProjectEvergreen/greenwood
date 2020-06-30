@@ -121,4 +121,27 @@ describe('Eject Greenwood With: ', function() {
       });
     });
   });
+  describe('Eject and Build Ejected Config', function() {
+
+    before(async function() {
+      setup = new TestBed();
+      this.context = await setup.setupTestBed(__dirname);
+      await setup.runGreenwoodCommand('eject');
+      await setup.runGreenwoodCommand('build');
+    });
+
+    runSmokeTest(['public', 'index', 'not-found', 'hello'], 'Eject and Build Ejected Config');
+  });
+  after(function() {
+    setup.teardownTestBed();
+
+    // remove ejected files
+    const configFiles = fs.readdirSync(__dirname);
+
+    configFiles.forEach(file => {
+      if (file !== 'eject.default.spec.js') {
+        fs.remove(path.join(__dirname, file));
+      }
+    });
+  });
 });
