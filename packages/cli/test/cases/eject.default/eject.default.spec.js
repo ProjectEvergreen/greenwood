@@ -13,7 +13,7 @@ const path = require('path');
 const expect = require('chai').expect;
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Eject Greenwood With: ', function() {
+describe.only('Eject Greenwood With: ', function() {
   let setup;
 
   before(async function() {
@@ -57,7 +57,7 @@ describe('Eject Greenwood With: ', function() {
       const configFiles = fs.readdirSync(__dirname);
 
       configFiles.forEach(file => {
-        if (file !== 'eject.default.spec.js') {
+        if (file !== 'eject.default.spec.js' && file !== 'node_modules') {
           fs.remove(path.join(__dirname, file));
         }
       });
@@ -115,23 +115,23 @@ describe('Eject Greenwood With: ', function() {
       const configFiles = fs.readdirSync(__dirname);
 
       configFiles.forEach(file => {
-        if (file !== 'eject.default.spec.js') {
+        if (file !== 'eject.default.spec.js' && file !== 'node_modules') {
           fs.remove(path.join(__dirname, file));
         }
       });
     });
   });
+
   describe('Eject and Build Ejected Config', function() {
 
     before(async function() {
-      setup = new TestBed();
-      this.context = await setup.setupTestBed(__dirname);
       await setup.runGreenwoodCommand('eject');
       await setup.runGreenwoodCommand('build');
     });
 
     runSmokeTest(['public', 'index', 'not-found', 'hello'], 'Eject and Build Ejected Config');
   });
+
   after(function() {
     setup.teardownTestBed();
 
