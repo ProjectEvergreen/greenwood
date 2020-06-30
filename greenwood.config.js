@@ -25,5 +25,12 @@ module.exports = {
       analyticsId: 'UA-147204327-1'
     }),
     ...pluginPolyfills()
-  ]
+  ],
+  markdown: {
+    plugins: [
+      require('rehype-slug'),
+      require('rehype-autolink-headings'),
+      require('remark-github')
+    ]
+  }
 };

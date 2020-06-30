@@ -8525,6 +8525,11 @@ mdast-util-to-hast@^8.0.0:
     unist-util-position "^3.0.0"
     unist-util-visit "^2.0.0"
 
+mdast-util-to-string@^1.0.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/mdast-util-to-string/-/mdast-util-to-string-1.1.0.tgz#27055500103f51637bd07d01da01eb1967a43527"
+  integrity sha512-jVU0Nr2B9X3MU4tSK7JP1CMkSvOj7X5l/GboG1tKRw52lLF1x2Ju92Ms9tNetCcbfX3hzlM73zYo2NKkWSfF/A==
+
 mdn-data@2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/mdn-data/-/mdn-data-2.0.4.tgz#699b3c38ac6f1d728091a64650b65d388502fd5b"
@@ -11288,6 +11293,17 @@ release-zalgo@^1.0.0:
   integrity sha1-CXALflB0Mpc5Mw5TXFqQ+2eFFzA=
   dependencies:
     es6-error "^4.0.1"
+
+remark-github@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/remark-github/-/remark-github-9.0.0.tgz#1b769edde8b4286b754acce0374254be0d328e00"
+  integrity sha512-RquQVKfjP9MXK3+g8fO4NPJLjz+q5CaqLscq6ySWGh3GT5PzHyrN8dpTPT/SCQDTzdQYOdS1PDdt6ACa6FHU3w==
+  dependencies:
+    is-alphabetical "^1.0.0"
+    is-decimal "^1.0.0"
+    is-hexadecimal "^1.0.0"
+    mdast-util-to-string "^1.0.0"
+    unist-util-visit "^2.0.0"
 
 remark-parse@^8.0.1:
   version "8.0.1"

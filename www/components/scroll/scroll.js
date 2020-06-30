@@ -23,22 +23,21 @@ class scroll extends LitElement {
       const elements = this.querySelectorAll(selector);
 
       return Array.from(elements).filter((element) => {
-        return RegExp(text, 'gmi').test(element.textContent);
+        let el = RegExp(text, 'gmi').test(element.href);
+        let href = element.href;
+        if (el && href.substr(href.length - text.length, href.length) === text) {
+          return el;
+        }
       });
     };
 
     let { hash } = window.location;
 
-    if (hash) {
-      // clean hash string, remove # and replace - with spaces
-      hash = hash.replace('#', '').toLowerCase();
-      // for cases of multiple hyphens
-      hash = hash.replace(/-/g, ' ');
-      // query text
-      const heading = contains('h3', hash)[0];
-      if (heading !== undefined) {
-        heading.scrollIntoView(true);
-      }
+    // query hash text
+    const heading = contains('a', hash)[0];
+
+    if (heading !== undefined) {
+      heading.scrollIntoView(true);
     }
   }
 
