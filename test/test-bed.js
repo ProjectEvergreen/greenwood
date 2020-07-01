@@ -90,7 +90,8 @@ module.exports = class TestBed {
 
       const runner = os.platform() === 'win32' ? 'node.cmd' : 'node';
       const npm = spawn(runner, [cliPath, task], {
-        cwd: this.rootDir
+        cwd: this.rootDir,
+        shell: true
       });
 
       npm.on('close', code => {

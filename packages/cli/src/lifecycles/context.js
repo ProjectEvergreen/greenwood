@@ -4,6 +4,7 @@ const defaultTemplatesDir = path.join(__dirname, '../templates/');
 const defaultConfigDir = path.join(__dirname, '../config');
 const scratchDir = path.join(process.cwd(), './.greenwood/');
 const publicDir = path.join(process.cwd(), './public');
+const dataDir = path.join(__dirname, '../data');
 
 module.exports = initContexts = async({ config }) => {
 
@@ -33,8 +34,9 @@ module.exports = initContexts = async({ config }) => {
       const userHasWorkspaceWebpackDevelop = await fs.exists(path.join(process.cwd(), webpackDev));
       const userHasWorkspaceBabel = await fs.exists(path.join(process.cwd(), babelConfig));
       const userHasWorkspacePostCSS = await fs.exists(path.join(process.cwd(), postcssConfig));
-
+      
       let context = {
+        dataDir,
         scratchDir,
         publicDir,
         pagesDir: userHasWorkspacePages ? userPagesDir : defaultTemplatesDir,
