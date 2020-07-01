@@ -10,13 +10,18 @@
 
   & h1, h2, h3, h4, h5 {
     & a > span.icon {
-      width:24px;
+      width:28px;
       height:24px;
       float:left;
       padding:2px;
       background-image: url(/assets/link.png);
-      background-size: 24px 24px;
+      background-size: 20px 20px;
       background-repeat: no-repeat;
+      margin-top: 10px;
+
+      &:hover {
+        filter: invert(.4);
+      }
     }
   }
 
