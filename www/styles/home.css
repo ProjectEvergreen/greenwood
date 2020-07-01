@@ -3,7 +3,7 @@
     color: green;
   }
 
-  & .content {
+  & .gwd-content {
     background-color:white !important;
     margin: 0 auto;
     margin-top: 20px;
