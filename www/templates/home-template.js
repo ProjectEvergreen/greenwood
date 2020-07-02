@@ -18,9 +18,9 @@ class HomeTemplate extends LitElement {
         ${homeCss}
       </style>
         <eve-banner></eve-banner>
-        <div class='content-wrapper'>
+        <div class='gwd-content-wrapper'>
           <eve-container fluid>
-            <div class='page-template content single-column'>
+            <div class='gwd-page-template gwd-content'>
               <entry></entry>
             </div>
           </eve-container>

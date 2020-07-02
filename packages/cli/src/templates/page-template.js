@@ -4,8 +4,8 @@ MDIMPORT;
 class PageTemplate extends LitElement {
   render() {
     return html`
-      <div class='wrapper'>
-        <div class='page-template content'>
+      <div class='gwd-wrapper'>
+        <div class='gwd-page-template gwd-content'>
           <entry></entry>
         </div>
       </div>

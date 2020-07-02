@@ -36,12 +36,12 @@ class PageTemplate extends LitElement {
         ${pageCss}
       </style>
 
-      <div class='content-wrapper'>
-        <div class="sidebar">
+      <div class='gwd-content-wrapper'>
+        <div class="gwd-sidebar">
           <eve-shelf .page="${page}"></eve-shelf>
         </div>
 
-        <div class="content">
+        <div class="gwd-content">
           <eve-container fluid>
             <eve-scroll>
               <entry></entry>
