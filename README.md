@@ -30,12 +30,14 @@ Then in your _package.json_, you can run the CLI like so:
 ```javascript
 "scripts": {
   "build": "greenwood build",
-  "start": "greenwood develop"
+  "start": "greenwood develop",
+  "eject": "greenwood eject",
 }
 ```
 
 - `npm run build`: generates a static build of your project
 - `npm start`: starts a local development server for your project
+- `npm run eject`: ejects configurations to your working directory for additional customizations
 
 ## Documentation
 All of our documentation is on our [website](https://www.greenwoodjs.io/) (which itself is built by Greenwood!).  See our website documentation to learn more about:

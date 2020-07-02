@@ -8,6 +8,7 @@ linkheadings: 3
 
 # Build Configurations
 
+A number of [core build configuration files](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/config) can be overridden by creating each file within the root path of your project. You can also automate this task in a single command [see eject configurations](#eject-configurations).
 
 ### Babel
 
@@ -37,3 +38,28 @@ By default, [this is the postcss.config.js](https://github.com/ProjectEvergreen/
 
 The webpack config for production(`webpack.config.prod.js`) and development(`webpack.config.develop.js`) can be overridden by providing your own custom configuration within your project's directory.  You can eject the default core configurations into your project using greenwood cli [eject](#eject-configurations) command and then edit them after, which is the simplest and recommended method for modifying webpack config.  If you wish to revert back to the default provided configuration, simply delete these 2 files from your project's root directory. 
 A number of core build configuration files can be overridden by creating each file within the root path of your project.
+
+### Eject Configurations
+
+From greenwood CLI you can eject [core configuration files(webpack, postcss, babel, browserslistrc)](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/config) into your project's working directory which will make it easier to add your own customizations.  To do so, add the following to your package.json `scripts` object:
+
+**package.json**
+
+```js
+{
+  "scripts": {
+    "eject":  "greenwood eject --all",
+  }
+}
+
+```
+
+> Note: The `--all` option is to eject all config files. If you only want to eject webpack config files, remove the `--all`
+
+You can then run:
+
+```bash
+$ npm run eject
+```
+
+To run the eject task which copies all the configuration files into your project's working directory.
