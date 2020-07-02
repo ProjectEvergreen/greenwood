@@ -61,11 +61,11 @@ a {
   }
 }
 
-.content-wrapper {
+.gwd-content-wrapper {
   background-color: white;
 }
 
-.wrapper {
+.gwd-wrapper {
   background-color: white;
 
   & .single-column {

@@ -20,7 +20,7 @@
     }
   }
 
-  & .content-wrapper {
+  & .gwd-content-wrapper {
     display:flex;
 
     @media (max-width: 768px) {
@@ -28,7 +28,7 @@
     }
   }
 
-  & .sidebar {
+  & .gwd-sidebar {
     width: 400px;
     background-color: rgb(242, 236, 239);
     height: 100vh;
@@ -42,7 +42,7 @@
     }
   }
 
-  & .content {
+  & .gwd-content {
     width: calc(100vw - 400px);
     height: 100vh;
     overflow: scroll;
