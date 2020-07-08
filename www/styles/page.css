@@ -6,11 +6,12 @@
   & h3 {
     color: #2D3D3A;
     padding-top: 4rem;
+    font-size: 1.8rem !important;
   }
 
   & h2 {
     color: #2D3D3A;
-    font-size: 2.2rem;
+    font-size: 2rem;
   }
 
   & h4, h5, h6 {
