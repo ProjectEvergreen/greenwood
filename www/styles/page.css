@@ -8,7 +8,18 @@
     padding-top: 4rem;
   }
 
+  & h2 {
+    color: #2D3D3A;
+    font-size: 2.2rem;
+  }
+
+  & h4, h5, h6 {
+    font-size: 1.2rem;
+  }
+
   & h1, h2, h3, h4, h5 {
+    line-height: 1rem;
+
     & a > span.icon {
       width:28px;
       height:24px;
@@ -17,7 +28,6 @@
       background-image: url(/assets/link.png);
       background-size: 20px 20px;
       background-repeat: no-repeat;
-      margin-top: 10px;
 
       &:hover {
         filter: invert(.4);
