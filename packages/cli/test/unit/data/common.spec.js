@@ -6,9 +6,10 @@ describe('Unit Test: Data', function() {
 
   describe('Common', function() {
 
-    describe('generateQueryHash', function() {
+    describe('getQueryKeysHash', function() {
       
       describe('standard graph query', function () {
+        // __typename is added by server.js
         const query = gql`
           query {
             graph {
@@ -17,7 +18,8 @@ describe('Unit Test: Data', function() {
               link,
               filePath,
               fileName,
-              template
+              template,
+              __typename
             }
           }
         `;

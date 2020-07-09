@@ -9,7 +9,9 @@ function getQueryKeysFromSelectionSet(selectionSet) {
     if (key === 'selections') {
       console.log('key is a selection');
       console.log('unique items before', queryKeys);
-      queryKeys += selectionSet[key].map(selection => selection.name.value).join('');
+      queryKeys += selectionSet[key]
+        .filter(selection => selection.name.value !== '__typename') // __typename is added by server.js
+        .map(selection => selection.name.value).join('');
       console.log('unique items after', queryKeys);
       console.log('**************');
     }

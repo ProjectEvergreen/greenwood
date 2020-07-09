@@ -1,11 +1,11 @@
 const { ApolloClient } = require('apollo-client');
 const createHttpLink = require('apollo-link-http').createHttpLink;
-const crypto = require('crypto');
 const fetch = require('node-fetch');
 const fs = require('fs-extra');
 const { gql } = require('apollo-server');
 const InMemoryCache = require('apollo-cache-inmemory').InMemoryCache;
 const path = require('path');
+const { getQueryKeysHash } = require('./common');
 
 /* Extract cache server-side */
 module.exports = async (req, context) => {
@@ -22,15 +22,18 @@ module.exports = async (req, context) => {
 
       /* Take the same query from request, and repeat the query for our server side cache */
       const { query, variables } = req.body;
+      const queryObj = gql`${query}`;
+
+      console.log('cache query', query);
 
       const { data } = await client.query({
-        query: gql`${query}`,
+        query: queryObj,
         variables
       });
 
       if (data) {
         const cache = JSON.stringify(client.extract());
-        const md5 = crypto.createHash('md5').update(query + JSON.stringify(variables)).digest('hex');
+        const md5 = getQueryKeysHash(queryObj);
 
         /* Get the requests entire (full) route and rootRoute to use as reference for designated cache directory */
         const { origin, referer } = req.headers;

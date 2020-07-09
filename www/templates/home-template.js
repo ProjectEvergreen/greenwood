@@ -1,4 +1,7 @@
+import client from '@greenwood/cli/data/client';
+import gql from 'graphql-tag';
 import { html, LitElement } from 'lit-element';
+
 import '../components/banner/banner';
 import '../components/card/card';
 import '../components/header/header';
@@ -12,6 +15,23 @@ MDIMPORT;
 
 class HomeTemplate extends LitElement {
 
+  async connectedCallback() {
+    super.connectedCallback();
+    const response = await client.query({
+      query: gql`query {
+        graph {
+          title,
+          link,
+          data {
+            noop
+          }
+        }
+      }`
+    });
+
+    console.log('response', response);
+  }
+  
   render() {
     return html`
       <style>
