@@ -44,7 +44,7 @@ describe('Build Greenwood With: ', function() {
   
       it('should not contain any components within eve-app', function() {
         // prove that our custom broken babel config is being used
-        const outlet = dom.window.document.querySelector('body > eve-app').innerHTML;
+        const outlet = dom.window.document.querySelector('body > body-app').innerHTML;
         expect(outlet).to.equal('');
       });
 
