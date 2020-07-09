@@ -85,7 +85,8 @@ module.exports = ({ config, context }) => {
     resolve: {
       extensions: ['.js', '.json', '.gql', '.graphql'],
       alias: {
-        '@greenwood/cli/data': path.join(__dirname, '../../..', './src', './data')
+        '@greenwood/cli/data': path.join(__dirname, '../../..', './src', './data'),
+        '@greenwood/app-template': path.join(context.scratchDir, 'app', 'appTemplate.js')
       }
     },
 
