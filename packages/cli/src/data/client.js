@@ -1,7 +1,7 @@
 import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { HttpLink } from 'apollo-link-http';
-import { getQueryKeysHash } from '@greenwood/cli/data/common';
+import { getQueryHash } from '@greenwood/cli/data/common';
 
 const APOLLO_STATE = window.__APOLLO_STATE__; // eslint-disable-line no-underscore-dangle
 const client = new ApolloClient({
@@ -21,8 +21,8 @@ client.query = (params) => {
       ? ''
       : '/';
 
-    const hash = getQueryKeysHash(params.query);
-    const cachePath = `/${root}${rootSuffix}${hash}-cache.json`;
+    const queryHash = getQueryHash(params.query, params.variables);
+    const cachePath = `/${root}${rootSuffix}${queryHash}-cache.json`;
     
     console.log('cachePath', cachePath);
     return fetch(cachePath)

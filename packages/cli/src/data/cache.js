@@ -5,7 +5,7 @@ const fs = require('fs-extra');
 const { gql } = require('apollo-server');
 const InMemoryCache = require('apollo-cache-inmemory').InMemoryCache;
 const path = require('path');
-const { getQueryKeysHash } = require('./common');
+const { getQueryHash } = require('./common');
 
 /* Extract cache server-side */
 module.exports = async (req, context) => {
@@ -33,14 +33,13 @@ module.exports = async (req, context) => {
 
       if (data) {
         const cache = JSON.stringify(client.extract());
-        const md5 = getQueryKeysHash(queryObj);
-
+        const queryHash = getQueryHash(queryObj, variables);
         /* Get the requests entire (full) route and rootRoute to use as reference for designated cache directory */
         const { origin, referer } = req.headers;
         const fullRoute = referer.substring(origin.length, referer.length);
         const rootRoute = fullRoute.substring(0, fullRoute.substring(1, fullRoute.length).indexOf('/') + 1);
         const targetDir = path.join(context.publicDir, rootRoute);
-        const targetFile = path.join(targetDir, `${md5}-cache.json`);
+        const targetFile = path.join(targetDir, `${queryHash}-cache.json`);
 
         if (!fs.existsSync(targetFile)) {
           fs.mkdirsSync(targetDir, { recursive: true });

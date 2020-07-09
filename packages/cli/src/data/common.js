@@ -30,13 +30,18 @@ function getQueryKeysFromSelectionSet(selectionSet) {
   return queryKeys;
 }
 
-function getQueryKeysHash(query) {
+function getQueryHash(query, variables = {}) {
   const queryKeys = getQueryKeysFromSelectionSet(query.definitions[0].selectionSet);
-  
+  const variableValues = Object.keys(variables).length > 0
+    ? `_${Object.values(variables).join('').replace(/\//g, '')}` // handle / which will translate to filepaths
+    : '';
+
+  console.log('variableValues', variableValues);
+
   // return crypto.createHash('md5').update(hash).digest('hex');  
-  return queryKeys;
+  return `${queryKeys}${variableValues}`;
 }
 
 module.exports = {
-  getQueryKeysHash
+  getQueryHash
 };
