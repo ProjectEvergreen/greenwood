@@ -1,4 +1,4 @@
-import { html, css, LitElement } from 'lit-element';
+import { html, LitElement } from 'lit-element';
 
 class AppComponent extends LitElement {
 

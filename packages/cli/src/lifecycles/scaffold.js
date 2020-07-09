@@ -100,7 +100,7 @@ const writeRoutes = async(compilation) => {
 
 const writeBaseAppTemplate = async({ context }) => {
   return new Promise(async (resolve, reject) => {
-    try{
+    try {
       let data = await fs.readFile(path.join(__dirname, '../templates/', 'base-template.js'), 'utf8');
 
       const appDir = path.join(context.scratchDir, 'app');
@@ -108,11 +108,11 @@ const writeBaseAppTemplate = async({ context }) => {
       await fs.ensureDir(appDir);
       await fs.writeFile(path.join(appDir, './app.js'), data);
       resolve();
-    } catch(err) {
+    } catch (err) {
       reject(err);
     }
-  })
-}
+  });
+};
 
 const setupIndex = async({ context }) => {
   return new Promise(async (resolve, reject) => {
