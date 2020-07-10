@@ -1,6 +1,7 @@
 /*
  * Use Case
- * Run Greenwood build command with GraphQL calls to get data about the projects graph.
+ * Run Greenwood build command with GraphQL calls to get data about the projects graph.  This will test various 
+ * permutations of Children, Menu, and Graph calls, simulating a site of blog posts.
  *
  * User Result
  * Should generate a Greenwood build that dynamically serializes data from the graph from the header and in the page-template.
@@ -16,12 +17,15 @@
  *     header.js
  *   pages/
  *     blog/
- *       first-post.md
- *       second-post.md
+ *       first-post/
+ *         index.md
+ *       second-post/
+ *         index.md
  *     index.md
  *   templates/
  *     app-template.js
  *     blog-template.js
+ *     post-template.js
  */
 const expect = require('chai').expect;
 const fs = require('fs');
@@ -112,22 +116,28 @@ describe('Build Greenwood With: ', function() {
 
       it('should have a expected NavigationQuery output in the <header> tag', function() {
         const listItems = dom.window.document.querySelectorAll('body header ul li');
-        const link = listItems[0].querySelector('a');
+        const link1 = listItems[0].querySelector('a');
+        const link2 = listItems[1].querySelector('a');
 
         expect(listItems.length).to.be.equal(2);
-        expect(link.href.replace('file://', '')).to.be.equal('/blog/first-post');
-        expect(link.title).to.be.equal('Click to visit the First blog post');
-        expect(link.innerHTML).to.contain('First');
+        
+        expect(link1.href.replace('file://', '')).to.be.equal('/blog/first-post/');
+        expect(link1.title).to.be.equal('Click to visit the First blog post');
+        expect(link1.innerHTML).to.contain('First');
+
+        expect(link2.href.replace('file://', '')).to.be.equal('/blog/second-post/');
+        expect(link2.title).to.be.equal('Click to visit the Second blog post');
+        expect(link2.innerHTML).to.contain('Second');
       });
     });
 
     describe('Blog Page (Template) w/ Navigation and Children Query', function() {
       beforeEach(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'blog', 'first-post', 'index.html'));
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'blog', 'index.html'));
       });
 
       it('should output an index.html file (first post page)', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, 'blog', 'first-post', 'index.html'))).to.be.true;
+        expect(fs.existsSync(path.join(this.context.publicDir, 'blog', 'index.html'))).to.be.true;
       });
 
       it('should output one (unified) cache.json file', async function() {
@@ -141,7 +151,100 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output four ("partial") *-cache.json files, one per query made', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, 'blog', './*-cache.json'))).to.have.lengthOf(4);
+        expect(await glob.promise(path.join(this.context.publicDir, 'blog', './*-cache.json'))).to.have.lengthOf(5);
+      });
+
+      it('should output four (partial) *-cache.json files that are defined', async function() {
+        const cacheFiles = await glob.promise(path.join(this.context.publicDir, 'blog', './*-cache.json'));
+
+        cacheFiles.forEach(file => {
+          const cache = require(file);
+
+          expect(cache).to.not.be.undefined;
+        });
+      });
+
+      it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {
+        const scriptTags = dom.window.document.querySelectorAll('head > script');
+        const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
+          return script.getAttribute('data-state') === 'apollo';
+        });
+
+        expect(apolloScriptTags.length).to.be.equal(1);
+        expect(apolloScriptTags[0].innerHTML).to.match(apolloStateRegex);
+      });
+
+      it('should have a <header> tag in the <body>', function() {
+        const header = dom.window.document.querySelectorAll('body header');
+
+        expect(header.length).to.be.equal(1);
+      });
+
+      it('should have expected navigation links in the <header> tag tag when using NavigationQuery', function() {
+        const listItems = dom.window.document.querySelectorAll('body header ul li');
+        const link1 = listItems[0].querySelector('a');
+        const link2 = listItems[1].querySelector('a');
+
+        expect(listItems.length).to.be.equal(2);
+        
+        expect(link1.href.replace('file://', '')).to.be.equal('/blog/first-post/');
+        expect(link1.title).to.be.equal('Click to visit the First blog post');
+        expect(link1.innerHTML).to.contain('First');
+
+        expect(link2.href.replace('file://', '')).to.be.equal('/blog/second-post/');
+        expect(link2.title).to.be.equal('Click to visit the Second blog post');
+        expect(link2.innerHTML).to.contain('Second');
+      });
+
+      it('should have expected blog posts links in the <body> tag when using ChildrenQuery', function() {
+        const listItems = dom.window.document.querySelectorAll('body div.posts ul li');
+        const linkItems = dom.window.document.querySelectorAll('body div.posts ul li a');
+
+        expect(listItems.length).to.be.equal(2);
+        expect(linkItems.length).to.be.equal(2);
+
+        const link1 = linkItems[0];
+        const link2 = linkItems[1];
+
+        expect(link1.href.replace('file://', '')).to.be.equal('/blog/first-post/');
+        expect(link1.title).to.be.equal('Click to read my First blog post');
+        expect(link1.innerHTML).to.contain('First');
+
+        expect(link2.href.replace('file://', '')).to.be.equal('/blog/second-post/');
+        expect(link2.title).to.be.equal('Click to read my Second blog post');
+        expect(link2.innerHTML).to.contain('Second');
+      });
+    });
+
+    describe('Blog Post Pages (Post Template) w/ custom Graph Query', function() {
+      let dom2;
+
+      // just use one post page for the generic tests here
+      beforeEach(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'blog', 'first-post', 'index.html'));
+        dom2 = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'blog', 'second-post', 'index.html'));
+      });
+
+      it('should output an index.html file for first blog post page', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, 'blog', 'first-post', 'index.html'))).to.be.true;
+      });
+
+      it('should output an index.html file for second blog post page)', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, 'blog', 'second-post', 'index.html'))).to.be.true;
+      });
+
+      it('should output one (unified) cache.json file', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'blog', 'cache.json'))).to.have.lengthOf(1);
+      });
+
+      it('should output one (unified) cache.json file that is defined', function() {
+        const cacheContents = require(path.join(this.context.publicDir, 'blog', 'cache.json'));
+
+        expect(cacheContents).to.not.be.undefined;
+      });
+
+      it('should output four ("partial") *-cache.json files, one per query made', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'blog', './*-cache.json'))).to.have.lengthOf(5);
       });
 
       it('should output four (partial) *-cache.json files that are defined', async function() {
@@ -175,28 +278,23 @@ describe('Build Greenwood With: ', function() {
         const link = listItems[0].querySelector('a');
 
         expect(listItems.length).to.be.equal(2);
-        expect(link.href.replace('file://', '')).to.be.equal('/blog/first-post');
+        expect(link.href.replace('file://', '')).to.be.equal('/blog/first-post/');
         expect(link.title).to.be.equal('Click to visit the First blog post');
         expect(link.innerHTML).to.contain('First');
       });
 
-      it('should have expected blog posts links in the <body> tag when using ChildrenQuery', function() {
-        const listItems = dom.window.document.querySelectorAll('body div.posts ul li');
-        const linkItems = dom.window.document.querySelectorAll('body div.posts ul li a');
+      it('should have expected date in the <body> tag when using custom GraphQuery', function() {
+        const date = dom.window.document.querySelectorAll('body p.date');
 
-        expect(listItems.length).to.be.equal(2);
-        expect(linkItems.length).to.be.equal(2);
+        expect(date.length).to.be.equal(1);
+        expect(date[0].innerHTML).to.contain('Posted on 07.08.2020');
+      });
 
-        const link1 = linkItems[0];
-        const link2 = linkItems[1];
+      it('should have expected date in the <body> tag when using custom GraphQuery', function() {
+        const date = dom2.window.document.querySelectorAll('body p.date');
 
-        expect(link1.href.replace('file://', '')).to.be.equal('/blog/first-post/');
-        expect(link1.title).to.be.equal('Click to read my First blog post');
-        expect(link1.innerHTML).to.contain('First');
-
-        expect(link2.href.replace('file://', '')).to.be.equal('/blog/second-post/');
-        expect(link2.title).to.be.equal('Click to read my Second blog post');
-        expect(link2.innerHTML).to.contain('Second');
+        expect(date.length).to.be.equal(1);
+        expect(date[0].innerHTML).to.contain('Posted on 07.09.2020');
       });
     });
 
