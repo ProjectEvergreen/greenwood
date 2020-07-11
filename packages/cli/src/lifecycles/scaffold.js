@@ -102,7 +102,6 @@ const writeBaseAppTemplate = async({ context }) => {
   return new Promise(async (resolve, reject) => {
     try {
       let data = await fs.readFile(path.join(__dirname, '../templates/', 'base-template.js'), 'utf8');
-
       const appDir = path.join(context.scratchDir, 'app');
 
       await fs.ensureDir(appDir);

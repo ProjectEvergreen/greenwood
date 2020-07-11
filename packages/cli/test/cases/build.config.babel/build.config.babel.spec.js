@@ -42,7 +42,7 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
   
-      it('should not contain any components within body-app', function() {
+      it('should not contain any components within base-app', function() {
         // prove that our custom broken babel config is being used
         const outlet = dom.window.document.querySelector('body > base-app').innerHTML;
         expect(outlet).to.equal('');
