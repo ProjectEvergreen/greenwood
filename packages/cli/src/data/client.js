@@ -5,7 +5,7 @@ import { getQueryHash } from '@greenwood/cli/data/common';
 
 const APOLLO_STATE = window.__APOLLO_STATE__; // eslint-disable-line no-underscore-dangle
 const client = new ApolloClient({
-  cache: new InMemoryCache().restore(APOLLO_STATE),
+  cache: new InMemoryCache(),
   link: new HttpLink({
     uri: 'http://localhost:4000'
   })
@@ -13,16 +13,10 @@ const client = new ApolloClient({
 const backupQuery = client.query;
 
 client.query = (params) => {
-
   if (APOLLO_STATE) {
     // __APOLLO_STATE__ defined, in "SSG" mode...
-    const root = window.location.pathname.split('/')[1];
-    const rootSuffix = root === ''
-      ? ''
-      : '/';
-
     const queryHash = getQueryHash(params.query, params.variables);
-    const cachePath = `/${root}${rootSuffix}${queryHash}-cache.json`;
+    const cachePath = `/${queryHash}-cache.json`;
     
     console.log('cachePath', cachePath);
     return fetch(cachePath)

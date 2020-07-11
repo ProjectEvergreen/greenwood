@@ -1,33 +1,8 @@
 const BrowserRunner = require('../lib/browser');
 const dataServer = require('../data/server');
-const deepmerge = require('deepmerge');
 const fs = require('fs-extra');
-const glob = require('glob-promise');
 const LocalWebServer = require('local-web-server');
 const path = require('path');
-
-const setDataForPages = async (context) => {
-  const { publicDir } = context;
-  const pages = await glob.promise(path.join(publicDir, '**/**/index.html'));
-
-  pages.forEach((pagePath) => {
-    const contents = fs.readFileSync(pagePath, 'utf-8');
-    const pageRoot = pagePath.replace(publicDir, '').split('/')[1];
-    const cacheRoot = pageRoot === 'index.html'
-      ? ''
-      : `${pageRoot}`;
-    let cacheContents = {};
-    
-    glob.sync(`${publicDir}/${cacheRoot}/*-cache.json`).forEach((file) => {
-      cacheContents = deepmerge(cacheContents, require(file));
-    });
-
-    const serialzedCacheContents = JSON.stringify(cacheContents);
-
-    fs.writeFileSync(`${publicDir}/${cacheRoot}/cache.json`, serialzedCacheContents);
-    fs.writeFileSync(pagePath, contents.replace('___DATA___', serialzedCacheContents));
-  });
-};
 
 module.exports = serializeBuild = async (compilation) => {
   const browserRunner = new BrowserRunner();
@@ -50,7 +25,7 @@ module.exports = serializeBuild = async (compilation) => {
             .replace(polyfill, '')
             .replace('<script></script>', `
               <script data-state="apollo">
-                window.__APOLLO_STATE__=___DATA___;
+                window.__APOLLO_STATE__ = true;
               </script> 
             `);
   
@@ -92,9 +67,6 @@ module.exports = serializeBuild = async (compilation) => {
 
       browserRunner.close();
       webServer.close();
-
-      // loop through all index.html files and inject cache
-      await setDataForPages(compilation.context);
 
       resolve();
     } catch (err) {

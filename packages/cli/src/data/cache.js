@@ -34,16 +34,15 @@ module.exports = async (req, context) => {
       if (data) {
         const cache = JSON.stringify(client.extract());
         const queryHash = getQueryHash(queryObj, variables);
-        /* Get the requests entire (full) route and rootRoute to use as reference for designated cache directory */
-        const { origin, referer } = req.headers;
-        const fullRoute = referer.substring(origin.length, referer.length);
-        const rootRoute = fullRoute.substring(0, fullRoute.substring(1, fullRoute.length).indexOf('/') + 1);
-        const targetDir = path.join(context.publicDir, rootRoute);
-        const targetFile = path.join(targetDir, `${queryHash}-cache.json`);
+        const hashFilename = `${queryHash}-cache.json`;
+        const cachePath = `${context.publicDir}/${queryHash}-cache.json`;
+        
+        if (!fs.existsSync(context.publicDir)) {
+          fs.mkdirSync(context.publicDir);
+        }
 
-        if (!fs.existsSync(targetFile)) {
-          fs.mkdirsSync(targetDir, { recursive: true });
-          fs.writeFileSync(path.join(targetFile), cache, 'utf8');
+        if (!fs.existsSync(cachePath)) {
+          fs.writeFileSync(path.join(context.publicDir, hashFilename), cache, 'utf8');
         }
       }
       resolve();
