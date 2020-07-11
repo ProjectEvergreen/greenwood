@@ -24,7 +24,7 @@ module.exports = initContexts = async({ config }) => {
       const userWorkspace = path.join(config.workspace);
       const userPagesDir = path.join(userWorkspace, 'pages/');
       const userTemplatesDir = path.join(userWorkspace, 'templates/');
-      const userAppTemplate = path.join(userTemplatesDir,  appTemplate);
+      const userAppTemplate = path.join(userTemplatesDir, appTemplate);
       const userPageTemplate = path.join(userTemplatesDir, pageTemplate);
       const userLoadingTemplate = path.join(userTemplatesDir, loadingTemplate);
 

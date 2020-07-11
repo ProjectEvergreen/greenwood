@@ -6,7 +6,7 @@ import thunk from 'redux-thunk';
 import client from '@greenwood/cli/data/client';
 import ConfigQuery from '@greenwood/cli/data/queries/config';
 import GraphQuery from '@greenwood/cli/data/queries/graph';
-LDIMPORT
+LDIMPORT;
 
 // eslint-disable-next-line no-underscore-dangle
 const compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || origCompose;
