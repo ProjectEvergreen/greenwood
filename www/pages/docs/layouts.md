@@ -84,6 +84,10 @@ class AppComponent extends LitElement {
 customElements.define('eve-app', AppComponent);
 ```
 
+* `app-template.js` requires MYROUTES predefined hook
+* `app-template.js` must have a component name `eve-app`
+* `app-template.js` must maintain filename and path `<your-workspace>/templates/app-template.js`
+
 > A working example can be found in the [greenwood source](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js) which is the default _app-template.js_ if no other is defined.
 
 A more practical production example can be found in [greenwood's website](https://github.com/ProjectEvergreen/greenwood/blob/master/www/templates/app-template.js).
