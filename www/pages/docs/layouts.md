@@ -61,34 +61,16 @@ With a completed page-template.js present in your `src/templates/` folder you ca
 
 ### App Template
 
-In order to make an app template, you need to create a `LitElement` component that contains a number of pre-defined variables, elements, and imports. You need to do this in a file called  your _<workspace>templates/app-template.js_.
+In order to make an app template, you need to create a `LitElement` component that contains a predefined hook `MYROUTES` aswell the component element itself **must be defined as `eve-app`**.  You need to do this in a file name and path _`<workspace>`/templates/app-template.js_.
 
-First, we need our app template to use routes, by default greenwood uses [**lit-redux-router**](https://github.com/fernandopasik/lit-redux-router).
+`MYROUTES` is used in our app template to define where our routes will be placed. Greenwood uses [**lit-redux-router**](https://github.com/fernandopasik/lit-redux-router) and will replace the `MYROUTES` placeholder with all page routes automatically.
 
-Here is Greenwood's app-template, which you can copy / paste as a starting point for your own custom app template, _though it is recommended to let Greenwood manage this for you_.
+Here is an example app-template:
 
 ```js
 import { html, LitElement } from 'lit-element';
-import { connectRouter } from 'lit-redux-router';
-import { applyMiddleware, createStore, compose as origCompose, combineReducers } from 'redux';
-import { lazyReducerEnhancer } from 'pwa-helpers/lazy-reducer-enhancer.js';
-import thunk from 'redux-thunk';
 
-// initialize a redux store
-const compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || origCompose;
-const store = createStore(
-  (state, action) => state,
-    compose(lazyReducerEnhancer(combineReducers), applyMiddleware(thunk)));
-
-
-// Next we need to import a list of files that will be generated when Greenwood is run
-import '../index/index.js';
-
-// Finally we can connect to our store and define our component.
-connectRouter(store);
-
-// Add the MY-ROUTES(without dash) predefined hook. This is where all your routes will be loaded.
-// You may also opt to define a custom 404 route here.
+// Add the MY-ROUTES(without dash) predefined hook. This is where all your routes will be
 // You must define the app-template with the element name eve-app
 class AppComponent extends LitElement {
   render() {
@@ -103,6 +85,8 @@ customElements.define('eve-app', AppComponent);
 ```
 
 > A working example can be found in the [greenwood source](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js) which is the default _app-template.js_ if no other is defined.
+
+A more practical production example can be found in [greenwood's website](https://github.com/ProjectEvergreen/greenwood/blob/master/www/templates/app-template.js).
 
 
 ### Pages
