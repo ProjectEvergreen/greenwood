@@ -81,10 +81,13 @@ const writeRoutes = async(compilation) => {
           path="${file.route}"
           component="eve-${file.label}"
           .resolve="\${() => import(/* webpackChunkName: "${file.chunkName}" */ ${file.relativeExpectedPath})}"
+          loading="eve-loading"
           ></lit-route>`;
       });
 
-      const result = data.toString().replace(/MYROUTES/g, routes.join(''));
+      let result = data.toString().replace(/MYROUTES/g, routes.join(''));
+      result = result.replace(/LDIMPORT/g, `import '${compilation.context.loadingTemplatePath}';`);
+
       // Create app directory so that app-template relative imports are correct
       const appDir = path.join(compilation.context.scratchDir, 'app');
 
