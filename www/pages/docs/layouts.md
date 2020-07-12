@@ -41,12 +41,6 @@ customElements.define('page-template', PageTemplate);
 #### Template Hooks
 A number of hook variables are defined that tell greenwood to do different things
 
-```js
-MDIMPORT;
-```
-
-`MDIMPORT;` Tells Greenwood to import a markdown file into this component.  But we also have to define where the compiled markdown element(page) will be placed within our page-template.  Hence below within our `render()` method you will see the `<entry></entry>` element. That defines exactly where to place it.
-
 
 ```js
 METAIMPORT;
