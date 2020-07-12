@@ -1,6 +1,5 @@
 import { html, LitElement } from 'lit-element';
 import '../components/header/header';
-MDIMPORT;
 
 class PageTemplate extends LitElement {
   render() {
