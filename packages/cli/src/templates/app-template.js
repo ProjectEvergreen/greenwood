@@ -92,7 +92,7 @@ class AppComponent extends LitElement {
 
   render() {
     return html`
-        MYROUTES
+        <routes></routes>
         <lit-route><h1>404 Not found</h1></lit-route>
     `;
   }

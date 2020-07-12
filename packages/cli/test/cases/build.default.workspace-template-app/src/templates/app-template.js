@@ -40,7 +40,7 @@ class AppComponent extends LitElement {
 
   render() {
     return html`
-        MYROUTES
+        <routes></routes>
         <p id="custom-app-template">My Custom App Template</p>
     `;
   }

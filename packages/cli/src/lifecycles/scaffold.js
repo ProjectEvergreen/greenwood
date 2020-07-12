@@ -84,7 +84,7 @@ const writeRoutes = async(compilation) => {
           ></lit-route>`;
       });
 
-      const result = data.toString().replace(/MYROUTES/g, routes.join(''));
+      const result = data.toString().replace(/<routes><\/routes>/g, routes.join(''));
       // Create app directory so that app-template relative imports are correct
       const appDir = path.join(compilation.context.scratchDir, 'app');
 

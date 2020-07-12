@@ -87,13 +87,13 @@ import '../index/index.js';
 // Finally we can connect to our store and define our component.
 connectRouter(store);
 
-// Add the MY-ROUTES(without dash) predefined hook. This is where all your routes will be loaded.
+// Add the <routes>-</routes>(without the dash) predefined hook. This is where all your routes will be loaded.
 // You may also opt to define a custom 404 route here.
 // You must define the app-template with the element name eve-app
 class AppComponent extends LitElement {
   render() {
     return html\`
-      MYROUTES
+      <routes></routes>
       <lit-route><h1>404 Not found</h1></lit-route>
     \`;
   }

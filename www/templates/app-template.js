@@ -105,7 +105,7 @@ class AppComponent extends LitElement {
       <div class='gwd-wrapper'>
         <eve-header></eve-header>
         <div class="gwd-content-outlet">
-          MYROUTES
+          <routes></routes>
         </div>
         <lit-route><h1>404 Not found</h1></lit-route>
         <eve-footer></eve-footer>
