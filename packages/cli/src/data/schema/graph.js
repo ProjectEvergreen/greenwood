@@ -129,7 +129,7 @@ const getChildrenFromParentRoute = async (root, query, context) => {
       const { label } = getDeriveMetaFromRoute(route);
       const root = route.split('/')[1];
 
-      if (root.indexOf(parent) >= 0) {
+      if (root.indexOf(parent) >= 0 && page.fileName !== 'index') {
         const id = page.label;
 
         pages.push({
