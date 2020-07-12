@@ -1,4 +1,4 @@
-// const crypto = require('crypto');
+const crypto = require('crypto');
 
 function getQueryKeysFromSelectionSet(selectionSet) {
   let queryKeys = '';
@@ -38,8 +38,7 @@ function getQueryHash(query, variables = {}) {
 
   console.log('variableValues', variableValues);
 
-  // return crypto.createHash('md5').update(hash).digest('hex');  
-  return `${queryKeys}${variableValues}`;
+  return crypto.createHash('md5').update(`${queryKeys}${variableValues}`).digest('hex');
 }
 
 module.exports = {
