@@ -18,7 +18,6 @@ client.query = (params) => {
     const queryHash = getQueryHash(params.query, params.variables);
     const cachePath = `/${queryHash}-cache.json`;
     
-    console.log('cachePath', cachePath);
     return fetch(cachePath)
       .then(response => response.json())
       .then((response) => {

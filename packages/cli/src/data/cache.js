@@ -24,8 +24,6 @@ module.exports = async (req, context) => {
       const { query, variables } = req.body;
       const queryObj = gql`${query}`;
 
-      console.log('cache query', query);
-
       const { data } = await client.query({
         query: queryObj,
         variables
