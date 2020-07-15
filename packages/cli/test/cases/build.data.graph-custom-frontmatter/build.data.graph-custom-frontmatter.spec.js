@@ -29,7 +29,7 @@ const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Data from GraphQL and using Custom Frontmatter Data';
-  const apolloStateRegex = /window.__APOLLO_STATE__=({.*?});/;
+  const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
   let setup;
 
   before(async function() {
@@ -54,14 +54,18 @@ describe('Build Greenwood With: ', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'blog', 'first-post', 'index.html'))).to.be.true;
       });
 
-      it('should output one cache.json file', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, 'blog', 'cache.json'))).to.have.lengthOf(1);
+      it('should output a (partial) *-cache.json file, one per each query made', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, './*-cache.json'))).to.have.lengthOf(3);
       });
 
-      it('should output one cache.json file to be defined', function() {
-        const cacheContents = require(path.join(this.context.publicDir, 'blog', 'cache.json'));
+      it('should output a (partial) *-cache.json files, one per each query made, that are all defined', async function() {
+        const cacheFiles = await glob.promise(path.join(this.context.publicDir, './*-cache.json'));
 
-        expect(cacheContents).to.not.be.undefined;
+        cacheFiles.forEach(file => {
+          const cache = require(file);
+
+          expect(cache).to.not.be.undefined;
+        });
       });
 
       it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {
