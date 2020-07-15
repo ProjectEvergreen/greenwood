@@ -1,4 +1,13 @@
-const crypto = require('crypto');
+// https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0#gistcomment-2775538
+function hashString(queryKeysString) {
+  let h = 0;
+    
+  for (let i = 0; i < queryKeysString.length; i += 1) {
+    h = Math.imul(31, h) + queryKeysString.charCodeAt(i) | 0; // eslint-disable-line no-bitwise
+  }
+
+  return Math.abs(h).toString();
+}
 
 function getQueryKeysFromSelectionSet(selectionSet) {
   let queryKeys = '';
@@ -38,7 +47,7 @@ function getQueryHash(query, variables = {}) {
 
   console.log('variableValues', variableValues);
 
-  return crypto.createHash('md5').update(`${queryKeys}${variableValues}`).digest('hex');
+  return hashString(`${queryKeys}${variableValues}`);
 }
 
 module.exports = {

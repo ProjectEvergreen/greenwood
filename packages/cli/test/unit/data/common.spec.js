@@ -25,7 +25,7 @@ describe('Unit Test: Data', function() {
         `;
         const hash = getQueryHash(query);
 
-        expect(hash).to.be.equal('8b36e0d34b7a39b5795e516474dc864b');
+        expect(hash).to.be.equal('876029931');
       });
 
       it('should return the expected hash for a custom graph query with custom data', function () {
@@ -43,7 +43,7 @@ describe('Unit Test: Data', function() {
         `;
         const hash = getQueryHash(query);
 
-        expect(hash).to.be.equal('3d8d29dc5119e352cf8bf3f46681cf2f');
+        expect(hash).to.be.equal('1656784831');
       });
 
       it('should return the expected hash for a children query with a variable', function () {
@@ -63,7 +63,7 @@ describe('Unit Test: Data', function() {
           parent: '/docs/'
         });
 
-        expect(hash).to.be.equal('754338ce25f3b0c6bedf5a845c287618');
+        expect(hash).to.be.equal('1366211136');
       });
     });
 
