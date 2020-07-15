@@ -1,5 +1,4 @@
 import { html, LitElement } from 'lit-element';
-
 import '../components/banner/banner';
 import '../components/card/card';
 import '../components/header/header';
