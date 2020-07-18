@@ -4,6 +4,7 @@ const url = require('url');
 
 let defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
+  mode: 'ssg',
   devServer: {
     port: 1984,
     host: 'localhost'
@@ -25,7 +26,8 @@ module.exports = readAndMergeConfig = async() => {
 
       if (await fs.exists(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, publicPath, title, meta, plugins, themeFile, markdown } = userCfgFile;
+        const modes = ['ssg', 'spa'];
+        const { workspace, devServer, mode, publicPath, title, meta, plugins, themeFile, markdown } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -41,6 +43,12 @@ module.exports = readAndMergeConfig = async() => {
           if (path.isAbsolute(workspace)) {
             // use the users provided path
             customConfig.workspace = workspace;
+          }
+
+          if (typeof mode === 'string' && modes.indexOf(mode.toLowerCase()) >= 0) {
+            customConfig.mode = mode;
+          } else if (mode) {
+            reject(`Error: provided ${mode} not supported, plase use one of: ${modes.join()}`);
           }
 
           if (!await fs.exists(customConfig.workspace)) {

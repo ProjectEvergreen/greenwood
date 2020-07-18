@@ -21,13 +21,18 @@ module.exports = serializeBuild = async (compilation) => {
   
         return await browserRunner.serialize(`http://127.0.0.1:${PORT}${route}`).then(async (content) => {
           const target = path.join(publicDir, route);
-          const html = content
+          let html = content
             .replace(polyfill, '')
             .replace('<script></script>', `
               <script data-state="apollo">
                 window.__APOLLO_STATE__ = true;
               </script> 
             `);
+
+          if (compilation.config.mode === 'ssg') {
+            //   <script type="text/javascript" src="/index.ee90c45c31f1e63b855e.bundle.js"></script>
+            html = html.replace(/<script type=\"text\/javascript\" src=\"\/index.*.bundle\.js\"><\/script>/, '');
+          }
   
           await fs.mkdirs(target, { recursive: true });
           await fs.writeFile(path.join(target, 'index.html'), html);
