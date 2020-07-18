@@ -21,6 +21,7 @@ module.exports = serializeBuild = async (compilation) => {
   
         return await browserRunner.serialize(`http://127.0.0.1:${PORT}${route}`).then(async (content) => {
           const target = path.join(publicDir, route);
+          const mode = compilation.config.mode;
           let html = content
             .replace(polyfill, '')
             .replace('<script></script>', `
@@ -29,9 +30,10 @@ module.exports = serializeBuild = async (compilation) => {
               </script> 
             `);
 
-          if (compilation.config.mode === 'ssg') {
-            //   <script type="text/javascript" src="/index.ee90c45c31f1e63b855e.bundle.js"></script>
-            html = html.replace(/<script type=\"text\/javascript\" src=\"\/index.*.bundle\.js\"><\/script>/, '');
+          if (mode === 'ssg') { // no javascript
+            html = html.replace(/<script type="text\/javascript" src="\/index.*.bundle\.js"><\/script>/, '');
+          } else if (mode === 'spa') { // all the javascript, and aysnc!
+            html = html.replace(/<script type="text\/javascript"/, '<script async type="text/javascript"');
           }
   
           await fs.mkdirs(target, { recursive: true });
