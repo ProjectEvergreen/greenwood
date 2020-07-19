@@ -138,7 +138,6 @@ describe('Build Greenwood With: ', function() {
         expect(isAsync).to.be.equal(true);
       });
     });
-
   });
 
   after(function() {
