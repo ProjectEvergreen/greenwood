@@ -95,6 +95,27 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
+    describe('Link Preconnect', function() {
+      let linkTag;
+
+      beforeEach(async function() {
+        const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+        const linkTags = dom.window.document.querySelectorAll('head link');
+
+        linkTag = Array.prototype.slice.call(linkTags).filter(link => {
+          return link.href === 'https://www.google-analytics.com/';
+        });
+      });
+
+      it('should have one <link> tag for prefetching from the Google Analytics domain', function() {
+        expect(linkTag.length).to.be.equal(1);
+      });
+
+      it('should have one <link> tag with rel preconnect attribute set', function() {
+        expect(linkTag[0].rel).to.be.equal('preconnect');
+      });
+    });
+
     describe('Tracking script', function() {
       let trackingScript;
 
@@ -117,6 +138,7 @@ describe('Build Greenwood With: ', function() {
         expect(isAsync).to.be.equal(true);
       });
     });
+
   });
 
   after(function() {
