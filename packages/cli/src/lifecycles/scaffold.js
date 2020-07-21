@@ -89,7 +89,7 @@ const writeRoutes = async(compilation) => {
       const appDir = path.join(compilation.context.scratchDir, 'app');
 
       await fs.ensureDir(appDir);
-      await fs.writeFile(path.join(appDir, './appTemplate.js'), result);
+      await fs.writeFile(path.join(appDir, './app-template.js'), result);
 
       resolve();
     } catch (err) {
