@@ -86,7 +86,6 @@ const writeRoutes = async(compilation) => {
       });
 
       let result = data.toString().replace(/MYROUTES/g, routes.join(''));
-      result = result.replace(/LDIMPORT/g, `import '${compilation.context.loadingTemplatePath}';`);
 
       // Create app directory so that app-template relative imports are correct
       const appDir = path.join(compilation.context.scratchDir, 'app');

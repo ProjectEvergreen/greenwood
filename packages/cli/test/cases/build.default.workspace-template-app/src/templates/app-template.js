@@ -5,6 +5,7 @@ import { lazyReducerEnhancer } from 'pwa-helpers/lazy-reducer-enhancer.js';
 import thunk from 'redux-thunk';
 import client from '@greenwood/cli/data/client';
 import ConfigQuery from '@greenwood/cli/data/queries/config';
+import '@greenwood/cli/templates/loading';
 
 // eslint-disable-next-line no-underscore-dangle
 const compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || origCompose;
