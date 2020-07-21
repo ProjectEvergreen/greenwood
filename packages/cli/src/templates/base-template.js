@@ -101,4 +101,4 @@ class BaseAppComponent extends LitElement {
   }
 }
 
-customElements.define('base-app', BaseAppComponent);
+customElements.define('app-root', BaseAppComponent);
