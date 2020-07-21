@@ -6,7 +6,7 @@ class AppComponent extends LitElement {
 
   static get styles() {
     return css`
-    .content-outlet {
+    .gwd-content-outlet {
       min-height: 100vh
     }`;
   }
