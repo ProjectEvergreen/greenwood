@@ -10,11 +10,10 @@ const writePageComponentsFromTemplate = async (compilation) => {
           : path.join(context.templatesDir, `${file.template}-template.js`);
 
         const templateData = await fs.readFile(pageTemplatePath, 'utf8');
-
         let result = templateData.toString().replace(/entry/g, `wc-md-${file.label}`);
-
+        
+        result = `import '${file.mdFile}';\n${result}`;
         result = result.replace(/page-template/g, `eve-${file.label}`);
-        result = result.replace(/MDIMPORT;/, `import '${file.mdFile}';`);
 
         resolve(result);
       } catch (err) {
@@ -84,7 +83,7 @@ const writeRoutes = async(compilation) => {
           ></lit-route>`;
       });
 
-      const result = data.toString().replace(/MYROUTES/g, routes.join(''));
+      const result = data.toString().replace(/<routes><\/routes>/g, routes.join(''));
       // Create app directory so that app-template relative imports are correct
       const appDir = path.join(compilation.context.scratchDir, 'app');
 

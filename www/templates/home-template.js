@@ -8,8 +8,6 @@ import '@evergreen-wc/eve-container';
 import '../styles/theme.css';
 import homeCss from '../styles/home.css';
 
-MDIMPORT;
-
 class HomeTemplate extends LitElement {
 
   render() {

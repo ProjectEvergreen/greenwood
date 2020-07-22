@@ -38,8 +38,6 @@ The below is an example of using _theme.css_ to load a Google font and apply a g
 import { html, LitElement } from 'lit-element';
 import '../styles/theme.css';
 
-MDIMPORT;
-
 class PageTemplate extends LitElement {
 
   constructor() {
@@ -61,8 +59,6 @@ For any of your components and page templates, it is recommended to use the [Sha
 ```javascript
 import { html, LitElement } from 'lit-element';
 import pageTemplateCss '../styles/page-template.css';  // if you like your CSS-in-JS
-
-MDIMPORT;
 
 class PageTemplate extends LitElement {
 
