@@ -50,7 +50,6 @@ So using the project structure we setup previously, adding your own custom page 
 For reference, here's what the default page template included by Greenwood looks like (using `LitElement`).
 ```javascript
 import { html, LitElement } from 'lit-element';
-MDIMPORT;
 
 class PageTemplate extends LitElement {
   render() {

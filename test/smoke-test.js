@@ -89,7 +89,7 @@ function defaultIndex(label) {
       });
 
       it('should have one <script> tag in the <body> for the main bundle', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body eve-app ~ script');
+        const scriptTags = dom.window.document.querySelectorAll('body app-root ~ script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
 

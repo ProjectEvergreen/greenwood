@@ -52,8 +52,6 @@ Now we can use it in both our templates, like so:
 import { html, LitElement } from 'lit-element';
 import '../components/header'; // import our custom element
 
-MDIMPORT;
-
 class PageTemplate extends LitElement {
 
   constructor() {
@@ -106,8 +104,6 @@ Now we can `import` this CSS file into our templates.
 import { html, LitElement } from 'lit-element';
 import '../components/header';
 import '../styles/theme.css'; // add this line
-
-MDIMPORT;
 
 class PageTemplate extends LitElement {
 
