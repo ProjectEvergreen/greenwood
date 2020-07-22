@@ -13,7 +13,7 @@ module.exports = (options = {}) => {
     provider: () => {
       return {
         hookGreenwoodAnalytics: `
-          <link rel="preconnect" href="https://www.google-analytics.com/">
+          <link rel="preload" href="https://www.google-analytics.com/">
 
           <script async src="https://www.googletagmanager.com/gtag/js?id=${analyticsId}"></script>
 
