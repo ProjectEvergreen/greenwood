@@ -2,8 +2,6 @@ import { html, LitElement } from 'lit-element';
 import client from '@greenwood/cli/data/client';
 import gql from 'graphql-tag';
 
-MDIMPORT;
-
 class BlogTemplate extends LitElement {
 
   static get properties() {

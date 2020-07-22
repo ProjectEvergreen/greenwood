@@ -3,8 +3,6 @@ import gql from 'graphql-tag';
 import { html, LitElement } from 'lit-element';
 import '../components/header';
 
-MDIMPORT;
-
 class PostTemplate extends LitElement {
 
   static get properties() {
