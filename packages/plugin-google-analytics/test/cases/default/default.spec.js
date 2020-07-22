@@ -112,7 +112,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have one <link> tag with rel preconnect attribute set', function() {
-        expect(linkTag[0].rel).to.be.equal('preload');
+        expect(linkTag[0].rel).to.be.equal('preconnect');
       });
     });
 
