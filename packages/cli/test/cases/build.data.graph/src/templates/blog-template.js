@@ -3,8 +3,6 @@ import client from '@greenwood/cli/data/client';
 import ChildrenQuery from '@greenwood/cli/data/queries/children';
 import '../components/header';
 
-MDIMPORT;
-
 class BlogTemplate extends LitElement {
 
   static get properties() {

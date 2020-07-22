@@ -1,6 +1,5 @@
 import { html, LitElement } from 'lit-element';
 import '../styles/my-brand.css';
-MDIMPORT;
 
 class PageTemplate extends LitElement {
   render() {
