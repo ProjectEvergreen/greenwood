@@ -29,9 +29,7 @@ class BlogTemplate extends LitElement {
       }
     });
 
-    this.posts = response.data.children.filter(post => {
-      return post.filePath.indexOf('/blog/index') < 0;
-    });
+    this.posts = response.data.children;
   }
 
   /* eslint-disable indent */
