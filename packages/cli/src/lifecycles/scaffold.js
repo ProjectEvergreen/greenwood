@@ -10,11 +10,10 @@ const writePageComponentsFromTemplate = async (compilation) => {
           : path.join(context.templatesDir, `${file.template}-template.js`);
 
         const templateData = await fs.readFile(pageTemplatePath, 'utf8');
-
         let result = templateData.toString().replace(/entry/g, `wc-md-${file.label}`);
-
+        
+        result = `import '${file.mdFile}';\n${result}`;
         result = result.replace(/page-template/g, `eve-${file.label}`);
-        result = result.replace(/MDIMPORT;/, `import '${file.mdFile}';`);
 
         resolve(result);
       } catch (err) {
@@ -84,13 +83,28 @@ const writeRoutes = async(compilation) => {
           ></lit-route>`;
       });
 
-      const result = data.toString().replace(/MYROUTES/g, routes.join(''));
+      const result = data.toString().replace(/<routes><\/routes>/g, routes.join(''));
       // Create app directory so that app-template relative imports are correct
       const appDir = path.join(compilation.context.scratchDir, 'app');
 
       await fs.ensureDir(appDir);
-      await fs.writeFile(path.join(appDir, './app.js'), result);
+      await fs.writeFile(path.join(appDir, './app-template.js'), result);
 
+      resolve();
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+const writeBaseAppTemplate = async({ context }) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let data = await fs.readFile(path.join(__dirname, '../templates/', 'base-template.js'), 'utf8');
+      const appDir = path.join(context.scratchDir, 'app');
+
+      await fs.ensureDir(appDir);
+      await fs.writeFile(path.join(appDir, './app.js'), data);
       resolve();
     } catch (err) {
       reject(err);
@@ -124,6 +138,9 @@ module.exports = generateScaffolding = async (compilation) => {
 
       console.log('Writing Lit routes...');
       await writeRoutes(compilation);
+
+      console.log('Write Base App Template...');
+      await writeBaseAppTemplate(compilation);
 
       console.log('setup index page and html');
       await setupIndex(compilation);
