@@ -69,7 +69,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have a router outlet tag in the <body>', function() {
-        const outlet = dom.window.document.querySelectorAll('body eve-app');
+        const outlet = dom.window.document.querySelectorAll('body app-root');
 
         expect(outlet.length).to.be.equal(1);
       });
