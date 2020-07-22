@@ -10,13 +10,9 @@ const writePageComponentsFromTemplate = async (compilation) => {
           : path.join(context.templatesDir, `${file.template}-template.js`);
 
         const templateData = await fs.readFile(pageTemplatePath, 'utf8');
-        let result = templateData.toString().replace(/entry/g, `wc-md-${file.label}`)
-        ;
-        const litElementStr = "'lit-element';";
-        let litElementIndex = result.lastIndexOf(litElementStr);
-        litElementIndex = litElementIndex + litElementStr.length;
+        let result = templateData.toString().replace(/entry/g, `wc-md-${file.label}`);
         
-        result = `${result.slice(0, litElementIndex)}\nimport '${file.mdFile}';${result.slice(litElementIndex)}`;
+        result = `import '${file.mdFile}';\n${result}`;
         result = result.replace(/page-template/g, `eve-${file.label}`);
 
         resolve(result);
