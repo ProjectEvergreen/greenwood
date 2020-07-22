@@ -2,8 +2,6 @@ import { html, LitElement } from 'lit-element';
 import '../components/footer';
 import '../components/header';
 
-MDIMPORT;
-
 class BlogTemplate extends LitElement {
 
   constructor() {

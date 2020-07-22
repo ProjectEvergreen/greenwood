@@ -3,8 +3,6 @@ import client from '@greenwood/cli/data/client';
 import ChildrenQuery from '@greenwood/cli/data/queries/children';
 import '../components/header';
 
-MDIMPORT;
-
 class BlogTemplate extends LitElement {
 
   static get properties() {
@@ -29,7 +27,9 @@ class BlogTemplate extends LitElement {
       }
     });
 
-    this.posts = response.data.children;
+    this.posts = response.data.children.filter(post => {
+      return post.filePath.indexOf('/blog/index') < 0;
+    });
   }
 
   /* eslint-disable indent */
@@ -41,16 +41,14 @@ class BlogTemplate extends LitElement {
       <div class='container'>
         <app-header></app-header>
 
-        <entry></entry>
-
         <div class="posts">
-          <h1>More Posts</h1>
-
+          <entry></entry>
+          
           <ul>
-            ${posts.map((item) => {
+            ${posts.map((post) => {
               return html`
                 <li>
-                  <a href="${item.link}/" title="Click to read my ${item.title} blog post">${item.title}</a>
+                  <a href="${post.link}" title="Click to read my ${post.title} blog post">${post.title}</a>
                 </li>
               `;
             })}

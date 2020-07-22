@@ -5,8 +5,6 @@ import '../components/scroll/scroll';
 import pageCss from '../styles/page.css';
 import '../styles/theme.css';
 
-MDIMPORT;
-
 class PageTemplate extends LitElement {
 
   static get properties() {
