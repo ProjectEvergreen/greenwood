@@ -49,7 +49,6 @@ Neat!  But naturally you're here to learn how to make your own site, and this is
 For this template, create a _page-template.js_ in a directory located at _src/templates/_ (make the _templates/_ directory if it doesn't exist) and include this code in it:
 ```javascript
 import { html, LitElement } from 'lit-element';
-MDIMPORT;
 
 class PageTemplate extends LitElement {
 
@@ -77,7 +76,6 @@ We just made a template for our home page, but for our blog posts, we're going t
 Create a _blog-template.js_ in _src/templates/_ and include this code in it.
 ```javascript
 import { html, LitElement } from 'lit-element';
-MDIMPORT;
 
 class BlogTemplate extends LitElement {
 

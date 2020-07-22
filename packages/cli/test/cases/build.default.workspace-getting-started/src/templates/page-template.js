@@ -3,8 +3,6 @@ import '../components/footer';
 import '../components/header';
 import '../styles/theme.css';
 
-MDIMPORT;
-
 class PageTemplate extends LitElement {
 
   constructor() {

@@ -1,5 +1,8 @@
 ---
 template: 'home'
+imports:
+  Row: '../components/row/row.js'
+  Card: '../components/card/card.js' 
 ---
 
 <div class="message">
