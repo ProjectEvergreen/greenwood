@@ -30,9 +30,9 @@ module.exports = serializeBuild = async (compilation) => {
               </script> 
             `);
 
-          if (mode === 'ssg') { // no javascript
+          if (mode === 'strict') { // no javascript
             html = html.replace(/<script type="text\/javascript" src="\/index.*.bundle\.js"><\/script>/, '');
-          } else if (mode === 'spa') { // all the javascript, and aysnc!
+          } else if (mode === 'spa') { // all the javascript, and async!
             html = html.replace(/<script type="text\/javascript"/, '<script async type="text/javascript"');
           }
   

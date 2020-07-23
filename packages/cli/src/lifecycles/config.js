@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const url = require('url');
 
+const modes = ['strict', 'spa'];
 let defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   mode: 'ssg',
@@ -26,7 +27,6 @@ module.exports = readAndMergeConfig = async() => {
 
       if (await fs.exists(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const modes = ['ssg', 'spa'];
         const { workspace, devServer, mode, publicPath, title, meta, plugins, themeFile, markdown } = userCfgFile;
 
         // workspace validation
