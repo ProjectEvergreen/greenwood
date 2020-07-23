@@ -5,7 +5,7 @@ const url = require('url');
 const modes = ['strict', 'spa'];
 let defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
-  mode: 'ssg',
+  mode: 'spa',
   devServer: {
     port: 1984,
     host: 'localhost'
