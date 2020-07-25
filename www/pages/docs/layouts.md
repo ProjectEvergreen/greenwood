@@ -50,7 +50,7 @@ Here is an example app-template:
 ```js
 import { html, LitElement } from 'lit-element';
 
-// Add the <routes>-</routes>(without the dash) predefined hook. This is where all your routes will be loaded.
+// Add the <routes></routes> predefined hook. This is where all your routes will be loaded.
 // You may also opt to define a custom 404 route here.
 // You must define the app-template with the element name eve-app
 class AppComponent extends LitElement {
@@ -65,7 +65,7 @@ class AppComponent extends LitElement {
 customElements.define('eve-app', AppComponent);
 ```
 
-* `app-template.js` requires MYROUTES predefined hook
+* `app-template.js` requires `<routes></routes>` element to place routes
 * `app-template.js` must have a component name `eve-app`
 * `app-template.js` must maintain filename and path `<your-workspace>/templates/app-template.js`
 
