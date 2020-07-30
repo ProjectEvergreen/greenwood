@@ -66,11 +66,7 @@ Caveats:
 #### SPA (expiremental)
 This mode will include all JavaScript, including a client side router provided by Greenwood (just like in development mode).  This will pre-render your site _and_ also ship a full "SPA" experience for your users and try and hydrate from that, but at the cost of shipping a little more JavaScript, so choose wisely!  
 
-Here are some of the known issues we are tracking at this time as we refine support for this feature:
-- [double rendering](https://github.com/ProjectEvergreen/greenwood/issues/348)
-- [meta not changing on route change](https://github.com/ProjectEvergreen/greenwood/issues/306)
-- [_cache.json_ hydration](https://github.com/ProjectEvergreen/greenwood/issues/349)
-
+> THere are a some [known issues](https://github.com/ProjectEvergreen/greenwood/labels/mode%3Aspa) we are tracking at this time as we refine support for this feature.
 
 ### Evergreen Build
 Greenwood promotes an "evergreen" build that ensures that the code delivered to users is as modern as the code all based on real browser usage and support statistics.  Automatically!
