@@ -1615,6 +1615,11 @@
     npmlog "^4.1.2"
     write-file-atomic "^2.3.0"
 
+"@ls-lint/ls-lint@^1.9.2":
+  version "1.9.2"
+  resolved "https://registry.yarnpkg.com/@ls-lint/ls-lint/-/ls-lint-1.9.2.tgz#689f1f4c06072823a726802ba167340efcefe19c"
+  integrity sha512-sugEjWjSSy9OHF6t1ZBLZCAROj52cZthB9dIePmzZzzMwmWwy3qAEMSdJheHeS1FOwDZI7Ipm1H/bWgzJNnSAw==
+
 "@mapbox/rehype-prism@^0.4.0":
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/@mapbox/rehype-prism/-/rehype-prism-0.4.0.tgz#58714b345ec01256aa74c24762a341f6a771494e"

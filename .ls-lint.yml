@@ -1,0 +1,11 @@
+ls:
+  .js: lowercase
+  .css: lowercase
+  .html: lowercase
+  .tff: lowercase
+  .woff: lowercase
+  .woff2: lowercase
+
+ignore: 
+  - .git 
+  - node_modules
