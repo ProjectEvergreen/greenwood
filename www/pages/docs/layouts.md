@@ -35,7 +35,7 @@ class PageTemplate extends LitElement {
 customElements.define('page-template', PageTemplate);
 ```
 
-> **Note**: the filename must be in the format `<label>-templates.js` and the `customElements` name must be `page-template`.
+> **Note**: the filename must be in the format `<label>-template.js` and the `customElements` name must be `page-template`.
 
 With a completed page-template.js present in your `src/templates/` folder you can define which page uses it via front-matter at the top of any markdown file.  See [Front Matter Docs](/docs/front-matter#define-template) for more information.  Simply including a file named `page-template.js` will overwrite the greenwood default template for all markdown files, without needing to declare the template at the top of markdown file.
 
