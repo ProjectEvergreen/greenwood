@@ -219,6 +219,7 @@ query {
       value,
       href
     },
+    mode,
     publicPath,
     title,
     workspace

@@ -6,7 +6,7 @@ const META_DESCRIPTION = 'A modern and performant static site generator supporti
 const FAVICON_HREF = '/assets/favicon.ico';
 
 module.exports = {
-  mode: 'strict',
+  mode: 'spa',
   workspace: path.join(__dirname, 'www'),
   title: 'Greenwood',
   meta: [

@@ -23,6 +23,7 @@ const configTypeDefs = gql`
   type Config {
     devServer: DevServer,
     meta: [Meta],
+    mode: String,
     publicPath: String,
     title: String,
     workspace: String
