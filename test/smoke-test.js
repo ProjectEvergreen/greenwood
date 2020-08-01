@@ -96,18 +96,7 @@ function defaultIndex(label) {
           return mainBundleScriptRegex.test(src);
         });
 
-        expect(bundledScript.length).to.be.equal(1);
-      });
-
-      it('should have one <script> tag in the <body> for the main bundle loaded asynchronously', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body app-root ~ script');
-        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
-
-          return mainBundleScriptRegex.test(src);
-        });
-        
-        expect(bundledScript[0].getAttribute('async')).to.be.equal('true');
+        expect(bundledScript.length).to.be.equal(0);
       });
       
       it('should have one <script> tag for Apollo state', function() {

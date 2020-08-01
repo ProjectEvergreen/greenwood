@@ -43,6 +43,7 @@ describe('Build Greenwood With: ', function() {
     before(async function() {
       await setup.runGreenwoodCommand('build');
     });
+
     runSmokeTest(['public', 'not-found', 'hello'], LABEL);
 
     describe('Custom Title', function() {
@@ -65,7 +66,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       // rest of index smoke-test because <title></title> is changed for this case
-      it('should have one <script> tag in the <body> for the main bundle', function() {
+      it('should have one <script> tag in the <body> for the main bundle like default app template', function() {
         const scriptTags = dom.window.document.querySelectorAll('body script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
@@ -73,16 +74,16 @@ describe('Build Greenwood With: ', function() {
           return mainBundleScriptRegex.test(src);
         });
 
-        expect(bundledScript.length).to.be.equal(1);
+        expect(bundledScript.length).to.be.equal(0);
       });
       
-      it('should have a router outlet tag in the <body>', function() {
+      it('should have a router outlet tag in the <body> like default app template', function() {
         const outlet = dom.window.document.querySelectorAll('body eve-app');
 
         expect(outlet.length).to.be.equal(1);
       });
 
-      it('should have the correct route tags in the <body>', function() {
+      it('should have the correct route tags in the <body> like default app template', function() {
         const routes = dom.window.document.querySelectorAll('body lit-route');
 
         expect(routes.length).to.be.equal(3);
