@@ -3,9 +3,10 @@ const path = require('path');
 const url = require('url');
 
 const modes = ['strict', 'spa'];
+
 let defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
-  mode: 'spa',
+  mode: 'strict',
   devServer: {
     port: 1984,
     host: 'localhost'
@@ -45,12 +46,6 @@ module.exports = readAndMergeConfig = async() => {
             customConfig.workspace = workspace;
           }
 
-          if (typeof mode === 'string' && modes.indexOf(mode.toLowerCase()) >= 0) {
-            customConfig.mode = mode;
-          } else if (mode) {
-            reject(`Error: provided ${mode} not supported, plase use one of: ${modes.join()}`);
-          }
-
           if (!await fs.exists(customConfig.workspace)) {
             reject('Error: greenwood.config.js workspace doesn\'t exist! \n' +
               'common issues to check might be: \n' +
@@ -78,6 +73,12 @@ module.exports = readAndMergeConfig = async() => {
 
         if (meta && meta.length > 0) {
           customConfig.meta = meta;
+        }
+
+        if (typeof mode === 'string' && modes.indexOf(mode.toLowerCase()) >= 0) {
+          customConfig.mode = mode;
+        } else if (mode) {
+          reject(`Error: provided mode "${mode}" is not supported.  Please use one of: ${modes.join(', ')}.`);
         }
 
         if (plugins && plugins.length > 0) {
