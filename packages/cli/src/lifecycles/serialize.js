@@ -35,8 +35,9 @@ module.exports = serializeBuild = async (compilation) => {
             .replace('<script></script>', apolloScript);
 
           if (isStrictMode) { // no javascript
-            html = html.replace(/<script type="text\/javascript" src="\/index.*.bundle\.js"><\/script>/, '');
-            html = html.replace(/<script charset="utf-8" src="\/*.*.bundle\.js"><\/script>/, '');
+            html = html.replace(/<script type="text\/javascript" src="\/index.*.bundle\.js"><\/script>/, ''); // main bundle
+            html = html.replace(/<script charset="utf-8" src="\/*.*.bundle\.js"><\/script>/, ''); // dynamic / import() bundles
+            html = html.replace(/<lit-route path="(.*)" component="(.*)" class="(.*)">(.*)<\/lit-route>/g, ''); // lit redux routes
           } else if (mode === 'spa') { // all the javascript, and async!
             html = html.replace(/<script type="text\/javascript"/, '<script async="true" type="text/javascript"');
           }

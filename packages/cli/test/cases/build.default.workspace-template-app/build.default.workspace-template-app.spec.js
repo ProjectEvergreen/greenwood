@@ -78,7 +78,7 @@ describe('Build Greenwood With: ', function() {
       it('should have the correct route tags in the <body>', function() {
         const routes = dom.window.document.querySelectorAll('body lit-route');
 
-        expect(routes.length).to.be.equal(2);
+        expect(routes.length).to.be.equal(1);
       });
 
       it('should have the expected heading text within the index page in the public directory', function() {

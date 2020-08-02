@@ -86,7 +86,7 @@ describe('Build Greenwood With: ', function() {
       it('should have the correct route tags in the <body> like default app template', function() {
         const routes = dom.window.document.querySelectorAll('body lit-route');
 
-        expect(routes.length).to.be.equal(3);
+        expect(routes.length).to.be.equal(2);
       });
 
       it('should have the expected heading text within the index page in the public directory', function() {
