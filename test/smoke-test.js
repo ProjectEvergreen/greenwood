@@ -12,8 +12,6 @@ const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 
-const mainBundleScriptRegex = /index.*.bundle\.js/;
-
 function publicDirectory(label) {
   describe(`Running Smoke Tests: ${label}`, function() {
     describe('Public Directory Generated Output', function() {
@@ -45,15 +43,16 @@ function defaultNotFound(label) {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, '404.html'));
       });
 
-      it('should have one <script> tag in the <body> for the main bundle', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body script');
-        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
+      it('should have one <script> tag in the <body>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body > script');
 
-          return mainBundleScriptRegex.test(src);
-        });
+        expect(scriptTags.length).to.be.equal(1);
+      });
+      
+      it('should have no <script> tags in the <head>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body > head');
 
-        expect(bundledScript.length).to.be.equal(1);
+        expect(scriptTags.length).to.be.equal(0);
       });
 
       it('should have a <title> tag in the <head>', function() {
@@ -88,24 +87,16 @@ function defaultIndex(label) {
         expect(title).to.be.equal('My App');
       });
 
-      it('should have one <script> tag in the <body> for the main bundle', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body app-root ~ script');
-        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
+      it('should have no <script> tag in the <body>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body > script');
 
-          return mainBundleScriptRegex.test(src);
-        });
-
-        expect(bundledScript.length).to.be.equal(0);
+        expect(scriptTags.length).to.be.equal(0);
       });
       
-      it('should have one <script> tag for Apollo state', function() {
-        const scriptTags = dom.window.document.querySelectorAll('script');
-        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.getAttribute('data-state') === 'apollo';
-        });
+      it('should have no <script> tags in the <head>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script');
 
-        expect(bundleScripts.length).to.be.equal(1);
+        expect(scriptTags.length).to.be.equal(0);
       });
 
       it('should have a router outlet tag in the <body>', function() {

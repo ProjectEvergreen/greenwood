@@ -46,7 +46,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
+    runSmokeTest(['public', 'not-found', 'hello'], LABEL);
 
     describe('Script tag in the <head> tag', function() {
       let dom;
@@ -63,6 +63,12 @@ describe('Build Greenwood With: ', function() {
         });
 
         expect(polyfillScriptTags.length).to.be.equal(1);
+      });
+
+      it('should not add more <script> tags to the <body>', function() {
+        const bodyTags = dom.window.document.querySelectorAll('body script');
+
+        expect(bodyTags.length).to.be.equal(0);
       });
 
     });

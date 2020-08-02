@@ -22,16 +22,21 @@ module.exports = serializeBuild = async (compilation) => {
         return await browserRunner.serialize(`http://127.0.0.1:${PORT}${route}`).then(async (content) => {
           const target = path.join(publicDir, route);
           const mode = compilation.config.mode;
-          let html = content
-            .replace(polyfill, '')
-            .replace('<script></script>', `
-              <script data-state="apollo">
+          const isStrictMode = mode === 'strict';
+          const apolloScript = isStrictMode
+            ? ''
+            : `<script data-state="apollo">
                 window.__APOLLO_STATE__ = true;
               </script> 
-            `);
+            `;
+          
+          let html = content
+            .replace(polyfill, '')
+            .replace('<script></script>', apolloScript);
 
-          if (mode === 'strict') { // no javascript
+          if (isStrictMode) { // no javascript
             html = html.replace(/<script type="text\/javascript" src="\/index.*.bundle\.js"><\/script>/, '');
+            html = html.replace(/<script charset="utf-8" src="\/*.*.bundle\.js"><\/script>/, '');
           } else if (mode === 'spa') { // all the javascript, and async!
             html = html.replace(/<script type="text\/javascript"/, '<script async="true" type="text/javascript"');
           }

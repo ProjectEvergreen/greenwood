@@ -36,7 +36,6 @@ const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Data from GraphQL';
-  const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
   let setup;
 
   before(async function() {
@@ -87,15 +86,10 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
-      it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {
+      it('should have no <script> tags in the <head>', () => {
         const scriptTags = dom.window.document.querySelectorAll('head > script');
-        const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.getAttribute('data-state') === 'apollo';
-        });
-        const innerHTML = apolloScriptTags[0].innerHTML;
 
-        expect(apolloScriptTags.length).to.equal(1);
-        expect(innerHTML).to.match(apolloStateRegex);
+        expect(scriptTags.length).to.be.equal(0);
       });
 
       it('should have a <header> tag in the <body>', function() {
@@ -130,14 +124,10 @@ describe('Build Greenwood With: ', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'blog', 'index.html'))).to.be.true;
       });
 
-      it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
-        const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.getAttribute('data-state') === 'apollo';
-        });
+      it('should have no <script> tags in the <head>', () => {
+        const scriptTags = dom.window.document.querySelectorAll('body ~ script');
 
-        expect(apolloScriptTags.length).to.be.equal(1);
-        expect(apolloScriptTags[0].innerHTML).to.match(apolloStateRegex);
+        expect(scriptTags.length).to.be.equal(0);
       });
 
       it('should have a <header> tag in the <body>', function() {
@@ -195,14 +185,10 @@ describe('Build Greenwood With: ', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'blog', 'first-post', 'index.html'))).to.be.true;
       });
 
-      it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
-        const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.getAttribute('data-state') === 'apollo';
-        });
+      it('should have no <script> tags in the <head>', () => {
+        const scriptTags = dom.window.document.querySelectorAll('body > script');
 
-        expect(apolloScriptTags.length).to.be.equal(1);
-        expect(apolloScriptTags[0].innerHTML).to.match(apolloStateRegex);
+        expect(scriptTags.length).to.be.equal(0);
       });
 
       it('should have a <header> tag in the <body>', function() {

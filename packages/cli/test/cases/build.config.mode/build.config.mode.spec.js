@@ -77,7 +77,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have one <script> tag for Apollo state', function() {
-        const scriptTags = dom.window.document.querySelectorAll('script');
+        const scriptTags = dom.window.document.querySelectorAll('head > script');
         const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';
         });
