@@ -1,7 +1,6 @@
 import { html, LitElement } from 'lit-element';
 import bannerCss from './banner.css';
 import buttonCss from './button.css';
-import greenwoodLogo250 from '../../assets/greenwood-logo-250w.png';
 import greenwoodLogo300 from '../../assets/greenwood-logo-300w.png';
 import greenwoodLogo500 from '../../assets/greenwood-logo-500w.png';
 import greenwoodLogo750 from '../../assets/greenwood-logo-750w.png';
@@ -61,11 +60,11 @@ class Banner extends LitElement {
             <img 
               src="${greenwoodLogo300}" 
               alt="Greenwood Logo"
-              srcset="${greenwoodLogo250} 1x,
-                      ${greenwoodLogo300} 2x,
-                      ${greenwoodLogo500} 3x,
-                      ${greenwoodLogo750} 4x,
-                      ${greenwoodLogo1000} 5x"/>
+              srcset="${greenwoodLogo300} 1x,
+                      ${greenwoodLogo500} 2x,
+                      ${greenwoodLogo750} 3x,
+                      ${greenwoodLogo1000} 4x
+                      ${greenwoodLogo1500} 5x"/>
 
             <h3>The static site generator for your. . . <br /><span class="${this.animateState}">${currentProjectType}.</span></h3>
 
