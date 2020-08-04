@@ -63,7 +63,7 @@ class Banner extends LitElement {
               srcset="${greenwoodLogo300} 1x,
                       ${greenwoodLogo500} 2x,
                       ${greenwoodLogo750} 3x,
-                      ${greenwoodLogo1000} 4x
+                      ${greenwoodLogo1000} 4x,
                       ${greenwoodLogo1500} 5x"/>
 
             <h3>The static site generator for your. . . <br /><span class="${this.animateState}">${currentProjectType}.</span></h3>
