@@ -3,7 +3,11 @@ import client from '@greenwood/cli/data/client';
 import MenuQuery from '@greenwood/cli/data/queries/menu';
 import '@evergreen-wc/eve-container';
 import headerCss from './header.css';
-import brand from '../../assets/brand.png';
+import brand32 from '../../assets/brand-32w.png';
+import brand64 from '../../assets/brand-64w.png';
+import brand128 from '../../assets/brand-128w.png';
+import brand256 from '../../assets/brand-256w.png';
+import brand512 from '../../assets/brand-256w.png';
 import '../components/social-icons/social-icons';
 
 class HeaderComponent extends LitElement {
@@ -50,7 +54,14 @@ class HeaderComponent extends LitElement {
             <div class="brand">
               <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer"
                 onclick="getOutboundLink('https://projectevergreen.github.io');">
-                <img src="${brand}" alt="Greenwood logo"/>
+                <img 
+                  src="${brand64}" 
+                  alt="Greenwood logo"
+                  srcset="${brand32} 1x,
+                      ${brand64} 2x,
+                      ${brand128} 3x,
+                      ${brand256} 4x,
+                      ${brand512} 5x"/>
               </a>
               <div class="project-name">
                 <a href="/">Greenwood</a>
