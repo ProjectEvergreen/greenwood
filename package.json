@@ -17,10 +17,10 @@
     "clean": "rimraf ./**/.greenwood/** && rimraf ./**/public/** && rimraf ./coverage",
     "clean:deps": "rimraf **/node_modules/**",
     "lint": "ls-lint && eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
-    "build": "yarn clean && node . build",
+    "build": "node . build",
     "serve": "yarn build && cd ./public && ws",
-    "develop": "yarn clean && node . develop",
-    "test": "export BROWSERSLIST_IGNORE_OLD_DATA=true && yarn clean && nyc mocha",
+    "develop": "node . develop",
+    "test": "export BROWSERSLIST_IGNORE_OLD_DATA=true && nyc mocha",
     "test:tdd": "yarn test --watch"
   },
   "devDependencies": {
