@@ -45,33 +45,28 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public', 'not-found', 'hello'], LABEL);
+    runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
 
     describe('Initialization script', function() {
+      let inlineScript = [];
       let scriptSrcTags = [];
-      let inlineScripts = [];
-      let dom;
 
       beforeEach(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+        const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+        const scriptTags = dom.window.document.querySelectorAll('head script');
 
-        const headTags = dom.window.document.querySelectorAll('head script');
-
-        inlineScripts = Array.prototype.slice.call(headTags).filter(script => {
-          return !script.src;
+        inlineScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          return !script.src && !script.getAttribute('data-state');
         });
-        
-        scriptSrcTags = Array.prototype.slice.call(headTags).filter(script => {
+
+        scriptSrcTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.src && script.src.indexOf('google') >= 0;
         });
+
       });
 
-      it('should be one inline <script> tag in the <head>', function() {
-        expect(inlineScripts.length).to.be.equal(1);
-      });
-
-      it('should be one <script> tag in the <head>', function() {
-        expect(scriptSrcTags.length).to.be.equal(1);
+      it('should be one inline <script> tag', function() {
+        expect(inlineScript.length).to.be.equal(1);
       });
 
       it('should have the expected code with users analyicsId', function() {
@@ -92,13 +87,11 @@ describe('Build Greenwood With: ', function() {
             gtag('config', '${mockAnalyticsId}');
         `;
 
-        expect(inlineScripts[0].textContent).to.contain(expectedContent);
+        expect(inlineScript[0].textContent).to.contain(expectedContent);
       });
 
-      it('should not add any <script> tags to the body', function() {
-        const bodyTags = dom.window.document.querySelectorAll('body script');
-
-        expect(bodyTags.length).to.be.equal(0);
+      it('should only have one external Google script tag', function() {
+        expect(scriptSrcTags.length).to.be.equal(1);
       });
     });
 

@@ -57,7 +57,7 @@ describe('Build Greenwood With: ', function() {
         expect(title).to.be.equal('My App');
       });
 
-      it('should have no <script> tags in the <body> for the main bundle like default app-template', function() {
+      it('should have one <script> tag in the <body> for the main bundle', function() {
         const scriptTags = dom.window.document.querySelectorAll('body script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
@@ -65,20 +65,20 @@ describe('Build Greenwood With: ', function() {
           return mainBundleScriptRegex.test(src);
         });
 
-        expect(bundledScript.length).to.be.equal(0);
+        expect(bundledScript.length).to.be.equal(1);
       });
 
-      it('should have a router outlet tag in the <body> like default app-template', function() {
+      it('should have a router outlet tag in the <body>', function() {
         const outlet = dom.window.document.querySelectorAll('body app-root');
 
         expect(outlet.length).to.be.equal(1);
       });
 
-      // no 404 route in our custom app-template.js
+      // no 404 route in our custom app-template.js, like greenwood does
       it('should have the correct route tags in the <body>', function() {
         const routes = dom.window.document.querySelectorAll('body lit-route');
 
-        expect(routes.length).to.be.equal(1);
+        expect(routes.length).to.be.equal(2);
       });
 
       it('should have the expected heading text within the index page in the public directory', function() {

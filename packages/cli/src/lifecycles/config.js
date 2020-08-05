@@ -6,7 +6,7 @@ const modes = ['strict', 'spa'];
 
 let defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
-  mode: 'strict',
+  mode: 'spa',
   devServer: {
     port: 1984,
     host: 'localhost'

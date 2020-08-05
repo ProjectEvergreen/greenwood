@@ -25,7 +25,8 @@
  */
 const expect = require('chai').expect;
 const fs = require('fs');
-const glob = require('glob-promise');
+const { JSDOM } = require('jsdom');
+const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 const { version } = require('../../../package.json');
@@ -51,13 +52,19 @@ describe('Build Greenwood With: ', function() {
       let bundleFile;
 
       beforeEach(async function() {
-        const files = await glob(`${this.context.publicDir}/index.*.bundle.js`);
-        
-        bundleFile = files[0];
+        const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+        const scriptTags = dom.window.document.querySelectorAll('body script');
+        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src;
+
+          return src.indexOf('index.') >= 0 && src.indexOf('.bundle.js') >= 0;
+        });
+
+        bundleFile = bundleScripts[0].src.replace('file:///', '');
       });
 
       it('should have the banner text in index.js', function() {
-        const fileContents = fs.readFileSync(bundleFile, 'utf8');
+        const fileContents = fs.readFileSync(path.resolve(this.context.publicDir, bundleFile), 'utf8');
 
         expect(fileContents).to.contain(mockBanner);
       });
