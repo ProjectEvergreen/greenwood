@@ -1,0 +1,16 @@
+ls:
+  .js: lowercase
+  .json: lowercase
+  .css: lowercase
+  .html: lowercase
+  .ico: lowercase
+  .jpg: lowercase
+  .png: lowercase
+  .svg: lowercase
+  .tff: lowercase
+  .woff: lowercase
+  .woff2: lowercase
+
+ignore: 
+  - .git 
+  - node_modules
