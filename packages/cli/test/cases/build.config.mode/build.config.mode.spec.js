@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with mode setting in Greenwood config set to spa.
+ * Run Greenwood with mode setting in Greenwood config set to strict.
  *
  * User Result
  * Should generate a bare bones Greenwood build with bundle JavaScript and routes.
@@ -28,9 +28,7 @@ const expect = require('chai').expect;
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-const mainBundleScriptRegex = /index.*.bundle\.js/;
-
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Mode';
   let setup;
 
@@ -47,31 +45,26 @@ xdescribe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'not-found', 'hello'], LABEL);
 
-    describe('SPA', function() {
+    describe('Strict', function() {
       let dom;
 
       beforeEach(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
       
-      it('should have no <script> tag in the <body> for the main bundle', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body app-root ~ script');
-        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
-      
-          return mainBundleScriptRegex.test(src);
-        });
-      
-        expect(bundledScript.length).to.be.equal(1);
-      });
-      
-      it('should have no <script> tags in the <body> for the main bundle loaded with defer', function() {
+      it('should have no <script> tag in the <body>', function() {
         const scriptTags = dom.window.document.querySelectorAll('body > script');
+      
+        expect(scriptTags.length).to.be.equal(0);
+      });
+      
+      it('should have no <script> tags in the <head>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script');
 
-        expect(scriptTags.length).to.be.equal(1);
+        expect(scriptTags.length).to.be.equal(0);
       });
 
-      it('should have no one <script> tag for Apollo state', function() {
+      it('should have no <script> tags for Apollo state', function() {
         const scriptTags = dom.window.document.querySelectorAll('script');
         const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';
@@ -86,10 +79,10 @@ xdescribe('Build Greenwood With: ', function() {
         expect(outlet.length).to.be.equal(1);
       });
       
-      it('should have the correct route tags in the <body>', function() {
+      it('should have only 2 route tags in the <body>', function() {
         const routes = dom.window.document.querySelectorAll('body lit-route');
       
-        expect(routes.length).to.be.equal(0);
+        expect(routes.length).to.be.equal(2);
       });
     });
 

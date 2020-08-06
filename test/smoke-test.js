@@ -114,6 +114,17 @@ function defaultIndex(label) {
         expect(bundledScript.length).to.be.equal(1);
       });
 
+      it('should have one <script> tag in the <body> for the main bundle loaded with defer', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body > script');
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+
+          return mainBundleScriptRegex.test(src);
+        });
+
+        expect(bundledScript[0].getAttribute('defer')).to.be.equal('');
+      });
+
       it('should have one <script> tag for Apollo state', function() {
         const scriptTags = dom.window.document.querySelectorAll('script');
         const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
@@ -122,17 +133,6 @@ function defaultIndex(label) {
 
         expect(bundleScripts.length).to.be.equal(1);
       });
-
-      // it('should have no <script> tags in the <body> for the main bundle loaded with defer', function() {
-      //   const scriptTags = dom.window.document.querySelectorAll('body > script');
-      //   const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
-      //     const src = script.src.replace('file:///', '');
-
-      //     return mainBundleScriptRegex.test(src);
-      //   });
-
-      //   expect(bundledScript[0].getAttribute('defer')).to.be.equal('');
-      // });
 
       it('should have a router outlet tag in the <body>', function() {
         const outlet = dom.window.document.querySelectorAll('body eve-app');
