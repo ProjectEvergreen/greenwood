@@ -27,6 +27,8 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
+const mainBundleScriptRegex = /index.*.bundle\.js/;
+
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Data from GraphQL and using Custom Frontmatter Data';
   const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
@@ -68,14 +70,33 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
+      it('should have one <script> tag in the <body> for the main bundle', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body > script');
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+
+          return mainBundleScriptRegex.test(src);
+        });
+
+        expect(bundledScript.length).to.be.equal(1);
+      });
+
       it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
+        const scriptTags = dom.window.document.querySelectorAll('script');
         const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';
         });
+        const innerHTML = apolloScriptTags[0].innerHTML;
 
-        expect(apolloScriptTags.length).to.be.equal(1);
-        expect(apolloScriptTags[0].innerHTML).to.match(apolloStateRegex);
+        expect(apolloScriptTags.length).to.equal(1);
+        expect(innerHTML).to.match(apolloStateRegex);
+      });
+
+      // two webpack bundles, and apollo state
+      it('should have only 3 <script> tag in the <head>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script');
+
+        expect(scriptTags.length).to.be.equal(3);
       });
 
       it('should have expected blog posts links in the <body> tag when using ChildrenQuery', function() {

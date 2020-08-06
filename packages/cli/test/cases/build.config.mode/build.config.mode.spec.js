@@ -54,7 +54,7 @@ xdescribe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
       
-      it('should have one <script> tag in the <body> for the main bundle', function() {
+      it('should have no <script> tag in the <body> for the main bundle', function() {
         const scriptTags = dom.window.document.querySelectorAll('body app-root ~ script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
@@ -65,24 +65,19 @@ xdescribe('Build Greenwood With: ', function() {
         expect(bundledScript.length).to.be.equal(1);
       });
       
-      it('should have one <script> tag in the <body> for the main bundle loaded with defer', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body app-root ~ script');
-        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
+      it('should have no <script> tags in the <body> for the main bundle loaded with defer', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body > script');
 
-          return mainBundleScriptRegex.test(src);
-        });
-
-        expect(bundledScript[0].getAttribute('defer')).to.be.equal('');
+        expect(scriptTags.length).to.be.equal(1);
       });
 
-      it('should have one <script> tag for Apollo state', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
+      it('should have no one <script> tag for Apollo state', function() {
+        const scriptTags = dom.window.document.querySelectorAll('script');
         const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';
         });
       
-        expect(bundleScripts.length).to.be.equal(1);
+        expect(bundleScripts.length).to.be.equal(0);
       });
       
       it('should have a router outlet tag in the <body>', function() {
@@ -94,7 +89,7 @@ xdescribe('Build Greenwood With: ', function() {
       it('should have the correct route tags in the <body>', function() {
         const routes = dom.window.document.querySelectorAll('body lit-route');
       
-        expect(routes.length).to.be.equal(4);
+        expect(routes.length).to.be.equal(0);
       });
     });
 
