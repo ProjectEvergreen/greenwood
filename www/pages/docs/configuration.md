@@ -98,17 +98,17 @@ Which would be equivalent to:
 <link rel="icon" href="/assets/favicon.ico">
 ```
 
-### Mode
+### Optimization
 Greenwood supports a couple different options for how it will generate a production build, depending on how much JavaScript you will need to serve your users.
-- **strict (default)**: What you write will only be used to pre-render your application. No JavaScript is shipped at all* and will typically yield the best results in regards to performance.
-- **spa** (expiremental): This will pre-render your site _and_ also ship a full "SPA" experience for your users.
+- **strict** (recommended for basic sites): What you write will only be used to pre-render your application. No JavaScript is shipped at all and will typically yield the best results in regards to performance.
+- **spa** (default): This will pre-render your site _and_ also ship a full "SPA" experience for your users.
 
-> _You can learn more about modes in our [How It Works](/about/how-it-works) docs._
+> _You can learn more about optimizations in our [How It Works](/about/how-it-works) docs._
 
 #### Example
 ```js
 module.exports = {
-  mode: 'spa'
+  optimization: 'spa'
 }
 ```
 
