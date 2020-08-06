@@ -21,9 +21,9 @@ module.exports = serializeBuild = async (compilation) => {
   
         return await browserRunner.serialize(`http://127.0.0.1:${PORT}${route}`).then(async (content) => {
           const target = path.join(publicDir, route);
-          const mode = compilation.config.mode;
-          const isStrictMode = mode === 'strict';
-          const apolloScript = isStrictMode
+          const optimization = compilation.config.optimization;
+          const isStrictOptimization = optimization === 'strict';
+          const apolloScript = isStrictOptimization
             ? ''
             : `<script data-state="apollo">
                 window.__APOLLO_STATE__ = true;
@@ -34,13 +34,13 @@ module.exports = serializeBuild = async (compilation) => {
             .replace(polyfill, '')
             .replace('<script></script>', apolloScript);
 
-          if (isStrictMode) { // no javascript
+          if (isStrictOptimization) { // no javascript
             html = html.replace(/<script type="text\/javascript" src="\/index.*.bundle\.js"><\/script>/, ''); // main bundle
             html = html.replace(/<script charset="utf-8" src="\/*.*.bundle\.js"><\/script>/, ''); // dynamic / import() bundles
             html = html.replace(/<lit-route path="(.*)" component="(.*)" class="(.*)">(.*)<\/lit-route>/g, ''); // lit redux routes
-          } else if (mode === 'spa') { // all the javascript, and async!
-            html = html.replace(/<script type="text\/javascript"/, '<script defer="" type="text/javascript"');
-            html = html.replace(/<script charset="utf-8"/, '<script defer="" charset="utf-8"'); // dynamic / import() bundles
+          } else if (optimization === 'spa') { // all the javascript, and async!
+            html = html.replace(/<script type="text\/javascript"/, '<script async="" type="text/javascript"');
+            html = html.replace(/<script charset="utf-8"/, '<script async="" charset="utf-8"'); // dynamic / import() bundles
           }
   
           await fs.mkdirs(target, { recursive: true });

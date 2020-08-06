@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with mode setting in Greenwood config set to strict.
+ * Run Greenwood with optimization setting in Greenwood config set to strict.
  *
  * User Result
  * Should generate a bare bones Greenwood build with bundle JavaScript and routes.
@@ -10,7 +10,7 @@
  *
  * User Config
  * {
- *   mode: 'spa'
+ *   optimization: 'spa'
  * }
  *
  * User Workspace

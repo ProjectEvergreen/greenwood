@@ -81,6 +81,17 @@ describe('Build Greenwood With: ', function() {
         expect(bundledScript.length).to.be.equal(1);
       });
 
+      it('should have one <script> tag in the <body> for the main bundle loaded with async', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body > script');
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+
+          return mainBundleScriptRegex.test(src);
+        });
+
+        expect(bundledScript[0].getAttribute('async')).to.be.equal('');
+      });
+
       it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {
         const scriptTags = dom.window.document.querySelectorAll('script');
         const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {

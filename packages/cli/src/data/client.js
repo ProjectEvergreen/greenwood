@@ -14,7 +14,7 @@ const backupQuery = client.query;
 
 client.query = (params) => {
   if (APOLLO_STATE) {
-    // __APOLLO_STATE__ defined, in "SSG" mode...
+    // __APOLLO_STATE__ defined, in production mode
     const queryHash = getQueryHash(params.query, params.variables);
     const cachePath = `/${queryHash}-cache.json`;
     
@@ -27,7 +27,7 @@ client.query = (params) => {
         };
       });
   } else {
-    // __APOLLO_STATE__ NOT defined, in "SPA" mode
+    // __APOLLO_STATE__ NOT defined, in development mode
     return backupQuery(params);
   }
 };

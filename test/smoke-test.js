@@ -114,7 +114,7 @@ function defaultIndex(label) {
         expect(bundledScript.length).to.be.equal(1);
       });
 
-      it('should have one <script> tag in the <body> for the main bundle loaded with defer', function() {
+      it('should have one <script> tag in the <body> for the main bundle loaded with async', function() {
         const scriptTags = dom.window.document.querySelectorAll('body > script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
@@ -122,7 +122,7 @@ function defaultIndex(label) {
           return mainBundleScriptRegex.test(src);
         });
 
-        expect(bundledScript[0].getAttribute('defer')).to.be.equal('');
+        expect(bundledScript[0].getAttribute('async')).to.be.equal('');
       });
 
       it('should have one <script> tag for Apollo state', function() {

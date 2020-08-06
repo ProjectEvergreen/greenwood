@@ -55,8 +55,8 @@ describe('Unit Test: Data', function() {
 
       describe('Mode', function() {
 
-        it('should have the default mode of strict', function() {
-          expect(config.mode).to.equal(MOCK_CONFIG.config.mode);
+        it('should have a default optimization setting of spa', function() {
+          expect(config.optimization).to.equal(MOCK_CONFIG.config.optimization);
         });
 
       });
