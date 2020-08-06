@@ -11,13 +11,23 @@ class HomeTemplate extends LitElement {
       <style>
         ${homeCss}
       </style>
-        <eve-banner></eve-banner>
-        <div class='gwd-content-wrapper'>
-          <eve-container fluid>
-            <div class='gwd-page-template gwd-content'>
-              <entry></entry>
-            </div>
-          </eve-container>
+
+      <script>
+        function inlineScript() {
+          alert('inline script running even in SSG mode, loading no external JS! 🎉');
+        }
+      </script>
+
+      <eve-banner></eve-banner>
+
+      <button onclick="inlineScript()">For a good time, click here.</button>
+      
+      <div class='gwd-content-wrapper'>
+        <eve-container fluid>
+          <div class='gwd-page-template gwd-content'>
+            <entry></entry>
+          </div>
+        </eve-container>
       </div>
     `;
   }
