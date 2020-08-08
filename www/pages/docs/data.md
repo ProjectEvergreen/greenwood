@@ -219,6 +219,7 @@ query {
       value,
       href
     },
+    optimization,
     publicPath,
     title,
     workspace

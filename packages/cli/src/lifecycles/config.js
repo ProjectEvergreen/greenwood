@@ -2,12 +2,15 @@ const fs = require('fs-extra');
 const path = require('path');
 const url = require('url');
 
+const optimizations = ['strict', 'spa'];
+
 let defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {
     port: 1984,
     host: 'localhost'
   },
+  optimization: 'spa',
   publicPath: '/',
   title: 'My App',
   meta: [],
@@ -25,7 +28,7 @@ module.exports = readAndMergeConfig = async() => {
 
       if (await fs.exists(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, publicPath, title, meta, plugins, themeFile, markdown } = userCfgFile;
+        const { workspace, devServer, optimization, publicPath, title, meta, plugins, themeFile, markdown } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -70,6 +73,12 @@ module.exports = readAndMergeConfig = async() => {
 
         if (meta && meta.length > 0) {
           customConfig.meta = meta;
+        }
+
+        if (typeof optimization === 'string' && optimizations.indexOf(optimization.toLowerCase()) >= 0) {
+          customConfig.optimization = optimization;
+        } else if (optimization) {
+          reject(`Error: provided optimization "${optimization}" is not supported.  Please use one of: ${optimizations.join(', ')}.`);
         }
 
         if (plugins && plugins.length > 0) {

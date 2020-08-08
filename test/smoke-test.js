@@ -56,6 +56,21 @@ function defaultNotFound(label) {
         expect(bundledScript.length).to.be.equal(1);
       });
 
+      it('should have no <script> tags for Apollo state', function() {
+        const scriptTags = dom.window.document.querySelectorAll('script');
+        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
+          return script.getAttribute('data-state') === 'apollo';
+        });
+
+        expect(bundleScripts.length).to.be.equal(0);
+      });
+
+      it('should have no <script> tags in the <head>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script');
+
+        expect(scriptTags.length).to.be.equal(0);
+      });
+
       it('should have a <title> tag in the <head>', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
@@ -89,7 +104,7 @@ function defaultIndex(label) {
       });
 
       it('should have one <script> tag in the <body> for the main bundle', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body app-root ~ script');
+        const scriptTags = dom.window.document.querySelectorAll('body > script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
 
@@ -99,13 +114,15 @@ function defaultIndex(label) {
         expect(bundledScript.length).to.be.equal(1);
       });
 
-      it('should have one <script> tag for Apollo state', function() {
-        const scriptTags = dom.window.document.querySelectorAll('script');
-        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.getAttribute('data-state') === 'apollo';
+      it('should have one <script> tag in the <body> for the main bundle loaded with async', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body > script');
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+
+          return mainBundleScriptRegex.test(src);
         });
 
-        expect(bundleScripts.length).to.be.equal(1);
+        expect(bundledScript[0].getAttribute('async')).to.be.equal('');
       });
 
       it('should have one <script> tag for Apollo state', function() {
