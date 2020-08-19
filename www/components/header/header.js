@@ -50,18 +50,7 @@ class HeaderComponent extends LitElement {
             <div class="brand">
               <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer"
                 onclick="getOutboundLink('https://projectevergreen.github.io');">
-<<<<<<< HEAD
-                <img 
-                  src="${brand64}" 
-                  alt="Greenwood logo"
-                  srcset="${brand32} 1x,
-                      ${brand64} 2x,
-                      ${brand128} 3x,
-                      ${brand256} 4x,
-                      ${brand512} 5x"/>
-=======
                 <img src="${evergreenLogo}" alt="Greenwood logo"/>
->>>>>>> 61c2f289358b795b4bdd10c3d140967a5e69552f
               </a>
               <div class="project-name">
                 <a href="/">Greenwood</a>
