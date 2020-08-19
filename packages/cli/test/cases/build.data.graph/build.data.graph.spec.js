@@ -34,6 +34,8 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
+const mainBundleScriptRegex = /index.*.bundle\.js/;
+
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Data from GraphQL';
   const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
@@ -87,8 +89,30 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
+      it('should have one <script> tag in the <body> for the main bundle', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body > script');
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+
+          return mainBundleScriptRegex.test(src);
+        });
+
+        expect(bundledScript.length).to.be.equal(1);
+      });
+
+      it('should have one <script> tag in the <body> for the main bundle loaded with async', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body > script');
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+
+          return mainBundleScriptRegex.test(src);
+        });
+
+        expect(bundledScript[0].getAttribute('async')).to.be.equal('');
+      });
+
       it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
+        const scriptTags = dom.window.document.querySelectorAll('script');
         const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';
         });
@@ -96,6 +120,12 @@ describe('Build Greenwood With: ', function() {
 
         expect(apolloScriptTags.length).to.equal(1);
         expect(innerHTML).to.match(apolloStateRegex);
+      });
+
+      it('should have only one <script> tag in the <head>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script');
+
+        expect(scriptTags.length).to.be.equal(1);
       });
 
       it('should have a <header> tag in the <body>', function() {
@@ -130,14 +160,32 @@ describe('Build Greenwood With: ', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'blog', 'index.html'))).to.be.true;
       });
 
+      it('should have one <script> tag in the <body> for the main bundle', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body > script');
+        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.src.replace('file:///', '');
+
+          return mainBundleScriptRegex.test(src);
+        });
+
+        expect(bundledScript.length).to.be.equal(1);
+      });
+
       it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
+        const scriptTags = dom.window.document.querySelectorAll('script');
         const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';
         });
+        const innerHTML = apolloScriptTags[0].innerHTML;
 
-        expect(apolloScriptTags.length).to.be.equal(1);
-        expect(apolloScriptTags[0].innerHTML).to.match(apolloStateRegex);
+        expect(apolloScriptTags.length).to.equal(1);
+        expect(innerHTML).to.match(apolloStateRegex);
+      });
+
+      it('should have only one <script> tag in the <head>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script');
+
+        expect(scriptTags.length).to.be.equal(2);
       });
 
       it('should have a <header> tag in the <body>', function() {
@@ -196,13 +244,14 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
+        const scriptTags = dom.window.document.querySelectorAll('script');
         const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';
         });
+        const innerHTML = apolloScriptTags[0].innerHTML;
 
-        expect(apolloScriptTags.length).to.be.equal(1);
-        expect(apolloScriptTags[0].innerHTML).to.match(apolloStateRegex);
+        expect(apolloScriptTags.length).to.equal(1);
+        expect(innerHTML).to.match(apolloStateRegex);
       });
 
       it('should have a <header> tag in the <body>', function() {

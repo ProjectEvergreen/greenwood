@@ -20,6 +20,55 @@ This allows us to provide fine tuned workflows for both development and producti
 
 > Note: As powerful as **webpack** is, it does provide a lot of seemingly "magical" functionality out of the box, in particular its ability to use `import` to turn just about anything into a module (css, images, text files, etc).  While this is convenient at build time and for development, being able to use `import` non JavaScript assets is not part of any specification.  For this reason, we urge developers to understand what **webpack** does that _is_ spec compliant, and what it does that _isn't_.  Where possible, Greenwood will always favor a stable web platform first solution, e.g. if CSS Modules were to become a spec, Greenwood will make sure it is supported.
 
+### Optimization
+Greenwood supports a couple [different options](/docs/configuration#optimization) depending on what kind of site how you want to control the pre-rendering and bundling of your project.  Generally this comes down to if you need JavaScript to actually "run" your site.
+
+> _Ideally, Greenwood would like to offer a [**progressive** option](https://github.com/ProjectEvergreen/greenwood/issues/354) that only ships the JavaScript you actually need at runtime automatically._  All optimzation options aim to provide the best balance of performance and achieving as close to 💯for a Lighthouse score.
+
+#### Strict
+With this setting, _no bundled JavaScript_ is shipped at all.  For true static sites with projects that are "side effect" free (e.g. not using `fetch`, `setTimeout`, etc and just need to render some static HTML, will  yield the best results in regards to [performance scores](https://developers.google.com/web/tools/lighthouse).  What you write will only be used to pre-render your application.
+
+As a neat trick though, you can still use ["inline" JavaScript](https://github.com/ProjectEvergreen/greenwood/pull/401) that will get rendered inline in the HTML.
+
+```javascript
+import { html, LitElement } from 'lit-element';
+
+class HomeTemplate extends LitElement {
+
+  render() {
+    return html\`
+      <style>
+        /* some CSS if you need it */
+      </style>
+
+      <script>
+        function inlineScript() {
+          alert('inline script running even in SSG mode when loading no external JS! 🎉');
+        }
+      </script>
+      
+      <div class='gwd-content-wrapper'>
+        <button onclick="inlineScript()">For a good time, click here.</button>
+        <entry></entry>
+      </div>
+    \`;
+  }
+}
+
+customElements.define('page-template', HomeTemplate);
+```
+
+Caveats:
+- Currently [not working during development (inside a LitElement `render` block)](https://github.com/ProjectEvergreen/greenwood/issues/413)
+- Code like [`fetch` and `setTimeout` in your JavaScript will not be available](https://github.com/ProjectEvergreen/greenwood/blob/v0.8.0/www/components/banner/banner.js#L37)
+- Your [CSS selectors cannot target custom elements](https://github.com/thegreenhouseio/www.thegreenhouse.io/pull/158/) (since `customElements.define` will not run)
+
+
+#### SPA (default)
+This option will bundle all your JavaScript, including a client side router provided by Greenwood (just like when development mode).  This will pre-render your site _and_ also ship a full "SPA" experience for your users and try and hydrate from that, but at the cost of shipping a little more JavaScript, so choose wisely!  
+
+> THere are a some [known issues](https://github.com/ProjectEvergreen/greenwood/labels/mode%3Aspa) we are tracking at this time as we refine support for this feature.
+
 ### Evergreen Build
 Greenwood promotes an "evergreen" build that ensures that the code delivered to users is as modern as the code all based on real browser usage and support statistics.  Automatically!
 

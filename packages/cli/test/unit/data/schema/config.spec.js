@@ -53,6 +53,14 @@ describe('Unit Test: Data', function() {
         });
       });
 
+      describe('Mode', function() {
+
+        it('should have a default optimization setting of spa', function() {
+          expect(config.optimization).to.equal(MOCK_CONFIG.config.optimization);
+        });
+
+      });
+
       describe('Public Path', function() {
         const { publicPath } = MOCK_CONFIG.config;
 
