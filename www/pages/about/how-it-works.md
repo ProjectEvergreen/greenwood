@@ -59,6 +59,7 @@ customElements.define('page-template', HomeTemplate);
 ```
 
 Caveats:
+- Currently [not working during development (inside a LitElement `render` block)](https://github.com/ProjectEvergreen/greenwood/issues/413)
 - Code like [`fetch` and `setTimeout` in your JavaScript will not be available](https://github.com/ProjectEvergreen/greenwood/blob/v0.8.0/www/components/banner/banner.js#L37)
 - Your [CSS selectors cannot target custom elements](https://github.com/thegreenhouseio/www.thegreenhouse.io/pull/158/) (since `customElements.define` will not run)
 
