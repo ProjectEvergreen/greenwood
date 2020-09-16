@@ -1,6 +1,6 @@
 const path = require('path');
-const pluginGoogleAnalytics = require('./packages/plugin-google-analytics/src/index');
-const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
+// const pluginGoogleAnalytics = require('./packages/plugin-google-analytics/src/index');
+// const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
@@ -19,18 +19,19 @@ module.exports = {
     { rel: 'shortcut icon', href: FAVICON_HREF },
     { rel: 'icon', href: FAVICON_HREF },
     { name: 'google-site-verification', content: '4rYd8k5aFD0jDnN0CCFgUXNe4eakLP4NnA18mNnK5P0' }
-  ],
-  plugins: [
-    ...pluginGoogleAnalytics({
-      analyticsId: 'UA-147204327-1'
-    }),
-    ...pluginPolyfills()
-  ],
-  markdown: {
-    plugins: [
-      require('rehype-slug'),
-      require('rehype-autolink-headings'),
-      require('remark-github')
-    ]
-  }
+  ]
+  // TODO
+  // plugins: [
+  //   ...pluginGoogleAnalytics({
+  //     analyticsId: 'UA-147204327-1'
+  //   }),
+  //   ...pluginPolyfills()
+  // ],
+  // markdown: {
+  //   plugins: [
+  //     require('rehype-slug'),
+  //     require('rehype-autolink-headings'),
+  //     require('remark-github')
+  //   ]
+  // }
 };

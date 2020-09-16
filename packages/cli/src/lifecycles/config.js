@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const url = require('url');
 
-const optimizations = ['strict', 'spa'];
+// TODO const optimizations = ['strict', 'spa'];
 
 let defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
@@ -10,12 +10,12 @@ let defaultConfig = {
     port: 1984,
     host: 'localhost'
   },
-  optimization: 'spa',
+  // optimization: 'spa',
   publicPath: '/',
   title: 'My App',
   meta: [],
   plugins: [],
-  themeFile: 'theme.css',
+  // TODO themeFile: 'theme.css',
   markdown: { plugins: [], settings: {} }
 };
 
@@ -25,7 +25,7 @@ module.exports = readAndMergeConfig = async() => {
     try {
       // deep clone of default config
       let customConfig = Object.assign({}, defaultConfig);
-
+      
       if (await fs.exists(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
         const { workspace, devServer, optimization, publicPath, title, meta, plugins, themeFile, markdown } = userCfgFile;
@@ -75,36 +75,38 @@ module.exports = readAndMergeConfig = async() => {
           customConfig.meta = meta;
         }
 
-        if (typeof optimization === 'string' && optimizations.indexOf(optimization.toLowerCase()) >= 0) {
-          customConfig.optimization = optimization;
-        } else if (optimization) {
-          reject(`Error: provided optimization "${optimization}" is not supported.  Please use one of: ${optimizations.join(', ')}.`);
-        }
+        // TODO
+        // if (typeof optimization === 'string' && optimizations.indexOf(optimization.toLowerCase()) >= 0) {
+        //   customConfig.optimization = optimization;
+        // } else if (optimization) {
+        //   reject(`Error: provided optimization "${optimization}" is not supported.  Please use one of: ${optimizations.join(', ')}.`);
+        // }
 
-        if (plugins && plugins.length > 0) {
-          const types = ['index', 'webpack'];
+        // TODO
+        // if (plugins && plugins.length > 0) {
+        //   const types = ['index', 'webpack'];
 
-          plugins.forEach(plugin => {
-            if (!plugin.type || types.indexOf(plugin.type) < 0) {
-              reject(`Error: greenwood.config.js plugins must be one of type "${types.join(', ')}". got "${plugin.type}" instead.`);
-            }
+        //   plugins.forEach(plugin => {
+        //     if (!plugin.type || types.indexOf(plugin.type) < 0) {
+        //       reject(`Error: greenwood.config.js plugins must be one of type "${types.join(', ')}". got "${plugin.type}" instead.`);
+        //     }
 
-            if (!plugin.provider || typeof plugin.provider !== 'function') {
-              const providerTypeof = typeof plugin.provider;
+        //     if (!plugin.provider || typeof plugin.provider !== 'function') {
+        //       const providerTypeof = typeof plugin.provider;
 
-              reject(`Error: greenwood.config.js plugins provider must of type function. got ${providerTypeof} instead.`);
-            }
-          });
+        //       reject(`Error: greenwood.config.js plugins provider must of type function. got ${providerTypeof} instead.`);
+        //     }
+        //   });
 
-          customConfig.plugins = customConfig.plugins.concat(plugins);
-        }
+        //   customConfig.plugins = customConfig.plugins.concat(plugins);
+        // }
 
-        if (themeFile) {
-          if (typeof themeFile !== 'string' && themeFile.indexOf('.') < 1) {
-            reject(`Error: greenwood.config.js themeFile must be a valid filename. got ${themeFile} instead.`);
-          }
-          customConfig.themeFile = themeFile;
-        }
+        // if (themeFile) {
+        //   if (typeof themeFile !== 'string' && themeFile.indexOf('.') < 1) {
+        //     reject(`Error: greenwood.config.js themeFile must be a valid filename. got ${themeFile} instead.`);
+        //   }
+        //   customConfig.themeFile = themeFile;
+        // }
 
         if (devServer && Object.keys(devServer).length > 0) {
 
@@ -129,10 +131,10 @@ module.exports = readAndMergeConfig = async() => {
           }
         }
 
-        if (markdown && Object.keys(markdown).length > 0) {
-          customConfig.markdown.plugins = markdown.plugins && markdown.plugins.length > 0 ? markdown.plugins : [];
-          customConfig.markdown.settings = markdown.settings ? markdown.settings : {};
-        }
+        // if (markdown && Object.keys(markdown).length > 0) {
+        //   customConfig.markdown.plugins = markdown.plugins && markdown.plugins.length > 0 ? markdown.plugins : [];
+        //   customConfig.markdown.settings = markdown.settings ? markdown.settings : {};
+        // }
       }
       resolve({ ...defaultConfig, ...customConfig });
     } catch (err) {

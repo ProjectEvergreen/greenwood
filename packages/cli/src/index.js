@@ -5,27 +5,31 @@
 // https://github.com/ProjectEvergreen/greenwood/issues/141
 process.setMaxListeners(0);
 
-require('colors');
+// TODO require('colors');
 
-const chalk = require('chalk');
 const program = require('commander');
 const generateCompilation = require('./lifecycles/compile');
-const runProdBuild = require('./tasks/build');
+// const runProdBuild = require('./tasks/build');
 const runDevServer = require('./tasks/develop');
-const ejectConfigFiles = require('./tasks/eject');
-const scriptPkg = require('../package.json');
-let compilation = {};
-let cmdOption = {};
+// const ejectConfigFiles = require('./tasks/eject');
+const greenwoodPackageJson = require('../package.json');
+// let compilation = {};
+// let cmdOption = {};
 let MODE = '';
 
-console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
-console.log(`${chalk.rgb(175, 207, 71)('Welcome to Greenwood ♻️')}`);
-console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
+// TODO
+// console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
+// console.log(`${chalk.rgb(175, 207, 71)('Welcome to Greenwood ♻️')}`);
+// console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
+console.info('-------------------------------------------------------');
+console.info('Welcome to Greenwood ♻️');
+console.info('-------------------------------------------------------');
 
 program
-  .version(scriptPkg.version)
+  .version(greenwoodPackageJson.version)
   .arguments('<script-mode>')
-  .usage(`${chalk.green('<script-mode>')} [options]`);
+  .usage('<script-mode> [options]');
+  // TODO .usage(`${chalk.green('<script-mode>')} [options]`);
 
 program
   .command('build')
@@ -51,54 +55,60 @@ program
 
 program.parse(process.argv);
 
+// TODO pick build by default?  Thinking of npx usage...
 if (program.parse.length === 0) {
   program.help();
 }
 
 const run = async() => {
+  let compilation = {};
   
   try {
     
     switch (MODE) {
-      
-      case 'build':
-        compilation = await generateCompilation();
 
-        console.log('Building project for production.'.yellow);
-        
-        await runProdBuild(compilation);
+      // TODO
+      // case 'build':
+      //   compilation = await generateCompilation();
 
-        console.log('...................................'.yellow);
-        console.log('Static site generation complete!');
-        console.log('...................................'.yellow);
+      //   console.log('Building project for production.'.yellow);
         
-        break;
+      //   await runProdBuild(compilation);
+
+      //   console.log('...................................'.yellow);
+      //   console.log('Static site generation complete!');
+      //   console.log('...................................'.yellow);
+        
+      //   break;
       case 'develop':
         compilation = await generateCompilation();
+        // console.debug('compilation', compilation);
 
-        console.log('Starting local development server'.yellow);        
-        
+        console.info('Starting local development server...');
         await runDevServer(compilation);
-        
-        console.log('Development mode activiated'.green);
 
         break;
-      case 'eject':
-        console.log('Ejecting configurations'.yellow);
+        // TODO
+        // case 'eject':
+        //   console.log('Ejecting configurations'.yellow);
 
-        await ejectConfigFiles(cmdOption.all);
-        
-        console.log(`Configurations ejected successfully to ${process.cwd()}`.green);
+        //   await ejectConfigFiles(cmdOption.all);
+          
+        //   console.log(`Configurations ejected successfully to ${process.cwd()}`.green);
 
-        break;
+        //   break;
       default: 
-        console.log('Error: missing command. try checking --help if you\'re encountering issues');
+        console.info(`
+          Error: missing command. try using the --help flag if 
+          you're encountering issues running Greenwood.  Visit our docs for more 
+          info: https://www.greenwoodjs.io/docs/
+        `);
         break;
 
     }
     process.exit(0); // eslint-disable-line no-process-exit
   } catch (err) {
-    console.error(`${err}`.red);
+    console.error(err);
     process.exit(1); // eslint-disable-line no-process-exit
   }
 };
