@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 const fs = require('fs-extra');
 const crypto = require('crypto');
-const fm = require('front-matter');
-const path = require('path');
+// const fm = require('front-matter');
+// const path = require('path');
 // const toc = require('markdown-toc');
 
 const createGraphFromPages = async (pagesDir, config) => {
-  console.debug('createGraphFromPages at', pagesDir);
   let pages = [];
 
   return new Promise(async (resolve, reject) => {

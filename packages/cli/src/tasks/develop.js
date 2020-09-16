@@ -1,5 +1,5 @@
-// TODO const dataServer = require('../data/server');
-const { app, liveReloadServer } = require('../lifecycles/serve');
+const livereload = require('livereload');
+const { server } = require('../lifecycles/serve');
 
 module.exports = runDevServer = async (compilation) => {
   return new Promise(async (resolve, reject) => {
@@ -8,26 +8,20 @@ module.exports = runDevServer = async (compilation) => {
       const { port } = compilation.config.devServer;
       const { userWorkspace } = compilation.context;
       
-      app.listen(port, () => {
+      server.listen(port, () => {
         console.info(`Started local development at localhost:${port}`);
-        console.info(`Now watching directory "${userWorkspace}" for changes.`);
-        
-        liveReloadServer.watch(userWorkspace);
+        const liveReloadServer = livereload.createServer({
+          exts: ['html', 'css', 'js', 'md'],
+          applyCSSLive: false // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
+        });
+
+        liveReloadServer.watch(userWorkspace, () => {
+          console.info(`Now watching directory "${userWorkspace}" for changes.`);
+        });
       });
-      // await dataServer(compilation).listen().then((server) => {
-      //   console.log(`dataServer started at ${server.url}`);
-      // });
-
-      // const webpackConfig = require(compilation.context.webpackDevelop)(compilation);
-      // const devServerConfig = webpackConfig.devServer;
-
-      // let compiler = webpack(webpackConfig);
-      // let webpackServer = new WebpackDevServer(compiler, devServerConfig);
-      
-      // webpackServer.listen(devServerConfig.port);
     } catch (err) {
       reject(err);
     }
-  
+
   });
 };

@@ -1,3 +1,4 @@
+// TODO delete
 import { html, LitElement } from 'lit-element';
 import '../components/banner/banner';
 import '@evergreen-wc/eve-container';

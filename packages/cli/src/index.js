@@ -84,12 +84,11 @@ const run = async() => {
         compilation = await generateCompilation();
         // console.debug('compilation', compilation);
 
-        console.info('Starting local development server...');
         await runDevServer(compilation);
 
         break;
         // TODO
-        // case 'eject':
+        // case 'eject'
         //   console.log('Ejecting configurations'.yellow);
 
         //   await ejectConfigFiles(cmdOption.all);

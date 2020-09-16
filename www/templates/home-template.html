@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
+
+  <head>
+    <title>TODO Should not be here :)</title>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'/>
+    <meta-outlet></meta-outlet>
+
+    <script type="module" src="../components/header/header.js"></script>
+    <script type="module" src="../components/footer/footer.js"></script>
+
+    <!-- TODO import '../componentsxw/banner/banner';
+    import '@evergreen-wc/eve-container'; -->
+
+    <link rel="stylesheet" href="../styles/theme.css"></link>
+    <link rel="stylesheet" href="../styles/home.css"></link>
+  </head>
+
+  <body>
+
+    <div class='gwd-wrapper'>
+      <app-header></app-header>
+      
+      <div class="gwd-content-outlet">
+        <content-outlet></content-outlet>
+      </div>
+      
+      <!-- TODO <lit-route><h1>404 Not found</h1></lit-route> -->
+      <app-footer></app-footer>
+    </div>
+
+  </body>
+
+</html>

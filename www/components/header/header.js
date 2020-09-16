@@ -1,10 +1,10 @@
 import { LitElement, html } from 'lit-element';
-import client from '@greenwood/cli/data/client';
-import MenuQuery from '@greenwood/cli/data/queries/menu';
-import '@evergreen-wc/eve-container';
-import headerCss from './header.css';
-import evergreenLogo from '../../assets/evergreen.svg';
-import '../components/social-icons/social-icons';
+// import client from '@greenwood/cli/data/client';
+// import MenuQuery from '@greenwood/cli/data/queries/menu';
+// import '@evergreen-wc/eve-container';
+// import headerCss from './header.css';
+// import evergreenLogo from '../../assets/evergreen.svg';
+// import '../components/social-icons/social-icons';
 
 class HeaderComponent extends LitElement {
 
@@ -21,28 +21,26 @@ class HeaderComponent extends LitElement {
     this.navigation = [];
   }
 
-  async connectedCallback() {
-    super.connectedCallback();
+  // async connectedCallback() {
+  //   super.connectedCallback();
 
-    const response = await client.query({
-      query: MenuQuery,
-      variables: {
-        name: 'navigation',
-        order: 'index_asc'
-      }
-    });
+  //   const response = await client.query({
+  //     query: MenuQuery,
+  //     variables: {
+  //       name: 'navigation',
+  //       order: 'index_asc'
+  //     }
+  //   });
 
-    this.navigation = response.data.menu.children;
-  }
+  //   this.navigation = response.data.menu.children;
+  // }
 
   /* eslint-disable indent */
   render() {
     const { navigation } = this;
 
     return html`
-      <style>
-        ${headerCss}
-      </style>
+      <!-- TODO use static styles for headerCss -->
       <header class="header">
         <eve-container fluid>
           <div class="head-wrap">
@@ -50,7 +48,7 @@ class HeaderComponent extends LitElement {
             <div class="brand">
               <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer"
                 onclick="getOutboundLink('https://projectevergreen.github.io');">
-                <img src="${evergreenLogo}" alt="Greenwood logo"/>
+                <img src="/assets/evergreen.svg" alt="Greenwood logo"/>
               </a>
               <div class="project-name">
                 <a href="/">Greenwood</a>
@@ -77,4 +75,4 @@ class HeaderComponent extends LitElement {
   }
 }
 
-customElements.define('eve-header', HeaderComponent);
+customElements.define('app-header', HeaderComponent);

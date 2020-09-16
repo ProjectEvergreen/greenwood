@@ -6,7 +6,6 @@ const remarkFrontmatter = require('remark-frontmatter');
 const raw = require('rehype-raw');
 const html = require('rehype-stringify');
 const Koa = require('koa');
-const livereload = require('livereload');
 const path = require('path');
 const remark = require('remark-parse');
 const remark2rehype = require('remark-rehype');
@@ -16,7 +15,6 @@ const walk = require('acorn-walk');
 const app = new Koa();
 // TODO get this from compilation
 const greenwoodConfig = require(path.join(process.cwd(), 'greenwood.config'));
-const liveReloadServer = livereload.createServer();
 const userWorkspace = path.join(process.cwd(), './www');
 
 // TODO export this an async function
@@ -46,9 +44,7 @@ app.use(async ctx => {
 
     // TODO get pages path from compilation
     const barePath = `${userWorkspace}/pages${ctx.request.url.replace('.html', '')}`;
-    const userPackageJson = require(path.join(process.cwd(), './package.json'));
-    // const pageTemplatePath = barePath.replace(userWorkspace, `${userWorkspace}/pages`);
-    // const contentTemplatePath = pageTemplatePath.replace('/index', '.md');
+
     // TODO use default page here if it exists?
     let contents = `
       <!DOCTYPE html>
@@ -93,10 +89,10 @@ app.use(async ctx => {
         .use(html)
         .process(markdownContents);
 
-      // TODO use a page template
-      // if (fm.attributes.template) {
-      //   contents = await fsp.readFile(`${userWorkspace}/templates/${fm.attributes.template}.html`, 'utf-8');
-      // }
+      // TODO use an app template
+      if (fm.attributes.template) {
+        contents = await fsp.readFile(`${userWorkspace}/templates/${fm.attributes.template}-template.html`, 'utf-8');
+      }
 
       // use page title
       if (fm.attributes.title) {
@@ -106,56 +102,61 @@ app.use(async ctx => {
       contents = contents.replace('<content-outlet></content-outlet>', processedMarkdown.contents);
     }
     
-    // use an HTML parser?  https://www.npmjs.com/package/node-html-parser
-    // contents = contents.replace('</head>', '<script src="http://localhost:35729/livereload.js?snipver=1"></script></head>');
+    // TODO use an HTML parser?  https://www.npmjs.com/package/node-html-parser
+    contents = contents.replace('</head>', '<script src="http://localhost:35729/livereload.js?snipver=1"></script></head>');
     
-    // contents = contents.replace(/type="module"/g, 'type="module-shim"');
-    // // console.log('dependencies', userPackageJson.dependencies);
-    // const importMap = {};
+    contents = contents.replace(/type="module"/g, 'type="module-shim"');
     
-    // Object.keys(userPackageJson.dependencies).forEach(dependency => {
-    //   const packageRootPath = path.join(process.cwd(), './node_modules', dependency);
-    //   const packageJsonPath = path.join(packageRootPath, 'package.json');
-    //   const packageJson = require(packageJsonPath);
-    //   const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, packageJson.main);
-    //   const packageFileContents = fs.readFileSync(packageEntryPointPath, 'utf-8');
+    const importMap = {};
+    const userPackageJson = fs.existsSync(path.join(userWorkspace, 'package.json'))
+      ? require(path.join(userWorkspace, 'package.json')) // its a monorepo?
+      : require(path.join(process.cwd(), 'package.json'));
 
-    //   walk.simple(acorn.parse(packageFileContents, { sourceType: 'module' }), {
-    //     ImportDeclaration(node) {
-    //       // console.log('Found a ImportDeclaration');
-    //       const sourceValue = node.source.value;
+    // console.debug('userPackageJson', userPackageJson);
+    // console.debug('dependencies', userPackageJson.dependencies);
+    
+    Object.keys(userPackageJson.dependencies).forEach(dependency => {
+      const packageRootPath = path.join(process.cwd(), './node_modules', dependency);
+      const packageJsonPath = path.join(packageRootPath, 'package.json');
+      const packageJson = require(packageJsonPath);
+      const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, packageJson.main);
+      const packageFileContents = fs.readFileSync(packageEntryPointPath, 'utf-8');
 
-    //       if (sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
-    //         // console.log(`found a bare import for ${sourceValue}!!!!!`);
-    //         importMap[sourceValue] = `/node_modules/${sourceValue}`;
-    //       }
-    //     },
-    //     ExportNamedDeclaration(node) {
-    //       // console.log('Found a ExportNamedDeclaration');
-    //       const sourceValue = node && node.source ? node.source.value : '';
+      walk.simple(acorn.parse(packageFileContents, { sourceType: 'module' }), {
+        ImportDeclaration(node) {
+          // console.log('Found a ImportDeclaration');
+          const sourceValue = node.source.value;
 
-    //       if (sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
-    //         // console.log(`found a bare export for ${sourceValue}!!!!!`);
-    //         importMap[sourceValue] = `/node_modules/${sourceValue}`;
-    //       }
-    //     }
-    //   });
+          if (sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
+            // console.log(`found a bare import for ${sourceValue}!!!!!`);
+            importMap[sourceValue] = `/node_modules/${sourceValue}`;
+          }
+        },
+        ExportNamedDeclaration(node) {
+          // console.log('Found a ExportNamedDeclaration');
+          const sourceValue = node && node.source ? node.source.value : '';
+
+          if (sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
+            // console.log(`found a bare export for ${sourceValue}!!!!!`);
+            importMap[sourceValue] = `/node_modules/${sourceValue}`;
+          }
+        }
+      });
       
-    //   // console.log('packageJson', packageJson);
-    //   importMap[dependency] = `/node_modules/${dependency}/${packageJson.main}`;
-    // });
+      importMap[dependency] = `/node_modules/${dependency}/${packageJson.main}`;
+    });
 
-    // // console.log('importMap all complete', importMap);
+    // console.log('importMap all complete', importMap);
     
-    // contents = contents.replace('<head>', `
-    //   <head>
-    //     <script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>
-    //     <script type="importmap-shim">
-    //       {
-    //         "imports": ${JSON.stringify(importMap, null, 1)}
-    //       }
-    //     </script>
-    // `);
+    contents = contents.replace('<head>', `
+      <head>
+        <script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>
+        <script type="importmap-shim">
+          {
+            "imports": ${JSON.stringify(importMap, null, 1)}
+          }
+        </script>
+    `);
 
     // if (process.env.__GWD__ === 'build') { // eslint-disable-line no-underscore-dangle
     //   // TODO setup and teardown should be done together
@@ -177,9 +178,7 @@ app.use(async ctx => {
   }
 
   if (ctx.request.url.indexOf('/node_modules') >= 0) {
-    // console.log('node modules!?', ctx.request.url);
     const modulePath = path.join(process.cwd(), ctx.request.url);
-    // console.log('modulePath', modulePath);
     const contents = await fsp.readFile(modulePath, 'utf-8'); // have to handle CJS vs ESM?
 
     ctx.set('Content-Type', 'text/javascript');
@@ -187,19 +186,19 @@ app.use(async ctx => {
   }
 
   // TODO This is here because of ordering, should make JS / JSON matching less greedy
-  if (ctx.request.url.indexOf('graph.json') >= 0) {
-    const graphPath = path.join(process.cwd(), '.greenwood', 'graph.json');
-    const json = await fsp.readFile(graphPath, 'utf-8');
+  // if (ctx.request.url.indexOf('graph.json') >= 0) {
+  //   const graphPath = path.join(process.cwd(), '.greenwood', 'graph.json');
+  //   const json = await fsp.readFile(graphPath, 'utf-8');
 
-    ctx.set('Content-Type', 'text/javascript');
-    ctx.body = JSON.parse(json);
-  }
+  //   ctx.set('Content-Type', 'text/javascript');
+  //   ctx.body = JSON.parse(json);
+  // }
 
   if (ctx.request.url.indexOf('/node_modules') < 0 && ctx.request.url.indexOf('.js') >= 0 && ctx.request.url.indexOf('.json') < 0) {
     const jsPath = path.join(userWorkspace, ctx.request.url);
     const contents = await fsp.readFile(jsPath, 'utf-8');
-    ctx.set('Content-Type', 'text/javascript');
 
+    ctx.set('Content-Type', 'text/javascript');
     ctx.body = contents;
   }
 
@@ -210,9 +209,30 @@ app.use(async ctx => {
     ctx.body = await fsp.readFile(cssPath, 'utf-8');
   }
 
+  if (ctx.request.url.indexOf('assets/') >= 0 && ctx.request.url.indexOf('.css') < 0) {
+    const assetPath = path.join(userWorkspace, ctx.request.url);
+    const ext = path.extname(assetPath);
+    const type = ext === '.svg'
+      ? `${ext.replace('.', '')}+xml`
+      : ext.replace('.', '');
+
+    // console.debug('assetPath', assetPath);
+    // console.debug('asset ext', ext);
+
+    if (['.jpg', '.png', '.gif', '.svg'].includes(ext)) {
+      ctx.set('Content-Type', `image/${type}`);
+      ctx.body = await fsp.readFile(assetPath, 'utf-8');
+    } else if (['.woff2', '.woff', '.ttf'].includes(ext)) {
+      ctx.set('Content-Type', `font/${type}`);
+      ctx.body = await fsp.readFile(assetPath);
+    } else {
+      ctx.set('Content-Type', `text/${type}`);
+      ctx.body = await fsp.readFile(assetPath, 'utf-8');
+    }
+  }
+
 });
 
 module.exports = {
-  app,
-  liveReloadServer
+  server: app
 };
