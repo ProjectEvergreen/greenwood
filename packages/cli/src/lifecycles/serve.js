@@ -186,13 +186,18 @@ app.use(async ctx => {
   }
 
   // TODO This is here because of ordering, should make JS / JSON matching less greedy
-  // if (ctx.request.url.indexOf('graph.json') >= 0) {
-  //   const graphPath = path.join(process.cwd(), '.greenwood', 'graph.json');
-  //   const json = await fsp.readFile(graphPath, 'utf-8');
+  // handle things outside if workspace, like a root directory resolver plugin?
+  if (ctx.request.url.indexOf('.json') >= 0) {
+    // console.debug('JSON file request!', ctx.request.url);
+    // const graphPath = path.join(process.cwd(), '.greenwood', 'graph.json');
+    const json = await fsp.readFile(path.join(userWorkspace, ctx.request.url), 'utf-8');
 
-  //   ctx.set('Content-Type', 'text/javascript');
-  //   ctx.body = JSON.parse(json);
-  // }
+    // TODO yay or nay to default exports?
+    ctx.set('Content-Type', 'text/javascript');
+    ctx.body = `
+      export default ${json}
+    `;
+  }
 
   if (ctx.request.url.indexOf('/node_modules') < 0 && ctx.request.url.indexOf('.js') >= 0 && ctx.request.url.indexOf('.json') < 0) {
     const jsPath = path.join(userWorkspace, ctx.request.url);
