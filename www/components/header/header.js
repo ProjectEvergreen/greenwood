@@ -27,7 +27,7 @@ class HeaderComponent extends LitElement {
     this.navigation = [];
   }
 
-  // async connectedCallback() {
+  // TODO async connectedCallback() {
   //   super.connectedCallback();
 
   //   const response = await client.query({

@@ -78,7 +78,7 @@ app.use(async ctx => {
       //   : fs.existsSync(contentTemplatePath)
       //     ? contentTemplatePath
       //     : `${pageTemplatePath}.md`;
-      console.debug('this route exists as a markdown file', markdownPath);
+      // console.debug('this route exists as a markdown file', markdownPath);
 
       // TODO extract front matter contents from remark-frontmatter instead of frontmatter lib
       // TODO handle prism
@@ -242,7 +242,12 @@ app.use(async ctx => {
 
     if (['.jpg', '.png', '.gif', '.svg'].includes(ext)) {
       ctx.set('Content-Type', `image/${type}`);
-      ctx.body = await fsp.readFile(assetPath, 'utf-8');
+
+      if (ext === '.svg') {
+        ctx.body = await fsp.readFile(assetPath, 'utf-8');
+      } else {
+        ctx.body = await fsp.readFile(assetPath); 
+      }
     } else if (['.woff2', '.woff', '.ttf'].includes(ext)) {
       ctx.set('Content-Type', `font/${type}`);
       ctx.body = await fsp.readFile(assetPath);

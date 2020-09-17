@@ -7,8 +7,9 @@
     <meta name='viewport' content='width=device-width, initial-scale=1'/>
     <meta-outlet></meta-outlet>
 
-    <script type="module" src="../components/header/header.js"></script>
+    <script type="module" src="../components/banner/banner.js"></script>
     <script type="module" src="../components/footer/footer.js"></script>
+    <script type="module" src="../components/header/header.js"></script>
 
     <script>
       function getOutboundLink() {
@@ -16,8 +17,7 @@
       }
     </script>
 
-    <!-- TODO import '../componentsxw/banner/banner';
-    import '@evergreen-wc/eve-container'; -->
+    <!-- TODO; import '@evergreen-wc/eve-container'; -->
 
     <link rel="stylesheet" href="../styles/theme.css"></link>
     <link rel="stylesheet" href="../styles/home.css"></link>
@@ -27,8 +27,9 @@
 
     <div class='gwd-wrapper'>
       <app-header></app-header>
-      
+
       <div class="gwd-content-outlet">
+        <app-banner></app-banner>
         <content-outlet></content-outlet>
       </div>
       

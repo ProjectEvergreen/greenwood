@@ -1,41 +1,40 @@
-:host {
-  & h3 {
-    color: green;
-  }
+/* TODO restore to nested styles */
+h3 {
+  color: green;
+}
 
-  & .gwd-content {
-    background-color:white !important;
-    margin: 0 auto;
-    margin-top: 20px;
-    min-height: 300px;
-    background-color: #efefef;
-    padding: 0 15%;
-    font-size:1.2rem;
+.gwd-content {
+  background-color:white !important;
+  margin: 0 auto;
+  margin-top: 20px;
+  min-height: 300px;
+  background-color: #efefef;
+  padding: 0 15%;
+  font-size:1.2rem;
+}
 
-    & h3 {
-      font-size:2rem;
-      margin: 5px 0;
-    }
+.gwd-content h3 {
+  font-size:2rem;
+  margin: 5px 0;
+}
 
-    & a {
-      color: #1d337a;
-    }
-  }
+.gwd-content a {
+  color: #1d337a;
+}
 
-  & .cards {
-    margin: 0 -15%
-  }
+.gwd-content .cards {
+  margin: 0 -15%
+}
   
-  & .message {
-    padding: 4rem;
-    text-align:center;
+.gwd-content .message {
+  padding: 4rem;
+  text-align:center;
+}
 
-    & hr {
-      margin-top: 4rem;
-    }
+.gwd-content .message hr {
+  margin-top: 4rem;
 
-    @media(max-width:768px) {
-      padding:0;
-    }
+  @media(max-width:768px) {
+    padding:0;
   }
 }

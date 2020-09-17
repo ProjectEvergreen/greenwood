@@ -1,3 +1,4 @@
+/* TODO restore to nested styles */
 @keyframes fadeOut {
   from {
     opacity: 1;
@@ -18,75 +19,73 @@
   }
 }
 
-:host {
+:host .banner {
+  background-color: #F6F2F4;
+  min-height: 60vh;
+}
 
+:host .content {
+  padding: 5vh 10px;
+  font-size:1.7rem;
+  text-align:center;
+}
+
+:host .content hr {
+  border-radius:25px;
+  border-style:none;
+  height:3px;
+  margin:0 auto;
+  background-color:white;
+  border:1px solid rgba(0, 0, 0, 0.6);
+  width: 160px;
+}
+
+:host .content h1 {
+  font-size:3.5rem;
+  text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
+}
+
+:host .content h3 {
+  padding-top: 10px;
+  text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
+}
+
+:host .content img {
+  width: 300px;
+  height: 300px;
+}
+
+:host .content span.off {
+  animation: 1s fadeOut ease-in-out;
+}
+
+:host .content span.on {
+  animation: 1s fadeIn linear;
+}
+
+/* @media (max-width: 980px) {
   & .banner {
-    background-color: #F6F2F4;
-    min-height: 60vh;
+    min-height: 40vh;
 
     & .content {
-      padding: 5vh 10px;
-      font-size:1.7rem;
-      text-align:center;
-
-      & hr {
-        border-radius:25px;
-        border-style:none;
-        height:3px;
-        margin:0 auto;
-        background-color:white;
-        border:1px solid rgba(0, 0, 0, 0.6);
-        width: 160px;
-      }
-
+      font-size: 1.5rem;
       & h1 {
-        font-size:3.5rem;
-        text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
+        font-size: 3rem;
       }
-      & h3 {
-        padding-top: 10px;
-        text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
-      }
-
       & img {
-        width: 300px;
-        height: 300px;
+        width: 250px;
+        height: 250px;
       }
-    }
-
-    & span.off {
-      animation: 1s fadeOut ease-in-out;
-    }
-
-    & span.on {
-      animation: 1s fadeIn linear;
-    }
-  }
-
-  @media (max-width: 980px) {
-    & .banner {
-      min-height: 40vh;
-
-      & .content {
-        font-size: 1.5rem;
-        & h1 {
-          font-size: 3rem;
-        }
-        & img {
-          width: 250px;
-          height: 250px;
-        }
-      }
-    }
-  }
-
-  @media (max-width: 756px) {
-    & .banner {
-       padding:0px;
-
-       & .content {
-         margin-top: 0;
-       }
     }
   }
 }
+
+@media (max-width: 756px) {
+  & .banner {
+      padding:0px;
+
+      & .content {
+        margin-top: 0;
+      }
+  }
+} */
