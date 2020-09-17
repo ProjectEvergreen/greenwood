@@ -1,10 +1,10 @@
-import { LitElement, html } from 'lit-element';
+import { css, html, LitElement, unsafeCSS } from 'lit-element';
 // import client from '@greenwood/cli/data/client';
 // import MenuQuery from '@greenwood/cli/data/queries/menu';
 // import '@evergreen-wc/eve-container';
-// import headerCss from './header.css';
-// import evergreenLogo from '../../assets/evergreen.svg';
-// import '../components/social-icons/social-icons';
+import headerCss from './header.css';
+// TODO import evergreenLogo from '../../assets/evergreen.svg';
+import '../social-icons/social-icons.js';
 
 class HeaderComponent extends LitElement {
 
@@ -14,6 +14,12 @@ class HeaderComponent extends LitElement {
         type: Array
       }
     };
+  }
+
+  static get styles() {
+    return css`
+      ${unsafeCSS(headerCss)}
+    `;
   }
 
   constructor() {
@@ -40,7 +46,6 @@ class HeaderComponent extends LitElement {
     const { navigation } = this;
 
     return html`
-      <!-- TODO use static styles for headerCss -->
       <header class="header">
         <eve-container fluid>
           <div class="head-wrap">
@@ -65,7 +70,7 @@ class HeaderComponent extends LitElement {
               </ul>
             </nav>
 
-            <eve-social-icons></eve-social-icons>
+            <app-social-icons></app-social-icons>
 
           </div>
         </eve-container>

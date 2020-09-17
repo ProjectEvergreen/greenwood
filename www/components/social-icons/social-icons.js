@@ -1,10 +1,17 @@
-import { html, LitElement } from 'lit-element';
-import css from './social-icons.css';
-import githubIcon from '../icons/github-icon';
-import twitterIcon from '../icons/twitter-icon';
-import slackIcon from '../icons/slack-icon';
+import { css, html, LitElement, unsafeCSS } from 'lit-element';
+import socialCss from './social-icons.css';
+import githubIcon from '../icons/github-icon.js';
+import twitterIcon from '../icons/twitter-icon.js';
+import slackIcon from '../icons/slack-icon.js';
 
 class SocialIcons extends LitElement {
+
+  static get styles() {
+    return css`
+      ${unsafeCSS(socialCss)}
+    `;
+  }
+
   render() {
     const socialUrls = {
       github: 'https://github.com/ProjectEvergreen/greenwood',
@@ -13,10 +20,6 @@ class SocialIcons extends LitElement {
     };
 
     return html`
-      <style>
-        ${css}
-      </style>
-
       <a class="icons" 
         href="${socialUrls.github}"
         target="_blank" 
@@ -43,4 +46,4 @@ class SocialIcons extends LitElement {
   }
 }
 
-customElements.define('eve-social-icons', SocialIcons);
+customElements.define('app-social-icons', SocialIcons);
