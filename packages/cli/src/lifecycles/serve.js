@@ -1,3 +1,5 @@
+/* eslint-disable complexity */
+// TODO ^^^
 const acorn = require('acorn');
 const { promises: fsp } = require('fs');
 const fs = require('fs');
