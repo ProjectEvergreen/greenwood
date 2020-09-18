@@ -33,7 +33,7 @@ app.use(async ctx => {
   // make sure this only happens for "pages", nor partials or fixtures, templates, et)
   if (ctx.request.url.indexOf('.html') >= 0) {
     // TODO get this stuff from compilation
-    let title = 'My App';
+    let title = greenwoodConfig.title;
     const metaOutletContent = greenwoodConfig.meta.map(item => {
       let metaHtml = '';
     
@@ -182,8 +182,11 @@ app.use(async ctx => {
   if (ctx.request.url.indexOf('/node_modules') >= 0) {
     const modulePath = path.join(process.cwd(), ctx.request.url);
     const contents = await fsp.readFile(modulePath, 'utf-8'); // have to handle CJS vs ESM?
+    const type = ctx.request.url.indexOf('.js') > 0
+      ? 'text/javascript'
+      : 'text/css'; // TODO eve components assume a bundler
 
-    ctx.set('Content-Type', 'text/javascript');
+    ctx.set('Content-Type', type);
     ctx.body = contents;
   }
 
@@ -211,7 +214,9 @@ app.use(async ctx => {
 
   if (ctx.request.url.indexOf('.css') >= 0) {
     const destHeader = ctx.request.header['sec-fetch-dest'];
-    const cssPath = path.join(userWorkspace, ctx.request.url);
+    const cssPath = ctx.request.url.indexOf('/node_modules') >= 0
+      ? path.join(process.cwd(), ctx.request.url)
+      : path.join(userWorkspace, ctx.request.url);
     const css = await fsp.readFile(cssPath, 'utf-8');
 
     // <style> tag used

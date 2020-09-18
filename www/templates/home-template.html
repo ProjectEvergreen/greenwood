@@ -2,11 +2,13 @@
 <html lang="en" prefix="og:http://ogp.me/ns#">
 
   <head>
-    <title>TODO Should not be here :)</title>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'/>
     <meta-outlet></meta-outlet>
 
+    <script type="module">
+      import '@evergreen-wc/eve-container';
+    </script>
     <script type="module" src="../components/banner/banner.js"></script>
     <script type="module" src="../components/footer/footer.js"></script>
     <script type="module" src="../components/header/header.js"></script>
@@ -16,8 +18,6 @@
         console.debug('TODO placeholder for Google Analytics...')
       }
     </script>
-
-    <!-- TODO; import '@evergreen-wc/eve-container'; -->
 
     <link rel="stylesheet" href="../styles/theme.css"></link>
     <link rel="stylesheet" href="../styles/home.css"></link>
@@ -30,7 +30,14 @@
 
       <div class="gwd-content-outlet">
         <app-banner></app-banner>
-        <content-outlet></content-outlet>
+        
+        <div class='gwd-content-wrapper'>
+          <eve-container fluid>
+            <div class='gwd-page-template gwd-content'>
+              <content-outlet></content-outlet>
+            </div>
+          </eve-container>
+        </div>
       </div>
       
       <!-- TODO <lit-route><h1>404 Not found</h1></lit-route> -->

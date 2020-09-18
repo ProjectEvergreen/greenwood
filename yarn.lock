@@ -100,6 +100,20 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
+"@evergreen-wc/eve-button@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@evergreen-wc/eve-button/-/eve-button-0.0.9.tgz#831eb39bbfc2990205edf4bb2b2ef8a92e86574c"
+  integrity sha512-peNYzu9/3a2glSBncOAJgb7o+C1KkHJefg/aOxfqS1SxPOVh/x30+uQ43iLJUkygg6ApyRoaka5E6ruLjQiylQ==
+  dependencies:
+    lit-element "^2.0.1"
+
+"@evergreen-wc/eve-container@^0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@evergreen-wc/eve-container/-/eve-container-0.0.10.tgz#f27f9db8fc1e7ebdbd4e6afdfe3993189c00cfd8"
+  integrity sha512-ZkHhKcjcgKeUAbcjYowTmD6DYGu0mZoJtWef8qF/1XAbIZPsZhs+6QgQEuvergCOdm8SlBypjB0FjDOcYDY5Cw==
+  dependencies:
+    lit-element "^2.0.1"
+
 "@evocateur/libnpmaccess@^3.1.2":
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/@evocateur/libnpmaccess/-/libnpmaccess-3.1.2.tgz#ecf7f6ce6b004e9f942b098d92200be4a4b1c845"
@@ -4717,7 +4731,7 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.1.6.tgz#1c00c743b433cd0a4e80758f7b64a57440d9ff00"
   integrity sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=
 
-lit-element@^2.4.0:
+lit-element@^2.0.1, lit-element@^2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/lit-element/-/lit-element-2.4.0.tgz#b22607a037a8fc08f5a80736dddf7f3f5d401452"
   integrity sha512-pBGLglxyhq/Prk2H91nA0KByq/hx/wssJBQFiYqXhGDvEnY31PRGYf1RglVzyLeRysu0IHm2K0P196uLLWmwFg==

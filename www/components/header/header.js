@@ -1,7 +1,7 @@
 import { css, html, LitElement, unsafeCSS } from 'lit-element';
 // import client from '@greenwood/cli/data/client';
 // import MenuQuery from '@greenwood/cli/data/queries/menu';
-// import '@evergreen-wc/eve-container';
+import '@evergreen-wc/eve-container';
 import headerCss from './header.css';
 // TODO import evergreenLogo from '../../assets/evergreen.svg';
 import '../social-icons/social-icons.js';
@@ -53,7 +53,7 @@ class HeaderComponent extends LitElement {
             <div class="brand">
               <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer"
                 onclick="getOutboundLink('https://projectevergreen.github.io');">
-                <img src="/assets/evergreen.svg" alt="Greenwood logo"/>
+                <img src="../../assets/evergreen.svg" alt="Greenwood logo"/>
               </a>
               <div class="project-name">
                 <a href="/">Greenwood</a>

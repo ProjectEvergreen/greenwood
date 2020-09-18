@@ -1,13 +1,13 @@
 import { css, html, LitElement, unsafeCSS } from 'lit-element';
 import bannerCss from './banner.css';
 import buttonCss from './button.css';
-// import greenwoodLogo300 from '../../assets/greenwood-logo-300w.png';
+// TODO import greenwoodLogo300 from '../../assets/greenwood-logo-300w.png';
 // import greenwoodLogo500 from '../../assets/greenwood-logo-500w.png';
 // import greenwoodLogo750 from '../../assets/greenwood-logo-750w.png';
 // import greenwoodLogo1000 from '../../assets/greenwood-logo-1000w.png';
 // import greenwoodLogo1500 from '../../assets/greenwood-logo-1500w.png';
-// import '@evergreen-wc/eve-button';
-// import '@evergreen-wc/eve-container';
+import '@evergreen-wc/eve-button';
+import '@evergreen-wc/eve-container';
 
 class Banner extends LitElement {
   constructor() {
