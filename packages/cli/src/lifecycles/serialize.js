@@ -38,7 +38,7 @@ module.exports = serializeBuild = async (compilation) => {
             htmlModified = htmlModified.replace(/<script type="module-shim"/g, '<script type="module"');
   
             // console.debug('final HTML', htmlModified);
-            console.info(`Serializing complete for page ${page} \n outputting... ${outputDir.replace(process.cwd(), '.')}/${outputPath}`);
+            console.info(`Serializing complete for page ${page} \n outputting... ${outputDir.replace(process.cwd(), '.')}${outputPath}`);
             await fsp.writeFile(path.join(outputDir, outputPath), htmlModified);
         });
       }))
@@ -53,7 +53,7 @@ module.exports = serializeBuild = async (compilation) => {
     try {
       const pages = ['index.html']; // TODO all pages from ompilation.graph;
       const port = compilation.config.devServer.port;
-      const outputDir = compilation.context.outputDir;
+      const outputDir = compilation.context.scratchDir;
       const serverAddress = `http://127.0.0.1:${port}`;
 
       console.debug(`Serializing pages at ${serverAddress}`);

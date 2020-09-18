@@ -1,3 +1,4 @@
+const { execSync } = require('child_process');
 const fs = require('fs');
 const generateCompilation = require('../lifecycles/compile');
 const serializeBuild = require('../lifecycles/serialize');
@@ -19,13 +20,16 @@ module.exports = runProductionBuild = async () => {
       }
   
       await serializeBuild(compilation);
-      
-      //   // TODO rollup only understands ESM in Node :/
-      //   // rollup.write(rollupConfig);
-  
-      //   // 5) run rollup on .greenwood and put into public/
-      //   // TODO this is a hack just for the sake of the POC, will do for real :)
-      //   execSync('rollup -c ./rollup.config.js');
+
+      // TODO this is a hack just for the sake of the POC, will do for real :)
+      // rollup.write(rollupConfig);
+      execSync('rollup -c ./packages/cli/src/config/rollup.config.js');
+
+      // TODO part of rollup?
+      execSync(`cp -vr ${compilation.context.userWorkspace}/assets/ ./public/assets`);
+
+      // TODO should be done by rollup
+      execSync(`cp -vr ${compilation.context.userWorkspace}/styles/ ./public/styles`);
   
       resolve();
     } catch (err) {
