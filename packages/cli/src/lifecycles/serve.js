@@ -105,7 +105,14 @@ app.use(async ctx => {
     }
     
     // TODO use an HTML parser?  https://www.npmjs.com/package/node-html-parser
-    contents = contents.replace('</head>', '<script src="http://localhost:35729/livereload.js?snipver=1"></script></head>');
+    if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
+      // TODO setup and teardown should be done together
+      console.info('running in develop mode, attach live reload script');
+      contents = contents.replace('</head>', `
+          <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+        </head>
+      `);
+    }
     
     contents = contents.replace(/type="module"/g, 'type="module-shim"');
     
@@ -160,14 +167,14 @@ app.use(async ctx => {
         </script>
     `);
 
-    // if (process.env.__GWD__ === 'build') { // eslint-disable-line no-underscore-dangle
-    //   // TODO setup and teardown should be done together
-    //   // console.log('running in build mode, polyfill WebComponents for puppeteer');
-    //   contents = contents.replace('<head>', `
-    //     <head>
-    //       <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
-    //   `);
-    // }
+    if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
+      // TODO setup and teardown should be done together
+      console.log('running in build mode, polyfill WebComponents for puppeteer');
+      contents = contents.replace('<head>', `
+        <head>
+          <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+      `);
+    }
 
     contents = contents.replace('<meta-outlet></meta-outlet>', metaOutletContent);
 

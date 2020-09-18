@@ -8,14 +8,13 @@ process.setMaxListeners(0);
 // TODO require('colors');
 
 const program = require('commander');
-const generateCompilation = require('./lifecycles/compile');
-// const runProdBuild = require('./tasks/build');
-const runDevServer = require('./tasks/develop');
+const runProductionBuild = require('./commands/build');
+const runDevServer = require('./commands/develop');
 // const ejectConfigFiles = require('./tasks/eject');
 const greenwoodPackageJson = require('../package.json');
-// let compilation = {};
-// let cmdOption = {};
-let MODE = '';
+
+let cmdOption = {};
+let command = '';
 
 // TODO
 // console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
@@ -35,13 +34,13 @@ program
   .command('build')
   .description('Build a static site for production.')
   .action((cmd) => {
-    MODE = cmd._name;
+    command = cmd._name;
   });
 program
   .command('develop')
   .description('Start a local development server.')
   .action((cmd) => {
-    MODE = cmd._name;
+    command = cmd._name;
   });
 
 program
@@ -49,7 +48,7 @@ program
   .option('-a, --all', 'eject all configurations including babel, postcss, browserslistrc')
   .description('Eject greenwood configurations.')
   .action((cmd) => {
-    MODE = cmd._name;
+    command = cmd._name;
     cmdOption.all = cmd.all;
   });
 
@@ -60,31 +59,19 @@ if (program.parse.length === 0) {
   program.help();
 }
 
-const run = async() => {
-  let compilation = {};
-  
+const run = async() => {  
   try {
+    console.info(`Running Greenwood with ${command} command.`);
+    process.env.__GWD_COMMAND__ = command;
     
-    switch (MODE) {
+    switch (command) {
 
-      // TODO
-      // case 'build':
-      //   compilation = await generateCompilation();
-
-      //   console.log('Building project for production.'.yellow);
+      case 'build':        
+        await runProductionBuild();
         
-      //   await runProdBuild(compilation);
-
-      //   console.log('...................................'.yellow);
-      //   console.log('Static site generation complete!');
-      //   console.log('...................................'.yellow);
-        
-      //   break;
+        break;
       case 'develop':
-        compilation = await generateCompilation();
-        // console.debug('compilation', compilation);
-
-        await runDevServer(compilation);
+        await runDevServer();
 
         break;
         // TODO
@@ -97,10 +84,10 @@ const run = async() => {
 
         //   break;
       default: 
-        console.info(`
-          Error: missing command. try using the --help flag if 
+        console.warn(`
+          Error: not able to detect command. try using the --help flag if 
           you're encountering issues running Greenwood.  Visit our docs for more 
-          info: https://www.greenwoodjs.io/docs/
+          info at https://www.greenwoodjs.io/docs/.
         `);
         break;
 

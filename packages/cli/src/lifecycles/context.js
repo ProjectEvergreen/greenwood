@@ -3,7 +3,7 @@ const path = require('path');
 // const defaultTemplatesDir = path.join(__dirname, '../templates/');
 // const defaultConfigDir = path.join(__dirname, '../config');
 const scratchDir = path.join(process.cwd(), './.greenwood/');
-const publicDir = path.join(process.cwd(), './public');
+const outputDir = path.join(process.cwd(), './public');
 const dataDir = path.join(__dirname, '../data');
 
 module.exports = initContexts = async({ config }) => {
@@ -74,15 +74,17 @@ module.exports = initContexts = async({ config }) => {
 
       const context = {
         dataDir,
-        publicDir,
+        outputDir,
         userWorkspace,
         pagesDir,
-        userTemplatesDir
+        userTemplatesDir,
+        scratchDir
       };
 
       if (!await fs.ensureDir(scratchDir)) {
         await fs.mkdirs(scratchDir);
       }
+      
       resolve(context);
     } catch (err) {
       console.log(err);
