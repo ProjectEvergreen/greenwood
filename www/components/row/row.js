@@ -1,15 +1,19 @@
-import { html, LitElement } from 'lit-element';
-import css from './row.css';
+import { css, html, LitElement, unsafeCSS } from 'lit-element';
+import rowCss from './row.css';
 
 class Row extends LitElement {
+
+  static get styles() {
+    return css`
+      ${unsafeCSS(rowCss)}
+    `;
+  }
+
   render() {
     return html`
-    <style>
-      ${css}
-    </style>
       <slot></slot>
     `;
   }
 }
 
-customElements.define('eve-row', Row);
+customElements.define('app-row', Row);

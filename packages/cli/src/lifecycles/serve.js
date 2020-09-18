@@ -66,7 +66,7 @@ app.use(async ctx => {
     `;
 
     if (fs.existsSync(`${barePath}.html`)) {
-      console.debug('this route exists as HTML');
+      // console.debug('this route exists as HTML');
       contents = await fsp.readFile(`${barePath}.html`, 'utf-8');
     } else if (fs.existsSync(`${barePath}.md`)) {
       // } else if (fs.existsSync(`${barePath}.md`) || fs.existsSync(`${pageTemplatePath}.md`) || fs.existsSync(contentTemplatePath)) {
