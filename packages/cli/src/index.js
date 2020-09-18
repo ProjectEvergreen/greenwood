@@ -61,7 +61,7 @@ if (program.parse.length === 0) {
 
 const run = async() => {  
   try {
-    console.info(`Running Greenwood with ${command} command.`);
+    console.info(`Running Greenwood with the ${command} command.`);
     process.env.__GWD_COMMAND__ = command;
     
     switch (command) {

@@ -40,6 +40,7 @@ class BrowserRunner {
     page.on('request', interceptedRequest => {
       const interceptedRequestUrl = interceptedRequest.url();
 
+      // console.debug('request', interceptedRequestUrl);
       // TODO handle serialize only requests
       interceptedRequest.continue();
       // if (
@@ -75,7 +76,7 @@ class BrowserRunner {
     // Serialize page.
     const content = await page.content();
 
-    console.debug('content????', content);
+    // console.debug('content????', content);
 
     await page.close();
 
