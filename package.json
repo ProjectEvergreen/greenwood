@@ -18,7 +18,7 @@
     "clean:deps": "rimraf **/node_modules/**",
     "lint": "ls-lint && eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
     "build": "node . build",
-    "serve": "yarn build && cd ./public && ws",
+    "serve": "yarn build && cd ./public && npx http-server .",
     "develop": "node . develop",
     "test": "export BROWSERSLIST_IGNORE_OLD_DATA=true && nyc mocha",
     "test:tdd": "yarn test --watch"
