@@ -16,6 +16,7 @@ const walk = require('acorn-walk');
 
 const app = new Koa();
 // TODO get this from compilation
+const scratchDirectory = path.join(process.cwd(), '.greenwood');
 const greenwoodConfig = require(path.join(process.cwd(), 'greenwood.config'));
 const userWorkspace = path.join(process.cwd(), './www');
 
@@ -200,15 +201,21 @@ app.use(async ctx => {
   // TODO This is here because of ordering, should make JS / JSON matching less greedy
   // handle things outside if workspace, like a root directory resolver plugin?
   if (ctx.request.url.indexOf('.json') >= 0) {
-    // console.debug('JSON file request!', ctx.request.url);
-    // const graphPath = path.join(process.cwd(), '.greenwood', 'graph.json');
-    const json = await fsp.readFile(path.join(userWorkspace, ctx.request.url), 'utf-8');
+    // console.debug('JSON file request!', ctx.request.url);'
 
-    // TODO yay or nay to default exports?
-    ctx.set('Content-Type', 'text/javascript');
-    ctx.body = `
-      export default ${json}
-    `;
+    if (ctx.request.url.indexOf('graph.json') >= 0) {
+      const json = await fsp.readFile(path.join(scratchDirectory, 'graph.json'), 'utf-8');
+
+      ctx.set('Content-Type', 'application/json');
+      ctx.body = JSON.parse(json);
+    } else {
+      const json = await fsp.readFile(path.join(userWorkspace, ctx.request.url), 'utf-8');
+
+      ctx.set('Content-Type', 'text/javascript');
+      ctx.body = `
+        export default ${json}
+      `;
+    }
   }
 
   if (ctx.request.url.indexOf('/node_modules') < 0 && ctx.request.url.indexOf('.js') >= 0 && ctx.request.url.indexOf('.json') < 0) {

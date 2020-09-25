@@ -30,6 +30,9 @@ module.exports = runProductionBuild = async () => {
 
       // TODO should be done by rollup
       execSync(`cp -vr ${compilation.context.userWorkspace}/styles/ ./public/styles`);
+
+      // TODO should be done by rollup
+      execSync(`cp -vr ${compilation.context.scratchDir}/graph.json ./public`);
   
       resolve();
     } catch (err) {

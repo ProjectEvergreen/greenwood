@@ -198,7 +198,7 @@ module.exports = generateGraph = async (compilation) => {
         await fsp.mkdir(context.scratchDir);
       }
       
-      await fsp.writeFile(`${path.join(process.cwd(), '.greenwood')}/graph.json`, JSON.stringify(JSON.stringify(compilation.graph)));
+      await fsp.writeFile(`${path.join(process.cwd(), '.greenwood')}/graph.json`, JSON.stringify(compilation.graph));
 
       resolve(compilation);
     } catch (err) {

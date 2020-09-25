@@ -27,19 +27,22 @@ class HeaderComponent extends LitElement {
     this.navigation = [];
   }
 
-  // TODO async connectedCallback() {
-  //   super.connectedCallback();
+  async connectedCallback() {
+    super.connectedCallback();
 
-  //   const response = await client.query({
-  //     query: MenuQuery,
-  //     variables: {
-  //       name: 'navigation',
-  //       order: 'index_asc'
-  //     }
-  //   });
-
-  //   this.navigation = response.data.menu.children;
-  // }
+    fetch('/graph.json')
+    .then(res => res.json())
+    .then(data => {
+      this.navigation = data.filter(page => {
+        if (page.data.menu === 'navigation') {
+          page.link = page.route;
+          page.label = `${page.label.charAt(0).toUpperCase()}${page.label.slice(1)}`.replace('-', ' ');
+          
+          return page;
+        }
+      })
+    });
+  }
 
   /* eslint-disable indent */
   render() {
@@ -62,7 +65,7 @@ class HeaderComponent extends LitElement {
 
             <nav>
               <ul>
-                ${navigation.map(({ item }) => {
+                ${navigation.map((item) => {
                   return html`
                     <li><a href="${item.link}" title="Click to visit the ${item.label} page">${item.label}</a></li>
                   `;
