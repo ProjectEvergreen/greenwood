@@ -94,7 +94,9 @@ app.use(async ctx => {
 
       // TODO use an app template
       if (fm.attributes.template) {
-        contents = await fsp.readFile(`${userWorkspace}/templates/${fm.attributes.template}-template.html`, 'utf-8');
+        contents = await fsp.readFile(`${userWorkspace}/templates/${fm.attributes.template}.html`, 'utf-8');
+      } else {
+        contents = await fsp.readFile(`${userWorkspace}/templates/page.html`, 'utf-8');
       }
 
       // use page title

@@ -31,16 +31,16 @@ class HeaderComponent extends LitElement {
     super.connectedCallback();
 
     fetch('/graph.json')
-    .then(res => res.json())
-    .then(data => {
-      this.navigation = data.filter(page => {
-        if (page.data.menu === 'navigation') {
-          page.link = page.route;
-          page.label = `${page.label.charAt(0).toUpperCase()}${page.label.slice(1)}`.replace('-', ' ');
-          
-          return page;
-        }
-      })
+      .then(res => res.json())
+      .then(data => {
+        this.navigation = data.filter(page => {
+          if (page.data.menu === 'navigation') {
+            page.link = page.route;
+            page.label = `${page.label.charAt(0).toUpperCase()}${page.label.slice(1)}`.replace('-', ' ');
+            
+            return page;
+          }
+        })
     });
   }
 
