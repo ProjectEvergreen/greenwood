@@ -1,5 +1,6 @@
 const BrowserRunner = require('../lib/browser');
 const { promises: fsp } = require('fs');
+const fs = require('fs');
 const path = require('path');
 
 module.exports = serializeBuild = async (compilation) => {
@@ -10,23 +11,18 @@ module.exports = serializeBuild = async (compilation) => {
 
     try {
       return Promise.all(pages.map(async(page) => {
-        console.info('serializing page...', page);
+        const { route } = page;
+        const url = route.lastIndexOf('/') === route.length - 1
+          ? route
+          : `${route}/index.html`;
+
+        console.info('serializing page...', url);
             
         return await browserRunner
-          .serialize(`${serverUrl}/${page}`)
+          .serialize(`${serverUrl}/${url}`)
           .then(async (html) => {
-            console.info(`content arrived for page => ${page}!!!`);
-            let outputPath = page;
-  
-            // TODO seems a little hacky, needs to keep lockstepping with rollup?
-            // if (page.indexOf('/') > 0 && page.indexOf('index.html') < 0) {
-            //   // console.log('non root nested page found!!!!');
-            //   let pieces = page.split('/');
-  
-            //   pieces[pieces.length - 1] = pieces[pieces.length - 1].replace('.html', '/');
-  
-            //   outputPath = `${pieces.join('/')}index.html`;
-            // }
+            console.debug(`content arrived for page => ${route}!!!`);
+            let outputPath = `${route.replace('/', '')}/index.html`;
             
             // TODO allow setup / teardown (e.g. module shims, then remove module-shims)
             let htmlModified = html;
@@ -38,7 +34,15 @@ module.exports = serializeBuild = async (compilation) => {
             htmlModified = htmlModified.replace(/<script type="module-shim"/g, '<script type="module"');
   
             // console.debug('final HTML', htmlModified);
-            console.info(`Serializing complete for page ${page} \n outputting... ${outputDir.replace(process.cwd(), '.')}${outputPath}`);
+            console.info(`Serializing complete for page ${route}.`);
+            console.debug(`outputting to... ${outputDir.replace(`${process.cwd()}`, '.')}${outputPath}`);
+            
+            if (!fs.existsSync(path.join(outputDir, route))) {
+              fs.mkdirSync(path.join(outputDir, route), {
+                recursive: true
+              });
+            }
+            
             await fsp.writeFile(path.join(outputDir, outputPath), htmlModified);
         });
       }))
@@ -51,13 +55,13 @@ module.exports = serializeBuild = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const pages = ['index.html']; // TODO all pages from ompilation.graph;
+      const pages = compilation.graph;
       const port = compilation.config.devServer.port;
       const outputDir = compilation.context.scratchDir;
       const serverAddress = `http://127.0.0.1:${port}`;
 
-      console.debug(`Serializing pages at ${serverAddress}`);
-      console.debug('pages to generate', `\n ${pages.join('\n  ')}`);
+      console.info(`Serializing pages at ${serverAddress}`);
+      console.debug('pages to generate', `\n ${pages.map(page => page.mdFile).join('\n ')}`);
   
       await runBrowser(serverAddress, pages, outputDir);
       
