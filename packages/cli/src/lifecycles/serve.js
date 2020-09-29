@@ -22,7 +22,7 @@ const userWorkspace = path.join(process.cwd(), './www');
 
 // TODO export this an async function
 app.use(async ctx => {
-  // console.log('URL', ctx.request.url);
+  // console.debug('URL', ctx.request.url);
   
   // TODO filter out node modules, only page / user requests from brower
   if (ctx.request.url.endsWith('/')) {
@@ -47,6 +47,7 @@ app.use(async ctx => {
 
     // TODO get pages path from compilation
     const barePath = `${userWorkspace}/pages${ctx.request.url.replace('.html', '')}`;
+    // console.debug('bare path', barePath);
 
     // TODO use default page here if it exists?
     let contents = `
@@ -69,16 +70,13 @@ app.use(async ctx => {
     if (fs.existsSync(`${barePath}.html`)) {
       // console.debug('this route exists as HTML');
       contents = await fsp.readFile(`${barePath}.html`, 'utf-8');
-    } else if (fs.existsSync(`${barePath}.md`)) {
-      // } else if (fs.existsSync(`${barePath}.md`) || fs.existsSync(`${pageTemplatePath}.md`) || fs.existsSync(contentTemplatePath)) {
+    } else if (fs.existsSync(`${barePath}.md`) || fs.existsSync(`${userWorkspace}/pages${ctx.request.url.replace('/index.html', '.md')}`)) {
       // TODO all this lookup could probably be handled a bit more gracefully perhaps?
-      const markdownPath = `${barePath}.md`;
+      const markdownPath = fs.existsSync(`${barePath}.md`)
+        ? `${barePath}.md`
+        : `${userWorkspace}/pages${ctx.request.url.replace('/index.html', '.md')}`;
       const markdownContents = await fsp.readFile(markdownPath, 'utf-8');
-      // const markdownPath = fs.existsSync(`${barePath}.md`)
-      //   ? `${barePath}.md`
-      //   : fs.existsSync(contentTemplatePath)
-      //     ? contentTemplatePath
-      //     : `${pageTemplatePath}.md`;
+
       // console.debug('this route exists as a markdown file', markdownPath);
 
       // TODO extract front matter contents from remark-frontmatter instead of frontmatter lib

@@ -10,10 +10,11 @@
     <script type="module">
       import '@evergreen-wc/eve-container';
     </script>
-    <script type="module" src="../components/footer/footer.js"></script>
-    <script type="module" src="../components/header/header.js"></script>
-    <script type="module" src="../components/shelf/shelf.js"></script>
-    <script type="module" src="../components/scroll/scroll.js"></script>
+    <!-- TODO have to use / for path references?  translate on the fly in serve.js? -->
+    <script type="module" src="/components/footer/footer.js"></script>
+    <script type="module" src="/components/header/header.js"></script>
+    <script type="module" src="/components/shelf/shelf.js"></script>
+    <script type="module" src="/components/scroll/scroll.js"></script>
 
     <script>
       function getOutboundLink() {
@@ -27,8 +28,8 @@
       }
     </script>
 
-    <link rel="stylesheet" href="../styles/theme.css"></link>
-    <link rel="stylesheet" href="../styles/page.css"></link>
+    <link rel="stylesheet" href="/styles/theme.css"></link>
+    <link rel="stylesheet" href="/styles/page.css"></link>
     
   </head>
 
