@@ -42,7 +42,9 @@ app.use(async ctx => {
         metaHtml += ` ${key}="${value}"`;
       }
     
-      return `<meta${metaHtml}/>`;
+      return item.rel
+        ? `<link${metaHtml}/>`
+        : `<meta${metaHtml}/>`;
     }).join('\n');
 
     // TODO get pages path from compilation
@@ -269,6 +271,9 @@ app.use(async ctx => {
       }
     } else if (['.woff2', '.woff', '.ttf'].includes(ext)) {
       ctx.set('Content-Type', `font/${type}`);
+      ctx.body = await fsp.readFile(assetPath);
+    } else if (['.ico'].includes(ext)) {
+      ctx.set('Content-Type', `image/x-icon`);
       ctx.body = await fsp.readFile(assetPath);
     } else {
       ctx.set('Content-Type', `text/${type}`);
