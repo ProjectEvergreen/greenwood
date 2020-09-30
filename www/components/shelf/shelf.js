@@ -99,6 +99,8 @@ class Shelf extends LitElement {
             
             return page;
           }
+        }).sort((a, b) => {
+          return a.data.index < b.data.index ? -1 : 1;
         });
       });
       // return await client.query({
@@ -116,7 +118,6 @@ class Shelf extends LitElement {
       // const response = await this.fetchShelfData();
       // this.shelfList = response.data.menu.children;
       this.shelfList = await this.fetchShelfData();
-
 
       this.expandRoute(window.location.pathname);
       this.requestUpdate();

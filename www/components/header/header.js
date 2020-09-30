@@ -40,7 +40,9 @@ class HeaderComponent extends LitElement {
             
             return page;
           }
-        })
+        }).sort((a, b) => {
+          return a.data.index < b.data.index ? -1 : 1;
+        });
     });
   }
 
