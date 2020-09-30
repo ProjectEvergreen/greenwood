@@ -21,7 +21,6 @@ module.exports = serializeBuild = async (compilation) => {
         return await browserRunner
           .serialize(`${serverUrl}/${url}`)
           .then(async (html) => {
-            console.debug(`content arrived for page => ${route}!!!`);
             let outputPath = `${route.replace('/', '')}/index.html`;
             
             // TODO allow setup / teardown (e.g. module shims, then remove module-shims)
@@ -35,7 +34,7 @@ module.exports = serializeBuild = async (compilation) => {
   
             // console.debug('final HTML', htmlModified);
             console.info(`Serializing complete for page ${route}.`);
-            console.debug(`outputting to... ${outputDir.replace(`${process.cwd()}`, '.')}${outputPath}`);
+            // console.debug(`outputting to... ${outputDir.replace(`${process.cwd()}`, '.')}${outputPath}`);
             
             if (!fs.existsSync(path.join(outputDir, route))) {
               fs.mkdirSync(path.join(outputDir, route), {
