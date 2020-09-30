@@ -18,14 +18,14 @@ const createGraphFromPages = async (pagesDir, config) => {
         let files = await fs.readdir(directory);
 
         return Promise.all(files.map((file) => {
-          // console.debug('walking files, on page', file);
           const filenameHash = crypto.createHash('md5').update(`${directory}/${file}`).digest('hex');
           const filePath = path.join(directory, file);
           const stats = fs.statSync(filePath);
-          const isMdFile = file.substr(file.length - 2, file.length) === 'md';
+          const isMdFile = path.extname(file) === '.md';
+          const ishtmlFile = path.extname(file) === '.html';
 
           // map each page to a (0 based) index based on filesystem order
-          if (isMdFile) {
+          if (isMdFile || ishtmlFile) {
             pagesIndexMap.set(filenameHash, pagesIndex);
             pagesIndex += 1;
           }
@@ -150,6 +150,26 @@ const createGraphFromPages = async (pagesDir, config) => {
                   title,
                   meta,
                   chunkName
+                };
+              }
+
+              // TODO handle top level root index.html
+              if (ishtmlFile){
+                // const { label, template, title } = attributes;
+                // const { meta } = config;
+
+                pages[pagesIndexMap.get(filenameHash)] = {
+                  data: {},
+                  // label,
+                  // route,
+                  // template,
+                  filePath,
+                  route: file === 'index.html' ? '/' : file
+                  // fileName,
+                  // relativeExpectedPath,
+                  // title
+                  // meta,
+                  // chunkName
                 };
               }
 
