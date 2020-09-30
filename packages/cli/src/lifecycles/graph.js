@@ -4,7 +4,7 @@ const { promises: fsp } = require('fs');
 const crypto = require('crypto');  // TODO pretty heavy just for some hashing?
 const path = require('path');
 const fm = require('front-matter');
-// const toc = require('markdown-toc');
+const toc = require('markdown-toc');
 
 const createGraphFromPages = async (pagesDir, config) => {
   let pages = [];
@@ -131,12 +131,11 @@ const createGraphFromPages = async (pagesDir, config) => {
                 customData.linkheadings = customData.linkheadings || 0;
                 customData.tableOfContents = [];
 
-                // TODO
-                // if (customData.linkheadings > 0) {
-                //   // parse markdown for table of contents and output to json
-                //   customData.tableOfContents = toc(fileContents).json;
-                //   customData.tableOfContents.shift();
-                // }
+                if (customData.linkheadings > 0) {
+                  // parse markdown for table of contents and output to json
+                  customData.tableOfContents = toc(fileContents).json;
+                  customData.tableOfContents.shift();
+                }
                 /* ---------End Menu Query-------------------- */
 
                 pages[pagesIndexMap.get(filenameHash)] = {

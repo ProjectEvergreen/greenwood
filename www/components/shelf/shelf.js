@@ -96,7 +96,17 @@ class Shelf extends LitElement {
           if (page.data.menu && page.data.menu === 'side' && page.route.indexOf(`/${this.page}`) === 0) {
             page.link = `${page.route}/index.html`;
             page.label = `${page.label.charAt(0).toUpperCase()}${page.label.slice(1)}`.replace('-', ' ');
+            page.children = [];
             
+            page.data.tableOfContents.forEach(({ content, slug, lvl }) => {
+              page.children.push({
+                item: {
+                  label: content,
+                  link: `#${slug}`
+                }
+              });
+            });
+
             return page;
           }
         }).sort((a, b) => {
@@ -118,6 +128,7 @@ class Shelf extends LitElement {
       // const response = await this.fetchShelfData();
       // this.shelfList = response.data.menu.children;
       this.shelfList = await this.fetchShelfData();
+      // console.debug('this.shelfList', this.shelfList);
 
       this.expandRoute(window.location.pathname);
       this.requestUpdate();
