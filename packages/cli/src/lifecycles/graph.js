@@ -73,7 +73,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                 }
 
                 // generate a random element tag name
-                label = label || generateLabelHash(filePath);
+                label = label || mdFile.split('/')[mdFile.split('/').length - 1].replace('.md', '');
 
                 // set <title></title> element text, override with markdown title
                 title = title || '';
@@ -173,17 +173,17 @@ const createGraphFromPages = async (pagesDir, config) => {
   });
 };
 
-const generateLabelHash = (label) => {
-  const hash = crypto.createHash('sha256');
+// const generateLabelHash = (label) => {
+//   const hash = crypto.createHash('sha256');
 
-  hash.update(label);
+//   hash.update(label);
 
-  let elementLabel = hash.digest('hex');
+//   let elementLabel = hash.digest('hex');
 
-  elementLabel = elementLabel.substring(elementLabel.length - 15, elementLabel.length);
+//   elementLabel = elementLabel.substring(elementLabel.length - 15, elementLabel.length);
 
-  return elementLabel;
-};
+//   return elementLabel;
+// };
 
 module.exports = generateGraph = async (compilation) => {
 
