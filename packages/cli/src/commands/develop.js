@@ -1,6 +1,6 @@
 const generateCompilation = require('../lifecycles/compile');
 const livereload = require('livereload');
-const { server } = require('../lifecycles/serve');
+const { devServer } = require('../lifecycles/serve');
 
 module.exports = runDevServer = async () => {
 
@@ -11,7 +11,7 @@ module.exports = runDevServer = async () => {
       const { port } = compilation.config.devServer;
       const { userWorkspace } = compilation.context;
       
-      server.listen(port, () => {
+      devServer(compilation).listen(port, () => {
         console.info(`Started local development at localhost:${port}`);
         const liveReloadServer = livereload.createServer({
           exts: ['html', 'css', 'js', 'md'],
