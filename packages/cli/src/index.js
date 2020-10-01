@@ -10,6 +10,7 @@ process.setMaxListeners(0);
 const program = require('commander');
 const runProductionBuild = require('./commands/build');
 const runDevServer = require('./commands/develop');
+const runProdServer = require('./commands/serve');
 // const ejectConfigFiles = require('./tasks/eject');
 const greenwoodPackageJson = require('../package.json');
 
@@ -36,9 +37,17 @@ program
   .action((cmd) => {
     command = cmd._name;
   });
+
 program
   .command('develop')
   .description('Start a local development server.')
+  .action((cmd) => {
+    command = cmd._name;
+  });
+
+program
+  .command('serve')
+  .description('View a production build locally with a basic web server.')
   .action((cmd) => {
     command = cmd._name;
   });
@@ -66,12 +75,19 @@ const run = async() => {
     
     switch (command) {
 
-      case 'build':        
+      case 'build':   
         await runProductionBuild();
         
         break;
       case 'develop':
         await runDevServer();
+
+        break;
+      case 'serve':
+        process.env.__GWD_COMMAND__ = 'build';
+        
+        await runProductionBuild();
+        await runProdServer();
 
         break;
         // TODO

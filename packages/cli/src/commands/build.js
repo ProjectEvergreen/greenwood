@@ -2,7 +2,7 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const generateCompilation = require('../lifecycles/compile');
 const serializeBuild = require('../lifecycles/serialize');
-const { server } = require('../lifecycles/serve');
+const { devServer } = require('../lifecycles/serve');
 
 module.exports = runProductionBuild = async () => {
 
@@ -13,7 +13,7 @@ module.exports = runProductionBuild = async () => {
       const port = compilation.config.devServer.port;
       const outputDir = compilation.context.outputDir;
 
-      await server.listen(port);
+      devServer(compilation).listen(port);
   
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir);
