@@ -30,18 +30,21 @@ With Greenwood installed, you can run its CLI to generate your site.  The comman
 - `develop`: Develop your project with a local development server.
 - `build`: For generating a production ready static site.
 
-As mentioned above, it is recommended to install Greenwood locally into your project. From there, you can define npm scripts in _package.json_:
+As mentioned above, it is recommended to install Greenwood locally into your project. From there, you can define npm scripts in _package.json_ like so:
 
 ```json
 "scripts": {
   "build": "greenwood build",
-  "start": "greenwood develop"
-},
+  "start": "greenwood develop",
+  "serve": "greenwood serve"
+}
 ```
 
 Then you can run:
-- `npm run build` - generate a static build of your project for production
-- `npm start` - starts a development server for local development
+- `greenwood build`: Generates a production build of your project
+- `greenwood develop`: Starts a local development server for your project
+- `greenwood serve`: Generates a production build of the project and serves it locally on a simple web server.
+- `greenwood eject`: Ejects configurations to your working directory for additional customizations.
 
 ### Sections
 - [Component Model](/docs/component-model/): Examples of using custom elements in Greenwood.
