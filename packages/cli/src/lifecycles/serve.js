@@ -7,6 +7,7 @@ const frontmatter = require('front-matter');
 const remarkFrontmatter = require('remark-frontmatter');
 const raw = require('rehype-raw');
 const html = require('rehype-stringify');
+const htmlparser = require('node-html-parser');
 const Koa = require('koa');
 const path = require('path');
 const remark = require('remark-parse');
@@ -33,6 +34,7 @@ function getDevServer(compilation) {
     // make sure this only happens for "pages", nor partials or fixtures, templates, et)
     if (ctx.request.url.indexOf('.html') >= 0) {
       let title = config.title;
+
       const metaOutletContent = config.meta.map(item => {
         let metaHtml = '';
       
@@ -49,22 +51,21 @@ function getDevServer(compilation) {
       const barePath = `${userWorkspace}/pages${ctx.request.url.replace('.html', '')}`;
       // console.debug('bare path', barePath);
 
-      // TODO use default page here if it exists?
       let contents = `
-        <!DOCTYPE html>
-          <html lang="en" prefix="og:http://ogp.me/ns#">
-            <head>
-              <title>${title}</title>
-              <meta charset='utf-8'>
-              <meta name='viewport' content='width=device-width, initial-scale=1'/>
-              <meta-outlet></meta-outlet>
-            </head>
-            <body>
-              <section>
-                <content-outlet></content-outlet>
-              </section>
-            </body>
-          </html>
+      <!DOCTYPE html>
+        <html lang="en" prefix="og:http://ogp.me/ns#">
+          <head>
+            <title>${title}</title>
+            <meta charset='utf-8'>
+            <meta name='viewport' content='width=device-width, initial-scale=1'/>
+            <meta-outlet></meta-outlet>
+          </head>
+          <body>
+            <section>
+              <content-outlet></content-outlet>
+            </section>
+          </body>
+        </html>
       `;
 
       if (fs.existsSync(`${barePath}.html`)) {
@@ -103,6 +104,48 @@ function getDevServer(compilation) {
         }
 
         contents = contents.replace('<content-outlet></content-outlet>', processedMarkdown.contents);
+      }
+
+      const appTemplate = `${userWorkspace}/templates/app.html`;
+
+      if (fs.existsSync(appTemplate)) {
+        let appTemplateContents = fs.readFileSync(appTemplate, 'utf-8');
+        const root = htmlparser.parse(contents, {
+          script: true,
+          style: true
+        });
+        const body = root.querySelector('body');
+        const headScripts = root.querySelectorAll('head script');
+        const headLinks = root.querySelectorAll('head link');
+
+        appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
+        
+        headScripts.forEach(script => {
+          if (script.rawAttrs !== '') {
+            appTemplateContents = appTemplateContents.replace(/<\/script>/, `
+              </script>\n
+              <script ${script.rawAttrs}></script>\n
+            `)
+          }
+
+          if (script.rawAttrs === '') {
+            appTemplateContents = appTemplateContents.replace(/<\/script>/, `
+              </script>\n
+              <script>
+                ${script.text}
+              </script>\n
+            `)
+          }
+        });
+
+        headLinks.forEach(link => {
+          appTemplateContents = appTemplateContents.replace(/<\/link>/, `
+            </link>\n
+            <link ${link.rawAttrs}></link>\n
+          `)
+        });
+
+        contents = appTemplateContents;
       }
       
       // TODO use an HTML parser?  https://www.npmjs.com/package/node-html-parser

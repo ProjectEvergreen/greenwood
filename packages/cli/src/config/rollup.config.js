@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { promises as fsPromises } from 'fs';
+// TODO use node-html-parser
 import htmlparser2 from 'htmlparser2';
 import json from '@rollup/plugin-json';
 import multiInput from 'rollup-plugin-multi-input';

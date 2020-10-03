@@ -2,62 +2,39 @@
 <html lang="en" prefix="og:http://ogp.me/ns#">
 
   <head>
-    <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1'/>
-    <meta-outlet></meta-outlet>
-
-    <!-- TODO how to import / register a component like below? -->
-    <script type="module">
-      import '@evergreen-wc/eve-container';
-    </script>
-    <!-- TODO have to use / for path references?  translate on the fly in serve.js? -->
-    <script type="module" src="/components/footer/footer.js"></script>
-    <script type="module" src="/components/header/header.js"></script>
+    <!-- TODO have to use forward slash / for path references?  translate on the fly in serve.js? -->
     <script type="module" src="/components/shelf/shelf.js"></script>
     <script type="module" src="/components/scroll/scroll.js"></script>
 
     <script>
-      function getOutboundLink() {
-        console.debug('TODO placeholder for Google Analytics...')
-      }
-
       window.onload = () => {
         const route = window.location.pathname.split('/')[1];
-
-        document.getElementsByTagName('app-shelf')[0].setAttribute('page', route)
+        
+        document.getElementsByTagName('app-shelf')[0].setAttribute('page', route);
       }
     </script>
 
-    <link rel="stylesheet" href="/styles/theme.css"></link>
-    <link rel="stylesheet" href="/styles/page.css"></link>
-    
+    <link rel="stylesheet" href="/styles/page.css"></link>    
   </head>
 
   <body>
 
-    <div class='gwd-wrapper'>
-      <app-header></app-header>
-
-      <div class='gwd-content-wrapper'>
-        
-        <div class="gwd-sidebar">
-          <app-shelf .page="${page}"></app-shelf>
-        </div>
-        
-        <div class="gwd-content">
-          <eve-container fluid>
-            <app-scroll>
-              <content-outlet></content-outlet>
-            </app-scroll>
-          </eve-container>
-        </div>
+    <div class='gwd-content-wrapper'>
       
+      <div class="gwd-sidebar">
+        <app-shelf .page="${page}"></app-shelf>
       </div>
       
-      <!-- TODO <lit-route><h1>404 Not found</h1></lit-route> -->
-      <app-footer></app-footer>
+      <div class="gwd-content">
+        <eve-container fluid>
+          <app-scroll>
+            <content-outlet></content-outlet>
+          </app-scroll>
+        </eve-container>
+      </div>
+    
     </div>
 
   </body>
-
+  
 </html>
