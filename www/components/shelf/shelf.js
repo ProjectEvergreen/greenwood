@@ -78,7 +78,7 @@ class Shelf extends LitElement {
     this.toggleSelectedItem();
   }
 
-  handleClick(evt) {
+  handleShelfClick(evt) {
     // collapse all other items
     this.collapseAll();
     // set selected to index
@@ -94,16 +94,13 @@ class Shelf extends LitElement {
       .then(data => {
         return data.filter(page => {
           if (page.data.menu && page.data.menu === 'side' && page.route.indexOf(`/${this.page}`) === 0) {
-            page.link = `${page.route}/index.html`;
             page.label = `${page.label.charAt(0).toUpperCase()}${page.label.slice(1)}`.replace('-', ' ');
             page.children = [];
             
-            page.data.tableOfContents.forEach(({ content, slug, lvl }) => {
+            page.data.tableOfContents.forEach(({ content, slug }) => {
               page.children.push({
-                item: {
-                  label: content,
-                  link: `#${slug}`
-                }
+                label: content,
+                route: `#${slug}`
               });
             });
 
@@ -143,9 +140,11 @@ class Shelf extends LitElement {
       if (list && list.length > 0) {
         listItems = html`
           <ul>
-            ${list.map(({ item }, index) => {
+            ${list.map((item, index) => {
               return html`
-                <li id="index_${index}" class="${selected ? '' : 'hidden'}"><a @click=${()=> this.goTo(`${item.link}`)}">${item.label}</a></li>
+                <li class="${selected ? '' : 'hidden'}">
+                  <a @click=${() => { this.goTo(`${item.route}`) }}>${item.label}</a>
+                </li>
               `;
             })}
           </ul>
@@ -164,8 +163,13 @@ class Shelf extends LitElement {
 
       return html`
         <li class="list-wrap">
-          <a id="${id}" href="${item.link}" @click="${this.handleClick}"><span>${item.label}</span><span>${chevron}</span></a>
-          <hr>
+          <div>
+            <a href="${item.route}">${item.label}</a>
+            <a id="${id}" @click="${this.handleShelfClick}"><span class="pointer">${chevron}</span></a>
+          </div>
+
+          <hr/>
+          
           ${renderListItems(item.children, item.selected)}
         </li>
       `;
