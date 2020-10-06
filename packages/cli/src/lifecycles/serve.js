@@ -25,14 +25,12 @@ function getDevServer(compilation) {
     // console.debug('URL', ctx.request.url);
     
     // TODO filter out node modules, only page / user requests from brower
-    if (ctx.request.url.endsWith('/')) {
+    // TODO make sure this only happens for "pages", nor partials or fixtures, templates, et)
+    if (ctx.request.url.endsWith('/') || ctx.request.url.endsWith('.html')) {
       // console.log('URL ends with /');
       // TODO get port from compilation
-      ctx.redirect(`http://localhost:1984${ctx.request.url}index.html`);
-    }
-
-    // make sure this only happens for "pages", nor partials or fixtures, templates, et)
-    if (ctx.request.url.indexOf('.html') >= 0) {
+      // ctx.redirect(`http://localhost:1984${ctx.request.url}index.html`);
+      // }
       let title = config.title;
 
       const metaOutletContent = config.meta.map(item => {
@@ -48,11 +46,14 @@ function getDevServer(compilation) {
       }).join('\n');
 
       // TODO get pages path from compilation
-      const barePath = `${userWorkspace}/pages${ctx.request.url.replace('.html', '')}`;
+      const barePath = ctx.request.url.endsWith('/')
+        ? `${userWorkspace}/pages${ctx.request.url}index`
+        : `${userWorkspace}/pages${ctx.request.url.replace('.html', '')}`;
+        
       // console.debug('bare path', barePath);
 
       let contents = `
-      <!DOCTYPE html>
+        <!DOCTYPE html>
         <html lang="en" prefix="og:http://ogp.me/ns#">
           <head>
             <title>${title}</title>
@@ -68,14 +69,21 @@ function getDevServer(compilation) {
         </html>
       `;
 
+
       if (fs.existsSync(`${barePath}.html`)) {
         // console.debug('this route exists as HTML');
         contents = await fsp.readFile(`${barePath}.html`, 'utf-8');
-      } else if (fs.existsSync(`${barePath}.md`) || fs.existsSync(`${userWorkspace}/pages${ctx.request.url.replace('/index.html', '.md')}`)) {
+      } else if (fs.existsSync(`${barePath}.md`) 
+        || fs.existsSync(`${userWorkspace}/pages${ctx.request.url.replace('/index.html', '.md')}`) 
+        || fs.existsSync(`${barePath.replace('/index', '.md')}`)) {
+        
         // TODO all this lookup could probably be handled a bit more gracefully perhaps?
+        // console.debug('this route exists as markdown');
         const markdownPath = fs.existsSync(`${barePath}.md`)
           ? `${barePath}.md`
-          : `${userWorkspace}/pages${ctx.request.url.replace('/index.html', '.md')}`;
+          : fs.existsSync(`${barePath.replace('/index', '.md')}`)
+            ? `${barePath.replace('/index', '.md')}`
+            : `${userWorkspace}/pages${ctx.request.url.replace('/index.html', '.md')}`;
         const markdownContents = await fsp.readFile(markdownPath, 'utf-8');
 
         // console.debug('this route exists as a markdown file', markdownPath);

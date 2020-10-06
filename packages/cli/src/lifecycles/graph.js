@@ -56,7 +56,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                 let fileRoute = subDir.substring(seperatorIndex, subDir.length - 3);
 
                 // determine if this is an index file, if so set route to '/'
-                let route = fileRoute === '/index' ? '/' : fileRoute;
+                let route = fileRoute === '/index' ? '/' : `${fileRoute}/`;
 
                 // check if additional nested directories
                 if (seperatorIndex > 0) {
@@ -164,7 +164,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                   // route,
                   // template,
                   filePath,
-                  route: file === 'index.html' ? '/' : file
+                  route: file === 'index.html' ? '/' : `${file}/`
                   // fileName,
                   // relativeExpectedPath,
                   // title

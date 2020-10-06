@@ -71,7 +71,7 @@ class Banner extends LitElement {
 
             <h3>The static site generator for your. . . <br /><span class="${this.animateState}">${currentProjectType}.</span></h3>
 
-            <eve-button size="md" href="/getting-started" style="${buttonCss}">Get Started</eve-button>
+            <eve-button size="md" href="/getting-started/" style="${buttonCss}">Get Started</eve-button>
           </div>
         </eve-container>
       </div>
