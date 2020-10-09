@@ -26,12 +26,12 @@ function getDevServer(compilation) {
     const { userWorkspace } = context;
 
     try {
-      ctx = await filterHtml(ctx, config, userWorkspace);
-      ctx = await filterModule(ctx);
-      ctx = await filterJSON(ctx, context);
-      ctx = await filterJavascript(ctx, context);
-      ctx = await filterStyles(ctx, context);
-      ctx = await filterAssets(ctx, context);
+      await filterHtml(ctx, config, userWorkspace);
+      await filterModule(ctx);
+      await filterJSON(ctx, context);
+      await filterJavascript(ctx, context);
+      await filterStyles(ctx, context);
+      await filterAssets(ctx, context);
     } catch (err) {
       console.log(err);
     }
@@ -255,7 +255,7 @@ const filterHtml = async (ctx, config, userWorkspace) => {
         ctx.set('Content-Type', 'text/html');
         ctx.body = contents;
       }
-      resolve(ctx);
+      resolve();
     } catch (err) {
       reject(err);
     }
@@ -275,7 +275,7 @@ const filterModule = async (ctx) => {
         ctx.set('Content-Type', type);
         ctx.body = contents;
       }
-      resolve(ctx);
+      resolve();
     } catch (err) {
       reject(err);
     }
@@ -304,7 +304,7 @@ const filterJSON = async (ctx, { userWorkspace, scratchDir }) => {
           `;
         }
       }
-      resolve(ctx);
+      resolve();
     } catch (err) {
       reject(err);
     }
@@ -321,7 +321,7 @@ const filterJavascript = async (ctx, { userWorkspace }) => {
         ctx.set('Content-Type', 'text/javascript');
         ctx.body = contents;
       }
-      resolve(ctx);
+      resolve();
     } catch (err) {
       reject(err);
     }
@@ -353,7 +353,7 @@ const filterStyles = async (ctx, { userWorkspace }) => {
           `;
         }
       }
-      resolve(ctx);
+      resolve();
     } catch (err) {
       reject(err);
     }
@@ -393,7 +393,7 @@ const filterAssets = async (ctx, { userWorkspace }) => {
           ctx.body = await fsp.readFile(assetPath, 'utf-8');
         }
       }
-      resolve(ctx);
+      resolve();
     } catch (err) {
       reject(err);
     }
