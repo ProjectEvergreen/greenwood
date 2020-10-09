@@ -29,9 +29,9 @@ function getDevServer(compilation) {
       await filterHtml(ctx, config, userWorkspace);
       await filterModule(ctx);
       await filterJSON(ctx, context);
-      await filterJavascript(ctx, context);
-      await filterStyles(ctx, context);
-      await filterAssets(ctx, context);
+      await filterJavascript(ctx, userWorkspace);
+      await filterStyles(ctx, userWorkspace);
+      await filterAssets(ctx, userWorkspace);
     } catch (err) {
       console.log(err);
     }
@@ -311,7 +311,7 @@ const filterJSON = async (ctx, { userWorkspace, scratchDir }) => {
   });
 };
 
-const filterJavascript = async (ctx, { userWorkspace }) => {
+const filterJavascript = async (ctx, userWorkspace) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (ctx.request.url.indexOf('/node_modules') < 0 && ctx.request.url.indexOf('.js') >= 0 && ctx.request.url.indexOf('.json') < 0) {
@@ -328,7 +328,7 @@ const filterJavascript = async (ctx, { userWorkspace }) => {
   });
 };
 
-const filterStyles = async (ctx, { userWorkspace }) => {
+const filterStyles = async (ctx, userWorkspace) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (ctx.request.url.indexOf('.css') >= 0) {
@@ -360,7 +360,7 @@ const filterStyles = async (ctx, { userWorkspace }) => {
   });
 };
 
-const filterAssets = async (ctx, { userWorkspace }) => {
+const filterAssets = async (ctx, userWorkspace) => {
   return new Promise(async (resolve, reject) => {
     try {
       // TODO break up into distinct font / icons / svg handlers, not related to assets/
