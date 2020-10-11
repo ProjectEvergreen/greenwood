@@ -1,7 +1,8 @@
-const { execSync } = require('child_process');
 const fs = require('fs');
+const bundleCompilation = require('../lifecycles/bundle');
+const copyAssets = require('../lifecycles/copy');
 const generateCompilation = require('../lifecycles/compile');
-const serializeBuild = require('../lifecycles/serialize');
+const serializeCompilation = require('../lifecycles/serialize');
 const { devServer } = require('../lifecycles/serve');
 
 module.exports = runProductionBuild = async () => {
@@ -19,21 +20,10 @@ module.exports = runProductionBuild = async () => {
         fs.mkdirSync(outputDir);
       }
   
-      await serializeBuild(compilation);
+      await serializeCompilation(compilation);
+      await bundleCompilation(compilation);
+      await copyAssets(compilation);
 
-      // TODO this is a hack just for the sake of the POC, will do for real :)
-      // rollup.write(rollupConfig);
-      execSync('rollup -c ./packages/cli/src/config/rollup.config.js');
-
-      // TODO part of rollup?
-      execSync(`cp -vr ${compilation.context.userWorkspace}/assets/ ./public/assets`);
-
-      // TODO should be done by rollup
-      execSync(`cp -vr ${compilation.context.userWorkspace}/styles/ ./public/styles`);
-
-      // TODO should be done by rollup
-      execSync(`cp -vr ${compilation.context.scratchDir}/graph.json ./public`);
-  
       resolve();
     } catch (err) {
       reject(err);

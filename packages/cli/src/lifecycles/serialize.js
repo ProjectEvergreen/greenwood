@@ -3,7 +3,7 @@ const { promises: fsp } = require('fs');
 const fs = require('fs');
 const path = require('path');
 
-module.exports = serializeBuild = async (compilation) => {
+module.exports = serializeCompilation = async (compilation) => {
   const browserRunner = new BrowserRunner();
   await browserRunner.init();
 
