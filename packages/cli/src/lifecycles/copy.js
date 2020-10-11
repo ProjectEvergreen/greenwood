@@ -11,7 +11,7 @@ async function rreaddir (dir, allFiles = []) {
     (await fsPromises.stat(f)).isDirectory() && rreaddir(f, allFiles)
   )));
   
-  return allFiles
+  return allFiles;
 }
 
 // https://stackoverflow.com/a/30405105/417806
@@ -44,8 +44,8 @@ module.exports = copyAssets = (compilation) => {
         const assetPaths = await rreaddir(`${context.userWorkspace}/assets`);
       
         if (assetPaths.length > 0){
-          if (!fs.existsSync(`${context.outputDir}/assets/`)) {
-            fs.mkdirSync(`${context.outputDir}/assets/`);
+          if (!fs.existsSync(`${context.outputDir}/assets`)) {
+            fs.mkdirSync(`${context.outputDir}/assets`);
           }
 
           Promise.all(assetPaths.filter((asset) => {
@@ -54,7 +54,7 @@ module.exports = copyAssets = (compilation) => {
             
             if (isDirectory && !fs.existsSync(target)) {
               fs.mkdirSync(target);
-            } else {
+            } else if(!isDirectory){
               return asset;
             }
           }).map((asset) => {
@@ -92,7 +92,6 @@ module.exports = copyAssets = (compilation) => {
 
       resolve();
     } catch (err) {
-      console.error('ERROR', err);
       reject(err);
     }
   });
