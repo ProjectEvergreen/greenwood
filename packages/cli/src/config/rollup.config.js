@@ -9,18 +9,15 @@ const path = require('path');
 const postcss = require('rollup-plugin-postcss');
 const { terser } = require('rollup-plugin-terser');
 
-// TODO from compilation
-const scratchDirectory = path.join(process.cwd(), '.greenwood');
-const workspaceDirectory = path.join(process.cwd(), 'www');
-const outputDirectory = path.join(process.cwd(), 'public');
+function greenwoodWorkspaceResolver (compilation) {
+  const { userWorkspace } = compilation.context;
 
-function greenwoodWorkspaceResolver () {
   return {
     name: 'greenwood-workspace-resolver', // this name will show up in warnings and errors
     resolveId(source) {
       // TODO better way to handle relative paths?  happens in generateBundle too
-      if ((source.indexOf('./') === 0 || source.indexOf('/') === 0) && path.extname(source) !== '.html' && fs.existsSync(path.join(workspaceDirectory, source))) {
-        const resolvedPath = source.replace(source, path.join(workspaceDirectory, source));
+      if ((source.indexOf('./') === 0 || source.indexOf('/') === 0) && path.extname(source) !== '.html' && fs.existsSync(path.join(userWorkspace, source))) {
+        const resolvedPath = source.replace(source, path.join(userWorkspace, source));
         // console.debug('resolve THIS sauce to workspace directory, returning ', resolvedPath);
         
         return resolvedPath; // this signals that rollup should not ask other plugins or check the file system to find this id
@@ -32,7 +29,8 @@ function greenwoodWorkspaceResolver () {
 }
 
 // https://github.com/rollup/rollup/issues/2873
-function greenwoodHtmlPlugin() {
+function greenwoodHtmlPlugin(compilation) {
+  const { userWorkspace } = compilation.context;
 
   return {
     name: 'greenwood-html-plugin',
@@ -51,7 +49,7 @@ function greenwoodHtmlPlugin() {
           if (name === 'script' && attribs.type === 'module' && attribs.src) {
             // TODO handle deeper paths
             const srcPath = attribs.src.replace('../', './');
-            const scriptSrc = fs.readFileSync(path.join(workspaceDirectory, srcPath), 'utf-8');
+            const scriptSrc = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
 
             that.emitFile({
               type: 'chunk',
@@ -101,6 +99,7 @@ function greenwoodHtmlPlugin() {
                   } else {
                     // console.debug('NO MATCH?????', innerBundleId);
                     // TODO better testing
+                    // TODO magic string
                     if(innerBundleId.indexOf('.greenwood/') < 0 && !mappedBundles.get(innerBundleId)){
                       // console.debug('NEW BUNDLE TO INJECT!');
                       newHtml = newHtml.replace(/<script type="module" src="(.*)"><\/script>/, `
@@ -117,7 +116,7 @@ function greenwoodHtmlPlugin() {
           parser.write(html);
           parser.end();
 
-          // TODO this seems hacky :D
+          // TODO this seems hacky; hardcoded dirs :D
           bundle.fileName = bundle.facadeModuleId.replace('.greenwood', './public');
           bundle.code = newHtml;
         }
@@ -128,11 +127,13 @@ function greenwoodHtmlPlugin() {
 
 module.exports = getRollupConfig = async (compilation) => {
   
+  const { scratchDir, outputDir } = compilation.context;;
+
   return [{
     // TODO Avoid .greenwood/ directory, do everything in public/?
-    input: `${scratchDirectory}/**/*.html`,
+    input: `${scratchDir}/**/*.html`,
     output: { 
-      dir: outputDirectory,
+      dir: outputDir,
       entryFileNames: '[name].[hash].js',
       chunkFileNames: '[name].[hash].js'
     },
@@ -142,8 +143,8 @@ module.exports = getRollupConfig = async (compilation) => {
       //   // extensions: ['.css']
       // }),
       nodeResolve(),
-      greenwoodWorkspaceResolver(),
-      greenwoodHtmlPlugin(),
+      greenwoodWorkspaceResolver(compilation),
+      greenwoodHtmlPlugin(compilation),
       multiInput(),
       postcss({
         extract: false,

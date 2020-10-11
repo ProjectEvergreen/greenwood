@@ -1,6 +1,6 @@
-const fs = require('fs');
 const bundleCompilation = require('../lifecycles/bundle');
 const copyAssets = require('../lifecycles/copy');
+const fs = require('fs');
 const generateCompilation = require('../lifecycles/compile');
 const serializeCompilation = require('../lifecycles/serialize');
 const { devServer } = require('../lifecycles/serve');
