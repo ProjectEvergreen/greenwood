@@ -6,7 +6,7 @@ module.exports = bundleCompilation = async (compilation) => {
     try {
 
       // TODO use rollup API directly and use compilation
-      // TODO nut that requires NodeJS 14.x w/ ESM support?
+      // TODO the above requires NodeJS 14.x w/ ESM support?
       execSync('rollup -c ./packages/cli/src/config/rollup.config.js');
 
       resolve();

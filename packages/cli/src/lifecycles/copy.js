@@ -1,4 +1,3 @@
-const { execSync } = require('child_process');
 const fs = require('fs');
 const fsPromises = fs.promises;
 const path = require('path');
@@ -70,9 +69,27 @@ module.exports = copyAssets = (compilation) => {
       console.info('copying graph.json...');
       await copyFile(`${context.scratchDir}graph.json`, `${context.outputDir}/graph.json`);
 
-      // TODO should be done by rollup
-      execSync(`cp -vr ${compilation.context.userWorkspace}/styles/ ./public/styles`);
-      
+      // TODO should really be done by rollup
+      console.info('copying CSS files...');
+      const cssPaths = await rreaddir(`${context.userWorkspace}`);
+
+      Promise.all(cssPaths.filter((cssPath) => {
+        if (path.extname(cssPath) === '.css') {
+          return cssPath;
+        } 
+      }).map((cssPath) => {
+        const targetPath = cssPath.replace(context.userWorkspace, context.outputDir);
+        const targetDir = targetPath.replace(path.basename(targetPath), '');
+        
+        if (!fs.existsSync(targetDir)) {
+          fs.mkdirSync(targetDir, {
+            recursive: true
+          });
+        }
+
+        return copyFile(cssPath, targetPath);
+      }));
+
       resolve();
     } catch (err) {
       console.error('ERROR', err);
