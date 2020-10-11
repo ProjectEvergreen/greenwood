@@ -1,15 +1,15 @@
-import fs from 'fs';
-import { promises as fsPromises } from 'fs';
+const fs = require('fs');
+const fsPromises = require('fs').promises;
 // TODO use node-html-parser
-import htmlparser2 from 'htmlparser2';
-import json from '@rollup/plugin-json';
-import multiInput from 'rollup-plugin-multi-input';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import path from 'path';
-import postcss from 'rollup-plugin-postcss';
-import { terser } from 'rollup-plugin-terser';
-import ignoreImport from 'rollup-plugin-ignore-import';
+const htmlparser2 = require('htmlparser2');
+const json = require('@rollup/plugin-json');
+const multiInput = require('rollup-plugin-multi-input').default;
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
+const path = require('path');
+const postcss = require('rollup-plugin-postcss');
+const { terser } = require('rollup-plugin-terser');
 
+// TODO from compilation
 const scratchDirectory = path.join(process.cwd(), '.greenwood');
 const workspaceDirectory = path.join(process.cwd(), 'www');
 const outputDirectory = path.join(process.cwd(), 'public');
@@ -37,6 +37,7 @@ function greenwoodHtmlPlugin() {
   return {
     name: 'greenwood-html-plugin',
     load(id) {
+      // console.debug('load id', id);
       if (path.extname(id) === '.html') {
         return '';
       }
@@ -125,30 +126,36 @@ function greenwoodHtmlPlugin() {
   };
 }
 
-export default [{
-  // TODO Avoid .greenwood/ directory, do everything in public/?
-  input: `${scratchDirectory}/**/*.html`,
-  output: { 
-    dir: outputDirectory,
-    entryFileNames: '[name].[hash].js',
-    chunkFileNames: '[name].[hash].js'
-  },
-  plugins: [
-    // ignoreImport({
-    //   include: ['**/*.css'],
-    //   // extensions: ['.css']
-    // }),
-    nodeResolve(),
-    greenwoodWorkspaceResolver(),
-    greenwoodHtmlPlugin(),
-    multiInput(),
-    postcss({
-      extract: false,
-      minimize: true
-    }),
-    json(), // TODO bundle as part of import support?
-    terser()
-  ]
+module.exports = getRollupConfig = async (compilation) => {
+  
+  return [{
+    // TODO Avoid .greenwood/ directory, do everything in public/?
+    input: `${scratchDirectory}/**/*.html`,
+    output: { 
+      dir: outputDirectory,
+      entryFileNames: '[name].[hash].js',
+      chunkFileNames: '[name].[hash].js'
+    },
+    plugins: [
+      // ignoreImport({
+      //   include: ['**/*.css'],
+      //   // extensions: ['.css']
+      // }),
+      nodeResolve(),
+      greenwoodWorkspaceResolver(),
+      greenwoodHtmlPlugin(),
+      multiInput(),
+      postcss({
+        extract: false,
+        minimize: true
+      }),
+      json(), // TODO bundle as part of import support?
+      terser()
+    ]
+  }];
+
+};
+
 // }, {
 //   input: `${workspaceDirectory}/**/*.css`, // TODO emits a www/styles.js file?
 //   output: { // TODO CSS filename hashing / cache busting - https://github.com/egoist/rollup-plugin-postcss/pull/226
@@ -161,4 +168,3 @@ export default [{
 //       minimize: true
 //     })
 //   ]
-}];
