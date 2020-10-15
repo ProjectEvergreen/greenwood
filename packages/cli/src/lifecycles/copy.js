@@ -48,7 +48,7 @@ module.exports = copyAssets = (compilation) => {
             fs.mkdirSync(`${context.outputDir}/assets`);
           }
 
-          Promise.all(assetPaths.filter((asset) => {
+          await Promise.all(assetPaths.filter((asset) => {
             const target = asset.replace(context.userWorkspace, context.outputDir);
             const isDirectory = path.extname(target) === '';
             
@@ -71,9 +71,9 @@ module.exports = copyAssets = (compilation) => {
 
       // TODO should really be done by rollup
       console.info('copying CSS files...');
-      const cssPaths = await rreaddir(`${context.userWorkspace}`);
+      const cssPaths = await rreaddir(context.userWorkspace);
 
-      Promise.all(cssPaths.filter((cssPath) => {
+      await Promise.all(cssPaths.filter((cssPath) => {
         if (path.extname(cssPath) === '.css') {
           return cssPath;
         } 
