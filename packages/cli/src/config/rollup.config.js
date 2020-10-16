@@ -100,7 +100,7 @@ function greenwoodHtmlPlugin(compilation) {
                     // console.debug('NO MATCH?????', innerBundleId);
                     // TODO better testing
                     // TODO magic string
-                    if(innerBundleId.indexOf('.greenwood/') < 0 && !mappedBundles.get(innerBundleId)){
+                    if (innerBundleId.indexOf('.greenwood/') < 0 && !mappedBundles.get(innerBundleId)) {
                       // console.debug('NEW BUNDLE TO INJECT!');
                       newHtml = newHtml.replace(/<script type="module" src="(.*)"><\/script>/, `
                         <script type="module" src="/${innerBundleId}"></script>
@@ -127,7 +127,7 @@ function greenwoodHtmlPlugin(compilation) {
 
 module.exports = getRollupConfig = async (compilation) => {
   
-  const { scratchDir, outputDir } = compilation.context;;
+  const { scratchDir, outputDir } = compilation.context;
 
   return [{
     // TODO Avoid .greenwood/ directory, do everything in public/?

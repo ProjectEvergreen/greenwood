@@ -16,4 +16,4 @@ module.exports = bundleCompilation = async (compilation) => {
       reject(err);
     }
   });
-}
+};

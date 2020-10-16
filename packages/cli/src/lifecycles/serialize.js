@@ -43,8 +43,8 @@ module.exports = serializeCompilation = async (compilation) => {
             }
             
             await fsp.writeFile(path.join(outputDir, outputPath), htmlModified);
-        });
-      }))
+          });
+      }));
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(err);
@@ -72,4 +72,4 @@ module.exports = serializeCompilation = async (compilation) => {
       reject(err);
     }
   });
-}
+};

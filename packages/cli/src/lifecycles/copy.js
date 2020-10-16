@@ -3,12 +3,12 @@ const fsPromises = fs.promises;
 const path = require('path');
 
 async function rreaddir (dir, allFiles = []) {
-  const files = (await fsPromises.readdir(dir)).map(f => path.join(dir, f))
+  const files = (await fsPromises.readdir(dir)).map(f => path.join(dir, f));
   
   allFiles.push(...files);
   
   await Promise.all(files.map(async f => (
-    (await fsPromises.stat(f)).isDirectory() && rreaddir(f, allFiles)
+    await fsPromises.stat(f)).isDirectory() && rreaddir(f, allFiles
   )));
   
   return allFiles;
@@ -43,7 +43,7 @@ module.exports = copyAssets = (compilation) => {
         console.info('copying assets/ directory...');
         const assetPaths = await rreaddir(`${context.userWorkspace}/assets`);
       
-        if (assetPaths.length > 0){
+        if (assetPaths.length > 0) {
           if (!fs.existsSync(`${context.outputDir}/assets`)) {
             fs.mkdirSync(`${context.outputDir}/assets`);
           }
@@ -54,7 +54,7 @@ module.exports = copyAssets = (compilation) => {
             
             if (isDirectory && !fs.existsSync(target)) {
               fs.mkdirSync(target);
-            } else if(!isDirectory){
+            } else if (!isDirectory) {
               return asset;
             }
           }).map((asset) => {
@@ -62,7 +62,7 @@ module.exports = copyAssets = (compilation) => {
 
             return copyFile(asset, target);
           }));
-        };
+        }
       }
 
       // TODO should be done via rollup detection, so Greenwood will only copy files used when actually imported by the user
@@ -95,4 +95,4 @@ module.exports = copyAssets = (compilation) => {
       reject(err);
     }
   });
-}
+};

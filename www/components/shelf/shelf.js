@@ -110,14 +110,14 @@ class Shelf extends LitElement {
           return a.data.index < b.data.index ? -1 : 1;
         });
       });
-      // return await client.query({
-      //   query: MenuQuery,
-      //   variables: {
-      //     name: 'side',
-      //     route: `/${this.page}/`,
-      //     order: 'index_asc'
-      //   }
-      // });
+    // return await client.query({
+    //   query: MenuQuery,
+    //   variables: {
+    //     name: 'side',
+    //     route: `/${this.page}/`,
+    //     order: 'index_asc'
+    //   }
+    // });
   }
 
   async updated(changedProperties) {
@@ -140,10 +140,10 @@ class Shelf extends LitElement {
       if (list && list.length > 0) {
         listItems = html`
           <ul>
-            ${list.map((item, index) => {
+            ${list.map((item) => {
               return html`
                 <li class="${selected ? '' : 'hidden'}">
-                  <a @click=${() => { this.goTo(`${item.route}`) }}>${item.label}</a>
+                  <a @click=${() => { this.goTo(`${item.route}`); }}>${item.label}</a>
                 </li>
               `;
             })}
