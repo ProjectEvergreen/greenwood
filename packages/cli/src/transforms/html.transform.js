@@ -54,7 +54,7 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
             </head>
             <body>
               <section>
-                <content-outlet></content-outlet>
+                <h1>Welcome to my website!</h1>
               </section>
             </body>
           </html>
@@ -159,14 +159,16 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
         contents = contents.replace(/type="module"/g, 'type="module-shim"');
         
         const importMap = {};
-        const userPackageJson = fs.existsSync(path.join(userWorkspace, 'package.json'))
+        const userPackageJson = fs.existsSync(`${userWorkspace}/package.json`)
           ? require(path.join(userWorkspace, 'package.json')) // its a monorepo?
-          : require(path.join(process.cwd(), 'package.json'));
+          : fs.existsSync(`${process.cwd()}/package.json`)
+            ? require(path.join(process.cwd(), 'package.json'))
+            : {};
 
         // console.debug('userPackageJson', userPackageJson);
         // console.debug('dependencies', userPackageJson.dependencies);
         
-        Object.keys(userPackageJson.dependencies).forEach(dependency => {
+        Object.keys(userPackageJson.dependencies || {}).forEach(dependency => {
           const packageRootPath = path.join(process.cwd(), './node_modules', dependency);
           const packageJsonPath = path.join(packageRootPath, 'package.json');
           const packageJson = require(packageJsonPath);

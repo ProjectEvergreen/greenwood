@@ -70,25 +70,31 @@ module.exports = copyAssets = (compilation) => {
       await copyFile(`${context.scratchDir}graph.json`, `${context.outputDir}/graph.json`);
 
       // TODO should really be done by rollup
-      console.info('copying CSS files...');
-      const cssPaths = await rreaddir(context.userWorkspace);
+      if (fs.existsSync(`${context.userWorkspace}`)) {
+        console.info('copying CSS files...');
+        const cssPaths = await rreaddir(context.userWorkspace);
 
-      await Promise.all(cssPaths.filter((cssPath) => {
-        if (path.extname(cssPath) === '.css') {
-          return cssPath;
-        } 
-      }).map((cssPath) => {
-        const targetPath = cssPath.replace(context.userWorkspace, context.outputDir);
-        const targetDir = targetPath.replace(path.basename(targetPath), '');
-        
-        if (!fs.existsSync(targetDir)) {
-          fs.mkdirSync(targetDir, {
-            recursive: true
-          });
+        if (cssPaths.length === 0) {
+          return;
         }
+        
+        await Promise.all(cssPaths.filter((cssPath) => {
+          if (path.extname(cssPath) === '.css') {
+            return cssPath;
+          } 
+        }).map((cssPath) => {
+          const targetPath = cssPath.replace(context.userWorkspace, context.outputDir);
+          const targetDir = targetPath.replace(path.basename(targetPath), '');
+          
+          if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, {
+              recursive: true
+            });
+          }
 
-        return copyFile(cssPath, targetPath);
-      }));
+          return copyFile(cssPath, targetPath);
+        }));
+      }
 
       resolve();
     } catch (err) {

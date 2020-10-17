@@ -137,6 +137,13 @@ module.exports = getRollupConfig = async (compilation) => {
       entryFileNames: '[name].[hash].js',
       chunkFileNames: '[name].[hash].js'
     },
+    onwarn: (messageObj) => {
+      if ((/EMPTY_BUNDLE/).test(messageObj.code)) {
+        return;
+      } else {
+        console.debug(messageObj.message);
+      }
+    },
     plugins: [
       // ignoreImport({
       //   include: ['**/*.css'],

@@ -185,8 +185,16 @@ const createGraphFromPages = async (pagesDir, config) => {
         }));
       };
 
-      await walkDirectory(pagesDir);
+      if (fs.existsSync(pagesDir)) {
+        await walkDirectory(pagesDir);
+      } else {
+        pages.push({
+          route: '/'
+        });
+      }
+
       resolve(pages);
+
     } catch (err) {
       reject(err);
     }
