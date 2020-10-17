@@ -39,7 +39,7 @@ const TestBed = require('../../../../../test/test-bed');
 
 const mainBundleScriptRegex = /index.*.bundle\.js/;
 
-describe('Build Greenwood With: ', function() {
+xdescribe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Meta Configuration and Nested Workspace';
   const meta = greenwoodConfig.meta;
   let setup;
