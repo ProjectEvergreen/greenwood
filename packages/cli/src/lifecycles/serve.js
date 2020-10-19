@@ -110,15 +110,13 @@ function getProdServer(compilation) {
 function getContextAPI(ctx) {
   const { header, url } = ctx.request;
 
-  let ctxAPI = {
-    body: (a) => ctx.body = a,
-    set: (a, b) => ctx.set(a, b),
+  return {
+    body: (contents) => ctx.body = contents,
+    set: (name, value) => ctx.set(name, value),
     url,
     header,
-    redirect: (a) => ctx.redirect(a)
+    redirect: (url) => ctx.redirect(url)
   };
-
-  return ctxAPI;
 }
 
 module.exports = {
