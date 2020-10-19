@@ -6,21 +6,21 @@ module.exports = filterJSON = async (ctx, { userWorkspace, scratchDir }) => {
     try {
       // TODO This is here because of ordering, should make JS / JSON matching less greedy
       // handle things outside if workspace, like a root directory resolver plugin?
-      if (ctx.request.url.indexOf('.json') >= 0) {
-        // console.debug('JSON file request!', ctx.request.url);'
+      if (ctx.url.indexOf('.json') >= 0) {
+        // console.debug('JSON file request!', ctx.url);'
 
-        if (ctx.request.url.indexOf('graph.json') >= 0) {
+        if (ctx.url.indexOf('graph.json') >= 0) {
           const json = await fsp.readFile(path.join(scratchDir, 'graph.json'), 'utf-8');
 
           ctx.set('Content-Type', 'application/json');
-          ctx.body = JSON.parse(json);
+          ctx.body(JSON.parse(json));
         } else {
-          const json = await fsp.readFile(path.join(userWorkspace, ctx.request.url), 'utf-8');
+          const json = await fsp.readFile(path.join(userWorkspace, ctx.url), 'utf-8');
 
           ctx.set('Content-Type', 'text/javascript');
-          ctx.body = `
+          ctx.body(`
             export default ${json}
-          `;
+          `);
         }
       }
       resolve();

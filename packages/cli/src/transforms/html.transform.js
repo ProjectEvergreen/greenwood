@@ -17,10 +17,10 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
     try {
       // TODO filter out node modules, only page / user requests from brower
       // TODO make sure this only happens for "pages", nor partials or fixtures, templates, et)
-      if (ctx.request.url.endsWith('/') || ctx.request.url.endsWith('.html')) {
+      if (ctx.url.endsWith('/') || ctx.url.endsWith('.html')) {
         // console.log('URL ends with /');
         // TODO get port from compilation
-        // ctx.redirect(`http://localhost:1984${ctx.request.url}index.html`);
+        // ctx.redirect(`http://localhost:1984${ctx.url}index.html`);
         // }
         let title = config.title;
 
@@ -37,9 +37,9 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
         }).join('\n');
 
         // TODO get pages path from compilation
-        const barePath = ctx.request.url.endsWith('/')
-          ? `${userWorkspace}/pages${ctx.request.url}index`
-          : `${userWorkspace}/pages${ctx.request.url.replace('.html', '')}`;
+        const barePath = ctx.url.endsWith('/')
+          ? `${userWorkspace}/pages${ctx.url}index`
+          : `${userWorkspace}/pages${ctx.url.replace('.html', '')}`;
           
         // console.debug('bare path', barePath);
 
@@ -64,7 +64,7 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
           // console.debug('this route exists as HTML');
           contents = await fsp.readFile(`${barePath}.html`, 'utf-8');
         } else if (fs.existsSync(`${barePath}.md`) 
-          || fs.existsSync(`${userWorkspace}/pages${ctx.request.url.replace('/index.html', '.md')}`) 
+          || fs.existsSync(`${userWorkspace}/pages${ctx.url.replace('/index.html', '.md')}`) 
           || fs.existsSync(`${barePath.replace('/index', '.md')}`)) {
           
           // TODO all this lookup could probably be handled a bit more gracefully perhaps?
@@ -73,7 +73,7 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
             ? `${barePath}.md`
             : fs.existsSync(`${barePath.replace('/index', '.md')}`)
               ? `${barePath.replace('/index', '.md')}`
-              : `${userWorkspace}/pages${ctx.request.url.replace('/index.html', '.md')}`;
+              : `${userWorkspace}/pages${ctx.url.replace('/index.html', '.md')}`;
           const markdownContents = await fsp.readFile(markdownPath, 'utf-8');
 
           // console.debug('this route exists as a markdown file', markdownPath);
@@ -225,7 +225,7 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
         contents = contents.replace('<head>', `<head><title>${title}</title>`);
 
         ctx.set('Content-Type', 'text/html');
-        ctx.body = contents;
+        ctx.body(contents);
       }
       resolve();
     } catch (err) {
