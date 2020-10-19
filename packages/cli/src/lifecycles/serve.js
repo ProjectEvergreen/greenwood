@@ -108,8 +108,7 @@ function getProdServer(compilation) {
 }
 
 function getContextAPI(ctx) {
-  const { request } = ctx;
-  const { header, url } = request;
+  const { header, url } = ctx.request;
 
   let ctxAPI = {
     body: (a) => ctx.body = a,
