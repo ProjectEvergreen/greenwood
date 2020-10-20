@@ -39,7 +39,7 @@ const TestBed = require('../../../../../test/test-bed');
 
 const mainBundleScriptRegex = /index.*.bundle\.js/;
 
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Meta Configuration and Nested Workspace';
   const meta = greenwoodConfig.meta;
   let setup;
@@ -62,7 +62,7 @@ xdescribe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public', 'not-found', 'hello'], LABEL);
+    runSmokeTest(['public'], LABEL);
 
     // hardcoding index smoke test here because of the nested route
     describe('Index (home) page with custom meta data', function() {
@@ -79,10 +79,10 @@ xdescribe('Build Greenwood With: ', function() {
       it('should have a <title> tag in the <head>', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
-        expect(title).to.be.equal('My Custom Greenwood App');
+        expect(title).to.be.equal(greenwoodConfig.title);
       });
 
-      it('should have one <script> tag in the <body> for the main bundle', function() {
+      xit('should have one <script> tag in the <body> for the main bundle', function() {
         const scriptTags = dom.window.document.querySelectorAll('body > script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
@@ -93,7 +93,7 @@ xdescribe('Build Greenwood With: ', function() {
         expect(bundledScript.length).to.be.equal(1);
       });
 
-      it('should have one <script> tag in the <body> for the main bundle loaded with async', function() {
+      xit('should have one <script> tag in the <body> for the main bundle loaded with async', function() {
         const scriptTags = dom.window.document.querySelectorAll('body > script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
@@ -104,7 +104,7 @@ xdescribe('Build Greenwood With: ', function() {
         expect(bundledScript[0].getAttribute('async')).to.be.equal('');
       });
 
-      it('should have one <script> tag for Apollo state', function() {
+      xit('should have one <script> tag for Apollo state', function() {
         const scriptTags = dom.window.document.querySelectorAll('script');
         const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';
@@ -113,19 +113,19 @@ xdescribe('Build Greenwood With: ', function() {
         expect(bundleScripts.length).to.be.equal(1);
       });
 
-      it('should have only one <script> tag in the <head>', function() {
+      xit('should have only one <script> tag in the <head>', function() {
         const scriptTags = dom.window.document.querySelectorAll('head > script');
 
         expect(scriptTags.length).to.be.equal(1);
       });
 
-      it('should have a router outlet tag in the <body>', function() {
+      xit('should have a router outlet tag in the <body>', function() {
         const outlet = dom.window.document.querySelectorAll('body eve-app');
 
         expect(outlet.length).to.be.equal(1);
       });
 
-      it('should have the correct route tags in the <body>', function() {
+      xit('should have the correct route tags in the <body>', function() {
         const routes = dom.window.document.querySelectorAll('body lit-route');
 
         expect(routes.length).to.be.equal(4);
@@ -156,7 +156,7 @@ xdescribe('Build Greenwood With: ', function() {
         const ogUrlMeta = metaFilter('og:url');
         const metaElement = dom.window.document.querySelector(`head meta[property="${ogUrlMeta.property}"]`);
 
-        expect(metaElement.getAttribute('content')).to.be.equal(`${ogUrlMeta.content}/`);
+        expect(metaElement.getAttribute('content')).to.be.equal(ogUrlMeta.content);
       });
 
       it('should have a <meta> tag with custom twitter:site content in the <head>', function() {

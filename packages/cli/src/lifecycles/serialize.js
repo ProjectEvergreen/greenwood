@@ -17,9 +17,9 @@ module.exports = serializeCompilation = async (compilation) => {
           : `${route}/index.html`;
 
         console.info('serializing page...', url);
-            
+        
         return await browserRunner
-          .serialize(`${serverUrl}/${url}`)
+          .serialize(`${serverUrl}${url}`)
           .then(async (html) => {
             let outputPath = `${route.replace('/', '')}/index.html`;
             

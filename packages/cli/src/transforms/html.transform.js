@@ -27,10 +27,19 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
         const metaOutletContent = config.meta.map(item => {
           let metaHtml = '';
         
+          // TODO better way to implememnt this?  should we implement this?
           for (const [key, value] of Object.entries(item)) {
-            metaHtml += ` ${key}="${value}"`;
+            const isOgUrl = item.property === 'og:url' && key === 'content';
+            const hasTrailingSlash = isOgUrl && value[value.length - 1] === '/';
+            const contextualValue = isOgUrl
+              ? hasTrailingSlash
+                ? `${value}${ctx.request.url.replace('/', '')}`
+                : `${value}${ctx.request.url === '/' ? '' : ctx.request.url}`
+              : value;
+              
+            metaHtml += ` ${key}="${contextualValue}"`;
           }
-        
+
           return item.rel
             ? `<link${metaHtml}/>`
             : `<meta${metaHtml}/>`;
@@ -55,6 +64,7 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
             <body>
               <section>
                 <h1>Welcome to my website!</h1>
+                <content-outlet></content-outlet>
               </section>
             </body>
           </html>
@@ -92,7 +102,7 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
           // TODO use an app template
           if (fm.attributes.template) {
             contents = await fsp.readFile(`${userWorkspace}/templates/${fm.attributes.template}.html`, 'utf-8');
-          } else {
+          } else if (fs.existsSync(`${userWorkspace}/templates/page.html`)) {
             contents = await fsp.readFile(`${userWorkspace}/templates/page.html`, 'utf-8');
           }
 
