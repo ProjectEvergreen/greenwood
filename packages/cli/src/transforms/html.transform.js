@@ -33,8 +33,8 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
             const hasTrailingSlash = isOgUrl && value[value.length - 1] === '/';
             const contextualValue = isOgUrl
               ? hasTrailingSlash
-                ? `${value}${ctx.request.url.replace('/', '')}`
-                : `${value}${ctx.request.url === '/' ? '' : ctx.request.url}`
+                ? `${value}${ctx.url.replace('/', '')}`
+                : `${value}${ctx.url === '/' ? '' : ctx.url}`
               : value;
               
             metaHtml += ` ${key}="${contextualValue}"`;
