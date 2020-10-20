@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const fs = require('fs-extra');
 const { promises: fsp } = require('fs');
-const crypto = require('crypto');  // TODO pretty heavy just for some hashing?
+const crypto = require('crypto'); // TODO pretty heavy just for some hashing?
 const path = require('path');
 const fm = require('front-matter');
 const toc = require('markdown-toc');
@@ -154,7 +154,7 @@ const createGraphFromPages = async (pagesDir, config) => {
               }
 
               // TODO handle top level root index.html
-              if (ishtmlFile){
+              if (ishtmlFile) {
                 // const { label, template, title } = attributes;
                 // const { meta } = config;
 
@@ -185,8 +185,16 @@ const createGraphFromPages = async (pagesDir, config) => {
         }));
       };
 
-      await walkDirectory(pagesDir);
+      if (fs.existsSync(pagesDir)) {
+        await walkDirectory(pagesDir);
+      } else {
+        pages.push({
+          route: '/'
+        });
+      }
+
       resolve(pages);
+
     } catch (err) {
       reject(err);
     }

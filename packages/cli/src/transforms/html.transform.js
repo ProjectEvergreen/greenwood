@@ -27,10 +27,19 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
         const metaOutletContent = config.meta.map(item => {
           let metaHtml = '';
         
+          // TODO better way to implememnt this?  should we implement this?
           for (const [key, value] of Object.entries(item)) {
-            metaHtml += ` ${key}="${value}"`;
+            const isOgUrl = item.property === 'og:url' && key === 'content';
+            const hasTrailingSlash = isOgUrl && value[value.length - 1] === '/';
+            const contextualValue = isOgUrl
+              ? hasTrailingSlash
+                ? `${value}${ctx.request.url.replace('/', '')}`
+                : `${value}${ctx.request.url === '/' ? '' : ctx.request.url}`
+              : value;
+              
+            metaHtml += ` ${key}="${contextualValue}"`;
           }
-        
+
           return item.rel
             ? `<link${metaHtml}/>`
             : `<meta${metaHtml}/>`;
@@ -54,6 +63,7 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
             </head>
             <body>
               <section>
+                <h1>Welcome to my website!</h1>
                 <content-outlet></content-outlet>
               </section>
             </body>
@@ -92,7 +102,7 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
           // TODO use an app template
           if (fm.attributes.template) {
             contents = await fsp.readFile(`${userWorkspace}/templates/${fm.attributes.template}.html`, 'utf-8');
-          } else {
+          } else if (fs.existsSync(`${userWorkspace}/templates/page.html`)) {
             contents = await fsp.readFile(`${userWorkspace}/templates/page.html`, 'utf-8');
           }
 
@@ -159,14 +169,16 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
         contents = contents.replace(/type="module"/g, 'type="module-shim"');
         
         const importMap = {};
-        const userPackageJson = fs.existsSync(path.join(userWorkspace, 'package.json'))
+        const userPackageJson = fs.existsSync(`${userWorkspace}/package.json`)
           ? require(path.join(userWorkspace, 'package.json')) // its a monorepo?
-          : require(path.join(process.cwd(), 'package.json'));
+          : fs.existsSync(`${process.cwd()}/package.json`)
+            ? require(path.join(process.cwd(), 'package.json'))
+            : {};
 
         // console.debug('userPackageJson', userPackageJson);
         // console.debug('dependencies', userPackageJson.dependencies);
         
-        Object.keys(userPackageJson.dependencies).forEach(dependency => {
+        Object.keys(userPackageJson.dependencies || {}).forEach(dependency => {
           const packageRootPath = path.join(process.cwd(), './node_modules', dependency);
           const packageJsonPath = path.join(packageRootPath, 'package.json');
           const packageJson = require(packageJsonPath);

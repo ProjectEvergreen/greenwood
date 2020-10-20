@@ -25,12 +25,24 @@ function publicDirectory(label) {
         expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
 
-      it('should output a single 404.html file (not found page)', function() {
+      xit('should output a single 404.html file (not found page)', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './404.html'))).to.be.true;
       });
 
-      it('should output one JS bundle file', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, './index.*.bundle.js'))).to.have.lengthOf(1);
+      it('should output no JS bundle files', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(0);
+      });
+
+      it('should output no CSS files', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, '*.css'))).to.have.lengthOf(0);
+      });
+
+      it('should output one graph.json file', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'graph.json'))).to.have.lengthOf(1);
+      });
+
+      it('should output no more than json file', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, '*.json'))).to.have.lengthOf(1);
       });
     });
   });
@@ -89,8 +101,6 @@ function defaultNotFound(label) {
 function defaultIndex(label) {
   describe(`Running Smoke Tests: ${label}`, function() {
     describe('Index (Home) page', function() {
-      const indexPageHeading = 'Greenwood';
-      const indexPageBody = 'This is the home page built by Greenwood. Make your own pages in src/pages/index.js!';
       let dom;
 
       beforeEach(async function() {
@@ -103,7 +113,13 @@ function defaultIndex(label) {
         expect(title).to.be.equal('My App');
       });
 
-      it('should have one <script> tag in the <body> for the main bundle', function() {
+      it('should have no <script> tags in the document', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script');
+
+        expect(scriptTags.length).to.be.equal(0);
+      });
+
+      xit('should have one <script> tag in the <body> for the main bundle', function() {
         const scriptTags = dom.window.document.querySelectorAll('body > script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
@@ -114,7 +130,7 @@ function defaultIndex(label) {
         expect(bundledScript.length).to.be.equal(1);
       });
 
-      it('should have one <script> tag in the <body> for the main bundle loaded with async', function() {
+      xit('should have one <script> tag in the <body> for the main bundle loaded with async', function() {
         const scriptTags = dom.window.document.querySelectorAll('body > script');
         const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.src.replace('file:///', '');
@@ -125,7 +141,7 @@ function defaultIndex(label) {
         expect(bundledScript[0].getAttribute('async')).to.be.equal('');
       });
 
-      it('should have one <script> tag for Apollo state', function() {
+      xit('should have one <script> tag for Apollo state', function() {
         const scriptTags = dom.window.document.querySelectorAll('script');
         const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';
@@ -134,28 +150,22 @@ function defaultIndex(label) {
         expect(bundleScripts.length).to.be.equal(1);
       });
 
-      it('should have a router outlet tag in the <body>', function() {
+      xit('should have a router outlet tag in the <body>', function() {
         const outlet = dom.window.document.querySelectorAll('body eve-app');
 
         expect(outlet.length).to.be.equal(1);
       });
 
-      it('should have the correct route tags in the <body>', function() {
+      xit('should have the correct route tags in the <body>', function() {
         const routes = dom.window.document.querySelectorAll('body lit-route');
 
         expect(routes.length).to.be.equal(3);
       });
 
       it('should have the expected heading text within the index page in the public directory', function() {
-        const heading = dom.window.document.querySelector('h3').textContent;
+        const heading = dom.window.document.querySelector('h1').textContent;
 
-        expect(heading).to.equal(indexPageHeading);
-      });
-
-      it('should have the expected paragraph text within the index page in the public directory', function() {
-        const paragraph = dom.window.document.querySelector('p').textContent;
-
-        expect(paragraph).to.equal(indexPageBody);
+        expect(heading).to.equal('Welcome to my website!');
       });
     });
   });

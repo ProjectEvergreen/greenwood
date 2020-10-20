@@ -30,7 +30,7 @@ const TestBed = require('../../../../../test/test-bed');
 const configTitle = require('./greenwood.config').title;
 const mainBundleScriptRegex = /index.*.bundle\.js/;
 
-describe('Build Greenwood With: ', function() {
+xdescribe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Title Configuration and Default Workspace';
   let setup;
 

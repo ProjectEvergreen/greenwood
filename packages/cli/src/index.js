@@ -29,7 +29,7 @@ program
   .version(greenwoodPackageJson.version)
   .arguments('<script-mode>')
   .usage('<script-mode> [options]');
-  // TODO .usage(`${chalk.green('<script-mode>')} [options]`);
+// TODO .usage(`${chalk.green('<script-mode>')} [options]`);
 
 program
   .command('build')

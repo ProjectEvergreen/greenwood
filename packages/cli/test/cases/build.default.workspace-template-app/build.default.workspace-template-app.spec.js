@@ -24,7 +24,7 @@ const TestBed = require('../../../../../test/test-bed');
 
 const mainBundleScriptRegex = /index.*.bundle\.js/;
 
-describe('Build Greenwood With: ', function() {
+xdescribe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace w/Custom App Template';
   let setup;
 

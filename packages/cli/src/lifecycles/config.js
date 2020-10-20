@@ -28,7 +28,8 @@ module.exports = readAndMergeConfig = async() => {
       
       if (await fs.exists(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, optimization, publicPath, title, meta, plugins, themeFile, markdown } = userCfgFile;
+        // TODO const { workspace, devServer, optimization, publicPath, title, meta, plugins, themeFile, markdown } = userCfgFile;
+        const { workspace, devServer, publicPath, title, meta } = userCfgFile;
 
         // workspace validation
         if (workspace) {

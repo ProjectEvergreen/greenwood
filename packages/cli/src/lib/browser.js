@@ -38,7 +38,7 @@ class BrowserRunner {
 
     // only allow puppeteer to load necessary scripts needed for pre-rendering of the site itself
     page.on('request', interceptedRequest => {
-      const interceptedRequestUrl = interceptedRequest.url();
+      // const interceptedRequestUrl = interceptedRequest.url();
 
       // console.debug('request', interceptedRequestUrl);
       // TODO handle serialize only requests

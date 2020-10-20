@@ -17,9 +17,9 @@ module.exports = serializeCompilation = async (compilation) => {
           : `${route}/index.html`;
 
         console.info('serializing page...', url);
-            
+        
         return await browserRunner
-          .serialize(`${serverUrl}/${url}`)
+          .serialize(`${serverUrl}${url}`)
           .then(async (html) => {
             let outputPath = `${route.replace('/', '')}/index.html`;
             
@@ -43,8 +43,8 @@ module.exports = serializeCompilation = async (compilation) => {
             }
             
             await fsp.writeFile(path.join(outputDir, outputPath), htmlModified);
-        });
-      }))
+          });
+      }));
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(err);
@@ -72,4 +72,4 @@ module.exports = serializeCompilation = async (compilation) => {
       reject(err);
     }
   });
-}
+};

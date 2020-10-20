@@ -24,7 +24,7 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', function() {
+xdescribe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Default Workspace w/ Nested Directories';
   let setup;
 
