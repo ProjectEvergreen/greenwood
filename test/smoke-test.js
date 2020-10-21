@@ -110,7 +110,7 @@ function defaultIndex(label) {
       it('should have a <title> tag in the <head>', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
-        expect(title).to.be.equal('My App');
+        expect(title).to.not.be.undefined;
       });
 
       it('should have no <script> tags in the document', function() {
