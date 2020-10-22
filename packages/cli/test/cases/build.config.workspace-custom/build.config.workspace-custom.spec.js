@@ -26,7 +26,7 @@ const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Configuration for Workspace (www) and Default Greenwood configuration';
   let setup;
 
@@ -40,7 +40,8 @@ xdescribe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public', 'index', 'not-found'], LABEL);
+    // TODO runSmokeTest(['public', 'index', 'not-found'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Custom About page', function() {
       let dom;
