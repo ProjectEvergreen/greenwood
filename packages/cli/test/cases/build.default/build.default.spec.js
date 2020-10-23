@@ -38,7 +38,7 @@ describe('Build Greenwood With: ', function() {
     // TODO runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
     runSmokeTest(['public', 'index'], LABEL);
   
-    describe('Default output', function() {
+    describe('Default output for index.html', function() {
       let dom;
 
       beforeEach(async function() {
@@ -58,10 +58,17 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have expected <content-outlet> tag in the <body>', function() {
-        const contentOutlet = dom.window.document.querySelector('body content-outlet');
-  
-        expect(contentOutlet).to.not.be.undefined;
-      });  
+        const contentOutlet = dom.window.document.querySelectorAll('body content-outlet');
+
+        expect(contentOutlet.length).to.be.equal(1);
+        expect(contentOutlet[0]).to.not.be.undefined;
+      });
+
+      it('should have the expected heading text within the index page in the public directory', function() {
+        const heading = dom.window.document.querySelector('body content-outlet h1').textContent;
+
+        expect(heading).to.equal('Welcome to my website!');
+      });
     });
   });
 

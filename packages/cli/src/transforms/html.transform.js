@@ -63,8 +63,9 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
             </head>
             <body>
               <section>
-                <h1>Welcome to my website!</h1>
-                <content-outlet></content-outlet>
+                <content-outlet>
+                  <h1>Welcome to my website!</h1>
+                </content-outlet>
               </section>
             </body>
           </html>
@@ -111,7 +112,7 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
             title = `${title} - ${fm.attributes.title}`;
           }
 
-          contents = contents.replace('<content-outlet></content-outlet>', processedMarkdown.contents);
+          contents = contents.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
         }
 
         const appTemplate = `${userWorkspace}/templates/app.html`;

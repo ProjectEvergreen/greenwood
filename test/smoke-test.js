@@ -162,7 +162,8 @@ function defaultIndex(label) {
         expect(routes.length).to.be.equal(3);
       });
 
-      it('should have the expected heading text within the index page in the public directory', function() {
+      // TODO moved to default spec, delete?
+      xit('should have the expected heading text within the index page in the public directory', function() {
         const heading = dom.window.document.querySelector('h1').textContent;
 
         expect(heading).to.equal('Welcome to my website!');
