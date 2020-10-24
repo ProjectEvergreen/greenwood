@@ -14,7 +14,7 @@
  * User Workspace
  * src/
  *   templates/
- *     app-template.js
+ *     app.html
  */
 const expect = require('chai').expect;
 const fs = require('fs');

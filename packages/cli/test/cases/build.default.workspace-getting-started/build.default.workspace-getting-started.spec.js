@@ -24,8 +24,8 @@
  *   styles/
  *     theme.css
  *   templates/
- *     app-template.js
- *     blog-template.js
+ *     app.html
+ *     blog.html
  */
 const expect = require('chai').expect;
 const fs = require('fs');
