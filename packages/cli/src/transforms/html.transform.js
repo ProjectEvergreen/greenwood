@@ -1,3 +1,5 @@
+/* eslint-disable complexity */
+// TODO ^^
 const acorn = require('acorn');
 const { promises: fsp } = require('fs');
 const fs = require('fs');
@@ -18,7 +20,7 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
       // TODO filter out node modules, only page / user requests from brower
       // TODO make sure this only happens for "pages", nor partials or fixtures, templates, et)
       if (ctx.request.url.endsWith('/') || ctx.request.url.endsWith('.html')) {
-        // console.log('URL ends with /');
+        // console.log('URL ends with / or endsWith.html');
         // TODO get port from compilation
         // ctx.redirect(`http://localhost:1984${ctx.request.url}index.html`);
         // }
@@ -104,6 +106,7 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
           if (fm.attributes.template) {
             contents = await fsp.readFile(`${userWorkspace}/templates/${fm.attributes.template}.html`, 'utf-8');
           } else if (fs.existsSync(`${userWorkspace}/templates/page.html`)) {
+            // console.debug('has a page template!');
             contents = await fsp.readFile(`${userWorkspace}/templates/page.html`, 'utf-8');
           }
 
@@ -113,6 +116,11 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
           }
 
           contents = contents.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
+        } else if (fs.existsSync(`${userWorkspace}/templates/page.html`)) {
+          // console.debug('only has a page template');
+          const page = await fsp.readFile(`${userWorkspace}/templates/page.html`, 'utf-8');
+          
+          contents = page.replace(/\<content-outlet>(.*)<\/content-outlet>/s, contents.match(/\<content-outlet>(.*)<\/content-outlet>/s)[0]);
         }
 
         const appTemplate = `${userWorkspace}/templates/app.html`;
