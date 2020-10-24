@@ -22,9 +22,7 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
-const mainBundleScriptRegex = /index.*.bundle\.js/;
-
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace w/Custom App Template';
   let setup;
 
@@ -40,85 +38,8 @@ xdescribe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public', 'not-found', 'hello'], LABEL);
-
-    describe('Custom Index (Home) page', function() {
-      const indexPageHeading = 'Greenwood';
-      const indexPageBody = 'This is the home page built by Greenwood. Make your own pages in src/pages/index.js!';
-      let dom;
-
-      beforeEach(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-      });
-
-      it('should have the default config title in the <title> tag in the <head>', function() {
-        const title = dom.window.document.querySelector('head title').textContent;
-
-        expect(title).to.be.equal('My App');
-      });
-
-      it('should have one <script> tag in the <body> for the main bundle', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body > script');
-        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
-
-          return mainBundleScriptRegex.test(src);
-        });
-
-        expect(bundledScript.length).to.be.equal(1);
-      });
-
-      it('should have one <script> tag in the <body> for the main bundle loaded with async', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body > script');
-        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
-
-          return mainBundleScriptRegex.test(src);
-        });
-
-        expect(bundledScript[0].getAttribute('async')).to.be.equal('');
-      });
-
-      it('should have one <script> tag for Apollo state', function() {
-        const scriptTags = dom.window.document.querySelectorAll('script');
-        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.getAttribute('data-state') === 'apollo';
-        });
-
-        expect(bundleScripts.length).to.be.equal(1);
-      });
-
-      it('should have only one <script> tag in the <head>', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
-
-        expect(scriptTags.length).to.be.equal(1);
-      });
-
-      it('should have a router outlet tag in the <body>', function() {
-        const outlet = dom.window.document.querySelectorAll('body app-root');
-
-        expect(outlet.length).to.be.equal(1);
-      });
-
-      // no 404 route in our custom app-template.js, like greenwood does
-      it('should have the correct route tags in the <body>', function() {
-        const routes = dom.window.document.querySelectorAll('body lit-route');
-
-        expect(routes.length).to.be.equal(2);
-      });
-
-      it('should have the expected heading text within the index page in the public directory', function() {
-        const heading = dom.window.document.querySelector('h3').textContent;
-
-        expect(heading).to.equal(indexPageHeading);
-      });
-
-      it('should have the expected paragraph text within the index page in the public directory', function() {
-        let paragraph = dom.window.document.querySelector('p').textContent;
-
-        expect(paragraph).to.equal(indexPageBody);
-      });
-    });
+    // TODO runSmokeTest(['public', 'not-found', 'hello'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Custom App Template', function() {
       before(async function() {
@@ -130,7 +51,7 @@ xdescribe('Build Greenwood With: ', function() {
       });
 
       it('should have the specific element we added as part of our custom app template', function() {
-        const customParagraph = dom.window.document.querySelector('p#custom-app-template').textContent;
+        const customParagraph = dom.window.document.querySelector('body p').textContent;
 
         expect(customParagraph).to.equal('My Custom App Template');
       });
