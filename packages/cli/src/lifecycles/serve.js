@@ -5,6 +5,7 @@ const path = require('path');
 const Koa = require('koa');
 
 const filterHTML = require('../transforms/html.transform');
+const filterMarkdown = require('../transforms/markdown.transform');
 const filterModule = require('../transforms/node-modules.transform');
 const filterCSS = require('../transforms/css.transform');
 const filterJavascript = require('../transforms/js.transform');
@@ -24,7 +25,9 @@ function getDevServer(compilation) {
     let ctx = getContextAPI(ctxKoa);
 
     try {
+
       await filterHTML(ctx, config, userWorkspace);
+      await filterMarkdown(ctx, config, userWorkspace);
       await filterModule(ctx);
       await filterJSON(ctx, context);
       await filterJavascript(ctx, userWorkspace);
