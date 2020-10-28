@@ -29,6 +29,7 @@
     "@ls-lint/ls-lint": "^1.9.2",
     "chai": "^4.2.0",
     "eslint": "^6.8.0",
+    "gallinago": "^0.2.0",
     "glob-promise": "^3.4.0",
     "jsdom": "^14.0.0",
     "lerna": "^3.16.4",

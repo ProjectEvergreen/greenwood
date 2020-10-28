@@ -16,7 +16,7 @@
  */
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
-const Runner = require('../../../../../test/gallinago').Runner;
+const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Empty Configuration and Default Workspace';
