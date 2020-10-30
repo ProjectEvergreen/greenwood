@@ -4,32 +4,60 @@ const { promises: fsp } = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
-const filterHTML = require('../transforms/html.transform');
-const filterModule = require('../transforms/node-modules.transform');
-const filterCSS = require('../transforms/css.transform');
-const filterJavascript = require('../transforms/js.transform');
-const filterJSON = require('../transforms/json.transform');
-const filterImages = require('../transforms/images.transform');
+const Transform = require('../transforms/transform.interface');
+const HTMLTransform = require('../transforms/transform.html');
+const CSSTransform = require('../transforms/transform.css');
+const JSTransform = require('../transforms/transform.js');
+const NodeTransform = require('../transforms/transform.node');
+const AssetTransform = require('../transforms/transform.assets');
 
 function getDevServer(compilation) {
   const app = new Koa();
 
-  // TODO use url.endsWith!!
-  // eslint-disable-next-line no-unused-vars
-  app.use(async ctxKoa => {
-    // console.debug('URL', ctx.url);
-    const { config, context } = compilation;
-    const { userWorkspace } = context;
+  app.use(async ctx => {
+    let response = {
+      body: '',
+      contentType: '',
+      extension: ''
+    };
 
-    let ctx = getContextAPI(ctxKoa);
+    let request = {
+      header: ctx.request.header,
+      url: ctx.request.url
+    };
 
     try {
-      await filterHTML(ctx, config, userWorkspace);
-      await filterModule(ctx);
-      await filterJSON(ctx, context);
-      await filterJavascript(ctx, userWorkspace);
-      await filterCSS(ctx, userWorkspace);
-      await filterImages(ctx, userWorkspace);
+      // default transforms 
+      const defaultTransforms = [
+        new HTMLTransform(request, compilation),
+        new CSSTransform(request, compilation),
+        new NodeTransform(request, compilation),
+        new JSTransform(request, compilation),
+        new AssetTransform(request, compilation)
+      ];
+      
+      // custom greenwood configured transform plugins
+      const transformPlugins = compilation.config.plugins.filter(plugin => plugin.type === 'transform') || [];
+
+      // combine arrays and remove duplicates
+      const allTransforms = defaultTransforms.concat(transformPlugins.filter(({ extension }) => 
+        defaultTransforms.extension.indexOf(extension) < 0));
+
+      // walk through all transforms
+      await Promise.all(allTransforms.map(async (plugin) => {
+        if (plugin instanceof Transform && plugin.shouldTransform()) {
+
+          const transformedResponse = await plugin.applyTransform();
+
+          response = { 
+            ...transformedResponse
+          };
+        }
+      }));
+
+      ctx.set('Content-Type', `${response.contentType}`);
+      ctx.body = response.body;
+      // etc
     } catch (err) {
       console.log(err);
     }
@@ -105,18 +133,6 @@ function getProdServer(compilation) {
   });
     
   return app;
-}
-
-function getContextAPI(ctx) {
-  const { header, url } = ctx.request;
-
-  return {
-    body: (contents) => ctx.body = contents,
-    set: (name, value) => ctx.set(name, value),
-    url,
-    header,
-    redirect: (url) => ctx.redirect(url)
-  };
 }
 
 module.exports = {
