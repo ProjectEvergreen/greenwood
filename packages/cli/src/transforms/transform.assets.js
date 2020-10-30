@@ -2,7 +2,7 @@ const path = require('path');
 const { promises: fsp } = require('fs');
 const TransformInterface = require('./transform.interface');
 
-module.exports = class TransformHtml extends TransformInterface {
+module.exports = class AssetTransform extends TransformInterface {
 
   constructor(req, compilation) {
     super(req, compilation, ['.woff2', '.woff', '.ttf', '.jpg', '.png', '.gif', '.svg']);

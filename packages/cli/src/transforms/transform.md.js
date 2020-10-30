@@ -11,7 +11,7 @@ const unified = require('unified');
 const TransformInterface = require('./transform.interface');
 const { getAppTemplate, getAppTemplateScripts, getUserScripts, getMetaContent } = require('./transform.tools');
 
-module.exports = class TransformHtml extends TransformInterface {
+module.exports = class MDTransform extends TransformInterface {
 
   constructor(req, compilation) {
     super(req, compilation, ['.md']);
