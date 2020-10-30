@@ -35,7 +35,7 @@ function getDevServer(compilation) {
         new JSTransform(request, compilation),
         new AssetTransform(request, compilation)
       ];
-      
+
       // custom greenwood configured transform plugins
       const transformPlugins = compilation.config.plugins.filter(plugin => plugin.type === 'transform') || [];
 
@@ -69,39 +69,38 @@ function getDevServer(compilation) {
 function getProdServer(compilation) {
   const app = new Koa();
 
-  app.use(async ctxKoa => {
-    // console.debug('URL', ctx.url);
+  app.use(async ctx => {
+    // console.debug('URL', ctx.request.url);
     const { outputDir } = compilation.context;
-    let ctx = getContextAPI(ctxKoa);
 
-    if (ctx.url.endsWith('/')) {
-      ctx.redirect(`http://localhost:8080${ctx.url}index.html`);
+    if (ctx.request.url.endsWith('/')) {
+      ctx.redirect(`http://localhost:8080${ctx.request.url}index.html`);
     }
 
-    if (ctx.url.endsWith('.html')) {
-      const contents = await fsp.readFile(path.join(outputDir, ctx.url), 'utf-8');
+    if (ctx.request.url.endsWith('.html')) {
+      const contents = await fsp.readFile(path.join(outputDir, ctx.request.url), 'utf-8');
 
       ctx.set('Content-Type', 'text/html');
-      ctx.body(contents);
+      ctx.body = contents;
     }
 
-    if (ctx.url.endsWith('.js')) {
-      const contents = await fsp.readFile(path.join(outputDir, ctx.url), 'utf-8');
+    if (ctx.request.url.endsWith('.js')) {
+      const contents = await fsp.readFile(path.join(outputDir, ctx.request.url), 'utf-8');
 
       ctx.set('Content-Type', 'text/javascript');
-      ctx.body(contents);
+      ctx.body = contents;
     }
 
-    if (ctx.url.endsWith('.css')) {
-      const contents = await fsp.readFile(path.join(outputDir, ctx.url), 'utf-8');
+    if (ctx.request.url.endsWith('.css')) {
+      const contents = await fsp.readFile(path.join(outputDir, ctx.request.url), 'utf-8');
 
       ctx.set('Content-Type', 'text/css');
-      ctx.body(contents);
+      ctx.body = contents;
     }
 
     // TODO break up into distinct font / icons / svg handlers, decouple from to assets/
-    if (ctx.url.indexOf('assets/')) {
-      const assetPath = path.join(outputDir, ctx.url);
+    if (ctx.request.url.indexOf('assets/')) {
+      const assetPath = path.join(outputDir, ctx.request.url);
       const ext = path.extname(assetPath);
       const type = ext === '.svg'
         ? `${ext.replace('.', '')}+xml`
@@ -111,24 +110,24 @@ function getProdServer(compilation) {
         ctx.set('Content-Type', `image/${type}`);
 
         if (ext === '.svg') {
-          ctx.body(await fsp.readFile(assetPath, 'utf-8'));
+          ctx.body = await fsp.readFile(assetPath, 'utf-8');
         } else {
-          ctx.body(await fsp.readFile(assetPath)); 
+          ctx.body = await fsp.readFile(assetPath); 
         }
       } else if (['.woff2', '.woff', '.ttf'].includes(ext)) {
         ctx.set('Content-Type', `font/${type}`);
-        ctx.body(await fsp.readFile(assetPath));
+        ctx.body = await fsp.readFile(assetPath);
       } else if (['.ico'].includes(ext)) {
         ctx.set('Content-Type', 'image/x-icon');
-        ctx.body(await fsp.readFile(assetPath));
+        ctx.body = await fsp.readFile(assetPath);
       }
     }
 
-    if (ctx.url.endsWith('.json')) {
+    if (ctx.request.url.endsWith('.json')) {
       const contents = await fsp.readFile(path.join(outputDir, 'graph.json'), 'utf-8');
 
       ctx.set('Content-Type', 'application/json');
-      ctx.body(JSON.parse(contents));
+      ctx.body = JSON.parse(contents);
     }
   });
     

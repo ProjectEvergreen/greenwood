@@ -29,8 +29,6 @@ const getAppTemplateScripts = async (contents, userWorkspace) => {
     const headScripts = root.querySelectorAll('head script');
     const headLinks = root.querySelectorAll('head link');
 
-    console.log(headLinks);
-
     appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
 
     headScripts.forEach(script => {
@@ -152,7 +150,7 @@ const getMetaContent = (url, config, contents) => {
       const contextualValue = isOgUrl
         ? hasTrailingSlash
           ? `${value}${url.replace('/', '')}`
-          : `${value}${url === '/' ? '' : ctx.url}`
+          : `${value}${url === '/' ? '' : url}`
         : value;
         
       metaHtml += ` ${key}="${contextualValue}"`;
