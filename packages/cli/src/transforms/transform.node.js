@@ -9,9 +9,7 @@ module.exports = class TransformHtml extends TransformInterface {
   }
 
   shouldTransform() {
-    const { url } = this.request;
-
-    return url.indexOf('/node_modules') >= 0;
+    return this.request.url.indexOf('/node_modules') >= 0;
   }
 
   async applyTransform() {

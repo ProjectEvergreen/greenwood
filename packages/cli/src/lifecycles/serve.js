@@ -6,6 +6,7 @@ const Koa = require('koa');
 
 const Transform = require('../transforms/transform.interface');
 const HTMLTransform = require('../transforms/transform.html');
+const MarkdownTransform = require('../transforms/transform.md');
 const CSSTransform = require('../transforms/transform.css');
 const JSTransform = require('../transforms/transform.js');
 const NodeTransform = require('../transforms/transform.node');
@@ -30,6 +31,7 @@ function getDevServer(compilation) {
       // default transforms 
       const defaultTransforms = [
         new HTMLTransform(request, compilation),
+        // new MarkdownTransform(request, compilation),
         new CSSTransform(request, compilation),
         new NodeTransform(request, compilation),
         new JSTransform(request, compilation),
@@ -57,7 +59,6 @@ function getDevServer(compilation) {
 
       ctx.set('Content-Type', `${response.contentType}`);
       ctx.body = response.body;
-      // etc
     } catch (err) {
       console.log(err);
     }

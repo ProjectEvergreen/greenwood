@@ -13,10 +13,6 @@ module.exports = class TransformInterface {
   }
 
   shouldTransform() {
-    // console.log(this.request.url);
-    // console.log(this.extensions);
-    // console.log(path.extname(this.request.url));
-    // console.log(this.extensions.indexOf(path.extname(this.request.url) >= 0));
     return this.extensions.indexOf(path.extname(this.request.url)) >= 0;
   }
 
