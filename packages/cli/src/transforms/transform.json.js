@@ -2,7 +2,7 @@ const path = require('path');
 const { promises: fsp } = require('fs');
 const TransformInterface = require('./transform.interface');
 
-module.exports = class TransformJSON extends TransformInterface {
+class TransformJSON extends TransformInterface {
 
   constructor(req, compilation) {
     super(req, compilation, ['.js']);
@@ -46,4 +46,6 @@ module.exports = class TransformJSON extends TransformInterface {
       }
     });
   }
-};
+}
+
+module.exports = TransformJSON;

@@ -2,7 +2,7 @@ const path = require('path');
 const { promises: fsp } = require('fs');
 const TransformInterface = require('./transform.interface');
 
-module.exports = class AssetTransform extends TransformInterface {
+class AssetTransform extends TransformInterface {
 
   constructor(req, compilation) {
     super(req, compilation, ['.woff2', '.woff', '.ttf', '.jpg', '.png', '.gif', '.svg']);
@@ -54,4 +54,6 @@ module.exports = class AssetTransform extends TransformInterface {
       }
     });
   }
-};
+}
+
+module.exports = AssetTransform;
