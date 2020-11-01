@@ -19,7 +19,7 @@ module.exports = {
     { rel: 'shortcut icon', href: FAVICON_HREF },
     { rel: 'icon', href: FAVICON_HREF },
     { name: 'google-site-verification', content: '4rYd8k5aFD0jDnN0CCFgUXNe4eakLP4NnA18mNnK5P0' }
-  ]
+  ],
   // TODO
   // plugins: [
   //   ...pluginGoogleAnalytics({
@@ -27,11 +27,13 @@ module.exports = {
   //   }),
   //   ...pluginPolyfills()
   // ],
-  // markdown: {
-  //   plugins: [
-  //     require('rehype-slug'),
-  //     require('rehype-autolink-headings'),
-  //     require('remark-github')
-  //   ]
-  // }
+  markdown: {
+    plugins: [
+      require('@mapbox/rehype-prism')
+      // TODO add remaining plugins
+      // require('rehype-slug'),
+      // require('rehype-autolink-headings'),
+      // require('remark-github')
+    ]
+  }
 };

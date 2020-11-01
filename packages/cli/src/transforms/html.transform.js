@@ -5,12 +5,11 @@ const { promises: fsp } = require('fs');
 const fs = require('fs');
 const path = require('path');
 const frontmatter = require('front-matter');
-const remarkFrontmatter = require('remark-frontmatter');
-const raw = require('rehype-raw');
-const html = require('rehype-stringify');
 const htmlparser = require('node-html-parser');
-const remark = require('remark-parse');
-const remark2rehype = require('remark-rehype');
+const rehypeStringify = require('rehype-stringify');
+const remarkFrontmatter = require('remark-frontmatter');
+const remarkParse = require('remark-parse');
+const remarkRehype = require('remark-rehype');
 const unified = require('unified');
 const walk = require('acorn-walk');
 
@@ -92,14 +91,13 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
           // console.debug('this route exists as a markdown file', markdownPath);
 
           // TODO extract front matter contents from remark-frontmatter instead of frontmatter lib
-          // TODO handle prism
           const fm = frontmatter(markdownContents);
           const processedMarkdown = await unified()
-            .use(remark)
+            .use(remarkParse)
             .use(remarkFrontmatter)
-            .use(remark2rehype, { allowDangerousHtml: true })
-            .use(raw)
-            .use(html)
+            .use(remarkRehype, { allowDangerousHtml: true })
+            .use([...config.markdown.plugins])
+            .use(rehypeStringify)
             .process(markdownContents);
 
           // TODO use an app template
@@ -129,7 +127,9 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
           let appTemplateContents = fs.readFileSync(appTemplate, 'utf-8');
           const root = htmlparser.parse(contents, {
             script: true,
-            style: true
+            style: true,
+            noscript: true,
+            pre: true
           });
           const body = root.querySelector('body');
           const headScripts = root.querySelectorAll('head script');
