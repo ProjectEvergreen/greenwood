@@ -29,11 +29,10 @@ module.exports = {
   // ],
   markdown: {
     plugins: [
-      require('@mapbox/rehype-prism')
-      // TODO add remaining plugins
-      // require('rehype-slug'),
-      // require('rehype-autolink-headings'),
-      // require('remark-github')
+      '@mapbox/rehype-prism',
+      'rehype-autolink-headings',
+      'rehype-slug',
+      'remark-github'
     ]
   }
 };

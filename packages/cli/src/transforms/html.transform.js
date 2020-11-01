@@ -50,7 +50,7 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
         const barePath = ctx.request.url.endsWith('/')
           ? `${userWorkspace}/pages${ctx.request.url}index`
           : `${userWorkspace}/pages${ctx.request.url.replace('.html', '')}`;
-          
+
         // console.debug('bare path', barePath);
 
         let contents = `
@@ -88,16 +88,30 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
               : `${userWorkspace}/pages${ctx.request.url.replace('/index.html', '.md')}`;
           const markdownContents = await fsp.readFile(markdownPath, 'utf-8');
 
-          // console.debug('this route exists as a markdown file', markdownPath);
+          const rehypePlugins = [];
+          const remarkPlugins = [];
 
+          config.markdown.plugins.forEach(plugin => {
+            if (plugin.indexOf('rehype-') >= 0) {
+              rehypePlugins.push(require(plugin));
+            }
+
+            if (plugin.indexOf('remark-') >= 0) {
+              remarkPlugins.push(require(plugin));
+            }
+          });
+
+          console.debug(rehypePlugins);
+          console.debug(remarkPlugins);
           // TODO extract front matter contents from remark-frontmatter instead of frontmatter lib
           const fm = frontmatter(markdownContents);
           const processedMarkdown = await unified()
-            .use(remarkParse)
-            .use(remarkFrontmatter)
-            .use(remarkRehype, { allowDangerousHtml: true })
-            .use([...config.markdown.plugins])
-            .use(rehypeStringify)
+            .use(remarkParse) // parse markdown into AST
+            .use(remarkFrontmatter) // extract frontmatter from AST
+            .use(...remarkPlugins) // apply userland remark plugins
+            .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
+            .use(...rehypePlugins) // apply userland rehype plugins
+            .use(rehypeStringify) // convert AST to HTML string
             .process(markdownContents);
 
           // TODO use an app template
