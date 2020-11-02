@@ -101,8 +101,6 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
             }
           });
 
-          console.debug(rehypePlugins);
-          console.debug(remarkPlugins);
           // TODO extract front matter contents from remark-frontmatter instead of frontmatter lib
           const fm = frontmatter(markdownContents);
           const processedMarkdown = await unified()
