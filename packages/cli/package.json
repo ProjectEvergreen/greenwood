@@ -51,6 +51,8 @@
     "unified": "^9.2.0"
   },
   "devDependencies": {
-    "@mapbox/rehype-prism": "^0.5.0"
+    "@mapbox/rehype-prism": "^0.5.0",
+    "rehype-autolink-headings": "^4.0.0",
+    "rehype-slug": "^3.0.0"
   }
 }
