@@ -27,9 +27,8 @@ class CSSTransform extends TransformInterface {
         } else if (destHeader === 'empty') {
           // assume JS import being being used
           contentType = 'text/javascript';
-          body = `const css = "${css.replace(/\r?\n|\r/g, ' ')}";
-export default css;
-          `;
+          // TODO line breaks are bad for fetch, need to return CSS string all on one line
+          body = `const css = "${css.replace(/\r?\n|\r/g, ' ')}";\nexport default css;`;
         }
 
         resolve({

@@ -21,7 +21,7 @@ class NodeTransform extends TransformInterface {
         const contentType = url.indexOf('.js') > 0
           ? 'text/javascript'
           : 'text/css'; // TODO eve components assume a bundler
-        
+
         resolve({
           body,
           contentType,

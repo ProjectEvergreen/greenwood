@@ -18,19 +18,22 @@ const getAppTemplate = async (barePath) => {
 const getAppTemplateScripts = async (contents, userWorkspace) => {
   
   const appTemplate = `${userWorkspace}/templates/app.html`;
+  let appTemplateContents = '';
 
   if (fs.existsSync(appTemplate)) {
-    let appTemplateContents = await fsp.readFile(appTemplate, 'utf-8');
+    appTemplateContents = fs.readFileSync(appTemplate, 'utf-8');
     const root = htmlparser.parse(contents, {
       script: true,
-      style: true
+      style: true,
+      noscript: true,
+      pre: true
     });
-    const body = root.querySelector('body');
+    const body = root.querySelector('body').innerHTML;
     const headScripts = root.querySelectorAll('head script');
     const headLinks = root.querySelectorAll('head link');
 
     appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
-
+    
     headScripts.forEach(script => {
       if (script.rawAttrs !== '') {
         appTemplateContents = appTemplateContents.replace(/<\/script>/, `
@@ -55,9 +58,8 @@ const getAppTemplateScripts = async (contents, userWorkspace) => {
         <link ${link.rawAttrs}></link>\n
       `);
     });
-
-    return appTemplateContents;
   }
+  return appTemplateContents || contents;
 };
 
 const getUserScripts = (contents, userWorkspace) => {
@@ -72,7 +74,7 @@ const getUserScripts = (contents, userWorkspace) => {
   }
 
   contents = contents.replace(/type="module"/g, 'type="module-shim"');
-  
+
   const importMap = {};
   const userPackageJson = fs.existsSync(`${userWorkspace}/package.json`)
     ? require(path.join(userWorkspace, 'package.json')) // its a monorepo?
@@ -82,7 +84,7 @@ const getUserScripts = (contents, userWorkspace) => {
 
   // console.debug('userPackageJson', userPackageJson);
   // console.debug('dependencies', userPackageJson.dependencies);
-  
+
   Object.keys(userPackageJson.dependencies || {}).forEach(dependency => {
     const packageRootPath = path.join(process.cwd(), './node_modules', dependency);
     const packageJsonPath = path.join(packageRootPath, 'package.json');
@@ -115,7 +117,7 @@ const getUserScripts = (contents, userWorkspace) => {
   });
 
   // console.log('importMap all complete', importMap);
-  
+
   contents = contents.replace('<head>', `
     <head>
       <script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>
@@ -161,10 +163,14 @@ const getMetaContent = (url, config, contents) => {
       : `<meta${metaHtml}/>`;
   }).join('\n');
 
+  // console.log(contents);
+
   // TODO make smarter so that if it already exists, then leave it alone
   contents = contents.replace(/<title>(.*)<\/title>/, '');
   contents = contents.replace('<head>', `<head><title>${title}</title>`);
   contents = contents.replace('<meta-outlet></meta-outlet>', metaContent);
+  // console.log(contents);
+
   return contents;
 };
 
