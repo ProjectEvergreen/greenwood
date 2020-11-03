@@ -9,6 +9,7 @@ const HTMLTransform = require('../transforms/transform.html');
 const MarkdownTransform = require('../transforms/transform.md');
 const CSSTransform = require('../transforms/transform.css');
 const JSTransform = require('../transforms/transform.js');
+const JSONTransform = require('../transforms/transform.json.js');
 const NodeTransform = require('../transforms/transform.node');
 const AssetTransform = require('../transforms/transform.assets');
 
@@ -31,10 +32,11 @@ function getDevServer(compilation) {
       // default transforms 
       const defaultTransforms = [
         new HTMLTransform(request, compilation),
-        // new MarkdownTransform(request, compilation),
+        new MarkdownTransform(request, compilation),
         new CSSTransform(request, compilation),
         new NodeTransform(request, compilation),
         new JSTransform(request, compilation),
+        new JSONTransform(request, compilation),
         new AssetTransform(request, compilation)
       ];
 

@@ -5,11 +5,7 @@ const TransformInterface = require('./transform.interface');
 class TransformJSON extends TransformInterface {
 
   constructor(req, compilation) {
-    super(req, compilation, ['.js']);
-  }
-
-  shouldTransform() {
-    return this.request.url.indexOf('.json') >= 0;
+    super(req, compilation, ['.json']);
   }
 
   async applyTransform() {
@@ -28,12 +24,10 @@ class TransformJSON extends TransformInterface {
           contentType = 'application/json';
           body = JSON.parse(json);
         } else {
-          const json = await fsp.readFile(path.join(userWorkspace, url), 'utf-8');
+          const json = await fsp.readFile(path.join(this.workspace, url), 'utf-8');
 
           contentType = 'text/javascript';
-          body = `
-            export default ${json}
-          `;
+          body = `export default ${json}`;
         }
 
         resolve({

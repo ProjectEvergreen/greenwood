@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const TransformInterface = require('./transform.interface');
 const { getAppTemplate, getAppTemplateScripts, getUserScripts, getMetaContent } = require('./transform.tools');
@@ -10,7 +11,10 @@ class HTMLTransform extends TransformInterface {
 
   shouldTransform() {
     const { url } = this.request;
-    return this.extensions.indexOf(path.extname(url)) >= 0 || path.extname(url) === '';
+    const barePath = url.endsWith('/')
+      ? `${this.workspace}/pages${url}index`
+      : `${this.workspace}/pages${url.replace('.html', '')}`;
+    return (this.extensions.indexOf(path.extname(url)) >= 0 || path.extname(url) === '') && fs.existsSync(`${barePath}.html`);
   }
 
   async applyTransform() {
