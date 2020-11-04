@@ -33,7 +33,6 @@ class HeaderComponent extends LitElement {
     fetch('/graph.json')
       .then(res => res.json())
       .then(data => {
-        console.log(this.data);
         this.navigation = data.filter(page => {
           if (page.data.menu === 'navigation') {
             page.link = page.route;
@@ -50,7 +49,6 @@ class HeaderComponent extends LitElement {
   /* eslint-disable indent */
   render() {
     const { navigation } = this;
-    console.log('test');
     return html`
       <header class="header">
         <!-- <eve-container fluid> -->
