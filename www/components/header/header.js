@@ -1,7 +1,7 @@
 import { css, html, LitElement, unsafeCSS } from 'lit-element';
 // import client from '@greenwood/cli/data/client';
 // import MenuQuery from '@greenwood/cli/data/queries/menu';
-import '@evergreen-wc/eve-container';
+// import '@evergreen-wc/eve-container';
 import headerCss from './header.css';
 // TODO import evergreenLogo from '../../assets/evergreen.svg';
 import '../social-icons/social-icons.js';
@@ -33,6 +33,7 @@ class HeaderComponent extends LitElement {
     fetch('/graph.json')
       .then(res => res.json())
       .then(data => {
+        console.log(this.data);
         this.navigation = data.filter(page => {
           if (page.data.menu === 'navigation') {
             page.link = page.route;
@@ -49,10 +50,10 @@ class HeaderComponent extends LitElement {
   /* eslint-disable indent */
   render() {
     const { navigation } = this;
-
+    console.log('test');
     return html`
       <header class="header">
-        <eve-container fluid>
+        <!-- <eve-container fluid> -->
           <div class="head-wrap">
 
             <div class="brand">
@@ -78,7 +79,7 @@ class HeaderComponent extends LitElement {
             <app-social-icons></app-social-icons>
 
           </div>
-        </eve-container>
+        <!-- </eve-container> -->
       </header>
     `;
     /* eslint-enable */
