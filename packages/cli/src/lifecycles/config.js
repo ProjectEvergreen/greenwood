@@ -28,8 +28,7 @@ module.exports = readAndMergeConfig = async() => {
       
       if (await fs.exists(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        // TODO const { workspace, devServer, optimization, publicPath, title, meta, plugins, themeFile, markdown } = userCfgFile;
-        const { workspace, devServer, publicPath, title, meta } = userCfgFile;
+        const { workspace, devServer, publicPath, title, markdown, meta } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -132,10 +131,10 @@ module.exports = readAndMergeConfig = async() => {
           }
         }
 
-        // if (markdown && Object.keys(markdown).length > 0) {
-        //   customConfig.markdown.plugins = markdown.plugins && markdown.plugins.length > 0 ? markdown.plugins : [];
-        //   customConfig.markdown.settings = markdown.settings ? markdown.settings : {};
-        // }
+        if (markdown && Object.keys(markdown).length > 0) {
+          customConfig.markdown.plugins = markdown.plugins && markdown.plugins.length > 0 ? markdown.plugins : [];
+          customConfig.markdown.settings = markdown.settings ? markdown.settings : {};
+        }
       }
       resolve({ ...defaultConfig, ...customConfig });
     } catch (err) {

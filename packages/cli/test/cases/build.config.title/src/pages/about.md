@@ -1,7 +1,8 @@
 ---
-label: 'hello'
-title: 'Hello Page'
+label: 'about'
+title: 'About Page'
 ---
-### Hello World
+
+### About
 
 This is an example page built by Greenwood.  Make your own in _src/pages_!

@@ -1,14 +1,15 @@
+/* eslint-disable complexity */
+// TODO ^^
 const acorn = require('acorn');
 const { promises: fsp } = require('fs');
 const fs = require('fs');
 const path = require('path');
 const frontmatter = require('front-matter');
-const remarkFrontmatter = require('remark-frontmatter');
-const raw = require('rehype-raw');
-const html = require('rehype-stringify');
 const htmlparser = require('node-html-parser');
-const remark = require('remark-parse');
-const remark2rehype = require('remark-rehype');
+const rehypeStringify = require('rehype-stringify');
+const remarkFrontmatter = require('remark-frontmatter');
+const remarkParse = require('remark-parse');
+const remarkRehype = require('remark-rehype');
 const unified = require('unified');
 const walk = require('acorn-walk');
 
@@ -17,8 +18,8 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
     try {
       // TODO filter out node modules, only page / user requests from brower
       // TODO make sure this only happens for "pages", nor partials or fixtures, templates, et)
-      if (ctx.url.endsWith('/') || ctx.url.endsWith('.html')) {
-        // console.log('URL ends with /');
+      if (ctx.request.url.endsWith('/') || ctx.request.url.endsWith('.html')) {
+        // console.log('URL ends with / or endsWith.html');
         // TODO get port from compilation
         // ctx.redirect(`http://localhost:1984${ctx.url}index.html`);
         // }
@@ -46,10 +47,10 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
         }).join('\n');
 
         // TODO get pages path from compilation
-        const barePath = ctx.url.endsWith('/')
-          ? `${userWorkspace}/pages${ctx.url}index`
-          : `${userWorkspace}/pages${ctx.url.replace('.html', '')}`;
-          
+        const barePath = ctx.request.url.endsWith('/')
+          ? `${userWorkspace}/pages${ctx.request.url}index`
+          : `${userWorkspace}/pages${ctx.request.url.replace('.html', '')}`;
+
         // console.debug('bare path', barePath);
 
         let contents = `
@@ -63,8 +64,9 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
             </head>
             <body>
               <section>
-                <h1>Welcome to my website!</h1>
-                <content-outlet></content-outlet>
+                <content-outlet>
+                  <h1>Welcome to my website!</h1>
+                </content-outlet>
               </section>
             </body>
           </html>
@@ -86,23 +88,35 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
               : `${userWorkspace}/pages${ctx.url.replace('/index.html', '.md')}`;
           const markdownContents = await fsp.readFile(markdownPath, 'utf-8');
 
-          // console.debug('this route exists as a markdown file', markdownPath);
+          const rehypePlugins = [];
+          const remarkPlugins = [];
+
+          config.markdown.plugins.forEach(plugin => {
+            if (plugin.indexOf('rehype-') >= 0) {
+              rehypePlugins.push(require(plugin));
+            }
+
+            if (plugin.indexOf('remark-') >= 0) {
+              remarkPlugins.push(require(plugin));
+            }
+          });
 
           // TODO extract front matter contents from remark-frontmatter instead of frontmatter lib
-          // TODO handle prism
           const fm = frontmatter(markdownContents);
           const processedMarkdown = await unified()
-            .use(remark)
-            .use(remarkFrontmatter)
-            .use(remark2rehype, { allowDangerousHtml: true })
-            .use(raw)
-            .use(html)
+            .use(remarkParse) // parse markdown into AST
+            .use(remarkFrontmatter) // extract frontmatter from AST
+            .use(...remarkPlugins) // apply userland remark plugins
+            .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
+            .use(...rehypePlugins) // apply userland rehype plugins
+            .use(rehypeStringify) // convert AST to HTML string
             .process(markdownContents);
 
           // TODO use an app template
           if (fm.attributes.template) {
             contents = await fsp.readFile(`${userWorkspace}/templates/${fm.attributes.template}.html`, 'utf-8');
           } else if (fs.existsSync(`${userWorkspace}/templates/page.html`)) {
+            // console.debug('has a page template!');
             contents = await fsp.readFile(`${userWorkspace}/templates/page.html`, 'utf-8');
           }
 
@@ -111,7 +125,12 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
             title = `${title} - ${fm.attributes.title}`;
           }
 
-          contents = contents.replace('<content-outlet></content-outlet>', processedMarkdown.contents);
+          contents = contents.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
+        } else if (fs.existsSync(`${userWorkspace}/templates/page.html`)) {
+          // console.debug('only has a page template');
+          const page = await fsp.readFile(`${userWorkspace}/templates/page.html`, 'utf-8');
+          
+          contents = page.replace(/\<content-outlet>(.*)<\/content-outlet>/s, contents.match(/\<content-outlet>(.*)<\/content-outlet>/s)[0]);
         }
 
         const appTemplate = `${userWorkspace}/templates/app.html`;
@@ -120,7 +139,9 @@ module.exports = filterHTML = async (ctx, config, userWorkspace) => {
           let appTemplateContents = fs.readFileSync(appTemplate, 'utf-8');
           const root = htmlparser.parse(contents, {
             script: true,
-            style: true
+            style: true,
+            noscript: true,
+            pre: true
           });
           const body = root.querySelector('body');
           const headScripts = root.querySelectorAll('head script');
