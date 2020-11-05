@@ -17,6 +17,7 @@ class CSSTransform extends TransformInterface {
         const cssPath = url.indexOf('/node_modules') >= 0
           ? path.join(process.cwd(), url)
           : path.join(this.workspace, url);
+        
         const css = await fsp.readFile(cssPath, 'utf-8');
         let body = '', contentType = '';
 

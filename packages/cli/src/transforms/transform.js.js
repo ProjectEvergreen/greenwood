@@ -11,15 +11,17 @@ class JSTransform extends TransformInterface {
   shouldTransform() {
     const { url } = this.request;
 
-    return this.extensions.indexOf(path.extname(url)) >= 0 &&
-      url.indexOf('/node_modules') < 0 && url.indexOf('.json') < 0;
+    return this.extensions.indexOf(path.extname(url)) >= 0 && url.indexOf('.json') < 0;
   }
 
   async applyTransform() {
     return new Promise(async (resolve, reject) => {
       try {
+        const { url } = this.request;
+        const jsPath = url.indexOf('/node_modules') >= 0
+          ? path.join(process.cwd(), url)
+          : path.join(this.workspace, this.request.url);
 
-        const jsPath = path.join(this.workspace, this.request.url);
         const body = await fsp.readFile(jsPath, 'utf-8');
         resolve({
           body,

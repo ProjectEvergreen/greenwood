@@ -33,7 +33,6 @@ const getAppTemplateScripts = async (contents, userWorkspace) => {
     const headLinks = root.querySelectorAll('head link');
 
     appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
-    
     headScripts.forEach(script => {
       if (script.rawAttrs !== '') {
         appTemplateContents = appTemplateContents.replace(/<\/script>/, `
@@ -169,7 +168,6 @@ const getMetaContent = (url, config, contents) => {
   contents = contents.replace(/<title>(.*)<\/title>/, '');
   contents = contents.replace('<head>', `<head><title>${title}</title>`);
   contents = contents.replace('<meta-outlet></meta-outlet>', metaContent);
-  // console.log(contents);
 
   return contents;
 };

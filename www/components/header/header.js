@@ -1,7 +1,7 @@
 import { css, html, LitElement, unsafeCSS } from 'lit-element';
 // import client from '@greenwood/cli/data/client';
 // import MenuQuery from '@greenwood/cli/data/queries/menu';
-// import '@evergreen-wc/eve-container';
+import '@evergreen-wc/eve-container';
 import headerCss from './header.css';
 // TODO import evergreenLogo from '../../assets/evergreen.svg';
 import '../social-icons/social-icons.js';
@@ -51,7 +51,7 @@ class HeaderComponent extends LitElement {
     const { navigation } = this;
     return html`
       <header class="header">
-        <!-- <eve-container fluid> -->
+        <eve-container fluid>
           <div class="head-wrap">
 
             <div class="brand">
@@ -77,7 +77,7 @@ class HeaderComponent extends LitElement {
             <app-social-icons></app-social-icons>
 
           </div>
-        <!-- </eve-container> -->
+        </eve-container>
       </header>
     `;
     /* eslint-enable */
