@@ -29,7 +29,7 @@ describe('Build Greenwood With: ', function() {
     this.context = await setup.setupTestBed(__dirname);
   });
 
-  describe.only(LABEL, function() {
+  describe(LABEL, function() {
 
     before(async function() {
       await setup.runGreenwoodCommand('build');

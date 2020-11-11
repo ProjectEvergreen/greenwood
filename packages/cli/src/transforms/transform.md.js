@@ -37,8 +37,6 @@ class MDTransform extends TransformInterface {
 
     return new Promise(async (resolve, reject) => {
       try {
-        // const config = this.config; // new immutable config copy
-        // console.log(config);
         const barePath = url.endsWith('/')
           ? `${workspace}/pages${url}index`
           : `${workspace}/pages${url.replace('.html', '')}`;
