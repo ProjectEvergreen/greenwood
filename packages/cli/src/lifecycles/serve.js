@@ -22,31 +22,25 @@ function getDevServer(compilation) {
       extension: ''
     };
 
-    let request = {
+    request = {
       header: ctx.request.header,
-      url: ctx.request.url
+      url: ctx.request.url,
+      compilation
     };
 
     try {
       // default transforms 
       const defaultTransforms = [
-        new HTMLTransform(request, compilation),
-        new MarkdownTransform(request, compilation),
-        new CSSTransform(request, compilation),
-        new JSTransform(request, compilation),
-        new JSONTransform(request, compilation),
-        new AssetTransform(request, compilation)
+        new HTMLTransform(request),
+        new MarkdownTransform(request),
+        new CSSTransform(request),
+        new JSTransform(request),
+        new JSONTransform(request),
+        new AssetTransform(request)
       ];
 
-      // custom greenwood configured transform plugins
-      const transformPlugins = compilation.config.plugins.filter(plugin => plugin.type === 'transform') || [];
-
-      // combine arrays and remove duplicates
-      const allTransforms = defaultTransforms.concat(transformPlugins.filter(({ extension }) => 
-        defaultTransforms.extension.indexOf(extension) < 0));
-
       // walk through all transforms
-      await Promise.all(allTransforms.map(async (plugin) => {
+      await Promise.all(defaultTransforms.map(async (plugin) => {
         if (plugin instanceof Transform && plugin.shouldTransform()) {
 
           const transformedResponse = await plugin.applyTransform();

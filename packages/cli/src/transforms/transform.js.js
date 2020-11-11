@@ -4,8 +4,8 @@ const TransformInterface = require('./transform.interface');
 
 class JSTransform extends TransformInterface {
 
-  constructor(req, compilation) {
-    super(req, compilation, ['.js']);
+  constructor(req) {
+    super(req, ['.js'], 'text/javascript');
   }
 
   shouldTransform() {
@@ -25,8 +25,8 @@ class JSTransform extends TransformInterface {
         const body = await fsp.readFile(jsPath, 'utf-8');
         resolve({
           body,
-          contentType: 'text/javascript',
-          extension: '.js'
+          contentType: this.contentType,
+          extension: this.extensions
         });
       } catch (e) {
         reject(e);

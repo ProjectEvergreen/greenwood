@@ -4,8 +4,8 @@ const TransformInterface = require('./transform.interface');
 
 class CSSTransform extends TransformInterface {
 
-  constructor(req, compilation) {
-    super(req, compilation, ['.css']);
+  constructor(req) {
+    super(req, ['.css'], 'text/css');
   }
 
   async applyTransform() {
@@ -35,7 +35,7 @@ class CSSTransform extends TransformInterface {
         resolve({
           body,
           contentType,
-          extension: '.css'
+          extension: this.extentsions
         });
       } catch (e) {
         reject(e);

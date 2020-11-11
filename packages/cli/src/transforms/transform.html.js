@@ -5,8 +5,8 @@ const { getAppTemplate, getAppTemplateScripts, getUserScripts, getMetaContent } 
 
 class HTMLTransform extends TransformInterface {
 
-  constructor(req, compilation) {
-    super(req, compilation, ['.html']);
+  constructor(req) {
+    super(req, ['.html'], 'text/html');
   }
 
   shouldTransform() {
@@ -35,8 +35,8 @@ class HTMLTransform extends TransformInterface {
 
         resolve({
           body,
-          contentType: 'text/html',
-          extension: '.html'
+          contentType: this.contentType,
+          extension: this.extensions
         });
       } catch (e) {
         reject(e);

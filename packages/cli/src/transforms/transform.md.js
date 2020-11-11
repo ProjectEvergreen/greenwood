@@ -12,8 +12,8 @@ const { getAppTemplateScripts, getUserScripts, getMetaContent } = require('./tra
 
 class MDTransform extends TransformInterface {
 
-  constructor(req, compilation) {
-    super(req, compilation, ['.md']);
+  constructor(req) {
+    super(req, ['.md']);
   }
 
   shouldTransform() {
@@ -92,8 +92,8 @@ class MDTransform extends TransformInterface {
 
         resolve({
           body,
-          contentType: 'text/html',
-          extension: '.md'
+          contentType: this.contentType,
+          extension: this.extensions
         });
       } catch (e) {
         reject(e);

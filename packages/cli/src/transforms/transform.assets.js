@@ -4,8 +4,8 @@ const TransformInterface = require('./transform.interface');
 
 class AssetTransform extends TransformInterface {
 
-  constructor(req, compilation) {
-    super(req, compilation, ['.woff2', '.woff', '.ttf', '.jpg', '.png', '.gif', '.svg']);
+  constructor(req) {
+    super(req, ['.woff2', '.woff', '.ttf', '.jpg', '.png', '.gif', '.svg']);
   }
 
   shouldTransform() {
@@ -47,7 +47,7 @@ class AssetTransform extends TransformInterface {
         resolve({
           body,
           contentType,
-          extension: ['.woff2', '.woff', '.ttf', '.jpg', '.png', '.gif', '.svg']
+          extension: this.extensions
         });
       } catch (e) {
         reject(e);
