@@ -14,7 +14,9 @@ class HTMLTransform extends TransformInterface {
     const barePath = url.endsWith('/')
       ? `${this.workspace}/pages${url}index`
       : `${this.workspace}/pages${url.replace('.html', '')}`;
-    return (this.extensions.indexOf(path.extname(url)) >= 0 || path.extname(url) === '') && fs.existsSync(`${barePath}.html`);
+      
+    return (this.extensions.indexOf(path.extname(url)) >= 0 || path.extname(url) === '') && 
+      (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index');
   }
 
   async applyTransform() {
@@ -27,8 +29,8 @@ class HTMLTransform extends TransformInterface {
         const barePath = url[url.length - 1] === '/'
           ? `${this.workspace}/pages${url}index`
           : `${this.workspace}/pages${url.replace('.html', '')}`;
-
-        let body = await getAppTemplate(barePath);
+        
+        let body = await getAppTemplate(barePath, this.workspace);
         body = await getAppTemplateScripts(body, this.workspace);
         body = getUserScripts(body, this.workspace);
         body = getMetaContent(url, this.config, body);

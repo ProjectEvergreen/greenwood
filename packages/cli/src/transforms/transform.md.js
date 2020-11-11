@@ -1,3 +1,4 @@
+const path = require('path');
 const { promises: fsp } = require('fs');
 const fs = require('fs');
 const frontmatter = require('front-matter');
@@ -28,13 +29,16 @@ class MDTransform extends TransformInterface {
   }
 
   async applyTransform() {
-    const { config, workspace, request } = this;
+    const { workspace, request } = this;
     const { url } = request;
+    const config = { ...this.config }; 
+
     let contents = '', title = config.title || '';
 
     return new Promise(async (resolve, reject) => {
       try {
-        
+        // const config = this.config; // new immutable config copy
+        // console.log(config);
         const barePath = url.endsWith('/')
           ? `${workspace}/pages${url}index`
           : `${workspace}/pages${url.replace('.html', '')}`;
@@ -47,7 +51,6 @@ class MDTransform extends TransformInterface {
             ? `${barePath.replace('/index', '.md')}`
             : `${workspace}/pages${url.replace('/index.html', '.md')}`;
         const markdownContents = await fsp.readFile(markdownPath, 'utf-8');
-
         const rehypePlugins = [];
         const remarkPlugins = [];
 
@@ -76,20 +79,21 @@ class MDTransform extends TransformInterface {
         if (fm.attributes.template) {
           contents = await fsp.readFile(`${workspace}/templates/${fm.attributes.template}.html`, 'utf-8');
         } else if (fs.existsSync(`${workspace}/templates/page.html`)) {
-          // console.debug('has a page template!');
           contents = await fsp.readFile(`${workspace}/templates/page.html`, 'utf-8');
+        } else {
+          contents = await fsp.readFile(path.join(__dirname, '../templates/app.html'), 'utf-8');
         }
 
         // use page title
         if (fm.attributes.title) {
-          title = `${title} - ${fm.attributes.title}`;
+          config.title = `${title} - ${fm.attributes.title}`;
         }
 
         let body = await getAppTemplateScripts(contents, workspace);
         body = getUserScripts(body, workspace);
         body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
         body = getMetaContent(url, config, body);
-
+        
         resolve({
           body,
           contentType: this.contentType,

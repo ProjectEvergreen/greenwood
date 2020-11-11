@@ -25,7 +25,7 @@ function getDevServer(compilation) {
     request = {
       header: ctx.request.header,
       url: ctx.request.url,
-      compilation
+      compilation: { ...compilation }
     };
 
     try {
