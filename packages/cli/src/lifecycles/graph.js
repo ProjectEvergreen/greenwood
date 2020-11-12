@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 const fs = require('fs-extra');
-const crypto = require('crypto');
-const fm = require('front-matter');
+const { promises: fsp } = require('fs');
+const crypto = require('crypto'); // TODO pretty heavy just for some hashing?
 const path = require('path');
+const fm = require('front-matter');
 const toc = require('markdown-toc');
 
 const createGraphFromPages = async (pagesDir, config) => {
@@ -20,10 +21,11 @@ const createGraphFromPages = async (pagesDir, config) => {
           const filenameHash = crypto.createHash('md5').update(`${directory}/${file}`).digest('hex');
           const filePath = path.join(directory, file);
           const stats = fs.statSync(filePath);
-          const isMdFile = file.substr(file.length - 2, file.length) === 'md';
+          const isMdFile = path.extname(file) === '.md';
+          const ishtmlFile = path.extname(file) === '.html';
 
           // map each page to a (0 based) index based on filesystem order
-          if (isMdFile) {
+          if (isMdFile || ishtmlFile) {
             pagesIndexMap.set(filenameHash, pagesIndex);
             pagesIndex += 1;
           }
@@ -54,7 +56,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                 let fileRoute = subDir.substring(seperatorIndex, subDir.length - 3);
 
                 // determine if this is an index file, if so set route to '/'
-                let route = fileRoute === '/index' ? '/' : fileRoute;
+                let route = fileRoute === '/index' ? '/' : `${fileRoute}/`;
 
                 // check if additional nested directories
                 if (seperatorIndex > 0) {
@@ -71,7 +73,7 @@ const createGraphFromPages = async (pagesDir, config) => {
                 }
 
                 // generate a random element tag name
-                label = label || generateLabelHash(filePath);
+                label = label || mdFile.split('/')[mdFile.split('/').length - 1].replace('.md', '');
 
                 // set <title></title> element text, override with markdown title
                 title = title || '';
@@ -151,6 +153,26 @@ const createGraphFromPages = async (pagesDir, config) => {
                 };
               }
 
+              // TODO handle top level root index.html
+              if (ishtmlFile) {
+                // const { label, template, title } = attributes;
+                // const { meta } = config;
+
+                pages[pagesIndexMap.get(filenameHash)] = {
+                  data: {},
+                  // label,
+                  // route,
+                  // template,
+                  filePath,
+                  route: file === 'index.html' ? '/' : `${file}/`
+                  // fileName,
+                  // relativeExpectedPath,
+                  // title
+                  // meta,
+                  // chunkName
+                };
+              }
+
               if (stats.isDirectory()) {
                 await walkDirectory(filePath);
                 resolve();
@@ -163,25 +185,33 @@ const createGraphFromPages = async (pagesDir, config) => {
         }));
       };
 
-      await walkDirectory(pagesDir);
+      if (fs.existsSync(pagesDir)) {
+        await walkDirectory(pagesDir);
+      } else {
+        pages.push({
+          route: '/'
+        });
+      }
+
       resolve(pages);
+
     } catch (err) {
       reject(err);
     }
   });
 };
 
-const generateLabelHash = (label) => {
-  const hash = crypto.createHash('sha256');
+// const generateLabelHash = (label) => {
+//   const hash = crypto.createHash('sha256');
 
-  hash.update(label);
+//   hash.update(label);
 
-  let elementLabel = hash.digest('hex');
+//   let elementLabel = hash.digest('hex');
 
-  elementLabel = elementLabel.substring(elementLabel.length - 15, elementLabel.length);
+//   elementLabel = elementLabel.substring(elementLabel.length - 15, elementLabel.length);
 
-  return elementLabel;
-};
+//   return elementLabel;
+// };
 
 module.exports = generateGraph = async (compilation) => {
 
@@ -190,6 +220,12 @@ module.exports = generateGraph = async (compilation) => {
       const { context, config } = compilation;
 
       compilation.graph = await createGraphFromPages(context.pagesDir, config);
+
+      if (!fs.existsSync(context.scratchDir)) {
+        await fsp.mkdir(context.scratchDir);
+      }
+      
+      await fsp.writeFile(`${path.join(process.cwd(), '.greenwood')}/graph.json`, JSON.stringify(compilation.graph));
 
       resolve(compilation);
     } catch (err) {

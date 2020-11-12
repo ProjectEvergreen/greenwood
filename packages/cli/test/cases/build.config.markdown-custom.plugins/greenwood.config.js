@@ -2,8 +2,9 @@ module.exports = {
   markdown: {
     settings: {},
     plugins: [
-      require('rehype-slug'),
-      require('rehype-autolink-headings')
+      '@mapbox/rehype-prism',
+      'rehype-slug',
+      'rehype-autolink-headings'
     ]
   }
 };

@@ -1,10 +1,10 @@
-import { LitElement, html } from 'lit-element';
-import client from '@greenwood/cli/data/client';
-import MenuQuery from '@greenwood/cli/data/queries/menu';
+import { css, html, LitElement, unsafeCSS } from 'lit-element';
+// import client from '@greenwood/cli/data/client';
+// import MenuQuery from '@greenwood/cli/data/queries/menu';
 import '@evergreen-wc/eve-container';
 import headerCss from './header.css';
-import evergreenLogo from '../../assets/evergreen.svg';
-import '../components/social-icons/social-icons';
+// TODO import evergreenLogo from '../../assets/evergreen.svg';
+import '../social-icons/social-icons.js';
 
 class HeaderComponent extends LitElement {
 
@@ -16,6 +16,12 @@ class HeaderComponent extends LitElement {
     };
   }
 
+  static get styles() {
+    return css`
+      ${unsafeCSS(headerCss)}
+    `;
+  }
+
   constructor() {
     super();
     this.navigation = [];
@@ -24,15 +30,20 @@ class HeaderComponent extends LitElement {
   async connectedCallback() {
     super.connectedCallback();
 
-    const response = await client.query({
-      query: MenuQuery,
-      variables: {
-        name: 'navigation',
-        order: 'index_asc'
-      }
-    });
-
-    this.navigation = response.data.menu.children;
+    fetch('/graph.json')
+      .then(res => res.json())
+      .then(data => {
+        this.navigation = data.filter(page => {
+          if (page.data.menu === 'navigation') {
+            page.link = page.route;
+            page.label = `${page.label.charAt(0).toUpperCase()}${page.label.slice(1)}`.replace('-', ' ');
+            
+            return page;
+          }
+        }).sort((a, b) => {
+          return a.data.index < b.data.index ? -1 : 1;
+        });
+      });
   }
 
   /* eslint-disable indent */
@@ -40,9 +51,6 @@ class HeaderComponent extends LitElement {
     const { navigation } = this;
 
     return html`
-      <style>
-        ${headerCss}
-      </style>
       <header class="header">
         <eve-container fluid>
           <div class="head-wrap">
@@ -50,7 +58,7 @@ class HeaderComponent extends LitElement {
             <div class="brand">
               <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer"
                 onclick="getOutboundLink('https://projectevergreen.github.io');">
-                <img src="${evergreenLogo}" alt="Greenwood logo"/>
+                <img src="../../assets/evergreen.svg" alt="Greenwood logo"/>
               </a>
               <div class="project-name">
                 <a href="/">Greenwood</a>
@@ -59,7 +67,7 @@ class HeaderComponent extends LitElement {
 
             <nav>
               <ul>
-                ${navigation.map(({ item }) => {
+                ${navigation.map((item) => {
                   return html`
                     <li><a href="${item.link}" title="Click to visit the ${item.label} page">${item.label}</a></li>
                   `;
@@ -67,7 +75,7 @@ class HeaderComponent extends LitElement {
               </ul>
             </nav>
 
-            <eve-social-icons></eve-social-icons>
+            <app-social-icons></app-social-icons>
 
           </div>
         </eve-container>
@@ -77,4 +85,4 @@ class HeaderComponent extends LitElement {
   }
 }
 
-customElements.define('eve-header', HeaderComponent);
+customElements.define('app-header', HeaderComponent);

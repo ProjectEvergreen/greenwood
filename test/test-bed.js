@@ -13,6 +13,9 @@ const { spawn } = require('child_process');
 
 // needed for puppeteer - #193
 const setupFiles = [{
+  dir: 'node_modules/es-module-shims/dist',
+  name: 'es-module-shims.js'
+}, {
   dir: 'node_modules/@webcomponents/webcomponentsjs',
   name: 'webcomponents-bundle.js'
 }];

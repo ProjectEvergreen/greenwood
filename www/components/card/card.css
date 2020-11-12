@@ -1,57 +1,16 @@
 :host {
-  & .card {
-    padding: 2.5rem;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    word-wrap: break-word;
-    background-color: #fff;
-    background-clip: initial;
-    text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: initial;
+  text-align: center;
 
-    @media (max-width: 768px) {
-      padding: 0;
-    }
-
-    & .body {
-      padding: 10px;
-    }
-  }
-
-  & .card-xs {
-    margin: 0.25rem;
-    flex: 1 1 16.666%;
-    max-width: 250px;
-
-    @media (max-width: 1024px) {
-      max-width: 100%;
-    }
-  }
-
-  & .card-sm {
-    margin: 0.25rem;
-    flex: 1 1 25%;
-    max-width: 380px;
-
-    @media (max-width: 1024px) {
-      max-width: 100%;
-    }
-  }
-
-  & .card-md {
-    margin: 0.25rem;
-    flex: 1 1 33.333%;
-    max-width: 450px;
-
-    @media (max-width: 1024px) {
-      max-width: 100%;
-    }
-  }
-
-  & .card-full {
-    margin: 0.25rem;
-    flex: 1 1 33.333%;
+  & slot {
+    text-align: left;
+    font-size: 1rem;
   }
 
   & .card-img-top {
@@ -60,7 +19,8 @@
     background-position-y: center;
 
     & img {
-      width: 100%;
+      width: 200px;
+      height: 200px;
       max-width: 200px;
     }
   }

@@ -11,6 +11,6 @@
 :host .btn:hover,
 :host .btn:focus {
   color: #020202;
-  background-color: #f9e7ca;
+  background-color: #F9E7CA;
   border: 1px solid #020202;
 }
