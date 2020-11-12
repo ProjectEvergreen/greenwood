@@ -1,3 +1,4 @@
+/* TODO restore to nested styles */
 @import url('/assets/fonts/source-sans-pro.css');
 
 * {
@@ -19,14 +20,13 @@ table {
   background-color: #334a5a;
   border-radius: 5px;
   padding: 10px!important;
+}
+table tr {
+  padding: 10px;
+}
 
-  & tr {
-    padding: 10px;
-  }
-
-  & td, & a, & th {
-    color: #efefef!important;
-  }
+table td, table a, table th {
+  color: #efefef!important;
 }
 
 img {
@@ -51,14 +51,12 @@ ul > li {
   margin: 10px 0;
 }
 
-a {
-  & .title {
-    text-decoration: underline;
-  }
+a .title {
+  text-decoration: underline;
+}
 
-  & .step {
-    margin: 2px;
-  }
+a .title .step {
+  margin: 2px;
 }
 
 .gwd-content-wrapper {
@@ -67,9 +65,9 @@ a {
 
 .gwd-wrapper {
   background-color: white;
+}
 
-  & .single-column {
-    margin: inherit;
-    color: #000;
-  }
+.gwd-wrapper.single-column {
+  margin: inherit;
+  color: #000;
 }

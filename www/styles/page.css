@@ -1,115 +1,114 @@
+/* TODO restore to nested styles */
+/* TODO handle prismjs */
 /* https://prismjs.com/examples.html */
 @import url('../../node_modules/prismjs/themes/prism-tomorrow.css');
 
-:host {
+h3 {
+  color: #2D3D3A;
+  padding-top: 4rem;
+  font-size: 1.8rem !important;
+}
 
-  & h3 {
-    color: #2D3D3A;
-    padding-top: 4rem;
-    font-size: 1.8rem !important;
+h2 {
+  color: #2D3D3A;
+  font-size: 2rem;
+}
+
+h4, h5, h6 {
+  font-size: 1.2rem;
+}
+
+h1, h2, h3, h4, h5 {
+  line-height: 1rem;
+}
+
+h5 a > span.icon {
+  width:28px;
+  height:24px;
+  float:left;
+  padding:2px;
+  background-image: url(/assets/link.png);
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+}
+
+h1, h2, h3, h4, h5 a:hover {
+  filter: invert(.4);
+}
+
+.gwd-content-wrapper {
+  display:flex;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
   }
+}
 
-  & h2 {
-    color: #2D3D3A;
-    font-size: 2rem;
-  }
+.gwd-sidebar {
+  width: 400px;
+  background-color: rgb(242, 236, 239);
+  height: 100vh;
+  overflow: auto;
+  padding: 2rem;
 
-  & h4, h5, h6 {
-    font-size: 1.2rem;
-  }
-
-  & h1, h2, h3, h4, h5 {
-    line-height: 1rem;
-
-    & a > span.icon {
-      width:28px;
-      height:24px;
-      float:left;
-      padding:2px;
-      background-image: url(/assets/link.png);
-      background-size: 20px 20px;
-      background-repeat: no-repeat;
-
-      &:hover {
-        filter: invert(.4);
-      }
-    }
-  }
-
-  & .gwd-content-wrapper {
-    display:flex;
-
-    @media (max-width: 768px) {
-      flex-direction: column;
-    }
-  }
-
-  & .gwd-sidebar {
-    width: 400px;
-    background-color: rgb(242, 236, 239);
-    height: 100vh;
-    overflow: auto;
-    padding: 2rem;
-
-    @media (max-width: 768px) {
-      width: 100%;
-      height: 100%;
-      padding: 0px;
-    }
-  }
-
-  & .gwd-content {
-    width: calc(100vw - 400px);
-    height: 100vh;
-    overflow: scroll;
-    margin: auto;
-    background-color:white;
-    font-size:1.2rem;
-    padding: 2rem;
-
-    @media(max-width:768px) {
-      padding:0;
-    }
-
-    & h3 {
-      font-size:2rem;
-      margin: 5px 0;
-    }
-
-    & a {
-      color: #1d337a;
-    }
-
-    & img {
-      width: 100%;
-    }
-
-    & blockquote {
-      margin:0.5em;
-      padding:15px;
-      background-color:#dcf9ca !important;
-      border-left: 6px solid #192a27;
-    }
-    @media (max-width: 768px) {
-      width: 100%;
-      height: 100%;
-    }
-
-  }
-
-  & table {
-    border: 1px solid #020202;
+  @media (max-width: 768px) {
     width: 100%;
-    text-align: left;
-    margin-bottom: 20px;
+    height: 100%;
+    padding: 0px;
   }
+}
 
-  & table th:first-child {
-    min-width: 150px;
-  }
+.gwd-content {
+  width: calc(100vw - 400px);
+  height: 100vh;
+  overflow: scroll;
+  margin: auto;
+  background-color:white;
+  font-size:1.2rem;
+  padding: 2rem;
 
-  & table th {
-    background-color: #f9e7ca;
-    text-decoration: underline;
+  @media(max-width:768px) {
+    padding:0;
   }
+}
+
+.gwd-content  h3 {
+  font-size:2rem;
+  margin: 5px 0;
+}
+
+.gwd-content  a {
+  color: #1d337a;
+}
+
+.gwd-content  img {
+  width: 100%;
+}
+
+.gwd-content  blockquote {
+    margin:0.5em;
+    padding:15px;
+    background-color:#dcf9ca !important;
+    border-left: 6px solid #192a27;
+  }
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.gwd-content table {
+  border: 1px solid #020202;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.gwd-content table th:first-child {
+  min-width: 150px;
+}
+
+.gwd-content table th {
+  background-color: #f9e7ca;
+  text-decoration: underline;
 }

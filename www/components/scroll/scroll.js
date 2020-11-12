@@ -48,4 +48,4 @@ class scroll extends LitElement {
   }
 }
 
-customElements.define('eve-scroll', scroll);
+customElements.define('app-scroll', scroll);

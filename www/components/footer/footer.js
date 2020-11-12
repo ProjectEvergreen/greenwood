@@ -1,14 +1,19 @@
-import { html, LitElement } from 'lit-element';
-// make sure version gets bumped first when building for release
-import { version } from '../../package.json';
+import { css, html, LitElement, unsafeCSS } from 'lit-element';
+import json from '../../package.json';
 import footerCss from './footer.css';
 
 class FooterComponent extends LitElement {
+
+  static get styles() {
+    return css`
+      ${unsafeCSS(footerCss)}
+    `;
+  }
+
   render() {
+    const { version } = json;
+
     return html`
-      <style>
-        ${footerCss}
-      </style>
       <footer class="footer">
         <h4>
           <a href="/">Greenwood v${version}</a>
@@ -18,4 +23,4 @@ class FooterComponent extends LitElement {
   }
 }
 
-customElements.define('eve-footer', FooterComponent);
+customElements.define('app-footer', FooterComponent);

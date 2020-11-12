@@ -1,7 +1,13 @@
-import { html, LitElement } from 'lit-element';
-import css from './card.css';
+import { css, html, LitElement, unsafeCSS } from 'lit-element';
+import cardCss from './card.css';
 
 class Card extends LitElement {
+
+  static get styles() {
+    return css`
+      ${unsafeCSS(cardCss)}
+    `;
+  }
 
   static get properties() {
     return {
@@ -51,4 +57,4 @@ class Card extends LitElement {
   }
 }
 
-customElements.define('eve-card', Card);
+customElements.define('app-card', Card);

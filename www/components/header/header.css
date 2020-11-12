@@ -1,78 +1,84 @@
-:host {
-  & .header {
-    background-color: #192a27;
-    min-height: 30px;
-    padding: 10px;
-    font-size: 1.2rem;
+/* TODO restore to nested styles */
+:host .header {
+  background-color: #192a27;
+  min-height: 30px;
+  padding: 10px;
+  font-size: 1.2rem;
+}
 
-    & a {
-      color: white;
-      text-decoration:none;
-    }
+:host a {
+  color: white;
+  text-decoration:none;
+}
 
-    & .project-name {
-      margin: -2px 0 auto;
-      padding:0;
-      padding-top:4px;
-      display:inline-block;
-      color: #1d337a;
-      font-weight: bold;
-    }
+:host .project-name {
+  margin: -2px 0 auto;
+  padding:0;
+  padding-top:4px;
+  display:inline-block;
+  color: #1d337a;
+  font-weight: bold;
+}
 
-    & .head-wrap {
-      display: flex;
-      align-items:center;
-      flex-wrap:wrap;
-      justify-content: space-between;
+:host .head-wrap {
+  display: flex;
+  align-items:center;
+  flex-wrap:wrap;
+  justify-content: space-between;
 
-      @media (max-width:768px) {
-        flex-direction:column;
-        text-align: center;
-      }
-    }
-
-    & nav {
-      justify-items: left;
-      width: 55%;
-      & ul {
-        padding:0;
-        margin:0;
-        list-style: none;
-        text-align: center;
-        & li {
-          margin:0;
-          color:white;
-          display: inline-block;
-          padding:10px;
-          &:hover {
-          color: #F9E7CA;
-            & a {
-              color:green;
-            }
-          }
-        }
-      }
-      @media (max-width: 768px) {
-        width:100%;
-      }
-    }
-    & .brand {
-      justify-items: left;
-      padding: 10px;
-      & img {
-        float:left;
-        height: 30px;
-        width: 30px;
-        margin-right: .5rem;
-      }
-    }
-    & .social {
-      margin-left:auto;
-      text-align: right;
-      & img {
-        width:84px;
-        height:20px;
-      }
-    }
+  @media (max-width:768px) {
+    flex-direction:column;
+    text-align: center;
   }
+}
+
+:host nav {
+  justify-items: left;
+  width: 55%;
+}
+
+:host nav ul {
+  padding:0;
+  margin:0;
+  list-style: none;
+  text-align: center;
+}
+
+:host nav li {
+  margin:0;
+  color:white;
+  display: inline-block;
+  padding:10px;
+}
+
+:host nav li:hover {
+  color: #F9E7CA;
+}
+ 
+:host nav li a {
+  @media (max-width: 768px) {
+    width:100%;
+  }
+}
+
+:host .brand {
+  justify-items: left;
+  padding: 10px;
+}
+
+:host img {
+  float: left;
+  height: 30px;
+  width: 30px;
+  margin-right: .5rem;
+}
+
+:host .social {
+  margin-left: auto;
+  text-align: right;
+}
+ 
+:host .social img {
+  width:84px;
+  height:20px;
 }
