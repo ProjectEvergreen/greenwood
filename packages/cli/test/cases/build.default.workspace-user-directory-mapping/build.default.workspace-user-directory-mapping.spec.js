@@ -25,8 +25,13 @@
  *     pages/
  *       pages.js
  *   templates/
- *     page-template.js
+ *     page.html
  */
+const expect = require('chai').expect;
+const fs = require('fs');
+const glob = require('glob-promise');
+const { JSDOM } = require('jsdom');
+const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
@@ -43,7 +48,91 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public', 'index', 'not-found'], LABEL);
+    // TODO runSmokeTest(['public', 'index', 'not-found'], LABEL);
+
+    describe('Output Folder Structure and Home Page', function() {
+      let dom;
+
+      beforeEach(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+      });
+
+      it('should create a public directory', function() {
+        expect(fs.existsSync(this.context.publicDir)).to.be.true;
+      });
+
+      it('should output an index.html file (home page)', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
+      });
+
+      // TODO
+      xit('should output a single 404.html file (not found page)', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, './404.html'))).to.be.true;
+      });
+
+      it('should output one JS bundle files', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, './*.js'))).to.have.lengthOf(1);
+      });
+
+      it('should have one <script> tags in the <head>', async function() {
+        const scriptTags = dom.window.document.querySelectorAll('head script');
+
+        expect(scriptTags.length).to.be.equal(1);
+      });
+
+      it('should have content in the <body>', function() {
+        const h3 = dom.window.document.querySelector('body h3');
+        const p = dom.window.document.querySelector('body p');
+
+        expect(h3.textContent).to.be.equal('Greenwood');
+        expect(p.textContent).to.be.equal('This is the home page built by Greenwood. Make your own pages in src/pages/index.js!');
+      });
+
+      it('should have a <header> tag in the <body>', function() {
+        const header = dom.window.document.querySelectorAll('body header');
+
+        expect(header.length).to.be.equal(1);
+        expect(header[0].textContent).to.be.equal('This is the header component.');
+      });
+    });
+
+    describe('Describe Nested Page', function() {
+      let dom;
+
+      beforeEach(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'pages/index.html'));
+      });
+
+      it('should output an index.html file (home page)', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, 'pages', 'index.html'))).to.be.true;
+      });
+
+      it('should output one JS bundle files', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, './*.js'))).to.have.lengthOf(1);
+      });
+
+      it('should have one <script> tags in the <head>', async function() {
+        const scriptTags = dom.window.document.querySelectorAll('head script');
+
+        expect(scriptTags.length).to.be.equal(1);
+      });
+
+      it('should have content in the <body>', function() {
+        const h2 = dom.window.document.querySelector('body h2');
+        const p = dom.window.document.querySelector('body p');
+
+        expect(h2.textContent).to.be.equal('Pages page');
+        expect(p.textContent).to.be.equal('This is a custom about page built by Greenwood.');
+      });
+
+      it('should have a <header> tag in the <body>', function() {
+        const header = dom.window.document.querySelectorAll('body header');
+
+        expect(header.length).to.be.equal(1);
+        expect(header[0].textContent).to.be.equal('This is the header component.');
+      });
+    });
+
   });
 
   after(function() {

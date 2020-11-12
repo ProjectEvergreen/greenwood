@@ -38,17 +38,21 @@ class BrowserRunner {
 
     // only allow puppeteer to load necessary scripts needed for pre-rendering of the site itself
     page.on('request', interceptedRequest => {
-      const interceptedRequestUrl = interceptedRequest.url();
+      // const interceptedRequestUrl = interceptedRequest.url();
 
-      if (
-        interceptedRequestUrl.indexOf('bundle.js') >= 0 || // webpack bundles, webcomponents-bundle.js
-        interceptedRequestUrl === requestUrl || // pages / routes
-        interceptedRequestUrl.indexOf('localhost:4000') >= 0 // Apollo GraphQL server
-      ) {
-        interceptedRequest.continue();
-      } else {
-        interceptedRequest.abort();
-      }
+      // console.debug('request', interceptedRequestUrl);
+      // TODO handle serialize only requests
+      interceptedRequest.continue();
+      // if (
+      //   interceptedRequestUrl.indexOf('bundle.js') >= 0 || // webpack bundles, webcomponents-bundle.js
+      //   interceptedRequestUrl === requestUrl || // pages / routes
+      //   interceptedRequestUrl.indexOf('localhost:4000') >= 0 // Apollo GraphQL server
+      // ) {
+      //   interceptedRequest.continue();
+      // } else {
+      //   console.debug('aborting request', interceptedRequestUrl)
+      //   interceptedRequest.abort();
+      // }
     });
 
     try {
@@ -71,6 +75,8 @@ class BrowserRunner {
 
     // Serialize page.
     const content = await page.content();
+
+    // console.debug('content????', content);
 
     await page.close();
 

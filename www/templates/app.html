@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
+
+  <head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'/>
+    <meta-outlet></meta-outlet>
+
+    <!-- TODO how to import / register a component like below? -->
+    <script type="module">
+      import '@evergreen-wc/eve-container';
+    </script>
+    
+    <!-- TODO have to use / for path references?  translate on the fly in serve.js? -->
+    <script type="module" src="/components/footer/footer.js"></script>
+    <script type="module" src="/components/header/header.js"></script>
+    
+    <script>
+      function getOutboundLink() {
+        console.debug('TODO placeholder for Google Analytics...')
+      }
+    </script>
+
+    <link rel="stylesheet" href="/styles/theme.css"></link>
+
+    <style>
+      .gwd-content-outlet {
+        min-height: 100vh
+      };
+    </style>
+    
+  </head>
+
+  <body>
+
+    <div class='gwd-wrapper'>
+      <app-header></app-header>
+
+      <page-outlet></page-outlet>
+      
+      <!-- TODO <lit-route><h1>404 Not found</h1></lit-route> -->
+      <app-footer></app-footer>
+    </div>
+
+  </body>
+
+</html>

@@ -1,4 +1,4 @@
-@import url('/assets/fonts/source-sans-pro.css');
+@import url('../assets/fonts/source-sans-pro.css');
 
 * {
   margin: 0;
@@ -12,23 +12,20 @@ html {
 
 body {
   font-family: 'Source Sans Pro', sans-serif;
-  line-height: 1.4;
+  line-height:1.4;
 }
 
 img {
   width: 100%;
 }
 
-h2,
-h3,
-h4,
-h5 {
-  margin-top: 1.5rem !important;
-  margin-bottom: 1.5rem !important;
-  color: #1d337a;
+h2, h3, h4, h5 {
+  margin-top:1.5rem !important;
+  margin-bottom:1.5rem !important;
+  color: #201E2E;
 }
 
-ul {
+ul, ol {
   padding-left: 20px;
 }
 
@@ -50,28 +47,12 @@ a {
   }
 }
 
-table {
-  background-color: #334a5a;
-  border-radius: 5px;
-  padding: 10px !important;
-
-  & tr {
-    padding: 10px;
-  }
-
-  & td,
-  & a,
-  & th {
-    color: #efefef!important;
-  }
-}
-
-.gwd-content-wrapper {
-  background-color: white;
+p > code {
+  color: #2D3D3A;
+  font-weight: 800;
 }
 
 .gwd-wrapper {
-  background-color: white;
 
   & .single-column {
     margin: inherit;

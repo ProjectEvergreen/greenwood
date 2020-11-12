@@ -29,7 +29,7 @@ const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', function() {
+xdescribe('Build Greenwood With: ', function() {
   const LABEL = 'Google Analytics Plugin with default options and Default Workspace';
   const mockAnalyticsId = 'UA-123456-1';
 
