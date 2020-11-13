@@ -4,30 +4,55 @@ const { promises: fsp } = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
-const filterHTML = require('../transforms/html.transform');
-const filterModule = require('../transforms/node-modules.transform');
-const filterCSS = require('../transforms/css.transform');
-const filterJavascript = require('../transforms/js.transform');
-const filterJSON = require('../transforms/json.transform');
-const filterImages = require('../transforms/images.transform');
+const Transform = require('../transforms/transform.interface');
+const HTMLTransform = require('../transforms/transform.html');
+const MarkdownTransform = require('../transforms/transform.md');
+const CSSTransform = require('../transforms/transform.css');
+const JSTransform = require('../transforms/transform.js');
+const JSONTransform = require('../transforms/transform.json.js');
+const AssetTransform = require('../transforms/transform.assets');
 
 function getDevServer(compilation) {
   const app = new Koa();
 
-  // TODO use url.endsWith!!
-  // eslint-disable-next-line no-unused-vars
   app.use(async ctx => {
-    // console.debug('URL', ctx.request.url);
-    const { config, context } = compilation;
-    const { userWorkspace } = context;
+    let response = {
+      body: '',
+      contentType: '',
+      extension: ''
+    };
+
+    request = {
+      header: ctx.request.header,
+      url: ctx.request.url,
+      compilation: { ...compilation }
+    };
 
     try {
-      await filterHTML(ctx, config, userWorkspace);
-      await filterModule(ctx);
-      await filterJSON(ctx, context);
-      await filterJavascript(ctx, userWorkspace);
-      await filterCSS(ctx, userWorkspace);
-      await filterImages(ctx, userWorkspace);
+      // default transforms 
+      const defaultTransforms = [
+        new HTMLTransform(request),
+        new MarkdownTransform(request),
+        new CSSTransform(request),
+        new JSTransform(request),
+        new JSONTransform(request),
+        new AssetTransform(request)
+      ];
+
+      // walk through all transforms
+      await Promise.all(defaultTransforms.map(async (plugin) => {
+        if (plugin instanceof Transform && plugin.shouldTransform()) {
+
+          const transformedResponse = await plugin.applyTransform();
+
+          response = { 
+            ...transformedResponse
+          };
+        }
+      }));
+
+      ctx.set('Content-Type', `${response.contentType}`);
+      ctx.body = response.body;
     } catch (err) {
       console.log(err);
     }
