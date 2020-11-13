@@ -49,7 +49,6 @@ class HeaderComponent extends LitElement {
   /* eslint-disable indent */
   render() {
     const { navigation } = this;
-
     return html`
       <header class="header">
         <eve-container fluid>

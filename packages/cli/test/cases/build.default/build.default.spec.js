@@ -65,7 +65,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have the expected heading text within the index page in the public directory', function() {
-        const heading = dom.window.document.querySelector('body content-outlet h1').textContent;
+        const heading = dom.window.document.querySelector('body h1').textContent;
 
         expect(heading).to.equal('Welcome to my website!');
       });
