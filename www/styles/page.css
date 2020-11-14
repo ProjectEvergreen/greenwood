@@ -86,11 +86,11 @@ h1, h2, h3, h4, h5 a:hover {
 }
 
 .gwd-content  blockquote {
-    margin:0.5em;
-    padding:15px;
-    background-color:#dcf9ca !important;
-    border-left: 6px solid #192a27;
-  }
+  margin:0.5em;
+  padding:15px;
+  background-color:#dcf9ca !important;
+  border-left: 6px solid #192a27;
+  
   @media (max-width: 768px) {
     width: 100%;
     height: 100%;

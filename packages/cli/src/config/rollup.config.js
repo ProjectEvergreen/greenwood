@@ -30,7 +30,7 @@ function greenwoodWorkspaceResolver (compilation) {
 
 // https://github.com/rollup/rollup/issues/2873
 function greenwoodHtmlPlugin(compilation) {
-  const { userWorkspace } = compilation.context;
+  const { userWorkspace, outputDir } = compilation.context;
 
   return {
     name: 'greenwood-html-plugin',
@@ -49,13 +49,28 @@ function greenwoodHtmlPlugin(compilation) {
           if (name === 'script' && attribs.type === 'module' && attribs.src) {
             // TODO handle deeper paths
             const srcPath = attribs.src.replace('../', './');
-            const scriptSrc = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
+            const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
 
             that.emitFile({
               type: 'chunk',
               id: srcPath,
               name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
-              source: scriptSrc
+              source
+            });
+
+            // console.debug('emitFile for script => ', srcPath);
+          }
+
+          if (name === 'link' && attribs.rel === 'stylesheet') {
+            // TODO handle deeper paths
+            const srcPath = attribs.href.replace('../', './');
+            const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
+
+            that.emitFile({
+              type: 'asset',
+              // fileName?
+              name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.css', ''),
+              source
             });
 
             // console.debug('emitFile for script => ', srcPath);
@@ -110,6 +125,22 @@ function greenwoodHtmlPlugin(compilation) {
                   }
                 }
               }
+
+              if (name === 'link' && attribs.rel === 'stylesheet') {
+                // console.debug('processing stylesheet', attribs);
+                // TODO handle supporting expanded paths, e.g. ../styles/
+                const from = `${userWorkspace}${attribs.href}`;
+                const to = `${outputDir}${attribs.href}`;
+
+                if (!fs.existsSync(path.dirname(to))) {
+                  fs.mkdirSync(path.dirname(to), {
+                    recursive: true
+                  });
+                }
+
+                // TODO could probably optimize by caching / checking for existing copies
+                fs.copyFileSync(from, to);
+              }
             }
           });
 
@@ -145,10 +176,6 @@ module.exports = getRollupConfig = async (compilation) => {
       }
     },
     plugins: [
-      // ignoreImport({
-      //   include: ['**/*.css'],
-      //   // extensions: ['.css']
-      // }),
       nodeResolve(),
       greenwoodWorkspaceResolver(compilation),
       greenwoodHtmlPlugin(compilation),
@@ -157,22 +184,9 @@ module.exports = getRollupConfig = async (compilation) => {
         extract: false,
         minimize: true
       }),
-      json(), // TODO bundle as part of import support?
+      json(), // TODO bundle as part of import support / transforms API?
       terser()
     ]
   }];
 
 };
-
-// }, {
-//   input: `${workspaceDirectory}/**/*.css`, // TODO emits a www/styles.js file?
-//   output: { // TODO CSS filename hashing / cache busting - https://github.com/egoist/rollup-plugin-postcss/pull/226
-//     dir: outputDirectory
-//   },
-//   plugins: [
-//     multiInput(),
-//     postcss({
-//       extract: true,
-//       minimize: true
-//     })
-//   ]
