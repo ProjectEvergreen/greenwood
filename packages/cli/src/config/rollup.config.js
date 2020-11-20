@@ -62,18 +62,29 @@ function greenwoodHtmlPlugin(compilation) {
           }
 
           if (name === 'link' && attribs.rel === 'stylesheet') {
-            // TODO handle deeper paths
-            const srcPath = attribs.href.replace('../', './');
+            // TODO handle auto expanding deeper paths
+            let srcPath = attribs.href.replace('../', './');
             const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
+            const to = `${outputDir}${attribs.href}`;
+
+            if (srcPath.charAt(0) === '/') {
+              srcPath = srcPath.slice(1);
+            }
 
             that.emitFile({
               type: 'asset',
-              // fileName?
+              fileName: srcPath,
               name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.css', ''),
               source
             });
 
-            // console.debug('emitFile for script => ', srcPath);
+            if (!fs.existsSync(path.dirname(to))) {
+              fs.mkdirSync(path.dirname(to), {
+                recursive: true
+              });
+            }
+
+            // console.debug('emitFile for link => ', srcPath);
           }
         }
       });
@@ -124,22 +135,6 @@ function greenwoodHtmlPlugin(compilation) {
                     }
                   }
                 }
-              }
-
-              if (name === 'link' && attribs.rel === 'stylesheet') {
-                // console.debug('processing stylesheet', attribs);
-                // TODO handle supporting expanded paths, e.g. ../styles/
-                const from = `${userWorkspace}${attribs.href}`;
-                const to = `${outputDir}${attribs.href}`;
-
-                if (!fs.existsSync(path.dirname(to))) {
-                  fs.mkdirSync(path.dirname(to), {
-                    recursive: true
-                  });
-                }
-
-                // TODO could probably optimize by caching / checking for existing copies
-                fs.copyFileSync(from, to);
               }
             }
           });
