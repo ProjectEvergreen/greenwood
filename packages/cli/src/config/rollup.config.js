@@ -45,7 +45,7 @@ function greenwoodHtmlPlugin(compilation) {
     },
     // TODO do this during load instead?
     async buildStart(options) {
-      // TODO dont emit duplicate scripts, e.g. use a Map()
+      const mappedStyles = new Map();
       const that = this;
       const parser = new htmlparser2.Parser({
         onopentag(name, attribs) {
@@ -64,12 +64,14 @@ function greenwoodHtmlPlugin(compilation) {
             // console.debug('emitFile for script => ', srcPath);
           }
 
-          if (name === 'link' && attribs.rel === 'stylesheet') {
+          if (name === 'link' && attribs.rel === 'stylesheet' && !mappedStyles.get(attribs.href)) {
+            mappedStyles.set(attribs.href, true);
+
             // TODO handle auto expanding deeper paths
             let srcPath = attribs.href.replace('../', './');
             const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
             
-            // TOD make async, track as G.F.I.?
+            // TODO convert async / await, track as G.F.I.?
             postcss(postcssConfig.plugins).process(source).then((result) => {
               const to = `${outputDir}${attribs.href}`;
 
@@ -89,7 +91,6 @@ function greenwoodHtmlPlugin(compilation) {
                   recursive: true
                 });
               }
-  
               // console.debug('emitAsset for link => ', srcPath);
             });
           }
