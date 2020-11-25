@@ -6,8 +6,11 @@ const json = require('@rollup/plugin-json');
 const multiInput = require('rollup-plugin-multi-input').default;
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const path = require('path');
-const postcss = require('rollup-plugin-postcss');
+const postcss = require('postcss');
+const postcssRollup = require('rollup-plugin-postcss');
 const { terser } = require('rollup-plugin-terser');
+
+const postcssConfig = require('./postcss.config');
 
 function greenwoodWorkspaceResolver (compilation) {
   const { userWorkspace } = compilation.context;
@@ -65,26 +68,30 @@ function greenwoodHtmlPlugin(compilation) {
             // TODO handle auto expanding deeper paths
             let srcPath = attribs.href.replace('../', './');
             const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
-            const to = `${outputDir}${attribs.href}`;
+            
+            // TOD make async, track as G.F.I.?
+            postcss(postcssConfig.plugins).process(source).then((result) => {
+              const to = `${outputDir}${attribs.href}`;
 
-            if (srcPath.charAt(0) === '/') {
-              srcPath = srcPath.slice(1);
-            }
+              if (srcPath.charAt(0) === '/') {
+                srcPath = srcPath.slice(1);
+              }
 
-            that.emitFile({
-              type: 'asset',
-              fileName: srcPath,
-              name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.css', ''),
-              source
-            });
-
-            if (!fs.existsSync(path.dirname(to))) {
-              fs.mkdirSync(path.dirname(to), {
-                recursive: true
+              that.emitFile({
+                type: 'asset',
+                fileName: srcPath,
+                name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.css', ''),
+                source: result.css
               });
-            }
-
-            // console.debug('emitFile for link => ', srcPath);
+  
+              if (!fs.existsSync(path.dirname(to))) {
+                fs.mkdirSync(path.dirname(to), {
+                  recursive: true
+                });
+              }
+  
+              // console.debug('emitAsset for link => ', srcPath);
+            });
           }
         }
       });
@@ -175,9 +182,10 @@ module.exports = getRollupConfig = async (compilation) => {
       greenwoodWorkspaceResolver(compilation),
       greenwoodHtmlPlugin(compilation),
       multiInput(),
-      postcss({
+      postcssRollup({
         extract: false,
-        minimize: true
+        minimize: true,
+        inject: false
       }),
       json(), // TODO bundle as part of import support / transforms API?
       terser()
