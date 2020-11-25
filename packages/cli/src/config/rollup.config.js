@@ -72,7 +72,8 @@ function greenwoodHtmlPlugin(compilation) {
             const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
             
             // TODO convert async / await, track as G.F.I.?
-            postcss(postcssConfig.plugins).process(source).then((result) => {
+            // https://stackoverflow.com/a/63193341/417806 (from)
+            postcss(postcssConfig.plugins).process(source, { from: path.join(userWorkspace, srcPath) }).then((result) => {
               const to = `${outputDir}${attribs.href}`;
 
               if (srcPath.charAt(0) === '/') {
