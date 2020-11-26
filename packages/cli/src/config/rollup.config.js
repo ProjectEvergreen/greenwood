@@ -48,7 +48,7 @@ function greenwoodHtmlPlugin(compilation) {
       const mappedStyles = new Map();
       const that = this;
       const parser = new htmlparser2.Parser({
-        onopentag(name, attribs) {
+        async onopentag(name, attribs) {
           if (name === 'script' && attribs.type === 'module' && attribs.src) {
             // TODO handle deeper paths
             const srcPath = attribs.src.replace('../', './');
@@ -70,30 +70,29 @@ function greenwoodHtmlPlugin(compilation) {
             // TODO handle auto expanding deeper paths
             let srcPath = attribs.href.replace('../', './');
             const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
-            
-            // TODO convert async / await, track as G.F.I.?
+            const to = `${outputDir}${attribs.href}`;
+
             // https://stackoverflow.com/a/63193341/417806 (from)
-            postcss(postcssConfig.plugins).process(source, { from: path.join(userWorkspace, srcPath) }).then((result) => {
-              const to = `${outputDir}${attribs.href}`;
+            const result = await postcss(postcssConfig.plugins)
+              .process(source, { from: path.join(userWorkspace, srcPath) })
+              .async();
 
-              if (srcPath.charAt(0) === '/') {
-                srcPath = srcPath.slice(1);
-              }
+            if (srcPath.charAt(0) === '/') {
+              srcPath = srcPath.slice(1);
+            }
 
-              that.emitFile({
-                type: 'asset',
-                fileName: srcPath,
-                name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.css', ''),
-                source: result.css
-              });
-  
-              if (!fs.existsSync(path.dirname(to))) {
-                fs.mkdirSync(path.dirname(to), {
-                  recursive: true
-                });
-              }
-              // console.debug('emitAsset for link => ', srcPath);
+            that.emitFile({
+              type: 'asset',
+              fileName: srcPath,
+              name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.css', ''),
+              source: result.css
             });
+
+            if (!fs.existsSync(path.dirname(to))) {
+              fs.mkdirSync(path.dirname(to), {
+                recursive: true
+              });
+            }
           }
         }
       });
