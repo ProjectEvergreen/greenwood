@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 // TODO use node-html-parser
@@ -11,6 +12,28 @@ const postcssRollup = require('rollup-plugin-postcss');
 const { terser } = require('rollup-plugin-terser');
 
 const postcssConfig = require('./postcss.config');
+
+// https://gist.github.com/GuillermoPena/9233069#gistcomment-2364896
+function fileHash(filename) {
+  return new Promise((resolve, reject) => {
+    
+    try {
+      const hash = crypto.createHash('md5');
+      const stream = fs.ReadStream(filename); // eslint-disable-line new-cap
+      
+      stream.on('data', (data) => {
+        hash.update(data);
+      });
+
+      stream.on('end', () => {
+        return resolve(hash.digest('hex'));
+      });
+    } catch (error) {
+      console.error(error);
+      return reject('fileHash fail');
+    }
+  });
+}
 
 function greenwoodWorkspaceResolver (compilation) {
   const { userWorkspace } = compilation.context;
@@ -65,26 +88,29 @@ function greenwoodHtmlPlugin(compilation) {
           }
 
           if (name === 'link' && attribs.rel === 'stylesheet' && !mappedStyles.get(attribs.href)) {
-            mappedStyles.set(attribs.href, true);
+            let { href } = attribs;
+            
+            mappedStyles.set(href, true);
+
+            if (href.charAt(0) === '/') {
+              href = href.slice(1);
+            }
 
             // TODO handle auto expanding deeper paths
-            let srcPath = attribs.href.replace('../', './');
-            const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
-            const to = `${outputDir}${attribs.href}`;
+            const filePath = path.join(userWorkspace, href.replace('../', './'));
+            const source = fs.readFileSync(filePath, 'utf-8');
+            const to = `${outputDir}${href}`;
+            const hash = await fileHash(filePath);
 
             // https://stackoverflow.com/a/63193341/417806 (from)
             const result = await postcss(postcssConfig.plugins)
-              .process(source, { from: path.join(userWorkspace, srcPath) })
+              .process(source, { from: path.join(userWorkspace, href) })
               .async();
-
-            if (srcPath.charAt(0) === '/') {
-              srcPath = srcPath.slice(1);
-            }
 
             that.emitFile({
               type: 'asset',
-              fileName: srcPath,
-              name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.css', ''),
+              fileName: href.replace('.css', `.${hash.slice(0, 8)}.css`),
+              name: href,
               source: result.css
             });
 
@@ -133,13 +159,25 @@ function greenwoodHtmlPlugin(compilation) {
                   } else {
                     // console.debug('NO MATCH?????', innerBundleId);
                     // TODO better testing
-                    // TODO magic string
+                    // TODO magic strings
                     if (innerBundleId.indexOf('.greenwood/') < 0 && !mappedBundles.get(innerBundleId)) {
                       // console.debug('NEW BUNDLE TO INJECT!');
                       newHtml = newHtml.replace(/<script type="module" src="(.*)"><\/script>/, `
                         <script type="module" src="/${innerBundleId}"></script>
                       `);
                       mappedBundles.set(innerBundleId, true);
+                    }
+                  }
+                }
+              }
+
+              if (name === 'link' && attribs.rel === 'stylesheet') {
+                for (const bundleId2 of Object.keys(bundles)) {
+                  if (bundleId2.indexOf('.css') > 0) {
+                    const bundle2 = bundles[bundleId2];
+
+                    if (attribs.href.indexOf(bundle2.name) >= 0) {
+                      newHtml = newHtml.replace(attribs.href, `/${bundle2.fileName}`);
                     }
                   }
                 }
