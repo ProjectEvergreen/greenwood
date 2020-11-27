@@ -8,10 +8,10 @@ const multiInput = require('rollup-plugin-multi-input').default;
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const path = require('path');
 const postcss = require('postcss');
+const postcssConfig = require('./postcss.config');
+const postcssImport = require('postcss-import');
 const postcssRollup = require('rollup-plugin-postcss');
 const { terser } = require('rollup-plugin-terser');
-
-const postcssConfig = require('./postcss.config');
 
 // https://gist.github.com/GuillermoPena/9233069#gistcomment-2364896
 function fileHash(filename) {
@@ -104,6 +104,7 @@ function greenwoodHtmlPlugin(compilation) {
 
             // https://stackoverflow.com/a/63193341/417806 (from)
             const result = await postcss(postcssConfig.plugins)
+              .use(postcssImport())
               .process(source, { from: path.join(userWorkspace, href) })
               .async();
 

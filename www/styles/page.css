@@ -27,7 +27,7 @@ h5 a > span.icon {
   height:24px;
   float:left;
   padding:2px;
-  background-image: url(/assets/link.png);
+  background-image: url('../assets/link.png');
   background-size: 20px 20px;
   background-repeat: no-repeat;
 }
