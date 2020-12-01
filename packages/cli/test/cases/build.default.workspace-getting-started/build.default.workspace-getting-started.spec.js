@@ -19,8 +19,10 @@
  *     footer.js
  *     header.js
  *   pages/
- *     first-post.md
- *     second-post.md
+ *     blog/
+ *       first-post.md
+ *       second-post.md
+ *     index.md
  *   styles/
  *     theme.css
  *   templates/
@@ -88,7 +90,7 @@ describe('Build Greenwood With: ', function() {
 
       // TODO what to do about theme.css?
       xit('should output one CSS file', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, './styles/theme.css'))).to.have.lengthOf(1);
+        expect(await glob.promise(`${path.join(this.context.publicDir, 'styles')}/*.css`)).to.have.lengthOf(1);
       });
 
       it('should output two <style> tag in the <head> (one from puppeteer)', async function() {

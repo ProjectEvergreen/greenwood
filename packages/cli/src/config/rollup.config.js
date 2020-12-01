@@ -97,20 +97,24 @@ function greenwoodHtmlPlugin(compilation) {
             }
 
             // TODO handle auto expanding deeper paths
-            const filePath = path.join(userWorkspace, href.replace('../', './'));
+            const filePath = path.join(userWorkspace, href);
             const source = fs.readFileSync(filePath, 'utf-8');
-            const to = `${outputDir}${href}`;
+            const to = `${outputDir}/${href}`;
             const hash = await fileHash(filePath);
+            const fileName = href
+              .replace('.css', `.${hash.slice(0, 8)}.css`)
+              .replace('../', '')
+              .replace('./', '');
 
             // https://stackoverflow.com/a/63193341/417806 (from)
             const result = await postcss(postcssConfig.plugins)
               .use(postcssImport())
-              .process(source, { from: path.join(userWorkspace, href) })
+              .process(source, { from: filePath })
               .async();
 
             that.emitFile({
               type: 'asset',
-              fileName: href.replace('.css', `.${hash.slice(0, 8)}.css`),
+              fileName,
               name: href,
               source: result.css
             });
