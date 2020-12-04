@@ -16,14 +16,14 @@
     "lerna": "lerna",
     "clean": "rimraf ./**/.greenwood/** && rimraf ./**/public/** && rimraf ./coverage",
     "clean:deps": "rimraf **/node_modules/**",
-    "lint": "ls-lint && eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
     "build": "node . build",
     "serve": "yarn build && cd ./public && ws",
     "develop": "node . develop",
     "test": "export BROWSERSLIST_IGNORE_OLD_DATA=true && nyc mocha",
     "test:tdd": "yarn test --watch",
-    "lint:css": "stylelint './www/**/*.js', './www/**/*.css'",
-    "lint:css:fix": "stylelint './www/**/*.js', './www/**/*.css --fix"
+    "lint:js": "eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
+    "lint:css": "stylelint \"./www/**/*.js\", \"./www/**/*.css\"",
+    "lint": "ls-lint && yarn lint:js && yarn lint:css"
   },
   "devDependencies": {
     "@ls-lint/ls-lint": "^1.9.2",
