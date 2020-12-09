@@ -1,15 +1,16 @@
 :host .btn {
-  display:inline-block;
-  border-radius:5px;
-  font-size:1.5rem;
+  display: inline-block;
+  border-radius: 5px;
+  font-size: 1.5rem;
   padding: 1rem;
   color: white;
   background-color: #1d337a;
-  border:1px solid white;
+  border: 1px solid white;
 }
 
-:host .btn:hover {
+:host .btn:hover,
+:host .btn:focus {
   color: #020202;
-  background-color: #F9E7CA;
-  border:1px solid #020202;
+  background-color: #f9e7ca;
+  border: 1px solid #020202;
 }
