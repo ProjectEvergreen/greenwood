@@ -36,7 +36,7 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', function() {
+describe.only('Build Greenwood With: ', function() {
   const LABEL = 'Custom Workspace based on the Getting Started guide and repo';
   let setup;
 
@@ -46,6 +46,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe(LABEL, function() {
+    
     before(async function() {
       await setup.runGreenwoodCommand('build');
     });
@@ -88,9 +89,8 @@ describe('Build Greenwood With: ', function() {
         expect(scriptTags.length).to.be.equal(2);
       });
 
-      // TODO what to do about theme.css?
-      xit('should output one CSS file', async function() {
-        expect(await glob.promise(`${path.join(this.context.publicDir, 'styles')}/*.css`)).to.have.lengthOf(1);
+      it('should output one CSS file', async function() {
+        expect(await glob.promise(`${path.join(this.context.publicDir, 'styles')}/theme.*.css`)).to.have.lengthOf(1);
       });
 
       it('should output two <style> tag in the <head> (one from puppeteer)', async function() {
@@ -167,11 +167,6 @@ describe('Build Greenwood With: ', function() {
         expect(scriptTags.length).to.be.equal(2);
       });
 
-      // TODO what to do about theme.css?
-      xit('should output one CSS file', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, './styles/theme.css'))).to.have.lengthOf(1);
-      });
-
       it('should output one <style> tag in the <head> (one from puppeteer)', async function() {
         const styleTags = dom.window.document.querySelectorAll('head style');
 
@@ -235,11 +230,6 @@ describe('Build Greenwood With: ', function() {
         const scriptTags = dom.window.document.querySelectorAll('head script');
 
         expect(scriptTags.length).to.be.equal(2);
-      });
-
-      // TODO what to do about theme.css?
-      xit('should output one CSS file', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, './styles/theme.css'))).to.have.lengthOf(1);
       });
 
       it('should output one <style> tag in the <head> (one from puppeteer)', async function() {
