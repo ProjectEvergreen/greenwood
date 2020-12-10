@@ -1,4 +1,4 @@
-// const crypto = require('crypto');
+const crypto = require('crypto');
 const fs = require('fs');
 // TODO use node-html-parser
 const htmlparser2 = require('htmlparser2');
@@ -11,28 +11,6 @@ const postcssConfig = require('./postcss.config');
 const postcssImport = require('postcss-import-sync');
 const postcssRollup = require('rollup-plugin-postcss');
 const { terser } = require('rollup-plugin-terser');
-
-// https://gist.github.com/GuillermoPena/9233069#gistcomment-2364896
-// function fileHash(filename) {
-//   return new Promise((resolve, reject) => {
-    
-//     try {
-//       const hash = crypto.createHash('md5');
-//       const stream = fs.ReadStream(filename); // eslint-disable-line new-cap
-      
-//       stream.on('data', (data) => {
-//         hash.update(data);
-//       });
-
-//       stream.on('end', () => {
-//         return resolve(hash.digest('hex'));
-//       });
-//     } catch (error) {
-//       console.error(error);
-//       return reject('fileHash fail');
-//     }
-//   });
-// }
 
 function greenwoodWorkspaceResolver (compilation) {
   const { userWorkspace } = compilation.context;
@@ -74,7 +52,9 @@ function greenwoodHtmlPlugin(compilation) {
         async onopentag(name, attribs) {
           if (name === 'script' && attribs.type === 'module' && attribs.src && !mappedScripts.get(attribs.src)) {
             const { src } = attribs;
-                        
+                      
+            // TODO avoid using src and set it to the value of rollup fileName
+            // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
             mappedScripts.set(src, true);
 
             const srcPath = src.replace('../', './');
@@ -94,6 +74,8 @@ function greenwoodHtmlPlugin(compilation) {
             // console.debug('found a stylesheet!', attribs);
             let { href } = attribs;
             
+            // TODO avoid using src and set it to the value of rollup fileName
+            // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
             mappedStyles.set(href, true);
 
             if (href.charAt(0) === '/') {
@@ -104,10 +86,9 @@ function greenwoodHtmlPlugin(compilation) {
             const filePath = path.join(userWorkspace, href);
             const source = fs.readFileSync(filePath, 'utf-8');
             const to = `${outputDir}/${href}`;
-            // TODO const hash = await fileHash(filePath);
+            const hash = crypto.createHash('md5').update(source, 'utf8').digest('hex');
             const fileName = href
-              // TODO .replace('.css', `.${hash.slice(0, 8)}.css`)
-              .replace('.css', `.${new Date().getTime()}.css`)
+              .replace('.css', `.${hash.slice(0, 8)}.css`)
               .replace('../', '')
               .replace('./', '');
 
@@ -169,7 +150,7 @@ function greenwoodHtmlPlugin(compilation) {
                   } else {
                     // console.debug('NO MATCH?????', innerBundleId);
                     // TODO better testing
-                    // TODO magic strings
+                    // TODO no magic strings
                     if (innerBundleId.indexOf('.greenwood/') < 0 && !mappedBundles.get(innerBundleId)) {
                       // console.debug('NEW BUNDLE TO INJECT!');
                       newHtml = newHtml.replace(/<script type="module" src="(.*)"><\/script>/, `
