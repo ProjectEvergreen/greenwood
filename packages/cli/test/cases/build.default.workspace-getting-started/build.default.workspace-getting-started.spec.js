@@ -36,7 +36,7 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
-describe.only('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Workspace based on the Getting Started guide and repo';
   let setup;
 
