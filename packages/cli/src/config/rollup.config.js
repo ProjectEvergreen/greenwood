@@ -8,7 +8,7 @@ const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const path = require('path');
 const postcss = require('postcss');
 const postcssConfig = require('./postcss.config');
-const postcssImport = require('postcss-import-sync');
+const postcssImport = require('postcss-import');
 const postcssRollup = require('rollup-plugin-postcss');
 const { terser } = require('rollup-plugin-terser');
 
@@ -44,12 +44,12 @@ function greenwoodHtmlPlugin(compilation) {
     },
     // TODO do this during load instead?
     async buildStart(options) {
-      const mappedStyles = new Map();
+      const mappedStyles = [];
       const mappedScripts = new Map();
       const that = this;
-      // TODO handle deeper paths. e.g. ../../../å
+      // TODO handle deeper paths. e.g. ../../../
       const parser = new htmlparser2.Parser({
-        async onopentag(name, attribs) {
+        onopentag(name, attribs) {
           if (name === 'script' && attribs.type === 'module' && attribs.src && !mappedScripts.get(attribs.src)) {
             const { src } = attribs;
                       
@@ -59,7 +59,7 @@ function greenwoodHtmlPlugin(compilation) {
 
             const srcPath = src.replace('../', './');
             const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
-
+            
             that.emitFile({
               type: 'chunk',
               id: srcPath,
@@ -70,13 +70,9 @@ function greenwoodHtmlPlugin(compilation) {
             // console.debug('rollup emitFile (chunk)', srcPath);
           }
 
-          if (name === 'link' && attribs.rel === 'stylesheet' && !mappedStyles.get(attribs.href)) {
+          if (name === 'link' && attribs.rel === 'stylesheet' && !mappedStyles[attribs.href]) {
             // console.debug('found a stylesheet!', attribs);
             let { href } = attribs;
-            
-            // TODO avoid using src and set it to the value of rollup fileName
-            // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
-            mappedStyles.set(href, true);
 
             if (href.charAt(0) === '/') {
               href = href.slice(1);
@@ -92,23 +88,21 @@ function greenwoodHtmlPlugin(compilation) {
               .replace('../', '')
               .replace('./', '');
 
-            // TODO postcssConfig.plugins
-            const result = postcss(postcssConfig.plugins)
-              .use(postcssImport())
-              .process(source, { from: filePath });
-
-            that.emitFile({
-              type: 'asset',
-              fileName,
-              name: href,
-              source: result.css
-            });
-                          
             if (!fs.existsSync(path.dirname(to))) {
               fs.mkdirSync(path.dirname(to), {
                 recursive: true
               });
             }
+
+            // TODO avoid using href and set it to the value of rollup fileName instead
+            // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
+            mappedStyles[attribs.href] = {
+              type: 'asset',
+              fileName,
+              name: href,
+              source
+            };
+
           }
         }
       });
@@ -121,6 +115,31 @@ function greenwoodHtmlPlugin(compilation) {
         parser.end();
         parser.reset();
       }
+      
+      // this is a giant work around because PostCSS and some plugins can only be run async
+      // and so have to use with awit but _outside_ sync code, like parser / rollup
+      // https://github.com/cssnano/cssnano/issues/68
+      // https://github.com/postcss/postcss/issues/595
+      // TODO consider similar approach for emitting chunks?
+      return Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
+        const asset = mappedStyles[assetKey];
+        const filePath = path.join(userWorkspace, asset.name);
+        
+        const result = await postcss(postcssConfig.plugins)
+          .use(postcssImport())
+          .process(asset.source, { from: filePath });
+
+        asset.source = result.css;
+
+        return new Promise((resolve, reject) => {
+          try {
+            that.emitFile(asset);
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }));
     },
     generateBundle(outputOptions, bundles) {
       const mappedBundles = new Map();
