@@ -20,6 +20,7 @@
  */
 const expect = require('chai').expect;
 const fs = require('fs');
+const glob = require('glob-promise');
 const path = require('path');
 const { JSDOM } = require('jsdom');
 const TestBed = require('../../../../../test/test-bed');
@@ -48,15 +49,18 @@ describe('Build Greenwood With: ', function() {
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
- 
+
+      it('should generate a single matching CSS file with hashed filename', async function() {
+        expect(await glob.promise(`${path.join(this.context.publicDir, 'styles')}/theme.*.css`)).to.have.lengthOf(1);
+      });
+
       it('should have the expected <link> tag in the <head>', async function() {
         const linkTags = dom.window.document.querySelectorAll('head > link');
         const linkTag = linkTags[0];
 
         expect(linkTags.length).to.equal(1);
         expect(linkTag.rel).to.equal('stylesheet');
-        expect(linkTag.href).to.contain('/styles/theme.');
-        expect(linkTag.href).to.contain('.css');
+        expect((/styles\/theme.[a-z0-9]{8}.css/).test(linkTag.href)).to.be.true;
       });
     });
 
