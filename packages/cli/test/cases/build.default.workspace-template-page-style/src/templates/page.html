@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
+
+  <head>
+    <!-- TODO have to use forward slash / for path references?  translate on the fly in serve.js? -->
+    <link rel="stylesheet" href="/styles/theme.css"></link>  
+  </head>
+
+  <style>
+    .owen-test {
+      color: blue;
+    }
+
+    h3 {
+      color: green;
+    }
+  </style>
+
+  <body>
+    <div class='wrapper'>
+      <div class='page-template content owen-test'>
+        <h3>Hello</h3>
+        <content-outlet></content-outlet>
+      </div>
+    </div>
+  </body>
+
+  <!-- import { html, LitElement } from 'lit-element';
+  import '../styles/theme.css';
+  import css from '../styles/style.css';
+
+  class PageTemplate extends LitElement {
+    render() {
+      return html`
+        <style>
+          ${css}
+        </style>
+        <div class='wrapper'>
+          <div class='page-template content owen-test'>
+            <entry></entry>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  customElements.define('page-template', PageTemplate); -->
+
+</html>
