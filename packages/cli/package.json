@@ -39,6 +39,7 @@
     "markdown-toc": "^1.2.0",
     "node-html-parser": "^1.2.21",
     "puppeteer": "^5.3.0",
+    "rehype-raw": "^5.0.0",
     "rehype-stringify": "^8.0.0",
     "remark-frontmatter": "^2.0.0",
     "remark-parse": "^8.0.3",
