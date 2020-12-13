@@ -6,7 +6,7 @@
  * There are a number of examples in the CLI package you can use as a reference.
  *
  */
-const fs = require('fs-extra');
+const fs = require('fs').promises;
 const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
@@ -44,8 +44,10 @@ module.exports = class TestBed {
 
               await new Promise(async(resolve, reject) => {
                 try {
-                  await fs.ensureDir(targetDir, { recursive: true });
-                  await fs.copy(targetSrc, targetPath);
+                  await fs.mkdir(targetDir, {
+                    recursive: true
+                  });
+                  await fs.copyFile(targetSrc, targetPath);
                   resolve();
                 } catch (err) {
                   reject(err);
@@ -72,11 +74,13 @@ module.exports = class TestBed {
   teardownTestBed() {
     return new Promise(async(resolve, reject) => {
       try {
-        await fs.remove(path.join(this.rootDir, '.greenwood'));
-        await fs.remove(path.join(this.rootDir, 'public'));
+        await fs.rmdir(path.join(this.rootDir, '.greenwood'), { recursive: true });
+        await fs.rmdir(path.join(this.rootDir, 'public'), { recursive: true });
 
         await Promise.all(setupFiles.map((file) => {
-          return fs.remove(path.join(this.rootDir, file.dir.split('/')[0]));
+          const dir = path.join(this.rootDir, file.dir.split('/')[0]);
+
+          return fs.rmdir(dir, { recursive: true });
         }));
         resolve();
       } catch (err) {
