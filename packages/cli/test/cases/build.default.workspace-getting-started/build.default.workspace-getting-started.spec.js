@@ -19,8 +19,10 @@
  *     footer.js
  *     header.js
  *   pages/
- *     first-post.md
- *     second-post.md
+ *     blog/
+ *       first-post.md
+ *       second-post.md
+ *     index.md
  *   styles/
  *     theme.css
  *   templates/
@@ -44,6 +46,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe(LABEL, function() {
+    
     before(async function() {
       await setup.runGreenwoodCommand('build');
     });
@@ -87,7 +90,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output one CSS file', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, './styles/theme.css'))).to.have.lengthOf(1);
+        expect(await glob.promise(`${path.join(this.context.publicDir, 'styles')}/theme.*.css`)).to.have.lengthOf(1);
       });
 
       it('should output two <style> tag in the <head> (one from puppeteer)', async function() {
@@ -164,10 +167,6 @@ describe('Build Greenwood With: ', function() {
         expect(scriptTags.length).to.be.equal(2);
       });
 
-      it('should output one CSS file', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, './styles/theme.css'))).to.have.lengthOf(1);
-      });
-
       it('should output one <style> tag in the <head> (one from puppeteer)', async function() {
         const styleTags = dom.window.document.querySelectorAll('head style');
 
@@ -231,10 +230,6 @@ describe('Build Greenwood With: ', function() {
         const scriptTags = dom.window.document.querySelectorAll('head script');
 
         expect(scriptTags.length).to.be.equal(2);
-      });
-
-      it('should output one CSS file', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, './styles/theme.css'))).to.have.lengthOf(1);
       });
 
       it('should output one <style> tag in the <head> (one from puppeteer)', async function() {
