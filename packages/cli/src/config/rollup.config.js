@@ -1,12 +1,15 @@
+const crypto = require('crypto');
 const fs = require('fs');
-const fsPromises = require('fs').promises;
 // TODO use node-html-parser
 const htmlparser2 = require('htmlparser2');
 const json = require('@rollup/plugin-json');
 const multiInput = require('rollup-plugin-multi-input').default;
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const path = require('path');
-const postcss = require('rollup-plugin-postcss');
+const postcss = require('postcss');
+const postcssConfig = require('./postcss.config');
+const postcssImport = require('postcss-import');
+const postcssRollup = require('rollup-plugin-postcss');
 const { terser } = require('rollup-plugin-terser');
 
 function greenwoodWorkspaceResolver (compilation) {
@@ -30,58 +33,125 @@ function greenwoodWorkspaceResolver (compilation) {
 
 // https://github.com/rollup/rollup/issues/2873
 function greenwoodHtmlPlugin(compilation) {
-  const { userWorkspace } = compilation.context;
+  const { userWorkspace, outputDir } = compilation.context;
 
   return {
     name: 'greenwood-html-plugin',
     load(id) {
-      // console.debug('load id', id);
       if (path.extname(id) === '.html') {
         return '';
       }
     },
     // TODO do this during load instead?
     async buildStart(options) {
-      // TODO dont emit duplicate scripts, e.g. use a Map()
+      const mappedStyles = [];
+      const mappedScripts = new Map();
       const that = this;
+      // TODO handle deeper paths. e.g. ../../../
       const parser = new htmlparser2.Parser({
         onopentag(name, attribs) {
-          if (name === 'script' && attribs.type === 'module' && attribs.src) {
-            // TODO handle deeper paths
-            const srcPath = attribs.src.replace('../', './');
-            const scriptSrc = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
+          if (name === 'script' && attribs.type === 'module' && attribs.src && !mappedScripts.get(attribs.src)) {
+            const { src } = attribs;
+                      
+            // TODO avoid using src and set it to the value of rollup fileName
+            // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
+            mappedScripts.set(src, true);
 
+            const srcPath = src.replace('../', './');
+            const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
+            
             that.emitFile({
               type: 'chunk',
               id: srcPath,
               name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
-              source: scriptSrc
+              source
             });
 
-            // console.debug('emitFile for script => ', srcPath);
+            // console.debug('rollup emitFile (chunk)', srcPath);
+          }
+
+          if (name === 'link' && attribs.rel === 'stylesheet' && !mappedStyles[attribs.href]) {
+            // console.debug('found a stylesheet!', attribs);
+            let { href } = attribs;
+
+            if (href.charAt(0) === '/') {
+              href = href.slice(1);
+            }
+
+            // TODO handle auto expanding deeper paths
+            const filePath = path.join(userWorkspace, href);
+            const source = fs.readFileSync(filePath, 'utf-8');
+            const to = `${outputDir}/${href}`;
+            const hash = crypto.createHash('md5').update(source, 'utf8').digest('hex');
+            const fileName = href
+              .replace('.css', `.${hash.slice(0, 8)}.css`)
+              .replace('../', '')
+              .replace('./', '');
+
+            if (!fs.existsSync(path.dirname(to))) {
+              fs.mkdirSync(path.dirname(to), {
+                recursive: true
+              });
+            }
+
+            // TODO avoid using href and set it to the value of rollup fileName instead
+            // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
+            mappedStyles[attribs.href] = {
+              type: 'asset',
+              fileName,
+              name: href,
+              source
+            };
+
           }
         }
       });
 
       for (const input in options.input) {
         const inputHtml = options.input[input];
-        const html = await fsPromises.readFile(inputHtml, 'utf-8');
+        const html = fs.readFileSync(inputHtml, 'utf-8');
 
         parser.write(html);
         parser.end();
         parser.reset();
       }
-    },
-    async generateBundle(outputOptions, bundles) {
-      const mappedBundles = new Map();
+      
+      // this is a giant work around because PostCSS and some plugins can only be run async
+      // and so have to use with awit but _outside_ sync code, like parser / rollup
+      // https://github.com/cssnano/cssnano/issues/68
+      // https://github.com/postcss/postcss/issues/595
+      // TODO consider similar approach for emitting chunks?
+      return Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
+        const asset = mappedStyles[assetKey];
+        const filePath = path.join(userWorkspace, asset.name);
+        
+        const result = await postcss(postcssConfig.plugins)
+          .use(postcssImport())
+          .process(asset.source, { from: filePath });
 
+        asset.source = result.css;
+
+        return new Promise((resolve, reject) => {
+          try {
+            that.emitFile(asset);
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }));
+    },
+    generateBundle(outputOptions, bundles) {
+      const mappedBundles = new Map();
+      // console.debug('rollup generateBundle bundles', Object.keys(bundles));
+      
       // TODO looping over bundles twice is wildly inneficient, should refactor and safe references once
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
 
         // TODO handle (!) Generated empty chunks .greenwood/about, .greenwood/index
         if (bundle.isEntry && path.extname(bundle.facadeModuleId) === '.html') {
-          const html = await fsPromises.readFile(bundle.facadeModuleId, 'utf-8');
+          const html = fs.readFileSync(bundle.facadeModuleId, 'utf-8');
           let newHtml = html;
 
           const parser = new htmlparser2.Parser({
@@ -99,13 +169,24 @@ function greenwoodHtmlPlugin(compilation) {
                   } else {
                     // console.debug('NO MATCH?????', innerBundleId);
                     // TODO better testing
-                    // TODO magic string
+                    // TODO no magic strings
                     if (innerBundleId.indexOf('.greenwood/') < 0 && !mappedBundles.get(innerBundleId)) {
                       // console.debug('NEW BUNDLE TO INJECT!');
                       newHtml = newHtml.replace(/<script type="module" src="(.*)"><\/script>/, `
                         <script type="module" src="/${innerBundleId}"></script>
                       `);
                       mappedBundles.set(innerBundleId, true);
+                    }
+                  }
+                }
+              }
+
+              if (name === 'link' && attribs.rel === 'stylesheet') {
+                for (const bundleId2 of Object.keys(bundles)) {
+                  if (bundleId2.indexOf('.css') > 0) {
+                    const bundle2 = bundles[bundleId2];
+                    if (attribs.href.indexOf(bundle2.name) >= 0) {
+                      newHtml = newHtml.replace(attribs.href, `/${bundle2.fileName}`);
                     }
                   }
                 }
@@ -117,7 +198,7 @@ function greenwoodHtmlPlugin(compilation) {
           parser.end();
 
           // TODO this seems hacky; hardcoded dirs :D
-          bundle.fileName = bundle.facadeModuleId.replace('.greenwood', './public');
+          bundle.fileName = bundle.facadeModuleId.replace('.greenwood', 'public');
           bundle.code = newHtml;
         }
       }
@@ -132,6 +213,7 @@ module.exports = getRollupConfig = async (compilation) => {
   return [{
     // TODO Avoid .greenwood/ directory, do everything in public/?
     input: `${scratchDir}/**/*.html`,
+    // preserveEntrySignatures: false,
     output: { 
       dir: outputDir,
       entryFileNames: '[name].[hash].js',
@@ -145,34 +227,18 @@ module.exports = getRollupConfig = async (compilation) => {
       }
     },
     plugins: [
-      // ignoreImport({
-      //   include: ['**/*.css'],
-      //   // extensions: ['.css']
-      // }),
       nodeResolve(),
       greenwoodWorkspaceResolver(compilation),
       greenwoodHtmlPlugin(compilation),
       multiInput(),
-      postcss({
+      postcssRollup({
         extract: false,
-        minimize: true
+        minimize: true,
+        inject: false
       }),
-      json(), // TODO bundle as part of import support?
+      json(), // TODO bundle as part of import support / transforms API?
       terser()
     ]
   }];
 
 };
-
-// }, {
-//   input: `${workspaceDirectory}/**/*.css`, // TODO emits a www/styles.js file?
-//   output: { // TODO CSS filename hashing / cache busting - https://github.com/egoist/rollup-plugin-postcss/pull/226
-//     dir: outputDirectory
-//   },
-//   plugins: [
-//     multiInput(),
-//     postcss({
-//       extract: true,
-//       minimize: true
-//     })
-//   ]
