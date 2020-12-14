@@ -85,8 +85,11 @@ module.exports = class TestBed {
         await Promise.all(setupFiles.map((file) => {
           const dir = path.join(this.rootDir, file.dir.split('/')[0]);
 
-          return fs.promises.rmdir(dir, { recursive: true });
+          return fs.existsSync(dir)
+            ? fs.promises.rmdir(dir, { recursive: true })
+            : Promise.resolve();
         }));
+        
         resolve();
       } catch (err) {
         reject(err);
