@@ -6,7 +6,7 @@
  * There are a number of examples in the CLI package you can use as a reference.
  *
  */
-const fs = require('fs').promises;
+const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
@@ -44,10 +44,10 @@ module.exports = class TestBed {
 
               await new Promise(async(resolve, reject) => {
                 try {
-                  await fs.mkdir(targetDir, {
+                  await fs.promises.mkdir(targetDir, {
                     recursive: true
                   });
-                  await fs.copyFile(targetSrc, targetPath);
+                  await fs.promises.copyFile(targetSrc, targetPath);
                   resolve();
                 } catch (err) {
                   reject(err);
@@ -74,13 +74,18 @@ module.exports = class TestBed {
   teardownTestBed() {
     return new Promise(async(resolve, reject) => {
       try {
-        await fs.rmdir(path.join(this.rootDir, '.greenwood'), { recursive: true });
-        await fs.rmdir(path.join(this.rootDir, 'public'), { recursive: true });
+        if (fs.existsSync(this.buildDir)) {
+          await fs.promises.rmdir(this.buildDir, { recursive: true }); 
+        }
+
+        if (fs.existsSync(this.publicDir)) {
+          await fs.promises.rmdir(this.publicDir, { recursive: true }); 
+        }
 
         await Promise.all(setupFiles.map((file) => {
           const dir = path.join(this.rootDir, file.dir.split('/')[0]);
 
-          return fs.rmdir(dir, { recursive: true });
+          return fs.promises.rmdir(dir, { recursive: true });
         }));
         resolve();
       } catch (err) {
