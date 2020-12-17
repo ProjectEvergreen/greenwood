@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const fs = require('fs');
+const fs = require('fs-extra');
 const fm = require('front-matter');
 const toc = require('markdown-toc');
 
