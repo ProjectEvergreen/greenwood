@@ -3,7 +3,7 @@
  * Run Greenwood with default config and nested directories in workspace with lots of nested pages.
  *
  * Result
- * Test for correctly ordered graph.json and pages output, which by default should mimic '
+ * Test for correctly ordered graph.json and pages output, which by default should mimic 
  * the filesystem order by default.
  *
  * Command
