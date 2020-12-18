@@ -60,7 +60,7 @@ module.exports = serializeCompilation = async (compilation) => {
       const serverAddress = `http://127.0.0.1:${port}`;
 
       console.info(`Serializing pages at ${serverAddress}`);
-      console.debug('pages to generate', `\n ${pages.map(page => page.mdFile).join('\n ')}`);
+      console.debug('pages to generate', `\n ${pages.map(page => page.path).join('\n ')}`);
   
       await runBrowser(serverAddress, pages, outputDir);
       
