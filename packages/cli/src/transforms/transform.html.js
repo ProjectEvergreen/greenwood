@@ -33,7 +33,7 @@ class HTMLTransform extends TransformInterface {
         let body = await getAppTemplate(barePath, this.workspace);
         body = await getAppTemplateScripts(body, this.workspace);
         body = getUserScripts(body, this.workspace);
-        body = getMetaContent(url.replace('index.html', ''), this.config, body);
+        body = getMetaContent(url, this.config, body);
 
         resolve({
           body,

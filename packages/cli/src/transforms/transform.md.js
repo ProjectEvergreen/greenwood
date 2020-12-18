@@ -92,7 +92,7 @@ class MDTransform extends TransformInterface {
         let body = await getAppTemplateScripts(contents, workspace);
         body = getUserScripts(body, workspace);
         body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
-        body = getMetaContent(url.replace('index.html', ''), config, body);
+        body = getMetaContent(url, config, body);
         
         resolve({
           body,
