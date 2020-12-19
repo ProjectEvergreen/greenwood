@@ -83,7 +83,7 @@ module.exports = readAndMergeConfig = async() => {
 
         // TODO
         if (plugins && plugins.length > 0) {
-          const types = ['index', 'webpack', 'transform'];
+          const types = ['index', 'webpack', 'transform-pre', 'transform-post'];
 
           plugins.forEach(plugin => {
             if (!plugin.type || types.indexOf(plugin.type) < 0) {

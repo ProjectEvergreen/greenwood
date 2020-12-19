@@ -44,7 +44,7 @@ class TestPostTransform extends TransformInterface {
 module.exports = () => {
   return [
     {
-      type: 'transform',
+      type: 'transform-post',
       provider: (req, compilation) => new TestPostTransform(req, compilation)
     }
   ];

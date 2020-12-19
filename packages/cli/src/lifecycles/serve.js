@@ -41,40 +41,28 @@ function getDevServer(compilation) {
       ];
 
       // walk through all transforms
-      // await Promise.all(defaultTransforms.map(async (plugin) => {
-      //   if (plugin instanceof Transform && plugin.shouldTransform()) {
-
-      //     const transformedResponse = await plugin.applyTransform();
-
-      //     response = { 
-      //       ...transformedResponse
-      //     };
-      //   }
-      // }));
-
-      // const defaultExtensions = [].concat(defaultTransforms.map(transform => transform.getExtensions()));
       let preProcessTransforms = compilation.config.plugins.filter(plugin => {
-        return plugin.type === 'transform';
-      });
-      preProcessTransforms = preProcessTransforms.map(({ provider }) => {
+        return plugin.type === 'transform-pre';
+      }).map(({ provider }) => {
         let plugin = provider(request, compilationCopy);
         if (plugin instanceof Transform) {
           return plugin;
         }
       });
-      // const postProcessTransforms = compilation.config.plugins.filter(plugin => {
-      //   return plugin.type === 'transform'
-      // }).filter(plugin => {
-      //   return defaultExtensions.includes(plugin.getExtension());
-      // });
+      let postProcessTransforms = compilation.config.plugins.filter(plugin => {
+        return plugin.type === 'transform-post';
+      }).map(({ provider }) => {
+        let plugin = provider(request, compilationCopy);
+        if (plugin instanceof Transform) {
+          return plugin;
+        }
+      });
 
       const orderedTransforms = [
         ...preProcessTransforms,
-        ...defaultTransforms
-        // ...postProcessTransforms
+        ...defaultTransforms,
+        ...postProcessTransforms
       ];
-
-      // console.log(orderedTransforms);
 
       let resp = orderedTransforms.reduce(async (promise, plugin) => {
         return promise.then(async(result) => {

@@ -52,7 +52,7 @@ class TestTransform extends TransformInterface {
 module.exports = () => {
   return [
     {
-      type: 'transform',
+      type: 'transform-pre',
       provider: (req, compilation) => new TestTransform(req, compilation)
     }
   ];
