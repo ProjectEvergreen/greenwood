@@ -4,6 +4,8 @@ const path = require('path');
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
+const preProcessHTMLTransformPlugin = require('./packages/plugin-preprocess-html/preprocess.transform');
+const postProcessHTMLTransformPlugin = require('./packages/plugin-postprocess-html/postprocess.transform');
 
 module.exports = {
   workspace: path.join(__dirname, 'www'),
@@ -27,6 +29,10 @@ module.exports = {
   //   }),
   //   ...pluginPolyfills()
   // ],
+  plugins: [
+    ...preProcessHTMLTransformPlugin(),
+    ...postProcessHTMLTransformPlugin()
+  ],
   markdown: {
     plugins: [
       '@mapbox/rehype-prism',

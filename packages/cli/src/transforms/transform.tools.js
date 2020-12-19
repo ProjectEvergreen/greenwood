@@ -5,8 +5,10 @@ const path = require('path');
 const htmlparser = require('node-html-parser');
 const walk = require('acorn-walk');
 
-const getAppTemplate = async (barePath, workspace) => {
-  if (fs.existsSync(`${barePath}.html`)) {
+const getAppTemplate = async (response, barePath, workspace) => {
+  if (response) {
+    contents = response.body;
+  } else if (fs.existsSync(`${barePath}.html`)) {
     // console.debug('this route exists as HTML');
     contents = await fsp.readFile(`${barePath}.html`, 'utf-8');
   } else if (fs.existsSync(`${workspace}/templates/page.html`)) {
@@ -19,7 +21,7 @@ const getAppTemplate = async (barePath, workspace) => {
 };
 
 const getAppTemplateScripts = async (contents, userWorkspace) => {
-  
+
   const appTemplate = `${userWorkspace}/templates/app.html`;
   let appTemplateContents = '';
 

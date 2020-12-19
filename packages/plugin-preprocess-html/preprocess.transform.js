@@ -1,9 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const TransformInterface = require('./transform.interface');
-const { getAppTemplate, getAppTemplateScripts, getUserScripts, getMetaContent } = require('./transform.tools');
+const TransformInterface = require('../cli/src/transforms/transform.interface');
 
-class HTMLTransform extends TransformInterface {
+class TestTransform extends TransformInterface {
 
   constructor(req, compilation) {
     super(req, compilation, {
@@ -22,21 +21,21 @@ class HTMLTransform extends TransformInterface {
       (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index');
   }
 
-  async applyTransform(response) {
-    // do stuff with path
-    let { url } = this.request;
+  async applyTransform() {
     
     return new Promise(async (resolve, reject) => {
       try {
-        // do something with markdown or html
-        const barePath = url[url.length - 1] === '/'
-          ? `${this.workspace}/pages${url}index`
-          : `${this.workspace}/pages${url.replace('.html', '')}`;
-        
-        let body = await getAppTemplate(response, barePath, this.workspace);
-        body = await getAppTemplateScripts(body, this.workspace);
-        body = getUserScripts(body, this.workspace);
-        body = getMetaContent(url, this.config, body);
+
+        let body = `
+        <html>
+          <head>
+            <title>test</title>
+            <meta-outlet></meta-outlet>
+          </head>
+          <body>
+            <h1>test pre process plugin</h1>
+          </body>
+        </html>`;
 
         resolve({
           body,
@@ -50,4 +49,11 @@ class HTMLTransform extends TransformInterface {
   }
 }
 
-module.exports = HTMLTransform;
+module.exports = () => {
+  return [
+    {
+      type: 'transform',
+      provider: (req, compilation) => new TestTransform(req, compilation)
+    }
+  ];
+};

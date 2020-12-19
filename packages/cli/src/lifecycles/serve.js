@@ -24,7 +24,7 @@ function getDevServer(compilation) {
 
     request = {
       header: ctx.request.header,
-      url: ctx.request.url,
+      url: ctx.request.url
     };
 
     let compilationCopy = { ...compilation };
@@ -33,7 +33,11 @@ function getDevServer(compilation) {
       // default transforms 
       const defaultTransforms = [
         new HTMLTransform(request, compilationCopy),
-        new CSSTransform(request, compilationCopy)
+        new CSSTransform(request, compilationCopy),
+        new MarkdownTransform(request, compilationCopy),
+        new JSTransform(request, compilationCopy),
+        new JSONTransform(request, compilationCopy),
+        new AssetTransform(request, compilationCopy)
       ];
 
       // walk through all transforms
@@ -49,11 +53,15 @@ function getDevServer(compilation) {
       // }));
 
       // const defaultExtensions = [].concat(defaultTransforms.map(transform => transform.getExtensions()));
-      // const preProcessTransforms = compilation.config.plugins.filter(plugin => {
-      //   return plugin.type === 'transform'
-      // }).filter(plugin => {
-      //   !defaultExtensions.includes(plugin.getExtension());
-      // });
+      let preProcessTransforms = compilation.config.plugins.filter(plugin => {
+        return plugin.type === 'transform';
+      });
+      preProcessTransforms = preProcessTransforms.map(({ provider }) => {
+        let plugin = provider(request, compilationCopy);
+        if (plugin instanceof Transform) {
+          return plugin;
+        }
+      });
       // const postProcessTransforms = compilation.config.plugins.filter(plugin => {
       //   return plugin.type === 'transform'
       // }).filter(plugin => {
@@ -61,12 +69,14 @@ function getDevServer(compilation) {
       // });
 
       const orderedTransforms = [
-        // ...preProcessTransforms,
-        ...defaultTransforms,
+        ...preProcessTransforms,
+        ...defaultTransforms
         // ...postProcessTransforms
-      ]
+      ];
 
-      let resp = defaultTransforms.reduce(async (promise, plugin) => {
+      // console.log(orderedTransforms);
+
+      let resp = orderedTransforms.reduce(async (promise, plugin) => {
         return promise.then(async(result) => {
           if (plugin instanceof Transform && plugin.shouldTransform()) {
             const transformedResponse = await plugin.applyTransform(result);
@@ -76,11 +86,13 @@ function getDevServer(compilation) {
               ...transformedResponse
             };
           }
-        })
+          return response = {
+            ...response
+          };
+        });
       }, Promise.resolve());
 
-      response = await resp;
-      console.log('response', response);
+      response = { ...await resp };
 
       ctx.set('Content-Type', `${response.contentType}`);
       ctx.body = response.body;
