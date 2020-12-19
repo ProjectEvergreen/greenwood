@@ -5,8 +5,11 @@ const { getAppTemplate, getAppTemplateScripts, getUserScripts, getMetaContent } 
 
 class HTMLTransform extends TransformInterface {
 
-  constructor(req) {
-    super(req, ['.html'], 'text/html');
+  constructor(req, compilation) {
+    super(req, compilation, {
+      extensions: ['.html'], 
+      constentType: 'text/html'
+    });
   }
 
   shouldTransform() {
@@ -19,12 +22,13 @@ class HTMLTransform extends TransformInterface {
       (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index');
   }
 
-  async applyTransform() {
+  async applyTransform(response) {
     // do stuff with path
     let { url } = this.request;
-
+    
     return new Promise(async (resolve, reject) => {
       try {
+        console.log(response);
         // do something with markdown or html
         const barePath = url[url.length - 1] === '/'
           ? `${this.workspace}/pages${url}index`

@@ -4,8 +4,10 @@ const TransformInterface = require('./transform.interface');
 
 class TransformJSON extends TransformInterface {
 
-  constructor(req) {
-    super(req, ['.json']);
+  constructor(req, compilation) {
+    super(req, compilation, {
+      extensions: ['.json']
+    });
   }
 
   async applyTransform() {

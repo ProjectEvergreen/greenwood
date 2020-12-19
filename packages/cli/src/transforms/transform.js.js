@@ -4,8 +4,11 @@ const TransformInterface = require('./transform.interface');
 
 class JSTransform extends TransformInterface {
 
-  constructor(req) {
-    super(req, ['.js'], 'text/javascript');
+  constructor(req, compilation) {
+    super(req, compilation, { 
+      extensions: ['.js'], 
+      contentType: ['text/javascript']
+    });
   }
 
   shouldTransform() {

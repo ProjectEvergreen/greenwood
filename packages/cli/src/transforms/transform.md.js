@@ -13,8 +13,10 @@ const { getAppTemplateScripts, getUserScripts, getMetaContent } = require('./tra
 
 class MDTransform extends TransformInterface {
 
-  constructor(req) {
-    super(req, ['.md']);
+  constructor(req, compilation) {
+    super(req, compilation, {
+      extensions: ['.md']
+    });
   }
 
   shouldTransform() {

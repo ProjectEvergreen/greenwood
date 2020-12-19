@@ -25,31 +25,62 @@ function getDevServer(compilation) {
     request = {
       header: ctx.request.header,
       url: ctx.request.url,
-      compilation: { ...compilation }
     };
+
+    let compilationCopy = { ...compilation };
 
     try {
       // default transforms 
       const defaultTransforms = [
-        new HTMLTransform(request),
-        new MarkdownTransform(request),
-        new CSSTransform(request),
-        new JSTransform(request),
-        new JSONTransform(request),
-        new AssetTransform(request)
+        new HTMLTransform(request, compilationCopy),
+        new CSSTransform(request, compilationCopy)
       ];
 
       // walk through all transforms
-      await Promise.all(defaultTransforms.map(async (plugin) => {
-        if (plugin instanceof Transform && plugin.shouldTransform()) {
+      // await Promise.all(defaultTransforms.map(async (plugin) => {
+      //   if (plugin instanceof Transform && plugin.shouldTransform()) {
 
-          const transformedResponse = await plugin.applyTransform();
+      //     const transformedResponse = await plugin.applyTransform();
 
-          response = { 
-            ...transformedResponse
-          };
-        }
-      }));
+      //     response = { 
+      //       ...transformedResponse
+      //     };
+      //   }
+      // }));
+
+      // const defaultExtensions = [].concat(defaultTransforms.map(transform => transform.getExtensions()));
+      // const preProcessTransforms = compilation.config.plugins.filter(plugin => {
+      //   return plugin.type === 'transform'
+      // }).filter(plugin => {
+      //   !defaultExtensions.includes(plugin.getExtension());
+      // });
+      // const postProcessTransforms = compilation.config.plugins.filter(plugin => {
+      //   return plugin.type === 'transform'
+      // }).filter(plugin => {
+      //   return defaultExtensions.includes(plugin.getExtension());
+      // });
+
+      const orderedTransforms = [
+        // ...preProcessTransforms,
+        ...defaultTransforms,
+        // ...postProcessTransforms
+      ]
+
+      let resp = defaultTransforms.reduce(async (promise, plugin) => {
+        return promise.then(async(result) => {
+          if (plugin instanceof Transform && plugin.shouldTransform()) {
+            const transformedResponse = await plugin.applyTransform(result);
+  
+            return response = {
+              ...response, 
+              ...transformedResponse
+            };
+          }
+        })
+      }, Promise.resolve());
+
+      response = await resp;
+      console.log('response', response);
 
       ctx.set('Content-Type', `${response.contentType}`);
       ctx.body = response.body;
