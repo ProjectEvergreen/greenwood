@@ -6,7 +6,7 @@ const htmlparser = require('node-html-parser');
 const walk = require('acorn-walk');
 
 const getAppTemplate = async (response, barePath, workspace) => {
-  if (response) {
+  if (response && response.body) {
     contents = response.body;
   } else if (fs.existsSync(`${barePath}.html`)) {
     // console.debug('this route exists as HTML');

@@ -18,7 +18,7 @@ class TestTransform extends TransformInterface {
       : `${this.workspace}/pages${url.replace('.html', '')}`;
       
     return (this.extensions.indexOf(path.extname(url)) >= 0 || path.extname(url) === '') && 
-      (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index');
+      (fs.existsSync(`${barePath}.html`) && url.endsWith('transform-example.html'));
   }
 
   async applyTransform() {
