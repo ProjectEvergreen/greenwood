@@ -17,7 +17,7 @@ class JSTransform extends TransformInterface {
     return this.extensions.indexOf(path.extname(url)) >= 0 && url.indexOf('.json') < 0;
   }
 
-  async applyTransform() {
+  async applyTransform(response) {
     return new Promise(async (resolve, reject) => {
       try {
         const { url } = this.request;
@@ -25,7 +25,8 @@ class JSTransform extends TransformInterface {
           ? path.join(process.cwd(), url)
           : path.join(this.workspace, this.request.url);
 
-        const body = await fsp.readFile(jsPath, 'utf-8');
+        const body = response.body || await fsp.readFile(jsPath, 'utf-8');
+        
         resolve({
           body,
           contentType: this.contentType,

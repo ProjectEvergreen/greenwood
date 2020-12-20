@@ -6,6 +6,7 @@ const META_DESCRIPTION = 'A modern and performant static site generator supporti
 const FAVICON_HREF = '/assets/favicon.ico';
 const preProcessHTMLTransformPlugin = require('./packages/plugin-preprocess-html/preprocess.transform');
 const postProcessHTMLTransformPlugin = require('./packages/plugin-postprocess-html/postprocess.transform');
+const SassTransformPlugin = require('./packages/plugin-sass/plugin-sass.transform');
 
 module.exports = {
   workspace: path.join(__dirname, 'www'),
@@ -30,6 +31,7 @@ module.exports = {
   //   ...pluginPolyfills()
   // ],
   plugins: [
+    ...SassTransformPlugin(),
     ...preProcessHTMLTransformPlugin(),
     ...postProcessHTMLTransformPlugin()
   ],

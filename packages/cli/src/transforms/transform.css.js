@@ -6,12 +6,12 @@ class CSSTransform extends TransformInterface {
 
   constructor(req, compilation) {
     super(req, compilation, {
-      extensions: ['.css'], 
+      extensions: ['.css', '.scss'], 
       contentType: 'text/css'
     });
   }
 
-  async applyTransform() {
+  async applyTransform(response) {
     // do stuff with path
     return new Promise(async (resolve, reject) => {
       try {
@@ -21,7 +21,7 @@ class CSSTransform extends TransformInterface {
           ? path.join(process.cwd(), url)
           : path.join(this.workspace, url);
         
-        const css = await fsp.readFile(cssPath, 'utf-8');
+        let css = response.body || await fsp.readFile(cssPath, 'utf-8');
         let body = '', contentType = '';
 
         // <style> tag used
@@ -38,7 +38,7 @@ class CSSTransform extends TransformInterface {
         resolve({
           body,
           contentType,
-          extension: this.extentsions
+          extension: this.extensions
         });
       } catch (e) {
         reject(e);

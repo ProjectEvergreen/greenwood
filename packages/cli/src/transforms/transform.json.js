@@ -10,7 +10,7 @@ class TransformJSON extends TransformInterface {
     });
   }
 
-  async applyTransform() {
+  async applyTransform(response) {
     return new Promise(async (resolve, reject) => {
       try {
 
@@ -21,12 +21,12 @@ class TransformJSON extends TransformInterface {
         const { url } = this.request;
 
         if (url.indexOf('graph.json') >= 0) {
-          const json = await fsp.readFile(path.join(this.scratchDir, 'graph.json'), 'utf-8');
+          const json = response.body || await fsp.readFile(path.join(this.scratchDir, 'graph.json'), 'utf-8');
 
           contentType = 'application/json';
           body = JSON.parse(json);
         } else {
-          const json = await fsp.readFile(path.join(this.workspace, url), 'utf-8');
+          const json = response.body || await fsp.readFile(path.join(this.workspace, url), 'utf-8');
 
           contentType = 'text/javascript';
           body = `export default ${json}`;
