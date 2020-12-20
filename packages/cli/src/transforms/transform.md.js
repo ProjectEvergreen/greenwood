@@ -5,6 +5,7 @@ const frontmatter = require('front-matter');
 const remarkFrontmatter = require('remark-frontmatter');
 const rehypeStringify = require('rehype-stringify');
 const remarkParse = require('remark-parse');
+const rehypeRaw = require('rehype-raw');
 const remarkRehype = require('remark-rehype');
 const unified = require('unified');
 
@@ -69,6 +70,7 @@ class MDTransform extends TransformInterface {
           .use(remarkFrontmatter) // extract frontmatter from AST
           .use(...remarkPlugins) // apply userland remark plugins
           .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
+          .use(rehypeRaw) // support mixed HTML in markdown
           .use(...rehypePlugins) // apply userland rehype plugins
           .use(rehypeStringify) // convert AST to HTML string
           .process(markdownContents);
