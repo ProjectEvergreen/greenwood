@@ -16,7 +16,6 @@ class SassTransform extends TransformInterface {
     
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('SASS FOUND!');
         const { url } = this.request;
         const cssPath = url.indexOf('/node_modules') >= 0
           ? path.join(process.cwd(), url)
@@ -24,7 +23,8 @@ class SassTransform extends TransformInterface {
         
         let css = await fsp.readFile(cssPath, 'utf-8');
         const result = sass.renderSync({
-          data: css
+          data: css,
+          includePaths: [this.workspace]
         });
 
         css = result.css.toString();

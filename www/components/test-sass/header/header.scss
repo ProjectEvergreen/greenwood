@@ -1,8 +1,4 @@
-$head-text-color: white;
-$head-background-color: #192a27;
-$head-min-height: 30px;
-$head-link-size: 1.2rem;
-$head-padding: 10px;
+@import './components/test-sass/header/vars.scss';
 
 :host .header {
   background-color: $head-background-color;
