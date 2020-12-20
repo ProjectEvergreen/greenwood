@@ -30,7 +30,7 @@ class MDTransform extends TransformInterface {
     return fs.existsSync(`${barePath}.md`) || fs.existsSync(`${barePath.replace('/index', '.md')}`);
   }
 
-  async applyTransform(response) {
+  async applyTransform() {
     const { workspace, request } = this;
     const { url } = request;
     const config = { ...this.config }; 
@@ -50,7 +50,7 @@ class MDTransform extends TransformInterface {
           : fs.existsSync(`${barePath.replace('/index', '.md')}`)
             ? `${barePath.replace('/index', '.md')}`
             : `${workspace}/pages${url.replace('/index.html', '.md')}`;
-        const markdownContents = response.body || await fsp.readFile(markdownPath, 'utf-8');
+        const markdownContents = await fsp.readFile(markdownPath, 'utf-8');
         const rehypePlugins = [];
         const remarkPlugins = [];
 
