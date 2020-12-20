@@ -10,12 +10,11 @@ let defaultConfig = {
     port: 1984,
     host: 'localhost'
   },
-  // optimization: 'spa',
+  // TODO optimization: 'spa',
   publicPath: '/',
   title: 'My App',
   meta: [],
   plugins: [],
-  // TODO themeFile: 'theme.css',
   markdown: { plugins: [], settings: {} }
 };
 
@@ -99,13 +98,6 @@ module.exports = readAndMergeConfig = async() => {
         //   });
 
         //   customConfig.plugins = customConfig.plugins.concat(plugins);
-        // }
-
-        // if (themeFile) {
-        //   if (typeof themeFile !== 'string' && themeFile.indexOf('.') < 1) {
-        //     reject(`Error: greenwood.config.js themeFile must be a valid filename. got ${themeFile} instead.`);
-        //   }
-        //   customConfig.themeFile = themeFile;
         // }
 
         if (devServer && Object.keys(devServer).length > 0) {
