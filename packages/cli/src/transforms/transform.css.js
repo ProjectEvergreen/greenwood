@@ -6,7 +6,7 @@ class CSSTransform extends TransformInterface {
 
   constructor(req, compilation) {
     super(req, compilation, {
-      extensions: ['.css', '.scss'], 
+      extensions: ['.css'], 
       contentType: 'text/css'
     });
   }
