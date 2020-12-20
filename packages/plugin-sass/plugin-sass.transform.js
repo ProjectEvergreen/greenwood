@@ -8,7 +8,7 @@ class SassTransform extends TransformInterface {
   constructor(req, compilation) {
     super(req, compilation, {
       extensions: ['.scss'], 
-      constentType: 'text/css'
+      contentType: 'text/css'
     });
   }
 
@@ -16,8 +16,7 @@ class SassTransform extends TransformInterface {
     
     return new Promise(async (resolve, reject) => {
       try {
-        const { url, header } = this.request;
-        const destHeader = header['sec-fetch-dest'];
+        const { url } = this.request;
         const cssPath = url.indexOf('/node_modules') >= 0
           ? path.join(process.cwd(), url)
           : path.join(this.workspace, url);
@@ -27,23 +26,12 @@ class SassTransform extends TransformInterface {
           data: css,
           includePaths: [this.workspace]
         });
-        let body = '', contentType = '';
-        css = result.css.toString();
 
-        // <style> tag used
-        if (destHeader === 'style') {
-          contentType = 'text/css';
-          body = css;
-        } else if (destHeader === 'empty') {
-          // assume JS import being being used
-          contentType = 'text/javascript';
-          // TODO line breaks are bad for fetch, need to return CSS string all on one line
-          body = `const css = "${css.replace(/\r?\n|\r/g, ' ')}";\nexport default css;`;
-        }
+        css = result.css.toString();
         
         resolve({
-          body,
-          contentType,
+          body: css,
+          contentType: this.contentType,
           extension: this.extensions
         });
       } catch (e) {

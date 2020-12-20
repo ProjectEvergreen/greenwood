@@ -11,6 +11,10 @@ class CSSTransform extends TransformInterface {
     });
   }
 
+  shouldTransform(response) {
+    return this.extensions.indexOf(path.extname(this.request.url)) >= 0 || response.contentType === this.contentType;
+  }
+
   async applyTransform(response) {
     // do stuff with path
     return new Promise(async (resolve, reject) => {

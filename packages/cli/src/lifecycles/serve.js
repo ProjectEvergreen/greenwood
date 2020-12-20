@@ -66,7 +66,7 @@ function getDevServer(compilation) {
 
       let resp = orderedTransforms.reduce(async (promise, plugin) => {
         return promise.then(async(result) => {
-          if (plugin instanceof Transform && plugin.shouldTransform()) {
+          if (plugin instanceof Transform && plugin.shouldTransform(result)) {
             const transformedResponse = await plugin.applyTransform(result);
   
             return response = {
