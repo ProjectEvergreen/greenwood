@@ -29,7 +29,7 @@ class HeaderComponent extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
-
+    
     fetch('/graph.json')
       .then(res => res.json())
       .then(data => {
