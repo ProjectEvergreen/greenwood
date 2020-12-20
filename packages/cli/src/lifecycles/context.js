@@ -1,4 +1,4 @@
-const fs = require('fs-extra');
+const fs = require('fs');
 const path = require('path');
 // const defaultTemplatesDir = path.join(__dirname, '../templates/');
 // const defaultConfigDir = path.join(__dirname, '../config');
@@ -81,8 +81,10 @@ module.exports = initContexts = async({ config }) => {
         scratchDir
       };
 
-      if (!await fs.ensureDir(scratchDir)) {
-        await fs.mkdirs(scratchDir);
+      if (!fs.existsSync(scratchDir)) {
+        fs.mkdirSync(scratchDir, {
+          recursive: true
+        });
       }
       
       resolve(context);

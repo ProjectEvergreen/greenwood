@@ -1,7 +1,7 @@
 const { ApolloClient } = require('apollo-client');
 const createHttpLink = require('apollo-link-http').createHttpLink;
 const fetch = require('node-fetch');
-const fs = require('fs-extra');
+const fs = require('fs');
 const { gql } = require('apollo-server');
 const InMemoryCache = require('apollo-cache-inmemory').InMemoryCache;
 const path = require('path');
