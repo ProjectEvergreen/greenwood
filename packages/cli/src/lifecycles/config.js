@@ -1,4 +1,4 @@
-const fs = require('fs-extra');
+const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
@@ -25,7 +25,7 @@ module.exports = readAndMergeConfig = async() => {
       // deep clone of default config
       let customConfig = Object.assign({}, defaultConfig);
       
-      if (await fs.exists(path.join(process.cwd(), 'greenwood.config.js'))) {
+      if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
         const { workspace, devServer, publicPath, title, markdown, meta } = userCfgFile;
 
@@ -45,7 +45,7 @@ module.exports = readAndMergeConfig = async() => {
             customConfig.workspace = workspace;
           }
 
-          if (!await fs.exists(customConfig.workspace)) {
+          if (!fs.existsSync(customConfig.workspace)) {
             reject('Error: greenwood.config.js workspace doesn\'t exist! \n' +
               'common issues to check might be: \n' +
               '- typo in your workspace directory name, or in greenwood.config.js \n' +

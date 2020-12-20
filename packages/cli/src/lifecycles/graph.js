@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-const fs = require('fs-extra');
-const { promises: fsp } = require('fs');
+const fs = require('fs');
 const crypto = require('crypto'); // TODO pretty heavy just for some hashing?
 const path = require('path');
 const fm = require('front-matter');
@@ -14,8 +13,8 @@ const createGraphFromPages = async (pagesDir, config) => {
       const pagesIndexMap = new Map();
       let pagesIndex = 0;
 
-      const walkDirectory = async(directory) => {
-        let files = await fs.readdir(directory);
+      const walkDirectory = async (directory) => {
+        let files = await fs.promises.readdir(directory);
 
         return Promise.all(files.map((file) => {
           const filenameHash = crypto.createHash('md5').update(`${directory}/${file}`).digest('hex');
@@ -34,7 +33,7 @@ const createGraphFromPages = async (pagesDir, config) => {
             try {
 
               if (isMdFile && !stats.isDirectory()) {
-                const fileContents = await fs.readFile(filePath, 'utf8');
+                const fileContents = await fs.promises.readFile(filePath, 'utf8');
                 const { attributes } = fm(fileContents);
                 let { label, template, title } = attributes;
                 let { meta } = config;
@@ -221,11 +220,7 @@ module.exports = generateGraph = async (compilation) => {
 
       compilation.graph = await createGraphFromPages(context.pagesDir, config);
 
-      if (!fs.existsSync(context.scratchDir)) {
-        await fsp.mkdir(context.scratchDir);
-      }
-      
-      await fsp.writeFile(`${path.join(process.cwd(), '.greenwood')}/graph.json`, JSON.stringify(compilation.graph));
+      await fs.promises.writeFile(`${path.join(process.cwd(), '.greenwood')}/graph.json`, JSON.stringify(compilation.graph));
 
       resolve(compilation);
     } catch (err) {

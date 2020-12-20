@@ -8,7 +8,7 @@
  * User Command
  * greenwood eject
  */
-const fs = require('fs-extra');
+const fs = require('fs');
 const path = require('path');
 const expect = require('chai').expect;
 const TestBed = require('../../../../../test/test-bed');
@@ -58,7 +58,7 @@ xdescribe('Eject Greenwood With: ', function() {
 
       configFiles.forEach(file => {
         if (file !== 'eject.default.spec.js' && file !== 'node_modules') {
-          fs.remove(path.join(__dirname, file));
+          fs.rmdirSync(path.join(__dirname, file));
         }
       });
     });
@@ -116,7 +116,7 @@ xdescribe('Eject Greenwood With: ', function() {
 
       configFiles.forEach(file => {
         if (file !== 'eject.default.spec.js' && file !== 'node_modules') {
-          fs.remove(path.join(__dirname, file));
+          fs.rmdirSync(path.join(__dirname, file));
         }
       });
     });
@@ -140,7 +140,7 @@ xdescribe('Eject Greenwood With: ', function() {
 
     configFiles.forEach(file => {
       if (file !== 'eject.default.spec.js') {
-        fs.remove(path.join(__dirname, file));
+        fs.rmdirSync(path.join(__dirname, file));
       }
     });
   });
