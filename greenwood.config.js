@@ -34,8 +34,8 @@ module.exports = {
   plugins: [
     ...tsTransformPlugin(),
     ...sassTransformPlugin(),
-    ...preProcessHTMLTransformPlugin(),
-    ...postProcessHTMLTransformPlugin()
+    // ...preProcessHTMLTransformPlugin(),
+    // ...postProcessHTMLTransformPlugin()
   ],
   markdown: {
     plugins: [
