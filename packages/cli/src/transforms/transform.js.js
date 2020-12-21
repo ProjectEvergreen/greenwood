@@ -25,10 +25,7 @@ class JSTransform extends TransformInterface {
         const jsPath = url.indexOf('/node_modules') >= 0
           ? path.join(process.cwd(), url)
           : path.join(this.workspace, this.request.url);
-
-          if(response.body) {
-            console.log(response);
-          }
+        
         const body = response.body || await fsp.readFile(jsPath, 'utf-8');
         
         resolve({
