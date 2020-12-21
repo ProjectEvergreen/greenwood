@@ -4,8 +4,8 @@ const path = require('path');
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
-const preProcessHTMLTransformPlugin = require('./packages/plugin-preprocess-html/src/index');
-const postProcessHTMLTransformPlugin = require('./packages/plugin-postprocess-html/src/index');
+// const preProcessHTMLTransformPlugin = require('./packages/plugin-preprocess-html/src/index');
+// const postProcessHTMLTransformPlugin = require('./packages/plugin-postprocess-html/src/index');
 const sassTransformPlugin = require('./packages/plugin-sass/src/index');
 const tsTransformPlugin = require('./packages/plugin-typescript/src/index');
 
@@ -33,7 +33,7 @@ module.exports = {
   // ],
   plugins: [
     ...tsTransformPlugin(),
-    ...sassTransformPlugin(),
+    ...sassTransformPlugin()
     // ...preProcessHTMLTransformPlugin(),
     // ...postProcessHTMLTransformPlugin()
   ],
