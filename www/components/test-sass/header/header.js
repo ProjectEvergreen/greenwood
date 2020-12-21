@@ -5,6 +5,7 @@ import '@evergreen-wc/eve-container';
 import headerCss from './header.scss';
 // TODO import evergreenLogo from '../../assets/evergreen.svg';
 import '../../social-icons/social-icons.js';
+import testTS from './testTS.ts';
 
 class HeaderComponent extends LitElement {
 
@@ -29,7 +30,7 @@ class HeaderComponent extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
-
+    testTS();
     fetch('/graph.json')
       .then(res => res.json())
       .then(data => {

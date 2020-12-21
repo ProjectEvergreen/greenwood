@@ -8,12 +8,12 @@ class TSTransform extends TransformInterface {
   constructor(req, compilation) {
     super(req, compilation, { 
       extensions: ['.ts'], 
-      contentType: ['text/javascript']
+      contentType: 'text/javascript'
     });
   }
 
   async applyTransform(response) {
-    console.log('TS FOUND');
+    // console.log('TS FOUND');
     return new Promise(async (resolve, reject) => {
       try {
         const { url } = this.request;
@@ -22,12 +22,10 @@ class TSTransform extends TransformInterface {
           : path.join(this.workspace, this.request.url);
 
         const result = response && response.body || await fsp.readFile(jsPath, 'utf-8');
-        
-        const body = ts.transpileModule(result, { compilerOptions: { module: ts.ModuleKind.AMD } }).outputText;
+        const body = ts.transpileModule(result, { compilerOptions: { module: 'es6' } }).outputText;
 
-        console.log(body);
         resolve({
-          body,
+          body: body,
           contentType: this.contentType,
           extension: this.extensions
         });

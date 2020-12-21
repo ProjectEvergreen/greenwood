@@ -7,14 +7,15 @@ class JSTransform extends TransformInterface {
   constructor(req, compilation) {
     super(req, compilation, { 
       extensions: ['.js'], 
-      contentType: ['text/javascript']
+      contentType: 'text/javascript'
     });
   }
 
-  shouldTransform() {
+  shouldTransform(response) {
     const { url } = this.request;
 
-    return this.extensions.indexOf(path.extname(url)) >= 0 && url.indexOf('.json') < 0;
+    return (this.extensions.indexOf(path.extname(url)) >= 0 && url.indexOf('.json') < 0) || 
+    response.contentType === this.contentType;
   }
 
   async applyTransform(response) {
@@ -25,6 +26,9 @@ class JSTransform extends TransformInterface {
           ? path.join(process.cwd(), url)
           : path.join(this.workspace, this.request.url);
 
+          if(response.body) {
+            console.log(response);
+          }
         const body = response.body || await fsp.readFile(jsPath, 'utf-8');
         
         resolve({
