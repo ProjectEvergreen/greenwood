@@ -1,0 +1,31 @@
+{
+  "name": "@greenwood/plugin-preprocess-html",
+  "version": "0.10.0-alpha.0",
+  "description": "A pre-transform HTML plugin for Greenwood.",
+  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-preprocess-html",
+  "author": "Grant Hutchinson <grant@hutchdev.ca>",
+  "license": "MIT",
+  "keywords": [
+    "Greenwood",
+    "Web Components",
+    "Lit Element",
+    "Lit Html",
+    "Static Site Generator",
+    "plugin",
+    "preprocess",
+    "html"
+  ],
+  "main": "src/index.js",
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@greenwood/cli": "^0.4.0"
+  },
+  "devDependencies": {
+    "@greenwood/cli": "^0.10.0-alpha.0"
+  }
+}

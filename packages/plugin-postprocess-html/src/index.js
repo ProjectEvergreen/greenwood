@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const TransformInterface = require('../cli/src/transforms/transform.interface');
+const TransformInterface = require('@greenwood/cli/src/transforms/transform.interface');
 
-class TestTransform extends TransformInterface {
+class TestPostTransform extends TransformInterface {
 
   constructor(req, compilation) {
     super(req, compilation, {
@@ -18,24 +18,14 @@ class TestTransform extends TransformInterface {
       : `${this.workspace}/pages${url.replace('.html', '')}`;
       
     return (this.extensions.indexOf(path.extname(url)) >= 0 || path.extname(url) === '') && 
-      (fs.existsSync(`${barePath}.html`) && url.endsWith('transform-example.html'));
+      fs.existsSync(`${barePath}.html`);
   }
 
-  async applyTransform() {
+  async applyTransform(response) {
     
     return new Promise(async (resolve, reject) => {
       try {
-
-        let body = `
-        <html>
-          <head>
-            <title>test</title>
-            <meta-outlet></meta-outlet>
-          </head>
-          <body>
-            <h1>test pre process plugin</h1>
-          </body>
-        </html>`;
+        let body = response.body.replace(/<\/h1>/, ' post process plugin </h1>\n');
 
         resolve({
           body,
@@ -52,8 +42,8 @@ class TestTransform extends TransformInterface {
 module.exports = () => {
   return [
     {
-      type: 'transform-pre',
-      provider: (req, compilation) => new TestTransform(req, compilation)
+      type: 'transform-post',
+      provider: (req, compilation) => new TestPostTransform(req, compilation)
     }
   ];
 };

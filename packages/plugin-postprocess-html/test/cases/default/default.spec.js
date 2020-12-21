@@ -1,19 +1,19 @@
 /*
  * Use Case
- * Run Greenwood with Sass transform plugin with default options.
+ * Run Greenwood with post-process html transform plugin with default options.
  *
  * Uaer Result
- * Should generate a bare bones Greenwood build with sass injected into header component within index.html.
+ * Should generate a bare bones Greenwood build with html injected before default html transform within index.html.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * const sassPlugin = require('@greenwood/plugin-sass');
+ * const postProcessHTMLTransformPlugin = require('@greenwood/plugin-postprocess-html');
  *
  * {
  *   plugins: [{
- *     ...sassPlugin()
+ *     ...postProcessHTMLTransformPlugin()
  *  }]
  *
  * }
@@ -26,8 +26,8 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Sass Plugin with default options and Default Workspace';
+describe.only('Build Greenwood With: ', function() {
+  const LABEL = 'Post-Process HTML Plugin with default options and Default Workspace';
 
   let setup;
 
@@ -41,17 +41,17 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    describe('header component class', function() {
+    describe('body', function() {
       let dom;
 
       beforeEach(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
-      it('should contain the correct background color compiled from scss file', function() {
-        const header = dom.window.document.querySelector('eve-header > style');
-        const compiledStyle = '\n      .header {   background-color: red;   width: 100vw;   height: 100vh; } \n      ';
-        expect(header.innerHTML).to.be.equal(compiledStyle);
+      it('should contain the postprocess injected html', function() {
+        const header = dom.window.document.querySelector('h1');
+
+        expect(header.textContent).to.be.equal('test post process plugin ');
       });
 
     });

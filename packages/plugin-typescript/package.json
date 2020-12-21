@@ -1,0 +1,32 @@
+{
+  "name": "@greenwood/plugin-typescript",
+  "version": "0.10.0-alpha.0",
+  "description": "A transforms plugin for Greenwood for adding typescript support.",
+  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-typescript",
+  "author": "Grant Hutchinson <grant@hutchdev.ca>",
+  "license": "MIT",
+  "keywords": [
+    "Greenwood",
+    "Web Components",
+    "Lit Element",
+    "Lit Html",
+    "Static Site Generator",
+    "typescript"
+  ],
+  "main": "src/index.js",
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@greenwood/cli": "^0.4.0"
+  },
+  "dependencies": {
+    "typescript": "^4.1.3"
+  },
+  "devDependencies": {
+    "@greenwood/cli": "^0.10.0-alpha.0"
+  }
+}

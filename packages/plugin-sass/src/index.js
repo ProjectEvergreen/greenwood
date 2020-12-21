@@ -1,6 +1,6 @@
 const path = require('path');
 const { promises: fsp } = require('fs');
-const TransformInterface = require('../../cli/src/transforms/transform.interface');
+const TransformInterface = require('@greenwood/cli/src/transforms/transform.interface');
 const sass = require('node-sass');
 
 class SassTransform extends TransformInterface {

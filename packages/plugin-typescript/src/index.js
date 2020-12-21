@@ -1,6 +1,6 @@
 const path = require('path');
 const { promises: fsp } = require('fs');
-const TransformInterface = require('../cli/src/transforms/transform.interface');
+const TransformInterface = require('../../cli/src/transforms/transform.interface');
 const ts = require('typescript');
 
 class TSTransform extends TransformInterface {
@@ -13,7 +13,6 @@ class TSTransform extends TransformInterface {
   }
 
   async applyTransform(response) {
-    // console.log('TS FOUND');
     return new Promise(async (resolve, reject) => {
       try {
         const { url } = this.request;
