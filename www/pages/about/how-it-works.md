@@ -36,7 +36,7 @@ import { html, LitElement } from 'lit-element';
 class HomeTemplate extends LitElement {
 
   render() {
-    return html\`
+    return html`
       <style>
         /* some CSS if you need it */
       </style>
@@ -51,7 +51,7 @@ class HomeTemplate extends LitElement {
         <button onclick="inlineScript()">For a good time, click here.</button>
         <entry></entry>
       </div>
-    \`;
+    `;
   }
 }
 

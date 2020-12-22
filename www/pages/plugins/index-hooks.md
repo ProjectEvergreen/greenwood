@@ -28,14 +28,14 @@ module.exports = {
     provider: (compilation) => {
       // you can access things like config, context if you need from compilation
       return {
-        hookGreenwoodAnalytics: \`
+        hookGreenwoodAnalytics: `
           <script>
             window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
             ga('create', 'UA-XXXXXXX', 'auto');
             ga('send', 'pageview');
           </script>
           <script async src='https://www.google-analytics.com/analytics.js'></script>
-        \`
+        `
       }
     }
   }]
@@ -80,9 +80,9 @@ module.exports = {
     provider: (compilation) => {
       // you can access things like config, context if you need from compilation
       return {
-        myCustomHook: \`
+        myCustomHook: `
           <div>My custom HTML here</div>
-        \`
+        `
       ]
     }
   }]

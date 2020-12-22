@@ -110,17 +110,17 @@ class HeaderComponent extends LitElement {
   render() {
     const { navigation } = this;
 
-    return html\`
+    return html`
       <nav>
         <ul>
           ${navigation.map(({ item }) => {
-            return html\`
-              <li><a href='\${item.link}' title='Click to visit the \${item.label} page'>\${item.label}</a></li>
-            \`;
+            return html`
+              <li><a href='${item.link}' title='Click to visit the ${item.label} page'>${item.label}</a></li>
+            `;
           })}
         </ul>
       </nav>
-    \`;
+    `;
   }
 }
 customElements.define('eve-header', HeaderComponent);

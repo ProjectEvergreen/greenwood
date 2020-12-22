@@ -31,15 +31,15 @@ Instead, Greenwood uses GraphQL + Apollo to make that a reality!  So instead of 
 
 ```javascript
 render() {
-  return html\`
+  return html`
     <ul>
       ${pages.map((page) => {
-        return html\`
+        return html`
           <li><a href=\"${page.path}\">${page.title}</a></li>
-        \`;
+        `;
       })}
     </ul>
-  \`;
+  `;
 }
 ```
 
@@ -55,7 +55,7 @@ To kick things off, let's review what is available to you.  Currently, the main 
 This is what the schema looks like:
 ```javascript
 graph {
-  id, // (string) the unique ID given to the generated component as it's selector e.g. \`<wc-md-id></wc-md-id>\`
+  id, // (string) the unique ID given to the generated component as it's selector e.g. `<wc-md-id></wc-md-id>`
 
   link,  // (string) A URL link, typically derived from the filesystem path, e.g. /blog/2019/first-post/
 
@@ -285,14 +285,14 @@ Or within your component
 ```javascript
 import gql from 'graphql-tag';  // comes with Greenwood
 
-const query = gql\`
+const query = gql`
   {
     user(id: 5) {
       firstName
       lastName
     }
   }
-\`
+`
 ```
 
 Then you can use `import` anywhere in your components!
@@ -336,21 +336,21 @@ class HeaderComponent extends LitElement {
   render() {
     const { navigation } = this;
 
-    return html\`
+    return html`
       <header class="header">
 
         <nav>
           <ul>
             ${navigation.map(({ item }) => {
-              return html\`
-                <li><a href="\${item.link}" title="Click to visit the \${item.label} page">\${item.label}</a></li>
-              \`;
+              return html`
+                <li><a href="${item.link}" title="Click to visit the ${item.label} page">${item.label}</a></li>
+              `;
             })}
           </ul>
         </nav>
 
       </header>
-    \`;
+    `;
   }
 }
 
