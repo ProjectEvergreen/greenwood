@@ -36,23 +36,21 @@ All set!
 ### Configuring Workflows
 With Greenwood installed, let's create a couple of **npm** scripts so that we can automate our development workflows with easy to remember commands.
 
-In _package.json_, edit the `scripts` section accordingly:
+In _package.json_, edit the `scripts` section accordingly by adding:
 ```json
-// before
-"scripts": {
-  "test": "echo \"Error: no test specified\" && exit 1"
-},
+{
+  "scripts": {
+    "...": "....",
 
-// after
-"scripts": {
-  "build": "greenwood build",
-  "start": "greenwood develop"
+    "build": "greenwood build",
+    "start": "greenwood develop"
+  }
 },
 ```
 
 Now, you'll be able to do two things:
-1. `npm start` - Start a local development server with file watching and reloading.
-1. `npm run build` - Generate a static version of the project that you can then upload to a web server.
+1. `npm start` - Start a local development server with file watching and live reloading.
+1. `npm run build` - Generate a static build of the project that you can upload to a web server.
 
 You can go ahead and try out both of these tasks now, and you should see Greenwood's default generated output, letting you know you've set everything up correctly.
 

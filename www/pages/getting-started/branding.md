@@ -34,54 +34,46 @@ class HeaderComponent extends HTMLElement {
 
   // create templates that interpolate variables and HTML!
   getTemplate() {
-    return \`
+    return `
       <style>
         /* CSS will go here */
       </style>
 
       <header>Welcome to my Blog!</header>
-    \`;
+    `;
   }
 }
 
 customElements.define('app-header', HeaderComponent);
 ```
 
-Now we can use it in both our templates, like so:
-```javascript
-import { html, LitElement } from 'lit-element';
-import '../components/header'; // import our custom element
+Now we can use it in both our templates by:
+1. Referencing our component via a `<script>` tag with the `type="module"` attribute
+1. Using our custom element's tag name of `<app-header>` in our `<body>`
 
-class PageTemplate extends LitElement {
+```html
+<html>
 
-  constructor() {
-    super();
-  }
+  <head>
+    <script type="module" src="/components/header.js"></script>
+  </head>
+  
+  <body>
+    <app-header></app-header>
 
-  render() {
-    return html\`
-      <div>
-        <!-- using our custom header -->
-        <app-header></app-header>
-
-        <entry></entry>
-
-        <!-- you can add your custom footer here -->
-      </div>
-    \`;
-  }
-}
-
-customElements.define('page-template', PageTemplate);
+    <content-outlet></content-outlet>
+  </body>
+  
+</html>
 ```
 
 
-> You now do the same for your `<footer>`.  See the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started/) for a complete working example.
+> You can now do the same for a `<footer>`.  See the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started/) for a complete working example.
 
 ### CSS
 OK, so we've made some content and some custom components, but what about the look and feel? Yes, of course, let's add some CSS!
 
-For global styles like Google fonts, Bootstrap, background colors, or browser resets, create a file called _src/styles/theme.css_ and Greenwood will make sure these styles get applied in the `<head>` of the doucment, outside of any Shadow DOMs.
+For global styles like Google fonts, Bootstrap, background colors, or browser resets, let's create a file called _src/styles/theme.css_ that we can reference in all templates.
 
 Here are some styles you can add to your site to snap things into place a little bit.
 ```css
@@ -99,20 +91,25 @@ body {
 }
 ```
 
-Now we can `import` this CSS file into our templates.
-```javascript
-import { html, LitElement } from 'lit-element';
-import '../components/header';
-import '../styles/theme.css'; // add this line
+Now we can `<link>` this CSS file into our template.  Easy!  💥
+```html
+<html>
 
-class PageTemplate extends LitElement {
+  <head>
+    <script type="module" src="/components/header.js"></script>
+    <link rel="stylesheet" href="/styles/theme.css"> 
+  </head>
+  
+  <body>
+    <app-header></app-header>
 
-  ...
-
-}
+    <content-outlet></content-outlet>
+  </body>
+  
+</html>
 ```
 
-Within our components, we can easily add some styles right within the component definition itself. For example in our header component, we can style it like this and take advantage of the Shadow DOM.
+Within our components, we can easily add some styles right within the component definition itself. For example in our header component, we can style it like this and take advantage of [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM).
 
 ```javascript
 class HeaderComponent extends HTMLElement {
@@ -127,14 +124,15 @@ class HeaderComponent extends HTMLElement {
   }
 
   getTemplate() {
-    return \`
+    return `
       <style>
         header {
           color: blue;
         }
       </style>
+
       <header>This is the header component.</header>
-    \`;
+    `;
   }
 }
 
