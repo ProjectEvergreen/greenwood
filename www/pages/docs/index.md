@@ -21,32 +21,52 @@ $ yarn add @greeenwood/cli --dev
 ```
 
 Though we recommend installing it locally to your project, you can also run Greenwood globally.  For global usage we recommend using `npx`
+
 ```bash
-$ npx @greenwood/cli <build>
+$ npx @greenwood/cli <command>
 ```
 
 ### CLI
-With Greenwood installed, you can run its CLI to generate your site.  The commands available are:
-- `develop`: Develop your project with a local development server.
-- `build`: For generating a production ready static site.
+With Greenwood installed, you can run its CLI to generate your site.  The principal commands available are:
+- `greenwood develop`: Starts a local development server for your project.
+- `greenwood build`: Generates a production build of your project.
+- `greenwood serve`: Generates a production build of the project and serves it locally on a simple web server.
+- `greenwood eject`: Ejects configurations (Rollup, PostCSS, etc) to your working directory for additional customizations.
 
-As mentioned above, it is recommended to install Greenwood locally into your project. From there, you can define npm scripts in _package.json_ like so:
+You can define npm scripts in _package.json_ like so to automate your workflows:
 
 ```json
-"scripts": {
-  "build": "greenwood build",
-  "start": "greenwood develop",
-  "serve": "greenwood serve"
+{
+
+  "scripts": {
+    "build": "greenwood build",
+    "start": "greenwood develop",
+    "serve": "greenwood serve"
+  }
+
 }
 ```
 
-Then you can run:
-- `greenwood build`: Generates a production build of your project
-- `greenwood develop`: Starts a local development server for your project
-- `greenwood serve`: Generates a production build of the project and serves it locally on a simple web server.
-- `greenwood eject`: Ejects configurations to your working directory for additional customizations.
+Then from the command line you can use npm or Yarn to run them:
+
+```bash
+ # start up the dev server
+$ npm start
+$ yarn start
+
+# generate a static build to deploy
+$ npm run build
+$ yarn build
+
+# generate a static build and preview it locally
+$ npm run serve
+$ yarn serve
+```
 
 ### Sections
+
+To continue learning more abuut Greenwood, please feel free to browse the other sections of our documentation.
+
 - [Component Model](/docs/component-model/): Examples of using custom elements in Greenwood.
 - [Configuration](/docs/configuration/): Available configuration options for the Greenwood CLI.
 - [Front Matter](/docs/front-matter/): Page level configurations through page markdown.

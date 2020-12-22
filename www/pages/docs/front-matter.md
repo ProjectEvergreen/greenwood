@@ -26,8 +26,9 @@ Which will compile to the element: `<wc-md-mypage></wc-md-mypage>`
 
 
 ### Imports
+> ⛔ _**Coming Soon!**_
 
-If you want to import custom files such as a custom element, you can use the predefined variable `imports`.
+<!-- If you want to include files on a _per **page** basis_, you can use the predefined `imports` feature from Greenwood.  This is great for one off use cases where you dont want to ship a third party lib in all your templates, but just for this one particular page.  This is effectively a naive form of code splitting.  🤓
 
 #### Example
 ```md
@@ -38,7 +39,7 @@ imports:
 
 ```
 
-See our [Markdown Docs](/docs/markdown#imports) for more information about rendering custom elements in markdown files.
+See our [Markdown Docs](/docs/markdown#imports) for more information about rendering custom elements in markdown files. -->
 
 
 ### Template

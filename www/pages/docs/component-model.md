@@ -6,11 +6,21 @@ index: 1
 ---
 
 ## Component Model
-In this section we'll review a little bit about how you can use Web Components in Greenwood.  Both the native `HTMLElement` and `LitElement` are available by default.
+Greenwood aims to support and optimize around the standard capabilities of the web platform and its features.  In particular, the concept of using Web Components as a way to add interactivity and dynamic content into your application and... that can all be prerendered for you, just like you could do with any server side templating language.
 
-### HTMLElement
+The options for how to design your app efficetively come down to what you're trying to build, so if that's with the native `HTMLElement` or something based on it like **LitElement** (installed seperately), **Greenwood** will take care of the rest.
 
-_footer.js_
+Below are a couple examples to get you going.  
+
+> _Check out our [README](https://github.com/ProjectEvergreen/greenwood#built-with-greenwood) for more examples of sites built with **Greenwood** to see what's possible._
+
+## Example
+
+Below is an example of creating a footer component using native `HTMLElement` within a page template of a Greenwood project. This is all just normal HTML / CSS / JS.
+
+### Component
+
+Our component, in a file called _src/components/footer.js_ could look like this
 
 ```js
 class FooterComponent extends HTMLElement {
@@ -26,81 +36,80 @@ class FooterComponent extends HTMLElement {
     this.root.innerHTML = this.getTemplate();
   }
 
-  // create templates that interpolate variables and HTML!
+  // function can be called anything you want
+  // return a string to be set to innerHTML, can include variable interpolation!
   getTemplate() {
     const year = new Date().getFullYear();
 
-    return \`<header>This is the header component.  &copy; \${year}</header>\`;
+    return `<footer>This is the header component.  &copy; ${year}</footer>`;
   }
 }
 
-customElements.define('x-footer', FooterComponent);
+customElements.define('my-footer', FooterComponent);
 ```
 
-You can then import it in a template and use it within your templates `render` function.
+> _You can use anything you want for the element's tag name (e.g. `app-footer`, `x-footer`, etc), it just needs to have a `-` in the name_.
 
+### Usage
+
+You can then use it within a page template.
+
+```html
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
+
+  <head>
+    <script type="module" src="/components/footer.js"></script>  
+  </head>
+
+  <body>
+    <my-footer></my-footer>
+  </body>
+  
+</html>
+```
+
+
+### Alternaties
+An alternaative like [**LitElement**](https://lit-element.polymer-project.org/) would work the same way.  
+
+> _Make sure you have installed LitElement with **npm** first!_
+
+_src/components/greeting.js_
 ```javascript
 import { html, LitElement } from 'lit-element';
-import '../components/footer';
 
-class PageTemplate extends LitElement {
+class GreetingComponent extends LitElement {
 
   constructor() {
     super();
   }
 
   render() {
-    return html\`
-      <section class='container'>
-        <entry></entry>
-      </section>
-
-      <section
-        <x-footer></x-footer>
-      </section>
-    \`;
-  }
-}
-
-customElements.define('page-template', PageTemplate);
-```
-
-
-### LitElement
-A simple example of a web component utilizing a basic [LitElement](https://lit-element.polymer-project.org/) base class
-
-_hello-world.js_
-```javascript
-import { html, LitElement } from 'lit-element';
-
-class HelloWorld extends LitElement {
-
-  constructor() {
-    super();
-  }
-
-  render() {
-    return html\`
+    return html`
       <div>
         <h1>Hello World!</h1>
       </div>
-    \`;
+    `;
   }
 }
 
-customElements.define('hello-world', HelloWorld);
+customElements.define('x-greeting', GreetingComponent);
 ```
 
-Which can then imported and used with
+```html
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
 
-```javascript
-import './hello-world.js'
+  <head>
+    <script type="module" src="/components/greeting.js"></script>  
+  </head>
 
-render() {
-  return html\`
-    <hello-world></hello-world>
-  \`
-}
+  <body>
+    <x-greeting></x-greeting>
+  </body>
+  
+</html>
 ```
 
 ## References

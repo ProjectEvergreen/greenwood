@@ -7,35 +7,11 @@ linkheadings: 3
 ---
 
 ## Markdown
-In this section we'll cover some of the Markdown related feature of Greenwood, which by default supports the [CommonMark](https://commonmark.org/help/) specification.
-
-### Syntax Highlighting
-When rendering code fencing, if you add the language after the fencing, the included [prismjs](https://prismjs.com/) library will add syntax highlighting.
-
-e.g. use:
-
-````js
-\`\`\`js
-const hello = "world";
-
-<p>\${hello}</p>
-\`\`\`
-````
-
-To get the result:
-
-```js
-const hello = "world";
-
-<p>\${hello}</p>
-```
-
-> **Note:** As demonstrated in the above example, backticks and `\$` characters require `\\` to escape correctly.
-
-> See our [website theme](https://github.com/ProjectEvergreen/greenwood/blob/master/www/styles/page.css#L1) for more examples on how to style PrismJS.
-
+In this section we'll cover some of the Markdown related feature of **Greenwood**, which by default supports the [CommonMark](https://commonmark.org/help/) specification and [**unifiedjs**](https://unifiedjs.com/) as the markdown / content framework.
 
 ### Imports
+> ⛔ _**Coming Soon!**_
+<!--
 From within the markdown you can also render components, not just their syntax, by importing them via [front-matter](/docs/front-matter).
 
 #### Example
@@ -52,5 +28,56 @@ imports:
 
 > See our [component model docs](/docs/component-model) for more information on authoring custom elements / components.  For information on configuring additional page meta data, see our section on [front-matter](/docs/front-matter/).
 
+-->
+
 ### Configuration
-Using your `greenwood.config.js`, within your project's root directory, you can have additional [markdown customizations and configurations](/docs/configuration#markdown) using unified presets.
+Using your _greenwood.config.js_ you can have additional [markdown customizations and configurations](/docs/configuration#markdown) using unified presets and plugins.
+
+For example, to add support for [**Prism**](https://prismjs.com/) for syntax highlighting, after installing `@mapbox/rehype-prism` via **npm**, just add following to your config file:
+
+```js
+module.exports = {
+  
+  ...
+
+  markdown: {
+    settings: { /* whatever you need */ },
+    plugins: [
+      '@mapbox/rehype-prism'
+    ]
+  }
+
+};
+```
+
+### Syntax Highlighting
+
+Although Greenwood does not provide any syntax highlighting by default, as demonstrated in the section above, it easy to add Prism markdown processing to your project.
+
+
+From there, just include a theme from a CSS file in your project, ex:
+
+```css
+/* https://prismjs.com/examples.html */
+@import url('../../node_modules/prismjs/themes/prism-tomorrow.css');
+```
+
+Then if you add the language after the fencing **prismjs** will add syntax highlighting to your code fences.
+
+Write the following in your markdown
+
+````js
+```js
+const hello = 'world';
+
+<p>${hello}</p>
+```
+````
+
+To get the result:
+
+```js
+const hello = 'world';
+
+<p>${hello}</p>
+```

@@ -11,7 +11,7 @@ let defaultConfig = {
     host: 'localhost'
   },
   // TODO optimization: 'spa',
-  publicPath: '/',
+  publicPath: '/', // TODO
   title: 'My App',
   meta: [],
   plugins: [],
