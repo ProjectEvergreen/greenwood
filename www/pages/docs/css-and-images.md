@@ -7,95 +7,41 @@ linkheadings: 3
 ---
 
 ## Styles and Assets
-Greenwood provides a couple ways to help style and theme your site.
-
-By default Greenwood supports directory detection for the following folder names within your workspace
-- _src/assets_ - Location for all your site images, fonts, JSON, etc and will be bundled automatically for you by Greenwood.
-- _src/styles_ - Recommended location for your template and theme CSS files
-
-> Be aware of the [limitations of the Shadow DOM](https://css-tricks.com/web-standards-meet-user-land-using-css-in-js-to-style-custom-elements/) with regard to which styles you can expect to apply globally vs. within a Shadow DOM.
+**Greenwood** generally does not have any opinion on how you structure your site, aside from the pre-determined _pages/_ and (optional) _templates/_ directories.  It supports all standard files that you can open in a web browser.
 
 
-### Theming
-To enable theming through global styles, create a file in your workspace styles directory called _theme.css_,  e.g. _src/styles/theme.css_ and import it into your page templates.  Greenwood will include this in a `<style>` tag in the `<head>` of the generated pages.
+### Styles
+Styles can be done in any standards compliant way that will work in a browser.  So just as in HTML, you can do anything you need like below:
 
+```html
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
 
-#### Example
-The below is an example of using _theme.css_ to load a Google font and apply a global browser reset for all pages.
-```css
-/* theme.css */
-@import url('//fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+  <head>
+    <style>
+      html {
+        background-color: white;
+      }
 
-* {
-  margin: 0;
-  padding: 0;
-  font-family: 'Source Sans Pro', sans-serif;
-}
+      body {
+        font-family: 'Source Sans Pro', sans-serif;
+        line-height:1.4;
+      }
+    </style>
+
+    <link rel="stylesheet" href="/styles/some-page.css"/>
+  </head>
+
+  <body>
+    <!-- content goes here -->
+  </body>
+  
+</html>
 ```
 
-```javascript
-// page-template.js
-import { html, LitElement } from 'lit-element';
-import '../styles/theme.css';
+### Assets
 
-class PageTemplate extends LitElement {
-
-  constructor() {
-    super();
-  }
-
-  ...
-
-}
-
-customElements.define('page-template', PageTemplate);
-```
-
-### Shadow DOM
-For any of your components and page templates, it is recommended to use the [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM) within your LitElement's `render` function.  You can also import the CSS too.
-
-#### Example
-
-```javascript
-import { html, LitElement } from 'lit-element';
-import pageTemplateCss '../styles/page-template.css';  // if you like your CSS-in-JS
-
-class PageTemplate extends LitElement {
-
-  constructor() {
-    super();
-  }
-
-  render() {
-    return html\`
-
-      <style>
-        ${pageTemplateCss}
-      </style>
-
-      <style>
-        :host {
-          h1 {
-            color: blue;
-            border: 1px solid #020202;
-          }
-        }
-      </style>
-
-      <div>
-
-        <entry></entry>
-
-      </div>
-    \`;
-  }
-}
-
-customElements.define('page-template', PageTemplate);
-```
-
-### Assets and Images
-They say a picture is worth 1000 words, so by default Greenwood will look for an _assets/_ folder in your workspace and automatically copy / bundle whatever it sees there.
+For convenience, **Greenwood** does support an "assets" directory wherein anything copied into that will be present in the build output directory.  This is the recommended location for all your local images, fonts, etc.  Effectively anything that is not part of an `import`, `@import`, `<script>`, `<style>` or `<link>` will not be handled by **Greenwood**.
 
 #### Example
 To use an image in a markdown file, you would reference it as so using standard markdown syntax:
@@ -106,31 +52,32 @@ To use an image in a markdown file, you would reference it as so using standard 
 ![my-image](/assets/images/my-image.png)
 ```
 
-If you like your all-the-things-in-JS, you can also use `import` in a custom element.
+You can do the same in your HTML
 
-```javascript
-import { html, LitElement } from 'lit-element';
-import logo from '../../assets/images/logo.png';
-
-class HeaderComponent extends LitElement {
-  render() {
-    return html\`
-      <style>
-        img {
-          border-radius: 0 !important;
-          min-height: 233px;
-          max-height: 233px;
-          object-fit: cover;
-        }
-      </style>
-
-      <header>
-        <h1>Welcome!</h1>
-        <img alt="brand logo" src="\${logo}" />
-      </header>
-    \`;
-  }
-}
-
-customElements.define('x-header', HeaderComponent);
+```html
+<header>
+  <h1>Welcome to My Site!</h1>
+  <img alt="logo" src="/assets/images/logo.png" />
+</header>
 ```
+
+
+> If you like your all-the-things-in-JS approach, Greenwood can be extended with [plugins](/plugins/) to support "webpack" like behavior as seeb in the below example:
+>
+> ```javascript
+> import { html, LitElement } from 'lit-element';
+> import logo from '../../assets/images/logo.png';
+>
+> class HeaderComponent extends LitElement {
+>  render() {
+>    return html`
+>      <header>
+>        <h1>Welcome to My Site!</h1>
+>        <img alt="brand logo" src="${logo}" />
+>      </header>
+>    `;
+>  }
+> }
+>
+> customElements.define('x-header', HeaderComponent);
+> ```

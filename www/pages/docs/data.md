@@ -9,6 +9,9 @@ linkheadings: 3
 
 ## Data Sources
 
+> ⛔ [_**Coming Soon!**_](https://github.com/ProjectEvergreen/greenwood/issues/278)
+
+<!--
 ### Overview
 
 Having to repeat things when programming is no fun, and that's why (web) component based development is so useful!  As websites start to grow, there comes a point where being able to have access to the content and structure of your site's layout and configuration as part of the development process becomes essential towards maintainability, performance, and scalability.
@@ -356,3 +359,5 @@ customElements.define('app-header', HeaderComponent);
 
 ### External Sources
 Coming [soon](https://github.com/ProjectEvergreen/greenwood/issues/21)!
+
+-->

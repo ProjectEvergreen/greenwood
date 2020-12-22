@@ -7,6 +7,10 @@ linkheadings: 3
 ---
 
 ## Menus
+
+> ⛔ [_**Coming Soon!**_](https://github.com/ProjectEvergreen/greenwood/issues/278)
+
+<!--
 In this section we'll touch on the menu related feature of Greenwood which utilizes [data sources](/docs/data) within a component to query for [front matter](/docs/front-matter) declared menus.
 
 ### Declare Menu
@@ -288,3 +292,4 @@ The object result for `/about` is:
 }
 ```
 
+-->
