@@ -1,5 +1,3 @@
-/* TODO restore to nested styles */
-/* https://prismjs.com/examples.html */
 @import url('../../node_modules/prismjs/themes/prism-tomorrow.css');
 
 h3 {
@@ -18,21 +16,22 @@ h4, h5, h6 {
 }
 
 h1, h2, h3, h4, h5 {
-  line-height: 1rem;
-}
+  line-height: 1.8rem;
 
-h5 a > span.icon {
-  width:28px;
-  height:24px;
-  float:left;
-  padding:2px;
-  background-image: url('../assets/link.png');
-  background-size: 20px 20px;
-  background-repeat: no-repeat;
-}
-
-h1, h2, h3, h4, h5 a:hover {
-  filter: invert(.4);
+  & a > span.icon {
+    width:28px;
+    height:24px;
+    float:left;
+    padding:2px;
+    background-image: url(/assets/link.png);
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position-y: center;
+    
+    &:hover {
+      filter: invert(.4);
+    }
+  }
 }
 
 .gwd-content-wrapper {
@@ -69,45 +68,44 @@ h1, h2, h3, h4, h5 a:hover {
   @media(max-width:768px) {
     padding:0;
   }
-}
 
-.gwd-content  h3 {
-  font-size:2rem;
-  margin: 5px 0;
-}
+  & h3 {
+    font-size:2rem;
+    margin: 5px 0;
+  }
 
-.gwd-content  a {
-  color: #1d337a;
-}
+  & a {
+    color: #1d337a;
+  }
 
-.gwd-content  img {
-  width: 100%;
-}
+  & img {
+    width: 100%;
+  }
 
-.gwd-content  blockquote {
-  margin:0.5em;
-  padding:15px;
-  background-color:#dcf9ca !important;
-  border-left: 6px solid #192a27;
-  
+  & blockquote {
+    margin:0.5em;
+    padding:15px;
+    background-color:#dcf9ca !important;
+    border-left: 6px solid #192a27;
+  }
   @media (max-width: 768px) {
     width: 100%;
     height: 100%;
   }
 }
 
-.gwd-content table {
+table {
   border: 1px solid #020202;
   width: 100%;
   text-align: left;
   margin-bottom: 20px;
 }
 
-.gwd-content table th:first-child {
+table th:first-child {
   min-width: 150px;
 }
 
-.gwd-content table th {
+table th {
   background-color: #f9e7ca;
   text-decoration: underline;
 }

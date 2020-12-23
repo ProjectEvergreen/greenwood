@@ -124,19 +124,7 @@ function greenwoodHtmlPlugin(compilation) {
       return Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
         const asset = mappedStyles[assetKey];
         const filePath = path.join(userWorkspace, asset.name);
-        const userPostcssConfig = fs.existsSync(path.join(process.cwd(), 'postcss.config.js'))
-          ? require(path.join(process.cwd(), 'postcss.config'))
-          : {};
-        const userPostcssPlugins = userPostcssConfig.plugins
-          ? userPostcssConfig.plugins
-          : [];
-        
-        const allPostcssPlugins = [
-          ...userPostcssPlugins,
-          ...postcssConfig.plugins
-        ];
-        
-        const result = await postcss(allPostcssPlugins)
+        const result = await postcss(postcssConfig.plugins)
           .use(postcssImport())
           .process(asset.source, { from: filePath });
 
