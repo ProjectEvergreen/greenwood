@@ -33,7 +33,7 @@ function greenwoodWorkspaceResolver (compilation) {
 
 // https://github.com/rollup/rollup/issues/2873
 function greenwoodHtmlPlugin(compilation) {
-  const { userWorkspace, outputDir } = compilation.context;
+  const { projectDirectory, userWorkspace, outputDir } = compilation.context;
 
   return {
     name: 'greenwood-html-plugin',
@@ -126,10 +126,10 @@ function greenwoodHtmlPlugin(compilation) {
         const filePath = path.join(userWorkspace, asset.name);
         // TODO we already process the user's CSS as part of serve lifecycle (dev / build commands)
         // if we pull from .greenwood/ then maybe we could avoid re-postcss step here?
-        const userPostcssConfig = fs.existsSync(path.join(process.cwd(), 'postcss.config.js'))
-          ? require(path.join(process.cwd(), 'postcss.config'))
+        const userPostcssConfig = fs.existsSync(`${projectDirectory}/postcss.config.js`)
+          ? require(`${projectDirectory}/postcss.config`)
           : {};
-        const userPostcssPlugins = userPostcssConfig.plugins
+        const userPostcssPlugins = userPostcssConfig.plugins && userPostcssConfig.plugins.length > 0
           ? userPostcssConfig.plugins
           : [];
         const allPostcssPlugins = [
