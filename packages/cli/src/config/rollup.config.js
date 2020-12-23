@@ -117,15 +117,26 @@ function greenwoodHtmlPlugin(compilation) {
       }
       
       // this is a giant work around because PostCSS and some plugins can only be run async
-      // and so have to use with awit but _outside_ sync code, like parser / rollup
+      // and so have to use with await but _outside_ sync code, like parser / rollup
       // https://github.com/cssnano/cssnano/issues/68
       // https://github.com/postcss/postcss/issues/595
       // TODO consider similar approach for emitting chunks?
       return Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
         const asset = mappedStyles[assetKey];
         const filePath = path.join(userWorkspace, asset.name);
+        const userPostcssConfig = fs.existsSync(path.join(process.cwd(), 'postcss.config.js'))
+          ? require(path.join(process.cwd(), 'postcss.config'))
+          : {};
+        const userPostcssPlugins = userPostcssConfig.plugins
+          ? userPostcssConfig.plugins
+          : [];
         
-        const result = await postcss(postcssConfig.plugins)
+        const allPostcssPlugins = [
+          ...userPostcssPlugins,
+          ...postcssConfig.plugins
+        ];
+        
+        const result = await postcss(allPostcssPlugins)
           .use(postcssImport())
           .process(asset.source, { from: filePath });
 
