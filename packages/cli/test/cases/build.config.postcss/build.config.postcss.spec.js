@@ -1,10 +1,9 @@
 /*
  * Use Case
- * Run Greenwood with a custom postcss config
+ * Run Greenwood with a custom PostCSS config
  *
  * User Result
- * Should generate a bare bones Greenwood build with a hello page containing a component with a 
- * @custom-media query
+ * Should generate a bare bones Greenwood build with the user's CSS file correctly un-nested and minified
  *
  * User Command
  * greenwood build
@@ -13,16 +12,18 @@
  * Greenwood default
  *  src/
  *   pages/
- *     hello.md
- *     index.md
+ *     index.html
+ *   styles/
+ *     main.css
  */
-const { JSDOM } = require('jsdom');
+const fs = require('fs');
+const glob = require('glob-promise');
 const path = require('path');
 const expect = require('chai').expect;
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom PostCSS configuration';
   let setup;
 
@@ -37,27 +38,17 @@ xdescribe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
+    // TODO runSmokeTest(['public', 'index', 'not-found'], LABEL);    
+    runSmokeTest(['public', 'index'], LABEL);
 
-    describe('Hello page with working @custom-media queries', function() {
-      let dom;
+    describe('Page referencing external nested CSS file', function() {
+      it('should output correctly processed nested CSS as non nested', function() {
+        const expectedCss = 'body{color:red}body h1{color:#00f}';
+        const cssFiles = glob.sync(path.join(this.context.publicDir, 'styles', '*.css'));
+        const css = fs.readFileSync(cssFiles[0], 'utf-8');
 
-      beforeEach(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './hello/index.html'));
-      });
-
-      it('should resolve the correct @custom-media queries for eve-container', function() {
-        // check @media (--screen-xs) resolves to @media (max-width:576px) via postcss preset-env: stage 1
-        const expectedStyle = 'eve-container .container.eve-container,eve-container ' +
-        '.container-fluid.eve-container {\n  margin-right:auto;margin-left:auto;padding-left:15px;' +
-        'padding-right:15px\n}\n\n@media (max-width:576px) {\neve-container .container.eve-container ' +
-        '{\n  width:calc(100% - 30px)\n}\n\n}\n\n@media (min-width:576px) {\neve-container ' + 
-        '.container.eve-container {\n  width:540px\n}\n\n}\n\n@media (min-width:768px) {\neve-container ' + 
-        '.container.eve-container {\n  width:720px\n}\n\n}\n\n@media (min-width:992px) {\neve-container ' +
-        '.container.eve-container {\n  width:960px\n}\n\n}\n\n@media (min-width:1200px) {\neve-container ' + 
-        '.container.eve-container {\n  width:1140px\n}\n\n}';
-        const containerStyle = dom.window.document.head.querySelector('style[scope="eve-container"]');
-        expect(containerStyle.innerHTML).to.equal(expectedStyle);
+        expect(cssFiles.length).to.equal(1);
+        expect(css).to.equal(expectedCss);
       });
     });
   });
