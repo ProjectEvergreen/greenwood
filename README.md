@@ -7,9 +7,9 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
 ## Overview
-Greenwood is a modern and performant static site generator supporting Web Component based development.  For more information about how to get started, review our docs, or learn more about our project please visit our [website](https://www.greenwoodjs.io/).
+Greenwood is a modern and performant static site generator supporting Web Component based development.  For more information about how to get started, lookup our docs, or learn more about the project, please visit our [website](https://www.greenwoodjs.io/).
 
-> Greenwood is currently a work in progress and we would love any help getting it to a 1.0 release.  Check out our [roadmap](https://github.com/ProjectEvergreen/greenwood/projects) to see what we're working on next and feel free to reach out through our [issue tracker](https://github.com/ProjectEvergreen/greenwood/issues) if you have any issues or would like to request a feature!
+> Greenwood is currently working towards a [1.0 release](https://github.com/ProjectEvergreen/greenwood/issues/418) with plans in our [next release (v.0.10.0)](https://github.com/ProjectEvergreen/greenwood/pull/436) to introduce some exciting new changes and concepts to the project.  Check out our [roadmap](https://github.com/ProjectEvergreen/greenwood/projects) to see what we're working on next and feel free to reach out through our [issue tracker](https://github.com/ProjectEvergreen/greenwood/issues) if you have any issues.  Additionally, please review our [Request for Contributions doc](https://docs.google.com/document/d/1MwDkszKvq81QgIYa8utJgyUgSpLZQx9eKCWjIikvfHU/) if would like to help us in building Greenwood! ✌️
 
 ## Getting Started
 Our website has a complete [Getting Started](http://www.greenwoodjs.io/getting-started) section that will walk you through creating a Greenwood project from scratch.
