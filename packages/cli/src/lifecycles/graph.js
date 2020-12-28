@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const fs = require('fs-extra');
+const fs = require('fs');
 const fm = require('front-matter');
 const toc = require('markdown-toc');
 
@@ -37,8 +37,8 @@ module.exports = generateGraph = async (compilation) => {
              */
             if (relativePagePath.lastIndexOf('/') > 0) {
               // https://github.com/ProjectEvergreen/greenwood/issues/455
-              route = label === 'index'
-                ? `${route.replace('/index', '')}/`
+              route = label === 'index' || route.replace('/index', '') === `/${label}`
+                ? route.replace('index', '')
                 : `${route}/`;
             } else {
               route = route === '/index'
