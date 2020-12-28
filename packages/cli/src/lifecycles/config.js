@@ -1,17 +1,13 @@
 const fs = require('fs');
 const path = require('path');
-const url = require('url');
 
 // TODO const optimizations = ['strict', 'spa'];
-
 let defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {
-    port: 1984,
-    host: 'localhost'
+    port: 1984
   },
   // TODO optimization: 'spa',
-  publicPath: '/', // TODO
   title: 'My App',
   meta: [],
   plugins: [],
@@ -27,7 +23,7 @@ module.exports = readAndMergeConfig = async() => {
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, publicPath, title, markdown, meta } = userCfgFile;
+        const { workspace, devServer, title, markdown, meta } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -61,15 +57,6 @@ module.exports = readAndMergeConfig = async() => {
           customConfig.title = title;
         }
 
-        if (publicPath) {
-          if (typeof publicPath !== 'string') {
-            reject('Error: greenwood.config.js publicPath must be a string');
-          } else {
-            customConfig.publicPath = publicPath;
-            // console.log('custom publicPath provided => ', customConfig.publicPath);
-          }
-        }
-
         if (meta && meta.length > 0) {
           customConfig.meta = meta;
         }
@@ -101,16 +88,6 @@ module.exports = readAndMergeConfig = async() => {
         // }
 
         if (devServer && Object.keys(devServer).length > 0) {
-
-          if (devServer.host) {
-            // eslint-disable-next-line max-depth
-            if (url.parse(devServer.host).pathname === null) {
-              reject(`Error: greenwood.config.js devServer host type must be a valid pathname.  Passed value was: ${devServer.host}`);
-            } else {
-              customConfig.devServer.host = devServer.host;
-              // console.log(`custom host provided => ${customConfig.devServer.host}`);
-            }
-          }
 
           if (devServer.port) {
             // eslint-disable-next-line max-depth

@@ -211,8 +211,7 @@ The Config query returns the configuration values from your _greenwood.config.js
 query {
   config {
   	devServer {
-      port,
-      host
+      port
     },
     meta {
       name,
@@ -223,7 +222,6 @@ query {
       href
     },
     optimization,
-    publicPath,
     title,
     workspace
   }
@@ -255,14 +253,12 @@ This will return an object of youf _greenwood.config.js_ as an object.  Example:
 ```javascript
 {
   devServer: {
-    port: 1984,
-    host: 'localhost'
+    port: 1984
   },
   meta: [
     { name: 'twitter:site', content: '@PrjEvergreen' },
     { rel: 'icon', href: '/assets/favicon.ico' }
   ],
-  publicPath: '/some-dir',
   title: 'My App',
   workspace: 'src'
 }

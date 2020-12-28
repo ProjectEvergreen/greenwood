@@ -87,7 +87,7 @@ Below are some tips to help with running / debugging tests:
 > **PLEASE DO NOT COMMIT ANY OF THESE ABOVE CHANGES THOUGH**
 
 ### Writing Tests
-Cases follow a convention starting with the command (e.g. `build`) and and the capability and features being tested, like configuration with a particular option (e.g. `publicPath`):
+Cases follow a convention starting with the command (e.g. `build`) and and the capability and features being tested, like configuration with a particular option (e.g. `port`):
 ```shell
 <command>.<capability>.<feature>.spec.js
 ```
@@ -95,7 +95,7 @@ Cases follow a convention starting with the command (e.g. `build`) and and the c
 Examples:
 - _build.default.spec.js_ - Would test `greenwood build` with no config and no workspace.
 - _build.config.workspace-custom.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace`
-- _build.config.workspace-public-path.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace` and `publicPath` set.
+- _build.config.workspace-dev-server-port.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace` and `devServer.port` set.
 
 ### Notes
 Here are some thigns to keep in mind while writing your tests, due to the asynchronous nature of Greenwwood:

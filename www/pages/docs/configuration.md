@@ -17,24 +17,21 @@ module.exports = {
     port: 1984,
     host: 'localhost'
   },
-  publicPath: '/',
   title: 'My App',
   meta: []
 };
 ```
 
 ### Dev Server
-Configuration for Greenwood's development server are available using the `devServer` option.  Two options are available:
+Configuration for Greenwood's development server is available using the `devServer` option.
 - `port`: Pick a different port when starting the dev server
-- `host`: If you need to use a custom domain (using [pathname](https://nodejs.org/api/url.html#url_url_pathname)) when developing locally and generally used along with editing an `/etc/hosts` file.
 
 #### Example
 ```js
 module.exports = {
   devServer: {
-    port: 8181,
-    host: 'local.my-domain.com'
-  },
+    port: 8181
+  }
 }
 ```
 
@@ -109,26 +106,6 @@ module.exports = {
   optimization: 'spa'
 }
 ```
--->
-
-### Public Path
-
-> ⛔ _**Coming Soon!**_
-
-<!-- The `publicPath` options allows configuring additional URL segments to customize the [`<base href="/">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) for your site.
-
-#### Example
-As an example, given:
-- Top level domain like: `http(s)://www.my-domain.com`
-- Deployment path of: `/web`
-- For a full URL of: `http(s)://www.my-domain.com/web`
-
-Your `publicPath` configuration would be:
-```js
-module.exports = {
-  publicPath: '/web'
-}
-``` 
 -->
 
 ### Title
