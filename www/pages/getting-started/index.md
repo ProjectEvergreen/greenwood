@@ -6,12 +6,12 @@ index: 3
 ---
 
 ## Introduction
-First off, thank you for taking the time to check out **Greenwood**!  As a tool, we hope that you find Greenwood to provide a productive and frictionless developer experience for you that results in performant and engaging experiences for your users.  Under the hood Greenwood is using the power of the modern web ([and friends !](/docs/tech-stack/)) to drive a modern development workflow that helps you deliver a modern and perfmant applicatiot site for your users... using the web languages you already know.
+First off, thank you for taking the time to check out **Greenwood**!  Under the hood Greenwood is taking advantage of the power of the modern web ([and friends !](/docs/tech-stack/)) to drive a modern development workflow that helps you deliver a modern, performant and pleasent experience for your users... using the web languages you already know!
 
 ## Your First Project
-To get things started, we first want to make sure everyone can get their first project up and running as easily and quickly as possible, and so through this guide, we will help walk you through everything you need to get started with your first project, including:
+To get things started, we first want to make sure everyone can get their first project up and running as easily and quickly as possible, and so through this guide, we will walk through everything you need to get started with your first project, including:
 
-1. Setting up your workspace and installing Greenwood
+1. Setting up your project workspace and installing Greenwood
 1. Reviewing key concepts of Greenwood
 1. Creating content and developing locally
 1. Authoring Web Components and adding CSS

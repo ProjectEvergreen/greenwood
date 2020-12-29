@@ -6,7 +6,7 @@ index: 2
 ---
 
 ## Documentation
-This is the documentation space for Greenwood that we hope will help you get the most out of using it.  If this is your first time with Greenwood, we recommend checking out our [Getting Started](/getting-started/) guide to get more familiar with setting up your first Greenwood project.
+This is the documentation space for **Greenwood** that we hope will help you get the most out of using it.  If this is your first time with Greenwood, we recommend checking out our [Getting Started](/getting-started/) guide to get more familiar with setting up your first Greenwood project.
 
 
 ### Installation
@@ -65,7 +65,7 @@ $ yarn serve
 
 ### Sections
 
-To continue learning more abuut Greenwood, please feel free to browse the other sections of our documentation.
+To continue learning more about Greenwood, please feel free to browse the other sections of our documentation.
 
 - [Component Model](/docs/component-model/): Examples of using custom elements in Greenwood.
 - [Configuration](/docs/configuration/): Available configuration options for the Greenwood CLI.

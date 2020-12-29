@@ -16,7 +16,7 @@ What we'll cover in this section:
 
 1. Home Page Template: Single column layout for our home page
 1. Blog Page Template: Two column layout for our blog posts
-1. Blog Posts: A couple sample pages of contentå written in markdown
+1. Blog Posts: A couple sample pages of content written in markdown
 1. Using Greenwood's built in local development server
 
 To go along with this guide, check out our [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started) that has a working example of all the code covered in this Getting Started guide.  In the end, what you will end up with is a project looking something like this:

@@ -16,9 +16,9 @@ In this section, we will add the following to your project:
 1. Styles - Of course we want things to look nice too!  We'll add some CSS to help hang things in just right the place.
 
 ### Web Components
-Web Components are supported out of the box with Greenwood using `HTMLElement` or **LitElement**.  For this guide, we'll use a "vanilla" custom element for our header, in _src/components/header.js_.
+For this guide, we'll use a "vanilla" custom element for our footer, in _src/components/footer.js_.
 ```javascript
-class HeaderComponent extends HTMLElement {
+class FooterComponent extends HTMLElement {
   constructor() {
     super();
 
@@ -34,44 +34,49 @@ class HeaderComponent extends HTMLElement {
 
   // create templates that interpolate variables and HTML!
   getTemplate() {
+    const year = new Date().getFullYear();
+
     return `
       <style>
         /* CSS will go here */
       </style>
 
-      <header>Welcome to my Blog!</header>
+      <footer>
+        <h4>My Blog &copy;${year}</h4>
+      </footer>
     `;
   }
 }
 
-customElements.define('app-header', HeaderComponent);
+customElements.define('app-footer', FooterComponent);
 ```
 
 Now we can use it in both our templates by:
 1. Referencing our component via a `<script>` tag with the `type="module"` attribute
-1. Using our custom element's tag name of `<app-header>` in our `<body>`
+1. Using our custom element's tag name of `<app-footer` in our `<body>`
 
 ```html
 <html>
 
   <head>
-    <script type="module" src="/components/header.js"></script>
+    <script type="module" src="/components/footer.js"></script>
   </head>
   
   <body>
-    <app-header></app-header>
-
     <content-outlet></content-outlet>
+
+    <app-footer></app-footer>
   </body>
   
 </html>
 ```
 
+Now do the same for a `<app-header>`.  See the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started/) for a complete working example.
 
-> You can now do the same for a `<footer>`.  See the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started/) for a complete working example.
+> _You can find more information about component models and Greenwood [here](/docs/component-model/)._
 
 ### CSS
-OK, so we've made some content and some custom components, but what about the look and feel? Yes, of course, let's add some CSS!
+OK, so we've made some content and some custom elements, but what about the look and feel? Yes, of course, let's add some CSS!
 
 For global styles like Google fonts, Bootstrap, background colors, or browser resets, let's create a file called _src/styles/theme.css_ that we can reference in all templates.
 
@@ -101,9 +106,9 @@ Now we can `<link>` this CSS file into our template.  Easy!  💥
   </head>
   
   <body>
-    <app-header></app-header>
-
     <content-outlet></content-outlet>
+
+    <app-footer></app-footer>
   </body>
   
 </html>
@@ -112,7 +117,7 @@ Now we can `<link>` this CSS file into our template.  Easy!  💥
 Within our components, we can easily add some styles right within the component definition itself. For example in our header component, we can style it like this and take advantage of [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM).
 
 ```javascript
-class HeaderComponent extends HTMLElement {
+class FooterComponent extends HTMLElement {
   constructor() {
     super();
 
@@ -126,17 +131,19 @@ class HeaderComponent extends HTMLElement {
   getTemplate() {
     return `
       <style>
-        header {
+        :host footer {
           color: blue;
         }
       </style>
 
-      <header>This is the header component.</header>
+      <footer>
+        <h4>My Blog &copy;${year}</h4>
+      </footer>
     `;
   }
 }
 
-customElements.define('app-header', HeaderComponent);
+customElements.define('app-footer', FooterComponent);
 ```
 
 Taking this all the way with [the code from companion repo](https://vuejs.org/v2/guide/single-file-components.html), you should be able to get a result that looks like this:

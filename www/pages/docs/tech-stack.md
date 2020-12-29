@@ -8,7 +8,7 @@ linkheadings: 3
 
 ## Tech Stack
 
-Greenwood uses a variety of open source JavaScript tools to help faciliate development and production building of Greenwood projects.  By putting all these tools together and configuring them for you, Greenwood helps you focus more on what matters; building your project.  Greenwood takes care of the performance and optimizations for you and provides static build output that you can host on any web server or cloud host, be it Netlify, S3 / CloudFront, Express, Apache, etc.  It's entirely up to you and what fits your workflow the best.
+**Greenwood** uses a variety of open source JavaScript tools to help faciliate development and production building of Greenwood projects.  By putting all these tools together and configuring them for you, Greenwood helps you focus more on what matters; building your project.  Greenwood takes care of the performance and optimizations for you and provides static build output that you can host on any web server or cloud host, be it Netlify, S3 / CloudFront, Express, Apache, etc.  It's entirely up to you and what fits your workflow the best.
 
 ### NodeJS
 For development, Greenwood requires **NodeJS** (LTS) to be available on the command line. This allows us (and you!) to tap into all the amazing web development tools and libraries available on **npm** for your project.
@@ -16,7 +16,7 @@ For development, Greenwood requires **NodeJS** (LTS) to be available on the comm
 To pre-render a site, we use [puppeteer](https://developers.google.com/web/tools/puppeteer/).
 
 ### Unified
-For processing markdown, **Greenwood** taps into the unified ecosystem taking afvantage of and supporting tools like **remark** and **rehype**
+For processing markdown, **Greenwood** taps into the unified ecosystem taking advantage of and supporting tools like **remark** and **rehype**
 
 ### Browsers
 

@@ -11,6 +11,7 @@ In this section we'll cover some of the Markdown related feature of **Greenwood*
 
 ### Imports
 > ⛔ _**Coming Soon!**_
+
 <!--
 From within the markdown you can also render components, not just their syntax, by importing them via [front-matter](/docs/front-matter).
 
@@ -52,10 +53,10 @@ module.exports = {
 
 ### Syntax Highlighting
 
-Although Greenwood does not provide any syntax highlighting by default, as demonstrated in the section above, it easy to add Prism markdown processing to your project.
+Although Greenwood does not provide any syntax highlighting by default, as demonstrated in the section above, it is fairly easy to add something like Prism syntax highlighting to your project. 
 
 
-From there, just include a theme from a CSS file in your project, ex:
+Here is an example of how to include a Prism theme from a CSS file into your project, ex:
 
 ```css
 /* https://prismjs.com/examples.html */
