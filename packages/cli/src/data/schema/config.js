@@ -7,8 +7,7 @@ const getConfiguration = async (root, query, context) => {
 // https://www.greenwoodjs.io/docs/configuration
 const configTypeDefs = gql`
   type DevServer {
-    port: Int,
-    host: String
+    port: Int
   }
 
   type Meta {
@@ -24,7 +23,6 @@ const configTypeDefs = gql`
     devServer: DevServer,
     meta: [Meta],
     optimization: String,
-    publicPath: String,
     title: String,
     workspace: String
   }

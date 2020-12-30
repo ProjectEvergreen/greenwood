@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/www",
-  "version": "0.10.0-alpha.0",
+  "version": "0.10.0-alpha.1",
   "private": true,
   "description": "Greenwood website workspace.",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@mapbox/rehype-prism": "^0.5.0",
+    "postcss-nested": "^4.1.2",
     "rehype-autolink-headings": "^4.0.0",
     "rehype-slug": "^3.0.0",
     "remark-github": "^10.0.1"

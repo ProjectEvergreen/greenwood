@@ -3,6 +3,53 @@
 ## Welcome!
 We're excited for your interest in Greenwood, and maybe even your contribution!
 
+> _We encourage all contributors to have first read about the project's vision and motivation's on the website's [About page](https://www.greenwoodjs.io/about/).  Greenwood is opinionated in the sense that is designed to support development for the web platform and deliver a first class developer experience tailored around that, so that anyone can create a modern and performant website (or webapp, if you prefer). So if that page is the "why", this page is the "how"._
+
+## Technical Design Overview
+
+The Greenwood GitHub repository is a combination [Yarn workspace](https://classic.yarnpkg.com/en/docs/workspaces/) and [Lerna monorepo](https://github.com/lerna/lerna).  The root level _package.json_ defines the workspaces and shared tooling used throughout the project, like for linting, testing, etc.
+
+The two main directories are:
+- [_packages/_](https://github.com/ProjectEvergreen/greenwood/tree/master/packages) - Packages published to NPM under the `@greenwood/` scope
+- [_www/_](https://github.com/ProjectEvergreen/greenwood/tree/master/www) - [website](https://www.greenwoodjs.io) / documentation code
+
+
+> _This guide is mainly intended to walk through the **cli** package, it being the principal pacakge within the project supporting all other packages._
+
+### CLI
+
+The CLI is the main entry point for Greenwood, similar to how the [front-controller pattern](https://en.wikipedia.org/wiki/Front_controller) works.  When users run a command like `greenwood build`, they are effectively invoking the file _src/index.js_ within the `@greenwood/cli` package.
+
+At a high level, this is how a command goes through the CLI:
+1. Each documented command a user can run maps to a script in the _commands/_ directory.
+1. Each command can invoke any number of lifecycles from the _lifecycles/_ directory.
+1. Lifecycles capture specific steps needed to build a site, serve it, generate a content dependency graph, etc.
+
+
+### Layout
+The [layout](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src) of the CLI package is as follows:
+
+- _index.js_ - Front controller
+- _commands/_ - map to runnable userland commands
+- _config/_ - Tooling configuration that Greenwood creates
+- _data/_ - Custom GraphQL server and client side utilities
+- _lib/_ - Customfized Local third party libraries and utility files
+- _lifecycles/_ - Tasks that can be composed by commands to support the full needs of that command
+- _plugins/_ - Custom defaukt plugins maintained by the CLI project
+- _templates/_ - Default templates and / or pages provided by Grennwood.
+
+We'll focus on the most important two here:
+
+
+### Lifecycles
+Aside from the config and graph lifecycles, all lifecycles (and config files and plugins) typically expect a compilation object to be passed in.  
+
+Lifeycles include handling:
+- starting a production or development server for a compilation
+- optimizing a compilation for production
+- prerendering a compilation for production
+- fetching external (content) data sources
+
 
 ## Issues
 Please make sure to have the following prepared (where applicable)
@@ -14,8 +61,8 @@ Please make sure to have the following prepared (where applicable)
 
 ## Pull Requests
 Pull requests are the best!  To best help facililate contributions to the project, here are some requests:
-- We generally we prefer an issue be opened first, to help faciliate general discussion outside of the code review process itself and align on the ask and any expections.  However, for typos in docs and minor "chore" like tasks a PR is usually sufficient.  When in doubt, open an issue.
-- For bugs, please consider reviewing the issue tracker.
+- We generally prefer an issue be opened first, to help faciliate general discussion outside of the code review process itself and align on the ask and any expections.  However, for typos in docs and minor "chore" like tasks a PR is usually sufficient.  When in doubt, open an issue.
+- For bugs, please consider reviewing the issue tracker first.
 - For branching, we generally follow the convention `<issue-label>/issue-<number>-<issue-title>`, e.g. _bug/issue-12-fixed-bug-with-yada-yada-yada_
 - To test the CI build scripts locally, run the `yarn` commands mentioned in the below section on CI.
 
@@ -31,13 +78,13 @@ A preview is also made available within the status checks section of the PR in G
 
 ## Local Development
 To develop for the project, you'll want to follow these steps:
-1. Have [NodeJS LTS](https://nodejs.org) installed (>= 10.x) and [Yarn](https://yarnpkg.com/)
+1. Have [NodeJS LTS](https://nodejs.org) installed (>= 12.x) and [Yarn](https://yarnpkg.com/)
 1. Clone the repository
 1. Run `yarn install`
 1. Run `yarn lerna bootstrap`
 
-### Tasks
-The Greenwood website is currently built by Greenwood itself, and all files for it are located in this repository in the _www/_ directory.  In addition to unit tests, you will want to verify all changes by running the website locally.
+### Scripts
+The [Greenwood website](https://www.greenwoodjs.io/) is currently built by Greenwood, and all files for it are located in this repository under the [_www/_ directory](https://github.com/ProjectEvergreen/greenwood/tree/master/www) workspace.  In addition to unit tests, you will want to verify any changes by running the website locally.
 
 Below are the development tasks available for working on this project:
 - `yarn develop` - Develop for the website locally using the dev server at `localhost:1984` in your browser.
@@ -45,7 +92,7 @@ Below are the development tasks available for working on this project:
 - `yarn serve` - Builds the website for production and runs it on a local webserver at `localhost:8000`
 
 ### Packages
-Greenwood is organized into packages as a monorepo, managed by [Lerna](https://lerna.js.org/) and [Yarn Workspaces](https://yarnpkg.com/lang/en/docs/workspaces/).  You can find all of these in the _packages/_ directory.  Each package will manage its own:
+As mentioned above, Greenwood is organized into packages as a monorepo, managed by [Lerna](https://lerna.js.org/) and [Yarn Workspaces](https://yarnpkg.com/lang/en/docs/workspaces/).  You can find all of these in the _packages/_ directory.  Each package will manage its own:
 - Dependencies
 - README
 - Test Cases
@@ -65,7 +112,7 @@ Yarn workspaces will automatically handle installing _node_modules_ in the appro
 
 
 ## Unit Testing
-[TDD](https://en.wikipedia.org/wiki/Test-driven_development) is the recommended approach for developing for Greenwood and for the style of test writing we use [BDD style testing](https://en.wikipedia.org/wiki/Behavior-driven_development); "cases".  Cases are used to capture the various configurations and expected outputs of Greenwood when running its  commands, in a way that is closer to how a user would be expecting Greenwood to work.
+[TDD](https://en.wikipedia.org/wiki/Test-driven_development) is the recommended approach for developing for Greenwood and for the style of test writing we use [BDD style testing](https://en.wikipedia.org/wiki/Behavior-driven_development); "cases".  Cases are used to capture the various configurations and expected outputs of Gre enwood when running its commands, in a way that is closer to how a user would be expecting Greenwood to work.
 
 ### Running Tests
 To run tests in watch mode, use:
@@ -87,7 +134,7 @@ Below are some tips to help with running / debugging tests:
 > **PLEASE DO NOT COMMIT ANY OF THESE ABOVE CHANGES THOUGH**
 
 ### Writing Tests
-Cases follow a convention starting with the command (e.g. `build`) and and the capability and features being tested, like configuration with a particular option (e.g. `publicPath`):
+Cases follow a convention starting with the command (e.g. `build`) and and the capability and features being tested, like configuration with a particular option (e.g. `port`):
 ```shell
 <command>.<capability>.<feature>.spec.js
 ```
@@ -95,7 +142,7 @@ Cases follow a convention starting with the command (e.g. `build`) and and the c
 Examples:
 - _build.default.spec.js_ - Would test `greenwood build` with no config and no workspace.
 - _build.config.workspace-custom.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace`
-- _build.config.workspace-public-path.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace` and `publicPath` set.
+- _build.config.workspace-dev-server-port.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace` and `devServer.port` set.
 
 ### Notes
 Here are some thigns to keep in mind while writing your tests, due to the asynchronous nature of Greenwwood:
@@ -104,7 +151,7 @@ Here are some thigns to keep in mind while writing your tests, due to the asynch
 - Avoid arrow functions in mocha tests (e.g. `() => `) as this [can cause unexpected behaviors.](https://mochajs.org/#arrow-functions).  Just use `function` instead.
 
 ## Internet Explorer
-For situations that require testing Internet Explorer or Edge browser, Microsoft [provides Virtual Machines](https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/) for various combinations of Windows and Internet Explorer versions.  [VirtualBox](https://www.virtualbox.org/) is a good platform to use for these VMs.
+For situations that require testing Internet Explorer or Edge browser, Microsoft provides [Virtual Machines](https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/) for various combinations of Windows and Internet Explorer versions.  [VirtualBox](https://www.virtualbox.org/) is a good platform to use for these VMs.
 
 To test from a VM, you can
 1. Run `yarn serve`
