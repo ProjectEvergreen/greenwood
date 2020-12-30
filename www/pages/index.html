@@ -4,31 +4,6 @@
   <head>
     <!-- TODO have to use forward slash / for path references?  translate on the fly in serve.js? -->
     <script type="module" src="../components/banner/banner.js"></script>
-
-    <script>
-      class SlotTestNative extends HTMLElement {
-        constructor() {
-          super();
-
-          // create a Shadow DOM
-          this.root = this.attachShadow({ mode: 'closed' });
-          this.root.innerHTML = `
-            <h3>Content from the custom element. (inside HTMLElement)</h3>
-            <h3>
-              <slot name="content"></slot>
-            <h3>
-            <div>
-              <span>nested - will the slot show?<span>
-              <h3>
-                <slot name="content"></slot>
-              <h3>
-            </div>
-          `;
-        }
-      }
-
-      customElements.define('slot-test-native', SlotTestNative);
-    </script>
     
     <!-- TODO these came from front matter, return to frontmatter? -->
     <script type="module" src="../components/card/card.js"></script>
@@ -40,10 +15,6 @@
   <body>
 
     <div class="gwd-content-outlet">
-
-      <slot-test-native>
-        <h3 slot="content">Content for the slot. (outside HTMLElement)</h3>
-      </slot-test-native>
 
       <app-banner></app-banner>
       

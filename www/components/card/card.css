@@ -1,5 +1,4 @@
 :host {
-
   padding: 2.5rem;
   position: relative;
   display: flex;
@@ -10,57 +9,54 @@
   background-clip: initial;
   text-align: center;
 
-  @media(max-width:768px) {
-    padding:0;
-  }
-
-  & .body {
-    padding:10px;
+  @media (max-width: 768px) {
+    padding: 0;
   }
 
   & slot {
-    padding:10px;
+    padding: 10px;
+    margin: 0.25rem;
+    flex: 1 1 33.333%;
+  }
 
-    & .card-xs {
-      margin: 0.25rem;
-      flex: 1 1 16.666%;
-      max-width: 250px;
+  & .card-xs {
+    margin: 0.25rem;
+    flex: 1 1 16.666%;
+    max-width: 250px;
 
-      @media (max-width: 1024px) {
-        max-width: 100%;
-      }
+    @media (max-width: 1024px) {
+      max-width: 100%;
     }
-    & .card-sm {
-      margin: 0.25rem;
-      flex: 1 1 25%;
-      max-width: 380px;
+  }
 
-      @media (max-width: 1024px) {
-        max-width: 100%;
-      }
-    }
-    & .card-md {
-      margin: 0.25rem;
-      flex: 1 1 33.333%;
-      max-width: 450px;
+  & .card-sm {
+    margin: 0.25rem;
+    flex: 1 1 25%;
+    max-width: 380px;
 
-      @media (max-width: 1024px) {
-        max-width: 100%;
-      }
+    @media (max-width: 1024px) {
+      max-width: 100%;
     }
-    & .card-full {
-      margin: 0.25rem;
-      flex: 1 1 33.333%;
-    }
+  }
 
-    & .card-img-top {
-      background-size: cover;
-      background-position-x: center;
-      background-position-y: center;
-      & img {
-        width: 100%;
-        max-width: 200px;
-      }
+  & .card-md {
+    margin: 0.25rem;
+    flex: 1 1 33.333%;
+    max-width: 450px;
+
+    @media (max-width: 1024px) {
+      max-width: 100%;
+    }
+  }
+
+  & .card-img-top {
+    background-size: cover;
+    background-position-x: center;
+    background-position-y: center;
+
+    & img {
+      width: 100%;
+      max-width: 200px;
     }
   }
 }
