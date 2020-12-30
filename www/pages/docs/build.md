@@ -56,7 +56,7 @@ For example, if you wanted to write CSS with nested selectors, you would want do
     }
     ```
 
-> _For reference, [this is the default _postcss.config.js_](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/src/config/postcss.config.js) being provided by Greenwood._
+> _For reference, [this is the default postcss.config.js](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/src/config/postcss.config.js) being provided by Greenwood._
 
 <!--
 > Note: [.browserslistrc](#browserslist) is used by postcss and is also needed to be overwritten. You can override that in that same directory or you may also configure postcss-preset-env to use default `.browserslistrc` path via environement variable to: `./node_modules/@greenwood/cli/src/config/.browserslistrc`.  See [postcss-preset-env docs](https://www.npmjs.com/package/postcss-preset-env#browsers) for further information. [Ejecting configuration](#eject-configuration) is one way in which you can easily override both with no extra configuraiton.
