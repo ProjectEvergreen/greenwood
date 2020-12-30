@@ -224,7 +224,7 @@ module.exports = getRollupConfig = async (compilation) => {
 
   return [{
     // TODO Avoid .greenwood/ directory, do everything in public/?
-    input: `${scratchDir}/**/*.html`,
+    input: `${scratchDir}**/*.html`,
     // preserveEntrySignatures: false,
     output: { 
       dir: outputDir,
