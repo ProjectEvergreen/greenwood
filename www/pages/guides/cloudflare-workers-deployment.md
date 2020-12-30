@@ -95,8 +95,8 @@ jobs:
       - name: Publish
         uses: cloudflare/wrangler-action@1.1.0
         with:
-           apiKey: \$\{\{ secrets\.\CF_WORKERS_KEY \}\}
-           email: \$\{\{ secrets\.\CF_WORKERS_EMAIL \}\}
+           apiKey: ${{ secrets.CF_WORKERS_KEY }}
+           email: ${{ secrets.CF_WORKERS_EMAIL }}
            environment: "production"
 ```
 
