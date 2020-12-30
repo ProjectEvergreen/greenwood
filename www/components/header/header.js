@@ -35,7 +35,6 @@ class HeaderComponent extends LitElement {
       .then(data => {
         this.navigation = data.filter(page => {
           if (page.data.menu === 'navigation') {
-            page.link = page.route;
             page.label = `${page.label.charAt(0).toUpperCase()}${page.label.slice(1)}`.replace('-', ' ');
             
             return page;
@@ -68,7 +67,7 @@ class HeaderComponent extends LitElement {
               <ul>
                 ${navigation.map((item) => {
                   return html`
-                    <li><a href="${item.link}" title="Click to visit the ${item.label} page">${item.label}</a></li>
+                    <li><a href="${item.route}" title="Click to visit the ${item.label} page">${item.label}</a></li>
                   `;
                 })}
               </ul>

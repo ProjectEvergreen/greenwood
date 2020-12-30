@@ -12,16 +12,12 @@ module.exports = serializeCompilation = async (compilation) => {
     try {
       return Promise.all(pages.map(async(page) => {
         const { route } = page;
-        const url = route.lastIndexOf('/') === route.length - 1
-          ? route
-          : `${route}/index.html`;
-
-        console.info('serializing page...', url);
+        console.info('serializing page...', route);
         
         return await browserRunner
-          .serialize(`${serverUrl}${url}`)
+          .serialize(`${serverUrl}${route}`)
           .then(async (html) => {
-            let outputPath = `${route.replace('/', '')}/index.html`;
+            const outputPath = `${outputDir}${route}index.html`;
             
             // TODO allow setup / teardown (e.g. module shims, then remove module-shims)
             let htmlModified = html;
@@ -42,7 +38,7 @@ module.exports = serializeCompilation = async (compilation) => {
               });
             }
             
-            await fsp.writeFile(path.join(outputDir, outputPath), htmlModified);
+            await fsp.writeFile(outputPath, htmlModified);
           });
       }));
     } catch (e) {
@@ -60,7 +56,7 @@ module.exports = serializeCompilation = async (compilation) => {
       const serverAddress = `http://127.0.0.1:${port}`;
 
       console.info(`Serializing pages at ${serverAddress}`);
-      console.debug('pages to generate', `\n ${pages.map(page => page.mdFile).join('\n ')}`);
+      console.debug('pages to generate', `\n ${pages.map(page => page.path).join('\n ')}`);
   
       await runBrowser(serverAddress, pages, outputDir);
       
