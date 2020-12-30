@@ -9,6 +9,9 @@ linkheadings: 3
 
 ## Data Sources
 
+> ⛔ [_**Coming Soon!**_](https://github.com/ProjectEvergreen/greenwood/issues/278)
+
+<!--
 ### Overview
 
 Having to repeat things when programming is no fun, and that's why (web) component based development is so useful!  As websites start to grow, there comes a point where being able to have access to the content and structure of your site's layout and configuration as part of the development process becomes essential towards maintainability, performance, and scalability.
@@ -28,15 +31,15 @@ Instead, Greenwood uses GraphQL + Apollo to make that a reality!  So instead of 
 
 ```javascript
 render() {
-  return html\`
+  return html`
     <ul>
       ${pages.map((page) => {
-        return html\`
+        return html`
           <li><a href=\"${page.path}\">${page.title}</a></li>
-        \`;
+        `;
       })}
     </ul>
-  \`;
+  `;
 }
 ```
 
@@ -52,7 +55,7 @@ To kick things off, let's review what is available to you.  Currently, the main 
 This is what the schema looks like:
 ```javascript
 graph {
-  id, // (string) the unique ID given to the generated component as it's selector e.g. \`<wc-md-id></wc-md-id>\`
+  id, // (string) the unique ID given to the generated component as it's selector e.g. `<wc-md-id></wc-md-id>`
 
   link,  // (string) A URL link, typically derived from the filesystem path, e.g. /blog/2019/first-post/
 
@@ -208,8 +211,7 @@ The Config query returns the configuration values from your _greenwood.config.js
 query {
   config {
   	devServer {
-      port,
-      host
+      port
     },
     meta {
       name,
@@ -220,7 +222,6 @@ query {
       href
     },
     optimization,
-    publicPath,
     title,
     workspace
   }
@@ -252,14 +253,12 @@ This will return an object of youf _greenwood.config.js_ as an object.  Example:
 ```javascript
 {
   devServer: {
-    port: 1984,
-    host: 'localhost'
+    port: 1984
   },
   meta: [
     { name: 'twitter:site', content: '@PrjEvergreen' },
     { rel: 'icon', href: '/assets/favicon.ico' }
   ],
-  publicPath: '/some-dir',
   title: 'My App',
   workspace: 'src'
 }
@@ -282,14 +281,14 @@ Or within your component
 ```javascript
 import gql from 'graphql-tag';  // comes with Greenwood
 
-const query = gql\`
+const query = gql`
   {
     user(id: 5) {
       firstName
       lastName
     }
   }
-\`
+`
 ```
 
 Then you can use `import` anywhere in your components!
@@ -333,21 +332,21 @@ class HeaderComponent extends LitElement {
   render() {
     const { navigation } = this;
 
-    return html\`
+    return html`
       <header class="header">
 
         <nav>
           <ul>
             ${navigation.map(({ item }) => {
-              return html\`
-                <li><a href="\${item.link}" title="Click to visit the \${item.label} page">\${item.label}</a></li>
-              \`;
+              return html`
+                <li><a href="${item.link}" title="Click to visit the ${item.label} page">${item.label}</a></li>
+              `;
             })}
           </ul>
         </nav>
 
       </header>
-    \`;
+    `;
   }
 }
 
@@ -356,3 +355,5 @@ customElements.define('app-header', HeaderComponent);
 
 ### External Sources
 Coming [soon](https://github.com/ProjectEvergreen/greenwood/issues/21)!
+
+-->

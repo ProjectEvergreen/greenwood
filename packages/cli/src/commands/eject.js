@@ -8,6 +8,7 @@ module.exports = ejectConfigFiles = async (copyAllFiles) => {
       if (copyAllFiles) {
         configFilePaths = fs.readdirSync(path.join(__dirname, '../config'));
       } else {
+        // TODO
         configFilePaths = [
           'webpack.config.common.js',
           'webpack.config.develop.js',

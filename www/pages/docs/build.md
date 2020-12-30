@@ -7,7 +7,9 @@ linkheadings: 3
 ---
 
 # Build Configurations
+> ⛔ [_**Coming Soon!**_](https://github.com/ProjectEvergreen/greenwood/issues/426)
 
+<!-- 
 A number of [core build configuration files](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/config) can be overridden by creating each file within the root path of your project. You can also automate this task in a single command [see eject configurations](#eject-configurations).
 
 ### Babel
@@ -63,3 +65,4 @@ $ npm run eject
 ```
 
 To run the eject task which copies all the configuration files into your project's working directory.
+-->

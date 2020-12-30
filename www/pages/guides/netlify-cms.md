@@ -75,11 +75,11 @@ Along with the admin UI, we also need to readd the identity widget script elemen
 
 ```javascript
   render() {
-    return html\`
+    return html`
       ...
       <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
       ...
-      \`
+      `
   }
 ```
 

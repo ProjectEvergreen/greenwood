@@ -16,78 +16,75 @@ In this section, we will add the following to your project:
 1. Styles - Of course we want things to look nice too!  We'll add some CSS to help hang things in just right the place.
 
 ### Web Components
-Web Components are supported out of the box with Greenwood using `HTMLElement` or **LitElement**.  For this guide, we'll use a "vanilla" custom element for our header, in _src/components/header.js_.
+For this guide, we'll use a "vanilla" custom element for our footer.
+
+Start by creating a file called _src/components/footer.js_ with the following code in it.
 ```javascript
-class HeaderComponent extends HTMLElement {
+class FooterComponent extends HTMLElement {
   constructor() {
     super();
 
-    // create a Shadow DOM
+    // creates a Shadow DOM root
     this.root = this.attachShadow({ mode: 'closed' });
   }
 
   // run some code when the component is ready
-  // like initializing our component's DOM
+  // like initializing our component's DOM / innerHTML
   connectedCallback() {
     this.root.innerHTML = this.getTemplate();
   }
 
-  // create templates that interpolate variables and HTML!
+  // create templates that can interpolate variables and HTML!
   getTemplate() {
-    return \`
+    const year = new Date().getFullYear();
+
+    return `
       <style>
         /* CSS will go here */
       </style>
 
-      <header>Welcome to my Blog!</header>
-    \`;
+      <footer>
+        <h4>My Blog &copy;${year}</h4>
+      </footer>
+    `;
   }
 }
 
-customElements.define('app-header', HeaderComponent);
+customElements.define('app-footer', FooterComponent);
 ```
 
-Now we can use it in both our templates, like so:
-```javascript
-import { html, LitElement } from 'lit-element';
-import '../components/header'; // import our custom element
+Now we can use it in a template by:
+1. Referencing our component file via a `<script>` tag with the `type="module"` attribute
+1. Using our custom element's tag name of `<app-footer>` in our `<body>`
 
-class PageTemplate extends LitElement {
+```html
+<html>
 
-  constructor() {
-    super();
-  }
+  <head>
+    <script type="module" src="/components/footer.js"></script>
+  </head>
+  
+  <body>
+    <content-outlet></content-outlet>
 
-  render() {
-    return html\`
-      <div>
-        <!-- using our custom header -->
-        <app-header></app-header>
-
-        <entry></entry>
-
-        <!-- you can add your custom footer here -->
-      </div>
-    \`;
-  }
-}
-
-customElements.define('page-template', PageTemplate);
+    <app-footer></app-footer>
+  </body>
+  
+</html>
 ```
 
+Now you can do the same for an `<app-header>`.  See the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started/) for a complete working example.
 
-> You now do the same for your `<footer>`.  See the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started/) for a complete working example.
+> _You can find more information about component models and Greenwood [here](/docs/component-model/)._
 
 ### CSS
-OK, so we've made some content and some custom components, but what about the look and feel? Yes, of course, let's add some CSS!
+OK, so we've made some content and some custom elements, but what about the look and feel? Yes, of course, let's add some CSS!
 
-For global styles like Google fonts, Bootstrap, background colors, or browser resets, create a file called _src/styles/theme.css_ and Greenwood will make sure these styles get applied in the `<head>` of the doucment, outside of any Shadow DOMs.
+For global styles like Google fonts, Bootstrap, background colors, or browser resets, let's create a file called _src/styles/theme.css_ that we can reference in all our templates.
 
 Here are some styles you can add to your site to snap things into place a little bit.
 ```css
 /* theme.css */
-@import url('//fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
-
 * {
   margin: 0;
   padding: 0;
@@ -99,23 +96,30 @@ body {
 }
 ```
 
-Now we can `import` this CSS file into our templates.
-```javascript
-import { html, LitElement } from 'lit-element';
-import '../components/header';
-import '../styles/theme.css'; // add this line
+Now we can `<link>` this CSS file into our template.  Easy!  💥
+```html
+<html>
 
-class PageTemplate extends LitElement {
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap">
+    <link rel="stylesheet" href="/styles/theme.css"> 
+    <script type="module" src="/components/header.js"></script>
+  </head>
+  
+  <body>
+    <content-outlet></content-outlet>
 
-  ...
-
-}
+    <app-footer></app-footer>
+  </body>
+  
+</html>
 ```
 
-Within our components, we can easily add some styles right within the component definition itself. For example in our header component, we can style it like this and take advantage of the Shadow DOM.
+Within our components, we can easily add some styles right within the component definition itself. For example in our header component, we can style it like this and take advantage of [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM).
 
 ```javascript
-class HeaderComponent extends HTMLElement {
+class FooterComponent extends HTMLElement {
   constructor() {
     super();
 
@@ -127,18 +131,21 @@ class HeaderComponent extends HTMLElement {
   }
 
   getTemplate() {
-    return \`
+    return `
       <style>
-        header {
+        :host footer {
           color: blue;
         }
       </style>
-      <header>This is the header component.</header>
-    \`;
+
+      <footer>
+        <h4>My Blog &copy;${year}</h4>
+      </footer>
+    `;
   }
 }
 
-customElements.define('app-header', HeaderComponent);
+customElements.define('app-footer', FooterComponent);
 ```
 
 Taking this all the way with [the code from companion repo](https://vuejs.org/v2/guide/single-file-components.html), you should be able to get a result that looks like this:

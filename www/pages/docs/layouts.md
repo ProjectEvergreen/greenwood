@@ -6,74 +6,101 @@ index: 6
 linkheadings: 3
 ---
 
-## Templates
-Greenwood has two types of templates:
-- App Template: The [app shell](https://developers.google.com/web/fundamentals/architecture/app-shell) if you will, that wraps all pages.  This is provided for you by Greenwood, but you can override if needed. (though not recommended)
-- Page Template:.  Nested within the app template, and how you define different pages / layouts for your site.  Common layouts would be used for a home page, documentation pages, blog posts, etc.
+## Templates and Pages
+
+Greenwood has two types of templates to help layout your pages:
+
+- _App Template_: The ["app shell"](https://developers.google.com/web/fundamentals/architecture/app-shell) that will wrap all pages.  One is provided for you by Greenwood, but you can override it if needed.
+- _Page Templates_:  A template for each unique page layout within your site.  Common layouts are great for documentation and blog sites, but also great for single pages as well (like a splash layout for the home page).
+
+> _**Note**: [For now](https://github.com/ProjectEvergreen/greenwood/issues/435), all paths in template files need to start with a `/` and omit the workspace directory._
+
+### Page Templates
+Pages in your project will generally want a template so you can control the output of the HTML and include all your own custom components and styles.  By default all pages will default to looking for a _page.html_ in _templates/ directory within your workspace.  
 
 
-### Page Template
-In order to make a page template, you need to create a `LitElement` based custom element that contains a predefined `<entry></entry>` element. The `<entry></entry>` element is where your markdown page content will be placed once compiled. You need to do this in a file within your _templates/_ directory named _<type>-template.js_.
+In order to make a page template, you just need to write up some HTML that can be enhanced with these special custom elements:
+- Include `<content-outlet></content-outlet>` to position where the processed markdown from the page will appear
+- Include `<meta-outlet></meta-outlet>` to position where `<meta>` tags should go 
 
-Here is an example `page-template.js` (the [default](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/page-template.js) one included with Greenwood which is the default page-template.js if no other is defined).  You can just copy / paste this to start your own page template.
 
-```js
-import { html, LitElement } from 'lit-element';
+Below is an example of a simple _page.html_.  You can just copy / paste this to start your own page templates and by default all your pages will start rendering using this layout.
 
-class PageTemplate extends LitElement {
-  render() {
-    return html\`
-      <div class='gwd-wrapper'>
-        <div class='gwd-page-template gwd-content'>
-          <entry></entry>
-        </div>
-      </div>
-    \`;
-  }
-}
+```html
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
 
-customElements.define('page-template', PageTemplate);
+  <head>
+    <meta-outlet></meta-outlet>
+  </head>
+  
+  <body>
+    <header>
+      <h1>Welcome to my site!</h1>
+    </header>
+      
+    <content-outlet></content-outlet>
+
+  </body>
+  
+</html>
 ```
 
-> **Note**: the filename must be in the format `<label>-template.js` and the `customElements` name must be `page-template`.
+You can create more templates and use them for pages by doing two things:
+1. Create a new template, e.g. _templates/blog-post.html_
+1. In your frontmatter, specify that `template`
+    ```md
+    ---
+    template: 'blog-post'
+    ---
 
-With a completed page-template.js present in your `src/templates/` folder you can define which page uses it via front-matter at the top of any markdown file.  See [Front Matter Docs](/docs/front-matter#define-template) for more information.  Simply including a file named `page-template.js` will overwrite the greenwood default template for all markdown files, without needing to declare the template at the top of markdown file.
+    ## My Blog Post
+    Lorum Ipsum
+    ```
+
+> _See our [Front Matter Docs](/docs/front-matter#define-template) for more information._
 
 ### App Template
 
-In order to make an app template, you need to create a `LitElement` component that contains a predefined hook `MYROUTES` aswell the component element itself **must be defined as `eve-app`**.  You need to do this in a file name and path _`<workspace>`/templates/app-template.js_.
+If you want to customize the outer most wrapping layout of your site, in the _templates/_ directory you can do this by creating an _app.html_ file.  Like a page template, this will just be another HTML document, with some additional capabilities:
+- Include `<page-outlet></page-outlet>` to position where the content from the processed page template will appear
+- Include `<meta-outlet></meta-outlet>` to position where `<meta>` tags goes.  _Make sure not to include this in your page templates!_
 
-First, we need our app template to use routes, by default greenwood uses [**lit-redux-router**](https://github.com/fernandopasik/lit-redux-router). To do this we define a `<routes></routes>` element in our app-template.js where our routes will be placed when compiled.
+As with page templates, app templates are just HTML.
 
-Here is an example app-template:
+```html
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
 
-```js
-import { html, LitElement } from 'lit-element';
+  <head>
+    <meta-outlet></meta-outlet>
+  </head>
 
-// Add the <routes></routes> predefined hook. This is where all your routes will be loaded.
-// You may also opt to define a custom 404 route here.
-// You must define the app-template with the element name eve-app
-class AppComponent extends LitElement {
-  render() {
-    return html\`
-      <routes></routes>
-      <lit-route><h1>404 Not found</h1></lit-route>
-    \`;
-  }
-}
+  <body>
+    <header>
+      <h1>Welcome to My Site!</h1>
+    </header>
+      
+    <section>
+      <page-outlet></page-outlet>
+    </section>
 
-customElements.define('eve-app', AppComponent);
+    <footer>
+      <h1>&copy; My Site</h1>
+    </footer>
+
+  </body>
+  
+</html>
 ```
 
-* `app-template.js` requires `<routes></routes>` element to place routes
-* `app-template.js` must have a component name `eve-app`
-* `app-template.js` must maintain filename and path `<your-workspace>/templates/app-template.js`
+> _When an app template is present, Greenwood will merge the `<head>` and `<body>` tags for both app and page templates into one HTML document structure for you._
 
-> A working example can be found in the [greenwood source](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/templates/app-template.js) which is the default _app-template.js_ if no other is defined. A production example can be found in [greenwood's website](https://github.com/ProjectEvergreen/greenwood/blob/master/www/templates/app-template.js).
 
+> _**Tip:** If you use an _.html_ file instead of _.md_ for a page, you can use that as a page template override.  (since there will be no frontmatter).  This way you don't have to make a template for a one off page like a home page._
 
 ### Pages
-You can create all your pages in a _pages/_ directory in your projects workspace.  You can also create nested pages and the page paths will map accordingly.
+You can create all your pages in a _pages/_ directory in your project's workspace which will in turn map to the generated file output and routes of your site.
 
 For example, given this folder structure:
 ```shell
@@ -83,11 +110,28 @@ For example, given this folder structure:
         ├── blog
         │   ├── first-post.md
         │   └── second-post.md
-        └── index.md
-
+        ├── about.md
+        └── index.html
 ```
 
-You will have the following page URLs:
+You will have the following page URLs accessible in the browser:
 - _/_
+- _/about/_
 - _/blog/first-post/_
 - _/blog/second-post/_
+
+And the following file output in the _public/_ directory
+```shell
+.
+└── public
+      ├── blog
+      │   ├── first-post
+      │   │     └── index.html
+      │   └── second-post
+      │         └── index.html
+      ├── about
+      │     └── index.html
+      └── index.html
+```
+
+> _See our [Front Matter Docs](/docs/front-matter#define-template) for more information on how you can extend fontmatter in **Greenwood**._
