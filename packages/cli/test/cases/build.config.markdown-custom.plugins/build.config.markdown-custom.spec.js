@@ -62,18 +62,16 @@ describe('Build Greenwood With: ', function() {
         expect(code[0].getAttribute('class')).to.equal('language-js');
       });
 
-      // TODO?
-      xit('should use our custom markdown preset rehype-autolink-headings and rehype-slug plugins', function() {
-        let heading = dom.window.document.querySelector('h3 > a');
+      it('should use our custom markdown preset rehype-autolink-headings and rehype-slug plugins', function() {
+        let heading = dom.window.document.querySelector('h1 > a');
         
-        expect(heading.getAttribute('href')).to.equal('#greenwood');
+        expect(heading.getAttribute('href')).to.equal('#greenwood-markdown-syntax-highlighting-test');
       });
 
-      // TODO?
-      xit('should use our custom markdown preset rremark-TBD plugins', function() {
+      it('should use our custom markdown preset rremark-TBD plugins', function() {
         let heading = dom.window.document.querySelector('h3 > a');
         
-        expect(heading.getAttribute('href')).to.equal('#greenwood');
+        expect(heading.getAttribute('href')).to.equal('#lower-heading-test');
       });
     });
 
