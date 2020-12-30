@@ -16,23 +16,25 @@ In this section, we will add the following to your project:
 1. Styles - Of course we want things to look nice too!  We'll add some CSS to help hang things in just right the place.
 
 ### Web Components
-For this guide, we'll use a "vanilla" custom element for our footer, in _src/components/footer.js_.
+For this guide, we'll use a "vanilla" custom element for our footer.
+
+Start by creating a file called _src/components/footer.js_ with the following code in it.
 ```javascript
 class FooterComponent extends HTMLElement {
   constructor() {
     super();
 
-    // create a Shadow DOM
+    // creates a Shadow DOM root
     this.root = this.attachShadow({ mode: 'closed' });
   }
 
   // run some code when the component is ready
-  // like initializing our component's DOM
+  // like initializing our component's DOM / innerHTML
   connectedCallback() {
     this.root.innerHTML = this.getTemplate();
   }
 
-  // create templates that interpolate variables and HTML!
+  // create templates that can interpolate variables and HTML!
   getTemplate() {
     const year = new Date().getFullYear();
 
@@ -51,9 +53,9 @@ class FooterComponent extends HTMLElement {
 customElements.define('app-footer', FooterComponent);
 ```
 
-Now we can use it in both our templates by:
-1. Referencing our component via a `<script>` tag with the `type="module"` attribute
-1. Using our custom element's tag name of `<app-footer` in our `<body>`
+Now we can use it in a template by:
+1. Referencing our component file via a `<script>` tag with the `type="module"` attribute
+1. Using our custom element's tag name of `<app-footer>` in our `<body>`
 
 ```html
 <html>
@@ -71,20 +73,18 @@ Now we can use it in both our templates by:
 </html>
 ```
 
-Now do the same for a `<app-header>`.  See the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started/) for a complete working example.
+Now you can do the same for an `<app-header>`.  See the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started/) for a complete working example.
 
 > _You can find more information about component models and Greenwood [here](/docs/component-model/)._
 
 ### CSS
 OK, so we've made some content and some custom elements, but what about the look and feel? Yes, of course, let's add some CSS!
 
-For global styles like Google fonts, Bootstrap, background colors, or browser resets, let's create a file called _src/styles/theme.css_ that we can reference in all templates.
+For global styles like Google fonts, Bootstrap, background colors, or browser resets, let's create a file called _src/styles/theme.css_ that we can reference in all our templates.
 
 Here are some styles you can add to your site to snap things into place a little bit.
 ```css
 /* theme.css */
-@import url('//fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
-
 * {
   margin: 0;
   padding: 0;
@@ -101,8 +101,10 @@ Now we can `<link>` this CSS file into our template.  Easy!  💥
 <html>
 
   <head>
-    <script type="module" src="/components/header.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap">
     <link rel="stylesheet" href="/styles/theme.css"> 
+    <script type="module" src="/components/header.js"></script>
   </head>
   
   <body>

@@ -48,13 +48,13 @@ Below is an example of a simple _page.html_.  You can just copy / paste this to 
 
 You can create more templates and use them for pages by doing two things:
 1. Create a new template, e.g. _templates/blog-post.html_
-1. In your frontmatter, specify to use that template
+1. In your frontmatter, specify that `template`
     ```md
     ---
     template: 'blog-post'
     ---
 
-    ## My blog Post
+    ## My Blog Post
     Lorum Ipsum
     ```
 
