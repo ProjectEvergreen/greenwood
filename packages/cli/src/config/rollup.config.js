@@ -33,7 +33,7 @@ function greenwoodWorkspaceResolver (compilation) {
 
 // https://github.com/rollup/rollup/issues/2873
 function greenwoodHtmlPlugin(compilation) {
-  const { userWorkspace, outputDir } = compilation.context;
+  const { projectDirectory, userWorkspace, outputDir } = compilation.context;
 
   return {
     name: 'greenwood-html-plugin',
@@ -117,15 +117,27 @@ function greenwoodHtmlPlugin(compilation) {
       }
       
       // this is a giant work around because PostCSS and some plugins can only be run async
-      // and so have to use with awit but _outside_ sync code, like parser / rollup
+      // and so have to use with await but _outside_ sync code, like parser / rollup
       // https://github.com/cssnano/cssnano/issues/68
       // https://github.com/postcss/postcss/issues/595
       // TODO consider similar approach for emitting chunks?
       return Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
         const asset = mappedStyles[assetKey];
         const filePath = path.join(userWorkspace, asset.name);
-        
-        const result = await postcss(postcssConfig.plugins)
+        // TODO we already process the user's CSS as part of serve lifecycle (dev / build commands)
+        // if we pull from .greenwood/ then maybe we could avoid re-postcss step here?
+        const userPostcssConfig = fs.existsSync(`${projectDirectory}/postcss.config.js`)
+          ? require(`${projectDirectory}/postcss.config`)
+          : {};
+        const userPostcssPlugins = userPostcssConfig.plugins && userPostcssConfig.plugins.length > 0
+          ? userPostcssConfig.plugins
+          : [];
+        const allPostcssPlugins = [
+          ...userPostcssPlugins,
+          ...postcssConfig.plugins
+        ];
+
+        const result = await postcss(allPostcssPlugins)
           .use(postcssImport())
           .process(asset.source, { from: filePath });
 
