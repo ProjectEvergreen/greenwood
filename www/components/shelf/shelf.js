@@ -41,7 +41,7 @@ class Shelf extends LitElement {
   expandRoute(path) {
     let routeShelfListIndex = this.shelfList.findIndex(item => {
       let expRoute = new RegExp(`^${path}$`);
-      return expRoute.test(item.link);
+      return expRoute.test(item.route);
     });
 
     if (routeShelfListIndex > -1) {
@@ -96,7 +96,7 @@ class Shelf extends LitElement {
           if (page.data.menu && page.data.menu === 'side' && page.route.indexOf(`/${this.page}`) === 0) {
             page.label = `${page.label.charAt(0).toUpperCase()}${page.label.slice(1)}`.replace('-', ' ');
             page.children = [];
-            
+
             page.data.tableOfContents.forEach(({ content, slug }) => {
               page.children.push({
                 label: content,
