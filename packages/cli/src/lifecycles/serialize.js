@@ -27,6 +27,7 @@ module.exports = serializeCompilation = async (compilation) => {
             let htmlModified = html;
   
             // TODO should really be happening via plugins or other standardize setup / teardown mechanism
+            htmlModified = htmlModified.replace(/<script src="\/node_modules\/@webcomponents\/webcomponentsjs\/webcomponents-loader.js"><\/script>/, '/<script src="\/webcomponents-loader.js"><\/script>');
             htmlModified = htmlModified.replace(/<script src="\/node_modules\/@webcomponents\/webcomponentsjs\/webcomponents-bundle.js"><\/script>/, '');
             htmlModified = htmlModified.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
             htmlModified = htmlModified.replace(/<script defer="" src="\/node_modules\/es-module-shims\/dist\/es-module-shims.js"><\/script>/, '');
