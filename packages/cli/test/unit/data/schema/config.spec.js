@@ -19,10 +19,6 @@ describe('Unit Test: Data', function() {
         it('should have the expected devServer.port', function() {
           expect(config.devServer.port).to.equal(devServer.port);
         });
-  
-        it('should have the expected devServer.host', function() {  
-          expect(config.devServer.host).to.equal(devServer.host);
-        });
       });
 
       describe('Meta', function() {
@@ -33,23 +29,11 @@ describe('Unit Test: Data', function() {
 
           expect(nameMeta.name).to.equal(meta[0].name);
         });
-  
-        it('should have the expected devServer.host', function() {  
-          const nameMeta = config.meta[0];
-
-          expect(nameMeta.content).to.equal(meta[0].content);
-        });
 
         it('should have the expected rel meta in the second index', function() {
           const relMeta = config.meta[1];
 
           expect(relMeta.rel).to.equal(meta[1].rel);
-        });
-  
-        it('should have the expected devServer.host', function() {  
-          const relMeta = config.meta[1];
-
-          expect(relMeta.content).to.equal(meta[1].content);
         });
       });
 
@@ -59,14 +43,6 @@ describe('Unit Test: Data', function() {
           expect(config.optimization).to.equal(MOCK_CONFIG.config.optimization);
         });
 
-      });
-
-      describe('Public Path', function() {
-        const { publicPath } = MOCK_CONFIG.config;
-
-        it('should have the expected publicPath', function() {  
-          expect(publicPath).to.equal(config.publicPath);
-        });
       });
 
       describe('Title', function() {

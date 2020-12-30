@@ -12,22 +12,22 @@ linkheadings: 3
 
 ### Element Label
 
-When this markdown file is compiled to a component it will automatically generate a custom element tag name. If you want to use a custom element name of your own for your page, you can give the component a label using the predefined variable `label`.
+By default Greenwood will aim to create a label for your page based on filename and context and include that in the graph.  This can be useful for categorizing or organizing your content when rendering client side, or if you want to create a custom value to display for a link or in your HTML that may be different from what can be inferred from the file name.
 
 #### Example
+_pages/blog/2020/03/05/index.md_
 ```md
 ---
-label: 'mypage'
+label: 'My Blog Post from 3/5/2020'
 ---
 
 ```
 
-Which will compile to the element: `<wc-md-mypage></wc-md-mypage>`
-
 
 ### Imports
+> ⛔ _**Coming Soon!**_
 
-If you want to import custom files such as a custom element, you can use the predefined variable `imports`.
+<!-- If you want to include files on a _per **page** basis_, you can use the predefined `imports` feature from Greenwood.  This is great for one off use cases where you dont want to ship a third party lib in all your templates, but just for this one particular page.  This is effectively a naive form of code splitting.  🤓
 
 #### Example
 ```md
@@ -38,11 +38,11 @@ imports:
 
 ```
 
-See our [Markdown Docs](/docs/markdown#imports) for more information about rendering custom elements in markdown files.
+See our [Markdown Docs](/docs/markdown#imports) for more information about rendering custom elements in markdown files. -->
 
 
 ### Template
-When creating multiple page templates, you can use the `template` front-matter to configure Greenwood to use that template for a given page.
+When creating multiple [page templates](/docs/layouts/), you can use the `template` front-matter to configure Greenwood to use that template for a given page.
 
 #### Example
 ```md
@@ -54,9 +54,9 @@ template: 'home'
 This is the home page
 ```
 
-In this example, the _src/templates/home-template.js_ will be used to render the current markdown page.
+In this example, the _src/templates/home.html_ will be used to render the current markdown page.
 
-> **Note:** By default, Greenwood will use `src/templates/page-template.js` for all undefined template pages.
+> **Note:** By default, Greenwood will use `src/templates/page.html` for all undefined template pages.
 
 
 ### Title

@@ -12,7 +12,7 @@ module.exports = runDevServer = async () => {
       const { userWorkspace } = compilation.context;
       
       devServer(compilation).listen(port, () => {
-        console.info(`Started local development at localhost:${port}`);
+        console.info(`Started local development server at localhost:${port}`);
         const liveReloadServer = livereload.createServer({
           exts: ['html', 'css', 'js', 'md'],
           applyCSSLive: false // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006

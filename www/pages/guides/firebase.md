@@ -91,7 +91,7 @@ jobs:
     - name: Firebase Deploy
       run: |
         sudo npm install -g firebase-tools
-        firebase deploy --token \$\{\{ secrets.FIREBASE_TOKEN \}\} -P your-firebase-project-name
+        firebase deploy --token ${{ secrets.FIREBASE_TOKEN }} -P your-firebase-project-name
 ```
 
 In the same directory as main.yml create a file 'chromium-lib-install.sh'
