@@ -1,4 +1,3 @@
-/* TODO restore to nested styles */
 h3 {
   color: green;
 }
@@ -11,28 +10,28 @@ h3 {
   background-color: #efefef;
   padding: 0 15%;
   font-size:1.2rem;
+
+  & h3 {
+    font-size:2rem;
+    margin: 5px 0;
+  }
+
+  & a {
+    color: #1d337a;
+  }
 }
 
-.gwd-content h3 {
-  font-size:2rem;
-  margin: 5px 0;
-}
-
-.gwd-content a {
-  color: #1d337a;
-}
-
-.gwd-content .cards {
+.cards {
   margin: 0 -15%
 }
   
-.gwd-content .message {
+.message {
   padding: 4rem;
   text-align:center;
-}
 
-.gwd-content .message hr {
-  margin-top: 4rem;
+  & hr {
+    margin-top: 4rem;
+  }
 
   @media(max-width:768px) {
     padding:0;
