@@ -4,13 +4,13 @@ const { promises: fsp } = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
-const Transform = require('../transforms/transform.interface');
-const HTMLTransform = require('../transforms/transform.html');
-const MarkdownTransform = require('../transforms/transform.md');
-const CSSTransform = require('../transforms/transform.css');
-const JSTransform = require('../transforms/transform.js');
-const JSONTransform = require('../transforms/transform.json.js');
-const AssetTransform = require('../transforms/transform.assets');
+const Transform = require('../plugins/transforms/transform.interface');
+const HTMLTransform = require('../plugins/transforms/transform.html');
+const MarkdownTransform = require('../plugins/transforms/transform.md');
+const CSSTransform = require('../plugins/transforms/transform.css');
+const JSTransform = require('../plugins/transforms/transform.js');
+const JSONTransform = require('../plugins/transforms/transform.json.js');
+const AssetTransform = require('../plugins/transforms/transform.assets');
 
 function getDevServer(compilation) {
   const app = new Koa();
