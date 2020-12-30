@@ -9,6 +9,7 @@ module.exports = initContexts = async({ config }) => {
   return new Promise(async (resolve, reject) => {
 
     try {
+      const projectDirectory = process.cwd();
       const userWorkspace = path.join(config.workspace);
       const pagesDir = path.join(userWorkspace, 'pages/');
       const userTemplatesDir = path.join(userWorkspace, 'templates/');
@@ -19,7 +20,8 @@ module.exports = initContexts = async({ config }) => {
         userWorkspace,
         pagesDir,
         userTemplatesDir,
-        scratchDir
+        scratchDir,
+        projectDirectory
       };
 
       if (!fs.existsSync(scratchDir)) {
