@@ -2,11 +2,11 @@ const path = require('path');
 const { promises: fsp } = require('fs');
 const TransformInterface = require('./transform.interface');
 
-class AssetTransform extends TransformInterface {
+class ImageTransform extends TransformInterface {
 
   constructor(req, compilation) {
     super(req, compilation, {
-      extensions: ['.woff2', '.woff', '.ttf', '.jpg', '.png', '.gif', '.svg']
+      extensions: ['.ico', '.jpg', '.png', '.gif', '.svg']
     });
   }
 
@@ -35,15 +35,9 @@ class AssetTransform extends TransformInterface {
           } else {
             body = await fsp.readFile(assetPath); 
           }
-        } else if (['.woff2', '.woff', '.ttf'].includes(ext)) {
-          contentType = `font/${type}`;
-          body = await fsp.readFile(assetPath);
         } else if (['.ico'].includes(ext)) {
           contentType = 'image/x-icon';
           body = await fsp.readFile(assetPath);
-        } else {
-          contentType = `text/${type}`;
-          body = await fsp.readFile(assetPath, 'utf-8');
         }
 
         resolve({
@@ -58,4 +52,4 @@ class AssetTransform extends TransformInterface {
   }
 }
 
-module.exports = AssetTransform;
+module.exports = ImageTransform;

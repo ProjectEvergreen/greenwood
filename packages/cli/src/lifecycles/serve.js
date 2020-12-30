@@ -10,7 +10,8 @@ const MarkdownTransform = require('../plugins/transforms/transform.md');
 const CSSTransform = require('../plugins/transforms/transform.css');
 const JSTransform = require('../plugins/transforms/transform.js');
 const JSONTransform = require('../plugins/transforms/transform.json.js');
-const AssetTransform = require('../plugins/transforms/transform.assets');
+const FontTransform = require('../plugins/transforms/transform.fonts');
+const ImageTransform = require('../plugins/transforms/transform.images');
 
 function getDevServer(compilation) {
   const app = new Koa();
@@ -37,7 +38,8 @@ function getDevServer(compilation) {
         new MarkdownTransform(request, compilationCopy),
         new JSTransform(request, compilationCopy),
         new JSONTransform(request, compilationCopy),
-        new AssetTransform(request, compilationCopy)
+        new FontTransform(request, compilationCopy),
+        new ImageTransform(request, compilationCopy)
       ];
 
       // walk through all transforms
