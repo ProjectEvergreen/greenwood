@@ -39,7 +39,7 @@ h2, h3, h4, h5 {
   color: #1d337a;
 }
 
-ul {
+ul, ol {
   padding-left: 20px;
 }
 
@@ -59,6 +59,11 @@ a {
   & .step {
     margin: 2px;
   }
+}
+
+p > code {
+  color: #2D3D3A;
+  font-weight: 800;
 }
 
 .gwd-content-wrapper {

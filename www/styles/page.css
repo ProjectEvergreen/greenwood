@@ -7,7 +7,6 @@ h3 {
 }
 
 h2 {
-  color: #2D3D3A;
   font-size: 2rem;
 }
 
@@ -17,7 +16,7 @@ h4, h5, h6 {
 
 h1, h2, h3, h4, h5 {
   line-height: 1.8rem;
-
+  color: #2D3D3A;
   & a > span.icon {
     width:28px;
     height:24px;
