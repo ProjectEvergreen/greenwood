@@ -18,12 +18,15 @@
  *     header/
  *       header.js
  *   pages/
- *     about.md
+ *     plugins/
+ *       index-hooks.md
+ *       index.md
  *     index.md
+ *     pages.md
  *   services/
- *     components.js
  *     pages/
  *       pages.js
+ *     components.js
  *   templates/
  *     page.html
  */
@@ -158,8 +161,7 @@ describe('Build Greenwood With: ', function() {
         expect(p.textContent).to.be.equal('Lorum Ipsum');
       });
 
-      // TODO - https://github.com/ProjectEvergreen/greenwood/issues/456
-      xit('should have the expected content in the <body> of the plugins hook index.html with index in the route name', function() {
+      it('should have the expected content in the <body> of the plugins hook index.html with index in the route name', function() {
         const h2 = pluginHooksIndexPageDom.window.document.querySelector('body h2');
         const p = pluginHooksIndexPageDom.window.document.querySelector('body p');
 
