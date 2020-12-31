@@ -75,13 +75,6 @@ function getProdServer(compilation) {
       ctx.body = contents;
     }
 
-    if (ctx.request.url.endsWith('.html')) {
-      const contents = await fsp.readFile(path.join(outputDir, ctx.request.url), 'utf-8');
-
-      ctx.set('Content-Type', 'text/html');
-      ctx.body = contents;
-    }
-
     if (ctx.request.url.endsWith('.js')) {
       const contents = await fsp.readFile(path.join(outputDir, ctx.request.url), 'utf-8');
 
