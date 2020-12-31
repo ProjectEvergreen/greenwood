@@ -68,8 +68,14 @@ function getProdServer(compilation) {
     // console.debug('URL', ctx.request.url);
     const { outputDir } = compilation.context;
 
-    if (ctx.request.url.endsWith('.html') || ctx.request.url.endsWith('/')) {
-      const contents = await fsp.readFile(path.join(outputDir, `${ctx.request.url}index.html`), 'utf-8');
+    if (ctx.request.url.endsWith('/')) {
+      const contents = await fsp.readFile(path.join(outputDir, ctx.request.url, 'index.html'), 'utf-8');
+      ctx.set('Content-Type', 'text/html');
+      ctx.body = contents;
+    }
+
+    if (ctx.request.url.endsWith('.html')) {
+      const contents = await fsp.readFile(path.join(outputDir, ctx.request.url, 'utf-8'));
 
       ctx.set('Content-Type', 'text/html');
       ctx.body = contents;
