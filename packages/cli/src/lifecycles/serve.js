@@ -67,37 +67,32 @@ function getProdServer(compilation) {
   app.use(async ctx => {
     // console.debug('URL', ctx.request.url);
     const { outputDir } = compilation.context;
+    const { url } = ctx.request;
 
-    if (ctx.request.url.endsWith('/')) {
-      const contents = await fsp.readFile(path.join(outputDir, ctx.request.url, 'index.html'), 'utf-8');
+    if (url.endsWith('/') || url.endsWith('.html')) {
+      const barePath = url.endsWith('/') ? path.join(url, 'index.html') : url;
+      const contents = await fsp.readFile(path.join(outputDir, barePath), 'utf-8');
       ctx.set('Content-Type', 'text/html');
       ctx.body = contents;
     }
 
-    if (ctx.request.url.endsWith('.html')) {
-      const contents = await fsp.readFile(path.join(outputDir, ctx.request.url), 'utf-8');
-
-      ctx.set('Content-Type', 'text/html');
-      ctx.body = contents;
-    }
-
-    if (ctx.request.url.endsWith('.js')) {
+    if (url.endsWith('.js')) {
       const contents = await fsp.readFile(path.join(outputDir, ctx.request.url), 'utf-8');
 
       ctx.set('Content-Type', 'text/javascript');
       ctx.body = contents;
     }
 
-    if (ctx.request.url.endsWith('.css')) {
-      const contents = await fsp.readFile(path.join(outputDir, ctx.request.url), 'utf-8');
+    if (url.endsWith('.css')) {
+      const contents = await fsp.readFile(path.join(outputDir, url), 'utf-8');
 
       ctx.set('Content-Type', 'text/css');
       ctx.body = contents;
     }
 
     // TODO break up into distinct font / icons / svg handlers, decouple from to assets/
-    if (ctx.request.url.indexOf('assets/')) {
-      const assetPath = path.join(outputDir, ctx.request.url);
+    if (url.indexOf('assets/')) {
+      const assetPath = path.join(outputDir, url);
       const ext = path.extname(assetPath);
       const type = ext === '.svg'
         ? `${ext.replace('.', '')}+xml`
@@ -120,7 +115,7 @@ function getProdServer(compilation) {
       }
     }
 
-    if (ctx.request.url.endsWith('.json')) {
+    if (url.endsWith('.json')) {
       const contents = await fsp.readFile(path.join(outputDir, 'graph.json'), 'utf-8');
 
       ctx.set('Content-Type', 'application/json');
