@@ -43,9 +43,11 @@ class Card extends LitElement {
 
   render() {
     return html`
-      ${this.renderImage()}
-      ${this.renderTitle()}
-      <slot name="cardcontent"></slot>
+      <div class="gwd-card">
+        ${this.renderImage()}
+        ${this.renderTitle()}
+        <slot name="cardcontent"></slot>
+      </div>
     `;
   }
 }

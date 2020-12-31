@@ -1,5 +1,4 @@
 :host {
-  padding: 2.5rem;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -10,7 +9,9 @@
   text-align: center;
 
   @media (max-width: 768px) {
-    padding: 0;
+    .gwd-card {
+      padding: 0;
+    }
   }
 
   & slot {
@@ -19,34 +20,8 @@
     flex: 1 1 33.333%;
   }
 
-  & .card-xs {
-    margin: 0.25rem;
-    flex: 1 1 16.666%;
-    max-width: 250px;
-
-    @media (max-width: 1024px) {
-      max-width: 100%;
-    }
-  }
-
-  & .card-sm {
-    margin: 0.25rem;
-    flex: 1 1 25%;
-    max-width: 380px;
-
-    @media (max-width: 1024px) {
-      max-width: 100%;
-    }
-  }
-
-  & .card-md {
-    margin: 0.25rem;
-    flex: 1 1 33.333%;
-    max-width: 450px;
-
-    @media (max-width: 1024px) {
-      max-width: 100%;
-    }
+  & .gwd-card {
+    padding: 1.25rem;
   }
 
   & .card-img-top {
