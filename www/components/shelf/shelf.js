@@ -88,7 +88,6 @@ class Shelf extends LitElement {
   }
 
   async fetchShelfData() {
-    console.log('fetchShelfData!!!', this.page);
     return fetch('/graph.json')
       .then(res => res.json())
       .then(data => {
