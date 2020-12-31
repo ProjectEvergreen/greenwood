@@ -68,8 +68,11 @@ function getProdServer(compilation) {
     // console.debug('URL', ctx.request.url);
     const { outputDir } = compilation.context;
 
-    if (ctx.request.url.endsWith('/')) {
-      ctx.redirect(`http://localhost:8080${ctx.request.url}index.html`);
+    if (ctx.request.url.endsWith('.html') || ctx.request.url.endsWith('/')) {
+      const contents = await fsp.readFile(path.join(outputDir, `${ctx.request.url}index.html`), 'utf-8');
+
+      ctx.set('Content-Type', 'text/html');
+      ctx.body = contents;
     }
 
     if (ctx.request.url.endsWith('.html')) {
