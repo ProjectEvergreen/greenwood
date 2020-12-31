@@ -88,7 +88,7 @@ class Shelf extends LitElement {
   }
 
   async fetchShelfData() {
-    // console.debug('fetchShelfData!!!', this.page);
+    console.log('fetchShelfData!!!', this.page);
     return fetch('/graph.json')
       .then(res => res.json())
       .then(data => {
@@ -132,9 +132,18 @@ class Shelf extends LitElement {
     }
   }
 
+  handleSubItemSelect(mainRoute, itemRoute) {
+    // check if we're on the same page as subitem anchor
+    if (window.location.pathname.substr(0, window.location.pathname.length - 1) !== mainRoute) {
+      window.location.href = mainRoute + itemRoute;
+    } else {
+      this.goTo(`${item.route}`);
+    }
+  }
+
   renderList() {
     /* eslint-disable indent */
-    const renderListItems = (list, selected) => {
+    const renderListItems = (mainRoute, list, selected) => {
       let listItems = '';
 
       if (list && list.length > 0) {
@@ -143,7 +152,7 @@ class Shelf extends LitElement {
             ${list.map((item) => {
               return html`
                 <li class="${selected ? '' : 'hidden'}">
-                  <a @click=${() => { this.goTo(`${item.route}`); }}>${item.label}</a>
+                  <a @click=${() => this.handleSubItemSelect(mainRoute, item.route)}>${item.label}</a>
                 </li>
               `;
             })}
@@ -170,7 +179,7 @@ class Shelf extends LitElement {
 
           <hr/>
           
-          ${renderListItems(item.children, item.selected)}
+          ${renderListItems(item.route, item.children, item.selected)}
         </li>
       `;
     });
