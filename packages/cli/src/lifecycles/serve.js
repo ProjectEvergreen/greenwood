@@ -77,7 +77,7 @@ function getProdServer(compilation) {
     }
 
     if (url.endsWith('.js')) {
-      const contents = await fsp.readFile(path.join(outputDir, ctx.request.url), 'utf-8');
+      const contents = await fsp.readFile(path.join(outputDir, url), 'utf-8');
 
       ctx.set('Content-Type', 'text/javascript');
       ctx.body = contents;
