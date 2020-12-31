@@ -8,20 +8,10 @@
   background-clip: initial;
   text-align: center;
 
-  @media (max-width: 768px) {
-    .gwd-card {
-      padding: 0;
-    }
-  }
-
   & slot {
     padding: 10px;
     margin: 0.25rem;
     flex: 1 1 33.333%;
-  }
-
-  & .gwd-card {
-    padding: 1.25rem;
   }
 
   & .card-img-top {
