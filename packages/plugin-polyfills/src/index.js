@@ -16,12 +16,14 @@ class PolyFillsPlugin extends TransformInterface {
   shouldTransform() {
     const { request, workspace } = this;
     const { url } = request;
-
+    
     const barePath = url.endsWith('/')
       ? `${workspace}/pages${url}index`
       : `${workspace}/pages${url.replace('.html', '')}`;
 
-    return fs.existsSync(`${barePath}.md`) || fs.existsSync(`${barePath.replace('/index', '.md')}`);
+    return fs.existsSync(`${barePath}.md`) 
+    || fs.existsSync(`${barePath}.html`) 
+    || fs.existsSync(`${barePath.replace('/index', '.md')}`);
   }
 
   async applyTransform(response) {
