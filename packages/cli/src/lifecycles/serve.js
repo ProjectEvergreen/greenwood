@@ -1,55 +1,63 @@
-/* eslint-disable complexity */
-// TODO ^^^
 const { promises: fsp } = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
-const Transform = require('../transforms/transform.interface');
-const HTMLTransform = require('../transforms/transform.html');
-const MarkdownTransform = require('../transforms/transform.md');
-const CSSTransform = require('../transforms/transform.css');
-const JSTransform = require('../transforms/transform.js');
-const JSONTransform = require('../transforms/transform.json.js');
-const AssetTransform = require('../transforms/transform.assets');
+const pluginServeHtml = require('../plugins/plugin-serve-html');
+const { ResourceInterface } = require('../lib/resource-interface');
+// const Transform = require('../transforms/transform.interface');
+// const HTMLTransform = require('../transforms/transform.html');
+// const MarkdownTransform = require('../transforms/transform.md');
+// const CSSTransform = require('../transforms/transform.css');
+// const JSTransform = require('../transforms/transform.js');
+// const JSONTransform = require('../transforms/transform.json.js');
+// const AssetTransform = require('../transforms/transform.assets');
 
+// 1) serve
+// 2) filter
 function getDevServer(compilation) {
   const app = new Koa();
 
   app.use(async ctx => {
     let response = {
       body: '',
-      contentType: '',
-      extension: ''
+      contentType: ''
     };
 
-    request = {
-      header: ctx.request.header,
-      url: ctx.request.url,
-      compilation: { ...compilation }
+    // TODO prune
+    const requestCopy = ctx.request;
+
+    const compilationCopy = {
+      ...compilation
     };
 
     try {
-      // default transforms 
-      const defaultTransforms = [
-        new HTMLTransform(request),
-        new MarkdownTransform(request),
-        new CSSTransform(request),
-        new JSTransform(request),
-        new JSONTransform(request),
-        new AssetTransform(request)
+      // TODO share these accross requests
+      // default resource to serve
+      const serveResources = [
+        pluginServeHtml.provider(compilationCopy)
+        // new HTMLTransform(request),
+        // new MarkdownTransform(request),
+        // new CSSTransform(request),
+        // new JSTransform(request),
+        // new JSONTransform(request),
+        // new AssetTransform(request)
       ];
 
-      // walk through all transforms
-      await Promise.all(defaultTransforms.map(async (plugin) => {
-        if (plugin instanceof Transform && plugin.shouldTransform()) {
-
-          const transformedResponse = await plugin.applyTransform();
-
-          response = { 
-            ...transformedResponse
+      const reducedResponse = serveResources.reduce((response = {}, resource) => {
+        if (resource instanceof ResourceInterface && resource.shouldServe(requestCopy)) {
+          return {
+            ...response,
+            ...resource.serve(requestCopy)
           };
         }
-      }));
+      }, response);
+
+      response = {
+        ...response,
+        ...reducedResponse
+      };
+
+      // console.debug('######### FINAL response #########', response);
 
       ctx.set('Content-Type', `${response.contentType}`);
       ctx.body = response.body;
