@@ -9,7 +9,6 @@ const pluginResourceStandardImage = require('../plugins/resource/plugin-standard
 const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
 const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-json');
 const { ResourceInterface } = require('../lib/resource-interface');
-// const MarkdownTransform = require('../transforms/transform.md');
 
 // async function responseTime (ctx, next) {
 //   console.log('Started tracking response time')
@@ -68,7 +67,6 @@ function getDevServer(compilation) {
         pluginResourceStandardImage.provider(compilationCopy),
         pluginResourceStandardJavaScript.provider(compilationCopy),
         pluginResourceStandardJson.provider(compilationCopy),
-        // new MarkdownTransform(request),
         ...userResourcePlugins
       ];
 

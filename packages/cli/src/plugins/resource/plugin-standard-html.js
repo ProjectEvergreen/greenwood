@@ -5,27 +5,42 @@
  *
  */
 const acorn = require('acorn');
+const frontmatter = require('front-matter');
 const fs = require('fs');
 const htmlparser = require('node-html-parser');
 const path = require('path');
+const rehypeStringify = require('rehype-stringify');
+const rehypeRaw = require('rehype-raw');
+const remarkFrontmatter = require('remark-frontmatter');
+const remarkParse = require('remark-parse');
+const remarkRehype = require('remark-rehype');
 const { ResourceInterface } = require('../../lib/resource-interface');
+const unified = require('unified');
 const walk = require('acorn-walk');
 
-const getAppTemplate = (barePath, workspace) => {
-  if (fs.existsSync(`${barePath}.html`)) {
-    // console.debug('this route exists as HTML');
+// TODO better error handling / messaging for users if things are not where they are expected to be
+// general refactoring
+const getPageTemplate = (barePath, workspace, template) => {
+  const templatesDir = path.join(workspace, 'templates');
+
+  if (template && fs.existsSync(`${templatesDir}/${template}.html`)) {
+    // use a predefined template, usually from markdown frontmatter
+    contents = fs.readFileSync(`${templatesDir}/${template}.html`, 'utf-8');
+  } else if (fs.existsSync(`${barePath}.html`)) {
+    // if the page is already HTML, use that as the template
     contents = fs.readFileSync(`${barePath}.html`, 'utf-8');
-  } else if (fs.existsSync(`${workspace}/templates/page.html`)) {
-    // use custom workspace page template
-    contents = fs.readFileSync(`${workspace}/templates/page.html`, 'utf-8');
+  } else if (fs.existsSync(`${templatesDir}/page.html`)) {
+    // look for default page template
+    contents = fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
   } else {
-    contents = fs.readFileSync(path.join(__dirname, '../templates/app.html'), 'utf-8');
+    // fallback to just using the app template
+    contents = fs.readFileSync(`${templatesDir}/app.html`, 'utf-8');
   }
 
   return contents;
 };
 
-const getAppTemplateScripts = (contents, userWorkspace) => {
+const getAppTemplate = (contents, userWorkspace) => {
 
   const appTemplate = `${userWorkspace}/templates/app.html`;
   let appTemplateContents = '';
@@ -201,28 +216,86 @@ class StandardHtmlResource extends ResourceInterface {
       
     // TODO share this logic with graph.js lookup
     return (this.extensions.indexOf(path.extname(url)) >= 0 || path.extname(url) === '') && 
-      (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index');
+      (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index')
+      || fs.existsSync(`${barePath}.md`) || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`);
   }
 
   async resolve(request) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
         const { url } = request;
+        const { config } = this.compilation;
         const { userWorkspace } = this.compilation.context;
-    
-        const barePath = url[url.length - 1] === '/'
+        let body = '';
+        let title = config.title || '';
+        let template = null;
+        let processedMarkdown = null;
+        const barePath = url.endsWith('/')
           ? `${userWorkspace}/pages${url}index`
           : `${userWorkspace}/pages${url.replace('.html', '')}`;
+
+        // console.debug('markdown exists 1?', fs.existsSync(`${barePath}.md`));
+        // console.debug('markdown exists 2?', fs.existsSync(`${userWorkspace}/pages${url.replace('/index.html', '.md')}`));
+        // console.debug('markdown exists 3?', fs.existsSync(`${barePath.replace('/index', '.md')}`));
         
-        let body = getAppTemplate(barePath, userWorkspace);
-        body = getAppTemplateScripts(body, userWorkspace);
+        const isMarkdownContent = fs.existsSync(`${barePath}.md`) 
+          // || fs.existsSync(`${userWorkspace}/pages${url.replace('/index.html', '.md')}`) 
+          || fs.existsSync(`${barePath.replace('/index', '.md')}`);
+
+        if (isMarkdownContent) {
+          const markdownPath = fs.existsSync(`${barePath}.md`)
+            ? `${barePath}.md`
+            : fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`)
+              ? `${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`
+              : `${userWorkspace}/pages${url.replace('/index.html', '.md')}`;
+          const markdownContents = await fs.promises.readFile(markdownPath, 'utf-8');
+          const rehypePlugins = [];
+          const remarkPlugins = [];
+
+          config.markdown.plugins.forEach(plugin => {
+            if (plugin.indexOf('rehype-') >= 0) {
+              rehypePlugins.push(require(plugin));
+            }
+
+            if (plugin.indexOf('remark-') >= 0) {
+              remarkPlugins.push(require(plugin));
+            }
+          });
+
+          // TODO extract front matter contents from remark-frontmatter instead of frontmatter lib
+          const fm = frontmatter(markdownContents);
+          processedMarkdown = await unified()
+            .use(remarkParse) // parse markdown into AST
+            .use(remarkFrontmatter) // extract frontmatter from AST
+            .use(...remarkPlugins) // apply userland remark plugins
+            .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
+            .use(rehypeRaw) // support mixed HTML in markdown
+            .use(...rehypePlugins) // apply userland rehype plugins
+            .use(rehypeStringify) // convert AST to HTML string
+            .process(markdownContents);
+
+          // use page title
+          if (fm.attributes.title) {
+            config.title = `${title} - ${fm.attributes.title}`;
+          }
+
+          if (fm.attributes.template) {
+            template = template;
+          }
+        }
+        
+        body = getPageTemplate(barePath, userWorkspace, template);
+        body = getAppTemplate(body, userWorkspace);
         body = getUserScripts(body, userWorkspace);
-        body = getMetaContent(url, this.compilation.config, body);
-    
+        body = getMetaContent(url, config, body);
+
+        if (processedMarkdown) {
+          body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
+        }
+
         resolve({
           body,
-          contentType: this.contentType,
-          extension: this.extensions
+          contentType: this.contentType
         });
       } catch (e) {
         reject(e);
