@@ -1,16 +1,16 @@
-const { promises: fsp } = require('fs');
+const fs = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
 const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
+const pluginResourceStandardFont = require('../plugins/resource/plugin-standard-font');
 const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
+const pluginResourceStandardImage = require('../plugins/resource/plugin-standard-image');
 const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
 const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-json');
 const { ResourceInterface } = require('../lib/resource-interface');
-
 // const MarkdownTransform = require('../transforms/transform.md');
-// const AssetTransform = require('../transforms/transform.assets');
-//
+
 // async function responseTime (ctx, next) {
 //   console.log('Started tracking response time')
 //   const started = Date.now()
@@ -60,15 +60,15 @@ function getDevServer(compilation) {
     });
 
     try {
-      // TODO share these accross requests
       // default resources to serve web standards, e.g. html (+ md), js, css
       const resources = [
         pluginResourceStandardCss.provider(compilationCopy),
+        pluginResourceStandardFont.provider(compilationCopy),
         pluginResourceStandardHtml.provider(compilationCopy),
+        pluginResourceStandardImage.provider(compilationCopy),
         pluginResourceStandardJavaScript.provider(compilationCopy),
         pluginResourceStandardJson.provider(compilationCopy),
         // new MarkdownTransform(request),
-        // new AssetTransform(request)
         ...userResourcePlugins
       ];
 
@@ -77,7 +77,6 @@ function getDevServer(compilation) {
         if (resource instanceof ResourceInterface && resource.shouldResolve(requestCopy)) {
           const resolvedResource = await resource.resolve(requestCopy);
           
-          // console.debug('resolvedResource', resolvedResource);
           return Promise.resolve({
             ...response,
             ...resolvedResource
@@ -112,20 +111,20 @@ function getProdServer(compilation) {
 
     if (url.endsWith('/') || url.endsWith('.html')) {
       const barePath = url.endsWith('/') ? path.join(url, 'index.html') : url;
-      const contents = await fsp.readFile(path.join(outputDir, barePath), 'utf-8');
+      const contents = await fs.promises.readFile(path.join(outputDir, barePath), 'utf-8');
       ctx.set('Content-Type', 'text/html');
       ctx.body = contents;
     }
 
     if (url.endsWith('.js')) {
-      const contents = await fsp.readFile(path.join(outputDir, url), 'utf-8');
+      const contents = await fs.promises.readFile(path.join(outputDir, url), 'utf-8');
 
       ctx.set('Content-Type', 'text/javascript');
       ctx.body = contents;
     }
 
     if (url.endsWith('.css')) {
-      const contents = await fsp.readFile(path.join(outputDir, url), 'utf-8');
+      const contents = await fs.promises.readFile(path.join(outputDir, url), 'utf-8');
 
       ctx.set('Content-Type', 'text/css');
       ctx.body = contents;
@@ -143,21 +142,21 @@ function getProdServer(compilation) {
         ctx.set('Content-Type', `image/${type}`);
 
         if (ext === '.svg') {
-          ctx.body = await fsp.readFile(assetPath, 'utf-8');
+          ctx.body = await fs.promises.readFile(assetPath, 'utf-8');
         } else {
-          ctx.body = await fsp.readFile(assetPath); 
+          ctx.body = await fs.promises.readFile(assetPath); 
         }
       } else if (['.woff2', '.woff', '.ttf'].includes(ext)) {
         ctx.set('Content-Type', `font/${type}`);
-        ctx.body = await fsp.readFile(assetPath);
+        ctx.body = await fs.promises.readFile(assetPath);
       } else if (['.ico'].includes(ext)) {
         ctx.set('Content-Type', 'image/x-icon');
-        ctx.body = await fsp.readFile(assetPath);
+        ctx.body = await fs.promises.readFile(assetPath);
       }
     }
 
     if (url.endsWith('.json')) {
-      const contents = await fsp.readFile(path.join(outputDir, 'graph.json'), 'utf-8');
+      const contents = await fs.promises.readFile(path.join(outputDir, 'graph.json'), 'utf-8');
 
       ctx.set('Content-Type', 'application/json');
       ctx.body = JSON.parse(contents);
