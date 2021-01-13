@@ -2,15 +2,13 @@ const { promises: fsp } = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
+const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
 const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
+const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
+const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-json');
 const { ResourceInterface } = require('../lib/resource-interface');
 
-// const Transform = require('../transforms/transform.interface');
-// const HTMLTransform = require('../transforms/transform.html');
 // const MarkdownTransform = require('../transforms/transform.md');
-// const CSSTransform = require('../transforms/transform.css');
-// const JSTransform = require('../transforms/transform.js');
-// const JSONTransform = require('../transforms/transform.json.js');
 // const AssetTransform = require('../transforms/transform.assets');
 //
 // async function responseTime (ctx, next) {
@@ -43,7 +41,6 @@ function getDevServer(compilation) {
   const app = new Koa();
 
   app.use(async ctx => {
-    console.debug(`MAKING REQUEST FOR => ${ctx.request.url}`);
     let response = {
       body: '',
       contentType: ''
@@ -66,26 +63,29 @@ function getDevServer(compilation) {
       // TODO share these accross requests
       // default resources to serve web standards, e.g. html (+ md), js, css
       const resources = [
+        pluginResourceStandardCss.provider(compilationCopy),
         pluginResourceStandardHtml.provider(compilationCopy),
-        // new HTMLTransform(request),
+        pluginResourceStandardJavaScript.provider(compilationCopy),
+        pluginResourceStandardJson.provider(compilationCopy),
         // new MarkdownTransform(request),
-        // new CSSTransform(request),
-        // new JSTransform(request),
-        // new JSONTransform(request),
         // new AssetTransform(request)
         ...userResourcePlugins
       ];
 
-      const reducedResponse = resources.reduce((response = {}, resource) => {
+      const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
+        const response = await responsePromise;
         if (resource instanceof ResourceInterface && resource.shouldResolve(requestCopy)) {
-          return {
+          const resolvedResource = await resource.resolve(requestCopy);
+          
+          // console.debug('resolvedResource', resolvedResource);
+          return Promise.resolve({
             ...response,
-            ...resource.resolve(requestCopy)
-          };
+            ...resolvedResource
+          });
         } else {
-          return response;
+          return Promise.resolve(response);
         }
-      }, response);
+      }, Promise.resolve(response));
 
       response = {
         ...response,

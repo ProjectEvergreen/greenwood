@@ -1,3 +1,5 @@
+const path = require('path');
+
 class ResourceInterface {
   constructor(compilation, options = {}) {
     this.extensions = [];
@@ -8,7 +10,7 @@ class ResourceInterface {
 
   // introduce a new resource type to the browser, on the fly, ex: `<script src="index.ts">`
   shouldResolve(request) {
-    return false;
+    return this.extensions.indexOf(path.extname(request.url)) === 0;
   }
 
   resolve(request) {

@@ -204,24 +204,30 @@ class StandardHtmlResource extends ResourceInterface {
       (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index');
   }
 
-  resolve(request) {
-    const { url } = request;
-    const { userWorkspace } = this.compilation.context;
-
-    const barePath = url[url.length - 1] === '/'
-      ? `${userWorkspace}/pages${url}index`
-      : `${userWorkspace}/pages${url.replace('.html', '')}`;
+  async resolve(request) {
+    return new Promise((resolve, reject) => {
+      try {
+        const { url } = request;
+        const { userWorkspace } = this.compilation.context;
     
-    let body = getAppTemplate(barePath, userWorkspace);
-    body = getAppTemplateScripts(body, userWorkspace);
-    body = getUserScripts(body, userWorkspace);
-    body = getMetaContent(url, this.compilation.config, body);
-
-    return {
-      body,
-      contentType: this.contentType,
-      extension: this.extensions
-    };
+        const barePath = url[url.length - 1] === '/'
+          ? `${userWorkspace}/pages${url}index`
+          : `${userWorkspace}/pages${url.replace('.html', '')}`;
+        
+        let body = getAppTemplate(barePath, userWorkspace);
+        body = getAppTemplateScripts(body, userWorkspace);
+        body = getUserScripts(body, userWorkspace);
+        body = getMetaContent(url, this.compilation.config, body);
+    
+        resolve({
+          body,
+          contentType: this.contentType,
+          extension: this.extensions
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
   }
 }
 

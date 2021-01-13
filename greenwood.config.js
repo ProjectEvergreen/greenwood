@@ -23,15 +23,21 @@ class FooResource extends ResourceInterface {
     }
   }
 
-  resolve(request) {
-    const { url } = request;
-    const fooPath = path.join(this.compilation.context.userWorkspace, url);
-    const body = fs.readFileSync(fooPath, 'utf-8');
-    
-    return {
-      body,
-      contentType: this.contentType
-    };
+  async resolve(request) {
+    return new Promise((resolve, reject) => {
+      try {
+        const { url } = request;
+        const fooPath = path.join(this.compilation.context.userWorkspace, url);
+        const body = fs.readFileSync(fooPath, 'utf-8');
+        
+        resolve({
+          body,
+          contentType: this.contentType
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
   }
 }
 
