@@ -1,9 +1,39 @@
+const fs = require('fs');
 const path = require('path');
+const { ResourceInterface } = require('./packages/cli/src/lib/resource-interface');
 // const pluginGoogleAnalytics = require('./packages/plugin-google-analytics/src/index');
 // const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
+
+class FooResource extends ResourceInterface {
+  constructor(compilation, options) {
+    super(compilation, options);
+    
+    this.extensions = ['.foo'];
+    this.contentType = 'text/javascript';
+  }
+
+  shouldResolve(request) {
+    const { url } = request;
+
+    if (url.endsWith('.foo')) {
+      return true;
+    }
+  }
+
+  resolve(request) {
+    const { url } = request;
+    const fooPath = path.join(this.compilation.context.userWorkspace, url);
+    const body = fs.readFileSync(fooPath, 'utf-8');
+    
+    return {
+      body,
+      contentType: this.contentType
+    };
+  }
+}
 
 module.exports = {
   workspace: path.join(__dirname, 'www'),
@@ -20,13 +50,17 @@ module.exports = {
     { rel: 'icon', href: FAVICON_HREF },
     { name: 'google-site-verification', content: '4rYd8k5aFD0jDnN0CCFgUXNe4eakLP4NnA18mNnK5P0' }
   ],
-  // TODO
-  // plugins: [
-  //   ...pluginGoogleAnalytics({
-  //     analyticsId: 'UA-147204327-1'
-  //   }),
-  //   ...pluginPolyfills()
-  // ],
+  plugins: [{
+    type: 'resource',
+    name: 'plugin-foo',
+    provider: (compilation, options) => new FooResource(compilation, options)
+  }
+  // // TODO
+  // ...pluginGoogleAnalytics({
+  //   analyticsId: 'UA-147204327-1'
+  // }),
+  // ...pluginPolyfills()
+  ],
   markdown: {
     plugins: [
       '@mapbox/rehype-prism',

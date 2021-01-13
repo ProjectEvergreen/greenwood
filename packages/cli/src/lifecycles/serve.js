@@ -2,8 +2,9 @@ const { promises: fsp } = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
-const pluginServeHtml = require('../plugins/plugin-serve-html');
+const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
 const { ResourceInterface } = require('../lib/resource-interface');
+
 // const Transform = require('../transforms/transform.interface');
 // const HTMLTransform = require('../transforms/transform.html');
 // const MarkdownTransform = require('../transforms/transform.md');
@@ -11,13 +12,38 @@ const { ResourceInterface } = require('../lib/resource-interface');
 // const JSTransform = require('../transforms/transform.js');
 // const JSONTransform = require('../transforms/transform.json.js');
 // const AssetTransform = require('../transforms/transform.assets');
+//
+// async function responseTime (ctx, next) {
+//   console.log('Started tracking response time')
+//   const started = Date.now()
+//   await next()
+//   // once all middleware below completes, this continues
+//   const ellapsed = (Date.now() - started) + 'ms'
+//   console.log('Response time is:', ellapsed)
+//   ctx.set('X-ResponseTime', ellapsed)
+// }
+//
+// app.use(responseTime)
+// app.use(async (ctx, next) => {
+//   ctx.status = 200
+//   console.log('Setting status')
+//   await next()
+// })
+// app.use(async (ctx) => {
+//   await delay(1000)
+//   console.log('Setting body')
+//   ctx.body = 'Hello from Koa'
+// })
+// Started tracking response time
+// Setting status
+// Setting body
+// Response time is: 1001ms
 
-// 1) serve
-// 2) filter
 function getDevServer(compilation) {
   const app = new Koa();
 
   app.use(async ctx => {
+    console.debug(`MAKING REQUEST FOR => ${ctx.request.url}`);
     let response = {
       body: '',
       contentType: ''
@@ -30,25 +56,34 @@ function getDevServer(compilation) {
       ...compilation
     };
 
+    const userResourcePlugins = compilation.config.plugins.filter((plugin) => { 
+      return plugin.type === 'resource';
+    }).map((plugin) => {
+      return plugin.provider(compilationCopy);
+    });
+
     try {
       // TODO share these accross requests
-      // default resource to serve
-      const serveResources = [
-        pluginServeHtml.provider(compilationCopy)
+      // default resources to serve web standards, e.g. html (+ md), js, css
+      const resources = [
+        pluginResourceStandardHtml.provider(compilationCopy),
         // new HTMLTransform(request),
         // new MarkdownTransform(request),
         // new CSSTransform(request),
         // new JSTransform(request),
         // new JSONTransform(request),
         // new AssetTransform(request)
+        ...userResourcePlugins
       ];
 
-      const reducedResponse = serveResources.reduce((response = {}, resource) => {
-        if (resource instanceof ResourceInterface && resource.shouldServe(requestCopy)) {
+      const reducedResponse = resources.reduce((response = {}, resource) => {
+        if (resource instanceof ResourceInterface && resource.shouldResolve(requestCopy)) {
           return {
             ...response,
-            ...resource.serve(requestCopy)
+            ...resource.resolve(requestCopy)
           };
+        } else {
+          return response;
         }
       }, response);
 
@@ -56,8 +91,6 @@ function getDevServer(compilation) {
         ...response,
         ...reducedResponse
       };
-
-      // console.debug('######### FINAL response #########', response);
 
       ctx.set('Content-Type', `${response.contentType}`);
       ctx.body = response.body;

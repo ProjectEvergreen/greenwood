@@ -1,0 +1,3 @@
+import './grant.foo';
+
+console.log('hello from owen.foo! 👋');

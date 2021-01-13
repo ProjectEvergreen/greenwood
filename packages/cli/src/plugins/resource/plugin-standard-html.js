@@ -1,8 +1,14 @@
+/*
+ * 
+ * Manages web standard resource related operations for HTML and markdown.
+ * This is a Greenwood default plugin.
+ *
+ */
 const acorn = require('acorn');
 const fs = require('fs');
 const htmlparser = require('node-html-parser');
 const path = require('path');
-const { ResourceInterface } = require('../lib/resource-interface');
+const { ResourceInterface } = require('../../lib/resource-interface');
 const walk = require('acorn-walk');
 
 const getAppTemplate = (barePath, workspace) => {
@@ -177,7 +183,7 @@ const getMetaContent = (url, config, contents) => {
   return contents;
 };
 
-class HtmlResource extends ResourceInterface {
+class StandardHtmlResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
     
@@ -185,7 +191,7 @@ class HtmlResource extends ResourceInterface {
     this.contentType = 'text/html';
   }
 
-  shouldServe(request) {
+  shouldResolve(request) {
     const { url } = request;
     const { userWorkspace } = this.compilation.context;
 
@@ -198,7 +204,7 @@ class HtmlResource extends ResourceInterface {
       (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index');
   }
 
-  serve(request) {
+  resolve(request) {
     const { url } = request;
     const { userWorkspace } = this.compilation.context;
 
@@ -217,20 +223,11 @@ class HtmlResource extends ResourceInterface {
       extension: this.extensions
     };
   }
-  
-  // TOOD - not needed, just do everything in serve?
-  filter() {
-
-  }
-
-  // TODO - replace in serialize.js
-  transform () {
-
-  }
 }
 
 // TODO Plugin interface?
 module.exports = {
-  name: 'plugin-serve-html',
-  provider: (compilation, options) => new HtmlResource(compilation, options)
+  type: 'resource',
+  name: 'plugin-standard-html',
+  provider: (compilation, options) => new StandardHtmlResource(compilation, options)
 };
