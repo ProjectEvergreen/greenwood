@@ -10,7 +10,6 @@ class NodeModulesResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
     this.extensions = ['*'];
-    this.contentType = '';
   }
 
   shouldResolve(url) {
@@ -20,7 +19,8 @@ class NodeModulesResource extends ResourceInterface {
   async resolve(url) {
     return new Promise((resolve, reject) => {
       try {
-        const nodeModulesUrl = path.join(process.cwd(), url.replace(this.compilation.context.userWorkspace, ''));
+        const relativeUrl = url.replace(this.compilation.context.userWorkspace, '');
+        const nodeModulesUrl = path.join(process.cwd(), relativeUrl);
         
         resolve(nodeModulesUrl);
       } catch (e) {

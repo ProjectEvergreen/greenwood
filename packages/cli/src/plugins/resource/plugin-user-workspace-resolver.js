@@ -11,7 +11,6 @@ class UserWorkspaceResolverResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
     this.extensions = ['*'];
-    this.contentType = '';
   }
 
   async resolve(url) {

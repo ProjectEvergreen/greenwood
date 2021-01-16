@@ -24,23 +24,22 @@ function getDevServer(compilation) {
     pluginResourceStandardJavaScript.provider(compilationCopy),
     pluginResourceStandardJson.provider(compilationCopy),
 
-    // Custom user resource plugins
+    // custom user resource plugins
     ...compilation.config.plugins.filter((plugin) => {
       return plugin.type === 'resource';
     }).map((plugin) => {
       const provider = plugin.provider(compilationCopy);
 
       if (!(provider instanceof ResourceInterface)) {
-        console.warn(`WARNING: ${plugin.name}'s provider is not an instanceof ResourceInterface.`);
+        console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ResourceInterface.`);
       }
 
       return provider;
     })
   ];
 
-  // TODO resolve a path (internal for now), or pull from resources / expose as an API?
+  // resolve urls to paths first
   app.use(async (ctx, next) => {
-    // TODO filter these from resources?
     const resolveResources = [
       pluginResolverUserWorkspace.provider(compilation),
       pluginResolverNodeModules.provider(compilation)
@@ -58,9 +57,9 @@ function getDevServer(compilation) {
     await next();
   });
 
-  // serve all paths
-  app.use(async (ctx, next) => {
-    const respAcc = {
+  // then handle serving urls
+  app.use(async (ctx) => {
+    const responseAccumulator = {
       body: ctx.body,
       contentType: ctx.response.contentType
     };
@@ -79,15 +78,11 @@ function getDevServer(compilation) {
       } else {
         return Promise.resolve(response);
       }
-    }, Promise.resolve(respAcc));
+    }, Promise.resolve(responseAccumulator));
 
     ctx.set('Content-Type', reducedResponse.contentType);
     ctx.body = reducedResponse.body;
-
-    await next();
   });
-
-  // TODO intercept
 
   return app;
 }

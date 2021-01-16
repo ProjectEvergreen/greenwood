@@ -5,9 +5,10 @@ class ResourceInterface {
     this.compilation = compilation;
     this.options = options;
     this.extensions = [];
-    this.contentType = undefined;
+    this.contentType = '';
   }
 
+  // hidden API?
   shouldResolve(url) {
     const { extensions } = this;
     
@@ -26,13 +27,12 @@ class ResourceInterface {
     return this.extensions.indexOf(path.extname(url)) >= 0;
   }
 
-  // hidden API?
   // eslint-disable-next-line no-unused-vars
   async serve(url, headers) {
-    return Promise.resolve(url);
+    return Promise.resolve({});
   }
 
-  // handle an already resolved resource
+  // handle an already resolved / served resource
   // eslint-disable-next-line no-unused-vars
   shouldInterceptl(url, headers) {
     return false;
@@ -47,13 +47,13 @@ class ResourceInterface {
   // ex: remove es shim <script>, convert .ts -> .js and update path references 
   // this is only an _index.html_ file, BYOA (Bring Your Own AST)
   // eslint-disable-next-line no-unused-vars
-  shouldOptimize(file) {
+  shouldOptimize(url) {
     return false;
   }
 
   // eslint-disable-next-line no-unused-vars
-  async optimize (file) {
-    return Promise.resolve(url);
+  async optimize (contents) {
+    return Promise.resolve(contents);
   }
 }
 

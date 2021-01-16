@@ -45,6 +45,7 @@ class StandardCssResource extends ResourceInterface {
           // assume JS import being being used
           contentType = 'text/javascript';
           // TODO line breaks are bad for fetch, need to return CSS string all on one line
+          // TODO this should be a seperate plugin / package
           body = `const css = "${css.replace(/\r?\n|\r/g, ' ')}";\nexport default css;`;
         }
 
