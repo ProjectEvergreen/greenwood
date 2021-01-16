@@ -14,12 +14,11 @@ class StandardFontResource extends ResourceInterface {
     this.extensions = ['.woff2', '.woff', '.ttf']; // TODO support more types?
   }
 
-  async resolve(request) {
+  async serve(url) {
     return new Promise(async (resolve, reject) => {
       try {
-        const assetPath = path.join(this.compilation.context.userWorkspace, request.url);
-        const contentType = path.extname(assetPath).replace('.', '');
-        const body = await fs.promises.readFile(assetPath);
+        const contentType = path.extname(url).replace('.', '');
+        const body = await fs.promises.readFile(url);
 
         resolve({
           body,

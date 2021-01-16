@@ -15,15 +15,12 @@ class StandardJsonResource extends ResourceInterface {
     this.contentType = 'text/javascript';
   }
 
-  async resolve(request) {
+  async serve(url) {
     return new Promise(async (resolve, reject) => {
       try {
-        // TODO This is here because of ordering, should make JS / JSON matching less greedy
-        // handle things outside if workspace, like a root directory resolver plugin?
-        // console.debug('JSON file request!', ctx.url);'
-        let body = '', contentType = '';
+        let body = ''; 
+        let contentType = '';
         const { context } = this.compilation;
-        const { url } = request;
 
         if (url.indexOf('graph.json') >= 0) {
           const json = await fs.promises.readFile(path.join(context.scratchDir, 'graph.json'), 'utf-8');
@@ -31,7 +28,7 @@ class StandardJsonResource extends ResourceInterface {
           contentType = 'application/json';
           body = JSON.parse(json);
         } else {
-          const json = await fs.promises.readFile(path.join(context.userWorkspace, url), 'utf-8');
+          const json = await fs.promises.readFile(url, 'utf-8');
 
           contentType = 'text/javascript';
           body = `export default ${json}`;

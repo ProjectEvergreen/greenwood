@@ -1,6 +1,6 @@
 /*
  * 
- * Manages requests to node_modules.
+ * Detects and fully resolve srequest to node_modules.
  *
  */
 const path = require('path');
@@ -18,12 +18,10 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   async resolve(url) {
-    // console.debug('node modules resource resolver', url);
     return new Promise((resolve, reject) => {
       try {
         const nodeModulesUrl = path.join(process.cwd(), url.replace(this.compilation.context.userWorkspace, ''));
         
-        // console.debug('node modules resource resolver final', nodeModulesUrl);
         resolve(nodeModulesUrl);
       } catch (e) {
         console.error(e);

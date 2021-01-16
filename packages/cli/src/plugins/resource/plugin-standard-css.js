@@ -16,17 +16,13 @@ class StandardCssResource extends ResourceInterface {
     this.contentType = 'text/css';
   }
 
-  async resolve(request) {
+  async serve(url, header) {
     return new Promise(async (resolve, reject) => {
       try {
-        const { url, header } = request;
-        const destHeader = header['sec-fetch-dest'];
-        const cssPath = url.indexOf('/node_modules') >= 0
-          ? path.join(process.cwd(), url)
-          : path.join(this.compilation.context.userWorkspace, url);
-        
-        let css = await fs.promises.readFile(cssPath, 'utf-8');
-        let body = '', contentType = '';
+        const destHeader = header['sec-fetch-dest'];        
+        let css = await fs.promises.readFile(url, 'utf-8');
+        let body = '';
+        let contentType = '';
 
         // TODO try and use context.projectDirectory
         if (fs.existsSync(path.join(process.cwd(), 'postcss.config.js'))) {
@@ -35,7 +31,7 @@ class StandardCssResource extends ResourceInterface {
           
           if (userPostcssPlugins.length > 0) {
             const result = await postcss(userPostcssPlugins)
-              .process(css, { from: cssPath });
+              .process(css, { from: url });
 
             css = result.css;
           }

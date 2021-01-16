@@ -2,9 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
-const pluginNodeModulesResolver = require('../plugins/resource/plugin-node-modules-resolver');
-const pluginUserWorkspaceResolver = require('../plugins/resource/plugin-user-workspace-resolver');
-const pluginResourceNodeModules = require('../plugins/resource/plugin-node-modules-resolver');
+const pluginResolverNodeModules = require('../plugins/resource/plugin-node-modules-resolver');
+const pluginResolverUserWorkspace = require('../plugins/resource/plugin-user-workspace-resolver');
 const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
 const pluginResourceStandardFont = require('../plugins/resource/plugin-standard-font');
 const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
@@ -13,77 +12,54 @@ const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-sta
 const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-json');
 const { ResourceInterface } = require('../lib/resource-interface');
 
-// async function responseTime (ctx, next) {
-//   console.log('Started tracking response time')
-//   const started = Date.now()
-//   await next()
-//   // once all middleware below completes, this continues
-//   const ellapsed = (Date.now() - started) + 'ms'
-//   console.log('Response time is:', ellapsed)
-//   ctx.set('X-ResponseTime', ellapsed)
-// }
-//
-// app.use(responseTime)
-// app.use(async (ctx, next) => {
-//   ctx.status = 200
-//   console.log('Setting status')
-//   await next()
-// })
-// app.use(async (ctx) => {
-//   await delay(1000)
-//   console.log('Setting body')
-//   ctx.body = 'Hello from Koa'
-// })
-// Started tracking response time
-// Setting status
-// Setting body
-// Response time is: 1001ms
-
 function getDevServer(compilation) {
   const app = new Koa();
   const compilationCopy = Object.assign({}, compilation);
   const resources = [
-    // pluginResourceNodeModules.provider(compilationCopy),
-    // pluginResourceStandardCss.provider(compilationCopy),
-    // pluginResourceStandardFont.provider(compilationCopy),
+    // Greenwood default standard resource plugins
+    pluginResourceStandardCss.provider(compilationCopy),
+    pluginResourceStandardFont.provider(compilationCopy),
     pluginResourceStandardHtml.provider(compilationCopy),
-    // pluginResourceStandardImage.provider(compilationCopy),
+    pluginResourceStandardImage.provider(compilationCopy),
     pluginResourceStandardJavaScript.provider(compilationCopy),
-    // pluginResourceStandardJson.provider(compilationCopy),
-    // ...userResourcePlugins
+    pluginResourceStandardJson.provider(compilationCopy),
+
+    // Custom user resource plugins
+    ...compilation.config.plugins.filter((plugin) => {
+      return plugin.type === 'resource';
+    }).map((plugin) => {
+      const provider = plugin.provider(compilationCopy);
+
+      if (!(provider instanceof ResourceInterface)) {
+        console.warn(`WARNING: ${plugin.name}'s provider is not an instanceof ResourceInterface.`);
+      }
+
+      return provider;
+    })
   ];
 
-  // resolve a path (internal for now)
+  // TODO resolve a path (internal for now), or pull from resources / expose as an API?
   app.use(async (ctx, next) => {
-    console.debug('start resolve request url', ctx.url);
-    // const resolvedUrl = '/';
+    // TODO filter these from resources?
     const resolveResources = [
-      pluginUserWorkspaceResolver.provider(compilation),
-      pluginNodeModulesResolver.provider(compilation)
+      pluginResolverUserWorkspace.provider(compilation),
+      pluginResolverNodeModules.provider(compilation)
     ];
 
-    const fullResolvedUrl = await resolveResources.reduce(async (responsePromise, resource) => {
+    ctx.url = await resolveResources.reduce(async (responsePromise, resource) => {
       const response = await responsePromise;
       const { url } = ctx; 
-      // TODO move interface check somewhere else...
-      if (resource.shouldResolve(url)) {
-        const resolvedUrl = await resource.resolve(url);
-        
-        return Promise.resolve(resolvedUrl);
-      } else {
-        return Promise.resolve(response);
-      }
+      
+      return resource.shouldResolve(url)
+        ? resource.resolve(url)
+        : Promise.resolve(response);
     }, Promise.resolve(''));
-
-    ctx.url = fullResolvedUrl;
     
-    console.debug('******** final resolved request url', ctx.url);
     await next();
   });
 
   // serve all paths
   app.use(async (ctx, next) => {
-    console.debug(`!!!!!!!!!!!!!!serve url => ${ctx.request.url}`);
     const respAcc = {
       body: ctx.body,
       contentType: ctx.response.contentType
@@ -91,10 +67,10 @@ function getDevServer(compilation) {
     
     const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
       const response = await responsePromise;
-      const { url } = ctx; 
-      // TODO move interface check somewhere else...
-      if (resource instanceof ResourceInterface && resource.shouldServe(url)) {
-        const resolvedResource = await resource.serve(url);
+      const { url, headers } = ctx;
+
+      if (resource.shouldServe(url, headers)) {
+        const resolvedResource = await resource.serve(url, headers);
         
         return Promise.resolve({
           ...response,
@@ -108,72 +84,10 @@ function getDevServer(compilation) {
     ctx.set('Content-Type', reducedResponse.contentType);
     ctx.body = reducedResponse.body;
 
-    // await next();
+    await next();
   });
 
-  // intercept
-
-
-
-
-
-  // app.use(async ctx => {
-  //   let response = {
-  //     body: '',
-  //     contentType: ''
-  //   };
-
-  //   // TODO prune
-  //   const requestCopy = ctx.request;
-
-  //   const compilationCopy = {
-  //     ...compilation
-  //   };
-
-  //   const userResourcePlugins = compilation.config.plugins.filter((plugin) => { 
-  //     return plugin.type === 'resource';
-  //   }).map((plugin) => {
-  //     return plugin.provider(compilationCopy);
-  //   });
-
-  //   try {
-  //     // default resources to serve web standards, e.g. html (+ md), js, css
-  //     const resources = [
-  //       pluginResourceNodeModules.provider(compilationCopy),
-  //       pluginResourceStandardCss.provider(compilationCopy),
-  //       pluginResourceStandardFont.provider(compilationCopy),
-  //       pluginResourceStandardHtml.provider(compilationCopy),
-  //       // pluginResourceStandardImage.provider(compilationCopy),
-  //       // pluginResourceStandardJavaScript.provider(compilationCopy),
-  //       // pluginResourceStandardJson.provider(compilationCopy),
-  //       ...userResourcePlugins
-  //     ];
-
-  //     const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
-  //       const response = await responsePromise;
-  //       if (resource instanceof ResourceInterface && resource.shouldResolve(requestCopy)) {
-  //         const resolvedResource = await resource.resolve(requestCopy);
-          
-  //         return Promise.resolve({
-  //           ...response,
-  //           ...resolvedResource
-  //         });
-  //       } else {
-  //         return Promise.resolve(response);
-  //       }
-  //     }, Promise.resolve(response));
-
-  //     response = {
-  //       ...response,
-  //       ...reducedResponse
-  //     };
-
-  //     ctx.set('Content-Type', `${response.contentType}`);
-  //     ctx.body = response.body;
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // });
+  // TODO intercept
 
   return app;
 }
@@ -182,13 +96,13 @@ function getProdServer(compilation) {
   const app = new Koa();
 
   app.use(async ctx => {
-    // console.debug('URL', ctx.request.url);
     const { outputDir } = compilation.context;
     const { url } = ctx.request;
 
     if (url.endsWith('/') || url.endsWith('.html')) {
       const barePath = url.endsWith('/') ? path.join(url, 'index.html') : url;
       const contents = await fs.promises.readFile(path.join(outputDir, barePath), 'utf-8');
+      
       ctx.set('Content-Type', 'text/html');
       ctx.body = contents;
     }

@@ -15,20 +15,10 @@ class FooResource extends ResourceInterface {
     this.contentType = 'text/javascript';
   }
 
-  shouldResolve(request) {
-    const { url } = request;
-
-    if (url.endsWith('.foo')) {
-      return true;
-    }
-  }
-
-  async resolve(request) {
-    return new Promise((resolve, reject) => {
+  async serve(url) {
+    return new Promise(async (resolve, reject) => {
       try {
-        const { url } = request;
-        const fooPath = path.join(this.compilation.context.userWorkspace, url);
-        const body = fs.readFileSync(fooPath, 'utf-8');
+        const body = await fs.promises.readFile(url, 'utf-8');
         
         resolve({
           body,

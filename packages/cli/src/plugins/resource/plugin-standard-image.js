@@ -14,13 +14,12 @@ class StandardFontResource extends ResourceInterface {
     this.extensions = ['.jpg', '.png', '.gif', '.svg', '.ico'];
   }
 
-  async resolve(request) {
+  async serve(url) {
     return new Promise(async (resolve, reject) => {
       try {
-
-        let body = '', contentType = '';
-        const assetPath = path.join(this.compilation.context.userWorkspace, request.url);
-        const ext = path.extname(assetPath);
+        let body = '';
+        let contentType = '';
+        const ext = path.extname(url);
         const type = ext === '.svg'
           ? `${ext.replace('.', '')}+xml`
           : ext.replace('.', '');
@@ -29,9 +28,9 @@ class StandardFontResource extends ResourceInterface {
           contentType = `image/${type}`;
 
           if (ext === '.svg') {
-            body = await fs.promises.readFile(assetPath, 'utf-8');
+            body = await fs.promises.readFile(url, 'utf-8');
           } else {
-            body = await fs.promises.readFile(assetPath); 
+            body = await fs.promises.readFile(url); 
           }
         } else if (['.ico'].includes(ext)) {
           contentType = 'image/x-icon';

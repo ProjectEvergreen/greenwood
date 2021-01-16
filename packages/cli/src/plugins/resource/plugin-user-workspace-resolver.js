@@ -1,6 +1,7 @@
 /*
  * 
- * Manages requests to node_modules.
+ * Detects and fully resolve requests to the user's workspace.  
+ * This sets the default value for requests in Greenwood.
  *
  */
 const path = require('path');
@@ -14,13 +15,10 @@ class UserWorkspaceResolverResource extends ResourceInterface {
   }
 
   async resolve(url) {
-    console.debug('user workspace resolver: resolve all paths to userWorkspace => ', url);
     return new Promise(async (resolve, reject) => {
       try {
         const workspaceUrl = path.join(this.compilation.context.userWorkspace, url);
         
-        console.debug('final workspaceUrl => ', workspaceUrl);
-
         resolve(workspaceUrl);
       } catch (e) {
         reject(e);
