@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
-const pluginResolverNodeModules = require('../plugins/resource/plugin-node-modules-resolver');
-const pluginResolverUserWorkspace = require('../plugins/resource/plugin-user-workspace-resolver');
+const pluginResolverNodeModules = require('../plugins/resource/plugin-resolver-node-modules');
+const pluginResolverUserWorkspace = require('../plugins/resource/plugin-resolver-user-workspace');
 const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
 const pluginResourceStandardFont = require('../plugins/resource/plugin-standard-font');
 const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
