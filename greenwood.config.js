@@ -18,8 +18,10 @@ class FooResource extends ResourceInterface {
   async serve(url) {
     return new Promise(async (resolve, reject) => {
       try {
-        const body = await fs.promises.readFile(url, 'utf-8');
+        let body = await fs.promises.readFile(url, 'utf-8');
         
+        body = body.replace(/interface (.*){(.*)}/s, '');
+
         resolve({
           body,
           contentType: this.contentType
