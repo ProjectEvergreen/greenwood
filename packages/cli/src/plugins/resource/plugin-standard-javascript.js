@@ -5,7 +5,6 @@
  *
  */
 const fs = require('fs');
-const path = require('path');
 const { ResourceInterface } = require('../../lib/resource-interface');
 
 class StandardJavaScriptResource extends ResourceInterface {
@@ -15,14 +14,10 @@ class StandardJavaScriptResource extends ResourceInterface {
     this.contentType = 'text/javascript';
   }
 
-  async resolve(request) {
+  async serve(url) {
     return new Promise(async(resolve, reject) => {
       try {
-        const { url } = request;
-        const jsPath = url.indexOf('/node_modules') >= 0
-          ? path.join(process.cwd(), url)
-          : path.join(this.compilation.context.userWorkspace, url);
-        const body = await fs.promises.readFile(jsPath, 'utf-8');
+        const body = await fs.promises.readFile(url, 'utf-8');
     
         resolve({
           body,

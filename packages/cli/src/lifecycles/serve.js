@@ -2,6 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
+const pluginNodeModulesResolver = require('../plugins/resource/plugin-node-modules-resolver');
+const pluginUserWorkspaceResolver = require('../plugins/resource/plugin-user-workspace-resolver');
+const pluginResourceNodeModules = require('../plugins/resource/plugin-node-modules-resolver');
 const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
 const pluginResourceStandardFont = require('../plugins/resource/plugin-standard-font');
 const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
@@ -38,63 +41,139 @@ const { ResourceInterface } = require('../lib/resource-interface');
 
 function getDevServer(compilation) {
   const app = new Koa();
+  const compilationCopy = Object.assign({}, compilation);
+  const resources = [
+    // pluginResourceNodeModules.provider(compilationCopy),
+    // pluginResourceStandardCss.provider(compilationCopy),
+    // pluginResourceStandardFont.provider(compilationCopy),
+    pluginResourceStandardHtml.provider(compilationCopy),
+    // pluginResourceStandardImage.provider(compilationCopy),
+    pluginResourceStandardJavaScript.provider(compilationCopy),
+    // pluginResourceStandardJson.provider(compilationCopy),
+    // ...userResourcePlugins
+  ];
 
-  app.use(async ctx => {
-    let response = {
-      body: '',
-      contentType: ''
-    };
+  // resolve a path (internal for now)
+  app.use(async (ctx, next) => {
+    console.debug('start resolve request url', ctx.url);
+    // const resolvedUrl = '/';
+    const resolveResources = [
+      pluginUserWorkspaceResolver.provider(compilation),
+      pluginNodeModulesResolver.provider(compilation)
+    ];
 
-    // TODO prune
-    const requestCopy = ctx.request;
+    const fullResolvedUrl = await resolveResources.reduce(async (responsePromise, resource) => {
+      const response = await responsePromise;
+      const { url } = ctx; 
+      // TODO move interface check somewhere else...
+      if (resource.shouldResolve(url)) {
+        const resolvedUrl = await resource.resolve(url);
+        
+        return Promise.resolve(resolvedUrl);
+      } else {
+        return Promise.resolve(response);
+      }
+    }, Promise.resolve(''));
 
-    const compilationCopy = {
-      ...compilation
-    };
-
-    const userResourcePlugins = compilation.config.plugins.filter((plugin) => { 
-      return plugin.type === 'resource';
-    }).map((plugin) => {
-      return plugin.provider(compilationCopy);
-    });
-
-    try {
-      // default resources to serve web standards, e.g. html (+ md), js, css
-      const resources = [
-        pluginResourceStandardCss.provider(compilationCopy),
-        pluginResourceStandardFont.provider(compilationCopy),
-        pluginResourceStandardHtml.provider(compilationCopy),
-        pluginResourceStandardImage.provider(compilationCopy),
-        pluginResourceStandardJavaScript.provider(compilationCopy),
-        pluginResourceStandardJson.provider(compilationCopy),
-        ...userResourcePlugins
-      ];
-
-      const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
-        const response = await responsePromise;
-        if (resource instanceof ResourceInterface && resource.shouldResolve(requestCopy)) {
-          const resolvedResource = await resource.resolve(requestCopy);
-          
-          return Promise.resolve({
-            ...response,
-            ...resolvedResource
-          });
-        } else {
-          return Promise.resolve(response);
-        }
-      }, Promise.resolve(response));
-
-      response = {
-        ...response,
-        ...reducedResponse
-      };
-
-      ctx.set('Content-Type', `${response.contentType}`);
-      ctx.body = response.body;
-    } catch (err) {
-      console.log(err);
-    }
+    ctx.url = fullResolvedUrl;
+    
+    console.debug('******** final resolved request url', ctx.url);
+    await next();
   });
+
+  // serve all paths
+  app.use(async (ctx, next) => {
+    console.debug(`!!!!!!!!!!!!!!serve url => ${ctx.request.url}`);
+    const respAcc = {
+      body: ctx.body,
+      contentType: ctx.response.contentType
+    };
+    
+    const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
+      const response = await responsePromise;
+      const { url } = ctx; 
+      // TODO move interface check somewhere else...
+      if (resource instanceof ResourceInterface && resource.shouldServe(url)) {
+        const resolvedResource = await resource.serve(url);
+        
+        return Promise.resolve({
+          ...response,
+          ...resolvedResource
+        });
+      } else {
+        return Promise.resolve(response);
+      }
+    }, Promise.resolve(respAcc));
+
+    ctx.set('Content-Type', reducedResponse.contentType);
+    ctx.body = reducedResponse.body;
+
+    // await next();
+  });
+
+  // intercept
+
+
+
+
+
+  // app.use(async ctx => {
+  //   let response = {
+  //     body: '',
+  //     contentType: ''
+  //   };
+
+  //   // TODO prune
+  //   const requestCopy = ctx.request;
+
+  //   const compilationCopy = {
+  //     ...compilation
+  //   };
+
+  //   const userResourcePlugins = compilation.config.plugins.filter((plugin) => { 
+  //     return plugin.type === 'resource';
+  //   }).map((plugin) => {
+  //     return plugin.provider(compilationCopy);
+  //   });
+
+  //   try {
+  //     // default resources to serve web standards, e.g. html (+ md), js, css
+  //     const resources = [
+  //       pluginResourceNodeModules.provider(compilationCopy),
+  //       pluginResourceStandardCss.provider(compilationCopy),
+  //       pluginResourceStandardFont.provider(compilationCopy),
+  //       pluginResourceStandardHtml.provider(compilationCopy),
+  //       // pluginResourceStandardImage.provider(compilationCopy),
+  //       // pluginResourceStandardJavaScript.provider(compilationCopy),
+  //       // pluginResourceStandardJson.provider(compilationCopy),
+  //       ...userResourcePlugins
+  //     ];
+
+  //     const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
+  //       const response = await responsePromise;
+  //       if (resource instanceof ResourceInterface && resource.shouldResolve(requestCopy)) {
+  //         const resolvedResource = await resource.resolve(requestCopy);
+          
+  //         return Promise.resolve({
+  //           ...response,
+  //           ...resolvedResource
+  //         });
+  //       } else {
+  //         return Promise.resolve(response);
+  //       }
+  //     }, Promise.resolve(response));
+
+  //     response = {
+  //       ...response,
+  //       ...reducedResponse
+  //     };
+
+  //     ctx.set('Content-Type', `${response.contentType}`);
+  //     ctx.body = response.body;
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // });
 
   return app;
 }
