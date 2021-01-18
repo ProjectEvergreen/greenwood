@@ -47,12 +47,12 @@ class ResourceInterface {
   // ex: remove es shim <script>, convert .ts -> .js and update path references 
   // this is only an _index.html_ file, BYOA (Bring Your Own AST)
   // eslint-disable-next-line no-unused-vars
-  shouldOptimize(url) {
+  shouldOptimize(url, contents) {
     return false;
   }
 
   // eslint-disable-next-line no-unused-vars
-  async optimize (contents) {
+  async optimize (url, contents) {
     return Promise.resolve(contents);
   }
 }

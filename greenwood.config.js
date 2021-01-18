@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { ResourceInterface } = require('./packages/cli/src/lib/resource-interface');
-// const pluginGoogleAnalytics = require('./packages/plugin-google-analytics/src/index');
+const pluginGoogleAnalytics = require('./packages/plugin-google-analytics/src/index');
 // const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
@@ -52,12 +52,11 @@ module.exports = {
     type: 'resource',
     name: 'plugin-foo',
     provider: (compilation, options) => new FooResource(compilation, options)
-  }
-  // // TODO
-  // ...pluginGoogleAnalytics({
-  //   analyticsId: 'UA-147204327-1'
-  // }),
-  // ...pluginPolyfills()
+  },
+  pluginGoogleAnalytics({
+    analyticsId: 'UA-147204327-1'
+  })
+  // TODO ...pluginPolyfills()
   ],
   markdown: {
     plugins: [
