@@ -1,7 +1,7 @@
 module.exports = {
   
   plugins: [{
-    type: 'index',
+    type: 'resource',
     provider: {}
   }]
   

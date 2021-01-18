@@ -79,7 +79,13 @@ module.exports = readAndMergeConfig = async() => {
             if (!plugin.provider || typeof plugin.provider !== 'function') {
               const providerTypeof = typeof plugin.provider;
 
-              reject(`Error: greenwood.config.js plugins provider must of type function. got ${providerTypeof} instead.`);
+              reject(`Error: greenwood.config.js plugins provider must be a function. got ${providerTypeof} instead.`);
+            }
+
+            if (!plugin.name || typeof plugin.name !== 'string') {
+              const nameTypeof = typeof plugin.name;
+
+              reject(`Error: greenwood.config.js plugins must have a name. got ${nameTypeof} instead.`);
             }
           });
 
@@ -94,7 +100,6 @@ module.exports = readAndMergeConfig = async() => {
               reject(`Error: greenwood.config.js devServer port must be an integer.  Passed value was: ${devServer.port}`);
             } else {
               customConfig.devServer.port = devServer.port;
-              // console.log(`custom port provided => ${customConfig.devServer.port}`);
             }
           }
         }
