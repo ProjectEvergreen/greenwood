@@ -34,7 +34,7 @@ class StandardFontResource extends ResourceInterface {
           }
         } else if (['.ico'].includes(ext)) {
           contentType = 'image/x-icon';
-          body = await fs.promises.readFile(assetPath);
+          body = await fs.promises.readFile(url);
         }
 
         resolve({
