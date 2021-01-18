@@ -39,20 +39,20 @@ class ResourceInterface {
   }
 
   // eslint-disable-next-line no-unused-vars
-  async intercept(url, headers) {
-    return Promise.resolve(url);
+  async intercept(contents, headers) {
+    return Promise.resolve(contents);
   }
 
   // handle a (final) resource type post build, pre optimize, 
   // ex: remove es shim <script>, convert .ts -> .js and update path references 
   // this is only an _index.html_ file, BYOA (Bring Your Own AST)
   // eslint-disable-next-line no-unused-vars
-  shouldOptimize(url, contents) {
+  shouldOptimize(contents, url) {
     return false;
   }
 
   // eslint-disable-next-line no-unused-vars
-  async optimize (url, contents) {
+  async optimize (contents, url) {
     return Promise.resolve(contents);
   }
 }

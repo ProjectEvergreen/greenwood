@@ -41,7 +41,6 @@ module.exports = serializeCompilation = async (compilation) => {
             htmlModified = htmlModified.replace(/<script type="module-shim"/g, '<script type="module"');
   
             console.info(`Serializing complete for page ${route}.`);
-            // console.debug(`outputting to... ${outputDir.replace(`${process.cwd()}`, '.')}${outputPath}`);
             
             htmlModified = await optimizeResources.reduce(async (htmlPromise, resource) => {
               const html = await htmlPromise;
