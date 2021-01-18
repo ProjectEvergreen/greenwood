@@ -187,9 +187,11 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have an the expected content in the <body>', function() {
+        const h1 = dom.window.document.querySelector('body h1');
         const h2 = dom.window.document.querySelector('body h2');
         const p = dom.window.document.querySelectorAll('body p');
 
+        expect(h1.textContent).to.be.equal('A Blog Post Page');
         expect(h2.textContent).to.be.equal('My First Blog Post');
         
         expect(p[0].textContent).to.be.equal('Lorem Ipsum');
@@ -252,9 +254,11 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have an the expected content in the <body>', function() {
+        const h1 = dom.window.document.querySelector('body h1');
         const h2 = dom.window.document.querySelector('body h2');
         const p = dom.window.document.querySelectorAll('body p');
 
+        expect(h1.textContent).to.be.equal('A Blog Post Page');
         expect(h2.textContent).to.be.equal('My Second Blog Post');
         
         expect(p[0].textContent).to.be.equal('Lorem Ipsum');

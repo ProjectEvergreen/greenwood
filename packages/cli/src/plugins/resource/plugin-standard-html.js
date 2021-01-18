@@ -32,9 +32,12 @@ const getPageTemplate = (barePath, workspace, template) => {
   } else if (fs.existsSync(`${templatesDir}/page.html`)) {
     // else look for default page template
     contents = fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
-  } else {
-    // finally, fallback to just using the stock app template
+  } else if (fs.existsSync(`${templatesDir}/app.html`)) {
+    // fallback to just using their app template
     contents = fs.readFileSync(`${templatesDir}/app.html`, 'utf-8');
+  } else {
+    // fallback to using Greenwood's stock app template
+    contents = fs.readFileSync(path.join(__dirname, '../../templates/app.html'), 'utf-8');
   }
 
   return contents;
@@ -165,8 +168,7 @@ const getUserScripts = (contents, userWorkspace) => {
 };
 
 const getMetaContent = (url, config, contents) => {
-
-  const title = config.title;
+  const title = config.title || '';
   const metaContent = config.meta.map(item => {
     let metaHtml = '';
 
@@ -187,8 +189,6 @@ const getMetaContent = (url, config, contents) => {
       ? `<link${metaHtml}/>`
       : `<meta${metaHtml}/>`;
   }).join('\n');
-
-  // console.log(contents);
 
   // TODO make smarter so that if it already exists, then leave it alone
   contents = contents.replace(/<title>(.*)<\/title>/, '');
@@ -213,42 +213,29 @@ class StandardHtmlResource extends ResourceInterface {
   shouldServe(url) {
     const { userWorkspace } = this.compilation.context;
     const relativeUrl = this.getRelativeUserworkspaceUrl(url);
-    // console.debug('>>>>>>>>>>>> HTML shouldServe url', url);
-    // console.debug('>>>>>>>>>>>> HTML shouldServe relativeUrl', relativeUrl);
-
     const barePath = relativeUrl.endsWith('/')
       ? `${userWorkspace}/pages${relativeUrl}index`
       : `${userWorkspace}/pages${relativeUrl.replace('.html', '')}`;
       
-    // console.debug('should serve HTML bare path', barePath);
-    // TODO share this logic with graph.js lookup
     return (this.extensions.indexOf(path.extname(relativeUrl)) >= 0 || path.extname(relativeUrl) === '') && 
       (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index')
       || fs.existsSync(`${barePath}.md`) || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`);
   }
 
   async serve(url) {
-    // console.debug('>>>>>>>>>>>> serve ', url);
     return new Promise(async (resolve, reject) => {
       try {
-        const { config } = this.compilation;
+        const config = Object.assign({}, this.compilation.config);
         const { userWorkspace } = this.compilation.context;
         const normalizedUrl = this.getRelativeUserworkspaceUrl(url);
         let body = '';
-        let title = config.title || '';
         let template = null;
         let processedMarkdown = null;
         const barePath = normalizedUrl.endsWith('/')
           ? `${userWorkspace}/pages${normalizedUrl}index`
           : `${userWorkspace}/pages${normalizedUrl.replace('.html', '')}`;
-
-        // console.debug('>>>>>>> barePath', barePath);
-        // console.debug('markdown exists 1?', fs.existsSync(`${barePath}.md`));
-        // console.debug('markdown exists 2?', fs.existsSync(`${userWorkspace}/pages${url.replace('/index.html', '.md')}`));
-        // console.debug('markdown exists 3?', fs.existsSync(`${barePath.replace('/index', '.md')}`));
-        
-        const isMarkdownContent = fs.existsSync(`${barePath}.md`) 
-          // || fs.existsSync(`${userWorkspace}/pages${url.replace('/index.html', '.md')}`) 
+        const isMarkdownContent = fs.existsSync(`${barePath}.md`)
+          || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`)
           || fs.existsSync(`${barePath.replace('/index', '.md')}`);
 
         if (isMarkdownContent) {
@@ -283,13 +270,17 @@ class StandardHtmlResource extends ResourceInterface {
             .use(rehypeStringify) // convert AST to HTML string
             .process(markdownContents);
 
-          // use page title
-          if (fm.attributes.title) {
-            config.title = `${title} - ${fm.attributes.title}`;
-          }
+          // configure via frontmatter
+          if (fm.attributes) {
+            const { attributes } = fm;
 
-          if (fm.attributes.template) {
-            template = template;
+            if (attributes.title) {
+              config.title = `${config.title} - ${attributes.title}`;
+            }
+  
+            if (attributes.template) {
+              template = attributes.template;
+            }
           }
         }
         
