@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const { ResourceInterface } = require('./packages/cli/src/lib/resource-interface');
 const pluginGoogleAnalytics = require('./packages/plugin-google-analytics/src/index');
-// const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
+const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
+const { ResourceInterface } = require('./packages/cli/src/lib/resource-interface');
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
@@ -55,8 +55,8 @@ module.exports = {
   },
   pluginGoogleAnalytics({
     analyticsId: 'UA-147204327-1'
-  })
-  // TODO ...pluginPolyfills()
+  }),
+  pluginPolyfills()
   ],
   markdown: {
     plugins: [
