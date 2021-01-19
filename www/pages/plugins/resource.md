@@ -1,11 +1,11 @@
 ---
-label: 'Resources'
+label: 'Resource'
 menu: side
-title: 'Resources'
+title: 'Resource'
 index: 2
 ---
 
-## Resources
+## Resource
 
 Resource plugins allow developers to interact with the request and response lifecycles of files at a variety of different points along the development and build workflow, when running the `develop` and `build` commands.  These lifecycles provide the ability to do things like:
 - Integrating Site Analytics (Google, Snowplow) in each generated _index.html_ page
@@ -130,3 +130,5 @@ module.exports = {
 
 }
 ```
+
+> _You can see [more in-depth examples of resource plugin](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/plugins/resource/) by reviewing the default plugins maintained in Greenwood's CLI package._
