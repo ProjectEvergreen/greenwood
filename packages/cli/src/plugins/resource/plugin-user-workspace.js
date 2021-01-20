@@ -7,7 +7,7 @@
 const path = require('path');
 const { ResourceInterface } = require('../../lib/resource-interface');
 
-class UserWorkspaceResolverResource extends ResourceInterface {
+class UserWorkspaceResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
     this.extensions = ['*'];
@@ -28,6 +28,6 @@ class UserWorkspaceResolverResource extends ResourceInterface {
 
 module.exports = {
   type: 'resource',
-  name: 'plugin-user-workspace-resolver',
-  provider: (compilation, options) => new UserWorkspaceResolverResource(compilation, options)
+  name: 'plugin-user-workspace',
+  provider: (compilation, options) => new UserWorkspaceResource(compilation, options)
 };

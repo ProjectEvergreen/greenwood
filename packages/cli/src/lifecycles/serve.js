@@ -2,8 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
-const pluginResolverNodeModules = require('../plugins/resource/plugin-resolver-node-modules');
-const pluginResolverUserWorkspace = require('../plugins/resource/plugin-resolver-user-workspace');
+const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
 const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
 const pluginResourceStandardFont = require('../plugins/resource/plugin-standard-font');
 const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
@@ -11,6 +10,7 @@ const pluginResourceStandardImage = require('../plugins/resource/plugin-standard
 const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
 const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-json');
 const { ResourceInterface } = require('../lib/resource-interface');
+const pluginUserWorkspace = require('../plugins/resource/plugin-user-workspace');
 
 function getDevServer(compilation) {
   const app = new Koa();
@@ -41,8 +41,8 @@ function getDevServer(compilation) {
   // resolve urls to paths first
   app.use(async (ctx, next) => {
     const resolveResources = [
-      pluginResolverUserWorkspace.provider(compilation),
-      pluginResolverNodeModules.provider(compilation)
+      pluginUserWorkspace.provider(compilation),
+      pluginNodeModules.provider(compilation)
     ];
 
     ctx.url = await resolveResources.reduce(async (responsePromise, resource) => {
@@ -58,7 +58,7 @@ function getDevServer(compilation) {
   });
 
   // then handle serving urls
-  app.use(async (ctx) => {
+  app.use(async (ctx, next) => {
     const responseAccumulator = {
       body: ctx.body,
       contentType: ctx.response.contentType
@@ -82,6 +82,28 @@ function getDevServer(compilation) {
 
     ctx.set('Content-Type', reducedResponse.contentType);
     ctx.body = reducedResponse.body;
+
+    await next();
+  });
+
+  // allow intercepting of urls
+  app.use(async (ctx) => {
+    const modifiedResources = resources.concat(pluginNodeModules.provider(compilation));
+
+    const reducedResponse = await modifiedResources.reduce(async (responsePromise, resource) => {
+      const response = await responsePromise;
+      const { url, headers } = ctx;
+
+      if (resource.shouldIntercept(url, headers)) {
+        const interceptedResponse = await resource.intercept(response);
+        
+        return Promise.resolve(interceptedResponse);
+      } else {
+        return Promise.resolve(response);
+      }
+    }, Promise.resolve(ctx.body));
+
+    ctx.body = reducedResponse;
   });
 
   return app;

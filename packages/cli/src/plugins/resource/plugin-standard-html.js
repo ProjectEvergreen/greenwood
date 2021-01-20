@@ -4,7 +4,6 @@
  * This is a Greenwood default plugin.
  *
  */
-const acorn = require('acorn');
 const frontmatter = require('front-matter');
 const fs = require('fs');
 const htmlparser = require('node-html-parser');
@@ -16,7 +15,6 @@ const remarkParse = require('remark-parse');
 const remarkRehype = require('remark-rehype');
 const { ResourceInterface } = require('../../lib/resource-interface');
 const unified = require('unified');
-const walk = require('acorn-walk');
 
 // TODO better error handling / messaging for users if things are not where they are expected to be
 // general refactoring
@@ -100,61 +98,6 @@ const getUserScripts = (contents, userWorkspace) => {
       </head>
     `);
   }
-
-  contents = contents.replace(/type="module"/g, 'type="module-shim"');
-
-  const importMap = {};
-  const userPackageJson = fs.existsSync(`${userWorkspace}/package.json`)
-    ? require(path.join(userWorkspace, 'package.json')) // its a monorepo?
-    : fs.existsSync(`${process.cwd()}/package.json`)
-      ? require(path.join(process.cwd(), 'package.json'))
-      : {};
-
-  // console.debug('userPackageJson', userPackageJson);
-  // console.debug('dependencies', userPackageJson.dependencies);
-
-  Object.keys(userPackageJson.dependencies || {}).forEach(dependency => {
-    const packageRootPath = path.join(process.cwd(), './node_modules', dependency);
-    const packageJsonPath = path.join(packageRootPath, 'package.json');
-    const packageJson = require(packageJsonPath);
-    const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, packageJson.main);
-    const packageFileContents = fs.readFileSync(packageEntryPointPath, 'utf-8');
-
-    walk.simple(acorn.parse(packageFileContents, { sourceType: 'module' }), {
-      ImportDeclaration(node) {
-        // console.log('Found a ImportDeclaration');
-        const sourceValue = node.source.value;
-
-        if (sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
-          // console.log(`found a bare import for ${sourceValue}!!!!!`);
-          importMap[sourceValue] = `/node_modules/${sourceValue}`;
-        }
-      },
-      ExportNamedDeclaration(node) {
-        // console.log('Found a ExportNamedDeclaration');
-        const sourceValue = node && node.source ? node.source.value : '';
-
-        if (sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
-          // console.log(`found a bare export for ${sourceValue}!!!!!`);
-          importMap[sourceValue] = `/node_modules/${sourceValue}`;
-        }
-      }
-    });
-    
-    importMap[dependency] = `/node_modules/${dependency}/${packageJson.main}`;
-  });
-
-  // console.log('importMap all complete', importMap);
-
-  contents = contents.replace('<head>', `
-    <head>
-      <script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>
-      <script type="importmap-shim">
-        {
-          "imports": ${JSON.stringify(importMap, null, 1)}
-        }
-      </script>
-  `);
 
   if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
     // TODO setup and teardown should be done together

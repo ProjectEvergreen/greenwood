@@ -34,7 +34,7 @@ class ResourceInterface {
 
   // handle an already resolved / served resource
   // eslint-disable-next-line no-unused-vars
-  shouldInterceptl(url, headers) {
+  shouldIntercept(url, headers) {
     return false;
   }
 
