@@ -88,7 +88,7 @@ const getAppTemplate = (contents, userWorkspace) => {
   return appTemplateContents || contents;
 };
 
-const getUserScripts = (contents, userWorkspace) => {
+const getUserScripts = (contents) => {
   // TODO use an HTML parser?  https://www.npmjs.com/package/node-html-parser
   if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
     // TODO setup and teardown should be done together
@@ -229,7 +229,7 @@ class StandardHtmlResource extends ResourceInterface {
         
         body = getPageTemplate(barePath, userWorkspace, template);
         body = getAppTemplate(body, userWorkspace);
-        body = getUserScripts(body, userWorkspace);
+        body = getUserScripts(body);
         body = getMetaContent(normalizedUrl, config, body);
 
         if (processedMarkdown) {
