@@ -1,12 +1,13 @@
 const BrowserRunner = require('../lib/browser');
-const { promises: fsp } = require('fs');
 const fs = require('fs');
 const path = require('path');
+const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
 
 module.exports = serializeCompilation = async (compilation) => {
   const compilationCopy = Object.assign({}, compilation);
   const browserRunner = new BrowserRunner();
   const optimizeResources = [
+    pluginResourceStandardHtml.provider(compilationCopy),
     ...compilation.config.plugins.filter((plugin) => {
       const provider = plugin.provider(compilationCopy);
 
@@ -28,27 +29,17 @@ module.exports = serializeCompilation = async (compilation) => {
         
         return await browserRunner
           .serialize(`${serverUrl}${route}`)
-          .then(async (html) => {
+          .then(async (indexHtml) => {
             const outputPath = `${outputDir}${route}index.html`;
-            
-            // TODO allow setup / teardown (e.g. module shims, then remove module-shims)
-            let htmlModified = html;
-  
-            // TODO should really be happening via plugins or other standardize setup / teardown mechanism
-            htmlModified = htmlModified.replace(/<script src="\/node_modules\/@webcomponents\/webcomponentsjs\/webcomponents-bundle.js"><\/script>/, '');
-            htmlModified = htmlModified.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
-            htmlModified = htmlModified.replace(/<script defer="" src="\/node_modules\/es-module-shims\/dist\/es-module-shims.js"><\/script>/, '');
-            htmlModified = htmlModified.replace(/<script type="module-shim"/g, '<script type="module"');
-  
             console.info(`Serializing complete for page ${route}.`);
             
-            htmlModified = await optimizeResources.reduce(async (htmlPromise, resource) => {
+            const htmlOptimized = await optimizeResources.reduce(async (htmlPromise, resource) => {
               const html = await htmlPromise;
               
               return resource.shouldOptimize(html)
                 ? resource.optimize(html)
                 : Promise.resolve(html);
-            }, Promise.resolve(htmlModified));
+            }, Promise.resolve(indexHtml));
 
             if (!fs.existsSync(path.join(outputDir, route))) {
               fs.mkdirSync(path.join(outputDir, route), {
@@ -56,7 +47,7 @@ module.exports = serializeCompilation = async (compilation) => {
               });
             }
             
-            await fsp.writeFile(outputPath, htmlModified);
+            await fs.promises.writeFile(outputPath, htmlOptimized);
           });
       }));
     } catch (e) {

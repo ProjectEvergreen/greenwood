@@ -302,9 +302,27 @@ class StandardHtmlResource extends ResourceInterface {
       }
     });
   }
+
+  shouldOptimize() {
+    return true;
+  }
+
+  async optimize(html) {
+    return new Promise((resolve, reject) => {
+      try {
+        html = html.replace(/<script src="\/node_modules\/@webcomponents\/webcomponentsjs\/webcomponents-bundle.js"><\/script>/, '');
+        html = html.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
+        html = html.replace(/<script defer="" src="\/node_modules\/es-module-shims\/dist\/es-module-shims.js"><\/script>/, '');
+        html = html.replace(/<script type="module-shim"/g, '<script type="module"');
+    
+        resolve(html);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
 }
 
-// TODO Plugin interface?
 module.exports = {
   type: 'resource',
   name: 'plugin-standard-html',
