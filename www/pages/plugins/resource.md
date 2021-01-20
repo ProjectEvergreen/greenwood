@@ -59,8 +59,6 @@ module.exports = (options = {}) => {
 };
 ```
 
-Note: you can always
-
 ## Example
 Below is an example of turning files that have a _.foo_ extension into JavaScript.
 
