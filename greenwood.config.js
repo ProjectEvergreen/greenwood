@@ -1,37 +1,9 @@
-const fs = require('fs');
 const path = require('path');
 const pluginGoogleAnalytics = require('./packages/plugin-google-analytics/src/index');
 const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
-const { ResourceInterface } = require('./packages/cli/src/lib/resource-interface');
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
-
-class FooResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
-    
-    this.extensions = ['.foo'];
-    this.contentType = 'text/javascript';
-  }
-
-  async serve(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let body = await fs.promises.readFile(url, 'utf-8');
-        
-        body = body.replace(/interface (.*){(.*)}/s, '');
-
-        resolve({
-          body,
-          contentType: this.contentType
-        });
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
-}
 
 module.exports = {
   workspace: path.join(__dirname, 'www'),
@@ -48,15 +20,11 @@ module.exports = {
     { rel: 'icon', href: FAVICON_HREF },
     { name: 'google-site-verification', content: '4rYd8k5aFD0jDnN0CCFgUXNe4eakLP4NnA18mNnK5P0' }
   ],
-  plugins: [{
-    type: 'resource',
-    name: 'plugin-foo',
-    provider: (compilation, options) => new FooResource(compilation, options)
-  },
-  pluginGoogleAnalytics({
-    analyticsId: 'UA-147204327-1'
-  }),
-  pluginPolyfills()
+  plugins: [
+    pluginGoogleAnalytics({
+      analyticsId: 'UA-147204327-1'
+    }),
+    pluginPolyfills()
   ],
   markdown: {
     plugins: [
