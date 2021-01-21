@@ -18,12 +18,15 @@
  *     header/
  *       header.js
  *   pages/
- *     about.md
+ *     plugins/
+ *       index-hooks.md
+ *       index.md
  *     index.md
+ *     pages.md
  *   services/
- *     components.js
  *     pages/
  *       pages.js
+ *     components.js
  *   templates/
  *     page.html
  */
@@ -96,7 +99,7 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('Describe Nested Page', function() {
+    describe('Describe Page page', function() {
       let dom;
 
       beforeEach(async function() {
@@ -130,6 +133,40 @@ describe('Build Greenwood With: ', function() {
 
         expect(header.length).to.be.equal(1);
         expect(header[0].textContent).to.be.equal('This is the header component.');
+      });
+    });
+
+    describe('Describe a page with index in the route filename', function() {
+      let pluginIndexPageDom;
+      let pluginHooksIndexPageDom;
+
+      beforeEach(async function() {
+        pluginIndexPageDom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'plugins/index.html'));
+        pluginHooksIndexPageDom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'plugins/index-hooks/index.html'));
+      });
+
+      it('should output an index.html file for the plugins index page', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, 'plugins', 'index.html'))).to.be.true;
+      });
+
+      it('should output an index.html file for the plugins page with index in the filename', function() {
+        expect(fs.existsSync(path.join(this.context.publicDir, 'plugins/index-hooks', 'index.html'))).to.be.true;
+      });
+
+      it('should have the expected content in the <body> of the plugins page index.html', function() {
+        const h2 = pluginIndexPageDom.window.document.querySelector('body h2');
+        const p = pluginIndexPageDom.window.document.querySelector('body p');
+
+        expect(h2.textContent).to.be.equal('Plugins');
+        expect(p.textContent).to.be.equal('Lorum Ipsum');
+      });
+
+      it('should have the expected content in the <body> of the plugins hook index.html with index in the route name', function() {
+        const h2 = pluginHooksIndexPageDom.window.document.querySelector('body h2');
+        const p = pluginHooksIndexPageDom.window.document.querySelector('body p');
+
+        expect(h2.textContent).to.be.equal('Index Hooks');
+        expect(p.textContent).to.be.equal('Some more Lorum Ipsum.');
       });
     });
 

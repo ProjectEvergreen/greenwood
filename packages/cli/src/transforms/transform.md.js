@@ -26,7 +26,7 @@ class MDTransform extends TransformInterface {
       ? `${workspace}/pages${url}index`
       : `${workspace}/pages${url.replace('.html', '')}`;
 
-    return fs.existsSync(`${barePath}.md`) || fs.existsSync(`${barePath.replace('/index', '.md')}`);
+    return fs.existsSync(`${barePath}.md`) || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`);
   }
 
   async applyTransform() {
@@ -43,11 +43,10 @@ class MDTransform extends TransformInterface {
           : `${workspace}/pages${url.replace('.html', '')}`;
           
         // TODO all this lookup could probably be handled a bit more gracefully perhaps?
-        // console.debug('this route exists as markdown');
         const markdownPath = fs.existsSync(`${barePath}.md`)
           ? `${barePath}.md`
-          : fs.existsSync(`${barePath.replace('/index', '.md')}`)
-            ? `${barePath.replace('/index', '.md')}`
+          : fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`)
+            ? `${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`
             : `${workspace}/pages${url.replace('/index.html', '.md')}`;
         const markdownContents = await fsp.readFile(markdownPath, 'utf-8');
         const rehypePlugins = [];

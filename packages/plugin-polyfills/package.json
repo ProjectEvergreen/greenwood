@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-polyfills",
-  "version": "0.10.0-alpha.1",
+  "version": "0.10.0-alpha.3",
   "description": "A composite plugin for Greenwood for adding polyfill support for older browsers.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-polyfills",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -27,6 +27,6 @@
     "@webcomponents/webcomponentsjs": "^2.3.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.10.0-alpha.1"
+    "@greenwood/cli": "^0.10.0-alpha.3"
   }
 }
