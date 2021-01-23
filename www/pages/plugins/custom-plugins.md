@@ -1,12 +1,12 @@
 ---
-label: 'composite-plugins'
+label: 'custom-plugins'
 menu: side
-title: 'Composite Plugins'
+title: 'Custom Plugins'
 index: 1
 ---
 
-## Composite Plugins
-Greenwood provides some custom "composite" plugins that are tasked with providing specific functionality to your project, built using the [available plugin types](/plugins/) already provided by Greenwood.
+## Custom Plugins
+Greenwood provides some custom plugins that can be used to enhance your project's default functionalty, using the [available plugin types](/plugins/) provided by Greenwood.
 
 The available plugins built and maintained by Greenwood team and contibutors have been provided in the table below, with links to their README with the appropriate installation and usage steps.
 
