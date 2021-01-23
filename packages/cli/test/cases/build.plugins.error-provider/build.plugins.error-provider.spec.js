@@ -11,10 +11,10 @@
  * User Config
  * {
  *   plugins: [{
- *     type: 'indexxxx',
- *     provider: function() { }
+ *     type: 'index',
+ *     name: 'plugin-something',
+ *     plugin: {}
  *  }]
- *
  * }
  *
  * User Workspace
@@ -25,7 +25,7 @@
 const expect = require('chai').expect;
 const TestBed = require('../../../../../test/test-bed');
 
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   let setup;
 
   before(async function() {
@@ -33,12 +33,12 @@ xdescribe('Build Greenwood With: ', function() {
     await setup.setupTestBed(__dirname);
   });
 
-  describe('Custom Configuration with a bad type value for a plugin', function() {
-    it('should throw an error that plugin.type is not valid must be a string', async function() {
+  describe('Custom Configuration with a bad provider value for a plugin', function() {
+    it('should throw an error that plugin.provider is not a function', async function() {
       try {
         await setup.runGreenwoodCommand('build');
       } catch (err) {
-        expect(err).to.contain('Error: greenwood.config.js plugins must be one of type "index, webpack". got "indexxx" instead.');
+        expect(err).to.contain('Error: greenwood.config.js plugins provider must be a function. got object instead.');
       }
     });
   });

@@ -37,9 +37,28 @@ function greenwoodHtmlPlugin(compilation) {
 
   return {
     name: 'greenwood-html-plugin',
-    load(id) {
-      if (path.extname(id) === '.html') {
-        return '';
+    async load(id) {
+      const extension = path.extname(id);
+      
+      if (extension === '.html') {
+        return Promise.resolve('');
+      }
+
+      // handle custom user file extensions
+      const customResources = compilation.config.plugins.filter((plugin) => {
+        return plugin.type === 'resource';
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      }).filter((resource) => {
+        if (resource.shouldServe(id)) {
+          return resource;
+        }
+      });
+
+      if (customResources.length) {
+        const response = await customResources[0].serve(id);
+
+        return response.body;
       }
     },
     // TODO do this during load instead?
@@ -59,7 +78,7 @@ function greenwoodHtmlPlugin(compilation) {
 
             const srcPath = src.replace('../', './');
             const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
-            
+
             that.emitFile({
               type: 'chunk',
               id: srcPath,

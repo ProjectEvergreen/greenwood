@@ -1,61 +1,109 @@
-/* eslint-disable complexity */
-// TODO ^^^
-const { promises: fsp } = require('fs');
+const fs = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
-const Transform = require('../transforms/transform.interface');
-const HTMLTransform = require('../transforms/transform.html');
-const MarkdownTransform = require('../transforms/transform.md');
-const CSSTransform = require('../transforms/transform.css');
-const JSTransform = require('../transforms/transform.js');
-const JSONTransform = require('../transforms/transform.json.js');
-const AssetTransform = require('../transforms/transform.assets');
+const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
+const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
+const pluginResourceStandardFont = require('../plugins/resource/plugin-standard-font');
+const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
+const pluginResourceStandardImage = require('../plugins/resource/plugin-standard-image');
+const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
+const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-json');
+const { ResourceInterface } = require('../lib/resource-interface');
+const pluginUserWorkspace = require('../plugins/resource/plugin-user-workspace');
 
 function getDevServer(compilation) {
   const app = new Koa();
+  const compilationCopy = Object.assign({}, compilation);
+  const resources = [
+    // Greenwood default standard resource plugins
+    pluginResourceStandardCss.provider(compilationCopy),
+    pluginResourceStandardFont.provider(compilationCopy),
+    pluginResourceStandardHtml.provider(compilationCopy),
+    pluginResourceStandardImage.provider(compilationCopy),
+    pluginResourceStandardJavaScript.provider(compilationCopy),
+    pluginResourceStandardJson.provider(compilationCopy),
 
-  app.use(async ctx => {
-    let response = {
-      body: '',
-      contentType: '',
-      extension: ''
+    // custom user resource plugins
+    ...compilation.config.plugins.filter((plugin) => {
+      return plugin.type === 'resource';
+    }).map((plugin) => {
+      const provider = plugin.provider(compilationCopy);
+
+      if (!(provider instanceof ResourceInterface)) {
+        console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ResourceInterface.`);
+      }
+
+      return provider;
+    })
+  ];
+
+  // resolve urls to paths first
+  app.use(async (ctx, next) => {
+    const resolveResources = [
+      pluginUserWorkspace.provider(compilation),
+      pluginNodeModules.provider(compilation)
+    ];
+
+    ctx.url = await resolveResources.reduce(async (responsePromise, resource) => {
+      const response = await responsePromise;
+      const { url } = ctx; 
+      
+      return resource.shouldResolve(url)
+        ? resource.resolve(url)
+        : Promise.resolve(response);
+    }, Promise.resolve(''));
+    
+    await next();
+  });
+
+  // then handle serving urls
+  app.use(async (ctx, next) => {
+    const responseAccumulator = {
+      body: ctx.body,
+      contentType: ctx.response.contentType
     };
+    
+    const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
+      const response = await responsePromise;
+      const { url, headers } = ctx;
 
-    request = {
-      header: ctx.request.header,
-      url: ctx.request.url,
-      compilation: { ...compilation }
-    };
+      if (resource.shouldServe(url, headers)) {
+        const resolvedResource = await resource.serve(url, headers);
+        
+        return Promise.resolve({
+          ...response,
+          ...resolvedResource
+        });
+      } else {
+        return Promise.resolve(response);
+      }
+    }, Promise.resolve(responseAccumulator));
 
-    try {
-      // default transforms 
-      const defaultTransforms = [
-        new HTMLTransform(request),
-        new MarkdownTransform(request),
-        new CSSTransform(request),
-        new JSTransform(request),
-        new JSONTransform(request),
-        new AssetTransform(request)
-      ];
+    ctx.set('Content-Type', reducedResponse.contentType);
+    ctx.body = reducedResponse.body;
 
-      // walk through all transforms
-      await Promise.all(defaultTransforms.map(async (plugin) => {
-        if (plugin instanceof Transform && plugin.shouldTransform()) {
+    await next();
+  });
 
-          const transformedResponse = await plugin.applyTransform();
+  // allow intercepting of urls
+  app.use(async (ctx) => {
+    const modifiedResources = resources.concat(pluginNodeModules.provider(compilation));
 
-          response = { 
-            ...transformedResponse
-          };
-        }
-      }));
+    const reducedResponse = await modifiedResources.reduce(async (responsePromise, resource) => {
+      const response = await responsePromise;
+      const { url, headers } = ctx;
 
-      ctx.set('Content-Type', `${response.contentType}`);
-      ctx.body = response.body;
-    } catch (err) {
-      console.log(err);
-    }
+      if (resource.shouldIntercept(url, headers)) {
+        const interceptedResponse = await resource.intercept(response);
+        
+        return Promise.resolve(interceptedResponse);
+      } else {
+        return Promise.resolve(response);
+      }
+    }, Promise.resolve(ctx.body));
+
+    ctx.body = reducedResponse;
   });
 
   return app;
@@ -65,26 +113,26 @@ function getProdServer(compilation) {
   const app = new Koa();
 
   app.use(async ctx => {
-    // console.debug('URL', ctx.request.url);
     const { outputDir } = compilation.context;
     const { url } = ctx.request;
 
     if (url.endsWith('/') || url.endsWith('.html')) {
       const barePath = url.endsWith('/') ? path.join(url, 'index.html') : url;
-      const contents = await fsp.readFile(path.join(outputDir, barePath), 'utf-8');
+      const contents = await fs.promises.readFile(path.join(outputDir, barePath), 'utf-8');
+      
       ctx.set('Content-Type', 'text/html');
       ctx.body = contents;
     }
 
     if (url.endsWith('.js')) {
-      const contents = await fsp.readFile(path.join(outputDir, url), 'utf-8');
+      const contents = await fs.promises.readFile(path.join(outputDir, url), 'utf-8');
 
       ctx.set('Content-Type', 'text/javascript');
       ctx.body = contents;
     }
 
     if (url.endsWith('.css')) {
-      const contents = await fsp.readFile(path.join(outputDir, url), 'utf-8');
+      const contents = await fs.promises.readFile(path.join(outputDir, url), 'utf-8');
 
       ctx.set('Content-Type', 'text/css');
       ctx.body = contents;
@@ -102,21 +150,21 @@ function getProdServer(compilation) {
         ctx.set('Content-Type', `image/${type}`);
 
         if (ext === '.svg') {
-          ctx.body = await fsp.readFile(assetPath, 'utf-8');
+          ctx.body = await fs.promises.readFile(assetPath, 'utf-8');
         } else {
-          ctx.body = await fsp.readFile(assetPath); 
+          ctx.body = await fs.promises.readFile(assetPath); 
         }
       } else if (['.woff2', '.woff', '.ttf'].includes(ext)) {
         ctx.set('Content-Type', `font/${type}`);
-        ctx.body = await fsp.readFile(assetPath);
+        ctx.body = await fs.promises.readFile(assetPath);
       } else if (['.ico'].includes(ext)) {
         ctx.set('Content-Type', 'image/x-icon');
-        ctx.body = await fsp.readFile(assetPath);
+        ctx.body = await fs.promises.readFile(assetPath);
       }
     }
 
     if (url.endsWith('.json')) {
-      const contents = await fsp.readFile(path.join(outputDir, 'graph.json'), 'utf-8');
+      const contents = await fs.promises.readFile(path.join(outputDir, 'graph.json'), 'utf-8');
 
       ctx.set('Content-Type', 'application/json');
       ctx.body = JSON.parse(contents);
