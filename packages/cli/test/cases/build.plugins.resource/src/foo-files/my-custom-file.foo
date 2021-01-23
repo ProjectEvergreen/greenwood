@@ -1,0 +1,9 @@
+import './my-other-custom-file.foo';
+
+const node = document.createElement('h6');
+const textnode = document.createTextNode('hello from my-custom-file.foo');
+
+node.appendChild(textnode);
+document.getElementsByTagName('body')[0].appendChild(node);
+
+console.log('hello from my-custom-file.foo 👋');
