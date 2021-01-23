@@ -9,6 +9,24 @@ const path = require('path');
 const { ResourceInterface } = require('../../lib/resource-interface');
 const walk = require('acorn-walk');
 
+const getPackageEntryPath = (packageJson) => {
+  // "main": "lib/index.js",
+  // "module": "es/index.js",
+  // "jsnext:main": "es/index.js"
+  let entry = packageJson.module 
+    ? packageJson.module // favor ESM entry points first
+    : packageJson.main;
+
+  if (fs.existsSync(`${process.cwd()}/node_modules/${packageJson.name}/${entry.replace('.js', '.mjs')}`)) {
+    console.debug('????????? has .mjs option, use?', `${process.cwd()}/${packageJson.name}/${entry.replace('.js', '.mjs')}`);
+    entry = entry.replace('.js', '.mjs');
+  }
+
+  console.debug(`getPackageEntryPath for ${packageJson.name} =>`, entry);
+
+  return entry;
+};
+
 class NodeModulesResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
@@ -24,10 +42,39 @@ class NodeModulesResource extends ResourceInterface {
       try {
         const relativeUrl = url.replace(this.compilation.context.userWorkspace, '');
         const nodeModulesUrl = path.join(process.cwd(), relativeUrl);
-        
+
         resolve(nodeModulesUrl);
       } catch (e) {
         console.error(e);
+        reject(e);
+      }
+    });
+  }
+
+  shouldServe(url) {
+    return path.extname(url) === '.mjs';
+  }
+
+  serve(url) {
+    return new Promise(async(resolve, reject) => {
+      try {
+        const body = await fs.promises.readFile(url, 'utf-8');
+    
+        // exports['default'] = result;
+        if (path.extname(url) === '.mjs' && body.indexOf(`exports['default'] = `) >= 0) {
+          body = `
+            let exports = {}\n
+            ${body}
+          `;
+          body = body.replace(`exports['default'] = `, 'export default ');
+          console.debug('handled a weird edge case!!!', body);
+        }
+
+        resolve({
+          body,
+          contentType: 'text/javascript'
+        });
+      } catch (e) {
         reject(e);
       }
     });
@@ -52,21 +99,40 @@ class NodeModulesResource extends ResourceInterface {
             ? require(path.join(process.cwd(), 'package.json'))
             : {};
 
+        // console.debug('userPackageJson', userPackageJson);
+        // console.debug('dependencies', userPackageJson.dependencies);
+
+        // TODO will need to track for non ESM packages, like CJS, and less likely, UMD and AMD
+        // maybe just use snowpack?
         Object.keys(userPackageJson.dependencies || {}).forEach(dependency => {
           const packageRootPath = path.join(process.cwd(), './node_modules', dependency);
           const packageJsonPath = path.join(packageRootPath, 'package.json');
           const packageJson = require(packageJsonPath);
-          const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, packageJson.main);
+          const entry = getPackageEntryPath(packageJson);
+          const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
           const packageFileContents = fs.readFileSync(packageEntryPointPath, 'utf-8');
+          console.debug(`########entry path for ${dependency} =>`, packageEntryPointPath);
 
+          // console.debug(acorn.parse(packageFileContents, { sourceType: 'module' }));
           walk.simple(acorn.parse(packageFileContents, { sourceType: 'module' }), {
             ImportDeclaration(node) {
               // console.log('Found a ImportDeclaration');
-              const sourceValue = node.source.value;
+              let { value: sourceValue } = node.source;
 
               if (sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
-                // console.log(`found a bare import for ${sourceValue}!!!!!`);
-                importMap[sourceValue] = `/node_modules/${sourceValue}`;
+                console.debug(`found a bare import for ${sourceValue}!!!!!`);
+
+                if (path.extname(sourceValue) === '' && !userPackageJson.dependencies[sourceValue]) {
+                  console.debug('!!!!!!! new bare import dependency of dependency, might need to resolve to a path first');
+                  const sourcePackageJsonPath = path.join(process.cwd(), './node_modules', sourceValue, 'package.json');
+                  const packageJson = require(sourcePackageJsonPath);
+                  const entry = getPackageEntryPath(packageJson);
+
+                  console.debug('file resolve => ', `/node_modules/${sourceValue}/${entry}`);
+                  importMap[sourceValue] = `/node_modules/${sourceValue}/${entry}`;
+                } else {
+                  importMap[sourceValue] = `/node_modules/${sourceValue}`;
+                }
               }
             },
             ExportNamedDeclaration(node) {
@@ -80,7 +146,7 @@ class NodeModulesResource extends ResourceInterface {
             }
           });
           
-          importMap[dependency] = `/node_modules/${dependency}/${packageJson.main}`;
+          importMap[dependency] = `/node_modules/${dependency}/${entry}`;
         });
 
         newContents = newContents.replace('<head>', `

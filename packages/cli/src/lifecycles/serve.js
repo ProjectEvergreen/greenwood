@@ -64,21 +64,23 @@ function getDevServer(compilation) {
       contentType: ctx.response.contentType
     };
     
-    const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
-      const response = await responsePromise;
-      const { url, headers } = ctx;
+    const reducedResponse = await resources
+      .concat([pluginNodeModules.provider(compilation)])
+      .reduce(async (responsePromise, resource) => {
+        const response = await responsePromise;
+        const { url, headers } = ctx;
 
-      if (resource.shouldServe(url, headers)) {
-        const resolvedResource = await resource.serve(url, headers);
-        
-        return Promise.resolve({
-          ...response,
-          ...resolvedResource
-        });
-      } else {
-        return Promise.resolve(response);
-      }
-    }, Promise.resolve(responseAccumulator));
+        if (resource.shouldServe(url, headers)) {
+          const resolvedResource = await resource.serve(url, headers);
+          
+          return Promise.resolve({
+            ...response,
+            ...resolvedResource
+          });
+        } else {
+          return Promise.resolve(response);
+        }
+      }, Promise.resolve(responseAccumulator));
 
     ctx.set('Content-Type', reducedResponse.contentType);
     ctx.body = reducedResponse.body;

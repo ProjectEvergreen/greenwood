@@ -10,7 +10,11 @@
     "@evergreen-wc/eve-button": "^0.0.9",
     "@evergreen-wc/eve-container": "^0.0.10",
     "lit-element": "^2.4.0",
-    "prismjs": "^1.21.0"
+    "lit-redux-router": "^0.15.7",
+    "lodash": "^4.17.20",
+    "prismjs": "^1.21.0",
+    "pwa-helpers": "^0.9.1",
+    "redux": "^4.0.5"
   },
   "devDependencies": {
     "@mapbox/rehype-prism": "^0.5.0",
