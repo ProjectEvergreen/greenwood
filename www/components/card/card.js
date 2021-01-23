@@ -43,16 +43,9 @@ class Card extends LitElement {
 
   render() {
     return html`
-    <style>
-      ${css}
-    </style>
-      <div class="card ${this.size ? `card-${this.size}` : ''}">
-        ${this.renderImage()}
-        ${this.renderTitle()}
-        <div class="body">
-          <slot></slot>
-        </div>
-      </div>
+      ${this.renderImage()}
+      ${this.renderTitle()}
+      <slot name="cardcontent"></slot>
     `;
   }
 }

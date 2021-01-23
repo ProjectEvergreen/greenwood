@@ -115,3 +115,18 @@ customElements.define('x-greeting', GreetingComponent);
 ## References
 - [MDN Developer Docs: Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components)
 - [Google Developer Docs: Web Components](https://developers.google.com/web/fundamentals/web-components/)
+
+
+> Some notes / recommendations about ShadowDOM from [our research](https://github.com/ProjectEvergreen/greenwood/pull/454)
+> - [`<slot>` should be named](https://github.com/Polymer/lit-element/issues/824#issuecomment-535574662)
+> - `<slot>` only supports a [shallow (one) level of nesting](https://javascript.info/slots-composition).  A `<slot>` tag must be within a direct descendant of its `:host`.
+> ```html
+> <h3>Content from inside the custom element. (inside HTMLElement)</h3>
+> <h3>
+>    <slot name="content"></slot> <!-- will show -->
+> <h3>
+> <div>
+>   <h3>
+>      <slot name="content"></slot> <!-- wont show -->
+>    <h3>
+> </div>
