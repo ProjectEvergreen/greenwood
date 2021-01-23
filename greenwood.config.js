@@ -29,8 +29,8 @@ module.exports = {
   markdown: {
     plugins: [
       '@mapbox/rehype-prism',
-      'rehype-autolink-headings',
       'rehype-slug',
+      'rehype-autolink-headings',
       'remark-github'
     ]
   }

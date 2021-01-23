@@ -41,7 +41,7 @@ class Shelf extends LitElement {
   expandRoute(path) {
     let routeShelfListIndex = this.shelfList.findIndex(item => {
       let expRoute = new RegExp(`^${path}$`);
-      return expRoute.test(item.link);
+      return expRoute.test(item.route);
     });
 
     if (routeShelfListIndex > -1) {
@@ -88,7 +88,6 @@ class Shelf extends LitElement {
   }
 
   async fetchShelfData() {
-    // console.debug('fetchShelfData!!!', this.page);
     return fetch('/graph.json')
       .then(res => res.json())
       .then(data => {
@@ -96,7 +95,7 @@ class Shelf extends LitElement {
           if (page.data.menu && page.data.menu === 'side' && page.route.indexOf(`/${this.page}`) === 0) {
             page.label = `${page.label.charAt(0).toUpperCase()}${page.label.slice(1)}`.replace('-', ' ');
             page.children = [];
-            
+
             page.data.tableOfContents.forEach(({ content, slug }) => {
               page.children.push({
                 label: content,
@@ -132,9 +131,18 @@ class Shelf extends LitElement {
     }
   }
 
+  handleSubItemSelect(mainRoute, itemRoute) {
+    // check if we're on the same page as subitem anchor
+    if (window.location.pathname.substr(0, window.location.pathname.length - 1) !== mainRoute) {
+      window.location.href = mainRoute + itemRoute;
+    } else {
+      this.goTo(`${item.route}`);
+    }
+  }
+
   renderList() {
     /* eslint-disable indent */
-    const renderListItems = (list, selected) => {
+    const renderListItems = (mainRoute, list, selected) => {
       let listItems = '';
 
       if (list && list.length > 0) {
@@ -143,7 +151,7 @@ class Shelf extends LitElement {
             ${list.map((item) => {
               return html`
                 <li class="${selected ? '' : 'hidden'}">
-                  <a @click=${() => { this.goTo(`${item.route}`); }}>${item.label}</a>
+                  <a @click=${() => this.handleSubItemSelect(mainRoute, item.route)}>${item.label}</a>
                 </li>
               `;
             })}
@@ -170,7 +178,7 @@ class Shelf extends LitElement {
 
           <hr/>
           
-          ${renderListItems(item.children, item.selected)}
+          ${renderListItems(item.route, item.children, item.selected)}
         </li>
       `;
     });
