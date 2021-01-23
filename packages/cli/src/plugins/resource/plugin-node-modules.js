@@ -61,12 +61,12 @@ class NodeModulesResource extends ResourceInterface {
         const body = await fs.promises.readFile(url, 'utf-8');
     
         // exports['default'] = result;
-        if (path.extname(url) === '.mjs' && body.indexOf(`exports['default'] = `) >= 0) {
+        if (path.extname(url) === '.mjs' && body.indexOf('exports[\'default\'] = ') >= 0) {
           body = `
             let exports = {}\n
             ${body}
           `;
-          body = body.replace(`exports['default'] = `, 'export default ');
+          body = body.replace('exports[\'default\'] = ', 'export default ');
           console.debug('handled a weird edge case!!!', body);
         }
 
