@@ -77,6 +77,12 @@ module.exports = generateGraph = async (compilation) => {
               // parse markdown for table of contents and output to json
               customData.tableOfContents = toc(fileContents).json;
               customData.tableOfContents.shift();
+
+              // parse table of contents for only the pages user wants linked
+              if (customData.tableOfContents.length > 0 && customData.linkheadings > 0) {
+                customData.tableOfContents = customData.tableOfContents
+                  .filter((item) => item.lvl === customData.linkheadings);
+              }
             }
             /* ---------End Menu Query-------------------- */
 

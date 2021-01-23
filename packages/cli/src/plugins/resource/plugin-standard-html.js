@@ -202,14 +202,15 @@ class StandardHtmlResource extends ResourceInterface {
           });
 
           // TODO extract front matter contents from remark-frontmatter instead of frontmatter lib
+          const settings = config.markdown.settings || {};
           const fm = frontmatter(markdownContents);
           processedMarkdown = await unified()
-            .use(remarkParse) // parse markdown into AST
+            .use(remarkParse, settings) // parse markdown into AST
             .use(remarkFrontmatter) // extract frontmatter from AST
-            .use(...remarkPlugins) // apply userland remark plugins
+            .use(remarkPlugins) // apply userland remark plugins
             .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
             .use(rehypeRaw) // support mixed HTML in markdown
-            .use(...rehypePlugins) // apply userland rehype plugins
+            .use(rehypePlugins) // apply userland rehype plugins
             .use(rehypeStringify) // convert AST to HTML string
             .process(markdownContents);
 
