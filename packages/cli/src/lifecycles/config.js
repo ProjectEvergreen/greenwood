@@ -23,7 +23,7 @@ module.exports = readAndMergeConfig = async() => {
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, title, markdown, meta } = userCfgFile;
+        const { workspace, devServer, title, markdown, meta, plugins } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -68,24 +68,29 @@ module.exports = readAndMergeConfig = async() => {
         //   reject(`Error: provided optimization "${optimization}" is not supported.  Please use one of: ${optimizations.join(', ')}.`);
         // }
 
-        // TODO
-        // if (plugins && plugins.length > 0) {
-        //   const types = ['index', 'webpack'];
+        if (plugins && plugins.length > 0) {
+          const types = ['resource'];
 
-        //   plugins.forEach(plugin => {
-        //     if (!plugin.type || types.indexOf(plugin.type) < 0) {
-        //       reject(`Error: greenwood.config.js plugins must be one of type "${types.join(', ')}". got "${plugin.type}" instead.`);
-        //     }
+          plugins.forEach(plugin => {
+            if (!plugin.type || types.indexOf(plugin.type) < 0) {
+              reject(`Error: greenwood.config.js plugins must be one of type "${types.join(', ')}". got "${plugin.type}" instead.`);
+            }
 
-        //     if (!plugin.provider || typeof plugin.provider !== 'function') {
-        //       const providerTypeof = typeof plugin.provider;
+            if (!plugin.provider || typeof plugin.provider !== 'function') {
+              const providerTypeof = typeof plugin.provider;
 
-        //       reject(`Error: greenwood.config.js plugins provider must of type function. got ${providerTypeof} instead.`);
-        //     }
-        //   });
+              reject(`Error: greenwood.config.js plugins provider must be a function. got ${providerTypeof} instead.`);
+            }
 
-        //   customConfig.plugins = customConfig.plugins.concat(plugins);
-        // }
+            if (!plugin.name || typeof plugin.name !== 'string') {
+              const nameTypeof = typeof plugin.name;
+
+              reject(`Error: greenwood.config.js plugins must have a name. got ${nameTypeof} instead.`);
+            }
+          });
+
+          customConfig.plugins = customConfig.plugins.concat(plugins);
+        }
 
         if (devServer && Object.keys(devServer).length > 0) {
 
@@ -95,7 +100,6 @@ module.exports = readAndMergeConfig = async() => {
               reject(`Error: greenwood.config.js devServer port must be an integer.  Passed value was: ${devServer.port}`);
             } else {
               customConfig.devServer.port = devServer.port;
-              // console.log(`custom port provided => ${customConfig.devServer.port}`);
             }
           }
         }

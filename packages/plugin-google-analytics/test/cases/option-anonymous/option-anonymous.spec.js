@@ -13,7 +13,7 @@
  *
  * {
  *   plugins: [{
- *     ...googleAnalyticsPlugin({
+ *     googleAnalyticsPlugin({
  *       analyticsId: 'UA-123456-1',
  *       anonymouse: false
  *     })
@@ -30,7 +30,7 @@ const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Google Analytics Plugin with IP Anonymization tracking set to false and Default Workspace';
   const mockAnalyticsId = 'UA-123456-1';
 
@@ -46,7 +46,8 @@ xdescribe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
+    // TODO runSmokeTest([not-found'], LABEL);
+    runSmokeTest(['public'], LABEL);
 
     describe('Initialization script', function() {
       let inlineScript;
@@ -70,7 +71,6 @@ xdescribe('Build Greenwood With: ', function() {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-
             gtag('config', '${mockAnalyticsId}', { 'anonymize_ip': false });
             gtag('config', '${mockAnalyticsId}');
         `;
