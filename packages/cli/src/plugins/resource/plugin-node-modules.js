@@ -29,6 +29,64 @@ const getPackageEntryPath = (packageJson) => {
   return entry;
 };
 
+const walkModule = (module, dependency) => {
+  walk.simple(acorn.parse(module, { sourceType: 'module' }), {
+    ImportDeclaration(node) {
+      let { value: sourceValue } = node.source;
+      // console.log('Found a ImportDeclaration', sourceValue);
+
+      if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {
+        console.debug(`!!!! found a new bare import for ${sourceValue}, we should probably and this to the importMap and walk this`);
+        if (!importMap[sourceValue]) {
+          importMap[sourceValue] = `/node_modules/${sourceValue}`;
+        }
+        walkPackageJson(path.join(process.cwd(), 'node_modules', sourceValue, 'package.json'));
+        // if (!packageJson.dependencies[sourceValue]) {
+        //   console.debug(`@@@@@@ new (transitive?) bare import ${sourceValue} found`); // from dependency of dependency, might need to resolve to a path first???');
+        //   if (sourceValue.indexOf('./') === 0 || sourceValue.indexOf('../') === 0) {
+        //     console.debug('##### is just a local file, resolve right here to this package?????');
+        //     importMap[sourceValue.replace('./', '')] = path.resolve(`/node_modules/${dependency}/${sourceValue}.js`);
+        //   } else {
+        //     console.debug('##### is an actual transitive dependency');
+        //     const sourcePackageJsonPath = path.join(process.cwd(), './node_modules', sourceValue, 'package.json');
+        //     // const packageJson = require(sourcePackageJsonPath);
+        //     // const entry = getPackageEntryPath(packageJson);
+
+        //     // console.debug('file resolve => ', `/node_modules/${sourceValue}/${entry}`);
+        //     // importMap[sourceValue] = `/node_modules/${sourceValue}/${entry}`;
+        //     walkPackageJson(sourcePackageJsonPath)
+        //   }
+        // } else {
+        //   importMap[sourceValue] = `/node_modules/${sourceValue}`;
+        // }
+      // } else {
+      } else if (sourceValue.indexOf('./') < 0) {
+        console.debug(`@@@@@@@@@@@@@@ adding ${sourceValue} to importMap`);
+        importMap[sourceValue] = `/node_modules/${sourceValue}`;
+      } else {
+        console.debug(`?????????? do something with ${sourceValue}?`);
+        sourceValue = sourceValue.indexOf('.js') < 0
+          ? `${sourceValue}.js`
+          : sourceValue;
+
+        if (fs.existsSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue))) {
+          const moduleContents = fs.readFileSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue));
+          walkModule(moduleContents, dependency);
+        }
+      }
+    },
+    ExportNamedDeclaration(node) {
+      // console.log('Found a ExportNamedDeclaration');
+      const sourceValue = node && node.source ? node.source.value : '';
+
+      if (sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
+        // console.log(`found a bare export for ${sourceValue}!!!!!`);
+        importMap[sourceValue] = `/node_modules/${sourceValue}`;
+      }
+    }
+  });
+};
+
 const walkPackageJson = (packageJson) => {
   // console.debug('=============== ENTER walkPackageJson');
   Object.keys(packageJson.dependencies || {}).forEach(dependency => {
@@ -37,53 +95,12 @@ const walkPackageJson = (packageJson) => {
     const dependencyPackageJson = require(dependencyPackageJsonPath);
     const entry = getPackageEntryPath(dependencyPackageJson);
     const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
-    const packageFileContents = fs.readFileSync(packageEntryPointPath, 'utf-8');
+    const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
+
     // console.debug(`########entry path for ${dependency} =>`, packageEntryPointPath);
+    walkModule(packageEntryModule, dependency);
 
-    // console.debug(acorn.parse(packageFileContents, { sourceType: 'module' }));
-    walk.simple(acorn.parse(packageFileContents, { sourceType: 'module' }), {
-      ImportDeclaration(node) {
-        // console.log('Found a ImportDeclaration');
-        let { value: sourceValue } = node.source;
-
-        if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {
-          // console.debug(`?????? found a bare import for ${sourceValue}`);
-          importMap[sourceValue] = `/node_modules/${sourceValue}`;
-          walkPackageJson(path.join(process.cwd(), 'node_modules', sourceValue, 'package.json'));
-          // if (!packageJson.dependencies[sourceValue]) {
-          //   console.debug(`@@@@@@ new (transitive?) bare import ${sourceValue} found`); // from dependency of dependency, might need to resolve to a path first???');
-          //   if (sourceValue.indexOf('./') === 0 || sourceValue.indexOf('../') === 0) {
-          //     console.debug('##### is just a local file, resolve right here to this package?????');
-          //     importMap[sourceValue.replace('./', '')] = path.resolve(`/node_modules/${dependency}/${sourceValue}.js`);
-          //   } else {
-          //     console.debug('##### is an actual transitive dependency');
-          //     const sourcePackageJsonPath = path.join(process.cwd(), './node_modules', sourceValue, 'package.json');
-          //     // const packageJson = require(sourcePackageJsonPath);
-          //     // const entry = getPackageEntryPath(packageJson);
-
-          //     // console.debug('file resolve => ', `/node_modules/${sourceValue}/${entry}`);
-          //     // importMap[sourceValue] = `/node_modules/${sourceValue}/${entry}`;
-          //     walkPackageJson(sourcePackageJsonPath)
-          //   }
-          // } else {
-          //   importMap[sourceValue] = `/node_modules/${sourceValue}`;
-          // }
-        // } else {
-        } else if (sourceValue.indexOf('./') < 0) {
-          importMap[sourceValue] = `/node_modules/${sourceValue}`;
-        }
-      },
-      ExportNamedDeclaration(node) {
-        // console.log('Found a ExportNamedDeclaration');
-        const sourceValue = node && node.source ? node.source.value : '';
-
-        if (sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
-          // console.log(`found a bare export for ${sourceValue}!!!!!`);
-          importMap[sourceValue] = `/node_modules/${sourceValue}`;
-        }
-      }
-    });
-    
+    console.debug('########## ADDING => ', `/node_modules/${dependency}/${entry}`);
     importMap[dependency] = `/node_modules/${dependency}/${entry}`;
   });
 };
@@ -113,7 +130,6 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   shouldServe(url) {
-    // console.debug(`nodemodules shouldServe ${url}???????`, path.extname(url) === '' && fs.existsSync(`${url}.js`));
     return path.extname(url) === '.mjs' || path.extname(url) === '' && fs.existsSync(`${url}.js`);
   }
 
