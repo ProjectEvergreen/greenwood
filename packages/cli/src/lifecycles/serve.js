@@ -94,10 +94,11 @@ function getDevServer(compilation) {
 
     const reducedResponse = await modifiedResources.reduce(async (responsePromise, resource) => {
       const response = await responsePromise;
-      const { url, headers } = ctx;
+      const { url } = ctx;
+      const { headers } = ctx.response;
 
       if (resource.shouldIntercept(url, headers)) {
-        const interceptedResponse = await resource.intercept(response);
+        const interceptedResponse = await resource.intercept(response, headers);
         
         return Promise.resolve(interceptedResponse);
       } else {
