@@ -1,6 +1,6 @@
 /*
  * 
- * Detects and fully resolve srequest to node_modules.
+ * Detects and fully resolves requests to node_modules.
  *
  */
 const acorn = require('acorn');
@@ -12,19 +12,16 @@ const walk = require('acorn-walk');
 const importMap = {};
 
 const getPackageEntryPath = (packageJson) => {
-  // "main": "lib/index.js",
-  // "module": "es/index.js",
-  // "jsnext:main": "es/index.js"
   let entry = packageJson.module 
     ? packageJson.module // favor ESM entry points first
-    : packageJson.main;
+    : packageJson.main
+      ? packageJson.main
+      : 'index.js';
 
   if (fs.existsSync(`${process.cwd()}/node_modules/${packageJson.name}/${entry.replace('.js', '.mjs')}`)) {
     // console.debug('????????? has .mjs option, use?', `${process.cwd()}/${packageJson.name}/${entry.replace('.js', '.mjs')}`);
     entry = entry.replace('.js', '.mjs');
   }
-
-  // console.debug(`getPackageEntryPath for ${packageJson.name} =>`, entry);
 
   return entry;
 };
@@ -36,35 +33,18 @@ const walkModule = (module, dependency) => {
       // console.log('Found a ImportDeclaration', sourceValue);
 
       if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {
-        console.debug(`!!!! found a new bare import for ${sourceValue}, we should probably and this to the importMap and walk this`);
+        // console.debug(`!!!! found a new bare import for ${sourceValue}, we should probably and this to the importMap and walk this`);
+        
         if (!importMap[sourceValue]) {
           importMap[sourceValue] = `/node_modules/${sourceValue}`;
         }
+        
         walkPackageJson(path.join(process.cwd(), 'node_modules', sourceValue, 'package.json'));
-        // if (!packageJson.dependencies[sourceValue]) {
-        //   console.debug(`@@@@@@ new (transitive?) bare import ${sourceValue} found`); // from dependency of dependency, might need to resolve to a path first???');
-        //   if (sourceValue.indexOf('./') === 0 || sourceValue.indexOf('../') === 0) {
-        //     console.debug('##### is just a local file, resolve right here to this package?????');
-        //     importMap[sourceValue.replace('./', '')] = path.resolve(`/node_modules/${dependency}/${sourceValue}.js`);
-        //   } else {
-        //     console.debug('##### is an actual transitive dependency');
-        //     const sourcePackageJsonPath = path.join(process.cwd(), './node_modules', sourceValue, 'package.json');
-        //     // const packageJson = require(sourcePackageJsonPath);
-        //     // const entry = getPackageEntryPath(packageJson);
-
-        //     // console.debug('file resolve => ', `/node_modules/${sourceValue}/${entry}`);
-        //     // importMap[sourceValue] = `/node_modules/${sourceValue}/${entry}`;
-        //     walkPackageJson(sourcePackageJsonPath)
-        //   }
-        // } else {
-        //   importMap[sourceValue] = `/node_modules/${sourceValue}`;
-        // }
-      // } else {
       } else if (sourceValue.indexOf('./') < 0) {
-        console.debug(`@@@@@@@@@@@@@@ adding ${sourceValue} to importMap`);
+        // console.debug(`@@@@@@@@@@@@@@ adding ${sourceValue} to importMap`);
         importMap[sourceValue] = `/node_modules/${sourceValue}`;
       } else {
-        console.debug(`?????????? do something with ${sourceValue}?`);
+        // console.debug(`?????????? do something with ${sourceValue}?`);
         sourceValue = sourceValue.indexOf('.js') < 0
           ? `${sourceValue}.js`
           : sourceValue;
@@ -87,8 +67,7 @@ const walkModule = (module, dependency) => {
   });
 };
 
-const walkPackageJson = (packageJson) => {
-  // console.debug('=============== ENTER walkPackageJson');
+const walkPackageJson = (packageJson = {}) => {
   Object.keys(packageJson.dependencies || {}).forEach(dependency => {
     const dependencyPackageRootPath = path.join(process.cwd(), './node_modules', dependency);
     const dependencyPackageJsonPath = path.join(dependencyPackageRootPath, 'package.json');
@@ -100,8 +79,11 @@ const walkPackageJson = (packageJson) => {
     // console.debug(`########entry path for ${dependency} =>`, packageEntryPointPath);
     walkModule(packageEntryModule, dependency);
 
-    console.debug('########## ADDING => ', `/node_modules/${dependency}/${entry}`);
+    // console.debug('########## ADDING => ', `/node_modules/${dependency}/${entry}`);
     importMap[dependency] = `/node_modules/${dependency}/${entry}`;
+
+    // console.debug(`########## WALKING for ${dependencyPackageJson.name}???????? => `, dependencyPackageJson.dependencies);
+    walkPackageJson(dependencyPackageJson);
   });
 };
 
@@ -134,7 +116,6 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   serve(url) {
-    // console.debug(`@@@@@@@@@@ nodemodules serve ${url}???????`);
     return new Promise(async(resolve, reject) => {
       try {
         const fullUrl = path.extname(url) === '' ? `${url}.js` : url; 
