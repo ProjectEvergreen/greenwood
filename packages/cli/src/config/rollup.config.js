@@ -10,6 +10,7 @@ const postcss = require('postcss');
 const postcssConfig = require('./postcss.config');
 const postcssImport = require('postcss-import');
 const postcssRollup = require('rollup-plugin-postcss');
+const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
 
 function greenwoodWorkspaceResolver (compilation) {
@@ -258,6 +259,9 @@ module.exports = getRollupConfig = async (compilation) => {
       }
     },
     plugins: [
+      replace({ // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
+        'process.env.NODE_ENV': JSON.stringify('production')
+      }),
       nodeResolve(),
       greenwoodWorkspaceResolver(compilation),
       greenwoodHtmlPlugin(compilation),

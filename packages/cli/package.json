@@ -54,6 +54,7 @@
   },
   "devDependencies": {
     "@mapbox/rehype-prism": "^0.5.0",
+    "@rollup/plugin-replace": "^2.3.4",
     "postcss-nested": "^4.1.2",
     "rehype-autolink-headings": "^4.0.0",
     "rehype-slug": "^3.0.0"
