@@ -18,8 +18,8 @@ const getPackageEntryPath = (packageJson) => {
       ? packageJson.main
       : 'index.js';
 
+  // use .mjs version of it exists, for packages like redux
   if (fs.existsSync(`${process.cwd()}/node_modules/${packageJson.name}/${entry.replace('.js', '.mjs')}`)) {
-    // console.debug('????????? has .mjs option, use?', `${process.cwd()}/${packageJson.name}/${entry.replace('.js', '.mjs')}`);
     entry = entry.replace('.js', '.mjs');
   }
 
