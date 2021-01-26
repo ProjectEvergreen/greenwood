@@ -112,7 +112,7 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   shouldServe(url) {
-    return path.extname(url) === '.mjs' || path.extname(url) === '' && fs.existsSync(`${url}.js`);
+    return path.extname(url) === '.mjs' || (path.extname(url) === '' && fs.existsSync(`${url}.js`));
   }
 
   serve(url) {
@@ -121,15 +121,15 @@ class NodeModulesResource extends ResourceInterface {
         const fullUrl = path.extname(url) === '' ? `${url}.js` : url; 
         const body = await fs.promises.readFile(fullUrl, 'utf-8');
     
-        // exports['default'] = result;
-        if (body.indexOf('exports[\'default\'] = ') >= 0) {
-          body = `
-            let exports = {}\n
-            ${body}
-          `;
-          body = body.replace('exports[\'default\'] = ', 'export default ');
-          console.debug('handled a weird edge case!!!', body);
-        }
+        // handle exports['default'] = result;
+        // if (body.indexOf('exports[\'default\'] = ') >= 0) {
+        //   body = `
+        //     let exports = {}\n
+        //     ${body}
+        //   `;
+        //   body = body.replace('exports[\'default\'] = ', 'export default ');
+        //   // console.debug('handled a weird edge case!!!', body);
+        // }
 
         resolve({
           body,
