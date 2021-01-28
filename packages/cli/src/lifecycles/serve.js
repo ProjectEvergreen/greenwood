@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
-const pluginImportCommonJs = require('../plugins/resource/plugin-import-commonjs');
 const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
 const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
 const pluginResourceStandardFont = require('../plugins/resource/plugin-standard-font');
@@ -17,7 +16,9 @@ function getDevServer(compilation) {
   const app = new Koa();
   const compilationCopy = Object.assign({}, compilation);
   const resources = [
-    // Greenwood default standard resource plugins
+    // Greenwood default standard resource and import plugins
+    pluginUserWorkspace.provider(compilation),
+    pluginNodeModules.provider(compilation),
     pluginResourceStandardCss.provider(compilationCopy),
     pluginResourceStandardFont.provider(compilationCopy),
     pluginResourceStandardHtml.provider(compilationCopy),
@@ -41,20 +42,16 @@ function getDevServer(compilation) {
 
   // resolve urls to paths first
   app.use(async (ctx, next) => {
-    const resolveResources = [
-      pluginUserWorkspace.provider(compilation),
-      pluginNodeModules.provider(compilation)
-    ];
-
-    ctx.url = await resolveResources.reduce(async (responsePromise, resource) => {
+    ctx.url = await resources.reduce(async (responsePromise, resource) => {
       const response = await responsePromise;
-      const { url } = ctx; 
+      const { url } = ctx;
+      const resourceShouldResolveUrl = await resource.shouldResolve(url);
       
-      return resource.shouldResolve(url)
+      return resourceShouldResolveUrl
         ? resource.resolve(url)
         : Promise.resolve(response);
     }, Promise.resolve(''));
-    
+
     await next();
   });
 
@@ -65,27 +62,22 @@ function getDevServer(compilation) {
       contentType: ctx.response.contentType
     };
     
-    const reducedResponse = await resources
-      .concat([
-        pluginNodeModules.provider(compilation),
-        pluginImportCommonJs.provider(compilation)
-      ])
-      .reduce(async (responsePromise, resource) => {
-        const response = await responsePromise;
-        const { url, headers } = ctx;
-        const shouldServe = await resource.shouldServe(url, headers);
+    const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
+      const response = await responsePromise;
+      const { url, headers } = ctx;
+      const shouldServe = await resource.shouldServe(url, headers);
 
-        if (shouldServe) {
-          const resolvedResource = await resource.serve(url, headers);
-          
-          return Promise.resolve({
-            ...response,
-            ...resolvedResource
-          });
-        } else {
-          return Promise.resolve(response);
-        }
-      }, Promise.resolve(responseAccumulator));
+      if (shouldServe) {
+        const resolvedResource = await resource.serve(url, headers);
+        
+        return Promise.resolve({
+          ...response,
+          ...resolvedResource
+        });
+      } else {
+        return Promise.resolve(response);
+      }
+    }, Promise.resolve(responseAccumulator));
 
     ctx.set('Content-Type', reducedResponse.contentType);
     ctx.body = reducedResponse.body;
@@ -95,14 +87,13 @@ function getDevServer(compilation) {
 
   // allow intercepting of urls
   app.use(async (ctx) => {
-    const modifiedResources = resources.concat(pluginNodeModules.provider(compilation));
-
-    const reducedResponse = await modifiedResources.reduce(async (responsePromise, resource) => {
+    const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
       const response = await responsePromise;
       const { url } = ctx;
       const { headers } = ctx.response;
+      const shouldIntercept = await resource.shouldIntercept(url, headers);
 
-      if (resource.shouldIntercept(url, headers)) {
+      if (shouldIntercept) {
         const interceptedResponse = await resource.intercept(response, headers);
         
         return Promise.resolve(interceptedResponse);

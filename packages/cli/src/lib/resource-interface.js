@@ -8,13 +8,10 @@ class ResourceInterface {
     this.contentType = '';
   }
 
-  // hidden API?
+  // resolve relative URLs from the browser to absolute path on disk
+  // eslint-disable-next-line no-unused-vars
   async shouldResolve(url) {
-    const { extensions } = this;
-    
-    return Promise.resolve(extensions.length && extensions.length > 0 
-      || extensions[0] === '*' 
-      || extensions.indexOf(path.extname(url) >= 0));
+    return Promise.resolve(false);
   }
 
   async resolve(url) {
@@ -23,8 +20,8 @@ class ResourceInterface {
 
   // introduce a new resource type to the browser, on the fly, ex: `<script src="index.ts">`
   // eslint-disable-next-line no-unused-vars
-  shouldServe(url, headers) {
-    return this.extensions.indexOf(path.extname(url)) >= 0;
+  async shouldServe(url, headers) {
+    return Promise.resolve(this.extensions.indexOf(path.extname(url)) >= 0);
   }
 
   // eslint-disable-next-line no-unused-vars
@@ -34,8 +31,8 @@ class ResourceInterface {
 
   // handle an already resolved / served resource
   // eslint-disable-next-line no-unused-vars
-  shouldIntercept(url, headers) {
-    return false;
+  async shouldIntercept(url, headers) {
+    return Promise.resolve(false);
   }
 
   // eslint-disable-next-line no-unused-vars

@@ -93,8 +93,8 @@ class NodeModulesResource extends ResourceInterface {
     this.extensions = ['*'];
   }
 
-  shouldResolve(url) {
-    return url.indexOf('node_modules/') >= 0;
+  async shouldResolve(url) {
+    return Promise.resolve(url.indexOf('node_modules/') >= 0);
   }
 
   async resolve(url) {
@@ -118,10 +118,11 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   async serve(url) {
+    // console.debug('node modules serving???? => ', url);
     return new Promise(async(resolve, reject) => {
       try {
         const fullUrl = path.extname(url) === '' ? `${url}.js` : url;
-        const body = await fs.promises.readFile(fullUrl, 'utf-8');
+        const body = await fs.promises.readFile(fullUrl);
 
         resolve({
           body,
@@ -133,8 +134,8 @@ class NodeModulesResource extends ResourceInterface {
     });
   }
 
-  shouldIntercept(url, headers) {
-    return headers['content-type'] === 'text/html';
+  async shouldIntercept(url, headers) {
+    return Promise.resolve(headers['content-type'] === 'text/html');
   }
 
   async intercept(contents) {

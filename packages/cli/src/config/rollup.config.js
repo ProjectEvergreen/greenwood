@@ -51,7 +51,9 @@ function greenwoodHtmlPlugin(compilation) {
       }).map((plugin) => {
         return plugin.provider(compilation);
       }).filter((resource) => {
-        if (resource.shouldServe(id)) {
+        const shouldServe = Promise.resolve(resource.shouldServe(id));
+
+        if (shouldServe) {
           return resource;
         }
       });
