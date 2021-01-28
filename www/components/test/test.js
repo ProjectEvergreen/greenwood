@@ -1,7 +1,7 @@
 import { createStore, compose, combineReducers } from 'redux';
 import { lazyReducerEnhancer } from 'pwa-helpers';
 import { connectRouter } from 'lit-redux-router';
-import _ from 'lodash'; // use es-lodash?
+import _ from 'lodash';
 import { pick } from 'lodash-es';
 
 console.debug('From REDUX', createStore, compose, combineReducers);

@@ -54,7 +54,6 @@ class ImportCommonJsResource extends ResourceInterface {
   }
 
   async intercept(url) {
-    console.debug('plugin-import-commonjs intercepting .....', url);
     return new Promise(async(resolve, reject) => {
       try {
         const options = {
@@ -78,11 +77,12 @@ class ImportCommonJsResource extends ResourceInterface {
   }
 
   async shouldOptimize(url) {
-    return this.shouldIntercept(url);
+    const shouldIntercept = await this.shouldIntercept(url);
+    
+    return Promise.resolve(shouldIntercept);
   }
 
   async optimize(url) {
-    console.debug('plugin-import-commonjs optimizing for .....', url);
     return this.intercept(url);
   }
 }
