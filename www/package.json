@@ -12,6 +12,7 @@
     "lit-element": "^2.4.0",
     "lit-redux-router": "^0.15.7",
     "lodash": "^4.17.20",
+    "lodash-es": "^4.17.20",
     "prismjs": "^1.21.0",
     "pwa-helpers": "^0.9.1",
     "redux": "^4.0.5"

@@ -9,12 +9,12 @@ class ResourceInterface {
   }
 
   // hidden API?
-  shouldResolve(url) {
+  async shouldResolve(url) {
     const { extensions } = this;
     
-    return extensions.length && extensions.length > 0 
+    return Promise.resolve(extensions.length && extensions.length > 0 
       || extensions[0] === '*' 
-      || extensions.indexOf(path.extname(url) >= 0);
+      || extensions.indexOf(path.extname(url) >= 0));
   }
 
   async resolve(url) {

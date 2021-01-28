@@ -111,25 +111,17 @@ class NodeModulesResource extends ResourceInterface {
     });
   }
 
-  shouldServe(url) {
-    return path.extname(url) === '.mjs' || (path.extname(url) === '' && fs.existsSync(`${url}.js`));
+  async shouldServe(url) {
+    return Promise.resolve(path.extname(url) === '.mjs' 
+      || (path.extname(url) === '' && fs.existsSync(`${url}.js`))
+      || (path.extname(url) === '.js' && (/node_modules/).test(url)));
   }
 
-  serve(url) {
+  async serve(url) {
     return new Promise(async(resolve, reject) => {
       try {
-        const fullUrl = path.extname(url) === '' ? `${url}.js` : url; 
+        const fullUrl = path.extname(url) === '' ? `${url}.js` : url;
         const body = await fs.promises.readFile(fullUrl, 'utf-8');
-    
-        // handle exports['default'] = result;
-        // if (body.indexOf('exports[\'default\'] = ') >= 0) {
-        //   body = `
-        //     let exports = {}\n
-        //     ${body}
-        //   `;
-        //   body = body.replace('exports[\'default\'] = ', 'export default ');
-        //   // console.debug('handled a weird edge case!!!', body);
-        // }
 
         resolve({
           body,

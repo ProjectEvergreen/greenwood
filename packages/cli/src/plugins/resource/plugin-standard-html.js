@@ -153,16 +153,16 @@ class StandardHtmlResource extends ResourceInterface {
     return url.replace(this.compilation.context.userWorkspace, '');
   }
 
-  shouldServe(url) {
+  async shouldServe(url) {
     const { userWorkspace } = this.compilation.context;
     const relativeUrl = this.getRelativeUserworkspaceUrl(url);
     const barePath = relativeUrl.endsWith('/')
       ? `${userWorkspace}/pages${relativeUrl}index`
       : `${userWorkspace}/pages${relativeUrl.replace('.html', '')}`;
       
-    return (this.extensions.indexOf(path.extname(relativeUrl)) >= 0 || path.extname(relativeUrl) === '') && 
+    return Promise.resolve((this.extensions.indexOf(path.extname(relativeUrl)) >= 0 || path.extname(relativeUrl) === '') && 
       (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index')
-      || fs.existsSync(`${barePath}.md`) || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`);
+      || fs.existsSync(`${barePath}.md`) || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`));
   }
 
   async serve(url) {

@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
+const pluginImportCommonJs = require('../plugins/resource/plugin-import-commonjs');
 const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
 const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
 const pluginResourceStandardFont = require('../plugins/resource/plugin-standard-font');
@@ -65,12 +66,16 @@ function getDevServer(compilation) {
     };
     
     const reducedResponse = await resources
-      .concat([pluginNodeModules.provider(compilation)])
+      .concat([
+        pluginNodeModules.provider(compilation),
+        pluginImportCommonJs.provider(compilation)
+      ])
       .reduce(async (responsePromise, resource) => {
         const response = await responsePromise;
         const { url, headers } = ctx;
+        const shouldServe = await resource.shouldServe(url, headers);
 
-        if (resource.shouldServe(url, headers)) {
+        if (shouldServe) {
           const resolvedResource = await resource.serve(url, headers);
           
           return Promise.resolve({
