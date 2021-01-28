@@ -247,19 +247,19 @@ class StandardHtmlResource extends ResourceInterface {
     });
   }
 
-  shouldOptimize() {
-    return true;
+  async shouldOptimize(url) {
+    return Promise.resolve(path.extname(url) === '.html');
   }
 
-  async optimize(html) {
+  async optimize(url, body) {
     return new Promise((resolve, reject) => {
       try {
-        html = html.replace(/<script src="\/node_modules\/@webcomponents\/webcomponentsjs\/webcomponents-bundle.js"><\/script>/, '');
-        html = html.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
-        html = html.replace(/<script defer="" src="\/node_modules\/es-module-shims\/dist\/es-module-shims.js"><\/script>/, '');
-        html = html.replace(/<script type="module-shim"/g, '<script type="module"');
+        body = body.replace(/<script src="\/node_modules\/@webcomponents\/webcomponentsjs\/webcomponents-bundle.js"><\/script>/, '');
+        body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
+        body = body.replace(/<script defer="" src="\/node_modules\/es-module-shims\/dist\/es-module-shims.js"><\/script>/, '');
+        body = body.replace(/<script type="module-shim"/g, '<script type="module"');
     
-        resolve(html);
+        resolve(body);
       } catch (e) {
         reject(e);
       }
