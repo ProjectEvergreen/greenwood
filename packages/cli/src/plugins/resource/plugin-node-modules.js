@@ -134,15 +134,15 @@ class NodeModulesResource extends ResourceInterface {
     });
   }
 
-  async shouldIntercept(url, headers) {
+  async shouldIntercept(url, body, headers) {
     return Promise.resolve(headers['content-type'] === 'text/html');
   }
 
-  async intercept(contents) {
+  async intercept(url, body) {
     return new Promise((resolve, reject) => {
       try {
         const { userWorkspace } = this.compilation.context;
-        let newContents = contents;
+        let newContents = body;
         
         newContents = newContents.replace(/type="module"/g, 'type="module-shim"');
 

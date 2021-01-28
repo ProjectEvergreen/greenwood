@@ -31,13 +31,13 @@ class ResourceInterface {
 
   // handle an already resolved / served resource
   // eslint-disable-next-line no-unused-vars
-  async shouldIntercept(url, headers) {
+  async shouldIntercept(url, body, headers) {
     return Promise.resolve(false);
   }
 
   // eslint-disable-next-line no-unused-vars
-  async intercept(contents, headers) {
-    return Promise.resolve(contents);
+  async intercept(url, body, headers) {
+    return Promise.resolve(body);
   }
 
   // handle a (final) resource type post build, pre optimize, 

@@ -88,17 +88,17 @@ function getDevServer(compilation) {
   // allow intercepting of urls
   app.use(async (ctx) => {
     const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
-      const response = await responsePromise;
+      const body = await responsePromise;
       const { url } = ctx;
       const { headers } = ctx.response;
-      const shouldIntercept = await resource.shouldIntercept(url, headers);
+      const shouldIntercept = await resource.shouldIntercept(url, body, headers);
 
       if (shouldIntercept) {
-        const interceptedResponse = await resource.intercept(response, headers);
+        const interceptedResponse = await resource.intercept(url, body, headers);
         
         return Promise.resolve(interceptedResponse);
       } else {
-        return Promise.resolve(response);
+        return Promise.resolve(body);
       }
     }, Promise.resolve(ctx.body));
 
