@@ -59,7 +59,7 @@ const walkModule = (module, dependency) => {
       // console.log('Found a ExportNamedDeclaration');
       const sourceValue = node && node.source ? node.source.value : '';
 
-      if (sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
+      if (sourceValue !== '' && sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
         // console.log(`found a bare export for ${sourceValue}!!!!!`);
         importMap[sourceValue] = `/node_modules/${sourceValue}`;
       }
