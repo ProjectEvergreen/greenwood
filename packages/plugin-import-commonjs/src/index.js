@@ -10,6 +10,8 @@ const { parse } = require('cjs-module-lexer');
 const rollupStream = require('@rollup/stream');
 const commonjs = require('@rollup/plugin-commonjs');
 
+// bit of a workaround, but maybe this could be supported by cjs-module-lexar natively
+// https://github.com/guybedford/cjs-module-lexer/issues/35
 const testForCjsModule = async(url) => {
   let isCommonJs = false;
 
@@ -25,7 +27,7 @@ const testForCjsModule = async(url) => {
         || message.indexOf('Unexpected export statement in CJS module.') >= 0;
       
       if (!isProbablyLexarErrorSoIgnore) {
-        // we probably _shouldn't_ ignore this, so let's log it since we don't swollow everything
+        // we probably _shouldn't_ ignore this, so let's log it since we don't want to swallow all errors
         console.error(e);
       }
     }
