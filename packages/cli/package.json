@@ -7,10 +7,8 @@
   "license": "MIT",
   "keywords": [
     "Greenwood",
-    "Web Components",
-    "Lit Element",
-    "Lit Html",
-    "Static Site Generator"
+    "Static Site Generator",
+    "Web Components"
   ],
   "engines": {
     "node": ">=10.x"
