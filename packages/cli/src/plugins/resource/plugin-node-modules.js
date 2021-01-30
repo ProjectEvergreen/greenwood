@@ -27,7 +27,10 @@ const getPackageEntryPath = (packageJson) => {
 };
 
 const walkModule = (module, dependency) => {
-  walk.simple(acorn.parse(module, { sourceType: 'module' }), {
+  walk.simple(acorn.parse(module, {
+    ecmaVersion: '2020',
+    sourceType: 'module'
+  }), {
     ImportDeclaration(node) {
       let { value: sourceValue } = node.source;
       // console.log('Found a ImportDeclaration', sourceValue);

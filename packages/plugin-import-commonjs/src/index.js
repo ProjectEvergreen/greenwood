@@ -10,7 +10,7 @@ const { parse } = require('cjs-module-lexer');
 const rollupStream = require('@rollup/stream');
 const commonjs = require('@rollup/plugin-commonjs');
 
-// bit of a workaround, but maybe this could be supported by cjs-module-lexar natively
+// bit of a workaround for now, but maybe this could be supported by cjs-module-lexar natively?
 // https://github.com/guybedford/cjs-module-lexer/issues/35
 const testForCjsModule = async(url) => {
   let isCommonJs = false;

@@ -27,6 +27,7 @@
     "cjs-module-lexer": "^1.0.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.10.0-alpha.4"
+    "@greenwood/cli": "^0.10.0-alpha.4",
+    "lodash": "^4.17.20"
   }
 }
