@@ -76,7 +76,7 @@ describe('Build Greenwood With: ', function() {
         const spanTags = dom.window.document.querySelectorAll('body > span');
         
         expect(spanTags.length).to.be.equal(1);
-        expect(spanTags[0].textContent).to.be.equal('hello from lodash {"a":1,"b":2}');
+        expect(spanTags[0].textContent).to.be.equal('import from lodash {"a":1,"b":2}');
       });
     });
   });
