@@ -5047,13 +5047,6 @@ lit-html@^1.1.1:
   resolved "https://registry.yarnpkg.com/lit-html/-/lit-html-1.3.0.tgz#c80f3cc5793a6dea6c07172be90a70ab20e56034"
   integrity sha512-0Q1bwmaFH9O14vycPHw8C/IeHMk/uSDldVLIefu/kfbTBGIc44KGH6A8p1bDfxUfHdc8q6Ct7kQklWoHgr4t1Q==
 
-lit-redux-router@^0.15.7:
-  version "0.15.7"
-  resolved "https://registry.yarnpkg.com/lit-redux-router/-/lit-redux-router-0.15.7.tgz#9678225ca9c918c8bf451baf76be0040b7c82484"
-  integrity sha512-TDMrFr0645MP+dStP7wcC6PZdG6yK6MiP/FKc6QzLZcwzIWwVpvYNZoAwr2cvIts4ZtDylrsWWvsqlsWmL4LyA==
-  dependencies:
-    regexparam "^1.3.0"
-
 livereload-js@^3.1.0:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/livereload-js/-/livereload-js-3.3.1.tgz#61f887468086762e61fb2987412cf9d1dda99202"
@@ -7216,11 +7209,6 @@ regex-not@^1.0.0, regex-not@^1.0.2:
   dependencies:
     extend-shallow "^3.0.2"
     safe-regex "^1.1.0"
-
-regexparam@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/regexparam/-/regexparam-1.3.0.tgz#2fe42c93e32a40eff6235d635e0ffa344b92965f"
-  integrity sha512-6IQpFBv6e5vz1QAqI+V4k8P2e/3gRrqfCJ9FI+O1FLQTO+Uz6RXZEZOPmTJ6hlGj7gkERzY5BRCv09whKP96/g==
 
 regexpp@^2.0.1:
   version "2.0.1"
