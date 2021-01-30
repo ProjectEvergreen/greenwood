@@ -11,6 +11,7 @@ const walk = require('acorn-walk');
 
 const importMap = {};
 
+// https://nodejs.org/api/packages.html#packages_determining_module_system
 const getPackageEntryPath = (packageJson) => {
   let entry = packageJson.module 
     ? packageJson.module // favor ESM entry points first
@@ -33,21 +34,20 @@ const walkModule = (module, dependency) => {
   }), {
     ImportDeclaration(node) {
       let { value: sourceValue } = node.source;
-      // console.log('Found a ImportDeclaration', sourceValue);
 
-      if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {
-        // console.debug(`!!!! found a new bare import for ${sourceValue}, we should probably and this to the importMap and walk this`);
-        
+      if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {        
         if (!importMap[sourceValue]) {
+          // found a _new_ bare import for ${sourceValue}
+          // we should add this to the importMap and walk its package.json for more transitive deps
           importMap[sourceValue] = `/node_modules/${sourceValue}`;
         }
         
         walkPackageJson(path.join(process.cwd(), 'node_modules', sourceValue, 'package.json'));
       } else if (sourceValue.indexOf('./') < 0) {
-        // console.debug(`@@@@@@@@@@@@@@ adding ${sourceValue} to importMap`);
+        // adding a relative import
         importMap[sourceValue] = `/node_modules/${sourceValue}`;
       } else {
-        // console.debug(`?????????? do something with ${sourceValue}?`);
+        // walk this module for all its dependencies
         sourceValue = sourceValue.indexOf('.js') < 0
           ? `${sourceValue}.js`
           : sourceValue;
@@ -59,11 +59,9 @@ const walkModule = (module, dependency) => {
       }
     },
     ExportNamedDeclaration(node) {
-      // console.log('Found a ExportNamedDeclaration');
       const sourceValue = node && node.source ? node.source.value : '';
 
       if (sourceValue !== '' && sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
-        // console.log(`found a bare export for ${sourceValue}!!!!!`);
         importMap[sourceValue] = `/node_modules/${sourceValue}`;
       }
     }
@@ -71,6 +69,10 @@ const walkModule = (module, dependency) => {
 };
 
 const walkPackageJson = (packageJson = {}) => {
+  // while walking a package.json we need to find its entry point, e.g. index.js
+  // and then walk that for import / export statements
+  // and walk its package.json for its dependencies
+
   Object.keys(packageJson.dependencies || {}).forEach(dependency => {
     const dependencyPackageRootPath = path.join(process.cwd(), './node_modules', dependency);
     const dependencyPackageJsonPath = path.join(dependencyPackageRootPath, 'package.json');
@@ -79,13 +81,10 @@ const walkPackageJson = (packageJson = {}) => {
     const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
     const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
 
-    // console.debug(`########entry path for ${dependency} =>`, packageEntryPointPath);
     walkModule(packageEntryModule, dependency);
 
-    // console.debug('########## ADDING => ', `/node_modules/${dependency}/${entry}`);
     importMap[dependency] = `/node_modules/${dependency}/${entry}`;
 
-    // console.debug(`########## WALKING for ${dependencyPackageJson.name}???????? => `, dependencyPackageJson.dependencies);
     walkPackageJson(dependencyPackageJson);
   });
 };
@@ -121,7 +120,6 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   async serve(url) {
-    // console.debug('node modules serving???? => ', url);
     return new Promise(async(resolve, reject) => {
       try {
         const fullUrl = path.extname(url) === '' ? `${url}.js` : url;
@@ -155,6 +153,10 @@ class NodeModulesResource extends ResourceInterface {
             ? require(path.join(process.cwd(), 'package.json'))
             : {};
 
+        // walk the project's pacakge.json for all its direct dependencies
+        // for each entry found in dependencies, find its entry point
+        // then walk its entry point (e.g. index.js) for imports / exports to add to the importMap
+        // and then walk its package.json for transitive dependencies and all those import / exports
         walkPackageJson(userPackageJson);
 
         newContents = newContents.replace('<head>', `
