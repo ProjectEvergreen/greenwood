@@ -1,0 +1,6 @@
+{
+  "name": "test-greenwood-import-types",
+  "dependencies": {
+    "redux": "^4.0.5"
+  }
+}
