@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 const fs = require('fs');
-// TODO use node-html-parser
-const htmlparser2 = require('htmlparser2');
+const htmlparser = require('node-html-parser');
 const json = require('@rollup/plugin-json');
 const multiInput = require('rollup-plugin-multi-input').default;
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
@@ -10,6 +9,24 @@ const postcss = require('postcss');
 const postcssImport = require('postcss-import');
 const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
+
+const parseTagForAttributes = (tag) => {
+  return tag.rawAttrs.split(' ').map((attribute) => {
+    if (attribute.indexOf('=') > 0) {
+      const attributePieces = attribute.split('=');
+      return {
+        [attributePieces[0]]: attributePieces[1].replace(/"/g, '').replace(/'/g, '')
+      };
+    } else {
+      return undefined;
+    }
+  }).filter(attribute => attribute)
+    .reduce((accum, attribute) => {
+      return Object.assign(accum, {
+        ...attribute
+      });
+    }, {});
+};
 
 async function getOptimizedSource(url, plugins, compilation) {
   const initSoure = fs.readFileSync(url, 'utf-8');
@@ -117,12 +134,25 @@ function greenwoodHtmlPlugin(compilation) {
       const mappedStyles = [];
       const mappedScripts = new Map();
       const that = this;
-      // TODO handle deeper paths. e.g. ../../../
-      const parser = new htmlparser2.Parser({
-        onopentag(name, attribs) {
-          if (name === 'script' && attribs.type === 'module' && attribs.src && !mappedScripts.get(attribs.src)) {
-            const { src } = attribs;
-                      
+
+      for (const input in options.input) {
+        const inputHtml = options.input[input];
+        const html = fs.readFileSync(inputHtml, 'utf-8');
+        const root = htmlparser.parse(html, {
+          script: true,
+          style: true
+        });
+        const headScripts = root.querySelectorAll('script');
+        const headLinks = root.querySelectorAll('link');
+    
+        // TODO handle deeper paths. e.g. ../../../
+        headScripts.forEach((scriptTag) => {
+          const parsedAttributes = parseTagForAttributes(scriptTag);
+
+          // handle <script type="module" src="some/path.js"></script>
+          if (parsedAttributes.type === 'module' && parsedAttributes.src && !mappedScripts.get(parsedAttributes.src)) {
+            const { src } = parsedAttributes;
+
             // TODO avoid using src and set it to the value of rollup fileName
             // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
             mappedScripts.set(src, true);
@@ -138,8 +168,16 @@ function greenwoodHtmlPlugin(compilation) {
             });
           }
 
-          if (name === 'link' && attribs.rel === 'stylesheet' && !mappedStyles[attribs.href]) {
-            let { href } = attribs;
+          // TODO handle <script type="module" src="@bare-path/specifier"></script>
+          // TODO handle <script type="module">/* some inline JavaScript code */</script> - as part of generateBundle?
+        });
+    
+        headLinks.forEach((linkTag) => {
+          const parsedAttributes = parseTagForAttributes(linkTag);
+
+          // handle <link rel="stylesheet" src="some/path.css"></link>
+          if (parsedAttributes.rel === 'stylesheet' && !mappedStyles[parsedAttributes.href]) {
+            let { href } = parsedAttributes;
 
             if (href.charAt(0) === '/') {
               href = href.slice(1);
@@ -163,24 +201,17 @@ function greenwoodHtmlPlugin(compilation) {
 
             // TODO avoid using href and set it to the value of rollup fileName instead
             // since user paths can still be the same file, 
-            // e.g. ../theme.css and ./theme.css are still the same file
-            mappedStyles[attribs.href] = {
+            // e.g.  ../theme.css and ./theme.css are still the same file
+            mappedStyles[parsedAttributes.href] = {
               type: 'asset',
               fileName,
               name: href,
               source
             };
           }
-        }
-      });
-
-      for (const input in options.input) {
-        const inputHtml = options.input[input];
-        const html = fs.readFileSync(inputHtml, 'utf-8');
-
-        parser.write(html);
-        parser.end();
-        parser.reset();
+    
+          // TODO handle <style>/* some inline CSS */</style> - as part of generateBundle?
+        });
       }
 
       // this is a giant work around because PostCSS and some plugins can only be run async
@@ -221,45 +252,6 @@ function greenwoodHtmlPlugin(compilation) {
         if (bundle.isEntry && path.extname(bundle.facadeModuleId) === '.html') {
           const html = fs.readFileSync(bundle.facadeModuleId, 'utf-8');
           let newHtml = html;
-
-          const parser = new htmlparser2.Parser({
-            onopentag(name, attribs) {
-              if (name === 'script' && attribs.type === 'module' && attribs.src) {
-                for (const innerBundleId of Object.keys(bundles)) {
-                  const facadeModuleId = bundles[innerBundleId].facadeModuleId;
-                  const pathToMatch = attribs.src.replace('../', '').replace('./', '');
-
-                  if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {
-                    newHtml = newHtml.replace(attribs.src, `/${innerBundleId}`);
-                  } else {
-                    // TODO better testing
-                    // TODO no magic strings
-                    if (innerBundleId.indexOf('.greenwood/') < 0 && !mappedBundles.get(innerBundleId)) {
-                      // console.debug('NEW BUNDLE TO INJECT!');
-                      newHtml = newHtml.replace(/<script type="module" src="(.*)"><\/script>/, `
-                        <script type="module" src="/${innerBundleId}"></script>
-                      `);
-                      mappedBundles.set(innerBundleId, true);
-                    }
-                  }
-                }
-              }
-
-              if (name === 'link' && attribs.rel === 'stylesheet') {
-                for (const bundleId2 of Object.keys(bundles)) {
-                  if (bundleId2.indexOf('.css') > 0) {
-                    const bundle2 = bundles[bundleId2];
-                    if (attribs.href.indexOf(bundle2.name) >= 0) {
-                      newHtml = newHtml.replace(attribs.href, `/${bundle2.fileName}`);
-                    }
-                  }
-                }
-              }
-            }
-          });
-
-          parser.write(html);
-          parser.end();
 
           // TODO this seems hacky; hardcoded dirs :D
           bundle.fileName = bundle.facadeModuleId.replace('.greenwood', 'public');
