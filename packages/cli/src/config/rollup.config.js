@@ -251,7 +251,62 @@ function greenwoodHtmlPlugin(compilation) {
         // TODO handle (!) Generated empty chunks .greenwood/about, .greenwood/index
         if (bundle.isEntry && path.extname(bundle.facadeModuleId) === '.html') {
           const html = fs.readFileSync(bundle.facadeModuleId, 'utf-8');
+  
+          const root = htmlparser.parse(html, {
+            script: true,
+            style: true
+          });
+          const headScripts = root.querySelectorAll('script');
+          const headLinks = root.querySelectorAll('link');
           let newHtml = html;
+
+          headScripts.forEach((scriptTag) => {
+            const parsedAttributes = parseTagForAttributes(scriptTag);
+  
+            // handle <script type="module" src="some/path.js"></script>
+            if (parsedAttributes.type === 'module' && parsedAttributes.src) {
+              // console.debug('bundle', bundle);
+              // console.debug(bundles[innerBundleId])
+              for (const innerBundleId of Object.keys(bundles)) {
+                const { src } = parsedAttributes;
+                const facadeModuleId = bundles[innerBundleId].facadeModuleId;
+                const pathToMatch = src.replace('../', '').replace('./', '');
+
+                if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {
+                  // console.debug('MATCH FOUND!!!!!!!');
+                  newHtml = newHtml.replace(src, `/${innerBundleId}`);
+                } else {
+                  // console.debug('NO MATCH?????', innerBundleId);
+                  // TODO better testing
+                  // TODO no magic strings
+                  if (innerBundleId.indexOf('.greenwood/') < 0 && !mappedBundles.get(innerBundleId)) {
+                    // console.debug('NEW BUNDLE TO INJECT!');
+                    newHtml = newHtml.replace(/<script type="module" src="(.*)"><\/script>/, `
+                      <script type="module" src="/${innerBundleId}"></script>
+                    `);
+                    mappedBundles.set(innerBundleId, true);
+                  }
+                }
+              }
+            }
+          });
+      
+          headLinks.forEach((linkTag) => {
+            const parsedAttributes = parseTagForAttributes(linkTag);
+            const { href } = parsedAttributes;
+  
+            // handle <link rel="stylesheet" src="some/path.css"></link>
+            if (parsedAttributes.rel === 'stylesheet') {
+              for (const bundleId2 of Object.keys(bundles)) {
+                if (bundleId2.indexOf('.css') > 0) {
+                  const bundle2 = bundles[bundleId2];
+                  if (href.indexOf(bundle2.name) >= 0) {
+                    newHtml = newHtml.replace(href, `/${bundle2.fileName}`);
+                  }
+                }
+              }
+            }
+          });
 
           // TODO this seems hacky; hardcoded dirs :D
           bundle.fileName = bundle.facadeModuleId.replace('.greenwood', 'public');
