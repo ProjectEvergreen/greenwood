@@ -1,5 +1,6 @@
 const generateCompilation = require('../lifecycles/compile');
-const livereload = require('livereload');
+// const livereload = require('livereload');
+const { ServerInterface } = require('../lib/server-interface');
 const { devServer } = require('../lifecycles/serve');
 
 module.exports = runDevServer = async () => {
@@ -9,18 +10,35 @@ module.exports = runDevServer = async () => {
     try {
       const compilation = await generateCompilation();
       const { port } = compilation.config.devServer;
-      const { userWorkspace } = compilation.context;
       
       devServer(compilation).listen(port, () => {
+        
         console.info(`Started local development server at localhost:${port}`);
-        const liveReloadServer = livereload.createServer({
-          exts: ['html', 'css', 'js', 'md'],
-          applyCSSLive: false // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
+        // custom user server plugins
+        const servers = [...compilation.config.plugins.filter((plugin) => {
+          return plugin.type === 'server';
+        }).map((plugin) => {
+          const provider = plugin.provider(compilation);
+
+          if (!(provider instanceof ServerInterface)) {
+            console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`);
+          }
+
+          return provider;
+        })];
+
+        servers.forEach((server) => {
+          server.start();
         });
 
-        liveReloadServer.watch(userWorkspace, () => {
-          console.info(`Now watching directory "${userWorkspace}" for changes.`);
-        });
+        // const liveReloadServer = livereload.createServer({
+        //   exts: ['html', 'css', 'js', 'md'],
+        //   applyCSSLive: false // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
+        // });
+
+        // liveReloadServer.watch(userWorkspace, () => {
+        //   console.info(`Now watching directory "${userWorkspace}" for changes.`);
+        // });
       });
     } catch (err) {
       reject(err);
