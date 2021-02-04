@@ -81,21 +81,16 @@ function greenwoodWorkspaceResolver (compilation) {
     name: 'greenwood-workspace-resolver',
     resolveId(source) {      
       // TODO better way to handle relative paths?  happens in generateBundle too
-      if ((source.indexOf('./') === 0 || source.indexOf('/') === 0) && path.extname(source) !== '.html' && fs.existsSync(path.join(userWorkspace, source))) {
-        const resolvedPath = source.replace(source, path.join(userWorkspace, source));
-        
-        return resolvedPath;
+      if ((source.indexOf('./') === 0 || source.indexOf('/') === 0) && path.extname(source) !== '.html' && fs.existsSync(path.join(userWorkspace, source))) {        
+        return source.replace(source, path.join(userWorkspace, source));
       }
 
       // handle inline script / style bundling
-      if (source.indexOf(`-${tokenSuffix}`) > 0 && fs.existsSync(path.join(scratchDir, source))) {
-        const resolvedPath = source.replace(source, path.join(scratchDir, source));
-        // console.debug('resolve THIS sauce to workspace directory, returning ', resolvedPath);
-        
-        return resolvedPath; // this signals that rollup should not ask other plugins or check the file system to find this id
+      if (source.indexOf(`-${tokenSuffix}`) > 0 && fs.existsSync(path.join(scratchDir, source))) {        
+        return source.replace(source, path.join(scratchDir, source));
       }
 
-      return null; // other ids should be handled as usually
+      return null;
     }
   };
 }
@@ -178,7 +173,7 @@ function greenwoodHtmlPlugin(compilation) {
             });
           }
 
-          // handle <script type="module">/* some inline JavaScript code */</script> - as part of generateBundle?
+          // handle <script type="module">/* some inline JavaScript code */</script>
           if (parsedAttributes.type === 'module' && scriptTag.rawText !== '') {
             const id = Buffer.from(scriptTag.rawText).toString('base64').slice(0, 8).toLowerCase();
 
@@ -211,7 +206,7 @@ function greenwoodHtmlPlugin(compilation) {
         headLinks.forEach((linkTag) => {
           const parsedAttributes = parseTagForAttributes(linkTag);
 
-          // handle <link rel="stylesheet" src="some/path.css"></link>
+          // handle <link rel="stylesheet" src="./some/path.css"></link>
           if (parsedAttributes.rel === 'stylesheet' && !mappedStyles[parsedAttributes.href]) {
             let { href } = parsedAttributes;
 
@@ -287,7 +282,6 @@ function greenwoodHtmlPlugin(compilation) {
         // TODO handle (!) Generated empty chunks .greenwood/about, .greenwood/index
         if (bundle.isEntry && path.extname(bundle.facadeModuleId) === '.html') {
           const html = fs.readFileSync(bundle.facadeModuleId, 'utf-8');
-  
           const root = htmlparser.parse(html, {
             script: true,
             style: true
@@ -358,14 +352,14 @@ function greenwoodHtmlPlugin(compilation) {
           const htmlPath = bundle.facadeModuleId.replace('.greenwood', 'public');
           const html = fs.readFileSync(htmlPath, 'utf-8');
           const root = htmlparser.parse(html, {
-            script: true,
-            style: true
+            script: true
           });
           const headScripts = root.querySelectorAll('script');
 
           headScripts.forEach((scriptTag) => {
             const parsedAttributes = parseTagForAttributes(scriptTag);
             
+            // handle <script type="module"> /* inline code */ </script>
             if (parsedAttributes.type === 'module' && scriptTag.rawText !== '') {
               for (const innerBundleId of Object.keys(bundles)) {
                 if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0) {             
