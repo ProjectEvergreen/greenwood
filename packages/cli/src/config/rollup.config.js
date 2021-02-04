@@ -1,3 +1,4 @@
+const Buffer = require('buffer').Buffer;
 const crypto = require('crypto');
 const fs = require('fs');
 const htmlparser = require('node-html-parser');
@@ -9,6 +10,8 @@ const postcss = require('postcss');
 const postcssImport = require('postcss-import');
 const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
+
+const tokenSuffix = 'scratch';
 
 const parseTagForAttributes = (tag) => {
   return tag.rawAttrs.split(' ').map((attribute) => {
@@ -72,11 +75,11 @@ async function getOptimizedSource(url, plugins, compilation) {
 }
 
 function greenwoodWorkspaceResolver (compilation) {
-  const { userWorkspace } = compilation.context;
+  const { userWorkspace, scratchDir } = compilation.context;
 
   return {
     name: 'greenwood-workspace-resolver',
-    resolveId(source) {
+    resolveId(source) {      
       // TODO better way to handle relative paths?  happens in generateBundle too
       if ((source.indexOf('./') === 0 || source.indexOf('/') === 0) && path.extname(source) !== '.html' && fs.existsSync(path.join(userWorkspace, source))) {
         const resolvedPath = source.replace(source, path.join(userWorkspace, source));
@@ -84,14 +87,22 @@ function greenwoodWorkspaceResolver (compilation) {
         return resolvedPath;
       }
 
-      return null;
+      // handle inline script / style bundling
+      if (source.indexOf(`-${tokenSuffix}`) > 0 && fs.existsSync(path.join(scratchDir, source))) {
+        const resolvedPath = source.replace(source, path.join(scratchDir, source));
+        // console.debug('resolve THIS sauce to workspace directory, returning ', resolvedPath);
+        
+        return resolvedPath; // this signals that rollup should not ask other plugins or check the file system to find this id
+      }
+
+      return null; // other ids should be handled as usually
     }
   };
 }
 
 // https://github.com/rollup/rollup/issues/2873
 function greenwoodHtmlPlugin(compilation) {
-  const { userWorkspace, outputDir } = compilation.context;
+  const { userWorkspace, outputDir, scratchDir  } = compilation.context;
   const customResources = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
   }).map((plugin) => {
@@ -133,7 +144,6 @@ function greenwoodHtmlPlugin(compilation) {
     buildStart(options) {
       const mappedStyles = [];
       const mappedScripts = new Map();
-      const that = this;
 
       for (const input in options.input) {
         const inputHtml = options.input[input];
@@ -160,7 +170,7 @@ function greenwoodHtmlPlugin(compilation) {
             const srcPath = src.replace('../', './');
             const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
 
-            that.emitFile({
+            this.emitFile({
               type: 'chunk',
               id: srcPath,
               name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
@@ -168,8 +178,34 @@ function greenwoodHtmlPlugin(compilation) {
             });
           }
 
+          // handle <script type="module">/* some inline JavaScript code */</script> - as part of generateBundle?
+          if (parsedAttributes.type === 'module' && scriptTag.rawText !== '') {
+            const id = Buffer.from(scriptTag.rawText).toString('base64').slice(0, 8).toLowerCase();
+
+            if (!mappedScripts.get(id)) {
+              const filename = `${id}-${tokenSuffix}.js`;
+              const source = `
+                // ${filename}
+                ${scriptTag.rawText}
+              `.trim();
+
+              // have to write a file for rollup?
+              fs.writeFileSync(path.join(scratchDir, filename), source);
+
+              // TODO avoid using src and set it to the value of rollup fileName
+              // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
+              mappedScripts.set(id, true);
+
+              this.emitFile({
+                type: 'chunk',
+                id: filename,
+                name: filename.replace('.js', ''),
+                source
+              });
+            }
+          }
+
           // TODO handle <script type="module" src="@bare-path/specifier"></script>
-          // TODO handle <script type="module">/* some inline JavaScript code */</script> - as part of generateBundle?
         });
     
         headLinks.forEach((linkTag) => {
@@ -265,18 +301,14 @@ function greenwoodHtmlPlugin(compilation) {
   
             // handle <script type="module" src="some/path.js"></script>
             if (parsedAttributes.type === 'module' && parsedAttributes.src) {
-              // console.debug('bundle', bundle);
-              // console.debug(bundles[innerBundleId])
               for (const innerBundleId of Object.keys(bundles)) {
                 const { src } = parsedAttributes;
                 const facadeModuleId = bundles[innerBundleId].facadeModuleId;
                 const pathToMatch = src.replace('../', '').replace('./', '');
 
                 if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {
-                  // console.debug('MATCH FOUND!!!!!!!');
                   newHtml = newHtml.replace(src, `/${innerBundleId}`);
                 } else {
-                  // console.debug('NO MATCH?????', innerBundleId);
                   // TODO better testing
                   // TODO no magic strings
                   if (innerBundleId.indexOf('.greenwood/') < 0 && !mappedBundles.get(innerBundleId)) {
@@ -315,17 +347,37 @@ function greenwoodHtmlPlugin(compilation) {
       }
     },
 
-    // use plugins to optimize final bundles for tools like terser, cssnano
-    // TODO could do this in generate bundle, but that needs to be async first
-    async writeBundle(outputOptions, bundles) {
+    writeBundle(outputOptions, bundles) {      
+      // TODO looping over bundles twice is wildly inneficient, should refactor and safe references once
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
 
-        if (path.extname(bundle.facadeModuleId || bundle.name) !== '.html') {
-          const sourcePath = `${outputDir}/${bundleId}`;
-          const optimizedSource = await getOptimizedSource(sourcePath, customResources, compilation);
+        // TODO handle (!) Generated empty chunks .greenwood/about, .greenwood/index
+        if (bundle.isEntry && path.extname(bundle.facadeModuleId) === '.html') {
+          // TODO this seems hacky; hardcoded dirs :D
+          const htmlPath = bundle.facadeModuleId.replace('.greenwood', 'public');
+          const html = fs.readFileSync(htmlPath, 'utf-8');
+          const root = htmlparser.parse(html, {
+            script: true,
+            style: true
+          });
+          const headScripts = root.querySelectorAll('script');
 
-          await fs.promises.writeFile(sourcePath, optimizedSource);
+          headScripts.forEach((scriptTag) => {
+            const parsedAttributes = parseTagForAttributes(scriptTag);
+            
+            if (parsedAttributes.type === 'module' && scriptTag.rawText !== '') {
+              for (const innerBundleId of Object.keys(bundles)) {
+                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0) {             
+                  const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8');
+                  const newHtml = html.replace(scriptTag.rawText, bundledSource);                  
+
+                  fs.writeFileSync(htmlPath, newHtml);
+                }
+              }
+            }
+          });
+>>>>>>> handling bundling of inline script tags
         }
       }
     }
