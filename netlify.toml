@@ -4,3 +4,6 @@
 
 [build.processing]
   skip_processing = true
+
+[build.environment]
+  NODE_VERSION = "12.13.0"
