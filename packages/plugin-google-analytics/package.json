@@ -1,16 +1,14 @@
 {
   "name": "@greenwood/plugin-google-analytics",
   "version": "0.10.0-alpha.4",
-  "description": "A composite plugin for Greenwood for adding support for Google Analytics.",
+  "description": "A Greenwood plugin adding support for Google Analytics JavaScript tracker.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-google-analytics",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "keywords": [
     "Greenwood",
-    "Web Components",
-    "Lit Element",
-    "Lit Html",
     "Static Site Generator",
+    "Web Components",
     "Google Analytics"
   ],
   "main": "src/index.js",
