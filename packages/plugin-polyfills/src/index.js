@@ -7,11 +7,11 @@ class PolyfillsResource extends ResourceInterface {
     super(compilation, options);
   }
 
-  shouldOptimize() {
-    return true;
+  async shouldOptimize(url) {
+    return Promise.resolve(path.extname(url) === '.html');
   }
 
-  async optimize(html) {
+  async optimize(url, body) {
     const filename = 'webcomponents-loader.js';
     const nodeModuleRoot = 'node_modules/@webcomponents/webcomponentsjs';
 
@@ -39,7 +39,7 @@ class PolyfillsResource extends ResourceInterface {
             : Promise.resolve();
         }));
 
-        const newHtml = html.replace('<head>', `
+        const newHtml = body.replace('<head>', `
           <head>
             <script src="/${filename}"></script>
         `);

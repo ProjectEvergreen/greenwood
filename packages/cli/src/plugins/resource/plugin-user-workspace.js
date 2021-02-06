@@ -4,6 +4,7 @@
  * This sets the default value for requests in Greenwood.
  *
  */
+const fs = require('fs');
 const path = require('path');
 const { ResourceInterface } = require('../../lib/resource-interface');
 
@@ -13,7 +14,11 @@ class UserWorkspaceResource extends ResourceInterface {
     this.extensions = ['*'];
   }
 
-  async resolve(url) {
+  async shouldResolve(url = '/') {
+    return Promise.resolve(fs.existsSync(this.compilation.context.userWorkspace, url) || url === '/');
+  }
+
+  async resolve(url = '/') {
     return new Promise(async (resolve, reject) => {
       try {
         const workspaceUrl = path.join(this.compilation.context.userWorkspace, url);

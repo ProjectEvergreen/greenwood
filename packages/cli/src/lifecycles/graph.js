@@ -116,7 +116,10 @@ module.exports = generateGraph = async (compilation) => {
 
       const graph = fs.existsSync(pagesDir)
         ? walkDirectoryForPages(pagesDir)
-        : [{ route: '/' }];
+        : [{
+          path: '/',
+          route: '/' 
+        }];
 
       compilation.graph = graph;
 
