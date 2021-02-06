@@ -16,7 +16,9 @@ function getDevServer(compilation) {
   const app = new Koa();
   const compilationCopy = Object.assign({}, compilation);
   const resources = [
-    // Greenwood default standard resource plugins
+    // Greenwood default standard resource and import plugins
+    pluginUserWorkspace.provider(compilation),
+    pluginNodeModules.provider(compilation),
     pluginResourceStandardCss.provider(compilationCopy),
     pluginResourceStandardFont.provider(compilationCopy),
     pluginResourceStandardHtml.provider(compilationCopy),
@@ -40,20 +42,16 @@ function getDevServer(compilation) {
 
   // resolve urls to paths first
   app.use(async (ctx, next) => {
-    const resolveResources = [
-      pluginUserWorkspace.provider(compilation),
-      pluginNodeModules.provider(compilation)
-    ];
-
-    ctx.url = await resolveResources.reduce(async (responsePromise, resource) => {
+    ctx.url = await resources.reduce(async (responsePromise, resource) => {
       const response = await responsePromise;
-      const { url } = ctx; 
+      const { url } = ctx;
+      const resourceShouldResolveUrl = await resource.shouldResolve(url);
       
-      return resource.shouldResolve(url)
+      return resourceShouldResolveUrl
         ? resource.resolve(url)
         : Promise.resolve(response);
     }, Promise.resolve(''));
-    
+
     await next();
   });
 
@@ -67,8 +65,9 @@ function getDevServer(compilation) {
     const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
       const response = await responsePromise;
       const { url, headers } = ctx;
+      const shouldServe = await resource.shouldServe(url, headers);
 
-      if (resource.shouldServe(url, headers)) {
+      if (shouldServe) {
         const resolvedResource = await resource.serve(url, headers);
         
         return Promise.resolve({
@@ -88,18 +87,18 @@ function getDevServer(compilation) {
 
   // allow intercepting of urls
   app.use(async (ctx) => {
-    const modifiedResources = resources.concat(pluginNodeModules.provider(compilation));
+    const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
+      const body = await responsePromise;
+      const { url } = ctx;
+      const { headers } = ctx.response;
+      const shouldIntercept = await resource.shouldIntercept(url, body, headers);
 
-    const reducedResponse = await modifiedResources.reduce(async (responsePromise, resource) => {
-      const response = await responsePromise;
-      const { url, headers } = ctx;
-
-      if (resource.shouldIntercept(url, headers)) {
-        const interceptedResponse = await resource.intercept(response);
+      if (shouldIntercept) {
+        const interceptedResponse = await resource.intercept(url, body, headers);
         
         return Promise.resolve(interceptedResponse);
       } else {
-        return Promise.resolve(response);
+        return Promise.resolve(body);
       }
     }, Promise.resolve(ctx.body));
 

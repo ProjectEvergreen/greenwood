@@ -1,3 +1,4 @@
+const path = require('path');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 
 class GoogleAnalyticsResource extends ResourceInterface {
@@ -11,17 +12,17 @@ class GoogleAnalyticsResource extends ResourceInterface {
     }
   }
 
-  shouldOptimize() {
-    return true;
+  async shouldOptimize(url) {
+    return Promise.resolve(path.extname(url) === '.html');
   }
 
-  async optimize(html) {
+  async optimize(url, body) {
     const { analyticsId, anonymous } = this.options;
     const trackAnon = typeof anonymous === 'boolean' ? anonymous : true;
 
     return new Promise((resolve, reject) => {
       try {
-        const newHtml = html.replace('</head>', `
+        const newHtml = body.replace('</head>', `
           <link rel="preconnect" href="https://www.google-analytics.com/">
           <script async src="https://www.googletagmanager.com/gtag/js?id=${analyticsId}"></script>
           <script>

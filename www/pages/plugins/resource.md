@@ -23,31 +23,57 @@ const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface
 class ExampleResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.xyz'];
-    this.contentType = 'text/something';
+    this.extensions = ['.foo'];
+    this.contentType = 'text/javascript';
   }
 
-  // test if this plugin should be used to process a given for the browser, ex: `<script type="module" src="index.foo">`
-  // return true if url / headers match your plugin's use case
-  shouldServe(url, headers) { }
+  // test if this plugin should change a relative URL from the browser to an absolute path on disk (like for node_modules/)
+  // return true | false
+  // eslint-disable-next-line no-unused-vars
+  async shouldResolve(url) {
+    return Promise.resolve(false);
+  }
 
-  // actually serve the contents of a url, e.g. convert .foo body -> .js body
-  // return body and / or contenType
-  async serve(url, headers) { }
+  // return an absolute path
+  async resolve(url) {
+    return Promise.resolve(url);
+  }
 
-  // handle (intercept) an already resolved / served resource
-  // return true if url / headers match your plugin's case
-  shouldIntercept(url, headers) { }
+  // test if this plugin should be used to process a given url / header combo the browser and retu
+  // ex: `<script type="module" src="index.ts">`
+  // return true | false
+  async shouldServe(url, headers) {
+    return Promise.resolve(this.extensions.indexOf(path.extname(url)) >= 0);
+  }
 
-  // in exchange for a response body, return new respone body 
-  async intercept(body, headers) { }
+  // return the new body and / or contentType, e.g. convert file.foo -> .js
+  async serve(url, headers) {
+    return Promise.resolve({});
+  }
 
-  // access to final index.html contents before final Rollup optimizing step
-  // inject tracking scripts here, or BYOA (Bring Your Own AST) if you need more than the contents of the HTML
-  shouldOptimze(contents) {}
+  // test if this plugin should return a new body for an already resolved resource
+  // useful for modifying code on the fly without needing to touch the file
+  // return true | false
+  async shouldIntercept(url, body, headers) {
+    return Promise.resolve(false);
+  }
 
-  // in exchange for file contents, return new file contents 
-  async optimize(contents) {}
+  // return the new body
+  async intercept(url, body, headers) {
+    return Promise.resolve(body);
+  }
+
+  // test if this plugin should manipulate any files prior to any final optmizations happening 
+  // ex: add a "banner" to all .js files with a timestamp of the build
+  // return true | false
+  async shouldOptimize(url, body) {
+    return Promise.resolve(false);
+  }
+
+  // return the new body
+  async optimize (url, body) {
+    return Promise.resolve(body);
+  }
 }
 
 module.exports = (options = {}) => {
