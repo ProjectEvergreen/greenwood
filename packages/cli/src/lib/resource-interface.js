@@ -46,7 +46,7 @@ class ResourceInterface {
   // return the new body
   // eslint-disable-next-line no-unused-vars
   async intercept(url, body, headers) {
-    return Promise.resolve(body);
+    return Promise.resolve({ body });
   }
 
   // test if this plugin should manipulate any files prior to any final optmizations happening 

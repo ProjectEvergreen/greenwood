@@ -6,6 +6,7 @@ const json = require('@rollup/plugin-json');
 const multiInput = require('rollup-plugin-multi-input').default;
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const path = require('path');
+// TODO refactor out postcss
 const postcss = require('postcss');
 const postcssConfig = require('./postcss.config');
 const postcssImport = require('postcss-import');

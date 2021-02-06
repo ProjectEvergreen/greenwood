@@ -136,7 +136,7 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   async shouldIntercept(url, body, headers) {
-    return Promise.resolve(headers['content-type'] === 'text/html');
+    return Promise.resolve(headers.response['content-type'] === 'text/html');
   }
 
   async intercept(url, body) {
@@ -169,7 +169,9 @@ class NodeModulesResource extends ResourceInterface {
             </script>
         `);
 
-        resolve(newContents);
+        resolve({
+          body: newContents
+        });
       } catch (e) {
         reject(e);
       }
