@@ -1,16 +1,14 @@
 {
   "name": "@greenwood/plugin-polyfills",
   "version": "0.10.0-alpha.4",
-  "description": "A composite plugin for Greenwood for adding polyfill support for older browsers.",
+  "description": "A Greenwood plugin adding support for Web Component related polyfills like Custom Elements and Shadow DOM.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-polyfills",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "keywords": [
     "Greenwood",
-    "Web Components",
-    "Lit Element",
-    "Lit Html",
     "Static Site Generator",
+    "Web Components",
     "Polyfills"
   ],
   "main": "src/index.js",

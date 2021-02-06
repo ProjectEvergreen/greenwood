@@ -153,16 +153,16 @@ class StandardHtmlResource extends ResourceInterface {
     return url.replace(this.compilation.context.userWorkspace, '');
   }
 
-  shouldServe(url) {
+  async shouldServe(url) {
     const { userWorkspace } = this.compilation.context;
     const relativeUrl = this.getRelativeUserworkspaceUrl(url);
     const barePath = relativeUrl.endsWith('/')
       ? `${userWorkspace}/pages${relativeUrl}index`
       : `${userWorkspace}/pages${relativeUrl.replace('.html', '')}`;
       
-    return (this.extensions.indexOf(path.extname(relativeUrl)) >= 0 || path.extname(relativeUrl) === '') && 
+    return Promise.resolve((this.extensions.indexOf(path.extname(relativeUrl)) >= 0 || path.extname(relativeUrl) === '') && 
       (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index')
-      || fs.existsSync(`${barePath}.md`) || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`);
+      || fs.existsSync(`${barePath}.md`) || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`));
   }
 
   async serve(url) {
@@ -247,19 +247,19 @@ class StandardHtmlResource extends ResourceInterface {
     });
   }
 
-  shouldOptimize() {
-    return true;
+  async shouldOptimize(url) {
+    return Promise.resolve(path.extname(url) === '.html');
   }
 
-  async optimize(html) {
+  async optimize(url, body) {
     return new Promise((resolve, reject) => {
       try {
-        html = html.replace(/<script src="\/node_modules\/@webcomponents\/webcomponentsjs\/webcomponents-bundle.js"><\/script>/, '');
-        html = html.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
-        html = html.replace(/<script defer="" src="\/node_modules\/es-module-shims\/dist\/es-module-shims.js"><\/script>/, '');
-        html = html.replace(/<script type="module-shim"/g, '<script type="module"');
+        body = body.replace(/<script src="\/node_modules\/@webcomponents\/webcomponentsjs\/webcomponents-bundle.js"><\/script>/, '');
+        body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
+        body = body.replace(/<script defer="" src="\/node_modules\/es-module-shims\/dist\/es-module-shims.js"><\/script>/, '');
+        body = body.replace(/<script type="module-shim"/g, '<script type="module"');
     
-        resolve(html);
+        resolve(body);
       } catch (e) {
         reject(e);
       }
