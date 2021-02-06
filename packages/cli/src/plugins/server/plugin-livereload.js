@@ -26,6 +26,6 @@ module.exports = (options = {}) => {
   return {
     type: 'server',
     name: 'plugin-live-reload',
-    provider: (compilation, options) => new LiveReloadServer(compilation, options)
+    provider: (compilation) => new LiveReloadServer(compilation, options)
   };
 };
