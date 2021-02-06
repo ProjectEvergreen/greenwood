@@ -25,6 +25,7 @@
   "dependencies": {
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
+    "@rollup/plugin-replace": "^2.3.4",
     "@webcomponents/webcomponentsjs": "^2.4.4",
     "acorn": "^8.0.1",
     "acorn-walk": "^8.0.0",
@@ -52,7 +53,11 @@
   },
   "devDependencies": {
     "@mapbox/rehype-prism": "^0.5.0",
+    "lit-element": "^2.4.0",
+    "lodash-es": "^4.17.20",
     "postcss-nested": "^4.1.2",
+    "pwa-helpers": "^0.9.1",
+    "redux": "^4.0.5",
     "rehype-autolink-headings": "^4.0.0",
     "rehype-slug": "^3.0.0"
   }

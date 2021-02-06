@@ -1,0 +1,6 @@
+{
+  "name": "test-plugin-import-commonjs",
+  "dependencies": {
+    "lodash": "^4.17.20"
+  }
+}
