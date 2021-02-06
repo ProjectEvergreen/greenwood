@@ -35,9 +35,10 @@ module.exports = serializeCompilation = async (compilation) => {
             
             const htmlOptimized = await optimizeResources.reduce(async (htmlPromise, resource) => {
               const html = await htmlPromise;
+              const shouldOptimize = await resource.shouldOptimize(outputPath, html);
               
-              return resource.shouldOptimize(html)
-                ? resource.optimize(html)
+              return shouldOptimize
+                ? resource.optimize(outputPath, html)
                 : Promise.resolve(html);
             }, Promise.resolve(indexHtml));
 

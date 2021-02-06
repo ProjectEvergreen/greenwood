@@ -10,6 +10,7 @@ const postcss = require('postcss');
 const postcssConfig = require('./postcss.config');
 const postcssImport = require('postcss-import');
 const postcssRollup = require('rollup-plugin-postcss');
+const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
 
 function greenwoodWorkspaceResolver (compilation) {
@@ -39,26 +40,50 @@ function greenwoodHtmlPlugin(compilation) {
     name: 'greenwood-html-plugin',
     async load(id) {
       const extension = path.extname(id);
-      
-      if (extension === '.html') {
-        return Promise.resolve('');
-      }
-
-      // handle custom user file extensions
       const customResources = compilation.config.plugins.filter((plugin) => {
         return plugin.type === 'resource';
       }).map((plugin) => {
         return plugin.provider(compilation);
-      }).filter((resource) => {
-        if (resource.shouldServe(id)) {
-          return resource;
-        }
       });
+      
+      switch (extension) {
 
-      if (customResources.length) {
-        const response = await customResources[0].serve(id);
+        case '.html':
+          return Promise.resolve('');
+        case '.js':
+        case '.css':
+          // TODO extend this optimization to more file types?
+          const reducedBody = await customResources.reduce(async (bodyPromise, resource) => {
+            const body = await bodyPromise;
+            const shouldOptimize = await resource.shouldOptimize(id, body);
+      
+            if (shouldOptimize) {
+              const optimizedBody = await resource.optimize(id, body);
+              
+              return Promise.resolve(optimizedBody);
+            } else {
+              return Promise.resolve(body);
+            }
+          }, Promise.resolve(fs.readFileSync(id, 'utf-8')));
 
-        return response.body;
+          return Promise.resolve(reducedBody);
+        default:
+          // handle custom user file extensions
+          customResources.filter((resource) => {
+            const shouldServe = Promise.resolve(resource.shouldServe(id));
+
+            if (shouldServe) {
+              return resource;
+            }
+          });
+
+          if (customResources.length) {
+            const response = await customResources[0].serve(id);
+
+            return Promise.resolve(response.body);
+          }
+          break;
+
       }
     },
     // TODO do this during load instead?
@@ -258,6 +283,9 @@ module.exports = getRollupConfig = async (compilation) => {
       }
     },
     plugins: [
+      replace({ // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
+        'process.env.NODE_ENV': JSON.stringify('production')
+      }),
       nodeResolve(),
       greenwoodWorkspaceResolver(compilation),
       greenwoodHtmlPlugin(compilation),
