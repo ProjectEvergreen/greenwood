@@ -7,9 +7,6 @@ const multiInput = require('rollup-plugin-multi-input').default;
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const path = require('path');
 // TODO refactor out postcss
-const postcss = require('postcss');
-const postcssConfig = require('./postcss.config');
-const postcssImport = require('postcss-import');
 const postcssRollup = require('rollup-plugin-postcss');
 const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
@@ -35,24 +32,24 @@ function greenwoodWorkspaceResolver (compilation) {
 
 // https://github.com/rollup/rollup/issues/2873
 function greenwoodHtmlPlugin(compilation) {
-  const { projectDirectory, userWorkspace, outputDir } = compilation.context;
+  const { userWorkspace, outputDir } = compilation.context;
+  const customResources = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'resource';
+  }).map((plugin) => {
+    return plugin.provider(compilation);
+  });
 
   return {
     name: 'greenwood-html-plugin',
     async load(id) {
       const extension = path.extname(id);
-      const customResources = compilation.config.plugins.filter((plugin) => {
-        return plugin.type === 'resource';
-      }).map((plugin) => {
-        return plugin.provider(compilation);
-      });
       
       switch (extension) {
 
         case '.html':
           return Promise.resolve('');
         case '.js':
-        case '.css':
+        case '.css': // TODO this should only be for CSS-in-JS???
           // TODO extend this optimization to more file types?
           const reducedBody = await customResources.reduce(async (bodyPromise, resource) => {
             const body = await bodyPromise;
@@ -169,24 +166,20 @@ function greenwoodHtmlPlugin(compilation) {
       return Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
         const asset = mappedStyles[assetKey];
         const filePath = path.join(userWorkspace, asset.name);
-        // TODO we already process the user's CSS as part of serve lifecycle (dev / build commands)
-        // if we pull from .greenwood/ then maybe we could avoid re-postcss step here?
-        const userPostcssConfig = fs.existsSync(`${projectDirectory}/postcss.config.js`)
-          ? require(`${projectDirectory}/postcss.config`)
-          : {};
-        const userPostcssPlugins = userPostcssConfig.plugins && userPostcssConfig.plugins.length > 0
-          ? userPostcssConfig.plugins
-          : [];
-        const allPostcssPlugins = [
-          ...userPostcssPlugins,
-          ...postcssConfig.plugins
-        ];
+        const optimizedSource = await customResources.reduce(async (bodyPromise, resource) => {
+          const body = await bodyPromise;
+          const shouldOptimize = await resource.shouldOptimize(filePath, body);
+    
+          if (shouldOptimize) {
+            const optimizedBody = await resource.optimize(filePath, body);
+            
+            return Promise.resolve(optimizedBody);
+          } else {
+            return Promise.resolve(body);
+          }
+        }, Promise.resolve(fs.readFileSync(filePath, 'utf-8')));
 
-        const result = await postcss(allPostcssPlugins)
-          .use(postcssImport())
-          .process(asset.source, { from: filePath });
-
-        asset.source = result.css;
+        asset.source = optimizedSource;
 
         return new Promise((resolve, reject) => {
           try {
@@ -270,7 +263,6 @@ module.exports = getRollupConfig = async (compilation) => {
   return [{
     // TODO Avoid .greenwood/ directory, do everything in public/?
     input: `${scratchDir}**/*.html`,
-    // preserveEntrySignatures: false,
     output: { 
       dir: outputDir,
       entryFileNames: '[name].[hash].js',
@@ -291,7 +283,7 @@ module.exports = getRollupConfig = async (compilation) => {
       greenwoodWorkspaceResolver(compilation),
       greenwoodHtmlPlugin(compilation),
       multiInput(),
-      postcssRollup({
+      postcssRollup({ // TODO should be part of a plugin
         extract: false,
         minimize: true,
         inject: false

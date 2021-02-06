@@ -30,7 +30,7 @@ describe('Build Greenwood With: ', function() {
   let setup;
 
   before(async function() {
-    setup = new TestBed(true);
+    setup = new TestBed();
 
     const litElementLibs = (await glob(`${process.cwd()}/node_modules/lit-element/lib/*.js`)).map((lib) => {
       return {

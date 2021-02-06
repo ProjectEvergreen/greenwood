@@ -39,7 +39,6 @@ const testForCjsModule = async(url) => {
 class ImportCommonJsResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['*'];
   }
 
   async shouldIntercept(url) {
@@ -70,7 +69,9 @@ class ImportCommonJsResource extends ResourceInterface {
 
         stream.on('data', (data) => (bundle += data));
         stream.on('end', () => {
-          resolve(bundle);
+          resolve({
+            body: bundle
+          });
         });
       } catch (e) {
         reject(e);
@@ -79,13 +80,15 @@ class ImportCommonJsResource extends ResourceInterface {
   }
 
   async shouldOptimize(url) {
-    const shouldIntercept = await this.shouldIntercept(url);
+    const shouldOptimize = await this.shouldIntercept(url);
     
-    return Promise.resolve(shouldIntercept);
+    return Promise.resolve(shouldOptimize);
   }
 
   async optimize(url) {
-    return this.intercept(url);
+    const body = (await this.intercept(url)).body;
+
+    return Promise.resolve(body);
   }
 }
 

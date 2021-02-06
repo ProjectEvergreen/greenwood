@@ -14,22 +14,30 @@ class PostCssResource extends ResourceInterface {
     this.extensions = ['.css'];
   }
 
+  isCssFile(url) {
+    return path.extname(url) === '.css';
+  }
+
+  getConfig() {
+    const { projectDirectory } = this.compilation.context;
+    const configRoot = fs.existsSync(`${projectDirectory}`, 'postcss.config.js')
+      ? projectDirectory
+      : __dirname;
+    
+    return require(`${configRoot}/postcss.config`);
+  }
+
   async shouldIntercept(url) {
-    return Promise.resolve(path.extname(url) === '.css');
+    return Promise.resolve(this.isCssFile(url));
   }
 
   async intercept(url, body) {
     return new Promise(async(resolve, reject) => {
       try {
-        const { projectDirectory } = this.compilation.context;
-        const postcssConfigRoot = fs.existsSync(`${projectDirectory}`, 'postcss.config.js')
-          ? projectDirectory
-          : __dirname;
-        const postcssConfigPath = `${postcssConfigRoot}/postcss.config`;
-        const postcssConfig = require(postcssConfigPath);
-        const postcssPlugins = postcssConfig.plugins || [];
-        const css = postcssPlugins.length > 0
-          ? (await postcss(postcssPlugins).process(body, { from: url })).css
+        const config = this.getConfig();
+        const plugins = config.plugins || [];
+        const css = plugins.length > 0
+          ? (await postcss(plugins).process(body, { from: url })).css
           : body;
 
         resolve({
@@ -39,6 +47,20 @@ class PostCssResource extends ResourceInterface {
         reject(e);
       }
     });
+  }
+
+  async shouldOptimize(url) {
+    return Promise.resolve(this.isCssFile(url));
+  }
+
+  async optimize(url, body) {
+    const config = this.getConfig();
+    const plugins = config.plugins || [];
+    const css = plugins.length > 0
+      ? (await postcss(plugins).process(body, { from: url })).css
+      : body;
+
+    return Promise.resolve(css);
   }
 }
 
