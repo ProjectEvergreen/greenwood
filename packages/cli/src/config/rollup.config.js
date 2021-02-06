@@ -79,7 +79,7 @@ function greenwoodWorkspaceResolver (compilation) {
 
   return {
     name: 'greenwood-workspace-resolver',
-    resolveId(source) {      
+    resolveId(source) {
       // TODO better way to handle relative paths?  happens in generateBundle too
       if ((source.indexOf('./') === 0 || source.indexOf('/') === 0) && path.extname(source) !== '.html' && fs.existsSync(path.join(userWorkspace, source))) {        
         return source.replace(source, path.join(userWorkspace, source));
@@ -149,6 +149,7 @@ function greenwoodHtmlPlugin(compilation) {
         });
         const headScripts = root.querySelectorAll('script');
         const headLinks = root.querySelectorAll('link');
+        const headStyles = root.querySelectorAll('style');
     
         // TODO handle deeper paths. e.g. ../../../
         headScripts.forEach((scriptTag) => {
@@ -243,6 +244,30 @@ function greenwoodHtmlPlugin(compilation) {
     
           // TODO handle <style>/* some inline CSS */</style> - as part of generateBundle?
         });
+
+        // handle <style>/* some inline CSS code */</style>
+        Promise.all(headStyles.map(async (styleTag) => {
+          const cssSource = styleTag.childNodes.map(node => node.rawText).join();
+          const id = Buffer.from(cssSource).toString('base64').slice(0, 8).toLowerCase();
+          const filename = `${id}-${tokenSuffix}.css`;
+          
+          if (cssSource !== '' && !mappedStyles[filename]) {
+            const fileName = `${id}-${tokenSuffix}.css`;
+            const source = `
+              /*! ${filename} */
+              ${cssSource}
+            `; // .trim();
+
+            // TODO avoid using src and set it to the value of rollup fileName
+            // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
+            mappedStyles[filename] = {
+              type: 'asset',
+              fileName,
+              name: id,
+              source
+            };
+          }
+        }));
       }
 
       // this is a giant work around because PostCSS and some plugins can only be run async
@@ -321,7 +346,7 @@ function greenwoodHtmlPlugin(compilation) {
             const parsedAttributes = parseTagForAttributes(linkTag);
             const { href } = parsedAttributes;
   
-            // handle <link rel="stylesheet" src="some/path.css"></link>
+            // handle <link rel="stylesheet" src="/some/path.css"></link>
             if (parsedAttributes.rel === 'stylesheet') {
               for (const bundleId2 of Object.keys(bundles)) {
                 if (bundleId2.indexOf('.css') > 0) {
@@ -345,6 +370,7 @@ function greenwoodHtmlPlugin(compilation) {
       // TODO looping over bundles twice is wildly inneficient, should refactor and safe references once
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
+        console.debug('bundleId@@@@@@', bundleId);
 
         // TODO handle (!) Generated empty chunks .greenwood/about, .greenwood/index
         if (bundle.isEntry && path.extname(bundle.facadeModuleId) === '.html') {
@@ -352,9 +378,11 @@ function greenwoodHtmlPlugin(compilation) {
           const htmlPath = bundle.facadeModuleId.replace('.greenwood', 'public');
           const html = fs.readFileSync(htmlPath, 'utf-8');
           const root = htmlparser.parse(html, {
-            script: true
+            script: true,
+            style: true
           });
           const headScripts = root.querySelectorAll('script');
+          const headStyles = root.querySelectorAll('style');
 
           headScripts.forEach((scriptTag) => {
             const parsedAttributes = parseTagForAttributes(scriptTag);
@@ -362,7 +390,7 @@ function greenwoodHtmlPlugin(compilation) {
             // handle <script type="module"> /* inline code */ </script>
             if (parsedAttributes.type === 'module' && scriptTag.rawText !== '') {
               for (const innerBundleId of Object.keys(bundles)) {
-                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0) {             
+                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js') {             
                   const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8');
                   const newHtml = html.replace(scriptTag.rawText, bundledSource);                  
 
@@ -371,7 +399,28 @@ function greenwoodHtmlPlugin(compilation) {
               }
             }
           });
->>>>>>> handling bundling of inline script tags
+
+          headStyles.forEach((styleTag) => {
+            const cssSource = styleTag.childNodes.map(node => node.rawText).join();
+            
+            if (cssSource !== '') {
+              for (const innerBundleId of Object.keys(bundles)) {
+                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.css') {             
+                  console.debug('!!!!!!!! found an inline style tag, swap out with optimized from disk');
+                  const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8');
+                  const newHtml = html.replace(cssSource, bundledSource);
+                  // console.debug('****************');
+                  // console.debug('bundledSource', bundledSource);
+                  // console.debug('css source', cssSource);
+                  // if()
+                  // console.debug('newHtml', newHtml);
+                  console.debug('****************');
+
+                  fs.writeFileSync(htmlPath, newHtml);
+                }
+              }
+            }
+          });
         }
       }
     }
