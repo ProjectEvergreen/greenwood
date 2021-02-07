@@ -12,6 +12,7 @@ class PostCssResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
     this.extensions = ['.css'];
+    this.contentType = ['text/css'];
   }
 
   isCssFile(url) {
@@ -55,7 +56,9 @@ class PostCssResource extends ResourceInterface {
 
   async optimize(url, body) {
     const config = this.getConfig();
-    const plugins = config.plugins || [];
+    const plugins = (config.plugins || []).concat([
+      require('cssnano')
+    ]);
     const css = plugins.length > 0
       ? (await postcss(plugins).process(body, { from: url })).css
       : body;

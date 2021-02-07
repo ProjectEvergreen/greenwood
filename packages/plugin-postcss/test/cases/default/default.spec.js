@@ -52,9 +52,9 @@ describe('Build Greenwood With: ', function() {
 
     describe('Page referencing external nested CSS file', function() {
       it('should output correctly processed nested CSS as non nested', function() {
-        const expectedCss = 'body{color:red;}bodyh1{color:blue;}';
+        const expectedCss = 'body{color:red}body h1{color:#00f}';
         const cssFiles = glob.sync(path.join(this.context.publicDir, 'styles', '*.css'));
-        const css = fs.readFileSync(cssFiles[0], 'utf-8').replace(/ /g, '').replace(/\n/g, '');
+        const css = fs.readFileSync(cssFiles[0], 'utf-8');
 
         expect(cssFiles.length).to.equal(1);
         expect(css).to.equal(expectedCss);

@@ -11,6 +11,53 @@ const postcssRollup = require('rollup-plugin-postcss');
 const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
 
+async function getOptimizedSource(url, plugins) {
+  const initSoure = fs.readFileSync(url, 'utf-8');
+  const optimizedSource = await plugins.reduce(async (bodyPromise, resource) => {
+    const body = await bodyPromise;
+    const shouldOptimize = await resource.shouldOptimize(url, body);
+
+    if (shouldOptimize) {
+      const optimizedBody = await resource.optimize(url, body);
+      
+      return Promise.resolve(optimizedBody);
+    } else {
+      return Promise.resolve(body);
+    }
+  }, Promise.resolve(initSoure));
+
+  // TODO if no custom user optimization found, fallback to standard Greenwood optimizations?
+  if (optimizedSource === initSoure && url.indexOf('node_modules') < 0) {
+    // console.debug('no custom optimizer, fallback to Greenwood optimizer, for', url);
+    // const standardResources = fs.readdirSync(path.join(__dirname, '../', 'plugins/resource'))
+    //   .filter(filename => filename.indexOf('plugin-standard-') === 0)
+    //   .map((filename) => {
+    //     return require(path.join(__dirname, '../', 'plugins/resource', filename));
+    //   }).filter((plugin) => {
+    //     return plugin.type === 'resource';
+    //   }).map((plugin) => {
+    //     return plugin.provider(compilation);
+    //   });
+
+    // optimizedSource = await standardResources.reduce(async (bodyPromise, resource) => {
+    //   const body = await bodyPromise;
+    //   const shouldOptimize = await resource.shouldOptimize(url, body);
+  
+    //   if (shouldOptimize) {
+    //     const optimizedBody = await resource.optimize(url, body);
+        
+    //     return Promise.resolve(optimizedBody);
+    //   } else {
+    //     return Promise.resolve(body);
+    //   }
+    // }, Promise.resolve(initSoure));
+
+    // console.debug('standardResources', standardResources);
+  }
+
+  return Promise.resolve(optimizedSource);
+}
+
 function greenwoodWorkspaceResolver (compilation) {
   const { userWorkspace } = compilation.context;
 
@@ -41,6 +88,8 @@ function greenwoodHtmlPlugin(compilation) {
 
   return {
     name: 'greenwood-html-plugin',
+    // tell Rollup how to handle HTML entry points 
+    // and other custom user resource types like .ts, .gql, etc
     async load(id) {
       const extension = path.extname(id);
       
@@ -48,25 +97,7 @@ function greenwoodHtmlPlugin(compilation) {
 
         case '.html':
           return Promise.resolve('');
-        case '.js':
-        case '.css': // TODO this should only be for CSS-in-JS???
-          // TODO extend this optimization to more file types?
-          const reducedBody = await customResources.reduce(async (bodyPromise, resource) => {
-            const body = await bodyPromise;
-            const shouldOptimize = await resource.shouldOptimize(id, body);
-      
-            if (shouldOptimize) {
-              const optimizedBody = await resource.optimize(id, body);
-              
-              return Promise.resolve(optimizedBody);
-            } else {
-              return Promise.resolve(body);
-            }
-          }, Promise.resolve(fs.readFileSync(id, 'utf-8')));
-
-          return Promise.resolve(reducedBody);
         default:
-          // handle custom user file extensions
           customResources.filter((resource) => {
             const shouldServe = Promise.resolve(resource.shouldServe(id));
 
@@ -84,8 +115,10 @@ function greenwoodHtmlPlugin(compilation) {
 
       }
     },
-    // TODO do this during load instead?
-    async buildStart(options) {
+
+    // crawl through all entry HTML files and emit JavaScript chunks and CSS assets along the way
+    // for bundling with Rollup
+    buildStart(options) {
       const mappedStyles = [];
       const mappedScripts = new Map();
       const that = this;
@@ -137,7 +170,8 @@ function greenwoodHtmlPlugin(compilation) {
             }
 
             // TODO avoid using href and set it to the value of rollup fileName instead
-            // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
+            // since user paths can still be the same file, 
+            // e.g. ../theme.css and ./theme.css are still the same file
             mappedStyles[attribs.href] = {
               type: 'asset',
               fileName,
@@ -145,6 +179,7 @@ function greenwoodHtmlPlugin(compilation) {
               source
             };
 
+            that.emitFile(mappedStyles[attribs.href]);
           }
         }
       });
@@ -157,45 +192,13 @@ function greenwoodHtmlPlugin(compilation) {
         parser.end();
         parser.reset();
       }
-      
-      // this is a giant work around because PostCSS and some plugins can only be run async
-      // and so have to use with await but _outside_ sync code, like parser / rollup
-      // https://github.com/cssnano/cssnano/issues/68
-      // https://github.com/postcss/postcss/issues/595
-      // TODO consider similar approach for emitting chunks?
-      return Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
-        const asset = mappedStyles[assetKey];
-        const filePath = path.join(userWorkspace, asset.name);
-        const optimizedSource = await customResources.reduce(async (bodyPromise, resource) => {
-          const body = await bodyPromise;
-          const shouldOptimize = await resource.shouldOptimize(filePath, body);
-    
-          if (shouldOptimize) {
-            const optimizedBody = await resource.optimize(filePath, body);
-            
-            return Promise.resolve(optimizedBody);
-          } else {
-            return Promise.resolve(body);
-          }
-        }, Promise.resolve(fs.readFileSync(filePath, 'utf-8')));
-
-        asset.source = optimizedSource;
-
-        return new Promise((resolve, reject) => {
-          try {
-            that.emitFile(asset);
-            resolve();
-          } catch (e) {
-            reject(e);
-          }
-        });
-      }));
     },
+
+    // crawl through all entry HTML files and map bundled JavaScript and CSS filenames 
+    // back to original <script> / <link> tags and update to their bundled filename in the HTML
     generateBundle(outputOptions, bundles) {
       const mappedBundles = new Map();
-      // console.debug('rollup generateBundle bundles', Object.keys(bundles));
       
-      // TODO looping over bundles twice is wildly inneficient, should refactor and safe references once
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
 
@@ -252,6 +255,22 @@ function greenwoodHtmlPlugin(compilation) {
           bundle.code = newHtml;
         }
       }
+    },
+
+    // use plugins to optimize final bundles for tools like terser, cssnano
+    // TODO do this in generate bundle, but it needs to be async first???
+    async writeBundle(outputOptions, bundles) {
+      
+      for (const bundleId of Object.keys(bundles)) {
+        const bundle = bundles[bundleId];
+
+        if (path.extname(bundle.facadeModuleId || bundle.name) !== '.html') {
+          const sourcePath = path.join(outputDir, bundleId);
+          const optimizedSource = await getOptimizedSource(sourcePath, customResources, compilation);
+
+          await fs.promises.writeFile(sourcePath, optimizedSource);
+        }
+      }
     }
   };
 }
@@ -276,6 +295,7 @@ module.exports = getRollupConfig = async (compilation) => {
       }
     },
     plugins: [
+      // TODO replace should come in via plugins?
       replace({ // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
         'process.env.NODE_ENV': JSON.stringify('production')
       }),
@@ -283,13 +303,13 @@ module.exports = getRollupConfig = async (compilation) => {
       greenwoodWorkspaceResolver(compilation),
       greenwoodHtmlPlugin(compilation),
       multiInput(),
-      postcssRollup({ // TODO should be part of a plugin
+      postcssRollup({ // TODO should be part of a plugin ?
         extract: false,
         minimize: true,
         inject: false
       }),
       json(), // TODO bundle as part of import support / transforms API?
-      terser()
+      terser() // TODO extract to a plugin
     ]
   }];
 

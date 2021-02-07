@@ -4,11 +4,6 @@
  * Enables using JavaScript to import CSS files, using ESM syntax.
  *
  */
-// TODO const postcssImport = require('postcss-import');
-// const result = await postcss(allPostcssPlugins)
-//   .use(postcssImport())
-//   .process(asset.source, { from: filePath });
-
 const path = require('path');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 
