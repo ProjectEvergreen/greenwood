@@ -18,7 +18,7 @@ yarn add @greenwood/plugin-postcss --dev
 ```
 
 ## Usage
-Use this plugin in your _greenwood.config.js_.
+Add this plugin to your _greenwood.config.js_.
 
 ```javascript
 const pluginPostCss = require('@greenwood/plugin-postcss');
@@ -34,15 +34,23 @@ module.exports = {
 
 > 👉 _If you are using this along with [**plugin-import-css**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-css), make sure **plugin-postcss** comes first.  All mnon stanrd transformation need to come last._ 
 
-Optionally, create a _postcss.config.js_ in the root of your project with your own custom plugins / settings.
+Optionally, create a _postcss.config.js_ in the root of your project with your own custom plugins / settings that you've installed.
 ```javascript
-// TODO
+module.exports = {
+  plugins: [
+    require('postcss-nested')
+  ]
+};
 ```
 
 
 By default, the configuration provided by this plugin is:
 ```javascript
-// TODO
+module.exports = {
+  plugins: [
+    require('postcss-import')
+  ]
+};
 ```
 
 This will then process your CSS with PostCSS with the configurated plugins / settings you provide.  

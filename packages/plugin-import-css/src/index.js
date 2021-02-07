@@ -5,6 +5,7 @@
  *
  */
 const path = require('path');
+const postcssRollup = require('rollup-plugin-postcss');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 
 class ImportCssResource extends ResourceInterface {
@@ -37,9 +38,19 @@ class ImportCssResource extends ResourceInterface {
 }
 
 module.exports = (options = {}) => {
-  return {
+  return [{
     type: 'resource',
-    name: 'plugin-import-css',
+    name: 'plugin-import-css-resource',
     provider: (compilation) => new ImportCssResource(compilation, options)
-  };
+  }, {
+    type: 'rollup',
+    name: 'plugin-import-css-rollup',
+    provider: () => [
+      postcssRollup({
+        extract: false,
+        minimize: true,
+        inject: false
+      })
+    ]
+  }];
 };

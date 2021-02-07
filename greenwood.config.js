@@ -28,7 +28,7 @@ module.exports = {
     }),
     pluginPolyfills(),
     pluginPostCss(),
-    pluginImportCss()
+    ...pluginImportCss()
   ],
   markdown: {
     plugins: [

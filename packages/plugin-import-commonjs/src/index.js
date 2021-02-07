@@ -78,24 +78,18 @@ class ImportCommonJsResource extends ResourceInterface {
       }
     });
   }
-
-  async shouldOptimize(url) {
-    const shouldOptimize = await this.shouldIntercept(url);
-    
-    return Promise.resolve(shouldOptimize);
-  }
-
-  async optimize(url) {
-    const body = (await this.intercept(url)).body;
-
-    return Promise.resolve(body);
-  }
 }
 
 module.exports = (options = {}) => {
-  return {
+  return [{
     type: 'resource',
     name: 'plugin-import-commonjs',
     provider: (compilation) => new ImportCommonJsResource(compilation, options)
-  };
+  }, {
+    type: 'rollup',
+    name: 'plugin-import-commonjs',
+    provider: () => [
+      commonjs()
+    ]
+  }];
 };

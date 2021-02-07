@@ -18,7 +18,7 @@ yarn add @greenwood/plugin-import-css --dev
 ```
 
 ## Usage
-Use this plugin in your _greenwood.config.js_.
+Add this plugin to your _greenwood.config.js_ and spread the `export`.
 
 ```javascript
 const pluginImportCss = require('@greenwood/plugin-import-css');
@@ -27,12 +27,12 @@ module.exports = {
   ...
 
   plugins: [
-    pluginImportCss()
+    ...pluginImportCss() // notice the spread ... !
   ]
 }
 ```
 
-> 👉 _If you are using this along with [**plugin-postcss**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss), make sure **plugin-postcss** comes first.  All non stanrd transformation need to come last._ 
+> 👉 _If you are using this along with [**plugin-postcss**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss), make sure **plugin-postcss** comes first.  All non standard transformations need to come last._ 
 
 
 This will then allow you use `import` to include CSS in your JavaScript files.

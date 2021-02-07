@@ -7,7 +7,6 @@ const multiInput = require('rollup-plugin-multi-input').default;
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const path = require('path');
 // TODO refactor out postcss
-const postcssRollup = require('rollup-plugin-postcss');
 const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
 
@@ -278,6 +277,12 @@ function greenwoodHtmlPlugin(compilation) {
 module.exports = getRollupConfig = async (compilation) => {
   
   const { scratchDir, outputDir } = compilation.context;
+  // TODO greenwood standard plugins, then "Greenwood" plugins, then use plugins
+  const customRollupPlugins = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'rollup';
+  }).map((plugin) => {
+    return plugin.provider();
+  }).flat();
 
   return [{
     // TODO Avoid .greenwood/ directory, do everything in public/?
@@ -299,17 +304,13 @@ module.exports = getRollupConfig = async (compilation) => {
       replace({ // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
         'process.env.NODE_ENV': JSON.stringify('production')
       }),
-      nodeResolve(),
+      nodeResolve(), // TODO move to plugin
       greenwoodWorkspaceResolver(compilation),
       greenwoodHtmlPlugin(compilation),
       multiInput(),
-      postcssRollup({ // TODO should be part of a plugin ?
-        extract: false,
-        minimize: true,
-        inject: false
-      }),
       json(), // TODO bundle as part of import support / transforms API?
-      terser() // TODO extract to a plugin
+      terser(), // TODO extract to a plugin
+      ...customRollupPlugins
     ]
   }];
 
