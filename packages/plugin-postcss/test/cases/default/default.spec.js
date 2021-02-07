@@ -8,6 +8,15 @@
  * User Command
  * greenwood build
  *
+ * User Config
+ * const pluginPostCss = require('@greenwod/plugin-postcss');
+ *
+ * {
+ *   plugins: [
+ *     pluginPostCss()
+ *  ]
+ * }
+ * 
  * User Workspace
  * Greenwood default
  *  src/
@@ -23,8 +32,7 @@ const expect = require('chai').expect;
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-// TODO move to plugin-postcss
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom PostCSS configuration';
   let setup;
 
@@ -44,9 +52,9 @@ xdescribe('Build Greenwood With: ', function() {
 
     describe('Page referencing external nested CSS file', function() {
       it('should output correctly processed nested CSS as non nested', function() {
-        const expectedCss = 'body{color:red}body h1{color:#00f}';
+        const expectedCss = 'body{color:red;}bodyh1{color:blue;}';
         const cssFiles = glob.sync(path.join(this.context.publicDir, 'styles', '*.css'));
-        const css = fs.readFileSync(cssFiles[0], 'utf-8');
+        const css = fs.readFileSync(cssFiles[0], 'utf-8').replace(/ /g, '').replace(/\n/g, '');
 
         expect(cssFiles.length).to.equal(1);
         expect(css).to.equal(expectedCss);

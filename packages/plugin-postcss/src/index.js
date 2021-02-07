@@ -39,7 +39,7 @@ class PostCssResource extends ResourceInterface {
         const css = plugins.length > 0
           ? (await postcss(plugins).process(body, { from: url })).css
           : body;
-
+        
         resolve({
           body: css
         });
