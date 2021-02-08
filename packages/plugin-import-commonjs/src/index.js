@@ -3,12 +3,12 @@
  * Detects and fully resolves import requests for CommonJS files in node_modules.
  *
  */
+const commonjs = require('@rollup/plugin-commonjs');
 const fs = require('fs');
 const path = require('path');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 const { parse } = require('cjs-module-lexer');
+const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 const rollupStream = require('@rollup/stream');
-const commonjs = require('@rollup/plugin-commonjs');
 
 // bit of a workaround for now, but maybe this could be supported by cjs-module-lexar natively?
 // https://github.com/guybedford/cjs-module-lexer/issues/35
