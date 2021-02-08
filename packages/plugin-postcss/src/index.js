@@ -8,14 +8,6 @@ const path = require('path');
 const postcss = require('postcss');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 
-const getConfig = (projectDirectory) => {
-  const configRoot = fs.existsSync(`${projectDirectory}`, 'postcss.config.js')
-    ? projectDirectory
-    : __dirname;
-  
-  return require(`${configRoot}/postcss.config`);
-};
-
 class PostCssResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
@@ -29,11 +21,12 @@ class PostCssResource extends ResourceInterface {
 
   getConfig() {
     const { projectDirectory } = this.compilation.context;
-    const configRoot = fs.existsSync(`${projectDirectory}`, 'postcss.config.js')
+    const configFile = 'postcss.config';
+    const configRoot = fs.existsSync(`${projectDirectory}/${configFile}.js`)
       ? projectDirectory
       : __dirname;
     
-    return require(`${configRoot}/postcss.config`);
+    return require(`${configRoot}/${configFile}`);
   }
 
   async shouldIntercept(url) {
@@ -43,7 +36,7 @@ class PostCssResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise(async(resolve, reject) => {
       try {
-        const config = getConfig(this.compilation.context.projectDirectory);
+        const config = this.getConfig();
         const plugins = config.plugins || [];
         const css = plugins.length > 0
           ? (await postcss(plugins).process(body, { from: url })).css
@@ -63,12 +56,12 @@ class PostCssResource extends ResourceInterface {
   }
   
   async optimize(url, body) {
-    const { outputDir, userWorkspace, projectDirectory } = this.compilation.context;
+    const { outputDir, userWorkspace } = this.compilation.context;
     const workspaceUrl = url.replace(outputDir, userWorkspace);
-    const config = this.getConfig(projectDirectory);
-    const plugins = (config.plugins || []).concat([
-      require('cssnano')
-    ]);
+    const config = this.getConfig();
+    const plugins = (config.plugins || []).concat(
+      require('cssnano') // TODO make configurable
+    );
     const css = plugins.length > 0
       ? (await postcss(plugins).process(body, { from: workspaceUrl })).css
       : body;
