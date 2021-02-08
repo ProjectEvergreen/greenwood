@@ -30,13 +30,13 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
-describe.only('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Import CommonJs Plugin with default options';
 
   let setup;
 
   before(async function() {
-    setup = new TestBed(true);
+    setup = new TestBed();
 
     this.context = await setup.setupTestBed(__dirname, [{
       dir: 'node_modules/lodash/',
@@ -82,7 +82,7 @@ describe.only('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    // setup.teardownTestBed();
+    setup.teardownTestBed();
   });
 
 });
