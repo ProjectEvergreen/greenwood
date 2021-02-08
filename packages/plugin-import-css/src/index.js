@@ -40,11 +40,11 @@ class ImportCssResource extends ResourceInterface {
 module.exports = (options = {}) => {
   return [{
     type: 'resource',
-    name: 'plugin-import-css-resource',
+    name: 'plugin-import-css:resource',
     provider: (compilation) => new ImportCssResource(compilation, options)
   }, {
     type: 'rollup',
-    name: 'plugin-import-css-rollup',
+    name: 'plugin-import-css:rollup',
     provider: () => [
       postcssRollup({
         extract: false,

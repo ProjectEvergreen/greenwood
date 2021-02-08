@@ -8,6 +8,14 @@ const path = require('path');
 const postcss = require('postcss');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 
+const getConfig = (projectDirectory) => {
+  const configRoot = fs.existsSync(`${projectDirectory}`, 'postcss.config.js')
+    ? projectDirectory
+    : __dirname;
+  
+  return require(`${configRoot}/postcss.config`);
+};
+
 class PostCssResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
@@ -35,7 +43,7 @@ class PostCssResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise(async(resolve, reject) => {
       try {
-        const config = this.getConfig();
+        const config = getConfig(this.compilation.context.projectDirectory);
         const plugins = config.plugins || [];
         const css = plugins.length > 0
           ? (await postcss(plugins).process(body, { from: url })).css
@@ -53,16 +61,18 @@ class PostCssResource extends ResourceInterface {
   async shouldOptimize(url) {
     return Promise.resolve(this.isCssFile(url));
   }
-
+  
   async optimize(url, body) {
-    const config = this.getConfig();
+    const { outputDir, userWorkspace, projectDirectory } = this.compilation.context;
+    const workspaceUrl = url.replace(outputDir, userWorkspace);
+    const config = this.getConfig(projectDirectory);
     const plugins = (config.plugins || []).concat([
       require('cssnano')
     ]);
     const css = plugins.length > 0
-      ? (await postcss(plugins).process(body, { from: url })).css
+      ? (await postcss(plugins).process(body, { from: workspaceUrl })).css
       : body;
-
+    
     return Promise.resolve(css);
   }
 }

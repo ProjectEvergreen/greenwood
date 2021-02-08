@@ -83,11 +83,11 @@ class ImportCommonJsResource extends ResourceInterface {
 module.exports = (options = {}) => {
   return [{
     type: 'resource',
-    name: 'plugin-import-commonjs',
+    name: 'plugin-import-commonjs:resource',
     provider: (compilation) => new ImportCommonJsResource(compilation, options)
   }, {
     type: 'rollup',
-    name: 'plugin-import-commonjs',
+    name: 'plugin-import-commonjs:rollup',
     provider: () => [
       commonjs()
     ]

@@ -133,11 +133,18 @@ function greenwoodHtmlPlugin(compilation) {
 
             const srcPath = src.replace('../', './');
             const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
+            let name = srcPath;
+            
+            if (name.charAt(0) === '/') {
+              name = name.slice(1);
+            }
+
+            name = name.replace('./', '');
 
             that.emitFile({
               type: 'chunk',
               id: srcPath,
-              name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
+              name, // TODO adding this broke tests now :/
               source
             });
 
@@ -259,15 +266,18 @@ function greenwoodHtmlPlugin(compilation) {
     // use plugins to optimize final bundles for tools like terser, cssnano
     // TODO do this in generate bundle, but it needs to be async first???
     async writeBundle(outputOptions, bundles) {
-      
+      console.debug(bundles);
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
 
         if (path.extname(bundle.facadeModuleId || bundle.name) !== '.html') {
-          const sourcePath = path.join(outputDir, bundleId);
+          console.debug('################', bundle);
+          const sourcePath = `${outputDir}/${bundleId}`;
+          console.debug('@@@@@@@@@@@@@@@@ sourcePath', sourcePath);
           const optimizedSource = await getOptimizedSource(sourcePath, customResources, compilation);
 
           await fs.promises.writeFile(sourcePath, optimizedSource);
+          console.debug('***********************');
         }
       }
     }
@@ -275,15 +285,15 @@ function greenwoodHtmlPlugin(compilation) {
 }
 
 module.exports = getRollupConfig = async (compilation) => {
-  
   const { scratchDir, outputDir } = compilation.context;
+  
   // TODO greenwood standard plugins, then "Greenwood" plugins, then use plugins
   const customRollupPlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'rollup';
   }).map((plugin) => {
-    return plugin.provider();
+    return plugin.provider(compilation);
   }).flat();
-
+  
   return [{
     // TODO Avoid .greenwood/ directory, do everything in public/?
     input: `${scratchDir}**/*.html`,
