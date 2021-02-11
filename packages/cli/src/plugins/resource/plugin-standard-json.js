@@ -45,6 +45,8 @@ class StandardJsonResource extends ResourceInterface {
       }
     });
   }
+
+  // TODO include rollup json plugin support
 }
 
 module.exports = {

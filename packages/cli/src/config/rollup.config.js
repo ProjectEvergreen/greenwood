@@ -11,9 +11,9 @@ const postcssImport = require('postcss-import');
 const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
 
-async function getOptimizedSource(url, plugins) {
+async function getOptimizedSource(url, plugins, compilation) {
   const initSoure = fs.readFileSync(url, 'utf-8');
-  const optimizedSource = await plugins.reduce(async (bodyPromise, resource) => {
+  let optimizedSource = await plugins.reduce(async (bodyPromise, resource) => {
     const body = await bodyPromise;
     const shouldOptimize = await resource.shouldOptimize(url, body);
 
@@ -26,8 +26,30 @@ async function getOptimizedSource(url, plugins) {
     }
   }, Promise.resolve(initSoure));
 
-  // TODO if no custom user optimization found, fallback to standard Greenwood optimizations?
-  // if (optimizedSource === initSoure)
+  // if no custom user optimization found, fallback to standard Greenwood default optimization
+  if (optimizedSource === initSoure) {
+    const standardPluginsPath = path.join(__dirname, '../', 'plugins/resource');
+    const standardPlugins = (await fs.promises.readdir(standardPluginsPath))
+      .filter(filename => filename.indexOf('plugin-standard') === 0)
+      .map((filename) => {
+        return require(`${standardPluginsPath}/${filename}`);
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      });
+
+    optimizedSource = await standardPlugins.reduce(async (sourcePromise, resource) => {
+      const source = await sourcePromise;
+      const shouldOptimize = await resource.shouldOptimize(url, source);
+  
+      if (shouldOptimize) {
+        const defaultOptimizedSource = await resource.optimize(url, source);
+        
+        return Promise.resolve(defaultOptimizedSource);
+      } else {
+        return Promise.resolve(source);
+      }
+    }, Promise.resolve(optimizedSource));
+  }
 
   return Promise.resolve(optimizedSource);
 }

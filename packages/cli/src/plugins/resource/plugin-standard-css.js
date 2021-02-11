@@ -5,7 +5,9 @@
  *
  */
 const fs = require('fs');
+const cssnano = require('cssnano');
 const path = require('path');
+const postcss = require('postcss');
 const { ResourceInterface } = require('../../lib/resource-interface');
 
 class StandardCssResource extends ResourceInterface {
@@ -16,9 +18,9 @@ class StandardCssResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    const isValidCss = path.extname(url) === this.extensions[0];
+    const isCssFile = path.extname(url) === this.extensions[0];
     
-    return Promise.resolve(isValidCss);
+    return Promise.resolve(isCssFile);
   }
 
   async serve(url) {
@@ -30,6 +32,26 @@ class StandardCssResource extends ResourceInterface {
           body: css,
           contentType: this.contentType
         });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  async shouldOptimize(url) {
+    const isValidCss = path.extname(url) === this.extensions[0];
+    
+    return Promise.resolve(isValidCss);
+  }
+
+  async optimize(url, body) {
+    return new Promise(async (resolve, reject) => {
+      try {  
+        const { outputDir, userWorkspace } = this.compilation.context;
+        const workspaceUrl = url.replace(outputDir, userWorkspace);
+        const css = (await postcss([cssnano]).process(body, { from: workspaceUrl })).css;
+
+        resolve(css);
       } catch (e) {
         reject(e);
       }
