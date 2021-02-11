@@ -6,6 +6,8 @@ const json = require('@rollup/plugin-json');
 const multiInput = require('rollup-plugin-multi-input').default;
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const path = require('path');
+const postcss = require('postcss');
+const postcssImport = require('postcss-import');
 const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
 
@@ -146,8 +148,6 @@ function greenwoodHtmlPlugin(compilation) {
               name: href,
               source
             };
-
-            that.emitFile(mappedStyles[attribs.href]);
           }
         }
       });
@@ -160,6 +160,31 @@ function greenwoodHtmlPlugin(compilation) {
         parser.end();
         parser.reset();
       }
+
+      // this is a giant work around because PostCSS and some plugins can only be run async
+      // and so have to use with await but _outside_ sync code, like parser / rollup
+      // https://github.com/cssnano/cssnano/issues/68
+      // https://github.com/postcss/postcss/issues/595
+      return Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
+        const asset = mappedStyles[assetKey];
+        const source = mappedStyles[assetKey].source;
+        const result = await postcss()
+          .use(postcssImport())
+          .process(source, {
+            from: path.join(userWorkspace, asset.name)
+          });
+
+        asset.source = result.css;
+
+        return new Promise((resolve, reject) => {
+          try {
+            this.emitFile(asset);
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }));
     },
 
     // crawl through all entry HTML files and map bundled JavaScript and CSS filenames 
