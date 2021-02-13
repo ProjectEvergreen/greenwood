@@ -60,12 +60,12 @@ const getAppTemplate = (contents, userWorkspace) => {
     const body = root.querySelector('body').innerHTML;
     const headScripts = root.querySelectorAll('head script');
     const headLinks = root.querySelectorAll('head link');
-    // TODO const headStyles = root.querySelectorAll('head style');
+    const headStyles = root.querySelectorAll('head style');
 
     appTemplateContents = fs.readFileSync(appTemplatePath, 'utf-8');
     appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
     
-    headScripts.forEach(script => {
+    headScripts.forEach((script) => {
       const matchNeedle = '</script>';
       const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
 
@@ -86,7 +86,7 @@ const getAppTemplate = (contents, userWorkspace) => {
       }
     });
 
-    headLinks.forEach(link => {
+    headLinks.forEach((link) => {
       const matchNeedle = '</link>';
       const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
 
@@ -94,6 +94,20 @@ const getAppTemplate = (contents, userWorkspace) => {
         </link>\n
         <link ${link.rawAttrs}></link>\n
       `);
+    });
+
+    headStyles.forEach((style) => {
+      const matchNeedle = '</style>';
+      const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
+
+      if (style.rawAttrs === '') {
+        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `
+          </style>\n
+          <style>
+            ${style.text}
+          </style>\n
+        `);
+      }
     });
   }
 
