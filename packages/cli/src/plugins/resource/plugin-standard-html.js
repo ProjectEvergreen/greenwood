@@ -43,10 +43,9 @@ const getPageTemplate = (barePath, workspace, template) => {
 
 const getAppTemplate = (contents, userWorkspace) => {
 
-  // TODO refactor to use below
-  // function sliceTemplate(template, pos) {
-  //   return template.slice(0, pos) + template.slice(pos);
-  // }
+  function sliceTemplate(template, pos, needle, replacer) {
+    return template.slice(0, pos) + template.slice(pos).replace(needle, replacer);
+  }
   
   const appTemplatePath = `${userWorkspace}/templates/app.html`;
   let appTemplateContents = contents || '';
@@ -71,14 +70,14 @@ const getAppTemplate = (contents, userWorkspace) => {
       const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
 
       if (script.rawAttrs !== '') {
-        appTemplateContents = appTemplateContents.slice(0, matchPos) + appTemplateContents.slice(matchPos).replace(matchNeedle, `
+        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `
           </script>\n
           <script ${script.rawAttrs}></script>\n
         `);
       }
 
       if (script.rawAttrs === '') {
-        appTemplateContents = appTemplateContents.slice(0, matchPos) + appTemplateContents.slice(matchPos).replace(matchNeedle, `
+        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `
           </script>\n
           <script>
             ${script.text}
@@ -91,7 +90,7 @@ const getAppTemplate = (contents, userWorkspace) => {
       const matchNeedle = '</link>';
       const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
 
-      appTemplateContents = appTemplateContents.slice(0, matchPos) + appTemplateContents.slice(matchPos).replace(matchNeedle, `
+      appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `
         </link>\n
         <link ${link.rawAttrs}></link>\n
       `);

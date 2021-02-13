@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with no config and custom page and app template.
+ * Run Greenwood build command with no config and custom page (and app) template.
  *
  * User Result
  * Should generate a bare bones Greenwood build with custom page template.
@@ -34,11 +34,11 @@ const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom Page Template';
+  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom App and Page Template';
   let setup;
 
   before(async function() {
-    setup = new TestBed(true);
+    setup = new TestBed();
     this.context = await setup.setupTestBed(__dirname);
   });
 
@@ -66,7 +66,7 @@ describe('Build Greenwood With: ', function() {
         expect(customElement.length).to.equal(1);
       });
 
-      describe('merging <head> tags', function() {
+      describe('merge order for app and page template <head> tags', function() {
         let scriptTags;
         let linkTags;
 
