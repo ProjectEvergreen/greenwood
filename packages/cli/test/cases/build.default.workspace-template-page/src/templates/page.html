@@ -2,22 +2,19 @@
 <html lang="en" prefix="og:http://ogp.me/ns#">
 
   <head>
-    <script type="module" src="../scripts/page-template-one.js"></script>
-    <script type="module" src="../scripts/page-template-two.js"></script>
-
-    <link type="rel" href="/styles/page-template-one.css"></link>
-    <link type="rel" href="/styles/page-template-two.css"></link>
-
+    <head>
+      <!-- TODO have to use forward slash / for path references?  translate on the fly in serve.js? -->
+      <script type="module" src="/scripts/main.js"></script>
+      <link rel="stylesheet" href="/styles/theme.css"></link>
+    </head>
+  
     <style>
-      /* page-template-one-style */
-      ol {
-        list-style: none;
+      .owen-test {
+        color: blue;
       }
-    </style>
-    <style>
-      /* page-template-two-style */
+  
       h3 {
-        text-decoration: underline;
+        color: green;
       }
     </style>
   </head>

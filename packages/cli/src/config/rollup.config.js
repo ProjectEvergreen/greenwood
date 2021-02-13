@@ -279,10 +279,10 @@ function greenwoodHtmlPlugin(compilation) {
         });
       }));
     },
-
-    // crawl through all entry HTML files and map bundled JavaScript and CSS filenames 
-    // back to original <script> / <link> tags and update to their bundled filename in the HTML
-    generateBundle(outputOptions, bundles) {      
+    generateBundle(outputOptions, bundles) {
+      // console.debug('rollup generateBundle bundles', Object.keys(bundles));
+      
+      // TODO looping over bundles twice is wildly inneficient, should refactor and safe references once
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
 
