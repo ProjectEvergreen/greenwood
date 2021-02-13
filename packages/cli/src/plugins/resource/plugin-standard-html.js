@@ -43,11 +43,15 @@ const getPageTemplate = (barePath, workspace, template) => {
 
 const getAppTemplate = (contents, userWorkspace) => {
 
-  const appTemplate = `${userWorkspace}/templates/app.html`;
-  let appTemplateContents = '';
+  // TODO refactor to use below
+  // function sliceTemplate(template, pos) {
+  //   return template.slice(0, pos) + template.slice(pos);
+  // }
+  
+  const appTemplatePath = `${userWorkspace}/templates/app.html`;
+  let appTemplateContents = contents || '';
 
-  if (fs.existsSync(appTemplate)) {
-    appTemplateContents = fs.readFileSync(appTemplate, 'utf-8');
+  if (fs.existsSync(appTemplatePath)) {
     const root = htmlparser.parse(contents, {
       script: true,
       style: true,
@@ -57,18 +61,24 @@ const getAppTemplate = (contents, userWorkspace) => {
     const body = root.querySelector('body').innerHTML;
     const headScripts = root.querySelectorAll('head script');
     const headLinks = root.querySelectorAll('head link');
+    // TODO const headStyles = root.querySelectorAll('head style');
 
+    appTemplateContents = fs.readFileSync(appTemplatePath, 'utf-8');
     appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
+    
     headScripts.forEach(script => {
+      const matchNeedle = '</script>';
+      const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
+
       if (script.rawAttrs !== '') {
-        appTemplateContents = appTemplateContents.replace(/<\/script>/, `
+        appTemplateContents = appTemplateContents.slice(0, matchPos) + appTemplateContents.slice(matchPos).replace(matchNeedle, `
           </script>\n
           <script ${script.rawAttrs}></script>\n
         `);
       }
 
       if (script.rawAttrs === '') {
-        appTemplateContents = appTemplateContents.replace(/<\/script>/, `
+        appTemplateContents = appTemplateContents.slice(0, matchPos) + appTemplateContents.slice(matchPos).replace(matchNeedle, `
           </script>\n
           <script>
             ${script.text}
@@ -78,14 +88,17 @@ const getAppTemplate = (contents, userWorkspace) => {
     });
 
     headLinks.forEach(link => {
-      appTemplateContents = appTemplateContents.replace(/<\/link>/, `
+      const matchNeedle = '</link>';
+      const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
+
+      appTemplateContents = appTemplateContents.slice(0, matchPos) + appTemplateContents.slice(matchPos).replace(matchNeedle, `
         </link>\n
         <link ${link.rawAttrs}></link>\n
       `);
     });
   }
 
-  return appTemplateContents || contents;
+  return appTemplateContents;
 };
 
 const getUserScripts = (contents) => {
