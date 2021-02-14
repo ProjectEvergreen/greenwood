@@ -87,12 +87,13 @@ const getAppTemplate = (contents, userWorkspace) => {
     });
 
     headLinks.forEach((link) => {
-      const matchNeedle = '</link>';
-      const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
+      const matchNeedle = /<link .*/g;
+      const matches = appTemplateContents.match(matchNeedle);
+      const lastLink = matches[matches.length - 1];
 
-      appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `
-        </link>\n
-        <link ${link.rawAttrs}></link>\n
+      appTemplateContents = appTemplateContents.replace(lastLink, `
+        ${lastLink}\n
+        <link ${link.rawAttrs}/>
       `);
     });
 

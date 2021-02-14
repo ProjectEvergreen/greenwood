@@ -22,7 +22,6 @@
  */
 const expect = require('chai').expect;
 const fs = require('fs');
-const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
@@ -78,6 +77,7 @@ describe('Build Greenwood With: ', function() {
         });
 
         it('should add one page template <script> tag', function() {
+          expect(scriptTags[0].type).to.equal('module');
           expect(scriptTags[0].src).to.match(/main.*.js/);
         });
 
@@ -91,29 +91,8 @@ describe('Build Greenwood With: ', function() {
           expect(styleTags[1].textContent).to.contain('.owen-test');
         });
       });
-
-      describe('custom <link> tag in the <head> of a page template', function() {
-        let dom;
-
-        before(async function() {
-          dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-        });
   
-        it('should generate a single matching CSS file with hashed filename', async function() {
-          expect(await glob.promise(`${path.join(this.context.publicDir, 'styles')}/theme.*.css`)).to.have.lengthOf(1);
-        });
-  
-        it('should have the expected <link> tag in the <head>', async function() {
-          const linkTags = dom.window.document.querySelectorAll('head > link');
-          const linkTag = linkTags[0];
-  
-          expect(linkTags.length).to.equal(1);
-          expect(linkTag.rel).to.equal('stylesheet');
-          expect((/styles\/theme.[a-z0-9]{8}.css/).test(linkTag.href)).to.be.true;
-        });
-      });
-  
-      describe('custom <style> tag in the <head> of a page template', function() {
+      describe('custom inline <style> tag in the <head> of a page template', function() {
         let dom;
   
         before(async function() {

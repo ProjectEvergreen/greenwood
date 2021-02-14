@@ -94,6 +94,10 @@ describe('Build Greenwood With: ', function() {
           expect(scriptTags[1].src).to.match(/app-template-two.*.js/);
           expect(scriptTags[2].src).to.match(/page-template-one.*.js/);
           expect(scriptTags[3].src).to.match(/page-template-two.*.js/);
+
+          scriptTags.forEach((scriptTag) => {
+            expect(scriptTag.type).to.equal('module');
+          });
         });
 
         it('should merge page template <link> tags after app template <link> tags', function() {
@@ -101,6 +105,10 @@ describe('Build Greenwood With: ', function() {
           expect(linkTags[1].href).to.match(/app-template-two.*.css/);
           expect(linkTags[2].href).to.match(/page-template-one.*.css/);
           expect(linkTags[3].href).to.match(/page-template-two.*.css/);
+
+          linkTags.forEach((linkTag) => {
+            expect(linkTag.rel).to.equal('stylesheet');
+          });
         });
 
         it('should merge page template <style> tags after app template <style> tags', function() {
