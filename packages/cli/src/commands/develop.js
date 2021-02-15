@@ -1,5 +1,5 @@
 const generateCompilation = require('../lifecycles/compile');
-// const livereload = require('livereload');
+const pluginLiveReloadServer = require('../plugins/server/plugin-livereload')()[0];
 const { ServerInterface } = require('../lib/server-interface');
 const { devServer } = require('../lifecycles/serve');
 
@@ -15,7 +15,7 @@ module.exports = runDevServer = async () => {
         
         console.info(`Started local development server at localhost:${port}`);
         // custom user server plugins
-        const servers = [...compilation.config.plugins.filter((plugin) => {
+        const servers = [...compilation.config.plugins.concat([pluginLiveReloadServer]).filter((plugin) => {
           return plugin.type === 'server';
         }).map((plugin) => {
           const provider = plugin.provider(compilation);
@@ -30,15 +30,6 @@ module.exports = runDevServer = async () => {
         servers.forEach((server) => {
           server.start();
         });
-
-        // const liveReloadServer = livereload.createServer({
-        //   exts: ['html', 'css', 'js', 'md'],
-        //   applyCSSLive: false // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
-        // });
-
-        // liveReloadServer.watch(userWorkspace, () => {
-        //   console.info(`Now watching directory "${userWorkspace}" for changes.`);
-        // });
       });
     } catch (err) {
       reject(err);

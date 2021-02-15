@@ -89,16 +89,6 @@ const getAppTemplate = (contents, userWorkspace) => {
 };
 
 const getUserScripts = (contents) => {
-  // TODO use an HTML parser?  https://www.npmjs.com/package/node-html-parser
-  if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
-    // TODO setup and teardown should be done together
-    // console.debug('running in develop mode, attach live reload script');
-    contents = contents.replace('</head>', `
-        <script src="http://localhost:35729/livereload.js?snipver=1"></script>
-      </head>
-    `);
-  }
-
   if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
     // TODO setup and teardown should be done together
     // console.debug('running in build mode, polyfill WebComponents for puppeteer');
