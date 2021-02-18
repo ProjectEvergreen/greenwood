@@ -9,8 +9,9 @@ const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-
 const pluginResourceStandardImage = require('../plugins/resource/plugin-standard-image');
 const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
 const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-json');
-const { ResourceInterface } = require('../lib/resource-interface');
+const pluginLiveReloadResource = require('../plugins/server/plugin-livereload')()[1];
 const pluginUserWorkspace = require('../plugins/resource/plugin-user-workspace');
+const { ResourceInterface } = require('../lib/resource-interface');
 
 function getDevServer(compilation) {
   const app = new Koa();
@@ -87,7 +88,11 @@ function getDevServer(compilation) {
 
   // allow intercepting of urls
   app.use(async (ctx) => {
-    const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
+    const modifiedResources = resources.concat(
+      pluginLiveReloadResource.provider(compilation)
+    );
+
+    const reducedResponse = await modifiedResources.reduce(async (responsePromise, resource) => {
       const body = await responsePromise;
       const { url } = ctx;
       const { headers } = ctx.response;

@@ -69,7 +69,7 @@ module.exports = readAndMergeConfig = async() => {
         // }
 
         if (plugins && plugins.length > 0) {
-          const types = ['resource'];
+          const types = ['resource', 'server'];
 
           plugins.forEach(plugin => {
             if (!plugin.type || types.indexOf(plugin.type) < 0) {
