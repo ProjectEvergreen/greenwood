@@ -65,11 +65,18 @@ function getDevServer(compilation) {
     
     const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
       const response = await responsePromise;
-      const { url, headers } = ctx;
-      const shouldServe = await resource.shouldServe(url, headers);
+      const { url } = ctx;
+      const { headers } = ctx.response;
+      const shouldServe = await resource.shouldServe(url, {
+        request: ctx.headers,
+        response: headers
+      });
 
       if (shouldServe) {
-        const resolvedResource = await resource.serve(url, headers);
+        const resolvedResource = await resource.serve(url, {
+          request: ctx.headers,
+          response: headers
+        });
         
         return Promise.resolve({
           ...response,
@@ -86,28 +93,42 @@ function getDevServer(compilation) {
     await next();
   });
 
-  // allow intercepting of urls
+  // allow intercepting of urls (response)
   app.use(async (ctx) => {
     const modifiedResources = resources.concat(
       pluginLiveReloadResource.provider(compilation)
     );
+    const responseAccumulator = {
+      body: ctx.body,
+      contentType: ctx.response.headers['content-type']
+    };
 
     const reducedResponse = await modifiedResources.reduce(async (responsePromise, resource) => {
-      const body = await responsePromise;
+      const response = await responsePromise;
       const { url } = ctx;
       const { headers } = ctx.response;
-      const shouldIntercept = await resource.shouldIntercept(url, body, headers);
+      const shouldIntercept = await resource.shouldIntercept(url, response.body, {
+        request: ctx.headers,
+        response: headers
+      });
 
       if (shouldIntercept) {
-        const interceptedResponse = await resource.intercept(url, body, headers);
+        const interceptedResponse = await resource.intercept(url, response.body, {
+          request: ctx.headers,
+          response: headers
+        });
         
-        return Promise.resolve(interceptedResponse);
+        return Promise.resolve({
+          ...response,
+          ...interceptedResponse
+        });
       } else {
-        return Promise.resolve(body);
+        return Promise.resolve(response);
       }
-    }, Promise.resolve(ctx.body));
+    }, Promise.resolve(responseAccumulator));
 
-    ctx.body = reducedResponse;
+    ctx.set('Content-Type', reducedResponse.contentType);
+    ctx.body = reducedResponse.body;
   });
 
   return app;

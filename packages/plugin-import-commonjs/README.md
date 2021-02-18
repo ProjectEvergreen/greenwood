@@ -18,7 +18,7 @@ yarn add @greenwood/plugin-import-commonjs --dev
 ```
 
 ## Usage
-Use this plugin in your _greenwood.config.js_.
+Add this plugin to your _greenwood.config.js_ and spread the `export`.
 
 ```javascript
 const pluginImportCommonJs = require('@greenwood/plugin-import-commonjs');
@@ -27,7 +27,7 @@ module.exports = {
   ...
 
   plugins: [
-    pluginImportCommonJs()
+    ...pluginImportCommonJs() // notice the spread ... !
   ]
 }
 ```
