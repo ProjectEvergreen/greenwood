@@ -37,7 +37,7 @@ class LiveReloadResource extends ResourceInterface {
           </head>
         `);
 
-        resolve(contents);
+        resolve({ body: contents });
       } catch (e) {
         reject(e);
       }
