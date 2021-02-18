@@ -12,7 +12,7 @@ Resource plugins allow developers to interact with the request and response life
 - Introduce additional file types, like TypeScript
 
 ### API (Resource Interface)
-Although JavaScript is loosely typed, a [resource "interface"](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/lib/resource-interface.js) has been provided by Greenwood that you can use to start building our own resource plugins.  Effectively you have to define two things:
+Although JavaScript is loosely typed, a [resource "interface"](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/lib/resource-interface.js) has been provided by Greenwood that you can use to start building your own resource plugins.  Effectively you have to define two things:
 - `extensions`: The file types your plugin will operate on
 - `contentType`: A browser compatible contentType to ensure browsers correctly interpret you transformations
 
