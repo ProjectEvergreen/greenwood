@@ -8,6 +8,15 @@
  * User Command
  * greenwood build
  *
+ * User Config
+ * const pluginPostCss = require('@greenwod/plugin-postcss');
+ *
+ * {
+ *   plugins: [
+ *     pluginPostCss()
+ *  ]
+ * }
+ * 
  * User Workspace
  * Greenwood default
  *  src/

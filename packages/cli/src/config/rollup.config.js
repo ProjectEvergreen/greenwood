@@ -7,68 +7,92 @@ const multiInput = require('rollup-plugin-multi-input').default;
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const path = require('path');
 const postcss = require('postcss');
-const postcssConfig = require('./postcss.config');
 const postcssImport = require('postcss-import');
-const postcssRollup = require('rollup-plugin-postcss');
 const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
+
+async function getOptimizedSource(url, plugins, compilation) {
+  const initSoure = fs.readFileSync(url, 'utf-8');
+  let optimizedSource = await plugins.reduce(async (bodyPromise, resource) => {
+    const body = await bodyPromise;
+    const shouldOptimize = await resource.shouldOptimize(url, body);
+
+    if (shouldOptimize) {
+      const optimizedBody = await resource.optimize(url, body);
+      
+      return Promise.resolve(optimizedBody);
+    } else {
+      return Promise.resolve(body);
+    }
+  }, Promise.resolve(initSoure));
+
+  // if no custom user optimization found, fallback to standard Greenwood default optimization
+  if (optimizedSource === initSoure) {
+    const standardPluginsPath = path.join(__dirname, '../', 'plugins/resource');
+    const standardPlugins = (await fs.promises.readdir(standardPluginsPath))
+      .filter(filename => filename.indexOf('plugin-standard') === 0)
+      .map((filename) => {
+        return require(`${standardPluginsPath}/${filename}`);
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      });
+
+    optimizedSource = await standardPlugins.reduce(async (sourcePromise, resource) => {
+      const source = await sourcePromise;
+      const shouldOptimize = await resource.shouldOptimize(url, source);
+  
+      if (shouldOptimize) {
+        const defaultOptimizedSource = await resource.optimize(url, source);
+        
+        return Promise.resolve(defaultOptimizedSource);
+      } else {
+        return Promise.resolve(source);
+      }
+    }, Promise.resolve(optimizedSource));
+  }
+
+  return Promise.resolve(optimizedSource);
+}
 
 function greenwoodWorkspaceResolver (compilation) {
   const { userWorkspace } = compilation.context;
 
   return {
-    name: 'greenwood-workspace-resolver', // this name will show up in warnings and errors
+    name: 'greenwood-workspace-resolver',
     resolveId(source) {
       // TODO better way to handle relative paths?  happens in generateBundle too
       if ((source.indexOf('./') === 0 || source.indexOf('/') === 0) && path.extname(source) !== '.html' && fs.existsSync(path.join(userWorkspace, source))) {
         const resolvedPath = source.replace(source, path.join(userWorkspace, source));
-        // console.debug('resolve THIS sauce to workspace directory, returning ', resolvedPath);
         
-        return resolvedPath; // this signals that rollup should not ask other plugins or check the file system to find this id
+        return resolvedPath;
       }
 
-      return null; // other ids should be handled as usually
+      return null;
     }
   };
 }
 
 // https://github.com/rollup/rollup/issues/2873
 function greenwoodHtmlPlugin(compilation) {
-  const { projectDirectory, userWorkspace, outputDir } = compilation.context;
+  const { userWorkspace, outputDir } = compilation.context;
+  const customResources = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'resource';
+  }).map((plugin) => {
+    return plugin.provider(compilation);
+  });
 
   return {
     name: 'greenwood-html-plugin',
+    // tell Rollup how to handle HTML entry points 
+    // and other custom user resource types like .ts, .gql, etc
     async load(id) {
       const extension = path.extname(id);
-      const customResources = compilation.config.plugins.filter((plugin) => {
-        return plugin.type === 'resource';
-      }).map((plugin) => {
-        return plugin.provider(compilation);
-      });
       
       switch (extension) {
 
         case '.html':
           return Promise.resolve('');
-        case '.js':
-        case '.css':
-          // TODO extend this optimization to more file types?
-          const reducedBody = await customResources.reduce(async (bodyPromise, resource) => {
-            const body = await bodyPromise;
-            const shouldOptimize = await resource.shouldOptimize(id, body);
-      
-            if (shouldOptimize) {
-              const optimizedBody = await resource.optimize(id, body);
-              
-              return Promise.resolve(optimizedBody);
-            } else {
-              return Promise.resolve(body);
-            }
-          }, Promise.resolve(fs.readFileSync(id, 'utf-8')));
-
-          return Promise.resolve(reducedBody);
         default:
-          // handle custom user file extensions
           customResources.filter((resource) => {
             const shouldServe = Promise.resolve(resource.shouldServe(id));
 
@@ -86,8 +110,10 @@ function greenwoodHtmlPlugin(compilation) {
 
       }
     },
-    // TODO do this during load instead?
-    async buildStart(options) {
+
+    // crawl through all entry HTML files and emit JavaScript chunks and CSS assets along the way
+    // for bundling with Rollup
+    buildStart(options) {
       const mappedStyles = [];
       const mappedScripts = new Map();
       const that = this;
@@ -110,12 +136,9 @@ function greenwoodHtmlPlugin(compilation) {
               name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
               source
             });
-
-            // console.debug('rollup emitFile (chunk)', srcPath);
           }
 
           if (name === 'link' && attribs.rel === 'stylesheet' && !mappedStyles[attribs.href]) {
-            // console.debug('found a stylesheet!', attribs);
             let { href } = attribs;
 
             if (href.charAt(0) === '/') {
@@ -139,14 +162,14 @@ function greenwoodHtmlPlugin(compilation) {
             }
 
             // TODO avoid using href and set it to the value of rollup fileName instead
-            // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
+            // since user paths can still be the same file, 
+            // e.g. ../theme.css and ./theme.css are still the same file
             mappedStyles[attribs.href] = {
               type: 'asset',
               fileName,
               name: href,
               source
             };
-
           }
         }
       });
@@ -159,37 +182,25 @@ function greenwoodHtmlPlugin(compilation) {
         parser.end();
         parser.reset();
       }
-      
+
       // this is a giant work around because PostCSS and some plugins can only be run async
       // and so have to use with await but _outside_ sync code, like parser / rollup
       // https://github.com/cssnano/cssnano/issues/68
       // https://github.com/postcss/postcss/issues/595
-      // TODO consider similar approach for emitting chunks?
       return Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
         const asset = mappedStyles[assetKey];
-        const filePath = path.join(userWorkspace, asset.name);
-        // TODO we already process the user's CSS as part of serve lifecycle (dev / build commands)
-        // if we pull from .greenwood/ then maybe we could avoid re-postcss step here?
-        const userPostcssConfig = fs.existsSync(`${projectDirectory}/postcss.config.js`)
-          ? require(`${projectDirectory}/postcss.config`)
-          : {};
-        const userPostcssPlugins = userPostcssConfig.plugins && userPostcssConfig.plugins.length > 0
-          ? userPostcssConfig.plugins
-          : [];
-        const allPostcssPlugins = [
-          ...userPostcssPlugins,
-          ...postcssConfig.plugins
-        ];
-
-        const result = await postcss(allPostcssPlugins)
+        const source = mappedStyles[assetKey].source;
+        const result = await postcss()
           .use(postcssImport())
-          .process(asset.source, { from: filePath });
+          .process(source, {
+            from: path.join(userWorkspace, asset.name)
+          });
 
         asset.source = result.css;
 
         return new Promise((resolve, reject) => {
           try {
-            that.emitFile(asset);
+            this.emitFile(asset);
             resolve();
           } catch (e) {
             reject(e);
@@ -197,11 +208,12 @@ function greenwoodHtmlPlugin(compilation) {
         });
       }));
     },
+
+    // crawl through all entry HTML files and map bundled JavaScript and CSS filenames 
+    // back to original <script> / <link> tags and update to their bundled filename in the HTML
     generateBundle(outputOptions, bundles) {
       const mappedBundles = new Map();
-      // console.debug('rollup generateBundle bundles', Object.keys(bundles));
       
-      // TODO looping over bundles twice is wildly inneficient, should refactor and safe references once
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
 
@@ -213,17 +225,13 @@ function greenwoodHtmlPlugin(compilation) {
           const parser = new htmlparser2.Parser({
             onopentag(name, attribs) {
               if (name === 'script' && attribs.type === 'module' && attribs.src) {
-                // console.debug('bundle', bundle);
-                // console.debug(bundles[innerBundleId])
                 for (const innerBundleId of Object.keys(bundles)) {
                   const facadeModuleId = bundles[innerBundleId].facadeModuleId;
                   const pathToMatch = attribs.src.replace('../', '').replace('./', '');
 
                   if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {
-                    // console.debug('MATCH FOUND!!!!!!!');
                     newHtml = newHtml.replace(attribs.src, `/${innerBundleId}`);
                   } else {
-                    // console.debug('NO MATCH?????', innerBundleId);
                     // TODO better testing
                     // TODO no magic strings
                     if (innerBundleId.indexOf('.greenwood/') < 0 && !mappedBundles.get(innerBundleId)) {
@@ -258,18 +266,38 @@ function greenwoodHtmlPlugin(compilation) {
           bundle.code = newHtml;
         }
       }
+    },
+
+    // use plugins to optimize final bundles for tools like terser, cssnano
+    // TODO could do this in generate bundle, but that needs to be async first
+    async writeBundle(outputOptions, bundles) {
+      for (const bundleId of Object.keys(bundles)) {
+        const bundle = bundles[bundleId];
+
+        if (path.extname(bundle.facadeModuleId || bundle.name) !== '.html') {
+          const sourcePath = `${outputDir}/${bundleId}`;
+          const optimizedSource = await getOptimizedSource(sourcePath, customResources, compilation);
+
+          await fs.promises.writeFile(sourcePath, optimizedSource);
+        }
+      }
     }
   };
 }
 
 module.exports = getRollupConfig = async (compilation) => {
-  
   const { scratchDir, outputDir } = compilation.context;
-
+  
+  // TODO greenwood standard plugins, then "Greenwood" plugins, then user plugins
+  const customRollupPlugins = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'rollup';
+  }).map((plugin) => {
+    return plugin.provider(compilation);
+  }).flat();
+  
   return [{
     // TODO Avoid .greenwood/ directory, do everything in public/?
     input: `${scratchDir}**/*.html`,
-    // preserveEntrySignatures: false,
     output: { 
       dir: outputDir,
       entryFileNames: '[name].[hash].js',
@@ -283,20 +311,17 @@ module.exports = getRollupConfig = async (compilation) => {
       }
     },
     plugins: [
+      // TODO replace should come in via plugins?
       replace({ // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
         'process.env.NODE_ENV': JSON.stringify('production')
       }),
-      nodeResolve(),
+      nodeResolve(), // TODO move to plugin
       greenwoodWorkspaceResolver(compilation),
       greenwoodHtmlPlugin(compilation),
       multiInput(),
-      postcssRollup({
-        extract: false,
-        minimize: true,
-        inject: false
-      }),
       json(), // TODO bundle as part of import support / transforms API?
-      terser()
+      terser(), // TODO extract to a plugin
+      ...customRollupPlugins
     ]
   }];
 

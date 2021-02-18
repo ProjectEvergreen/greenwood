@@ -1,0 +1,31 @@
+{
+  "name": "@greenwood/plugin-import-css",
+  "version": "0.10.0-alpha.4",
+  "description": "A Greenwood plugin to allow you use ESM (import) syntax to load your CSS.",
+  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss",
+  "author": "Owen Buckley <owen@thegreenhouse.io>",
+  "license": "MIT",
+  "keywords": [
+    "Greenwood",
+    "CommonJS",
+    "Static Site Generator",
+    "NodeJS",
+    "Css-in-Js"
+  ],
+  "main": "src/index.js",
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@greenwood/cli": "^0.4.0"
+  },
+  "dependencies": {
+    "rollup-plugin-postcss": "^3.1.5"
+  },
+  "devDependencies": {
+    "@greenwood/cli": "^0.10.0-alpha.4"
+  }
+}

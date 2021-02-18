@@ -24,7 +24,7 @@ Greenwood aims to cater to these use cases through two approaches:
 ### API
 Each plugin must return a function that has the following three properties:.
 - `name`: A string to give your plugin a name and used for error handling and troubleshooting.
-- `type`: A string to specify to Greenwood the type of plugin.  Right now the current supported plugin type [`'resource'`](/plugins/resource/) and [`'plugin'`](/plugins/server/).
+- `type`: A string to specify to Greenwood the type of plugin.  Right now the current supported plugin types are [`'resource'`](/plugins/resource/), [`'rollup'`](/plugins/rollup/), and [`'server'`](/plugins/server/).
 - `provider`: A function that will be invoked by Greenwood that Can accept  a `compilation` param that provides read-only access to parts of Greenwood's state and configuration that can be used by a plugin.
 
 Here is an example of creating a plugin in a _greenwood.config.js_.
