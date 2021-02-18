@@ -97,7 +97,7 @@ function greenwoodWorkspaceResolver (compilation) {
 
 // https://github.com/rollup/rollup/issues/2873
 function greenwoodHtmlPlugin(compilation) {
-  const { userWorkspace, outputDir, scratchDir  } = compilation.context;
+  const { userWorkspace, outputDir, scratchDir } = compilation.context;
   const customResources = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
   }).map((plugin) => {
@@ -367,12 +367,10 @@ function greenwoodHtmlPlugin(compilation) {
       }
     },
 
-    writeBundle(outputOptions, bundles) {      
-      // TODO looping over bundles twice is wildly inneficient, should refactor and safe references once
+    async writeBundle(outputOptions, bundles) {
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
 
-        // TODO handle (!) Generated empty chunks .greenwood/about, .greenwood/index
         if (bundle.isEntry && path.extname(bundle.facadeModuleId) === '.html') {
           // TODO this seems hacky; hardcoded dirs :D
           const htmlPath = bundle.facadeModuleId.replace('.greenwood', 'public');
@@ -421,6 +419,11 @@ function greenwoodHtmlPlugin(compilation) {
           });
 
           fs.writeFileSync(htmlPath, html);
+        } else {
+          const sourcePath = `${outputDir}/${bundleId}`;
+          const optimizedSource = await getOptimizedSource(sourcePath, customResources, compilation);
+  
+          await fs.promises.writeFile(sourcePath, optimizedSource);
         }
       }
     }
