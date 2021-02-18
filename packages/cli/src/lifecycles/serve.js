@@ -89,13 +89,13 @@ function getDevServer(compilation) {
   // allow intercepting of urls
   app.use(async (ctx) => {
     const modifiedResources = resources.concat(
-      pluginNodeModules.provider(compilation),
-      pluginLiveReloadResource.provider(compilationCopy)
+      pluginLiveReloadResource.provider(compilation)
     );
 
     const reducedResponse = await modifiedResources.reduce(async (responsePromise, resource) => {
       const body = await responsePromise;
-      const { url, headers } = ctx;
+      const { url } = ctx;
+      const { headers } = ctx.response;
       const shouldIntercept = await resource.shouldIntercept(url, body, headers);
 
       if (shouldIntercept) {

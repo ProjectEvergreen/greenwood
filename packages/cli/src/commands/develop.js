@@ -27,9 +27,9 @@ module.exports = runDevServer = async () => {
           return provider;
         })];
 
-        servers.forEach((server) => {
-          server.start();
-        });
+        return Promise.all(servers.map(async (server) => {
+          return server.start();
+        }));
       });
     } catch (err) {
       reject(err);

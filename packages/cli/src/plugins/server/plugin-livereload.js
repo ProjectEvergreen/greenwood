@@ -26,20 +26,16 @@ class LiveReloadServer extends ServerInterface {
 class LiveReloadResource extends ResourceInterface {
   
   async shouldIntercept(url) {
-    return Promise.resolve(path.extname(url) === '');
+    return Promise.resolve(path.extname(url) === '' && process.env.__GWD_COMMAND__ === 'develop'); // eslint-disable-line no-underscore-dangle
   }
 
-  async intercept(body) {
+  async intercept(url, body) {
     return new Promise((resolve, reject) => {
       try {
-        let contents = body;
-
-        if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
-          contents = contents.replace('</head>', `
-              <script src="http://localhost:35729/livereload.js?snipver=1"></script>
-            </head>
-          `);
-        }
+        const contents = body.replace('</head>', `
+            <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+          </head>
+        `);
 
         resolve(contents);
       } catch (e) {
