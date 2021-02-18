@@ -149,7 +149,7 @@ function greenwoodHtmlPlugin(compilation) {
         });
         const headScripts = root.querySelectorAll('script');
         const headLinks = root.querySelectorAll('link');
-        const headStyles = root.querySelectorAll('style');
+        // const headStyles = root.querySelectorAll('style');
     
         // TODO handle deeper paths. e.g. ../../../
         headScripts.forEach((scriptTag) => {
@@ -245,29 +245,30 @@ function greenwoodHtmlPlugin(compilation) {
           // TODO handle <style>/* some inline CSS */</style> - as part of generateBundle?
         });
 
-        // handle <style>/* some inline CSS code */</style>
-        Promise.all(headStyles.map(async (styleTag) => {
-          const cssSource = styleTag.childNodes.map(node => node.rawText).join();
-          const id = Buffer.from(cssSource).toString('base64').slice(0, 8).toLowerCase();
-          const filename = `${id}-${tokenSuffix}.css`;
+        // TODO handle <style>/* some inline CSS code */</style>
+        // how to avoid Puppeteer styles?
+        // headStyles.map((styleTag) => {
+        //   const cssSource = styleTag.childNodes.map(node => node.rawText).join();
+        //   const id = Buffer.from(cssSource).toString('base64').slice(0, 8).toLowerCase();
+        //   const filename = `${id}-${tokenSuffix}.css`;
           
-          if (cssSource !== '' && !mappedStyles[filename]) {
-            const fileName = `${id}-${tokenSuffix}.css`;
-            const source = `
-              /*! ${filename} */
-              ${cssSource}
-            `; // .trim();
+        //   if (cssSource !== '' && !mappedStyles[filename]) {
+        //     const fileName = `${id}-${tokenSuffix}.css`;
+        //     const source = `
+        //       /*! ${filename} */
+        //       ${cssSource}
+        //     `; // .trim();
 
-            // TODO avoid using src and set it to the value of rollup fileName
-            // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
-            mappedStyles[filename] = {
-              type: 'asset',
-              fileName,
-              name: id,
-              source
-            };
-          }
-        }));
+        //     // TODO avoid using src and set it to the value of rollup fileName
+        //     // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
+        //     mappedStyles[filename] = {
+        //       type: 'asset',
+        //       fileName,
+        //       name: id,
+        //       source
+        //     };
+        //   }
+        // });
       }
 
       // this is a giant work around because PostCSS and some plugins can only be run async
@@ -370,13 +371,12 @@ function greenwoodHtmlPlugin(compilation) {
       // TODO looping over bundles twice is wildly inneficient, should refactor and safe references once
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
-        console.debug('bundleId@@@@@@', bundleId);
 
         // TODO handle (!) Generated empty chunks .greenwood/about, .greenwood/index
         if (bundle.isEntry && path.extname(bundle.facadeModuleId) === '.html') {
           // TODO this seems hacky; hardcoded dirs :D
           const htmlPath = bundle.facadeModuleId.replace('.greenwood', 'public');
-          const html = fs.readFileSync(htmlPath, 'utf-8');
+          let html = fs.readFileSync(htmlPath, 'utf-8');
           const root = htmlparser.parse(html, {
             script: true,
             style: true
@@ -390,37 +390,37 @@ function greenwoodHtmlPlugin(compilation) {
             // handle <script type="module"> /* inline code */ </script>
             if (parsedAttributes.type === 'module' && scriptTag.rawText !== '') {
               for (const innerBundleId of Object.keys(bundles)) {
-                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js') {             
-                  const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8');
-                  const newHtml = html.replace(scriptTag.rawText, bundledSource);                  
-
-                  fs.writeFileSync(htmlPath, newHtml);
+                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js') {           
+                  const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8')
+                    .replace(/.\//g, '/'); // force absolute paths
+                  html = html.replace(scriptTag.rawText, bundledSource);
                 }
               }
             }
           });
 
+          // TODO - support optimizzing <style> /* some code */ </style> and not confuse with puppeteer styles
           headStyles.forEach((styleTag) => {
             const cssSource = styleTag.childNodes.map(node => node.rawText).join();
             
             if (cssSource !== '') {
               for (const innerBundleId of Object.keys(bundles)) {
                 if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.css') {             
-                  console.debug('!!!!!!!! found an inline style tag, swap out with optimized from disk');
-                  const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8');
-                  const newHtml = html.replace(cssSource, bundledSource);
+                  // console.debug('!!!!!!!! found an inline style tag, swap out with optimized from disk');
+                  // const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8');
+                  // html = html.replace(cssSource, bundledSource);
                   // console.debug('****************');
                   // console.debug('bundledSource', bundledSource);
                   // console.debug('css source', cssSource);
                   // if()
                   // console.debug('newHtml', newHtml);
-                  console.debug('****************');
-
-                  fs.writeFileSync(htmlPath, newHtml);
+                  // console.debug('****************');
                 }
               }
             }
           });
+
+          fs.writeFileSync(htmlPath, html);
         }
       }
     }
