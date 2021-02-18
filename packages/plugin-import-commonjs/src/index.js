@@ -3,12 +3,12 @@
  * Detects and fully resolves import requests for CommonJS files in node_modules.
  *
  */
+const commonjs = require('@rollup/plugin-commonjs');
 const fs = require('fs');
 const path = require('path');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 const { parse } = require('cjs-module-lexer');
+const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 const rollupStream = require('@rollup/stream');
-const commonjs = require('@rollup/plugin-commonjs');
 
 // bit of a workaround for now, but maybe this could be supported by cjs-module-lexar natively?
 // https://github.com/guybedford/cjs-module-lexer/issues/35
@@ -39,7 +39,6 @@ const testForCjsModule = async(url) => {
 class ImportCommonJsResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['*'];
   }
 
   async shouldIntercept(url) {
@@ -70,29 +69,27 @@ class ImportCommonJsResource extends ResourceInterface {
 
         stream.on('data', (data) => (bundle += data));
         stream.on('end', () => {
-          resolve(bundle);
+          resolve({
+            body: bundle
+          });
         });
       } catch (e) {
         reject(e);
       }
     });
   }
-
-  async shouldOptimize(url) {
-    const shouldIntercept = await this.shouldIntercept(url);
-    
-    return Promise.resolve(shouldIntercept);
-  }
-
-  async optimize(url) {
-    return this.intercept(url);
-  }
 }
 
 module.exports = (options = {}) => {
-  return {
+  return [{
     type: 'resource',
-    name: 'plugin-import-commonjs',
+    name: 'plugin-import-commonjs:resource',
     provider: (compilation) => new ImportCommonJsResource(compilation, options)
-  };
+  }, {
+    type: 'rollup',
+    name: 'plugin-import-commonjs:rollup',
+    provider: () => [
+      commonjs()
+    ]
+  }];
 };

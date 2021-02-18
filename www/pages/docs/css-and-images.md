@@ -2,7 +2,7 @@
 label: 'styles-assets'
 menu: side
 title: 'Styles and Assets'
-index: 6
+index: 5
 linkheadings: 3
 ---
 
