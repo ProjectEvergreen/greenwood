@@ -216,7 +216,7 @@ function greenwoodHtmlPlugin(compilation) {
             }
 
             // TODO handle auto expanding deeper paths
-            const filePath = path.join(userWorkspace, href);
+            const filePath = path.join(userWorkspace, href.replace('../', './'));
             const source = fs.readFileSync(filePath, 'utf-8');
             const to = `${outputDir}/${href}`;
             const hash = crypto.createHash('md5').update(source, 'utf8').digest('hex');

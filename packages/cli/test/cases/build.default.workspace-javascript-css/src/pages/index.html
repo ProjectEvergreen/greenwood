@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
+
+  <head>
+    <!-- TODO have to use forward slash / for path references?  translate on the fly in serve.js? -->
+    <script type="module" src="../scripts/main.js"></script>
+    
+    <script type="module">
+      document.getElementsByClassName('output-script-inline')[0].innerHTML = 'script tag module inline';
+    </script>
+
+    <style>
+      p.output-style {
+        color: green;
+      }
+    </style>
+
+    <link rel="stylesheet" href="../styles/main.css"></link>
+  </head>
+
+  <body>
+    <p class="output-script-src"></p>
+    <p class="output-script-inline"></p>
+    <p class="output-style"></p>
+    <p class="output-link">Hi</p>
+  </body>
+
+</html>
