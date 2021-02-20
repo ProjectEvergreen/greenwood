@@ -1,5 +1,4 @@
 const Buffer = require('buffer').Buffer;
-const crypto = require('crypto');
 const fs = require('fs');
 const htmlparser = require('node-html-parser');
 const json = require('@rollup/plugin-json');
@@ -219,7 +218,7 @@ function greenwoodHtmlPlugin(compilation) {
             const filePath = path.join(userWorkspace, href.replace('../', './'));
             const source = fs.readFileSync(filePath, 'utf-8');
             const to = `${outputDir}/${href}`;
-            const hash = crypto.createHash('md5').update(source, 'utf8').digest('hex');
+            const hash = Buffer.from(source).toString('base64').toLowerCase();
             const fileName = href
               .replace('.css', `.${hash.slice(0, 8)}.css`)
               .replace('../', '')
