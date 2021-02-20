@@ -18,6 +18,7 @@
  *   scripts/
  *     main.js
  *   styles/
+ *     main.css
  *     
  */
 const expect = require('chai').expect;
@@ -32,7 +33,7 @@ describe('Build Greenwood With: ', function() {
   let setup;
 
   before(async function() {
-    setup = new TestBed(true);
+    setup = new TestBed();
 
     this.context = await setup.setupTestBed(__dirname);
   });
@@ -49,11 +50,12 @@ describe('Build Greenwood With: ', function() {
     describe('<script type="module" src="..."></script> tag in the <head>', function() {
       it('should have one <script> tag for main.js loaded in the <head>', function() {
         const scriptTags = dom.window.document.querySelectorAll('head > script[src]');
-        const mainScriptTag = Array.prototype.slice.call(scriptTags).filter(script => {
-          return (/.*.js/).test(script.src);
-        });
+        // TODO
+        // const mainScriptTag = Array.prototype.slice.call(scriptTags).filter(script => {
+        //   return (/main.*.js/).test(script.src);
+        // });
         
-        expect(mainScriptTag.length).to.be.equal(1);
+        expect(scriptTags.length).to.be.equal(1);
       });
 
       it('should have the expected main.js file in the output directory', async function() {

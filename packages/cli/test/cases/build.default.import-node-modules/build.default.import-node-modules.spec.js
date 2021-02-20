@@ -138,22 +138,17 @@ describe('Build Greenwood With: ', function() {
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
     });
 
-    describe('Script tag in the <head> tag', function() {
-      it('should have one <script> tag for main.js loaded in the <head> tag', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
-        const mainScriptTag = Array.prototype.slice.call(scriptTags).filter(script => {
-          return (/main.*.js/).test(script.src);
-        });
+    describe('<script src="..."> tag in the <head> tag', function() {
+      it('should have one <script src="..."> tag for main.js loaded in the <head> tag', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script[src]');
         
-        expect(mainScriptTag.length).to.be.equal(1);
+        expect(scriptTags.length).to.be.equal(1);
       });
 
       it('should have the expected main.js file in the output directory', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'main.*.js'))).to.have.lengthOf(1);
       });
-    });
 
-    describe('exported node_module content in the body of the page', function() {
       it('should have the expected output from main.js for lit-element (ESM) in the page output', async function() {
         const litOutput = dom.window.document.querySelectorAll('body > .output-lit');
         
@@ -180,6 +175,28 @@ describe('Build Greenwood With: ', function() {
         
         expect(reduxOutput.length).to.be.equal(1);
         expect(reduxOutput[0].textContent).to.be.equal('import from redux ZnVuY3Rpb24gbyh0');
+      });
+    });
+
+    describe('<script> tag within inline code in the <head> tag', function() {
+      it('should have one <script src="..."> tag for main.js loaded in the <head> tag', function() {
+        const scriptTagsInline = dom.window.document.querySelectorAll('head > script:not([src])');
+        
+        expect(scriptTagsInline.length).to.be.equal(1);
+      });
+
+      it('should have the expected inline node_modules content in the inline script', async function() {
+        const inlineScriptTag = dom.window.document.querySelector('head > script:not([src])');
+        
+        console.debug('inlineScriptTag', inlineScriptTag);
+        expect(inlineScriptTag.textContent).to.contain('import"/lit-element.397ae7ce.js"');
+      });
+
+      it('should have the expected output from inline <script> tag in the page output', async function() {
+        const inlineScriptOutput = dom.window.document.querySelectorAll('body > .output-script-inline');
+        
+        expect(inlineScriptOutput.length).to.be.equal(1);
+        expect(inlineScriptOutput[0].textContent).to.be.equal('script tag module inline');
       });
     });
   });

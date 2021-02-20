@@ -4,6 +4,13 @@
   <head>
     <!-- TODO have to use forward slash / for path references?  translate on the fly in serve.js? -->
     <script type="module" src="../scripts/main.js"></script>
+
+    <script type="module">
+      import { html } from 'lit-element';
+
+      document.getElementsByClassName('output-script-inline')[0].innerHTML = 'script tag module inline';
+    </script>
+
   </head>
 
   <body>
@@ -11,6 +18,7 @@
     <span class="output-lodash"></span>
     <span class="output-pwa"></span>
     <span class="output-redux"></span>
+    <span class="output-script-inline"></span>
   </body>
 
 </html>
