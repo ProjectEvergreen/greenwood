@@ -188,7 +188,6 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected inline node_modules content in the inline script', async function() {
         const inlineScriptTag = dom.window.document.querySelector('head > script:not([src])');
         
-        console.debug('inlineScriptTag', inlineScriptTag);
         expect(inlineScriptTag.textContent).to.contain('import"/lit-element.397ae7ce.js"');
       });
 
