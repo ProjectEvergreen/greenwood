@@ -1,3 +1,4 @@
 **/node_modules/**
 !.eslintrc.js
 !.mocharc.js
+www/scripts/main.js
