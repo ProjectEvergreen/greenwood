@@ -50,16 +50,28 @@ describe('Build Greenwood With: ', function() {
     describe('<script type="module" src="..."></script> tag in the <head>', function() {
       it('should have one <script> tag for main.js loaded in the <head>', function() {
         const scriptTags = dom.window.document.querySelectorAll('head > script[src]');
-        // TODO
-        // const mainScriptTag = Array.prototype.slice.call(scriptTags).filter(script => {
-        //   return (/main.*.js/).test(script.src);
-        // });
+        const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
+          return (/main.*.js/).test(script.src);
+        });
         
-        expect(scriptTags.length).to.be.equal(1);
+        expect(mainScriptTags.length).to.be.equal(1);
+      });
+
+      it('should have one <script> tag for other.js loaded in the <head>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script[src]');
+        const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
+          return (/other.*.js/).test(script.src);
+        });
+        
+        expect(mainScriptTags.length).to.be.equal(1);
       });
 
       it('should have the expected main.js file in the output directory', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'main.*.js'))).to.have.lengthOf(1);
+      });
+
+      it('should have the expected main.js file in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'other.*.js'))).to.have.lengthOf(1);
       });
 
       it('should have the expected output from main.js file in index.html', async function() {

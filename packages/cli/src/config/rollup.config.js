@@ -298,9 +298,7 @@ function greenwoodHtmlPlugin(compilation) {
 
     // crawl through all entry HTML files and map bundled JavaScript and CSS filenames 
     // back to original <script> / <link> tags and update to their bundled filename in the HTML
-    generateBundle(outputOptions, bundles) {
-      const mappedBundles = new Map();
-      
+    generateBundle(outputOptions, bundles) {      
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
 
@@ -327,16 +325,6 @@ function greenwoodHtmlPlugin(compilation) {
 
                 if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {
                   newHtml = newHtml.replace(src, `/${innerBundleId}`);
-                } else {
-                  // TODO better testing
-                  // TODO no magic strings
-                  if (innerBundleId.indexOf('.greenwood/') < 0 && !mappedBundles.get(innerBundleId)) {
-                    // console.debug('NEW BUNDLE TO INJECT!');
-                    newHtml = newHtml.replace(/<script type="module" src="(.*)"><\/script>/, `
-                      <script type="module" src="/${innerBundleId}"></script>
-                    `);
-                    mappedBundles.set(innerBundleId, true);
-                  }
                 }
               }
             }

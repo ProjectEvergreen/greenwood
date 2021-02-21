@@ -141,8 +141,11 @@ describe('Build Greenwood With: ', function() {
     describe('<script src="..."> tag in the <head> tag', function() {
       it('should have one <script src="..."> tag for main.js loaded in the <head> tag', function() {
         const scriptTags = dom.window.document.querySelectorAll('head > script[src]');
+        const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
+          return (/main.*.js/).test(script.src);
+        });
         
-        expect(scriptTags.length).to.be.equal(1);
+        expect(mainScriptTags.length).to.be.equal(1);
       });
 
       it('should have the expected main.js file in the output directory', async function() {
