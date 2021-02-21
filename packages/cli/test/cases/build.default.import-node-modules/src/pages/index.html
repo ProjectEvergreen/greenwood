@@ -4,12 +4,13 @@
   <head>
     <!-- TODO have to use forward slash / for path references?  translate on the fly in serve.js? -->
     <script type="module" src="../scripts/main.js"></script>
-
     <script type="module">
       import { html } from 'lit-element';
 
       document.getElementsByClassName('output-script-inline')[0].innerHTML = 'script tag module inline';
     </script>
+    <script type="module" src="/node_modules/lit-html/lit-html.js"></script>
+    <link rel="stylesheet" href="/node_modules/prismjs/themes/prism-tomorrow.css"></link>
 
   </head>
 
