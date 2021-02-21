@@ -1,7 +1,7 @@
 # @greenwood/plugin-babel
 
 ## Overview
-A Greenwood plugin for using Babel and applying it to your JavaScript.
+A Greenwood plugin for using [**Babel**](https://babeljs.io/) and applying it to your JavaScript.
 
 > This package assumes you already have `@greenwood/cli` installed.
 
@@ -21,13 +21,13 @@ yarn add @greenwood/plugin-babel --dev
 Add this plugin to your _greenwood.config.js_.
 
 ```javascript
-const pluginBabel = require('@greenwood/plugin-postcss');
+const pluginBabel = require('@greenwood/plugin-babel');
 
 module.exports = {
   ...
 
   plugins: [
-    pluginBabel()
+    ...pluginBabel() // notice the spread ... !
   ]
 }
 ```

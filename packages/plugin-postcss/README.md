@@ -1,7 +1,7 @@
 # @greenwood/plugin-postcss
 
 ## Overview
-A Greenwood plugin for loading PostCSS configuration and applying it to your CSS.
+A Greenwood plugin for loading [**PostCSS**](https://postcss.org/) configuration and applying it to your CSS.
 
 > This package assumes you already have `@greenwood/cli` installed.
 

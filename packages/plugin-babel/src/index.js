@@ -7,6 +7,17 @@ const babel = require('@babel/core');
 const fs = require('fs');
 const path = require('path');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
+const rollupBabelPlugin = require('@rollup/plugin-babel').default;
+
+function getConfig (compilation) {
+  const { projectDirectory } = compilation.context;
+  const configFile = 'babel.config';
+  const configRoot = fs.existsSync(`${projectDirectory}/${configFile}.js`)
+    ? projectDirectory
+    : __dirname;
+  
+  return require(`${configRoot}/${configFile}`);
+}
 
 class BabelResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -15,28 +26,14 @@ class BabelResource extends ResourceInterface {
     this.contentType = ['text/javascript'];
   }
 
-  isResolvableJavascriptFile(url) {
-    return path.extname(url) === this.extensions[0] && url.indexOf('node_modules/') < 0;
-  }
-
-  getConfig() {
-    const { projectDirectory } = this.compilation.context;
-    const configFile = 'babel.config';
-    const configRoot = fs.existsSync(`${projectDirectory}/${configFile}.js`)
-      ? projectDirectory
-      : __dirname;
-    
-    return require(`${configRoot}/${configFile}`);
-  }
-
   async shouldIntercept(url) {
-    return Promise.resolve(this.isResolvableJavascriptFile(url));
+    return Promise.resolve(path.extname(url) === this.extensions[0] && url.indexOf('node_modules/') < 0);
   }
 
   async intercept(url, body) {
     return new Promise(async(resolve, reject) => {
       try {
-        const config = this.getConfig();
+        const config = getConfig(this.compilation);
         const result = await babel.transform(body, config);
         
         resolve({
@@ -47,23 +44,18 @@ class BabelResource extends ResourceInterface {
       }
     });
   }
-
-  async shouldOptimize(url) {
-    return Promise.resolve(this.isResolvableJavascriptFile(url));
-  }
-  
-  async optimize(url, body) {
-    const config = this.getConfig();
-    const result = await babel.transform(body, config);
-    
-    return Promise.resolve(result.code);
-  }
 }
 
 module.exports = (options = {}) => {
-  return {
+  return [{
     type: 'resource',
-    name: 'plugin-babel',
+    name: 'plugin-babel:resource',
     provider: (compilation) => new BabelResource(compilation, options)
-  };
+  }, {
+    type: 'rollup',
+    name: 'plugin-babel:rollup',
+    provider: (compilation) => [
+      rollupBabelPlugin(getConfig(compilation))
+    ]
+  }];
 };

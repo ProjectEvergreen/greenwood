@@ -24,7 +24,7 @@ module.exports = {
     { name: 'google-site-verification', content: '4rYd8k5aFD0jDnN0CCFgUXNe4eakLP4NnA18mNnK5P0' }
   ],
   plugins: [
-    pluginBabel(),
+    ...pluginBabel(),
     pluginGoogleAnalytics({
       analyticsId: 'UA-147204327-1'
     }),
