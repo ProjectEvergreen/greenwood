@@ -20,7 +20,8 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.4.0"
+    "@greenwood/cli": "^0.4.0",
+    "postcss": "^7.0.32"
   },
   "devDependencies": {
     "@greenwood/cli": "^0.10.0-alpha.7"
