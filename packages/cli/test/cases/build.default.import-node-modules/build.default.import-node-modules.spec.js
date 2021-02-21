@@ -148,8 +148,16 @@ describe('Build Greenwood With: ', function() {
         expect(mainScriptTags.length).to.be.equal(1);
       });
 
+      it('should have the expected number of bundled .js files in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(2);
+      });
+
       it('should have the expected main.js file in the output directory', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'main.*.js'))).to.have.lengthOf(1);
+      });
+
+      it('should have the expected lit-element.js file in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'lit-element.*.js'))).to.have.lengthOf(1);
       });
 
       it('should have the expected output from main.js for lit-element (ESM) in the page output', async function() {

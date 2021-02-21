@@ -355,6 +355,8 @@ function greenwoodHtmlPlugin(compilation) {
     },
 
     async writeBundle(outputOptions, bundles) {
+      const scratchFiles = {};
+
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
 
@@ -379,6 +381,8 @@ function greenwoodHtmlPlugin(compilation) {
                   const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8')
                     .replace(/\.\//g, '/'); // force absolute paths
                   html = html.replace(scriptTag.rawText, bundledSource);
+
+                  scratchFiles[innerBundleId] = true;
                 }
               }
             }
@@ -405,7 +409,7 @@ function greenwoodHtmlPlugin(compilation) {
             }
           });
 
-          fs.writeFileSync(htmlPath, html);
+          await fs.promises.writeFile(htmlPath, html);
         } else {
           const sourcePath = `${outputDir}/${bundleId}`;
           const optimizedSource = await getOptimizedSource(sourcePath, customResources, compilation);
@@ -413,6 +417,11 @@ function greenwoodHtmlPlugin(compilation) {
           await fs.promises.writeFile(sourcePath, optimizedSource);
         }
       }
+
+      // cleanup any scratch files
+      return Promise.all(Object.keys(scratchFiles).map(async (file) => {
+        return await fs.promises.unlink(path.join(outputDir, file));
+      }));
     }
   };
 }
