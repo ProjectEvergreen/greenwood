@@ -11,6 +11,7 @@ const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
 
 const tokenSuffix = 'scratch';
+// const tokenNodeModules = 'node_modules/';
 
 const parseTagForAttributes = (tag) => {
   return tag.rawAttrs.split(' ').map((attribute) => {
@@ -96,7 +97,7 @@ function greenwoodWorkspaceResolver (compilation) {
 
 // https://github.com/rollup/rollup/issues/2873
 function greenwoodHtmlPlugin(compilation) {
-  const { userWorkspace, outputDir, scratchDir } = compilation.context;
+  const { projectDirectory, userWorkspace, outputDir, scratchDir } = compilation.context;
   const customResources = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
   }).map((plugin) => {
@@ -163,11 +164,14 @@ function greenwoodHtmlPlugin(compilation) {
             mappedScripts.set(src, true);
 
             const srcPath = src.replace('../', './');
-            const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
+            const basePath = srcPath.indexOf('node_modules/') >= 0
+              ? projectDirectory
+              : userWorkspace;
+            const source = fs.readFileSync(path.join(basePath, srcPath), 'utf-8');
 
             this.emitFile({
               type: 'chunk',
-              id: srcPath,
+              id: srcPath.replace('/node_modules', path.join(projectDirectory, 'node_modules')),
               name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
               source
             });
@@ -215,7 +219,10 @@ function greenwoodHtmlPlugin(compilation) {
             }
 
             // TODO handle auto expanding deeper paths
-            const filePath = path.join(userWorkspace, href.replace('../', './'));
+            const basePath = href.indexOf('node_modules/') >= 0
+              ? projectDirectory
+              : userWorkspace;
+            const filePath = path.join(basePath, href.replace('../', './'));
             const source = fs.readFileSync(filePath, 'utf-8');
             const to = `${outputDir}/${href}`;
             const hash = Buffer.from(source).toString('base64').toLowerCase();
@@ -235,7 +242,9 @@ function greenwoodHtmlPlugin(compilation) {
             // e.g.  ../theme.css and ./theme.css are still the same file
             mappedStyles[parsedAttributes.href] = {
               type: 'asset',
-              fileName,
+              fileName: fileName.indexOf('node_modules/') >= 0
+                ? path.basename(fileName)
+                : fileName,
               name: href,
               source
             };
@@ -274,13 +283,16 @@ function greenwoodHtmlPlugin(compilation) {
       // and so have to use with await but _outside_ sync code, like parser / rollup
       // https://github.com/cssnano/cssnano/issues/68
       // https://github.com/postcss/postcss/issues/595
-      return Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
+      Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
         const asset = mappedStyles[assetKey];
         const source = mappedStyles[assetKey].source;
+        const basePath = asset.name.indexOf('node_modules/') >= 0
+          ? projectDirectory
+          : userWorkspace;
         const result = await postcss()
           .use(postcssImport())
           .process(source, {
-            from: path.join(userWorkspace, asset.name)
+            from: path.join(basePath, asset.name)
           });
 
         asset.source = result.css;
