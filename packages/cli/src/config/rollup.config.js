@@ -11,7 +11,7 @@ const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
 
 const tokenSuffix = 'scratch';
-// const tokenNodeModules = 'node_modules/';
+const tokenNodeModules = 'node_modules/';
 
 const parseTagForAttributes = (tag) => {
   return tag.rawAttrs.split(' ').map((attribute) => {
@@ -164,14 +164,14 @@ function greenwoodHtmlPlugin(compilation) {
             mappedScripts.set(src, true);
 
             const srcPath = src.replace('../', './');
-            const basePath = srcPath.indexOf('node_modules/') >= 0
+            const basePath = srcPath.indexOf(tokenNodeModules) >= 0
               ? projectDirectory
               : userWorkspace;
             const source = fs.readFileSync(path.join(basePath, srcPath), 'utf-8');
 
             this.emitFile({
               type: 'chunk',
-              id: srcPath.replace('/node_modules', path.join(projectDirectory, 'node_modules')),
+              id: srcPath.replace('/node_modules', path.join(projectDirectory, tokenNodeModules)),
               name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
               source
             });
@@ -219,7 +219,7 @@ function greenwoodHtmlPlugin(compilation) {
             }
 
             // TODO handle auto expanding deeper paths
-            const basePath = href.indexOf('node_modules/') >= 0
+            const basePath = href.indexOf(tokenNodeModules) >= 0
               ? projectDirectory
               : userWorkspace;
             const filePath = path.join(basePath, href.replace('../', './'));
@@ -242,7 +242,7 @@ function greenwoodHtmlPlugin(compilation) {
             // e.g.  ../theme.css and ./theme.css are still the same file
             mappedStyles[parsedAttributes.href] = {
               type: 'asset',
-              fileName: fileName.indexOf('node_modules/') >= 0
+              fileName: fileName.indexOf(tokenNodeModules) >= 0
                 ? path.basename(fileName)
                 : fileName,
               name: href,
@@ -286,7 +286,7 @@ function greenwoodHtmlPlugin(compilation) {
       Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
         const asset = mappedStyles[assetKey];
         const source = mappedStyles[assetKey].source;
-        const basePath = asset.name.indexOf('node_modules/') >= 0
+        const basePath = asset.name.indexOf(tokenNodeModules) >= 0
           ? projectDirectory
           : userWorkspace;
         const result = await postcss()
