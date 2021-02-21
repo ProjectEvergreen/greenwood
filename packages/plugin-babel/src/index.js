@@ -55,7 +55,10 @@ module.exports = (options = {}) => {
     type: 'rollup',
     name: 'plugin-babel:rollup',
     provider: (compilation) => [
-      rollupBabelPlugin(getConfig(compilation))
+      rollupBabelPlugin({
+        babelHelpers: 'bundled',
+        ...getConfig(compilation)
+      })
     ]
   }];
 };
