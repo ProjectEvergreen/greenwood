@@ -149,7 +149,6 @@ function greenwoodHtmlPlugin(compilation) {
         });
         const headScripts = root.querySelectorAll('script');
         const headLinks = root.querySelectorAll('link');
-        // const headStyles = root.querySelectorAll('style');
     
         // TODO handle deeper paths. e.g. ../../../
         headScripts.forEach((scriptTag) => {
@@ -159,8 +158,9 @@ function greenwoodHtmlPlugin(compilation) {
           if (parsedAttributes.type === 'module' && parsedAttributes.src && !mappedScripts.get(parsedAttributes.src)) {
             const { src } = parsedAttributes;
 
-            // TODO avoid using src and set it to the value of rollup fileName
-            // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
+            // TODO avoid using href and set it to the value of rollup fileName instead
+            // since user paths can still be the same file, 
+            // e.g.  ../theme.css and ./theme.css are still the same file
             mappedScripts.set(src, true);
 
             const srcPath = src.replace('../', './');
@@ -191,8 +191,9 @@ function greenwoodHtmlPlugin(compilation) {
               // have to write a file for rollup?
               fs.writeFileSync(path.join(scratchDir, filename), source);
 
-              // TODO avoid using src and set it to the value of rollup fileName
-              // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
+              // TODO avoid using href and set it to the value of rollup fileName instead
+              // since user paths can still be the same file, 
+              // e.g.  ../theme.css and ./theme.css are still the same file
               mappedScripts.set(id, true);
 
               this.emitFile({
@@ -203,8 +204,6 @@ function greenwoodHtmlPlugin(compilation) {
               });
             }
           }
-
-          // TODO handle <script type="module" src="@bare-path/specifier"></script>
         });
     
         headLinks.forEach((linkTag) => {
@@ -231,7 +230,7 @@ function greenwoodHtmlPlugin(compilation) {
               .replace('../', '')
               .replace('./', '');
 
-            if (!fs.existsSync(path.dirname(to))) {
+            if (!fs.existsSync(path.dirname(to)) && href.indexOf(tokenNodeModules) < 0) {
               fs.mkdirSync(path.dirname(to), {
                 recursive: true
               });
@@ -249,34 +248,7 @@ function greenwoodHtmlPlugin(compilation) {
               source
             };
           }
-    
-          // TODO handle <style>/* some inline CSS */</style> - as part of generateBundle?
         });
-
-        // TODO handle <style>/* some inline CSS code */</style>
-        // how to avoid Puppeteer styles?
-        // headStyles.map((styleTag) => {
-        //   const cssSource = styleTag.childNodes.map(node => node.rawText).join();
-        //   const id = Buffer.from(cssSource).toString('base64').slice(0, 8).toLowerCase();
-        //   const filename = `${id}-${tokenSuffix}.css`;
-          
-        //   if (cssSource !== '' && !mappedStyles[filename]) {
-        //     const fileName = `${id}-${tokenSuffix}.css`;
-        //     const source = `
-        //       /*! ${filename} */
-        //       ${cssSource}
-        //     `; // .trim();
-
-        //     // TODO avoid using src and set it to the value of rollup fileName
-        //     // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
-        //     mappedStyles[filename] = {
-        //       type: 'asset',
-        //       fileName,
-        //       name: id,
-        //       source
-        //     };
-        //   }
-        // });
       }
 
       // this is a giant work around because PostCSS and some plugins can only be run async
@@ -381,7 +353,6 @@ function greenwoodHtmlPlugin(compilation) {
             style: true
           });
           const headScripts = root.querySelectorAll('script');
-          const headStyles = root.querySelectorAll('style');
 
           headScripts.forEach((scriptTag) => {
             const parsedAttributes = parseTagForAttributes(scriptTag);
@@ -395,27 +366,6 @@ function greenwoodHtmlPlugin(compilation) {
                   html = html.replace(scriptTag.rawText, bundledSource);
 
                   scratchFiles[innerBundleId] = true;
-                }
-              }
-            }
-          });
-
-          // TODO - support optimizzing <style> /* some code */ </style> and not confuse with puppeteer styles
-          headStyles.forEach((styleTag) => {
-            const cssSource = styleTag.childNodes.map(node => node.rawText).join();
-            
-            if (cssSource !== '') {
-              for (const innerBundleId of Object.keys(bundles)) {
-                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.css') {             
-                  // console.debug('!!!!!!!! found an inline style tag, swap out with optimized from disk');
-                  // const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8');
-                  // html = html.replace(cssSource, bundledSource);
-                  // console.debug('****************');
-                  // console.debug('bundledSource', bundledSource);
-                  // console.debug('css source', cssSource);
-                  // if()
-                  // console.debug('newHtml', newHtml);
-                  // console.debug('****************');
                 }
               }
             }
