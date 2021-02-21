@@ -32,7 +32,7 @@ module.exports = {
 }
 ```
 
-> 👉 _If you are using this along with [**plugin-import-css**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-css), make sure **plugin-postcss** comes first.  All mnon stanrd transformation need to come last._ 
+> 👉 _If you are using this along with [**plugin-import-css**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-css), make sure **plugin-postcss** comes first.  All non stanrd transformation need to come last._ 
 
 Optionally, create a _postcss.config.js_ in the root of your project with your own custom plugins / settings that you've installed.
 ```javascript

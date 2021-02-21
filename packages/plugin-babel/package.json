@@ -1,0 +1,33 @@
+{
+  "name": "@greenwood/plugin-babel",
+  "version": "0.10.0-alpha.6",
+  "description": "A Greenwood plugin for using Babel and applying it to your JavaScript.",
+  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-babel",
+  "author": "Owen Buckley <owen@thegreenhouse.io>",
+  "license": "MIT",
+  "keywords": [
+    "Greenwood",
+    "CommonJS",
+    "Static Site Generator",
+    "NodeJS",
+    "Babel"
+  ],
+  "main": "src/index.js",
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@greenwood/cli": "^0.4.0"
+  },
+  "dependencies": {
+    "@babel/core": "^7.8.3"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-private-methods": "^7.8.3",
+    "@greenwood/cli": "^0.10.0-alpha.6"
+  }
+}
