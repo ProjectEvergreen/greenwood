@@ -16,7 +16,7 @@ class ImportCssResource extends ResourceInterface {
   }
 
   async shouldIntercept(url, body, headers) {
-    const isCssInJs = path.extname(url) === this.extensions[0] && headers.request['sec-fetch-dest'] === 'empty';
+    const isCssInJs = path.extname(url) === this.extensions[0] && headers.request.accept.indexOf('text/css') < 0;
 
     return Promise.resolve(isCssInJs);
   }
