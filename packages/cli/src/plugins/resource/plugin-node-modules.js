@@ -80,12 +80,15 @@ const walkPackageJson = (packageJson = {}) => {
     const entry = getPackageEntryPath(dependencyPackageJson);
     const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
     const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
+    const isJavascriptPackage = packageEntryPointPath.endsWith('.js') || packageEntryPointPath.endsWith('.mjs');
 
-    walkModule(packageEntryModule, dependency);
+    if (isJavascriptPackage) {
+      walkModule(packageEntryModule, dependency);
 
-    importMap[dependency] = `/node_modules/${dependency}/${entry}`;
+      importMap[dependency] = `/node_modules/${dependency}/${entry}`;
 
-    walkPackageJson(dependencyPackageJson);
+      walkPackageJson(dependencyPackageJson);
+    }
   });
 };
 

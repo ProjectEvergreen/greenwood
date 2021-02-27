@@ -7655,6 +7655,11 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
+simpledotcss@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/simpledotcss/-/simpledotcss-1.0.0.tgz#b5ac8fcd73d111938def9c0f43f1839d6eae96be"
+  integrity sha512-inneK6Wqh5rUdASxJMAKJORbDeKRySZPlY6H1Jqc6o6t5QbXhd5UZUi5snkKnB0ror0H72in0zlNeeA4Vw+Fiw==
+
 slash@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/slash/-/slash-2.0.0.tgz#de552851a1759df3a8f206535442f5ec4ddeab44"
