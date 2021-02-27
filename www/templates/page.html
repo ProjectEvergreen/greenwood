@@ -3,9 +3,11 @@
 
   <head>
     <!-- TODO have to use forward slash / for path references?  translate on the fly in serve.js? -->
+    <link rel="stylesheet" href="/node_modules/prismjs/themes/prism-tomorrow.css"></link>
+    <link rel="stylesheet" href="/styles/page.css"></link>
+
     <script type="module" src="/components/shelf/shelf.js"></script>
     <script type="module" src="/components/scroll/scroll.js"></script>
-
     <script>
       window.onload = () => {
         const route = window.location.pathname.split('/')[1];
@@ -14,7 +16,7 @@
       }
     </script>
 
-    <link rel="stylesheet" href="/styles/page.css"></link>    
+    <link rel="stylesheet" href="/styles/page.css"/>
   </head>
 
   <body>

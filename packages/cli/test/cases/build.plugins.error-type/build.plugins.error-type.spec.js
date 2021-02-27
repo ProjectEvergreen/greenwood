@@ -38,7 +38,7 @@ describe('Build Greenwood With: ', function() {
       try {
         await setup.runGreenwoodCommand('build');
       } catch (err) {
-        expect(err).to.contain('Error: greenwood.config.js plugins must be one of type "resource". got "indexxx" instead.');
+        expect(err).to.contain('Error: greenwood.config.js plugins must be one of type "resource, rollup, server". got "indexxx" instead.');
       }
     });
   });
