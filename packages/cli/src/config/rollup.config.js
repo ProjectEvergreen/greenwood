@@ -1,7 +1,6 @@
-const crypto = require('crypto');
+const Buffer = require('buffer').Buffer;
 const fs = require('fs');
-// TODO use node-html-parser
-const htmlparser2 = require('htmlparser2');
+const htmlparser = require('node-html-parser');
 const json = require('@rollup/plugin-json');
 const multiInput = require('rollup-plugin-multi-input').default;
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
@@ -10,6 +9,27 @@ const postcss = require('postcss');
 const postcssImport = require('postcss-import');
 const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
+
+const tokenSuffix = 'scratch';
+const tokenNodeModules = 'node_modules/';
+
+const parseTagForAttributes = (tag) => {
+  return tag.rawAttrs.split(' ').map((attribute) => {
+    if (attribute.indexOf('=') > 0) {
+      const attributePieces = attribute.split('=');
+      return {
+        [attributePieces[0]]: attributePieces[1].replace(/"/g, '').replace(/'/g, '')
+      };
+    } else {
+      return undefined;
+    }
+  }).filter(attribute => attribute)
+    .reduce((accum, attribute) => {
+      return Object.assign(accum, {
+        ...attribute
+      });
+    }, {});
+};
 
 async function getOptimizedSource(url, plugins, compilation) {
   const initSoure = fs.readFileSync(url, 'utf-8');
@@ -55,16 +75,19 @@ async function getOptimizedSource(url, plugins, compilation) {
 }
 
 function greenwoodWorkspaceResolver (compilation) {
-  const { userWorkspace } = compilation.context;
+  const { userWorkspace, scratchDir } = compilation.context;
 
   return {
     name: 'greenwood-workspace-resolver',
     resolveId(source) {
       // TODO better way to handle relative paths?  happens in generateBundle too
-      if ((source.indexOf('./') === 0 || source.indexOf('/') === 0) && path.extname(source) !== '.html' && fs.existsSync(path.join(userWorkspace, source))) {
-        const resolvedPath = source.replace(source, path.join(userWorkspace, source));
-        
-        return resolvedPath;
+      if ((source.indexOf('./') === 0 || source.indexOf('/') === 0) && path.extname(source) !== '.html' && fs.existsSync(path.join(userWorkspace, source))) {        
+        return source.replace(source, path.join(userWorkspace, source));
+      }
+
+      // handle inline script / style bundling
+      if (source.indexOf(`-${tokenSuffix}`) > 0 && fs.existsSync(path.join(scratchDir, source))) {        
+        return source.replace(source, path.join(scratchDir, source));
       }
 
       return null;
@@ -74,7 +97,7 @@ function greenwoodWorkspaceResolver (compilation) {
 
 // https://github.com/rollup/rollup/issues/2873
 function greenwoodHtmlPlugin(compilation) {
-  const { userWorkspace, outputDir } = compilation.context;
+  const { projectDirectory, userWorkspace, outputDir, scratchDir } = compilation.context;
   const customResources = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
   }).map((plugin) => {
@@ -116,46 +139,98 @@ function greenwoodHtmlPlugin(compilation) {
     buildStart(options) {
       const mappedStyles = [];
       const mappedScripts = new Map();
-      const that = this;
-      // TODO handle deeper paths. e.g. ../../../
-      const parser = new htmlparser2.Parser({
-        onopentag(name, attribs) {
-          if (name === 'script' && attribs.type === 'module' && attribs.src && !mappedScripts.get(attribs.src)) {
-            const { src } = attribs;
-                      
-            // TODO avoid using src and set it to the value of rollup fileName
-            // since user paths can still be the same file, e.g.  ../theme.css and ./theme.css are still the same file
+
+      for (const input in options.input) {
+        const inputHtml = options.input[input];
+        const html = fs.readFileSync(inputHtml, 'utf-8');
+        const root = htmlparser.parse(html, {
+          script: true,
+          style: true
+        });
+        const headScripts = root.querySelectorAll('script');
+        const headLinks = root.querySelectorAll('link');
+    
+        // TODO handle deeper paths. e.g. ../../../
+        headScripts.forEach((scriptTag) => {
+          const parsedAttributes = parseTagForAttributes(scriptTag);
+
+          // handle <script type="module" src="some/path.js"></script>
+          if (parsedAttributes.type === 'module' && parsedAttributes.src && !mappedScripts.get(parsedAttributes.src)) {
+            const { src } = parsedAttributes;
+
+            // TODO avoid using href and set it to the value of rollup fileName instead
+            // since user paths can still be the same file, 
+            // e.g.  ../theme.css and ./theme.css are still the same file
             mappedScripts.set(src, true);
 
             const srcPath = src.replace('../', './');
-            const source = fs.readFileSync(path.join(userWorkspace, srcPath), 'utf-8');
+            const basePath = srcPath.indexOf(tokenNodeModules) >= 0
+              ? projectDirectory
+              : userWorkspace;
+            const source = fs.readFileSync(path.join(basePath, srcPath), 'utf-8');
 
-            that.emitFile({
+            this.emitFile({
               type: 'chunk',
-              id: srcPath,
+              id: srcPath.replace('/node_modules', path.join(projectDirectory, tokenNodeModules)),
               name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
               source
             });
           }
 
-          if (name === 'link' && attribs.rel === 'stylesheet' && !mappedStyles[attribs.href]) {
-            let { href } = attribs;
+          // handle <script type="module">/* some inline JavaScript code */</script>
+          if (parsedAttributes.type === 'module' && scriptTag.rawText !== '') {
+            const id = Buffer.from(scriptTag.rawText).toString('base64').slice(0, 8).toLowerCase();
+
+            if (!mappedScripts.get(id)) {
+              const filename = `${id}-${tokenSuffix}.js`;
+              const source = `
+                // ${filename}
+                ${scriptTag.rawText}
+              `.trim();
+
+              // have to write a file for rollup?
+              fs.writeFileSync(path.join(scratchDir, filename), source);
+
+              // TODO avoid using href and set it to the value of rollup fileName instead
+              // since user paths can still be the same file, 
+              // e.g.  ../theme.css and ./theme.css are still the same file
+              mappedScripts.set(id, true);
+
+              this.emitFile({
+                type: 'chunk',
+                id: filename,
+                name: filename.replace('.js', ''),
+                source
+              });
+            }
+          }
+        });
+    
+        headLinks.forEach((linkTag) => {
+          const parsedAttributes = parseTagForAttributes(linkTag);
+
+          // handle <link rel="stylesheet" src="./some/path.css"></link>
+          if (parsedAttributes.rel === 'stylesheet' && !mappedStyles[parsedAttributes.href]) {
+            let { href } = parsedAttributes;
 
             if (href.charAt(0) === '/') {
               href = href.slice(1);
             }
 
             // TODO handle auto expanding deeper paths
-            const filePath = path.join(userWorkspace, href);
+            const basePath = href.indexOf(tokenNodeModules) >= 0
+              ? projectDirectory
+              : userWorkspace;
+            const filePath = path.join(basePath, href.replace('../', './'));
             const source = fs.readFileSync(filePath, 'utf-8');
             const to = `${outputDir}/${href}`;
-            const hash = crypto.createHash('md5').update(source, 'utf8').digest('hex');
+            const hash = Buffer.from(source).toString('base64').toLowerCase();
             const fileName = href
               .replace('.css', `.${hash.slice(0, 8)}.css`)
               .replace('../', '')
               .replace('./', '');
 
-            if (!fs.existsSync(path.dirname(to))) {
+            if (!fs.existsSync(path.dirname(to)) && href.indexOf(tokenNodeModules) < 0) {
               fs.mkdirSync(path.dirname(to), {
                 recursive: true
               });
@@ -163,37 +238,33 @@ function greenwoodHtmlPlugin(compilation) {
 
             // TODO avoid using href and set it to the value of rollup fileName instead
             // since user paths can still be the same file, 
-            // e.g. ../theme.css and ./theme.css are still the same file
-            mappedStyles[attribs.href] = {
+            // e.g.  ../theme.css and ./theme.css are still the same file
+            mappedStyles[parsedAttributes.href] = {
               type: 'asset',
-              fileName,
+              fileName: fileName.indexOf(tokenNodeModules) >= 0
+                ? path.basename(fileName)
+                : fileName,
               name: href,
               source
             };
           }
-        }
-      });
-
-      for (const input in options.input) {
-        const inputHtml = options.input[input];
-        const html = fs.readFileSync(inputHtml, 'utf-8');
-
-        parser.write(html);
-        parser.end();
-        parser.reset();
+        });
       }
 
       // this is a giant work around because PostCSS and some plugins can only be run async
       // and so have to use with await but _outside_ sync code, like parser / rollup
       // https://github.com/cssnano/cssnano/issues/68
       // https://github.com/postcss/postcss/issues/595
-      return Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
+      Promise.all(Object.keys(mappedStyles).map(async (assetKey) => {
         const asset = mappedStyles[assetKey];
         const source = mappedStyles[assetKey].source;
+        const basePath = asset.name.indexOf(tokenNodeModules) >= 0
+          ? projectDirectory
+          : userWorkspace;
         const result = await postcss()
           .use(postcssImport())
           .process(source, {
-            from: path.join(userWorkspace, asset.name)
+            from: path.join(basePath, asset.name)
           });
 
         asset.source = result.css;
@@ -211,55 +282,54 @@ function greenwoodHtmlPlugin(compilation) {
 
     // crawl through all entry HTML files and map bundled JavaScript and CSS filenames 
     // back to original <script> / <link> tags and update to their bundled filename in the HTML
-    generateBundle(outputOptions, bundles) {
-      const mappedBundles = new Map();
-      
+    generateBundle(outputOptions, bundles) {      
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
 
         // TODO handle (!) Generated empty chunks .greenwood/about, .greenwood/index
         if (bundle.isEntry && path.extname(bundle.facadeModuleId) === '.html') {
           const html = fs.readFileSync(bundle.facadeModuleId, 'utf-8');
+          const root = htmlparser.parse(html, {
+            script: true,
+            style: true
+          });
+          const headScripts = root.querySelectorAll('script');
+          const headLinks = root.querySelectorAll('link');
           let newHtml = html;
 
-          const parser = new htmlparser2.Parser({
-            onopentag(name, attribs) {
-              if (name === 'script' && attribs.type === 'module' && attribs.src) {
-                for (const innerBundleId of Object.keys(bundles)) {
-                  const facadeModuleId = bundles[innerBundleId].facadeModuleId;
-                  const pathToMatch = attribs.src.replace('../', '').replace('./', '');
+          headScripts.forEach((scriptTag) => {
+            const parsedAttributes = parseTagForAttributes(scriptTag);
+  
+            // handle <script type="module" src="some/path.js"></script>
+            if (parsedAttributes.type === 'module' && parsedAttributes.src) {
+              for (const innerBundleId of Object.keys(bundles)) {
+                const { src } = parsedAttributes;
+                const facadeModuleId = bundles[innerBundleId].facadeModuleId;
+                const pathToMatch = src.replace('../', '').replace('./', '');
 
-                  if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {
-                    newHtml = newHtml.replace(attribs.src, `/${innerBundleId}`);
-                  } else {
-                    // TODO better testing
-                    // TODO no magic strings
-                    if (innerBundleId.indexOf('.greenwood/') < 0 && !mappedBundles.get(innerBundleId)) {
-                      // console.debug('NEW BUNDLE TO INJECT!');
-                      newHtml = newHtml.replace(/<script type="module" src="(.*)"><\/script>/, `
-                        <script type="module" src="/${innerBundleId}"></script>
-                      `);
-                      mappedBundles.set(innerBundleId, true);
-                    }
-                  }
+                if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {
+                  newHtml = newHtml.replace(src, `/${innerBundleId}`);
                 }
               }
-
-              if (name === 'link' && attribs.rel === 'stylesheet') {
-                for (const bundleId2 of Object.keys(bundles)) {
-                  if (bundleId2.indexOf('.css') > 0) {
-                    const bundle2 = bundles[bundleId2];
-                    if (attribs.href.indexOf(bundle2.name) >= 0) {
-                      newHtml = newHtml.replace(attribs.href, `/${bundle2.fileName}`);
-                    }
+            }
+          });
+      
+          headLinks.forEach((linkTag) => {
+            const parsedAttributes = parseTagForAttributes(linkTag);
+            const { href } = parsedAttributes;
+  
+            // handle <link rel="stylesheet" src="/some/path.css"></link>
+            if (parsedAttributes.rel === 'stylesheet') {
+              for (const bundleId2 of Object.keys(bundles)) {
+                if (bundleId2.indexOf('.css') > 0) {
+                  const bundle2 = bundles[bundleId2];
+                  if (href.indexOf(bundle2.name) >= 0) {
+                    newHtml = newHtml.replace(href, `/${bundle2.fileName}`);
                   }
                 }
               }
             }
           });
-
-          parser.write(html);
-          parser.end();
 
           // TODO this seems hacky; hardcoded dirs :D
           bundle.fileName = bundle.facadeModuleId.replace('.greenwood', 'public');
@@ -268,19 +338,52 @@ function greenwoodHtmlPlugin(compilation) {
       }
     },
 
-    // use plugins to optimize final bundles for tools like terser, cssnano
-    // TODO could do this in generate bundle, but that needs to be async first
     async writeBundle(outputOptions, bundles) {
+      const scratchFiles = {};
+
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
 
-        if (path.extname(bundle.facadeModuleId || bundle.name) !== '.html') {
+        if (bundle.isEntry && path.extname(bundle.facadeModuleId) === '.html') {
+          // TODO this seems hacky; hardcoded dirs :D
+          const htmlPath = bundle.facadeModuleId.replace('.greenwood', 'public');
+          let html = fs.readFileSync(htmlPath, 'utf-8');
+          const root = htmlparser.parse(html, {
+            script: true,
+            style: true
+          });
+          const headScripts = root.querySelectorAll('script');
+
+          headScripts.forEach((scriptTag) => {
+            const parsedAttributes = parseTagForAttributes(scriptTag);
+            
+            // handle <script type="module"> /* inline code */ </script>
+            if (parsedAttributes.type === 'module' && scriptTag.rawText !== '') {
+              for (const innerBundleId of Object.keys(bundles)) {
+                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js') {           
+                  const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8')
+                    .replace(/\.\//g, '/'); // force absolute paths
+                  html = html.replace(scriptTag.rawText, bundledSource);
+
+                  scratchFiles[innerBundleId] = true;
+                }
+              }
+            }
+          });
+
+          await fs.promises.writeFile(htmlPath, html);
+        } else {
           const sourcePath = `${outputDir}/${bundleId}`;
           const optimizedSource = await getOptimizedSource(sourcePath, customResources, compilation);
-
+  
           await fs.promises.writeFile(sourcePath, optimizedSource);
         }
       }
+
+      // cleanup any scratch files
+      return Promise.all(Object.keys(scratchFiles).map(async (file) => {
+        return await fs.promises.unlink(path.join(outputDir, file));
+      }));
     }
   };
 }

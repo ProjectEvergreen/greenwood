@@ -6,15 +6,7 @@
     <meta name='viewport' content='width=device-width, initial-scale=1'/>
     <meta-outlet></meta-outlet>
 
-    <!-- TODO how to import / register a component like below? -->
-    <script type="module">
-      import '@evergreen-wc/eve-container';
-    </script>
-    
-    <!-- TODO have to use / for path references?  translate on the fly in serve.js? -->
-    <script type="module" src="/components/footer/footer.js"></script>
-    <script type="module" src="/components/header/header.js"></script>
-
+    <link rel="stylesheet" href="/assets/fonts/source-sans-pro.css"></link>
     <link rel="stylesheet" href="/styles/theme.css"></link>
 
     <style>
@@ -22,6 +14,14 @@
         min-height: 100vh
       };
     </style>
+
+    <script type="module">
+      import '@evergreen-wc/eve-container';
+    </script>
+    
+    <!-- TODO have to use / for path references?  translate on the fly in serve.js? -->
+    <script type="module" src="/components/footer/footer.js"></script>
+    <script type="module" src="/components/header/header.js"></script>
     
   </head>
 
