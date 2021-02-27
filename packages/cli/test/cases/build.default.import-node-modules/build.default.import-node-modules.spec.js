@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with and loading different module types to ensure support for ESM and MJS node modules resolution.
+ * Run Greenwood with and loading different references to node_module types to ensure proper support.
  *
  * Uaer Result
  * Should generate a bare bones Greenwood build without erroring.
@@ -124,7 +124,13 @@ describe('Build Greenwood With: ', function() {
       name: 'package.json'
     },
 
-    ...pwaHelpersLibs
+    ...pwaHelpersLibs,
+
+    {
+      // prism.css
+      dir: 'node_modules/prismjs/themes/',
+      name: 'prism-tomorrow.css'
+    }
 
     ]);
   });
@@ -138,22 +144,24 @@ describe('Build Greenwood With: ', function() {
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
     });
 
-    describe('Script tag in the <head> tag', function() {
-      it('should have one <script> tag for main.js loaded in the <head> tag', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
-        const mainScriptTag = Array.prototype.slice.call(scriptTags).filter(script => {
+    describe('<script src="..."> tag in the <head> tag', function() {
+      it('should have one <script src="..."> tag for main.js loaded in the <head> tag', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script[src]');
+        const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return (/main.*.js/).test(script.src);
         });
         
-        expect(mainScriptTag.length).to.be.equal(1);
+        expect(mainScriptTags.length).to.be.equal(1);
+      });
+
+      it('should have the total expected number of .js file in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(4);
       });
 
       it('should have the expected main.js file in the output directory', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'main.*.js'))).to.have.lengthOf(1);
       });
-    });
 
-    describe('exported node_module content in the body of the page', function() {
       it('should have the expected output from main.js for lit-element (ESM) in the page output', async function() {
         const litOutput = dom.window.document.querySelectorAll('body > .output-lit');
         
@@ -180,6 +188,66 @@ describe('Build Greenwood With: ', function() {
         
         expect(reduxOutput.length).to.be.equal(1);
         expect(reduxOutput[0].textContent).to.be.equal('import from redux ZnVuY3Rpb24gbyh0');
+      });
+    });
+
+    describe('<script> tag with inline code in the <head> tag', function() {
+      it('should have one <script> tag with inline code loaded in the <head> tag', function() {
+        const scriptTagsInline = dom.window.document.querySelectorAll('head > script:not([src])');
+        
+        expect(scriptTagsInline.length).to.be.equal(1);
+      });
+
+      it('should have the expected lit-element.js file in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'lit-element.*.js'))).to.have.lengthOf(1);
+      });
+
+      it('should have the expected lit-html.js files in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'lit-html.cdc8faae.js'))).to.have.lengthOf(1);
+      });
+
+      it('should have the expected inline node_modules content in the inline script', async function() {
+        const inlineScriptTag = dom.window.document.querySelector('head > script:not([src])');
+        
+        expect(inlineScriptTag.textContent).to
+          .contain('import"/lit-html.d69ea26f.js";import"/lit-element.ea26fec7.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline"');
+      });
+
+      it('should have the expected output from inline <script> tag in the page output', async function() {
+        const inlineScriptOutput = dom.window.document.querySelectorAll('body > .output-script-inline');
+        
+        expect(inlineScriptOutput.length).to.be.equal(1);
+        expect(inlineScriptOutput[0].textContent).to.be.equal('script tag module inline');
+      });
+    });
+
+    describe('<script src="..."> with reference to node_modules/ path in the <head> tag', function() {
+      it('should have one <script src="..."> tag for lit-html loaded in the <head> tag', function() {
+        const scriptTagsInline = dom.window.document.querySelectorAll('head > script[src]');
+        const litScriptTags = Array.prototype.slice.call(scriptTagsInline).filter(script => {
+          return (/lit.*.js/).test(script.src);
+        });
+
+        expect(litScriptTags.length).to.be.equal(1);
+      });
+
+      it('should have the expected lit-html.js files in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'lit-html.d69ea26f.js'))).to.have.lengthOf(1);
+      });
+    });
+
+    describe('<link rel="stylesheet" href="..."> with reference to node_modules/ path in the <head> tag', function() {
+      it('should have one <link href="..."> tag in the <head> tag', function() {
+        const linkTags = dom.window.document.querySelectorAll('head > link[href]');
+        const prismLinkTag = Array.prototype.slice.call(linkTags).filter(link => {
+          return (/prism-tomorrow.*.css/).test(link.href);
+        });
+
+        expect(prismLinkTag.length).to.be.equal(1);
+      });
+
+      it('should have the expected prism.css file in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'prism-tomorrow.*.css'))).to.have.lengthOf(1);
       });
     });
   });
