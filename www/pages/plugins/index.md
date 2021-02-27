@@ -24,7 +24,7 @@ Greenwood aims to cater to these use cases through two approaches:
 ### API
 Each plugin must return a function that has the following three properties:.
 - `name`: A string to give your plugin a name and used for error handling and troubleshooting.
-- `type`: A string to specify to Greenwood the type of plugin.  Right now the current supported plugin type `'resource'`
+- `type`: A string to specify to Greenwood the type of plugin.  Right now the current supported plugin types are [`'resource'`](/plugins/resource/), [`'rollup'`](/plugins/rollup/), and [`'server'`](/plugins/server/).
 - `provider`: A function that will be invoked by Greenwood that Can accept  a `compilation` param that provides read-only access to parts of Greenwood's state and configuration that can be used by a plugin.
 
 Here is an example of creating a plugin in a _greenwood.config.js_.
@@ -106,4 +106,7 @@ module.exports = {
 While each API has its own documentation section on the left sidebar of this page, here is a quick overview of the current set of Plugin APIs Greenwood supports.
 
 #### Resource Plugins
-Resource plugins allow users to interact with the request and response lifecycles of files at a variety of different ways.  These lifecycles provide the ability to do things like introduce new file types, to adding hosted 3rd party scripts to your site.
+[Resource plugins](/plugins/resource/) allow users to interact with the request and response lifecycles of files at a variety of different ways.  These lifecycles provide the ability to do things like introduce new file types, to adding hosted 3rd party scripts to your site.
+
+#### Server Plugins
+[Server plugins](/plugins/server/) allow developers to start and stop custom servers as part of the **serve** lifecycle of Greenwood.  These lifecycles provide the ability to do things like start a GraphQL server, or reverse proy requests to a custom server.

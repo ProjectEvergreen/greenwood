@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/cli",
-  "version": "0.10.0-alpha.4",
+  "version": "0.10.0-alpha.6",
   "description": "Greenwood CLI.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -33,11 +33,11 @@
     "cssnano": "^4.1.10",
     "es-module-shims": "^0.5.2",
     "front-matter": "^4.0.2",
-    "htmlparser2": "^4.1.0",
     "koa": "^2.13.0",
     "livereload": "^0.9.1",
     "markdown-toc": "^1.2.0",
     "node-html-parser": "^1.2.21",
+    "postcss": "^7.0.32",
     "postcss-import": "^12.0.0",
     "puppeteer": "^5.3.0",
     "rehype-raw": "^5.0.0",
@@ -47,7 +47,6 @@
     "remark-rehype": "^7.0.0",
     "rollup": "^2.34.1",
     "rollup-plugin-multi-input": "^1.1.1",
-    "rollup-plugin-postcss": "^3.1.5",
     "rollup-plugin-terser": "^7.0.0",
     "unified": "^9.2.0"
   },
