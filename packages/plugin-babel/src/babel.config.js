@@ -1,10 +1,10 @@
 module.exports = {
   
   // https://github.com/babel/babel/issues/9937#issuecomment-489352549
-  sourceType: 'unambiguous',
+  // sourceType: 'unambiguous',
   
   // https://github.com/babel/babel/issues/8731#issuecomment-426522500
-  ignore: [/[\/\\]core-js/, /@babel[\/\\]runtime/],
+  // ignore: [/[\/\\]core-js/, /@babel[\/\\]runtime/],
 
   // https://github.com/zloirock/core-js/blob/master/docs/2019-03-19-core-js-3-babel-and-a-look-into-the-future.md#babelpreset-env
   presets: [
@@ -15,7 +15,10 @@ module.exports = {
         
         // https://babeljs.io/docs/en/babel-preset-env#usebuiltins
         useBuiltIns: 'entry',
-        
+
+        // https://babeljs.io/docs/en/babel-preset-env#modules
+        modules: false,
+
         // https://babeljs.io/docs/en/babel-preset-env#corejs
         corejs: { 
           version: 3,
@@ -33,8 +36,7 @@ module.exports = {
     [
       '@babel/plugin-transform-runtime', {
         regenerator: true
-      },
-      '@babel/plugin-syntax-dynamic-import'
+      }
     ]
   ]
 

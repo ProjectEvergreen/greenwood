@@ -20,16 +20,20 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@babel/core": "^7.8.3",
+    "@babel/core": "^7.10.4",
     "@greenwood/cli": "^0.4.0"
   },
   "dependencies": {
-    "@babel/core": "^7.8.3",
-    "@rollup/plugin-babel": "^5.3.0"
+    "@babel/core": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/runtime": "^7.10.4",
+    "@rollup/plugin-babel": "^5.3.0",
+    "core-js": "^3.4.1"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/plugin-proposal-private-methods": "^7.8.3",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-proposal-private-methods": "^7.10.4",
     "@greenwood/cli": "^0.10.0-alpha.6"
   }
 }

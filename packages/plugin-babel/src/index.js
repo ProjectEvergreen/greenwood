@@ -8,15 +8,38 @@ const fs = require('fs');
 const path = require('path');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 const rollupBabelPlugin = require('@rollup/plugin-babel').default;
+const defaultConfig = require('./babel.config');
 
-function getConfig (compilation) {
+function getConfig (compilation, merge) {
   const { projectDirectory } = compilation.context;
   const configFile = 'babel.config';
-  const configRoot = fs.existsSync(`${projectDirectory}/${configFile}.js`)
+  const configRoot = fs.existsSync(`${projectDirectory}/${configFile}.js`) || merge
     ? projectDirectory
     : __dirname;
+  const userConfig = require(`${configRoot}/${configFile}`);
+  let finalConfig = Object.assign({}, userConfig);
   
-  return require(`${configRoot}/${configFile}`);
+  if (merge) {
+    const presets = userConfig.presets
+      ? [...userConfig.presets, ...defaultConfig.presets]
+      : [...defaultConfig.presets];
+    const plugins = userConfig.plugins
+      ? [...userConfig.plugins, ...defaultConfig.plugins]
+      : [...defaultConfig.plugins];
+    // TODO finalConfig.sourceType = defaultConfig.sourceType;
+    // TODO finalConfig.ignore = defaultConfig.ignore;
+    finalConfig.presets = [
+      ...presets
+    ];
+    finalConfig.plugins = [
+      ...plugins
+    ];
+  }
+  
+  console.debug(finalConfig);
+  console.debug('*****************');
+
+  return finalConfig;
 }
 
 class BabelResource extends ResourceInterface {
@@ -33,7 +56,7 @@ class BabelResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise(async(resolve, reject) => {
       try {
-        const config = getConfig(this.compilation);
+        const config = getConfig(this.compilation, this.options.mergeConfigs);
         const result = await babel.transform(body, config);
         
         resolve({
