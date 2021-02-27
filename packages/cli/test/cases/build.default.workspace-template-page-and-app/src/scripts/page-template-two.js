@@ -1,0 +1,1 @@
+export default 'page template two';

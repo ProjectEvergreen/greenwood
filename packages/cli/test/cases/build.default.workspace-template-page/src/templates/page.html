@@ -2,18 +2,30 @@
 <html lang="en" prefix="og:http://ogp.me/ns#">
 
   <head>
-    <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1'/>
+    <head>
+      <!-- TODO have to use forward slash / for path references?  translate on the fly in serve.js? -->
+      <script type="module" src="/scripts/main.js"></script>
+      <link rel="stylesheet" href="/styles/theme.css"></link>
+    </head>
+  
+    <style>
+      .owen-test {
+        color: blue;
+      }
+  
+      h3 {
+        color: green;
+      }
+    </style>
   </head>
 
   <body>
-
+    
     <div class='wrapper'>
-      
-      <div class='page-template blog-content content owen-test'>
+      <div class='page-template content owen-test'>
+        <h3>Hello</h3>
         <content-outlet></content-outlet>
       </div>
-    
     </div>
 
   </body>

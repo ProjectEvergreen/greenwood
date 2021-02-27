@@ -358,13 +358,13 @@ function greenwoodHtmlPlugin(compilation) {
             const parsedAttributes = parseTagForAttributes(scriptTag);
             
             // handle <script type="module"> /* inline code */ </script>
-            if (parsedAttributes.type === 'module' && scriptTag.rawText !== '') {
+            if (parsedAttributes.type === 'module' && !parsedAttributes.src) {
               for (const innerBundleId of Object.keys(bundles)) {
                 if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js') {           
                   const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8')
                     .replace(/\.\//g, '/'); // force absolute paths
+                  
                   html = html.replace(scriptTag.rawText, bundledSource);
-
                   scratchFiles[innerBundleId] = true;
                 }
               }
