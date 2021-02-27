@@ -135,3 +135,47 @@ And the following file output in the _public/_ directory
 ```
 
 > _See our [Front Matter Docs](/docs/front-matter#define-template) for more information on how you can extend fontmatter in **Greenwood**._
+
+## Scripts and Styles
+
+Since all pages and templates are just HTML with Greenwood, you can use `<script>`, `<style>`, and `<link>` tags as normal, referencing paths from your template to the location of the files in your project's workspace.
+
+For example, here is what a standard app template might look like:
+```html
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
+
+  <head>
+    <meta-outlet></meta-outlet>
+    <link rel="stylesheet" href="/styles/theme.css"/>
+    <script type="module" src="/components/app-header.js"></script>
+    <script type="module" src="/components/app-footer.js"></script>
+  </head>
+  
+  <body>
+    <app-header></app-header>
+      
+    <page-outlet></page-outlet>
+
+    <app-footer></app-footer>
+  </body>
+  
+</html>
+```
+
+And the directory structure for it:
+```shell
+.
+└── src
+      ├── components
+      │   ├── app-header.js
+      │   └── app-footer.js
+      ├── pages
+      │   ├── index.md
+      ├── styles
+      │   └── theme.css
+      ├── templates/
+          └── app.html
+```
+
+> _It is recommended to use the "file" based approaches for loading JavaScript and CSS; `<script src="...">` and `<link rel="stylesheet" href="...">` respectively.  This will allow Greenwood to optimize these assets during both development and build workflows.  However, inline `<script>` and `<style>` can both be super helpful for one-off cases, so in those cases we recommend only relying on "vanilla" JS / CSS syntax. For more context, examples, and background information, you can [review this PR](https://github.com/ProjectEvergreen/greenwood/pull/472)._
