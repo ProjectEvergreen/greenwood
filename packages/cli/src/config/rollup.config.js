@@ -279,10 +279,10 @@ function greenwoodHtmlPlugin(compilation) {
         });
       }));
     },
-    generateBundle(outputOptions, bundles) {
-      // console.debug('rollup generateBundle bundles', Object.keys(bundles));
-      
-      // TODO looping over bundles twice is wildly inneficient, should refactor and safe references once
+
+    // crawl through all entry HTML files and map bundled JavaScript and CSS filenames 
+    // back to original <script> / <link> tags and update to their bundled filename in the HTML
+    generateBundle(outputOptions, bundles) {      
       for (const bundleId of Object.keys(bundles)) {
         const bundle = bundles[bundleId];
 
@@ -358,13 +358,13 @@ function greenwoodHtmlPlugin(compilation) {
             const parsedAttributes = parseTagForAttributes(scriptTag);
             
             // handle <script type="module"> /* inline code */ </script>
-            if (parsedAttributes.type === 'module' && scriptTag.rawText !== '') {
+            if (parsedAttributes.type === 'module' && !parsedAttributes.src) {
               for (const innerBundleId of Object.keys(bundles)) {
                 if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js') {           
                   const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8')
                     .replace(/\.\//g, '/'); // force absolute paths
+                  
                   html = html.replace(scriptTag.rawText, bundledSource);
-
                   scratchFiles[innerBundleId] = true;
                 }
               }
