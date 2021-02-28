@@ -32,7 +32,8 @@ module.exports = {
 }
 ```
 
-Optionally, create a _babel.config.js_ in the root of your project with your own custom plugins / settings that you've installed.
+Create a _babel.config.js_ in the root of your project with your own custom plugins / settings that you've installed and want to use.
+
 ```javascript
 module.exports = {
   plugins: [
@@ -42,22 +43,12 @@ module.exports = {
 };
 ```
 
-
-By default, the configuration provided by this plugin is:
-```javascript
-module.exports = {
-  plugins: [
-    '@babel/preset-env'
-  ]
-};
-```
-
 This will then process your JavaScript with Babel with the configurated plugins / settings you provide.  
 
 ## Options
-By default this plugin provides a default _babel.config.js_ that provides support for [**@babel/preset-env**](https://babeljs.io/docs/en/babel-preset-env) and [**browserslist**](https://github.com/browserslist/browserslist) with [default configs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-babel/src/) for each.  
+This plugin provides a default _babel.config.js_ that includes support for [**@babel/preset-env**](https://babeljs.io/docs/en/babel-preset-env) using [**browserslist**](https://github.com/browserslist/browserslist) with reasonable [default configs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-babel/src/) for each.  
 
-If you would like to use it, you will need to take the following extra steps:
+If you would like to use it, either standalone or your own custom _babel.config.js_, you will need to take the following extra steps:
 
 1. Install `@babel/runtime` and `regenerator-runtime` as direct dependencies of your project
     ```bash

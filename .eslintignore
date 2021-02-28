@@ -2,3 +2,4 @@
 !.eslintrc.js
 !.mocharc.js
 www/scripts/main.js
+packages/plugin-babel/test/cases/**/*main.js

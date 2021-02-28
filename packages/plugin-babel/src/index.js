@@ -1,6 +1,6 @@
 /*
  * 
- * Enable using Babel process for JavaScript files.
+ * Enable using Babel for processing JavaScript files.
  *
  */
 const babel = require('@babel/core');
