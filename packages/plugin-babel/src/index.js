@@ -4,35 +4,25 @@
  *
  */
 const babel = require('@babel/core');
-const fs = require('fs');
 const path = require('path');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 const rollupBabelPlugin = require('@rollup/plugin-babel').default;
-const defaultConfig = require('./babel.config');
 
-function getConfig (compilation, mergeConfigs) {
+function getConfig (compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = 'babel.config';
-  const configRoot = fs.existsSync(`${projectDirectory}/${configFile}.js`) || merge
-    ? projectDirectory
-    : __dirname;
-  const userConfig = require(`${configRoot}/${configFile}`);
+  const defaultConfig = require('./babel.config');
+  const userConfig = require(`${projectDirectory}/${configFile}`);
   let finalConfig = Object.assign({}, userConfig);
   
-  if (mergeConfigs) {
-    const presets = userConfig.presets
-      ? [...userConfig.presets, ...defaultConfig.presets]
+  if (extendConfig) {    
+    finalConfig.presets = Array.isArray(userConfig.presets)
+      ? [...defaultConfig.presets, ...userConfig.presets]
       : [...defaultConfig.presets];
-    const plugins = userConfig.plugins
-      ? [...userConfig.plugins, ...defaultConfig.plugins]
-      : [...defaultConfig.plugins];
     
-    finalConfig.presets = [
-      ...presets
-    ];
-    finalConfig.plugins = [
-      ...plugins
-    ];
+    finalConfig.plugins = Array.isArray(userConfig.plugins)
+      ? [...defaultConfig.plugins, ...userConfig.plugins]
+      : [...defaultConfig.plugins];
   }
 
   return finalConfig;
@@ -52,7 +42,7 @@ class BabelResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise(async(resolve, reject) => {
       try {
-        const config = getConfig(this.compilation, this.options.mergeConfigs);
+        const config = getConfig(this.compilation, this.options.extendConfig);
         const result = await babel.transform(body, config);
         
         resolve({
@@ -75,8 +65,9 @@ module.exports = (options = {}) => {
     name: 'plugin-babel:rollup',
     provider: (compilation) => [
       rollupBabelPlugin({
-        babelHelpers: 'bundled',
-        ...getConfig(compilation)
+        // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
+        babelHelpers: options.extendConfig ? 'runtime' : 'bundled',
+        ...getConfig(compilation, options.extendConfig)
       })
     ]
   }];

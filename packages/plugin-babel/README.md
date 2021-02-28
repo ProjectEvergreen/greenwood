@@ -48,7 +48,7 @@ This will then process your JavaScript with Babel with the configurated plugins 
 ## Options
 This plugin provides a default _babel.config.js_ that includes support for [**@babel/preset-env**](https://babeljs.io/docs/en/babel-preset-env) using [**browserslist**](https://github.com/browserslist/browserslist) with reasonable [default configs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-babel/src/) for each.  
 
-If you would like to use it, either standalone or your own custom _babel.config.js_, you will need to take the following extra steps:
+If you would like to use it, either standalone or with your own custom _babel.config.js_, you will need to take the following extra steps:
 
 1. Install `@babel/runtime` and `regenerator-runtime` as direct dependencies of your project
     ```bash
@@ -66,9 +66,12 @@ If you would like to use it, either standalone or your own custom _babel.config.
       ...
 
       plugins: [
+        // notice the spread ... !
         ...pluginBabel({
-          mergeConfigs: true
-        }) // notice the spread ... !
+          extendConfig: true
+        })
       ]
     }
     ```
+
+If you have a custom _babel.config.js_, this option will merge its own `presets` and `plugins` in the array ahead of your own (if you have them).

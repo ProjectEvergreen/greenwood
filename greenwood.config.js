@@ -26,7 +26,7 @@ module.exports = {
   ],
   plugins: [
     ...pluginBabel({
-      mergeConfigs: true
+      extendConfig: true
     }),
     ...pluginCommonJs(),
     pluginGoogleAnalytics({
