@@ -10,7 +10,7 @@ const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface
 const rollupBabelPlugin = require('@rollup/plugin-babel').default;
 const defaultConfig = require('./babel.config');
 
-function getConfig (compilation, merge) {
+function getConfig (compilation, mergeConfigs) {
   const { projectDirectory } = compilation.context;
   const configFile = 'babel.config';
   const configRoot = fs.existsSync(`${projectDirectory}/${configFile}.js`) || merge
@@ -19,15 +19,14 @@ function getConfig (compilation, merge) {
   const userConfig = require(`${configRoot}/${configFile}`);
   let finalConfig = Object.assign({}, userConfig);
   
-  if (merge) {
+  if (mergeConfigs) {
     const presets = userConfig.presets
       ? [...userConfig.presets, ...defaultConfig.presets]
       : [...defaultConfig.presets];
     const plugins = userConfig.plugins
       ? [...userConfig.plugins, ...defaultConfig.plugins]
       : [...defaultConfig.plugins];
-    // TODO finalConfig.sourceType = defaultConfig.sourceType;
-    // TODO finalConfig.ignore = defaultConfig.ignore;
+    
     finalConfig.presets = [
       ...presets
     ];
@@ -35,9 +34,6 @@ function getConfig (compilation, merge) {
       ...plugins
     ];
   }
-  
-  console.debug(finalConfig);
-  console.debug('*****************');
 
   return finalConfig;
 }

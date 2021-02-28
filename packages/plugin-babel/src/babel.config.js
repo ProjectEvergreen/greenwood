@@ -17,7 +17,8 @@ module.exports = {
         useBuiltIns: 'entry',
 
         // https://babeljs.io/docs/en/babel-preset-env#modules
-        modules: false,
+        // preserves ES Modules
+        modules: false, 
 
         // https://babeljs.io/docs/en/babel-preset-env#corejs
         corejs: { 

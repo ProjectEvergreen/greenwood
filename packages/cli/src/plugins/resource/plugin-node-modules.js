@@ -1,6 +1,6 @@
 /*
  * 
- * Detects and fully resolves requests to node_modules.
+ * Detects and fully resolves requests to node_modules as well handles creating an importMap.
  *
  */
 const acorn = require('acorn');
@@ -15,12 +15,14 @@ const importMap = {};
 const getPackageEntryPath = (packageJson) => {
   let entry = packageJson.module 
     ? packageJson.module // favor ESM entry points first
-    : packageJson.main
-      ? packageJson.main
-      : 'index.js';
+    : packageJson.exports // next favor export maps
+      ? Object.keys(packageJson.exports)
+      : packageJson.main // then favor main
+        ? packageJson.main
+        : 'index.js'; // lastly, fallback to index.js
 
   // use .mjs version of it exists, for packages like redux
-  if (fs.existsSync(`${process.cwd()}/node_modules/${packageJson.name}/${entry.replace('.js', '.mjs')}`)) {
+  if (!Array.isArray(entry) && fs.existsSync(`${process.cwd()}/node_modules/${packageJson.name}/${entry.replace('.js', '.mjs')}`)) {
     entry = entry.replace('.js', '.mjs');
   }
 
@@ -79,15 +81,43 @@ const walkPackageJson = (packageJson = {}) => {
     const dependencyPackageJson = require(dependencyPackageJsonPath);
     const entry = getPackageEntryPath(dependencyPackageJson);
     const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
-    const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
     const isJavascriptPackage = packageEntryPointPath.endsWith('.js') || packageEntryPointPath.endsWith('.mjs');
 
     if (isJavascriptPackage) {
-      walkModule(packageEntryModule, dependency);
 
-      importMap[dependency] = `/node_modules/${dependency}/${entry}`;
+      if (Array.isArray(entry)) {
+        // we have an exportMap
+        const exportMap = entry;
 
-      walkPackageJson(dependencyPackageJson);
+        exportMap.forEach((entry) => {
+          const exportMapEntry = dependencyPackageJson.exports[entry];
+          let packageExport;
+
+          if (Array.isArray(exportMapEntry)) {
+            // console.debug('walk exports array');
+            packageExport = exportMapEntry.filter((entry) => {
+              return typeof entry === 'string';
+            })[0];
+          } else if ((exportMapEntry.endsWith('.js') || exportMapEntry.endsWith('.mjs')) && exportMapEntry.indexOf('*') < 0) {
+            // console.debug('is not an export array, or package.json, or wildcard');
+            packageExport = exportMapEntry;
+          }
+
+          if (packageExport) {
+            // console.debug('packageExport', packageExport);
+            // console.debug('exportMapEntry', exportMapEntry);
+            // console.debug('file', file);
+            importMap[`${dependency}/${entry.replace('./', '')}`] = `/node_modules/${dependency}/${packageExport.replace('./', '')}`;
+          }
+        });
+      } else {
+        const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
+        const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
+
+        walkModule(packageEntryModule, dependency);
+        importMap[dependency] = `/node_modules/${dependency}/${entry}`;
+        walkPackageJson(dependencyPackageJson);
+      }
     }
   });
 };

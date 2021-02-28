@@ -53,3 +53,31 @@ module.exports = {
 ```
 
 This will then process your JavaScript with Babel with the configurated plugins / settings you provide.  
+
+## Options
+By default this plugin provides a default _babel.config.js_ that provides support for [**@babel/preset-env**](https://babeljs.io/docs/en/babel-preset-env) and [**browserslist**](https://github.com/browserslist/browserslist) with [default configs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-babel/src/) for each.  
+
+If you would like to use it, you will need to take the following extra steps:
+
+1. Install `@babel/runtime` and `regenerator-runtime` as direct dependencies of your project
+    ```bash
+    # npm
+    npm -i @babel/runtime regenerator-runtime
+
+    # yarn
+    yarn add @babel/runtime regenerator-runtime
+    ```
+1. When adding `pluginBabel` to your _greenwood.config.js_, enable the `mergeConfigs` option
+    ```js
+    const pluginBabel = require('@greenwood/plugin-babel');
+
+    module.exports = {
+      ...
+
+      plugins: [
+        ...pluginBabel({
+          mergeConfigs: true
+        }) // notice the spread ... !
+      ]
+    }
+    ```
