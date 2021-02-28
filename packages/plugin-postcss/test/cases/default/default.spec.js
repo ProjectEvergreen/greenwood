@@ -18,12 +18,18 @@
  * }
  * 
  * User Workspace
- * Greenwood default
  *  src/
  *   pages/
  *     index.html
  *   styles/
  *     main.css
+ * 
+ * User postcss.config.js
+ * module.exports = {
+ *   plugins: [
+ *     require('postcss-nested')
+ *   ]
+ * };
  */
 const fs = require('fs');
 const glob = require('glob-promise');
