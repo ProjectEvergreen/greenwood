@@ -1,6 +1,6 @@
 /*
  * 
- * Detects and fully resolves requests to node_modules as well handles creating an importMap.
+ * Detects and fully resolves requests to node_modules and handles creating an importMap.
  *
  */
 const acorn = require('acorn');
@@ -78,12 +78,12 @@ const walkPackageJson = (packageJson = {}) => {
     const dependencyPackageRootPath = path.join(process.cwd(), './node_modules', dependency);
     const dependencyPackageJsonPath = path.join(dependencyPackageRootPath, 'package.json');
     const dependencyPackageJson = require(dependencyPackageJsonPath);
-    const entry = getPackageEntryPath(dependencyPackageJson);
+    const entry = getPackageEntryPath(dependencyPackageJson);AD
     const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
     const isJavascriptPackage = packageEntryPointPath.endsWith('.js') || packageEntryPointPath.endsWith('.mjs');
 
     if (isJavascriptPackage) {
-
+      // // https://nodejs.org/api/packages.html#packages_determining_module_system
       if (Array.isArray(entry)) {
         // we have an exportMap
         const exportMap = entry;
@@ -135,6 +135,7 @@ const walkPackageJson = (packageJson = {}) => {
           }
         });
       } else {
+        // const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
         const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
   
         walkModule(packageEntryModule, dependency);
