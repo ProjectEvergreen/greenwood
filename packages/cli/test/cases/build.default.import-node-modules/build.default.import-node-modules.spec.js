@@ -130,9 +130,18 @@ describe('Build Greenwood With: ', function() {
       // prism.css
       dir: 'node_modules/prismjs/themes/',
       name: 'prism-tomorrow.css'
-    }
+    },
 
-    ]);
+    {
+      // simple.css - included as a non-JavaScript package
+      // https://github.com/ProjectEvergreen/greenwood/issues/484
+      dir: 'node_modules/simpledotcss/',
+      name: 'package.json'
+    },
+    {
+      dir: 'node_modules/simpledotcss/',
+      name: 'simple.css'
+    }]);
   });
 
   describe(LABEL, function() {
