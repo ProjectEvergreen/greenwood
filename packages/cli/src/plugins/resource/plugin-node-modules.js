@@ -11,7 +11,6 @@ const walk = require('acorn-walk');
 
 const importMap = {};
 
-// https://nodejs.org/api/packages.html#packages_determining_module_system
 const getPackageEntryPath = (packageJson) => {
   let entry = packageJson.module 
     ? packageJson.module // favor ESM entry points first
@@ -88,32 +87,56 @@ const walkPackageJson = (packageJson = {}) => {
       if (Array.isArray(entry)) {
         // we have an exportMap
         const exportMap = entry;
-
+  
         exportMap.forEach((entry) => {
           const exportMapEntry = dependencyPackageJson.exports[entry];
           let packageExport;
-
+  
           if (Array.isArray(exportMapEntry)) {
-            // console.debug('walk exports array');
-            packageExport = exportMapEntry.filter((entry) => {
-              return typeof entry === 'string';
-            })[0];
+            let fallbackPath;
+            let esmPath;
+  
+            exportMapEntry.forEach((mapItem) => {
+              switch (typeof mapItem) {
+  
+                case 'string':
+                  fallbackPath = mapItem;
+                  break;
+                case 'object':
+                  const entryTypes = Object.keys(mapItem);
+  
+                  if (entryTypes.import) {
+                    esmPath = entryTypes.import;
+                  } else if (entryTypes.require) {
+                    console.error('the package you are importing needs commonjs support.  Please use our commonjs plugin to fix this error.');
+                    fallbackPath = entryTypes.require;
+                  } else if (entryTypes.default) {
+                    console.warn('the package you are requiring may need commonjs support.  If this module is not working for you, considering adding our commonjs plugin.');
+                    fallbackPath = entryTypes.default;
+                  }
+                  break;
+                default:
+                  console.warn(`sorry, we were unable to detect the module type for ${mapItem} :(.  please consider opening an issue to let us know about your use case.`);
+                  break;
+  
+              }
+            });
+  
+            packageExport = esmPath
+              ? esmPath
+              : fallbackPath;
           } else if ((exportMapEntry.endsWith('.js') || exportMapEntry.endsWith('.mjs')) && exportMapEntry.indexOf('*') < 0) {
-            // console.debug('is not an export array, or package.json, or wildcard');
+            // is not an export array, or package.json, or wildcard
             packageExport = exportMapEntry;
           }
-
+  
           if (packageExport) {
-            // console.debug('packageExport', packageExport);
-            // console.debug('exportMapEntry', exportMapEntry);
-            // console.debug('file', file);
             importMap[`${dependency}/${entry.replace('./', '')}`] = `/node_modules/${dependency}/${packageExport.replace('./', '')}`;
           }
         });
       } else {
-        const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
         const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
-
+  
         walkModule(packageEntryModule, dependency);
         importMap[dependency] = `/node_modules/${dependency}/${entry}`;
         walkPackageJson(dependencyPackageJson);

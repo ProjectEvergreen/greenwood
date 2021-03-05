@@ -1,6 +1,5 @@
 const path = require('path');
 const pluginBabel = require('./packages/plugin-babel/src/index');
-const pluginCommonJs = require('./packages/plugin-import-commonjs/src/index');
 const pluginGoogleAnalytics = require('./packages/plugin-google-analytics/src/index');
 const pluginImportCss = require('./packages/plugin-import-css/src/index');
 const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
@@ -28,7 +27,6 @@ module.exports = {
     ...pluginBabel({
       extendConfig: true
     }),
-    ...pluginCommonJs(),
     pluginGoogleAnalytics({
       analyticsId: 'UA-147204327-1'
     }),

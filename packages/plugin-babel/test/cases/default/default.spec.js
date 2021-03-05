@@ -59,7 +59,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('Babel should process JavaScript that reference private class members / methods', function() {
       it('should output correctly processed JavaScript without private members', function() {
-        const expectedJavaScript = '#x = 0;';
+        const expectedJavaScript = '#x';
         const jsFiles = glob.sync(path.join(this.context.publicDir, '*.js'));
         const javascript = fs.readFileSync(jsFiles[0], 'utf-8');
 

@@ -67,6 +67,7 @@ module.exports = (options = {}) => {
       rollupBabelPlugin({
         // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
         babelHelpers: options.extendConfig ? 'runtime' : 'bundled',
+        
         ...getConfig(compilation, options.extendConfig)
       })
     ]

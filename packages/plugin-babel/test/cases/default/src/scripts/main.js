@@ -2,7 +2,7 @@ class Counter {
   #x = 0;
 
   #logClicked() {
-    console.debug('private #x was clicked. is now =>', this.#x)
+    console.debug('private variable "x" was clicked. is now =>', this.#x)
   }
 
   clicked() {
