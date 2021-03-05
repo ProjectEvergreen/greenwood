@@ -58,7 +58,7 @@ If you would like to use it, either standalone or with your own custom _babel.co
     # yarn
     yarn add @babel/runtime regenerator-runtime
     ```
-1. When adding `pluginBabel` to your _greenwood.config.js_, enable the `mergeConfigs` option
+1. When adding `pluginBabel` to your _greenwood.config.js_, enable the `extendConfig` option
     ```js
     const pluginBabel = require('@greenwood/plugin-babel');
 
