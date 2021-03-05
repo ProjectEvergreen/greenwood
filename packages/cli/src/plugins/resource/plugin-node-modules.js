@@ -20,7 +20,7 @@ const getPackageEntryPath = (packageJson) => {
         ? packageJson.main
         : 'index.js'; // lastly, fallback to index.js
 
-  // use .mjs version of it exists, for packages like redux
+  // use .mjs version if it exists, for packages like redux
   if (!Array.isArray(entry) && fs.existsSync(`${process.cwd()}/node_modules/${packageJson.name}/${entry.replace('.js', '.mjs')}`)) {
     entry = entry.replace('.js', '.mjs');
   }
@@ -78,12 +78,12 @@ const walkPackageJson = (packageJson = {}) => {
     const dependencyPackageRootPath = path.join(process.cwd(), './node_modules', dependency);
     const dependencyPackageJsonPath = path.join(dependencyPackageRootPath, 'package.json');
     const dependencyPackageJson = require(dependencyPackageJsonPath);
-    const entry = getPackageEntryPath(dependencyPackageJson);AD
-    const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
-    const isJavascriptPackage = packageEntryPointPath.endsWith('.js') || packageEntryPointPath.endsWith('.mjs');
+    const entry = getPackageEntryPath(dependencyPackageJson);
+    const isJavascriptPackage = Array.isArray(entry) || typeof entry === 'string' && entry.endsWith('.js') || entry.endsWith('.mjs');
 
     if (isJavascriptPackage) {
-      // // https://nodejs.org/api/packages.html#packages_determining_module_system
+      
+      // https://nodejs.org/api/packages.html#packages_determining_module_system
       if (Array.isArray(entry)) {
         // we have an exportMap
         const exportMap = entry;
@@ -108,15 +108,15 @@ const walkPackageJson = (packageJson = {}) => {
                   if (entryTypes.import) {
                     esmPath = entryTypes.import;
                   } else if (entryTypes.require) {
-                    console.error('the package you are importing needs commonjs support.  Please use our commonjs plugin to fix this error.');
+                    console.error('The package you are importing needs commonjs support.  Please use our commonjs plugin to fix this error.');
                     fallbackPath = entryTypes.require;
                   } else if (entryTypes.default) {
-                    console.warn('the package you are requiring may need commonjs support.  If this module is not working for you, considering adding our commonjs plugin.');
+                    console.warn('The package you are requiring may need commonjs support.  If this module is not working for you, consider adding our commonjs plugin.');
                     fallbackPath = entryTypes.default;
                   }
                   break;
                 default:
-                  console.warn(`sorry, we were unable to detect the module type for ${mapItem} :(.  please consider opening an issue to let us know about your use case.`);
+                  console.warn(`Sorry, we were unable to detect the module type for ${mapItem} :(.  please consider opening an issue to let us know about your use case.`);
                   break;
   
               }
@@ -135,7 +135,7 @@ const walkPackageJson = (packageJson = {}) => {
           }
         });
       } else {
-        // const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
+        const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
         const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
   
         walkModule(packageEntryModule, dependency);
