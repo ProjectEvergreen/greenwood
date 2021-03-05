@@ -20,13 +20,18 @@ const unified = require('unified');
 // general refactoring
 const getPageTemplate = (barePath, workspace, template) => {
   const templatesDir = path.join(workspace, 'templates');
+  const pageIsHtmlPath = `${barePath.substring(0, barePath.lastIndexOf('/index'))}.html`;
 
   if (template && fs.existsSync(`${templatesDir}/${template}.html`)) {
     // use a predefined template, usually from markdown frontmatter
     contents = fs.readFileSync(`${templatesDir}/${template}.html`, 'utf-8');
-  } else if (fs.existsSync(`${barePath}.html`)) {
+  } else if (fs.existsSync(`${barePath}.html`) || fs.existsSync(pageIsHtmlPath)) {
     // if the page is already HTML, use that as the template
-    contents = fs.readFileSync(`${barePath}.html`, 'utf-8');
+    const indexPath = fs.existsSync(pageIsHtmlPath)
+      ? pageIsHtmlPath
+      : `${barePath}.html`;
+    
+    contents = fs.readFileSync(indexPath, 'utf-8');
   } else if (fs.existsSync(`${templatesDir}/page.html`)) {
     // else look for default page template
     contents = fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
@@ -43,11 +48,14 @@ const getPageTemplate = (barePath, workspace, template) => {
 
 const getAppTemplate = (contents, userWorkspace) => {
 
-  const appTemplate = `${userWorkspace}/templates/app.html`;
-  let appTemplateContents = '';
+  function sliceTemplate(template, pos, needle, replacer) {
+    return template.slice(0, pos) + template.slice(pos).replace(needle, replacer);
+  }
+  
+  const appTemplatePath = `${userWorkspace}/templates/app.html`;
+  let appTemplateContents = contents || '';
 
-  if (fs.existsSync(appTemplate)) {
-    appTemplateContents = fs.readFileSync(appTemplate, 'utf-8');
+  if (fs.existsSync(appTemplatePath)) {
     const root = htmlparser.parse(contents, {
       script: true,
       style: true,
@@ -57,18 +65,24 @@ const getAppTemplate = (contents, userWorkspace) => {
     const body = root.querySelector('body').innerHTML;
     const headScripts = root.querySelectorAll('head script');
     const headLinks = root.querySelectorAll('head link');
+    const headStyles = root.querySelectorAll('head style');
 
+    appTemplateContents = fs.readFileSync(appTemplatePath, 'utf-8');
     appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
-    headScripts.forEach(script => {
+    
+    headScripts.forEach((script) => {
+      const matchNeedle = '</script>';
+      const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
+
       if (script.rawAttrs !== '') {
-        appTemplateContents = appTemplateContents.replace(/<\/script>/, `
+        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `
           </script>\n
           <script ${script.rawAttrs}></script>\n
         `);
       }
 
       if (script.rawAttrs === '') {
-        appTemplateContents = appTemplateContents.replace(/<\/script>/, `
+        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `
           </script>\n
           <script>
             ${script.text}
@@ -77,15 +91,33 @@ const getAppTemplate = (contents, userWorkspace) => {
       }
     });
 
-    headLinks.forEach(link => {
-      appTemplateContents = appTemplateContents.replace(/<\/link>/, `
-        </link>\n
-        <link ${link.rawAttrs}></link>\n
+    headLinks.forEach((link) => {
+      const matchNeedle = /<link .*/g;
+      const matches = appTemplateContents.match(matchNeedle);
+      const lastLink = matches[matches.length - 1];
+
+      appTemplateContents = appTemplateContents.replace(lastLink, `
+        ${lastLink}\n
+        <link ${link.rawAttrs}/>
       `);
+    });
+
+    headStyles.forEach((style) => {
+      const matchNeedle = '</style>';
+      const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
+
+      if (style.rawAttrs === '') {
+        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `
+          </style>\n
+          <style>
+            ${style.text}
+          </style>\n
+        `);
+      }
     });
   }
 
-  return appTemplateContents || contents;
+  return appTemplateContents;
 };
 
 const getUserScripts = (contents) => {

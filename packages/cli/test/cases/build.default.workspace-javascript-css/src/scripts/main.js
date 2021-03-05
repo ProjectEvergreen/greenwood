@@ -1,0 +1,1 @@
+document.getElementsByClassName('output-script-src')[0].innerHTML = 'script tag module with src';
