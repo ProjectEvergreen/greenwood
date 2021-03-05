@@ -4,6 +4,7 @@
  *
  */
 const babel = require('@babel/core');
+const fs = require('fs');
 const path = require('path');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 const rollupBabelPlugin = require('@rollup/plugin-babel').default;
@@ -11,8 +12,10 @@ const rollupBabelPlugin = require('@rollup/plugin-babel').default;
 function getConfig (compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = 'babel.config';
-  const defaultConfig = require('./babel.config');
-  const userConfig = require(`${projectDirectory}/${configFile}`);
+  const defaultConfig = require(path.join(__dirname, configFile));
+  const userConfig = fs.existsSync(path.join(projectDirectory, `${configFile}.js`))
+    ? require(`${projectDirectory}/${configFile}`)
+    : {};
   let finalConfig = Object.assign({}, userConfig);
   
   if (extendConfig) {    
