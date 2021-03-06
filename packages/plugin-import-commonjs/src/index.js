@@ -69,7 +69,7 @@ class ImportCommonJsResource extends ResourceInterface {
 
         stream.on('data', (data) => (bundle += data));
         stream.on('end', () => {
-          console.info(`proccessed module "${url}" as a CommonJS module type.`);
+          console.debug(`proccessed module "${url}" as a CommonJS module type.`);
           resolve({
             body: bundle
           });
