@@ -1,7 +1,7 @@
 import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { HttpLink } from 'apollo-link-http';
-import { getQueryHash } from '@greenwood/cli/data/common';
+// import { getQueryHash } from '@greenwood/cli/data/common';
 
 const APOLLO_STATE = window.__APOLLO_STATE__; // eslint-disable-line no-underscore-dangle
 const client = new ApolloClient({
@@ -15,17 +15,17 @@ const backupQuery = client.query;
 client.query = (params) => {
   if (APOLLO_STATE) {
     // __APOLLO_STATE__ defined, in production mode
-    const queryHash = getQueryHash(params.query, params.variables);
-    const cachePath = `/${queryHash}-cache.json`;
+    // const queryHash = getQueryHash(params.query, params.variables);
+    // const cachePath = `/${queryHash}-cache.json`;
     
-    return fetch(cachePath)
-      .then(response => response.json())
-      .then((response) => {
-        // mock client.query response
-        return {
-          data: new InMemoryCache().restore(response).readQuery(params)
-        };
-      });
+    // return fetch(cachePath)
+    //   .then(response => response.json())
+    //   .then((response) => {
+    //     // mock client.query response
+    //     return {
+    //       data: new InMemoryCache().restore(response).readQuery(params)
+    //     };
+    //   });
   } else {
     // __APOLLO_STATE__ NOT defined, in development mode
     return backupQuery(params);

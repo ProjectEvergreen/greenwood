@@ -1,10 +1,17 @@
 import { css, html, LitElement, unsafeCSS } from 'lit-element';
-// import client from '@greenwood/cli/data/client';
-// import MenuQuery from '@greenwood/cli/data/queries/menu';
+import client from '@greenwood/plugin-graphql/core/client.js';
+import MenuQuery from '@greenwood/plugin-graphql/queries/menu.gql';
+import ConfigQuery from '@greenwood/plugin-graphql/queries/config.gql';
+// import gql from 'graphql-tag';
 import '@evergreen-wc/eve-container';
 import headerCss from './header.css';
 // TODO import evergreenLogo from '../../assets/evergreen.svg';
 import '../social-icons/social-icons.js';
+
+console.debug('MenuQuery', MenuQuery);
+console.debug('ConfigQuery', ConfigQuery);
+console.debug('client', client);
+// console.debug('gql', gql);
 
 class HeaderComponent extends LitElement {
 
@@ -29,6 +36,15 @@ class HeaderComponent extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
+
+    // const response = await client.query({
+    //   query: MenuQuery,
+    //   variables: {
+    //     name: 'navigation',
+    //     order: 'index_asc'
+    //   }
+    // });
+    // console.debug(response);
 
     fetch('/graph.json')
       .then(res => res.json())
