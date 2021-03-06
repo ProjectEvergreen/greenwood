@@ -45,7 +45,7 @@ class ImportCommonJsResource extends ResourceInterface {
     return new Promise(async (resolve, reject) => {
       try {
         const isCommonJs = await testForCjsModule(url);
-        
+
         return resolve(isCommonJs);
       } catch (e) {
         console.error(e);
@@ -69,6 +69,7 @@ class ImportCommonJsResource extends ResourceInterface {
 
         stream.on('data', (data) => (bundle += data));
         stream.on('end', () => {
+          console.info(`proccessed module "${url}" as a CommonJS module type.`);
           resolve({
             body: bundle
           });
