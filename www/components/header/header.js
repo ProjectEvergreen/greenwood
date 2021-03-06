@@ -11,7 +11,6 @@ import '../social-icons/social-icons.js';
 console.debug('MenuQuery', MenuQuery);
 console.debug('ConfigQuery', ConfigQuery);
 console.debug('client', client);
-// console.debug('gql', gql);
 
 class HeaderComponent extends LitElement {
 
@@ -37,28 +36,12 @@ class HeaderComponent extends LitElement {
   async connectedCallback() {
     super.connectedCallback();
 
-    // const response = await client.query({
-    //   query: MenuQuery,
-    //   variables: {
-    //     name: 'navigation',
-    //     order: 'index_asc'
-    //   }
-    // });
-    // console.debug(response);
+    const response = await client.query(MenuQuery, {
+      name: 'navigation',
+      order: 'index_asc'
+    });
 
-    fetch('/graph.json')
-      .then(res => res.json())
-      .then(data => {
-        this.navigation = data.filter(page => {
-          if (page.data.menu === 'navigation') {
-            page.label = `${page.label.charAt(0).toUpperCase()}${page.label.slice(1)}`.replace('-', ' ');
-            
-            return page;
-          }
-        }).sort((a, b) => {
-          return a.data.index < b.data.index ? -1 : 1;
-        });
-      });
+    this.navigation = response.data.menu.children.map(item => item.item);
   }
 
   /* eslint-disable indent */
