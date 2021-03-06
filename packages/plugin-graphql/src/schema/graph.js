@@ -77,38 +77,18 @@ const getParsedHeadingsFromPage = (tableOfContents, headingLevel) => {
   return children;
 };
 
-const getDeriveMetaFromRoute = (route) => {
-  const root = route.split('/')[1] || '';
-  const label = root
-    .replace('/', '')
-    .replace('-', ' ')
-    .split(' ')
-    .map((word) => `${word.charAt(0).toUpperCase()}${word.substring(1)}`)
-    .join(' ');
-
-  return {
-    label,
-    root
-  };
-};
-
 const getPagesFromGraph = async (root, query, context) => {
   const pages = [];
   const { graph } = context;
 
   graph
     .forEach((page) => {
-      const { route, mdFile, fileName, template, title, data } = page;
-      const { label } = getDeriveMetaFromRoute(route);
+      const { data } = page;
       const id = page.label;
 
       pages.push({
+        ...page,
         id,
-        filePath: mdFile,
-        fileName,
-        template,
-        title: title !== '' ? title : label,
-        link: route,
         data: {
           ...data
         }
@@ -125,20 +105,16 @@ const getChildrenFromParentRoute = async (root, query, context) => {
 
   graph
     .forEach((page) => {
-      const { route, mdFile, fileName, template, title, data } = page;
-      const { label } = getDeriveMetaFromRoute(route);
+      const { route, path, data } = page;
+      // const { label } = getDeriveMetaFromRoute(route);
       const root = route.split('/')[1];
 
-      if (root.indexOf(parent) >= 0 && mdFile !== `./${parent}/index.md`) {
+      if (root.indexOf(parent) >= 0 && path !== `./${parent}/index.md`) {
         const id = page.label;
 
         pages.push({
           id,
-          filePath: mdFile,
-          fileName,
-          template,
-          title: title !== '' ? title : label,
-          link: route,
+          ...page,
           data: {
             ...data
           }
@@ -152,17 +128,18 @@ const getChildrenFromParentRoute = async (root, query, context) => {
 const graphTypeDefs = gql`
   type Page {
     data: Data,
+    filename: String,
     id: String,
-    filePath: String,
-    fileName: String,
+    label: String,
+    path: String,
+    route: String,
     template: String,
-    link: String,
     title: String
   }
 
   type Link {
     label: String,
-    link: String
+    route: String
   }
 
   type Menu {

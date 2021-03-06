@@ -2,7 +2,7 @@ const { ApolloServer } = require('apollo-server');
 
 module.exports = (compilation) => {
   const { config, graph, context } = compilation;
-  const schema = require('./schema/schema')(graph);
+  const schema = require('../schema/schema')(graph);
   const createCache = require('./cache');
 
   const server = new ApolloServer({
@@ -14,11 +14,10 @@ module.exports = (compilation) => {
       }
     },
     context: async (integrationContext) => {
-      const { req } = integrationContext;
-
-      if (req.query.q !== 'internal') {
-        await createCache(req, context);
-      }
+      // const { req } = integrationContext;
+      // if (req.query.q !== 'internal') {
+      //   await createCache(req, context);
+      // }
 
       return {
         config,

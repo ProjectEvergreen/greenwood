@@ -1,5 +1,6 @@
 const path = require('path');
 const pluginGoogleAnalytics = require('./packages/plugin-google-analytics/src/index');
+const pluginGraphQL = require('./packages/plugin-graphql/src/index');
 const pluginImportCss = require('./packages/plugin-import-css/src/index');
 const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
 const pluginPostCss = require('./packages/plugin-postcss/src/index');
@@ -26,6 +27,7 @@ module.exports = {
     pluginGoogleAnalytics({
       analyticsId: 'UA-147204327-1'
     }),
+    ...pluginGraphQL(),
     pluginPolyfills(),
     pluginPostCss(),
     ...pluginImportCss()
