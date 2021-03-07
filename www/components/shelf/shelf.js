@@ -88,10 +88,13 @@ class Shelf extends LitElement {
   }
 
   async fetchShelfData() {
-    return await client.query(MenuQuery, {
-      name: 'side',
-      route: `/${this.page}/`,
-      order: 'index_asc'
+    return await client.query({
+      query: MenuQuery,
+      variables: {
+        name: 'side',
+        route: `/${this.page}/`,
+        order: 'index_asc'
+      }
     });
   }
 

@@ -33,9 +33,12 @@ class HeaderComponent extends LitElement {
   async connectedCallback() {
     super.connectedCallback();
 
-    const response = await client.query(MenuQuery, {
-      name: 'navigation',
-      order: 'index_asc'
+    const response = await client.query({
+      query: MenuQuery, 
+      variables: {
+        name: 'navigation',
+        order: 'index_asc'
+      }
     });
 
     this.navigation = response.data.menu.children.map(item => item.item);

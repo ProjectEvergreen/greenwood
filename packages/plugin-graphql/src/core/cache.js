@@ -5,7 +5,7 @@ const fs = require('fs');
 const { gql } = require('apollo-server');
 const InMemoryCache = require('apollo-cache-inmemory').InMemoryCache;
 const path = require('path');
-const { getQueryHash } = require('./common');
+const { getQueryHash } = require('./common.server');
 
 /* Extract cache server-side */
 module.exports = async (req, context) => {
@@ -30,17 +30,19 @@ module.exports = async (req, context) => {
       });
 
       if (data) {
+        const { outputDir } = context;
+
         const cache = JSON.stringify(client.extract());
         const queryHash = getQueryHash(queryObj, variables);
         const hashFilename = `${queryHash}-cache.json`;
-        const cachePath = `${context.publicDir}/${queryHash}-cache.json`;
+        const cachePath = `${outputDir}/${queryHash}-cache.json`;
         
-        if (!fs.existsSync(context.publicDir)) {
-          fs.mkdirSync(context.publicDir);
+        if (!fs.existsSync(outputDir)) {
+          fs.mkdirSync(outputDir);
         }
 
         if (!fs.existsSync(cachePath)) {
-          fs.writeFileSync(path.join(context.publicDir, hashFilename), cache, 'utf8');
+          fs.writeFileSync(path.join(outputDir, hashFilename), cache, 'utf8');
         }
       }
       resolve();
