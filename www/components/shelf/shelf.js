@@ -99,7 +99,12 @@ class Shelf extends LitElement {
     if (changedProperties.has('page') && this.page !== '' && this.page !== '/') {
       const response = await this.fetchShelfData();
       
-      this.shelfList = response.data.menu.children;
+      this.shelfList = response.data.menu.children.map((item) => { 
+        return { 
+          ...item.item,
+          children: item.children
+        }; 
+      });
       this.expandRoute(window.location.pathname);
       this.requestUpdate();
     }
@@ -116,16 +121,16 @@ class Shelf extends LitElement {
 
   renderList() {
     /* eslint-disable indent */
-    const renderListItems = (mainRoute, list, selected) => {
+    const renderListItems = (mainRoute, children, selected) => {
       let listItems = '';
 
-      if (list && list.length > 0) {
+      if (children && children.length > 0) {
         listItems = html`
           <ul>
-            ${list.map((item) => {
+            ${children.map((child) => {
               return html`
                 <li class="${selected ? '' : 'hidden'}">
-                  <a @click=${() => this.handleSubItemSelect(mainRoute, item.item.route)}>${item.item.label}</a>
+                  <a @click=${() => this.handleSubItemSelect(mainRoute, child.item.route)}>${child.item.label}</a>
                 </li>
               `;
             })}
@@ -146,13 +151,13 @@ class Shelf extends LitElement {
       return html`
         <li class="list-wrap">
           <div>
-            <a href="${item.item.route}">${item.item.label}</a>
+            <a href="${item.route}">${item.label}</a>
             <a id="${id}" @click="${this.handleShelfClick}"><span class="pointer">${chevron}</span></a>
           </div>
 
           <hr/>
           
-          ${renderListItems(item.item.route, item.children, item.selected)}
+          ${renderListItems(item.route, item.children, item.selected)}
         </li>
       `;
     });
