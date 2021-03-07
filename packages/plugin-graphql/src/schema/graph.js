@@ -20,17 +20,17 @@ const getMenuFromGraph = async (root, { name, pathname, orderBy }, context) => {
           }
 
           if (route.includes(baseRoute)) {
-            items.push({ item: { link: route, label: title, index }, children });
+            items.push({ item: { route, label: title, index }, children });
           }
         } else {
-          items.push({ item: { link: route, label: title, index }, children });
+          items.push({ item: { route, label: title, index }, children });
         }
       }
     });
   if (orderBy !== '') {
     items = sortMenuItems(items, orderBy);
   }
-  return { item: { label: name, link: 'na' }, children: items };
+  return { item: { label: name }, children: items };
 };
 
 const sortMenuItems = (menuItems, order) => {
@@ -70,7 +70,7 @@ const getParsedHeadingsFromPage = (tableOfContents, headingLevel) => {
     tableOfContents.forEach(({ content, slug, lvl }) => {
       // make sure we only add heading elements of the same level (h1, h2, h3)
       if (lvl === headingLevel) {
-        children.push({ item: { label: content, link: '#' + slug }, children: [] });
+        children.push({ item: { label: content, route: '#' + slug }, children: [] });
       }
     });
   }

@@ -1,6 +1,6 @@
 import { css, html, LitElement, unsafeCSS } from 'lit-element';
-// import client from '@greenwood/cli/data/client';
-// import MenuQuery from '@greenwood/cli/data/queries/menu';
+import client from '@greenwood/plugin-graphql/core/client';
+import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
 import shelfCss from './shelf.css';
 import chevronRt from '../icons/chevron-right.js';
 import chevronDwn from '../icons/chevron-down.js';
@@ -88,44 +88,18 @@ class Shelf extends LitElement {
   }
 
   async fetchShelfData() {
-    return fetch('/graph.json')
-      .then(res => res.json())
-      .then(data => {
-        return data.filter(page => {
-          if (page.data.menu && page.data.menu === 'side' && page.route.indexOf(`/${this.page}`) === 0) {
-            page.label = `${page.label.charAt(0).toUpperCase()}${page.label.slice(1)}`.replace('-', ' ');
-            page.children = [];
-
-            page.data.tableOfContents.forEach(({ content, slug }) => {
-              page.children.push({
-                label: content,
-                route: `#${slug}`
-              });
-            });
-
-            return page;
-          }
-        }).sort((a, b) => {
-          return a.data.index < b.data.index ? -1 : 1;
-        });
-      });
-    // return await client.query({
-    //   query: MenuQuery,
-    //   variables: {
-    //     name: 'side',
-    //     route: `/${this.page}/`,
-    //     order: 'index_asc'
-    //   }
-    // });
+    return await client.query(MenuQuery, {
+      name: 'side',
+      route: `/${this.page}/`,
+      order: 'index_asc'
+    });
   }
 
   async updated(changedProperties) {
     if (changedProperties.has('page') && this.page !== '' && this.page !== '/') {
-      // const response = await this.fetchShelfData();
-      // this.shelfList = response.data.menu.children;
-      this.shelfList = await this.fetchShelfData();
-      // console.debug('this.shelfList', this.shelfList);
-
+      const response = await this.fetchShelfData();
+      
+      this.shelfList = response.data.menu.children;
       this.expandRoute(window.location.pathname);
       this.requestUpdate();
     }
@@ -151,7 +125,7 @@ class Shelf extends LitElement {
             ${list.map((item) => {
               return html`
                 <li class="${selected ? '' : 'hidden'}">
-                  <a @click=${() => this.handleSubItemSelect(mainRoute, item.route)}>${item.label}</a>
+                  <a @click=${() => this.handleSubItemSelect(mainRoute, item.item.route)}>${item.item.label}</a>
                 </li>
               `;
             })}
@@ -172,13 +146,13 @@ class Shelf extends LitElement {
       return html`
         <li class="list-wrap">
           <div>
-            <a href="${item.route}">${item.label}</a>
+            <a href="${item.item.route}">${item.item.label}</a>
             <a id="${id}" @click="${this.handleShelfClick}"><span class="pointer">${chevron}</span></a>
           </div>
 
           <hr/>
           
-          ${renderListItems(item.route, item.children, item.selected)}
+          ${renderListItems(item.item.route, item.children, item.selected)}
         </li>
       `;
     });

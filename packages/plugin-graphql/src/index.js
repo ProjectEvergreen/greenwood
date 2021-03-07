@@ -63,9 +63,9 @@ class GraphQLResource extends ResourceInterface {
       try {
         const shimmedBody = body.replace('"imports": {', `
           "imports": {
-            "@greenwood/plugin-graphql/core/client.js": "/node_modules/@greenwood/plugin-graphql/src/core/client.js",
-            "@greenwood/plugin-graphql/queries/menu.gql": "/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql",
-            "@greenwood/plugin-graphql/queries/config.gql": "/node_modules/@greenwood/plugin-graphql/src/queries/config.gql",
+            "@greenwood/plugin-graphql/core/client": "/node_modules/@greenwood/plugin-graphql/src/core/client.js",
+            "@greenwood/plugin-graphql/queries/menu": "/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql",
+            "@greenwood/plugin-graphql/queries/config": "/node_modules/@greenwood/plugin-graphql/src/queries/config.gql",
         `);
 
         resolve({ body: shimmedBody });
