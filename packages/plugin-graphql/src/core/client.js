@@ -30,9 +30,8 @@ client.query = (params) => {
     return fetch(cachePath)
       .then(response => response.json())
       .then((response) => {
-        // mock client.query response
         return {
-          data: response // new InMemoryCache().restore(response).readQuery(params)
+          data: response
         };
       });
   } else {

@@ -1,9 +1,10 @@
 const bundleCompilation = require('../lifecycles/bundle');
 const copyAssets = require('../lifecycles/copy');
+const { devServer } = require('../lifecycles/serve');
 const fs = require('fs');
 const generateCompilation = require('../lifecycles/compile');
 const serializeCompilation = require('../lifecycles/serialize');
-const { devServer } = require('../lifecycles/serve');
+const { ServerInterface } = require('../lib/server-interface');
 
 module.exports = runProductionBuild = async () => {
 
@@ -15,6 +16,22 @@ module.exports = runProductionBuild = async () => {
       const outputDir = compilation.context.outputDir;
 
       devServer(compilation).listen(port);
+
+      const servers = [...compilation.config.plugins.filter((plugin) => {
+        return plugin.type === 'server';
+      }).map((plugin) => {
+        const provider = plugin.provider(compilation);
+
+        if (!(provider instanceof ServerInterface)) {
+          console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`);
+        }
+
+        return provider;
+      })];
+
+      await Promise.all(servers.map(async (server) => {
+        return server.start();
+      }));
   
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir);
