@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 const MOCK_CONFIG = require('../mocks/config');
-const { configResolvers } = require('../../../../src/data/schema/config');
+const { configResolvers } = require('../../../src/schema/config');
 
 describe('Unit Test: Data', function() {
 

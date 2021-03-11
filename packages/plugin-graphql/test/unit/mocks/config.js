@@ -1,8 +1,7 @@
 const MOCK_CONFIG = {
   config: {
     devServer: {
-      port: 1984,
-      host: 'localhost'
+      port: 1984
     },
     meta: [
       { name: 'twitter:site', content: '@PrjEvergreen' },

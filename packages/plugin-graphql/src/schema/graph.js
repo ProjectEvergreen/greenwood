@@ -106,10 +106,9 @@ const getChildrenFromParentRoute = async (root, query, context) => {
   graph
     .forEach((page) => {
       const { route, path, data } = page;
-      // const { label } = getDeriveMetaFromRoute(route);
       const root = route.split('/')[1];
 
-      if (root.indexOf(parent) >= 0 && path !== `./${parent}/index.md`) {
+      if (root === parent && path.indexOf(`${parent}/index.md`) < 0) {
         const id = page.label;
 
         pages.push({

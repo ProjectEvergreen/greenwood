@@ -1,6 +1,5 @@
 const expect = require('chai').expect;
-const { gql } = require('apollo-server');
-const { getQueryHash } = require('../../../src/data/common');
+const { getQueryHash } = require('../../src/core/common.server');
 
 describe('Unit Test: Data', function() {
 
@@ -10,14 +9,14 @@ describe('Unit Test: Data', function() {
       
       it('should return the expected hash for a standard graph query', function () {
         // __typename is added by server.js
-        const query = gql`
+        const query = `
           query {
             graph {
               id,
               title,
-              link,
-              filePath,
-              fileName,
+              route,
+              path,
+              filename,
               template,
               __typename
             }
@@ -25,15 +24,15 @@ describe('Unit Test: Data', function() {
         `;
         const hash = getQueryHash(query);
 
-        expect(hash).to.be.equal('876029931');
+        expect(hash).to.be.equal('380713565');
       });
 
       it('should return the expected hash for a custom graph query with custom data', function () {
-        const query = gql`
+        const query = `
           query {
             graph {
               title,
-              link,
+              route,
               data {
                 date,
                 image
@@ -43,18 +42,18 @@ describe('Unit Test: Data', function() {
         `;
         const hash = getQueryHash(query);
 
-        expect(hash).to.be.equal('1656784831');
+        expect(hash).to.be.equal('1136154652');
       });
 
       it('should return the expected hash for a children query with a variable', function () {
-        const query = gql`
+        const query = `
           query($parent: String!) {
             children(parent: $parent) {
               id,
               title,
-              link,
-              filePath,
-              fileName,
+              route,
+              path,
+              filename,
               template
             }
           }
@@ -63,7 +62,7 @@ describe('Unit Test: Data', function() {
           parent: '/docs/'
         });
 
-        expect(hash).to.be.equal('1366211136');
+        expect(hash).to.be.equal('1696894039');
       });
     });
 
