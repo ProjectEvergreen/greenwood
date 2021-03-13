@@ -15,33 +15,38 @@ module.exports = runProductionBuild = async () => {
       const port = compilation.config.devServer.port;
       const outputDir = compilation.context.outputDir;
 
-      devServer(compilation).listen(port);
+      devServer(compilation).listen(port, async () => {
+        console.info(`Started local development server at localhost:${port}`);
+        
+        // custom user server plugins
+        const servers = [...compilation.config.plugins.filter((plugin) => {
+          return plugin.type === 'server';
+        }).map((plugin) => {
+          const provider = plugin.provider(compilation);
 
-      const servers = [...compilation.config.plugins.filter((plugin) => {
-        return plugin.type === 'server';
-      }).map((plugin) => {
-        const provider = plugin.provider(compilation);
+          if (!(provider instanceof ServerInterface)) {
+            console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`);
+          }
 
-        if (!(provider instanceof ServerInterface)) {
-          console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`);
+          return provider;
+        })];
+
+        await Promise.all(servers.map(async (server) => {
+          server.start();
+
+          return Promise.resolve(server);
+        }));
+
+        if (!fs.existsSync(outputDir)) {
+          fs.mkdirSync(outputDir);
         }
+    
+        await serializeCompilation(compilation);
+        await bundleCompilation(compilation);
+        await copyAssets(compilation);
 
-        return provider;
-      })];
-
-      await Promise.all(servers.map(async (server) => {
-        return server.start();
-      }));
-  
-      if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir);
-      }
-  
-      await serializeCompilation(compilation);
-      await bundleCompilation(compilation);
-      await copyAssets(compilation);
-
-      resolve();
+        resolve();
+      });
     } catch (err) {
       reject(err);
     }
