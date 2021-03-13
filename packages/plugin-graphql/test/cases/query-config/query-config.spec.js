@@ -8,7 +8,7 @@
  * User Command
  * greenwood build
  *
- * Default Config
+ * Default Config (+ plugin-graphql)
  *
  * Custom Workspace
  * greenwood.config.js
@@ -27,12 +27,12 @@ const path = require('path');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Config from GraphQL';
+  const LABEL = 'ConfigQuery from GraphQL';
   const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
   let setup;
 
   before(async function() {
-    setup = new TestBed(true);
+    setup = new TestBed();
 
     const greenwoodGraphqlCoreLibs = (await glob(`${process.cwd()}/packages/plugin-graphql/src/core/*.js`)).map((lib) => {
       return {
