@@ -33,7 +33,7 @@ describe('Build Greenwood With: ', function() {
   let setup;
 
   before(async function() {
-    setup = new TestBed(true);
+    setup = new TestBed();
 
     const greenwoodGraphqlCoreLibs = (await glob(`${process.cwd()}/packages/plugin-graphql/src/core/*.js`)).map((lib) => {
       return {
