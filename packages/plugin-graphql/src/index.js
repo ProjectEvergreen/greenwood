@@ -73,6 +73,7 @@ class GraphQLResource extends ResourceInterface {
             "@greenwood/plugin-graphql/core/common": "/node_modules/@greenwood/plugin-graphql/src/core/common.client.js",
             "@greenwood/plugin-graphql/queries/children": "/node_modules/@greenwood/plugin-graphql/src/queries/children.gql",
             "@greenwood/plugin-graphql/queries/config": "/node_modules/@greenwood/plugin-graphql/src/queries/config.gql",
+            "@greenwood/plugin-graphql/queries/graph": "/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql",
             "@greenwood/plugin-graphql/queries/menu": "/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql"${danglingComma}
         `);
 
@@ -137,7 +138,8 @@ module.exports = (options = {}) => {
           { find: '@greenwood/plugin-graphql/core/common', replacement: '@greenwood/plugin-graphql/src/core/common.client.js' },
           { find: '@greenwood/plugin-graphql/queries/menu', replacement: '@greenwood/plugin-graphql/src/queries/menu.gql' },
           { find: '@greenwood/plugin-graphql/queries/config', replacement: '@greenwood/plugin-graphql/src/queries/config.gql' },
-          { find: '@greenwood/plugin-graphql/queries/children', replacement: '@greenwood/plugin-graphql/src/queries/children.gql' }
+          { find: '@greenwood/plugin-graphql/queries/children', replacement: '@greenwood/plugin-graphql/src/queries/children.gql' },
+          { find: '@greenwood/plugin-graphql/queries/graph', replacement: '@greenwood/plugin-graphql/src/queries/graph.gql' }
         ]
       })
     ]
