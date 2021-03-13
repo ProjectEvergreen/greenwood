@@ -63,12 +63,16 @@ class GraphQLResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise(async (resolve, reject) => {
       try {
+        // es-modules-shims breaks on dangling commas in an importMap :/
+        const danglingComma = body.indexOf('"imports": {}') > 0 
+          ? ''
+          : ',';
         const shimmedBody = body.replace('"imports": {', `
           "imports": {
             "@greenwood/plugin-graphql/core/client": "/node_modules/@greenwood/plugin-graphql/src/core/client.js",
             "@greenwood/plugin-graphql/core/common": "/node_modules/@greenwood/plugin-graphql/src/core/common.client.js",
             "@greenwood/plugin-graphql/queries/menu": "/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql",
-            "@greenwood/plugin-graphql/queries/config": "/node_modules/@greenwood/plugin-graphql/src/queries/config.gql",
+            "@greenwood/plugin-graphql/queries/config": "/node_modules/@greenwood/plugin-graphql/src/queries/config.gql"${danglingComma}
         `);
 
         resolve({ body: shimmedBody });
@@ -86,11 +90,11 @@ class GraphQLResource extends ResourceInterface {
     return new Promise((resolve, reject) => {
       try {
         // TODO const apolloScript = isStrictOptimization (no apollo-state)
-        body = body.replace('<script>', `
+        body = body.replace('<head>', `
           <script data-state="apollo">
             window.__APOLLO_STATE__ = true;
           </script>
-          <script>
+          </head>
         `);
     
         resolve(body);
