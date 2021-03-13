@@ -27,7 +27,6 @@ class HeaderComponent extends LitElement {
       }
     });
 
-    // this.navigation = response.data.menu.children;
     this.navigation = response.data.menu.children.map(item => item.item);
   }
 

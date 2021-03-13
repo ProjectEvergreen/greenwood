@@ -4,15 +4,11 @@ import ConfigQuery from '@greenwood/plugin-graphql/queries/config';
 class FooterComponent extends HTMLElement {
   constructor() {
     super();
-    console.debug('FooterComponent hello!!!');
-
+    
     this.root = this.attachShadow({ mode: 'open' });
   }
 
-  async connectedCallback() {    
-    console.debug(client);
-    console.debug(ConfigQuery);
-
+  async connectedCallback() {
     await client.query({
       query: ConfigQuery
     }).then((response) => {
@@ -20,10 +16,6 @@ class FooterComponent extends HTMLElement {
         <footer>${response.data.config.title}</footer>
       `;
     });
-    // this.root.innerHTML = `
-    //   <footer>&copy; ${response.data.config.title}</footer>
-    // `;
-    // });
   }
 }
 
