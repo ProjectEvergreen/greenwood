@@ -1,5 +1,4 @@
 const path = require('path');
-const pluginBabel = require('./packages/plugin-babel/src/index');
 const pluginGoogleAnalytics = require('./packages/plugin-google-analytics/src/index');
 const pluginImportCss = require('./packages/plugin-import-css/src/index');
 const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
@@ -24,9 +23,6 @@ module.exports = {
     { name: 'google-site-verification', content: '4rYd8k5aFD0jDnN0CCFgUXNe4eakLP4NnA18mNnK5P0' }
   ],
   plugins: [
-    ...pluginBabel({
-      extendConfig: true
-    }),
     pluginGoogleAnalytics({
       analyticsId: 'UA-147204327-1'
     }),

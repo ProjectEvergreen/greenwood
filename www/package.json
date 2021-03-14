@@ -7,12 +7,10 @@
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "dependencies": {
-    "@babel/runtime": "^7.10.4",
     "@evergreen-wc/eve-button": "^0.0.9",
     "@evergreen-wc/eve-container": "^0.0.10",
     "lit-element": "^2.4.0",
-    "prismjs": "^1.21.0",
-    "regenerator-runtime": "^0.13.7"
+    "prismjs": "^1.21.0"
   },
   "devDependencies": {
     "@mapbox/rehype-prism": "^0.5.0",
