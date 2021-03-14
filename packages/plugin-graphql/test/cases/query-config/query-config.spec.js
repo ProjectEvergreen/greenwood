@@ -75,7 +75,7 @@ describe('Build Greenwood With: ', function() {
         expect(footer.innerHTML).to.be.equal(greenwoodConfig.title);
       });
 
-      it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {
+      it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', function() {
         const scriptTags = dom.window.document.querySelectorAll('script');
         const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';

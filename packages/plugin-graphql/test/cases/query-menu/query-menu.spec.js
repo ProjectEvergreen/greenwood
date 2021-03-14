@@ -104,7 +104,7 @@ describe('Build Greenwood With: ', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
 
-      it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', () => {
+      it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', function() {
         const scriptTags = dom.window.document.querySelectorAll('script');
         const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';

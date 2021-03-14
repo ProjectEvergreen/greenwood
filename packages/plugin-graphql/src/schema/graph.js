@@ -32,7 +32,7 @@ const getMenuFromGraph = async (root, { name, pathname, orderBy }, context) => {
     items = sortMenuItems(items, orderBy);
   }
 
-  return { item: { label: name }, children: items };
+  return Promise.resolve({ item: { label: name }, children: items });
 };
 
 const sortMenuItems = (menuItems, order) => {
@@ -80,24 +80,7 @@ const getParsedHeadingsFromPage = (tableOfContents, headingLevel) => {
 };
 
 const getPagesFromGraph = async (root, query, context) => {
-  const pages = [];
-  const { graph } = context;
-
-  graph
-    .forEach((page) => {
-      const { data } = page;
-      const id = page.label;
-
-      pages.push({
-        ...page,
-        id,
-        data: {
-          ...data
-        }
-      });
-    });
-
-  return pages;
+  return Promise.resolve(context.graph);
 };
 
 const getChildrenFromParentRoute = async (root, query, context) => {
@@ -107,23 +90,15 @@ const getChildrenFromParentRoute = async (root, query, context) => {
 
   graph
     .forEach((page) => {
-      const { route, path, data } = page;
+      const { route, path } = page;
       const root = route.split('/')[1];
 
       if (root === parent && path.indexOf(`${parent}/index.md`) < 0) {
-        const id = page.label;
-
-        pages.push({
-          id,
-          ...page,
-          data: {
-            ...data
-          }
-        });
+        pages.push(page);
       }
     });
 
-  return pages;
+  return Promise.resolve(pages);
 };
 
 const graphTypeDefs = gql`
