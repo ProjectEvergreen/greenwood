@@ -9,7 +9,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./index.md",
-      label: "be5eeae398e34ba",
+      id: "index",
+      label: "Index",
       route: "/",
       template: "home",
       path:
@@ -69,7 +70,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./about/community.md",
-      label: "community",
+      id: "community",
+      label: "Community",
       route: "/about/community",
       template: "page",
       path:
@@ -129,7 +131,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./about/features.md",
-      label: "features",
+      id: "features",
+      label: "Features",
       route: "/about/features",
       template: "page",
       path:
@@ -189,7 +192,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./about/goals.md",
-      label: "goals",
+      id: "Goals",
+      label: "Goals",
       route: "/about/goals",
       template: "page",
       path:
@@ -278,7 +282,8 @@ module.exports = {
         ],
       },
       filename: "./about/how-it-works.md",
-      label: "how-it-works",
+      id: "how-it-works",
+      label: "How It Works",
       route: "/about/how-it-works",
       template: "page",
       path:
@@ -338,7 +343,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./about/index.md",
-      label: "about",
+      id: "about",
+      label: "About",
       route: "/about/",
       template: "page",
       path:
@@ -398,7 +404,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./docs/component-model.md",
-      label: "component-model",
+      id: "component-model",
+      label: "Component Model",
       route: "/docs/component-model",
       template: "page",
       path:
@@ -529,7 +536,8 @@ module.exports = {
         ],
       },
       filename: "./docs/configuration.md",
-      label: "configuration",
+      id: "configuration",
+      label: "Configuration",
       route: "/docs/configuration",
       template: "page",
       path:
@@ -632,7 +640,8 @@ module.exports = {
         ],
       },
       filename: "./docs/css-and-images.md",
-      label: "styles-assets",
+      id: "css-and-images",
+      label: "CSS and Images",
       route: "/docs/css-and-images",
       template: "page",
       path:
@@ -833,7 +842,8 @@ module.exports = {
         ],
       },
       filename: "./docs/data.md",
-      label: "data-sources",
+      id: "data-sources",
+      label: "Data Sources",
       route: "/docs/data",
       template: "page",
       path:
@@ -966,7 +976,8 @@ module.exports = {
         ],
       },
       filename: "./docs/front-matter.md",
-      label: "front-matter",
+      id: "front-matter",
+      label: "Front Matter",
       route: "/docs/front-matter",
       template: "page",
       path:
@@ -1026,7 +1037,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./docs/index.md",
-      label: "docs",
+      id: "docs",
+      label: "Docs",
       route: "/docs/",
       template: "page",
       path:
@@ -1115,7 +1127,8 @@ module.exports = {
         ],
       },
       filename: "./docs/layouts.md",
-      label: "templates",
+      id: "templates",
+      label: "Templates",
       route: "/docs/layouts",
       template: "page",
       path:
@@ -1197,7 +1210,8 @@ module.exports = {
         ],
       },
       filename: "./docs/markdown.md",
-      label: "markdown",
+      id: "markdown",
+      label: "Markdown",
       route: "/docs/markdown",
       template: "page",
       path:
@@ -1286,7 +1300,8 @@ module.exports = {
         ],
       },
       filename: "./docs/menus.md",
-      label: "menus",
+      id: "menus",
+      label: "Menus",
       route: "/docs/menus",
       template: "page",
       path:
@@ -1375,7 +1390,8 @@ module.exports = {
         ],
       },
       filename: "./docs/tech-stack.md",
-      label: "stack",
+      id: "tech-stack",
+      label: "Tech Stack",
       route: "/docs/tech-stack",
       template: "page",
       path:
@@ -1450,7 +1466,8 @@ module.exports = {
         ],
       },
       filename: "./getting-started/branding.md",
-      label: "branding",
+      id: "branding",
+      label: "Branding",
       route: "/getting-started/branding",
       template: "page",
       path:
@@ -1510,7 +1527,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./getting-started/build-and-deploy.md",
-      label: "build-and-deploy",
+      id: "build-and-deploy",
+      label: "Build And Deploy",
       route: "/getting-started/build-and-deploy",
       template: "page",
       path:
@@ -1606,7 +1624,8 @@ module.exports = {
         ],
       },
       filename: "./getting-started/creating-content.md",
-      label: "creating-content",
+      id: "creating-content",
+      label: "Creating Content",
       route: "/getting-started/creating-content",
       template: "page",
       path:
@@ -1666,7 +1685,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./getting-started/index.md",
-      label: "getting-started",
+      id: "getting-started",
+      label: "Getting Started",
       route: "/getting-started/",
       template: "page",
       path:
@@ -1748,7 +1768,8 @@ module.exports = {
         ],
       },
       filename: "./getting-started/key-concepts.md",
-      label: "key-concepts",
+      id: "key-concepts",
+      label: "Key Concepts",
       route: "/getting-started/key-concepts",
       template: "page",
       path:
@@ -1808,7 +1829,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./getting-started/next-steps.md",
-      label: "next-steps",
+      id: "next-steps",
+      label: "Next Steps",
       route: "/getting-started/next-steps",
       template: "page",
       path:
@@ -1890,7 +1912,8 @@ module.exports = {
         ],
       },
       filename: "./getting-started/project-setup.md",
-      label: "project-setup",
+      id: "project-setup",
+      label: "Project Setup",
       route: "/getting-started/project-setup",
       template: "page",
       path:
@@ -1950,7 +1973,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./getting-started/quick-start.md",
-      label: "quick-start",
+      id: "quick-start",
+      label: "Quick Start",
       route: "/getting-started/quick-start",
       template: "page",
       path:
@@ -2010,7 +2034,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./plugins/composite-plugins.md",
-      label: "composite-plugins",
+      id: "composite-plugins",
+      label: "Composite Plugins",
       route: "/plugins/composite-plugins",
       template: "page",
       path:
@@ -2070,7 +2095,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./plugins/index-hooks.md",
-      label: "index-hooks",
+      id: "index-hooks",
+      label: "Index Hooks",
       route: "/plugins/index-hooks",
       template: "page",
       path:
@@ -2130,7 +2156,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./plugins/index.md",
-      label: "plugins",
+      id: "plugins",
+      label: "Plugins",
       route: "/plugins/",
       template: "page",
       path:
@@ -2190,7 +2217,8 @@ module.exports = {
         tableOfContents: [],
       },
       filename: "./plugins/webpack.md",
-      label: "webpack",
+      id: "webpack",
+      label: "Webpack",
       route: "/plugins/webpack",
       template: "page",
       path:

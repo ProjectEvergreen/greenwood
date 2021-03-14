@@ -6,7 +6,7 @@ const getMenuFromGraph = async (root, { name, pathname, orderBy }, context) => {
 
   graph
     .forEach((page) => {
-      const { route, data, title } = page;
+      const { route, data, label } = page;
       const { menu, index, tableOfContents, linkheadings } = data;
       let children = getParsedHeadingsFromPage(tableOfContents, linkheadings);
 
@@ -20,16 +20,18 @@ const getMenuFromGraph = async (root, { name, pathname, orderBy }, context) => {
           }
 
           if (route.includes(baseRoute)) {
-            items.push({ item: { route, label: title, index }, children });
+            items.push({ item: { route, label, index }, children });
           }
         } else {
-          items.push({ item: { route, label: title, index }, children });
+          items.push({ item: { route, label, index }, children });
         }
       }
     });
+
   if (orderBy !== '') {
     items = sortMenuItems(items, orderBy);
   }
+
   return { item: { label: name }, children: items };
 };
 

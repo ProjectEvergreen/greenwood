@@ -73,7 +73,7 @@ describe('Unit Test: Data', function() {
             it('should be labeled and linked to Styles and Web Components', function() {
               const item = shelf.children[0].item;
 
-              expect(item.label).to.be.equal('Styles and Web Components');
+              expect(item.label).to.be.equal('Branding');
               expect(item.route).to.be.equal('/getting-started/branding');
             });
 
@@ -88,10 +88,10 @@ describe('Unit Test: Data', function() {
           });
 
           describe('the second item:', function() {
-            it('should be labeled and linked to Build and Deploy', function() {
+            it('should be labeled and linked to Build And Deploy', function() {
               const item = shelf.children[1].item;
 
-              expect(item.label).to.be.equal('Build and Deploy');
+              expect(item.label).to.be.equal('Build And Deploy');
               expect(item.route).to.be.equal('/getting-started/build-and-deploy');
             });
           });
@@ -205,10 +205,10 @@ describe('Unit Test: Data', function() {
           });
 
           describe('the second item:', function() {
-            it('should be labeled and linked to Build and Deploy', function() {
+            it('should be labeled and linked to Build And Deploy', function() {
               const item = shelf.children[1].item;
 
-              expect(item.label).to.be.equal('Build and Deploy');
+              expect(item.label).to.be.equal('Build And Deploy');
               expect(item.route).to.be.equal('/getting-started/build-and-deploy');
             });
           });
@@ -217,7 +217,7 @@ describe('Unit Test: Data', function() {
             it('should be labeled and linked to Styles and Web Components', function() {
               const item = shelf.children[2].item;
 
-              expect(item.label).to.be.equal('Styles and Web Components');
+              expect(item.label).to.be.equal('Branding');
               expect(item.route).to.be.equal('/getting-started/branding');
             });
 
@@ -248,33 +248,42 @@ describe('Unit Test: Data', function() {
           });
 
           describe('the first item:', function() {
-            it('should be labeled and linked to Build and Deploy', function() {
+            it('should be labeled and linked to Branding', function() {
               const item = shelf.children[0].item;
 
-              expect(item.label).to.be.equal('Build and Deploy');
-              expect(item.route).to.be.equal('/getting-started/build-and-deploy');
+              expect(item.label).to.be.equal('Branding');
+              expect(item.route).to.be.equal('/getting-started/branding');
             });
           });
 
           describe('the second item:', function() {
-            it('should be labeled and linked to Creating Content', function() {
+            it('should be labeled and linked to Build And Deploy', function() {
               const item = shelf.children[1].item;
+
+              expect(item.label).to.be.equal('Build And Deploy');
+              expect(item.route).to.be.equal('/getting-started/build-and-deploy');
+            });
+          });
+
+          describe('the third item:', function() {
+            it('should be labeled and linked to Creating Content', function() {
+              const item = shelf.children[2].item;
 
               expect(item.label).to.be.equal('Creating Content');
               expect(item.route).to.be.equal('/getting-started/creating-content');
             });
           });
 
-          describe('the third item:', function() {
+          describe('the fourth item:', function() {
             it('should be labeled and linked to Key Concepts', function() {
-              const item = shelf.children[2].item;
+              const item = shelf.children[3].item;
 
               expect(item.label).to.be.equal('Key Concepts');
               expect(item.route).to.be.equal('/getting-started/key-concepts');
             });
 
             it('should have the correct sub items', function() {
-              const subitem = shelf.children[2].children;
+              const subitem = shelf.children[3].children;
 
               expect(subitem[0].item.label).to.be.equal('Workspace');
               expect(subitem[0].item.route).to.be.equal('#workspace');
@@ -302,42 +311,24 @@ describe('Unit Test: Data', function() {
           });
 
           describe('the first item:', function() {
-            it('should be labeled and linked to Styles and Web Components', function() {
-              const item = shelf.children[0].item;
-
-              expect(item.label).to.be.equal('Styles and Web Components');
-              expect(item.route).to.be.equal('/getting-started/branding');
-            });
-
-            it('should have the correct sub items', function() {
-              const subitem = shelf.children[0].children;
-
-              expect(subitem[0].item.label).to.be.equal('Web Components');
-              expect(subitem[0].item.route).to.be.equal('#web-components');
-              expect(subitem[1].item.label).to.be.equal('CSS');
-              expect(subitem[1].item.route).to.be.equal('#css');
-            });
-          });
-
-          describe('the second item:', function() {
             it('should be labeled and linked to Quick Start', function() {
-              const item = shelf.children[1].item;
+              const item = shelf.children[0].item;
 
               expect(item.label).to.be.equal('Quick Start');
               expect(item.route).to.be.equal('/getting-started/quick-start');
             });
           });
 
-          describe('the third item:', function() {
+          describe('the second item:', function() {
             it('should be labeled and linked to Project Setup', function() {
-              const item = shelf.children[2].item;
+              const item = shelf.children[1].item;
 
               expect(item.label).to.be.equal('Project Setup');
               expect(item.route).to.be.equal('/getting-started/project-setup');
             });
 
             it('should have the correct sub items', function() {
-              const subitem = shelf.children[2].children;
+              const subitem = shelf.children[1].children;
 
               expect(subitem[0].item.label).to.be.equal('Installing Greenwood');
               expect(subitem[0].item.route).to.be.equal('#installing-greenwood');
@@ -345,6 +336,15 @@ describe('Unit Test: Data', function() {
               expect(subitem[1].item.route).to.be.equal('#configuring-workflows');
               expect(subitem[2].item.label).to.be.equal('Project Structure');
               expect(subitem[2].item.route).to.be.equal('#project-structure');
+            });
+          });
+
+          describe('the third item:', function() {
+            it('should be labeled and linked to Next Steps', function() {
+              const item = shelf.children[2].item;
+
+              expect(item.label).to.be.equal('Next Steps');
+              expect(item.route).to.be.equal('/getting-started/next-steps');
             });
           });
         });

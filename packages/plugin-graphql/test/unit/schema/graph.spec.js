@@ -53,25 +53,25 @@ describe('Unit Test: Data', function() {
           expect(children[6].id).to.equal('quick-start');
         });
 
-        it('should have the expected path for each child', function() {
+        it('should have the expected route for each child', function() {
           children.forEach(function(child) {
-            expect(child.route).to.equal(`/getting-started/${child.label}`);
+            expect(child.route).to.equal(`/getting-started/${child.id}`);
           });
         });
 
         it('should have the expected label for each child', function() {
-          expect(children[0].label).to.equal('branding');
-          expect(children[1].label).to.equal('build-and-deploy');
-          expect(children[2].label).to.equal('creating-content');
-          expect(children[3].label).to.equal('key-concepts');
-          expect(children[4].label).to.equal('next-steps');
-          expect(children[5].label).to.equal('project-setup');
-          expect(children[6].label).to.equal('quick-start');
+          expect(children[0].label).to.equal('Branding');
+          expect(children[1].label).to.equal('Build And Deploy');
+          expect(children[2].label).to.equal('Creating Content');
+          expect(children[3].label).to.equal('Key Concepts');
+          expect(children[4].label).to.equal('Next Steps');
+          expect(children[5].label).to.equal('Project Setup');
+          expect(children[6].label).to.equal('Quick Start');
         });
 
         it('should have the expected path for each child', function() {
           children.forEach(function(child) {
-            expect(child.path).to.contain(`/getting-started/${child.label}.md`);
+            expect(child.path).to.contain(`/getting-started/${child.id}.md`);
           });
         });
 

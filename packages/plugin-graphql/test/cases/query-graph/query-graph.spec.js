@@ -138,9 +138,9 @@ describe('Build Greenwood With: ', function() {
 
         expect(listItems.length).to.be.equal(3);        
         
-        expect(listItems[0].innerHTML).to.be.contain('first-post');
-        expect(listItems[1].innerHTML).to.be.contain('second-post');
-        expect(listItems[2].innerHTML).to.be.contain('index');
+        expect(listItems[0].innerHTML).to.be.contain('First Post');
+        expect(listItems[1].innerHTML).to.be.contain('Second Post');
+        expect(listItems[2].innerHTML).to.be.contain('Index');
       });
     });
   });
