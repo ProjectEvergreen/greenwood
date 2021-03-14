@@ -1,13 +1,10 @@
 import { css, html, LitElement, unsafeCSS } from 'lit-element';
 import client from '@greenwood/plugin-graphql/core/client';
 import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
-import ConfigQuery from '@greenwood/plugin-graphql/queries/config';
 import '@evergreen-wc/eve-container';
 import headerCss from './header.css';
 // TODO import evergreenLogo from '../../assets/evergreen.svg';
 import '../social-icons/social-icons.js';
-
-console.debug('ConfigQuery', ConfigQuery);
 
 class HeaderComponent extends LitElement {
 
