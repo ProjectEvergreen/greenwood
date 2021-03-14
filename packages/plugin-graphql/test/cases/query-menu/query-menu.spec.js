@@ -94,7 +94,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    describe('Home (Page Template) navigation w/ MenuQuery', function() {
+    describe('Home Page navigation w/ MenuQuery', function() {
       
       beforeEach(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
