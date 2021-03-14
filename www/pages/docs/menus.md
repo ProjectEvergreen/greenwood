@@ -8,10 +8,7 @@ linkheadings: 3
 
 ## Menus
 
-> ⛔ [_**Coming Soon!**_](https://github.com/ProjectEvergreen/greenwood/issues/278)
-
-<!--
-In this section we'll touch on the menu related feature of Greenwood which utilizes [data sources](/docs/data) within a component to query for [front matter](/docs/front-matter) declared menus.
+In this section we'll touch on the menu related feature of Greenwood which utilizes [data sources](/docs/data/) within a component to query for [front matter](/docs/front-matter/) declared menus.
 
 ### Declare Menu
 
@@ -78,14 +75,14 @@ linkheadings: 3
 
 ### Retrieve Menu
 
-Now in order to use our navigation menu within a component we need to query it via GraphQL, see [data sources](/docs/data) for more information.
+Now in order to use our navigation menu within a component we need to query it via GraphQL.
 
 `navigation.js`
 
 ```js
 import { LitElement, html } from 'lit-element';
-import client from '@greenwood/cli/data/client';
-import MenuQuery from '@greenwood/cli/data/queries/menu';
+import client from '@greenwood/plugin-graphql/core/client';
+import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
 
 class HeaderComponent extends LitElement {
 
@@ -104,7 +101,7 @@ class HeaderComponent extends LitElement {
       }
     });
 
-    this.navigation = response.data.menu.children;
+    this.navigation = response.data.menu.children.map(item => item.item);
   }
 
   render() {
@@ -115,7 +112,7 @@ class HeaderComponent extends LitElement {
         <ul>
           ${navigation.map(({ item }) => {
             return html`
-              <li><a href='${item.link}' title='Click to visit the ${item.label} page'>${item.label}</a></li>
+              <li><a href='${item.route}' title='Click to visit the ${item.label} page'>${item.label}</a></li>
             `;
           })}
         </ul>
@@ -123,7 +120,7 @@ class HeaderComponent extends LitElement {
     `;
   }
 }
-customElements.define('eve-header', HeaderComponent);
+customElements.define('app-header', HeaderComponent);
 ```
 
 ### Query Result
@@ -134,22 +131,22 @@ menu: {
   children:[
     {
       children: [
-        { item: {label: "Online", link: "#online"}},
-        { item: {label: "Offline", link: "#offline"}},
-        { item: {label: "Locations", link: "#locations"}},
+        { item: {label: "Online", route: "#online"}},
+        { item: {label: "Offline", route: "#offline"}},
+        { item: {label: "Locations", route: "#locations"}},
       ],
-      item: {label: "Contact", link: "/mydirectory/contact"}
+      item: {label: "Contact", route: "/mydirectory/contact"}
     },
     {
       children: []
-      item: {label: "Docs", link: "/mydirectory/docs"}
+      item: {label: "Docs", route: "/mydirectory/docs"}
     },
     {
       children: []
-      item: {label: "About", link: "/mydirectory/"}
+      item: {label: "About", route: "/mydirectory/"}
     }
   ],
-  item: {label: "navigation", link: "na"}
+  item: {label: "navigation", route: "na"}
 ]
 ```
 
@@ -264,11 +261,11 @@ The object result for `/docs` is:
 "menu":{
   "item": {"label": "shelf", "link": "na"},
   "children":[{
-      "item":{"label":"Components","link":"/docs/components"},
+      "item":{"label":"Components","route":"/docs/components"},
       "children":[]
     },
     {
-      "item":{"label":"Docs","link":"/docs/""},
+      "item":{"label":"Docs","route":"/docs/"},
       "children":[]
     }
   ]
@@ -291,5 +288,3 @@ The object result for `/about` is:
   ]
 }
 ```
-
--->

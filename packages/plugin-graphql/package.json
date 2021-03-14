@@ -9,7 +9,8 @@
     "Greenwood",
     "GraphQL",
     "Static Site Generator",
-    "NodeJS"
+    "NodeJS",
+    "Apollo"
   ],
   "main": "src/index.js",
   "files": [
