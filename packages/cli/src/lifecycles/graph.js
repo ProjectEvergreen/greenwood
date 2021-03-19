@@ -24,7 +24,11 @@ module.exports = generateGraph = async (compilation) => {
             const relativeWorkspacePath = directory.replace(process.cwd(), '').replace('/', '');
             const template = attributes.template || 'page';
             const title = attributes.title || compilation.config.title || '';
-            const label = attributes.label || filename.split('/')[filename.split('/').length - 1].replace('.md', '').replace('.html', '');
+            const id = attributes.label || filename.split('/')[filename.split('/').length - 1].replace('.md', '').replace('.html', '');
+            const label = id.split('-')
+              .map((idPart) => {
+                return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
+              }).join(' ');
             let route = relativePagePath.replace('.md', '').replace('.html', '');
 
             /*
@@ -37,7 +41,7 @@ module.exports = generateGraph = async (compilation) => {
              */
             if (relativePagePath.lastIndexOf('/') > 0) {
               // https://github.com/ProjectEvergreen/greenwood/issues/455
-              route = label === 'index' || route.replace('/index', '') === `/${label}`
+              route = id === 'index' || route.replace('/index', '') === `/${id}`
                 ? route.replace('index', '')
                 : `${route}/`;
             } else {
@@ -91,7 +95,8 @@ module.exports = generateGraph = async (compilation) => {
              *----------------------
              * data: custom page frontmatter
              * filename: name of the file
-             * label: text representation of the filename
+             * id: filename without the extension
+             * label: "pretty" text representation of the filename
              * path: path to the file relative to the workspace
              * route: URL route for a given page on outputFilePath
              * template: page template to use as a base for a generated component
@@ -100,6 +105,7 @@ module.exports = generateGraph = async (compilation) => {
             pages.push({
               data: customData || {},
               filename,
+              id,
               label,
               path: route === '/' || relativePagePath.lastIndexOf('/') === 0
                 ? `${relativeWorkspacePath}${filename}`

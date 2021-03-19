@@ -1,6 +1,6 @@
 import { css, html, LitElement, unsafeCSS } from 'lit-element';
-// import client from '@greenwood/cli/data/client';
-// import MenuQuery from '@greenwood/cli/data/queries/menu';
+import client from '@greenwood/plugin-graphql/core/client';
+import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
 import '@evergreen-wc/eve-container';
 import headerCss from './header.css';
 // TODO import evergreenLogo from '../../assets/evergreen.svg';
@@ -30,19 +30,15 @@ class HeaderComponent extends LitElement {
   async connectedCallback() {
     super.connectedCallback();
 
-    fetch('/graph.json')
-      .then(res => res.json())
-      .then(data => {
-        this.navigation = data.filter(page => {
-          if (page.data.menu === 'navigation') {
-            page.label = `${page.label.charAt(0).toUpperCase()}${page.label.slice(1)}`.replace('-', ' ');
-            
-            return page;
-          }
-        }).sort((a, b) => {
-          return a.data.index < b.data.index ? -1 : 1;
-        });
-      });
+    const response = await client.query({
+      query: MenuQuery, 
+      variables: {
+        name: 'navigation',
+        order: 'index_asc'
+      }
+    });
+
+    this.navigation = response.data.menu.children.map(item => item.item);
   }
 
   /* eslint-disable indent */

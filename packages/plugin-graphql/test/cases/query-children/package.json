@@ -1,0 +1,6 @@
+{
+  "name": "plugin-graphql-test-children-query",
+  "dependencies": {
+    "lit-element": "^2.4.0"
+  }
+}

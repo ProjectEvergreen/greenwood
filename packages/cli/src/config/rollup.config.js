@@ -116,16 +116,17 @@ function greenwoodHtmlPlugin(compilation) {
         case '.html':
           return Promise.resolve('');
         default:
-          customResources.filter((resource) => {
-            const shouldServe = Promise.resolve(resource.shouldServe(id));
+          const resourceHandler = (await Promise.all(customResources.map(async (resource) => {
+            const shouldServe = await resource.shouldServe(id);
 
-            if (shouldServe) {
-              return resource;
-            }
-          });
+            return shouldServe
+              ? resource
+              : null;
+          }))).filter(resource => resource);
 
-          if (customResources.length) {
-            const response = await customResources[0].serve(id);
+          // TODO should reduce here instead
+          if (resourceHandler.length) {
+            const response = await resourceHandler[0].serve(id);
 
             return Promise.resolve(response.body);
           }

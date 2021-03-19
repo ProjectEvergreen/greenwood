@@ -84,7 +84,7 @@ In this example, the `<title>` tag will be the `title`.
 
 ### Custom Data
 
-You can also pass custom data from your markdown file and extract that through the GraphQL server.
+You can also pass custom data from your markdown file and extract that from Greenwood's [_graph.json_ via `fetch` or our GraphQL server](/docs/data/).
 
 
 #### Example
@@ -107,4 +107,4 @@ query {
 }
 ```
 
-> See [our docs](https://deploy-preview-284--elastic-blackwell-3aef44.netlify.com/docs/data#internal-sources) on using GraphQL w/Greenwood for more information on querying for data.
+> See [our docs](/docs/data#internal-sources) on using GraphQL w/Greenwood for more information on querying for data.
