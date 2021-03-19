@@ -31,7 +31,7 @@ With Greenwood installed, you can run its CLI to generate your site.  The princi
 - `greenwood develop`: Starts a local development server for your project.
 - `greenwood build`: Generates a production build of your project.
 - `greenwood serve`: Generates a production build of the project and serves it locally on a simple web server.
-- `greenwood eject`: Ejects configurations (Rollup, PostCSS, etc) to your working directory for additional customizations.
+- `greenwood eject`: Ejects CLI configurations (Just Rollup right now) to your working directory for more advanced customization.  [YMMV](https://www.howtogeek.com/693183/what-does-ymmv-mean-and-how-do-you-use-it/).
 
 You can define npm scripts in _package.json_ like so to automate your workflows:
 

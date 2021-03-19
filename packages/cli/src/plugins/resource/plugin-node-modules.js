@@ -1,6 +1,6 @@
 /*
  * 
- * Detects and fully resolves requests to node_modules.
+ * Detects and fully resolves requests to node_modules and handles creating an importMap.
  *
  */
 const acorn = require('acorn');
@@ -11,16 +11,17 @@ const walk = require('acorn-walk');
 
 const importMap = {};
 
-// https://nodejs.org/api/packages.html#packages_determining_module_system
 const getPackageEntryPath = (packageJson) => {
   let entry = packageJson.module 
     ? packageJson.module // favor ESM entry points first
-    : packageJson.main
-      ? packageJson.main
-      : 'index.js';
+    : packageJson.exports // next favor export maps
+      ? Object.keys(packageJson.exports)
+      : packageJson.main // then favor main
+        ? packageJson.main
+        : 'index.js'; // lastly, fallback to index.js
 
-  // use .mjs version of it exists, for packages like redux
-  if (fs.existsSync(`${process.cwd()}/node_modules/${packageJson.name}/${entry.replace('.js', '.mjs')}`)) {
+  // use .mjs version if it exists, for packages like redux
+  if (!Array.isArray(entry) && fs.existsSync(`${process.cwd()}/node_modules/${packageJson.name}/${entry.replace('.js', '.mjs')}`)) {
     entry = entry.replace('.js', '.mjs');
   }
 
@@ -78,16 +79,69 @@ const walkPackageJson = (packageJson = {}) => {
     const dependencyPackageJsonPath = path.join(dependencyPackageRootPath, 'package.json');
     const dependencyPackageJson = require(dependencyPackageJsonPath);
     const entry = getPackageEntryPath(dependencyPackageJson);
-    const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
-    const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
-    const isJavascriptPackage = packageEntryPointPath.endsWith('.js') || packageEntryPointPath.endsWith('.mjs');
+    const isJavascriptPackage = Array.isArray(entry) || typeof entry === 'string' && entry.endsWith('.js') || entry.endsWith('.mjs');
 
     if (isJavascriptPackage) {
-      walkModule(packageEntryModule, dependency);
-
-      importMap[dependency] = `/node_modules/${dependency}/${entry}`;
-
-      walkPackageJson(dependencyPackageJson);
+      
+      // https://nodejs.org/api/packages.html#packages_determining_module_system
+      if (Array.isArray(entry)) {
+        // we have an exportMap
+        const exportMap = entry;
+  
+        exportMap.forEach((entry) => {
+          const exportMapEntry = dependencyPackageJson.exports[entry];
+          let packageExport;
+  
+          if (Array.isArray(exportMapEntry)) {
+            let fallbackPath;
+            let esmPath;
+  
+            exportMapEntry.forEach((mapItem) => {
+              switch (typeof mapItem) {
+  
+                case 'string':
+                  fallbackPath = mapItem;
+                  break;
+                case 'object':
+                  const entryTypes = Object.keys(mapItem);
+  
+                  if (entryTypes.import) {
+                    esmPath = entryTypes.import;
+                  } else if (entryTypes.require) {
+                    console.error('The package you are importing needs commonjs support.  Please use our commonjs plugin to fix this error.');
+                    fallbackPath = entryTypes.require;
+                  } else if (entryTypes.default) {
+                    console.warn('The package you are requiring may need commonjs support.  If this module is not working for you, consider adding our commonjs plugin.');
+                    fallbackPath = entryTypes.default;
+                  }
+                  break;
+                default:
+                  console.warn(`Sorry, we were unable to detect the module type for ${mapItem} :(.  please consider opening an issue to let us know about your use case.`);
+                  break;
+  
+              }
+            });
+  
+            packageExport = esmPath
+              ? esmPath
+              : fallbackPath;
+          } else if ((exportMapEntry.endsWith('.js') || exportMapEntry.endsWith('.mjs')) && exportMapEntry.indexOf('*') < 0) {
+            // is not an export array, or package.json, or wildcard
+            packageExport = exportMapEntry;
+          }
+  
+          if (packageExport) {
+            importMap[`${dependency}/${entry.replace('./', '')}`] = `/node_modules/${dependency}/${packageExport.replace('./', '')}`;
+          }
+        });
+      } else {
+        const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
+        const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
+  
+        walkModule(packageEntryModule, dependency);
+        importMap[dependency] = `/node_modules/${dependency}/${entry}`;
+        walkPackageJson(dependencyPackageJson);
+      }
     }
   });
 };

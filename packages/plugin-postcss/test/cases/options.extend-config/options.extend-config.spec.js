@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood with default PostCSS config.
+ * Run Greenwood with a custom PostCSS config
  *
  * User Result
- * Should generate a bare bones Greenwood build with the user's CSS file correctly minified.
+ * Should generate a bare bones Greenwood build with the user's CSS file correctly un-nested and minified
  *
  * User Command
  * greenwood build
@@ -23,6 +23,13 @@
  *     index.html
  *   styles/
  *     main.css
+ * 
+ * User postcss.config.js
+ * module.exports = {
+ *   plugins: [
+ *     require('postcss-nested')
+ *   ]
+ * };
  */
 const fs = require('fs');
 const glob = require('glob-promise');
@@ -32,7 +39,7 @@ const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default PostCSS configuration';
+  const LABEL = 'Custom PostCSS configuration';
   let setup;
 
   before(async function() {
@@ -51,7 +58,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('Page referencing external nested CSS file', function() {
       it('should output correctly processed nested CSS as non nested', function() {
-        const expectedCss = 'body{color:red}h1{color:#00f}';
+        const expectedCss = 'body{color:red}body h1{color:#00f}';
         const cssFiles = glob.sync(path.join(this.context.publicDir, 'styles', '*.css'));
         const css = fs.readFileSync(cssFiles[0], 'utf-8');
 

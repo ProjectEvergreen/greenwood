@@ -3,3 +3,4 @@
 **/node_modules/**
 !.eslintrc.js
 !.mocharc.js
+packages/plugin-babel/test/cases/**/*main.js
