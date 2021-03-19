@@ -179,7 +179,14 @@ class NodeModulesResource extends ResourceInterface {
   async serve(url) {
     return new Promise(async(resolve, reject) => {
       try {
-        const fullUrl = path.extname(url) === '' ? `${url}.js` : url;
+        const fullUrl = path.extname(url) === ''
+          ? `${url}.js`
+          : url;
+        // const fullUrl = path.extname(url) === ''
+        //   ? fs.existsSync(`${url}.mjs`) // test for .mjs first
+        //     ? `${url}.mjs`
+        //     : `${url}.js`
+        //   : url;
         const body = await fs.promises.readFile(fullUrl);
 
         resolve({

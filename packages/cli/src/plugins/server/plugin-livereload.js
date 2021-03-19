@@ -1,5 +1,4 @@
 const livereload = require('livereload');
-const path = require('path');
 const { ResourceInterface } = require('../../lib/resource-interface');
 const { ServerInterface } = require('../../lib/server-interface');
 
@@ -25,8 +24,10 @@ class LiveReloadServer extends ServerInterface {
 
 class LiveReloadResource extends ResourceInterface {
   
-  async shouldIntercept(url) {
-    return Promise.resolve(path.extname(url) === '' && process.env.__GWD_COMMAND__ === 'develop'); // eslint-disable-line no-underscore-dangle
+  async shouldIntercept(url, body, headers) {
+    const { accept } = headers.request;
+
+    return Promise.resolve(accept && accept.indexOf('text/html') >= 0 && process.env.__GWD_COMMAND__ === 'develop'); // eslint-disable-line no-underscore-dangle
   }
 
   async intercept(url, body) {

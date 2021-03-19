@@ -1,9 +1,10 @@
 const bundleCompilation = require('../lifecycles/bundle');
 const copyAssets = require('../lifecycles/copy');
+const { devServer } = require('../lifecycles/serve');
 const fs = require('fs');
 const generateCompilation = require('../lifecycles/compile');
 const serializeCompilation = require('../lifecycles/serialize');
-const { devServer } = require('../lifecycles/serve');
+const { ServerInterface } = require('../lib/server-interface');
 
 module.exports = runProductionBuild = async () => {
 
@@ -14,17 +15,38 @@ module.exports = runProductionBuild = async () => {
       const port = compilation.config.devServer.port;
       const outputDir = compilation.context.outputDir;
 
-      devServer(compilation).listen(port);
-  
-      if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir);
-      }
-  
-      await serializeCompilation(compilation);
-      await bundleCompilation(compilation);
-      await copyAssets(compilation);
+      devServer(compilation).listen(port, async () => {
+        console.info(`Started local development server at localhost:${port}`);
+        
+        // custom user server plugins
+        const servers = [...compilation.config.plugins.filter((plugin) => {
+          return plugin.type === 'server';
+        }).map((plugin) => {
+          const provider = plugin.provider(compilation);
 
-      resolve();
+          if (!(provider instanceof ServerInterface)) {
+            console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`);
+          }
+
+          return provider;
+        })];
+
+        await Promise.all(servers.map(async (server) => {
+          server.start();
+
+          return Promise.resolve(server);
+        }));
+
+        if (!fs.existsSync(outputDir)) {
+          fs.mkdirSync(outputDir);
+        }
+    
+        await serializeCompilation(compilation);
+        await bundleCompilation(compilation);
+        await copyAssets(compilation);
+
+        resolve();
+      });
     } catch (err) {
       reject(err);
     }
