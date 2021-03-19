@@ -1,13 +1,7 @@
-// const path = require('path');
-
 module.exports = {
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module'
-    // TODO should we use this?
-    // babelOptions: {
-    //   configFile: path.join(__dirname, './packages/cli/src/config/babel.config.js')
-    // }
   },
   env: {
     browser: true,

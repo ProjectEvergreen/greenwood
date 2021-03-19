@@ -8,6 +8,24 @@ const path = require('path');
 const postcss = require('postcss');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 
+function getConfig (compilation, extendConfig = false) {
+  const { projectDirectory } = compilation.context;
+  const configFile = 'postcss.config';
+  const defaultConfig = require(path.join(__dirname, configFile));
+  const userConfig = fs.existsSync(path.join(projectDirectory, `${configFile}.js`))
+    ? require(`${projectDirectory}/${configFile}`)
+    : {};
+  let finalConfig = Object.assign({}, userConfig);
+  
+  if (userConfig && extendConfig) {    
+    finalConfig.plugins = Array.isArray(userConfig.plugins)
+      ? [...defaultConfig.plugins, ...userConfig.plugins]
+      : [...defaultConfig.plugins];
+  }
+
+  return finalConfig;
+}
+
 class PostCssResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
@@ -19,16 +37,6 @@ class PostCssResource extends ResourceInterface {
     return path.extname(url) === '.css';
   }
 
-  getConfig() {
-    const { projectDirectory } = this.compilation.context;
-    const configFile = 'postcss.config';
-    const configRoot = fs.existsSync(`${projectDirectory}/${configFile}.js`)
-      ? projectDirectory
-      : __dirname;
-    
-    return require(`${configRoot}/${configFile}`);
-  }
-
   async shouldIntercept(url) {
     return Promise.resolve(this.isCssFile(url));
   }
@@ -36,7 +44,7 @@ class PostCssResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise(async(resolve, reject) => {
       try {
-        const config = this.getConfig();
+        const config = getConfig(this.compilation);
         const plugins = config.plugins || [];
         const css = plugins.length > 0
           ? (await postcss(plugins).process(body, { from: url })).css
@@ -58,10 +66,13 @@ class PostCssResource extends ResourceInterface {
   async optimize(url, body) {
     const { outputDir, userWorkspace } = this.compilation.context;
     const workspaceUrl = url.replace(outputDir, userWorkspace);
-    const config = this.getConfig();
-    const plugins = (config.plugins || []).concat(
-      require('cssnano') // TODO make configurable
+    const config = getConfig(this.compilation, this.options.extendConfig);
+    const plugins = config.plugins || [];
+    
+    plugins.push(
+      require('cssnano')
     );
+    
     const css = plugins.length > 0
       ? (await postcss(plugins).process(body, { from: workspaceUrl })).css
       : body;
