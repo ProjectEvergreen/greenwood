@@ -1,24 +1,24 @@
 const fs = require('fs');
+const generateCompilation = require('../lifecycles/compile');
 const path = require('path');
 
-module.exports = ejectConfigFiles = async (copyAllFiles) => {
+module.exports = ejectConfiguration = async () => {
   return new Promise(async (resolve, reject) => {
     try {
+      const compilation = await generateCompilation();
+      const configFilePaths = fs.readdirSync(path.join(__dirname, '../config'));
 
-      if (copyAllFiles) {
-        configFilePaths = fs.readdirSync(path.join(__dirname, '../config'));
-      } else {
-        // TODO
-        configFilePaths = [
-          'webpack.config.common.js',
-          'webpack.config.develop.js',
-          'webpack.config.prod.js'
-        ];
-      }
-      configFilePaths.forEach(configFile => {
-        fs.copyFileSync(path.join(__dirname, '../config', configFile), path.join(process.cwd(), configFile));
-        console.log(`Ejecting ${configFile}`.blue);
+      configFilePaths.forEach((configFile) => {
+        const from = path.join(__dirname, '../config', configFile);
+        const to = `${compilation.context.projectDirectory}/${configFile}`;
+
+        fs.copyFileSync(from, to);
+        
+        console.log(`Ejected ${configFile} successfully.`);
       });
+
+      console.debug('all configuration files ejected.');
+
       resolve();
     } catch (err) {
       reject(err);

@@ -11,7 +11,7 @@ const program = require('commander');
 const runProductionBuild = require('./commands/build');
 const runDevServer = require('./commands/develop');
 const runProdServer = require('./commands/serve');
-// const ejectConfigFiles = require('./tasks/eject');
+const ejectConfiguration = require('./commands/eject');
 const greenwoodPackageJson = require('../package.json');
 
 let cmdOption = {};
@@ -90,15 +90,10 @@ const run = async() => {
         await runProdServer();
 
         break;
-        // TODO
-        // case 'eject'
-        //   console.log('Ejecting configurations'.yellow);
+      case 'eject':
+        await ejectConfiguration();
 
-        //   await ejectConfigFiles(cmdOption.all);
-          
-        //   console.log(`Configurations ejected successfully to ${process.cwd()}`.green);
-
-        //   break;
+        break;
       default: 
         console.warn(`
           Error: not able to detect command. try using the --help flag if 
