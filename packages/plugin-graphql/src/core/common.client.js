@@ -9,31 +9,8 @@ function hashString(queryKeysString) {
   return Math.abs(h).toString();
 }
 
-// function getQueryKeysFromSelectionSet(selectionSet) {
-//   let queryKeys = '';
-
-//   for (let key in selectionSet) {
-    
-//     if (key === 'selections') {
-//       queryKeys += selectionSet[key]
-//         .filter(selection => selection.name.value !== '__typename') // __typename is added by server.js
-//         .map(selection => selection.name.value).join('');
-//     }
-//   }
-  
-//   if (selectionSet.kind === 'SelectionSet') {
-//     selectionSet.selections.forEach(selection => {
-//       if (selection.selectionSet) {
-//         queryKeys += getQueryKeysFromSelectionSet(selection.selectionSet);
-//       }
-//     });
-//   }
-
-//   return queryKeys;
-// }
-
 function getQueryHash(query, variables = {}) {
-  const queryKeys = query; // getQueryKeysFromSelectionSet(query.definitions[0].selectionSet);
+  const queryKeys = query;
   const variableValues = Object.keys(variables).length > 0
     ? `_${Object.values(variables).join('').replace(/\//g, '')}` // handle / which will translate to filepaths
     : '';

@@ -19,8 +19,6 @@ module.exports = async (req, context) => {
 
       /* Take the same query from request, and repeat the query for our server side cache */
       const { query, variables } = req.body;
-      // const queryObj = gql`${query}`;
-
       const { data } = await client.query({
         query: gql`${query}`,
         variables
@@ -28,8 +26,6 @@ module.exports = async (req, context) => {
 
       if (data) {
         const { outputDir } = context;
-
-        // const cache = JSON.stringify(client.extract());
         const cache = JSON.stringify(data);
         const queryHash = getQueryHash(query, variables);
         const hashFilename = `${queryHash}-cache.json`;
