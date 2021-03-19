@@ -189,7 +189,7 @@ function getProdServer(compilation) {
     }
 
     if (url.endsWith('.json')) {
-      const contents = await fs.promises.readFile(path.join(outputDir, 'graph.json'), 'utf-8');
+      const contents = await fs.promises.readFile(path.join(outputDir, url), 'utf-8');
 
       ctx.set('Content-Type', 'application/json');
       ctx.body = JSON.parse(contents);

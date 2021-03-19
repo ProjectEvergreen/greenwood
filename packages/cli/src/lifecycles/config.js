@@ -7,7 +7,7 @@ let defaultConfig = {
   devServer: {
     port: 1984
   },
-  // TODO optimization: 'spa',
+  optimization: '',
   title: 'My App',
   meta: [],
   plugins: [],

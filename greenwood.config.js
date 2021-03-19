@@ -1,5 +1,7 @@
 const path = require('path');
+// const pluginImportCommonjs = require('./packages/plugin-import-commonjs/src/index');
 const pluginGoogleAnalytics = require('./packages/plugin-google-analytics/src/index');
+const pluginGraphQL = require('./packages/plugin-graphql/src/index');
 const pluginImportCss = require('./packages/plugin-import-css/src/index');
 const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
 const pluginPostCss = require('./packages/plugin-postcss/src/index');
@@ -23,9 +25,11 @@ module.exports = {
     { name: 'google-site-verification', content: '4rYd8k5aFD0jDnN0CCFgUXNe4eakLP4NnA18mNnK5P0' }
   ],
   plugins: [
+    // ...pluginImportCommonjs(),
     pluginGoogleAnalytics({
       analyticsId: 'UA-147204327-1'
     }),
+    ...pluginGraphQL(),
     pluginPolyfills(),
     pluginPostCss(),
     ...pluginImportCss()

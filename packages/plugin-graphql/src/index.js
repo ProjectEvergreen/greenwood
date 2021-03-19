@@ -1,0 +1,121 @@
+const fs = require('fs');
+const graphqlServer = require('./core/server');
+const path = require('path');
+const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
+const { ServerInterface } = require('@greenwood/cli/src/lib/server-interface');
+const rollupPluginAlias = require('@rollup/plugin-alias');
+
+class GraphQLResource extends ResourceInterface {
+  constructor(compilation, options = {}) {
+    super(compilation, options);
+    this.extensions = ['.gql'];
+    this.contentType = ['text/javascript'];
+  }
+
+  async serve(url) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const js = await fs.promises.readFile(url, 'utf-8');
+        const body = `
+          export default \`${js}\`;
+        `;
+
+        resolve({
+          body,
+          contentType: this.contentType
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+  
+  async shouldIntercept(url, body, headers) {
+    return Promise.resolve(headers.request.accept && headers.request.accept.indexOf('text/html') >= 0);
+  }
+
+  async intercept(url, body) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        // es-modules-shims breaks on dangling commas in an importMap :/
+        const danglingComma = body.indexOf('"imports": {}') > 0 
+          ? ''
+          : ',';
+        const shimmedBody = body.replace('"imports": {', `
+          "imports": {
+            "@greenwood/plugin-graphql/core/client": "/node_modules/@greenwood/plugin-graphql/src/core/client.js",
+            "@greenwood/plugin-graphql/core/common": "/node_modules/@greenwood/plugin-graphql/src/core/common.client.js",
+            "@greenwood/plugin-graphql/queries/children": "/node_modules/@greenwood/plugin-graphql/src/queries/children.gql",
+            "@greenwood/plugin-graphql/queries/config": "/node_modules/@greenwood/plugin-graphql/src/queries/config.gql",
+            "@greenwood/plugin-graphql/queries/graph": "/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql",
+            "@greenwood/plugin-graphql/queries/menu": "/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql"${danglingComma}
+        `);
+
+        resolve({ body: shimmedBody });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  async shouldOptimize(url) {
+    return Promise.resolve(path.extname(url) === '.html');
+  }
+
+  async optimize(url, body) {
+    return new Promise((resolve, reject) => {
+      try {
+        // TODO const apolloScript = isStrictOptimization (no apollo-state)
+        body = body.replace('<head>', `
+          <script data-state="apollo">
+            window.__APOLLO_STATE__ = true;
+          </script>
+          </head>
+        `);
+    
+        resolve(body);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+}
+
+class GraphQLServer extends ServerInterface {
+  constructor(compilation, options = {}) {
+    super(compilation, options);
+  }
+
+  async start() {
+    return graphqlServer(this.compilation).listen().then((server) => {
+      console.log(`GraphQLServer started at ${server.url}`);
+    });
+  }
+}
+
+module.exports = (options = {}) => {
+  return [{
+    type: 'server',
+    name: 'plugin-graphql:server',
+    provider: (compilation) => new GraphQLServer(compilation, options)
+  }, {
+    type: 'resource',
+    name: 'plugin-graphql:resource',
+    provider: (compilation) => new GraphQLResource(compilation, options)
+  }, {
+    type: 'rollup',
+    name: 'plugin-graphql:rollup',
+    provider: () => [
+      rollupPluginAlias({
+        entries: [
+          { find: '@greenwood/plugin-graphql/core/client', replacement: '@greenwood/plugin-graphql/src/core/client.js' },
+          { find: '@greenwood/plugin-graphql/core/common', replacement: '@greenwood/plugin-graphql/src/core/common.client.js' },
+          { find: '@greenwood/plugin-graphql/queries/menu', replacement: '@greenwood/plugin-graphql/src/queries/menu.gql' },
+          { find: '@greenwood/plugin-graphql/queries/config', replacement: '@greenwood/plugin-graphql/src/queries/config.gql' },
+          { find: '@greenwood/plugin-graphql/queries/children', replacement: '@greenwood/plugin-graphql/src/queries/children.gql' },
+          { find: '@greenwood/plugin-graphql/queries/graph', replacement: '@greenwood/plugin-graphql/src/queries/graph.gql' }
+        ]
+      })
+    ]
+  }];
+};
