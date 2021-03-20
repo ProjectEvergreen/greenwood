@@ -51,32 +51,6 @@ Greenwood (via [**plugin-graphql**](https://github.com/ProjectEvergreen/greenwoo
 #### Schema
 To kick things off, let's review what is available to you.  Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type definition](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's `graph`.
 
-
-  /*
-    * Graph Properties (per page)
-    *----------------------
-    * data: custom page frontmatter
-    * filename: name of the file
-    * id: filename without the extension
-    * label: "pretty" text representation of the filename
-    * path: path to the file relative to the workspace
-    * route: URL route for a given page on outputFilePath
-    * template: page template to use as a base for a generated component
-    * title: a default value that can be used for <title></title>
-    */
-  pages.push({
-    data: customData || {},
-    filename,
-    id,
-    label,
-    path: route === '/' || relativePagePath.lastIndexOf('/') === 0
-      ? `${relativeWorkspacePath}${filename}`
-      : `${relativeWorkspacePath}/${filename}`,
-    route,
-    template,
-    title
-  });
-
 This is what the schema looks like:
 ```javascript
 graph {
