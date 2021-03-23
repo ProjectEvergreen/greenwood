@@ -1,13 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
-// TODO const optimizations = ['strict', 'spa'];
+const optimizations = ['default', 'mpa']; // TOOD implement none, strict
+
 let defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {
     port: 1984
   },
-  optimization: '',
+  optimization: 'default',
   title: 'My App',
   meta: [],
   plugins: [],
@@ -23,7 +24,7 @@ module.exports = readAndMergeConfig = async() => {
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, title, markdown, meta, plugins } = userCfgFile;
+        const { workspace, devServer, title, markdown, meta, optimization, plugins } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -61,12 +62,11 @@ module.exports = readAndMergeConfig = async() => {
           customConfig.meta = meta;
         }
 
-        // TODO
-        // if (typeof optimization === 'string' && optimizations.indexOf(optimization.toLowerCase()) >= 0) {
-        //   customConfig.optimization = optimization;
-        // } else if (optimization) {
-        //   reject(`Error: provided optimization "${optimization}" is not supported.  Please use one of: ${optimizations.join(', ')}.`);
-        // }
+        if (typeof optimization === 'string' && optimizations.indexOf(optimization.toLowerCase()) >= 0) {
+          customConfig.optimization = optimization;
+        } else if (optimization) {
+          reject(`Error: provided optimization "${optimization}" is not supported.  Please use one of: ${optimizations.join(', ')}.`);
+        }
 
         if (plugins && plugins.length > 0) {
           const types = ['resource', 'rollup', 'server'];

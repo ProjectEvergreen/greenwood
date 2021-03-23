@@ -9,7 +9,6 @@ const postcss = require('postcss');
 const postcssImport = require('postcss-import');
 const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
-
 const tokenSuffix = 'scratch';
 const tokenNodeModules = 'node_modules/';
 
@@ -290,6 +289,7 @@ function greenwoodHtmlPlugin(compilation) {
     // back to original <script> / <link> tags and update to their bundled filename in the HTML
     generateBundle(outputOptions, bundles) {      
       for (const bundleId of Object.keys(bundles)) {
+<<<<<<< HEAD
         try {
           const bundle = bundles[bundleId];
 
@@ -312,7 +312,19 @@ function greenwoodHtmlPlugin(compilation) {
                 for (const innerBundleId of Object.keys(bundles)) {
                   const { src } = parsedAttributes;
                   const facadeModuleId = bundles[innerBundleId].facadeModuleId;
-                  const pathToMatch = src.replace('../', '').replace('./', '');
+                  let pathToMatch = src.replace('../', '').replace('./', '');
+
+                  if (pathToMatch.indexOf(tokenNodeModules) >= 0) {
+                    pathToMatch = pathToMatch.replace(`/${tokenNodeModules}`, '');
+  
+                    const pathToMatchPieces = pathToMatch.split('/');
+  
+                    pathToMatch = pathToMatch.replace(tokenNodeModules, '');
+                    pathToMatch = pathToMatch.replace(`${pathToMatchPieces[0]}/`, '');
+                  }
+                  console.debug('facadeModuleId', facadeModuleId);
+                  console.debug('pathToMatch', pathToMatch);
+                  console.debug('*******************************');
 
                   if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {
                     newHtml = newHtml.replace(src, `/${innerBundleId}`);

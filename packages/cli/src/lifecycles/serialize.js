@@ -2,12 +2,14 @@ const BrowserRunner = require('../lib/browser');
 const fs = require('fs');
 const path = require('path');
 const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
+const pluginOptimizationMpa = require('../plugins/resource/plugin-optimization-mpa');
 
 module.exports = serializeCompilation = async (compilation) => {
   const compilationCopy = Object.assign({}, compilation);
   const browserRunner = new BrowserRunner();
   const optimizeResources = [
     pluginResourceStandardHtml.provider(compilationCopy),
+    pluginOptimizationMpa()[0].provider(compilationCopy),
     ...compilation.config.plugins.filter((plugin) => {
       const provider = plugin.provider(compilationCopy);
 

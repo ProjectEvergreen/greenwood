@@ -11,6 +11,7 @@ const FAVICON_HREF = '/assets/favicon.ico';
 
 module.exports = {
   workspace: path.join(__dirname, 'www'),
+  optimization: 'mpa',
   title: 'Greenwood',
   meta: [
     { name: 'description', content: META_DESCRIPTION },
