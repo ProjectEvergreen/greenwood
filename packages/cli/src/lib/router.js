@@ -24,11 +24,14 @@ document.addEventListener('click', function(e) {
 
 class RouteComponent extends HTMLElement {
   loadRoute() {
-    console.debug('load route ->', this.getAttribute('data-route'));
-    console.debug('with bundle ->', this.getAttribute('data-key'));
-    fetch(this.getAttribute('data-key'))
+    const route = this.getAttribute('data-route');
+    const key = this.getAttribute('data-key');
+    console.debug('load route ->', route);
+    console.debug('with bundle ->', key);
+    fetch(key)
       .then(res => res.text())
       .then((response) => {
+        history.pushState(response, route, route);
         document.getElementsByTagName('router-outlet')[0].innerHTML = response;
       });
   }
