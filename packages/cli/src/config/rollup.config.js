@@ -313,6 +313,7 @@ function greenwoodHtmlPlugin(compilation) {
                   const facadeModuleId = bundles[innerBundleId].facadeModuleId;
                   let pathToMatch = src.replace('../', '').replace('./', '');
 
+                  // special handling for node_modules paths
                   if (pathToMatch.indexOf(tokenNodeModules) >= 0) {
                     pathToMatch = pathToMatch.replace(`/${tokenNodeModules}`, '');
   
@@ -326,7 +327,14 @@ function greenwoodHtmlPlugin(compilation) {
                   console.debug('*******************************');
 
                   if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {
-                    newHtml = newHtml.replace(src, `/${innerBundleId}`);
+                    const newSrc = `/${innerBundleId}`;
+                    
+                    newHtml = newHtml.replace(src, newSrc);
+                    // newHtml = newHtml.replace(/><\/script>/g, 'crossorigin="anonymous"></script>');
+                    newHtml = newHtml.replace('<head>', `
+                      <head>
+                      <link rel="prefetch" href="${newSrc}" as="script" crossorigin="anonymous">
+                    `);
                   }
                 }
               }
@@ -342,7 +350,13 @@ function greenwoodHtmlPlugin(compilation) {
                   if (bundleId2.indexOf('.css') > 0) {
                     const bundle2 = bundles[bundleId2];
                     if (href.indexOf(bundle2.name) >= 0) {
-                      newHtml = newHtml.replace(href, `/${bundle2.fileName}`);
+                      const newHref = `/${bundle2.fileName}`;
+                      
+                      newHtml = newHtml.replace(href, newHref);
+                      newHtml = newHtml.replace('<head>', `
+                        <head>
+                        <link rel="preload" href="${newHref}" as="style" crossorigin="anonymous"></link>
+                      `);
                     }
                   }
                 }

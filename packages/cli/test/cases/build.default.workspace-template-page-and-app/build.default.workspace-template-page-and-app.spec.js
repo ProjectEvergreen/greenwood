@@ -73,7 +73,7 @@ describe('Build Greenwood With: ', function() {
 
         before(function() {
           scriptTags = dom.window.document.querySelectorAll('head > script');
-          linkTags = dom.window.document.querySelectorAll('head > link');
+          linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"');
           styleTags = dom.window.document.querySelectorAll('head > style');
         });
 

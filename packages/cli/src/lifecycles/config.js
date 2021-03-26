@@ -2,9 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 const modes = ['ssg', 'mpa'];
-const optimizations = ['default']; // TOOD implement none, strict, inline
-
-let defaultConfig = {
+const optimizations = ['default'];
+const defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {
     port: 1984

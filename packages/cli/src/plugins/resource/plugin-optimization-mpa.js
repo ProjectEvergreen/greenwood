@@ -96,10 +96,6 @@ class OptimizationMPAResource extends ResourceInterface {
 
         await fs.promises.writeFile(outputBundlePath, bodyContents);
 
-        // TODO this gets swalloed by Rollup?
-        // <script type="module" src="/node_modules/@greenw">
-        //   import "@greenwood/cli/lib/router";
-        // </script>\n
         body = body.replace('</head>', `
           <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
           <script>
