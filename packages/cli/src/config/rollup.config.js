@@ -289,7 +289,6 @@ function greenwoodHtmlPlugin(compilation) {
     // back to original <script> / <link> tags and update to their bundled filename in the HTML
     generateBundle(outputOptions, bundles) {      
       for (const bundleId of Object.keys(bundles)) {
-<<<<<<< HEAD
         try {
           const bundle = bundles[bundleId];
 
