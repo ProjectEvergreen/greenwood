@@ -16,7 +16,10 @@ class ImportCssResource extends ResourceInterface {
   }
 
   async shouldIntercept(url, body, headers) {
-    const isCssInJs = path.extname(url) === this.extensions[0] && headers.request.accept.indexOf('text/css') < 0;
+    // https://github.com/ProjectEvergreen/greenwood/issues/492
+    const isCssInJs = path.extname(url) === this.extensions[0]
+      && headers.request.accept.indexOf('text/css') < 0
+      && headers.request.accept.indexOf('application/signed-exchange') < 0;
 
     return Promise.resolve(isCssInJs);
   }
