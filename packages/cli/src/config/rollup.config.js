@@ -331,10 +331,10 @@ function greenwoodHtmlPlugin(compilation) {
                     
                     newHtml = newHtml.replace(src, newSrc);
                     // newHtml = newHtml.replace(/><\/script>/g, 'crossorigin="anonymous"></script>');
-                    newHtml = newHtml.replace('<head>', `
-                      <head>
-                      <link rel="prefetch" href="${newSrc}" as="script" crossorigin="anonymous">
-                    `);
+                    // newHtml = newHtml.replace('<head>', `
+                    //   <head>
+                    //   <link rel="prefetch" href="${newSrc}" as="script" crossorigin="anonymous">
+                    // `);
                   }
                 }
               }
