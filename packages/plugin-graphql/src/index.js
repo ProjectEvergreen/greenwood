@@ -70,7 +70,7 @@ class GraphQLResource extends ResourceInterface {
           <script data-state="apollo">
             window.__APOLLO_STATE__ = true;
           </script>
-          </head>
+          <head>
         `);
     
         resolve(body);
