@@ -11,6 +11,7 @@ query {
       value,
       href
     },
+    mode,
     optimization,
     title,
     workspace

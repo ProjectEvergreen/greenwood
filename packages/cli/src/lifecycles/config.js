@@ -1,14 +1,16 @@
 const fs = require('fs');
 const path = require('path');
 
-const optimizations = ['default', 'mpa']; // TOOD implement none, strict
+const modes = ['ssg', 'mpa'];
+const optimizations = ['default']; // TOOD implement none, strict, inline
 
 let defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {
     port: 1984
   },
-  optimization: 'default',
+  mode: modes[0],
+  optimization: optimizations[0],
   title: 'My App',
   meta: [],
   plugins: [],
@@ -24,7 +26,7 @@ module.exports = readAndMergeConfig = async() => {
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, title, markdown, meta, optimization, plugins } = userCfgFile;
+        const { workspace, devServer, title, markdown, meta, mode, optimization, plugins } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -60,6 +62,12 @@ module.exports = readAndMergeConfig = async() => {
 
         if (meta && meta.length > 0) {
           customConfig.meta = meta;
+        }
+
+        if (typeof mode === 'string' && modes.indexOf(mode.toLowerCase()) >= 0) {
+          customConfig.mode = mode;
+        } else if (mode) {
+          reject(`Error: provided mode "${mode}" is not supported.  Please use one of: ${modes.join(', ')}.`);
         }
 
         if (typeof optimization === 'string' && optimizations.indexOf(optimization.toLowerCase()) >= 0) {
