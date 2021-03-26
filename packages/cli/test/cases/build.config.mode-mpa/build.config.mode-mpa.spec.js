@@ -124,14 +124,14 @@ describe('Build Greenwood With: ', function() {
         expect(partials.length).to.be.equal(2);
       });
 
-      it('should have the expected partial output to match the contents of the page in the <router-outlet> tag in the <body>', function() {
+      it('should have the expected partial output to match the contents of the home page in the <router-outlet> tag in the <body>', function() {
         const aboutPartial = fs.readFileSync(path.join(this.context.publicDir, '_routes/about/index.html'), 'utf-8');
         const aboutRouterOutlet = aboutDom.window.document.querySelectorAll('body > router-outlet')[0];
 
         expect(aboutRouterOutlet.innerHTML).to.contain(aboutPartial);
       });
 
-      it('should have the expected partial output to match the contents of the about in the <router-outlet> tag in the <body>', function() {
+      it('should have the expected partial output to match the contents of the about page in the <router-outlet> tag in the <body>', function() {
         const homePartial = fs.readFileSync(path.join(this.context.publicDir, '_routes/index.html'), 'utf-8');
         const homeRouterOutlet = dom.window.document.querySelectorAll('body > router-outlet')[0];
         
