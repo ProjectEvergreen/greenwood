@@ -99,7 +99,7 @@ function greenwoodWorkspaceResolver (compilation) {
 function greenwoodHtmlPlugin(compilation) {
   const { projectDirectory, userWorkspace, outputDir, scratchDir } = compilation.context;
   const { optimization } = compilation.config;
-  const isRemoteUrl = (url = '') => url.indexOf('http') === 0 || url.indexOf('//') === 0;
+  const isRemoteUrl = (url = undefined) => url && (url.indexOf('http') === 0 || url.indexOf('//') === 0);
   const customResources = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
   }).map((plugin) => {
@@ -161,7 +161,7 @@ function greenwoodHtmlPlugin(compilation) {
             // handle <script type="module" src="some/path.js"></script>
             if (!isRemoteUrl(parsedAttributes.src) && parsedAttributes.type === 'module' && parsedAttributes.src && !mappedScripts.get(parsedAttributes.src)) {
               if (optimization === 'static') {
-                console.debug('dont emit ', parsedAttributes.src);
+                // console.debug('dont emit ', parsedAttributes.src);
               } else {
                 const { src } = parsedAttributes;
 
@@ -328,9 +328,6 @@ function greenwoodHtmlPlugin(compilation) {
                     pathToMatch = pathToMatch.replace(tokenNodeModules, '');
                     pathToMatch = pathToMatch.replace(`${pathToMatchPieces[0]}/`, '');
                   }
-                  console.debug('facadeModuleId', facadeModuleId);
-                  console.debug('pathToMatch', pathToMatch);
-                  console.debug('*******************************');
 
                   if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {
                     const newSrc = `/${innerBundleId}`;
@@ -405,18 +402,23 @@ function greenwoodHtmlPlugin(compilation) {
 
           headScripts.forEach((scriptTag) => {
             const parsedAttributes = parseTagForAttributes(scriptTag);
-            
-            if (optimization === 'inline' && parsedAttributes.type === 'module' && !isRemoteUrl(parsedAttributes.src)) {
-              const outputPath = path.join(outputDir, parsedAttributes.src);
+            const isScriptSrcTag = parsedAttributes.src && parsedAttributes.type === 'module';
+
+            if (optimization === 'inline' && isScriptSrcTag && !isRemoteUrl(parsedAttributes.src)) {
+              const src = parsedAttributes.src;
+              const basePath = src.indexOf(tokenNodeModules) >= 0 
+                ? process.cwd()
+                : outputDir;
+              const outputPath = path.join(basePath, src);
               const js = fs.readFileSync(outputPath, 'utf-8');
 
-              html = html.replace(`<script ${scriptTag.rawAttrs}>`, `
-                <script>
+              // scratchFiles[src] = true;
+
+              html = html.replace(`<script ${scriptTag.rawAttrs}></script>`, `
+                <script type="module">
                   ${js}
                 </script>
               `);
-
-              // TODO clean up inline files after all templating fs.unlinkSync(outputPath);
             }
 
             // handle <script type="module"> /* inline code */ </script>
@@ -441,16 +443,17 @@ function greenwoodHtmlPlugin(compilation) {
                   && !isRemoteUrl(linkTagAttributes.href);
                 
                 if (isLocalLinkTag) {
-                  const outputPath = path.join(outputDir, linkTagAttributes.href);
+                  const href = linkTagAttributes.href;
+                  const outputPath = path.join(outputDir, href);
                   const css = fs.readFileSync(outputPath, 'utf-8');
+
+                  // scratchFiles[href] = true;
 
                   html = html.replace(`<link ${linkTag.rawAttrs}>`, `
                     <style>
                       ${css}
                     </style>
                   `);
-
-                  // TODO clean up inline files after all templating fs.unlinkSync(outputPath);
                 }
               });
           }

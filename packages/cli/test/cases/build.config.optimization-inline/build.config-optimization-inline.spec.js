@@ -75,9 +75,10 @@ describe('Build Greenwood With: ', function() {
           expect(jsFiles).to.have.lengthOf(0);
         });
 
-        it('should contain one <script> tag with the expected JS content inlined', function() {
+        it('should contain one <script> tag with the expected JS content inlined of type="module"', function() {
           const scriptTag = dom.window.document.querySelectorAll('head script')[0];
           
+          expect(scriptTag.type).to.be.equal('module');
           // eslint-disable-next-line max-len
           expect(scriptTag.textContent).to.be.contain('class e extends HTMLElement{constructor(){super(),this.root=this.attachShadow({mode:"open"}),this.root.innerHTML="\\n      <header>This is the header component.</header>\\n    "}}customElements.define("app-header",e);');
         });
