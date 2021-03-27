@@ -1,3 +1,4 @@
+/* eslint-disable max-depth */
 const Buffer = require('buffer').Buffer;
 const fs = require('fs');
 const htmlparser = require('node-html-parser');
@@ -97,6 +98,7 @@ function greenwoodWorkspaceResolver (compilation) {
 // https://github.com/rollup/rollup/issues/2873
 function greenwoodHtmlPlugin(compilation) {
   const { projectDirectory, userWorkspace, outputDir, scratchDir } = compilation.context;
+  const { optimization } = compilation.config;
   const isRemoteUrl = (url = '') => url.indexOf('http') === 0 || url.indexOf('//') === 0;
   const customResources = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
@@ -330,11 +332,16 @@ function greenwoodHtmlPlugin(compilation) {
                     const newSrc = `/${innerBundleId}`;
                     
                     newHtml = newHtml.replace(src, newSrc);
-                    // newHtml = newHtml.replace(/><\/script>/g, 'crossorigin="anonymous"></script>');
-                    // newHtml = newHtml.replace('<head>', `
-                    //   <head>
-                    //   <link rel="prefetch" href="${newSrc}" as="script" crossorigin="anonymous">
-                    // `);
+                    
+                    if (optimization !== 'none') {
+                      // TODO what is the best behavior / option here for JS
+                      // seems more contextual than JS
+                      // target router specifically as a prefetch if mpa is set?
+                      newHtml = newHtml.replace('<head>', `
+                        <head>
+                        <link rel="preload" href="${newSrc}" as="script" crossorigin="anonymous">
+                      `);
+                    }
                   }
                 }
               }
@@ -353,10 +360,13 @@ function greenwoodHtmlPlugin(compilation) {
                       const newHref = `/${bundle2.fileName}`;
                       
                       newHtml = newHtml.replace(href, newHref);
-                      newHtml = newHtml.replace('<head>', `
-                        <head>
-                        <link rel="preload" href="${newHref}" as="style" crossorigin="anonymous"></link>
-                      `);
+
+                      if (optimization !== 'none') {
+                        newHtml = newHtml.replace('<head>', `
+                          <head>
+                          <link rel="preload" href="${newHref}" as="style" crossorigin="anonymous"></link>
+                        `);
+                      }
                     }
                   }
                 }
@@ -425,13 +435,29 @@ function greenwoodHtmlPlugin(compilation) {
 
 module.exports = getRollupConfig = async (compilation) => {
   const { scratchDir, outputDir } = compilation.context;
-  
+  const defaultRollupPlugins = [
+    // TODO replace should come in via plugin-node-modules
+    replace({ // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
+      'process.env.NODE_ENV': JSON.stringify('production')
+    }),
+    nodeResolve(), // TODO move to plugin-node-modules
+    greenwoodWorkspaceResolver(compilation),
+    greenwoodHtmlPlugin(compilation),
+    multiInput(),
+    json() // TODO make it part plugin-standard-json
+  ];
   // TODO greenwood standard plugins, then "Greenwood" plugins, then user plugins
   const customRollupPlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'rollup';
   }).map((plugin) => {
     return plugin.provider(compilation);
   }).flat();
+
+  if (compilation.config.optimization !== 'none') {
+    defaultRollupPlugins.push(
+      terser() // TODO extract to plugin-standard-javascript
+    );
+  }
   
   return [{
     // TODO Avoid .greenwood/ directory, do everything in public/?
@@ -449,16 +475,7 @@ module.exports = getRollupConfig = async (compilation) => {
       }
     },
     plugins: [
-      // TODO replace should come in via plugins?
-      replace({ // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
-        'process.env.NODE_ENV': JSON.stringify('production')
-      }),
-      nodeResolve(), // TODO move to plugin
-      greenwoodWorkspaceResolver(compilation),
-      greenwoodHtmlPlugin(compilation),
-      multiInput(),
-      json(), // TODO bundle as part of import support / transforms API?
-      terser(), // TODO extract to a plugin
+      ...defaultRollupPlugins,
       ...customRollupPlugins
     ]
   }];

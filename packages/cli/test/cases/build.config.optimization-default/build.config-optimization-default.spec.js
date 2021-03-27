@@ -40,14 +40,14 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
   
-    describe('Default output for index.html', function() {
+    describe('Test output of <script> and <link> tags', function() {
       let dom;
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      xdescribe('<script> tag and preloading', function() {
+      describe('<script> tag and preloading', function() {
         it('should contain one javasccript file in the output directory', async function() {
           expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(1);
         });
@@ -66,6 +66,13 @@ describe('Build Greenwood With: ', function() {
           expect(preloadScriptTags.length).to.be.equal(1);
           expect(preloadScriptTags[0].href).to.match(/header.*.js/);
           expect(preloadScriptTags[0].getAttribute('crossorigin')).to.equal('anonymous');
+        });
+
+        it('should contain the expected content from <app-header> in the <body>', function() {
+          const header = dom.window.document.querySelectorAll('body header');
+
+          expect(header.length).to.be.equal(1);
+          expect(header[0].textContent).to.be.equal('This is the header component.');
         });
       });
 

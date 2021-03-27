@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 const modes = ['ssg', 'mpa'];
-const optimizations = ['default'];
+const optimizations = ['default', 'none'];
+
 const defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {

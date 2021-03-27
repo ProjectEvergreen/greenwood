@@ -32,7 +32,7 @@ describe('Build Greenwood With: ', function() {
       try {
         await setup.runGreenwoodCommand('build');
       } catch (err) {
-        expect(err).to.contain('Error: provided optimization "loremipsum" is not supported.  Please use one of: default.');
+        expect(err).to.contain('Error: provided optimization "loremipsum" is not supported.  Please use one of: default, none.');
       }
     });
   });
