@@ -3,14 +3,7 @@ class HeaderComponent extends HTMLElement {
     super();
 
     this.root = this.attachShadow({ mode: 'open' });
-  }
-
-  connectedCallback() {
-    this.root.innerHTML = this.getTemplate();
-  }
-
-  getTemplate() {
-    return `
+    this.root.innerHTML = `
       <header>This is the header component.</header>
     `;
   }

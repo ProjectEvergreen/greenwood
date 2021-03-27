@@ -44,7 +44,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
   
-    describe('Default output JavaScript and CSS tags and content', function() {
+    describe('Output for JavaScript / CSS tags and files', function() {
       let dom;
       let cssFiles;
       let jsFiles;
@@ -70,7 +70,7 @@ describe('Build Greenwood With: ', function() {
           const js = fs.readFileSync(jsFiles[0], 'utf-8');
 
           // eslint-disable-next-line max-len
-          expect(js).to.be.contain('class HeaderComponent extends HTMLElement {\n  constructor() {\n    super();\n\n    this.root = this.attachShadow({ mode: \'open\' });\n  }\n\n  connectedCallback() {\n    this.root.innerHTML = this.getTemplate();\n  }\n\n  getTemplate() {\n    return `\n      <header>This is the header component.</header>\n    `;\n  }\n}\n\ncustomElements.define(\'app-header\', HeaderComponent);\n');
+          expect(js).to.be.contain('class HeaderComponent extends HTMLElement {\n  constructor() {\n    super();\n\n    this.root = this.attachShadow({ mode: \'open\' });\n    this.root.innerHTML = `\n      <header>This is the header component.</header>\n    `;\n  }\n}\n\ncustomElements.define(\'app-header\', HeaderComponent);\n');
         });
 
         it('should have the expected <script> tag in the <head>', function() {

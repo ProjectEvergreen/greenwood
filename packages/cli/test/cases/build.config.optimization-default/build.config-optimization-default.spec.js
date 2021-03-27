@@ -40,7 +40,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
   
-    describe('Test output of <script> and <link> tags', function() {
+    describe('Output for JavaScript / CSS tags and files', function() {
       let dom;
 
       before(async function() {
