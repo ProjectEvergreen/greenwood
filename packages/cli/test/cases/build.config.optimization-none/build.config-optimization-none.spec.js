@@ -3,13 +3,16 @@
  * Run Greenwood build command with none setting for optimization
  *
  * User Result
- * Should generate a Greenwood build that preloads all <script> and <link> tags
+ * Should generate a Greenwood build that does not optimize any <script> and <link> tags
  *
  * User Command
  * greenwood build
  *
- * Default Config
- *
+ * User Config
+ * {
+ *   optimization: 'none'
+ * }
+ * 
  * Custom Workspace
  * src/
  *   components/
