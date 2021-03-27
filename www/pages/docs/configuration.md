@@ -9,16 +9,23 @@ linkheadings: 3
 ## Configuration
 These are all the supported configuration options in **Greenwood**, which you can define in a _greenwood.config.js_ file in your project's root directory.
 
-A **greenwood.config.js** file reflecting default values would be:
+The below is a _greenwood.config.js_ file reflecting default values:
 ```js
 module.exports = {
-  workspace: 'src',  // path.join(process.cwd(), 'src')
   devServer: {
     port: 1984,
     host: 'localhost'
   },
+  markdown: {
+    plugins: [],
+    settings: {}
+  },
+  meta: [],
+  mode: 'ssg',
+  optimization: 'default',
+  plugins: [],
   title: 'My App',
-  meta: []
+  workspace: 'src'  // assumes process.cwd()
 };
 ```
 
@@ -91,22 +98,44 @@ Which would be equivalent to:
 <link rel="icon" href="/assets/favicon.ico">
 ```
 
-### Optimization
-> ⛔ [_**Coming Soon!**_](https://github.com/ProjectEvergreen/greenwood/issues/354)
+### Mode
 
-<!-- Greenwood supports a couple different options for how it will generate a production build, depending on how much JavaScript you will need to serve your users.
-- **strict** (expiremental, but recommended for basic sites): What you write will only be used to pre-render your application. No JavaScript is shipped at all and will typically yield the best results in regards to performance.
-- **spa** (default): This will pre-render your site _and_ also ship a full "SPA" experience for your users.
+Greenwood provides a couple different "modes" by which you can indicate the type of project your are making:
 
-> _You can learn more about optimizations in our [How It Works](/about/how-it-works) docs._
+| Option | Description | Use Cases |
+| ------ | ----------- | --------- |
+|`mpa` | Assumes an `ssg` based site, but additionally adds a client side router to create a _Multi Page Application_. | Any `ssg` based site where content lines up well with templates to help with transition between similar pages, like blogs and documentation sites. |
+|`ssg` | (_Default_) Generates a pre-rendered statically generated website from [pages and templates](/docs/layouts/)at build time. | Blog, portfolio, anything really! |
 
 #### Example
 ```js
 module.exports = {
-  optimization: 'spa'
+  mode: 'mpa'
 }
 ```
--->
+
+> _`spa` (Single Page Application) mode coming soon!_
+
+
+### Optimization
+
+Greenwood provides a number of different ways to send hints to Greenwood as to how JavaScript and CSS tags in your HTML should get loaded by the browser.  Greenwood supplements, and builds up on top of existing [resource "hints" like `preload` and `prefetch`](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content).  These optimization settings are intended to compliment any `mode` setting you may have selected.
+
+| Option | Description | Use Cases |
+| ------ | ----------- | --------- |
+|`default` | Will add a `<link rel="preload" src="..." as="..." crossorigin></link>` tag for every `<script>` or `<link>` tag in the `<head>` of your HTML. Will also minify all your JS and CSS files. | General purpose. |
+|`inline` | Using this setting, all your `<script>` and `<link>` tags will get inlined right into your HTML. | For  sites with smaller payloads, this could work best as with inlining, you do so at the expense of long-term caching. |
+|`none` | With this setting, _none_ of your JS or CSS will be minified or hinted at all. | The best choice if you want to handle everything yourself through custom [Resource plugins](/plugins/resource/). |
+|`static` | Only for `<script>` tags, but this setting will remove `<script>` tags from your HTML. | If your Web Components only need a single render just to emit some static HTML, or are otherwise not dynamic or needed at runtime, this will really speed up your site's performance by dropping uncessary HTTP requests. |
+
+#### Example
+```js
+module.exports = {
+  optimization: 'inline'
+}
+```
+
+> _These settings are currently expiremental, and more fine grained control and intelligent based defaults will be coming soon!_
 
 ### Title
 A default `<title>` element for all pages can be configured with the `title` option.
