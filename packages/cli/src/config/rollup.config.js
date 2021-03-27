@@ -1,4 +1,4 @@
-/* eslint-disable max-depth */
+/* eslint-disable max-depth, no-loop-func */
 const Buffer = require('buffer').Buffer;
 const fs = require('fs');
 const htmlparser = require('node-html-parser');
@@ -337,7 +337,7 @@ function greenwoodHtmlPlugin(compilation) {
                     
                     newHtml = newHtml.replace(src, newSrc);
                     
-                    if (optimization !== 'none') {
+                    if (optimization !== 'none' && optimization !== 'inline') {
                       newHtml = newHtml.replace('<head>', `
                         <head>
                         <link rel="preload" href="${newSrc}" as="script" crossorigin="anonymous">
@@ -364,7 +364,7 @@ function greenwoodHtmlPlugin(compilation) {
                       
                       newHtml = newHtml.replace(href, newHref);
 
-                      if (optimization !== 'none') {
+                      if (optimization !== 'none' && optimization !== 'inline') {
                         newHtml = newHtml.replace('<head>', `
                           <head>
                           <link rel="preload" href="${newHref}" as="style" crossorigin="anonymous"></link>
@@ -401,10 +401,24 @@ function greenwoodHtmlPlugin(compilation) {
             style: true
           });
           const headScripts = root.querySelectorAll('script');
+          const headLinks = root.querySelectorAll('link');
 
           headScripts.forEach((scriptTag) => {
             const parsedAttributes = parseTagForAttributes(scriptTag);
             
+            if (optimization === 'inline' && parsedAttributes.type === 'module' && !isRemoteUrl(parsedAttributes.src)) {
+              const outputPath = path.join(outputDir, parsedAttributes.src);
+              const js = fs.readFileSync(outputPath, 'utf-8');
+
+              html = html.replace(`<script ${scriptTag.rawAttrs}>`, `
+                <script>
+                  ${js}
+                </script>
+              `);
+
+              // TODO clean up inline files after all templating fs.unlinkSync(outputPath);
+            }
+
             // handle <script type="module"> /* inline code */ </script>
             if (parsedAttributes.type === 'module' && !parsedAttributes.src) {
               for (const innerBundleId of Object.keys(bundles)) {
@@ -418,6 +432,28 @@ function greenwoodHtmlPlugin(compilation) {
               }
             }
           });
+
+          if (optimization === 'inline') {
+            headLinks
+              .forEach((linkTag) => {
+                const linkTagAttributes = parseTagForAttributes(linkTag);
+                const isLocalLinkTag = linkTagAttributes.rel === 'stylesheet'
+                  && !isRemoteUrl(linkTagAttributes.href);
+                
+                if (isLocalLinkTag) {
+                  const outputPath = path.join(outputDir, linkTagAttributes.href);
+                  const css = fs.readFileSync(outputPath, 'utf-8');
+
+                  html = html.replace(`<link ${linkTag.rawAttrs}>`, `
+                    <style>
+                      ${css}
+                    </style>
+                  `);
+
+                  // TODO clean up inline files after all templating fs.unlinkSync(outputPath);
+                }
+              });
+          }
 
           await fs.promises.writeFile(htmlPath, html);
         } else {
