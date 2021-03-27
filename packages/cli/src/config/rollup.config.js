@@ -160,25 +160,29 @@ function greenwoodHtmlPlugin(compilation) {
      
             // handle <script type="module" src="some/path.js"></script>
             if (!isRemoteUrl(parsedAttributes.src) && parsedAttributes.type === 'module' && parsedAttributes.src && !mappedScripts.get(parsedAttributes.src)) {
-              const { src } = parsedAttributes;
+              if (optimization === 'static') {
+                console.debug('dont emit ', parsedAttributes.src);
+              } else {
+                const { src } = parsedAttributes;
 
-              // TODO avoid using href and set it to the value of rollup fileName instead
-              // since user paths can still be the same file, 
-              // e.g.  ../theme.css and ./theme.css are still the same file
-              mappedScripts.set(src, true);
-
-              const srcPath = src.replace('../', './');
-              const basePath = srcPath.indexOf(tokenNodeModules) >= 0
-                ? projectDirectory
-                : userWorkspace;
-              const source = fs.readFileSync(path.join(basePath, srcPath), 'utf-8');
-
-              this.emitFile({
-                type: 'chunk',
-                id: srcPath.replace('/node_modules', path.join(projectDirectory, tokenNodeModules)),
-                name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
-                source
-              });
+                // TODO avoid using href and set it to the value of rollup fileName instead
+                // since user paths can still be the same file, 
+                // e.g.  ../theme.css and ./theme.css are still the same file
+                mappedScripts.set(src, true);
+  
+                const srcPath = src.replace('../', './');
+                const basePath = srcPath.indexOf(tokenNodeModules) >= 0
+                  ? projectDirectory
+                  : userWorkspace;
+                const source = fs.readFileSync(path.join(basePath, srcPath), 'utf-8');
+  
+                this.emitFile({
+                  type: 'chunk',
+                  id: srcPath.replace('/node_modules', path.join(projectDirectory, tokenNodeModules)),
+                  name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
+                  source
+                });
+              }
             }
 
             // handle <script type="module">/* some inline JavaScript code */</script>
@@ -334,14 +338,13 @@ function greenwoodHtmlPlugin(compilation) {
                     newHtml = newHtml.replace(src, newSrc);
                     
                     if (optimization !== 'none') {
-                      // TODO what is the best behavior / option here for JS
-                      // seems more contextual than JS
-                      // target router specifically as a prefetch if mpa is set?
                       newHtml = newHtml.replace('<head>', `
                         <head>
                         <link rel="preload" href="${newSrc}" as="script" crossorigin="anonymous">
                       `);
                     }
+                  } else if (optimization === 'static' && newHtml.indexOf(pathToMatch) > 0) {
+                    newHtml = newHtml.replace(scriptTag, '');
                   }
                 }
               }
