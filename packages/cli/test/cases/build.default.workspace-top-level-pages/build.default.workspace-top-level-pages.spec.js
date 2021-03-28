@@ -38,8 +38,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    // TODO runSmokeTest(['public', 'not-found', 'index'], LABEL);
-    runSmokeTest(['public'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Home (index) Page', function() {
       let dom;
@@ -48,8 +47,11 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
-      it('should create a top level home (index) page with just an index.html', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
+      xit('should have the correct <title> for the home page', function() {
+        const titleTags = dom.window.document.querySelectorAll('title');
+
+        expect(titleTags.length).to.equal(1);
+        expect(titleTags[0].textContent).to.equal('Top Level Test');
       });
 
       it('should have the correct content for the home page', function() {

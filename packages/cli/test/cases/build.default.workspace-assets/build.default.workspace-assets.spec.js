@@ -32,7 +32,6 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    // runSmokeTest(['public', 'index', 'not-found'], LABEL);
     runSmokeTest(['public', 'index'], LABEL);
 
     describe('Assets folder', function() {

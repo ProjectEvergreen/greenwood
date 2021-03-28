@@ -24,6 +24,7 @@ const expect = require('chai').expect;
 const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const path = require('path');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
@@ -40,7 +41,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    // TODO runSmokeTest(['not-found'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Custom Page Template', function() {
       let dom;

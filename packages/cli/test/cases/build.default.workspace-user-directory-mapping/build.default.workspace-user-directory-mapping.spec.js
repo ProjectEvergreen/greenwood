@@ -35,6 +35,7 @@ const fs = require('fs');
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
@@ -51,7 +52,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    // TODO runSmokeTest(['public', 'index', 'not-found'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Output Folder Structure and Home Page', function() {
       let dom;

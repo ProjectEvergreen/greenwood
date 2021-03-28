@@ -45,8 +45,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    // TODO runSmokeTest(['public', 'index', 'not-found'], LABEL);
-    runSmokeTest(['public'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Initialization script', function() {
       let inlineScript = [];

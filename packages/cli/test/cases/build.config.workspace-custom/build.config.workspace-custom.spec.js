@@ -40,7 +40,6 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    // TODO runSmokeTest(['public', 'index', 'not-found'], LABEL);
     runSmokeTest(['public', 'index'], LABEL);
 
     describe('Custom About page', function() {

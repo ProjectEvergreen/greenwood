@@ -43,8 +43,7 @@ describe('Build Greenwood With: ', function() {
     before(async function() {
       await setup.runGreenwoodCommand('build');
     });
-    
-    // TODO runSmokeTest(['public', 'not-found', 'hello'], LABEL);
+     
     runSmokeTest(['public', 'index'], LABEL);
 
     describe('Custom Title from Configuration', function() {

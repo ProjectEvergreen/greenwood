@@ -62,7 +62,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     // hardcoding index smoke test here because of the nested route
     describe('Index (home) page with custom meta data', function() {

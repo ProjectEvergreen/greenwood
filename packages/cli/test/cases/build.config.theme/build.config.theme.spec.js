@@ -43,7 +43,7 @@ xdescribe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public', 'not-found', 'index'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Theme Styled Page Template', function() {
       let dom;
