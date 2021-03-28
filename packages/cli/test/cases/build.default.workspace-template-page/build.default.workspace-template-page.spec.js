@@ -50,10 +50,6 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
-      it('should output a single index.html file using our custom page template', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
-      });
-
       describe('correct merge order for default app and custom page template <head> tags', function() {
         let scriptTags;
         let linkTags;

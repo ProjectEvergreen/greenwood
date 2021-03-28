@@ -57,10 +57,6 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
-      it('should output a single index.html file using our custom page template', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
-      });
-
       it('should have the specific element we added as part of our custom page template', function() {
         const customElement = dom.window.document.querySelectorAll('div.owen-test');
 
