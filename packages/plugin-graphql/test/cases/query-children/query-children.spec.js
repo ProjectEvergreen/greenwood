@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood build command with GraphQL calls to get data about the projects graph using GraphQuaery.
+ * Run Greenwood build command with GraphQL calls to get data about the projects graph using ChildrenQuaery.
  *
  * User Result
- * Should generate a Greenwood build that tests basic output from the GraphQuery.
+ * Should generate a Greenwood build that tests basic output from the ChildrenQuery.
  * 
  * User Command
  * greenwood build
@@ -13,11 +13,13 @@
  * Custom Workspace
  * src/
  *   components/
- *     debug-output.js
+ *     posts-list.js
  *   pages/
  *     blog/
- *       first-post.md
- *       second-post.md
+ *       first-post/
+ *         index.md
+ *       second-post/
+ *         index.md
  *     index.html
  */
 const expect = require('chai').expect;
@@ -28,7 +30,7 @@ const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Graph from GraphQL';
+  const LABEL = 'Children from GraphQL';
   const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
   let setup;
 
@@ -94,7 +96,7 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('Home Page output w/ GraphQuery', function() {
+    describe('Home Page output w/ ChildrenQuery', function() {
       
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
@@ -134,11 +136,10 @@ describe('Build Greenwood With: ', function() {
       it('should have a expected navigation output in the <header> based on pages with menu: navigation frontmatter', function() {
         const listItems = dom.window.document.querySelectorAll('body ul li');
 
-        expect(listItems.length).to.be.equal(3);        
+        expect(listItems.length).to.be.equal(2);        
         
         expect(listItems[0].innerHTML).to.be.contain('First Post');
         expect(listItems[1].innerHTML).to.be.contain('Second Post');
-        expect(listItems[2].innerHTML).to.be.contain('Index');
       });
     });
   });

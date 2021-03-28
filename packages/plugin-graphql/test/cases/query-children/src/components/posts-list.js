@@ -41,7 +41,7 @@ class PostsListTemplate extends LitElement {
           ${posts.map((post) => {
             return html`
               <li>
-                <a href="${post.route}" title="Click to read my ${post.title} blog post">${post.title}</a>
+                <a href="${post.route}" title="Click to read my ${post.title} blog post">${post.title} Post</a>
               </li>
             `;
           })}
