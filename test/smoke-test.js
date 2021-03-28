@@ -13,21 +13,12 @@ const { JSDOM } = require('jsdom');
 const path = require('path');
 
 function tagsMatch(tagName, html) {
-  const oTagRegex = new RegExp(`<${tagName}`, 'g');
-  const cTagRegex = new RegExp(`<\/${tagName.replace('>', '')}>`, 'g');
-  const opening = (html.match(oTagRegex) || []).length;
-  const closing = (html.match(cTagRegex) || []).length;
-
-  // console.debug(html);
-  // console.debug('opening match', html.match(oTagRegex));
-  // console.debug('closing match', html.match(cTagRegex));
-  // console.debug('opening tag', `<${tagName}`);
-  // console.debug('closing tag', `<\/${tagName.replace('>', '')}>`);
-  // console.debug('opening tag count', opening);
-  // console.debug('closing tag count', closing);
-  // console.debug('************');
+  const openTagRegex = new RegExp(`<${tagName}`, 'g');
+  const closeTagRegex = new RegExp(`<\/${tagName.replace('>', '')}>`, 'g');
+  const openingCount = (html.match(openTagRegex) || []).length;
+  const closingCount = (html.match(closeTagRegex) || []).length;
   
-  return opening === closing;
+  return openingCount === closingCount;
 }
 
 function publicDirectory(label) {

@@ -28,6 +28,7 @@ const expect = require('chai').expect;
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
@@ -51,6 +52,8 @@ describe('Build Greenwood With: ', function() {
     before(async function() {
       await setup.runGreenwoodCommand('build');
     });
+
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Script tag in the <head> tag', function() {
       let dom;
