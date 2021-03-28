@@ -28,7 +28,6 @@
  *     page.html
  */
 const expect = require('chai').expect;
-const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');

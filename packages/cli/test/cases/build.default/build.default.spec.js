@@ -40,7 +40,7 @@ describe('Build Greenwood With: ', function() {
     describe('Default output for index.html', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 

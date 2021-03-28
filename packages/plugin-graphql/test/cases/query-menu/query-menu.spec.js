@@ -96,7 +96,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('Home Page navigation w/ MenuQuery', function() {
       
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
   

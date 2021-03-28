@@ -55,7 +55,7 @@ describe('Build Greenwood With: ', function() {
     describe('Script tag in the <head> tag', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 

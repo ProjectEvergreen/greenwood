@@ -18,9 +18,6 @@ function tagsMatch(tagName, html) {
   const opening = (html.match(oTagRegex) || []).length;
   const closing = (html.match(cTagRegex) || []).length;
   
-  console.debug(`opening <${tagName}>`, opening);
-  console.debug(`closing </${tagName}>`, closing);
-  console.debug('*************************');
   return opening === closing;
 }
 

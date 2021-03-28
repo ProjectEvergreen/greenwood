@@ -98,7 +98,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('Home Page <posts-list> w/ custom Graph query', function() {
       
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
   

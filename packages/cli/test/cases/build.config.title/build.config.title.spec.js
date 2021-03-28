@@ -49,7 +49,7 @@ describe('Build Greenwood With: ', function() {
     describe('Custom Title from Configuration', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
@@ -64,7 +64,7 @@ describe('Build Greenwood With: ', function() {
       const pageTitle = 'About Page';
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'about', './index.html'));
       });
 

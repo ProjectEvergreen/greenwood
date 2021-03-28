@@ -65,7 +65,7 @@ describe('Build Greenwood With: ', function() {
     describe('Blog Pages Directory', function() {
       let graph;
 
-      beforeEach(async function() {
+      before(async function() {
         graph = require(path.join(this.context.publicDir, 'graph.json'));
       });
 

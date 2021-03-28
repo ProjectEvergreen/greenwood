@@ -45,7 +45,7 @@ describe('Build Greenwood With: ', function() {
     describe('Custom About page', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'about', './index.html'));
       });
 

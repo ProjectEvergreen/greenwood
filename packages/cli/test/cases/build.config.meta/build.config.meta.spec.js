@@ -68,7 +68,7 @@ describe('Build Greenwood With: ', function() {
     describe('Index (home) page with custom meta data', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
@@ -170,7 +170,7 @@ describe('Build Greenwood With: ', function() {
     describe('Nested About page meta data', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'about', './index.html'));
       });
 
@@ -203,7 +203,7 @@ describe('Build Greenwood With: ', function() {
     describe('favicon', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 

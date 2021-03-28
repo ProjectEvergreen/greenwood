@@ -54,7 +54,7 @@ describe('Build Greenwood With: ', function() {
     describe('Folder Structure and Home Page', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
@@ -149,7 +149,7 @@ describe('Build Greenwood With: ', function() {
     describe('First Blog Post', function() {
       let dom;
       
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'blog/first-post/index.html'));
       });
 
@@ -216,7 +216,7 @@ describe('Build Greenwood With: ', function() {
     describe('Second Blog Post', function() {
       let dom;
       
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'blog/second-post/index.html'));
       });
 

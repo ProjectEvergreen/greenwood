@@ -61,7 +61,7 @@ describe('Build Greenwood With: ', function() {
     });
 
     describe('displaying config title in the footer using ConfigQuery', function() {
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 

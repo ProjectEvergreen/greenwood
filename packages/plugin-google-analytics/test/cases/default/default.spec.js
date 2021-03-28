@@ -51,7 +51,7 @@ describe('Build Greenwood With: ', function() {
       let inlineScript = [];
       let scriptSrcTags = [];
 
-      beforeEach(async function() {
+      before(async function() {
         const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
         const scriptTags = dom.window.document.querySelectorAll('head script');
 
@@ -96,7 +96,7 @@ describe('Build Greenwood With: ', function() {
     describe('Link Preconnect', function() {
       let linkTag;
 
-      beforeEach(async function() {
+      before(async function() {
         const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
         const linkTags = dom.window.document.querySelectorAll('head link');
 
@@ -117,7 +117,7 @@ describe('Build Greenwood With: ', function() {
     describe('Tracking script', function() {
       let trackingScript;
 
-      beforeEach(async function() {
+      before(async function() {
         const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
         const scriptTags = dom.window.document.querySelectorAll('head script');
 
