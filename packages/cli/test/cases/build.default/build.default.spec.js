@@ -57,6 +57,10 @@ describe('Build Greenwood With: ', function() {
           expect(title).to.be.equal('My App');
         });
 
+        it('should have five default <meta> tags in the <head>', function() {
+          expect(metaTags.length).to.be.equal(5);
+        });
+
         it('should have default charset <meta> tag', function() {
           expect(metaTags[0].getAttribute('charset')).to.be.equal('utf-8');
         });

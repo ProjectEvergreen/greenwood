@@ -69,11 +69,6 @@ describe('Build Greenwood With: ', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
 
-      // TODO
-      xit('should output a single 404.html file (not found page)', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './404.html'))).to.be.true;
-      });
-
       it('should output one JS bundle files', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, './*.js'))).to.have.lengthOf(1);
       });

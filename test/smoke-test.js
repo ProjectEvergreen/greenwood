@@ -66,10 +66,6 @@ function defaultIndex(label) {
   
           expect(title).to.not.be.undefined;
         });
-  
-        xit('should have matching opening and closing <meta> tags in the <head>', function() {
-          expect(tagsMatch('meta', html)).to.be.equal(true);
-        });
 
         it('should have matching opening and closing <script> tags in the <head>', function() {
           expect(tagsMatch('script', html)).to.be.equal(true);

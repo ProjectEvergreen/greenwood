@@ -76,8 +76,8 @@ describe('Build Greenwood With: ', function() {
     });
 
     // find a better way to test for preset-env specifically?
-    xdescribe('Babel should handle processing of JavaScript per usage of @babel/preset-env', function() {
-      it('should output correctly processed JavaScript...', function() {
+    describe('Babel should handle processing of JavaScript per usage of @babel/preset-env', function() {
+      xit('should output correctly processed JavaScript...', function() {
         const expectedJavaScript = 'return e&&e.__esModule';
         const javascript = fs.readFileSync(jsFiles[0], 'utf-8');
 
