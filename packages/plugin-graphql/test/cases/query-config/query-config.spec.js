@@ -19,11 +19,11 @@
  *     index.html
  */
 const expect = require('chai').expect;
-const fs = require('fs');
 const greenwoodConfig = require('./greenwood.config');
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
@@ -60,13 +60,11 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
+    runSmokeTest(['public', 'index'], LABEL);
+
     describe('displaying config title in the footer using ConfigQuery', function() {
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-      });
-
-      it('should output an index.html file', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
 
       it('should have a <footer> in the <body> with greenwoodConfig#title as the text value', function() {

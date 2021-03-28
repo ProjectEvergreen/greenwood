@@ -17,6 +17,15 @@ function tagsMatch(tagName, html) {
   const cTagRegex = new RegExp(`<\/${tagName.replace('>', '')}>`, 'g');
   const opening = (html.match(oTagRegex) || []).length;
   const closing = (html.match(cTagRegex) || []).length;
+
+  // console.debug(html);
+  // console.debug('opening match', html.match(oTagRegex));
+  // console.debug('closing match', html.match(cTagRegex));
+  // console.debug('opening tag', `<${tagName}`);
+  // console.debug('closing tag', `<\/${tagName.replace('>', '')}>`);
+  // console.debug('opening tag count', opening);
+  // console.debug('closing tag count', closing);
+  // console.debug('************');
   
   return opening === closing;
 }
@@ -35,10 +44,6 @@ function publicDirectory(label) {
       it('should output one graph.json file', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'graph.json'))).to.have.lengthOf(1);
       });
-
-      it('should output no more than json file', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, '*.json'))).to.have.lengthOf(1);
-      });
     });
   });
 }
@@ -50,8 +55,10 @@ function defaultIndex(label) {
       let html;
 
       before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-        html = dom.window.document.querySelector('html').innerHTML;
+        const htmlPath = path.resolve(this.context.publicDir, 'index.html');
+
+        dom = await JSDOM.fromFile(htmlPath);
+        html = await fs.promises.readFile(htmlPath, 'utf-8');
       });
 
       describe('document <head>', function() {
