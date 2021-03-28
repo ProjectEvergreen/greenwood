@@ -80,7 +80,6 @@ function greenwoodWorkspaceResolver (compilation) {
   return {
     name: 'greenwood-workspace-resolver',
     resolveId(source) {
-      // TODO better way to handle relative paths?  happens in generateBundle too
       if ((source.indexOf('./') === 0 || source.indexOf('/') === 0) && path.extname(source) !== '.html' && fs.existsSync(path.join(userWorkspace, source))) {        
         return source.replace(source, path.join(userWorkspace, source));
       }
@@ -126,7 +125,6 @@ function greenwoodHtmlPlugin(compilation) {
               : null;
           }))).filter(resource => resource);
 
-          // TODO should reduce here instead
           if (resourceHandler.length) {
             const response = await resourceHandler[0].serve(id);
 
@@ -153,8 +151,7 @@ function greenwoodHtmlPlugin(compilation) {
           });
           const headScripts = root.querySelectorAll('script');
           const headLinks = root.querySelectorAll('link');
-      
-          // TODO handle deeper paths. e.g. ../../../
+
           headScripts.forEach((scriptTag) => {
             const parsedAttributes = parseTagForAttributes(scriptTag);
      
@@ -196,12 +193,7 @@ function greenwoodHtmlPlugin(compilation) {
                   ${scriptTag.rawText}
                 `.trim();
 
-                // have to write a file for rollup?
                 fs.writeFileSync(path.join(scratchDir, filename), source);
-
-                // TODO avoid using href and set it to the value of rollup fileName instead
-                // since user paths can still be the same file, 
-                // e.g.  ../theme.css and ./theme.css are still the same file
                 mappedScripts.set(id, true);
 
                 this.emitFile({
@@ -225,7 +217,6 @@ function greenwoodHtmlPlugin(compilation) {
                 href = href.slice(1);
               }
 
-              // TODO handle auto expanding deeper paths
               const basePath = href.indexOf(tokenNodeModules) >= 0
                 ? projectDirectory
                 : userWorkspace;
@@ -244,9 +235,6 @@ function greenwoodHtmlPlugin(compilation) {
                 });
               }
 
-              // TODO avoid using href and set it to the value of rollup fileName instead
-              // since user paths can still be the same file, 
-              // e.g.  ../theme.css and ./theme.css are still the same file
               mappedStyles[parsedAttributes.href] = {
                 type: 'asset',
                 fileName: fileName.indexOf(tokenNodeModules) >= 0
@@ -298,7 +286,6 @@ function greenwoodHtmlPlugin(compilation) {
         try {
           const bundle = bundles[bundleId];
 
-          // TODO handle (!) Generated empty chunks .greenwood/about, .greenwood/index
           if (bundle.isEntry && path.extname(bundle.facadeModuleId) === '.html') {
             const html = fs.readFileSync(bundle.facadeModuleId, 'utf-8');
             const root = htmlparser.parse(html, {
@@ -373,7 +360,6 @@ function greenwoodHtmlPlugin(compilation) {
               }
             });
 
-            // TODO this seems hacky; hardcoded dirs :D
             bundle.fileName = bundle.facadeModuleId.replace('.greenwood', 'public');
             bundle.code = newHtml;
           }
@@ -390,7 +376,6 @@ function greenwoodHtmlPlugin(compilation) {
         const bundle = bundles[bundleId];
 
         if (bundle.isEntry && path.extname(bundle.facadeModuleId) === '.html') {
-          // TODO this seems hacky; hardcoded dirs :D
           const htmlPath = bundle.facadeModuleId.replace('.greenwood', 'public');
           let html = fs.readFileSync(htmlPath, 'utf-8');
           const root = htmlparser.parse(html, {
@@ -478,17 +463,15 @@ function greenwoodHtmlPlugin(compilation) {
 module.exports = getRollupConfig = async (compilation) => {
   const { scratchDir, outputDir } = compilation.context;
   const defaultRollupPlugins = [
-    // TODO replace should come in via plugin-node-modules
     replace({ // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
-    nodeResolve(), // TODO move to plugin-node-modules
+    nodeResolve(),
     greenwoodWorkspaceResolver(compilation),
     greenwoodHtmlPlugin(compilation),
     multiInput(),
-    json() // TODO make it part plugin-standard-json
+    json()
   ];
-  // TODO greenwood standard plugins, then "Greenwood" plugins, then user plugins
   const customRollupPlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'rollup';
   }).map((plugin) => {
@@ -497,12 +480,11 @@ module.exports = getRollupConfig = async (compilation) => {
 
   if (compilation.config.optimization !== 'none') {
     defaultRollupPlugins.push(
-      terser() // TODO extract to plugin-standard-javascript
+      terser()
     );
   }
   
   return [{
-    // TODO Avoid .greenwood/ directory, do everything in public/?
     input: `${scratchDir}**/*.html`,
     output: { 
       dir: outputDir,
