@@ -65,7 +65,6 @@ module.exports = copyAssets = (compilation) => {
         }
       }
 
-      // TODO should be done via rollup detection, so Greenwood will only copy files used when actually imported by the user
       console.info('copying graph.json...');
       await copyFile(`${context.scratchDir}graph.json`, `${context.outputDir}/graph.json`);
 

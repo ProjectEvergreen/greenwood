@@ -165,7 +165,6 @@ function getProdServer(compilation) {
       ctx.body = contents;
     }
 
-    // TODO break up into distinct font / icons / svg handlers, decouple from to assets/
     if (url.indexOf('assets/')) {
       const assetPath = path.join(outputDir, url);
       const ext = path.extname(assetPath);
