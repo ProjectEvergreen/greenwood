@@ -5,10 +5,9 @@
     <script type="module" src="../components/banner/banner.js"></script>
     <script type="module" src="../components/card/card.js"></script>
 
-    <link rel="stylesheet" href="/node_modules/prismjs/themes/prism-tomorrow.css"></link>
+    <link rel="stylesheet" href="/node_modules/prismjs/themes/prism-tomorrow.css"/>
     <link rel="stylesheet" href="/styles/home.css"/>
   </head>
-
   <body>
 
     <div class="gwd-content-outlet">
@@ -36,16 +35,18 @@
 
               <div class="quickstart">
                 <h2>Quick Start Example</h2>
-                <pre class="language-js">
-                  # with NodeJS already installed
-                  # create a pages directory for your content
-                  $ mkdir -p src/pages
+                <pre class="language-bash">
+                  <code class="language-bash">
+                    # with NodeJS already installed
+                    # create a pages directory for your content
+                    $ mkdir -p src/pages
 
-                  # create an index.md file with some content
-                  $ echo "## hello world" > src/pages.index.md
+                    # create an index.md file as your home page
+                    $ echo "## hello world" > src/pages/index.md
 
-                  # run Greenwood. that's it!
-                  $ @npx greenwood/cli build
+                    # run one of Greenwood's commands, and that's it!
+                    $ npx @greenwood/cli develop
+                  </code>
                 </pre>
               </div>
 
