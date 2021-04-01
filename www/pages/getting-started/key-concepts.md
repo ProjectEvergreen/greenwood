@@ -1,5 +1,5 @@
 ---
-label: 'concepts'
+label: 'key-concepts'
 menu: side
 title: 'Key Concepts'
 index: 3
