@@ -79,7 +79,7 @@ Any regular HTML will do.  You will just need to include a `<content-outlet></co
 Don't worry too much about the `<content-outlet></content-outlet>`, this is discussed in more detail in our [docs](/docs/layouts/).
 
 ### Pages
-Pages are how you will create the content for your site by (generally) creating markdown files.  Simply make a _pages/_ directory in your workspace and Greenwood will start building them automatically.  By default, pages will build using the default page template: _page-template.js_.
+Pages are how you will create the content for your site by (generally) creating markdown files.  Simply make a _pages/_ directory in your workspace and Greenwood will start building them automatically.  By default, pages will build using the default page template: _page.html_.
 
 By adding a home page (_index.md_), your directory structure for a basic Greenwood application would now look like this:
 ```bash

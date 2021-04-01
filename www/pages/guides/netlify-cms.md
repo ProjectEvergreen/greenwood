@@ -71,16 +71,14 @@ Inside the `public/admin/` directory create another file called `index.html` thi
 
 #### Identity Widget
 
-Along with the admin UI, we also need to readd the identity widget script element within our page-template.js so that it will be accessible from any page.  Within our `src/components/templates/page-template.js` you need to add the following script element within the function:
+Along with the admin UI, we also need to readd the identity widget script element within our app template so that it will be accessible from any page.  Within our `src/templates/app.html` you need to add the following script element within the function:
 
-```javascript
-  render() {
-    return html`
-      ...
-      <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-      ...
-      `
-  }
+```html
+<head>
+  ...
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  ...
+</head>
 ```
 
 > Later, when you're doing this with a your own projects, make sure you either:

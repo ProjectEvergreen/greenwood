@@ -52,8 +52,8 @@ module.exports = {
   markdown: {
     settings: { commonmark: true },
     plugins: [
-      require('rehype-slug'),
-      require('rehype-autolink-headings')
+      'rehype-slug',
+      'rehype-autolink-headings'
     ]
   }
 }
