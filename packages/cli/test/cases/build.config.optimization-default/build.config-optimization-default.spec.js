@@ -58,14 +58,13 @@ describe('Build Greenwood With: ', function() {
           expect(scriptTags.length).to.be.equal(1);
         });
 
-        it('should have the expect preload <link> tag for the same <script> tag src in the <head>', function() {
+        it('should have the expect modulepreload <link> tag for the same <script> tag src in the <head>', function() {
           const preloadScriptTags = Array
-            .from(dom.window.document.querySelectorAll('head link[rel="preload"]'))
+            .from(dom.window.document.querySelectorAll('head link[rel="modulepreload"]'))
             .filter(link => link.getAttribute('as') === 'script');
 
           expect(preloadScriptTags.length).to.be.equal(1);
           expect(preloadScriptTags[0].href).to.match(/header.*.js/);
-          expect(preloadScriptTags[0].getAttribute('crossorigin')).to.equal('anonymous');
         });
 
         it('should contain the expected content from <app-header> in the <body>', function() {

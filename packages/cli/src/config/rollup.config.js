@@ -337,7 +337,7 @@ function greenwoodHtmlPlugin(compilation) {
                     if (optimization !== 'none' && optimization !== 'inline') {
                       newHtml = newHtml.replace('<head>', `
                         <head>
-                        <link rel="preload" href="${newSrc}" as="script" crossorigin="anonymous">
+                        <link rel="modulepreload" href="${newSrc}" as="script">
                       `);
                     }
                   } else if (optimization === 'static' && newHtml.indexOf(pathToMatch) > 0) {

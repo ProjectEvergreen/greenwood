@@ -123,7 +123,7 @@ Greenwood provides a number of different ways to send hints to Greenwood as to h
 
 | Option | Description | Use Cases |
 | ------ | ----------- | --------- |
-|`default` | Will add a `<link rel="preload" src="..." as="..." crossorigin></link>` tag for every `<script>` or `<link>` tag in the `<head>` of your HTML. Will also minify all your JS and CSS files. | General purpose. |
+|`default` | Will add a `<link rel="..." src="..." as="..."></link>` tag for every `<script>` or `<link>` tag in the `<head>` of your HTML using `preload` for styles and `modulepreload` for scripts.  This setting will also minify all your JS and CSS files. | General purpose. |
 |`inline` | Using this setting, all your `<script>` and `<link>` tags will get inlined right into your HTML. | For  sites with smaller payloads, this could work best as with inlining, you do so at the expense of long-term caching. |
 |`none` | With this setting, _none_ of your JS or CSS will be minified or hinted at all. | The best choice if you want to handle everything yourself through custom [Resource plugins](/plugins/resource/). |
 |`static` | Only for `<script>` tags, but this setting will remove `<script>` tags from your HTML. | If your Web Components only need a single render just to emit some static HTML, or are otherwise not dynamic or needed at runtime, this will really speed up your site's performance by dropping uncessary HTTP requests. |
