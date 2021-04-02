@@ -8,7 +8,7 @@ index: 0
 ## Goals
 
 #### It's Not About Us
-First and foremost, Greenwood aims to be developer friendly.  We want to provide the capabilities and tooling to help you accelerate your workflow and build your project, all while getting out of the way as much as possible.  We value documentation and transparency into our project's roadmap and decision making, and encourage all to participate in our [GitHub](https://github.com/ProjectEvergreen/greenwood) issues, discussions, and pull requests.  We want to hear from you about what you think would make Greenwood better!
+First and foremost, Greenwood aims to be developer friendly.  We want to provide the capabilities and the right amount of tooling and options to help you accelerate your workflow and build your project.  We value documentation and transparency into our project's roadmap and decision making, and encourage all to participate in our [GitHub](https://github.com/ProjectEvergreen/greenwood) issues, discussions, and pull requests.  We want to hear from you about what you think would make Greenwood better!
 
 
 

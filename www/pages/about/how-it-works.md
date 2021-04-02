@@ -19,15 +19,15 @@ Greenwood wants to take advantage of this oppourtunity to join in with other pro
 To actually use Greenwood, everyone is required to install the CLI.  The CLI is what powers all the workflows available by Greenwood and builds your project for local development and production builds.  It is plugin based so that it can be extended by users to support additional workflows not intended to be supported by core.
 
 During _development_ the CLI will:
-
 - Instantaneously start a local web server with live reload.
-- Process requests on the fly only for the content you need for a given page.
-- Supports loading dependencies from _node_modules_ using `importMap`.
-- We even have a plugin to tranform CommonJS into ESM (🤞).
+- Process requests on the fly only for the content or code you need for a given page.
+- Supports loading dependencies from _node_modules_ using an [`importMap`](https://github.com/WICG/import-maps).
+- We even have a plugin to tranform CommonJS into ESM (🤞)!
 
-For _production_ builds, Greenwood:
-- Combines all your code and dependencies into effecient modern bundles including minifying JS and CSS.
+For _production_ builds:
+- Combine all your code and dependencies into efficient modern bundles including minifying your JavaScript and CSS.
 - Optimizes loading of JavaScript and CSS assets using web hints like `preload` and `prefetch`.
+- All JavaScript (Web Components) are pre-rendered to static HTML (using **puppeteer**) for web standards templating with no runtime cost.
 - Can [output](docs/config#mode) a standard static site (SSG), a multi-page application (MPA), or single-page application (SPA).
 - Supports [further optimization](docs/config#optimization) for additional hints like inlining or only statically pre-rendering JavaScript.
 
