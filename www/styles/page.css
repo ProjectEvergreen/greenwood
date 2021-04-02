@@ -26,19 +26,19 @@ h3 > a > span.icon {
   background-size: 20px 20px;
   background-repeat: no-repeat;
   background-position-y: center;
-  
+
   &:hover {
     filter: invert(.4);
   }
 }
 
-.gwd-content-wrapper {
+/* .gwd-content-wrapper {
   display:flex;
 
   @media (max-width: 768px) {
     flex-direction: column;
   }
-}
+} */
 
 .gwd-sidebar {
   width: 400px;

@@ -9,9 +9,8 @@
   text-align: center;
 
   & slot {
-    padding: 10px;
-    margin: 0.25rem;
-    flex: 1 1 33.333%;
+    text-align: left;
+    font-size: 1rem;
   }
 
   & .card-img-top {
