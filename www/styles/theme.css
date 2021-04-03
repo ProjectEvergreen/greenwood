@@ -22,7 +22,7 @@ img {
 h2, h3, h4, h5 {
   margin-top:1.5rem !important;
   margin-bottom:1.5rem !important;
-  color: #1d337a;
+  color: #201E2E;
 }
 
 ul, ol {
@@ -52,12 +52,7 @@ p > code {
   font-weight: 800;
 }
 
-.gwd-content-wrapper {
-  background-color: white;
-}
-
 .gwd-wrapper {
-  background-color: white;
 
   & .single-column {
     margin: inherit;

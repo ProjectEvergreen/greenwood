@@ -21,7 +21,7 @@
 :host {
 
   & .banner {
-    background-color: #F6F2F4;
+    background-color: #fff;
     min-height: 60vh;
 
     & .content {
@@ -41,11 +41,11 @@
 
       & h1 {
         font-size:3.5rem;
-        text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
+        color: #201E2E;
       }
       & h3 {
         padding-top: 10px;
-        text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
+        color: #201E2E;
       }
 
       & img {
