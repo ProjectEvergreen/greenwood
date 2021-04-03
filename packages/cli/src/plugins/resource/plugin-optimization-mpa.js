@@ -7,7 +7,6 @@
 const fs = require('fs');
 const path = require('path');
 const { ResourceInterface } = require('../../lib/resource-interface');
-// const rollupPluginAlias = require('@rollup/plugin-alias');
 
 class OptimizationMPAResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -17,7 +16,6 @@ class OptimizationMPAResource extends ResourceInterface {
     this.libPath = '@greenwood/router/router.js';
   }
 
-  // TODO make this work using this.libPath
   async shouldResolve(url) {
     return Promise.resolve(url.indexOf(this.libPath) >= 0);
   }
@@ -33,30 +31,6 @@ class OptimizationMPAResource extends ResourceInterface {
       }
     });
   }
-
-  // TODO add support for running in development?
-  // async shouldIntercept(url, body, headers) {
-  //   return Promise.resolve(this.compilation.config.optimization === 'mpa' && headers.request.accept.indexOf('text/html') >= 0);
-  // }
-
-  // async intercept(url, body) {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       // es-modules-shims breaks on dangling commas in an importMap :/
-  //       const danglingComma = body.indexOf('"imports": {}') > 0 
-  //         ? ''
-  //         : ',';
-  //       const shimmedBody = body.replace('"imports": {', `
-  //         "imports": {
-  //           "@greenwood/cli/lib/router": "/node_modules/@greenwood/cli/lib/router.js"${danglingComma}
-  //       `);
-
-  //       resolve({ body: shimmedBody });
-  //     } catch (e) {
-  //       reject(e);
-  //     }
-  //   });
-  // }
 
   async shouldOptimize(url) {
     return Promise.resolve(path.extname(url) === '.html' && this.compilation.config.mode === 'mpa');
@@ -124,19 +98,9 @@ class OptimizationMPAResource extends ResourceInterface {
 }
 
 module.exports = (options = {}) => {
-  return [{
+  return {
     type: 'resource',
     name: 'plugin-optimization-mpa',
     provider: (compilation) => new OptimizationMPAResource(compilation, options)
-  // }, {
-  //   type: 'rollup',
-  //   name: 'plugin-optimization-mpa:rollup',
-  //   provider: () => [
-  //     rollupPluginAlias({
-  //       entries: [
-  //         { find: '@greenwood/cli/lib/router', replacement: '/node_modules/@greenwood/cli/lib/router.js' }
-  //       ]
-  //     })
-  //   ]
-  }];
+  };
 }; 

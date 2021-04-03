@@ -27,7 +27,7 @@ function getDevServer(compilation) {
     pluginResourceStandardImage.provider(compilationCopy),
     pluginResourceStandardJavaScript.provider(compilationCopy),
     pluginResourceStandardJson.provider(compilationCopy),
-    pluginResourceOptimizationMpa()[0].provider(compilationCopy),
+    pluginResourceOptimizationMpa().provider(compilationCopy),
 
     // custom user resource plugins
     ...compilation.config.plugins.filter((plugin) => {

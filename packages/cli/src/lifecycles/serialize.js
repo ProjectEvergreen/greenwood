@@ -9,7 +9,7 @@ module.exports = serializeCompilation = async (compilation) => {
   const browserRunner = new BrowserRunner();
   const optimizeResources = [
     pluginResourceStandardHtml.provider(compilationCopy),
-    pluginOptimizationMpa()[0].provider(compilationCopy),
+    pluginOptimizationMpa().provider(compilationCopy),
     ...compilation.config.plugins.filter((plugin) => {
       const provider = plugin.provider(compilationCopy);
 
