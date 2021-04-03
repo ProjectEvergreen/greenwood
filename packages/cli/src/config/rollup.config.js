@@ -1,3 +1,4 @@
+/* eslint-disable max-depth, no-loop-func */
 const Buffer = require('buffer').Buffer;
 const fs = require('fs');
 const htmlparser = require('node-html-parser');
@@ -9,7 +10,6 @@ const postcss = require('postcss');
 const postcssImport = require('postcss-import');
 const replace = require('@rollup/plugin-replace');
 const { terser } = require('rollup-plugin-terser');
-
 const tokenSuffix = 'scratch';
 const tokenNodeModules = 'node_modules/';
 
@@ -98,7 +98,8 @@ function greenwoodWorkspaceResolver (compilation) {
 // https://github.com/rollup/rollup/issues/2873
 function greenwoodHtmlPlugin(compilation) {
   const { projectDirectory, userWorkspace, outputDir, scratchDir } = compilation.context;
-  const isRemoteUrl = (url = '') => url.indexOf('http') === 0 || url.indexOf('//') === 0;
+  const { optimization } = compilation.config;
+  const isRemoteUrl = (url = undefined) => url && (url.indexOf('http') === 0 || url.indexOf('//') === 0);
   const customResources = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
   }).map((plugin) => {
@@ -159,25 +160,29 @@ function greenwoodHtmlPlugin(compilation) {
      
             // handle <script type="module" src="some/path.js"></script>
             if (!isRemoteUrl(parsedAttributes.src) && parsedAttributes.type === 'module' && parsedAttributes.src && !mappedScripts.get(parsedAttributes.src)) {
-              const { src } = parsedAttributes;
+              if (optimization === 'static') {
+                // console.debug('dont emit ', parsedAttributes.src);
+              } else {
+                const { src } = parsedAttributes;
 
-              // TODO avoid using href and set it to the value of rollup fileName instead
-              // since user paths can still be the same file, 
-              // e.g.  ../theme.css and ./theme.css are still the same file
-              mappedScripts.set(src, true);
-
-              const srcPath = src.replace('../', './');
-              const basePath = srcPath.indexOf(tokenNodeModules) >= 0
-                ? projectDirectory
-                : userWorkspace;
-              const source = fs.readFileSync(path.join(basePath, srcPath), 'utf-8');
-
-              this.emitFile({
-                type: 'chunk',
-                id: srcPath.replace('/node_modules', path.join(projectDirectory, tokenNodeModules)),
-                name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
-                source
-              });
+                // TODO avoid using href and set it to the value of rollup fileName instead
+                // since user paths can still be the same file, 
+                // e.g.  ../theme.css and ./theme.css are still the same file
+                mappedScripts.set(src, true);
+  
+                const srcPath = src.replace('../', './');
+                const basePath = srcPath.indexOf(tokenNodeModules) >= 0
+                  ? projectDirectory
+                  : userWorkspace;
+                const source = fs.readFileSync(path.join(basePath, srcPath), 'utf-8');
+  
+                this.emitFile({
+                  type: 'chunk',
+                  id: srcPath.replace('/node_modules', path.join(projectDirectory, tokenNodeModules)),
+                  name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
+                  source
+                });
+              }
             }
 
             // handle <script type="module">/* some inline JavaScript code */</script>
@@ -312,10 +317,31 @@ function greenwoodHtmlPlugin(compilation) {
                 for (const innerBundleId of Object.keys(bundles)) {
                   const { src } = parsedAttributes;
                   const facadeModuleId = bundles[innerBundleId].facadeModuleId;
-                  const pathToMatch = src.replace('../', '').replace('./', '');
+                  let pathToMatch = src.replace('../', '').replace('./', '');
+
+                  // special handling for node_modules paths
+                  if (pathToMatch.indexOf(tokenNodeModules) >= 0) {
+                    pathToMatch = pathToMatch.replace(`/${tokenNodeModules}`, '');
+  
+                    const pathToMatchPieces = pathToMatch.split('/');
+  
+                    pathToMatch = pathToMatch.replace(tokenNodeModules, '');
+                    pathToMatch = pathToMatch.replace(`${pathToMatchPieces[0]}/`, '');
+                  }
 
                   if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {
-                    newHtml = newHtml.replace(src, `/${innerBundleId}`);
+                    const newSrc = `/${innerBundleId}`;
+                    
+                    newHtml = newHtml.replace(src, newSrc);
+                    
+                    if (optimization !== 'none' && optimization !== 'inline') {
+                      newHtml = newHtml.replace('<head>', `
+                        <head>
+                        <link rel="modulepreload" href="${newSrc}" as="script">
+                      `);
+                    }
+                  } else if (optimization === 'static' && newHtml.indexOf(pathToMatch) > 0) {
+                    newHtml = newHtml.replace(scriptTag, '');
                   }
                 }
               }
@@ -331,7 +357,16 @@ function greenwoodHtmlPlugin(compilation) {
                   if (bundleId2.indexOf('.css') > 0) {
                     const bundle2 = bundles[bundleId2];
                     if (href.indexOf(bundle2.name) >= 0) {
-                      newHtml = newHtml.replace(href, `/${bundle2.fileName}`);
+                      const newHref = `/${bundle2.fileName}`;
+                      
+                      newHtml = newHtml.replace(href, newHref);
+
+                      if (optimization !== 'none' && optimization !== 'inline') {
+                        newHtml = newHtml.replace('<head>', `
+                          <head>
+                          <link rel="preload" href="${newHref}" as="style" crossorigin="anonymous"></link>
+                        `);
+                      }
                     }
                   }
                 }
@@ -363,10 +398,29 @@ function greenwoodHtmlPlugin(compilation) {
             style: true
           });
           const headScripts = root.querySelectorAll('script');
+          const headLinks = root.querySelectorAll('link');
 
           headScripts.forEach((scriptTag) => {
             const parsedAttributes = parseTagForAttributes(scriptTag);
-            
+            const isScriptSrcTag = parsedAttributes.src && parsedAttributes.type === 'module';
+
+            if (optimization === 'inline' && isScriptSrcTag && !isRemoteUrl(parsedAttributes.src)) {
+              const src = parsedAttributes.src;
+              const basePath = src.indexOf(tokenNodeModules) >= 0 
+                ? process.cwd()
+                : outputDir;
+              const outputPath = path.join(basePath, src);
+              const js = fs.readFileSync(outputPath, 'utf-8');
+
+              // scratchFiles[src] = true;
+
+              html = html.replace(`<script ${scriptTag.rawAttrs}></script>`, `
+                <script type="module">
+                  ${js}
+                </script>
+              `);
+            }
+
             // handle <script type="module"> /* inline code */ </script>
             if (parsedAttributes.type === 'module' && !parsedAttributes.src) {
               for (const innerBundleId of Object.keys(bundles)) {
@@ -380,6 +434,29 @@ function greenwoodHtmlPlugin(compilation) {
               }
             }
           });
+
+          if (optimization === 'inline') {
+            headLinks
+              .forEach((linkTag) => {
+                const linkTagAttributes = parseTagForAttributes(linkTag);
+                const isLocalLinkTag = linkTagAttributes.rel === 'stylesheet'
+                  && !isRemoteUrl(linkTagAttributes.href);
+                
+                if (isLocalLinkTag) {
+                  const href = linkTagAttributes.href;
+                  const outputPath = path.join(outputDir, href);
+                  const css = fs.readFileSync(outputPath, 'utf-8');
+
+                  // scratchFiles[href] = true;
+
+                  html = html.replace(`<link ${linkTag.rawAttrs}>`, `
+                    <style>
+                      ${css}
+                    </style>
+                  `);
+                }
+              });
+          }
 
           await fs.promises.writeFile(htmlPath, html);
         } else {
@@ -400,13 +477,29 @@ function greenwoodHtmlPlugin(compilation) {
 
 module.exports = getRollupConfig = async (compilation) => {
   const { scratchDir, outputDir } = compilation.context;
-  
+  const defaultRollupPlugins = [
+    // TODO replace should come in via plugin-node-modules
+    replace({ // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
+      'process.env.NODE_ENV': JSON.stringify('production')
+    }),
+    nodeResolve(), // TODO move to plugin-node-modules
+    greenwoodWorkspaceResolver(compilation),
+    greenwoodHtmlPlugin(compilation),
+    multiInput(),
+    json() // TODO make it part plugin-standard-json
+  ];
   // TODO greenwood standard plugins, then "Greenwood" plugins, then user plugins
   const customRollupPlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'rollup';
   }).map((plugin) => {
     return plugin.provider(compilation);
   }).flat();
+
+  if (compilation.config.optimization !== 'none') {
+    defaultRollupPlugins.push(
+      terser() // TODO extract to plugin-standard-javascript
+    );
+  }
   
   return [{
     // TODO Avoid .greenwood/ directory, do everything in public/?
@@ -424,16 +517,7 @@ module.exports = getRollupConfig = async (compilation) => {
       }
     },
     plugins: [
-      // TODO replace should come in via plugins?
-      replace({ // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
-        'process.env.NODE_ENV': JSON.stringify('production')
-      }),
-      nodeResolve(), // TODO move to plugin
-      greenwoodWorkspaceResolver(compilation),
-      greenwoodHtmlPlugin(compilation),
-      multiInput(),
-      json(), // TODO bundle as part of import support / transforms API?
-      terser(), // TODO extract to a plugin
+      ...defaultRollupPlugins,
       ...customRollupPlugins
     ]
   }];

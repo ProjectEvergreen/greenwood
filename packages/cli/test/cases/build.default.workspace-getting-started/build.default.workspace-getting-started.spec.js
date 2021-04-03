@@ -100,7 +100,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output one <link> tag in the <head>', async function() {
-        const linkTags = dom.window.document.querySelectorAll('head link');
+        const linkTags = dom.window.document.querySelectorAll('head link[rel="stylesheet"]');
 
         expect(linkTags.length).to.be.equal(1);
       });
@@ -174,7 +174,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output one <link> tag in the <head>', async function() {
-        const linkTags = dom.window.document.querySelectorAll('head link');
+        const linkTags = dom.window.document.querySelectorAll('head link[rel="stylesheet"]');
 
         expect(linkTags.length).to.be.equal(1);
       });
@@ -241,7 +241,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output one <link> tag in the <head>', async function() {
-        const linkTags = dom.window.document.querySelectorAll('head link');
+        const linkTags = dom.window.document.querySelectorAll('head link[rel="stylesheet"]');
 
         expect(linkTags.length).to.be.equal(1);
       });

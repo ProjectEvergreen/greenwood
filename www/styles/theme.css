@@ -15,20 +15,6 @@ body {
   line-height:1.4;
 }
 
-table {
-  background-color: #334a5a;
-  border-radius: 5px;
-  padding: 10px!important;
-
-  & tr {
-    padding: 10px;
-  }
-
-  & td, & a, & th {
-    color: #efefef!important;
-  }
-}
-
 img {
   width: 100%;
 }

@@ -247,7 +247,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('<link rel="stylesheet" href="..."> with reference to node_modules/ path in the <head> tag', function() {
       it('should have one <link href="..."> tag in the <head> tag', function() {
-        const linkTags = dom.window.document.querySelectorAll('head > link[href]');
+        const linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"]');
         const prismLinkTag = Array.prototype.slice.call(linkTags).filter(link => {
           return (/prism-tomorrow.*.css/).test(link.href);
         });

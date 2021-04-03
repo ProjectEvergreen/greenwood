@@ -39,7 +39,15 @@ describe('Unit Test: Data', function() {
 
       describe('Mode', function() {
 
-        it('should have a default optimization setting of spa', function() {
+        it('should have a default mode setting of mode', function() {
+          expect(config.mode).to.equal(MOCK_CONFIG.config.mode);
+        });
+
+      });
+
+      describe('Optimization', function() {
+
+        it('should have a default optimization setting of default', function() {
           expect(config.optimization).to.equal(MOCK_CONFIG.config.optimization);
         });
 

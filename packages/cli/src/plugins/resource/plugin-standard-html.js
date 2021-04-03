@@ -75,15 +75,13 @@ const getAppTemplate = (contents, userWorkspace) => {
       const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
 
       if (script.rawAttrs !== '') {
-        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `
-          </script>\n
+        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</script>\n
           <script ${script.rawAttrs}></script>\n
         `);
       }
 
       if (script.rawAttrs === '') {
-        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `
-          </script>\n
+        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</script>\n
           <script>
             ${script.text}
           </script>\n
@@ -96,8 +94,7 @@ const getAppTemplate = (contents, userWorkspace) => {
       const matches = appTemplateContents.match(matchNeedle);
       const lastLink = matches[matches.length - 1];
 
-      appTemplateContents = appTemplateContents.replace(lastLink, `
-        ${lastLink}\n
+      appTemplateContents = appTemplateContents.replace(lastLink, `${lastLink}\n
         <link ${link.rawAttrs}/>
       `);
     });
@@ -107,8 +104,7 @@ const getAppTemplate = (contents, userWorkspace) => {
       const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
 
       if (style.rawAttrs === '') {
-        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `
-          </style>\n
+        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</style>\n
           <style>
             ${style.text}
           </style>\n

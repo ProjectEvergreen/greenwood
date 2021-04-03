@@ -3,6 +3,7 @@ const path = require('path');
 const Koa = require('koa');
 
 const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
+const pluginResourceOptimizationMpa = require('../plugins/resource/plugin-optimization-mpa');
 const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
 const pluginResourceStandardFont = require('../plugins/resource/plugin-standard-font');
 const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
@@ -26,6 +27,7 @@ function getDevServer(compilation) {
     pluginResourceStandardImage.provider(compilationCopy),
     pluginResourceStandardJavaScript.provider(compilationCopy),
     pluginResourceStandardJson.provider(compilationCopy),
+    pluginResourceOptimizationMpa().provider(compilationCopy),
 
     // custom user resource plugins
     ...compilation.config.plugins.filter((plugin) => {

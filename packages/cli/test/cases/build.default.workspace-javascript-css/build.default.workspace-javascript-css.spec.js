@@ -124,7 +124,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('<link rel="stylesheet" href="..."/> tag in the <head>', function() {
       it('should have one <link> tag in the <head>', function() {
-        const linkTags = dom.window.document.querySelectorAll('head > link');
+        const linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"]');
         
         expect(linkTags.length).to.be.equal(1);
       });
