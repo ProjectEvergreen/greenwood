@@ -162,9 +162,6 @@ function greenwoodHtmlPlugin(compilation) {
               } else {
                 const { src } = parsedAttributes;
 
-                // TODO avoid using href and set it to the value of rollup fileName instead
-                // since user paths can still be the same file, 
-                // e.g.  ../theme.css and ./theme.css are still the same file
                 mappedScripts.set(src, true);
   
                 const srcPath = src.replace('../', './');
