@@ -1,5 +1,5 @@
 ---
-label: 'create-content'
+label: 'creating-content'
 menu: side
 title: 'Creating Content'
 index: 4

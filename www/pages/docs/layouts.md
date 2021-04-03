@@ -1,5 +1,5 @@
 ---
-label: 'templates'
+label: 'templates-and-pages'
 menu: side
 title: 'Templates and Pages'
 index: 6
