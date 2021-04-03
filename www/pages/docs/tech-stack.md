@@ -26,6 +26,9 @@ Web standards like Web Components and ES Modules, coupled with network standards
 ### Rollup
 Greenwood makes use of [**Rollup**](https://rollupjs.org/) as part of build phase to optimize all the HTML / CSS and JavaScript for a given project.  This affords **Greenwood** the ability to bundle, minify and otherwise prepare the site for final deployement in the best way possible based on the code you've written.
 
+### Puppeteer
+When pre-rendering content for Web Components, Greenwood  makes use of [**Puppeteer**](https://developers.google.com/web/tools/puppeteer) as part of build phase to generate all the appropriate static HTML and CSS.
+
 
 ### Development
 To assist in the project's development and maintenance, we also use these tools:

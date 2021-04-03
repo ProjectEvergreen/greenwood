@@ -43,7 +43,7 @@ module.exports = {
 ```
 
 ### Markdown
-You can provide custom **unifiedjs** [presets](https://github.com/unifiedjs/unified#preset) and [plugins](https://github.com/unifiedjs/unified#plugin) to further custonmize and process your markdown past what [Greenwood does by default](https://github.com/ProjectEvergreen/greenwood/blob/release/0.10.0/packages/cli/src/transforms/transform.md.js#L68). 
+You can install and provide custom **unifiedjs** [presets](https://github.com/unifiedjs/unified#preset) and [plugins](https://github.com/unifiedjs/unified#plugin) to further customize and process your markdown past what [Greenwood does by default](https://github.com/ProjectEvergreen/greenwood/blob/release/0.10.0/packages/cli/src/transforms/transform.md.js#L68).  After running an `npm install` you can provide their package names to Greenwood.
 
 #### Example
 
@@ -52,8 +52,8 @@ module.exports = {
   markdown: {
     settings: { commonmark: true },
     plugins: [
-      require('rehype-slug'),
-      require('rehype-autolink-headings')
+      'rehype-slug',
+      'rehype-autolink-headings'
     ]
   }
 }

@@ -56,7 +56,7 @@ This is the home page
 
 In this example, the _src/templates/home.html_ will be used to render the current markdown page.
 
-> **Note:** By default, Greenwood will use `src/templates/page.html` for all undefined template pages.
+> **Note:** By default, Greenwood will look for and use `src/templates/page.html` for all pages by default.
 
 
 ### Title
