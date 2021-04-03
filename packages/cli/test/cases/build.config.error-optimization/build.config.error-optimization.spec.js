@@ -10,7 +10,7 @@
  *
  * User Config
  * {
- *   mode: 'lorumipsum'
+ *   optimization: 'lorumipsum'
  * }
  *
  * User Workspace
@@ -27,12 +27,12 @@ describe('Build Greenwood With: ', function() {
     await setup.setupTestBed(__dirname);
   });
 
-  describe('Custom Configuration with a bad value for mode', function() {
-    it('should throw an error that provided mode is not valid', async function() {
+  describe('Custom Configuration with a bad value for optimization', function() {
+    it('should throw an error that provided optimization is not valid', async function() {
       try {
         await setup.runGreenwoodCommand('build');
       } catch (err) {
-        expect(err).to.contain('Error: provided mode "loremipsum" is not supported.  Please use one of: ssg, mpa.');
+        expect(err).to.contain('Error: provided optimization "loremipsum" is not supported.  Please use one of: default, none, static, inline.');
       }
     });
   });

@@ -1,3 +1,3 @@
 module.exports = {
-  mode: 'loremipsum'
+  mode: 'mpa'
 };

@@ -236,6 +236,7 @@ query {
       value,
       href
     },
+    mode,
     optimization,
     title,
     workspace
@@ -263,7 +264,7 @@ async connectedCallback() {
 ```
 
 ###### Response
-This will return an object of youf _greenwood.config.js_ as an object.  Example:
+This will return an object of your _greenwood.config.js_ as an object.  Example:
 ```javascript
 {
   devServer: {
