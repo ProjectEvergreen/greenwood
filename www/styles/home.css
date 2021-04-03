@@ -5,33 +5,33 @@ h3 {
 .gwd-content {
   background-color: white;
   min-height: 300px;
-  font-size:1.2rem;
+  font-size: 1.2rem;
 
   & h3 {
-    font-size:2rem;
+    font-size: 2rem;
     margin: 5px 0;
   }
 
   & a {
-    color: #201E2E;
+    color: #201e2e;
   }
 }
 
-.cards {
+/* .cards {
   margin: 0 -15%;
-}
+} */
 
 .message {
   padding: 2rem;
-  text-align:center;
+  text-align: center;
   margin: 0 auto;
 
   & hr {
     margin-top: 4rem;
   }
 
-  @media(max-width:768px) {
-    padding:0;
+  @media (max-width: 768px) {
+    padding: 0;
   }
 }
 
@@ -60,14 +60,14 @@ h3 {
 }
 
 #gwd-message-wrapper {
-  background-color: #504B65;
+  background-color: #504b65;
 
   & h2 {
     color: #fff;
     max-width: 60ch;
     margin: auto;
 
-    @media(max-width:768px) {
+    @media (max-width: 768px) {
       padding-top: 2rem;
     }
   }
@@ -76,18 +76,18 @@ h3 {
 .mini-card {
   width: 200px;
   margin: 1.5rem;
-  border: 0.5px solid #DDDDE1;
+  border: 0.5px solid #dddde1;
   border-radius: 20px;
   background-color: #fff;
-  display:flex;
+  display: flex;
   align-items: center;
   padding: 2rem;
   box-shadow:
-  0 1.3px 2.7px rgba(0, 0, 0, 0.065),
-  0 3.4px 6.9px rgba(0, 0, 0, 0.093),
-  0 6.9px 14.2px rgba(0, 0, 0, 0.117),
-  0 14.2px 29.2px rgba(0, 0, 0, 0.145),
-  0 39px 80px rgba(0, 0, 0, 0.21);
+    0 1.3px 2.7px rgba(0, 0, 0, 0.065),
+    0 3.4px 6.9px rgba(0, 0, 0, 0.093),
+    0 6.9px 14.2px rgba(0, 0, 0, 0.117),
+    0 14.2px 29.2px rgba(0, 0, 0, 0.145),
+    0 39px 80px rgba(0, 0, 0, 0.21);
 }
 
 .min-card-container {
@@ -101,11 +101,11 @@ h3 {
 app-card {
   margin: 1.5rem;
   padding: 2rem;
-  border: 0.5px solid #DDDDE1;
+  border: 0.5px solid #dddde1;
   border-radius: 20px;
   box-shadow:
-  0 2px 3.6px rgba(0, 0, 0, 0.014),
-  0 5.6px 10px rgba(0, 0, 0, 0.02),
-  0 13.6px 24.1px rgba(0, 0, 0, 0.026),
-  0 45px 80px rgba(0, 0, 0, 0.04);
+    0 2px 3.6px rgba(0, 0, 0, 0.014),
+    0 5.6px 10px rgba(0, 0, 0, 0.02),
+    0 13.6px 24.1px rgba(0, 0, 0, 0.026),
+    0 45px 80px rgba(0, 0, 0, 0.04);
 }

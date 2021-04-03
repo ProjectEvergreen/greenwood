@@ -1,5 +1,5 @@
 h3 {
-  color: #2D3D3A;
+  color: #2d3d3a;
   padding-top: 4rem;
   font-size: 1.8rem !important;
 }
@@ -8,32 +8,38 @@ h2 {
   font-size: 2rem;
 }
 
-h4, h5, h6 {
+h4,
+h5,
+h6 {
   font-size: 1.2rem;
 }
 
-h1, h2, h3, h4, h5 {
+h1,
+h2,
+h3,
+h4,
+h5 {
   line-height: 1.8rem;
-  color: #2D3D3A;
+  color: #2d3d3a;
 }
 
 h3 > a > span.icon {
-  width:28px;
-  height:24px;
-  float:left;
-  padding:2px;
+  width: 28px;
+  height: 24px;
+  float: left;
+  padding: 2px;
   background-image: url(/assets/link.png);
   background-size: 20px 20px;
   background-repeat: no-repeat;
   background-position-y: center;
 
-  &:hover {
-    filter: invert(.4);
+  &:hover:focus {
+    filter: invert(0.4);
   }
 }
 
 .gwd-content-wrapper {
-  display:flex;
+  display: flex;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -50,7 +56,7 @@ h3 > a > span.icon {
   @media (max-width: 768px) {
     width: 100%;
     height: 100%;
-    padding: 0px;
+    padding: 0;
   }
 }
 
@@ -59,16 +65,16 @@ h3 > a > span.icon {
   height: 100vh;
   overflow: scroll;
   margin: auto;
-  background-color:white;
-  font-size:1.2rem;
+  background-color: white;
+  font-size: 1.2rem;
   padding: 2rem;
 
-  @media(max-width:768px) {
-    padding:0;
+  @media (max-width: 768px) {
+    padding: 0;
   }
 
   & h3 {
-    font-size:2rem;
+    font-size: 2rem;
     margin: 5px 0;
   }
 
@@ -81,11 +87,12 @@ h3 > a > span.icon {
   }
 
   & blockquote {
-    margin:0.5em;
-    padding:15px;
-    background-color:#dcf9ca !important;
+    margin: 0.5em;
+    padding: 15px;
+    background-color: #dcf9ca !important;
     border-left: 6px solid #192a27;
   }
+
   @media (max-width: 768px) {
     width: 100%;
     height: 100%;
@@ -99,12 +106,9 @@ table {
   margin-bottom: 20px;
 }
 
-table td:first-child{
+table td:first-child {
   min-width: 100px;
   white-space: nowrap;
-}
-
-table td:first-child{
   padding: 0 5px;
 }
 

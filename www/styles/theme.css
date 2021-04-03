@@ -12,20 +12,24 @@ html {
 
 body {
   font-family: 'Source Sans Pro', sans-serif;
-  line-height:1.4;
+  line-height: 1.4;
 }
 
 img {
   width: 100%;
 }
 
-h2, h3, h4, h5 {
-  margin-top:1.5rem !important;
-  margin-bottom:1.5rem !important;
-  color: #201E2E;
+h2,
+h3,
+h4,
+h5 {
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+  color: #201e2e;
 }
 
-ul, ol {
+ul,
+ol {
   padding-left: 20px;
 }
 
@@ -48,12 +52,11 @@ a {
 }
 
 p > code {
-  color: #2D3D3A;
+  color: #2d3d3a;
   font-weight: 800;
 }
 
 .gwd-wrapper {
-
   & .single-column {
     margin: inherit;
     color: #000;

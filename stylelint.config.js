@@ -11,6 +11,10 @@ module.exports = {
     'value-list-comma-newline-after': null,
     'declaration-colon-newline-after': null,
     'value-keyword-case': null,
-    'declaration-bang-space-before': null
+    'declaration-bang-space-before': null,
+    'selector-type-no-unknown': [true, {
+      ignore: ['custom-elements'],
+      ignoreTypes: ['/^app-/']
+    }]
   }
 };
