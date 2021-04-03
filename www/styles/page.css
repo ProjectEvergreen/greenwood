@@ -32,13 +32,13 @@ h3 > a > span.icon {
   }
 }
 
-/* .gwd-content-wrapper {
+.gwd-content-wrapper {
   display:flex;
 
   @media (max-width: 768px) {
     flex-direction: column;
   }
-} */
+}
 
 .gwd-sidebar {
   width: 400px;
