@@ -1,4 +1,3 @@
-// TODO require('colors');
 const initConfig = require('./config');
 const initContext = require('./context');
 const generateGraph = require('./graph');
@@ -21,7 +20,6 @@ module.exports = generateCompilation = () => {
       compilation.context = await initContext(compilation);
       
       // generate a graph of all pages / components to build
-      // TODO make this async somehow / run in parallel?
       console.info('Generating graph of workspace files...');
       compilation = await generateGraph(compilation);
 

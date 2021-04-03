@@ -28,8 +28,6 @@ class StandardJavaScriptResource extends ResourceInterface {
       }
     });
   }
-
-  // TODO pptional optimize w/ terser (not rollup)
 }
 
 module.exports = {

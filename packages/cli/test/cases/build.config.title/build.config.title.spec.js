@@ -43,14 +43,13 @@ describe('Build Greenwood With: ', function() {
     before(async function() {
       await setup.runGreenwoodCommand('build');
     });
-    
-    // TODO runSmokeTest(['public', 'not-found', 'hello'], LABEL);
+     
     runSmokeTest(['public', 'index'], LABEL);
 
     describe('Custom Title from Configuration', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
@@ -65,7 +64,7 @@ describe('Build Greenwood With: ', function() {
       const pageTitle = 'About Page';
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'about', './index.html'));
       });
 
