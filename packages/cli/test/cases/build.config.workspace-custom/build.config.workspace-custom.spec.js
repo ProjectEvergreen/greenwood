@@ -40,13 +40,12 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    // TODO runSmokeTest(['public', 'index', 'not-found'], LABEL);
     runSmokeTest(['public', 'index'], LABEL);
 
     describe('Custom About page', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'about', './index.html'));
       });
 

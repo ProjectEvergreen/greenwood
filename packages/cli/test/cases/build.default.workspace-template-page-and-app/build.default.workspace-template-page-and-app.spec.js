@@ -28,9 +28,9 @@
  *     page.html
  */
 const expect = require('chai').expect;
-const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const path = require('path');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
@@ -47,17 +47,13 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    // TODO runSmokeTest(['not-found'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Custom App and Page Templates', function() {
       let dom;
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-      });
-
-      it('should output a single index.html file using our custom page template', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
 
       it('should have the specific element we added as part of our custom page template', function() {

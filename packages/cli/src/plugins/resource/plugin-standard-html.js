@@ -16,7 +16,6 @@ const remarkRehype = require('remark-rehype');
 const { ResourceInterface } = require('../../lib/resource-interface');
 const unified = require('unified');
 
-// TODO better error handling / messaging for users if things are not where they are expected to be
 // general refactoring
 const getPageTemplate = (barePath, workspace, template) => {
   const templatesDir = path.join(workspace, 'templates');
@@ -118,8 +117,6 @@ const getAppTemplate = (contents, userWorkspace) => {
 
 const getUserScripts = (contents) => {
   if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
-    // TODO setup and teardown should be done together
-    // console.debug('running in build mode, polyfill WebComponents for puppeteer');
     contents = contents.replace('<head>', `
       <head>
         <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
@@ -133,7 +130,6 @@ const getMetaContent = (url, config, contents) => {
   const metaContent = config.meta.map(item => {
     let metaHtml = '';
 
-    // TODO better way to implememnt this?  should we implement this?
     for (const [key, value] of Object.entries(item)) {
       const isOgUrl = item.property === 'og:url' && key === 'content';
       const hasTrailingSlash = isOgUrl && value[value.length - 1] === '/';
@@ -151,7 +147,6 @@ const getMetaContent = (url, config, contents) => {
       : `<meta${metaHtml}/>`;
   }).join('\n');
 
-  // TODO make smarter so that if it already exists, then leave it alone
   contents = contents.replace(/<title>(.*)<\/title>/, '');
   contents = contents.replace('<head>', `<head><title>${title}</title>`);
   contents = contents.replace('<meta-outlet></meta-outlet>', metaContent);
@@ -219,7 +214,6 @@ class StandardHtmlResource extends ResourceInterface {
             }
           });
 
-          // TODO extract front matter contents from remark-frontmatter instead of frontmatter lib
           const settings = config.markdown.settings || {};
           const fm = frontmatter(markdownContents);
           processedMarkdown = await unified()

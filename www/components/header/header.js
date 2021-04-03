@@ -3,7 +3,6 @@ import client from '@greenwood/plugin-graphql/core/client';
 import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
 import '@evergreen-wc/eve-container';
 import headerCss from './header.css';
-// TODO import evergreenLogo from '../../assets/evergreen.svg';
 import '../social-icons/social-icons.js';
 
 class HeaderComponent extends LitElement {

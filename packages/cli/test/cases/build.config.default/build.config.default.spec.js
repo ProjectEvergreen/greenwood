@@ -18,7 +18,7 @@ const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Empty Configuration and Default Workspace';
+  const LABEL = 'Empty User Configuration and No Workspace';
   let setup;
 
   before(async function() {
@@ -30,7 +30,7 @@ describe('Build Greenwood With: ', function() {
     before(async function() {
       await setup.runGreenwoodCommand('build');
     });
-    // TODO runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
+
     runSmokeTest(['public', 'index'], LABEL);
   });
 

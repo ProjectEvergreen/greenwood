@@ -34,6 +34,7 @@ const fs = require('fs');
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
@@ -51,15 +52,13 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
+    runSmokeTest(['public'], LABEL);
+
     describe('Folder Structure and Home Page', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-      });
-
-      it('should create a public directory', function() {
-        expect(fs.existsSync(this.context.publicDir)).to.be.true;
       });
 
       it('should create a new assets directory', function() {
@@ -68,15 +67,6 @@ describe('Build Greenwood With: ', function() {
 
       it('should contain files from the asset directory', async function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'assets', './greenwood-logo.png'))).to.be.true;
-      });
-
-      it('should output an index.html file (home page)', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
-      });
-
-      // TODO
-      xit('should output a single 404.html file (not found page)', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './404.html'))).to.be.true;
       });
 
       it('should output two JS bundle files', async function() {
@@ -149,7 +139,7 @@ describe('Build Greenwood With: ', function() {
     describe('First Blog Post', function() {
       let dom;
       
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'blog/first-post/index.html'));
       });
 
@@ -216,7 +206,7 @@ describe('Build Greenwood With: ', function() {
     describe('Second Blog Post', function() {
       let dom;
       
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'blog/second-post/index.html'));
       });
 

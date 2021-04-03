@@ -25,10 +25,10 @@
  *     index.html
  */
 const expect = require('chai').expect;
-const fs = require('fs');
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
@@ -96,14 +96,12 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
+    runSmokeTest(['public', 'index'], LABEL);
+
     describe('Home Page <posts-list> w/ custom Graph query', function() {
       
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-      });
-  
-      it('should output an index.html file (home page)', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
 
       it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', function() {

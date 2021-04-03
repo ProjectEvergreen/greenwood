@@ -25,6 +25,7 @@ const expect = require('chai').expect;
 const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const path = require('path');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 const expectedPolyfillFiles = [
@@ -64,12 +65,12 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    // runSmokeTest(['not-found'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Script tag in the <head> tag', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 

@@ -11,7 +11,7 @@ const { ResourceInterface } = require('../../lib/resource-interface');
 class StandardFontResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.woff2', '.woff', '.ttf']; // TODO support more types?
+    this.extensions = ['.woff2', '.woff', '.ttf'];
   }
 
   async serve(url) {
