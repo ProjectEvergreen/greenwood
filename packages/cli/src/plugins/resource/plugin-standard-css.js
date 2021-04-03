@@ -39,7 +39,7 @@ class StandardCssResource extends ResourceInterface {
   }
 
   async shouldOptimize(url) {
-    const isValidCss = path.extname(url) === this.extensions[0];
+    const isValidCss = path.extname(url) === this.extensions[0] && this.compilation.config.optimization !== 'none';
     
     return Promise.resolve(isValidCss);
   }
