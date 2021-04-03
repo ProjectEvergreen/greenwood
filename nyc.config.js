@@ -19,12 +19,6 @@ module.exports = {
 
   checkCoverage: true,
 
-  // TODO try and match previous thresholds after mode / optimization PR merge
-  // statements: 85,
-  // branches: 75,
-  // functions: 90,
-  // lines: 85,
-
   statements: 80,
   branches: 65,
   functions: 85,
