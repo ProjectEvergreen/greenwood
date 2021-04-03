@@ -10,19 +10,20 @@ linkheadings: 3
 
 ### Philosophy
 
-At its heart, Greenwood is all about web standards.  With the browser becoming such a powerful tool now, especially with the advent of [ECMAScript Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) (ESM) now having ubiquitious support in modern browsers now, an entirely new workflow paradigm has emerged in which the browser can now be a more dependenable platform.  In this way, less tooling and depedencies are needed to achieve excellent local development workflows as well as just less overhead needed for a local development stack in general.
+At its heart, Greenwood is all about web standards.  With the browser becoming such a powerful tool, especially with the advent of [ECMAScript Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) (ESM) now having ubiquitious support in modern browsers, an entirely new workflow paradigm has emerged in which the browser can do more of the heavy lifting in our web dev workflows.  In this way, less tooling and depedencies are needed to achieve excellent local development workflows as well as needing less overhead to maintain that stack.
 
-Greenwood wants to take advantage of this oppourtunity to join in with other projects that are re-evaluating the landscape and thinking of a more unbundled world, at least in development.  With less reliance on transpilation, and rather just some light on-the-fly transformations.  This paradigm lends itself really well to speedy local development workflows as well benefiting end users who can be shipped more modern code.  And for developers, now the code you write might actually look familiar while debugging in your browser!
+Greenwood wants to take advantage of this oppourtunity to join in with other projects that are re-evaluating the landscape and thinking of a more unbundled world.  One with less reliance on across the board bundling and transpilation, and one that just transforms on the fly only when needed.  This paradigm lends itself really well to speedy local development workflows as well as benefiting end users who can be shipped more modern code.  And for developers, now the code you write might actually look familiar while debugging in your browser!
+
 
 ### CLI
 
-To actually use Greenwood, everyone is required to install the CLI.  The CLI is what powers all the workflows available by Greenwood and builds your project for local development and production builds.  It is plugin based so that it can be extended by users to support additional workflows not intended to be supported by core.
+To actually use Greenwood, everyone is required to install the CLI.  The CLI is what powers all the workflows available by Greenwood and builds your project for local development and production builds.  It is plugin based so that it can be extended by users to support additional workflows not intended to be maintained in core.
 
 During _development_ the CLI will:
 - Instantaneously start a local web server with live reload.
 - Process requests on the fly only for the content or code you need for a given page.
-- Supports loading dependencies from _node_modules_ using an [`importMap`](https://github.com/WICG/import-maps).
-- We even have a plugin to tranform CommonJS into ESM (🤞)!
+- Supports loading dependencies from _node_modules_ using an [`importMap`](https://github.com/WICG/import-maps) to avoid bundling.
+- While Greenwood is ESM first, we have a [plugin](/plugins/custom-plugins) to tranform CommonJS into ESM (🤞)
 
 For _production_ builds:
 - Combine all your code and dependencies into efficient modern bundles including minifying your JavaScript and CSS.

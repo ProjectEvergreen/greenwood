@@ -9,7 +9,7 @@ linkheadings: 3
 ## Features
 
 ### Easy Onboarding
-We built Greenwood in the hopes that getting started would be easy.  By default Greenwood will build an app for you.  Just simply start adding pages and customizing templates as needed and you're good to go!  You pick your workspace, Greenwood makes as few assumptions as needed to deliver an optimal development experience with minimum configuration needed.
+We built Greenwood in the hopes that getting started would be easy.  By default Greenwood will build an app for you.  Just simply start adding pages and customizing templates as needed and you're good to go!  Greenwood makes as few assumptions as needed to deliver an optimal development experience with minimum configuration needed.
 
 We strive to provide good documentation, intuitive developer experiences, and stable workflows.  Even if you don't know anything about Modules or Web Components, if you can learn a little markdown and some HTML / CSS, you can get started making a modern website right away!
 
@@ -17,7 +17,7 @@ We strive to provide good documentation, intuitive developer experiences, and st
 ### Modern Apps, Modern Workflows
 At the heart of Greenwood is an "evergreen" build, that aims to deliver the most optimized user experience through a combination of techniques likes web hints, modern JavaScript and CSS, and sensible defaults.  
 
-During development, we keep things lean and tooling free (relatively) by crawling your project's _package.json_ for all your dependencies and then generating an [`importMap`](https://github.com/WICG/import-maps) from that to resolve dependencies on the fly without the need for bundling. During production, we optimize and minify your code and get it ready to deploy to the web!
+During development, we keep things lean and tooling free (relatively) by crawling your project's _package.json_ for all your dependencies and then generating an [`importMap`](https://github.com/WICG/import-maps) from that to resolve dependencies on the fly without the need for bundling. During production, we optimize and minify your code and get it ready to deploy to the web.
 
 > _You can vist [this page](/about/how-it-works/) to learn more about how Greenwood works under the hood._
 

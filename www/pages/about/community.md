@@ -10,14 +10,13 @@ index: 3
 Greenwood understands the role of community in open source, technology, and learning and we want to embrace that in this project as well.  There are many great tools and projects available in the web ecosystem that we want to highlight here for their importance and influence towards the development of Greenwood (in no particular order).
 
 - [**MDN**](https://developer.mozilla.org/) - Mozilla Developer Network, the one reference documentation site to rule them all.
-- [**Rollup**](https://rollupjs.org/) - For helping push the bundler worls forward towards ESM
-- [**Snowpack**](https://www.snowpack.dev/) - Evangalizing and advocacy for ESM has really helped push the industry forward in such a short amount of time
+- [**Rollup**](https://rollupjs.org/) - For helping push the bundler world forward towards (shipping) ESM
+- [**Snowpack**](https://www.snowpack.dev/) - Evangalizing and advocacy for ESM (particularly in development) has really helped push the industry forward in such a short amount of time
 - [**OpenWC**](https://open-wc.org/) - Taking web developers from zero to hero with Web Components.
 - [**Netlify**](https://www.netlify.com/) - One of the innovators in the JAMstack era!
 - [**Rome**](https://rome.tools/) - As about as non meta-framework as they come.  No doubt the spirit of this project is contagious.
 - [**Parcel**](https://parceljs.org/) - HTML as the entry point.  Huh, wish we had thought of that.
-- [**Gatsby**](https://www.gatsbyjs.com/) - Gatsby was at the forefront of the recent JAMStack wave of tools and certainly set the pace for tools to come.
-
+- [**Gatsby**](https://www.gatsbyjs.com/) - Gatsby was at the forefront of the JAMStack wave of tools and certainly set the pace for some to come.
 
 
 And of course we can't forget our [Contributors](https://github.com/ProjectEvergreen/greenwood/graphs/contributors)!
