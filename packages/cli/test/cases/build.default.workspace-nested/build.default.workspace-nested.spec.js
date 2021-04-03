@@ -60,13 +60,12 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    // TODO runSmokeTest(['public', 'not-found', 'index'], LABEL);
     runSmokeTest(['public', 'index'], LABEL);
 
     describe('Blog Pages Directory', function() {
       let graph;
 
-      beforeEach(async function() {
+      before(async function() {
         graph = require(path.join(this.context.publicDir, 'graph.json'));
       });
 

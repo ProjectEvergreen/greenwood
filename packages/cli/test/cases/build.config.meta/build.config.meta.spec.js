@@ -37,8 +37,6 @@ const expect = require('chai').expect;
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-const mainBundleScriptRegex = /index.*.bundle\.js/;
-
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Meta Configuration and Nested Workspace';
   const meta = greenwoodConfig.meta;
@@ -62,73 +60,19 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
-    // hardcoding index smoke test here because of the nested route
     describe('Index (home) page with custom meta data', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
-      });
-
-      it('should output an index.html file within the default hello page directory', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
 
       it('should have a <title> tag in the <head>', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
         expect(title).to.be.equal(greenwoodConfig.title);
-      });
-
-      xit('should have one <script> tag in the <body> for the main bundle', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body > script');
-        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
-
-          return mainBundleScriptRegex.test(src);
-        });
-
-        expect(bundledScript.length).to.be.equal(1);
-      });
-
-      xit('should have one <script> tag in the <body> for the main bundle loaded with async', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body > script');
-        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
-
-          return mainBundleScriptRegex.test(src);
-        });
-
-        expect(bundledScript[0].getAttribute('async')).to.be.equal('');
-      });
-
-      xit('should have one <script> tag for Apollo state', function() {
-        const scriptTags = dom.window.document.querySelectorAll('script');
-        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.getAttribute('data-state') === 'apollo';
-        });
-
-        expect(bundleScripts.length).to.be.equal(1);
-      });
-
-      xit('should have only one <script> tag in the <head>', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
-
-        expect(scriptTags.length).to.be.equal(1);
-      });
-
-      xit('should have a router outlet tag in the <body>', function() {
-        const outlet = dom.window.document.querySelectorAll('body eve-app');
-
-        expect(outlet.length).to.be.equal(1);
-      });
-
-      xit('should have the correct route tags in the <body>', function() {
-        const routes = dom.window.document.querySelectorAll('body lit-route');
-
-        expect(routes.length).to.be.equal(4);
       });
 
       it('should have the expected heading text within the index page in the public directory', function() {
@@ -170,7 +114,7 @@ describe('Build Greenwood With: ', function() {
     describe('Nested About page meta data', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'about', './index.html'));
       });
 
@@ -203,7 +147,7 @@ describe('Build Greenwood With: ', function() {
     describe('favicon', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 

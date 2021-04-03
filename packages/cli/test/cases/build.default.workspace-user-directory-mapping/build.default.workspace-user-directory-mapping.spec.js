@@ -35,6 +35,7 @@ const fs = require('fs');
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
@@ -51,12 +52,12 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    // TODO runSmokeTest(['public', 'index', 'not-found'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Output Folder Structure and Home Page', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
@@ -66,11 +67,6 @@ describe('Build Greenwood With: ', function() {
 
       it('should output an index.html file (home page)', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
-      });
-
-      // TODO
-      xit('should output a single 404.html file (not found page)', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './404.html'))).to.be.true;
       });
 
       it('should output one JS bundle files', async function() {
@@ -102,7 +98,7 @@ describe('Build Greenwood With: ', function() {
     describe('Describe Page page', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'pages/index.html'));
       });
 
@@ -140,7 +136,7 @@ describe('Build Greenwood With: ', function() {
       let pluginIndexPageDom;
       let pluginHooksIndexPageDom;
 
-      beforeEach(async function() {
+      before(async function() {
         pluginIndexPageDom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'plugins/index.html'));
         pluginHooksIndexPageDom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'plugins/index-hooks/index.html'));
       });

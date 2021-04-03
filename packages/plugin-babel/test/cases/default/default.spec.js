@@ -37,7 +37,7 @@ const fs = require('fs');
 const glob = require('glob-promise');
 const path = require('path');
 const expect = require('chai').expect;
-// const runSmokeTest = require('../../../../../test/smoke-test');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
@@ -55,7 +55,7 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    // TODO runSmokeTest(['public', 'index', 'not-found'], LABEL);    
+    runSmokeTest(['public', 'index'], LABEL);    
 
     describe('Babel should process JavaScript that reference private class members / methods', function() {
       it('should output correctly processed JavaScript without private members', function() {

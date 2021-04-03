@@ -65,7 +65,6 @@ class GraphQLResource extends ResourceInterface {
   async optimize(url, body) {
     return new Promise((resolve, reject) => {
       try {
-        // TODO const apolloScript = isStrictOptimization (no apollo-state)
         body = body.replace('<head>', `
           <script data-state="apollo">
             window.__APOLLO_STATE__ = true;

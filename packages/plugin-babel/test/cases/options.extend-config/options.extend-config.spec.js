@@ -39,7 +39,7 @@ const fs = require('fs');
 const glob = require('glob-promise');
 const path = require('path');
 const expect = require('chai').expect;
-// const runSmokeTest = require('../../../../../test/smoke-test');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
@@ -60,7 +60,7 @@ describe('Build Greenwood With: ', function() {
       jsFiles = glob.sync(path.join(this.context.publicDir, '*.js'));
     });
 
-    // TODO runSmokeTest(['public', 'index', 'not-found'], LABEL);    
+    runSmokeTest(['public', 'index'], LABEL);    
 
     it('should output one JavaScript file', function() {
       expect(jsFiles.length).to.equal(1);
@@ -76,8 +76,8 @@ describe('Build Greenwood With: ', function() {
     });
 
     // find a better way to test for preset-env specifically?
-    xdescribe('Babel should handle processing of JavaScript per usage of @babel/preset-env', function() {
-      it('should output correctly processed JavaScript...', function() {
+    describe('Babel should handle processing of JavaScript per usage of @babel/preset-env', function() {
+      xit('should output correctly processed JavaScript...', function() {
         const expectedJavaScript = 'return e&&e.__esModule';
         const javascript = fs.readFileSync(jsFiles[0], 'utf-8');
 

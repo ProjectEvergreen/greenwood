@@ -35,13 +35,12 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
     
-    // TODO runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
     runSmokeTest(['public', 'index'], LABEL);
   
     describe('Default output for index.html', function() {
       let dom;
 
-      beforeEach(async function() {
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
@@ -56,6 +55,10 @@ describe('Build Greenwood With: ', function() {
           const title = dom.window.document.querySelector('head title').textContent;
     
           expect(title).to.be.equal('My App');
+        });
+
+        it('should have five default <meta> tags in the <head>', function() {
+          expect(metaTags.length).to.be.equal(5);
         });
 
         it('should have default charset <meta> tag', function() {

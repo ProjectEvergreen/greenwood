@@ -5,8 +5,6 @@
 // https://github.com/ProjectEvergreen/greenwood/issues/141
 process.setMaxListeners(0);
 
-// TODO require('colors');
-
 const program = require('commander');
 const runProductionBuild = require('./commands/build');
 const runDevServer = require('./commands/develop');
@@ -17,10 +15,6 @@ const greenwoodPackageJson = require('../package.json');
 let cmdOption = {};
 let command = '';
 
-// TODO
-// console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
-// console.log(`${chalk.rgb(175, 207, 71)('Welcome to Greenwood ♻️')}`);
-// console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
 console.info('-------------------------------------------------------');
 console.info('Welcome to Greenwood ♻️');
 console.info('-------------------------------------------------------');
@@ -29,7 +23,6 @@ program
   .version(greenwoodPackageJson.version)
   .arguments('<script-mode>')
   .usage('<script-mode> [options]');
-// TODO .usage(`${chalk.green('<script-mode>')} [options]`);
 
 program
   .command('build')
@@ -63,7 +56,6 @@ program
 
 program.parse(process.argv);
 
-// TODO pick build by default?  Thinking of npx usage...
 if (program.parse.length === 0) {
   program.help();
 }
