@@ -1,50 +1,78 @@
 const { makeExecutableSchema } = require('apollo-server-express');
 const { configTypeDefs, configResolvers } = require('./config');
 const { graphTypeDefs, graphResolvers } = require('./graph');
+const fs = require('fs');
 const gql = require('graphql-tag');
+const path = require('path');
 
-module.exports = (graph) => {
-  let uniqueCustomDataDefKeys = {};
-  let customDataDefs = '';
+module.exports = (compilation) => {
+  const { graph } = compilation;
+  const uniqueCustomDataDefKeys = {};
+  const customSchemasPath = `${compilation.context.userWorkspace}/data/schema`;
+  const customUserResolvers = [];
+  const customUserDefs = [];
+  let customDataDefsString = '';
 
-  graph.forEach((page) => {
-    Object.keys(page.data).forEach(key => {
-      uniqueCustomDataDefKeys[key] = 'String';
+  try {
+
+    // define custom data type definitions from user frontmatter
+    graph.forEach((page) => {
+      Object.keys(page.data).forEach(key => {
+        uniqueCustomDataDefKeys[key] = 'String';
+      });
     });
-  });
+  
+    Object.keys(uniqueCustomDataDefKeys).forEach((key) => {
+      customDataDefsString += `
+        ${key}: ${uniqueCustomDataDefKeys[key]}
+      `;
+    });
 
-  Object.keys(uniqueCustomDataDefKeys).forEach((key) => {
-    customDataDefs += `
-      ${key}: ${uniqueCustomDataDefKeys[key]}
+    const customDataDefs = gql`
+      type Data {
+        noop: String
+        ${customDataDefsString}
+      }
     `;
-  });
 
-  // use noop as a default key since type Data cannot be empty
-  const mergedGraphTypeDefs = gql`
-    type Data {
-      noop: String
-      ${customDataDefs}
+    if (fs.existsSync(customSchemasPath)) {
+      console.debug('custom data schemas directory detected, scanning...');
+      fs.readdirSync(customSchemasPath)
+        .filter(file => path.extname(file) === '.js')
+        .forEach(file => {
+          const { customTypeDefs, customResolvers } = require(`${customSchemasPath}/${file}`);
+          customUserDefs.push(customTypeDefs);
+          customUserResolvers.push(customResolvers);
+        });
     }
-
-    ${graphTypeDefs}
-  `;
-
-  const mergedResolvers = Object.assign({}, {
-    Query: {
-      ...configResolvers.Query,
-      ...graphResolvers.Query
-    }
-  });
-
-  const schema = makeExecutableSchema({
-    typeDefs: [
-      configTypeDefs,
-      mergedGraphTypeDefs
-    ],
-    resolvers: [
-      mergedResolvers
-    ]
-  });
-
-  return schema;
+  
+    const mergedResolvers = Object.assign({}, {
+      Query: {
+        ...graphResolvers.Query,
+        ...configResolvers.Query,
+        ...customUserResolvers.reduce((resolvers, resolver) => {
+          return {
+            ...resolvers,
+            ...resolver.Query
+          };
+        }, {})
+      }
+    });
+  
+    const schema = makeExecutableSchema({
+      typeDefs: [
+        graphTypeDefs,
+        configTypeDefs,
+        customDataDefs,
+        ...customUserDefs
+      ],
+      resolvers: [
+        mergedResolvers
+      ]
+    });
+  
+    return schema;
+  } catch (e) {
+    console.error(e);
+  }
 };
