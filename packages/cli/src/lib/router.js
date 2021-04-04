@@ -6,8 +6,6 @@ document.addEventListener('click', function(e) {
       ? e.originalTarget.href // firefox
       : null;
 
-  console.debug(e);
-  console.debug('href', href);
   if (href) {
     e.preventDefault();
     const route = href.replace(window.location.origin, '');
