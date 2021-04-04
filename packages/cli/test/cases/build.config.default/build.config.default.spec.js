@@ -36,6 +36,9 @@ describe('Build Greenwood With: ', function() {
       await runner.setup(outputPath, [{
         source: path.join(process.cwd(), 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js'),
         destination: path.join(outputPath, 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js')
+      }, {
+        source: path.join(process.cwd(), 'node_modules/es-module-shims/dist/es-module-shims.js'),
+        destination: path.join(outputPath, 'node_modules/es-module-shims/dist/es-module-shims.js')
       }]);
 
       await runner.runCommand(cliPath, 'build');
