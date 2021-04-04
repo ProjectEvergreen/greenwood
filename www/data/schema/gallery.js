@@ -1,6 +1,7 @@
 const gql = require('graphql-tag');
 
 const getGallery = async (root, query, context) => {
+  console.debug(root, query, context);
   return [{
     name: 'Gallery 1',
     title: 'Gallery Title',
