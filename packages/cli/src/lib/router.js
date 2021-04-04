@@ -1,10 +1,16 @@
 /* eslint-disable no-underscore-dangle */
 document.addEventListener('click', function(e) {
-  e.preventDefault();
+  const href = e.path && e.path[0]
+    ? e.path[0].href // chrome
+    : e.originalTarget && e.originalTarget.href
+      ? e.originalTarget.href // firefox
+      : null;
 
-  if (e.path[0].href) {
-    const target = e.path[0];
-    const route = target.href.replace(window.location.origin, '');
+  console.debug(e);
+  console.debug('href', href);
+  if (href) {
+    e.preventDefault();
+    const route = href.replace(window.location.origin, '');
     const routerOutlet = Array.from(document.getElementsByTagName('greenwood-route')).filter(outlet => {
       return outlet.getAttribute('data-route') === route;
     })[0];
@@ -13,7 +19,7 @@ document.addEventListener('click', function(e) {
       window.__greenwood.currentTemplate = routerOutlet.getAttribute('data-template');
       routerOutlet.loadRoute();
     } else {
-      window.location.href = target;
+      window.location.href = href;
     }
   }
 });
