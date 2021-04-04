@@ -1,0 +1,9 @@
+query {
+  gallery {
+    name,
+    title,
+    images {
+      path
+    }
+  }
+}
