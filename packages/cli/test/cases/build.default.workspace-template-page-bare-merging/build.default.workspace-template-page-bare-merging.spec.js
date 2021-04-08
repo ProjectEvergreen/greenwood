@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with no config for Quick Start example.
+ * Run Greenwood build command with no config and emplty page templates.
  *
  * User Result
  * Should generate a bare bones Greenwood build.
@@ -100,6 +100,13 @@ describe('Build Greenwood With: ', function() {
       });
 
       describe('expected content output in <body> tag', function() {
+        it('should have expected h2 tag in the <body>', function() {
+          const h1 = dom.window.document.querySelectorAll('body h1');
+    
+          expect(h1.length).to.be.equal(1);
+          expect(h1[0].textContent).to.be.equal('Page Template Heading');
+        });
+
         it('should have expected h2 tag in the <body>', function() {
           const h2 = dom.window.document.querySelectorAll('body h2');
     

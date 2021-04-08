@@ -94,23 +94,10 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
-      it('should have expected h1 tag in the <body>', function() {
-        const title = dom.window.document.querySelector('body h1').textContent;
-  
-        expect(title).to.be.equal('Welcome to my website!');
-      });
-
-      it('should have expected <content-outlet> tag in the <body>', function() {
-        const contentOutlet = dom.window.document.querySelectorAll('body content-outlet');
-
-        expect(contentOutlet.length).to.be.equal(1);
-        expect(contentOutlet[0]).to.not.be.undefined;
-      });
-
       it('should have the expected heading text within the index page in the public directory', function() {
         const heading = dom.window.document.querySelector('body h1').textContent;
 
-        expect(heading).to.equal('Welcome to my website!');
+        expect(heading).to.equal('Welcome to Greenwood!');
       });
     });
   });

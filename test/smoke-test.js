@@ -105,6 +105,18 @@ function defaultIndex(label) {
   
           expect(bodyMetas.length).to.be.equal(0);
         });
+
+        it('should have no <content-outlet> tags in the <body>', function() {
+          const contentOutlet = dom.window.document.querySelectorAll('body content-outlet');
+  
+          expect(contentOutlet.length).to.be.equal(0);
+        });
+
+        it('should have no <page-outlet> tags in the <body>', function() {
+          const pageOutlet = dom.window.document.querySelectorAll('body page-outlet');
+  
+          expect(pageOutlet.length).to.be.equal(0);
+        });
       });
     });
   });
