@@ -48,7 +48,6 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      // TODO test with no <head> tag in user page.html
       describe('head section tags', function() {
         let metaTags;
 
