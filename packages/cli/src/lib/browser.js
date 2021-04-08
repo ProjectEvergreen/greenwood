@@ -42,7 +42,8 @@ class BrowserRunner {
 
       if (
         interceptedRequestUrl.indexOf('http://127.0.0.1') >= 0 ||
-        interceptedRequestUrl.indexOf('localhost') >= 0
+        interceptedRequestUrl.indexOf('localhost') >= 0 ||
+        interceptedRequestUrl.indexOf('unpkg.com') >= 0
       ) {
         interceptedRequest.continue();
       } else {

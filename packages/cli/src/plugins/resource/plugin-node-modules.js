@@ -184,11 +184,6 @@ class NodeModulesResource extends ResourceInterface {
         const fullUrl = path.extname(url) === ''
           ? `${url}.js`
           : url;
-        // const fullUrl = path.extname(url) === ''
-        //   ? fs.existsSync(`${url}.mjs`) // test for .mjs first
-        //     ? `${url}.mjs`
-        //     : `${url}.js`
-        //   : url;
         const body = await fs.promises.readFile(fullUrl);
 
         resolve({
@@ -228,8 +223,8 @@ class NodeModulesResource extends ResourceInterface {
           : fs.existsSync(`${process.cwd()}/package.json`)
             ? require(path.join(process.cwd(), 'package.json'))
             : {};
-        const esShimsPath = fs.existsSync(path.join(projectDirectory, 'node_modules/es-module-shims/dist/es-module-shims.js'))
-          ? '/node_modules/es-module-shims/dist/es-module-shims.js'
+        const esShimsPath = fs.existsSync(path.join(projectDirectory, url))
+          ? url
           : 'https://unpkg.com/es-module-shims@0.5.2/dist/es-module-shims.js';
         
         // walk the project's pacakge.json for all its direct dependencies

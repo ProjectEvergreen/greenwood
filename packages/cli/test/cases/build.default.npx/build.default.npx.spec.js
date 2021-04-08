@@ -22,8 +22,8 @@ const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
-describe.only('Build Greenwood With: ', function() {
-  const LABEL = 'Default Greenwood Configuration and Workspace using npx';
+describe('Build Greenwood With: ', function() {
+  const LABEL = 'Default Greenwood Configuration and Workspace and emulating npx';
   let setup;
 
   before(async function() {
