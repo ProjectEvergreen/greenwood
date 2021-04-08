@@ -223,8 +223,9 @@ class NodeModulesResource extends ResourceInterface {
           : fs.existsSync(`${process.cwd()}/package.json`)
             ? require(path.join(process.cwd(), 'package.json'))
             : {};
-        const esShimsPath = fs.existsSync(path.join(projectDirectory, url))
-          ? url
+        const esShimsFilename = '/node_modules/es-module-shims/dist/es-module-shims.js';
+        const esShimsPath = fs.existsSync(path.join(projectDirectory, esShimsFilename))
+          ? esShimsFilename
           : 'https://unpkg.com/es-module-shims@0.5.2/dist/es-module-shims.js';
         
         // walk the project's pacakge.json for all its direct dependencies
