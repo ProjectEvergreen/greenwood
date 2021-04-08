@@ -46,7 +46,7 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      describe('head section tags', function() {
+      xdescribe('head section tags', function() {
         let metaTags;
 
         before(function() {
@@ -96,23 +96,18 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
-      it('should have expected h1 tag in the <body>', function() {
-        const title = dom.window.document.querySelector('body h1').textContent;
-  
-        expect(title).to.be.equal('Welcome to my website!');
-      });
+      describe('content in the <body>', function() {
+        it('should have the expected content within the <app-header> tag', function() {
+          const heading = dom.window.document.querySelector('body app-header header').textContent;
 
-      it('should have expected <content-outlet> tag in the <body>', function() {
-        const contentOutlet = dom.window.document.querySelectorAll('body content-outlet');
+          expect(heading).to.equal('This is the header component.');
+        });
 
-        expect(contentOutlet.length).to.be.equal(1);
-        expect(contentOutlet[0]).to.not.be.undefined;
-      });
-
-      it('should have the expected heading text within the index page in the public directory', function() {
-        const heading = dom.window.document.querySelector('body h1').textContent;
-
-        expect(heading).to.equal('Welcome to my website!');
+        it('should have expected h2 tag in the <body>', function() {
+          const heading = dom.window.document.querySelector('body h2').textContent;
+    
+          expect(heading).to.be.equal('hello world');
+        });
       });
     });
   });
