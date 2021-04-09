@@ -53,7 +53,8 @@ async function getOptimizedSource(url, plugins, compilation) {
       .map((filename) => {
         return require(`${standardPluginsPath}/${filename}`);
       }).map((plugin) => {
-        return plugin.length 
+        // assume that if it is an array, second item is a rollup plugin
+        return plugin.length
           ? plugin[0].provider(compilation)
           : plugin.provider(compilation);
       });
