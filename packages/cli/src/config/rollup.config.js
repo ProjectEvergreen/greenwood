@@ -2,14 +2,13 @@
 const Buffer = require('buffer').Buffer;
 const fs = require('fs');
 const htmlparser = require('node-html-parser');
-const json = require('@rollup/plugin-json');
 const multiInput = require('rollup-plugin-multi-input').default;
-const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const path = require('path');
 const postcss = require('postcss');
 const postcssImport = require('postcss-import');
-const replace = require('@rollup/plugin-replace');
-const { terser } = require('rollup-plugin-terser');
+const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
+const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
+const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-json');
 const tokenSuffix = 'scratch';
 const tokenNodeModules = 'node_modules/';
 
@@ -54,7 +53,9 @@ async function getOptimizedSource(url, plugins, compilation) {
       .map((filename) => {
         return require(`${standardPluginsPath}/${filename}`);
       }).map((plugin) => {
-        return plugin.provider(compilation);
+        return plugin.length 
+          ? plugin[0].provider(compilation)
+          : plugin.provider(compilation);
       });
 
     optimizedSource = await standardPlugins.reduce(async (sourcePromise, resource) => {
@@ -459,15 +460,12 @@ function greenwoodHtmlPlugin(compilation) {
 
 module.exports = getRollupConfig = async (compilation) => {
   const { scratchDir, outputDir } = compilation.context;
-  const defaultRollupPlugins = [
-    replace({ // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
-      'process.env.NODE_ENV': JSON.stringify('production')
-    }),
-    nodeResolve(),
+  const greenwoodRollupPlugins = [
+    ...pluginNodeModules[1].provider(compilation),
+    ...pluginResourceStandardJavaScript[1].provider(compilation),
+    ...pluginResourceStandardJson[1].provider(compilation),
     greenwoodWorkspaceResolver(compilation),
-    greenwoodHtmlPlugin(compilation),
-    multiInput(),
-    json()
+    greenwoodHtmlPlugin(compilation)
   ];
   const customRollupPlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'rollup';
@@ -475,12 +473,6 @@ module.exports = getRollupConfig = async (compilation) => {
     return plugin.provider(compilation);
   }).flat();
 
-  if (compilation.config.optimization !== 'none') {
-    defaultRollupPlugins.push(
-      terser()
-    );
-  }
-  
   return [{
     input: `${scratchDir}**/*.html`,
     output: { 
@@ -496,7 +488,8 @@ module.exports = getRollupConfig = async (compilation) => {
       }
     },
     plugins: [
-      ...defaultRollupPlugins,
+      multiInput(),
+      ...greenwoodRollupPlugins,
       ...customRollupPlugins
     ]
   }];

@@ -6,6 +6,7 @@
  */
 const fs = require('fs');
 const { ResourceInterface } = require('../../lib/resource-interface');
+const { terser } = require('rollup-plugin-terser');
 
 class StandardJavaScriptResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -30,8 +31,16 @@ class StandardJavaScriptResource extends ResourceInterface {
   }
 }
 
-module.exports = {
+module.exports = [{
   type: 'resource',
-  name: 'plugin-standard-javascript',
+  name: 'plugin-standard-javascript:resource',
   provider: (compilation, options) => new StandardJavaScriptResource(compilation, options)
-};
+}, {
+  type: 'rollup',
+  name: 'plugin-standard-javascript:rollup',
+  provider: (compilation) => {
+    return compilation.config.optimization !== 'none'
+      ? [terser()]
+      : [];
+  }
+}];

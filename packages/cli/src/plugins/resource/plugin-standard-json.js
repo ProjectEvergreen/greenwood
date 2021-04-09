@@ -5,6 +5,7 @@
  *
  */
 const fs = require('fs');
+const json = require('@rollup/plugin-json');
 const path = require('path');
 const { ResourceInterface } = require('../../lib/resource-interface');
 
@@ -45,8 +46,16 @@ class StandardJsonResource extends ResourceInterface {
   }
 }
 
-module.exports = {
+module.exports = [{
   type: 'resource',
-  name: 'plugin-standard-json',
+  name: 'plugin-standard-json:resource',
   provider: (compilation, options) => new StandardJsonResource(compilation, options)
-};
+}, {
+  type: 'resource',
+  name: 'plugin-standard-json:rollup',
+  provider: () => {
+    return [
+      json()
+    ];
+  }
+}];
