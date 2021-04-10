@@ -65,17 +65,6 @@ describe('Build Greenwood With: ', function() {
           expect(metaTags.length).to.be.equal(5);
         });
 
-        it('should have default charset <meta> tag', function() {
-          expect(metaTags[0].getAttribute('charset')).to.be.equal('utf-8');
-        });
-
-        it('should have default viewport <meta> tag', function() {
-          const viewportMeta = metaTags[1];
-          
-          expect(viewportMeta.getAttribute('name')).to.be.equal('viewport');
-          expect(viewportMeta.getAttribute('content')).to.be.equal('width=device-width, initial-scale=1');
-        });
-
         it('should have default mobile-web-app-capable <meta> tag', function() {
           const mwacMeta = metaTags[2];
 

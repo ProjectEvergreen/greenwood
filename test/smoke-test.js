@@ -11,15 +11,7 @@ const fs = require('fs');
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
-
-function tagsMatch(tagName, html) {
-  const openTagRegex = new RegExp(`<${tagName}`, 'g');
-  const closeTagRegex = new RegExp(`<\/${tagName.replace('>', '')}>`, 'g');
-  const openingCount = (html.match(openTagRegex) || []).length;
-  const closingCount = (html.match(closeTagRegex) || []).length;
-  
-  return openingCount === closingCount;
-}
+const { tagsMatch } = require('./utils');
 
 function publicDirectory(label) {
   describe(`Running Smoke Tests: ${label}`, function() {
@@ -52,7 +44,31 @@ function defaultIndex(label) {
         html = await fs.promises.readFile(htmlPath, 'utf-8');
       });
 
+      describe('document <html>', function() {
+        it('should have an <html> tag with the DOCTYPE attribute', function() {
+          expect(html.indexOf('<!DOCTYPE html>')).to.be.equal(0);
+        });
+
+        it('should have a <head> tag with the lang attribute on it', function() {
+          const htmlTag = dom.window.document.querySelectorAll('html');
+    
+          expect(htmlTag.length).to.equal(1);
+          expect(htmlTag[0].getAttribute('lang')).to.be.equal('en');
+          expect(htmlTag[0].getAttribute('prefix')).to.be.equal('og:http://ogp.me/ns#');
+        });
+
+        it('should have matching opening and closing <head> tags', function() {
+          expect(tagsMatch('<html>', html)).to.be.equal(true);
+        });
+      });
+
       describe('document <head>', function() {
+        let metaTags;
+
+        before(function() {
+          metaTags = dom.window.document.querySelectorAll('head > meta');
+        });
+
         it('should have matching opening and closing <head> tags in the <head>', function() {
           // add an expclit > here to avoid conflicting with <header>
           // which is used in a lot of test case scaffolding
@@ -78,6 +94,17 @@ function defaultIndex(label) {
         // note: one will always be present when using puppeteer
         it('should have matching opening and closing <style> tags in the <head>', function() {
           expect(tagsMatch('style', html)).to.be.equal(true);
+        });
+
+        it('should have default viewport <meta> tag', function() {
+          const viewportMeta = metaTags[1];
+          
+          expect(viewportMeta.getAttribute('name')).to.be.equal('viewport');
+          expect(viewportMeta.getAttribute('content')).to.be.equal('width=device-width, initial-scale=1');
+        });
+
+        it('should have default charset <meta> tag', function() {
+          expect(metaTags[0].getAttribute('charset')).to.be.equal('utf-8');
         });
       });
 
