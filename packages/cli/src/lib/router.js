@@ -7,11 +7,9 @@ document.addEventListener('click', function(e) {
     : e.originalTarget && e.originalTarget.href
       ? e.originalTarget.href // firefox
       : '';
+  // we only want to handle links like /about/ and /docs/ to trigger client side routing
   const isUrl = href && href.match(urlRegex);
-  // we only want routes like /about/, /docs/ to trigger client side routing
-  // and also want to exclude # links
   const canClientSideRoute = href && href !== '' && !isUrl;
-  console.debug('canClientSideRoute???????', canClientSideRoute);
   
   if (canClientSideRoute) {
     e.preventDefault();
