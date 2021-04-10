@@ -3,14 +3,17 @@ document.addEventListener('click', function(e) {
   // https://stackoverflow.com/a/3809435/417806
   const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
   const href = e.path && e.path[0]
-    ? e.path[0].href // chrome
+    ? e.path[0].href // chrome + edge
     : e.originalTarget && e.originalTarget.href
       ? e.originalTarget.href // firefox
-      : null;
+      : '';
+  const isUrl = href && href.match(urlRegex);
   // we only want routes like /about/, /docs/ to trigger client side routing
-  const isClientSideRoute = !(href && (href.match(urlRegex) || []).length > 0);
+  // and also want to exclude # links
+  const canClientSideRoute = href && href !== '' && !isUrl;
+  console.debug('canClientSideRoute???????', canClientSideRoute);
   
-  if (isClientSideRoute) {
+  if (canClientSideRoute) {
     e.preventDefault();
     
     const route = href.replace(window.location.origin, '');
