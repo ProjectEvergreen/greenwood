@@ -1,6 +1,5 @@
 /* eslint-disable no-underscore-dangle */
 document.addEventListener('click', function(e) {
-  console.debug('@@@@@@@ e', e);
   // https://stackoverflow.com/a/3809435/417806
   const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
   const href = e.path && e.path[0]
@@ -8,11 +7,8 @@ document.addEventListener('click', function(e) {
     : e.originalTarget && e.originalTarget.href
       ? e.originalTarget.href // firefox
       : null;
-  console.debug('href???????', href);
-  console.debug('???match', href.match(urlRegex));
   // we only want routes like /about/, /docs/ to trigger client side routing
   const isClientSideRoute = !(href && (href.match(urlRegex) || []).length > 0);
-  console.debug('isClientSideRoute???????', isClientSideRoute);
   
   if (isClientSideRoute) {
     e.preventDefault();
