@@ -3,9 +3,14 @@ label: 'plugins'
 menu: navigation
 title: Plugins
 index: 4
+imports:
+  - /components/counter/counter.js
+  - /components/counter/counter.css
 ---
 
 ## Plugins
+
+<x-counter></x-counter>
 
 At its core, Greenwood provides a CLI to drive all the development related workflows for a Greenwood project.  The CLI aims to provide a simple interface for quickly and simply building sites from as little as markdown files.
 
