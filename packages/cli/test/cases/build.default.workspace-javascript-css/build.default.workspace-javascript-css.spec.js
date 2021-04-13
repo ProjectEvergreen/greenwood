@@ -147,6 +147,15 @@ describe('Build Greenwood With: ', function() {
         expect(computedStyle.color).to.equal('blue');
       });
     });
+
+    describe('untouched content in the <body> for type="module-shim"', function() {
+      it('should have two <link> tag in the <head>', function() {
+        const output = dom.window.document.querySelectorAll('p.module-shim');
+
+        expect(output.length).to.be.equal(1);
+        expect(output[0].textContent).to.be.equal('let me tell you about type="module-shim"');
+      });
+    });
   });
 
   after(function() {
