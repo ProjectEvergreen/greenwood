@@ -269,7 +269,7 @@ class StandardHtmlResource extends ResourceInterface {
         body = body.replace(/<script src="\/node_modules\/@webcomponents\/webcomponentsjs\/webcomponents-bundle.js"><\/script>/, '');
         body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
         body = body.replace(/<script defer="" src="\/node_modules\/es-module-shims\/dist\/es-module-shims.js"><\/script>/, '');
-        body = body.replace(/<script type="module-shim"/g, '<script type="module"');
+        body = body.replace(/type="module-shim"/g, 'type="module"');
     
         resolve(body);
       } catch (e) {

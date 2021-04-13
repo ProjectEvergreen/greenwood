@@ -17,9 +17,10 @@
  *     index.html
  *   scripts/
  *     main.js
+ *     other.js
  *   styles/
  *     main.css
- *     
+ *     other.css
  */
 const expect = require('chai').expect;
 const glob = require('glob-promise');
@@ -85,8 +86,8 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('<script>...</script> tag in the <head>', function() {
-      it('should have one <script> tag with inline script in the <head>', function() {
+    describe('<script>...</script> tag in the <head> with mixed attribute ordering', function() {
+      it('should have two <script> tag with inline script in the <head>', function() {
         const scriptTagInline = dom.window.document.querySelectorAll('head > script:not([src])');
         
         expect(scriptTagInline.length).to.be.equal(1);
@@ -122,15 +123,19 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('<link rel="stylesheet" href="..."/> tag in the <head>', function() {
-      it('should have one <link> tag in the <head>', function() {
+    describe('<link rel="stylesheet" href="..."/> tag in the <head> with mixed attribute ordering', function() {
+      it('should have two <link> tag in the <head>', function() {
         const linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"]');
         
-        expect(linkTags.length).to.be.equal(1);
+        expect(linkTags.length).to.be.equal(2);
       });
 
       it('should have the expected main.css file in the output directory', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'styles', 'main.*.css'))).to.have.lengthOf(1);
+      });
+
+      it('should have the expected other.css file in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'styles', 'other.*.css'))).to.have.lengthOf(1);
       });
 
       // JSDOM may not support this case of computing styles when using a <link> tag?
