@@ -6,7 +6,7 @@ template.innerHTML = `
       color: blue;
     }
   </style>
-  <h1>My Counter</h1>
+  <h3>My Counter</h3>
   <button id="dec">-</button>
   <span id="count"></span>
   <button id="inc">+</button>
