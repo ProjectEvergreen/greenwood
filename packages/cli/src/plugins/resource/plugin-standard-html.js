@@ -38,80 +38,108 @@ const getPageTemplate = (barePath, workspace, template) => {
     // fallback to just using their app template
     contents = fs.readFileSync(`${templatesDir}/app.html`, 'utf-8');
   } else {
-    // fallback to using Greenwood's stock app template
-    contents = fs.readFileSync(path.join(__dirname, '../../templates/app.html'), 'utf-8');
+    // fallback to using Greenwood's stock page template
+    contents = fs.readFileSync(path.join(__dirname, '../../templates/page.html'), 'utf-8');
   }
 
   return contents;
 };
 
 const getAppTemplate = (contents, userWorkspace) => {
-
   function sliceTemplate(template, pos, needle, replacer) {
     return template.slice(0, pos) + template.slice(pos).replace(needle, replacer);
   }
   
-  const appTemplatePath = `${userWorkspace}/templates/app.html`;
-  let appTemplateContents = contents || '';
+  const userAppTemplatePath = `${userWorkspace}/templates/app.html`;
+  let appTemplateContents = fs.existsSync(userAppTemplatePath)
+    ? fs.readFileSync(userAppTemplatePath, 'utf-8')
+    : fs.readFileSync(path.join(__dirname, '../../templates/app.html'), 'utf-8');
 
-  if (fs.existsSync(appTemplatePath)) {
-    const root = htmlparser.parse(contents, {
-      script: true,
-      style: true,
-      noscript: true,
-      pre: true
-    });
-    const body = root.querySelector('body').innerHTML;
-    const headScripts = root.querySelectorAll('head script');
-    const headLinks = root.querySelectorAll('head link');
-    const headStyles = root.querySelectorAll('head style');
+  const root = htmlparser.parse(contents, {
+    script: true,
+    style: true,
+    noscript: true,
+    pre: true
+  });
+  const body = root.querySelector('body').innerHTML;
+  const headScripts = root.querySelectorAll('head script');
+  const headLinks = root.querySelectorAll('head link');
+  const headStyles = root.querySelectorAll('head style');
 
-    appTemplateContents = fs.readFileSync(appTemplatePath, 'utf-8');
-    appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
-    
-    headScripts.forEach((script) => {
-      const matchNeedle = '</script>';
-      const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
+  appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
+  
+  headScripts.forEach((script) => {
+    const matchNeedle = '</script>';
+    const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
 
-      if (script.rawAttrs !== '') {
+    if (script.text === '') {
+      if (matchPos > 0) {
         appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</script>\n
           <script ${script.rawAttrs}></script>\n
         `);
+      } else {
+        appTemplateContents = appTemplateContents.replace('</head>', `
+            <script ${script.rawAttrs}></script>\n
+          </head>
+        `);
       }
+    }
 
-      if (script.rawAttrs === '') {
+    if (script.text !== '') {
+      const attributes = script.rawAttrs !== '' 
+        ? ` ${script.rawAttrs}`
+        : '';
+      if (matchPos > 0) {
         appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</script>\n
-          <script>
+          <script${attributes}>
             ${script.text}
           </script>\n
         `);
+      } else {
+        appTemplateContents = appTemplateContents.replace('</head>', `
+            <script${attributes}>
+              ${script.text}
+            </script>\n
+          </head>
+        `);
       }
-    });
+    }
+  });
 
-    headLinks.forEach((link) => {
-      const matchNeedle = /<link .*/g;
-      const matches = appTemplateContents.match(matchNeedle);
-      const lastLink = matches[matches.length - 1];
+  headLinks.forEach((link) => {
+    const matchNeedle = /<link .*/g;
+    const matches = appTemplateContents.match(matchNeedle);
+    const lastLink = matches && matches.length && matches.length > 0 
+      ? matches[matches.length - 1]
+      : '<head>';
 
-      appTemplateContents = appTemplateContents.replace(lastLink, `${lastLink}\n
-        <link ${link.rawAttrs}/>
-      `);
-    });
+    appTemplateContents = appTemplateContents.replace(lastLink, `${lastLink}\n
+      <link ${link.rawAttrs}/>
+    `);
+  });
 
-    headStyles.forEach((style) => {
-      const matchNeedle = '</style>';
-      const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
+  headStyles.forEach((style) => {
+    const matchNeedle = '</style>';
+    const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
 
-      if (style.rawAttrs === '') {
+    if (style.rawAttrs === '') {
+      if (matchPos > 0) {
         appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</style>\n
           <style>
             ${style.text}
           </style>\n
         `);
+      } else {
+        appTemplateContents = appTemplateContents.replace('<head>', `
+          <head> \n
+            <style>
+              ${style.text}
+            </style>\n
+        `);
       }
-    });
-  }
-
+    }
+  });
+  
   return appTemplateContents;
 };
 
@@ -244,9 +272,16 @@ class StandardHtmlResource extends ResourceInterface {
         body = getAppTemplate(body, userWorkspace);
         body = getUserScripts(body);
         body = getMetaContent(normalizedUrl, config, body);
-
+        
         if (processedMarkdown) {
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
+        }
+
+        // give the user something to see so they know it works, if they have no content
+        if (body.indexOf('<content-outlet></content-outlet>') > 0) {
+          body = body.replace('<content-outlet></content-outlet>', `
+            <h1>Welcome to Greenwood!</h1>
+          `);
         }
 
         resolve({

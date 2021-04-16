@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with no config.
+ * Run Greenwood build command with no config and emplty page templates.
  *
  * User Result
  * Should generate a bare bones Greenwood build.
@@ -12,7 +12,11 @@
  * None (Greenwood Default)
  *
  * User Workspace
- * Greenwood default (src/)
+ * src/
+ *   pages/
+ *     index.md
+ *   templates/
+ *     page.html
  */
 const expect = require('chai').expect;
 const { JSDOM } = require('jsdom');
@@ -21,7 +25,7 @@ const runSmokeTest = require('../../../../../test/smoke-test');
 const TestBed = require('../../../../../test/test-bed');
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Greenwood Configuration and Workspace';
+  const LABEL = 'Default Greenwood Configuration and Workspace for Quick Start';
   let setup;
 
   before(async function() {
@@ -83,10 +87,27 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
-      it('should have the expected heading text within the index page in the public directory', function() {
-        const heading = dom.window.document.querySelector('body h1').textContent;
+      describe('expected content output in <body> tag', function() {
+        it('should have expected h2 tag in the <body>', function() {
+          const h1 = dom.window.document.querySelectorAll('body h1');
+    
+          expect(h1.length).to.be.equal(1);
+          expect(h1[0].textContent).to.be.equal('Page Template Heading');
+        });
 
-        expect(heading).to.equal('Welcome to Greenwood!');
+        it('should have expected h2 tag in the <body>', function() {
+          const h2 = dom.window.document.querySelectorAll('body h2');
+    
+          expect(h2.length).to.be.equal(1);
+          expect(h2[0].textContent).to.be.equal('Quick Start');
+        });
+  
+        it('should have expected content output tag in the <body>', function() {
+          const p = dom.window.document.querySelectorAll('body p');
+  
+          expect(p.length).to.be.equal(1);
+          expect(p[0].textContent).to.be.equal('This is a test.');
+        });
       });
     });
   });
