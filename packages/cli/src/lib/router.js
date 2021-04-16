@@ -5,8 +5,9 @@ document.addEventListener('click', function(e) {
     : e.originalTarget && e.originalTarget.href
       ? e.originalTarget.href // firefox
       : '') || '';
-  // best case guess is that if the link oriniates on the current site
-  // treat it as a client side route, ex:  /about/, /docs/
+  // best case "guess" is that if the link originates on the current site when resolved by the browser
+  // treat it as a client side route, ex:  /about/, /docs/ and trigger the client side router
+  // https://github.com/ProjectEvergreen/greenwood/issues/562
   const isOnCurrentDomain = href.indexOf(window.location.hostname) >= 0 || href.indexOf('localhost') >= 0;
   const canClientSideRoute = href !== '' && isOnCurrentDomain;
 
