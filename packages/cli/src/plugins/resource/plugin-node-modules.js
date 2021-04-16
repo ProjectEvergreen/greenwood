@@ -210,8 +210,18 @@ class NodeModulesResource extends ResourceInterface {
       try {
         const { userWorkspace } = this.compilation.context;
         let newContents = body;
-        
-        newContents = newContents.replace(/type="module"/g, 'type="module-shim"');
+        const hasHead = body.match(/\<head>(.*)<\/head>/s);
+
+        if (hasHead && hasHead.length > 0) {
+          const contents = hasHead[0]
+            .replace(/type="module"/g, 'type="module-shim"');
+
+          newContents = newContents.replace(/\<head>(.*)<\/head>/s, `
+            <head>
+              ${contents}
+            </head>
+          `);
+        }
 
         const userPackageJson = fs.existsSync(`${userWorkspace}/package.json`)
           ? require(path.join(userWorkspace, 'package.json')) // its a monorepo?

@@ -1,13 +1,19 @@
 /* eslint-disable no-underscore-dangle */
 document.addEventListener('click', function(e) {
+  // https://stackoverflow.com/a/3809435/417806
+  const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
   const href = e.path && e.path[0]
-    ? e.path[0].href // chrome
+    ? e.path[0].href // chrome + edge
     : e.originalTarget && e.originalTarget.href
       ? e.originalTarget.href // firefox
-      : null;
-
-  if (href) {
+      : '';
+  // we only want to handle links like /about/ and /docs/ to trigger client side routing
+  const isUrl = href && href.match(urlRegex);
+  const canClientSideRoute = href && href !== '' && !isUrl;
+  
+  if (canClientSideRoute) {
     e.preventDefault();
+    
     const route = href.replace(window.location.origin, '');
     const routerOutlet = Array.from(document.getElementsByTagName('greenwood-route')).filter(outlet => {
       return outlet.getAttribute('data-route') === route;
