@@ -301,10 +301,22 @@ class StandardHtmlResource extends ResourceInterface {
   async optimize(url, body) {
     return new Promise((resolve, reject) => {
       try {
-        body = body.replace(/<script src="\/node_modules\/@webcomponents\/webcomponentsjs\/webcomponents-bundle.js"><\/script>/, '');
-        body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
-        body = body.replace(/<script defer="" src="\/node_modules\/es-module-shims\/dist\/es-module-shims.js"><\/script>/, '');
-        body = body.replace(/<script type="module-shim"/g, '<script type="module"');
+        const hasHead = body.match(/\<head>(.*)<\/head>/s);
+
+        if (hasHead && hasHead.length > 0) {
+          let contents = hasHead[0];
+
+          contents = contents.replace(/<script src="\/node_modules\/@webcomponents\/webcomponentsjs\/webcomponents-bundle.js"><\/script>/, '');
+          contents = contents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
+          contents = contents.replace(/<script defer="" src="\/node_modules\/es-module-shims\/dist\/es-module-shims.js"><\/script>/, '');
+          contents = contents.replace(/type="module-shim"/g, 'type="module"');
+
+          body = body.replace(/\<head>(.*)<\/head>/s, `
+            <head>
+              ${contents}
+            </head>
+          `);
+        }
     
         resolve(body);
       } catch (e) {
