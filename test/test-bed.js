@@ -6,13 +6,16 @@
  * There are a number of examples in the CLI package you can use as a reference.
  *
  */
-const fs = require('fs-extra');
+const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
 
 // needed for puppeteer - #193
 const setupFiles = [{
+  dir: 'node_modules/es-module-shims/dist',
+  name: 'es-module-shims.js'
+}, {
   dir: 'node_modules/@webcomponents/webcomponentsjs',
   name: 'webcomponents-bundle.js'
 }];
@@ -41,8 +44,10 @@ module.exports = class TestBed {
 
               await new Promise(async(resolve, reject) => {
                 try {
-                  await fs.ensureDir(targetDir, { recursive: true });
-                  await fs.copy(targetSrc, targetPath);
+                  await fs.promises.mkdir(targetDir, {
+                    recursive: true
+                  });
+                  await fs.promises.copyFile(targetSrc, targetPath);
                   resolve();
                 } catch (err) {
                   reject(err);
@@ -69,12 +74,22 @@ module.exports = class TestBed {
   teardownTestBed() {
     return new Promise(async(resolve, reject) => {
       try {
-        await fs.remove(path.join(this.rootDir, '.greenwood'));
-        await fs.remove(path.join(this.rootDir, 'public'));
+        if (fs.existsSync(this.buildDir)) {
+          await fs.promises.rmdir(this.buildDir, { recursive: true }); 
+        }
+
+        if (fs.existsSync(this.publicDir)) {
+          await fs.promises.rmdir(this.publicDir, { recursive: true }); 
+        }
 
         await Promise.all(setupFiles.map((file) => {
-          return fs.remove(path.join(this.rootDir, file.dir.split('/')[0]));
+          const dir = path.join(this.rootDir, file.dir.split('/')[0]);
+
+          return fs.existsSync(dir)
+            ? fs.promises.rmdir(dir, { recursive: true })
+            : Promise.resolve();
         }));
+        
         resolve();
       } catch (err) {
         reject(err);

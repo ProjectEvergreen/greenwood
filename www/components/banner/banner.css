@@ -20,7 +20,7 @@
 
 :host {
   & .banner {
-    background-color: #f6f2f4;
+    background-color: #fff;
     min-height: 60vh;
 
     & .content {
@@ -40,12 +40,12 @@
 
       & h1 {
         font-size: 3.5rem;
-        text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
+        color: #201e2e;
       }
 
       & h3 {
         padding-top: 10px;
-        text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
+        color: #201e2e;
       }
 
       & img {

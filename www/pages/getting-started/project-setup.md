@@ -7,7 +7,7 @@ linkheadings: 3
 ---
 
 ## Overview
-In the [previous section](/getting-started/), we shared a little bit about what Greenwood is and the high level goals of this guide.  Now we are ready to help you start your first project!
+In the [previous section](/getting-started/), we shared a little bit about what **Greenwood** is and the high level goals of this guide.  Now we are ready to help you start your first project!
 
 In this section, we will kick off our Greenwood project by:
 
@@ -18,7 +18,7 @@ In this section, we will kick off our Greenwood project by:
 > _This guide assumes you are starting from an **empty** directory (`git init` being the exception).  We recommend going through this guide once to understand the basics and from there, you can explore our [documentation](/docs/) to learn more about all of Greenwood's capabilities._
 
 ### Installing Greenwood
-First thing we need to do is setup our project for installing Greenwood.  With Greenwood installed, you will be able to use its CLI to power the development of your project though automated scripts and configuration.
+With Greenwood installed, you will be able to use its CLI to power the development of your project though automated scripts and configuration.
 
 First thing we need to do is generate a _package.json_ file so we can install Greenwood.  The easist way to do that is by running `npm init` from the root directory of where you want to start your project:
 ```shell
@@ -36,23 +36,21 @@ All set!
 ### Configuring Workflows
 With Greenwood installed, let's create a couple of **npm** scripts so that we can automate our development workflows with easy to remember commands.
 
-In _package.json_, edit the `scripts` section accordingly:
+In _package.json_, edit the `scripts` section accordingly by adding:
 ```json
-// before
-"scripts": {
-  "test": "echo \"Error: no test specified\" && exit 1"
-},
+{
+  "scripts": {
+    "...": "....",
 
-// after
-"scripts": {
-  "build": "greenwood build",
-  "start": "greenwood develop"
+    "build": "greenwood build",
+    "start": "greenwood develop"
+  }
 },
 ```
 
 Now, you'll be able to do two things:
-1. `npm start` - Start a local development server with file watching and reloading.
-1. `npm run build` - Generate a static version of the project that you can then upload to a web server.
+1. `npm start` - Start a local development server with file watching and live reloading.
+1. `npm run build` - Generate a static build of the project that you can upload to a web server.
 
 You can go ahead and try out both of these tasks now, and you should see Greenwood's default generated output, letting you know you've set everything up correctly.
 

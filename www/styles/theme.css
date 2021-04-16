@@ -1,4 +1,4 @@
-@import url('/assets/fonts/source-sans-pro.css');
+@import url('../assets/fonts/source-sans-pro.css');
 
 * {
   margin: 0;
@@ -25,10 +25,11 @@ h4,
 h5 {
   margin-top: 1.5rem !important;
   margin-bottom: 1.5rem !important;
-  color: #1d337a;
+  color: #201e2e;
 }
 
-ul {
+ul,
+ol {
   padding-left: 20px;
 }
 
@@ -50,29 +51,12 @@ a {
   }
 }
 
-table {
-  background-color: #334a5a;
-  border-radius: 5px;
-  padding: 10px !important;
-
-  & tr {
-    padding: 10px;
-  }
-
-  & td,
-  & a,
-  & th {
-    color: #efefef!important;
-  }
-}
-
-.gwd-content-wrapper {
-  background-color: white;
+p > code {
+  color: #2d3d3a;
+  font-weight: 800;
 }
 
 .gwd-wrapper {
-  background-color: white;
-
   & .single-column {
     margin: inherit;
     color: #000;

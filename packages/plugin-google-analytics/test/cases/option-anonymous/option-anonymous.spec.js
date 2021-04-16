@@ -13,7 +13,7 @@
  *
  * {
  *   plugins: [{
- *     ...googleAnalyticsPlugin({
+ *     googleAnalyticsPlugin({
  *       analyticsId: 'UA-123456-1',
  *       anonymouse: false
  *     })
@@ -46,12 +46,12 @@ describe('Build Greenwood With: ', function() {
       await setup.runGreenwoodCommand('build');
     });
 
-    runSmokeTest(['public', 'index', 'not-found', 'hello'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Initialization script', function() {
       let inlineScript;
 
-      beforeEach(async function() {
+      before(async function() {
         const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
         const scriptTags = dom.window.document.querySelectorAll('head script');
 
@@ -70,7 +70,6 @@ describe('Build Greenwood With: ', function() {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-
             gtag('config', '${mockAnalyticsId}', { 'anonymize_ip': false });
             gtag('config', '${mockAnalyticsId}');
         `;
@@ -82,7 +81,7 @@ describe('Build Greenwood With: ', function() {
     describe('Tracking script', function() {
       let trackingScript;
 
-      beforeEach(async function() {
+      before(async function() {
         const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
         const scriptTags = dom.window.document.querySelectorAll('head script');
 

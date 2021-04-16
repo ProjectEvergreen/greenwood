@@ -18,7 +18,7 @@
     }
   }
 
-  & .list-wrap > a {
+  & .list-wrap > :first-child {
     display: grid;
     grid-template-columns: auto 20px;
     align-items: center;

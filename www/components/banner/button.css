@@ -1,16 +1,17 @@
+/* stylelint-disable a11y/media-prefers-reduced-motion */
 :host .btn {
   display: inline-block;
-  border-radius: 5px;
-  font-size: 1.5rem;
-  padding: 1rem;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  padding: 0.75rem;
   color: white;
-  background-color: #1d337a;
+  background-color: #201e2e;
   border: 1px solid white;
+  transition: 0.3s;
 }
 
 :host .btn:hover,
 :host .btn:focus {
-  color: #020202;
-  background-color: #f9e7ca;
-  border: 1px solid #020202;
+  background-color: #425d58;
+  border: 1px solid white;
 }

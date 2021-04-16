@@ -13,7 +13,7 @@
  *
  * {
  *   plugins: [{
- *     ...googleAnalyticsPlugin()
+ *     googleAnalyticsPlugin()
  *  }]
  *
  * }
@@ -37,7 +37,7 @@ describe('Build Greenwood With: ', function() {
       try {
         await setup.runGreenwoodCommand('build');
       } catch (err) {
-        expect(err).to.contain('analyticsId should be of type string.  get "undefined" instead.');
+        expect(err).to.contain('Error: analyticsId should be of type string.  got "undefined" instead.');
       }
     });
   });

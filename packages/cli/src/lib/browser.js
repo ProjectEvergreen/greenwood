@@ -36,17 +36,17 @@ class BrowserRunner {
     
     await page.setRequestInterception(true);
 
-    // only allow puppeteer to load necessary scripts needed for pre-rendering of the site itself
+    // only allow puppeteer to load necessary (local) scripts needed for pre-rendering of the site itself
     page.on('request', interceptedRequest => {
       const interceptedRequestUrl = interceptedRequest.url();
 
       if (
-        interceptedRequestUrl.indexOf('bundle.js') >= 0 || // webpack bundles, webcomponents-bundle.js
-        interceptedRequestUrl === requestUrl || // pages / routes
-        interceptedRequestUrl.indexOf('localhost:4000') >= 0 // Apollo GraphQL server
+        interceptedRequestUrl.indexOf('http://127.0.0.1') >= 0 ||
+        interceptedRequestUrl.indexOf('localhost') >= 0
       ) {
         interceptedRequest.continue();
       } else {
+        // console.warn('aborting request', interceptedRequestUrl);
         interceptedRequest.abort();
       }
     });
@@ -71,6 +71,8 @@ class BrowserRunner {
 
     // Serialize page.
     const content = await page.content();
+
+    // console.debug('content????', content);
 
     await page.close();
 

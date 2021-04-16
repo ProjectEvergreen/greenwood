@@ -1,0 +1,11 @@
+query($parent: String!) {
+  children(parent: $parent) {
+    id,
+    filename,
+    label,
+    path,
+    route,
+    template,
+    title
+  }
+}

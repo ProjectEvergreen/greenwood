@@ -18,7 +18,7 @@
  *   pages/
  *     index.md
  */
-const fs = require('fs');
+const { JSDOM } = require('jsdom');
 const path = require('path');
 const expect = require('chai').expect;
 const TestBed = require('../../../../../test/test-bed');
@@ -34,15 +34,23 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe(LABEL, function() {
+
+    before(async function() {
+      await setup.runGreenwoodCommand('build');
+    });
+
     describe('Custom Markdown Presets', function() {
+      let dom;
+
+      before(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+      });
 
       // gfm: false disables things like fenced code blocks https://www.npmjs.com/package/remark-parse#optionsgfm
-      it('should intentionally fail to compile using our custom markdown preset settings', async function() {
-        try {
-          await setup.runGreenwoodCommand('build');
-        } catch (err) {
-          expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.false;
-        }
+      it('should intentionally fail to compile code fencing using our custom markdown preset settings', async function() {
+        let pre = dom.window.document.querySelector('pre > code'); 
+
+        expect(pre).to.equal(null);
       });
 
     });

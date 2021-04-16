@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
+
+  <head>
+    <script type="module" src="../components/banner/banner.js"></script>
+    <script type="module" src="../components/card/card.js"></script>
+
+    <link rel="stylesheet" href="/node_modules/prismjs/themes/prism-tomorrow.css"/>
+    <link rel="stylesheet" href="/styles/home.css"/>
+  </head>
+  <body>
+
+    <div class="gwd-content-outlet">
+
+      <app-banner></app-banner>
+
+      <div class='gwd-content-wrapper'>
+
+          <div class='gwd-page-template gwd-content'>
+            <div id="gwd-message-wrapper">
+              <div class="message">
+                <h2>Greenwood is a modern and performant static site generator for Web Component based development.</h2>
+
+                <div class="min-card-container">
+                  <div class="mini-card"><p>Prerendered, <a href="/about/how-it-works/" title="How It Works" target="_blank" rel="noopener noreferrer">even your Web Components</a></p></div>
+                  <div class="mini-card"><p><a href="/docs/layouts/" title="Layout docs" target="_blank" rel="noopener noreferrer">Filesystem based routing</a></p></div>
+                  <div class="mini-card"><p>A fast, unbundled, local development workflow</p></div>
+                  <div class="mini-card"><p><a href="/about/goals/" title="Goals" target="_blank" rel="noopener noreferrer">Easy to get started with</a></p></div>
+                  <div class="mini-card"><p>Extensible <a href="/plugins/" title="Plugins" target="_blank" rel="noopener noreferrer">plugin system</a></p></div>
+                  <div class="mini-card"><p><a href="/docs/data/" title="Data docs" target="_blank" rel="noopener noreferrer">Content as data</a> with GraphQL</p></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="quickstart">
+              <!-- <h2>Quick Start Example</h2>
+              <pre class="language-bash">
+                <code class="language-bash">
+                  # with NodeJS already installed
+                  # create a pages directory for your content
+                  $ mkdir -p src/pages
+
+                  # create an index.md file as your home page
+                  $ echo "## hello world" > src/pages/index.md
+
+                  # run one of Greenwood's commands, and that's it!
+                  $ npx @greenwood/cli develop
+                </code>
+              </pre> -->
+              <p>For anyone new to Greenwood, we encourage you go through our <a href="/getting-started/">Getting Started</a> guide, or to get right to work, head on over to our <a href="/docs/">documentation</a>.</p>
+            </div>
+
+            <div class="cards">
+              <app-card title="The Modern Web" img="../assets/webcomponents.svg">
+                <p slot="cardcontent">Modern browsers, combined with recent advancements in web standards like <strong>Web Components</strong>, <strong>ES Modules</strong>, and <strong>CSS Custom Properties</strong>, bring a lot of native power and features to the web browsers we all use now.  With less need to put tools in front of your code, Greenwood makes completing your goals easier, faster, and less complicated.</p>
+              </app-card>
+
+              <app-card title="Ecosystem" img="../assets/nodejs.png">
+                <p slot="cardcontent">While the web provides a lot out of the box, we want everyone to be able to reach for those additional packages we need that help us achieve our goal of building great things.  <strong>NodeJS</strong>, along with <strong>npm</strong>, provides a great developer experience and ecosystem to leverage when  building web projects.</p>
+              </app-card>
+
+              <app-card title="Keeping It Simple" img="../assets/simple.png">
+                <p slot="cardcontent">Greenwood is on a mission to provide the best web development experience, to make sure content is easy to create, and that going live is a breeze.  Keeping things simple is a part of that mission, and while we levarge some open source tool to achieve all this, we intend to avoid the meta framework trend and aim keep to a lean(er) core over time.</p>
+              </app-card>
+            </div>
+
+          </div>
+      </div>
+
+    </div>
+
+  </body>
+
+</html>

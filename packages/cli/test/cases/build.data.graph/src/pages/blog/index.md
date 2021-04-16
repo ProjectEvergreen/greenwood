@@ -1,5 +1,0 @@
----
-template: 'blog'
----
-
-## My Posts

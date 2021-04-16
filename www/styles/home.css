@@ -1,40 +1,111 @@
-:host {
+h3 {
+  color: green;
+}
+
+.gwd-content {
+  background-color: white;
+  min-height: 300px;
+  font-size: 1.2rem;
+
   & h3 {
-    color: green;
+    font-size: 2rem;
+    margin: 5px 0;
   }
 
-  & .gwd-content {
-    background-color: white;
-    margin: 0 auto;
-    margin-top: 20px;
-    min-height: 300px;
-    padding: 0 15%;
-    font-size: 1.2rem;
+  & a {
+    color: #201e2e;
+  }
+}
 
-    & h3 {
-      font-size: 2rem;
-      margin: 5px 0;
-    }
+/* .cards {
+  margin: 0 -15%;
+} */
 
-    & a {
-      color: #1d337a;
-    }
+.message {
+  padding: 2rem;
+  text-align: center;
+  margin: 0 auto;
+
+  & hr {
+    margin-top: 4rem;
   }
 
-  & .cards {
-    margin: 0 -15%;
+  @media (max-width: 768px) {
+    padding: 0;
   }
+}
 
-  & .message {
-    padding: 4rem;
-    text-align: center;
+.quickstart {
+  width: 90%;
+  text-align: center;
+  margin: 4rem auto;
 
-    & hr {
-      margin-top: 4rem;
-    }
+  & p {
+    max-width: 60ch;
+    margin: auto;
+    margin-top: 2rem;
+  }
+}
+
+.cards {
+  margin: 20px -0.25rem;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+  margin-bottom: 3rem;
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
+}
+
+#gwd-message-wrapper {
+  background-color: #504b65;
+
+  & h2 {
+    color: #fff;
+    max-width: 60ch;
+    margin: auto;
 
     @media (max-width: 768px) {
-      padding: 0;
+      padding-top: 2rem;
     }
   }
+}
+
+.mini-card {
+  width: 200px;
+  margin: 1.5rem;
+  border: 0.5px solid #dddde1;
+  border-radius: 20px;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 2rem;
+  box-shadow:
+    0 1.3px 2.7px rgba(0, 0, 0, 0.065),
+    0 3.4px 6.9px rgba(0, 0, 0, 0.093),
+    0 6.9px 14.2px rgba(0, 0, 0, 0.117),
+    0 14.2px 29.2px rgba(0, 0, 0, 0.145),
+    0 39px 80px rgba(0, 0, 0, 0.21);
+}
+
+.min-card-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: auto;
+}
+
+app-card {
+  margin: 1.5rem;
+  padding: 2rem;
+  border: 0.5px solid #dddde1;
+  border-radius: 20px;
+  box-shadow:
+    0 2px 3.6px rgba(0, 0, 0, 0.014),
+    0 5.6px 10px rgba(0, 0, 0, 0.02),
+    0 13.6px 24.1px rgba(0, 0, 0, 0.026),
+    0 45px 80px rgba(0, 0, 0, 0.04);
 }

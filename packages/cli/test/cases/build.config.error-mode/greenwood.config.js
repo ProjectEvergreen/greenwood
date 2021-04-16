@@ -1,3 +1,3 @@
 module.exports = {
-  optimization: 'loremipsum'
+  mode: 'loremipsum'
 };

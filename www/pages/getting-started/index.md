@@ -6,18 +6,19 @@ index: 3
 ---
 
 ## Introduction
-First off, thank you for taking the time to check out Greenwood!  As a tool, we hope that you find Greenwood to provide a productive and frictionless developer experience for you that results in performant and engaging experiences for your users.  Under the hood Greenwood is using NodeJS, webpack, babel and a lot of other amazing JavaScript tools to power a modern development workflow based on first class support for the modern web like Web Components, FlexBox, CSS Grid, ECMAScript modules, and all your favorite features!
+First off, thank you for taking the time to check out **Greenwood**!  Under the hood Greenwood is taking advantage of the power of the modern web ([and friends !](/docs/tech-stack/)) to drive a modern development workflow that helps you deliver a modern, performant and pleasent experience for your users... using the web languages you already know!
 
 ## Your First Project
-To get things started, we first want to make sure everyone can get their first project up and running as easily and quickly as possible, and so through this guide, we will help walk you through everything you need to get started with your first project, including:
+To get things started, we first want to make sure everyone can get their first project up and running as easily and quickly as possible, and so through this guide, we will walk through everything you need to get started with your first project, including:
 
-1. Setting up your workspace and installing Greenwood
+1. Setting up your project workspace and installing Greenwood
 1. Reviewing key concepts of Greenwood
 1. Creating content and developing locally
 1. Authoring Web Components and adding CSS
 1. Configuration
 1. Building and hosting for production
 
+> _If you already have NodeJS installed on your machine and are comfortable with Git, you can skip the prequisites and jump right to [project setup](/getting-started/project-setup)._
 
 ## Prequisites
 Before going into the setup section of the tutorial, we want to make sure that you are familiar with some of the expectations and assumptions this guide (and Greenwood) make.
@@ -35,7 +36,7 @@ $ npm -v
 
 # for example
 $ node -v
-v10.15.1
+v12.13.0
 
 $ npm -v
 6.4.1
@@ -57,7 +58,7 @@ $ npm run develop
 #### Experience
 No advanced JavaScript / CSS experience is needed for using Greenwood.  Just knowing some [markdown](https://daringfireball.net/projects/markdown/) and following some basic steps from the command line will be enough to get you up and running quickly.
 
-We like to think that that as your experience grows, so can the way you build your site.  Greenwood has very few opinions on how you structure your site or what you're trying to build or how and so our hope is to provide you a developer experience that is conducive to modern web development.
+We like to think that that as your experience grows, so can the way you build your site.  Greenwood has very few opinions on how you structure your project (aside from pages and templates), or what you're trying to build, or how.  _Our hope is to provide you a developer experience that is conducive to modern web development and the expectations around it_.
 
 ## Tutorials
 So if you're ready to get started, let's get [your first project setup](/getting-started/project-setup/)!  Or if you just want to "code and go", check out our [quick start](/getting-started/quick-start/).

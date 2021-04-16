@@ -1,0 +1,8 @@
+interface User {
+  id: number
+  firstName: string
+  lastName: string
+  role: string
+}
+
+console.log('hello from some-other-custom-file.foo! 😎');

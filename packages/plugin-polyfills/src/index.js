@@ -1,34 +1,61 @@
-const CopyWebpackPlugin = require('copy-webpack-plugin'); // part of @greeenwood/cli
+const fs = require('fs');
 const path = require('path');
+const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 
-module.exports = () => {
-  const filename = 'webcomponents-loader.js';
-  const nodeModuleRoot = 'node_modules/@webcomponents/webcomponentsjs';
+class PolyfillsResource extends ResourceInterface {
+  constructor(compilation, options = {}) {
+    super(compilation, options);
+  }
 
-  return [{
-    type: 'index',
-    provider: () => {
-      return {
-        hookGreenwoodPolyfills: `
-          <!-- Web Components poyfill -->
-          <script src="/${filename}"></script>
-        `
-      };
-    }
-  }, {
-    type: 'webpack',
-    provider: (compilation) => {
-      const cwd = process.cwd();
-      const { publicDir } = compilation.context;
-    
-      return new CopyWebpackPlugin([{
-        from: path.join(cwd, nodeModuleRoot, filename),
-        to: publicDir
-      }, {
-        context: path.join(cwd, nodeModuleRoot),
-        from: 'bundles/*.js',
-        to: publicDir
-      }]);
-    }
-  }];
+  async shouldOptimize(url) {
+    return Promise.resolve(path.extname(url) === '.html');
+  }
+
+  async optimize(url, body) {
+    const filename = 'webcomponents-loader.js';
+    const nodeModuleRoot = 'node_modules/@webcomponents/webcomponentsjs';
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        const cwd = process.cwd();
+        const { outputDir } = this.compilation.context;
+        const polyfillFiles = [
+          'webcomponents-loader.js',
+          ...fs.readdirSync(path.join(process.cwd(), nodeModuleRoot, 'bundles')).map(file => {
+            return `bundles/${file}`;
+          })
+        ];
+
+        if (!fs.existsSync(path.join(outputDir, 'bundles'))) {
+          fs.mkdirSync(path.join(outputDir, 'bundles'));
+        }
+
+        await Promise.all(polyfillFiles.map(async (file) => {
+          const from = path.join(cwd, nodeModuleRoot, file);
+          const to = path.join(outputDir, file);
+          
+          return !fs.existsSync(to)
+            ? fs.promises.copyFile(from, to)
+            : Promise.resolve();
+        }));
+
+        const newHtml = body.replace('<head>', `
+          <head>
+            <script src="/${filename}"></script>
+        `);
+
+        resolve(newHtml);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+}
+
+module.exports = (options = {}) => {
+  return {
+    type: 'resource',
+    name: 'plugin-polyfills',
+    provider: (compilation) => new PolyfillsResource(compilation, options)
+  };
 };

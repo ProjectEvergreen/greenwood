@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta-outlet></meta-outlet>
+
+    <link rel="stylesheet" href="/assets/fonts/source-sans-pro.css"></link>
+    <link rel="stylesheet" href="/styles/theme.css"></link>
+
+    <style>
+      .gwd-content-outlet {
+        min-height: 100vh
+      };
+    </style>
+
+    <script type="module">
+      import '@evergreen-wc/eve-container';
+    </script>
+    
+    <script type="module" src="/components/footer/footer.js"></script>
+    <script type="module" src="/components/header/header.js"></script>
+    
+  </head>
+
+  <body>
+
+    <div class='gwd-wrapper'>
+      <app-header></app-header>
+
+      <page-outlet></page-outlet>
+      
+      <app-footer></app-footer>
+    </div>
+
+  </body>
+
+</html>

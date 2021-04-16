@@ -9,7 +9,7 @@
 ## Overview
 Greenwood is a modern and performant static site generator supporting Web Component based development.  For more information about how to get started, lookup our docs, or learn more about the project, please visit our [website](https://www.greenwoodjs.io/).
 
-> Greenwood is currently working towards a [1.0 release](https://github.com/ProjectEvergreen/greenwood/issues/418) with plans in our [next release (v.0.10.0)](https://github.com/ProjectEvergreen/greenwood/pull/436) to introduce some exciting [new changes and concepts](https://github.com/ProjectEvergreen/greenwood/releases/tag/v0.10.0-alpha.0) to the project.  Check out our [roadmap](https://github.com/ProjectEvergreen/greenwood/projects) to see what we're working on next and feel free to reach out through our [issue tracker](https://github.com/ProjectEvergreen/greenwood/issues) if you have any issues.  Additionally, please review our [Request for Contributions doc](https://docs.google.com/document/d/1MwDkszKvq81QgIYa8utJgyUgSpLZQx9eKCWjIikvfHU/) if would like to help us in building Greenwood! ✌️
+> Greenwood is currently working towards a [1.0 release](https://github.com/ProjectEvergreen/greenwood/issues/418) with our [recent release (v.0.10.0)](https://github.com/ProjectEvergreen/greenwood/pull/436) introducing some exciting [new changes and concepts](https://github.com/ProjectEvergreen/greenwood/releases/tag/v0.10.0) to the project.  Check out our [roadmap](https://github.com/ProjectEvergreen/greenwood/projects) to see what we're working on next and feel free to reach out through our [issue tracker](https://github.com/ProjectEvergreen/greenwood/issues) if you have any issues.  Additionally, please review our [Request for Contributions doc](https://docs.google.com/document/d/1MwDkszKvq81QgIYa8utJgyUgSpLZQx9eKCWjIikvfHU/) if would like to help us in building Greenwood! ✌️
 
 ## Getting Started
 Our website has a complete [Getting Started](http://www.greenwoodjs.io/getting-started) section that will walk you through creating a Greenwood project from scratch.
@@ -31,13 +31,13 @@ Then in your _package.json_, you can run the CLI like so:
 "scripts": {
   "build": "greenwood build",
   "start": "greenwood develop",
-  "eject": "greenwood eject",
+  "serve": "greenwood serve"
 }
 ```
 
-- `npm run build`: generates a static build of your project
-- `npm start`: starts a local development server for your project
-- `npm run eject`: ejects configurations to your working directory for additional customizations
+- `greenwood build`: Generates a production build of your project
+- `greenwood develop`: Starts a local development server for your project
+- `greenwood serve`: Generates a production build of the project and serves it locally on a simple web server.
 
 ## Documentation
 All of our documentation is on our [website](https://www.greenwoodjs.io/) (which itself is built by Greenwood!).  See our website documentation to learn more about:

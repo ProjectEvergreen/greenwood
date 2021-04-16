@@ -13,7 +13,7 @@ linkheadings: 3
 
 Having to repeat things when programming is no fun, and that's why (web) component based development is so useful!  As websites start to grow, there comes a point where being able to have access to the content and structure of your site's layout and configuration as part of the development process becomes essential towards maintainability, performance, and scalability.
 
-As an example, if you are developing a blog site, like in our [Getting Started](/getting-started/) guide, having to list a couple blogs posts by hand isn't so bad.
+As an example, if you are developing a blog site, like in our [Getting Started](/getting-started/) guide, having to manually list a couple of blog posts by hand isn't so bad.
 
 ```html
 <ul>
@@ -22,47 +22,51 @@ As an example, if you are developing a blog site, like in our [Getting Started](
 </ul>
 ```
 
-But what happens over time, when that list grows to 10, 50, 100+ posts?  Imagine maintaining that list each time, over and over again?  Not only that, but wouldn't it be great to also be able to sort, search, filter, and organize those posts to make them easier for users to navigate and find?  Even better would be not having to maintain a secondary list of your own content.
+But what happens over time, when that list grows to 10, 50, 100+ posts?  Imagine maintaining that list each time, over and over again?  Or just remembering to update that list each time you publish a new post?  Not only that, but wouldn't it also be great to sort, search, filter, and organize those posts to make them easier for users to navigate and find?
 
-Instead, Greenwood uses GraphQL + Apollo to make that a reality!  So instead of a static list, you can do something like this!
+So instead of a static list, you can do something like this! 
 
 ```javascript
 render() {
-  return html\`
+  return html`
     <ul>
       ${pages.map((page) => {
-        return html\`
-          <li><a href=\"${page.path}\">${page.title}</a></li>
-        \`;
+        return html`
+          <li><a href="${page.path}">${page.title}</a></li>
+        `;
       })}
     </ul>
-  \`;
+  `;
 }
 ```
 
+To assist with this, Greenwood provides all your content as data, accessible from a single _graph.json_ file that you can simply [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) RESTfully or, if you install our [plugin for GraphQL](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql), you can use a GraphQL interfact to make all this a reality! 💯
+
+
 ### Internal Sources
-Greenwood exposes a [GraphQL](https://graphql.org/) + [Apollo](https://www.apollographql.com/docs/apollo-server/) server locally when developing available at `localhost:4000` that can be used to get information about your local content like path, "slug", title and other useful information that will be dynamic to the content you have.  Programmatic access to this data can provide the oppourtunity to share your content with your users in a way that supports sorting, filter, organizing, and more!
+Greenwood (via [**plugin-graphql**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql)) exposes an [Apollo](https://www.apollographql.com/docs/apollo-server/) server locally when developing available at `localhost:4000` that can be used to get information about your local content like path, "slug", title and other useful information that will be dynamic to the content you create.  Programmatic access to this data can provide you the oppourtunity to share your content with your users in a way that supports sorting, filter, organizing, and more!
 
 ![graphql-playground](/assets/graphql-playground.png)
 
 #### Schema
 To kick things off, let's review what is available to you.  Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type definition](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's `graph`.
 
-
 This is what the schema looks like:
 ```javascript
 graph {
-  id, // (string) the unique ID given to the generated component as it's selector e.g. \`<wc-md-id></wc-md-id>\`
+  filename, // (string) file name without extension/path, so that it can be copied to scratch dir with same name
+  
+  id, // (string) filename without the extension
 
-  link,  // (string) A URL link, typically derived from the filesystem path, e.g. /blog/2019/first-post/
+  label, // (string) best guess pretty text / display based on filename
+
+  path, // (string) path to the file
+
+  route,  // (string) A URL, typically derived from the filesystem path, e.g. /blog/2019/first-post/
+
+  template, // (string) page template used for the page
 
   title,  // (string) Useful for a page's <title> tag or the title attribute for an <a> tag, inferred from the filesystem path, e.g. "First Post" or provided through front matter.
-
-  filePath, // (string) path to file
-
-  fileName, // (string) file name without extension/path, so that it can be copied to scratch dir with same name
-
-  template // (string) page template used for the page
 }
 ```
 
@@ -80,12 +84,13 @@ The Graph query returns an array of all pages.
 ```javascript
 query {
   graph {
+    filename,
     id,
-    title,
-    link,
-    filePath,
-    fileName,
-    template
+    label,
+    path,
+    route,
+    template,
+    title
   }
 }
 ```
@@ -93,8 +98,8 @@ query {
 ###### Usage
 `import` the query in your component
 ```javascript
-import client from '@greenwood/cli/data/client';
-import GraphQuery from '@greenwood/cli/data/queries/graph';
+import client from '@greenwood/plugin-graphql/core/client';
+import GraphQuery from '@greenwood/plugin-graphql/queries/menu';
 
 .
 .
@@ -115,20 +120,30 @@ This will return the full `graph` of all pages as an array
 ```javascript
 [
   {
-    id: "dd1ec2ef00cc386",
-    title: "Blog",
-    link: "/blog/2019/first-post",
-    filePath: "./blog/2019/first-post.md",
-    fileName: "first-post",
-    template: "blog"
+    filename: "index.md",
+    id: "index",
+    label: "Index",
+    path: "./index.md",
+    route: "/",
+    template: "page",
+    title: "Home Page"
+  }, {
+    filename: "first-post.md",
+    id: "first-post",
+    label: "First Post",
+    path: "./blog/2019/first-post.md",
+    route: "/blog/2019/first-post",
+    template: "blog",
+    title: "My First Blog Poast"
   },
   {
-    id: "9d2b98c69ab0867"
-    title: "Blog",
-    link: "/blog/2019/second-post",
-    filePath: "./blog/2019/second-post.md",
-    fileName: "second-post",
-    template: "blog"
+    filename: "second-post.md",
+    id: "second-post",
+    label: "Second Post",
+    path: "./blog/2019/second-post.md",
+    route: "/blog/2019/second-post",
+    template: "blog",
+    title: "My Second Blog Poast"
   }
 ]
 ```
@@ -145,11 +160,12 @@ The Children query returns an array of all pages below a given top level route.
 query {
   children {
     id,
-    title,
-    link,
-    filePath,
-    fileName,
-    template
+    filename,
+    label,
+    path,
+    route,
+    template,
+    title
   }
 }
 ```
@@ -157,8 +173,8 @@ query {
 ###### Usage
 `import` the query in your component
 ```javascript
-import client from '@greenwood/cli/data/client';
-import ChildrenQuery from '@greenwood/cli/data/queries/children';
+import client from '@greenwood/plugin-graphql/core/client';
+import ChildrenQuery from '@greenwood/plugin-graphql/queries/menu';
 
 .
 .
@@ -182,20 +198,22 @@ This will return the full `graph` of all pages as an array that are under a give
 ```javascript
 [
   {
-    id: "dd1ec2ef00cc386",
-    title: "Blog",
-    link: "/blog/2019/first-post",
-    filePath: "./blog/2019/first-post.md",
-    fileName: "first-post",
-    template: "blog"
+    filename: "first-post.md",
+    id: "first-post",
+    label: "First Post",
+    path: "./blog/2019/first-post.md",
+    route: "/blog/2019/first-post",
+    template: "blog",
+    title: "My First Blog Poast"
   },
   {
-    id: "9d2b98c69ab0867"
-    title: "Blog",
-    link: "/blog/2019/second-post",
-    filePath: "./blog/2019/first-post.md",
-    fileName: "second-post",
-    template: "blog"
+    filename: "second-post.md",
+    id: "second-post",
+    label: "Second Post",
+    path: "./blog/2019/second-post.md",
+    route: "/blog/2019/second-post",
+    template: "blog",
+    title: "My Second Blog Poast"
   }
 ]
 ```
@@ -208,8 +226,7 @@ The Config query returns the configuration values from your _greenwood.config.js
 query {
   config {
   	devServer {
-      port,
-      host
+      port
     },
     meta {
       name,
@@ -219,8 +236,8 @@ query {
       value,
       href
     },
+    mode,
     optimization,
-    publicPath,
     title,
     workspace
   }
@@ -230,9 +247,8 @@ query {
 ###### Usage
 `import` the query in your component
 ```javascript
-import client from '@greenwood/cli/data/client';
-import ConfigQuery from '@greenwood/cli/data/queries/config';
-
+import client from '@greenwood/plugin-graphql/core/client';
+import ConfigQuery from '@greenwood/plugin-graphql/queries/menu';
 .
 .
 .
@@ -240,7 +256,7 @@ import ConfigQuery from '@greenwood/cli/data/queries/config';
 async connectedCallback() {
   super.connectedCallback();
   const response = await client.query({
-    query: GraphQuery
+    query: ConfigQuery
   });
 
   this.meta = response.data.config.meta;
@@ -248,18 +264,16 @@ async connectedCallback() {
 ```
 
 ###### Response
-This will return an object of youf _greenwood.config.js_ as an object.  Example:
+This will return an object of your _greenwood.config.js_ as an object.  Example:
 ```javascript
 {
   devServer: {
-    port: 1984,
-    host: 'localhost'
+    port: 1984
   },
   meta: [
     { name: 'twitter:site', content: '@PrjEvergreen' },
     { rel: 'icon', href: '/assets/favicon.ico' }
   ],
-  publicPath: '/some-dir',
   title: 'My App',
   workspace: 'src'
 }
@@ -282,14 +296,14 @@ Or within your component
 ```javascript
 import gql from 'graphql-tag';  // comes with Greenwood
 
-const query = gql\`
+const query = gql`
   {
     user(id: 5) {
       firstName
       lastName
     }
   }
-\`
+`
 ```
 
 Then you can use `import` anywhere in your components!
@@ -299,8 +313,8 @@ Now of course comes the fun part, actually seeing it all come together.  Here is
 
 ```javascript
 import { LitElement, html } from 'lit-element';
-import client from '@greenwood/cli/data/client';
-import MenuQuery from '@greenwood/cli/data/queries/menu';
+import client from '@greenwood/plugin-graphql/core/client';
+import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
 
 class HeaderComponent extends LitElement {
 
@@ -327,27 +341,27 @@ class HeaderComponent extends LitElement {
       }
     });
 
-    this.navigation = response.data.menu.children;
+    this.navigation = response.data.menu.children.map(item => item.item);
   }
 
   render() {
     const { navigation } = this;
 
-    return html\`
+    return html`
       <header class="header">
 
         <nav>
           <ul>
             ${navigation.map(({ item }) => {
-              return html\`
-                <li><a href="\${item.link}" title="Click to visit the \${item.label} page">\${item.label}</a></li>
-              \`;
+              return html`
+                <li><a href="${item.route}" title="Click to visit the ${item.label} page">${item.label}</a></li>
+              `;
             })}
           </ul>
         </nav>
 
       </header>
-    \`;
+    `;
   }
 }
 

@@ -1,91 +1,83 @@
 const BrowserRunner = require('../lib/browser');
-const dataServer = require('../data/server');
-const fs = require('fs-extra');
-const LocalWebServer = require('local-web-server');
+const fs = require('fs');
 const path = require('path');
+const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
+const pluginOptimizationMpa = require('../plugins/resource/plugin-optimization-mpa');
 
-module.exports = serializeBuild = async (compilation) => {
+module.exports = serializeCompilation = async (compilation) => {
+  const compilationCopy = Object.assign({}, compilation);
   const browserRunner = new BrowserRunner();
-  const localWebServer = new LocalWebServer();
-  const PORT = '8000';
-  const polyfillPath = path.join(process.cwd(), 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js');
-  let polyfill = '';
-  
+  const optimizeResources = [
+    pluginResourceStandardHtml.provider(compilationCopy),
+    pluginOptimizationMpa().provider(compilationCopy),
+    ...compilation.config.plugins.filter((plugin) => {
+      const provider = plugin.provider(compilationCopy);
+
+      return plugin.type === 'resource' 
+        && provider.shouldOptimize 
+        && provider.optimize;
+    }).map((plugin) => {
+      return plugin.provider(compilationCopy);
+    })
+  ];
+
   await browserRunner.init();
 
-  const runBrowser = async (compilation) => {
+  const runBrowser = async (serverUrl, pages, outputDir) => {
     try {
-      return Promise.all(compilation.graph.map(async(page) => {
-        const { publicDir } = compilation.context;
+      return Promise.all(pages.map(async(page) => {
         const { route } = page;
-  
-        return await browserRunner.serialize(`http://127.0.0.1:${PORT}${route}`).then(async (content) => {
-          const target = path.join(publicDir, route);
-          const optimization = compilation.config.optimization;
-          const isStrictOptimization = optimization === 'strict';
-          const apolloScript = isStrictOptimization
-            ? ''
-            : `<script data-state="apollo">
-                window.__APOLLO_STATE__ = true;
-              </script> 
-            `;
-          
-          let html = content
-            .replace(polyfill, '')
-            .replace('<script></script>', apolloScript);
+        console.info('serializing page...', route);
+        
+        return await browserRunner
+          .serialize(`${serverUrl}${route}`)
+          .then(async (indexHtml) => {
+            const outputPath = `${outputDir}${route}index.html`;
+            console.info(`Serializing complete for page ${route}.`);
+            
+            const htmlOptimized = await optimizeResources.reduce(async (htmlPromise, resource) => {
+              const html = await htmlPromise;
+              const shouldOptimize = await resource.shouldOptimize(outputPath, html);
+              
+              return shouldOptimize
+                ? resource.optimize(outputPath, html)
+                : Promise.resolve(html);
+            }, Promise.resolve(indexHtml));
 
-          if (isStrictOptimization) { // no javascript
-            html = html.replace(/<script type="text\/javascript" src="\/index.*.bundle\.js"><\/script>/, ''); // main bundle
-            html = html.replace(/<script charset="utf-8" src="\/*.*.bundle\.js"><\/script>/, ''); // dynamic / import() bundles
-            html = html.replace(/<lit-route path="(.*)" component="(.*)" class="(.*)">(.*)<\/lit-route>/g, ''); // lit redux routes
-          } else if (optimization === 'spa') { // all the javascript, and async!
-            html = html.replace(/<script type="text\/javascript"/, '<script async="" type="text/javascript"');
-            html = html.replace(/<script charset="utf-8"/, '<script async="" charset="utf-8"'); // dynamic / import() bundles
-          }
-  
-          await fs.mkdirs(target, { recursive: true });
-          await fs.writeFile(path.join(target, 'index.html'), html);
-        });
+            if (!fs.existsSync(path.join(outputDir, route))) {
+              fs.mkdirSync(path.join(outputDir, route), {
+                recursive: true
+              });
+            }
+            
+            await fs.promises.writeFile(outputPath, htmlOptimized);
+          });
       }));
-    } catch (err) {
+    } catch (e) {
       // eslint-disable-next-line no-console
       console.error(err);
       return false;
     }
   };
-  
+
   return new Promise(async (resolve, reject) => {
     try {
-      polyfill = await fs.readFile(polyfillPath, 'utf8');
+      const pages = compilation.graph;
+      const port = compilation.config.devServer.port;
+      const outputDir = compilation.context.scratchDir;
+      const serverAddress = `http://127.0.0.1:${port}`;
 
-      const { context } = compilation;
-      const indexContentsPath = path.join(compilation.context.publicDir, compilation.context.indexPageTemplate);
-      const indexContents = await fs.readFile(indexContentsPath, 'utf8');
-      const indexContentsPolyfilled = indexContents.replace('<body>', `<script>${polyfill}</script><body>`);
-
-      await fs.writeFile(indexContentsPath, indexContentsPolyfilled);
-
-      await dataServer(compilation).listen().then((server) => {
-        console.log(`dataServer started at ${server.url}`);
-      });
-
-      // "serialize" our SPA into a static site
-      const webServer = localWebServer.listen({
-        port: PORT,
-        https: false,
-        directory: context.publicDir,
-        spa: context.indexPageTemplate
-      });
-
-      await runBrowser(compilation);
-
+      console.info(`Serializing pages at ${serverAddress}`);
+      console.debug('pages to generate', `\n ${pages.map(page => page.path).join('\n ')}`);
+  
+      await runBrowser(serverAddress, pages, outputDir);
+      
+      console.info('done serializing all pages');
       browserRunner.close();
-      webServer.close();
 
       resolve();
     } catch (err) {
       reject(err);
     }
-
   });
 };

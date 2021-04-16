@@ -1,0 +1,10 @@
+{
+  "name": "test-import-node-modules",
+  "dependencies": {
+    "lit-element": "^2.4.0",
+    "lodash-es": "^4.17.20",
+    "pwa-helpers": "^0.9.1",
+    "redux": "^4.0.5",
+    "simpledotcss": "^1.0.0"
+  }
+}

@@ -25,7 +25,7 @@ class scroll extends LitElement {
       return Array.from(elements).filter((element) => {
         let el = RegExp(text, 'gmi').test(element.href);
         let href = element.href;
-        if (el && href.substr(href.length - text.length, href.length) === text) {
+        if (el && href.substr(href.length - text.length, href.length) === text && (el.tagName && el.tagName.toLowerCase() === 'h3')) {
           return el;
         }
       });
@@ -36,7 +36,7 @@ class scroll extends LitElement {
     // query hash text
     const heading = contains('a', hash)[0];
 
-    if (heading !== undefined) {
+    if (heading) {
       heading.scrollIntoView(true);
     }
   }
@@ -48,4 +48,4 @@ class scroll extends LitElement {
   }
 }
 
-customElements.define('eve-scroll', scroll);
+customElements.define('app-scroll', scroll);

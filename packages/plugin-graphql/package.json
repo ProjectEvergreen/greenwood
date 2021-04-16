@@ -1,0 +1,35 @@
+{
+  "name": "@greenwood/plugin-graphql",
+  "version": "0.10.0",
+  "description": "A plugin for using GraphQL for querying your content.",
+  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql",
+  "author": "Owen Buckley <owen@thegreenhouse.io>",
+  "license": "MIT",
+  "keywords": [
+    "Greenwood",
+    "GraphQL",
+    "Static Site Generator",
+    "NodeJS",
+    "Apollo"
+  ],
+  "main": "src/index.js",
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@greenwood/cli": "^0.4.0"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.3.11",
+    "@rollup/plugin-alias": "^3.1.2",
+    "apollo-server": "^2.21.0",
+    "graphql": "^15.5.0",
+    "graphql-tag": "^2.10.1"
+  },
+  "devDependencies": {
+    "@greenwood/cli": "^0.10.0"
+  }
+}

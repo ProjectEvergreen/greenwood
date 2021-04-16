@@ -11,8 +11,7 @@ const fs = require('fs');
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
-
-const mainBundleScriptRegex = /index.*.bundle\.js/;
+const { tagsMatch } = require('./utils');
 
 function publicDirectory(label) {
   describe(`Running Smoke Tests: ${label}`, function() {
@@ -25,62 +24,8 @@ function publicDirectory(label) {
         expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
 
-      it('should output a single 404.html file (not found page)', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './404.html'))).to.be.true;
-      });
-
-      it('should output one JS bundle file', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, './index.*.bundle.js'))).to.have.lengthOf(1);
-      });
-    });
-  });
-}
-
-function defaultNotFound(label) {
-  describe(`Running Smoke Tests: ${label}`, function() {
-    describe('404 (Not Found) page', function() {
-      let dom;
-
-      beforeEach(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, '404.html'));
-      });
-
-      it('should have one <script> tag in the <body> for the main bundle', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body script');
-        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
-
-          return mainBundleScriptRegex.test(src);
-        });
-
-        expect(bundledScript.length).to.be.equal(1);
-      });
-
-      it('should have no <script> tags for Apollo state', function() {
-        const scriptTags = dom.window.document.querySelectorAll('script');
-        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.getAttribute('data-state') === 'apollo';
-        });
-
-        expect(bundleScripts.length).to.be.equal(0);
-      });
-
-      it('should have no <script> tags in the <head>', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
-
-        expect(scriptTags.length).to.be.equal(0);
-      });
-
-      it('should have a <title> tag in the <head>', function() {
-        const title = dom.window.document.querySelector('head title').textContent;
-
-        expect(title).to.be.equal('404 - Not Found');
-      });
-
-      it('should have a <h1> tag in the <body>', function() {
-        const heading = dom.window.document.querySelector('body h1').textContent;
-
-        expect(heading).to.be.equal('404 Not Found');
+      it('should output one graph.json file', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'graph.json'))).to.have.lengthOf(1);
       });
     });
   });
@@ -89,107 +34,116 @@ function defaultNotFound(label) {
 function defaultIndex(label) {
   describe(`Running Smoke Tests: ${label}`, function() {
     describe('Index (Home) page', function() {
-      const indexPageHeading = 'Greenwood';
-      const indexPageBody = 'This is the home page built by Greenwood. Make your own pages in src/pages/index.js!';
       let dom;
+      let html;
 
-      beforeEach(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+      before(async function() {
+        const htmlPath = path.resolve(this.context.publicDir, 'index.html');
+
+        dom = await JSDOM.fromFile(htmlPath);
+        html = await fs.promises.readFile(htmlPath, 'utf-8');
       });
 
-      it('should have a <title> tag in the <head>', function() {
-        const title = dom.window.document.querySelector('head title').textContent;
-
-        expect(title).to.be.equal('My App');
-      });
-
-      it('should have one <script> tag in the <body> for the main bundle', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body > script');
-        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
-
-          return mainBundleScriptRegex.test(src);
+      describe('document <html>', function() {
+        it('should have an <html> tag with the DOCTYPE attribute', function() {
+          expect(html.indexOf('<!DOCTYPE html>')).to.be.equal(0);
         });
 
-        expect(bundledScript.length).to.be.equal(1);
-      });
-
-      it('should have one <script> tag in the <body> for the main bundle loaded with async', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body > script');
-        const bundledScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          const src = script.src.replace('file:///', '');
-
-          return mainBundleScriptRegex.test(src);
+        it('should have a <head> tag with the lang attribute on it', function() {
+          const htmlTag = dom.window.document.querySelectorAll('html');
+    
+          expect(htmlTag.length).to.equal(1);
+          expect(htmlTag[0].getAttribute('lang')).to.be.equal('en');
+          expect(htmlTag[0].getAttribute('prefix')).to.be.equal('og:http://ogp.me/ns#');
         });
 
-        expect(bundledScript[0].getAttribute('async')).to.be.equal('');
+        it('should have matching opening and closing <head> tags', function() {
+          expect(tagsMatch('<html>', html)).to.be.equal(true);
+        });
       });
 
-      it('should have one <script> tag for Apollo state', function() {
-        const scriptTags = dom.window.document.querySelectorAll('script');
-        const bundleScripts = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.getAttribute('data-state') === 'apollo';
+      describe('document <head>', function() {
+        let metaTags;
+
+        before(function() {
+          metaTags = dom.window.document.querySelectorAll('head > meta');
         });
 
-        expect(bundleScripts.length).to.be.equal(1);
+        it('should have matching opening and closing <head> tags in the <head>', function() {
+          // add an expclit > here to avoid conflicting with <header>
+          // which is used in a lot of test case scaffolding
+          expect(tagsMatch('head>', html)).to.be.equal(true);
+        });
+  
+        it('should have a <title> tag in the <head>', function() {
+          const title = dom.window.document.querySelector('head title').textContent;
+  
+          expect(title).to.not.be.undefined;
+        });
+
+        it('should have matching opening and closing <script> tags in the <head>', function() {
+          expect(tagsMatch('script', html)).to.be.equal(true);
+        });
+
+        it('should have matching opening and closing <link> tags in the <head>', function() {
+          const html = dom.window.document.querySelector('html').textContent;
+  
+          expect(tagsMatch('link', html)).to.be.equal(true);
+        });
+
+        // note: one will always be present when using puppeteer
+        it('should have matching opening and closing <style> tags in the <head>', function() {
+          expect(tagsMatch('style', html)).to.be.equal(true);
+        });
+
+        it('should have default viewport <meta> tag', function() {
+          const viewportMeta = metaTags[1];
+          
+          expect(viewportMeta.getAttribute('name')).to.be.equal('viewport');
+          expect(viewportMeta.getAttribute('content')).to.be.equal('width=device-width, initial-scale=1');
+        });
+
+        it('should have default charset <meta> tag', function() {
+          expect(metaTags[0].getAttribute('charset')).to.be.equal('utf-8');
+        });
       });
 
-      it('should have a router outlet tag in the <body>', function() {
-        const outlet = dom.window.document.querySelectorAll('body eve-app');
+      describe('document <body>', function() {
+        it('should have no <script> tags in the <body>', function() {
+          const bodyScripts = dom.window.document.querySelectorAll('body script');
+  
+          expect(bodyScripts.length).to.be.equal(0);
+        });
+  
+        it('should have no <link> tags in the <body>', function() {
+          const bodyLinks = dom.window.document.querySelectorAll('body link');
+  
+          expect(bodyLinks.length).to.be.equal(0);
+        });
+  
+        it('should have no <style> tags in the <body>', function() {
+          const bodyStyles = dom.window.document.querySelectorAll('body style');
+  
+          expect(bodyStyles.length).to.be.equal(0);
+        });
+  
+        it('should have no <meta> tags in the <body>', function() {
+          const bodyMetas = dom.window.document.querySelectorAll('body meta');
+  
+          expect(bodyMetas.length).to.be.equal(0);
+        });
 
-        expect(outlet.length).to.be.equal(1);
-      });
+        it('should have no <content-outlet> tags in the <body>', function() {
+          const contentOutlet = dom.window.document.querySelectorAll('body content-outlet');
+  
+          expect(contentOutlet.length).to.be.equal(0);
+        });
 
-      it('should have the correct route tags in the <body>', function() {
-        const routes = dom.window.document.querySelectorAll('body lit-route');
-
-        expect(routes.length).to.be.equal(3);
-      });
-
-      it('should have the expected heading text within the index page in the public directory', function() {
-        const heading = dom.window.document.querySelector('h3').textContent;
-
-        expect(heading).to.equal(indexPageHeading);
-      });
-
-      it('should have the expected paragraph text within the index page in the public directory', function() {
-        const paragraph = dom.window.document.querySelector('p').textContent;
-
-        expect(paragraph).to.equal(indexPageBody);
-      });
-    });
-  });
-}
-
-function defaultHelloPage(label) {
-  describe(`Running Smoke Tests: ${label}`, function() {
-    describe('Hello World (dummy) page', function() {
-      const helloPageHeading = 'Hello World';
-      const helloPageBody = 'This is an example page built by Greenwood.  Make your own in src/pages!';
-      let dom;
-
-      beforeEach(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './hello', './index.html'));
-      });
-
-      it('should output a hello page directory', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './hello'))).to.be.true;
-      });
-
-      it('should output an index.html file within the default hello page directory', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './hello', './index.html'))).to.be.true;
-      });
-
-      it('should have the expected heading text within the hello example page in the hello directory', function() {
-        const heading = dom.window.document.querySelector('h3').textContent;
-
-        expect(heading).to.equal(helloPageHeading);
-      });
-
-      it('should have the expected paragraph text within the hello example page in the hello directory', function() {
-        let paragraph = dom.window.document.querySelector('p').textContent;
-
-        expect(paragraph).to.equal(helloPageBody);
+        it('should have no <page-outlet> tags in the <body>', function() {
+          const pageOutlet = dom.window.document.querySelectorAll('body page-outlet');
+  
+          expect(pageOutlet.length).to.be.equal(0);
+        });
       });
     });
   });
@@ -200,20 +154,14 @@ module.exports = runSmokeTest = async function(testCases, label) {
   testCases.forEach(async (testCase) => {
     switch (testCase) {
 
-      case 'not-found':
-        defaultNotFound(label);
-        break;
       case 'index':
         defaultIndex(label);
-        break;
-      case 'hello':
-        defaultHelloPage(label);
         break;
       case 'public':
         publicDirectory(label);
         break;
       default:
-        console.log(`unknown case ${testCase}`); // eslint-disable-line no-console
+        console.warn(`unknown case ${testCase}`);
         break;
 
     }

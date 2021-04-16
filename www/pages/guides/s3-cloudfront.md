@@ -71,7 +71,7 @@ jobs:
          sh ./.github/workflows/chromium-lib-install.sh
       - uses: actions/setup-node@v1
         with:
-          node-version: "10.x"
+          node-version: "12.x"
       - name: Install deps
         run: npm install
       - name: Build docs
@@ -79,8 +79,8 @@ jobs:
       - name: Publish to AWS S3
         uses: opspresso/action-s3-sync@master
         env:
-          AWS_ACCESS_KEY_ID: \$\{\{ secrets\.AWS_SECRET_ACCESS_KEY_ID \}\}
-          AWS_SECRET_ACCESS_KEY: \$\{\{ secrets\.AWS_SECRET_ACCESS_KEY \}\}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_SECRET_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: "us-east-2"
           FROM_PATH: "./public"
           DEST_PATH: "s3://your-s3-bucket-name" #your target s3 bucket name goes here

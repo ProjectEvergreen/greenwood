@@ -1,21 +1,19 @@
-const fs = require('fs-extra');
+const fs = require('fs');
 const path = require('path');
-const url = require('url');
 
-const optimizations = ['strict', 'spa'];
+const modes = ['ssg', 'mpa'];
+const optimizations = ['default', 'none', 'static', 'inline'];
 
-let defaultConfig = {
+const defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {
-    port: 1984,
-    host: 'localhost'
+    port: 1984
   },
-  optimization: 'spa',
-  publicPath: '/',
+  mode: modes[0],
+  optimization: optimizations[0],
   title: 'My App',
   meta: [],
   plugins: [],
-  themeFile: 'theme.css',
   markdown: { plugins: [], settings: {} }
 };
 
@@ -25,10 +23,10 @@ module.exports = readAndMergeConfig = async() => {
     try {
       // deep clone of default config
       let customConfig = Object.assign({}, defaultConfig);
-
-      if (await fs.exists(path.join(process.cwd(), 'greenwood.config.js'))) {
+      
+      if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, optimization, publicPath, title, meta, plugins, themeFile, markdown } = userCfgFile;
+        const { workspace, devServer, title, markdown, meta, mode, optimization, plugins } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -46,7 +44,7 @@ module.exports = readAndMergeConfig = async() => {
             customConfig.workspace = workspace;
           }
 
-          if (!await fs.exists(customConfig.workspace)) {
+          if (!fs.existsSync(customConfig.workspace)) {
             reject('Error: greenwood.config.js workspace doesn\'t exist! \n' +
               'common issues to check might be: \n' +
               '- typo in your workspace directory name, or in greenwood.config.js \n' +
@@ -62,17 +60,14 @@ module.exports = readAndMergeConfig = async() => {
           customConfig.title = title;
         }
 
-        if (publicPath) {
-          if (typeof publicPath !== 'string') {
-            reject('Error: greenwood.config.js publicPath must be a string');
-          } else {
-            customConfig.publicPath = publicPath;
-            // console.log('custom publicPath provided => ', customConfig.publicPath);
-          }
-        }
-
         if (meta && meta.length > 0) {
           customConfig.meta = meta;
+        }
+
+        if (typeof mode === 'string' && modes.indexOf(mode.toLowerCase()) >= 0) {
+          customConfig.mode = mode;
+        } else if (mode) {
+          reject(`Error: provided mode "${mode}" is not supported.  Please use one of: ${modes.join(', ')}.`);
         }
 
         if (typeof optimization === 'string' && optimizations.indexOf(optimization.toLowerCase()) >= 0) {
@@ -82,7 +77,7 @@ module.exports = readAndMergeConfig = async() => {
         }
 
         if (plugins && plugins.length > 0) {
-          const types = ['index', 'webpack'];
+          const types = ['resource', 'rollup', 'server'];
 
           plugins.forEach(plugin => {
             if (!plugin.type || types.indexOf(plugin.type) < 0) {
@@ -92,31 +87,20 @@ module.exports = readAndMergeConfig = async() => {
             if (!plugin.provider || typeof plugin.provider !== 'function') {
               const providerTypeof = typeof plugin.provider;
 
-              reject(`Error: greenwood.config.js plugins provider must of type function. got ${providerTypeof} instead.`);
+              reject(`Error: greenwood.config.js plugins provider must be a function. got ${providerTypeof} instead.`);
+            }
+
+            if (!plugin.name || typeof plugin.name !== 'string') {
+              const nameTypeof = typeof plugin.name;
+
+              reject(`Error: greenwood.config.js plugins must have a name. got ${nameTypeof} instead.`);
             }
           });
 
           customConfig.plugins = customConfig.plugins.concat(plugins);
         }
 
-        if (themeFile) {
-          if (typeof themeFile !== 'string' && themeFile.indexOf('.') < 1) {
-            reject(`Error: greenwood.config.js themeFile must be a valid filename. got ${themeFile} instead.`);
-          }
-          customConfig.themeFile = themeFile;
-        }
-
         if (devServer && Object.keys(devServer).length > 0) {
-
-          if (devServer.host) {
-            // eslint-disable-next-line max-depth
-            if (url.parse(devServer.host).pathname === null) {
-              reject(`Error: greenwood.config.js devServer host type must be a valid pathname.  Passed value was: ${devServer.host}`);
-            } else {
-              customConfig.devServer.host = devServer.host;
-              // console.log(`custom host provided => ${customConfig.devServer.host}`);
-            }
-          }
 
           if (devServer.port) {
             // eslint-disable-next-line max-depth
@@ -124,7 +108,6 @@ module.exports = readAndMergeConfig = async() => {
               reject(`Error: greenwood.config.js devServer port must be an integer.  Passed value was: ${devServer.port}`);
             } else {
               customConfig.devServer.port = devServer.port;
-              // console.log(`custom port provided => ${customConfig.devServer.port}`);
             }
           }
         }
