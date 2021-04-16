@@ -20,13 +20,13 @@ function getDevServer(compilation) {
   const resources = [
     // Greenwood default standard resource and import plugins
     pluginUserWorkspace.provider(compilation),
-    pluginNodeModules.provider(compilation),
+    pluginNodeModules[0].provider(compilation),
     pluginResourceStandardCss.provider(compilationCopy),
     pluginResourceStandardFont.provider(compilationCopy),
     pluginResourceStandardHtml.provider(compilationCopy),
     pluginResourceStandardImage.provider(compilationCopy),
-    pluginResourceStandardJavaScript.provider(compilationCopy),
-    pluginResourceStandardJson.provider(compilationCopy),
+    pluginResourceStandardJavaScript[0].provider(compilationCopy),
+    pluginResourceStandardJson[0].provider(compilationCopy),
     pluginResourceOptimizationMpa().provider(compilationCopy),
 
     // custom user resource plugins

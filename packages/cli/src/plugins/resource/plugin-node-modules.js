@@ -6,6 +6,8 @@
 const acorn = require('acorn');
 const fs = require('fs');
 const path = require('path');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
+const replace = require('@rollup/plugin-replace');
 const { ResourceInterface } = require('../../lib/resource-interface');
 const walk = require('acorn-walk');
 
@@ -253,8 +255,19 @@ class NodeModulesResource extends ResourceInterface {
   }
 }
 
-module.exports = {
+module.exports = [{
   type: 'resource',
-  name: 'plugin-node-modules',
+  name: 'plugin-node-modules:resource',
   provider: (compilation, options) => new NodeModulesResource(compilation, options)
-};
+}, {
+  type: 'rollup',
+  name: 'plugin-node-modules:rollup',
+  provider: () => {
+    return [
+      replace({ // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
+        'process.env.NODE_ENV': JSON.stringify('production')
+      }),
+      nodeResolve()
+    ];
+  }
+}];
