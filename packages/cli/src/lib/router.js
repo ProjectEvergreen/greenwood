@@ -1,16 +1,16 @@
 /* eslint-disable no-underscore-dangle */
 document.addEventListener('click', function(e) {
-  // https://stackoverflow.com/a/3809435/417806
-  const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
-  const href = e.path && e.path[0]
+  const href = (e.path && e.path[0]
     ? e.path[0].href // chrome + edge
     : e.originalTarget && e.originalTarget.href
       ? e.originalTarget.href // firefox
-      : '';
-  // we only want to handle links like /about/ and /docs/ to trigger client side routing
-  const isUrl = href && href.match(urlRegex);
-  const canClientSideRoute = href && href !== '' && !isUrl;
-  
+      : '') || '';
+  // best case "guess" is that if the link originates on the current site when resolved by the browser
+  // treat it as a client side route, ex:  /about/, /docs/ and trigger the client side router
+  // https://github.com/ProjectEvergreen/greenwood/issues/562
+  const isOnCurrentDomain = href.indexOf(window.location.hostname) >= 0 || href.indexOf('localhost') >= 0;
+  const canClientSideRoute = href !== '' && isOnCurrentDomain;
+
   if (canClientSideRoute) {
     e.preventDefault();
     
