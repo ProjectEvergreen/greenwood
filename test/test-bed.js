@@ -26,16 +26,19 @@ module.exports = class TestBed {
     this.enableStdOut = enableStdOut; // debugging tests
   }
 
-  setupTestBed(cwd, testFiles = []) {
+  setupTestBed(cwd, testFiles = [], useSetupFiles = true) {
     return new Promise(async (resolve, reject) => {
       try {
         this.rootDir = cwd;
         this.publicDir = path.join(this.rootDir, 'public');
         this.buildDir = path.join(this.rootDir, '.greenwood');
+        const allSetupFiles = useSetupFiles 
+          ? setupFiles.concat(testFiles)
+          : [].concat(testFiles);
 
         await this.teardownTestBed();
 
-        await Promise.all(setupFiles.concat(testFiles).map((file) => {
+        await Promise.all(allSetupFiles.map((file) => {
           return new Promise(async (resolve, reject) => {
             try {
               const targetSrc = path.join(process.cwd(), file.dir, file.name);
