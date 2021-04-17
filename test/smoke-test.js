@@ -57,8 +57,8 @@ function defaultIndex(label) {
           expect(htmlTag[0].getAttribute('prefix')).to.be.equal('og:http://ogp.me/ns#');
         });
 
-        it('should have matching opening and closing <head> tags', function() {
-          expect(tagsMatch('<html>', html)).to.be.equal(true);
+        it('should have matching opening and closing <html> tags', function() {
+          expect(tagsMatch('html', html, 1)).to.be.equal(true);
         });
       });
 
@@ -72,7 +72,7 @@ function defaultIndex(label) {
         it('should have matching opening and closing <head> tags in the <head>', function() {
           // add an expclit > here to avoid conflicting with <header>
           // which is used in a lot of test case scaffolding
-          expect(tagsMatch('head>', html)).to.be.equal(true);
+          expect(tagsMatch('head>', html, 1)).to.be.equal(true);
         });
   
         it('should have a <title> tag in the <head>', function() {
@@ -109,6 +109,10 @@ function defaultIndex(label) {
       });
 
       describe('document <body>', function() {
+        it('should have matching opening and closing <body> tags', function() {
+          expect(tagsMatch('body', html, 1)).to.be.equal(true);
+        });
+
         it('should have no <script> tags in the <body>', function() {
           const bodyScripts = dom.window.document.querySelectorAll('body script');
   
