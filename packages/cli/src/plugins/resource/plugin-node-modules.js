@@ -184,11 +184,6 @@ class NodeModulesResource extends ResourceInterface {
         const fullUrl = path.extname(url) === ''
           ? `${url}.js`
           : url;
-        // const fullUrl = path.extname(url) === ''
-        //   ? fs.existsSync(`${url}.mjs`) // test for .mjs first
-        //     ? `${url}.mjs`
-        //     : `${url}.js`
-        //   : url;
         const body = await fs.promises.readFile(fullUrl);
 
         resolve({
@@ -208,7 +203,7 @@ class NodeModulesResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise((resolve, reject) => {
       try {
-        const { userWorkspace } = this.compilation.context;
+        const { userWorkspace, projectDirectory } = this.compilation.context;
         let newContents = body;
         const hasHead = body.match(/\<head>(.*)<\/head>/s);
 
@@ -228,7 +223,11 @@ class NodeModulesResource extends ResourceInterface {
           : fs.existsSync(`${process.cwd()}/package.json`)
             ? require(path.join(process.cwd(), 'package.json'))
             : {};
-
+        const esShimsFilename = '/node_modules/es-module-shims/dist/es-module-shims.js';
+        const esShimsPath = fs.existsSync(path.join(projectDirectory, esShimsFilename))
+          ? esShimsFilename
+          : 'https://unpkg.com/es-module-shims@0.5.2/dist/es-module-shims.js';
+        
         // walk the project's pacakge.json for all its direct dependencies
         // for each entry found in dependencies, find its entry point
         // then walk its entry point (e.g. index.js) for imports / exports to add to the importMap
@@ -237,7 +236,7 @@ class NodeModulesResource extends ResourceInterface {
 
         newContents = newContents.replace('<head>', `
           <head>
-            <script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>
+            <script defer src="${esShimsPath}"></script>
             <script type="importmap-shim">
               {
                 "imports": ${JSON.stringify(importMap, null, 1)}

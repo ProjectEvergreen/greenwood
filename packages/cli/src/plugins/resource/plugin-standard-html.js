@@ -143,11 +143,16 @@ const getAppTemplate = (contents, userWorkspace) => {
   return appTemplateContents;
 };
 
-const getUserScripts = (contents) => {
+const getUserScripts = (contents, projectDirectory) => {
   if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
+    const wcBundleFilename = '/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js';
+    const wcBundlePath = fs.existsSync(path.join(projectDirectory, wcBundleFilename))
+      ? wcBundleFilename
+      : 'https://unpkg.com/@webcomponents/webcomponentsjs@2.4.4/webcomponents-bundle.js';
+
     contents = contents.replace('<head>', `
       <head>
-        <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+        <script src="${wcBundlePath}"></script>
     `);
   }
   return contents;
@@ -210,7 +215,7 @@ class StandardHtmlResource extends ResourceInterface {
     return new Promise(async (resolve, reject) => {
       try {
         const config = Object.assign({}, this.compilation.config);
-        const { userWorkspace } = this.compilation.context;
+        const { userWorkspace, projectDirectory } = this.compilation.context;
         const normalizedUrl = this.getRelativeUserworkspaceUrl(url);
         let body = '';
         let template = null;
@@ -270,7 +275,7 @@ class StandardHtmlResource extends ResourceInterface {
         
         body = getPageTemplate(barePath, userWorkspace, template);
         body = getAppTemplate(body, userWorkspace);
-        body = getUserScripts(body);
+        body = getUserScripts(body, projectDirectory);
         body = getMetaContent(normalizedUrl, config, body);
         
         if (processedMarkdown) {
@@ -306,9 +311,9 @@ class StandardHtmlResource extends ResourceInterface {
         if (hasHead && hasHead.length > 0) {
           let contents = hasHead[0];
 
-          contents = contents.replace(/<script src="\/node_modules\/@webcomponents\/webcomponentsjs\/webcomponents-bundle.js"><\/script>/, '');
+          contents = contents.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
           contents = contents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
-          contents = contents.replace(/<script defer="" src="\/node_modules\/es-module-shims\/dist\/es-module-shims.js"><\/script>/, '');
+          contents = contents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
           contents = contents.replace(/type="module-shim"/g, 'type="module"');
 
           body = body.replace(/\<head>(.*)<\/head>/s, `
