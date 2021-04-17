@@ -8,3 +8,5 @@ imports:
 ## Counter Page Example
 
 <x-counter></x-counter>
+
+<app-header>I am a header</app-header>

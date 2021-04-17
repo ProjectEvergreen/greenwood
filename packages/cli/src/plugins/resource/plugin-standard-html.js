@@ -309,18 +309,19 @@ class StandardHtmlResource extends ResourceInterface {
         body = getMetaContent(normalizedUrl, config, body);
         
         if (processedMarkdown) {
-          // TODO this obviously a contrived regex example
-          // but my regex skills are poo and everything I wrote hung the browser :/
-          const wrappedCustomElementRegex = /<p><x-counter>(.*)<\/x-counter><\/p>/sg;
+          const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z]*>(.*)<\/[a-zA-Z]*-[a-zA-Z]*><\/p>/g;
           const ceTest = wrappedCustomElementRegex.test(processedMarkdown.contents);
 
           if (ceTest) {
             const ceMatches = processedMarkdown.contents.match(wrappedCustomElementRegex);
-            const stripWrappingTags = ceMatches[0]
-              .replace('<p>', '')
-              .replace('</p>', '');
 
-            processedMarkdown.contents = processedMarkdown.contents.replace(ceMatches[0], stripWrappingTags);
+            ceMatches.forEach((match) => {
+              const stripWrappingTags = match
+                .replace('<p>', '')
+                .replace('</p>', '');
+
+              processedMarkdown.contents = processedMarkdown.contents.replace(match, stripWrappingTags);
+            });
           }
 
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);

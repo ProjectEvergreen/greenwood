@@ -70,25 +70,50 @@ describe('Build Greenwood With: ', function() {
         expect(jsFiles).to.have.lengthOf(1);
       });
 
-      it('should output a custom element tag that is _not_ wrapped in a <p> tag', function() {
-        expect((/<p><x-counter>/).test(html)).to.be.false;
-        expect((/<\/x-counter><\/p>/).test(html)).to.be.false;
-      });
-
-      it('should output a heading tag from the custom element', function() {
-        const heading = dom.window.document.querySelectorAll('body h3');
+      it('should a page heading', function() {
+        const heading = dom.window.document.querySelectorAll('body h2');
 
         expect(heading.length).to.be.equal(1);
-        expect(heading[0].textContent).to.be.equal('My Counter');
+        expect(heading[0].textContent).to.be.equal('Counter Page Example');
       });
 
-      // JSDOM may not support this case of computing styles when using a <link> tag?
-      // https://github.com/jsdom/jsdom/issues/2986
-      xit('should have the color style for the output element', function() {
-        const output = dom.window.document.querySelector('body ~ h2');
-        const computedStyle = dom.window.getComputedStyle(output);
+      describe('Counter component from front matter', () => {
+        it('should output a custom x-counter tag that', function() {
+          const counter = dom.window.document.querySelectorAll('body x-counter');
+  
+          expect(counter.length).to.be.equal(1);
+        });
+  
+        it('should output a custom element tag that is _not_ wrapped in a <p> tag', function() {
+          expect((/<p><x-counter>/).test(html)).to.be.false;
+          expect((/<\/x-counter><\/p>/).test(html)).to.be.false;
+        });
+  
+        it('should output a heading tag from the custom element', function() {
+          const heading = dom.window.document.querySelectorAll('body h3');
+  
+          expect(heading.length).to.be.equal(1);
+          expect(heading[0].textContent).to.be.equal('My Counter');
+        });
+      });
 
-        expect(computedStyle.color).to.equal('red');
+      describe('Custom header component', () => {
+        it('should output a custom app-header tag that', function() {
+          const header = dom.window.document.querySelectorAll('body app-header');
+  
+          expect(header.length).to.be.equal(1);
+        });
+  
+        it('should output a app-header element tag that is _not_ wrapped in a <p> tag', function() {
+          expect((/<p><app-header>/).test(html)).to.be.false;
+          expect((/<\/app-header><\/p>/).test(html)).to.be.false;
+        });
+  
+        it('should output a <app-header> tag with expected content', function() {
+          const header = dom.window.document.querySelectorAll('body app-header');
+  
+          expect(header[0].textContent).to.be.equal('I am a header');
+        });
       });
     });
   });
