@@ -309,7 +309,7 @@ class StandardHtmlResource extends ResourceInterface {
         body = getMetaContent(normalizedUrl, config, body);
         
         if (processedMarkdown) {
-          const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z]*>(.*)<\/[a-zA-Z]*-[a-zA-Z]*><\/p>/g;
+          const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
           const ceTest = wrappedCustomElementRegex.test(processedMarkdown.contents);
 
           if (ceTest) {

@@ -77,14 +77,14 @@ describe('Build Greenwood With: ', function() {
         expect(heading[0].textContent).to.be.equal('Counter Page Example');
       });
 
-      describe('Counter component from front matter', () => {
-        it('should output a custom x-counter tag that', function() {
+      describe('Counter <x-counter> component from front matter', () => {
+        it('should output a custom <x-counter> tag that', function() {
           const counter = dom.window.document.querySelectorAll('body x-counter');
   
           expect(counter.length).to.be.equal(1);
         });
   
-        it('should output a custom element tag that is _not_ wrapped in a <p> tag', function() {
+        it('should output a custom <x-counter> tag that is _not_ wrapped in a <p> tag', function() {
           expect((/<p><x-counter>/).test(html)).to.be.false;
           expect((/<\/x-counter><\/p>/).test(html)).to.be.false;
         });
@@ -97,14 +97,14 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
-      describe('Custom header component', () => {
-        it('should output a custom app-header tag that', function() {
+      describe('Custom <app-header> component', () => {
+        it('should output a custom <app-header> tag that', function() {
           const header = dom.window.document.querySelectorAll('body app-header');
   
           expect(header.length).to.be.equal(1);
         });
   
-        it('should output a app-header element tag that is _not_ wrapped in a <p> tag', function() {
+        it('should output a <app-header> tag that is _not_ wrapped in a <p> tag', function() {
           expect((/<p><app-header>/).test(html)).to.be.false;
           expect((/<\/app-header><\/p>/).test(html)).to.be.false;
         });
@@ -113,6 +113,19 @@ describe('Build Greenwood With: ', function() {
           const header = dom.window.document.querySelectorAll('body app-header');
   
           expect(header[0].textContent).to.be.equal('I am a header');
+        });
+      });
+
+      describe('Custom Multihypen component', () => {
+        it('should output a custom <multihyphen-custom-element> tag that', function() {
+          const header = dom.window.document.querySelectorAll('body multihyphen-custom-element');
+  
+          expect(header.length).to.be.equal(1);
+        });
+  
+        it('should output a <multihyphen-custom-element> tag that is _not_ wrapped in a <p> tag', function() {
+          expect((/<p><multihyphen-custom-element>/).test(html)).to.be.false;
+          expect((/<\/multihyphen-custom-element><\/p>/).test(html)).to.be.false;
         });
       });
     });

@@ -10,3 +10,5 @@ imports:
 <x-counter></x-counter>
 
 <app-header>I am a header</app-header>
+
+<multihyphen-custom-element></multihyphen-custom-element>
