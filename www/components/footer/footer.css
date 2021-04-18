@@ -17,5 +17,9 @@
       color: white;
       text-decoration: none;
     }
+
+    & span.separator {
+      color: white;
+    }
   }
 }
