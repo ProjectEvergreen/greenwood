@@ -1,5 +1,4 @@
 const path = require('path');
-const pluginGoogleAnalytics = require('@greenwood/plugin-google-analytics');
 const pluginGraphQL = require('@greenwood/plugin-graphql');
 const pluginImportCss = require('@greenwood/plugin-import-css');
 const pluginImportJson = require('@greenwood/plugin-import-json');
@@ -27,9 +26,6 @@ module.exports = {
     { name: 'google-site-verification', content: '4rYd8k5aFD0jDnN0CCFgUXNe4eakLP4NnA18mNnK5P0' }
   ],
   plugins: [
-    pluginGoogleAnalytics({
-      analyticsId: 'UA-147204327-1'
-    }),
     ...pluginGraphQL(),
     pluginPolyfills(),
     pluginPostCss(),
