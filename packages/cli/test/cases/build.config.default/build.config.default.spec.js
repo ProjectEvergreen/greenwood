@@ -16,6 +16,7 @@
  */
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
+const { getSetupFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
@@ -24,7 +25,7 @@ describe('Build Greenwood With: ', function() {
   const outputPath = path.join(__dirname, 'output');
   let runner;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
@@ -33,14 +34,7 @@ describe('Build Greenwood With: ', function() {
 
   describe(LABEL, function() {
     before(async function() {
-      await runner.setup(outputPath, [{
-        source: path.join(process.cwd(), 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js'),
-        destination: path.join(outputPath, 'node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js')
-      }, {
-        source: path.join(process.cwd(), 'node_modules/es-module-shims/dist/es-module-shims.js'),
-        destination: path.join(outputPath, 'node_modules/es-module-shims/dist/es-module-shims.js')
-      }]);
-
+      await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });
 

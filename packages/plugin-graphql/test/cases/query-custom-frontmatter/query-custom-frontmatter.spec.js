@@ -29,71 +29,76 @@ const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
-const TestBed = require('../../../../../test/test-bed');
+const { getSetupFiles } = require('../../../../../test/utils');
+const Runner = require('gallinago').Runner;
 
-describe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', async function() {
   const LABEL = 'Custom GraphQuery for Front Matter from GraphQL';
   const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
-  let setup;
+  const greenwoodGraphqlCoreLibs = (await glob(`${process.cwd()}/packages/plugin-graphql/src/core/*.js`)).map((lib) => {
+    return {
+      dir: 'node_modules/@greenwood/plugin-graphql/src/core/',
+      name: path.basename(lib)
+    };
+  });
+  const greenwoodGraphqlQueryLibs = (await glob(`${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`)).map((lib) => {
+    return {
+      dir: 'node_modules/@greenwood/plugin-graphql/src/queries/',
+      name: path.basename(lib)
+    };
+  });
+  const litElementLibs = (await glob(`${process.cwd()}/node_modules/lit-element/lib/*.js`)).map((lib) => {
+    return {
+      dir: 'node_modules/lit-element/lib/',
+      name: path.basename(lib)
+    };
+  });
+  const litHtmlLibs = (await glob(`${process.cwd()}/node_modules/lit-html/lib/*.js`)).map((lib) => {
+    return {
+      dir: 'node_modules/lit-html/lib/',
+      name: path.basename(lib)
+    };
+  });
+  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+  const outputPath = path.join(__dirname, 'output');
+  let runner;
 
-  before(async function() {
-    setup = new TestBed();
-
-    const greenwoodGraphqlCoreLibs = (await glob(`${process.cwd()}/packages/plugin-graphql/src/core/*.js`)).map((lib) => {
-      return {
-        dir: 'node_modules/@greenwood/plugin-graphql/src/core/',
-        name: path.basename(lib)
-      };
-    });
-    const greenwoodGraphqlQueryLibs = (await glob(`${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`)).map((lib) => {
-      return {
-        dir: 'node_modules/@greenwood/plugin-graphql/src/queries/',
-        name: path.basename(lib)
-      };
-    });
-    const litElementLibs = (await glob(`${process.cwd()}/node_modules/lit-element/lib/*.js`)).map((lib) => {
-      return {
-        dir: 'node_modules/lit-element/lib/',
-        name: path.basename(lib)
-      };
-    });
-    const litHtmlLibs = (await glob(`${process.cwd()}/node_modules/lit-html/lib/*.js`)).map((lib) => {
-      return {
-        dir: 'node_modules/lit-html/lib/',
-        name: path.basename(lib)
-      };
-    });
-
-    this.context = await setup.setupTestBed(__dirname, [
-      ...greenwoodGraphqlCoreLibs,
-      ...greenwoodGraphqlQueryLibs, 
-      {
-        // lit-element (+ lit-html)
-        dir: 'node_modules/lit-element/',
-        name: 'lit-element.js'
-      }, {
-        dir: 'node_modules/lit-element/',
-        name: 'package.json'
-      },
-
-      ...litElementLibs, 
-      
-      {
-        dir: 'node_modules/lit-html/',
-        name: 'lit-html.js'
-      }, {
-        dir: 'node_modules/lit-html/',
-        name: 'package.json'
-      },
-      
-      ...litHtmlLibs
-    ]);
+  before(function() {
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
+    };
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
 
     before(async function() {
-      await setup.runGreenwoodCommand('build');
+      await runner.setup(outputPath, [
+        ...getSetupFiles(outputPath),
+        ...greenwoodGraphqlCoreLibs,
+        ...greenwoodGraphqlQueryLibs, 
+        {
+          // lit-element (+ lit-html)
+          dir: 'node_modules/lit-element/',
+          name: 'lit-element.js'
+        }, {
+          dir: 'node_modules/lit-element/',
+          name: 'package.json'
+        },
+
+        ...litElementLibs, 
+        
+        {
+          dir: 'node_modules/lit-html/',
+          name: 'lit-html.js'
+        }, {
+          dir: 'node_modules/lit-html/',
+          name: 'package.json'
+        },
+        
+        ...litHtmlLibs
+      ]);
+      await runner.runCommand(cliPath, 'build');
     });
 
     runSmokeTest(['public', 'index'], LABEL);
@@ -171,7 +176,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    setup.teardownTestBed();
+    runner.teardown();
   });
 
 });

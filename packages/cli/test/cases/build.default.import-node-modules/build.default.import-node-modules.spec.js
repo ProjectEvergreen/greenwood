@@ -22,133 +22,139 @@ const expect = require('chai').expect;
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
-const TestBed = require('../../../../../test/test-bed');
+const { getSetupFiles } = require('../../../../../test/utils');
+const Runner = require('gallinago').Runner;
 
-describe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', async function() {
   const LABEL = 'Importing packages from node modules';
-
-  let setup;
+  const litElementLibs = (await glob(`${process.cwd()}/node_modules/lit-element/lib/*.js`)).map((lib) => {
+    return {
+      dir: 'node_modules/lit-element/lib/',
+      name: path.basename(lib)
+    };
+  });
+  const litHtmlLibs = (await glob(`${process.cwd()}/node_modules/lit-html/lib/*.js`)).map((lib) => {
+    return {
+      dir: 'node_modules/lit-html/lib/',
+      name: path.basename(lib)
+    };
+  });
+  const lodashLibs = (await glob(`${process.cwd()}/node_modules/lodash-es/*.js`)).map((lib) => {
+    return {
+      dir: 'node_modules/lodash-es/',
+      name: path.basename(lib)
+    };
+  });
+  const pwaHelpersLibs = (await glob(`${process.cwd()}/node_modules/pwa-helpers/*.js`)).map((lib) => {
+    return {
+      dir: 'node_modules/pwa-helpers/',
+      name: path.basename(lib)
+    };
+  });
+  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+  const outputPath = path.join(__dirname, 'output');
+  let runner;
 
   before(async function() {
-    setup = new TestBed();
-
-    const litElementLibs = (await glob(`${process.cwd()}/node_modules/lit-element/lib/*.js`)).map((lib) => {
-      return {
-        dir: 'node_modules/lit-element/lib/',
-        name: path.basename(lib)
-      };
-    });
-    const litHtmlLibs = (await glob(`${process.cwd()}/node_modules/lit-html/lib/*.js`)).map((lib) => {
-      return {
-        dir: 'node_modules/lit-html/lib/',
-        name: path.basename(lib)
-      };
-    });
-    const lodashLibs = (await glob(`${process.cwd()}/node_modules/lodash-es/*.js`)).map((lib) => {
-      return {
-        dir: 'node_modules/lodash-es/',
-        name: path.basename(lib)
-      };
-    });
-    const pwaHelpersLibs = (await glob(`${process.cwd()}/node_modules/pwa-helpers/*.js`)).map((lib) => {
-      return {
-        dir: 'node_modules/pwa-helpers/',
-        name: path.basename(lib)
-      };
-    });
-
-    this.context = await setup.setupTestBed(__dirname, [{
-      // redux
-      dir: 'node_modules/redux/es',
-      name: 'redux.mjs'
-    }, {
-      dir: 'node_modules/redux/',
-      name: 'package.json'
-    }, {
-      dir: 'node_modules/loose-envify/',
-      name: 'index.js'
-    }, {
-      dir: 'node_modules/loose-envify/',
-      name: 'package.json'
-    }, {
-      dir: 'node_modules/js-tokens/',
-      name: 'index.js'
-    }, {
-      dir: 'node_modules/js-tokens/',
-      name: 'package.json'
-    }, {
-      dir: 'node_modules/symbol-observable/es/',
-      name: 'index.js'
-    }, {
-      dir: 'node_modules/symbol-observable/es/',
-      name: 'ponyfill.js'
-    }, {
-      dir: 'node_modules/symbol-observable/',
-      name: 'package.json'
-    }, {
-
-      // lit-element (+ lit-html)
-      dir: 'node_modules/lit-element/',
-      name: 'lit-element.js'
-    }, {
-      dir: 'node_modules/lit-element/',
-      name: 'package.json'
-    },
-
-    ...litElementLibs, 
-    
-    {
-      dir: 'node_modules/lit-html/',
-      name: 'lit-html.js'
-    }, {
-      dir: 'node_modules/lit-html/',
-      name: 'package.json'
-    },
-    
-    ...litHtmlLibs,
-    
-    {
-      // lodash-es
-      dir: 'node_modules/lodash-es/',
-      name: 'lodash.js'
-    }, {
-      dir: 'node_modules/lodash-es/',
-      name: 'package.json'
-    },
-
-    ...lodashLibs,
-
-    {
-      // pwa-helpers
-      dir: 'node_modules/pwa-helpers/',
-      name: 'package.json'
-    },
-
-    ...pwaHelpersLibs,
-
-    {
-      // prism.css
-      dir: 'node_modules/prismjs/themes/',
-      name: 'prism-tomorrow.css'
-    },
-
-    {
-      // simple.css - included as a non-JavaScript package
-      // https://github.com/ProjectEvergreen/greenwood/issues/484
-      dir: 'node_modules/simpledotcss/',
-      name: 'package.json'
-    },
-    {
-      dir: 'node_modules/simpledotcss/',
-      name: 'simple.css'
-    }]);
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
+    };
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
     let dom;
 
     before(async function() {
-      await setup.runGreenwoodCommand('build');
+      await runner.setup(outputPath, [
+        ...getSetupFiles(outputPath),
+        {
+          // redux
+          dir: 'node_modules/redux/es',
+          name: 'redux.mjs'
+        }, {
+          dir: 'node_modules/redux/',
+          name: 'package.json'
+        }, {
+          dir: 'node_modules/loose-envify/',
+          name: 'index.js'
+        }, {
+          dir: 'node_modules/loose-envify/',
+          name: 'package.json'
+        }, {
+          dir: 'node_modules/js-tokens/',
+          name: 'index.js'
+        }, {
+          dir: 'node_modules/js-tokens/',
+          name: 'package.json'
+        }, {
+          dir: 'node_modules/symbol-observable/es/',
+          name: 'index.js'
+        }, {
+          dir: 'node_modules/symbol-observable/es/',
+          name: 'ponyfill.js'
+        }, {
+          dir: 'node_modules/symbol-observable/',
+          name: 'package.json'
+        }, {
+    
+          // lit-element (+ lit-html)
+          dir: 'node_modules/lit-element/',
+          name: 'lit-element.js'
+        }, {
+          dir: 'node_modules/lit-element/',
+          name: 'package.json'
+        },
+    
+        ...litElementLibs, 
+        
+        {
+          dir: 'node_modules/lit-html/',
+          name: 'lit-html.js'
+        }, {
+          dir: 'node_modules/lit-html/',
+          name: 'package.json'
+        },
+        
+        ...litHtmlLibs,
+        
+        {
+          // lodash-es
+          dir: 'node_modules/lodash-es/',
+          name: 'lodash.js'
+        }, {
+          dir: 'node_modules/lodash-es/',
+          name: 'package.json'
+        },
+    
+        ...lodashLibs,
+    
+        {
+          // pwa-helpers
+          dir: 'node_modules/pwa-helpers/',
+          name: 'package.json'
+        },
+    
+        ...pwaHelpersLibs,
+    
+        {
+          // prism.css
+          dir: 'node_modules/prismjs/themes/',
+          name: 'prism-tomorrow.css'
+        },
+    
+        {
+          // simple.css - included as a non-JavaScript package
+          // https://github.com/ProjectEvergreen/greenwood/issues/484
+          dir: 'node_modules/simpledotcss/',
+          name: 'package.json'
+        },
+        {
+          dir: 'node_modules/simpledotcss/',
+          name: 'simple.css'
+        }
+      ]);
+      await runner.runCommand(cliPath, 'build');
 
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
     });
@@ -262,7 +268,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    setup.teardownTestBed();
+    runner.teardown();
   });
 
 });

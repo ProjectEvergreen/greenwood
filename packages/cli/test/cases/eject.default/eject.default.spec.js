@@ -11,21 +11,27 @@
 const fs = require('fs');
 const path = require('path');
 const expect = require('chai').expect;
-const TestBed = require('../../../../../test/test-bed');
+const { getSetupFiles } = require('../../../../../test/utils');
+const Runner = require('gallinago').Runner;
 
 describe('Eject Greenwood', function() {
-  let setup;
+  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+  const outputPath = path.join(__dirname, 'output');
+  let runner;
   let configFiles;
 
   before(async function() {
-    setup = new TestBed();
-    this.context = await setup.setupTestBed(__dirname);
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
+    };
+    runner = new Runner();
   });
 
   describe('Default Eject', function() {
 
     before(async function() {
-      await setup.runGreenwoodCommand('eject');
+      await runner.setup(outputPath, getSetupFiles(outputPath));
+      await runner.runCommand(cliPath, 'eject');
 
       configFiles = fs.readdirSync(__dirname)
         .filter((file) => path.extname(file) === '.js' && file.indexOf('spec.js') < 0);
@@ -50,8 +56,8 @@ describe('Eject Greenwood', function() {
   describe('Eject and Build Ejected Config', function() {
 
     before(async function() {
-      await setup.runGreenwoodCommand('eject');
-      await setup.runGreenwoodCommand('build');
+      await runner.runCommand(cliPath, 'build');
+      await runner.runCommand(cliPath, 'eject');
     });
 
     runSmokeTest(['public', 'index'], 'Eject and Build Ejected Config');
@@ -63,6 +69,6 @@ describe('Eject Greenwood', function() {
       fs.unlinkSync(path.join(__dirname, file));
     });
 
-    setup.teardownTestBed();
+    runner.teardown();
   });
 });

@@ -17,20 +17,27 @@
  * Greenwood default
  */
 const expect = require('chai').expect;
-const TestBed = require('../../../../../test/test-bed');
+const path = require('path');
+const { getSetupFiles } = require('../../../../../test/utils');
+const Runner = require('gallinago').Runner;
 
-describe('Build Greenwood With: ', function() {
-  let setup;
+describe.only('Build Greenwood With: ', function() {
+  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+  const outputPath = path.join(__dirname, 'output');
+  let runner;
 
   before(async function() {
-    setup = new TestBed();
-    await setup.setupTestBed(__dirname);
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
+    };
+    runner = new Runner();
   });
 
   describe('Custom Configuration with a bad value for optimization', function() {
     it('should throw an error that provided optimization is not valid', async function() {
       try {
-        await setup.runGreenwoodCommand('build');
+        await runner.setup(outputPath, getSetupFiles(outputPath));
+        await runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain('Error: provided optimization "loremipsum" is not supported.  Please use one of: default, none, static, inline.');
       }
@@ -38,7 +45,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    setup.teardownTestBed();
+    runner.teardown();
   });
 
 });

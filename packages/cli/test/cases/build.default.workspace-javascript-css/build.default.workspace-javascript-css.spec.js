@@ -26,24 +26,28 @@ const expect = require('chai').expect;
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
-const TestBed = require('../../../../../test/test-bed');
+const { getSetupFiles } = require('../../../../../test/utils');
+const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Importing JavaScript and CSS using <script>, <style>, and <link> tags';
+  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+  const outputPath = path.join(__dirname, 'output');
+  let runner;
 
-  let setup;
-
-  before(async function() {
-    setup = new TestBed();
-
-    this.context = await setup.setupTestBed(__dirname);
+  before(function() {
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
+    };
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
     let dom;
 
     before(async function() {
-      await setup.runGreenwoodCommand('build');
+      await runner.setup(outputPath, getSetupFiles(outputPath));
+      await runner.runCommand(cliPath, 'build');
 
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
     });
@@ -159,7 +163,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    setup.teardownTestBed();
+    runner.teardown();
   });
 
 });

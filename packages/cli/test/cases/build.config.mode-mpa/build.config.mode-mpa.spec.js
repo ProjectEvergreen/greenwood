@@ -25,31 +25,36 @@ const fs = require('fs');
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
-const TestBed = require('../../../../../test/test-bed');
+const { getSetupFiles } = require('../../../../../test/utils');
+const Runner = require('gallinago').Runner;
 
-describe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', async function() {
   const LABEL = 'Custom Mode';
-  let setup;
+  const greenwoodRouterLibs = (await glob(`${process.cwd()}/packages/cli/src/lib/router.js`)).map((lib) => {
+    return {
+      dir: 'node_modules/@greenwood/cli/src/lib/',
+      name: path.basename(lib)
+    };
+  });
+  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+  const outputPath = path.join(__dirname, 'output');
+  let runner;
 
-  before(async function() {
-    setup = new TestBed();
-
-    const greenwoodRouterLibs = (await glob(`${process.cwd()}/packages/cli/src/lib/router.js`)).map((lib) => {
-      return {
-        dir: 'node_modules/@greenwood/cli/src/lib/',
-        name: path.basename(lib)
-      };
-    });
-
-    this.context = await setup.setupTestBed(__dirname, [
-      ...greenwoodRouterLibs
-    ]);
+  before(function() {
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
+    };
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
 
     before(async function() {
-      await setup.runGreenwoodCommand('build');
+      await runner.setup(outputPath, [
+        ...getSetupFiles(outputPath),
+        ...greenwoodRouterLibs
+      ]);
+      await runner.runCommand(cliPath, 'build');
     });
 
     describe('MPA (Multi Page Application)', function() {
@@ -143,7 +148,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    setup.teardownTestBed();
+    runner.teardown();
   });
 
 });
