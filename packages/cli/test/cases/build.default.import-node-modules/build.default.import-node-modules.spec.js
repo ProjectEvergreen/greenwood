@@ -22,37 +22,13 @@ const expect = require('chai').expect;
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
-const { getSetupFiles } = require('../../../../../test/utils');
+const { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
-describe('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Importing packages from node modules';
-  const litElementLibs = (await glob(`${process.cwd()}/node_modules/lit-element/lib/*.js`)).map((lib) => {
-    return {
-      dir: 'node_modules/lit-element/lib/',
-      name: path.basename(lib)
-    };
-  });
-  const litHtmlLibs = (await glob(`${process.cwd()}/node_modules/lit-html/lib/*.js`)).map((lib) => {
-    return {
-      dir: 'node_modules/lit-html/lib/',
-      name: path.basename(lib)
-    };
-  });
-  const lodashLibs = (await glob(`${process.cwd()}/node_modules/lodash-es/*.js`)).map((lib) => {
-    return {
-      dir: 'node_modules/lodash-es/',
-      name: path.basename(lib)
-    };
-  });
-  const pwaHelpersLibs = (await glob(`${process.cwd()}/node_modules/pwa-helpers/*.js`)).map((lib) => {
-    return {
-      dir: 'node_modules/pwa-helpers/',
-      name: path.basename(lib)
-    };
-  });
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.join(__dirname, 'output');
+  const outputPath = __dirname;
   let runner;
 
   before(async function() {
@@ -66,93 +42,115 @@ describe('Build Greenwood With: ', async function() {
     let dom;
 
     before(async function() {
+      const litElementLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-element/lib/*.js`, 
+        `${outputPath}/node_modules/lit-element/lib/`
+      );
+      const litElement = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-element/lit-element.js`, 
+        `${outputPath}/node_modules/lit-element/`
+      );
+      const litElementPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-element/package.json`, 
+        `${outputPath}/node_modules/lit-element/`
+      );
+      const litHtml = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/lit-html.js`, 
+        `${outputPath}/node_modules/lit-html/`
+      );
+      const litHtmlPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/package.json`, 
+        `${outputPath}/node_modules/lit-html/`
+      );
+      const litHtmlLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/lib/*.js`, 
+        `${outputPath}/node_modules/lit-html/lib/`
+      );
+      const reduxLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/redux/es/redux.mjs`, 
+        `${outputPath}/node_modules/redux/es`
+      );
+      const reduxPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/redux/package.json`, 
+        `${outputPath}/node_modules/redux/`
+      );
+      const looseLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/loose-envify/index.js`, 
+        `${outputPath}/node_modules/loose-envify`
+      );
+      const looseLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/loose-envify/package.json`, 
+        `${outputPath}/node_modules/loose-envify/`
+      );
+      const tokensLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/js-tokens/index.js`, 
+        `${outputPath}/node_modules/js-tokens`
+      );
+      const tokensLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/js-tokens/package.json`, 
+        `${outputPath}/node_modules/js-tokens/`
+      );
+      const symbolLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/symbol-observable/es/*.js`, 
+        `${outputPath}/node_modules/symbol-observable/es`
+      );
+      const symobolLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/symbol-observable/package.json`, 
+        `${outputPath}/node_modules/symbol-observable/`
+      );
+      const lodashEsLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lodash-es/*.js`, 
+        `${outputPath}/node_modules/lodash-es/`
+      );
+      const lodashEsLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lodash-es/package.json`, 
+        `${outputPath}/node_modules/lodash-es/`
+      );
+      const pwaHelpersLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/pwa-helpers/*.js`, 
+        `${outputPath}/node_modules/pwa-helpers/`
+      );
+      const pwaHelpersPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/pwa-helpers/package.json`, 
+        `${outputPath}/node_modules/pwa-helpers/`
+      );
+      const simpleCss = await getDependencyFiles(
+        `${process.cwd()}/node_modules/simpledotcss/simple.css`, 
+        `${outputPath}/node_modules/simpledotcss/`
+      );
+      const simpleCssPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/simpledotcss/package.json`, 
+        `${outputPath}/node_modules/simpledotcss/`
+      );
+      const prismCss = await getDependencyFiles(
+        `${process.cwd()}/node_modules/prismjs/themes/prism-tomorrow.css`, 
+        `${outputPath}/node_modules/prismjs/themes/`
+      );
+
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
-        {
-          // redux
-          dir: 'node_modules/redux/es',
-          name: 'redux.mjs'
-        }, {
-          dir: 'node_modules/redux/',
-          name: 'package.json'
-        }, {
-          dir: 'node_modules/loose-envify/',
-          name: 'index.js'
-        }, {
-          dir: 'node_modules/loose-envify/',
-          name: 'package.json'
-        }, {
-          dir: 'node_modules/js-tokens/',
-          name: 'index.js'
-        }, {
-          dir: 'node_modules/js-tokens/',
-          name: 'package.json'
-        }, {
-          dir: 'node_modules/symbol-observable/es/',
-          name: 'index.js'
-        }, {
-          dir: 'node_modules/symbol-observable/es/',
-          name: 'ponyfill.js'
-        }, {
-          dir: 'node_modules/symbol-observable/',
-          name: 'package.json'
-        }, {
-    
-          // lit-element (+ lit-html)
-          dir: 'node_modules/lit-element/',
-          name: 'lit-element.js'
-        }, {
-          dir: 'node_modules/lit-element/',
-          name: 'package.json'
-        },
-    
+        ...reduxLibs,
+        ...reduxPackageJson,
+        ...looseLibs,
+        ...looseLibsPackageJson,
+        ...tokensLibs,
+        ...tokensLibsPackageJson,
+        ...symbolLibs,
+        ...symobolLibsPackageJson,
+        ...litElementPackageJson,
+        ...litElement,
         ...litElementLibs, 
-        
-        {
-          dir: 'node_modules/lit-html/',
-          name: 'lit-html.js'
-        }, {
-          dir: 'node_modules/lit-html/',
-          name: 'package.json'
-        },
-        
+        ...litHtmlPackageJson,
+        ...litHtml,
         ...litHtmlLibs,
-        
-        {
-          // lodash-es
-          dir: 'node_modules/lodash-es/',
-          name: 'lodash.js'
-        }, {
-          dir: 'node_modules/lodash-es/',
-          name: 'package.json'
-        },
-    
-        ...lodashLibs,
-    
-        {
-          // pwa-helpers
-          dir: 'node_modules/pwa-helpers/',
-          name: 'package.json'
-        },
-    
+        ...lodashEsLibs,
+        ...lodashEsLibsPackageJson,
+        // ...lodashLibs,
+        ...pwaHelpersPackageJson,    
         ...pwaHelpersLibs,
-    
-        {
-          // prism.css
-          dir: 'node_modules/prismjs/themes/',
-          name: 'prism-tomorrow.css'
-        },
-    
-        {
-          // simple.css - included as a non-JavaScript package
-          // https://github.com/ProjectEvergreen/greenwood/issues/484
-          dir: 'node_modules/simpledotcss/',
-          name: 'package.json'
-        },
-        {
-          dir: 'node_modules/simpledotcss/',
-          name: 'simple.css'
-        }
+        ...prismCss,
+        ...simpleCss,
+        ...simpleCssPackageJson
       ]);
       await runner.runCommand(cliPath, 'build');
 
@@ -268,7 +266,7 @@ describe('Build Greenwood With: ', async function() {
   });
 
   after(function() {
-    runner.teardown();
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 
 });

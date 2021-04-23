@@ -23,12 +23,11 @@
  */
 const expect = require('chai').expect;
 const path = require('path');
-const { getSetupFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.join(__dirname, 'output');
+  const outputPath = __dirname;
   let runner;
 
   before(function() {
@@ -41,7 +40,7 @@ describe('Build Greenwood With: ', function() {
   describe('Google Analytics Plugin with a bad value for analyticsId', function() {
     it('should throw an error that analyticsId must be a string', async function() {
       try {
-        await runner.setup(outputPath, getSetupFiles(outputPath));
+        await runner.setup(outputPath);
         await runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain('Error: analyticsId should be of type string.  got "undefined" instead.');

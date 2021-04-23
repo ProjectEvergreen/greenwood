@@ -27,14 +27,14 @@ const expect = require('chai').expect;
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles } = require('../../../../../test/utils');
+const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Google Analytics Plugin with default options and Default Workspace';
   const mockAnalyticsId = 'UA-123456-1';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.join(__dirname, 'output');
+  const outputPath = __dirname;
   let runner;
 
   before(async function() {
@@ -144,7 +144,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    runner.teardown();
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 
 });

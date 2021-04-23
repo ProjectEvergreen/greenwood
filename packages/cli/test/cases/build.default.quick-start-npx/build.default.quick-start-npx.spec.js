@@ -19,13 +19,14 @@
 const expect = require('chai').expect;
 const { JSDOM } = require('jsdom');
 const path = require('path');
+const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace and emulating npx';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.join(__dirname, 'output');
+  const outputPath = __dirname;
   let runner;
 
   before(function() {
@@ -38,7 +39,7 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      await runner.setup(outputPath);
+      await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });
     
@@ -118,6 +119,6 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    runner.teardown();
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

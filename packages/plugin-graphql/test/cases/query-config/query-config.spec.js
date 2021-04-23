@@ -24,26 +24,14 @@ const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles } = require('../../../../../test/utils');
+const { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
-describe('Build Greenwood With: ', async function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'ConfigQuery from GraphQL';
   const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
-  const greenwoodGraphqlCoreLibs = (await glob(`${process.cwd()}/packages/plugin-graphql/src/core/*.js`)).map((lib) => {
-    return {
-      dir: 'node_modules/@greenwood/plugin-graphql/src/core/',
-      name: path.basename(lib)
-    };
-  });
-  const greenwoodGraphqlQueryLibs = (await glob(`${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`)).map((lib) => {
-    return {
-      dir: 'node_modules/@greenwood/plugin-graphql/src/queries/',
-      name: path.basename(lib)
-    };
-  });
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.join(__dirname, 'output');
+  const outputPath = __dirname;
   let runner;
 
   before(function() {
@@ -56,6 +44,15 @@ describe('Build Greenwood With: ', async function() {
   describe(LABEL, function() {
 
     before(async function() {
+      const greenwoodGraphqlCoreLibs = await getDependencyFiles(
+        `${process.cwd()}/packages/plugin-graphql/src/core/*.js`, 
+        `${outputPath}/node_modules/@greenwood/plugin-graphql/src/core/`
+      );
+      const greenwoodGraphqlQueryLibs = await getDependencyFiles(
+        `${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`, 
+        `${outputPath}/node_modules/@greenwood/plugin-graphql/src/queries/`
+      );
+
       await runner.setup(outputPath, [ 
         ...getSetupFiles(outputPath),
         ...greenwoodGraphqlCoreLibs,
@@ -106,7 +103,7 @@ describe('Build Greenwood With: ', async function() {
   });
 
   after(function() {
-    runner.teardown();
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 
 });

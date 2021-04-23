@@ -16,18 +16,18 @@
  */
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles } = require('../../../../../test/utils');
+const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Empty Configuration and Default Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.join(__dirname, 'output');
+  const outputPath = __dirname;
   let runner;
 
   before(function() {
-    this.context = {
-      publicDir: path.join(outputPath, 'public')
+    this.context = { 
+      publicDir: path.join(outputPath, 'public') 
     };
     runner = new Runner();
   });
@@ -42,6 +42,6 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    runner.teardown();
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

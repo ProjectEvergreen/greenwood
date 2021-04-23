@@ -35,14 +35,14 @@ const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles } = require('../../../../../test/utils');
+const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 const { tagsMatch } = require('../../../../../test/utils');
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Workspace based on the Getting Started guide and repo';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.join(__dirname, 'output');
+  const outputPath = __dirname;
   let runner;
 
   before(function() {
@@ -343,7 +343,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    runner.teardown();
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 
 });

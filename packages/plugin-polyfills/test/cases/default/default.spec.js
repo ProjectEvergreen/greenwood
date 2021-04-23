@@ -26,7 +26,7 @@ const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles } = require('../../../../../test/utils');
+const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
 const expectedPolyfillFiles = [
@@ -44,7 +44,7 @@ const expectedPolyfillFiles = [
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Polyfill Plugin with default options and Default Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.join(__dirname, 'output');
+  const outputPath = __dirname;
   let runner;
 
   before(async function() {
@@ -60,10 +60,10 @@ describe('Build Greenwood With: ', function() {
         const dir = file === 'webcomponents-loader.js'
           ? 'node_modules/@webcomponents/webcomponentsjs'
           : 'node_modules/@webcomponents/webcomponentsjs/bundles';
-  
+
         return {
-          dir,
-          name: file
+          source: `${process.cwd()}/${dir}/${file}`,
+          destination: `${outputPath}/${dir}/${file}`
         };
       })]);
       await runner.runCommand(cliPath, 'build');
@@ -100,7 +100,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    runner.teardown();
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 
 });

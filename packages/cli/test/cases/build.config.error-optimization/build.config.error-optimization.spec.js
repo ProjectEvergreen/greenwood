@@ -18,12 +18,11 @@
  */
 const expect = require('chai').expect;
 const path = require('path');
-const { getSetupFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
-describe.only('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.join(__dirname, 'output');
+  const outputPath = __dirname;
   let runner;
 
   before(async function() {
@@ -36,16 +35,12 @@ describe.only('Build Greenwood With: ', function() {
   describe('Custom Configuration with a bad value for optimization', function() {
     it('should throw an error that provided optimization is not valid', async function() {
       try {
-        await runner.setup(outputPath, getSetupFiles(outputPath));
+        await runner.setup(outputPath);
         await runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain('Error: provided optimization "loremipsum" is not supported.  Please use one of: default, none, static, inline.');
       }
     });
-  });
-
-  after(function() {
-    runner.teardown();
   });
 
 });

@@ -11,12 +11,12 @@
 const fs = require('fs');
 const path = require('path');
 const expect = require('chai').expect;
-const { getSetupFiles } = require('../../../../../test/utils');
+const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
 describe('Eject Greenwood', function() {
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.join(__dirname, 'output');
+  const outputPath = __dirname;
   let runner;
   let configFiles;
 
@@ -69,6 +69,6 @@ describe('Eject Greenwood', function() {
       fs.unlinkSync(path.join(__dirname, file));
     });
 
-    runner.teardown();
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

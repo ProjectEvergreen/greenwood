@@ -29,13 +29,13 @@ const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles } = require('../../../../../test/utils');
+const { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Import CommonJs Plugin with default options';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.join(__dirname, 'output');
+  const outputPath = __dirname;
   let runner;
 
   before(async function() {
@@ -47,15 +47,19 @@ describe('Build Greenwood With: ', function() {
 
   describe(LABEL, function() {
     before(async function() {
+      const lodashLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lodash/lodash.js`, 
+        `${outputPath}/node_modules/lodash/`
+      );
+      const lodashLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lodash/package.json`, 
+        `${outputPath}/node_modules/lodash/`
+      );
+
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
-        {
-          dir: 'node_modules/lodash/',
-          name: 'lodash.js'
-        }, {
-          dir: 'node_modules/lodash/',
-          name: 'package.json'
-        }
+        ...lodashLibs,
+        ...lodashLibsPackageJson
       ]);
       await runner.runCommand(cliPath, 'build');
     });
@@ -92,7 +96,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    runner.teardown();
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 
 });

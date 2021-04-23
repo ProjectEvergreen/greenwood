@@ -18,12 +18,11 @@
  */
 const expect = require('chai').expect;
 const path = require('path');
-const { getSetupFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.join(__dirname, 'output');
+  const outputPath = __dirname;
   let runner;
 
   before(async function() {
@@ -36,16 +35,12 @@ describe('Build Greenwood With: ', function() {
   describe('Custom Configuration with a bad value (absolute path) for Workspace', function() {
     it('should throw an error that workspace path must exist', async function() {
       try {
-        await runner.setup(outputPath, getSetupFiles(outputPath));
+        await runner.setup(outputPath);
         await runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain('greenwood.config.js workspace doesn\'t exist!');
       }
     });
-  });
-
-  after(function() {
-    runner.teardown();
   });
 
 });

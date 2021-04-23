@@ -1,3 +1,4 @@
+const glob = require('glob-promise');
 const path = require('path');
 
 function tagsMatch(tagName, html, expected = null) {
@@ -20,7 +21,28 @@ function getSetupFiles(outputPath) {
   }];
 }
 
+function getOutputTeardownFiles(outputPath) {
+  return [
+    path.join(outputPath, '.greenwood'),
+    path.join(outputPath, 'public'),
+    path.join(outputPath, 'node_modules')
+  ];
+}
+
+async function getDependencyFiles(sourcePath, outputPath) {
+  const files = await glob(sourcePath);
+
+  return files.map((lib) => {
+    return {
+      source: path.join(lib),
+      destination: path.join(outputPath, path.basename(lib))
+    };
+  });
+}
+
 module.exports = {
+  getDependencyFiles,
+  getOutputTeardownFiles,
   getSetupFiles,
   tagsMatch
 };
