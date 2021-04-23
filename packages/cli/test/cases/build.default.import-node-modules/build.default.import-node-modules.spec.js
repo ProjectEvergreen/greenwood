@@ -145,7 +145,6 @@ describe('Build Greenwood With: ', function() {
         ...litHtmlLibs,
         ...lodashEsLibs,
         ...lodashEsLibsPackageJson,
-        // ...lodashLibs,
         ...pwaHelpersPackageJson,    
         ...pwaHelpersLibs,
         ...prismCss,
