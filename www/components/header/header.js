@@ -1,7 +1,6 @@
 import { css, html, LitElement, unsafeCSS } from 'lit-element';
 import client from '@greenwood/plugin-graphql/core/client';
 import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
-import GalleryQuery from '../../data/queries/gallery.gql';
 import '@evergreen-wc/eve-container';
 import headerCss from './header.css';
 import '../social-icons/social-icons.js';
@@ -37,12 +36,6 @@ class HeaderComponent extends LitElement {
         order: 'index_asc'
       }
     });
-
-    const galleryResponse = await client.query({
-      query: GalleryQuery
-    });
-
-    console.debug(galleryResponse.data);
 
     this.navigation = response.data.menu.children.map(item => item.item);
   }

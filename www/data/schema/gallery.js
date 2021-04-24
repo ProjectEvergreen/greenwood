@@ -1,16 +1,29 @@
 const gql = require('graphql-tag');
 
-const getGallery = async (root, query, context) => {
-  console.debug(root, query, context);
-  return [{
-    name: 'Gallery 1',
-    title: 'Gallery Title',
-    images: [{
-      path: '/assets/gallery1/image1.png'
-    }, {
-      path: '/assets/gallery1/image2.png'
-    }]
-  }];
+const getGallery = async (root, query) => {
+  if (query.name === 'logos') {
+    return [{
+      name: 'logos',
+      title: 'Home Page Logos',
+      images: [{
+        path: '/assets/webcomponents.svg'
+      }, {
+        path: '/assets/nodejs.png'
+      }, {
+        path: '/assets/simple.png'
+      }]
+    }];
+  } else {
+    return [{
+      name: 'Gallery 1',
+      title: 'Gallery Title',
+      images: [{
+        path: '/assets/gallery1/image1.png'
+      }, {
+        path: '/assets/gallery1/image2.png'
+      }]
+    }];
+  }
 };
 
 const galleryTypeDefs = gql`
@@ -25,7 +38,7 @@ const galleryTypeDefs = gql`
   }
 
   extend type Query {
-    gallery: [Gallery]
+    gallery(name: String!): [Gallery]
   }
 `;
 
