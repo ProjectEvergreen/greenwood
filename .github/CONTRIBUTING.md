@@ -128,8 +128,8 @@ $ yarn test
 Below are some tips to help with running / debugging tests:
 - `describe.only` / `it.only`: only runs this block
 - `xdescribe` / `xit`: dont run this block
-- Uncomment `setup.teardownTestBed()` in a case to see the build output without it getting cleaned up post test run
-- Use `new TestBed(true)` get debug output from Greenwood when running tests
+- Uncomment `runner.teardown()` in a case to see the build output without it getting cleaned up post test run
+- Use `new Runner(true)` get debug output from Greenwood when running tests
 
 > **PLEASE DO NOT COMMIT ANY OF THESE ABOVE CHANGES THOUGH**
 

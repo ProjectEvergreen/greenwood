@@ -18,7 +18,7 @@
  *     app-template-two.js
  *     page-template-one.js
  *     page-template-two.js
-  *   styles/
+ *   styles/
  *     app-template-one.css
  *     app-template-two.css
  *     page-template-one.css
@@ -31,20 +31,26 @@ const expect = require('chai').expect;
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
-const TestBed = require('../../../../../test/test-bed');
+const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
+const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace w/Custom App and Page Templates';
-  let setup;
+  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+  const outputPath = __dirname;
+  let runner;
 
-  before(async function() {
-    setup = new TestBed();
-    this.context = await setup.setupTestBed(__dirname);
+  before(function() {
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
+    };
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
     before(async function() {
-      await setup.runGreenwoodCommand('build');
+      await runner.setup(outputPath, getSetupFiles(outputPath));
+      await runner.runCommand(cliPath, 'build');
     });
 
     runSmokeTest(['public', 'index'], LABEL);
@@ -120,6 +126,6 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    setup.teardownTestBed();
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
