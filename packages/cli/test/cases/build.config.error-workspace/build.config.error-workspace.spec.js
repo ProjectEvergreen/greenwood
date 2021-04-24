@@ -17,28 +17,30 @@
  * Greenwood default
  */
 const expect = require('chai').expect;
-const TestBed = require('../../../../../test/test-bed');
+const path = require('path');
+const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
-  let setup;
+  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+  const outputPath = __dirname;
+  let runner;
 
   before(async function() {
-    setup = new TestBed();
-    await setup.setupTestBed(__dirname);
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
+    };
+    runner = new Runner();
   });
 
   describe('Custom Configuration with a bad value for Workspace', function() {
     it('should throw an error that workspace path must be a string', async function() {
       try {
-        await setup.runGreenwoodCommand('build');
+        await runner.setup(outputPath);
+        await runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain('greenwood.config.js workspace path must be a string');
       }
     });
-  });
-
-  after(function() {
-    setup.teardownTestBed();
   });
 
 });

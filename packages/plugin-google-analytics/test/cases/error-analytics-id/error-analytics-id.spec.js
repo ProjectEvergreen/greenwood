@@ -22,20 +22,26 @@
  * Greenwood default (src/)
  */
 const expect = require('chai').expect;
-const TestBed = require('../../../../../test/test-bed');
+const path = require('path');
+const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
-  let setup;
+  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+  const outputPath = __dirname;
+  let runner;
 
-  before(async function() {
-    setup = new TestBed();
-    this.context = await setup.setupTestBed(__dirname);
+  before(function() {
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
+    };
+    runner = new Runner();
   });
 
   describe('Google Analytics Plugin with a bad value for analyticsId', function() {
     it('should throw an error that analyticsId must be a string', async function() {
       try {
-        await setup.runGreenwoodCommand('build');
+        await runner.setup(outputPath);
+        await runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain('Error: analyticsId should be of type string.  got "undefined" instead.');
       }
@@ -43,7 +49,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    setup.teardownTestBed();
+    runner.teardown();
   });
 
 });

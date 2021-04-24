@@ -26,7 +26,8 @@ const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
-const TestBed = require('../../../../../test/test-bed');
+const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
+const Runner = require('gallinago').Runner;
 
 const expectedPolyfillFiles = [
   'webcomponents-loader.js',
@@ -42,27 +43,30 @@ const expectedPolyfillFiles = [
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Polyfill Plugin with default options and Default Workspace';
-
-  let setup;
+  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+  const outputPath = __dirname;
+  let runner;
 
   before(async function() {
-    setup = new TestBed();
-
-    this.context = await setup.setupTestBed(__dirname, expectedPolyfillFiles.map((file) => {
-      const dir = file === 'webcomponents-loader.js'
-        ? 'node_modules/@webcomponents/webcomponentsjs'
-        : 'node_modules/@webcomponents/webcomponentsjs/bundles';
-
-      return {
-        dir,
-        name: file
-      };
-    }));
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
+    };
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
     before(async function() {
-      await setup.runGreenwoodCommand('build');
+      await runner.setup(outputPath, [...getSetupFiles(outputPath), ...expectedPolyfillFiles.map((file) => {
+        const dir = file === 'webcomponents-loader.js'
+          ? 'node_modules/@webcomponents/webcomponentsjs'
+          : 'node_modules/@webcomponents/webcomponentsjs/bundles';
+
+        return {
+          source: `${process.cwd()}/${dir}/${file}`,
+          destination: `${outputPath}/${dir}/${file}`
+        };
+      })]);
+      await runner.runCommand(cliPath, 'build');
     });
 
     runSmokeTest(['public', 'index'], LABEL);
@@ -96,7 +100,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    setup.teardownTestBed();
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 
 });
