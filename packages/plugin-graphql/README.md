@@ -81,4 +81,93 @@ class HeaderComponent extends HTMLElement {
 }
 ```
 
-> _For more information on using GraphQL with Greenwood, [please review our docs](https://www.greenwoodjs.io/docs/data)._
+> _For more general purpose information on integrating GraphQL with Greenwood, [please review our docs](https://www.greenwoodjs.io/docs/data)._
+
+## Custom Schemas
+
+This plugin also supports you providing your own custom schemas in your project so you can make GraphQL pull in whatever data or content you need!
+
+Just create a _data/schema_ directory and then Greenwood will look for any files inside it that you can use to export typeDefs and resolvers.  Each schema file must specifically export a `customTypeDefs` and `customResolvers`.
+
+### Example
+
+For example, you could create a "gallery" schema that could be used to group and organize photos for your frontend using variable.
+```js
+const gql = require('graphql-tag');
+
+const getGallery = async (root, query) => {
+  if (query.name === 'logos') {
+    // you could of course use fs here and look up files on the filesystem, or remotely!
+    return [{
+      name: 'logos',
+      title: 'Home Page Logos',
+      images: [{
+        path: '/assets/logo1.png'
+      }, {
+        path: '/assets/logo2.png'
+      }, {
+        path: '/assets/logo3.png'
+      }]
+    }];
+  }
+};
+
+const galleryTypeDefs = gql`
+  type Image {
+    path: String
+  }
+
+  type Gallery {
+    name: String,
+    title: String,
+    images: [Image]
+  }
+
+  extend type Query {
+    gallery(name: String!): [Gallery]
+  }
+`;
+
+const galleryResolvers = {
+  Query: {
+    gallery: getGallery
+  }
+};
+
+module.exports = {
+  customTypeDefs: galleryTypeDefs,
+  customResolvers: galleryResolvers
+};
+```
+
+```js
+// gallery.gql
+query($name: String!) {
+  gallery(name: $name)  {
+    name,
+    title,
+    images {
+      path
+    }
+  }
+}
+```
+
+And then you can use it in your code as such:
+```js
+import client from '@greenwood/plugin-graphql/core/client';
+import GalleryQuery from '/data/queries/gallery.gql';
+
+client.query({
+  query: GalleryQuery,
+  variables: {
+    name: 'logos'
+  }
+}).then((response) => {
+  const logos = response.data.gallery[0].images[i];
+
+  logos.forEach((logo) => {
+    console.log(logo.path); // /assets/logo1.png, /assets/logo2.png, /assets/logo3.png
+  })
+});
+```
