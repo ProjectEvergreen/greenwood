@@ -316,11 +316,7 @@ class StandardHtmlResource extends ResourceInterface {
           contents = contents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
           contents = contents.replace(/type="module-shim"/g, 'type="module"');
 
-          body = body.replace(/\<head>(.*)<\/head>/s, `
-            <head>
-              ${contents}
-            </head>
-          `);
+          body = body.replace(/\<head>(.*)<\/head>/s, contents);
         }
     
         resolve(body);
