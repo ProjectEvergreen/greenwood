@@ -36,7 +36,7 @@ module.exports = (compilation) => {
     `;
 
     if (fs.existsSync(customSchemasPath)) {
-      console.debug('custom data schemas directory detected, scanning...');
+      console.log('custom schemas directory detected, scanning...');
       fs.readdirSync(customSchemasPath)
         .filter(file => path.extname(file) === '.js')
         .forEach(file => {
