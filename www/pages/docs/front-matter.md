@@ -25,20 +25,24 @@ label: 'My Blog Post from 3/5/2020'
 
 
 ### Imports
-> ⛔ _**Coming Soon!**_
-
-<!-- If you want to include files on a _per **page** basis_, you can use the predefined `imports` feature from Greenwood.  This is great for one off use cases where you dont want to ship a third party lib in all your templates, but just for this one particular page.  This is effectively a naive form of code splitting.  🤓
+If you want to include files on a _per **page** basis_, you can use the predefined `imports` feature from Greenwood.  This is great for one off use cases where you dont want to ship a third party lib in all your templates, but just for this one particular page.  This is effectively a naive form of code splitting.  🤓
 
 #### Example
 ```md
 ---
 imports:
-  MyFile: '../components/MyFile/myfile.js'
+  - /components/my-component/component.js
+  - /components/my-component/component.css
 ---
-
 ```
 
-See our [Markdown Docs](/docs/markdown#imports) for more information about rendering custom elements in markdown files. -->
+You will then see the following emitted for file
+```html
+<script type="module" src="/components/my-component/component.js"></script>
+<link rel="stylesheet" href="/components/my-component/component.css"/>
+```
+
+> _See our [Markdown Docs](/docs/markdown#imports) for more information about rendering custom elements in markdown files._
 
 
 ### Template
