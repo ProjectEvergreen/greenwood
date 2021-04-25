@@ -12,6 +12,16 @@ const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-
 const tokenSuffix = 'scratch';
 const tokenNodeModules = 'node_modules/';
 
+const hashString = (queryKeysString) => {
+  let h = 0;
+
+  for (let i = 0; i < queryKeysString.length; i += 1) {
+    h = Math.imul(31, h) + queryKeysString.charCodeAt(i) | 0; // eslint-disable-line no-bitwise
+  }
+
+  return Math.abs(h).toString();
+};
+
 const parseTagForAttributes = (tag) => {
   return tag.rawAttrs.split(' ').map((attribute) => {
     if (attribute.indexOf('=') > 0) {
@@ -183,12 +193,14 @@ function greenwoodHtmlPlugin(compilation) {
 
             // handle <script type="module">/* some inline JavaScript code */</script>
             if (parsedAttributes.type === 'module' && scriptTag.rawText !== '') {
-              const id = Buffer.from(scriptTag.rawText).toString('base64').slice(0, 8).toLowerCase();
-
+              const id = hashString(scriptTag.rawText);
+              
               if (!mappedScripts.get(id)) {
-                const filename = `${id}-${tokenSuffix}.js`;
+                const marker = `${id}-${tokenSuffix}`;
+                const filename = `${marker}.js`;
+                // @preserve avoids having terser strip out our internal marker
                 const source = `
-                  // ${filename}
+                  // @preserve ${marker}
                   ${scriptTag.rawText}
                 `.trim();
 
@@ -396,8 +408,6 @@ function greenwoodHtmlPlugin(compilation) {
               const outputPath = path.join(basePath, src);
               const js = fs.readFileSync(outputPath, 'utf-8');
 
-              // scratchFiles[src] = true;
-
               html = html.replace(`<script ${scriptTag.rawAttrs}></script>`, `
                 <script type="module">
                   ${js}
@@ -407,13 +417,34 @@ function greenwoodHtmlPlugin(compilation) {
 
             // handle <script type="module"> /* inline code */ </script>
             if (parsedAttributes.type === 'module' && !parsedAttributes.src) {
+              console.debug('@@@@@@@@@@@@ raw dog', scriptTag.rawText);
+              const id = hashString(scriptTag.rawText);
+              const markerRegex = /@preserve [0-9]+/;
+              console.debug('id!!!!!', id);
+
               for (const innerBundleId of Object.keys(bundles)) {
-                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js') {           
+                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js' && !scratchFiles[innerBundleId]) {
+                  console.debug('???? innerBundleId', innerBundleId);
                   const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8')
                     .replace(/\.\//g, '/'); // force absolute paths
+                  console.debug('???? bundledSource', bundledSource);
                   
-                  html = html.replace(scriptTag.rawText, bundledSource);
-                  scratchFiles[innerBundleId] = true;
+                  if (markerRegex.test(bundledSource)) {
+                    const marker = bundledSource.match(markerRegex)[0].split(' ')[1];
+                    console.debug('marker!!!!!', marker);
+
+                    if (id === marker) {
+                      const cleaned = bundledSource.replace(`// @preserve ${marker}-scratch\n`, '');
+
+                      console.debug('???? cleaned bundled source', cleaned);
+                      html = html.replace(scriptTag.rawText, cleaned);
+                      scratchFiles[innerBundleId] = true;
+                    }
+                  } else {
+                    html = html.replace(scriptTag.rawText, bundledSource);
+                    scratchFiles[innerBundleId] = true;
+                  }
+                  console.debug('******************************');
                 }
               }
             }

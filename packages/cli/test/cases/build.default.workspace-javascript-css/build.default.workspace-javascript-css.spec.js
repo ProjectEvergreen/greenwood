@@ -94,14 +94,33 @@ describe('Build Greenwood With: ', function() {
       it('should have two <script> tag with inline script in the <head>', function() {
         const scriptTagInline = dom.window.document.querySelectorAll('head > script:not([src])');
         
-        expect(scriptTagInline.length).to.be.equal(1);
+        expect(scriptTagInline.length).to.be.equal(2);
       });
 
-      it('should have the expected output from inline <script> tag in index.html', async function() {
-        const scriptTagSrc = dom.window.document.querySelector('body > .output-script-inline');
+      it('should have the expected inline content from inline <script> tag one in index.html', async function() {
+        const scriptTagSrcOne = dom.window.document.querySelectorAll('head > script:not([src])')[0];
 
-        expect(scriptTagSrc.textContent).to.be.equal('script tag module inline');
+        expect(scriptTagSrcOne.textContent).to.be.contain('document.getElementsByClassName("output-script-inline-one")[0].innerHTML="script tag module inline one"');
       });
+
+      it('should have the expected output from inline <script> tag one in index.html', async function() {
+        const scriptTagOneOutput = dom.window.document.querySelector('body > .output-script-inline-one');
+
+        expect(scriptTagOneOutput.textContent).to.be.equal('script tag module inline one');
+      });
+
+      it('should have the expected inline content from inline <script> tag two in index.html', async function() {
+        const scriptTagSrcTwo = dom.window.document.querySelectorAll('head > script:not([src])')[1];
+
+        expect(scriptTagSrcTwo.textContent).to.be.contain('document.getElementsByClassName("output-script-inline-two")[0].innerHTML="script tag module inline two"');
+      });
+      
+      it('should have the expected output from inline <script> tag two in index.html', async function() {
+        const scriptTagTwoOutput = dom.window.document.querySelector('body > .output-script-inline-two');
+
+        expect(scriptTagTwoOutput.textContent).to.be.contain('script tag module inline two');
+      });
+
     });
 
     describe('<style>...</style> tag in the <head>', function() {
