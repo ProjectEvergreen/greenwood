@@ -25,6 +25,18 @@
 
       document.getElementsByClassName('output-script-inline-two')[0].innerHTML = two;
     </script>
+
+    <style>
+      span.output-style {
+        color: red;
+      }
+    </style>
+
+    <script>
+      const three = 'script tag module inline three';
+      
+      document.getElementsByClassName('output-script-inline-three')[0].innerHTML = three;
+    </script>
   </head>
 
   <body>
@@ -34,6 +46,8 @@
     <p class="output-link"></p>
     <p class="module-shim">let me tell you about type="module-shim"</p>
     <p class="output-script-inline-two"></p>
+
+    <span>CSS output two</span>
   </body>
 
 </html>

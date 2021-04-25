@@ -94,7 +94,7 @@ describe('Build Greenwood With: ', function() {
       it('should have two <script> tag with inline script in the <head>', function() {
         const scriptTagInline = dom.window.document.querySelectorAll('head > script:not([src])');
         
-        expect(scriptTagInline.length).to.be.equal(2);
+        expect(scriptTagInline.length).to.be.equal(3);
       });
 
       it('should have the expected inline content from inline <script> tag one in index.html', async function() {
@@ -121,6 +121,12 @@ describe('Build Greenwood With: ', function() {
         expect(scriptTagTwoOutput.textContent).to.be.contain('script tag module inline two');
       });
 
+      it('should have the expected inline content from inline <script> tag three in index.html', async function() {
+        const scriptTagSrcTwo = dom.window.document.querySelectorAll('head > script:not([src])')[2];
+
+        expect(scriptTagSrcTwo.textContent).to.be.contain('document.getElementsByClassName(\'output-script-inline-three\')[0].innerHTML = three');
+      });
+
     });
 
     describe('<style>...</style> tag in the <head>', function() {
@@ -128,14 +134,21 @@ describe('Build Greenwood With: ', function() {
         const styleTags = dom.window.document.querySelectorAll('head > style');
         
         // first <style> tag comes from puppeteer output
-        expect(styleTags.length).to.be.equal(2);
+        expect(styleTags.length).to.be.equal(3);
       });
 
-      it('should have the expected output from main.js file in index.html', async function() {
+      it('should have the expected output from the first inline <style> tag in index.html', async function() {
         const styleTags = dom.window.document.querySelectorAll('head > style');
 
         // first <style> tag comes from puppeteer output
         expect(styleTags[1].textContent.replace(/\n/g, '').trim().replace(' ', '')).to.be.contain('p.output-style{        color: green;      }');
+      });
+
+      it('should have the expected output from the second inline <style> tag in index.html', async function() {
+        const styleTags = dom.window.document.querySelectorAll('head > style');
+
+        // first <style> tag comes from puppeteer output
+        expect(styleTags[2].textContent.replace(/\n/g, '').trim().replace(' ', '')).to.be.contain('span.output-style{        color: red;      }');
       });
 
       it('should have the color style for the output element', function() {
