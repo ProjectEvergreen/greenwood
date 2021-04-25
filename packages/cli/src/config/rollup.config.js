@@ -420,7 +420,7 @@ function greenwoodHtmlPlugin(compilation) {
               const markerRegex = /@preserve [0-9]+/;
 
               for (const innerBundleId of Object.keys(bundles)) {
-                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js' && !scratchFiles[innerBundleId]) {
+                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js') {
                   const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8')
                     .replace(/\.\//g, '/'); // force absolute paths
                   
