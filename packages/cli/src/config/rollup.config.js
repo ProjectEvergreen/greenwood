@@ -194,7 +194,7 @@ function greenwoodHtmlPlugin(compilation) {
             // handle <script type="module">/* some inline JavaScript code */</script>
             if (parsedAttributes.type === 'module' && scriptTag.rawText !== '') {
               const id = hashString(scriptTag.rawText);
-              
+
               if (!mappedScripts.get(id)) {
                 const marker = `${id}-${tokenSuffix}`;
                 const filename = `${marker}.js`;
@@ -417,26 +417,20 @@ function greenwoodHtmlPlugin(compilation) {
 
             // handle <script type="module"> /* inline code */ </script>
             if (parsedAttributes.type === 'module' && !parsedAttributes.src) {
-              console.debug('@@@@@@@@@@@@ raw dog', scriptTag.rawText);
               const id = hashString(scriptTag.rawText);
               const markerRegex = /@preserve [0-9]+/;
-              console.debug('id!!!!!', id);
 
               for (const innerBundleId of Object.keys(bundles)) {
                 if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js' && !scratchFiles[innerBundleId]) {
-                  console.debug('???? innerBundleId', innerBundleId);
                   const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8')
                     .replace(/\.\//g, '/'); // force absolute paths
-                  console.debug('???? bundledSource', bundledSource);
                   
                   if (markerRegex.test(bundledSource)) {
                     const marker = bundledSource.match(markerRegex)[0].split(' ')[1];
-                    console.debug('marker!!!!!', marker);
 
                     if (id === marker) {
                       const cleaned = bundledSource.replace(`// @preserve ${marker}-scratch\n`, '');
 
-                      console.debug('???? cleaned bundled source', cleaned);
                       html = html.replace(scriptTag.rawText, cleaned);
                       scratchFiles[innerBundleId] = true;
                     }
@@ -444,7 +438,6 @@ function greenwoodHtmlPlugin(compilation) {
                     html = html.replace(scriptTag.rawText, bundledSource);
                     scratchFiles[innerBundleId] = true;
                   }
-                  console.debug('******************************');
                 }
               }
             }
