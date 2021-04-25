@@ -1,5 +1,4 @@
 /* eslint-disable max-depth, no-loop-func */
-const Buffer = require('buffer').Buffer;
 const fs = require('fs');
 const htmlparser = require('node-html-parser');
 const multiInput = require('rollup-plugin-multi-input').default;
@@ -234,7 +233,7 @@ function greenwoodHtmlPlugin(compilation) {
               const filePath = path.join(basePath, href.replace('../', './'));
               const source = fs.readFileSync(filePath, 'utf-8');
               const to = `${outputDir}/${href}`;
-              const hash = Buffer.from(source).toString('base64').toLowerCase();
+              const hash = hashString(source);
               const fileName = href
                 .replace('.css', `.${hash.slice(0, 8)}.css`)
                 .replace('../', '')
