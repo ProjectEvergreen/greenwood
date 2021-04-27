@@ -4,7 +4,7 @@ const path = require('path');
 const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
 const pluginOptimizationMpa = require('../plugins/resource/plugin-optimization-mpa');
 
-module.exports = serializeCompilation = async (compilation) => {
+module.exports = prerenderCompilation = async (compilation) => {
   const compilationCopy = Object.assign({}, compilation);
   const browserRunner = new BrowserRunner();
   const optimizeResources = [
