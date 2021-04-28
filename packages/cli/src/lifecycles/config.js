@@ -119,9 +119,14 @@ module.exports = readAndMergeConfig = async() => {
         }
 
         if (prerender !== undefined) {
-          customConfig.prerender = prerender;
+          if (typeof prerender === 'boolean') {
+            customConfig.prerender = prerender;
+          } else {
+            reject(`Error: greenwood.config.js prerender must be a boolean; true or false.  Passed value was typeof: ${typeof prerender}`);
+          }
         }
       }
+
       resolve({ ...defaultConfig, ...customConfig });
     } catch (err) {
       reject(err);

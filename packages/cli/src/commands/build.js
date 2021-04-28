@@ -84,7 +84,7 @@ module.exports = runProductionBuild = async () => {
               : Promise.resolve(html);
           }, Promise.resolve(response.body));
 
-          console.info('generating page...', outputPath);
+          console.info('generating page...', outputPath.replace(scratchDir, ''));
 
           if (!fs.existsSync(path.join(scratchDir, route))) {
             fs.mkdirSync(path.join(scratchDir, route), {
