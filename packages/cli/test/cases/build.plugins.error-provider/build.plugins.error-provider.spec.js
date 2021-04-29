@@ -23,28 +23,30 @@
  */
 
 const expect = require('chai').expect;
-const TestBed = require('../../../../../test/test-bed');
+const path = require('path');
+const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
-  let setup;
+  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+  const outputPath = __dirname;
+  let runner;
 
   before(async function() {
-    setup = new TestBed();
-    await setup.setupTestBed(__dirname);
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
+    };
+    runner = new Runner();
   });
 
   describe('Custom Configuration with a bad provider value for a plugin', function() {
     it('should throw an error that plugin.provider is not a function', async function() {
       try {
-        await setup.runGreenwoodCommand('build');
+        await runner.setup(outputPath);
+        await runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain('Error: greenwood.config.js plugins provider must be a function. got object instead.');
       }
     });
-  });
-
-  after(function() {
-    setup.teardownTestBed();
   });
 
 });

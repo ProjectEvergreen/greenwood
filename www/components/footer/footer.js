@@ -16,7 +16,7 @@ class FooterComponent extends LitElement {
     return html`
       <footer class="footer">
         <h4>
-          <a href="/">Greenwood v${version}</a>
+          <a href="/">Greenwood v${version}</a> <span class="separator">&#9672</span> <a href="https://www.netlify.com/">This site is powered by Netlify</a>
         </h4>
       </footer>
     `;

@@ -10,26 +10,23 @@ linkheadings: 3
 In this section we'll cover some of the Markdown related feature of **Greenwood**, which by default supports the [CommonMark](https://commonmark.org/help/) specification and [**unifiedjs**](https://unifiedjs.com/) as the markdown / content framework.
 
 ### Imports
-> ⛔ _**Coming Soon!**_
-
-<!--
 From within the markdown you can also render components, not just their syntax, by importing them via [front-matter](/docs/front-matter).
 
+
 #### Example
-At the top of a `.md` file add an `import` section to render a component inline to the page itself.  This can be helpful if there are situations where you may want to `import` a component for a specific set of pages, as opposed to through a page or app template.:
+At the top of a `.md` file add an [`import` section](/docs/front-matter/) to render a component inline to the page itself.  This can be helpful if there are situations where you may want to `import` a component for a specific set of pages, as opposed to through a page or app template.:
 
 ```md
 ---
 imports:
-  HelloWorld: '../components/helloworld/helloworld.js'
+  - /components/counter/counter.js
 ---
 
-<hello text='world'>World</hello>
+## My Demo Page
+<x-counter></x-counter>
 ```
 
 > See our [component model docs](/docs/component-model) for more information on authoring custom elements / components.  For information on configuring additional page meta data, see our section on [front-matter](/docs/front-matter/).
-
--->
 
 ### Configuration
 Using your _greenwood.config.js_ you can have additional [markdown customizations and configurations](/docs/configuration#markdown) using unified presets and plugins.
