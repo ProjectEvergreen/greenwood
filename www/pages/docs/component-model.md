@@ -71,7 +71,7 @@ You can then use it within a page template.
 
 
 ### Alternaties
-An alternaative like [**LitElement**](https://lit-element.polymer-project.org/) would work the same way.  
+An alternaative like [**LitElement**](https://lit.dev/) would work the same way.  
 
 > _Make sure you have installed LitElement with **npm** first!_
 
