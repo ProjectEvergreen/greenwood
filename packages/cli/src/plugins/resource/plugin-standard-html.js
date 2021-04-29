@@ -45,7 +45,7 @@ const getPageTemplate = (barePath, workspace, template) => {
   return contents;
 };
 
-const getAppTemplate = (contents, userWorkspace) => {
+const getAppTemplate = (contents, userWorkspace, customImports = []) => {
   function sliceTemplate(template, pos, needle, replacer) {
     return template.slice(0, pos) + template.slice(pos).replace(needle, replacer);
   }
@@ -140,6 +140,30 @@ const getAppTemplate = (contents, userWorkspace) => {
     }
   });
   
+  customImports.forEach((customImport) => {
+    const extension = path.extname(customImport);
+
+    switch (extension) {
+
+      case '.js':
+        appTemplateContents = appTemplateContents.replace('</head>', `
+            <script src="${customImport}" type="module"></script>
+          </head>
+        `);
+        break;
+      case '.css':
+        appTemplateContents = appTemplateContents.replace('</head>', `
+          <link rel="stylesheet" href="${customImport}"></link>
+          </head>
+        `);
+        break;
+
+      default:
+        break;
+
+    }
+  });
+
   return appTemplateContents;
 };
 
@@ -217,6 +241,8 @@ class StandardHtmlResource extends ResourceInterface {
         const config = Object.assign({}, this.compilation.config);
         const { userWorkspace, projectDirectory } = this.compilation.context;
         const normalizedUrl = this.getRelativeUserworkspaceUrl(url);
+        let customImports;
+
         let body = '';
         let template = null;
         let processedMarkdown = null;
@@ -270,15 +296,34 @@ class StandardHtmlResource extends ResourceInterface {
             if (attributes.template) {
               template = attributes.template;
             }
+
+            if (attributes.imports) {
+              customImports = attributes.imports;
+            }
           }
         }
         
         body = getPageTemplate(barePath, userWorkspace, template);
-        body = getAppTemplate(body, userWorkspace);
+        body = getAppTemplate(body, userWorkspace, customImports);
         body = getUserScripts(body, projectDirectory);
         body = getMetaContent(normalizedUrl, config, body);
         
         if (processedMarkdown) {
+          const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
+          const ceTest = wrappedCustomElementRegex.test(processedMarkdown.contents);
+
+          if (ceTest) {
+            const ceMatches = processedMarkdown.contents.match(wrappedCustomElementRegex);
+
+            ceMatches.forEach((match) => {
+              const stripWrappingTags = match
+                .replace('<p>', '')
+                .replace('</p>', '');
+
+              processedMarkdown.contents = processedMarkdown.contents.replace(match, stripWrappingTags);
+            });
+          }
+
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
         }
 

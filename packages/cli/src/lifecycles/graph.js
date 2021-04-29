@@ -25,6 +25,7 @@ module.exports = generateGraph = async (compilation) => {
             const template = attributes.template || 'page';
             const title = attributes.title || compilation.config.title || '';
             const id = attributes.label || filename.split('/')[filename.split('/').length - 1].replace('.md', '').replace('.html', '');
+            const imports = attributes.imports || [];
             const label = id.split('-')
               .map((idPart) => {
                 return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
@@ -97,6 +98,7 @@ module.exports = generateGraph = async (compilation) => {
              * filename: name of the file
              * id: filename without the extension
              * label: "pretty" text representation of the filename
+             * imports: per page JS or CSS file imports to be included in HTML output
              * path: path to the file relative to the workspace
              * route: URL route for a given page on outputFilePath
              * template: page template to use as a base for a generated component
@@ -107,6 +109,7 @@ module.exports = generateGraph = async (compilation) => {
               filename,
               id,
               label,
+              imports,
               path: route === '/' || relativePagePath.lastIndexOf('/') === 0
                 ? `${relativeWorkspacePath}${filename}`
                 : `${relativeWorkspacePath}/${filename}`,

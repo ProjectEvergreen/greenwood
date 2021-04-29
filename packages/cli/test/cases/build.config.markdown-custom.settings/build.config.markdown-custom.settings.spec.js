@@ -19,24 +19,29 @@
  *     index.md
  */
 const { JSDOM } = require('jsdom');
-const path = require('path');
 const expect = require('chai').expect;
-const TestBed = require('../../../../../test/test-bed');
+const path = require('path');
+const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
+const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Markdown Configuration and Custom Workspace';
-  let setup;
+  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+  const outputPath = __dirname;
+  let runner;
 
   before(async function() {
-    setup = new TestBed();
-
-    this.context = await setup.setupTestBed(__dirname);
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
+    };
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
 
     before(async function() {
-      await setup.runGreenwoodCommand('build');
+      await runner.setup(outputPath, getSetupFiles(outputPath));
+      await runner.runCommand(cliPath, 'build');
     });
 
     describe('Custom Markdown Presets', function() {
@@ -58,7 +63,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    setup.teardownTestBed();
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 
 });

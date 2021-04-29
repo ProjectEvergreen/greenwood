@@ -4,6 +4,7 @@ const pluginGraphQL = require('./packages/plugin-graphql/src/index');
 const pluginImportCss = require('./packages/plugin-import-css/src/index');
 const pluginPolyfills = require('./packages/plugin-polyfills/src/index');
 const pluginPostCss = require('./packages/plugin-postcss/src/index');
+const rollupPluginAnalyzer = require('rollup-plugin-analyzer');
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
@@ -31,7 +32,21 @@ module.exports = {
     ...pluginGraphQL(),
     pluginPolyfills(),
     pluginPostCss(),
-    ...pluginImportCss()
+    ...pluginImportCss(),
+    {
+      type: 'rollup',
+      name: 'rollup-plugin-analyzer',
+      provider: () => {
+        return [
+          rollupPluginAnalyzer({
+            summaryOnly: true,
+            filter: (module) => {
+              return !module.id.endsWith('.html');
+            }
+          })
+        ];
+      }
+    }
   ],
   markdown: {
     plugins: [

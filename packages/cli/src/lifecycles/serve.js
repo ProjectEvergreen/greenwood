@@ -141,7 +141,7 @@ function getProdServer(compilation) {
 
   app.use(async ctx => {
     const { outputDir } = compilation.context;
-    const { url } = ctx.request;
+    const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
 
     if (url.endsWith('/') || url.endsWith('.html')) {
       const barePath = url.endsWith('/') ? path.join(url, 'index.html') : url;
