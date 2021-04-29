@@ -17,6 +17,7 @@
     "postcss-nested": "^4.1.2",
     "rehype-autolink-headings": "^4.0.0",
     "rehype-slug": "^3.0.0",
-    "remark-github": "^10.0.1"
+    "remark-github": "^10.0.1",
+    "rollup-plugin-analyzer": "^4.0.0"
   }
 }
