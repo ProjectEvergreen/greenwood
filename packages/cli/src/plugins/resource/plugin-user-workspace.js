@@ -14,14 +14,19 @@ class UserWorkspaceResource extends ResourceInterface {
     this.extensions = ['*'];
   }
 
+  getBareUrlPath(url) {
+    // get rid of things like query string parameters
+    return url.replace(/\?(.*)/, '');
+  }
+
   async shouldResolve(url = '/') {
-    return Promise.resolve(fs.existsSync(this.compilation.context.userWorkspace, url) || url === '/');
+    return Promise.resolve(fs.existsSync(this.compilation.context.userWorkspace, this.getBareUrlPath(url)) || url === '/');
   }
 
   async resolve(url = '/') {
     return new Promise(async (resolve, reject) => {
       try {
-        const workspaceUrl = path.join(this.compilation.context.userWorkspace, url);
+        const workspaceUrl = path.join(this.compilation.context.userWorkspace, this.getBareUrlPath(url));
         
         resolve(workspaceUrl);
       } catch (e) {
