@@ -3,6 +3,7 @@ const path = require('path');
 const Koa = require('koa');
 
 const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
+const pluginDevProxyResource = require('../plugins/resource/plugin-dev-proxy');
 const pluginResourceOptimizationMpa = require('../plugins/resource/plugin-optimization-mpa');
 const pluginSourceMaps = require('../plugins/resource/plugin-source-maps');
 const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
@@ -22,6 +23,7 @@ function getDevServer(compilation) {
     // Greenwood default standard resource and import plugins
     pluginUserWorkspace.provider(compilation),
     pluginNodeModules[0].provider(compilation),
+    pluginDevProxyResource.provider(compilationCopy),
     pluginResourceStandardCss.provider(compilationCopy),
     pluginResourceStandardFont.provider(compilationCopy),
     pluginResourceStandardHtml.provider(compilationCopy),

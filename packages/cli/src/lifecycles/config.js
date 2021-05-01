@@ -111,6 +111,10 @@ module.exports = readAndMergeConfig = async() => {
               customConfig.devServer.port = devServer.port;
             }
           }
+
+          if (devServer.proxy) {
+            customConfig.devServer.proxy = devServer.proxy;
+          }
         }
 
         if (markdown && Object.keys(markdown).length > 0) {
