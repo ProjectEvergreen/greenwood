@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const modes = ['ssg', 'mpa'];
+const modes = ['ssg', 'mpa', 'spa'];
 const optimizations = ['default', 'none', 'static', 'inline'];
 
 const defaultConfig = {

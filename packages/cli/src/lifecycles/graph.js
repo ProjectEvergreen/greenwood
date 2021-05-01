@@ -7,8 +7,13 @@ module.exports = generateGraph = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const { context } = compilation;
-      const { pagesDir } = context;
+      const { context, config } = compilation;
+      const { pagesDir, userWorkspace } = context;
+      let graph = [{
+        path: '/',
+        route: '/',
+        data: {}
+      }];
 
       const walkDirectoryForPages = function(directory, pages = []) {
         
@@ -123,12 +128,16 @@ module.exports = generateGraph = async (compilation) => {
         return pages;
       };
 
-      const graph = fs.existsSync(pagesDir)
-        ? walkDirectoryForPages(pagesDir)
-        : [{
-          path: '/',
-          route: '/' 
+      if (config.mode === 'spa') {
+        graph = [{
+          ...graph[0],
+          path: `${userWorkspace}/index.html`
         }];
+      } else {
+        graph = fs.existsSync(pagesDir)
+          ? walkDirectoryForPages(pagesDir)
+          : graph;
+      }
 
       compilation.graph = graph;
 
