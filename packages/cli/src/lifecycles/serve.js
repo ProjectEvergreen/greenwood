@@ -142,6 +142,7 @@ function getDevServer(compilation) {
 
 function getProdServer(compilation) {
   const app = new Koa();
+  const proxyPlugin = pluginDevProxyResource.provider(compilation);
 
   app.use(async ctx => {
     const { outputDir } = compilation.context;
@@ -198,6 +199,10 @@ function getProdServer(compilation) {
 
       ctx.set('Content-Type', 'application/json');
       ctx.body = JSON.parse(contents);
+    }
+
+    if (url !== '/' && await proxyPlugin.shouldServe(url)) {
+      ctx.body = await proxyPlugin.serve(url);
     }
   });
     
