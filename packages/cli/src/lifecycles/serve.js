@@ -202,7 +202,7 @@ function getProdServer(compilation) {
     }
 
     if (url !== '/' && await proxyPlugin.shouldServe(url)) {
-      ctx.body = await proxyPlugin.serve(url);
+      ctx.body = (await proxyPlugin.serve(url)).body;
     }
   });
     
