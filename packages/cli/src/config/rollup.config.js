@@ -196,9 +196,9 @@ function greenwoodHtmlPlugin(compilation) {
 
               if (!mappedScripts.get(id)) {
                 // using alert avoids having rollup strip out our internal marker if we used a commnent
-                const marker = `alert("${id}-${tokenSuffix}");`;
+                const marker = `${id}-${tokenSuffix}`;
                 const filename = `${marker}.js`;
-                const source = `${scriptTag.rawText}${marker}`.trim();
+                const source = `${scriptTag.rawText}alert("${marker}");`.trim();
 
                 fs.writeFileSync(path.join(scratchDir, filename), source);
                 mappedScripts.set(id, true);
@@ -414,37 +414,27 @@ function greenwoodHtmlPlugin(compilation) {
             // handle <script type="module"> /* inline code */ </script>
             if (parsedAttributes.type === 'module' && !parsedAttributes.src) {
               const id = hashString(scriptTag.rawText);
-              // const markerRegex = new RegExp(`alert\("[0-9]+-${tokenSuffix}"\)`);
-              const markerRegex = new RegExp(/alert\("[0-9]+-scratch"\)/);
+              const markerExp = `alert\\("[0-9]+-${tokenSuffix}"\\)`;
+              const markerRegex = new RegExp(markerExp);
 
-              console.debug('scriptTag.rawText', scriptTag.rawText);
               for (const innerBundleId of Object.keys(bundles)) {
-                console.debug('innerBundleId', innerBundleId);
                 if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js') {
                   const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8')
                     .replace(/\.\//g, '/'); // force absolute paths
                   
-                  console.debug('bundledSource', bundledSource);
-                  console.debug('markerRegex', markerRegex);
-                  console.debug('markerRegex test', markerRegex.test(bundledSource));
                   if (markerRegex.test(bundledSource)) {
-                    console.debug(bundledSource.match(/[0-9]+-scratch/));
                     const marker = bundledSource.match(/[0-9]+-scratch/)[0].split('-')[0];
-                    console.log('marker', marker);
-                    console.log('id', id);
+                    
                     if (id === marker) {
-                      console.log('@@@@@@@@@@@@ MATCH 11111');
                       const cleaned = bundledSource
-                        .replace(/,alert\("[0-9]+-scratch"\);\n/, '')
-                        .replace(/alert\("[0-9]+-scratch"\);\n/, '');
+                        .replace(new RegExp(`,${markerExp};\n`), '')
+                        .replace(new RegExp(`${markerExp};\n`), '');
 
-                      console.debug('cleaned', cleaned);
                       html = html.replace(scriptTag.rawText, cleaned);
                       scratchFiles[innerBundleId] = true;
                     }
                   }
                 }
-                console.debug('****************************');
               }
             }
           });
