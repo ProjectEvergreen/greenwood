@@ -423,7 +423,7 @@ function greenwoodHtmlPlugin(compilation) {
                     .replace(/\.\//g, '/'); // force absolute paths
                   
                   if (markerRegex.test(bundledSource)) {
-                    const marker = bundledSource.match(/[0-9]+-scratch/)[0].split('-')[0];
+                    const marker = bundledSource.match(new RegExp(`[0-9]+-${tokenSuffix}`))[0].split('-')[0];
                     
                     if (id === marker) {
                       const cleaned = bundledSource
