@@ -42,7 +42,7 @@ describe('Build Greenwood With: ', function() {
     this.context = { 
       publicDir: path.join(outputPath, 'public') 
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function() {
@@ -221,9 +221,11 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have two code split route javascript files emitted based code splitting', function() {
-        const aboutBundle = jsFiles.filter(file => (/about.*.js/).test(file));
-        const homeBundle = jsFiles.filter(file => (/home.*.js/).test(file));
+        const aboutBundle = jsFiles.filter(file => (/about.*.js/).test(path.basename(file)));
+        const homeBundle = jsFiles.filter(file => (/home.*.js/).test(path.basename(file)));
         
+        console.debug('aboutBundle', aboutBundle);
+        console.debug('homeBundle', homeBundle);
         expect(aboutBundle.length).to.equal(1);
         expect(homeBundle.length).to.equal(1);
       });
