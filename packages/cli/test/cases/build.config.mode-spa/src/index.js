@@ -17,12 +17,12 @@ class MyApp extends LitElement {
         <lit-route 
           path="/" 
           component="app-home"
-          .resolve="${() => { console.log('lazy load home'); return import('./routes/home.js') }}"
+          .resolve="${() => { console.log('lazy load home'); return import('./routes/home.js'); }}"
         ></lit-route>
         <lit-route 
           path="/about" 
           component="app-about"
-          .resolve="${() => { console.log('lazy load about'); return import('./routes/about.js') }}"
+          .resolve="${() => { console.log('lazy load about'); return import('./routes/about.js'); }}"
         ></lit-route>
       </div>
     `;
