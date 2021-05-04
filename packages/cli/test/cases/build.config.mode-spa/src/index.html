@@ -4,12 +4,26 @@
   <head>
     <meta-outlet></meta-outlet>
     <script type="module" src="/components/footer.js"></script>
+    <script type="module" src="/index.js"></script>
   </head>
 
   <body>
     <h1>SPA mode activated!</h1>
+    <nav>
+      <ul>
+        <li>
+          <a href="/">Home</a>
+        </li>
+        <li>
+          <a href="/about">About</a>
+        </li>
+      </ul>
+    </nav>
+
+    <my-app></my-app>
 
     <app-footer></app-footer>
+    
   </body>
 
 </html>

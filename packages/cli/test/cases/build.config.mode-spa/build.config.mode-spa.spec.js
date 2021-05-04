@@ -18,6 +18,9 @@
  *  src/
  *   components/
  *     footer.js
+ *   routes/
+ *     about.js
+ *     home.js
  *   index.js
  *   index.html
  */
@@ -39,7 +42,7 @@ describe('Build Greenwood With: ', function() {
     this.context = { 
       publicDir: path.join(outputPath, 'public') 
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
@@ -69,6 +72,78 @@ describe('Build Greenwood With: ', function() {
         `${process.cwd()}/node_modules/lit-html/lib/*.js`, 
         `${outputPath}/node_modules/lit-html/lib/`
       );
+      const litHtmlDirectives = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/directives/*.js`,
+        `${outputPath}/node_modules/lit-html/directives/`
+      );
+      const litReduxRouterPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-redux-router/package.json`,
+        `${outputPath}/node_modules/lit-redux-router/`
+      );
+      const litReduxRouter = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-redux-router/*.js`,
+        `${outputPath}/node_modules/lit-redux-router/`
+      );
+      const litReduxRouterLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-redux-router/lib/*.js`,
+        `${outputPath}/node_modules/lit-redux-router/lib/`
+      );
+      const pwaHelpersLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/pwa-helpers/*.js`,
+        `${outputPath}/node_modules/pwa-helpers/`
+      );
+      const pwaHelpersPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/pwa-helpers/package.json`,
+        `${outputPath}/node_modules/pwa-helpers/`
+      );
+      const reduxLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/redux/es/redux.mjs`,
+        `${outputPath}/node_modules/redux/es`
+      );
+      const reduxPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/redux/package.json`,
+        `${outputPath}/node_modules/redux/`
+      );
+      const regexParam = await getDependencyFiles(
+        `${process.cwd()}/node_modules/regexparam/dist/*`,
+        `${outputPath}/node_modules/regexparam/dist/`
+      );
+      const regexParamPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/regexparam/package.json`,
+        `${outputPath}/node_modules/regexparam/`
+      );
+      const looseLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/loose-envify/index.js`,
+        `${outputPath}/node_modules/loose-envify`
+      );
+      const looseLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/loose-envify/package.json`,
+        `${outputPath}/node_modules/loose-envify/`
+      );
+      const tokensLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/js-tokens/index.js`,
+        `${outputPath}/node_modules/js-tokens`
+      );
+      const tokensLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/js-tokens/package.json`,
+        `${outputPath}/node_modules/js-tokens/`
+      );
+      const symbolLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/symbol-observable/es/*.js`,
+        `${outputPath}/node_modules/symbol-observable/es`
+      );
+      const symobolLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/symbol-observable/package.json`,
+        `${outputPath}/node_modules/symbol-observable/`
+      );
+      const reduxThunk = await getDependencyFiles(
+        `${process.cwd()}/node_modules/redux-thunk/es/*.js`,
+        `${outputPath}/node_modules/redux-thunk/es`
+      );
+      const reduxThunkPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/redux-thunk/package.json`,
+        `${outputPath}/node_modules/redux-thunk/`
+      );
 
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
@@ -77,7 +152,25 @@ describe('Build Greenwood With: ', function() {
         ...litElementPackageJson,
         ...litHtmlPackageJson,
         ...litHtml,
-        ...litHtmlLibs
+        ...litHtmlLibs,
+        ...litHtmlDirectives,
+        ...litReduxRouterPackageJson,
+        ...litReduxRouter,
+        ...litReduxRouterLibs,
+        ...pwaHelpersLibs,
+        ...pwaHelpersPackageJson,
+        ...reduxLibs,
+        ...reduxPackageJson,
+        ...regexParam,
+        ...regexParamPackageJson,
+        ...looseLibs,
+        ...looseLibsPackageJson,
+        ...tokensLibs,
+        ...tokensLibsPackageJson,
+        ...symbolLibs,
+        ...symobolLibsPackageJson,
+        ...reduxThunkPackageJson,
+        ...reduxThunk
       ]);
       await runner.runCommand(cliPath, 'build');
     });
@@ -87,29 +180,55 @@ describe('Build Greenwood With: ', function() {
     describe('SPA (Single Page Application)', function() {
       let dom;
       let htmlFiles;
+      let jsFiles;
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
         htmlFiles = await glob(`${this.context.publicDir}/**/*.html`);
+        jsFiles = await glob(`${this.context.publicDir}/**/*.js`);
       });
       
       it('should only have one HTML file in the output directory', function() {
         expect(htmlFiles.length).to.be.equal(1);
       });
 
-      it('should have one <script> tag in the <head> for the footer', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head > script[type]');
+      it('should output five script files in the output directory', function() {
+        // one for each route (home, about)
+        // one for the footer.js
+        // one for index.js
+        // one for lit element bundle
+        expect(jsFiles.length).to.be.equal(5);
+      });
 
-        expect(scriptTags.length).to.be.equal(1);
-        expect(scriptTags[0].href).to.be.contain(/footer.*.js/);
-        expect(scriptTags[0].type).to.be.equal('module');
+      it('should only have two script tags in the <head>', function() {
+        expect(htmlFiles.length).to.be.equal(1);
+      });
+
+      it('should have one <script> tag in the <head> for index.js', function() {
+        const indexScript = Array.from(dom.window.document.querySelectorAll('head > script[type]'))
+          .filter(script => (/index.*.js/).test(script.src));
+
+        expect(indexScript.length).to.be.equal(1);
+        expect(indexScript[0].type).to.be.equal('module');
+      });
+
+      it('should have one <script> tag in the <head> for the footer.js', function() {
+        const footerScript = Array.from(dom.window.document.querySelectorAll('head > script[type]'))
+          .filter(script => (/footer.*.js/).test(script.src));
+
+        expect(footerScript.length).to.be.equal(1);
+        expect(footerScript[0].type).to.be.equal('module');
+      });
+
+      it('should have two code split route javascript files emitted based code splitting', function() {
+        const aboutBundle = jsFiles.filter(file => (/about.*.js/).test(file));
+        const homeBundle = jsFiles.filter(file => (/home.*.js/).test(file));
+        
+        expect(aboutBundle.length).to.equal(1);
+        expect(homeBundle.length).to.equal(1);
       });
 
       xit('shuuld not have a pre-rendered custom footer', function() {
-
-      });
-
-      xit('shuuld have appropraiate route based code splitting', function() {
 
       });
     });
