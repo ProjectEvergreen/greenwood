@@ -10,8 +10,8 @@ const META_DESCRIPTION = 'A modern and performant static site generator supporti
 const FAVICON_HREF = '/assets/favicon.ico';
 
 module.exports = {
-  workspace: path.join(__dirname, 'www'),
-  mode: 'mpa',
+  workspace: path.join(__dirname, 'spa'),
+  mode: 'spa',
   title: 'Greenwood',
   meta: [
     { name: 'description', content: META_DESCRIPTION },
