@@ -4,22 +4,42 @@ const path = require('path');
 const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
 const pluginOptimizationMpa = require('../plugins/resource/plugin-optimization-mpa');
 
-module.exports = prerenderCompilation = async (compilation) => {
-  const compilationCopy = Object.assign({}, compilation);
-  const browserRunner = new BrowserRunner();
+async function optimizePage(compilation, contents, route, outputDir) {
+  const outputPath = `${outputDir}${route}index.html`;
   const optimizeResources = [
-    pluginResourceStandardHtml.provider(compilationCopy),
-    pluginOptimizationMpa().provider(compilationCopy),
+    pluginResourceStandardHtml.provider(compilation),
+    pluginOptimizationMpa().provider(compilation),
     ...compilation.config.plugins.filter((plugin) => {
-      const provider = plugin.provider(compilationCopy);
+      const provider = plugin.provider(compilation);
 
       return plugin.type === 'resource' 
         && provider.shouldOptimize 
         && provider.optimize;
     }).map((plugin) => {
-      return plugin.provider(compilationCopy);
+      return plugin.provider(compilation);
     })
   ];
+
+  const htmlOptimized = await optimizeResources.reduce(async (htmlPromise, resource) => {
+    const html = await htmlPromise;
+    const shouldOptimize = await resource.shouldOptimize(outputPath, html);
+    
+    return shouldOptimize
+      ? resource.optimize(outputPath, html)
+      : Promise.resolve(html);
+  }, Promise.resolve(contents));
+
+  if (!fs.existsSync(path.join(outputDir, route))) {
+    fs.mkdirSync(path.join(outputDir, route), {
+      recursive: true
+    });
+  }
+  
+  await fs.promises.writeFile(outputPath, htmlOptimized);
+}
+
+async function preRenderCompilation(compilation) {
+  const browserRunner = new BrowserRunner();
 
   await browserRunner.init();
 
@@ -27,30 +47,14 @@ module.exports = prerenderCompilation = async (compilation) => {
     try {
       return Promise.all(pages.map(async(page) => {
         const { route } = page;
-        console.info('serializing page...', route);
+        console.info('prerendering page...', route);
         
         return await browserRunner
           .serialize(`${serverUrl}${route}`)
           .then(async (indexHtml) => {
-            const outputPath = `${outputDir}${route}index.html`;
-            console.info(`Serializing complete for page ${route}.`);
+            console.info(`prerendering complete for page ${route}.`);
             
-            const htmlOptimized = await optimizeResources.reduce(async (htmlPromise, resource) => {
-              const html = await htmlPromise;
-              const shouldOptimize = await resource.shouldOptimize(outputPath, html);
-              
-              return shouldOptimize
-                ? resource.optimize(outputPath, html)
-                : Promise.resolve(html);
-            }, Promise.resolve(indexHtml));
-
-            if (!fs.existsSync(path.join(outputDir, route))) {
-              fs.mkdirSync(path.join(outputDir, route), {
-                recursive: true
-              });
-            }
-            
-            await fs.promises.writeFile(outputPath, htmlOptimized);
+            await optimizePage(compilation, indexHtml, route, outputDir);
           });
       }));
     } catch (e) {
@@ -67,12 +71,12 @@ module.exports = prerenderCompilation = async (compilation) => {
       const outputDir = compilation.context.scratchDir;
       const serverAddress = `http://127.0.0.1:${port}`;
 
-      console.info(`Serializing pages at ${serverAddress}`);
-      console.debug('pages to generate', `\n ${pages.map(page => page.path).join('\n ')}`);
+      console.info(`Prerendering pages at ${serverAddress}`);
+      console.debug('pages to render', `\n ${pages.map(page => page.path).join('\n ')}`);
   
       await runBrowser(serverAddress, pages, outputDir);
       
-      console.info('done serializing all pages');
+      console.info('done prerendering all pages');
       browserRunner.close();
 
       resolve();
@@ -80,4 +84,28 @@ module.exports = prerenderCompilation = async (compilation) => {
       reject(err);
     }
   });
+}
+
+async function staticRenderCompilation(compilation) {
+  const pages = compilation.graph;
+  const scratchDir = compilation.context.scratchDir;
+  const htmlResource = pluginResourceStandardHtml.provider(compilation);
+
+  console.info('pages to generate', `\n ${pages.map(page => page.path).join('\n ')}`);
+  
+  await Promise.all(pages.map(async (page) => {
+    const route = page.route;
+    const response = await htmlResource.serve(route);
+
+    await optimizePage(compilation, response.body, route, scratchDir);
+
+    return Promise.resolve();
+  }));
+  
+  console.info('success, done generating all pages!');
+}
+
+module.exports = {
+  preRenderCompilation,
+  staticRenderCompilation
 };

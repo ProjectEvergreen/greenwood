@@ -10,7 +10,7 @@
  *
  * User Config
  * {
- *   prerender: 'false'
+ *   prerender: false
  * }
  *
  * User Workspace
