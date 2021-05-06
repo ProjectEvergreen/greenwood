@@ -259,7 +259,11 @@ module.exports = [{
   name: 'plugin-node-modules:rollup',
   provider: () => {
     return [
-      replace({ // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
+      replace({
+        // https://github.com/ProjectEvergreen/greenwood/issues/582
+        'preventAssignment': true,
+        
+        // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
         'process.env.NODE_ENV': JSON.stringify('production')
       }),
       nodeResolve()
