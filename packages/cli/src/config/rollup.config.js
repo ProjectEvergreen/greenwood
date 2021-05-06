@@ -195,10 +195,10 @@ function greenwoodHtmlPlugin(compilation) {
               const id = hashString(scriptTag.rawText);
 
               if (!mappedScripts.get(id)) {
-                // using alert avoids having rollup strip out our internal marker if we used a commnent
+                // using console.log avoids having rollup strip out our internal marker if we used a commnent
                 const marker = `${id}-${tokenSuffix}`;
                 const filename = `${marker}.js`;
-                const source = `${scriptTag.rawText}alert("${marker}");`.trim();
+                const source = `${scriptTag.rawText}console.log("${marker}");`.trim();
 
                 fs.writeFileSync(path.join(scratchDir, filename), source);
                 mappedScripts.set(id, true);
@@ -414,7 +414,7 @@ function greenwoodHtmlPlugin(compilation) {
             // handle <script type="module"> /* inline code */ </script>
             if (parsedAttributes.type === 'module' && !parsedAttributes.src) {
               const id = hashString(scriptTag.rawText);
-              const markerExp = `alert\\("[0-9]+-${tokenSuffix}"\\)`;
+              const markerExp = `console.log\\("[0-9]+-${tokenSuffix}"\\)`;
               const markerRegex = new RegExp(markerExp);
 
               for (const innerBundleId of Object.keys(bundles)) {
