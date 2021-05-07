@@ -207,7 +207,7 @@ describe('Build Greenwood With: ', function() {
       it('should have one <script> tag with inline code loaded in the <head> tag', function() {
         const scriptTagsInline = dom.window.document.querySelectorAll('head > script:not([src])');
         
-        expect(scriptTagsInline.length).to.be.equal(1);
+        expect(scriptTagsInline.length).to.be.equal(2);
       });
 
       it('should have the expected lit-element.js file in the output directory', async function() {
@@ -218,14 +218,20 @@ describe('Build Greenwood With: ', function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'lit-html.cdc8faae.js'))).to.have.lengthOf(1);
       });
 
-      it('should have the expected inline node_modules content in the inline script', async function() {
-        const inlineScriptTag = dom.window.document.querySelector('head > script:not([src])');
+      it('should have the expected inline node_modules content in the first inline script', async function() {
+        const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[0];
         
-        expect(inlineScriptTag.textContent).to
-          .contain('import"/lit-html.d69ea26f.js";import"/lit-element.ea26fec7.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline"');
+        expect(inlineScriptTag.textContent.replace('\n', '')).to
+          .equal('import"/lit-html.d69ea26f.js";import"/lit-element.ea26fec7.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline"');
       });
 
-      it('should have the expected output from inline <script> tag in the page output', async function() {
+      it('should have the expected inline node_modules content in the second inline script tag which should include extra code from rollup', async function() {
+        const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[1];
+        
+        expect(inlineScriptTag.textContent.replace('\n', '')).to.equal('import"/lit-html.d69ea26f.js";import"/lit-element.ea26fec7.js";');
+      });
+
+      it('should have the expected output from the first inline <script> tag in the page output', async function() {
         const inlineScriptOutput = dom.window.document.querySelectorAll('body > .output-script-inline');
         
         expect(inlineScriptOutput.length).to.be.equal(1);

@@ -6,7 +6,9 @@
     <script src="../scripts/other.js" type="module"></script>
     
     <script type="module">
-      document.getElementsByClassName('output-script-inline')[0].innerHTML = 'script tag module inline';
+      const one = 'script tag module inline one';
+
+      document.getElementsByClassName('output-script-inline-one')[0].innerHTML = one;
     </script>
 
     <style>
@@ -17,14 +19,35 @@
 
     <link rel="stylesheet" href="../styles/main.css"></link>
     <link href="../styles/other.css" rel="stylesheet"></link>
+
+    <script type="module">
+      const two = 'script tag module inline two';
+
+      document.getElementsByClassName('output-script-inline-two')[0].innerHTML = two;
+    </script>
+
+    <style>
+      span.output-style {
+        color: red;
+      }
+    </style>
+
+    <script>
+      const three = 'script tag module inline three';
+      
+      document.getElementsByClassName('output-script-inline-three')[0].innerHTML = three;
+    </script>
   </head>
 
   <body>
     <p class="output-script-src"></p>
-    <p class="output-script-inline"></p>
+    <p class="output-script-inline-one"></p>
     <p class="output-style"></p>
     <p class="output-link"></p>
     <p class="module-shim">let me tell you about type="module-shim"</p>
+    <p class="output-script-inline-two"></p>
+
+    <span>CSS output two</span>
   </body>
 
 </html>

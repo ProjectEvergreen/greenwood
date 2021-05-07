@@ -1,5 +1,4 @@
 /* eslint-disable max-depth, no-loop-func */
-const Buffer = require('buffer').Buffer;
 const fs = require('fs');
 const htmlparser = require('node-html-parser');
 const multiInput = require('rollup-plugin-multi-input').default;
@@ -11,6 +10,16 @@ const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-sta
 const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-json');
 const tokenSuffix = 'scratch';
 const tokenNodeModules = 'node_modules/';
+
+const hashString = (queryKeysString) => {
+  let h = 0;
+
+  for (let i = 0; i < queryKeysString.length; i += 1) {
+    h = Math.imul(31, h) + queryKeysString.charCodeAt(i) | 0; // eslint-disable-line no-bitwise
+  }
+
+  return Math.abs(h).toString();
+};
 
 const parseTagForAttributes = (tag) => {
   return tag.rawAttrs.split(' ').map((attribute) => {
@@ -183,14 +192,13 @@ function greenwoodHtmlPlugin(compilation) {
 
             // handle <script type="module">/* some inline JavaScript code */</script>
             if (parsedAttributes.type === 'module' && scriptTag.rawText !== '') {
-              const id = Buffer.from(scriptTag.rawText).toString('base64').slice(0, 8).toLowerCase();
+              const id = hashString(scriptTag.rawText);
 
               if (!mappedScripts.get(id)) {
-                const filename = `${id}-${tokenSuffix}.js`;
-                const source = `
-                  // ${filename}
-                  ${scriptTag.rawText}
-                `.trim();
+                // using console.log avoids having rollup strip out our internal marker if we used a commnent
+                const marker = `${id}-${tokenSuffix}`;
+                const filename = `${marker}.js`;
+                const source = `${scriptTag.rawText}console.log("${marker}");`.trim();
 
                 fs.writeFileSync(path.join(scratchDir, filename), source);
                 mappedScripts.set(id, true);
@@ -222,7 +230,7 @@ function greenwoodHtmlPlugin(compilation) {
               const filePath = path.join(basePath, href.replace('../', './'));
               const source = fs.readFileSync(filePath, 'utf-8');
               const to = `${outputDir}/${href}`;
-              const hash = Buffer.from(source).toString('base64').toLowerCase();
+              const hash = hashString(source);
               const fileName = href
                 .replace('.css', `.${hash.slice(0, 8)}.css`)
                 .replace('../', '')
@@ -396,8 +404,6 @@ function greenwoodHtmlPlugin(compilation) {
               const outputPath = path.join(basePath, src);
               const js = fs.readFileSync(outputPath, 'utf-8');
 
-              // scratchFiles[src] = true;
-
               html = html.replace(`<script ${scriptTag.rawAttrs}></script>`, `
                 <script type="module">
                   ${js}
@@ -407,13 +413,27 @@ function greenwoodHtmlPlugin(compilation) {
 
             // handle <script type="module"> /* inline code */ </script>
             if (parsedAttributes.type === 'module' && !parsedAttributes.src) {
+              const id = hashString(scriptTag.rawText);
+              const markerExp = `console.log\\("[0-9]+-${tokenSuffix}"\\)`;
+              const markerRegex = new RegExp(markerExp);
+
               for (const innerBundleId of Object.keys(bundles)) {
-                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js') {           
+                if (innerBundleId.indexOf(`-${tokenSuffix}`) > 0 && path.extname(innerBundleId) === '.js') {
                   const bundledSource = fs.readFileSync(path.join(outputDir, innerBundleId), 'utf-8')
                     .replace(/\.\//g, '/'); // force absolute paths
                   
-                  html = html.replace(scriptTag.rawText, bundledSource);
-                  scratchFiles[innerBundleId] = true;
+                  if (markerRegex.test(bundledSource)) {
+                    const marker = bundledSource.match(new RegExp(`[0-9]+-${tokenSuffix}`))[0].split('-')[0];
+                    
+                    if (id === marker) {
+                      const cleaned = bundledSource
+                        .replace(new RegExp(`,${markerExp};\n`), '')
+                        .replace(new RegExp(`${markerExp};\n`), '');
+
+                      html = html.replace(scriptTag.rawText, cleaned);
+                      scratchFiles[innerBundleId] = true;
+                    }
+                  }
                 }
               }
             }
@@ -430,8 +450,6 @@ function greenwoodHtmlPlugin(compilation) {
                   const href = linkTagAttributes.href;
                   const outputPath = path.join(outputDir, href);
                   const css = fs.readFileSync(outputPath, 'utf-8');
-
-                  // scratchFiles[href] = true;
 
                   html = html.replace(`<link ${linkTag.rawAttrs}>`, `
                     <style>

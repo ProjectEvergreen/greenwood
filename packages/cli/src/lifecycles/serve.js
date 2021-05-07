@@ -4,6 +4,7 @@ const Koa = require('koa');
 
 const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
 const pluginResourceOptimizationMpa = require('../plugins/resource/plugin-optimization-mpa');
+const pluginSourceMaps = require('../plugins/resource/plugin-source-maps');
 const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
 const pluginResourceStandardFont = require('../plugins/resource/plugin-standard-font');
 const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
@@ -27,6 +28,7 @@ function getDevServer(compilation) {
     pluginResourceStandardImage.provider(compilationCopy),
     pluginResourceStandardJavaScript[0].provider(compilationCopy),
     pluginResourceStandardJson[0].provider(compilationCopy),
+    pluginSourceMaps.provider(compilationCopy),
     pluginResourceOptimizationMpa().provider(compilationCopy),
 
     // custom user resource plugins
@@ -141,7 +143,7 @@ function getProdServer(compilation) {
 
   app.use(async ctx => {
     const { outputDir } = compilation.context;
-    const { url } = ctx.request;
+    const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
 
     if (url.endsWith('/') || url.endsWith('.html')) {
       const barePath = url.endsWith('/') ? path.join(url, 'index.html') : url;
