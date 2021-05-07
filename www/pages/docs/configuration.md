@@ -137,6 +137,21 @@ module.exports = {
 
 > _These settings are currently expiremental, and more fine grained control and intelligent based defaults will be coming soon!_
 
+### Prerender
+
+By default, [Greenwood pre-renders](/about/how-it-works/) all your _runtime_ JavaScript (Web Components, GraphQL calls, etc) across all your pages and captures the output as part of the final built HTML output.  This means you can have ["static" components](/docs/configuration/#optimization) that can just render once and generate all their initial HTML at build time.  This aims to provide a fully complete HTML document to the user, so even if JavaScript is disabled or something breaks in their browser, the user gets all the initial content.  And from there, progessive enhancement can take over.
+
+_However_, you may not need that, like for a [SPA (Single Page Application)](/docs/configuration#mode).  If you _don't_ want any sort of pre-rendering and just want to render out your markdown / HTML, add this setting to your _greenwood.config.js_ and set it to `false`.
+
+#### Example
+```js
+module.exports = {
+  prerender: false 
+}
+```
+
+> _**As of now, if you are using [plugin-graphql](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql) you cannot change this setting.**  We are working on improving support for server [side rendering and templating](https://github.com/ProjectEvergreen/greenwood/discussions/576) (with Web Components) as part of our [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3)._
+
 ### Title
 A default `<title>` element for all pages can be configured with the `title` option.
 
