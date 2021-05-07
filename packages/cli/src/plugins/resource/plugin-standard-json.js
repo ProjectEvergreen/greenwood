@@ -5,7 +5,7 @@
  *
  */
 const fs = require('fs');
-const json = require('@rollup/plugin-json');
+const path = require('path');
 const { ResourceInterface } = require('../../lib/resource-interface');
 
 class StandardJsonResource extends ResourceInterface {
@@ -15,30 +15,19 @@ class StandardJsonResource extends ResourceInterface {
     this.contentType = 'application/json';
   }
 
-  async serve(url, headers) {
+  async shouldServe(url) {
+    return Promise.resolve(path.basename(url) === 'graph.json');
+  }
+
+  async serve() {
     return new Promise(async (resolve, reject) => {
       try {
-        const filePath = url.indexOf('graph.json') >= 0
-          ? url.replace(userWorkspace, scratchDir)
-          : url;
-        const { scratchDir, userWorkspace } = this.compilation.context;
-        const { originalUrl } = headers.request;
-        const contents = await fs.promises.readFile(filePath, 'utf-8');
-        const isJsonInJs = originalUrl && originalUrl.indexOf('?type=json') >= 0;
-        let body;
-        let contentType;
-
-        if (isJsonInJs) {
-          contentType = 'text/javascript';
-          body = `export default ${contents}`;
-        } else {
-          body = JSON.parse(contents);
-          contentType = this.contentType;
-        }
+        const { scratchDir } = this.compilation.context; 
+        const json = await fs.promises.readFile(path.join(scratchDir, 'graph.json'), 'utf-8');
 
         resolve({
-          body,
-          contentType
+          body: JSON.parse(json),
+          contentType: this.contentType
         });
       } catch (e) {
         reject(e);
@@ -51,12 +40,4 @@ module.exports = [{
   type: 'resource',
   name: 'plugin-standard-json:resource',
   provider: (compilation, options) => new StandardJsonResource(compilation, options)
-}, {
-  type: 'resource',
-  name: 'plugin-standard-json:rollup',
-  provider: () => {
-    return [
-      json()
-    ];
-  }
 }];

@@ -7,6 +7,12 @@
 
     <link rel="stylesheet" href="/node_modules/prismjs/themes/prism-tomorrow.css"/>
     <link rel="stylesheet" href="/styles/home.css"/>
+
+    <script type="module">
+      fetch('/graph.json')
+        .then(resp => resp.json())
+        .then(resp => console.log(resp));
+    </script>
   </head>
   <body>
 

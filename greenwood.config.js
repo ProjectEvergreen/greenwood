@@ -2,6 +2,7 @@ const path = require('path');
 const pluginGoogleAnalytics = require('@greenwood/plugin-google-analytics');
 const pluginGraphQL = require('@greenwood/plugin-graphql');
 const pluginImportCss = require('@greenwood/plugin-import-css');
+const pluginImportJson = require('@greenwood/plugin-import-json');
 const pluginPolyfills = require('@greenwood/plugin-polyfills');
 const pluginPostCss = require('@greenwood/plugin-postcss');
 const rollupPluginAnalyzer = require('rollup-plugin-analyzer');
@@ -32,6 +33,7 @@ module.exports = {
     ...pluginGraphQL(),
     pluginPolyfills(),
     pluginPostCss(),
+    ...pluginImportJson(),
     ...pluginImportCss(),
     {
       type: 'rollup',
