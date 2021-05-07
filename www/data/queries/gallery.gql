@@ -1,9 +1,0 @@
-query($name: String!) {
-  gallery(name: $name)  {
-    name,
-    title,
-    images {
-      path
-    }
-  }
-}
