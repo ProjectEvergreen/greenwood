@@ -53,6 +53,14 @@ describe('Unit Test: Data', function() {
 
       });
 
+      describe('Prerender', function() {
+
+        it('should have a default prerender setting of false', function() {
+          expect(config.optimization).to.equal(MOCK_CONFIG.config.prerender);
+        });
+
+      });
+
       describe('Title', function() {
         const { title } = MOCK_CONFIG.config;
 

@@ -174,8 +174,25 @@ And the directory structure for it:
       │   ├── index.md
       ├── styles
       │   └── theme.css
-      ├── templates/
+      └── templates/
           └── app.html
 ```
 
 > _It is recommended to use the "file" based approaches for loading JavaScript and CSS; `<script src="...">` and `<link rel="stylesheet" href="...">` respectively.  This will allow Greenwood to optimize these assets during both development and build workflows.  However, inline `<script>` and `<style>` can both be super helpful for one-off cases, so in those cases we recommend only relying on "vanilla" JS / CSS syntax. For more context, examples, and background information, you can [review this PR](https://github.com/ProjectEvergreen/greenwood/pull/472)._
+
+### Single Page Applications
+
+If you would like to build a SPA and only deal with client side rendering, Greenwood can [support that](/docs/configuration#mode)!  As the name implies, your layout will be slightly different in this case.  Below is an example layout of a SPA, and you can see a working example in our [test suite](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/test/cases/build.config.mode-spa) where we validate using [**lit-redux-router**](https://github.com/fernandopasik/lit-redux-router) with route based code splitting.
+
+```shell
+
+└── src
+      ├── components
+      │   └── app-footer.js
+      ├── routes
+      │   ├── about.js
+      │   └── home.js
+      ├── styles.css
+      ├── index.js
+      └── index.html
+```

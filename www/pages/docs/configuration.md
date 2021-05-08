@@ -32,12 +32,17 @@ module.exports = {
 ### Dev Server
 Configuration for Greenwood's development server is available using the `devServer` option.
 - `port`: Pick a different port when starting the dev server
+- `proxy`: A set of paths to match and re-route to other hosts.  Highest specificty should go at the end.
 
 #### Example
 ```js
 module.exports = {
   devServer: {
-    port: 8181
+    port: 8181,
+    proxy: {
+      '/api': 'https://stage.myapp.com',
+      '/api/foo': 'https://foo.otherdomain.net'
+    }
   }
 }
 ```
@@ -104,8 +109,9 @@ Greenwood provides a couple different "modes" by which you can indicate the type
 
 | Option | Description | Use Cases |
 | ------ | ----------- | --------- |
-|`mpa` | Assumes an `ssg` based site, but additionally adds a client side router to create a _Multi Page Application_. | Any `ssg` based site where content lines up well with templates to help with transition between similar pages, like blogs and documentation sites. |
 |`ssg` | (_Default_) Generates a pre-rendered statically generated website from [pages and templates](/docs/layouts/)at build time. | Blog, portfolio, anything really! |
+|`mpa` | Assumes an `ssg` based site, but additionally adds a client side router to create a _Multi Page Application_. | Any `ssg` based site where content lines up well with templates to help with transition between similar pages, like blogs and documentation sites. |
+|`spa` | For building and bundling a _Single Page Application (SPA)_ with client side routing and a [single _index.html_ file](/docs/layouts/#single-page-applications). | Any type of client side only rendered application. |
 
 #### Example
 ```js
@@ -136,6 +142,21 @@ module.exports = {
 ```
 
 > _These settings are currently expiremental, and more fine grained control and intelligent based defaults will be coming soon!_
+
+### Prerender
+
+By default, [Greenwood pre-renders](/about/how-it-works/) all your _runtime_ JavaScript (Web Components, GraphQL calls, etc) across all your pages and captures the output as part of the final built HTML output.  This means you can have ["static" components](/docs/configuration/#optimization) that can just render once and generate all their initial HTML at build time.  This aims to provide a fully complete HTML document to the user, so even if JavaScript is disabled or something breaks in their browser, the user gets all the initial content.  And from there, progessive enhancement can take over.
+
+_However_, you may not need that, like for a [SPA (Single Page Application)](/docs/configuration#mode).  If you _don't_ want any sort of pre-rendering and just want to render out your markdown / HTML, add this setting to your _greenwood.config.js_ and set it to `false`.
+
+#### Example
+```js
+module.exports = {
+  prerender: false 
+}
+```
+
+> _**As of now, if you are using [plugin-graphql](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql) you cannot change this setting.**  We are working on improving support for server [side rendering and templating](https://github.com/ProjectEvergreen/greenwood/discussions/576) (with Web Components) as part of our [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3)._
 
 ### Title
 A default `<title>` element for all pages can be configured with the `title` option.

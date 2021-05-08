@@ -368,5 +368,7 @@ class HeaderComponent extends LitElement {
 customElements.define('app-header', HeaderComponent);
 ```
 
+> _For more information on using GraphQL with Greenwood, please see our [GraphQL plugin's README](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql)._
+
 ### External Sources
 Coming [soon](https://github.com/ProjectEvergreen/greenwood/issues/21)!
