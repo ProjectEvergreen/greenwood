@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const modes = ['ssg', 'mpa'];
+const modes = ['ssg', 'mpa', 'spa'];
 const optimizations = ['default', 'none', 'static', 'inline'];
 
 const defaultConfig = {
@@ -128,6 +128,11 @@ module.exports = readAndMergeConfig = async() => {
           } else {
             reject(`Error: greenwood.config.js prerender must be a boolean; true or false.  Passed value was typeof: ${typeof prerender}`);
           }
+        }
+        
+        // SPA should _not_ prerender if user has specified prerender should be true
+        if (prerender === undefined && mode === 'spa') {
+          customConfig.prerender = false;
         }
       }
 

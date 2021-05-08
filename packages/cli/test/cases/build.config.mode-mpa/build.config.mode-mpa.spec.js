@@ -56,6 +56,8 @@ describe('Build Greenwood With: ', function() {
       await runner.runCommand(cliPath, 'build');
     });
 
+    runSmokeTest(['public', 'index'], LABEL);
+
     describe('MPA (Multi Page Application)', function() {
       let dom;
       let aboutDom;

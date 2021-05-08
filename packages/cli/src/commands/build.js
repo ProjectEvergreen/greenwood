@@ -12,6 +12,7 @@ module.exports = runProductionBuild = async () => {
 
     try {
       const compilation = await generateCompilation();
+      const { prerender } = compilation.config;
       const port = compilation.config.devServer.port;
       const outputDir = compilation.context.outputDir;
 
@@ -19,7 +20,7 @@ module.exports = runProductionBuild = async () => {
         fs.mkdirSync(outputDir);
       }
       
-      if (compilation.config.prerender) {
+      if (prerender) {
         await new Promise((resolve) => {
           devServer(compilation).listen(port, async () => {
             console.info(`Started local development server at localhost:${port}`);

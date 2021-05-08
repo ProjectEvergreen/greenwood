@@ -109,8 +109,9 @@ Greenwood provides a couple different "modes" by which you can indicate the type
 
 | Option | Description | Use Cases |
 | ------ | ----------- | --------- |
-|`mpa` | Assumes an `ssg` based site, but additionally adds a client side router to create a _Multi Page Application_. | Any `ssg` based site where content lines up well with templates to help with transition between similar pages, like blogs and documentation sites. |
 |`ssg` | (_Default_) Generates a pre-rendered statically generated website from [pages and templates](/docs/layouts/)at build time. | Blog, portfolio, anything really! |
+|`mpa` | Assumes an `ssg` based site, but additionally adds a client side router to create a _Multi Page Application_. | Any `ssg` based site where content lines up well with templates to help with transition between similar pages, like blogs and documentation sites. |
+|`spa` | For building and bundling a _Single Page Application (SPA)_ with client side routing and a [single _index.html_ file](/docs/layouts/#single-page-applications). | Any type of client side only rendered application. |
 
 #### Example
 ```js

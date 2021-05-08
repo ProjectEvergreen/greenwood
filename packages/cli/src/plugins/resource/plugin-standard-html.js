@@ -240,6 +240,7 @@ class StandardHtmlResource extends ResourceInterface {
       try {
         const config = Object.assign({}, this.compilation.config);
         const { userWorkspace, projectDirectory } = this.compilation.context;
+        const { mode } = this.compilation.config;
         const normalizedUrl = this.getRelativeUserworkspaceUrl(url);
         let customImports;
 
@@ -252,7 +253,7 @@ class StandardHtmlResource extends ResourceInterface {
         const isMarkdownContent = fs.existsSync(`${barePath}.md`)
           || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`)
           || fs.existsSync(`${barePath.replace('/index', '.md')}`);
-
+        
         if (isMarkdownContent) {
           const markdownPath = fs.existsSync(`${barePath}.md`)
             ? `${barePath}.md`
@@ -302,9 +303,14 @@ class StandardHtmlResource extends ResourceInterface {
             }
           }
         }
-        
-        body = getPageTemplate(barePath, userWorkspace, template);
-        body = getAppTemplate(body, userWorkspace, customImports);
+      
+        if (mode === 'spa') {
+          body = fs.readFileSync(this.compilation.graph[0].path, 'utf-8');
+        } else {
+          body = getPageTemplate(barePath, userWorkspace, template);
+        }
+
+        body = getAppTemplate(body, userWorkspace, customImports);  
         body = getUserScripts(body, projectDirectory);
         body = getMetaContent(normalizedUrl, config, body);
         
