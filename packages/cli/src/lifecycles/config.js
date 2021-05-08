@@ -14,7 +14,8 @@ const defaultConfig = {
   title: 'My App',
   meta: [],
   plugins: [],
-  markdown: { plugins: [], settings: {} }
+  markdown: { plugins: [], settings: {} },
+  prerender: true
 };
 
 module.exports = readAndMergeConfig = async() => {
@@ -26,7 +27,7 @@ module.exports = readAndMergeConfig = async() => {
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, title, markdown, meta, mode, optimization, plugins } = userCfgFile;
+        const { workspace, devServer, title, markdown, meta, mode, optimization, plugins, prerender } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -116,7 +117,16 @@ module.exports = readAndMergeConfig = async() => {
           customConfig.markdown.plugins = markdown.plugins && markdown.plugins.length > 0 ? markdown.plugins : [];
           customConfig.markdown.settings = markdown.settings ? markdown.settings : {};
         }
+
+        if (prerender !== undefined) {
+          if (typeof prerender === 'boolean') {
+            customConfig.prerender = prerender;
+          } else {
+            reject(`Error: greenwood.config.js prerender must be a boolean; true or false.  Passed value was typeof: ${typeof prerender}`);
+          }
+        }
       }
+
       resolve({ ...defaultConfig, ...customConfig });
     } catch (err) {
       reject(err);
