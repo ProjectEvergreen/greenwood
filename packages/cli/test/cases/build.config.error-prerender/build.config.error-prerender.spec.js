@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with a bad value for mode in a custom config.
+ * Run Greenwood build command with a bad value for title in a custom config.
  *
  * User Result
  * Should throw an error.
@@ -10,7 +10,7 @@
  *
  * User Config
  * {
- *   mode: 'lorumipsum'
+ *   title: {}
  * }
  *
  * User Workspace
@@ -25,20 +25,20 @@ describe('Build Greenwood With: ', function() {
   const outputPath = __dirname;
   let runner;
 
-  before(function() {
+  before(async function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
     runner = new Runner();
   });
 
-  describe('Custom Configuration with a bad value for mode', function() {
-    it('should throw an error that provided mode is not valid', async function() {
+  describe('Custom Configuration with a bad value for Prerender', function() {
+    it('should throw an error that prerender must be a boolean', async function() {
       try {
         await runner.setup(outputPath);
         await runner.runCommand(cliPath, 'build');
       } catch (err) {
-        expect(err).to.contain('Error: provided mode "loremipsum" is not supported.  Please use one of: ssg, mpa, spa.');
+        expect(err).to.contain('Error: greenwood.config.js prerender must be a boolean; true or false.  Passed value was typeof: object');
       }
     });
   });
