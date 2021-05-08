@@ -20,7 +20,7 @@ module.exports = {
   checkCoverage: true,
 
   statements: 80,
-  branches: 65,
+  branches: 60,
   functions: 80,
   lines: 80,
 

@@ -32,12 +32,17 @@ module.exports = {
 ### Dev Server
 Configuration for Greenwood's development server is available using the `devServer` option.
 - `port`: Pick a different port when starting the dev server
+- `proxy`: A set of paths to match and re-route to other hosts.  Highest specificty should go at the end.
 
 #### Example
 ```js
 module.exports = {
   devServer: {
-    port: 8181
+    port: 8181,
+    proxy: {
+      '/api': 'https://stage.myapp.com',
+      '/api/foo': 'https://foo.otherdomain.net'
+    }
   }
 }
 ```
