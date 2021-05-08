@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og:http://ogp.me/ns#">
+
+  <head>
+    <script type="module">
+      import client from '@greenwood/plugin-graphql/core/client';
+      import GalleryQuery from '/data/queries/gallery.gql';
+
+      client.query({
+        query: GalleryQuery,
+        variables: {
+          name: 'logos'
+        }
+      }).then((response) => {
+        const logosGallery = response.data.gallery[0];
+        const title = logosGallery.title;
+
+        Array.from(document.getElementsByTagName('img')).forEach((image, i) => {
+          image.setAttribute('src', logosGallery.images[i].path);
+          image.setAttribute('title', `${title} - Logo #${++i}`);
+        });
+
+        document.getElementsByTagName('h2')[0].innerHTML = title;
+      });
+    </script>
+  </head>
+  
+  <body>
+    <h2></h2>
+    <img src="#"/>
+    <img src="#"/>
+    <img src="#"/>
+  </body>
+
+</html>

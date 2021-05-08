@@ -2,7 +2,7 @@ const { ApolloServer } = require('apollo-server');
 
 module.exports = (compilation) => {
   const { config, graph, context } = compilation;
-  const schema = require('../schema/schema')(graph);
+  const schema = require('../schema/schema')(compilation);
   const createCache = require('./cache');
 
   const server = new ApolloServer({
