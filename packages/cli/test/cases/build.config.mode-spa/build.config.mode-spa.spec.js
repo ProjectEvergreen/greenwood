@@ -228,8 +228,10 @@ describe('Build Greenwood With: ', function() {
         expect(homeBundle.length).to.equal(1);
       });
 
-      xit('shuuld not have a pre-rendered custom footer', function() {
+      it('should not have a pre-rendered custom footer', function() {
+        const footer = dom.window.document.querySelector('app-footer');
 
+        expect(footer.textContent).to.be.equal('');
       });
     });
 
