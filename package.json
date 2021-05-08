@@ -25,13 +25,6 @@
     "lint:css": "stylelint \"./www/**/*.js\", \"./www/**/*.css\"",
     "lint": "ls-lint && yarn lint:js && yarn lint:css"
   },
-  "dependencies": {
-    "lit-element": "^2.4.0",
-    "lit-redux-router": "^0.17.1",
-    "pwa-helpers": "^0.9.1",
-    "redux": "^4.0.5",
-    "redux-thunk": "^2.3.0"
-  },
   "devDependencies": {
     "@ls-lint/ls-lint": "^1.9.2",
     "babel-eslint": "^10.1.0",
