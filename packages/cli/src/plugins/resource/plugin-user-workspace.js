@@ -21,8 +21,9 @@ class UserWorkspaceResource extends ResourceInterface {
 
   async shouldResolve(url = '/') {
     const bareUrl = this.getBareUrlPath(url);
+    const isWorkspaceFile = fs.existsSync(path.join(this.compilation.context.userWorkspace, bareUrl));
 
-    return Promise.resolve(fs.existsSync(this.compilation.context.userWorkspace, bareUrl) || bareUrl === '/');
+    return Promise.resolve(isWorkspaceFile || bareUrl === '/');
   }
 
   async resolve(url = '/') {
