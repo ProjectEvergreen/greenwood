@@ -200,6 +200,14 @@ describe('Build Greenwood With: ', function() {
         expect(jsFiles.length).to.be.equal(5);
       });
 
+      it('should have custom <meta> tag in the <head>', function() {
+        const customMeta = Array.from(dom.window.document.querySelectorAll('head > meta'))
+          .filter(meta => meta.getAttribute('property') === 'og:description');
+
+        expect(customMeta.length).to.be.equal(1);
+        expect(customMeta[0].getAttribute('content')).to.be.equal('My custom meta content.');
+      });
+
       it('should only have two script tags in the <head>', function() {
         expect(htmlFiles.length).to.be.equal(1);
       });

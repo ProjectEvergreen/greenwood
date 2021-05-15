@@ -57,7 +57,7 @@ function getDevServer(compilation) {
       return resourceShouldResolveUrl
         ? resource.resolve(url)
         : Promise.resolve(response);
-    }, Promise.resolve(''));
+    }, Promise.resolve(ctx.url));
 
     await next();
   });
