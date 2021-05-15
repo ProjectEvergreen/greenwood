@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/cli",
-  "version": "0.11.1",
+  "version": "0.12.2",
   "description": "Greenwood CLI.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -53,10 +53,12 @@
   "devDependencies": {
     "@mapbox/rehype-prism": "^0.5.0",
     "lit-element": "^2.4.0",
+    "lit-redux-router": "^0.17.1",
     "lodash-es": "^4.17.20",
     "postcss-nested": "^4.1.2",
     "pwa-helpers": "^0.9.1",
     "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0",
     "rehype-autolink-headings": "^4.0.0",
     "rehype-slug": "^3.0.0",
     "simpledotcss": "^1.0.0"

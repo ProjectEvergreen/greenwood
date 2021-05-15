@@ -3,6 +3,7 @@ const path = require('path');
 const Koa = require('koa');
 
 const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
+const pluginDevProxyResource = require('../plugins/resource/plugin-dev-proxy');
 const pluginResourceOptimizationMpa = require('../plugins/resource/plugin-optimization-mpa');
 const pluginSourceMaps = require('../plugins/resource/plugin-source-maps');
 const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
@@ -22,6 +23,7 @@ function getDevServer(compilation) {
     // Greenwood default standard resource and import plugins
     pluginUserWorkspace.provider(compilation),
     pluginNodeModules[0].provider(compilation),
+    pluginDevProxyResource.provider(compilationCopy),
     pluginResourceStandardCss.provider(compilationCopy),
     pluginResourceStandardFont.provider(compilationCopy),
     pluginResourceStandardHtml.provider(compilationCopy),
@@ -55,7 +57,7 @@ function getDevServer(compilation) {
       return resourceShouldResolveUrl
         ? resource.resolve(url)
         : Promise.resolve(response);
-    }, Promise.resolve(''));
+    }, Promise.resolve(ctx.url));
 
     await next();
   });
@@ -140,13 +142,19 @@ function getDevServer(compilation) {
 
 function getProdServer(compilation) {
   const app = new Koa();
+  const proxyPlugin = pluginDevProxyResource.provider(compilation);
 
   app.use(async ctx => {
     const { outputDir } = compilation.context;
+    const { mode } = compilation.config;
     const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
 
     if (url.endsWith('/') || url.endsWith('.html')) {
-      const barePath = url.endsWith('/') ? path.join(url, 'index.html') : url;
+      const barePath = mode === 'spa'
+        ? 'index.html'
+        : url.endsWith('/')
+          ? path.join(url, 'index.html')
+          : url;
       const contents = await fs.promises.readFile(path.join(outputDir, barePath), 'utf-8');
       
       ctx.set('Content-Type', 'text/html');
@@ -196,6 +204,10 @@ function getProdServer(compilation) {
 
       ctx.set('Content-Type', 'application/json');
       ctx.body = JSON.parse(contents);
+    }
+
+    if (url !== '/' && await proxyPlugin.shouldServe(url)) {
+      ctx.body = (await proxyPlugin.serve(url)).body;
     }
   });
     

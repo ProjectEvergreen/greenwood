@@ -24,6 +24,7 @@ const configTypeDefs = gql`
     meta: [Meta],
     mode: String,
     optimization: String,
+    prerender: Boolean,
     title: String,
     workspace: String
   }
