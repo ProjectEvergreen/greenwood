@@ -34,9 +34,6 @@ const getPageTemplate = (barePath, workspace, template) => {
   } else if (fs.existsSync(`${templatesDir}/page.html`)) {
     // else look for default page template
     contents = fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
-  } else if (fs.existsSync(`${templatesDir}/app.html`)) {
-    // fallback to just using their app template
-    contents = fs.readFileSync(`${templatesDir}/app.html`, 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
     contents = fs.readFileSync(path.join(__dirname, '../../templates/page.html'), 'utf-8');
@@ -64,10 +61,11 @@ const getAppTemplate = (contents, userWorkspace, customImports = []) => {
   const body = root.querySelector('body').innerHTML;
   const headScripts = root.querySelectorAll('head script');
   const headLinks = root.querySelectorAll('head link');
+  const headMeta = root.querySelectorAll('head meta');
   const headStyles = root.querySelectorAll('head style');
 
   appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
-  
+
   headScripts.forEach((script) => {
     const matchNeedle = '</script>';
     const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
@@ -139,7 +137,14 @@ const getAppTemplate = (contents, userWorkspace, customImports = []) => {
       }
     }
   });
-  
+
+  headMeta.forEach((meta) => {
+    appTemplateContents = appTemplateContents.replace('<head>', `
+      <head>
+        <meta ${meta.rawAttrs}/>
+    `);
+  });
+
   customImports.forEach((customImport) => {
     const extension = path.extname(customImport);
 
