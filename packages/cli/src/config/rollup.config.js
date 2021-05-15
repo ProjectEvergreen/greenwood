@@ -90,7 +90,7 @@ function greenwoodWorkspaceResolver (compilation) {
 
   return {
     name: 'greenwood-workspace-resolver',
-    resolveId(source) {      
+    resolveId(source) {
       if ((source.indexOf('./') === 0 || source.indexOf('/') === 0) && path.extname(source) !== '.html' && fs.existsSync(path.join(userWorkspace, source))) {        
         return source.replace(source, path.join(userWorkspace, source));
       }

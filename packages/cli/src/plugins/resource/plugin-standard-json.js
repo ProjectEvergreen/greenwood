@@ -6,7 +6,6 @@
  */
 const fs = require('fs');
 const json = require('@rollup/plugin-json');
-const path = require('path');
 const { ResourceInterface } = require('../../lib/resource-interface');
 
 class StandardJsonResource extends ResourceInterface {
@@ -34,7 +33,7 @@ class StandardJsonResource extends ResourceInterface {
           body = `export default ${contents}`;
         } else {
           body = JSON.parse(contents);
-          contentType = this.contentType
+          contentType = this.contentType;
         }
 
         resolve({
