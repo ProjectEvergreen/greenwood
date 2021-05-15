@@ -90,7 +90,7 @@ function greenwoodWorkspaceResolver (compilation) {
 
   return {
     name: 'greenwood-workspace-resolver',
-    resolveId(source) {
+    resolveId(source) {      
       if ((source.indexOf('./') === 0 || source.indexOf('/') === 0) && path.extname(source) !== '.html' && fs.existsSync(path.join(userWorkspace, source))) {        
         return source.replace(source, path.join(userWorkspace, source));
       }
@@ -118,11 +118,17 @@ function greenwoodHtmlPlugin(compilation) {
 
   return {
     name: 'greenwood-html-plugin',
-    // tell Rollup how to handle HTML entry points 
-    // and other custom user resource types like .ts, .gql, etc
     async load(id) {
       const extension = path.extname(id);
-      
+      const importAsRegex = /\?type=(.*)/;
+
+      if (importAsRegex.test(id)) {
+        const match = id.match(importAsRegex);
+        const importee = id.replace(match[0], '');
+        
+        return `export {default} from '${importee}';`;
+      }
+
       switch (extension) {
 
         case '.html':
