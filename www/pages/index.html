@@ -7,14 +7,6 @@
 
     <link rel="stylesheet" href="/node_modules/prismjs/themes/prism-tomorrow.css"/>
     <link rel="stylesheet" href="/styles/home.css"/>
-
-    <script type="module">
-      console.debug(window.location.search);
-
-      fetch('/assets/data.json')
-        .then(resp => resp.json())
-        .then(resp => console.debug('DATA', resp));
-    </script>
   </head>
   <body>
 
