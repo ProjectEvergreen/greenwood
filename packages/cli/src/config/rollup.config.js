@@ -118,6 +118,8 @@ function greenwoodHtmlPlugin(compilation) {
 
   return {
     name: 'greenwood-html-plugin',
+    // tell Rollup how to handle HTML entry points 
+    // and other custom user resource types like .ts, .gql, etc
     async load(id) {
       const extension = path.extname(id);
       const importAsRegex = /\?type=(.*)/;
