@@ -97,14 +97,18 @@ function defaultIndex(label) {
         });
 
         it('should have default viewport <meta> tag', function() {
-          const viewportMeta = metaTags[1];
+          const viewportMeta = Array.from(metaTags).filter(meta => meta.getAttribute('name') === 'viewport');
           
-          expect(viewportMeta.getAttribute('name')).to.be.equal('viewport');
-          expect(viewportMeta.getAttribute('content')).to.be.equal('width=device-width, initial-scale=1');
+          expect(viewportMeta.length).to.be.equal(1);
+          expect(viewportMeta[0].getAttribute('name')).to.be.equal('viewport');
+          expect(viewportMeta[0].getAttribute('content')).to.be.equal('width=device-width, initial-scale=1');
         });
 
         it('should have default charset <meta> tag', function() {
-          expect(metaTags[0].getAttribute('charset')).to.be.equal('utf-8');
+          const chartsetMeta = Array.from(metaTags).filter(meta => meta.getAttribute('charset') === 'utf-8');
+
+          expect(chartsetMeta.length).to.be.equal(1);
+          expect(chartsetMeta[0].getAttribute('charset')).to.be.equal('utf-8');
         });
       });
 
