@@ -122,6 +122,9 @@ function greenwoodHtmlPlugin(compilation) {
       const extension = path.extname(id);
       const importAsRegex = /\?type=(.*)/;
 
+      // bit of a hack to get these two bugs to play well together
+      // https://github.com/ProjectEvergreen/greenwood/issues/598
+      // https://github.com/ProjectEvergreen/greenwood/issues/604
       if (importAsRegex.test(id)) {
         const match = id.match(importAsRegex);
         const importee = id.replace(match[0], '');
