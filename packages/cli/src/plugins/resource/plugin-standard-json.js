@@ -15,15 +15,18 @@ class StandardJsonResource extends ResourceInterface {
     this.contentType = 'application/json';
   }
 
-  async shouldServe(url) {
-    return Promise.resolve(path.basename(url) === 'graph.json');
+  async shouldServe(url = '') {
+    return Promise.resolve(path.extname(url) === '.json');
   }
 
-  async serve() {
+  async serve(url) {
     return new Promise(async (resolve, reject) => {
       try {
         const { scratchDir } = this.compilation.context; 
-        const json = await fs.promises.readFile(path.join(scratchDir, 'graph.json'), 'utf-8');
+        const filePath = path.basename(url) === 'graph.json'
+          ? path.join(scratchDir, 'graph.json')
+          : url;
+        const json = await fs.promises.readFile(filePath, 'utf-8');
 
         resolve({
           body: JSON.parse(json),

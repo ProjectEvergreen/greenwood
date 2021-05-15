@@ -11,7 +11,11 @@
     <script type="module">
       fetch('/graph.json')
         .then(resp => resp.json())
-        .then(resp => console.log(resp));
+        .then(resp => console.log('GRAPH!', resp));
+
+      fetch('/data.json')
+        .then(resp => resp.json())
+        .then(resp => console.log('DATA!', resp));
     </script>
   </head>
   <body>

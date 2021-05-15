@@ -105,7 +105,7 @@ function getDevServer(compilation) {
   });
 
   // allow intercepting of urls (response)
-  app.use(async (ctx, next) => {
+  app.use(async (ctx) => {
     const modifiedResources = resources.concat(
       pluginLiveReloadResource.provider(compilation)
     );
@@ -138,15 +138,8 @@ function getDevServer(compilation) {
       }
     }, Promise.resolve(responseAccumulator));
 
-    console.debug('url', ctx.url);
-    if (path.extname(ctx.url) === '.json') {
-      console.debug('interceptedResponse', reducedResponse);
-    }
-
     ctx.set('Content-Type', reducedResponse.contentType);
     ctx.body = reducedResponse.body;
-
-    await next();
   });
 
   return app;

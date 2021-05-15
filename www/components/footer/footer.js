@@ -13,6 +13,8 @@ class FooterComponent extends LitElement {
   render() {
     const { version } = json;
 
+    console.debug('VERSION', version);
+
     return html`
       <footer class="footer">
         <h4>
