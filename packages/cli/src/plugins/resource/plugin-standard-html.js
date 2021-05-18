@@ -225,19 +225,19 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   getRelativeUserworkspaceUrl(url) {
-    return url.replace(this.compilation.context.userWorkspace, '');
+    return path.normalize(url.replace(this.compilation.context.userWorkspace, ''));
   }
 
   async shouldServe(url) {
     const { userWorkspace } = this.compilation.context;
     const relativeUrl = this.getRelativeUserworkspaceUrl(url);
-    const barePath = relativeUrl.endsWith('/')
-      ? `${userWorkspace}/pages${relativeUrl}index`
-      : `${userWorkspace}/pages${relativeUrl.replace('.html', '')}`;
-      
-    return Promise.resolve((this.extensions.indexOf(path.extname(relativeUrl)) >= 0 || path.extname(relativeUrl) === '') && 
-      (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index')
-      || fs.existsSync(`${barePath}.md`) || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`));
+    const barePath = relativeUrl.endsWith(path.sep)
+      ? `${userWorkspace}${path.sep}pages${relativeUrl}index`
+      : `${userWorkspace}${path.sep}pages${relativeUrl.replace('.html', '')}`;
+    
+    return Promise.resolve(this.extensions.indexOf(path.extname(relativeUrl)) >= 0 || path.extname(relativeUrl) === '') && 
+    (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index')
+    || fs.existsSync(`${barePath}.md`) || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`);
   }
 
   async serve(url) {
@@ -252,19 +252,19 @@ class StandardHtmlResource extends ResourceInterface {
         let body = '';
         let template = null;
         let processedMarkdown = null;
-        const barePath = normalizedUrl.endsWith('/')
-          ? `${userWorkspace}/pages${normalizedUrl}index`
-          : `${userWorkspace}/pages${normalizedUrl.replace('.html', '')}`;
+        const barePath = normalizedUrl.endsWith(path.sep)
+          ? `${userWorkspace}${path.sep}pages${normalizedUrl}index`
+          : `${userWorkspace}${path.sep}pages${normalizedUrl.replace('.html', '')}`;
         const isMarkdownContent = fs.existsSync(`${barePath}.md`)
-          || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`)
-          || fs.existsSync(`${barePath.replace('/index', '.md')}`);
+          || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
+          || fs.existsSync(`${barePath.replace(`${path.sep}index`, '.md')}`);
         
         if (isMarkdownContent) {
           const markdownPath = fs.existsSync(`${barePath}.md`)
             ? `${barePath}.md`
-            : fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`)
-              ? `${barePath.substring(0, barePath.lastIndexOf('/index'))}.md`
-              : `${userWorkspace}/pages${url.replace('/index.html', '.md')}`;
+            : fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
+              ? `${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`
+              : `${userWorkspace}${path.sep}pages${url.replace(`${path.sep}index.html`, '.md')}`;
           const markdownContents = await fs.promises.readFile(markdownPath, 'utf-8');
           const rehypePlugins = [];
           const remarkPlugins = [];
