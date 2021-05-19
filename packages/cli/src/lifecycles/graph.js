@@ -51,11 +51,11 @@ module.exports = generateGraph = async (compilation) => {
              */
             if (relativePagePath.lastIndexOf(path.sep) > 0) {
               // https://github.com/ProjectEvergreen/greenwood/issues/455
-              route = id === 'index' || route.replace(`/index`, '') === `/${id}`
+              route = id === 'index' || route.replace('/index', '') === `/${id}`
                 ? route.replace('index', '')
                 : `${route}/`;
             } else {
-              route = route === `/index`
+              route = route === '/index'
                 ? '/'
                 : `${route}/`;
             }

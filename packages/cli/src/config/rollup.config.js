@@ -312,7 +312,7 @@ function greenwoodHtmlPlugin(compilation) {
                   const { src } = parsedAttributes;
                   const facadeModuleId = bundles[innerBundleId].facadeModuleId
                     ? bundles[innerBundleId].facadeModuleId.replace(/\\/g, '/')
-                    : bundles[innerBundleId].facadeModuleId
+                    : bundles[innerBundleId].facadeModuleId;
                   let pathToMatch = src.replace('../', '').replace('./', '');
 
                   // special handling for node_modules paths
