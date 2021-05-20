@@ -50,7 +50,6 @@
   },
   "devDependencies": {
     "@mapbox/rehype-prism": "^0.5.0",
-    "lit-element": "^2.4.0",
     "lit-redux-router": "^0.17.1",
     "lodash-es": "^4.17.20",
     "postcss-nested": "^4.1.2",

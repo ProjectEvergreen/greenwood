@@ -1,4 +1,4 @@
-import { css, html, LitElement, unsafeCSS } from 'lit-element';
+import { css, html, LitElement, unsafeCSS } from 'lit';
 import socialCss from './social-icons.css?type=css';
 import githubIcon from '../icons/github-icon.js';
 import twitterIcon from '../icons/twitter-icon.js';
