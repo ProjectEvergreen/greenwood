@@ -28,7 +28,7 @@ const path = require('path');
 const { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Mode';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;

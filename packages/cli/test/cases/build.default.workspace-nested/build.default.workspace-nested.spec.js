@@ -77,7 +77,7 @@ describe('Build Greenwood With: ', function() {
             return {
               ...item,
               path: item.path.replace(/\\/g, '/')
-            }
+            };
           });
       });
 
