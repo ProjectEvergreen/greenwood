@@ -19,7 +19,7 @@ const unified = require('unified');
 // general refactoring
 const getPageTemplate = (barePath, workspace, template) => {
   const templatesDir = path.join(workspace, 'templates');
-  const pageIsHtmlPath = `${barePath.substring(0, barePath.lastIndexOf('/index'))}.html`;
+  const pageIsHtmlPath = `${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.html`;
 
   if (template && fs.existsSync(`${templatesDir}/${template}.html`)) {
     // use a predefined template, usually from markdown frontmatter
