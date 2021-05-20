@@ -20,6 +20,7 @@
     "serve": "node . serve",
     "develop": "node . develop",
     "test": "export BROWSERSLIST_IGNORE_OLD_DATA=true && nyc mocha",
+    "test:win": "set BROWSERSLIST_IGNORE_OLD_DATA=true && nyc mocha",
     "test:tdd": "yarn test --watch",
     "lint:js": "eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
     "lint:css": "stylelint \"./www/**/*.js\", \"./www/**/*.css\"",
