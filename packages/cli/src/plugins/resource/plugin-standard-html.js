@@ -317,7 +317,7 @@ class StandardHtmlResource extends ResourceInterface {
 
         body = getAppTemplate(body, userWorkspace, customImports);  
         body = getUserScripts(body, projectDirectory);
-        body = getMetaContent(normalizedUrl, config, body);
+        body = getMetaContent(normalizedUrl.replace(/\\/g, '/'), config, body);
         
         if (processedMarkdown) {
           const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
