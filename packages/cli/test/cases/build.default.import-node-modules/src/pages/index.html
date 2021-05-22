@@ -4,12 +4,12 @@
   <head>
     <script type="module" src="../scripts/main.js"></script>
     <script type="module">
-      import { html } from 'lit-element';
+      import { html } from 'lit';
 
       document.getElementsByClassName('output-script-inline')[0].innerHTML = 'script tag module inline';
     </script>
     <script type="module">
-      import { html } from 'lit-element';
+      import { html } from 'lit';
     </script>
     <script type="module" src="/node_modules/lit-html/lit-html.js"></script>
     <link rel="stylesheet" href="/node_modules/prismjs/themes/prism-tomorrow.css"></link>
@@ -21,6 +21,7 @@
     <span class="output-pwa"></span>
     <span class="output-redux"></span>
     <span class="output-script-inline"></span>
+    <span class="output-error"></span>
   </body>
 
 </html>
