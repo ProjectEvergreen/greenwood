@@ -57,41 +57,76 @@ describe('Build Greenwood With: ', function() {
         `${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`, 
         `${outputPath}/node_modules/@greenwood/plugin-graphql/src/queries/`
       );
-      const litElementLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/lib/*.js`, 
-        `${outputPath}/node_modules/lit-element/lib/`
+      const lit = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit/*.js`, 
+        `${outputPath}/node_modules/lit/`
+      );
+      const litDecorators = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit/decorators/*.js`, 
+        `${outputPath}/node_modules/lit/decorators/`
+      );
+      const litDirectives = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit/directives/*.js`, 
+        `${outputPath}/node_modules/lit/directives/`
+      );
+      const litPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit/package.json`, 
+        `${outputPath}/node_modules/lit/`
       );
       const litElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/lit-element.js`, 
+        `${process.cwd()}/node_modules/lit-element/*.js`, 
         `${outputPath}/node_modules/lit-element/`
       );
       const litElementPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-element/package.json`, 
         `${outputPath}/node_modules/lit-element/`
       );
+      const litElementDecorators = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-element/decorators/*.js`, 
+        `${outputPath}/node_modules/lit-element/decorators/`
+      );
       const litHtml = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/lit-html.js`, 
+        `${process.cwd()}/node_modules/lit-html/*.js`, 
         `${outputPath}/node_modules/lit-html/`
       );
       const litHtmlPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-html/package.json`, 
         `${outputPath}/node_modules/lit-html/`
       );
-      const litHtmlLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/lib/*.js`, 
-        `${outputPath}/node_modules/lit-html/lib/`
+      const litHtmlDirectives = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/directives/*.js`, 
+        `${outputPath}/node_modules/lit-html/directives/`
+      );
+      const litReactiveElement = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`, 
+        `${outputPath}/node_modules/@lit/reactive-element/`
+      );
+      const litReactiveElementDecorators = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`, 
+        `${outputPath}/node_modules/@lit/reactive-element/decorators/`
+      );
+      const litReactiveElementPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`, 
+        `${outputPath}/node_modules/@lit/reactive-element/`
       );
 
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...greenwoodGraphqlCoreLibs,
         ...greenwoodGraphqlQueryLibs,
-        ...litElement,
+        ...lit,
+        ...litPackageJson,
+        ...litDirectives,
+        ...litDecorators,
         ...litElementPackageJson,
-        ...litElementLibs,
-        ...litHtml,
+        ...litElement,
+        ...litElementDecorators,
         ...litHtmlPackageJson,
-        ...litHtmlLibs
+        ...litHtml,
+        ...litHtmlDirectives,
+        ...litReactiveElement,
+        ...litReactiveElementDecorators,
+        ...litReactiveElementPackageJson
       ]);
       await runner.runCommand(cliPath, 'build');
     });
@@ -160,11 +195,12 @@ describe('Build Greenwood With: ', function() {
         expect(authors.length).to.be.equal(2);
         expect(dates.length).to.be.equal(2);
         
-        expect(authors[0].innerHTML).to.be.contain('Written By: someone@blog.com');
-        expect(dates[0].innerHTML).to.be.contain('On: 07.08.2020');
+        // account for dynamic hydration markers added by lit
+        expect(authors[0].innerHTML).to.match(/Written By:(.*.)someone@blog.com/);
+        expect(dates[0].innerHTML).to.match(/On:(.*.)07.08.2020/);
 
-        expect(authors[1].innerHTML).to.be.contain('Written By: someone_else@blog.com');
-        expect(dates[1].innerHTML).to.be.contain('On: 07.09.2020');
+        expect(authors[1].innerHTML).to.match(/Written By:(.*.)someone_else@blog.com/);
+        expect(dates[1].innerHTML).to.match(/On:(.*.)07.09.2020/);
       });
     });
 

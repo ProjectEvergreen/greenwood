@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit-element';
+import { html, LitElement } from 'lit';
 import client from '@greenwood/plugin-graphql/core/client';
 import GraphQuery from '@greenwood/plugin-graphql/queries/graph';
 
