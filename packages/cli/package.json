@@ -54,7 +54,7 @@
     "@lion/calendar": "~0.15.0",
     "@mapbox/rehype-prism": "^0.5.0",
     "@types/trusted-types": "^2.0.2",
-    "lit-element": "^2.4.0",
+    "lit": "^2.0.0-rc.2",
     "lit-redux-router": "^0.17.1",
     "lodash-es": "^4.17.20",
     "postcss-nested": "^4.1.2",
