@@ -122,7 +122,18 @@ function greenwoodHtmlPlugin(compilation) {
     // and other custom user resource types like .ts, .gql, etc
     async load(id) {
       const extension = path.extname(id);
-      
+      const importAsRegex = /\?type=(.*)/;
+
+      // bit of a hack to get these two bugs to play well together
+      // https://github.com/ProjectEvergreen/greenwood/issues/598
+      // https://github.com/ProjectEvergreen/greenwood/issues/604
+      if (importAsRegex.test(id)) {
+        const match = id.match(importAsRegex);
+        const importee = id.replace(match[0], '');
+        
+        return `export {default} from '${importee}';`;
+      }
+
       switch (extension) {
 
         case '.html':
