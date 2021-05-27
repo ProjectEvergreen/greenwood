@@ -321,7 +321,9 @@ function greenwoodHtmlPlugin(compilation) {
               if (!isRemoteUrl(parsedAttributes.src) && parsedAttributes.type === 'module' && parsedAttributes.src) {
                 for (const innerBundleId of Object.keys(bundles)) {
                   const { src } = parsedAttributes;
-                  const facadeModuleId = bundles[innerBundleId].facadeModuleId;
+                  const facadeModuleId = bundles[innerBundleId].facadeModuleId
+                    ? bundles[innerBundleId].facadeModuleId.replace(/\\/g, '/')
+                    : bundles[innerBundleId].facadeModuleId;
                   let pathToMatch = src.replace('../', '').replace('./', '');
 
                   // special handling for node_modules paths
@@ -387,6 +389,8 @@ function greenwoodHtmlPlugin(compilation) {
       }
     },
 
+    // crawl through all entry HTML files and map bundled JavaScript and CSS filenames
+    // back to their original _inline_ <script> / <link> tags
     async writeBundle(outputOptions, bundles) {
       const scratchFiles = {};
 
