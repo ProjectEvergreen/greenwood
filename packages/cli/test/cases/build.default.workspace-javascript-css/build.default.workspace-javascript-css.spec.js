@@ -13,6 +13,8 @@
  *
  * User Workspace
  * src/
+ *   assets/
+ *     data.json
  *   pages/
  *     index.html
  *   scripts/
@@ -94,7 +96,7 @@ describe('Build Greenwood With: ', function() {
       it('should have two <script> tag with inline script in the <head>', function() {
         const scriptTagInline = dom.window.document.querySelectorAll('head > script:not([src])');
         
-        expect(scriptTagInline.length).to.be.equal(3);
+        expect(scriptTagInline.length).to.be.equal(4);
       });
 
       it('should have the expected inline content from inline <script> tag one in index.html', async function() {
@@ -127,6 +129,20 @@ describe('Build Greenwood With: ', function() {
         expect(scriptTagSrcTwo.textContent).to.be.contain('document.getElementsByClassName(\'output-script-inline-three\')[0].innerHTML = three');
       });
 
+    });
+
+    describe('json fetching and importing', function() {
+      it('should have the expected output from inline <script> tag fetching data.json in index.html', async function() {
+        const scriptTagOneOutput = dom.window.document.querySelector('body > .output-json-fetch');
+
+        expect(scriptTagOneOutput.textContent).to.be.equal('got json via fetch, status is - 200');
+      });
+
+      it('should have the expected output from importing data.json in main.js', async function() {
+        const scriptTagOneOutput = dom.window.document.querySelector('body > .output-json-import');
+
+        expect(scriptTagOneOutput.textContent).to.be.equal('got json via import, status is - 200');
+      });
     });
 
     describe('<style>...</style> tag in the <head>', function() {

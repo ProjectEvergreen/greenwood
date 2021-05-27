@@ -59,6 +59,11 @@ function getDevServer(compilation) {
         : Promise.resolve(response);
     }, Promise.resolve(ctx.url));
 
+    // bit of a hack to get these two bugs to play well together
+    // https://github.com/ProjectEvergreen/greenwood/issues/598
+    // https://github.com/ProjectEvergreen/greenwood/issues/604
+    ctx.request.headers.originalUrl = ctx.originalUrl;
+
     await next();
   });
 

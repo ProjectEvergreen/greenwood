@@ -37,6 +37,15 @@
       
       document.getElementsByClassName('output-script-inline-three')[0].innerHTML = three;
     </script>
+
+    <script type="module">
+      fetch('/assets/data.json')
+        .then((resp) => resp.json())
+        .then((resp) => {
+          const msg =  `${resp.message} via fetch, status is - ${resp.status}`;
+          document.getElementsByClassName('output-json-fetch')[0].innerHTML = msg;
+        })
+    </script>
   </head>
 
   <body>
@@ -46,6 +55,8 @@
     <p class="output-link"></p>
     <p class="module-shim">let me tell you about type="module-shim"</p>
     <p class="output-script-inline-two"></p>
+    <p class="output-json-fetch"></p>
+    <p class="output-json-import"></p>
 
     <span>CSS output two</span>
   </body>

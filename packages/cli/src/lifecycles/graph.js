@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const fs = require('fs');
 const fm = require('front-matter');
+const path = require('path');
 const toc = require('markdown-toc');
 
 module.exports = generateGraph = async (compilation) => {
@@ -18,7 +19,7 @@ module.exports = generateGraph = async (compilation) => {
       const walkDirectoryForPages = function(directory, pages = []) {
         
         fs.readdirSync(directory).forEach((filename) => {
-          const fullPath = `${directory}/${filename}`.replace('//', '/');
+          const fullPath = path.normalize(`${directory}${path.sep}${filename}`);
           
           if (fs.statSync(fullPath).isDirectory()) {
             pages = walkDirectoryForPages(fullPath, pages);
@@ -26,16 +27,19 @@ module.exports = generateGraph = async (compilation) => {
             const fileContents = fs.readFileSync(fullPath, 'utf8');
             const { attributes } = fm(fileContents);
             const relativePagePath = fullPath.substring(pagesDir.length - 1, fullPath.length);
-            const relativeWorkspacePath = directory.replace(process.cwd(), '').replace('/', '');
+            const relativeWorkspacePath = directory.replace(process.cwd(), '').replace(path.sep, '');
             const template = attributes.template || 'page';
             const title = attributes.title || compilation.config.title || '';
-            const id = attributes.label || filename.split('/')[filename.split('/').length - 1].replace('.md', '').replace('.html', '');
+            const id = attributes.label || filename.split(path.sep)[filename.split(path.sep).length - 1].replace('.md', '').replace('.html', '');
             const imports = attributes.imports || [];
             const label = id.split('-')
               .map((idPart) => {
                 return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
               }).join(' ');
-            let route = relativePagePath.replace('.md', '').replace('.html', '');
+            let route = relativePagePath
+              .replace('.md', '')
+              .replace('.html', '')
+              .replace(/\\/g, '/');
 
             /*
              * check if additional nested directories exist to correctly determine route (minus filename)
@@ -45,7 +49,7 @@ module.exports = generateGraph = async (compilation) => {
              * - pages/blog/index.{html,md} -> /blog/
              * - pages/blog/some-post.{html,md} -> /blog/some-post/
              */
-            if (relativePagePath.lastIndexOf('/') > 0) {
+            if (relativePagePath.lastIndexOf(path.sep) > 0) {
               // https://github.com/ProjectEvergreen/greenwood/issues/455
               route = id === 'index' || route.replace('/index', '') === `/${id}`
                 ? route.replace('index', '')
@@ -55,7 +59,7 @@ module.exports = generateGraph = async (compilation) => {
                 ? '/'
                 : `${route}/`;
             }
-
+            
             // prune "reserved" attributes that are supported by Greenwood
             // https://www.greenwoodjs.io/docs/front-matter
             const customData = attributes;
@@ -115,9 +119,9 @@ module.exports = generateGraph = async (compilation) => {
               id,
               label,
               imports,
-              path: route === '/' || relativePagePath.lastIndexOf('/') === 0
+              path: route === '/' || relativePagePath.lastIndexOf(path.sep) === 0
                 ? `${relativeWorkspacePath}${filename}`
-                : `${relativeWorkspacePath}/${filename}`,
+                : `${relativeWorkspacePath}${path.sep}${filename}`,
               route,
               template,
               title
@@ -131,7 +135,7 @@ module.exports = generateGraph = async (compilation) => {
       if (config.mode === 'spa') {
         graph = [{
           ...graph[0],
-          path: `${userWorkspace}/index.html`
+          path: `${userWorkspace}${path.sep}index.html`
         }];
       } else {
         graph = fs.existsSync(pagesDir)
