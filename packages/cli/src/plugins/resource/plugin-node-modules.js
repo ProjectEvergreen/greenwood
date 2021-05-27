@@ -13,6 +13,15 @@ const walk = require('acorn-walk');
 
 const importMap = {};
 
+const updateImportMap = (entry, entryPath) => {
+
+  if (path.extname(entryPath) === '') {
+    entryPath = `${entryPath}/${entry}.js`;
+  }
+
+  importMap[entry] = entryPath;
+};
+
 const getPackageEntryPath = (packageJson) => {
   let entry = packageJson.module 
     ? packageJson.module // favor ESM entry points first
@@ -42,13 +51,13 @@ const walkModule = (module, dependency) => {
         if (!importMap[sourceValue]) {
           // found a _new_ bare import for ${sourceValue}
           // we should add this to the importMap and walk its package.json for more transitive deps
-          importMap[sourceValue] = `/node_modules/${sourceValue}`;
+          updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
         }
         
         walkPackageJson(path.join(process.cwd(), 'node_modules', sourceValue, 'package.json'));
       } else if (sourceValue.indexOf('./') < 0) {
         // adding a relative import
-        importMap[sourceValue] = `/node_modules/${sourceValue}`;
+        updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
       } else {
         // walk this module for all its dependencies
         sourceValue = sourceValue.indexOf('.js') < 0
@@ -65,7 +74,14 @@ const walkModule = (module, dependency) => {
       const sourceValue = node && node.source ? node.source.value : '';
 
       if (sourceValue !== '' && sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
-        importMap[sourceValue] = `/node_modules/${sourceValue}`;
+        updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
+      }
+    },
+    ExportAllDeclaration(node) {
+      const sourceValue = node && node.source ? node.source.value : '';
+
+      if (sourceValue !== '' && sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
+        updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
       }
     }
   });
@@ -84,7 +100,6 @@ const walkPackageJson = (packageJson = {}) => {
     const isJavascriptPackage = Array.isArray(entry) || typeof entry === 'string' && entry.endsWith('.js') || entry.endsWith('.mjs');
 
     if (isJavascriptPackage) {
-      
       // https://nodejs.org/api/packages.html#packages_determining_module_system
       if (Array.isArray(entry)) {
         // we have an exportMap
@@ -133,7 +148,7 @@ const walkPackageJson = (packageJson = {}) => {
           }
   
           if (packageExport) {
-            importMap[`${dependency}/${entry.replace('./', '')}`] = `/node_modules/${dependency}/${packageExport.replace('./', '')}`;
+            updateImportMap(`${dependency}/${packageExport.replace('./', '')}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
           }
         });
       } else {
@@ -141,7 +156,7 @@ const walkPackageJson = (packageJson = {}) => {
         const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
   
         walkModule(packageEntryModule, dependency);
-        importMap[dependency] = `/node_modules/${dependency}/${entry}`;
+        updateImportMap(dependency, `/node_modules/${dependency}/${entry}`);
         walkPackageJson(dependencyPackageJson);
       }
     }
