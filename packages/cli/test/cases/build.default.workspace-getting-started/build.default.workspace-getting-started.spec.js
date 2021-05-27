@@ -183,10 +183,10 @@ describe('Build Greenwood With: ', function() {
           expect(li.length).to.be.equal(2);
           expect(links.length).to.be.equal(2);
   
-          expect(links[0].href.replace('file://', '').replace('/C:', '')).to.be.equal('/blog/second-post/');
+          expect(links[0].href.replace('file://', '').replace(/\/[A-Z]:/, '')).to.be.equal('/blog/second-post/');
           expect(links[0].textContent).to.be.equal('my-second-post');
   
-          expect(links[1].href.replace('file://', '').replace('/C:', '')).to.be.equal('/blog/first-post/');
+          expect(links[1].href.replace('file://', '').replace(/\/[A-Z]:/, '')).to.be.equal('/blog/first-post/');
           expect(links[1].textContent).to.be.equal('my-first-post');
         });
   
