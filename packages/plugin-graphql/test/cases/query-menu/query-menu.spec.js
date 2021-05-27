@@ -140,11 +140,11 @@ describe('Build Greenwood With: ', async function() {
 
         expect(listItems.length).to.be.equal(2);
         
-        expect(link1.href.replace('file://', '')).to.be.equal('/about/');
+        expect(link1.href.replace('file://', '').replace(/\/[A-Z]:/, '')).to.be.equal('/about/');
         expect(link1.title).to.be.equal('Click to visit the About page');
         expect(link1.innerHTML).to.contain('About');
 
-        expect(link2.href.replace('file://', '')).to.be.equal('/contact/');
+        expect(link2.href.replace('file://', '').replace(/\/[A-Z]:/, '')).to.be.equal('/contact/');
         expect(link2.title).to.be.equal('Click to visit the Contact page');
         expect(link2.innerHTML).to.contain('Contact');
       });

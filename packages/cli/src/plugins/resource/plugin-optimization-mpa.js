@@ -42,9 +42,8 @@ class OptimizationMPAResource extends ResourceInterface {
         let currentTemplate;
         const { projectDirectory, scratchDir, outputDir } = this.compilation.context;
         const bodyContents = body.match(/<body>(.*)<\/body>/s)[0].replace('<body>', '').replace('</body>', '');
-        const outputBundlePath = `${outputDir}/_routes${url.replace(projectDirectory, '')}`
-          .replace('.greenwood/', '')
-          .replace('//', '/');
+        const outputBundlePath = path.normalize(`${outputDir}/_routes${url.replace(projectDirectory, '')}`)
+          .replace(`.greenwood${path.sep}`, '');
 
         const routeTags = this.compilation.graph.map((page) => {
           const template = path.extname(page.filename) === '.html'

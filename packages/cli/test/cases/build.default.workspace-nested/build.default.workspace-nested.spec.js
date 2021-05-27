@@ -72,7 +72,13 @@ describe('Build Greenwood With: ', function() {
       let graph;
 
       before(async function() {
-        graph = require(path.join(this.context.publicDir, 'graph.json'));
+        graph = require(path.join(this.context.publicDir, 'graph.json'))
+          .map(item => {
+            return {
+              ...item,
+              path: item.path.replace(/\\/g, '/')
+            };
+          });
       });
 
       it('should have the expected ordering of pages in graph.json', function() {
