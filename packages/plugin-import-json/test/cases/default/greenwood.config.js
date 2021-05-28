@@ -1,7 +1,7 @@
-const pluginImportCss = require('../../../src/index');
+const pluginImportJson = require('../../../src/index');
 
 module.exports = {
   plugins: [
-    ...pluginImportCss()
+    ...pluginImportJson()
   ]
 };

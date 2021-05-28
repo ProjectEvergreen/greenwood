@@ -19,10 +19,12 @@
  *
  * User Workspace
  * src/
- *   main.js
- *   styles.css
+ *   assets/
+ *     data.json
  *   pages/
  *     index.html
+ *   scripts/
+ *     main.js
  */
 const expect = require('chai').expect;
 const { JSDOM } = require('jsdom');
@@ -32,7 +34,7 @@ const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/u
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Import Css Plugin with default options';
+  const LABEL = 'Import JSON Plugin with default options';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
   let runner;
@@ -52,18 +54,17 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('importing CSS using ESM (import)', function() {
+    describe('importing JSON using ESM (import)', function() {
       let dom;
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
+    
+      it('should have the expected output from importing data.json in main.js', async function() {
+        const scriptTagOneOutput = dom.window.document.querySelector('body > .output-json-import');
 
-      it('should have the expected output from main.js (lodash) in the page output', async function() {
-        const spanTags = dom.window.document.querySelectorAll('body > span');
-        
-        expect(spanTags.length).to.be.equal(1);
-        expect(spanTags[0].textContent).to.be.equal('import from styles.css: p {   color: red; }');
+        expect(scriptTagOneOutput.textContent).to.be.equal('got json via import, status is - 200');
       });
     });
   });

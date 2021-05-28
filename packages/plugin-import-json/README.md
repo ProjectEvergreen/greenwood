@@ -1,4 +1,4 @@
-# @greenwood/plugin-import-css
+# @greenwood/plugin-import-json
 
 ## Overview
 A Greenwood plugin to allow you use ESM (`import`) syntax to load your CSS.
@@ -11,31 +11,32 @@ You can use your favorite JavaScript package manager to install this package.
 _examples:_
 ```bash
 # npm
-npm -i @greenwood/plugin-import-css --save-dev
+npm -i @greenwood/plugin-import-json --save-dev
 
 # yarn
-yarn add @greenwood/plugin-import-css --dev
+yarn add @greenwood/plugin-import-json --dev
 ```
 
 ## Usage
 Add this plugin to your _greenwood.config.js_ and spread the `export`.
 
 ```javascript
-const pluginImportCss = require('@greenwood/plugin-import-css');
+const pluginImportJson = require('@greenwood/plugin-import-json');
 
 module.exports = {
   ...
 
   plugins: [
-    ...pluginImportCss() // notice the spread ... !
+    ...pluginImportJson() // notice the spread ... !
   ]
 }
 ```
 
-> 👉 _If you are using this along with [**plugin-postcss**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss), make sure **plugin-postcss** comes first.  All non standard transformations need to come last._ 
+This will then allow you use `import` to include JSON in your JavaScript files by appending `?type=json` to the end of the `import` statement.
 
-
-This will then allow you use `import` to include CSS in your JavaScript files.
 ```js
-import cardCss from './card.css';
+// { status: 200, message: 'some data' }
+import json from '/assets/data.json?type=json';
+
+console.log(json.status) // 200
 ```
