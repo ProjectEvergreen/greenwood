@@ -494,8 +494,9 @@ function greenwoodHtmlPlugin(compilation) {
 module.exports = getRollupConfig = async (compilation) => {
   const { scratchDir, outputDir } = compilation.context;
   const inputs = compilation.graph.map((page) => {
-    return `${scratchDir}${page.route.replace('/', '')}index.html`;
+    return path.normalize(`${scratchDir}${page.route}index.html`);
   });
+  console.debug('inputs', inputs);
   const greenwoodRollupPlugins = [
     ...pluginNodeModules[1].provider(compilation),
     ...pluginResourceStandardJavaScript[1].provider(compilation),
