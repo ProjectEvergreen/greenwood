@@ -5,7 +5,7 @@
  *
  */
 const fs = require('fs');
-const path = require('path');
+const json = require('@rollup/plugin-json');
 const { ResourceInterface } = require('../../lib/resource-interface');
 
 class StandardJsonResource extends ResourceInterface {
@@ -15,22 +15,31 @@ class StandardJsonResource extends ResourceInterface {
     this.contentType = 'application/json';
   }
 
-  async shouldServe(url = '') {
-    return Promise.resolve(path.extname(url) === '.json');
-  }
-
-  async serve(url) {
+  async serve(url, headers) {
     return new Promise(async (resolve, reject) => {
       try {
-        const { scratchDir } = this.compilation.context; 
-        const filePath = path.basename(url) === 'graph.json'
-          ? path.join(scratchDir, 'graph.json')
+        console.debug('url', url);
+        const { scratchDir } = this.compilation.context;
+        const filePath = url.indexOf('graph.json') >= 0
+          ? `${scratchDir}/graph.json`
           : url;
-        const json = await fs.promises.readFile(filePath, 'utf-8');
+        const { originalUrl } = headers.request;
+        const contents = await fs.promises.readFile(filePath, 'utf-8');
+        const isJsonInJs = originalUrl && originalUrl.indexOf('?type=json') >= 0;
+        let body;
+        let contentType;
+
+        if (isJsonInJs) {
+          contentType = 'text/javascript';
+          body = `export default ${contents}`;
+        } else {
+          body = JSON.parse(contents);
+          contentType = this.contentType;
+        }
 
         resolve({
-          body: JSON.parse(json),
-          contentType: this.contentType
+          body,
+          contentType
         });
       } catch (e) {
         reject(e);
@@ -43,4 +52,12 @@ module.exports = [{
   type: 'resource',
   name: 'plugin-standard-json:resource',
   provider: (compilation, options) => new StandardJsonResource(compilation, options)
+}, {
+  type: 'resource',
+  name: 'plugin-standard-json:rollup',
+  provider: () => {
+    return [
+      json()
+    ];
+  }
 }];

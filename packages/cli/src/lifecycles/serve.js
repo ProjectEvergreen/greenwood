@@ -111,7 +111,7 @@ function getDevServer(compilation) {
     );
     const responseAccumulator = {
       body: ctx.body,
-      contentType: ctx.response.contentType || ctx.response.headers['content-type']
+      contentType: ctx.response.headers['content-type']
     };
 
     const reducedResponse = await modifiedResources.reduce(async (responsePromise, resource) => {
