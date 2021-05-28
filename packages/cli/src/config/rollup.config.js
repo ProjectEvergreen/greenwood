@@ -1,7 +1,6 @@
 /* eslint-disable max-depth, no-loop-func */
 const fs = require('fs');
 const htmlparser = require('node-html-parser');
-const multiInput = require('rollup-plugin-multi-input').default;
 const path = require('path');
 const postcss = require('postcss');
 const postcssImport = require('postcss-import');
@@ -506,9 +505,12 @@ module.exports = getRollupConfig = async (compilation) => {
   }).map((plugin) => {
     return plugin.provider(compilation);
   }).flat();
+  const inputs = compilation.graph.map((page) => {
+    return `${scratchDir}${page.route.replace('/', '')}index.html`;
+  });
 
   return [{
-    input: `${scratchDir}**/*.html`,
+    input: inputs,
     output: { 
       dir: outputDir,
       entryFileNames: '[name].[hash].js',
@@ -522,7 +524,6 @@ module.exports = getRollupConfig = async (compilation) => {
       }
     },
     plugins: [
-      multiInput(),
       ...greenwoodRollupPlugins,
       ...customRollupPlugins
     ]
