@@ -41,7 +41,7 @@ describe('Build Greenwood With: ', function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
@@ -65,6 +65,7 @@ describe('Build Greenwood With: ', function() {
       // styles content
       // home page component
       // page three content
+      // more nesting examples like in greenwood?
       xit('should have the specific element we added as part of our custom page template', function() {
         const customElement = dom.window.document.querySelectorAll('div.owen-test');
 

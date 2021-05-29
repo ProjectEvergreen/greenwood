@@ -16,31 +16,25 @@ class UserWorkspaceResource extends ResourceInterface {
 
   getBareUrlPath(url) {
     // get rid of things like query string parameters
+    // that will break when trying to use with fs
     return url.replace(/\?(.*)/, '');
   }
 
   getReducedUrl(url) {
     const { userWorkspace } = this.compilation.context;
     let reducedUrl;
-    console.debug('url', url);
 
     url.split('/')
-      .filter(piece => piece !== '')
-      .reduce((acc, piece) => {
-        console.debug('piece', piece);
-        console.debug('acc', acc);
-        // fs.existsSync(path.join(userWorkspace, bareUrl));
-        const reducedPath = url.replace(`${acc}/${piece}`, '');
-        console.debug('reducedPath', reducedPath);
+      .filter((segment) => segment !== '')
+      .reduce((acc, segment) => {
+        const reducedPath = url.replace(`${acc}/${segment}`, '');
+
         if (path.extname(reducedPath) !== '' && fs.existsSync(path.join(userWorkspace, reducedPath))) {
-          console.debug('WOW, GREAT SUCCESS!!!!');
           reducedUrl = reducedPath;
         }
-        return `${acc}/${piece}`;
+        return `${acc}/${segment}`;
       }, '');
 
-    console.debug('reducedUrl', reducedUrl);
-    console.debug('*****************************************************************');
     return reducedUrl;
   }
 
@@ -50,14 +44,13 @@ class UserWorkspaceResource extends ResourceInterface {
     const isAbsoluteWorkspaceFile = fs.existsSync(path.join(userWorkspace, bareUrl));
 
     // if url is immediately resolvable to a file path, we should return early
+    // else try and expand and map as a relative path
     if (isAbsoluteWorkspaceFile) {
       return Promise.resolve(isAbsoluteWorkspaceFile || bareUrl === '/');
     } else if (url.indexOf('node_modules') < 0 && path.extname(url) !== '') {
-      // /one/two/styles/theme.css -> /../../styles/theme.css
-      console.debug('how to handle relative URL????', url);
+      // TODO handle and defer to custom resolvers and node_modules first before trying ourselves
       let reducedUrl = this.getReducedUrl(bareUrl);
 
-      console.debug('!!!!!! reducedUrl', reducedUrl);
       return Promise.resolve(reducedUrl);
     }
   }

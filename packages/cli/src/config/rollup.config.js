@@ -227,7 +227,7 @@ function greenwoodHtmlPlugin(compilation) {
           headLinks.forEach((linkTag) => {
             const parsedAttributes = parseTagForAttributes(linkTag);
 
-            // handle <link rel="stylesheet" src="./some/path.css"></link>
+            // handle <link rel="stylesheet" href="./some/path.css"></link>
             if (!isRemoteUrl(parsedAttributes.href) && parsedAttributes.rel === 'stylesheet' && !mappedStyles[parsedAttributes.href]) {
               let { href } = parsedAttributes;
 
@@ -238,14 +238,12 @@ function greenwoodHtmlPlugin(compilation) {
               const basePath = href.indexOf(tokenNodeModules) >= 0
                 ? projectDirectory
                 : userWorkspace;
-              const filePath = path.join(basePath, href.replace('../', './'));
+              const absoluteHref = href.replace(/\.\.\//g, '').replace('./', '');
+              const filePath = path.join(basePath, absoluteHref);
               const source = fs.readFileSync(filePath, 'utf-8');
-              const to = `${outputDir}/${href}`;
+              const to = `${outputDir}/${absoluteHref}`;
               const hash = hashString(source);
-              const fileName = href
-                .replace('.css', `.${hash.slice(0, 8)}.css`)
-                .replace('../', '')
-                .replace('./', '');
+              const fileName = absoluteHref.replace('.css', `.${hash.slice(0, 8)}.css`);
 
               if (!fs.existsSync(path.dirname(to)) && href.indexOf(tokenNodeModules) < 0) {
                 fs.mkdirSync(path.dirname(to), {
@@ -253,7 +251,7 @@ function greenwoodHtmlPlugin(compilation) {
                 });
               }
 
-              mappedStyles[parsedAttributes.href] = {
+              mappedStyles[fileName] = {
                 type: 'asset',
                 fileName: fileName.indexOf(tokenNodeModules) >= 0
                   ? path.basename(fileName)
@@ -281,7 +279,7 @@ function greenwoodHtmlPlugin(compilation) {
         const result = await postcss()
           .use(postcssImport())
           .process(source, {
-            from: path.join(basePath, asset.name)
+            from: path.join(basePath, asset.name.replace(/\.\.\//g, ''))
           });
 
         asset.source = result.css;
