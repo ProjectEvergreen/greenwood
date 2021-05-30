@@ -195,7 +195,7 @@ function greenwoodHtmlPlugin(compilation) {
                 this.emitFile({
                   type: 'chunk',
                   id,
-                  name: absoluteSrc.split('/')[absoluteSrc.split('/').length - 1].replace('.js', ''),
+                  name: absoluteSrc.split(`${path.sep}`)[absoluteSrc.split(`${path.sep}`).length - 1].replace('.js', ''),
                   source
                 });
               }
