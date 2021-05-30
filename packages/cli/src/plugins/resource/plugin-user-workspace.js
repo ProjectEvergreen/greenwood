@@ -24,7 +24,6 @@ class UserWorkspaceResource extends ResourceInterface {
     if (isAbsoluteWorkspaceFile) {
       return Promise.resolve(isAbsoluteWorkspaceFile || bareUrl === '/');
     } else if (url.indexOf('node_modules') < 0 && path.extname(url) !== '') {
-      // TODO handle and defer to custom resolvers and node_modules first before trying ourselves
       const reducedUrl = this.getReducedUrl(userWorkspace, bareUrl);
 
       return Promise.resolve(reducedUrl);

@@ -183,19 +183,19 @@ function greenwoodHtmlPlugin(compilation) {
                 // console.debug('dont emit ', parsedAttributes.src);
               } else {
                 const { src } = parsedAttributes;
-
-                mappedScripts.set(src, true);
-  
-                const srcPath = src.replace('../', './');
-                const basePath = srcPath.indexOf(tokenNodeModules) >= 0
+                const absoluteSrc = `${path.normalize(src.replace(/\.\.\//g, '').replace('./', ''))}`;
+                const basePath = absoluteSrc.indexOf(tokenNodeModules) >= 0
                   ? projectDirectory
                   : userWorkspace;
-                const source = fs.readFileSync(path.join(basePath, srcPath), 'utf-8');
-  
+                const id = path.join(basePath, absoluteSrc);
+                const source = fs.readFileSync(id, 'utf-8');
+                
+                mappedScripts.set(absoluteSrc, true);
+
                 this.emitFile({
                   type: 'chunk',
-                  id: srcPath.replace('/node_modules', path.join(projectDirectory, tokenNodeModules)),
-                  name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
+                  id,
+                  name: absoluteSrc.split('/')[absoluteSrc.split('/').length - 1].replace('.js', ''),
                   source
                 });
               }
@@ -323,7 +323,7 @@ function greenwoodHtmlPlugin(compilation) {
                   const facadeModuleId = bundles[innerBundleId].facadeModuleId
                     ? bundles[innerBundleId].facadeModuleId.replace(/\\/g, '/')
                     : bundles[innerBundleId].facadeModuleId;
-                  let pathToMatch = src.replace('../', '').replace('./', '');
+                  let pathToMatch = src.replace(/\.\.\//g, '').replace('./', '');
 
                   // special handling for node_modules paths
                   if (pathToMatch.indexOf(tokenNodeModules) >= 0) {
