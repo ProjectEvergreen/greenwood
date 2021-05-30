@@ -13,7 +13,7 @@ Greenwood has two types of templates to help layout your pages:
 - _App Template_: The ["app shell"](https://developers.google.com/web/fundamentals/architecture/app-shell) that will wrap all pages.  One is provided for you by Greenwood, but you can override it if needed.
 - _Page Templates_:  A template for each unique page layout within your site.  Common layouts are great for documentation and blog sites, but also great for single pages as well (like a splash layout for the home page).
 
-> _**Note**: [For now](https://github.com/ProjectEvergreen/greenwood/issues/435), all paths in template files need to start with a `/` and omit the workspace directory._
+> _**Note:** You can use either relative (`../`) or absolute (`/`) paths in your templates since using `../` will allow for IDE autocomplete on your filesystem, but is marginally slower than using `/`._
 
 ### Page Templates
 Pages in your project will generally want a template so you can control the output of the HTML and include all your own custom components and styles.  By default all pages will default to looking for a _page.html_ in _templates/ directory within your workspace.  
