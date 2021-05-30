@@ -276,7 +276,6 @@ function greenwoodHtmlPlugin(compilation) {
         const basePath = asset.name.indexOf(tokenNodeModules) >= 0
           ? projectDirectory
           : userWorkspace;
-        // TODO refactor and add try catch
         const result = await postcss()
           .use(postcssImport())
           .process(source, {
