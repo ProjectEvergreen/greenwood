@@ -17,14 +17,21 @@
  *     footer.js
  *     header.js
  *   styles/
+ *     home.css
+ *     page.css
  *     theme.css
  *   pages/
- *     index.md
+ *     one/
+ *       two/
+ *         three/
+ *           index.md
+ *     index.html
  *   templates/
  *     app.html
  *     page.html
  */
 const expect = require('chai').expect;
+const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
@@ -52,81 +59,160 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('Custom App and Page Templates', function() {
-      let dom;
+    describe('Custom App and Page Templates using relative paths', function() {
+      let cssFiles;
+      let scriptFiles;
 
       before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+        cssFiles = await glob(`${this.context.publicDir}/**/**/*.css`);
+        scriptFiles = await glob(`${this.context.publicDir}/**/**/*.js`);
       });
 
-      // TODO
-      // footer content
-      // header content
-      // styles content
-      // home page component
-      // page three content
-      // more nesting examples like in greenwood?
-      xit('should have the specific element we added as part of our custom page template', function() {
-        const customElement = dom.window.document.querySelectorAll('div.owen-test');
+      describe('common styles and scripts file output', function() {
+        it('should emit two javascript files for the header and footer', function() {
+          const footer = scriptFiles.filter((file) => file.indexOf('/footer') >= 0);
+          const header = scriptFiles.filter(file => file.indexOf('/header') >= 0);
 
-        expect(customElement.length).to.equal(1);
+          expect(scriptFiles.length).to.be.equal(2);
+          expect(footer.length).to.be.equal(1);
+          expect(header.length).to.be.equal(1);
+        });
+
+        it('should emit four CSS files for styles and assets/', function() {
+          const styles = cssFiles.filter((file) => file.indexOf('/styles') >= 0);
+          const assets = cssFiles.filter(file => file.indexOf('/assets') >= 0);
+
+          expect(cssFiles.length).to.be.equal(4);
+          expect(styles.length).to.be.equal(3);
+          expect(assets.length).to.be.equal(1);
+        });
       });
 
-      xdescribe('merge order for app and page template <head> tags', function() {
+      describe('top level index (home) page content', function() {
+        let dom;
         let scriptTags;
         let linkTags;
-        let styleTags;
 
-        before(function() {
-          scriptTags = dom.window.document.querySelectorAll('head > script');
-          linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"');
-          styleTags = dom.window.document.querySelectorAll('head > style');
+        before(async function() {
+          dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+
+          scriptTags = Array.from(dom.window.document.querySelectorAll('head > script'));
+          linkTags = Array.from(dom.window.document.querySelectorAll('head > link[rel="stylesheet"'));
         });
 
-        it('should have 4 <script> tags in the <head>', function() {
-          expect(scriptTags.length).to.equal(4);
-        });
-
-        it('should have 4 <link> tags in the <head>', function() {
-          expect(linkTags.length).to.equal(4);
-        });
-
-        it('should have 5 <style> tags in the <head> (4 + one from Puppeteer)', function() {
-          expect(styleTags.length).to.equal(5);
-        });
-
-        it('should merge page template <script> tags after app template <script> tags', function() {
-          expect(scriptTags[0].src).to.match(/app-template-one.*.js/);
-          expect(scriptTags[1].src).to.match(/app-template-two.*.js/);
-          expect(scriptTags[2].src).to.match(/page-template-one.*.js/);
-          expect(scriptTags[3].src).to.match(/page-template-two.*.js/);
-
-          scriptTags.forEach((scriptTag) => {
-            expect(scriptTag.type).to.equal('module');
+        it('should have one <script> tags in the <head> for the header', function() {
+          const headerTag = scriptTags.filter((tag) => {
+            return tag.src.indexOf('/header') >= 0 && tag.src.indexOf('..') < 0;
           });
+          expect(headerTag.length).to.be.equal(1);
         });
 
-        it('should merge page template <link> tags after app template <link> tags', function() {
-          expect(linkTags[0].href).to.match(/app-template-one.*.css/);
-          expect(linkTags[1].href).to.match(/app-template-two.*.css/);
-          expect(linkTags[2].href).to.match(/page-template-one.*.css/);
-          expect(linkTags[3].href).to.match(/page-template-two.*.css/);
-
-          linkTags.forEach((linkTag) => {
-            expect(linkTag.rel).to.equal('stylesheet');
+        it('should have one <script> tags in the <head> for the footer', function() {
+          const footerTag = scriptTags.filter((tag) => {
+            return tag.src.indexOf('/footer') >= 0 && tag.src.indexOf('..') < 0;
           });
+          expect(footerTag.length).to.be.equal(1);
         });
 
-        it('should merge page template <style> tags after app template <style> tags', function() {
-          // offset index by one since first <style> tag is from Puppeteer
-          expect(styleTags[1].textContent).to.contain('app-template-one-style');
-          expect(styleTags[2].textContent).to.contain('app-template-two-style');
-          expect(styleTags[3].textContent).to.contain('page-template-one-style');
-          expect(styleTags[4].textContent).to.contain('page-template-two-style');
+        it('should have one <link> tag in the <head> for theme.css', function() {
+          const themeTag = linkTags.filter((tag) => {
+            return tag.href.indexOf('/theme') >= 0 && tag.href.indexOf('..') < 0;
+          });
+          expect(themeTag.length).to.be.equal(1);
+        });
+
+        it('should have one <link> tag in the <head> for home.css', function() {
+          const homeTag = linkTags.filter((tag) => {
+            return tag.href.indexOf('/home') >= 0 && tag.href.indexOf('..') < 0;
+          });
+          expect(homeTag.length).to.be.equal(1);
+        });
+
+        it('should have content output for the <app-footer> component', function() {
+          const footer = dom.window.document.querySelectorAll('body footer');
+
+          expect(footer.length).to.be.equal(1);
+          expect(footer[0].textContent).to.be.equal('This is the footer component.');
+        });
+
+        it('should have content output for the <app-header> component', function() {
+          const header = dom.window.document.querySelectorAll('body header');
+
+          expect(header.length).to.be.equal(1);
+          expect(header[0].textContent).to.be.equal('This is the header component.');
+        });
+
+        it('should have content output for the page', function() {
+          const content = dom.window.document.querySelectorAll('body > h1');
+
+          expect(content.length).to.be.equal(1);
+          expect(content[0].textContent).to.be.equal('Home Page');
         });
       });
-    });
 
+      describe('three level deep nested page content', function() {
+        let dom;
+        let scriptTags;
+        let linkTags;
+
+        before(async function() {
+          dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'one/two/three', 'index.html'));
+
+          scriptTags = Array.from(dom.window.document.querySelectorAll('head > script'));
+          linkTags = Array.from(dom.window.document.querySelectorAll('head > link[rel="stylesheet"'));
+        });
+
+        it('should have one <script> tags in the <head> for the header', function() {
+          const headerTag = scriptTags.filter((tag) => {
+            return tag.src.indexOf('/header') >= 0 && tag.src.indexOf('..') < 0;
+          });
+          expect(headerTag.length).to.be.equal(1);
+        });
+
+        it('should have one <script> tags in the <head> for the footer', function() {
+          const footerTag = scriptTags.filter((tag) => {
+            return tag.src.indexOf('/footer') >= 0 && tag.src.indexOf('..') < 0;
+          });
+          expect(footerTag.length).to.be.equal(1);
+        });
+
+        it('should have one <link> tag in the <head> for theme.css', function() {
+          const themeTag = linkTags.filter((tag) => {
+            return tag.href.indexOf('/theme') >= 0 && tag.href.indexOf('..') < 0;
+          });
+          expect(themeTag.length).to.be.equal(1);
+        });
+
+        it('should have one <link> tag in the <head> for page.css', function() {
+          const pageTag = linkTags.filter((tag) => {
+            return tag.href.indexOf('/page') >= 0 && tag.href.indexOf('..') < 0;
+          });
+          expect(pageTag.length).to.be.equal(1);
+        });
+
+        it('should have content output for the <app-footer> component', function() {
+          const footer = dom.window.document.querySelectorAll('body footer');
+
+          expect(footer.length).to.be.equal(1);
+          expect(footer[0].textContent).to.be.equal('This is the footer component.');
+        });
+
+        it('should have content output for the <app-header> component', function() {
+          const header = dom.window.document.querySelectorAll('body header');
+
+          expect(header.length).to.be.equal(1);
+          expect(header[0].textContent).to.be.equal('This is the header component.');
+        });
+
+        it('should have content output for the page', function() {
+          const content = dom.window.document.querySelectorAll('body > h1');
+
+          expect(content.length).to.be.equal(1);
+          expect(content[0].textContent).to.be.equal('One Two Three');
+        });
+      });
+
+    });
   });
 
   after(function() {
