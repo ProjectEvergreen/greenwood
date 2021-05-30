@@ -35,7 +35,7 @@ const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
+const { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
@@ -53,7 +53,15 @@ describe('Build Greenwood With: ', function() {
 
   describe(LABEL, function() {
     before(async function() {
-      await runner.setup(outputPath, getSetupFiles(outputPath));
+      const prismCss = await getDependencyFiles(
+        `${process.cwd()}/node_modules/prismjs/themes/prism-tomorrow.css`,
+        `${outputPath}/node_modules/prismjs/themes/`
+      );
+
+      await runner.setup(outputPath, [
+        ...getSetupFiles(outputPath),
+        ...prismCss
+      ]);
       await runner.runCommand(cliPath, 'build');
     });
 

@@ -14,30 +14,6 @@ class UserWorkspaceResource extends ResourceInterface {
     this.extensions = ['*'];
   }
 
-  getBareUrlPath(url) {
-    // get rid of things like query string parameters
-    // that will break when trying to use with fs
-    return url.replace(/\?(.*)/, '');
-  }
-
-  getReducedUrl(url) {
-    const { userWorkspace } = this.compilation.context;
-    let reducedUrl;
-
-    url.split('/')
-      .filter((segment) => segment !== '')
-      .reduce((acc, segment) => {
-        const reducedPath = url.replace(`${acc}/${segment}`, '');
-
-        if (path.extname(reducedPath) !== '' && fs.existsSync(path.join(userWorkspace, reducedPath))) {
-          reducedUrl = reducedPath;
-        }
-        return `${acc}/${segment}`;
-      }, '');
-
-    return reducedUrl;
-  }
-
   async shouldResolve(url = '/') {
     const { userWorkspace } = this.compilation.context;
     const bareUrl = this.getBareUrlPath(url);
@@ -49,7 +25,7 @@ class UserWorkspaceResource extends ResourceInterface {
       return Promise.resolve(isAbsoluteWorkspaceFile || bareUrl === '/');
     } else if (url.indexOf('node_modules') < 0 && path.extname(url) !== '') {
       // TODO handle and defer to custom resolvers and node_modules first before trying ourselves
-      let reducedUrl = this.getReducedUrl(bareUrl);
+      const reducedUrl = this.getReducedUrl(userWorkspace, bareUrl);
 
       return Promise.resolve(reducedUrl);
     }
@@ -63,7 +39,7 @@ class UserWorkspaceResource extends ResourceInterface {
         const bareUrl = this.getBareUrlPath(url);
         const workspaceUrl = fs.existsSync(path.join(userWorkspace, bareUrl))
           ? path.join(userWorkspace, bareUrl)
-          : path.join(userWorkspace, this.getReducedUrl(bareUrl));
+          : path.join(userWorkspace, this.getReducedUrl(userWorkspace, bareUrl));
         
         resolve(workspaceUrl);
       } catch (e) {
