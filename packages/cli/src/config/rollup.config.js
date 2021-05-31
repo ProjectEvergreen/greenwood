@@ -7,7 +7,7 @@ const postcssImport = require('postcss-import');
 const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
 const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
 const tokenSuffix = 'scratch';
-const tokenNodeModules = 'node_modules/';
+const tokenNodeModules = 'node_modules';
 
 const hashString = (queryKeysString) => {
   let h = 0;
@@ -324,14 +324,8 @@ function greenwoodHtmlPlugin(compilation) {
                     : bundles[innerBundleId].facadeModuleId;
                   let pathToMatch = src.replace(/\.\.\//g, '').replace('./', '');
 
-                  // special handling for node_modules paths
-                  if (pathToMatch.indexOf(tokenNodeModules) >= 0) {
-                    pathToMatch = pathToMatch.replace(`/${tokenNodeModules}`, '');
-  
-                    const pathToMatchPieces = pathToMatch.split('/');
-  
-                    pathToMatch = pathToMatch.replace(tokenNodeModules, '');
-                    pathToMatch = pathToMatch.replace(`${pathToMatchPieces[0]}/`, '');
+                  if (facadeModuleId && facadeModuleId.indexOf(tokenNodeModules) < 0 && fs.existsSync(path.join(projectDirectory, pathToMatch))) {
+                    pathToMatch = pathToMatch.replace(/\/node_modules\/@greenwood\//, '');
                   }
 
                   if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {
