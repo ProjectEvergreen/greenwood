@@ -130,8 +130,8 @@ function greenwoodHtmlPlugin(compilation) {
       if (importAsRegex.test(id)) {
         const match = id.match(importAsRegex);
         const importee = id
-         .replace(match[0], '')
-         .replace(/\\/g, '/');
+          .replace(match[0], '')
+          .replace(/\\/g, '/');
         
         return `export {default} from '${importee}';`;
       }
