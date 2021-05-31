@@ -517,10 +517,28 @@ module.exports = getRollupConfig = async (compilation) => {
       chunkFileNames: '[name].[hash].js'
     },
     onwarn: (messageObj) => {
-      if ((/EMPTY_BUNDLE/).test(messageObj.code)) {
-        return;
-      } else {
-        console.debug(messageObj.message);
+      const { code } = messageObj;
+
+      switch (code) {
+
+        case 'EMPTY_BUNDLE':
+          // since we use .html files as entry points
+          // we "ignore" them as bundles (see greenwoodHtmlPlugin#load hook)
+          // but don't want the logs to be noisy, so this suppresses those warnings
+          break;
+        case 'UNRESOLVED_IMPORT':
+          // this could be a legit warning for users, but...
+          if (process.env.__GWD_ROLLUP_MODE__ === 'strict') {
+            // if we see it happening in our tests / website build
+            // treat it as an error for us since it usually is...
+            // https://github.com/ProjectEvergreen/greenwood/issues/620
+            throw new Error(messageObj.message);
+          }
+          break;
+        default:
+          // otherwise, log all warnings from rollup
+          console.debug(messageObj.message);
+
       }
     },
     plugins: [
