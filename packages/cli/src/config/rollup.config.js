@@ -528,7 +528,7 @@ module.exports = getRollupConfig = async (compilation) => {
           break;
         case 'UNRESOLVED_IMPORT':
           // this could be a legit warning for users, but...
-          if (process.env.__GWD_ROLLUP_MODE__ === 'strict') {
+          if (process.env.__GWD_ROLLUP_MODE__ === 'strict') { // eslint-disable-line no-underscore-dangle
             // if we see it happening in our tests / website build
             // treat it as an error for us since it usually is...
             // https://github.com/ProjectEvergreen/greenwood/issues/620
