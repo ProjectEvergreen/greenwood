@@ -325,6 +325,10 @@ function greenwoodHtmlPlugin(compilation) {
                   let pathToMatch = src.replace(/\.\.\//g, '').replace('./', '');
 
                   if (facadeModuleId && facadeModuleId.indexOf(tokenNodeModules) < 0 && fs.existsSync(path.join(projectDirectory, pathToMatch))) {
+                    // TODO special handling for node_modules paths due to mono repo
+                    // pathToMatch /node_modules/@greenwood/cli/src/lib/router.js
+                    // facadeModuleId /Users/owenbuckley/Workspace/project-evergreen/repos/greenwood/packages/cli/src/lib/router.js
+                    // facadeModuleId /Users/owenbuckley/Workspace/project-evergreen/repos/greenwood/packages/cli/test/cases/
                     pathToMatch = pathToMatch.replace(/\/node_modules\/@greenwood\//, '');
                   }
 
