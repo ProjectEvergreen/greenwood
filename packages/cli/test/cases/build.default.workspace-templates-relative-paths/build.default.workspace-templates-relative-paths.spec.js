@@ -15,6 +15,7 @@
  * src/
  *   components/
  *     footer.js
+ *     greeting.js
  *     header.js
  *   styles/
  *     home.css
@@ -77,13 +78,20 @@ describe('Build Greenwood With: ', function() {
       });
 
       describe('common styles and scripts file output', function() {
-        it('should emit two javascript files for the header and footer', function() {
-          const footer = scriptFiles.filter((file) => file.indexOf('/footer') >= 0);
+        it('should emit three javascript files (header, footer, greeting)', function() {
+          expect(scriptFiles.length).to.be.equal(3);
+        });
+
+        it('should emit one javascript file for the header', function() {
           const header = scriptFiles.filter(file => file.indexOf('/header') >= 0);
 
-          expect(scriptFiles.length).to.be.equal(2);
-          expect(footer.length).to.be.equal(1);
           expect(header.length).to.be.equal(1);
+        });
+
+        it('should emit one javascript file for the footer', function() {
+          const footer = scriptFiles.filter(file => file.indexOf('/footer') >= 0);
+
+          expect(footer.length).to.be.equal(1);
         });
 
         it('should emit four CSS files for styles and assets/', function() {
@@ -170,6 +178,12 @@ describe('Build Greenwood With: ', function() {
           linkTags = Array.from(dom.window.document.querySelectorAll('head > link[rel="stylesheet"'));
         });
 
+        it('should emit one javascript file for the greeting component from frontmatter import', function() {
+          const greeting = scriptFiles.filter(file => file.indexOf('/greeting') >= 0);
+
+          expect(greeting.length).to.be.equal(1);
+        });
+
         it('should have one <script> tags in the <head> for the header', function() {
           const headerTag = scriptTags.filter((tag) => {
             return tag.src.indexOf('/header') >= 0 && tag.src.indexOf('..') < 0;
@@ -182,6 +196,13 @@ describe('Build Greenwood With: ', function() {
             return tag.src.indexOf('/footer') >= 0 && tag.src.indexOf('..') < 0;
           });
           expect(footerTag.length).to.be.equal(1);
+        });
+
+        it('should have one <script> tags in the <head> for the greeting from front matter import', function() {
+          const greetingTag = scriptTags.filter((tag) => {
+            return tag.src.indexOf('/greeting') >= 0 && tag.src.indexOf('..') < 0;
+          });
+          expect(greetingTag.length).to.be.equal(1);
         });
 
         it('should have one <link> tag in the <head> for theme.css', function() {
@@ -217,6 +238,13 @@ describe('Build Greenwood With: ', function() {
 
           expect(content.length).to.be.equal(1);
           expect(content[0].textContent).to.be.equal('One Two Three');
+        });
+
+        it('should have content output for the x-greeting component from front matter import', function() {
+          const content = dom.window.document.querySelectorAll('body > x-greeting > h3');
+
+          expect(content.length).to.be.equal(1);
+          expect(content[0].textContent).to.be.equal('Hello from the greeting component!');
         });
       });
 
