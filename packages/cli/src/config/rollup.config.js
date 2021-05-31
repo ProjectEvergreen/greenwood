@@ -324,12 +324,26 @@ function greenwoodHtmlPlugin(compilation) {
                     : bundles[innerBundleId].facadeModuleId;
                   let pathToMatch = src.replace(/\.\.\//g, '').replace('./', '');
 
+                  /*
+                   * this is an odd issue related to symlinking in our Greenwood monorepo when building the website
+                   * and managing packages that we create as "virtaul" modules, like for the mpa router
+                   *
+                   * ex. import @greenwood/router/router.js -> /node_modules/@greenwood/cli/src/lib/router.js
+                   *
+                   * when running our tests, which better emulates a real user
+                   * facadeModuleId will be in node_modules, which is like how it would be for a user:
+                   * /node_modules/@greenwood/cli/src/lib/router.js
+                   *
+                   * however, when building our website, where symlinking points back to our packages/ directory
+                   * facadeModuleId will look like this:
+                   * /<workspace>/greenwood/packages/cli/src/lib/router.js
+                   *
+                   * so we need to massage pathToMatch a bit for Rollup for our internal development
+                   * pathToMatch (before): /node_modules/@greenwood/cli/src/lib/router.js
+                   * pathToMatch (after): /cli/src/lib/router.js
+                   */
                   if (facadeModuleId && facadeModuleId.indexOf(tokenNodeModules) < 0 && fs.existsSync(path.join(projectDirectory, pathToMatch))) {
-                    // TODO special handling for node_modules paths due to mono repo
-                    // pathToMatch /node_modules/@greenwood/cli/src/lib/router.js
-                    // facadeModuleId /Users/owenbuckley/Workspace/project-evergreen/repos/greenwood/packages/cli/src/lib/router.js
-                    // facadeModuleId /Users/owenbuckley/Workspace/project-evergreen/repos/greenwood/packages/cli/test/cases/
-                    pathToMatch = pathToMatch.replace(/\/node_modules\/@greenwood\//, '');
+                    pathToMatch = pathToMatch.replace(/\/node_modules\/@greenwood\//, '/');
                   }
 
                   if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {
