@@ -516,8 +516,8 @@ module.exports = getRollupConfig = async (compilation) => {
       entryFileNames: '[name].[hash].js',
       chunkFileNames: '[name].[hash].js'
     },
-    onwarn: (messageObj) => {
-      const { code } = messageObj;
+    onwarn: (errorObj) => {
+      const { code, message } = errorObj;
 
       switch (code) {
 
@@ -532,12 +532,15 @@ module.exports = getRollupConfig = async (compilation) => {
             // if we see it happening in our tests / website build
             // treat it as an error for us since it usually is...
             // https://github.com/ProjectEvergreen/greenwood/issues/620
-            throw new Error(messageObj.message);
+            throw new Error(message);
+          } else {
+            // we should still log it so the user knows at least
+            console.debug(message);
           }
           break;
         default:
           // otherwise, log all warnings from rollup
-          console.debug(messageObj.message);
+          console.debug(message);
 
       }
     },
