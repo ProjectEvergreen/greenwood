@@ -48,7 +48,7 @@ All of our documentation is on our [website](https://www.greenwoodjs.io/) (which
 - Styles and Assets
 
 ## Contributing
-We would love your [contribution](.github/CONTRIBUTING.md) to Greenwood!  Please check out our issue tracker for "good first issue" labels or feel to reach out to us on Gitter in the room "Greenwood" or on [Twitter](https://twitter.com/PrjEvergreen).
+We would love your [contribution](.github/CONTRIBUTING.md) to Greenwood!  Please check out our issue tracker for "good first issue" labels or feel to reach out to us on [Slack](https://join.slack.com/t/thegreenhouseio/shared_invite/enQtMzcyMzE2Mjk1MjgwLTU5YmM1MDJiMTg0ODk4MjA4NzUwNWFmZmMxNDY5MTcwM2I0MjYxN2VhOTEwNDU2YWQwOWQzZmY1YzY4MWRlOGI) in the room _"Greenwood"_ or on [Twitter](https://twitter.com/PrjEvergreen).
 
 ## Built With Greenwood
 | Site  | Repo  | Project Details  | 
