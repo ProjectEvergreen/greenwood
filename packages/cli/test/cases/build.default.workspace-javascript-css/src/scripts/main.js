@@ -1,4 +1,4 @@
-import json from '/assets/data.json?type=json';
+import json from '../assets/data.json?type=json';
 
 const msg = `${json.message} via import, status is - ${json.status}`;
 
