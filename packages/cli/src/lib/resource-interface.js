@@ -17,7 +17,7 @@ class ResourceInterface {
 
   // turn relative paths into relatively absolute based on a known root directory
   // e.g. "../styles/theme.css" -> `${userWorkspace}/styles/theme.css`
-  getReducedUrl(root, url) {
+  resolveRelativeUrl(root, url) {
     let reducedUrl;
 
     url.split('/')
