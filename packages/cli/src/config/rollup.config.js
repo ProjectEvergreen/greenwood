@@ -1,13 +1,11 @@
 /* eslint-disable max-depth, no-loop-func */
 const fs = require('fs');
 const htmlparser = require('node-html-parser');
-const multiInput = require('rollup-plugin-multi-input').default;
 const path = require('path');
 const postcss = require('postcss');
 const postcssImport = require('postcss-import');
 const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
 const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
-const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-json');
 const tokenSuffix = 'scratch';
 const tokenNodeModules = 'node_modules/';
 
@@ -129,7 +127,9 @@ function greenwoodHtmlPlugin(compilation) {
       // https://github.com/ProjectEvergreen/greenwood/issues/604
       if (importAsRegex.test(id)) {
         const match = id.match(importAsRegex);
-        const importee = id.replace(match[0], '');
+        const importee = id
+          .replace(match[0], '')
+          .replace(/\\/g, '/');
         
         return `export {default} from '${importee}';`;
       }
@@ -494,10 +494,12 @@ function greenwoodHtmlPlugin(compilation) {
 
 module.exports = getRollupConfig = async (compilation) => {
   const { scratchDir, outputDir } = compilation.context;
+  const inputs = compilation.graph.map((page) => {
+    return path.normalize(`${scratchDir}${page.route}index.html`);
+  });
   const greenwoodRollupPlugins = [
     ...pluginNodeModules[1].provider(compilation),
     ...pluginResourceStandardJavaScript[1].provider(compilation),
-    ...pluginResourceStandardJson[1].provider(compilation),
     greenwoodWorkspaceResolver(compilation),
     greenwoodHtmlPlugin(compilation)
   ];
@@ -508,21 +510,41 @@ module.exports = getRollupConfig = async (compilation) => {
   }).flat();
 
   return [{
-    input: `${scratchDir}**/*.html`,
+    input: inputs,
     output: { 
       dir: outputDir,
       entryFileNames: '[name].[hash].js',
       chunkFileNames: '[name].[hash].js'
     },
-    onwarn: (messageObj) => {
-      if ((/EMPTY_BUNDLE/).test(messageObj.code)) {
-        return;
-      } else {
-        console.debug(messageObj.message);
+    onwarn: (errorObj) => {
+      const { code, message } = errorObj;
+
+      switch (code) {
+
+        case 'EMPTY_BUNDLE':
+          // since we use .html files as entry points
+          // we "ignore" them as bundles (see greenwoodHtmlPlugin#load hook)
+          // but don't want the logs to be noisy, so this suppresses those warnings
+          break;
+        case 'UNRESOLVED_IMPORT':
+          // this could be a legit warning for users, but...
+          if (process.env.__GWD_ROLLUP_MODE__ === 'strict') { // eslint-disable-line no-underscore-dangle
+            // if we see it happening in our tests / website build
+            // treat it as an error for us since it usually is...
+            // https://github.com/ProjectEvergreen/greenwood/issues/620
+            throw new Error(message);
+          } else {
+            // we should still log it so the user knows at least
+            console.debug(message);
+          }
+          break;
+        default:
+          // otherwise, log all warnings from rollup
+          console.debug(message);
+
       }
     },
     plugins: [
-      multiInput(),
       ...greenwoodRollupPlugins,
       ...customRollupPlugins
     ]

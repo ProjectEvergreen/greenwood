@@ -16,6 +16,7 @@ The available plugins built and maintained by Greenwood team and contibutors hav
 | [Google Analytics](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-google-analytics) | Easily add usage tracking to your site with Google Analytics. |
 | [Import CommonJs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-commonjs) | Enables usage of `import` syntax for loading CommonJS modules from _node_modules_. |
 | [Import CSS](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-css) | Enables usage of `import` syntax for loading CSS files. |
+| [Import JSON](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-json) | Enables usage of `import` syntax for loading JSON files. |
 | [Polyfills](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-polyfills) | Although most modern browsers now support the APIs that make up Web Component, for older browsers use this plugin to Let Greenwood automatically take care of progressively loading polyfills for you. |
 | [PostCSS](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss) | Allows usage of [**PostCSS**](https://postcss.org/) plugins and configuration in your project. |
 

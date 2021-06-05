@@ -142,8 +142,10 @@ const walkPackageJson = (packageJson = {}) => {
             packageExport = esmPath
               ? esmPath
               : fallbackPath;
-          } else if ((exportMapEntry.endsWith('.js') || exportMapEntry.endsWith('.mjs')) && exportMapEntry.indexOf('*') < 0) {
-            // is not an export array, or package.json, or wildcard
+          } else if (exportMapEntry.default) {
+            packageExport = exportMapEntry.default;
+          } else if (exportMapEntry.endsWith && (exportMapEntry.endsWith('.js') || exportMapEntry.endsWith('.mjs')) && exportMapEntry.indexOf('*') < 0) {
+            // is probably a file, so _not_ an export array, package.json, or wildcard export
             packageExport = exportMapEntry;
           }
   
