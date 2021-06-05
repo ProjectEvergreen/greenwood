@@ -2,7 +2,7 @@ import { css, html, LitElement, unsafeCSS } from 'lit-element';
 import client from '@greenwood/plugin-graphql/core/client';
 import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
 import '@evergreen-wc/eve-container';
-import headerCss from './header.css';
+import headerCss from './header.css?type=css';
 import '../social-icons/social-icons.js';
 
 class HeaderComponent extends LitElement {

@@ -35,7 +35,9 @@ module.exports = {
 > 👉 _If you are using this along with [**plugin-postcss**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss), make sure **plugin-postcss** comes first.  All non standard transformations need to come last._ 
 
 
-This will then allow you use `import` to include CSS in your JavaScript files.
+This will then allow you use `import` to include CSS in your JavaScript files by appending `?type=css` to the end of the `import` statement.
 ```js
-import cardCss from './card.css';
+import cardCss from './card.css?type=css'; // must be a relative path per ESM spec
 ```
+
+> _**Note**: Due to a characteristic of using ESM with CSS, Greenwood will also try and detect `import` usage (without needing `?type=css`), but it is recommended to favor explicitness as much as possible, given this is not a standard._
