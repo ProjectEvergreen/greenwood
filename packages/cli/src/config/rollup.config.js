@@ -6,7 +6,6 @@ const postcss = require('postcss');
 const postcssImport = require('postcss-import');
 const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
 const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
-const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-json');
 const tokenSuffix = 'scratch';
 const tokenNodeModules = 'node_modules/';
 
@@ -501,7 +500,6 @@ module.exports = getRollupConfig = async (compilation) => {
   const greenwoodRollupPlugins = [
     ...pluginNodeModules[1].provider(compilation),
     ...pluginResourceStandardJavaScript[1].provider(compilation),
-    ...pluginResourceStandardJson[1].provider(compilation),
     greenwoodWorkspaceResolver(compilation),
     greenwoodHtmlPlugin(compilation)
   ];
