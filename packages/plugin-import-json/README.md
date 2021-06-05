@@ -1,7 +1,7 @@
 # @greenwood/plugin-import-json
 
 ## Overview
-A Greenwood plugin to allow you use ESM (`import`) syntax to load your CSS.
+A Greenwood plugin to allow you use ESM (`import`) syntax to load your JSON.
 
 > This package assumes you already have `@greenwood/cli` installed.
 
@@ -36,7 +36,7 @@ This will then allow you use `import` to include JSON in your JavaScript files b
 
 ```js
 // { status: 200, message: 'some data' }
-import json from '../path/to/data.json?type=json';  // must be a relative path
+import json from '../path/to/data.json?type=json';  // must be a relative path per ESM spec
 
 console.log(json.status) // 200
 ```
