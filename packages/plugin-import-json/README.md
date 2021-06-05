@@ -36,7 +36,7 @@ This will then allow you use `import` to include JSON in your JavaScript files b
 
 ```js
 // { status: 200, message: 'some data' }
-import json from '/assets/data.json?type=json';
+import json from '../path/to/data.json?type=json';  // must be a relative path
 
 console.log(json.status) // 200
 ```
