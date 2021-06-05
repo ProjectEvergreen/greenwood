@@ -1,0 +1,9 @@
+@import '../assets/fonts/source-sans-pro.css';
+
+a {
+  cursor: pointer;
+}
+
+h1 {
+  font-size: 16rem;
+}

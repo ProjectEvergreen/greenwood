@@ -7,7 +7,7 @@ const postcssImport = require('postcss-import');
 const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
 const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
 const tokenSuffix = 'scratch';
-const tokenNodeModules = 'node_modules/';
+const tokenNodeModules = 'node_modules';
 
 const hashString = (queryKeysString) => {
   let h = 0;
@@ -183,19 +183,19 @@ function greenwoodHtmlPlugin(compilation) {
                 // console.debug('dont emit ', parsedAttributes.src);
               } else {
                 const { src } = parsedAttributes;
-
-                mappedScripts.set(src, true);
-  
-                const srcPath = src.replace('../', './');
-                const basePath = srcPath.indexOf(tokenNodeModules) >= 0
+                const absoluteSrc = `${path.normalize(src.replace(/\.\.\//g, '').replace('./', ''))}`;
+                const basePath = absoluteSrc.indexOf(tokenNodeModules) >= 0
                   ? projectDirectory
                   : userWorkspace;
-                const source = fs.readFileSync(path.join(basePath, srcPath), 'utf-8');
-  
+                const id = path.join(basePath, absoluteSrc);
+                const source = fs.readFileSync(id, 'utf-8');
+                
+                mappedScripts.set(absoluteSrc, true);
+
                 this.emitFile({
                   type: 'chunk',
-                  id: srcPath.replace('/node_modules', path.join(projectDirectory, tokenNodeModules)),
-                  name: srcPath.split('/')[srcPath.split('/').length - 1].replace('.js', ''),
+                  id,
+                  name: absoluteSrc.split(`${path.sep}`)[absoluteSrc.split(`${path.sep}`).length - 1].replace('.js', ''),
                   source
                 });
               }
@@ -227,7 +227,7 @@ function greenwoodHtmlPlugin(compilation) {
           headLinks.forEach((linkTag) => {
             const parsedAttributes = parseTagForAttributes(linkTag);
 
-            // handle <link rel="stylesheet" src="./some/path.css"></link>
+            // handle <link rel="stylesheet" href="./some/path.css"></link>
             if (!isRemoteUrl(parsedAttributes.href) && parsedAttributes.rel === 'stylesheet' && !mappedStyles[parsedAttributes.href]) {
               let { href } = parsedAttributes;
 
@@ -238,14 +238,12 @@ function greenwoodHtmlPlugin(compilation) {
               const basePath = href.indexOf(tokenNodeModules) >= 0
                 ? projectDirectory
                 : userWorkspace;
-              const filePath = path.join(basePath, href.replace('../', './'));
+              const absoluteHref = href.replace(/\.\.\//g, '').replace('./', '');
+              const filePath = path.join(basePath, absoluteHref);
               const source = fs.readFileSync(filePath, 'utf-8');
-              const to = `${outputDir}/${href}`;
+              const to = `${outputDir}/${absoluteHref}`;
               const hash = hashString(source);
-              const fileName = href
-                .replace('.css', `.${hash.slice(0, 8)}.css`)
-                .replace('../', '')
-                .replace('./', '');
+              const fileName = absoluteHref.replace('.css', `.${hash.slice(0, 8)}.css`);
 
               if (!fs.existsSync(path.dirname(to)) && href.indexOf(tokenNodeModules) < 0) {
                 fs.mkdirSync(path.dirname(to), {
@@ -253,7 +251,7 @@ function greenwoodHtmlPlugin(compilation) {
                 });
               }
 
-              mappedStyles[parsedAttributes.href] = {
+              mappedStyles[fileName] = {
                 type: 'asset',
                 fileName: fileName.indexOf(tokenNodeModules) >= 0
                   ? path.basename(fileName)
@@ -281,7 +279,7 @@ function greenwoodHtmlPlugin(compilation) {
         const result = await postcss()
           .use(postcssImport())
           .process(source, {
-            from: path.join(basePath, asset.name)
+            from: path.join(basePath, asset.name.replace(/\.\.\//g, ''))
           });
 
         asset.source = result.css;
@@ -324,16 +322,28 @@ function greenwoodHtmlPlugin(compilation) {
                   const facadeModuleId = bundles[innerBundleId].facadeModuleId
                     ? bundles[innerBundleId].facadeModuleId.replace(/\\/g, '/')
                     : bundles[innerBundleId].facadeModuleId;
-                  let pathToMatch = src.replace('../', '').replace('./', '');
+                  let pathToMatch = src.replace(/\.\.\//g, '').replace('./', '');
 
-                  // special handling for node_modules paths
-                  if (pathToMatch.indexOf(tokenNodeModules) >= 0) {
-                    pathToMatch = pathToMatch.replace(`/${tokenNodeModules}`, '');
-  
-                    const pathToMatchPieces = pathToMatch.split('/');
-  
-                    pathToMatch = pathToMatch.replace(tokenNodeModules, '');
-                    pathToMatch = pathToMatch.replace(`${pathToMatchPieces[0]}/`, '');
+                  /*
+                   * this is an odd issue related to symlinking in our Greenwood monorepo when building the website
+                   * and managing packages that we create as "virtaul" modules, like for the mpa router
+                   *
+                   * ex. import @greenwood/router/router.js -> /node_modules/@greenwood/cli/src/lib/router.js
+                   *
+                   * when running our tests, which better emulates a real user
+                   * facadeModuleId will be in node_modules, which is like how it would be for a user:
+                   * /node_modules/@greenwood/cli/src/lib/router.js
+                   *
+                   * however, when building our website, where symlinking points back to our packages/ directory
+                   * facadeModuleId will look like this:
+                   * /<workspace>/greenwood/packages/cli/src/lib/router.js
+                   *
+                   * so we need to massage pathToMatch a bit for Rollup for our internal development
+                   * pathToMatch (before): /node_modules/@greenwood/cli/src/lib/router.js
+                   * pathToMatch (after): /cli/src/lib/router.js
+                   */
+                  if (facadeModuleId && facadeModuleId.indexOf(tokenNodeModules) < 0 && fs.existsSync(path.join(projectDirectory, pathToMatch))) {
+                    pathToMatch = pathToMatch.replace(/\/node_modules\/@greenwood\//, '/');
                   }
 
                   if (facadeModuleId && facadeModuleId.indexOf(pathToMatch) > 0) {

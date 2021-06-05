@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 
 class ResourceInterface {
@@ -6,6 +7,31 @@ class ResourceInterface {
     this.options = options;
     this.extensions = [];
     this.contentType = '';
+  }
+
+  // get rid of things like query string parameters
+  // that will break when trying to use with fs
+  getBareUrlPath(url) {
+    return url.replace(/\?(.*)/, '');
+  }
+
+  // turn relative paths into relatively absolute based on a known root directory
+  // e.g. "../styles/theme.css" -> `${userWorkspace}/styles/theme.css`
+  resolveRelativeUrl(root, url) {
+    let reducedUrl;
+
+    url.split('/')
+      .filter((segment) => segment !== '')
+      .reduce((acc, segment) => {
+        const reducedPath = url.replace(`${acc}/${segment}`, '');
+
+        if (path.extname(reducedPath) !== '' && fs.existsSync(path.join(root, reducedPath))) {
+          reducedUrl = reducedPath;
+        }
+        return `${acc}/${segment}`;
+      }, '');
+
+    return reducedUrl;
   }
 
   // test if this plugin should change a relative URL from the browser to an absolute path on disk 
