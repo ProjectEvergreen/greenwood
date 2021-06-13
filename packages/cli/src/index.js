@@ -16,7 +16,7 @@ let cmdOption = {};
 let command = '';
 
 console.info('-------------------------------------------------------');
-console.info('Welcome to Greenwood ♻️');
+console.info(`Welcome to Greenwood (v${greenwoodPackageJson.version}) ♻️`);
 console.info('-------------------------------------------------------');
 
 program
