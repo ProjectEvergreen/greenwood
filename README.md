@@ -7,7 +7,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
 ## Overview
-Greenwood is a modern and performant static site generator supporting Web Component based development.  For more information about how to get started, lookup our docs, or learn more about the project, please visit our [website](https://www.greenwoodjs.io/).
+Greenwood is a modern and performant static site generator supporting Web Component based development.  For more information about how to get started, read our docs, or learn more about the project and how it works, please visit our [website](https://www.greenwoodjs.io/).
 
 Features:
 - ⚡ No bundle development. Pages are built on the fly.
@@ -18,7 +18,7 @@ Features:
 - ⚒️ Extensible via [plugins](https://www.greenwoodjs.io/plugins/).
 - ⚙️ Supports [SSG, MPA, and SPA](https://www.greenwoodjs.io/docs/configuration/#mode). ([SSR support](https://github.com/ProjectEvergreen/greenwood/discussions/576) coming soon!)
 
-> Greenwood is currently working towards a [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3).  If you're interested in learning more about the web or interested in checking out our high level roadmap, please see our [Open Beta + RFC Google doc](https://docs.google.com/document/d/1MwDkszKvq81QgIYa8utJgyUgSpLZQx9eKCWjIikvfHU/).  We would love to have your help making Greenwood! ✌️
+> Greenwood is currently working towards a [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3) with our recent [`v0.10.0`](https://github.com/ProjectEvergreen/greenwood/releases/tag/v0.10.0) introducing some exciting new changes and concepts  to the project.  If you're interested in learning more about the web and web development (at any skill level!), or interested in checking out our high level roadmap and how Greenwood got where it is today, please see our [Open Beta + RFC Google doc](https://docs.google.com/document/d/1MwDkszKvq81QgIYa8utJgyUgSpLZQx9eKCWjIikvfHU/).  We would love to have your help making Greenwood! ✌️
 
 ## Getting Started
 Our website has a complete [Getting Started](http://www.greenwoodjs.io/getting-started) section that will walk you through creating a Greenwood project from scratch.
