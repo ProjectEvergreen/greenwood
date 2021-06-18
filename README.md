@@ -10,9 +10,9 @@
 Greenwood is a modern and performant static site generator supporting Web Component based development.  For more information about how to get started, read our docs, or learn more about the project and how it works, please visit our [website](https://www.greenwoodjs.io/).
 
 Features:
-- ⚡ No bundle development. Pages are built on the fly.
-- 📝 HTML (+ markdown) first [authoring experience](https://www.greenwoodjs.io/docs/layouts/) and ESM friendly.
-- 🎁 [Optimized(https://www.greenwoodjs.io/docs/configuration/#optimization) production builds
+- ⚡ [No bundle development](https://www.greenwoodjs.io/about/how-it-works/). Pages are built on the fly.
+- 📝 HTML (and markdown) first [authoring experience](https://www.greenwoodjs.io/docs/layouts/) and ESM friendly.
+- 🎁 [Optimized](https://www.greenwoodjs.io/docs/configuration/#optimization) production builds.
 - 🚫 No JavaScript by default.
 - 📖 Prerendering support for Web Components.
 - ⚒️ Extensible via [plugins](https://www.greenwoodjs.io/plugins/).
