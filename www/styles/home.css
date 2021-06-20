@@ -47,6 +47,11 @@ h3 {
   }
 }
 
+iframe {
+  width: 100%;
+  height: 800px;
+}
+
 .cards {
   margin: 20px -0.25rem;
   display: flex;
