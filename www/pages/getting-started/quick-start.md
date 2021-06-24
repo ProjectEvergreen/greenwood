@@ -6,10 +6,15 @@ index: 1
 ---
 
 ## Quick Start
-If you want to code and go then we welcome you to check out the ["companion" repository](https://github.com/ProjectEvergreen/greenwood-getting-started) we made to accompany this guide.
 
+If you want to get right into some code, we have a few options for you to start building with Greenwood right away:
+- GitHub repo
+- Stackblitz
+- Command line with `npx`
 
-To get the code from this walkthrough, you can simply clone the repo, install dependencies, and off you go!
+### GitHub Repo
+If you want to _clone and go_ then we welcome you to check out the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started) we made to accompany this guide.  To get the code from this walkthrough, you can simply clone the repo, install dependencies, and off you go!
+
 ```bash
 $ git clone https://github.com/ProjectEvergreen/greenwood-getting-started
 $ cd greenwood-getting-started
@@ -21,6 +26,14 @@ $ npm start
 
 Done!
 
+### Stackblitz ⚡
+
+Greenwood thinks there's a world where you never have to leave the browser to build and author content for your site, and after you see our starter working in Stackblitz, we think you'll be a believer too!
+
+<iframe src="https://stackblitz.com/github/projectevergreen/greenwood-getting-started?embed=1" loading="lazy"></iframe>
+
+
+### Command Line
 
 Additionally, you can start your own project right now as easy as 1.. 2.. 3, right from the command line!
 ```bash
