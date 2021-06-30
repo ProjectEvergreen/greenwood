@@ -3,14 +3,16 @@ label: 'quick-start'
 menu: side
 title: 'Quick Start'
 index: 1
+linkheadings: 3
 ---
 
 ## Quick Start
 
-If you want to get right into some code, we have a few options for you to start building with Greenwood right away:
+If you want to get right into some code, we have a few options to get you started with building with Greenwood right away:
+
 - GitHub repo
+- Command line (w/ `npx`)
 - Stackblitz
-- Command line with `npx`
 
 ### GitHub Repo
 If you want to _clone and go_ then we welcome you to check out the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started) we made to accompany this guide.  To get the code from this walkthrough, you can simply clone the repo, install dependencies, and off you go!
@@ -26,16 +28,9 @@ $ npm start
 
 Done!
 
-### Stackblitz ⚡
-
-Greenwood thinks there's a world where you never have to leave the browser to build and author content for your site, and after you see our starter working in Stackblitz, we think you'll be a believer too!
-
-<iframe src="https://stackblitz.com/github/projectevergreen/greenwood-getting-started?embed=1" loading="lazy"></iframe>
-
-
 ### Command Line
 
-Additionally, you can start your own project right now as easy as 1.. 2.. 3, right from the command line!
+Additionally, you can start your own project right now as easy as 1.. 2.. 3, right from your terminal!
 ```bash
 # with NodeJS already installed
 # create a pages directory for your content
@@ -48,4 +43,13 @@ $ echo "## hello world" > src/pages/index.md
 $ npx @greenwood/cli develop
 ```
 
-_To learn more about what you can do with Greenwood, head over to our [documentation](/docs/) or feel to review the other sections in this guide.  To setup a project from scratch, you can pick up the rest of the getting started guide in the [project setup](/getting-started/project-setup) page._
+
+### Stackblitz ⚡
+
+Greenwood thinks there's a world where you never have to leave the browser to build and author content for your site, and after you see our starter working [in Stackblitz](https://stackblitz.com/github/projectevergreen/greenwood-getting-started?embed=1), we think you'll be a believer too!
+
+<iframe src="https://stackblitz.com/github/projectevergreen/greenwood-getting-started?embed=1" class="stackblitz" loading="lazy"></iframe>
+
+----
+
+_To learn more about what you can do with Greenwood, head over to our [documentation](/docs/) or feel to review the other sections in this guide.  To setup a project from scratch, you can pick up the rest of the getting started guide on the [project setup](/getting-started/project-setup) page._
