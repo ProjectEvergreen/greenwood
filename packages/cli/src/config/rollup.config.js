@@ -179,8 +179,8 @@ function greenwoodHtmlPlugin(compilation) {
      
             // handle <script type="module" src="some/path.js"></script>
             if (!isRemoteUrl(parsedAttributes.src) && parsedAttributes.type === 'module' && parsedAttributes.src && !mappedScripts.get(parsedAttributes.src)) {
-              if (optimization === 'static') {
-                // console.debug('dont emit ', parsedAttributes.src);
+              if (optimization === 'static' || parsedAttributes['data-gwd-opt'] === 'static') {
+                // dont need to bundle / emit this one
               } else {
                 const { src } = parsedAttributes;
                 const absoluteSrc = `${path.normalize(src.replace(/\.\.\//g, '').replace('./', ''))}`;
@@ -357,7 +357,7 @@ function greenwoodHtmlPlugin(compilation) {
                         <link rel="modulepreload" href="${newSrc}" as="script">
                       `);
                     }
-                  } else if (optimization === 'static' && newHtml.indexOf(pathToMatch) > 0) {
+                  } else if ((parsedAttributes['data-gwd-opt'] === 'static' || optimization === 'static') && newHtml.indexOf(pathToMatch) > 0) {
                     newHtml = newHtml.replace(scriptTag, '');
                   }
                 }
