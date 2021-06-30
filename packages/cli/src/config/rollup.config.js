@@ -295,8 +295,8 @@ function greenwoodHtmlPlugin(compilation) {
       }));
     },
 
-    // crawl through all entry HTML files and map bundled JavaScript and CSS filenames 
-    // back to original <script> / <link> tags and update to their bundled filename in the HTML
+    // crawl through all entry HTML files and map Rollup bundled JavaScript and CSS filenames
+    // back to their original <script> / <link> tags, and update the HTML to their new bundled filenames
     generateBundle(outputOptions, bundles) {      
       for (const bundleId of Object.keys(bundles)) {
         try {
@@ -351,7 +351,7 @@ function greenwoodHtmlPlugin(compilation) {
                     
                     newHtml = newHtml.replace(src, newSrc);
                     
-                    if (optimization !== 'none' && optimization !== 'inline') {
+                    if (!parsedAttributes['data-gwd-opt'] && optimization === 'default') {
                       newHtml = newHtml.replace('<head>', `
                         <head>
                         <link rel="modulepreload" href="${newSrc}" as="script">
@@ -421,7 +421,7 @@ function greenwoodHtmlPlugin(compilation) {
             const parsedAttributes = parseTagForAttributes(scriptTag);
             const isScriptSrcTag = parsedAttributes.src && parsedAttributes.type === 'module';
 
-            if (optimization === 'inline' && isScriptSrcTag && !isRemoteUrl(parsedAttributes.src)) {
+            if ((parsedAttributes['data-gwd-opt'] === 'inline' || optimization === 'inline') && isScriptSrcTag && !isRemoteUrl(parsedAttributes.src)) {
               const src = parsedAttributes.src;
               const basePath = src.indexOf(tokenNodeModules) >= 0 
                 ? process.cwd()

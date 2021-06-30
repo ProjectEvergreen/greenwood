@@ -1,10 +1,8 @@
 const template = document.createElement('template');
       
-template.innerHTML = `
-  <header>This is the header component.</header>
-`;
+template.innerHTML = '<footer>This is the footer component.</footer>';
 
-class HeaderComponent extends HTMLElement {
+class FooterComponent extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -15,4 +13,4 @@ class HeaderComponent extends HTMLElement {
   }
 }
 
-customElements.define('app-header', HeaderComponent);
+customElements.define('app-footer', FooterComponent);
