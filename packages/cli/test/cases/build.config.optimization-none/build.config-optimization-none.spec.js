@@ -68,7 +68,7 @@ describe('Build Greenwood With: ', function() {
       });
       
       describe('<script> tag and preloading', function() {
-        it('should contain one unminifed javasccript file in the output directory', async function() {
+        it('should contain one unminifed javascript file in the output directory', async function() {
           expect(jsFiles).to.have.lengthOf(1);
         });
 
