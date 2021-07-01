@@ -524,7 +524,8 @@ module.exports = getRollupConfig = async (compilation) => {
     output: { 
       dir: outputDir,
       entryFileNames: '[name].[hash].js',
-      chunkFileNames: '[name].[hash].js'
+      chunkFileNames: '[name].[hash].js',
+      sourcemap: true
     },
     onwarn: (errorObj) => {
       const { code, message } = errorObj;
