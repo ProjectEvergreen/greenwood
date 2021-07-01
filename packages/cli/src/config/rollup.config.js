@@ -421,6 +421,7 @@ function greenwoodHtmlPlugin(compilation) {
             const parsedAttributes = parseTagForAttributes(scriptTag);
             const isScriptSrcTag = parsedAttributes.src && parsedAttributes.type === 'module';
 
+            // handle <script type="module" src="..."></script>
             if ((parsedAttributes['data-gwd-opt'] === 'inline' || optimization === 'inline') && isScriptSrcTag && !isRemoteUrl(parsedAttributes.src)) {
               const src = parsedAttributes.src;
               const basePath = src.indexOf(tokenNodeModules) >= 0 
