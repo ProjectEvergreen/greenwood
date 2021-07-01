@@ -47,9 +47,9 @@ describe('Build Greenwood With: ', function() {
 
     describe('Cumulative output based on all settings', function() {
       // TODO
-      // total JS files emitted
-      // total script tags
-      // total preload tags
+      // total JS / CSS files expected
+      // total script / style tags expected
+      // total preload tags expected
     });
 
     describe('JavaScript <script> tag and static optimization override for <app-header>', function() {
@@ -121,6 +121,43 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should contain the expected content from <app-footer> in the <body>', function() {
+        const footer = dom.window.document.querySelectorAll('body footer');
+
+        expect(footer.length).to.be.equal(1);
+        expect(footer[0].textContent).to.be.equal('This is the footer component.');
+      });
+    });
+
+    describe('CSS <link> tag and inline optimization override for theme.css', function() {
+      let dom;
+
+      before(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+      });
+
+      // TODO should we clean this up since the final bundle just gets inlined anyway
+      // and thus would actally be a length of zero
+      it('should emit one theme.css file to the output directory', async function() {
+        const cssFiles = await glob.promise(path.join(this.context.publicDir, 'styles/*.css'));
+        
+        expect(cssFiles).to.have.lengthOf(1);
+      });
+
+      it('should contain no <link> tags in the <head>', function() {
+        const themeLinkTags = Array.from(dom.window.document.querySelectorAll('head link'))
+          .filter(link => link.getAttribute('href').indexOf('theme') >= 0);
+
+        expect(themeLinkTags.length).to.be.equal(0);
+      });
+      
+      it('should have an inline <style> tag in the <head>', function() {
+        const themeStyleTags = Array.from(dom.window.document.querySelectorAll('head style'))
+          .filter(style => style.textContent.indexOf('*{color:#00f}') >= 0);
+
+        expect(themeStyleTags.length).to.be.equal(1);
+      });
+
+      xit('should contain the expected content from <app-footer> in the <body>', function() {
         const footer = dom.window.document.querySelectorAll('body footer');
 
         expect(footer.length).to.be.equal(1);
