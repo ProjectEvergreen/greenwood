@@ -14,9 +14,12 @@
  * Custom Workspace
  * src/
  *   components/
+ *     footer.js
  *     header.js
  *   pages/
  *     index.html
+ *   styles/
+ *     theme.css
  */
 const expect = require('chai').expect;
 const glob = require('glob-promise');
@@ -45,11 +48,43 @@ describe('Build Greenwood With: ', function() {
       await runner.runCommand(cliPath, 'build');
     });
 
-    describe('Cumulative output based on all settings', function() {
-      // TODO
-      // total JS / CSS files expected
-      // total script / style tags expected
-      // total preload tags expected
+    describe('Cumulative output based on all override settings', function() {
+      let dom;
+
+      before(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+      });
+
+      it('should emit one Javascript file to the output directory', async function() {
+        const jsFiles = await glob.promise(path.join(this.context.publicDir, '**/*.js'));
+        
+        expect(jsFiles).to.have.lengthOf(1);
+      });
+
+      it('should emit one CSS file to the output directory', async function() {
+        const cssFiles = await glob.promise(path.join(this.context.publicDir, '**/*.css'));
+        
+        expect(cssFiles).to.have.lengthOf(1);
+      });
+
+      it('should have one <script> tag in the <head>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head script');
+
+        expect(scriptTags.length).to.be.equal(1);
+      });
+
+      // one of these tags comes from puppeteer
+      it('should have two <style> tags in the <head>', function() {
+        const styleTags = dom.window.document.querySelectorAll('head style');
+
+        expect(styleTags.length).to.be.equal(2);
+      });
+
+      it('should have no <link> tags in the <head>', function() {
+        const linkTags = dom.window.document.querySelectorAll('head link');
+
+        expect(linkTags.length).to.be.equal(0);
+      });
     });
 
     describe('JavaScript <script> tag and static optimization override for <app-header>', function() {
@@ -157,7 +192,7 @@ describe('Build Greenwood With: ', function() {
         expect(themeStyleTags.length).to.be.equal(1);
       });
 
-      xit('should contain the expected content from <app-footer> in the <body>', function() {
+      it('should contain the expected content from <app-footer> in the <body>', function() {
         const footer = dom.window.document.querySelectorAll('body footer');
 
         expect(footer.length).to.be.equal(1);
