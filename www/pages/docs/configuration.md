@@ -141,7 +141,19 @@ module.exports = {
 }
 ```
 
-> _These settings are currently expiremental, and more fine grained control and intelligent based defaults will be coming soon!_
+#### Overrides
+Additionally, you can apply overrides on a per `<link>` or `<script>` tag basis by addding a custom `data-gwd-opt` attribute to your HTML.  The following is supported for JavaScript and CSS.
+
+```html
+<!-- Javascript -->
+<script type="module" src="/path/to/file1.js" data-gwd-opt="static"></script>
+<script type="module" src="/path/to/file2.js" data-gwd-opt="inline"></script>
+
+<!-- CSS -->
+<link rel="stylesheet" href="/path/to/file1.css" data-gwd-opt="inline"/>
+```
+
+> _These settings are currently considered expiremental.  Additional improvements and considerations include adding [`none` override support](https://github.com/ProjectEvergreen/greenwood/discussions/545#discussioncomment-957320), [SSR + hydration](https://github.com/ProjectEvergreen/greenwood/discussions/576), and [side effect free templates and pages](https://github.com/ProjectEvergreen/greenwood/discussions/644)._
 
 ### Prerender
 
