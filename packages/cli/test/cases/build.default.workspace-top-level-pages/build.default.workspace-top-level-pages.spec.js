@@ -61,7 +61,7 @@ describe('Build Greenwood With: ', function() {
         expect(customMeta[0].getAttribute('content')).to.be.equal('My custom meta content.');
       });
 
-      xit('should have the correct <title> for the home page', function() {
+      it('should have the correct <title> for the home page', function() {
         const titleTags = dom.window.document.querySelectorAll('title');
 
         expect(titleTags.length).to.equal(1);

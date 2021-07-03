@@ -63,8 +63,13 @@ const getAppTemplate = (contents, userWorkspace, customImports = []) => {
   const headLinks = root.querySelectorAll('head link');
   const headMeta = root.querySelectorAll('head meta');
   const headStyles = root.querySelectorAll('head style');
+  const headTitle = root.querySelector('head title');
 
   appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
+
+  if (headTitle) {
+    appTemplateContents = appTemplateContents.replace(/<title>(.*)<\/title>/, `<title>${headTitle.rawText}</title>`);
+  }
 
   headScripts.forEach((script) => {
     const matchNeedle = '</script>';
@@ -188,7 +193,12 @@ const getUserScripts = (contents, projectDirectory) => {
 };
 
 const getMetaContent = (url, config, contents) => {
-  const title = config.title || '';
+  const existingTitleMatch = contents.match(/<title>(.*)<\/title>/);
+  const existingTitleCheck = existingTitleMatch && existingTitleMatch[1] && existingTitleMatch !== '';
+
+  const title = existingTitleCheck
+    ? existingTitleMatch[1]
+    : config.title;
   const metaContent = config.meta.map(item => {
     let metaHtml = '';
 
@@ -209,8 +219,12 @@ const getMetaContent = (url, config, contents) => {
       : `<meta${metaHtml}/>`;
   }).join('\n');
 
-  contents = contents.replace(/<title>(.*)<\/title>/, '');
-  contents = contents.replace('<head>', `<head><title>${title}</title>`);
+  // add a title if its not already there
+  if (!existingTitleCheck) {
+    contents = contents.replace('<head>', '<head><title></title>');
+  }
+
+  contents = contents.replace(/<title>(.*)<\/title>/, `<title>${title}</title>`);
   contents = contents.replace('<meta-outlet></meta-outlet>', metaContent);
 
   return contents;
