@@ -12,7 +12,7 @@ If you want to get right into some code, we have a few options to get you starte
 
 - GitHub repo
 - Command line (w/ `npx`)
-- Stackblitz
+- Stackblitz ⚡
 
 ### GitHub Repo
 If you want to _clone and go_ then we welcome you to check out the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started) we made to accompany this guide.  To get the code from this walkthrough, you can simply clone the repo, install dependencies, and off you go!
@@ -44,7 +44,7 @@ $ npx @greenwood/cli develop
 ```
 
 
-### Stackblitz ⚡
+### Stackblitz
 
 Greenwood thinks there's a world where you never have to leave the browser to build and author content for your site, and after you see our starter working [in Stackblitz](https://stackblitz.com/github/projectevergreen/greenwood-getting-started?embed=1), we think you'll be a believer too!
 
