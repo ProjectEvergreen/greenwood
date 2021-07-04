@@ -25,7 +25,7 @@ const updateImportMap = (entry, entryPath) => {
 const getPackageEntryPath = (packageJson) => {
   let entry = packageJson.exports
     ? Object.keys(packageJson.exports) // first favor export maps first
-    : packageJson.module // next favor ESM entry points first
+    : packageJson.module // next favor ESM entry points
       ? packageJson.module
       : packageJson.main && packageJson.main !== '' // then favor main
         ? packageJson.main
@@ -145,6 +145,7 @@ const walkPackageJson = (packageJson = {}) => {
           } else if (exportMapEntry.default) {
             packageExport = exportMapEntry.default;
             
+            // use the dependency itself as an entry in the importMap
             if (entry === '.') {
               updateImportMap(dependency, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
             }
@@ -154,10 +155,14 @@ const walkPackageJson = (packageJson = {}) => {
           }
   
           if (packageExport) {
+
+            // check all exports of an exportMap entry
+            // to make sure those deps get added to the importMap
             if (packageExport.endsWith('.js')) {
               const moduleContents = fs.readFileSync(path.join(process.cwd(), 'node_modules', `${dependency}/${packageExport.replace('./', '')}`));
               walkModule(moduleContents, dependency);
             }
+
             updateImportMap(`${dependency}/${packageExport.replace('./', '')}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
           }
         });
@@ -166,6 +171,7 @@ const walkPackageJson = (packageJson = {}) => {
       } else {
         const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
         
+        // sometimes a main file is actually just an empty string... :/
         if (fs.existsSync(packageEntryPointPath)) {
           const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
     
