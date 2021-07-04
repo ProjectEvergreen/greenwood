@@ -142,20 +142,10 @@ const walkPackageJson = (packageJson = {}) => {
             packageExport = esmPath
               ? esmPath
               : fallbackPath;
-<<<<<<< HEAD
-<<<<<<< HEAD
           } else if (exportMapEntry.default) {
             packageExport = exportMapEntry.default;
           } else if (exportMapEntry.endsWith && (exportMapEntry.endsWith('.js') || exportMapEntry.endsWith('.mjs')) && exportMapEntry.indexOf('*') < 0) {
             // is probably a file, so _not_ an export array, package.json, or wildcard export
-=======
-=======
-          } else if (exportMapEntry.default) {
-            packageExport = exportMapEntry.default;
->>>>>>> e16401d0 (handle default exportMap case)
-          } else if ((exportMapEntry.endsWith('.js') || exportMapEntry.endsWith('.mjs')) && exportMapEntry.indexOf('*') < 0) {
-            // is not an export array, or package.json, or wildcard
->>>>>>> c5861dac (remove console logs)
             packageExport = exportMapEntry;
           }
   
