@@ -194,7 +194,7 @@ const getUserScripts = (contents, projectDirectory) => {
 
 const getMetaContent = (url, config, contents) => {
   const existingTitleMatch = contents.match(/<title>(.*)<\/title>/);
-  const existingTitleCheck = existingTitleMatch && existingTitleMatch[1] && existingTitleMatch !== '';
+  const existingTitleCheck = !!(existingTitleMatch && existingTitleMatch[1] && existingTitleMatch[1] !== '');
 
   const title = existingTitleCheck
     ? existingTitleMatch[1]
@@ -219,8 +219,8 @@ const getMetaContent = (url, config, contents) => {
       : `<meta${metaHtml}/>`;
   }).join('\n');
 
-  // add a title if its not already there
-  if (!existingTitleCheck) {
+  // add an empty <title> if it's not already there
+  if (!existingTitleMatch) {
     contents = contents.replace('<head>', '<head><title></title>');
   }
 
