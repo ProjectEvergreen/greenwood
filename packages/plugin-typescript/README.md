@@ -34,8 +34,7 @@ module.exports = {
 
 Then, you can write some TypeScript
 ```ts
-import { html, css, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { html, css, LitElement, customElement, property } from 'lit-element';
 
 @customElement('app-greeting')
 export class GreetingComponent extends LitElement {
@@ -47,7 +46,7 @@ export class GreetingComponent extends LitElement {
   render() {
     return html`<p>Hello, ${this.name}!</p>`;
   }
-} 
+}
 ```
 
 And use it in your project like you would use a _.js_ file!
@@ -56,7 +55,7 @@ And use it in your project like you would use a _.js_ file!
 ```
 
 ## Options
-This plugin provides the following default `compilerOptions` in a _tsconfig.json_.
+This plugin provides the following default `compilerOptions`.
 
 ```json
 {
@@ -94,4 +93,4 @@ If you would like to extend / override it, you can do as follows:
     }
     ```
 
-This will then process your JavaScript with TypeScript with the configurated settings you provide.  
+This will then process your JavaScript with TypeScript with the additional configurated settings you provide.  
