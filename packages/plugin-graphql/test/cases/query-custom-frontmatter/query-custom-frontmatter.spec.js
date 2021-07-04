@@ -97,6 +97,12 @@ describe('Build Greenwood With: ', function() {
         `${process.cwd()}/node_modules/lit-html/directives/*.js`, 
         `${outputPath}/node_modules/lit-html/directives/`
       );
+      // lit-html has a dependency on this
+      // https://github.com/lit/lit/blob/main/packages/lit-html/package.json#L82
+      const trustedTypes = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
+        `${outputPath}/node_modules/@types/trusted-types/`
+      );
       const litReactiveElement = await getDependencyFiles(
         `${process.cwd()}/node_modules/@lit/reactive-element/*.js`, 
         `${outputPath}/node_modules/@lit/reactive-element/`
@@ -124,6 +130,7 @@ describe('Build Greenwood With: ', function() {
         ...litHtmlPackageJson,
         ...litHtml,
         ...litHtmlDirectives,
+        ...trustedTypes,
         ...litReactiveElement,
         ...litReactiveElementDecorators,
         ...litReactiveElementPackageJson
