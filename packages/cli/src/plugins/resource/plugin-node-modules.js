@@ -23,11 +23,11 @@ const updateImportMap = (entry, entryPath) => {
 };
 
 const getPackageEntryPath = (packageJson) => {
-  let entry = packageJson.module 
-    ? packageJson.module // favor ESM entry points first
-    : packageJson.exports // next favor export maps
-      ? Object.keys(packageJson.exports)
-      : packageJson.main // then favor main
+  let entry = packageJson.exports
+    ? Object.keys(packageJson.exports) // first favor export maps first
+    : packageJson.module // next favor ESM entry points first
+      ? packageJson.module
+      : packageJson.main && packageJson.main !== '' // then favor main
         ? packageJson.main
         : 'index.js'; // lastly, fallback to index.js
 
@@ -144,22 +144,35 @@ const walkPackageJson = (packageJson = {}) => {
               : fallbackPath;
           } else if (exportMapEntry.default) {
             packageExport = exportMapEntry.default;
+            
+            if (entry === '.') {
+              updateImportMap(dependency, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
+            }
           } else if (exportMapEntry.endsWith && (exportMapEntry.endsWith('.js') || exportMapEntry.endsWith('.mjs')) && exportMapEntry.indexOf('*') < 0) {
             // is probably a file, so _not_ an export array, package.json, or wildcard export
             packageExport = exportMapEntry;
           }
   
           if (packageExport) {
+            if (packageExport.endsWith('.js')) {
+              const moduleContents = fs.readFileSync(path.join(process.cwd(), 'node_modules', `${dependency}/${packageExport.replace('./', '')}`));
+              walkModule(moduleContents, dependency);
+            }
             updateImportMap(`${dependency}/${packageExport.replace('./', '')}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
           }
         });
+
+        walkPackageJson(dependencyPackageJson);
       } else {
         const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
-        const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
-  
-        walkModule(packageEntryModule, dependency);
-        updateImportMap(dependency, `/node_modules/${dependency}/${entry}`);
-        walkPackageJson(dependencyPackageJson);
+        
+        if (fs.existsSync(packageEntryPointPath)) {
+          const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
+    
+          walkModule(packageEntryModule, dependency);
+          updateImportMap(dependency, `/node_modules/${dependency}/${entry}`);
+          walkPackageJson(dependencyPackageJson);
+        }
       }
     }
   });
