@@ -1,20 +1,40 @@
+const fs = require('fs');
 const livereload = require('livereload');
+const path = require('path');
 const { ResourceInterface } = require('../../lib/resource-interface');
 const { ServerInterface } = require('../../lib/server-interface');
 
 class LiveReloadServer extends ServerInterface {
   constructor(compilation, options = {}) {
     super(compilation, options);
-
-    this.liveReloadServer = livereload.createServer({
-      exts: ['html', 'css', 'js', 'md'],
-      applyCSSLive: false // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
-    });
   }
 
   async start() {
     const { userWorkspace } = this.compilation.context;
+    const standardPluginsPath = path.join(__dirname, '../', 'resource');
+    const standardPluginsExtensions = fs.readdirSync(standardPluginsPath)
+      .filter(filename => filename.indexOf('plugin-standard') === 0)
+      .map((filename) => {
+        return require(`${standardPluginsPath}/${filename}`);
+      })
+      .map((plugin) => {
+        // assume that if it is an array, the second item is a rollup plugin
+        const instance = plugin.length
+          ? plugin[0].provider(this.compilation)
+          : plugin.provider(this.compilation);
 
+        return instance.extensions.flat();
+      })
+      .flat();
+
+    const allExtensions = [...standardPluginsExtensions]
+      .filter((ext) => ext !== '*' || ext !== '')
+      .map((ext) => ext.replace('.', ''));
+
+    this.liveReloadServer = livereload.createServer({
+      exts: allExtensions,
+      applyCSSLive: false // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
+    });
     this.liveReloadServer.watch(userWorkspace, () => {
       console.info(`Now watching directory "${userWorkspace}" for changes.`);
       return Promise.resolve(true);
