@@ -32,16 +32,22 @@ class LiveReloadServer extends ServerInterface {
         return plugin.provider(this.compilation).extensions.flat();
       }).flat();
 
-    const allExtensions = [...standardPluginsExtensions, ...customPluginsExtensions]
+    // filter out wildcards or otherwise undesired values and remove any . since livereload likes them that way
+    const allExtensions = [
+      ...standardPluginsExtensions,
+      ...customPluginsExtensions,
+      ...this.compilation.config.devServer.extensions
+    ]
       .filter((ext) => ext !== '*' || ext !== '')
       .map((ext) => ext.replace('.', ''));
 
     console.debug('allExtentions', allExtensions.filter((ext, idx) => idx === allExtensions.indexOf(ext)));
-    this.liveReloadServer = livereload.createServer({
+    const liveReloadServer = livereload.createServer({
       exts: allExtensions.filter((ext, idx) => idx === allExtensions.indexOf(ext)),
       applyCSSLive: false // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
     });
-    this.liveReloadServer.watch(userWorkspace, () => {
+
+    liveReloadServer.watch(userWorkspace, () => {
       console.info(`Now watching directory "${userWorkspace}" for changes.`);
       return Promise.resolve(true);
     });

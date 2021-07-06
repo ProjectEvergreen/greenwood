@@ -7,7 +7,8 @@ const optimizations = ['default', 'none', 'static', 'inline'];
 const defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {
-    port: 1984
+    port: 1984,
+    extensions: []
   },
   mode: modes[0],
   optimization: optimizations[0],
@@ -114,6 +115,10 @@ module.exports = readAndMergeConfig = async() => {
 
           if (devServer.proxy) {
             customConfig.devServer.proxy = devServer.proxy;
+          }
+
+          if (devServer.extensions && devServer.extensions.length > 0) {
+            customConfig.devServer.extensions = devServer.extensions;
           }
         }
 
