@@ -26,13 +26,19 @@ class LiveReloadServer extends ServerInterface {
         return instance.extensions.flat();
       })
       .flat();
+    const customPluginsExtensions = this.compilation.config.plugins
+      .filter((plugin) => plugin.type === 'resource')
+      .map((plugin) => {
+        return plugin.provider(this.compilation).extensions.flat();
+      }).flat();
 
-    const allExtensions = [...standardPluginsExtensions]
+    const allExtensions = [...standardPluginsExtensions, ...customPluginsExtensions]
       .filter((ext) => ext !== '*' || ext !== '')
       .map((ext) => ext.replace('.', ''));
 
+    console.debug('allExtentions', allExtensions.filter((ext, idx) => idx === allExtensions.indexOf(ext)));
     this.liveReloadServer = livereload.createServer({
-      exts: allExtensions,
+      exts: allExtensions.filter((ext, idx) => idx === allExtensions.indexOf(ext)),
       applyCSSLive: false // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
     });
     this.liveReloadServer.watch(userWorkspace, () => {
