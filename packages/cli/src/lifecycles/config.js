@@ -117,8 +117,12 @@ module.exports = readAndMergeConfig = async() => {
             customConfig.devServer.proxy = devServer.proxy;
           }
 
-          if (devServer.extensions && devServer.extensions.length > 0) {
-            customConfig.devServer.extensions = devServer.extensions;
+          if (devServer.extensions) {
+            if (Array.isArray(devServer.extensions)) {
+              customConfig.devServer.extensions = devServer.extensions;
+            } else {
+              reject('Error: provided extensions is not an array.  Please provide an array like [\'.txt\', \'.foo\']');
+            }
           }
         }
 
