@@ -1,20 +1,19 @@
 /*
  * Use Case
- * Run Greenwood with Babel processing merging user and default babel.config.js files.
+ * Run Greenwood with TypeScript processing merging user and default tsconfig.json options.
  *
  * User Result
- * Should generate a bare bones Greenwood build with the user's JavaScript files processed 
- * based on their own babel.config.js file merged with plugin default babel.config.js file.
+ * Should generate a bare bones Greenwood build with the user's JavaScript files processed based on their own tsconfig.json file merged with the plugin default config.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * const pluginBabel = require('@greenwod/plugin-babel');
+ * const pluginTypeScript = require('@greenwod/plugin-typescript');
  *
  * {
  *   plugins: [
- *     ...pluginBabel({
+ *     ...pluginTypeScript({
  *        extendConfig: true
  *     })
  *   ]
@@ -25,14 +24,14 @@
  *   pages/
  *     index.html
  *   scripts/
- *     main.js
+ *     main.ts
  * 
- * User babel.config.js
- * module.exports = {
- *   plugins: [
- *     '@babel/plugin-proposal-class-properties',
- *     '@babel/plugin-proposal-private-methods'
- *   ]
+ * User tsconfig.json (example)
+ * {
+ *   "compilerOptions": {
+ *     "expirementalDecorators": true,
+ *     "strict": true
+ *   }
  * };
  */
 const fs = require('fs');

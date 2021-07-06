@@ -3,8 +3,7 @@
  * Run Greenwood with Babel processing.
  *
  * User Result
- * Should generate a bare bones Greenwood build with the user's JavaScript files processed 
- * based on their own babel.config.js file.
+ * Should generate a bare bones Greenwood build with the user's JavaScript files processed based on the default plugin babel.config.js.
  *
  * User Command
  * greenwood build
@@ -25,13 +24,6 @@
  *   scripts/
  *     main.js
  * 
- * User babel.config.js
- * module.exports = {
- *   plugins: [
- *     '@babel/plugin-proposal-class-properties',
- *     '@babel/plugin-proposal-private-methods'
- *   ]
- * };
  */
 const fs = require('fs');
 const glob = require('glob-promise');
