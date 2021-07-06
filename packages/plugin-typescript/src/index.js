@@ -5,6 +5,7 @@
  */
 const rollupPluginTypescript = require('@rollup/plugin-typescript');
 const fs = require('fs').promises;
+const path = require('path');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 const tsc = require('typescript');
 
@@ -16,7 +17,6 @@ class ImportTypeScriptResource extends ResourceInterface {
     this.compilerOptions = {
       target: 'es2020',
       module: 'es2020',
-      experimentalDecorators: true, // TODO
       moduleResolution: 'node'
     };
   }
@@ -24,13 +24,18 @@ class ImportTypeScriptResource extends ResourceInterface {
   async serve(url) {
     return new Promise(async (resolve, reject) => {
       try {
+        const { projectDirectory } = this.compilation.context;
         const source = await fs.readFile(url, 'utf-8');
-        // TODO const tsConfig = await fs.readFile(path.join(__dirname, 'tsconfig.json'), 'utf-8');
+        const customOptions = this.options.extendConfig
+          ? require(path.join(projectDirectory, 'tsconfig.json'))
+          : { compilerOptions: {} };
+        const compilerOptions = {
+          ...this.compilerOptions,
+          ...customOptions.compilerOptions
+        };
         
         // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
-        const result = tsc.transpileModule(source, {
-          compilerOptions: this.compilerOptions
-        });
+        const result = tsc.transpileModule(source, { compilerOptions });
 
         resolve({
           body: result.outputText,

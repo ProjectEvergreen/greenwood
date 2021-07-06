@@ -42,7 +42,7 @@ const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/u
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Babel configuration';
+  const LABEL = 'Default TypeScript configuration';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
   let runner;
@@ -63,14 +63,14 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);    
 
-    describe('Babel should process JavaScript that reference private class members / methods', function() {
-      it('should output correctly processed JavaScript without private members', function() {
-        const expectedJavaScript = '#x';
+    describe('TypeScript should process JavaScript that uses an interface', function() {
+      it('should output correctly processed JavaScript without the interface', function() {
+        const expectedJavaScript = 'const l="Angela";console.log(`Hello ${l} ${l}!`);';
         const jsFiles = glob.sync(path.join(this.context.publicDir, '*.js'));
         const javascript = fs.readFileSync(jsFiles[0], 'utf-8');
 
         expect(jsFiles.length).to.equal(1);
-        expect(javascript).to.not.contain(expectedJavaScript);
+        expect(javascript.replace(/\n/g, '')).to.equal(expectedJavaScript);
       });
     });
   });
