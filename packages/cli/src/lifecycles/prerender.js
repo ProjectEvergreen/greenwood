@@ -69,7 +69,7 @@ async function preRenderCompilation(compilation) {
   try {
     await browserRunner.init();
   } catch (e) {
-    console.error('There was an error trying to initializing puppeteer for prerendering.');
+    console.error('There was an error trying to initialize puppeteer for prerendering.');
     console.error(e);
 
     console.info('To troubleshoot, please check your environment for any npm install or postinstall errors as may be the case in a Stackblitz or other sandbox like environment.');
