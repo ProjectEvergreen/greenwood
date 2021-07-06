@@ -1,4 +1,4 @@
-import { css, html, LitElement, unsafeCSS } from 'lit-element';
+import { css, html, LitElement, unsafeCSS } from 'lit';
 import bannerCss from './banner.css?type=css';
 import buttonCss from './button.css?type=css';
 import '@evergreen-wc/eve-button';
