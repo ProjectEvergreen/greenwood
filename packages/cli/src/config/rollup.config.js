@@ -484,6 +484,9 @@ function greenwoodHtmlPlugin(compilation) {
                 }
               });
           }
+          
+          // mark each HTML's .map file to be cleaned up
+          scratchFiles[`${htmlPath.replace(outputDir, '')}.map`] = true;
 
           await fs.promises.writeFile(htmlPath, html);
         } else {
