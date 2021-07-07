@@ -55,16 +55,16 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      it('should emit one Javascript file to the output directory', async function() {
+      it('should emit no Javascript files to the output directory', async function() {
         const jsFiles = await glob.promise(path.join(this.context.publicDir, '**/*.js'));
         
-        expect(jsFiles).to.have.lengthOf(1);
+        expect(jsFiles).to.have.lengthOf(0);
       });
 
-      it('should emit one CSS file to the output directory', async function() {
+      it('should emit no CSS files to the output directory', async function() {
         const cssFiles = await glob.promise(path.join(this.context.publicDir, '**/*.css'));
         
-        expect(cssFiles).to.have.lengthOf(1);
+        expect(cssFiles).to.have.lengthOf(0);
       });
 
       it('should have one <script> tag in the <head>', function() {
@@ -94,12 +94,6 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      it('should emit no header javascript files to the output directory', async function() {
-        const jsFiles = await glob.promise(path.join(this.context.publicDir, 'header.*.js'));
-        
-        expect(jsFiles).to.have.lengthOf(0);
-      });
-
       it('should contain no <link> tags in the <head>', function() {
         const headerLinkTags = Array.from(dom.window.document.querySelectorAll('head link'))
           .filter(link => link.getAttribute('href').indexOf('header') >= 0);
@@ -127,14 +121,6 @@ describe('Build Greenwood With: ', function() {
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
-      });
-
-      // TODO should we clean this up since the final bundle just gets inlined anyway
-      // and thus would actally be a length of zero
-      it('should emit one footer javascript file to the output directory', async function() {
-        const jsFiles = await glob.promise(path.join(this.context.publicDir, 'footer.*.js'));
-        
-        expect(jsFiles).to.have.lengthOf(1);
       });
 
       it('should contain no <link> tags in the <head>', function() {
@@ -170,14 +156,6 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      // TODO should we clean this up since the final bundle just gets inlined anyway
-      // and thus would actally be a length of zero
-      it('should emit one theme.css file to the output directory', async function() {
-        const cssFiles = await glob.promise(path.join(this.context.publicDir, 'styles/*.css'));
-        
-        expect(cssFiles).to.have.lengthOf(1);
-      });
-
       it('should contain no <link> tags in the <head>', function() {
         const themeLinkTags = Array.from(dom.window.document.querySelectorAll('head link'))
           .filter(link => link.getAttribute('href').indexOf('theme') >= 0);
@@ -190,13 +168,6 @@ describe('Build Greenwood With: ', function() {
           .filter(style => style.textContent.indexOf('*{color:#00f}') >= 0);
 
         expect(themeStyleTags.length).to.be.equal(1);
-      });
-
-      it('should contain the expected content from <app-footer> in the <body>', function() {
-        const footer = dom.window.document.querySelectorAll('body footer');
-
-        expect(footer.length).to.be.equal(1);
-        expect(footer[0].textContent).to.be.equal('This is the footer component.');
       });
     });
   });

@@ -430,6 +430,7 @@ function greenwoodHtmlPlugin(compilation) {
                 : outputDir;
               const outputPath = path.join(basePath, src);
               const js = fs.readFileSync(outputPath, 'utf-8');
+              scratchFiles[src] = true;
 
               html = html.replace(`<script ${scriptTag.rawAttrs}></script>`, `
                 <script type="module">
@@ -476,6 +477,7 @@ function greenwoodHtmlPlugin(compilation) {
                 const href = parsedAttributes.href;
                 const outputPath = path.join(outputDir, href);
                 const css = fs.readFileSync(outputPath, 'utf-8');
+                scratchFiles[href] = true;
 
                 html = html.replace(`<link ${linkTag.rawAttrs}>`, `
                   <style>
