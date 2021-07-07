@@ -101,6 +101,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       // assume the second tag is for FooBar
+      // https://github.com/ProjectEvergreen/greenwood/issues/656
       describe('Foobar', function() {
         it('should contain one <script> tag with the expected JS content inlined of type="module" for the header', function() {
           const scriptTag = dom.window.document.querySelectorAll('head script')[1];
