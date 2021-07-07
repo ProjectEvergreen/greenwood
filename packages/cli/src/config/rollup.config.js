@@ -378,7 +378,6 @@ function greenwoodHtmlPlugin(compilation) {
                       
                       newHtml = newHtml.replace(href, newHref);
 
-                      // TODO remove negatives
                       if (!parsedAttributes['data-gwd-opt'] && (optimization !== 'none' && optimization !== 'inline')) {
                         newHtml = newHtml.replace('<head>', `
                           <head>
