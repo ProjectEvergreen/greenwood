@@ -63,7 +63,7 @@ This plugin provides the following default `compilerOptions`.
     "target": "es2020",
     "module": "es2020",
     "moduleResolution": "node",
-    "sourcemaps": true
+    "sourceMap": true
   }
 } 
 ```
