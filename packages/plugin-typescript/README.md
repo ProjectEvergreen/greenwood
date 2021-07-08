@@ -1,7 +1,7 @@
 # @greenwood/plugin-typescript
 
 ## Overview
-A Greenwood plugin for writing [**TypeScript**](https://www.typescriptlang.org/).
+A Greenwood plugin for writing [**TypeScript**](https://www.typescriptlang.org/).   There is still a [little more work](https://github.com/ProjectEvergreen/greenwood/issues/658) we would like to do but this plugin should be suitable for general usage.
 
 > This package assumes you already have `@greenwood/cli` installed.
 

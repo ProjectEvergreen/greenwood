@@ -9,17 +9,29 @@ const path = require('path');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 const tsc = require('typescript');
 
+const defaultcompilerOptions = {
+  target: 'es2020',
+  module: 'es2020',
+  moduleResolution: 'node',
+  sourceMap: true
+};
+
+function getCompilerOptions (projectDirectory, extendConfig) {
+  const customOptions = extendConfig
+    ? require(path.join(projectDirectory, 'tsconfig.json'))
+    : { compilerOptions: {} };
+
+  return compilerOptions = {
+    ...defaultcompilerOptions,
+    ...customOptions.compilerOptions
+  };
+}
+
 class TypeScriptResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
     this.extensions = ['.ts'];
     this.contentType = 'text/javascript';
-    this.compilerOptions = {
-      target: 'es2020',
-      module: 'es2020',
-      moduleResolution: 'node',
-      sourcemaps: true
-    };
   }
 
   async serve(url) {
@@ -27,16 +39,9 @@ class TypeScriptResource extends ResourceInterface {
       try {
         const { projectDirectory } = this.compilation.context;
         const source = await fs.readFile(url, 'utf-8');
-        const customOptions = this.options.extendConfig
-          ? require(path.join(projectDirectory, 'tsconfig.json'))
-          : { compilerOptions: {} };
-        const compilerOptions = {
-          ...this.compilerOptions,
-          ...customOptions.compilerOptions
-        };
-        
+        const compilerOptions = getCompilerOptions(projectDirectory, this.options.extendConfig);
+
         // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
-        // https://www.typescriptlang.org/docs/handbook/tsconfig-json.html
         const result = tsc.transpileModule(source, { compilerOptions });
 
         resolve({
@@ -58,8 +63,12 @@ module.exports = (options = {}) => {
   }, {
     type: 'rollup',
     name: 'plugin-import-typescript:rollup',
-    provider: () => [
-      rollupPluginTypescript()
-    ]
+    provider: (compilation) => {
+      const compilerOptions = getCompilerOptions(compilation.context.projectDirectory, options.extendConfig);
+
+      return [
+        rollupPluginTypescript(compilerOptions)
+      ];
+    }
   }];
 };

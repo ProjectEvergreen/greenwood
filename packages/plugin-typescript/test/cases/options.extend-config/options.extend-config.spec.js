@@ -30,6 +30,7 @@
  * {
  *   "compilerOptions": {
  *     "expirementalDecorators": true,
+ *     "noImplicitAny": true,
  *     "strict": true
  *   }
  * };
