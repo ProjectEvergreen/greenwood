@@ -8,6 +8,10 @@ export class GreetingComponent extends LitElement {
   name = 'Somebody';
 
   render() {
-    return html`<p>Hello, ${this.name}!</p>`;
+    const greeting: Greeting = {
+      message: html`<p>Hello, ${this.name}!</p>`
+    };
+
+    return greeting.message;
   }
 }
