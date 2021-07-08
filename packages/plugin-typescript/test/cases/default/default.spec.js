@@ -27,9 +27,10 @@
  * Default Config
  * {
  *   "compilerOptions": {
- *      target: "es2020",
- *      module: "es2020",
- *      moduleResolution: "node"
+ *      "target": "es2020",
+ *      "module": "es2020",
+ *      "moduleResolution": "node",
+ *      "sourcemaps": true
  *   }
  * }
  * 

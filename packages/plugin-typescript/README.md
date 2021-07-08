@@ -62,14 +62,15 @@ This plugin provides the following default `compilerOptions`.
   "compilerOptions": {
     "target": "es2020",
     "module": "es2020",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "sourcemaps": true
   }
 } 
 ```
 
-If you would like to extend / override it, you can do as follows:
+If you would like to extend / override these options:
 
-1. Create your own _tsconfig.json_
+1. Create your own [_tsconfig.json_](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html) with your own `compilerOptions`
     ```json
     {
       "compilerOptions": {
@@ -93,4 +94,4 @@ If you would like to extend / override it, you can do as follows:
     }
     ```
 
-This will then process your JavaScript with TypeScript with the additional configurated settings you provide.  
+This will then process your JavaScript with TypeScript with the additional configurated settings you provide.  This also allows you to configure the rest of _tsconfig.json_ to support your IDE and local development environment settings.

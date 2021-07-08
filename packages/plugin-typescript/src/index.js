@@ -9,7 +9,7 @@ const path = require('path');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 const tsc = require('typescript');
 
-class ImportTypeScriptResource extends ResourceInterface {
+class TypeScriptResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
     this.extensions = ['.ts'];
@@ -17,7 +17,8 @@ class ImportTypeScriptResource extends ResourceInterface {
     this.compilerOptions = {
       target: 'es2020',
       module: 'es2020',
-      moduleResolution: 'node'
+      moduleResolution: 'node',
+      sourcemaps: true
     };
   }
 
@@ -35,6 +36,7 @@ class ImportTypeScriptResource extends ResourceInterface {
         };
         
         // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
+        // https://www.typescriptlang.org/docs/handbook/tsconfig-json.html
         const result = tsc.transpileModule(source, { compilerOptions });
 
         resolve({
@@ -52,7 +54,7 @@ module.exports = (options = {}) => {
   return [{
     type: 'resource',
     name: 'plugin-import-typescript:resource',
-    provider: (compilation) => new ImportTypeScriptResource(compilation, options)
+    provider: (compilation) => new TypeScriptResource(compilation, options)
   }, {
     type: 'rollup',
     name: 'plugin-import-typescript:rollup',
