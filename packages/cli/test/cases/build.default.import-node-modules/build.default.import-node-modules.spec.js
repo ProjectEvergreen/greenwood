@@ -222,13 +222,14 @@ describe('Build Greenwood With: ', function() {
         const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[0];
         
         expect(inlineScriptTag.textContent.replace('\n', '')).to
-          .equal('import"/lit-html.d69ea26f.js";import"/lit-element.ea26fec7.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline"');
+          // eslint-disable-next-line max-len
+          .equal('import"/lit-html.d69ea26f.js";import"/lit-element.ea26fec7.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline"//# sourceMappingURL=1008626452-scratch.743d0af4.js.map');
       });
 
       it('should have the expected inline node_modules content in the second inline script tag which should include extra code from rollup', async function() {
         const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[1];
         
-        expect(inlineScriptTag.textContent.replace('\n', '')).to.equal('import"/lit-html.d69ea26f.js";import"/lit-element.ea26fec7.js";');
+        expect(inlineScriptTag.textContent.replace('\n', '')).to.equal('import"/lit-html.d69ea26f.js";import"/lit-element.ea26fec7.js";//# sourceMappingURL=1832243663-scratch.01361a49.js.map');
       });
 
       it('should have the expected output from the first inline <script> tag in the page output', async function() {

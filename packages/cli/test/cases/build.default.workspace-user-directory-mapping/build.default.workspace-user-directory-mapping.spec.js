@@ -101,7 +101,7 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('Describe Page page', function() {
+    describe('Describe Pages page', function() {
       let dom;
 
       before(async function() {

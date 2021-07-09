@@ -200,6 +200,13 @@ describe('Build Greenwood With: ', function() {
         expect(jsFiles.length).to.be.equal(5);
       });
 
+      it('should have custom <title> tag in the <head>', function() {
+        const title = dom.window.document.querySelectorAll('head > title');
+
+        expect(title.length).to.be.equal(1);
+        expect(title[0].textContent).to.be.equal('My Super SPA');
+      });
+
       it('should have custom <meta> tag in the <head>', function() {
         const customMeta = Array.from(dom.window.document.querySelectorAll('head > meta'))
           .filter(meta => meta.getAttribute('property') === 'og:description');
