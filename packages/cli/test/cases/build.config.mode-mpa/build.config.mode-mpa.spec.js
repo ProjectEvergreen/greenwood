@@ -62,11 +62,13 @@ describe('Build Greenwood With: ', function() {
       let dom;
       let aboutDom;
       let partials;
+      let routerFiles;
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
         aboutDom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'about/index.html'));
         partials = await glob(`${this.context.publicDir}/_routes/**/*.html`);
+        routerFiles = await glob(`${this.context.publicDir}/router.*.js`);
       });
       
       it('should have one <script> tag in the <head> for the router', function() {
@@ -78,9 +80,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have one router.js file in the output directory', function() {
-        const routerJsFiles = fs.readdirSync(this.context.publicDir).filter(file => file.indexOf('router') === 0);
-
-        expect(routerJsFiles.length).to.be.equal(1);
+        expect(routerFiles.length).to.be.equal(1);
       });
 
       it('should have one expected inline <script> tag in the <head> for router global variables', function() {

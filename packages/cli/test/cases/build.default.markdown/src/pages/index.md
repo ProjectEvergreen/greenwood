@@ -1,3 +1,7 @@
+---
+title: 'this is a custom markdown title'
+---
+
 ### Greenwood Markdown Test
 
 This is some markdown being rendered by Greenwood.

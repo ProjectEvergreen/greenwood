@@ -27,6 +27,10 @@ function publicDirectory(label) {
       it('should output one graph.json file', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'graph.json'))).to.have.lengthOf(1);
       });
+
+      it('should not output any map files for HTML pages', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, '**/**/*.html.map'))).to.have.lengthOf(0);
+      });
     });
   });
 }
