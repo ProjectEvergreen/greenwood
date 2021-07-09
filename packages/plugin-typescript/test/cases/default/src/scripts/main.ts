@@ -12,4 +12,4 @@ const user: User = {
   age: 30
 };
 
-console.log(`Hello ${user.firstName} ${user.firstName}!`);
+console.log(`Hello ${user.role} ${user.firstName} ${user.lastName}!`);

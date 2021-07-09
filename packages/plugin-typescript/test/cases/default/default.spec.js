@@ -67,7 +67,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('TypeScript should process JavaScript that uses an interface', function() {
       it('should output correctly processed JavaScript without the interface', function() {
-        const expectedJavaScript = 'const l="Angela";console.log(`Hello ${l} ${l}!`);';
+        const expectedJavaScript = 'const o="Angela",l="Davis",s="Professor";console.log(`Hello ${s} ${o} ${l}!`);//# sourceMappingURL=main.ts.4805de86.js.map';
         const jsFiles = glob.sync(path.join(this.context.publicDir, '*.js'));
         const javascript = fs.readFileSync(jsFiles[0], 'utf-8');
 
