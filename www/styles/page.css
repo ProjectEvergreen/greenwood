@@ -116,3 +116,13 @@ table th {
   background-color: #f9e7ca;
   text-decoration: underline;
 }
+
+iframe.stackblitz {
+  width: 100%;
+  height: 800px;
+  display: none;
+
+  @media (min-width: 768px) {
+    display: block;
+  }
+}

@@ -41,8 +41,6 @@ async function optimizePage(compilation, contents, route, outputDir) {
 async function preRenderCompilation(compilation) {
   const browserRunner = new BrowserRunner();
 
-  await browserRunner.init();
-
   const runBrowser = async (serverUrl, pages, outputDir) => {
     try {
       return Promise.all(pages.map(async(page) => {
@@ -63,6 +61,22 @@ async function preRenderCompilation(compilation) {
       return false;
     }
   };
+
+  // gracefully handle if puppeteer is not installed correctly
+  // like may happen in a stackblitz environment and just reject early
+  // otherwise we can feel confident attempating to prerender all pages
+  // https://github.com/ProjectEvergreen/greenwood/discussions/639
+  try {
+    await browserRunner.init();
+  } catch (e) {
+    console.error('There was an error trying to initialize puppeteer for prerendering.');
+    console.error(e);
+
+    console.info('To troubleshoot, please check your environment for any npm install or postinstall errors as may be the case in a Stackblitz or other sandbox like environment.');
+    console.info('For more information please see this guide - https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md');
+
+    return Promise.reject(e);
+  }
 
   return new Promise(async (resolve, reject) => {
     try {
