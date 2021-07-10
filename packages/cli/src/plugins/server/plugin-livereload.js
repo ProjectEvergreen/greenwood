@@ -41,7 +41,6 @@ class LiveReloadServer extends ServerInterface {
       .filter((ext) => ext !== '*' || ext !== '')
       .map((ext) => ext.replace('.', ''));
 
-    console.debug('allExtentions', allExtensions.filter((ext, idx) => idx === allExtensions.indexOf(ext)));
     const liveReloadServer = livereload.createServer({
       exts: allExtensions.filter((ext, idx) => idx === allExtensions.indexOf(ext)),
       applyCSSLive: false // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
