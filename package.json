@@ -22,7 +22,7 @@
     "test": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict nyc mocha",
     "test:tdd": "yarn test --watch",
     "lint:js": "eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
-    "lint:ts": "eslint \"./packages/**/**/*.ts\" \"./www/**/**/*.ts\"",
+    "lint:ts": "eslint \"./packages/**/**/*.ts\"",
     "lint:css": "stylelint \"./www/**/*.js\", \"./www/**/*.css\"",
     "lint": "ls-lint && yarn lint:js && yarn lint:ts && yarn lint:css"
   },
