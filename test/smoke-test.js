@@ -27,6 +27,10 @@ function publicDirectory(label) {
       it('should output one graph.json file', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'graph.json'))).to.have.lengthOf(1);
       });
+
+      it('should not output any map files for HTML pages', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, '**/**/*.html.map'))).to.have.lengthOf(0);
+      });
     });
   });
 }
@@ -151,6 +155,11 @@ function defaultIndex(label) {
           const pageOutlet = dom.window.document.querySelectorAll('body page-outlet');
   
           expect(pageOutlet.length).to.be.equal(0);
+        });
+
+        // 
+        it('should not have any sourcemap inlining for Rollup HTML entry points', function() {
+          expect(html).not.to.contain('//# sourceMappingURL=index.html.map');
         });
       });
     });
