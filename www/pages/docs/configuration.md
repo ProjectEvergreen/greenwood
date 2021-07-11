@@ -13,6 +13,7 @@ The below is a _greenwood.config.js_ file reflecting default values:
 ```js
 module.exports = {
   devServer: {
+    extensions: [],
     port: 1984,
     host: 'localhost'
   },
@@ -31,6 +32,7 @@ module.exports = {
 
 ### Dev Server
 Configuration for Greenwood's development server is available using the `devServer` option.
+- `extensions`: Provide an array of to watch for changes and reload the live server with.  By default, Greenwood will already watch all "standard" web assets (HTML, CSS, JS, etc) it supports by default, as well as any extensions set by [resource plugins](/plugins/resource) you are using in your _greenwood.config.json_.
 - `port`: Pick a different port when starting the dev server
 - `proxy`: A set of paths to match and re-route to other hosts.  Highest specificty should go at the end.
 
@@ -38,6 +40,7 @@ Configuration for Greenwood's development server is available using the `devServ
 ```js
 module.exports = {
   devServer: {
+    extensions: ['.txt', '.rtf'],
     port: 8181,
     proxy: {
       '/api': 'https://stage.myapp.com',
