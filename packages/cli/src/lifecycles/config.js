@@ -7,7 +7,8 @@ const optimizations = ['default', 'none', 'static', 'inline'];
 const defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {
-    port: 1984
+    port: 1984,
+    extensions: []
   },
   mode: modes[0],
   optimization: optimizations[0],
@@ -114,6 +115,14 @@ module.exports = readAndMergeConfig = async() => {
 
           if (devServer.proxy) {
             customConfig.devServer.proxy = devServer.proxy;
+          }
+
+          if (devServer.extensions) {
+            if (Array.isArray(devServer.extensions)) {
+              customConfig.devServer.extensions = devServer.extensions;
+            } else {
+              reject('Error: provided extensions is not an array.  Please provide an array like [\'.txt\', \'.foo\']');
+            }
           }
         }
 
