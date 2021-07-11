@@ -1,19 +1,19 @@
 /*
  * Use Case
- * Run Greenwood with Babel processing.
+ * Run Greenwood with TypeScript processing.
  *
  * User Result
- * Should generate a bare bones Greenwood build with the user's JavaScript files processed based on the default plugin babel.config.js.
+ * Should generate a bare bones Greenwood build with the user's JavaScript files processed based on the pluygins default config.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * const pluginBabel = require('@greenwod/plugin-babel');
+ * const pluginTypeScript = require('@greenwod/plugin-typescript);
  *
  * {
  *   plugins: [
- *     ...pluginBabel()
+ *     ...pluginTypeScript()
  *  ]
  * }
  * 
@@ -22,7 +22,17 @@
  *   pages/
  *     index.html
  *   scripts/
- *     main.js
+ *     main.ts
+ * 
+ * Default Config
+ * {
+ *   "compilerOptions": {
+ *      "target": "es2020",
+ *      "module": "es2020",
+ *      "moduleResolution": "node",
+ *      "sourceMap": true
+ *   }
+ * }
  * 
  */
 const fs = require('fs');
@@ -34,7 +44,7 @@ const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/u
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Babel configuration';
+  const LABEL = 'Default TypeScript configuration';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
   let runner;
@@ -55,14 +65,16 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);    
 
-    describe('Babel should process JavaScript that reference private class members / methods', function() {
-      it('should output correctly processed JavaScript without private members', function() {
-        const expectedJavaScript = '#x';
+    describe('TypeScript should process JavaScript that uses an interface', function() {
+      it('should output correctly processed JavaScript without the interface', function() {
+        // Rollup is giving different [hash] filenames for us in Windows vs Linux / macOS so cant do a to.equal here :/
+        // https://github.com/ProjectEvergreen/greenwood/pull/650#issuecomment-877614947
+        const expectedJavaScript = 'const o="Angela",l="Davis",s="Professor";console.log(`Hello ${s} ${o} ${l}!`);//# sourceMappingURL=main.ts.';
         const jsFiles = glob.sync(path.join(this.context.publicDir, '*.js'));
         const javascript = fs.readFileSync(jsFiles[0], 'utf-8');
 
         expect(jsFiles.length).to.equal(1);
-        expect(javascript).to.not.contain(expectedJavaScript);
+        expect(javascript.replace(/\n/g, '')).to.contain(expectedJavaScript);
       });
     });
   });

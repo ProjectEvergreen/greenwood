@@ -1,20 +1,22 @@
 /*
  * Use Case
- * Run Greenwood with Babel processing.
+ * Run Greenwood with TypeScript processing merging user and default tsconfig.json options.
  *
  * User Result
- * Should generate a bare bones Greenwood build with the user's JavaScript files processed based on the default plugin babel.config.js.
+ * Should generate a bare bones Greenwood build with the user's JavaScript files processed based on their own tsconfig.json file merged with the plugin default config.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * const pluginBabel = require('@greenwod/plugin-babel');
+ * const pluginTypeScript = require('@greenwod/plugin-typescript');
  *
  * {
  *   plugins: [
- *     ...pluginBabel()
- *  ]
+ *     ...pluginTypeScript({
+ *        extendConfig: true
+ *     })
+ *   ]
  * }
  * 
  * User Workspace
@@ -22,19 +24,27 @@
  *   pages/
  *     index.html
  *   scripts/
- *     main.js
+ *     main.ts
  * 
+ * User tsconfig.json (example)
+ * {
+ *   "compilerOptions": {
+ *     "expirementalDecorators": true,
+ *     "noImplicitAny": true,
+ *     "strict": true
+ *   }
+ * };
  */
 const fs = require('fs');
 const glob = require('glob-promise');
-const path = require('path');
 const expect = require('chai').expect;
 const runSmokeTest = require('../../../../../test/smoke-test');
+const path = require('path');
 const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Babel configuration';
+  const LABEL = 'Custom TypeScript Options for extending Default Configuration';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
   let runner;
@@ -47,22 +57,27 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe(LABEL, function() {
+    let jsFiles;
 
     before(async function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
+
+      jsFiles = glob.sync(path.join(this.context.publicDir, '*.js'));
     });
 
     runSmokeTest(['public', 'index'], LABEL);    
 
-    describe('Babel should process JavaScript that reference private class members / methods', function() {
-      it('should output correctly processed JavaScript without private members', function() {
-        const expectedJavaScript = '#x';
-        const jsFiles = glob.sync(path.join(this.context.publicDir, '*.js'));
+    it('should output one JavaScript file', function() {
+      expect(jsFiles.length).to.equal(1);
+    });
+
+    describe('TypeScript should process JavaScript that references decorators', function() {
+      it('should output correctly processed JavaScript without decorators', function() {
+        const notExpectedJavaScript = '@customElement(\'app-greeting\')';
         const javascript = fs.readFileSync(jsFiles[0], 'utf-8');
 
-        expect(jsFiles.length).to.equal(1);
-        expect(javascript).to.not.contain(expectedJavaScript);
+        expect(javascript).to.not.contain(notExpectedJavaScript);
       });
     });
   });

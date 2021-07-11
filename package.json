@@ -22,11 +22,14 @@
     "test": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict nyc mocha",
     "test:tdd": "yarn test --watch",
     "lint:js": "eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
+    "lint:ts": "eslint \"./packages/**/**/*.ts\"",
     "lint:css": "stylelint \"./www/**/*.js\", \"./www/**/*.css\"",
-    "lint": "ls-lint && yarn lint:js && yarn lint:css"
+    "lint": "ls-lint && yarn lint:js && yarn lint:ts && yarn lint:css"
   },
   "devDependencies": {
     "@ls-lint/ls-lint": "^1.9.2",
+    "@typescript-eslint/eslint-plugin": "^4.28.2",
+    "@typescript-eslint/parser": "^4.28.2",
     "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
     "cross-env": "^7.0.3",
