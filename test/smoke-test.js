@@ -156,6 +156,11 @@ function defaultIndex(label) {
   
           expect(pageOutlet.length).to.be.equal(0);
         });
+
+        // 
+        it('should not have any sourcemap inlining for Rollup HTML entry points', function() {
+          expect(html).not.to.contain('//# sourceMappingURL=index.html.map');
+        });
       });
     });
   });
