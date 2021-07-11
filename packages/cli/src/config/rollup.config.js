@@ -179,8 +179,8 @@ function greenwoodHtmlPlugin(compilation) {
      
             // handle <script type="module" src="some/path.js"></script>
             if (!isRemoteUrl(parsedAttributes.src) && parsedAttributes.type === 'module' && parsedAttributes.src && !mappedScripts.get(parsedAttributes.src)) {
-              if (optimization === 'static') {
-                // console.debug('dont emit ', parsedAttributes.src);
+              if (optimization === 'static' || parsedAttributes['data-gwd-opt'] === 'static') {
+                // dont need to bundle / emit this one
               } else {
                 const { src } = parsedAttributes;
                 const absoluteSrc = `${path.normalize(src.replace(/\.\.\//g, '').replace('./', ''))}`;
@@ -295,8 +295,8 @@ function greenwoodHtmlPlugin(compilation) {
       }));
     },
 
-    // crawl through all entry HTML files and map bundled JavaScript and CSS filenames 
-    // back to original <script> / <link> tags and update to their bundled filename in the HTML
+    // crawl through all entry HTML files and map Rollup bundled JavaScript and CSS filenames
+    // back to their original <script> / <link> tags, and update the HTML to their new bundled filenames
     generateBundle(outputOptions, bundles) {      
       for (const bundleId of Object.keys(bundles)) {
         try {
@@ -351,13 +351,13 @@ function greenwoodHtmlPlugin(compilation) {
                     
                     newHtml = newHtml.replace(src, newSrc);
                     
-                    if (optimization !== 'none' && optimization !== 'inline') {
+                    if (!parsedAttributes['data-gwd-opt'] && optimization === 'default') {
                       newHtml = newHtml.replace('<head>', `
                         <head>
                         <link rel="modulepreload" href="${newSrc}" as="script">
                       `);
                     }
-                  } else if (optimization === 'static' && newHtml.indexOf(pathToMatch) > 0) {
+                  } else if ((parsedAttributes['data-gwd-opt'] === 'static' || optimization === 'static') && newHtml.indexOf(pathToMatch) > 0) {
                     newHtml = newHtml.replace(scriptTag, '');
                   }
                 }
@@ -378,7 +378,7 @@ function greenwoodHtmlPlugin(compilation) {
                       
                       newHtml = newHtml.replace(href, newHref);
 
-                      if (optimization !== 'none' && optimization !== 'inline') {
+                      if (!parsedAttributes['data-gwd-opt'] && (optimization !== 'none' && optimization !== 'inline')) {
                         newHtml = newHtml.replace('<head>', `
                           <head>
                           <link rel="preload" href="${newHref}" as="style" crossorigin="anonymous"></link>
@@ -421,13 +421,15 @@ function greenwoodHtmlPlugin(compilation) {
             const parsedAttributes = parseTagForAttributes(scriptTag);
             const isScriptSrcTag = parsedAttributes.src && parsedAttributes.type === 'module';
 
-            if (optimization === 'inline' && isScriptSrcTag && !isRemoteUrl(parsedAttributes.src)) {
+            // handle <script type="module" src="..."></script>
+            if ((parsedAttributes['data-gwd-opt'] === 'inline' || optimization === 'inline') && isScriptSrcTag && !isRemoteUrl(parsedAttributes.src)) {
               const src = parsedAttributes.src;
               const basePath = src.indexOf(tokenNodeModules) >= 0 
                 ? process.cwd()
                 : outputDir;
               const outputPath = path.join(basePath, src);
               const js = fs.readFileSync(outputPath, 'utf-8');
+              scratchFiles[src] = true;
 
               html = html.replace(`<script ${scriptTag.rawAttrs}></script>`, `
                 <script type="module">
@@ -464,27 +466,25 @@ function greenwoodHtmlPlugin(compilation) {
             }
           });
 
-          if (optimization === 'inline') {
-            headLinks
-              .forEach((linkTag) => {
-                const linkTagAttributes = parseTagForAttributes(linkTag);
-                const isLocalLinkTag = linkTagAttributes.rel === 'stylesheet'
-                  && !isRemoteUrl(linkTagAttributes.href);
-                
-                if (isLocalLinkTag) {
-                  const href = linkTagAttributes.href;
-                  const outputPath = path.join(outputDir, href);
-                  const css = fs.readFileSync(outputPath, 'utf-8');
+          headLinks
+            .forEach((linkTag) => {
+              const parsedAttributes = parseTagForAttributes(linkTag);
+              const isLocalLinkTag = parsedAttributes.rel === 'stylesheet'
+                && !isRemoteUrl(parsedAttributes.href);
+              
+              if (isLocalLinkTag && (parsedAttributes['data-gwd-opt'] === 'inline' || optimization === 'inline')) {
+                const href = parsedAttributes.href;
+                const outputPath = path.join(outputDir, href);
+                const css = fs.readFileSync(outputPath, 'utf-8');
+                scratchFiles[href] = true;
 
-                  html = html.replace(`<link ${linkTag.rawAttrs}>`, `
-                    <style>
-                      ${css}
-                    </style>
-                  `);
-                }
-              });
-          }
-          
+                html = html.replace(`<link ${linkTag.rawAttrs}>`, `
+                  <style>
+                    ${css}
+                  </style>
+                `);
+              }
+            });
           // mark each HTML's sourcemap file (generated by Rollup) to be cleaned up
           // would be nice if we could just prevent Rollup from generating sourcemaps for just our input files in the first place (GFI)
           // https://github.com/ProjectEvergreen/greenwood/issues/659
