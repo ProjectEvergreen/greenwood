@@ -21,33 +21,37 @@ module.exports = runProductionBuild = async () => {
       }
       
       if (prerender) {
-        await new Promise((resolve) => {
-          devServer(compilation).listen(port, async () => {
-            console.info(`Started local development server at localhost:${port}`);
-            
-            // custom user server plugins
-            const servers = [...compilation.config.plugins.filter((plugin) => {
-              return plugin.type === 'server';
-            }).map((plugin) => {
-              const provider = plugin.provider(compilation);
-    
-              if (!(provider instanceof ServerInterface)) {
-                console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`);
-              }
-    
-              return provider;
-            })];
-    
-            await Promise.all(servers.map(async (server) => {
-              server.start();
-    
-              return Promise.resolve(server);
-            }));
-        
-            await preRenderCompilation(compilation);
-
-            resolve();
-          });
+        await new Promise((resolve, reject) => {
+          try {
+            devServer(compilation).listen(port, async () => {
+              console.info(`Started local development server at localhost:${port}`);
+              
+              // custom user server plugins
+              const servers = [...compilation.config.plugins.filter((plugin) => {
+                return plugin.type === 'server';
+              }).map((plugin) => {
+                const provider = plugin.provider(compilation);
+      
+                if (!(provider instanceof ServerInterface)) {
+                  console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`);
+                }
+      
+                return provider;
+              })];
+      
+              await Promise.all(servers.map(async (server) => {
+                server.start();
+      
+                return Promise.resolve(server);
+              }));
+          
+              await preRenderCompilation(compilation);
+  
+              resolve();
+            });
+          } catch (e) {
+            reject(e);
+          }
         });
       } else {
         await staticRenderCompilation(compilation);
