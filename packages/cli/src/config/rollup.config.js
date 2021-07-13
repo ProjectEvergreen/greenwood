@@ -428,7 +428,9 @@ function greenwoodHtmlPlugin(compilation) {
                 ? process.cwd()
                 : outputDir;
               const outputPath = path.join(basePath, src);
-              const js = fs.readFileSync(outputPath, 'utf-8');
+              const js = fs.readFileSync(outputPath, 'utf-8')
+                .replace(/\$/g, '$$$') // https://github.com/ProjectEvergreen/greenwood/issues/656
+                .replace(/\.\//g, '/'); // force absolute paths
               scratchFiles[src] = true;
 
               html = html.replace(`<script ${scriptTag.rawAttrs}></script>`, `
