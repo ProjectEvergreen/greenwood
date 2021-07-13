@@ -85,7 +85,7 @@ describe('Build Greenwood With: ', function() {
       // assume the first tag is for the header
       describe('Header', function() {
         it('should contain one <script> tag with the expected JS content inlined of type="module" for the header', function() {
-          const scriptTag = dom.window.document.querySelectorAll('head script')[0]
+          const scriptTag = dom.window.document.querySelectorAll('head script')[0];
           
           expect(scriptTag.type).to.be.equal('module');
           // eslint-disable-next-line max-len
