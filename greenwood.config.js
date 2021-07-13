@@ -13,6 +13,7 @@ const FAVICON_HREF = '/assets/favicon.ico';
 module.exports = {
   workspace: path.join(__dirname, 'www'),
   mode: 'mpa',
+  optimization: 'inline',
   title: 'Greenwood',
   meta: [
     { name: 'description', content: META_DESCRIPTION },
