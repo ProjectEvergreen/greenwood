@@ -4,6 +4,24 @@
   <head>
     <script type="module" src="/components/header.js"></script>
     <script type="module" src="/components/foobar.js"></script>
+
+    <script type="module">
+      class Baz extends HTMLElement {
+
+        constructor() {
+          super();
+          this.list = [];
+        }
+
+        find(path) {
+          this.list.findIndex(item => {
+            return new RegExp(`^${path}$`).test(item.route);
+          });
+        }
+      }
+
+      export { Baz };
+    </script>
     <link rel="stylesheet" href="/styles/theme.css"></link>  
   </head>
 
