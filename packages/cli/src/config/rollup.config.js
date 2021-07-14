@@ -103,7 +103,7 @@ function greenwoodHtmlPlugin(compilation) {
   const { optimization } = compilation.config;
   const isRemoteUrl = (url = undefined) => url && (url.indexOf('http') === 0 || url.indexOf('//') === 0);
   const customResources = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'resource';
+    return plugin.type === 'resource' && !plugin.isGreenwoodPlugin;
   }).map((plugin) => {
     return plugin.provider(compilation);
   });
