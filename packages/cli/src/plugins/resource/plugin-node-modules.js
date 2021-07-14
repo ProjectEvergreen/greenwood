@@ -216,7 +216,7 @@ class NodeModulesResource extends ResourceInterface {
         const fullUrl = path.extname(url) === ''
           ? `${url}.js`
           : url;
-        const body = await fs.promises.readFile(fullUrl);
+        const body = await fs.promises.readFile(fullUrl, 'utf-8');
 
         resolve({
           body,
