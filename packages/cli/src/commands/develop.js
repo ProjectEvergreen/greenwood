@@ -19,7 +19,6 @@ module.exports = runDevServer = async () => {
         }).map((plugin) => {
           const provider = plugin.provider(compilation);
 
-          // TODO move to config
           if (!(provider instanceof ServerInterface)) {
             console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`);
           }

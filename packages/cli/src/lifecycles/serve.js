@@ -21,7 +21,6 @@ function getDevServer(compilation) {
     }).map((plugin) => {
       const provider = plugin.provider(compilationCopy);
 
-      // TODO move to config
       if (!(provider instanceof ResourceInterface)) {
         console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ResourceInterface.`);
       }
