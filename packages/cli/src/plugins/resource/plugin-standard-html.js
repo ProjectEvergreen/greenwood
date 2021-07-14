@@ -92,16 +92,19 @@ const getAppTemplate = (contents, userWorkspace, customImports = []) => {
       const attributes = script.rawAttrs !== '' 
         ? ` ${script.rawAttrs}`
         : '';
+      const source = script.text
+        .replace(/\$/g, '$$$'); // https://github.com/ProjectEvergreen/greenwood/issues/656
+
       if (matchPos > 0) {
         appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</script>\n
           <script${attributes}>
-            ${script.text}
+            ${source}
           </script>\n
         `);
       } else {
         appTemplateContents = appTemplateContents.replace('</head>', `
             <script${attributes}>
-              ${script.text}
+              ${source}
             </script>\n
           </head>
         `);
@@ -386,7 +389,7 @@ class StandardHtmlResource extends ResourceInterface {
           contents = contents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
           contents = contents.replace(/type="module-shim"/g, 'type="module"');
 
-          body = body.replace(/\<head>(.*)<\/head>/s, contents);
+          body = body.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
         }
     
         resolve(body);

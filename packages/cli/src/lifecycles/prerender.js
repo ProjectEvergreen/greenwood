@@ -69,13 +69,17 @@ async function preRenderCompilation(compilation) {
   try {
     await browserRunner.init();
   } catch (e) {
-    console.error('There was an error trying to initialize puppeteer for prerendering.');
     console.error(e);
 
-    console.info('To troubleshoot, please check your environment for any npm install or postinstall errors as may be the case in a Stackblitz or other sandbox like environment.');
+    console.error('*******************************************************************');
+    console.error('*******************************************************************');
+
+    console.error('There was an error trying to initialize puppeteer for pre-rendering.');
+
+    console.info('To troubleshoot, please check your environment for any npm install or postinstall errors, as may be the case in a Stackblitz or other sandbox like environment.');
     console.info('For more information please see this guide - https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md');
 
-    return Promise.reject(e);
+    return Promise.reject();
   }
 
   return new Promise(async (resolve, reject) => {
