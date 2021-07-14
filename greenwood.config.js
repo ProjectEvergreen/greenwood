@@ -4,7 +4,6 @@ const pluginImportCss = require('@greenwood/plugin-import-css');
 const pluginImportJson = require('@greenwood/plugin-import-json');
 const pluginPolyfills = require('@greenwood/plugin-polyfills');
 const pluginPostCss = require('@greenwood/plugin-postcss');
-const pluginTypeScript = require('@greenwood/plugin-typescript');
 const rollupPluginAnalyzer = require('rollup-plugin-analyzer');
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
@@ -46,8 +45,7 @@ module.exports = {
           })
         ];
       }
-    },
-    ...pluginTypeScript()
+    }
   ],
   markdown: {
     plugins: [
