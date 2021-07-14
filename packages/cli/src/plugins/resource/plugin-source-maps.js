@@ -14,7 +14,7 @@ class SourceMapsResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    return Promise.resolve(path.extname(url) === this.extensions[0]);
+    return Promise.resolve(path.extname(url) === this.extensions[0] && fs.existsSync(url));
   }
 
   async serve(url) {
