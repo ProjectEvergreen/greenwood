@@ -62,11 +62,11 @@ describe('Build Greenwood With: ', function() {
         expect(linkTags.length).to.be.equal(0);
       });
 
-      describe('<script> tag and files', function() {
-        it('should contain one <script> tags in the <head>', function() {
+      describe('<script> tags and files', function() {
+        it('should contain three <script> tags in the <head>', function() {
           const allScriptTags = dom.window.document.querySelectorAll('head script');
 
-          expect(allScriptTags.length).to.be.equal(1);
+          expect(allScriptTags.length).to.be.equal(3);
         });
 
         it('should contain no <script> tags in the <head> with a src', function() {
@@ -75,13 +75,16 @@ describe('Build Greenwood With: ', function() {
           expect(allSrcScriptTags.length).to.be.equal(0);
         });
       
-        xit('should contain no Javascript files in the output directory', async function() {
+        it('should contain no Javascript files in the output directory', async function() {
           const jsFiles = await glob.promise(`${this.context.publicDir}**/**/*.js`);
           
           expect(jsFiles).to.have.lengthOf(0);
         });
+      });
 
-        it('should contain one <script> tag with the expected JS content inlined of type="module"', function() {
+      // assume the first tag is for the header
+      describe('Header', function() {
+        it('should contain one <script> tag with the expected JS content inlined of type="module" for the header', function() {
           const scriptTag = dom.window.document.querySelectorAll('head script')[0];
           
           expect(scriptTag.type).to.be.equal('module');
@@ -97,8 +100,32 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
+      // assume the second tag is for FooBar
+      // https://github.com/ProjectEvergreen/greenwood/issues/656
+      describe('Foobar', function() {
+        it('should contain one <script> tag with the expected JS content inlined of type="module" for FooBar', function() {
+          const scriptTag = dom.window.document.querySelectorAll('head script')[1];
+
+          expect(scriptTag.type).to.be.equal('module');
+          // eslint-disable-next-line max-len
+          expect(scriptTag.textContent).to.be.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex(e=>new RegExp(`^${t}$`).test(e.route))}}export{t as Foobar};');
+        });
+      });
+
+      // assume the third tag is for Baz
+      // https://github.com/ProjectEvergreen/greenwood/issues/656
+      describe('Baz', function() {
+        it('should contain one <script> tag with the expected JS content for the already inlined of type="module" for Baz', function() {
+          const scriptTag = dom.window.document.querySelectorAll('head script')[2];
+
+          expect(scriptTag.type).to.be.equal('module');
+          // eslint-disable-next-line max-len
+          expect(scriptTag.textContent).to.be.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex(e=>new RegExp(`^${t}$`).test(e.route))}}console.log("1049249078-scratch");export{t as Baz};');
+        });
+      });
+
       describe('<link> tags as <style> tags and file output', function() {
-        xit('should contain no CSS files in the output directory', async function() {
+        it('should contain no CSS files in the output directory', async function() {
           const cssFiles = await glob.promise(`${this.context.publicDir}**/**/*.css`);
           
           expect(cssFiles).to.have.lengthOf(0);

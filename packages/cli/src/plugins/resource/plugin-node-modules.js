@@ -243,7 +243,7 @@ class NodeModulesResource extends ResourceInterface {
           const contents = hasHead[0]
             .replace(/type="module"/g, 'type="module-shim"');
 
-          newContents = newContents.replace(/\<head>(.*)<\/head>/s, contents);
+          newContents = newContents.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
         }
 
         const userPackageJson = fs.existsSync(`${userWorkspace}/package.json`)
