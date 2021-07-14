@@ -4,8 +4,6 @@ const htmlparser = require('node-html-parser');
 const path = require('path');
 const postcss = require('postcss');
 const postcssImport = require('postcss-import');
-const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
-const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
 const tokenSuffix = 'scratch';
 const tokenNodeModules = 'node_modules';
 
@@ -54,19 +52,15 @@ async function getOptimizedSource(url, plugins, compilation) {
 
   // if no custom user optimization found, fallback to standard Greenwood default optimization
   if (optimizedSource === initSoure) {
-    const standardPluginsPath = path.join(__dirname, '../', 'plugins/resource');
-    const standardPlugins = (await fs.promises.readdir(standardPluginsPath))
-      .filter(filename => filename.indexOf('plugin-standard') === 0)
-      .map((filename) => {
-        return require(`${standardPluginsPath}/${filename}`);
+    const standardResourcePlugins = compilation.config.plugins
+      .filter((plugin) => {
+        return plugin.type === 'resource'
+          && plugin.name.indexOf('plugin-standard') === 0;
       }).map((plugin) => {
-        // assume that if it is an array, second item is a rollup plugin
-        return plugin.length
-          ? plugin[0].provider(compilation)
-          : plugin.provider(compilation);
+        return plugin.provider(compilation);
       });
 
-    optimizedSource = await standardPlugins.reduce(async (sourcePromise, resource) => {
+    optimizedSource = await standardResourcePlugins.reduce(async (sourcePromise, resource) => {
       const source = await sourcePromise;
       const shouldOptimize = await resource.shouldOptimize(url, source);
   
@@ -517,16 +511,21 @@ module.exports = getRollupConfig = async (compilation) => {
   const inputs = compilation.graph.map((page) => {
     return path.normalize(`${scratchDir}${page.route}index.html`);
   });
-  const greenwoodRollupPlugins = [
-    ...pluginNodeModules[1].provider(compilation),
-    ...pluginResourceStandardJavaScript[1].provider(compilation),
+
+  // order matters but so far nodeModulesResource resolve plugin is the first in our list (so far)
+  const greenwoodRollupPlugins = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'rollup' && plugin.isGreenwoodPlugin;
+  }).map((plugin) => {
+    return plugin.provider(compilation).flat();
+  }).concat([
     greenwoodWorkspaceResolver(compilation),
     greenwoodHtmlPlugin(compilation)
-  ];
-  const customRollupPlugins = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'rollup';
+  ]).flat();
+
+  const userRollupPlugins = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'rollup' && !plugin.isGreenwoodPlugin;
   }).map((plugin) => {
-    return plugin.provider(compilation);
+    return plugin.provider(compilation).flat();
   }).flat();
 
   return [{
@@ -567,7 +566,7 @@ module.exports = getRollupConfig = async (compilation) => {
     },
     plugins: [
       ...greenwoodRollupPlugins,
-      ...customRollupPlugins
+      ...userRollupPlugins
     ]
   }];
 

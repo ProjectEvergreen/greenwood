@@ -1,9 +1,29 @@
 const fs = require('fs');
 const path = require('path');
 
+const greenwoodPluginsBasePath = path.join(__dirname, '../', 'plugins');
+const greenwoodPlugins = [
+  path.join(greenwoodPluginsBasePath, 'resource'),
+  path.join(greenwoodPluginsBasePath, 'server')
+].map((pluginDirectory) => {
+  return fs.readdirSync(pluginDirectory)
+    .map((filename) => {
+      const plugin = require(`${pluginDirectory}/${filename}`);
+
+      return Array.isArray(plugin)
+        ? plugin
+        : [plugin];
+    }).flat();
+}).flat()
+  .map((plugin) => {
+    return {
+      isGreenwoodPlugin: true,
+      ...plugin
+    };
+  });
+
 const modes = ['ssg', 'mpa', 'spa'];
 const optimizations = ['default', 'none', 'static', 'inline'];
-
 const defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {
@@ -14,7 +34,7 @@ const defaultConfig = {
   optimization: optimizations[0],
   title: 'My App',
   meta: [],
-  plugins: [],
+  plugins: greenwoodPlugins,
   markdown: { plugins: [], settings: {} },
   prerender: true
 };

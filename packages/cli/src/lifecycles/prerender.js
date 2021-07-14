@@ -6,9 +6,10 @@ const pluginOptimizationMpa = require('../plugins/resource/plugin-optimization-m
 
 async function optimizePage(compilation, contents, route, outputDir) {
   const outputPath = `${outputDir}${route}index.html`;
+  // TODO
   const optimizeResources = [
     pluginResourceStandardHtml.provider(compilation),
-    pluginOptimizationMpa().provider(compilation),
+    pluginOptimizationMpa.provider(compilation),
     ...compilation.config.plugins.filter((plugin) => {
       const provider = plugin.provider(compilation);
 

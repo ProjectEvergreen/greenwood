@@ -12,7 +12,7 @@ const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-
 const pluginResourceStandardImage = require('../plugins/resource/plugin-standard-image');
 const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
 const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-json');
-const pluginLiveReloadResource = require('../plugins/server/plugin-livereload')()[1];
+const pluginLiveReloadResource = require('../plugins/server/plugin-livereload')[1];
 const pluginUserWorkspace = require('../plugins/resource/plugin-user-workspace');
 const { ResourceInterface } = require('../lib/resource-interface');
 
@@ -21,6 +21,7 @@ function getDevServer(compilation) {
   const compilationCopy = Object.assign({}, compilation);
   const resources = [
     // Greenwood default standard resource and import plugins
+    // TODOs
     pluginUserWorkspace.provider(compilation),
     pluginNodeModules[0].provider(compilation),
     pluginDevProxyResource.provider(compilationCopy),
@@ -31,7 +32,7 @@ function getDevServer(compilation) {
     pluginResourceStandardJavaScript[0].provider(compilationCopy),
     pluginResourceStandardJson[0].provider(compilationCopy),
     pluginSourceMaps.provider(compilationCopy),
-    pluginResourceOptimizationMpa().provider(compilationCopy),
+    pluginResourceOptimizationMpa.provider(compilationCopy),
 
     // custom user resource plugins
     ...compilation.config.plugins.filter((plugin) => {
@@ -39,6 +40,7 @@ function getDevServer(compilation) {
     }).map((plugin) => {
       const provider = plugin.provider(compilationCopy);
 
+      // TODO move to config
       if (!(provider instanceof ResourceInterface)) {
         console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ResourceInterface.`);
       }
