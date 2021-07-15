@@ -10,14 +10,14 @@ function getDevServer(compilation) {
   const resources = [
     // Greenwood default standard resource and import plugins
     ...compilation.config.plugins.filter((plugin) => {
-      return plugin.type === 'resource' && plugin.isGreenwoodPlugin;
+      return plugin.type === 'resource' && plugin.isGreenwoodDefaultPlugin;
     }).map((plugin) => {
       return plugin.provider(compilationCopy);
     }),
 
     // custom user resource plugins
     ...compilation.config.plugins.filter((plugin) => {
-      return plugin.type === 'resource' && !plugin.isGreenwoodPlugin;
+      return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
     }).map((plugin) => {
       const provider = plugin.provider(compilationCopy);
 

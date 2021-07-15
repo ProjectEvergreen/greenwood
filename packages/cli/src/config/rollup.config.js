@@ -103,7 +103,7 @@ function greenwoodHtmlPlugin(compilation) {
   const { optimization } = compilation.config;
   const isRemoteUrl = (url = undefined) => url && (url.indexOf('http') === 0 || url.indexOf('//') === 0);
   const customResources = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'resource' && !plugin.isGreenwoodPlugin;
+    return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
   }).map((plugin) => {
     return plugin.provider(compilation);
   });
@@ -514,7 +514,7 @@ module.exports = getRollupConfig = async (compilation) => {
 
   // order matters but so far nodeModulesResource resolve plugin is the first in our list (so far)
   const greenwoodRollupPlugins = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'rollup' && plugin.isGreenwoodPlugin;
+    return plugin.type === 'rollup' && plugin.isGreenwoodDefaultPlugin;
   }).map((plugin) => {
     return plugin.provider(compilation).flat();
   }).concat([
@@ -523,7 +523,7 @@ module.exports = getRollupConfig = async (compilation) => {
   ]).flat();
 
   const userRollupPlugins = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'rollup' && !plugin.isGreenwoodPlugin;
+    return plugin.type === 'rollup' && !plugin.isGreenwoodDefaultPlugin;
   }).map((plugin) => {
     return plugin.provider(compilation).flat();
   }).flat();

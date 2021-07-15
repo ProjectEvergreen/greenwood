@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
+// get and "tag" all plugins provided / maintained by the @greenwood/cli
+// and include as the default set, with all user plugins getting appended
 const greenwoodPluginsBasePath = path.join(__dirname, '../', 'plugins');
 const greenwoodPlugins = [
   path.join(greenwoodPluginsBasePath, 'resource'),
@@ -17,7 +19,7 @@ const greenwoodPlugins = [
 }).flat()
   .map((plugin) => {
     return {
-      isGreenwoodPlugin: true,
+      isGreenwoodDefaultPlugin: true,
       ...plugin
     };
   });
