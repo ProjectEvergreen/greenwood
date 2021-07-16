@@ -21,18 +21,21 @@ function getCustomPageTemplates(contextPlugins, templateName) {
     .map(plugin => plugin.templates)
     .flat()
     .filter((templateDir) => {
-      return fs.existsSync(path.join(templateDir, `${templateName}.html`));
+      return templateName && fs.existsSync(path.join(templateDir, `${templateName}.html`));
     });
 }
 
 const getPageTemplate = (barePath, workspace, template, contextPlugins = []) => {
   const templatesDir = path.join(workspace, 'templates');
   const pageIsHtmlPath = `${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.html`;
-  const customPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
-
-  if (template && fs.existsSync(`${templatesDir}/${template}.html`)) {
-    // use a predefined template, usually from markdown frontmatter
-    contents = fs.readFileSync(`${templatesDir}/${template}.html`, 'utf-8');
+  const customPluginDefaultPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
+  const customPluginPageTemplates = getCustomPageTemplates(contextPlugins, template);
+  
+  if (template && customPluginPageTemplates.length > 0 || fs.existsSync(`${templatesDir}/${template}.html`)) {
+    // use a custom template, usually from markdown frontmatter
+    contents = customPluginPageTemplates.length > 0
+      ? fs.readFileSync(`${customPluginPageTemplates[0]}/${template}.html`, 'utf-8')
+      : fs.readFileSync(`${templatesDir}/${template}.html`, 'utf-8');
   } else if (fs.existsSync(`${barePath}.html`) || fs.existsSync(pageIsHtmlPath)) {
     // if the page is already HTML, use that as the template
     const indexPath = fs.existsSync(pageIsHtmlPath)
@@ -40,10 +43,10 @@ const getPageTemplate = (barePath, workspace, template, contextPlugins = []) => 
       : `${barePath}.html`;
     
     contents = fs.readFileSync(indexPath, 'utf-8');
-  } else if (customPageTemplates.length > 0 || fs.existsSync(`${templatesDir}/page.html`)) {
+  } else if (customPluginDefaultPageTemplates.length > 0 || fs.existsSync(`${templatesDir}/page.html`)) {
     // else look for default page template from the user
-    contents = customPageTemplates.length > 0
-      ? fs.readFileSync(`${customPageTemplates[0]}/page.html`, 'utf-8')
+    contents = customPluginDefaultPageTemplates.length > 0
+      ? fs.readFileSync(`${customPluginDefaultPageTemplates[0]}/page.html`, 'utf-8')
       : fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
@@ -53,15 +56,19 @@ const getPageTemplate = (barePath, workspace, template, contextPlugins = []) => 
   return contents;
 };
 
-const getAppTemplate = (contents, userWorkspace, customImports = []) => {
+const getAppTemplate = (contents, userWorkspace, customImports = [], contextPlugins) => {
   function sliceTemplate(template, pos, needle, replacer) {
     return template.slice(0, pos) + template.slice(pos).replace(needle, replacer);
   }
   
   const userAppTemplatePath = `${userWorkspace}/templates/app.html`;
-  let appTemplateContents = fs.existsSync(userAppTemplatePath)
-    ? fs.readFileSync(userAppTemplatePath, 'utf-8')
-    : fs.readFileSync(path.join(__dirname, '../../templates/app.html'), 'utf-8');
+  const customAppTemplates = getCustomPageTemplates(contextPlugins, 'app');
+
+  let appTemplateContents = customAppTemplates.length > 0
+    ? fs.readFileSync(`${customAppTemplates[0]}/app.html`, 'utf-8')
+    : fs.existsSync(userAppTemplatePath)
+      ? fs.readFileSync(userAppTemplatePath, 'utf-8')
+      : fs.readFileSync(path.join(__dirname, '../../templates/app.html'), 'utf-8');
 
   const root = htmlparser.parse(contents, {
     script: true,
@@ -350,7 +357,7 @@ class StandardHtmlResource extends ResourceInterface {
           body = getPageTemplate(barePath, userWorkspace, template, contextPlugins);
         }
 
-        body = getAppTemplate(body, userWorkspace, customImports);  
+        body = getAppTemplate(body, userWorkspace, customImports, contextPlugins);  
         body = getUserScripts(body, projectDirectory);
         body = getMetaContent(normalizedUrl.replace(/\\/g, '/'), config, body);
         

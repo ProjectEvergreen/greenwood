@@ -62,29 +62,59 @@ describe('Build Greenwood With: ', function() {
       await runner.runCommand(cliPath, 'build');
     });
 
-    describe('Custom Templates', function() {
+    describe('Custom Default App and Page Templates', function() {
       let dom;
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
-      xit('should have expected text from from a mock package layout/app.html in node_modules/', function() {
+      it('should have expected text from from a mock package layout/app.html in node_modules/', function() {
+        const pageTemplateHeading = dom.window.document.querySelectorAll('body h1')[0];
 
+        expect(pageTemplateHeading.textContent).to.be.equal('This is a custom app template from the custom layouts directory.');
       });
 
       it('should have expected text from from a mock package layout/page.html in node_modules/', function() {
-        const pageTemplateHeading = dom.window.document.querySelectorAll('body h1')[0];
+        const pageTemplateHeading = dom.window.document.querySelectorAll('body h2')[0];
 
         expect(pageTemplateHeading.textContent).to.be.equal('This is a custom page template from the custom layouts directory.');
       });
 
       it('should have expected text from user workspace pages/index.md', function() {
-        const pageHeadingPrimary = dom.window.document.querySelectorAll('body h2')[0];
-        const pageHeadingSecondary = dom.window.document.querySelectorAll('body h3')[0];
+        const pageHeadingPrimary = dom.window.document.querySelectorAll('body h3')[0];
+        const pageHeadingSecondary = dom.window.document.querySelectorAll('body h4')[0];
 
         expect(pageHeadingPrimary.textContent).to.be.equal('Context Plugin Theme Pack Test');
         expect(pageHeadingSecondary.textContent).to.be.equal('From user workspace pages/index.md');
+      });
+    });
+
+    describe('Custom Title Page Template', function() {
+      let dom;
+
+      before(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'slides/index.html'));
+      });
+
+      it('should have expected text from from a mock package layout/app.html in node_modules/', function() {
+        const pageTemplateHeading = dom.window.document.querySelectorAll('body h1')[0];
+
+        expect(pageTemplateHeading.textContent).to.be.equal('This is a custom app template from the custom layouts directory.');
+      });
+
+      it('should have expected text from from a mock package layout/title.html in node_modules/', function() {
+        const pageTemplateHeading = dom.window.document.querySelectorAll('body h2')[0];
+
+        expect(pageTemplateHeading.textContent).to.be.equal('This is a custom page template called title from the layouts directory.');
+      });
+
+      it('should have expected text from user workspace pages/index.md', function() {
+        const pageHeadingPrimary = dom.window.document.querySelectorAll('body h3')[0];
+        const pageHeadingSecondary = dom.window.document.querySelectorAll('body h4')[0];
+
+        expect(pageHeadingPrimary.textContent).to.be.equal('Title Page');
+        expect(pageHeadingSecondary.textContent).to.be.equal('Some content from title.md.');
       });
     });
   });
