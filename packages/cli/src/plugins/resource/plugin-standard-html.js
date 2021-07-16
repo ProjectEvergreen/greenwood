@@ -16,10 +16,19 @@ const remarkRehype = require('remark-rehype');
 const { ResourceInterface } = require('../../lib/resource-interface');
 const unified = require('unified');
 
-// general refactoring
-const getPageTemplate = (barePath, workspace, template) => {
+function getCustomPageTemplates(contextPlugins, templateName) {
+  return contextPlugins
+    .map(plugin => plugin.templates)
+    .flat()
+    .filter((templateDir) => {
+      return fs.existsSync(path.join(templateDir, `${templateName}.html`));
+    });
+}
+
+const getPageTemplate = (barePath, workspace, template, contextPlugins = []) => {
   const templatesDir = path.join(workspace, 'templates');
   const pageIsHtmlPath = `${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.html`;
+  const customPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
 
   if (template && fs.existsSync(`${templatesDir}/${template}.html`)) {
     // use a predefined template, usually from markdown frontmatter
@@ -31,9 +40,11 @@ const getPageTemplate = (barePath, workspace, template) => {
       : `${barePath}.html`;
     
     contents = fs.readFileSync(indexPath, 'utf-8');
-  } else if (fs.existsSync(`${templatesDir}/page.html`)) {
-    // else look for default page template
-    contents = fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
+  } else if (customPageTemplates.length > 0 || fs.existsSync(`${templatesDir}/page.html`)) {
+    // else look for default page template from the user
+    contents = customPageTemplates.length > 0
+      ? fs.readFileSync(`${customPageTemplates[0]}/page.html`, 'utf-8')
+      : fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
     contents = fs.readFileSync(path.join(__dirname, '../../templates/page.html'), 'utf-8');
@@ -325,11 +336,18 @@ class StandardHtmlResource extends ResourceInterface {
             }
           }
         }
+
+        // get context plugins
+        const contextPlugins = this.compilation.config.plugins.filter((plugin) => {
+          return plugin.type === 'context';
+        }).map((plugin) => {
+          return plugin.provider(this.compilation);
+        });
       
         if (mode === 'spa') {
           body = fs.readFileSync(this.compilation.graph[0].path, 'utf-8');
         } else {
-          body = getPageTemplate(barePath, userWorkspace, template);
+          body = getPageTemplate(barePath, userWorkspace, template, contextPlugins);
         }
 
         body = getAppTemplate(body, userWorkspace, customImports);  
