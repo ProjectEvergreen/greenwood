@@ -54,10 +54,6 @@ describe('Develop Greenwood With: ', function() {
       let response = '';
 
       before(async function() {
-        // const htmlPath = path.resolve(this.context.publicDir, 'index.html');
-        // dom = await JSDOM.fromFile(htmlPath);
-        // html = await fs.promises.readFile(htmlPath, 'utf-8');
-
         return new Promise((resolve, reject) => {
           http.get(url, res => {
             res.setEncoding('utf8');
@@ -88,7 +84,7 @@ describe('Develop Greenwood With: ', function() {
   after(function() {
     runner.stopCommand();
     runner.teardown([
-      path.join(outputPath, '.greenwood/')
+      path.join(outputPath, '.greenwood')
     ]);
   });
 });

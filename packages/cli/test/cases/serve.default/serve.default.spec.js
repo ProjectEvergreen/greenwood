@@ -14,7 +14,6 @@
  * User Workspace
  * Greenwood default (src/)
  */
-// const expect = require('chai').expect;
 const path = require('path');
 const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const runSmokeTest = require('../../../../../test/smoke-test');
