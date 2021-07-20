@@ -9,6 +9,7 @@
 const expect = require('chai').expect;
 const fs = require('fs');
 const glob = require('glob-promise');
+const http = require('http');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const { tagsMatch } = require('./utils');
@@ -157,10 +158,42 @@ function defaultIndex(label) {
           expect(pageOutlet.length).to.be.equal(0);
         });
 
-        // 
         it('should not have any sourcemap inlining for Rollup HTML entry points', function() {
           expect(html).not.to.contain('//# sourceMappingURL=index.html.map');
         });
+      });
+    });
+  });
+}
+
+function serve(label) {
+  describe(`Running Smoke Tests: ${label}`, function() {
+    describe('Serving Index (Home) page', function() {
+      let response = {
+        body: '',
+        code: 0
+      };
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          http.get(this.context.url, (res) => {
+            res.setEncoding('utf8');
+            response.status = res.statusCode;
+
+            res.on('data', chunk => response.body += chunk);
+            res.on('end', () => resolve(response));
+          }).on('error', reject);
+        });
+        // const htmlPath = path.resolve(this.context.publicDir, 'index.html');
+
+        // dom = await JSDOM.fromFile(htmlPath);
+        // html = await fs.promises.readFile(htmlPath, 'utf-8');
+      });
+
+      // content type
+      it('should start the server at the expected url', function(done) {
+        expect(response.status).to.equal(200);
+        done();
       });
     });
   });
@@ -176,6 +209,9 @@ module.exports = runSmokeTest = async function(testCases, label) {
         break;
       case 'public':
         publicDirectory(label);
+        break;
+      case 'serve':
+        serve(label);
         break;
       default:
         console.warn(`unknown case ${testCase}`);

@@ -14,21 +14,22 @@
  * User Workspace
  * Greenwood default (src/)
  */
-const expect = require('chai').expect;
+// const expect = require('chai').expect;
 const path = require('path');
 const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
+const runSmokeTest = require('../../../../../test/smoke-test');
 const Runner = require('gallinago').Runner;
-const http = require('http');
 
 describe('Serve Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
+  const url = 'http://localhost:8080';
   let runner;
 
   before(function() {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      url
     };
     runner = new Runner();
   });
@@ -47,12 +48,7 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    it('should start the dev server at port 8080', function(done) {
-      http.get('http://localhost:8080', function (res) {
-        expect(res.statusCode).to.equal(200);
-        done();
-      });
-    });
+    runSmokeTest(['serve'], LABEL);
   });
 
   after(function() {
