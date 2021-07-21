@@ -33,14 +33,15 @@ describe('Develop Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
-  const hostname = 'http://localhost:1984';
+  const hostname = 'http://localhost';
+  const port = 1984;
   let runner;
 
   before(function() {
     this.context = {
-      hostname
+      hostname: `${hostname}:${port}`
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function() {
@@ -98,7 +99,13 @@ describe('Develop Greenwood With: ', function() {
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          http.get(hostname, res => {
+          http.get({
+            hostname: '127.0.0.1',
+            port,
+            headers: {
+              accept: 'text/html'
+            }
+          }, res => {
             res.setEncoding('utf8');
             res.on('data', chunk => response += chunk);
             res.on('end', () => {
@@ -130,7 +137,16 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
 
-      // livereload      
+      it('should add a <script> tag for livereload', function(done) {
+        const scriptTags = Array.from(dom.window.document.querySelectorAll('head > script[src]'));
+        const livereloadScript = scriptTags.filter((tag) => {
+          return tag.getAttribute('src').indexOf('livereload.js') >= 0;
+        });
+
+        expect(livereloadScript.length).to.equal(1);
+
+        done();
+      });   
     });
 
     describe('Develop command specific JavaScript behaviors', function() {
@@ -141,7 +157,7 @@ describe('Develop Greenwood With: ', function() {
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          http.get(`${hostname}/components/header.js`, (res) => {
+          http.get(`${hostname}:${port}/components/header.js`, (res) => {
             res.setEncoding('utf8');
             response.status = res.statusCode;
             response.headers = res.headers;
@@ -173,7 +189,7 @@ describe('Develop Greenwood With: ', function() {
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          http.get(`${hostname}/styles/main.css`, (res) => {
+          http.get(`${hostname}:${port}/styles/main.css`, (res) => {
             res.setEncoding('utf8');
             response.status = res.statusCode;
             response.headers = res.headers;
@@ -205,7 +221,7 @@ describe('Develop Greenwood With: ', function() {
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          http.get(`${hostname}/node_modules/lit-html/lit-html.js`, (res) => {
+          http.get(`${hostname}:${port}/node_modules/lit-html/lit-html.js`, (res) => {
             res.setEncoding('utf8');
             response.status = res.statusCode;
             response.headers = res.headers;
