@@ -3,11 +3,13 @@ module.exports = {
   all: true,
   
   include: [
-    'packages/cli/src/commands/*.js',
-    'packages/cli/src/lib/*.js',
-    'packages/cli/src/lifecycles/*.js',
-    'packages/cli/src/plugins/*.js',
-    'packages/plugin-*/src/*.js'
+    'packages/*/src/**/**/*.js'
+  ],
+
+  exclude: [
+    'packages/cli/src/index.js',
+    'packages/**/**/*.config.js',
+    'packages/cli/src/lib/*-interface.js'
   ],
 
   reporter: [
@@ -20,7 +22,7 @@ module.exports = {
   checkCoverage: true,
 
   statements: 80,
-  branches: 65,
+  branches: 70,
   functions: 80,
   lines: 80,
 

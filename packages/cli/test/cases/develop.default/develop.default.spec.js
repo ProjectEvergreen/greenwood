@@ -24,12 +24,12 @@ describe('Develop Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
-  const url = 'http://localhost:1984';
+  const hostname = 'http://localhost:1984';
   let runner;
 
   before(function() {
     this.context = {
-      url
+      hostname
     };
     runner = new Runner();
   });
@@ -50,12 +50,12 @@ describe('Develop Greenwood With: ', function() {
 
     runSmokeTest(['serve'], LABEL);
 
-    describe('Develop command specific behaviors', function() {
+    describe('Develop command specific HTML behaviors', function() {
       let response = '';
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          http.get(url, res => {
+          http.get(hostname, res => {
             res.setEncoding('utf8');
             res.on('data', chunk => response += chunk);
             res.on('end', () => resolve(response));
@@ -78,6 +78,70 @@ describe('Develop Greenwood With: ', function() {
       // <script defer src="https://unpkg.com/es-module-shims@0.5.2/dist/es-module-shims.js"></script>
 
       // livereload      
+    });
+
+    describe('Develop command specific JavaScript behaviors', function() {
+      let response = {
+        body: '',
+        code: 0
+      };
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          http.get(`${hostname}/components/header.js`, (res) => {
+            res.setEncoding('utf8');
+            response.status = res.statusCode;
+            response.headers = res.headers;
+
+            res.on('data', chunk => response.body += chunk);
+            res.on('end', () => {
+              resolve(response);
+            });
+          }).on('error', reject);
+        });
+      });
+
+      it('should start the server and return 200 status', function(done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal('text/javascript');
+        done();
+      });
+    });
+
+    describe('Develop command specific CSS behaviors', function() {
+      let response = {
+        body: '',
+        code: 0
+      };
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          http.get(`${hostname}/styles/main.css`, (res) => {
+            res.setEncoding('utf8');
+            response.status = res.statusCode;
+            response.headers = res.headers;
+
+            res.on('data', chunk => response.body += chunk);
+            res.on('end', () => {
+              resolve(response);
+            });
+          }).on('error', reject);
+        });
+      });
+
+      it('should start the server and return 200 status', function(done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal('text/css');
+        done();
+      });
     });
   });
 

@@ -23,12 +23,12 @@ describe('Serve Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
-  const url = 'http://localhost:8080';
+  const hostname = 'http://localhost:8080';
   let runner;
 
   before(function() {
     this.context = {
-      url
+      hostname
     };
     runner = new Runner();
   });
