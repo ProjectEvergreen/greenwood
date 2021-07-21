@@ -7,8 +7,6 @@ module.exports = {
   ],
 
   exclude: [
-    'packages/cli/src/index.js',
-    'packages/**/**/*.config.js',
     'packages/cli/src/lib/*-interface.js'
   ],
 
