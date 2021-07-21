@@ -12,13 +12,22 @@
  * None (Greenwood Default)
  *
  * User Workspace
- * Greenwood default (src/)
+ * src/
+ *   components/
+ *     header.js
+ *   pages/
+ *     index.html
+ *   styles/
+ *     main.css
+ *
  */
 const expect = require('chai').expect;
+const http = require('http');
+const { JSDOM } = require('jsdom');
 const path = require('path');
+const { getDependencyFiles, getSetupFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 const runSmokeTest = require('../../../../../test/smoke-test');
-const http = require('http');
 
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
@@ -37,7 +46,40 @@ describe('Develop Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      await runner.setup(outputPath);
+      const litElementLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-element/lib/*.js`,
+        `${outputPath}/node_modules/lit-element/lib/`
+      );
+      const litElement = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-element/lit-element.js`,
+        `${outputPath}/node_modules/lit-element/`
+      );
+      const litElementPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-element/package.json`,
+        `${outputPath}/node_modules/lit-element/`
+      );
+      const litHtml = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/lit-html.js`,
+        `${outputPath}/node_modules/lit-html/`
+      );
+      const litHtmlPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/package.json`,
+        `${outputPath}/node_modules/lit-html/`
+      );
+      const litHtmlLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/lib/*.js`,
+        `${outputPath}/node_modules/lit-html/lib/`
+      );
+
+      await runner.setup(outputPath, [
+        ...getSetupFiles(outputPath),
+        ...litElementPackageJson,
+        ...litElement,
+        ...litElementLibs,
+        ...litHtmlPackageJson,
+        ...litHtml,
+        ...litHtmlLibs
+      ]);
 
       return new Promise(async (resolve) => {
         setTimeout(() => {
@@ -52,30 +94,41 @@ describe('Develop Greenwood With: ', function() {
 
     describe('Develop command specific HTML behaviors', function() {
       let response = '';
+      let dom;
 
       before(async function() {
         return new Promise((resolve, reject) => {
           http.get(hostname, res => {
             res.setEncoding('utf8');
             res.on('data', chunk => response += chunk);
-            res.on('end', () => resolve(response));
+            res.on('end', () => {
+              dom = new JSDOM(response);
+              resolve(response);
+            });
           }).on('error', reject);
         });
       });
 
-      //   <script type="importmap-shim">
-      //   {
-      //     "imports": {}
-      //   }
-      // </script>
-      it('should return an import map in the <head> of the document', function(done) {
-        // console.debug('response??????', response);
-        expect(response).to.contain('<html');
+      it('should return an import map shim <script> in the <head> of the document', function(done) {
+        const importMapTag = dom.window.document.querySelectorAll('head > script[type="importmap-shim"]')[0];
+        const importMap = JSON.parse(importMapTag.textContent).imports;
+
+        expect(importMap['lit-html']).to.equal('/node_modules/lit-html/lit-html.js');
+        expect(importMap['lit-element']).to.equal('/node_modules/lit-element/lit-element.js');
+        expect(importMap['lit-html/lit-html.js']).to.equal('/node_modules/lit-html/lit-html.js');
+        expect(importMap['lit-html/lib/shady-render.js']).to.equal('/node_modules/lit-html/lib/shady-render.js');
+
         done();
       });
 
-      // esmodule shims
-      // <script defer src="https://unpkg.com/es-module-shims@0.5.2/dist/es-module-shims.js"></script>
+      it('should return an import map in the <head> of the document', function(done) {
+        const importMapShimTag = dom.window.document.querySelectorAll('head > script[defer]')[0];
+        const shimSrc = importMapShimTag.getAttribute('src');
+
+        expect(shimSrc).to.equal('/node_modules/es-module-shims/dist/es-module-shims.js');
+
+        done();
+      });
 
       // livereload      
     });
@@ -101,7 +154,7 @@ describe('Develop Greenwood With: ', function() {
         });
       });
 
-      it('should start the server and return 200 status', function(done) {
+      it('should return a 200 status', function(done) {
         expect(response.status).to.equal(200);
         done();
       });
@@ -133,7 +186,7 @@ describe('Develop Greenwood With: ', function() {
         });
       });
 
-      it('should start the server and return 200 status', function(done) {
+      it('should eturn a 200 status', function(done) {
         expect(response.status).to.equal(200);
         done();
       });
@@ -143,12 +196,45 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
     });
+
+    describe('Develop command specific node modules resolution behavior', function() {
+      let response = {
+        body: '',
+        code: 0
+      };
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          http.get(`${hostname}/node_modules/lit-html/lit-html.js`, (res) => {
+            res.setEncoding('utf8');
+            response.status = res.statusCode;
+            response.headers = res.headers;
+
+            res.on('data', chunk => response.body += chunk);
+            res.on('end', () => {
+              resolve(response);
+            });
+          }).on('error', reject);
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal('text/javascript');
+        done();
+      });
+    });
   });
 
   after(function() {
     runner.stopCommand();
     runner.teardown([
-      path.join(outputPath, '.greenwood')
+      path.join(outputPath, '.greenwood'),
+      path.join(outputPath, 'node_modules')
     ]);
   });
 });
