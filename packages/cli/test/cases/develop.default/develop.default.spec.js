@@ -246,7 +246,7 @@ describe('Develop Greenwood With: ', function() {
     });
 
     // proxies to analogstudios.net/api/events
-    describe.only('Develop command with dev proxy', function() {
+    describe('Develop command with dev proxy', function() {
       let response = {
         body: '',
         code: 0
