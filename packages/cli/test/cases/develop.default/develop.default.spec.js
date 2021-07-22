@@ -244,6 +244,39 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
     });
+
+    // proxies to analogstudios.net/api/events
+    describe.only('Develop command with dev proxy', function() {
+      let response = {
+        body: '',
+        code: 0
+      };
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          http.get(`${hostname}:${port}/api/events`, (res) => {
+            res.setEncoding('utf8');
+            response.status = res.statusCode;
+            response.headers = res.headers;
+
+            res.on('data', chunk => response.body += chunk);
+            res.on('end', () => {
+              resolve(response);
+            });
+          }).on('error', reject);
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('application/json');
+        done();
+      });
+    });
   });
 
   after(function() {
