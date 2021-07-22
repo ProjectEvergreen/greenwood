@@ -9,7 +9,11 @@
  * greenwood develop
  *
  * User Config
- * None (Greenwood Default)
+ * devServer: {
+ *   proxy: {
+ *     '/api': 'https://www.analogstudios.net'
+ *   }
+ * }
  *
  * User Workspace
  * src/
@@ -22,10 +26,10 @@
  *
  */
 const expect = require('chai').expect;
-const http = require('http');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const { getDependencyFiles, getSetupFiles } = require('../../../../../test/utils');
+const request = require('request');
 const Runner = require('gallinago').Runner;
 const runSmokeTest = require('../../../../../test/smoke-test');
 
@@ -99,20 +103,22 @@ describe('Develop Greenwood With: ', function() {
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          http.get({
-            hostname: '127.0.0.1',
-            port,
+          request.get({
+            url: `http://127.0.0.1:${port}`,
             headers: {
               accept: 'text/html'
             }
-          }, res => {
-            res.setEncoding('utf8');
-            res.on('data', chunk => response += chunk);
-            res.on('end', () => {
-              dom = new JSDOM(response);
-              resolve(response);
-            });
-          }).on('error', reject);
+          }, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response.status = res.statusCode;
+            response.headers = res.headers;
+
+            dom = new JSDOM(body);
+            resolve(response);
+          });
         });
       });
 
@@ -157,16 +163,16 @@ describe('Develop Greenwood With: ', function() {
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          http.get(`${hostname}:${port}/components/header.js`, (res) => {
-            res.setEncoding('utf8');
+          request.get(`${hostname}:${port}/components/header.js`, (err, res) => {
+            if (err) {
+              reject();
+            }
+
             response.status = res.statusCode;
             response.headers = res.headers;
 
-            res.on('data', chunk => response.body += chunk);
-            res.on('end', () => {
-              resolve(response);
-            });
-          }).on('error', reject);
+            resolve(response);
+          });
         });
       });
 
@@ -189,16 +195,16 @@ describe('Develop Greenwood With: ', function() {
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          http.get(`${hostname}:${port}/styles/main.css`, (res) => {
-            res.setEncoding('utf8');
+          request.get(`${hostname}:${port}/styles/main.css`, (err, res) => {
+            if (err) {
+              reject();
+            }
+
             response.status = res.statusCode;
             response.headers = res.headers;
 
-            res.on('data', chunk => response.body += chunk);
-            res.on('end', () => {
-              resolve(response);
-            });
-          }).on('error', reject);
+            resolve(response);
+          });
         });
       });
 
@@ -221,16 +227,16 @@ describe('Develop Greenwood With: ', function() {
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          http.get(`${hostname}:${port}/node_modules/lit-html/lit-html.js`, (res) => {
-            res.setEncoding('utf8');
+          request.get(`${hostname}:${port}/node_modules/lit-html/lit-html.js`, (err, res) => {
+            if (err) {
+              reject();
+            }
+
             response.status = res.statusCode;
             response.headers = res.headers;
 
-            res.on('data', chunk => response.body += chunk);
-            res.on('end', () => {
-              resolve(response);
-            });
-          }).on('error', reject);
+            resolve(response);
+          });
         });
       });
 
@@ -254,16 +260,16 @@ describe('Develop Greenwood With: ', function() {
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          http.get(`${hostname}:${port}/api/events`, (res) => {
-            res.setEncoding('utf8');
+          request.get(`${hostname}:${port}/api/events`, (err, res) => {
+            if (err) {
+              reject();
+            }
+
             response.status = res.statusCode;
             response.headers = res.headers;
 
-            res.on('data', chunk => response.body += chunk);
-            res.on('end', () => {
-              resolve(response);
-            });
-          }).on('error', reject);
+            resolve(response);
+          });
         });
       });
 
