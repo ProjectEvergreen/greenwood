@@ -3,7 +3,7 @@
  * Run Greenwood develop command with no config.
  *
  * User Result
- * Should start the development server and render a bare bones Greenwood build.
+ * Should start the development server and render a bare bones Greenwood build and process TypeScript (.ts) files.
  *
  * User Command
  * greenwood develop

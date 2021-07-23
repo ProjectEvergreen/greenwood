@@ -3,7 +3,7 @@
  * Run Greenwood develop command with no config.
  *
  * User Result
- * Should start the development server and render a bare bones Greenwood build and process GraphQL (.gql) files.
+ * Should start the development server and render a bare bones Greenwood build and process GraphQL (.gql) files as ESM.
  *
  * User Command
  * greenwood develop
