@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit-element';
+import { html, LitElement } from 'lit';
 import { connectRouter } from 'lit-redux-router';
 import { applyMiddleware, createStore, compose, combineReducers } from 'redux';
 import { lazyReducerEnhancer } from 'pwa-helpers';
@@ -16,12 +16,12 @@ class MyApp extends LitElement {
       <div class="app-content">
         <lit-route 
           path="/" 
-          component="app-home"
+          component="app-route-home"
           .resolve="${() => import('./routes/home.js')}"
         ></lit-route>
         <lit-route 
           path="/about" 
-          component="app-about"
+          component="app-route-about"
           .resolve="${() => import('./routes/about.js')}"
         ></lit-route>
       </div>

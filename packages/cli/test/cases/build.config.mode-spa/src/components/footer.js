@@ -1,4 +1,4 @@
-import { css, html, LitElement } from 'lit-element';
+import { css, html, LitElement } from 'lit';
 
 class FooterComponent extends LitElement {
 
