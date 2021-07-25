@@ -3,17 +3,17 @@
  * Run Greenwood develop command with no config.
  *
  * User Result
- * Should start the development server and render a bare bones Greenwood build and process TypeScript (.ts) files.
+ * Should start the development server and render a bare bones Greenwood build and return CSS file as ESM.
  *
  * User Command
  * greenwood develop
  *
  * User Config
- * TypeScript Plugin
+ * Import CSS Plugin
  *
  * User Workspace
  * src/
- *   main.ts
+ *   main.css
  *
  */
 const expect = require('chai').expect;
@@ -24,7 +24,7 @@ const Runner = require('gallinago').Runner;
 const runSmokeTest = require('../../../../../test/smoke-test');
 
 describe('Develop Greenwood With: ', function() {
-  const LABEL = 'TypeScript plugin for resolving .ts files';
+  const LABEL = 'Import CSS plugin for using ESM with .css files';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
   const hostname = 'http://localhost';
@@ -54,13 +54,13 @@ describe('Develop Greenwood With: ', function() {
 
     runSmokeTest(['serve'], LABEL);
 
-    describe('Develop command specific .ts behaviors', function() {
+    describe('Develop command specific ESM .css behaviors', function() {
       let response = {};
 
       before(async function() {
         return new Promise((resolve, reject) => {
           request.get({
-            url: `http://127.0.0.1:${port}/main.ts`
+            url: `http://127.0.0.1:${port}/main.css?type=css`
           }, (err, res, body) => {
             if (err) {
               reject();
@@ -85,8 +85,8 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
 
-      it('should return an ECMAScript module', function(done) {
-        expect(response.body.trim().indexOf('const user')).to.equal(0);
+      it('should return an ECMASCript module', function(done) {
+        expect(response.body.replace('\n', '')).to.equal('const css = "* {   color: blue; }";export default css;');
         done();
       });
     });
