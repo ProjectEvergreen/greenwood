@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "lit-element": "^2.4.0",
-    "lit-redux-router": "^0.17.1",
+    "lit": "^2.0.0-rc.2",
+    "lit-redux-router": "~0.19.0",
     "pwa-helpers": "^0.9.1",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0"
