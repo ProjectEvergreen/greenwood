@@ -205,7 +205,7 @@ class NodeModulesResource extends ResourceInterface {
     return Promise.resolve(url.indexOf('node_modules/') >= 0);
   }
 
-  sync resolve(url) {
+  async resolve(url) {
     const packagePathPieces = url.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
     let packageName = packagePathPieces.shift();
     let nodeModulesUrl;
