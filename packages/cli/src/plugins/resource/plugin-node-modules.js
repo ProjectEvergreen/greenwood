@@ -142,8 +142,10 @@ const walkPackageJson = (packageJson = {}) => {
             packageExport = esmPath
               ? esmPath
               : fallbackPath;
-          } else if (exportMapEntry.default) {
-            packageExport = exportMapEntry.default;
+          } else if (exportMapEntry.import || exportMapEntry.default) {
+            packageExport = exportMapEntry.import
+              ? exportMapEntry.import
+              : exportMapEntry.default;
             
             // use the dependency itself as an entry in the importMap
             if (entry === '.') {
@@ -155,15 +157,24 @@ const walkPackageJson = (packageJson = {}) => {
           }
   
           if (packageExport) {
+            const packageExportLocation = path.join(process.cwd(), 'node_modules', `${dependency}/${packageExport.replace('./', '')}`);
 
             // check all exports of an exportMap entry
             // to make sure those deps get added to the importMap
-            if (packageExport.endsWith('.js')) {
-              const moduleContents = fs.readFileSync(path.join(process.cwd(), 'node_modules', `${dependency}/${packageExport.replace('./', '')}`));
-              walkModule(moduleContents, dependency);
-            }
+            if (packageExport.endsWith('js')) {
+              const moduleContents = fs.readFileSync(packageExportLocation);
 
-            updateImportMap(`${dependency}/${packageExport.replace('./', '')}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
+              walkModule(moduleContents, dependency);
+              updateImportMap(`${dependency}/${packageExport.replace('./', '')}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
+            } else if (fs.lstatSync(packageExportLocation).isDirectory()) {
+              fs.readdirSync(packageExportLocation)
+                .filter(file => file.endsWith('.js') || file.endsWith('.mjs'))
+                .forEach((file) => {
+                  updateImportMap(`${dependency}/${packageExport.replace('./', '')}${file}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}${file}`);
+                });
+            } else {
+              console.warn('Warning, not able to handle export', `${dependency}/${packageExport}`);
+            }
           }
         });
 
