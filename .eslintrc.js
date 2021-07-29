@@ -5,7 +5,8 @@ module.exports = {
     sourceType: 'module'
   },
   plugins: [
-    '@typescript-eslint'
+    '@typescript-eslint',
+    'no-only-tests'
   ],
   env: {
     browser: true,
@@ -37,6 +38,7 @@ module.exports = {
     'no-irregular-whitespace': 2,
     'no-negated-in-lhs': 2,
     'no-obj-calls': 0,
+    'no-only-tests/no-only-tests': 2,
     'no-regex-spaces': 0,
     'no-sparse-arrays': 2,
     'no-unreachable': 2,
