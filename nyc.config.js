@@ -21,7 +21,7 @@ module.exports = {
 
   statements: 80,
   branches: 75,
-  functions: 80,
+  functions: 85,
   lines: 80,
 
   watermarks: {
