@@ -77,14 +77,12 @@ class LiveReloadResource extends ResourceInterface {
   }
 }
 
-module.exports = (options = {}) => {
-  return [{
-    type: 'server',
-    name: 'plugin-live-reload:server',
-    provider: (compilation) => new LiveReloadServer(compilation, options)
-  }, {
-    type: 'resource',
-    name: 'plugin-live-reload:resource',
-    provider: (compilation) => new LiveReloadResource(compilation, options)
-  }];
-};
+module.exports = [{
+  type: 'server',
+  name: 'plugin-live-reload:server',
+  provider: (compilation) => new LiveReloadServer(compilation)
+}, {
+  type: 'resource',
+  name: 'plugin-live-reload:resource',
+  provider: (compilation) => new LiveReloadResource(compilation)
+}];

@@ -2,18 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const Koa = require('koa');
 
-const pluginNodeModules = require('../plugins/resource/plugin-node-modules');
-const pluginDevProxyResource = require('../plugins/resource/plugin-dev-proxy');
-const pluginResourceOptimizationMpa = require('../plugins/resource/plugin-optimization-mpa');
-const pluginSourceMaps = require('../plugins/resource/plugin-source-maps');
-const pluginResourceStandardCss = require('../plugins/resource/plugin-standard-css');
-const pluginResourceStandardFont = require('../plugins/resource/plugin-standard-font');
-const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
-const pluginResourceStandardImage = require('../plugins/resource/plugin-standard-image');
-const pluginResourceStandardJavaScript = require('../plugins/resource/plugin-standard-javascript');
-const pluginResourceStandardJson = require('../plugins/resource/plugin-standard-json');
-const pluginLiveReloadResource = require('../plugins/server/plugin-livereload')()[1];
-const pluginUserWorkspace = require('../plugins/resource/plugin-user-workspace');
 const { ResourceInterface } = require('../lib/resource-interface');
 
 function getDevServer(compilation) {
@@ -21,21 +9,15 @@ function getDevServer(compilation) {
   const compilationCopy = Object.assign({}, compilation);
   const resources = [
     // Greenwood default standard resource and import plugins
-    pluginUserWorkspace.provider(compilation),
-    pluginNodeModules[0].provider(compilation),
-    pluginDevProxyResource.provider(compilationCopy),
-    pluginResourceStandardCss.provider(compilationCopy),
-    pluginResourceStandardFont.provider(compilationCopy),
-    pluginResourceStandardHtml.provider(compilationCopy),
-    pluginResourceStandardImage.provider(compilationCopy),
-    pluginResourceStandardJavaScript[0].provider(compilationCopy),
-    pluginResourceStandardJson[0].provider(compilationCopy),
-    pluginSourceMaps.provider(compilationCopy),
-    pluginResourceOptimizationMpa().provider(compilationCopy),
+    ...compilation.config.plugins.filter((plugin) => {
+      return plugin.type === 'resource' && plugin.isGreenwoodDefaultPlugin;
+    }).map((plugin) => {
+      return plugin.provider(compilationCopy);
+    }),
 
     // custom user resource plugins
     ...compilation.config.plugins.filter((plugin) => {
-      return plugin.type === 'resource';
+      return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
     }).map((plugin) => {
       const provider = plugin.provider(compilationCopy);
 
@@ -106,15 +88,12 @@ function getDevServer(compilation) {
 
   // allow intercepting of urls (response)
   app.use(async (ctx) => {
-    const modifiedResources = resources.concat(
-      pluginLiveReloadResource.provider(compilation)
-    );
     const responseAccumulator = {
       body: ctx.body,
       contentType: ctx.response.headers['content-type']
     };
 
-    const reducedResponse = await modifiedResources.reduce(async (responsePromise, resource) => {
+    const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
       const response = await responsePromise;
       const { url } = ctx;
       const { headers } = ctx.response;
@@ -147,7 +126,11 @@ function getDevServer(compilation) {
 
 function getProdServer(compilation) {
   const app = new Koa();
-  const proxyPlugin = pluginDevProxyResource.provider(compilation);
+  const proxyPlugin = compilation.config.plugins.filter((plugin) => {
+    return plugin.name === 'plugin-dev-server';
+  }).map((plugin) => {
+    return plugin.provider(compilation);
+  })[0];
 
   app.use(async ctx => {
     const { outputDir } = compilation.context;

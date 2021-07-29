@@ -1,24 +1,16 @@
 const BrowserRunner = require('../lib/browser');
 const fs = require('fs');
 const path = require('path');
-const pluginResourceStandardHtml = require('../plugins/resource/plugin-standard-html');
-const pluginOptimizationMpa = require('../plugins/resource/plugin-optimization-mpa');
 
 async function optimizePage(compilation, contents, route, outputDir) {
   const outputPath = `${outputDir}${route}index.html`;
-  const optimizeResources = [
-    pluginResourceStandardHtml.provider(compilation),
-    pluginOptimizationMpa().provider(compilation),
-    ...compilation.config.plugins.filter((plugin) => {
-      const provider = plugin.provider(compilation);
-
-      return plugin.type === 'resource' 
-        && provider.shouldOptimize 
-        && provider.optimize;
-    }).map((plugin) => {
-      return plugin.provider(compilation);
-    })
-  ];
+  const optimizeResources = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'resource';
+  }).map((plugin) => {
+    return plugin.provider(compilation);
+  }).filter((provider) => {
+    return provider.shouldOptimize && provider.optimize;
+  });
 
   const htmlOptimized = await optimizeResources.reduce(async (htmlPromise, resource) => {
     const html = await htmlPromise;
@@ -107,7 +99,11 @@ async function preRenderCompilation(compilation) {
 async function staticRenderCompilation(compilation) {
   const pages = compilation.graph;
   const scratchDir = compilation.context.scratchDir;
-  const htmlResource = pluginResourceStandardHtml.provider(compilation);
+  const htmlResource = compilation.config.plugins.filter((plugin) => {
+    return plugin.name === 'plugin-standard-html';
+  }).map((plugin) => {
+    return plugin.provider(compilation);
+  })[0];
 
   console.info('pages to generate', `\n ${pages.map(page => page.path).join('\n ')}`);
   

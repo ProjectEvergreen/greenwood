@@ -25,8 +25,7 @@ module.exports = runProductionBuild = async () => {
           try {
             devServer(compilation).listen(port, async () => {
               console.info(`Started local development server at localhost:${port}`);
-              
-              // custom user server plugins
+  
               const servers = [...compilation.config.plugins.filter((plugin) => {
                 return plugin.type === 'server';
               }).map((plugin) => {

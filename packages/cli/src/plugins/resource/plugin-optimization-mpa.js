@@ -96,10 +96,8 @@ class OptimizationMPAResource extends ResourceInterface {
   }
 }
 
-module.exports = (options = {}) => {
-  return {
-    type: 'resource',
-    name: 'plugin-optimization-mpa',
-    provider: (compilation) => new OptimizationMPAResource(compilation, options)
-  };
+module.exports = {
+  type: 'resource',
+  name: 'plugin-optimization-mpa',
+  provider: (compilation, options) => new OptimizationMPAResource(compilation, options)
 }; 
