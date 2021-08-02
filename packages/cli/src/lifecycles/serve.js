@@ -126,13 +126,17 @@ function getDevServer(compilation) {
 
 function getProdServer(compilation) {
   const app = new Koa();
-  const proxyPlugin = compilation.config.plugins.filter((plugin) => {
-    return plugin.name === 'plugin-dev-server';
+  const standardResources = compilation.config.plugins.filter((plugin) => {
+    // html is intentionally omitted
+    return plugin.isGreenwoodDefaultPlugin
+      && plugin.type === 'resource'
+      && plugin.name.indexOf('plugin-standard') >= 0
+      && plugin.name.indexOf('plugin-standard-html') < 0;
   }).map((plugin) => {
     return plugin.provider(compilation);
-  })[0];
+  });
 
-  app.use(async ctx => {
+  app.use(async (ctx, next) => {
     const { outputDir } = compilation.context;
     const { mode } = compilation.config;
     const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
@@ -145,58 +149,64 @@ function getProdServer(compilation) {
           : url;
       const contents = await fs.promises.readFile(path.join(outputDir, barePath), 'utf-8');
       
-      ctx.set('Content-Type', 'text/html');
+      ctx.set('content-type', 'text/html');
       ctx.body = contents;
     }
 
-    if (url.endsWith('.js')) {
-      const contents = await fs.promises.readFile(path.join(outputDir, url), 'utf-8');
+    await next();
+  });
 
-      ctx.set('Content-Type', 'text/javascript');
-      ctx.body = contents;
-    }
+  app.use(async (ctx, next) => {
+    const url = ctx.request.url;
 
-    if (url.endsWith('.css')) {
-      const contents = await fs.promises.readFile(path.join(outputDir, url), 'utf-8');
+    if (compilation.config.devServer.proxy) {
+      const proxyPlugin = compilation.config.plugins.filter((plugin) => {
+        return plugin.name === 'plugin-dev-proxy';
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      })[0];
 
-      ctx.set('Content-Type', 'text/css');
-      ctx.body = contents;
-    }
-
-    if (url.indexOf('assets/')) {
-      const assetPath = path.join(outputDir, url);
-      const ext = path.extname(assetPath);
-      const type = ext === '.svg'
-        ? `${ext.replace('.', '')}+xml`
-        : ext.replace('.', '');
-
-      if (['.jpg', '.png', '.gif', '.svg'].includes(ext)) {
-        ctx.set('Content-Type', `image/${type}`);
-
-        if (ext === '.svg') {
-          ctx.body = await fs.promises.readFile(assetPath, 'utf-8');
-        } else {
-          ctx.body = await fs.promises.readFile(assetPath); 
-        }
-      } else if (['.woff2', '.woff', '.ttf'].includes(ext)) {
-        ctx.set('Content-Type', `font/${type}`);
-        ctx.body = await fs.promises.readFile(assetPath);
-      } else if (['.ico'].includes(ext)) {
-        ctx.set('Content-Type', 'image/x-icon');
-        ctx.body = await fs.promises.readFile(assetPath);
+      if (url !== '/' && await proxyPlugin.shouldServe(url)) {
+        ctx.body = (await proxyPlugin.serve(url)).body;
       }
     }
 
-    if (url.endsWith('.json')) {
-      const contents = await fs.promises.readFile(path.join(outputDir, url), 'utf-8');
+    await next();
+  });
 
-      ctx.set('Content-Type', 'application/json');
-      ctx.body = JSON.parse(contents);
-    }
+  app.use(async (ctx) => {
+    const responseAccumulator = {
+      body: ctx.body,
+      contentType: ctx.response.header['content-type']
+    };
 
-    if (url !== '/' && await proxyPlugin.shouldServe(url)) {
-      ctx.body = (await proxyPlugin.serve(ctx.url)).body;
-    }
+    const reducedResponse = await standardResources.reduce(async (responsePromise, resource) => {
+      const response = await responsePromise;
+      const { url } = ctx;
+      const { headers } = ctx.response;
+      const outputPathUrl = path.join(compilation.context.outputDir, url);
+      const shouldServe = await resource.shouldServe(outputPathUrl, {
+        request: ctx.headers,
+        response: headers
+      });
+
+      if (shouldServe) {
+        const resolvedResource = await resource.serve(outputPathUrl, {
+          request: ctx.headers,
+          response: headers
+        });
+
+        return Promise.resolve({
+          ...response,
+          ...resolvedResource
+        });
+      } else {
+        return Promise.resolve(response);
+      }
+    }, Promise.resolve(responseAccumulator));
+
+    ctx.set('content-type', reducedResponse.contentType);
+    ctx.body = reducedResponse.body;
   });
     
   return app;
