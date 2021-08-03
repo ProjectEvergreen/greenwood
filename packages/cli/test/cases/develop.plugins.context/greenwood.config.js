@@ -1,12 +1,8 @@
-const os = require('os');
+// shared from another test
+const myThemePackPlugin = require('../build.plugins.context/theme-pack-context-plugin');
 const packageName = require('./package.json').name;
 const path = require('path');
-const myThemePackPlugin = require('./theme-pack-context-plugin');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
-const { spawnSync } = require('child_process');
-
-const command = os.platform() === 'win32' ? 'npm.cmd' : 'npm';
-const ls = spawnSync(command, ['ls', packageName]);
 
 class MyThemePackDevelopmentResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -25,9 +21,8 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
 
 module.exports = {
   plugins: [
-    ...myThemePackPlugin({
-      __isDevelopment: ls.stdout.toString().indexOf('(empty)') >= 0
-    }), {
+    ...myThemePackPlugin(),
+    {
       type: 'resource',
       name: 'my-theme-pack:resource',
       provider: (compilation, options) => new MyThemePackDevelopmentResource(compilation, options)

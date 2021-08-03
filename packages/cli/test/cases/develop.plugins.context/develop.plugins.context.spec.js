@@ -22,7 +22,6 @@ const expect = require('chai').expect;
 const { JSDOM } = require('jsdom');
 const packageJson = require('./package.json');
 const path = require('path');
-const { getSetupFiles, getDependencyFiles } = require('../../../../../test/utils');
 const request = require('request');
 const Runner = require('gallinago').Runner;
 const runSmokeTest = require('../../../../../test/smoke-test');
@@ -45,27 +44,7 @@ describe('Develop Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      // copy fixtures into node_modules
-      // to match the location specified in the plugin under test
-      const themePacktemplates = await getDependencyFiles(
-        `${__dirname}/fixtures/layouts/*.html`,
-        `${outputPath}/node_modules/my-theme-pack/dist/layouts`
-      );
-      const themePackStyles = await getDependencyFiles(
-        `${__dirname}/fixtures/styles/*.css`,
-        `${outputPath}/node_modules/my-theme-pack/dist/styles`
-      );
-      const themePackComponents = await getDependencyFiles(
-        `${__dirname}/fixtures/components/*.js`,
-        `${outputPath}/node_modules/my-theme-pack/dist/components`
-      );
-
-      await runner.setup(outputPath, [
-        ...getSetupFiles(outputPath),
-        ...themePacktemplates,
-        ...themePackStyles,
-        ...themePackComponents
-      ]);
+      await runner.setup(outputPath);
 
       return new Promise(async (resolve) => {
         setTimeout(() => {
@@ -211,8 +190,7 @@ describe('Develop Greenwood With: ', function() {
   after(function() {
     runner.stopCommand();
     runner.teardown([
-      path.join(outputPath, '.greenwood'),
-      path.join(outputPath, 'node_modules')
+      path.join(outputPath, '.greenwood')
     ]);
   });
 
