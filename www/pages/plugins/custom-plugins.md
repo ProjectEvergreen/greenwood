@@ -2,7 +2,7 @@
 label: 'custom-plugins'
 menu: side
 title: 'Custom Plugins'
-index: 1
+index: 2
 ---
 
 ## Custom Plugins

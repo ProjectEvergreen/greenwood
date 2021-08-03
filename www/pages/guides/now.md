@@ -2,7 +2,7 @@
 title: 'Deploy on Now'
 menu: side
 linkheadings: 3
-index: 2
+index: 3
 ---
 
 ## Deploying your site on Now
