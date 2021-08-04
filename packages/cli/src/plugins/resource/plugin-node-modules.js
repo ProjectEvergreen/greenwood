@@ -264,7 +264,7 @@ class NodeModulesResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise((resolve, reject) => {
       try {
-        const { userWorkspace, projectDirectory } = this.compilation.context;
+        const { userWorkspace } = this.compilation.context;
         let newContents = body;
         const hasHead = body.match(/\<head>(.*)<\/head>/s);
 
@@ -280,10 +280,6 @@ class NodeModulesResource extends ResourceInterface {
           : fs.existsSync(`${process.cwd()}/package.json`)
             ? require(path.join(process.cwd(), 'package.json'))
             : {};
-        const esShimsFilename = '/node_modules/es-module-shims/dist/es-module-shims.js';
-        const esShimsPath = fs.existsSync(path.join(projectDirectory, esShimsFilename))
-          ? esShimsFilename
-          : 'https://unpkg.com/es-module-shims@0.5.2/dist/es-module-shims.js';
         
         // walk the project's pacakge.json for all its direct dependencies
         // for each entry found in dependencies, find its entry point
@@ -291,9 +287,10 @@ class NodeModulesResource extends ResourceInterface {
         // and then walk its package.json for transitive dependencies and all those import / exports
         walkPackageJson(userPackageJson);
 
+        // apply import map and shim for users
         newContents = newContents.replace('<head>', `
           <head>
-            <script defer src="${esShimsPath}"></script>
+            <script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>
             <script type="importmap-shim">
               {
                 "imports": ${JSON.stringify(importMap, null, 1)}

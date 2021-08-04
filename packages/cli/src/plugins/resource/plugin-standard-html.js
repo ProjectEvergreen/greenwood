@@ -197,16 +197,12 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
   return appTemplateContents;
 };
 
-const getUserScripts = (contents, projectDirectory) => {
+const getUserScripts = (contents) => {
+  // polyfill chromium for WCs support
   if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
-    const wcBundleFilename = '/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js';
-    const wcBundlePath = fs.existsSync(path.join(projectDirectory, wcBundleFilename))
-      ? wcBundleFilename
-      : 'https://unpkg.com/@webcomponents/webcomponentsjs@2.4.4/webcomponents-bundle.js';
-
     contents = contents.replace('<head>', `
       <head>
-        <script src="${wcBundlePath}"></script>
+        <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     `);
   }
   return contents;
@@ -356,8 +352,8 @@ class StandardHtmlResource extends ResourceInterface {
           body = getPageTemplate(barePath, userTemplatesDir, template, contextPlugins);
         }
 
-        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins);
-        body = getUserScripts(body, projectDirectory);
+        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins);  
+        body = getUserScripts(body, customImports);
         body = getMetaContent(normalizedUrl.replace(/\\/g, '/'), config, body);
         
         if (processedMarkdown) {
