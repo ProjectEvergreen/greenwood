@@ -274,7 +274,7 @@ class StandardHtmlResource extends ResourceInterface {
     return new Promise(async (resolve, reject) => {
       try {
         const config = Object.assign({}, this.compilation.config);
-        const { pagesDir, userTemplatesDir, projectDirectory } = this.compilation.context;
+        const { pagesDir, userTemplatesDir } = this.compilation.context;
         const { mode } = this.compilation.config;
         const normalizedUrl = this.getRelativeUserworkspaceUrl(url);
         let customImports;
