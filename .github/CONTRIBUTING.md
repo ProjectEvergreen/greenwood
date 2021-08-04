@@ -159,6 +159,37 @@ To test from a VM, you can
 
 You can disable plugins in _webpack.config.prod.js_ to remove production optimizations for testing purposes.
 
+## npx Testing
+[`npx`](https://www.npmjs.com/package/npx) is a useful CLI utitlity bundled with NodeJS that allows users to run npm packages globally but without having to install them.
+
+```sh
+% npx http-server
+Starting up http-server, serving ./public
+Available on:
+  http://127.0.0.1:8080
+  http://192.168.1.153:8080
+Hit CTRL-C to stop the server
+```
+
+It's featured on the Greenwood website [home page](https://www.greenwoodjs.io/) and in the [Quick Start guide](https://www.greenwoodjs.io/getting-started/quick-start/#command-line) as an option for using Greenwood.  There is a [spec for it](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/test/cases/build.default.quick-start-npx) to try and simulate running it.
+
+You can use it for local development with Greenwood by using [npm link](https://docs.npmjs.com/cli/v7/commands/npm-link) to make `greenwood` available to your local CLI.
+```sh
+# From the root of the Greenwood repo
+$ npm link
+
+# then say in a test case folder
+$ cd packages/cli/test/cases/build.default.quick-start-npx
+$ npx greenwood
+-------------------------------------------------------
+Welcome to Greenwood (v0.14.1) ♻️
+-------------------------------------------------------
+Running Greenwood with the  command.
+
+          Error: not able to detect command. try using the --help flag if
+          you're encountering issues running Greenwood.  Visit our docs for more
+          info at https://www.greenwoodjs.io/docs/.
+```
 
 ## Docker
 A Docker container is available within the project to use as a development environment if you like.  It is configured to use the same image that runs as part of the project's [Continuous Integration environment](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/ci.yml#L9).
