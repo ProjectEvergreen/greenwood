@@ -14,8 +14,10 @@
  * User Workspace
  * Greenwood default (src/)
  */
+const expect = require('chai').expect;
 const path = require('path');
 const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
+const request = require('request');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const Runner = require('gallinago').Runner;
 
@@ -48,6 +50,42 @@ describe('Serve Greenwood With: ', function() {
     });
 
     runSmokeTest(['serve'], LABEL);
+
+    // proxies to analogstudios.net/api/events vis greenwood.config.js
+    // ideally should find something else to avoid using something "live" in our tests
+    describe('Serve command with dev proxy', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/api/albums?artistId=2`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = JSON.parse(body);
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('application/json');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(response.body).to.have.lengthOf(1);
+        done();
+      });
+    });
   });
 
   after(function() {
