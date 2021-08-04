@@ -25,12 +25,11 @@ function getCustomPageTemplates(contextPlugins, templateName) {
     });
 }
 
-const getPageTemplate = (barePath, workspace, template, contextPlugins = []) => {
-  const templatesDir = path.join(workspace, 'templates');
+const getPageTemplate = (barePath, templatesDir, template, contextPlugins = []) => {
   const pageIsHtmlPath = `${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.html`;
   const customPluginDefaultPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
   const customPluginPageTemplates = getCustomPageTemplates(contextPlugins, template);
-  
+
   if (template && customPluginPageTemplates.length > 0 || fs.existsSync(`${templatesDir}/${template}.html`)) {
     // use a custom template, usually from markdown frontmatter
     contents = customPluginPageTemplates.length > 0
@@ -56,12 +55,12 @@ const getPageTemplate = (barePath, workspace, template, contextPlugins = []) => 
   return contents;
 };
 
-const getAppTemplate = (contents, userWorkspace, customImports = [], contextPlugins) => {
+const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugins) => {
   function sliceTemplate(template, pos, needle, replacer) {
     return template.slice(0, pos) + template.slice(pos).replace(needle, replacer);
   }
   
-  const userAppTemplatePath = `${userWorkspace}/templates/app.html`;
+  const userAppTemplatePath = `${templatesDir}app.html`;
   const customAppTemplates = getCustomPageTemplates(contextPlugins, 'app');
 
   let appTemplateContents = customAppTemplates.length > 0
@@ -264,11 +263,11 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    const { userWorkspace } = this.compilation.context;
+    const { pagesDir } = this.compilation.context;
     const relativeUrl = this.getRelativeUserworkspaceUrl(url);
     const barePath = relativeUrl.endsWith(path.sep)
-      ? `${userWorkspace}${path.sep}pages${relativeUrl}index`
-      : `${userWorkspace}${path.sep}pages${relativeUrl.replace('.html', '')}`;
+      ? `${pagesDir}${relativeUrl}index`
+      : `${pagesDir}${relativeUrl.replace('.html', '')}`;
     
     return Promise.resolve(this.extensions.indexOf(path.extname(relativeUrl)) >= 0 || path.extname(relativeUrl) === '') && 
     (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index')
@@ -279,7 +278,7 @@ class StandardHtmlResource extends ResourceInterface {
     return new Promise(async (resolve, reject) => {
       try {
         const config = Object.assign({}, this.compilation.config);
-        const { userWorkspace, projectDirectory } = this.compilation.context;
+        const { pagesDir, userTemplatesDir, projectDirectory } = this.compilation.context;
         const { mode } = this.compilation.config;
         const normalizedUrl = this.getRelativeUserworkspaceUrl(url);
         let customImports;
@@ -288,8 +287,8 @@ class StandardHtmlResource extends ResourceInterface {
         let template = null;
         let processedMarkdown = null;
         const barePath = normalizedUrl.endsWith(path.sep)
-          ? `${userWorkspace}${path.sep}pages${normalizedUrl}index`
-          : `${userWorkspace}${path.sep}pages${normalizedUrl.replace('.html', '')}`;
+          ? `${pagesDir}${normalizedUrl}index`
+          : `${pagesDir}${normalizedUrl.replace('.html', '')}`;
         const isMarkdownContent = fs.existsSync(`${barePath}.md`)
           || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
           || fs.existsSync(`${barePath.replace(`${path.sep}index`, '.md')}`);
@@ -299,7 +298,7 @@ class StandardHtmlResource extends ResourceInterface {
             ? `${barePath}.md`
             : fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
               ? `${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`
-              : `${userWorkspace}${path.sep}pages${url.replace(`${path.sep}index.html`, '.md')}`;
+              : `${pagesDir}${url.replace(`${path.sep}index.html`, '.md')}`;
           const markdownContents = await fs.promises.readFile(markdownPath, 'utf-8');
           const rehypePlugins = [];
           const remarkPlugins = [];
@@ -350,14 +349,14 @@ class StandardHtmlResource extends ResourceInterface {
         }).map((plugin) => {
           return plugin.provider(this.compilation);
         });
-      
+
         if (mode === 'spa') {
           body = fs.readFileSync(this.compilation.graph[0].path, 'utf-8');
         } else {
-          body = getPageTemplate(barePath, userWorkspace, template, contextPlugins);
+          body = getPageTemplate(barePath, userTemplatesDir, template, contextPlugins);
         }
 
-        body = getAppTemplate(body, userWorkspace, customImports, contextPlugins);  
+        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins);
         body = getUserScripts(body, projectDirectory);
         body = getMetaContent(normalizedUrl.replace(/\\/g, '/'), config, body);
         
