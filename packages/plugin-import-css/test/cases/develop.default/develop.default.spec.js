@@ -86,7 +86,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return an ECMASCript module', function(done) {
-        expect(response.body.replace('\n', '')).to.equal('const css = "* {   color: blue; }";export default css;');
+        expect(response.body.replace('\n', '')).to.equal('const css = "* {   color: blue;   background-image: url(\\"/assets/background.jpg\\"); }";export default css;');
         done();
       });
     });
