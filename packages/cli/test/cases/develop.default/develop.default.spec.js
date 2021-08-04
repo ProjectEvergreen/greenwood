@@ -520,7 +520,7 @@ describe('Develop Greenwood With: ', function() {
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/api/events`, (err, res, body) => {
+          request.get(`${hostname}:${port}/api/albums?artistId=2`, (err, res, body) => {
             if (err) {
               reject();
             }
@@ -544,7 +544,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.have.lengthOf.at.least(0);
+        expect(response.body).to.have.lengthOf(1);
         done();
       });
     });
