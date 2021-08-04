@@ -196,7 +196,7 @@ When it comes to publishing, it should be fairly straightforward, you'll just wa
         "dist/"
       ],
       "scripts": {
-        "prepbulish": "rm -rf dist/ && mdkir dist/ && cd src/ && cp -rv templates ../dist && cp -rv pages ../dist"
+        "prepublish": "rm -rf dist/ && mkdir dist/ && cd src/ && cp -rv templates ../dist && cp -rv pages ../dist"
       }
     }
     ```
