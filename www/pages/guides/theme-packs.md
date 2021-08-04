@@ -144,7 +144,7 @@ module.exports = () => [{
 }];
 ```
 
-And our final _greenwood.config.js_ would look like this
+And our final _greenwood.config.js_ would look like this, which add a "one-off" [resource plugin](/plugins/resource/) to tell Greenwood to route requests to your theme pack files from their _node_modules_ path to the source directory of your repository for development.
 ```js
 // shared from another test
 const myThemePackPlugin = require('./my-theme-pack');
