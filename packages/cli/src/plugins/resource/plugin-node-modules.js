@@ -210,7 +210,9 @@ class NodeModulesResource extends ResourceInterface {
     const isAbsoluteNodeModulesFile = fs.existsSync(path.join(projectDirectory, url));
     const nodeModulesUrl = isAbsoluteNodeModulesFile
       ? path.join(projectDirectory, url)
-      : path.join(projectDirectory, this.resolveRelativeUrl(projectDirectory, url));
+      : this.resolveRelativeUrl(projectDirectory, url)
+        ? path.join(projectDirectory, this.resolveRelativeUrl(projectDirectory, url))
+        : url;
 
     return Promise.resolve(nodeModulesUrl);
   }

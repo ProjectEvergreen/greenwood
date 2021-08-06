@@ -38,7 +38,9 @@ const defaultConfig = {
   meta: [],
   plugins: greenwoodPlugins,
   markdown: { plugins: [], settings: {} },
-  prerender: true
+  prerender: true,
+  pagesDirectory: 'pages',
+  templatesDirectory: 'templates'
 };
 
 module.exports = readAndMergeConfig = async() => {
@@ -50,7 +52,7 @@ module.exports = readAndMergeConfig = async() => {
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
-        const { workspace, devServer, title, markdown, meta, mode, optimization, plugins, prerender } = userCfgFile;
+        const { workspace, devServer, title, markdown, meta, mode, optimization, plugins, prerender, pagesDirectory, templatesDirectory } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -101,7 +103,7 @@ module.exports = readAndMergeConfig = async() => {
         }
 
         if (plugins && plugins.length > 0) {
-          const types = ['resource', 'rollup', 'server'];
+          const types = ['context', 'resource', 'rollup', 'server'];
 
           plugins.forEach(plugin => {
             if (!plugin.type || types.indexOf(plugin.type) < 0) {
@@ -164,6 +166,18 @@ module.exports = readAndMergeConfig = async() => {
         // SPA should _not_ prerender if user has specified prerender should be true
         if (prerender === undefined && mode === 'spa') {
           customConfig.prerender = false;
+        }
+
+        if (pagesDirectory && typeof pagesDirectory === 'string') {
+          customConfig.pagesDirectory = pagesDirectory;
+        } else if (pagesDirectory) {
+          reject(`Error: provided pagesDirectory "${pagesDirectory}" is not supported.  Please make sure to pass something like 'docs/'`);
+        }
+
+        if (templatesDirectory && typeof templatesDirectory === 'string') {
+          customConfig.templatesDirectory = templatesDirectory;
+        } else if (templatesDirectory) {
+          reject(`Error: provided templatesDirectory "${templatesDirectory}" is not supported.  Please make sure to pass something like 'layouts/'`);
         }
       }
 
