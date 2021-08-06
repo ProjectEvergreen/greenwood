@@ -7,7 +7,7 @@ index: 2
 
 ## Creating a Theme Pack
 
-Introduced as a concept in the [Context Plugin docs](/plugins/context/), a theme pack is what Greenwood uses to refer to a plugin that aims to provide a set of reasuale templates, pages and more to a user (think of [**CSS Zen Garden**](http://www.csszengarden.com/)).  A good example (and the one used in this guide!) is greenwood-starter-presentation, which provides the starting point for creating a slide deck entirely from markdown, using Greenwood!
+Introduced as a concept in the [Context Plugin docs](/plugins/context/), a theme pack is what Greenwood uses to refer to a plugin that aims to provide a set of reasuale templates, pages and more to a user (think of [**CSS Zen Garden**](http://www.csszengarden.com/)).  A good example (and the one used in this guide!) is [greenwood-starter-presentation](https://github.com/thescientist13/greenwood-starter-presentation), which provides the starting point for creating a slide deck entirely from markdown, using Greenwood!
 
 > _Support for pages [coming soon](https://github.com/ProjectEvergreen/greenwood/issues/681)_!
 
