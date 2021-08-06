@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with a bad value for the type of a plugin.
+ * Run Greenwood build command with a bad value for pagesDirectory in a custom config.
  *
  * User Result
  * Should throw an error.
@@ -10,18 +10,12 @@
  *
  * User Config
  * {
- *   plugins: [{
- *     type: 'indexxxx',
- *     name: 'plugin-something',
- *     provider: function() { }
- *  }]
+ *   pagesDirectory: {}
  * }
  *
  * User Workspace
- * Greenwood default (src/)
- *
+ * Greenwood default
  */
-
 const expect = require('chai').expect;
 const path = require('path');
 const Runner = require('gallinago').Runner;
@@ -38,13 +32,13 @@ describe('Build Greenwood With: ', function() {
     runner = new Runner();
   });
 
-  describe('Custom Configuration with a bad value for plugin type', function() {
-    it('should throw an error that plugin.type is not a valid value', async function() {
+  describe('Custom Configuration with a bad value for pagesDirectory', function() {
+    it('should throw an error that pagesDirectory must be a string', async function() {
       try {
         await runner.setup(outputPath);
         await runner.runCommand(cliPath, 'build');
       } catch (err) {
-        expect(err).to.contain('Error: greenwood.config.js plugins must be one of type "context, resource, rollup, server". got "indexxx" instead.');
+        expect(err).to.contain('Error: provided pagesDirectory "[object Object]" is not supported.  Please make sure to pass something like \'docs/\'');
       }
     });
   });
