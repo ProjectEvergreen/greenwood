@@ -40,6 +40,6 @@ class DevProxyResource extends ResourceInterface {
 
 module.exports = {
   type: 'resource',
-  name: 'plugin-dev-server',
+  name: 'plugin-dev-proxy',
   provider: (compilation, options) => new DevProxyResource(compilation, options)
 };
