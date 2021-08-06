@@ -478,6 +478,42 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
+    // if things work correctly, this workspace file should never resolve for the equivalent node_modules file
+    // https://github.com/ProjectEvergreen/greenwood/pull/687
+    describe('Develop command specific workspace resolution when matching node_modules', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}:${port}/lit-html.js`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal('text/javascript');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(response.body).to.equal('console.debug(\'its just a prank bro!\');');
+        done();
+      });
+    });
+
     // need some better 404 handling here (promise reject handling for assets and routes)
     describe('Develop command with default 404 behavior', function() {
       let response = {};
