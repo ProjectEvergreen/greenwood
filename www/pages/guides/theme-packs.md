@@ -146,7 +146,6 @@ module.exports = () => [{
 
 And our final _greenwood.config.js_ would look like this, which add a "one-off" [resource plugin](/plugins/resource/) to tell Greenwood to route requests to your theme pack files from their _node_modules_ path to the source directory of your repository for development.
 ```js
-// shared from another test
 const myThemePackPlugin = require('./my-theme-pack');
 const packageName = require('./package.json').name;
 const path = require('path');
@@ -163,7 +162,7 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
   }
 
   async resolve(url) {
-    return Promise.resolve(url.replace(`/node_modules/${packageName}/dist/`, path.join(process.cwd(), '/src/')));
+    return Promise.resolve(this.getBareUrlPath(url).replace(`/node_modules/${packageName}/dist/`, path.join(process.cwd(), '/src/')));
   }
 }
 
@@ -196,7 +195,7 @@ When it comes to publishing, it should be fairly straightforward, you'll just wa
         "dist/"
       ],
       "scripts": {
-        "prepublish": "rm -rf dist/ && mkdir dist/ && cd src/ && cp -rv templates ../dist && cp -rv pages ../dist"
+        "prepublish": "rm -rf dist/ && mkdir dist/ && cd src/ && cp -rv templates ../dist"
       }
     }
     ```
@@ -210,7 +209,6 @@ With the above in place the package published, user's would just need to do the 
     ```
 1. Add the plugin to their _greenwood.config.js_ 
     ```js
-    // shared with another test develop.plugins.context
     const myThemePackPlugin = require('my-theme-pack');
 
     module.exports = {
