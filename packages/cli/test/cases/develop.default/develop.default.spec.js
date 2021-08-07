@@ -82,6 +82,14 @@ describe('Develop Greenwood With: ', function() {
         `${process.cwd()}/node_modules/lit-html/lit-html.js.map`,
         `${outputPath}/node_modules/lit-html/`
       );
+      const simpleCss = await getDependencyFiles(
+        `${process.cwd()}/node_modules/simpledotcss/simple.css`,
+        `${outputPath}/node_modules/simpledotcss/`
+      );
+      const simpleCssPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/simpledotcss/package.json`,
+        `${outputPath}/node_modules/simpledotcss/`
+      );
 
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
@@ -91,7 +99,9 @@ describe('Develop Greenwood With: ', function() {
         ...litHtmlPackageJson,
         ...litHtml,
         ...litHtmlLibs,
-        ...litHtmlSourceMap
+        ...litHtmlSourceMap,
+        ...simpleCss,
+        ...simpleCssPackageJson
       ]);
 
       return new Promise(async (resolve) => {
@@ -444,12 +454,12 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command specific node modules resolution behavior', function() {
+    describe('Develop command specific node modules resolution behavior for JS with query string', function() {
       let response = {};
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/node_modules/lit-html/lit-html.js`, (err, res, body) => {
+          request.get(`${hostname}:${port}/node_modules/lit-html/lit-html.js?type=xyz`, (err, res, body) => {
             if (err) {
               reject();
             }
@@ -478,7 +488,43 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
-    // if things work correctly, this workspace file should never resolve for the equivalent node_modules file
+    describe('Develop command specific node modules resolution behavior for CSS with query string', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get({
+            url: `http://127.0.0.1:${port}/node_modules/simpledotcss/simple.css?xyz=123`
+          }, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal('text/css');
+        done();
+      });
+
+      it('should correctly return CSS from the developers local files', function(done) {
+        expect(response.body).to.contain('/* Set the global variables for everything. Change these to use your own fonts/colours. */');
+        done();
+      });
+    });
+
+    // if things work correctly, this workspace file should never resolve to the equivalent node_modules file
     // https://github.com/ProjectEvergreen/greenwood/pull/687
     describe('Develop command specific workspace resolution when matching node_modules', function() {
       let response = {};
