@@ -17,7 +17,6 @@
  *
  */
 const expect = require('chai').expect;
-const { JSDOM } = require('jsdom');
 const path = require('path');
 const request = require('request');
 const Runner = require('gallinago').Runner;
@@ -67,8 +66,8 @@ describe('Develop Greenwood With: ', function() {
             }
 
             response = res;
-            
-            dom = new JSDOM(body);
+            response.body = body;
+
             resolve();
           });
         });
@@ -86,7 +85,8 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return an ECMASCript module', function(done) {
-        expect(response.body.replace('\n', '')).to.equal('const css = "* {   color: blue;   background-image: url(\\"/assets/background.jpg\\"); }";export default css;');
+        expect(response.body.replace('\n', ''))
+          .to.equal('const css = `* {   color: \\\'blue\\\';   background-image: url("/assets/background.jpg");   content: \\"\\";   font-family: \'Arial\' }`;export default css;');
         done();
       });
     });

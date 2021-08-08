@@ -30,7 +30,7 @@ class ImportCssResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise(async (resolve, reject) => {
       try {
-        const cssInJsBody = `const css = "${body.replace(/\r?\n|\r/g, ' ').replace(/"/g, '\\"')}";\nexport default css;`;
+        const cssInJsBody = `const css = \`${body.replace(/\r?\n|\r/g, ' ')}\`;\nexport default css;`;
         
         resolve({
           body: cssInJsBody,

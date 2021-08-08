@@ -1,4 +1,6 @@
 * {
-  color: blue;
+  color: \'blue\';
   background-image: url("/assets/background.jpg");
+  content: \"\";
+  font-family: 'Arial'
 }
