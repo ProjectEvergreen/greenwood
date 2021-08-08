@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-babel",
-  "version": "0.15.0",
+  "version": "0.15.1",
   "description": "A Greenwood plugin for using Babel and applying it to your JavaScript.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-babel",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -34,6 +34,6 @@
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/plugin-proposal-private-methods": "^7.10.4",
     "@babel/runtime": "^7.10.4",
-    "@greenwood/cli": "^0.15.0"
+    "@greenwood/cli": "^0.15.1"
   }
 }
