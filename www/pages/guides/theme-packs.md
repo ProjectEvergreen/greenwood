@@ -11,7 +11,7 @@ Introduced as a concept in the [Context Plugin docs](/plugins/context/), a theme
 
 
 ### Prerequistes
-This guide will walk through the process of setting up Greenwood to support the developing and publishing of your package (theme pack) to **npm*.
+This guide will walk through the process of setting up Greenwood to support the developing and publishing of your package (theme pack) to **npm**.
 
 To try and focus on just the theme pack aspects, this guide assumes a couple things:
 1. You are already familiar with [setting up](/getting-started/) a Greenwood project.
@@ -266,6 +266,38 @@ Error: ENOENT: no such file or directory, open '/Users/owenbuckley/Workspace/git
 
 Although within your theme pack project you can use `yarn develop` to create a theme pack like any other Greenwood project, there are a couple limitations.  Mainly from your theme pack templates you must explicitely reference _node_modules/<pacakge-name>/path/to/asset/_ as the starting prefix, but we are tracking a solution and `yarn develop` should be sufficient to be able to succesfully develop and publish for now.
 
-#### Will there be less development boilerplate in the future for plugin authors?
+#### _Will there be less development boilerplate in the future for plugin authors?_
 
 Yes, we do realize this current workflow is a bit clunky at the moment, so please follow [this discussion](https://github.com/ProjectEvergreen/greenwood/discussions/682) for ways we can try and make this more elegant!  🙏🏻
+
+
+#### Why can't I just use relative paths in my templates to help avoid the boilerplate?
+
+ex.
+```html
+<html>
+
+  <!-- we're using the npm publishing paths here which will come up again in the development section -->
+
+  <head>
+    <!-- reference JS or assets/ too! -->
+    <link rel="stylesheet" href="../styles/theme.css">
+  </head>
+
+  <body>
+    ...
+  </body>
+
+</html>
+```
+
+Good question!  We tried that approach initially as it would help alleivate the open issues and needing to work around local development vs published development identified above, but the issue that was faced was that relative paths like the above [don't preserve their location / context on disk](https://github.com/ProjectEvergreen/greenwood/issues/689#issuecomment-895519561) when coming through the development server
+```html
+# with explicit path that includes node_modules (is exactly the same)
+url -> /node_modules/my-theme-pack/dist/styles/theme.css
+
+# with relative paths
+url -> < pagesDir >/styles/theme.css
+```
+
+And so at this time Greenwood only looks in the user's workspace, not in _node_modules) and so it will `404`.
