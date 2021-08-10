@@ -11,7 +11,7 @@ Introduced as a concept in the [Context Plugin docs](/plugins/context/), a theme
 
 
 ### Prerequistes
-This guide will walk through the process of setting up Greenwood to support the developing and publishing of your package (theme pack) to npm.
+This guide will walk through the process of setting up Greenwood to support the developing and publishing of your package (theme pack) to **npm*.
 
 To try and focus on just the theme pack aspects, this guide assumes a couple things:
 1. You are already familiar with [setting up](/getting-started/) a Greenwood project.
@@ -24,14 +24,14 @@ We encourage using Greenwood to develop your theme pack mainly so that you can e
 For the sake of development, you can create as much as you need to recreate a user workspace and to simulate what your theme pack would look like.  Think of it like creating a [Storybook](https://storybook.js.org/) for your theme pack.
 
 
-For this guide, we will be publishing _templates/_ and _styles/_ to npm.  The _pages/_ diretory is just being used  to pull in the template for local development and testing purposes for the plugin author.
+For this guide, we will be publishing _layouts/_ (templates) and _styles/_ to **npm**.  The _pages/_ diretory is just being used to pull in the template for local development and testing purposes for you as the plugin author.
 ```shell
 src/
   pages/
     index.md
   styles/
     theme.css
-  templates/
+  layouts/
     blog-post.html
 package.json
 my-theme-pack.js
@@ -61,14 +61,14 @@ module.exports = () => [{
   provider: () => {
     return {
       templates: [
-        path.join(__dirname, 'dist/templates')
+        path.join(__dirname, 'dist/layouts')
       ]
     };
   }
 }];
 ```
 
-_blog-post.html_
+_src/layouts/blog-post.html_
 ```html
 <html>
 
@@ -88,14 +88,14 @@ _blog-post.html_
 </html>
 ```
 
-_theme.css_
+_src/styles/theme.css_
 ```css
 * {
   color: red
 }
 ```
 
-_index.md_
+_src/pages/index.md_
 ```md
 ---
 template: 'blog-post'
@@ -106,14 +106,40 @@ template: 'blog-post'
 Lorum Ipsum, this is a test.
 ```
 
-You should then be able to run `yarn develop` and load `/` in your browser and the color of the text should be red.
-
-You're all ready for development! 🙌
-
 ### Development
 
-The main consideration needed for development is that your files won't be in _node_modules_, which is what the case would be for users when you publish.  So for that reason, we need to add a little boilerplate to the _greenwood.config.js_ in your project to add a "one-off" [resource plugin](/plugins/resource/) to tell Greenwood to resolve requests to your theme pack files to the directory in your project you're using for development.
+The main consideration needed for development is that your files won't be in _node_modules_, which is what the case would be for users when you publish.  So for that reason, we need to add a little boilerplate to _my-theme-pack.js_.  There might be others way to solve it, but for right now, accepting a "developer only" flag can easily make the plugin pivot into local or "published" modes.
+
+1. If the flag _is_ passed, then use `__dirname` (which would resolve to somewhere inside _node_modules_) as the base path
+1. If the flag _is not_ installed (like we want for local development) then you can use use whatever location you have defined in your repository.  Most common would just be to use `process.cwd`
+
+So using our current example, our final _my-theme-pack.js_ would look like this:
 ```js
+const path = require('path');
+
+module.exports = () => [{
+  type: 'context',
+  name: 'my-theme-pack:context',
+  provider: (options = {}) => {
+    // you can use other directory names besides templates/ this way!
+    const templateLocation = options.__isDevelopment
+      ? path.join(process.cwd(), 'src/layouts')
+      : path.join(__dirname, 'dist/layouts');
+
+    return {
+      templates: [
+        templateLocation
+      ]
+    };
+  }
+}];
+```
+
+And our final _greenwood.config.js_ would look like this, which add a "one-off" [resource plugin](/plugins/resource/) to tell Greenwood to route requests to your theme pack files away from _node_modules+ and to the location of your projects files for development.  
+
+Additionally, we make sure to pass the flag from above for `__isDevelopment` to our plugin.
+```js
+// shared from another test
 const myThemePackPlugin = require('./my-theme-pack');
 const packageName = require('./package.json').name;
 const path = require('path');
@@ -130,13 +156,15 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
   }
 
   async resolve(url) {
-    return Promise.resolve(this.getBareUrlPath(url).replace(`/node_modules/${packageName}/dist/`, path.join(process.cwd(), '/src/')));
+    return Promise.resolve(url.replace(`/node_modules/${packageName}/dist/`, path.join(process.cwd(), '/src/')));
   }
 }
 
 module.exports = {
   plugins: [
-    ...myThemePackPlugin(),
+    ...myThemePackPlugin({
+      __isDevelopment: true
+    }),
     {
       type: 'resource',
       name: 'my-theme-pack:resource',
@@ -146,7 +174,9 @@ module.exports = {
 };
 ```
 
-> _We realize this current workflow is a bit clunky at the moment, so please follow [this discussion](https://github.com/ProjectEvergreen/greenwood/discussions/682) for ways we can try and make this more elegant!_  🙏🏻
+You should then be able to run `yarn develop` and load `/` in your browser and the color of the text should be red.
+
+You're all ready for development now! 🙌
 
 
 ### Publishing
@@ -235,3 +265,7 @@ Error: ENOENT: no such file or directory, open '/Users/owenbuckley/Workspace/git
 ```
 
 Although within your theme pack project you can use `yarn develop` to create a theme pack like any other Greenwood project, there are a couple limitations.  Mainly from your theme pack templates you must explicitely reference _node_modules/<pacakge-name>/path/to/asset/_ as the starting prefix, but we are tracking a solution and `yarn develop` should be sufficient to be able to succesfully develop and publish for now.
+
+#### Will there be less development boilerplate in the future for plugin authors?
+
+Yes, we do realize this current workflow is a bit clunky at the moment, so please follow [this discussion](https://github.com/ProjectEvergreen/greenwood/discussions/682) for ways we can try and make this more elegant!  🙏🏻
