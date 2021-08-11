@@ -2,7 +2,7 @@
 title: 'Firebase Deployment'
 menu: side
 linkheadings: 3
-index: 4
+index: 5
 ---
 
 ### Deploy on Firebase

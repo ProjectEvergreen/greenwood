@@ -2,7 +2,7 @@
 title: 'AWS S3 & CloudFront Deployment'
 menu: side
 linkheadings: 3
-index: 6
+index: 7
 ---
 
 ## Deployment from AWS S3 & CloudFront
