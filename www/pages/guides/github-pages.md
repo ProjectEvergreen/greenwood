@@ -82,7 +82,8 @@ If all was succesful, you should now see a [`gh-pages` branch](https://github.co
 
 
 Now, configure your repository by going to your [repo's _Settings -> Pages_](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) and make the following changes.
-
+1. Set the source branch to **gh-pages**
+1. Set path to be **/root**
 ![github pages branch](/assets/repo-github-pages-config.png)
 
 ### Next Steps
