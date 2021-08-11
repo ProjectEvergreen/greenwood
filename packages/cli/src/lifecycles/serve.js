@@ -33,11 +33,10 @@ function getDevServer(compilation) {
   app.use(async (ctx, next) => {
     ctx.url = await resources.reduce(async (responsePromise, resource) => {
       const response = await responsePromise;
-      const { url } = ctx;
-      const resourceShouldResolveUrl = await resource.shouldResolve(url);
+      const resourceShouldResolveUrl = await resource.shouldResolve(response);
       
       return resourceShouldResolveUrl
-        ? resource.resolve(url)
+        ? resource.resolve(response)
         : Promise.resolve(response);
     }, Promise.resolve(ctx.url));
 
