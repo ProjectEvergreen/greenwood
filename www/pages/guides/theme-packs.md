@@ -9,6 +9,7 @@ index: 2
 
 Introduced as a concept in the [Context Plugin docs](/plugins/context/), a theme pack is what Greenwood uses to refer to a plugin that aims to provide a set of reasuale templates, pages and more to a user (think of [**CSS Zen Garden**](http://www.csszengarden.com/)).  A good example (and the one this guide is based on) is [**greenwood-starter-presentation**](https://github.com/thescientist13/greenwood-starter-presentation), which provides the starting point for creating a [slide deck entirely from markdown](https://github.com/thescientist13/knowing-your-tco), using Greenwood!
 
+![greenwood-starter-presentation](/assets/greenwood-starter-presentation.png)
 
 ### Prerequistes
 This guide will walk through the process of setting up Greenwood to support the developing and publishing of your package (theme pack) to **npm**.
@@ -61,6 +62,8 @@ module.exports = () => [{
   provider: () => {
     return {
       templates: [
+        // __dirname will be _node_modules/your-package/_ 
+        // when your plugin is run in a users project
         path.join(__dirname, 'dist/layouts')
       ]
     };
@@ -182,7 +185,7 @@ You're all ready for development now! 🙌
 ### Publishing
 When it comes to publishing, it should be fairly straightforward, and you'll just want to do the following:
 1. Add _dist/_ to _.gitignore_ (or whatever `files` location you want to use for publishing)
-1. Add a `prepublish` script to your _package.json_ to create the _dist/_ directory with all the needed _templates/_ and _styles/_
+1. Add a `prepublish` script to your _package.json_ to create the _dist/_ directory with all the needed _layouts_ (templates) /_ and _styles/_
     ```json
     {
       "name": "my-theme-pack",
@@ -200,7 +203,7 @@ When it comes to publishing, it should be fairly straightforward, and you'll jus
 1. Now, when you run `npm publish` a fresh _dist/_ folder will be made and [included in your package](https://unpkg.com/browse/greenwood-starter-presentation/)
 
 ### Installation and Usage for Users
-With the above in place the package published, you're now ready to share your theme pack with other Greenwood users!
+With the above in place and the package published, you're now ready to share your theme pack with other Greenwood users!
 
 For users, they would just need to do the following:
 
@@ -218,7 +221,7 @@ For users, they would just need to do the following:
       ]
     };
     ```
-1. Then in any of their markdown files, users would just reference the published template's filename
+1. Then in any of their markdown files, users would just need to reference the published template's filename
     ```md
     ---
     template: 'blog-post'
@@ -233,11 +236,6 @@ Success! 🥳
 
 
 ### FAQ
-
-#### _Can I include pages as part of a theme pack?_
-
-Support for [including pages as part of a theme pack](https://github.com/ProjectEvergreen/greenwood/issues/681) is planned and coming soon, pretty much as soon as we can support [external data sources](https://github.com/ProjectEvergreen/greenwood/issues/21) in the CLI.
-
 
 #### _I'm getting an (Rollup) error when trying to build or test my theme pack for production_
 If you try and run `yarn build` or `yarn serve` in a repo where you are creating the theme pack, as per the guide here, you may see this error if you reference assets like `<script>`, `<link>`, etc in your templates.  ex:
@@ -265,6 +263,12 @@ Error: ENOENT: no such file or directory, open '/Users/owenbuckley/Workspace/git
 ```
 
 Although within your theme pack project you can use `yarn develop` to create a theme pack like any other Greenwood project, there are a couple limitations.  Mainly from your theme pack templates you must explicitely reference _node_modules/<pacakge-name>/path/to/asset/_ as the starting prefix, but we are tracking a solution and `yarn develop` should be sufficient to be able to succesfully develop and publish for now.
+
+
+#### _Can I include pages as part of a theme pack?_
+
+Support for [including pages as part of a theme pack](https://github.com/ProjectEvergreen/greenwood/issues/681) is planned and coming soon, pretty much as soon as we can support [external data sources](https://github.com/ProjectEvergreen/greenwood/issues/21) in the CLI.
+
 
 #### _Will there be less development boilerplate in the future for plugin authors?_
 
