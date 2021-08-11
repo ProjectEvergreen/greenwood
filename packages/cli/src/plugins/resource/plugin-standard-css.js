@@ -17,12 +17,6 @@ class StandardCssResource extends ResourceInterface {
     this.contentType = 'text/css';
   }
 
-  async shouldServe(url) {
-    const isCssFile = path.extname(url) === this.extensions[0];
-    
-    return Promise.resolve(isCssFile);
-  }
-
   async serve(url) {
     return new Promise(async (resolve, reject) => {
       try {  

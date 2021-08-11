@@ -20,7 +20,7 @@ class UserWorkspaceResource extends ResourceInterface {
     const isAbsoluteWorkspaceFile = fs.existsSync(path.join(userWorkspace, bareUrl));
     const workspaceUrl = isAbsoluteWorkspaceFile
       ? isAbsoluteWorkspaceFile || bareUrl === '/'
-      : this.resolveRelativeUrl(userWorkspace, bareUrl);
+      : url.indexOf('node_modules') < 0 && this.resolveRelativeUrl(userWorkspace, bareUrl);
 
     return Promise.resolve(workspaceUrl);
   }

@@ -2,7 +2,7 @@
 label: 'Rollup'
 menu: side
 title: 'Rollup'
-index: 3
+index: 4
 ---
 
 ## Rollup
@@ -10,7 +10,7 @@ index: 3
 These plugins allow users to tap into the [Rollup](https://rollupjs.org/) configuration that Greenwood uses to build and optimize the static assets (JS / CSS) of your site when running the `build` command.  Simply use the `provider` method to return an array of rollup plugins.  Easy!
 
 ### Example
-Install your favorite rollup plugin(s), then create a simple object to provde those plugins.
+Install your favorite rollup plugin(s), then create a simple object to provide those plugins to Greenwood.
 
 ```javascript
 const bannerRollup = require('rollup-plugin-banner');

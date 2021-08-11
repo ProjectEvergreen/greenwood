@@ -26,7 +26,9 @@ module.exports = {
   optimization: 'default',
   plugins: [],
   title: 'My App',
-  workspace: 'src'  // assumes process.cwd()
+  workspace: 'src', // assumes process.cwd()
+  pagesDirectory: 'pages' // e.g. src/pages
+  templatesDirectory: 'templates' // e.g. src/templates
 };
 ```
 
@@ -160,6 +162,17 @@ Additionally, you can apply overrides on a per `<link>` or `<script>` tag basis 
 
 > _Just be mindful that style encapsulation provided by ShadowDOM (e.g. `:host`) for custom elements will now have their styles inlined in the `<head>` and mixed with all other global styles, and thus may collide and [be suceptible to the cascade](https://github.com/ProjectEvergreen/greenwood/pull/645#issuecomment-873125192) depending on their degree of specificity.  Increasing specificity of selectors or using only global styles will help resolve this._
 
+### Pages Directory
+
+By default the directory Greenwood will use to look for your local content is _pages/_.  It is relative to your [user workspace](/docs/configuration#workspace) setting. (`${userWorkspace}/${pagesDirectory}`)
+
+#### Example
+```js
+module.exports = {
+  pagesDirectory: 'docs' // Greenwood will look for pages at src/docs/
+}
+```
+
 ### Prerender
 
 By default, [Greenwood pre-renders](/about/how-it-works/) all your _runtime_ JavaScript (Web Components, GraphQL calls, etc) across all your pages and captures the output as part of the final built HTML output.  This means you can have ["static" components](/docs/configuration/#optimization) that can just render once and generate all their initial HTML at build time.  This aims to provide a fully complete HTML document to the user, so even if JavaScript is disabled or something breaks in their browser, the user gets all the initial content.  And from there, progessive enhancement can take over.
@@ -174,6 +187,17 @@ module.exports = {
 ```
 
 > _**As of now, if you are using [plugin-graphql](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql) you cannot change this setting.**  We are working on improving support for server [side rendering and templating](https://github.com/ProjectEvergreen/greenwood/discussions/576) (with Web Components) as part of our [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3)._
+
+### Templates Directory
+
+By default the directory Greenwood will use to look for your templates is _templates/_.  It is relative to your [user workspace](/docs/configuration#workspace) setting. (`${userWorkspace}/${templatesDirectory}`)
+
+#### Example
+```js
+module.exports = {
+  templatesDirectory: 'layouts' // Greenwood will look for templates at src/layouts/
+}
+```
 
 ### Title
 A default `<title>` element for all pages can be configured with the `title` option.
