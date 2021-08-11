@@ -7,7 +7,7 @@ index: 2
 
 ## Deploying your site with GitHub Pages
 
-In this guide we'll walk through the steps for setting up a [GitHub Pages](https://pages.github.com/) for your GitHub repository with GitHub Actions.  With this setup, anytime you push to the designated branch, GitHub will automatically build your project with Greenwood and publish to GitHub Page! to setup automatic publishing to GitHub Pages.
+In this guide we'll walk through the steps for setting up a [GitHub Pages](https://pages.github.com/) for your GitHub repository with GitHub Actions.  With this setup, anytime you push to the designated branch, GitHub will automatically build your project with Greenwood and publish to GitHub Page!
 
 > _As a reference, the **Project Evergreen** [website repository](https://github.com/ProjectEvergreen/projectevergreen.github.io) is configured using this exact setup._
 
