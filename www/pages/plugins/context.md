@@ -17,7 +17,7 @@ Similar in spirit to [**CSS Zen Garden**](http://www.csszengarden.com/)
 At present, Greenwood allows for configuring the following locations as array of (absolute) paths
 - Templates directory - where additional custom page templates can be found
 
-> _Support for pages [coming soon](https://github.com/ProjectEvergreen/greenwood/issues/681)_!
+> _We plan to expand the scope of this as use cases are identified._
 
 ### Templates
 By providing paths to directories of templates, plugin authors can share complete pages, themes, and UI complete with JavaScript and CSS to Greenwood users, and all a user has to do (besides installing the plugin), is specify a template filename in their frontmatter.
@@ -33,7 +33,9 @@ template: 'acme-theme-blog-layout'
 Your plugin might look like this:
 ```js
 /* 
- * Asssumes a (simplified) npm publishing structure like so
+ * For context, when your plugin is installed via npm or Yarn, __dirname will be /path/to/node_modules/  <your-package-name>/
+ *
+ * You can then choose how to organize and publish your files.  In this case, we have published the template under a _dist/_ folder, which was specified in the package.json `files` field.
  * 
  * node_modules/
  *   acme-theme-pack/
@@ -51,6 +53,7 @@ module.exports = () => [{
   provider: () => {
     return {
       templates: [
+        // when the plugin is installed __dirname will be /path/to/node_modules/<your-package>/
         path.join(__dirname, 'dist/layouts')
       ]
     };
