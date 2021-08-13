@@ -11,7 +11,7 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
 
   async shouldResolve(url) {
     // eslint-disable-next-line no-underscore-dangle
-    return Promise.resolve((process.env.__GWD_COMMAND__ === ' develop') && url.indexOf(`/node_modules/${packageName}/`) >= 0);
+    return Promise.resolve(process.env.__GWD_COMMAND__ === 'develop' && url.indexOf(`/node_modules/${packageName}/`) >= 0);
   }
 
   async resolve(url) {

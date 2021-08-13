@@ -33,8 +33,8 @@ const request = require('request');
 const Runner = require('gallinago').Runner;
 const runSmokeTest = require('../../../../../test/smoke-test');
 
-xdescribe('Develop Greenwood With: ', function() {
-  const LABEL = 'Developement environment for a heme Pack';
+describe('Develop Greenwood With: ', function() {
+  const LABEL = 'Developement environment for a Theme Pack';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
   const hostname = 'http://localhost';
@@ -93,26 +93,19 @@ xdescribe('Develop Greenwood With: ', function() {
         done();
       });
 
-      it('should have expected text from from a mock package layout/app.html in node_modules/', function(done) {
+      it('should have expected text from from a mock package layouts/blog-post.html in the users workspace', function(done) {
         const pageTemplateHeading = dom.window.document.querySelectorAll('body h1')[0];
 
-        expect(pageTemplateHeading.textContent).to.be.equal('This is a custom app template from the custom layouts directory.');
-        done();
-      });
-
-      it('should have expected text from from a mock package layout/page.html in node_modules/', function(done) {
-        const pageTemplateHeading = dom.window.document.querySelectorAll('body h2')[0];
-
-        expect(pageTemplateHeading.textContent).to.be.equal('This is a custom (default) page template from the custom layouts directory.');
+        expect(pageTemplateHeading.textContent).to.be.equal('This is the blog post template called from the layouts directory.');
         done();
       });
 
       it('should have expected text from user workspace pages/index.md', function(done) {
-        const pageHeadingPrimary = dom.window.document.querySelectorAll('body h3')[0];
-        const pageHeadingSecondary = dom.window.document.querySelectorAll('body h4')[0];
+        const heading = dom.window.document.querySelectorAll('body h2')[0];
+        const paragraph = dom.window.document.querySelectorAll('body p')[0];
 
-        expect(pageHeadingPrimary.textContent).to.be.equal('Context Plugin Theme Pack Test');
-        expect(pageHeadingSecondary.textContent).to.be.equal('From user workspace pages/index.md');
+        expect(heading.textContent).to.be.equal('Title of blog post');
+        expect(paragraph.textContent).to.be.equal('Lorum Ipsum, this is a test.');
         done();
       });
     });
@@ -149,19 +142,19 @@ xdescribe('Develop Greenwood With: ', function() {
       });
 
       it('should correctly return CSS from the developers local files', function(done) {
-        expect(response.body).to.equal(':root {\n  --color-primary: #135;\n}');
+        expect(response.body).to.equal(':root {\n  --color-primary: #135;\n  --color-secondary: #74b238;\n  --font-family: \'Optima\', sans-serif;\n}');
 
         done();
       });
     });
 
-    describe('Custom Theme Pack internal logic for resolving greeting.js for local development', function() {
+    describe('Custom Theme Pack internal logic for resolving header.js for local development', function() {
       let response = {};
 
       before(async function() {
         return new Promise((resolve, reject) => {
           request.get({
-            url: `http://127.0.0.1:${port}/node_modules/${packageJson.name}/dist/components/greeting.js`
+            url: `http://127.0.0.1:${port}/node_modules/${packageJson.name}/dist/components/header.js`
           }, (err, res, body) => {
             if (err) {
               reject();
@@ -187,7 +180,7 @@ xdescribe('Develop Greenwood With: ', function() {
       });
 
       it('should correctly return JavaScript from the developers local files', function(done) {
-        expect(response.body).to.contain('customElements.define(\'x-greeting\', GreetingComponent);');
+        expect(response.body).to.contain('customElements.define(\'x-header\', HeaderComponent);');
 
         done();
       });

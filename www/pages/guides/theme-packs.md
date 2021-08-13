@@ -123,10 +123,10 @@ const path = require('path');
 module.exports = (options = {}) => [{
   type: 'context',
   name: 'my-theme-pack:context',
-  provider: () => {
+  provider: compilation) => {
     // you can use other directory names besides templates/ this way!
     const templateLocation = options.__isDevelopment
-      ? path.join(process.cwd(), 'src/layouts')
+      ? path.join(compilation.context.userWorkspace, 'layouts')
       : path.join(__dirname, 'dist/layouts');
 
     return {
