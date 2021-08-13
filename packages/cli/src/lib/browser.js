@@ -19,7 +19,6 @@ class BrowserRunner {
 
   async init() {
     this.browser = await puppeteer.launch({
-      headless: true,
       args: ['--no-sandbox']
     });
   }
