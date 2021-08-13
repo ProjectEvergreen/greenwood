@@ -206,7 +206,7 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   async resolve(url) {
-    const packagePathPieces = url.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
+    const packagePathPieces = this.getBareUrlPath(url).split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
     let packageName = packagePathPieces.shift();
     let nodeModulesUrl;
 
@@ -215,22 +215,39 @@ class NodeModulesResource extends ResourceInterface {
       packageName = `${packageName}/${packagePathPieces.shift()}`;
     }
 
-    const packageEntryLocation = require.resolve(packageName).replace(/\\/g, '/'); // force / for consistency and path matching
-    
-    if (packageName.indexOf('@greenwood') === 0) {
-      const subPackage = packageName.split('/')[1];
-      const packageRootPath = packageEntryLocation.indexOf('@greenwood') > 0
-        ? packageEntryLocation.split(packageName)[0] // we are in the user's node modules
-        : packageEntryLocation.split(subPackage)[0]; // else we are in our monorepo
+    // ideally let NodeJS do the look up for us, but in the evant that fails
+    // do our best to resolve the file (helpful for theme pack testing and development) 
+    // (where things are unpublished and routed around)
+    try {
+      const packageEntryLocation = require.resolve(packageName).replace(/\\/g, '/'); // force / for consistency and path matching
 
-      nodeModulesUrl = `${packageRootPath}${subPackage}/${packagePathPieces.join('/')}`;
-    } else {
-      const packageRootPath = packageEntryLocation.split(packageName)[0];
+      if (packageName.indexOf('@greenwood') === 0) {
+        const subPackage = packageName.split('/')[1];
+        const packageRootPath = packageEntryLocation.indexOf('@greenwood') > 0
+          ? packageEntryLocation.split(packageName)[0] // we are in the user's node modules
+          : packageEntryLocation.split(subPackage)[0]; // else we are in our monorepo
 
-      nodeModulesUrl = `${packageRootPath}${packageName}/${packagePathPieces.join('/')}`;
+        nodeModulesUrl = `${packageRootPath}${subPackage}/${packagePathPieces.join('/')}`;
+      } else {
+        const packageRootPath = packageEntryLocation.split(packageName)[0];
+
+        nodeModulesUrl = `${packageRootPath}${packageName}/${packagePathPieces.join('/')}`;
+      }
+
+      return Promise.resolve(nodeModulesUrl);
+    } catch (e) {
+      console.debug('Error looking of package with NodeJS, falling back to default greenwood node_modules resolution');
+      const { projectDirectory } = this.compilation.context;
+      const bareUrl = this.getBareUrlPath(url);
+      const isAbsoluteNodeModulesFile = fs.existsSync(path.join(projectDirectory, bareUrl));
+      const nodeModulesUrl = isAbsoluteNodeModulesFile
+        ? path.join(projectDirectory, bareUrl)
+        : this.resolveRelativeUrl(projectDirectory, bareUrl)
+          ? path.join(projectDirectory, this.resolveRelativeUrl(projectDirectory, bareUrl))
+          : bareUrl;
+
+      return Promise.resolve(nodeModulesUrl);
     }
-    
-    return Promise.resolve(nodeModulesUrl);
   }
 
   async shouldServe(url) {
