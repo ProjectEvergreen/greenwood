@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with a custom context plugin that provides custom templates (app / page) and resources (JS / CSS); aka a "theme pack".
+ * Build with Greenwood when using a custom context plugin (e.g. installed via npm) that provides custom templates (app / page) and resources (JS / CSS); aka a "theme pack".
  *
  * User Result
  * Should generate a bare bones Greenwood build with expected templates being used from node_modules along with JS and CSS.

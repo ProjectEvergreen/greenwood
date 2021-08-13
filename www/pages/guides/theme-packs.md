@@ -120,10 +120,10 @@ So using our current example, our final _my-theme-pack.js_ would look like this:
 ```js
 const path = require('path');
 
-module.exports = () => [{
+module.exports = (options = {}) => [{
   type: 'context',
   name: 'my-theme-pack:context',
-  provider: (options = {}) => {
+  provider: () => {
     // you can use other directory names besides templates/ this way!
     const templateLocation = options.__isDevelopment
       ? path.join(process.cwd(), 'src/layouts')
@@ -138,7 +138,7 @@ module.exports = () => [{
 }];
 ```
 
-And our final _greenwood.config.js_ would look like this, which add a "one-off" [resource plugin](/plugins/resource/) to tell Greenwood to route requests to your theme pack files away from _node_modules+ and to the location of your projects files for development.  
+And our final _greenwood.config.js_ would look like this, which adds a "one-off" [resource plugin](/plugins/resource/) to tell Greenwood to route requests to your theme pack files away from _node_modules+ and to the location of your projects files for development.  
 
 Additionally, we make sure to pass the flag from above for `__isDevelopment` to our plugin.
 ```js
@@ -155,7 +155,7 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
   }
 
   async shouldResolve(url) {
-    return Promise.resolve(url.indexOf(`/node_modules/${packageName}/`) >= 0);
+    return Promise.resolve(process.env.__GWD_COMMAND__ === ' develop' && url.indexOf(`/node_modules/${packageName}/`) >= 0);
   }
 
   async resolve(url) {
@@ -181,6 +181,20 @@ You should then be able to run `yarn develop` and load `/` in your browser and t
 
 You're all ready for development now! 🙌
 
+### Production Testing
+You can also use Greenwood to test your theme pack using a production build so that you can run `greenwood build` or `greenwood serve` to validate your work.  To do so requires just one additional script to your _package.json_ to put your theme pack files in the _node_modules_ where Greenwood would assume them to be.  Just call this before `build` or `serve`.
+```json
+{
+  "scripts": {
+    
+    "build:pre": "mkdir -pv ./node_modules/greenwood-starter-presentation/dist && rsync -rv --exclude 'pages/' ./src/ ./node_modules/greenwood-starter-presentation/dist",
+
+    "build": "npm run build:pre && greenwood build",
+    "serve": "npm run build:pre && greenwood serve"
+    
+  }
+}
+```
 
 ### Publishing
 When it comes to publishing, it should be fairly straightforward, and you'll just want to do the following:

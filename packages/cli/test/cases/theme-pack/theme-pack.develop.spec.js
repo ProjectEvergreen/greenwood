@@ -1,22 +1,29 @@
 /*
  * Use Case
- * Develop with Greenwood when using a custom context plugin (e.g. installed via npm) that provides custom templates (app / page) and resources (JS / CSS); aka a "theme pack".
- *
+ * A theme pack _author_ creating a theme pack and using Greenwood for development and testing
+ * following the guide published on the Greenwood website. (https://www.greenwoodjs.io/guides/theme-packs/)
+ * 
  * User Result
- * Should start development server with expected templates being used from node_modules along with JS and CSS.
- *
+ * Should correctly validate the develop and build / serve commands work correctly using tge expected templates 
+ * being resolved correctly per the known work around needs as documented in the FAQ and tracked in a discussion.
+ * https://github.com/ProjectEvergreen/greenwood/discussions/682
+ * 
  * User Command
  * greenwood develop
  *
  * User Config
  * Mock Theme Pack Plugin (from fixtures)
  *
- * Custom Workspace
+ * Plugin Author Workspace
  * src/
+ *   components/
+ *     header.js
+ *   layouts/
+ *     blog-post.html
  *   pages/
- *     slides/
- *       index.md
  *     index.md
+ *   styles/
+ *     theme.css
  */
 const expect = require('chai').expect;
 const { JSDOM } = require('jsdom');
@@ -26,8 +33,8 @@ const request = require('request');
 const Runner = require('gallinago').Runner;
 const runSmokeTest = require('../../../../../test/smoke-test');
 
-describe('Develop Greenwood With: ', function() {
-  const LABEL = 'Custom Context Plugin and Default Workspace (aka Theme Packs)';
+xdescribe('Develop Greenwood With: ', function() {
+  const LABEL = 'Developement environment for a heme Pack';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
   const hostname = 'http://localhost';
@@ -195,3 +202,4 @@ describe('Develop Greenwood With: ', function() {
   });
 
 });
+
