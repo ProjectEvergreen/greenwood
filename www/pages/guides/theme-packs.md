@@ -155,11 +155,15 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
   }
 
   async shouldResolve(url) {
-    return Promise.resolve(process.env.__GWD_COMMAND__ === 'develop' && url.indexOf(`/node_modules/${packageName}/`) >= 0);
+    // eslint-disable-next-line no-underscore-dangle
+    return Promise.resolve((process.env.__GWD_COMMAND__ === 'develop') && url.indexOf(`/node_modules/${packageName}/`) >= 0);
   }
 
   async resolve(url) {
-    return Promise.resolve(url.replace(`/node_modules/${packageName}/dist/`, path.join(process.cwd(), '/src/')));
+    const { userWorkspace } = this.compilation.context;
+    const filePath = this.getBareUrlPath(url).split(`/node_modules/${packageName}/dist/`)[1];
+
+    return Promise.resolve(path.join(userWorkspace, filePath));
   }
 }
 
