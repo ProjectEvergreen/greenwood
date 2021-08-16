@@ -251,34 +251,6 @@ Success! 🥳
 
 ### FAQ
 
-#### _I'm getting an (Rollup) error when trying to build or test my theme pack for production_
-If you try and run `yarn build` or `yarn serve` in a repo where you are creating the theme pack, as per the guide here, you may see this error if you reference assets like `<script>`, `<link>`, etc in your templates.  ex:
-
-```shell
-prerendering complete for page /slides/7/.
-prerendering complete for page /slides/6/.
-prerendering complete for page /.
-done prerendering all pages
-Error: ENOENT: no such file or directory, open '/Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/greenwood-starter-presentation/dist/components/presenter-mode.js'
-    at Object.openSync (fs.js:476:3)
-    at Object.readFileSync (fs.js:377:35)
-    at /Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/@greenwood/cli/src/config/rollup.config.js:185:35
-    at Array.forEach (<anonymous>)
-    at Object.buildStart (/Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/@greenwood/cli/src/config/rollup.config.js:171:23)
-    at /Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/rollup/dist/shared/rollup.js:18870:25
-    at async Promise.all (index 2)
-    at async rollupInternal (/Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/rollup/dist/shared/rollup.js:20239:9)
-    at async /Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/@greenwood/cli/src/lifecycles/bundle.js:12:24 {
-  errno: -2,
-  syscall: 'open',
-  code: 'ENOENT',
-  path: '/Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/greenwood-starter-presentation/dist/components/presenter-mode.js'
-}
-```
-
-Although within your theme pack project you can use `yarn develop` to create a theme pack like any other Greenwood project, there are a couple limitations.  Mainly from your theme pack templates you must explicitely reference _node_modules/<pacakge-name>/path/to/asset/_ as the starting prefix, but we are tracking a solution and `yarn develop` should be sufficient to be able to succesfully develop and publish for now.
-
-
 #### _Can I include pages as part of a theme pack?_
 
 Support for [including pages as part of a theme pack](https://github.com/ProjectEvergreen/greenwood/issues/681) is planned and coming soon, pretty much as soon as we can support [external data sources](https://github.com/ProjectEvergreen/greenwood/issues/21) in the CLI.
