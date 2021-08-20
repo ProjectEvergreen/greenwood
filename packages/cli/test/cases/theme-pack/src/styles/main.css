@@ -1,0 +1,7 @@
+@import './theme.css';
+
+:root {
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
+  background-color: var(--color-secondary);
+}
