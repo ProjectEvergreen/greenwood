@@ -120,13 +120,13 @@ So using our current example, our final _my-theme-pack.js_ would look like this:
 ```js
 const path = require('path');
 
-module.exports = () => [{
+module.exports = (options = {}) => [{
   type: 'context',
   name: 'my-theme-pack:context',
-  provider: (options = {}) => {
+  provider: compilation) => {
     // you can use other directory names besides templates/ this way!
     const templateLocation = options.__isDevelopment
-      ? path.join(process.cwd(), 'src/layouts')
+      ? path.join(compilation.context.userWorkspace, 'layouts')
       : path.join(__dirname, 'dist/layouts');
 
     return {
@@ -138,7 +138,7 @@ module.exports = () => [{
 }];
 ```
 
-And our final _greenwood.config.js_ would look like this, which add a "one-off" [resource plugin](/plugins/resource/) to tell Greenwood to route requests to your theme pack files away from _node_modules+ and to the location of your projects files for development.  
+And our final _greenwood.config.js_ would look like this, which adds a "one-off" [resource plugin](/plugins/resource/) to tell Greenwood to route requests to your theme pack files away from _node_modules+ and to the location of your projects files for development.  
 
 Additionally, we make sure to pass the flag from above for `__isDevelopment` to our plugin.
 ```js
@@ -155,11 +155,15 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
   }
 
   async shouldResolve(url) {
-    return Promise.resolve(url.indexOf(`/node_modules/${packageName}/`) >= 0);
+    // eslint-disable-next-line no-underscore-dangle
+    return Promise.resolve((process.env.__GWD_COMMAND__ === 'develop') && url.indexOf(`/node_modules/${packageName}/`) >= 0);
   }
 
   async resolve(url) {
-    return Promise.resolve(url.replace(`/node_modules/${packageName}/dist/`, path.join(process.cwd(), '/src/')));
+    const { userWorkspace } = this.compilation.context;
+    const filePath = this.getBareUrlPath(url).split(`/node_modules/${packageName}/dist/`)[1];
+
+    return Promise.resolve(path.join(userWorkspace, filePath));
   }
 }
 
@@ -181,6 +185,20 @@ You should then be able to run `yarn develop` and load `/` in your browser and t
 
 You're all ready for development now! 🙌
 
+### Production Testing
+You can also use Greenwood to test your theme pack using a production build so that you can run `greenwood build` or `greenwood serve` to validate your work.  To do so requires just one additional script to your _package.json_ to put your theme pack files in the _node_modules_ where Greenwood would assume them to be.  Just call this before `build` or `serve`.
+```json
+{
+  "scripts": {
+    
+    "build:pre": "mkdir -pv ./node_modules/greenwood-starter-presentation/dist && rsync -rv --exclude 'pages/' ./src/ ./node_modules/greenwood-starter-presentation/dist",
+
+    "build": "npm run build:pre && greenwood build",
+    "serve": "npm run build:pre && greenwood serve"
+    
+  }
+}
+```
 
 ### Publishing
 When it comes to publishing, it should be fairly straightforward, and you'll just want to do the following:
@@ -236,34 +254,6 @@ Success! 🥳
 
 
 ### FAQ
-
-#### _I'm getting an (Rollup) error when trying to build or test my theme pack for production_
-If you try and run `yarn build` or `yarn serve` in a repo where you are creating the theme pack, as per the guide here, you may see this error if you reference assets like `<script>`, `<link>`, etc in your templates.  ex:
-
-```shell
-prerendering complete for page /slides/7/.
-prerendering complete for page /slides/6/.
-prerendering complete for page /.
-done prerendering all pages
-Error: ENOENT: no such file or directory, open '/Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/greenwood-starter-presentation/dist/components/presenter-mode.js'
-    at Object.openSync (fs.js:476:3)
-    at Object.readFileSync (fs.js:377:35)
-    at /Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/@greenwood/cli/src/config/rollup.config.js:185:35
-    at Array.forEach (<anonymous>)
-    at Object.buildStart (/Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/@greenwood/cli/src/config/rollup.config.js:171:23)
-    at /Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/rollup/dist/shared/rollup.js:18870:25
-    at async Promise.all (index 2)
-    at async rollupInternal (/Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/rollup/dist/shared/rollup.js:20239:9)
-    at async /Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/@greenwood/cli/src/lifecycles/bundle.js:12:24 {
-  errno: -2,
-  syscall: 'open',
-  code: 'ENOENT',
-  path: '/Users/owenbuckley/Workspace/github/repos/greenwood-starter-presentation/node_modules/greenwood-starter-presentation/dist/components/presenter-mode.js'
-}
-```
-
-Although within your theme pack project you can use `yarn develop` to create a theme pack like any other Greenwood project, there are a couple limitations.  Mainly from your theme pack templates you must explicitely reference _node_modules/<pacakge-name>/path/to/asset/_ as the starting prefix, but we are tracking a solution and `yarn develop` should be sufficient to be able to succesfully develop and publish for now.
-
 
 #### _Can I include pages as part of a theme pack?_
 
