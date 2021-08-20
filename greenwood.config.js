@@ -20,7 +20,7 @@ module.exports = {
     { property: 'og:title', content: 'Greenwood' },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: 'https://www.greenwoodjs.io' },
-    { property: 'og:image', content: 'https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png' },
+    { property: 'og:image', content: 'https://www.greenwoodjs.io/assets/greenwood-logo-300w.png' },
     { property: 'og:description', content: META_DESCRIPTION },
     { rel: 'shortcut icon', href: FAVICON_HREF },
     { rel: 'icon', href: FAVICON_HREF },
