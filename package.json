@@ -6,6 +6,7 @@
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "main": "./packages/cli/src/index.js",
+  "type": "module",
   "workspaces": {
     "packages": [
       "packages/*",

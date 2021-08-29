@@ -13,6 +13,4 @@ class ServerInterface {
   }
 }
 
-module.exports = {
-  ServerInterface
-};
+export { ServerInterface };

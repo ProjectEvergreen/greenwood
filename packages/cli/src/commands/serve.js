@@ -1,7 +1,7 @@
-const generateCompilation = require('../lifecycles/compile');
-const { prodServer } = require('../lifecycles/serve');
+import { generateCompilation } from '../lifecycles/compile.js';
+import { prodServer } from '../lifecycles/serve.js';
 
-module.exports = runProdServer = async () => {
+const runProdServer = async () => {
 
   return new Promise(async (resolve, reject) => {
 
@@ -18,3 +18,5 @@ module.exports = runProdServer = async () => {
 
   });
 };
+
+export { runProdServer };

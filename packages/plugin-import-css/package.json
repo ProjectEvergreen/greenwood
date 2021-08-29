@@ -13,6 +13,7 @@
     "Css-in-Js"
   ],
   "main": "src/index.js",
+  "type": "module",
   "files": [
     "src/"
   ],

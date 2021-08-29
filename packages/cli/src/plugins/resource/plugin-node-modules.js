@@ -3,14 +3,14 @@
  * Detects and fully resolves requests to node_modules and handles creating an importMap.
  *
  */
-const acorn = require('acorn');
-const fs = require('fs');
-const path = require('path');
-const { nodeResolve } = require('@rollup/plugin-node-resolve');
-const replace = require('@rollup/plugin-replace');
-const { getNodeModulesLocationForPackage, getPackageNameFromUrl } = require('../../lib/node-modules-utils');
-const { ResourceInterface } = require('../../lib/resource-interface');
-const walk = require('acorn-walk');
+import * as acorn from 'acorn';
+import fs from 'fs';
+import path from 'path';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
+import { getNodeModulesLocationForPackage, getPackageNameFromUrl } from '../../lib/node-modules-utils.js';
+import { ResourceInterface } from '../../lib/resource-interface.js';
+import * as walk from 'acorn-walk';
 
 const importMap = {};
 
@@ -106,7 +106,7 @@ const walkPackageJson = (packageJson = {}) => {
   Object.keys(packageJson.dependencies || {}).forEach(dependency => {
     const dependencyPackageRootPath = path.join(process.cwd(), './node_modules', dependency);
     const dependencyPackageJsonPath = path.join(dependencyPackageRootPath, 'package.json');
-    const dependencyPackageJson = require(dependencyPackageJsonPath);
+    const dependencyPackageJson = JSON.parse(fs.readFileSync(dependencyPackageJsonPath, 'utf-8'));
     const entry = getPackageEntryPath(dependencyPackageJson);
     const isJavascriptPackage = Array.isArray(entry) || typeof entry === 'string' && entry.endsWith('.js') || entry.endsWith('.mjs');
 
@@ -284,9 +284,9 @@ class NodeModulesResource extends ResourceInterface {
         }
 
         const userPackageJson = fs.existsSync(`${userWorkspace}/package.json`)
-          ? require(path.join(userWorkspace, 'package.json')) // its a monorepo?
+          ? JSON.parse(fs.readFileSync(path.join(userWorkspace, 'package.json'), 'utf-8')) // its a monorepo?
           : fs.existsSync(`${process.cwd()}/package.json`)
-            ? require(path.join(process.cwd(), 'package.json'))
+            ? JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8'))
             : {};
         
         // walk the project's pacakge.json for all its direct dependencies
@@ -316,7 +316,7 @@ class NodeModulesResource extends ResourceInterface {
   }
 }
 
-module.exports = [{
+const greenwoodPluginNodeModules = [{
   type: 'resource',
   name: 'plugin-node-modules:resource',
   provider: (compilation, options) => new NodeModulesResource(compilation, options)
@@ -336,3 +336,5 @@ module.exports = [{
     ];
   }
 }];
+
+export { greenwoodPluginNodeModules };

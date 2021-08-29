@@ -3,20 +3,23 @@
  * Enable using PostCSS process for CSS files.
  *
  */
-const fs = require('fs');
-const path = require('path');
-const postcss = require('postcss');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
+import fs from 'fs';
+import path from 'path';
+import postcss from 'postcss';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
-function getConfig (compilation, extendConfig = false) {
+async function getConfig (compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
-  const configFile = 'postcss.config';
-  const defaultConfig = require(path.join(__dirname, configFile));
-  const userConfig = fs.existsSync(path.join(projectDirectory, `${configFile}.js`))
-    ? require(`${projectDirectory}/${configFile}`)
+  const configFile = 'postcss.config.js';
+  const defaultConfig = (await import(new URL(configFile, import.meta.url).pathname)).default; // JSON.parse(fs.readFileSync(new URL(`${configFile}.js`, import.meta.url), 'utf-8'));
+  const userConfig = fs.existsSync(path.join(projectDirectory, `${configFile}`))
+    ? (await import(new URL(configFile, import.meta.url).pathname)).default
     : {};
   let finalConfig = Object.assign({}, userConfig);
   
+  console.debug('defaultConfig', defaultConfig);
+  console.debug('userConfig', userConfig);
+
   if (userConfig && extendConfig) {    
     finalConfig.plugins = Array.isArray(userConfig.plugins)
       ? [...defaultConfig.plugins, ...userConfig.plugins]
@@ -66,11 +69,11 @@ class PostCssResource extends ResourceInterface {
   async optimize(url, body) {
     const { outputDir, userWorkspace } = this.compilation.context;
     const workspaceUrl = url.replace(outputDir, userWorkspace);
-    const config = getConfig(this.compilation, this.options.extendConfig);
+    const config = await getConfig(this.compilation, this.options.extendConfig);
     const plugins = config.plugins || [];
     
     plugins.push(
-      require('cssnano')
+      await import('cssnano')
     );
     
     const css = plugins.length > 0
@@ -81,10 +84,12 @@ class PostCssResource extends ResourceInterface {
   }
 }
 
-module.exports = (options = {}) => {
+const greenwoodPluginPostCss = (options = {}) => {
   return {
     type: 'resource',
     name: 'plugin-postcss',
     provider: (compilation) => new PostCssResource(compilation, options)
   };
 };
+
+export { greenwoodPluginPostCss };

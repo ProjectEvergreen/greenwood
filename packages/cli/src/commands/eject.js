@@ -1,8 +1,8 @@
-const fs = require('fs');
-const generateCompilation = require('../lifecycles/compile');
-const path = require('path');
+import fs from 'fs';
+import { generateCompilation } from '../lifecycles/compile.js';
+import path from 'path';
 
-module.exports = ejectConfiguration = async () => {
+const ejectConfiguration = async () => {
   return new Promise(async (resolve, reject) => {
     try {
       const compilation = await generateCompilation();
@@ -25,3 +25,5 @@ module.exports = ejectConfiguration = async () => {
     }
   });
 };
+
+export { ejectConfiguration };

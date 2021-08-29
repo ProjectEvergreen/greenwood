@@ -4,11 +4,11 @@
  * This is a Greenwood default plugin.
  *
  */
-const fs = require('fs');
-const cssnano = require('cssnano');
-const path = require('path');
-const postcss = require('postcss');
-const { ResourceInterface } = require('../../lib/resource-interface');
+import fs from 'fs';
+import path from 'path';
+import cssnano from 'cssnano';
+import postcss from 'postcss';
+import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardCssResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -53,8 +53,10 @@ class StandardCssResource extends ResourceInterface {
   }
 }
 
-module.exports = {
+const greenwoodPluginStandardCss = {
   type: 'resource',
   name: 'plugin-standard-css',
   provider: (compilation, options) => new StandardCssResource(compilation, options)
 };
+
+export { greenwoodPluginStandardCss };

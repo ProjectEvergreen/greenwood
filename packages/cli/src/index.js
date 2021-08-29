@@ -5,13 +5,17 @@
 // https://github.com/ProjectEvergreen/greenwood/issues/141
 process.setMaxListeners(0);
 
-const program = require('commander');
-const runProductionBuild = require('./commands/build');
-const runDevServer = require('./commands/develop');
-const runProdServer = require('./commands/serve');
-const ejectConfiguration = require('./commands/eject');
-const greenwoodPackageJson = require('../package.json');
+import program from 'commander';
+import fs from 'fs/promises';
+import { URL } from 'url';
 
+import { runDevServer } from './commands/develop.js';
+import { runProductionBuild } from './commands/build.js';
+// const runProdServer = require('./commands/serve');
+// const ejectConfiguration = require('./commands/eject');
+
+// TODO track / watch for improt json support - https://stackoverflow.com/a/62621693/417806
+const greenwoodPackageJson = JSON.parse(await fs.readFile(new URL('../package.json', import.meta.url), 'utf-8'));
 let cmdOption = {};
 let command = '';
 
@@ -78,12 +82,12 @@ const run = async() => {
       case 'serve':
         process.env.__GWD_COMMAND__ = 'build';
         
-        await runProductionBuild();
-        await runProdServer();
+        // await runProductionBuild();
+        // await runProdServer();
 
         break;
       case 'eject':
-        await ejectConfiguration();
+        // await ejectConfiguration();
 
         break;
       default: 

@@ -1,29 +1,25 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // get and "tag" all plugins provided / maintained by the @greenwood/cli
 // and include as the default set, with all user plugins getting appended
-const greenwoodPluginsBasePath = path.join(__dirname, '../', 'plugins');
-const greenwoodPlugins = [
-  path.join(greenwoodPluginsBasePath, 'copy'),
+const greenwoodPluginsBasePath = new URL('../plugins', import.meta.url).pathname;
+const greenwoodPlugins = (await Promise.all([
+  path.join(greenwoodPluginsBasePath, 'copy'),  
   path.join(greenwoodPluginsBasePath, 'resource'),
   path.join(greenwoodPluginsBasePath, 'server')
-].map((pluginDirectory) => {
-  return fs.readdirSync(pluginDirectory)
-    .map((filename) => {
-      const plugin = require(`${pluginDirectory}/${filename}`);
+].map(async (pluginDirectory) => {
+  const files = await fs.promises.readdir(pluginDirectory);
 
-      return Array.isArray(plugin)
-        ? plugin
-        : [plugin];
-    }).flat();
-}).flat()
-  .map((plugin) => {
-    return {
-      isGreenwoodDefaultPlugin: true,
-      ...plugin
-    };
-  });
+  return (await Promise.all(files.map(async(file) => {
+    const pluginImport = await import(`${pluginDirectory}/${file}`);
+    const plugin = pluginImport[Object.keys(pluginImport)[0]];
+
+    return Array.isArray(plugin)
+      ? plugin
+      : [plugin];
+  }))).flat();
+}).flat())).flat();
 
 const modes = ['ssg', 'mpa', 'spa'];
 const optimizations = ['default', 'none', 'static', 'inline'];
@@ -46,7 +42,7 @@ const defaultConfig = {
   templatesDirectory: 'templates'
 };
 
-module.exports = readAndMergeConfig = async() => {
+const readAndMergeConfig = async() => {
   // eslint-disable-next-line complexity
   return new Promise(async (resolve, reject) => {
     try {
@@ -54,7 +50,7 @@ module.exports = readAndMergeConfig = async() => {
       let customConfig = Object.assign({}, defaultConfig);
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
-        const userCfgFile = require(path.join(process.cwd(), 'greenwood.config.js'));
+        const userCfgFile = (await import(path.join(process.cwd(), 'greenwood.config.js'))).default;
         const { workspace, devServer, title, markdown, meta, mode, optimization, plugins, prerender, pagesDirectory, templatesDirectory } = userCfgFile;
 
         // workspace validation
@@ -196,3 +192,5 @@ module.exports = readAndMergeConfig = async() => {
     }
   });
 };
+
+export { readAndMergeConfig };

@@ -1,12 +1,12 @@
 /*
  * 
- * Manages web standard resource related operations for JavaScript.
+ * Manages web standard resource related operations for JSON.
  * This is a Greenwood default plugin.
  *
  */
-const fs = require('fs');
-const pluginRollupJson = require('@rollup/plugin-json');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
+import fs from 'fs';
+import pluginRollupJson from '@rollup/plugin-json';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class ImportJsonResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -38,7 +38,7 @@ class ImportJsonResource extends ResourceInterface {
   }
 }
 
-module.exports = (options = {}) => [{
+const greenwoodPluginImportJson = (options = {}) => [{
   type: 'resource',
   name: 'plugin-import-json:resource',
   provider: (compilation) => new ImportJsonResource(compilation, options)
@@ -51,3 +51,5 @@ module.exports = (options = {}) => [{
     ];
   }
 }];
+
+export { greenwoodPluginImportJson };

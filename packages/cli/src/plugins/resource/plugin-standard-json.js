@@ -4,8 +4,8 @@
  * This is a Greenwood default plugin.
  *
  */
-const fs = require('fs');
-const { ResourceInterface } = require('../../lib/resource-interface');
+import fs from 'fs';
+import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardJsonResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -34,8 +34,10 @@ class StandardJsonResource extends ResourceInterface {
   }
 }
 
-module.exports = [{
+const pluginGreenwoodStandardJson = [{
   type: 'resource',
   name: 'plugin-standard-json:resource',
   provider: (compilation, options) => new StandardJsonResource(compilation, options)
 }];
+
+export { pluginGreenwoodStandardJson };

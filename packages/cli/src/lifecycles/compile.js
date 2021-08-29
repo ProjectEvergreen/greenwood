@@ -1,8 +1,8 @@
-const initConfig = require('./config');
-const initContext = require('./context');
-const generateGraph = require('./graph');
+import { readAndMergeConfig as initConfig } from './config.js';
+import { initContext } from './context.js';
+import { generateGraph } from './graph.js';
 
-module.exports = generateCompilation = () => {
+const generateCompilation = () => {
   return new Promise(async (resolve, reject) => {
     try {
 
@@ -29,3 +29,5 @@ module.exports = generateCompilation = () => {
     }
   });
 };
+
+export { generateCompilation };

@@ -1,10 +1,10 @@
-const fs = require('fs');
-const path = require('path');
-const scratchDir = path.join(process.cwd(), './.greenwood/');
-const outputDir = path.join(process.cwd(), './public');
-const dataDir = path.join(__dirname, '../data');
+import fs from 'fs';
+import path from 'path';
 
-module.exports = initContexts = async({ config }) => {
+const initContext = async({ config }) => {
+  const scratchDir = path.join(process.cwd(), './.greenwood/');
+  const outputDir = path.join(process.cwd(), './public');
+  const dataDir = new URL('../data', import.meta.url).pathname;
 
   return new Promise(async (resolve, reject) => {
     try {
@@ -36,3 +36,5 @@ module.exports = initContexts = async({ config }) => {
     }
   });
 };
+
+export { initContext };
