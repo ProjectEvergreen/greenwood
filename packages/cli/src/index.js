@@ -11,7 +11,7 @@ import { URL } from 'url';
 
 import { runDevServer } from './commands/develop.js';
 import { runProductionBuild } from './commands/build.js';
-// const runProdServer = require('./commands/serve');
+import { runProdServer } from './commands/serve.js';
 // const ejectConfiguration = require('./commands/eject');
 
 // TODO track / watch for improt json support - https://stackoverflow.com/a/62621693/417806
@@ -82,8 +82,8 @@ const run = async() => {
       case 'serve':
         process.env.__GWD_COMMAND__ = 'build';
         
-        // await runProductionBuild();
-        // await runProdServer();
+        await runProductionBuild();
+        await runProdServer();
 
         break;
       case 'eject':

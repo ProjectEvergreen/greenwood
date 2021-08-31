@@ -1,6 +1,6 @@
-const BrowserRunner = require('../lib/browser');
-const fs = require('fs');
-const path = require('path');
+import { BrowserRunner } from '../lib/browser.js';
+import fs from 'fs';
+import path from 'path';
 
 async function optimizePage(compilation, contents, route, outputPath, outputDir) {
   const optimizeResources = compilation.config.plugins.filter((plugin) => {
@@ -118,7 +118,7 @@ async function staticRenderCompilation(compilation) {
   console.info('success, done generating all pages!');
 }
 
-module.exports = {
+export {
   preRenderCompilation,
   staticRenderCompilation
 };

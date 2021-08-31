@@ -1,10 +1,10 @@
-// const bundleCompilation = require('../lifecycles/bundle');
-// const copyAssets = require('../lifecycles/copy');
+import { bundleCompilation } from '../lifecycles/bundle.js';
+import { copyAssets } from '../lifecycles/copy.js';
 import { devServer } from '../lifecycles/serve.js';
 import fs from 'fs';
 import { generateCompilation } from '../lifecycles/compile.js';
-// const { preRenderCompilation, staticRenderCompilation } = require('../lifecycles/prerender');
-// const { ServerInterface } = require('../lib/server-interface');
+import { preRenderCompilation, staticRenderCompilation } from '../lifecycles/prerender.js';
+import { ServerInterface } from '../lib/server-interface.js';
 
 const runProductionBuild = async () => {
 
@@ -44,7 +44,7 @@ const runProductionBuild = async () => {
                 return Promise.resolve(server);
               }));
           
-              // await preRenderCompilation(compilation);
+              await preRenderCompilation(compilation);
   
               resolve();
             });
@@ -53,11 +53,11 @@ const runProductionBuild = async () => {
           }
         });
       } else {
-        // wait staticRenderCompilation(compilation);
+        await staticRenderCompilation(compilation);
       }
 
-      // await bundleCompilation(compilation);
-      // await copyAssets(compilation);
+      await bundleCompilation(compilation);
+      await copyAssets(compilation);
 
       resolve();
     } catch (err) {

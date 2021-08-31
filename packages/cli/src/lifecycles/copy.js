@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 async function rreaddir (dir, allFiles = []) {
   const files = (await fs.promises.readdir(dir)).map(f => path.join(dir, f));
@@ -65,7 +65,7 @@ async function copyDirectory(from, to) {
   });
 }
 
-module.exports = copyAssets = (compilation) => {
+const copyAssets = (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
@@ -93,3 +93,5 @@ module.exports = copyAssets = (compilation) => {
     }
   });
 };
+
+export { copyAssets };

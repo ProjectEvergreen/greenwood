@@ -11,7 +11,7 @@ import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js'
 async function getConfig (compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = 'postcss.config.js';
-  const defaultConfig = (await import(new URL(configFile, import.meta.url).pathname)).default; // JSON.parse(fs.readFileSync(new URL(`${configFile}.js`, import.meta.url), 'utf-8'));
+  const defaultConfig = (await import(new URL(configFile, import.meta.url).pathname)).default;
   const userConfig = fs.existsSync(path.join(projectDirectory, `${configFile}`))
     ? (await import(path.join(projectDirectory, `${configFile}`))).default
     : {};
@@ -70,7 +70,7 @@ class PostCssResource extends ResourceInterface {
     const plugins = config.plugins || [];
     
     plugins.push(
-      await import('cssnano')
+      (await import('cssnano')).default
     );
     
     const css = plugins.length > 0
