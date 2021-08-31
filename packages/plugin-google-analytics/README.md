@@ -12,7 +12,7 @@ You can use your favorite JavaScript package manager to install this package.  T
 _examples:_
 ```bash
 # npm
-npm -i @greenwood/plugin-google-analytics --save-dev
+npm install @greenwood/plugin-google-analytics --save-dev
 
 # yarn
 yarn add @greenwood/plugin-google-analytics --dev
