@@ -40,11 +40,11 @@ const createSchema = async (compilation) => {
       const schemaPaths = (await fs.promises.readdir(customSchemasPath))
         .filter(file => path.extname(file) === '.js');
 
-      for(const schemaPath in schemaPaths) {
+      for (const schemaPath in schemaPaths) {
         const { customTypeDefs, customResolvers } = await import(`${customSchemasPath}/${schemaPath}`);
         customUserDefs.push(customTypeDefs);
         customUserResolvers.push(customResolvers);
-      };
+      }
     }
   
     const mergedResolvers = Object.assign({}, {
