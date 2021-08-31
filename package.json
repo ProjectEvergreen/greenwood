@@ -19,7 +19,7 @@
     "clean:deps": "rimraf **/node_modules/**",
     "build": "cross-env __GWD_ROLLUP_MODE__=strict node . build",
     "serve": "node . serve",
-    "develop": "node . develop",
+    "develop": "node --trace-warnings . develop",
     "test": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict nyc mocha",
     "test:tdd": "yarn test --watch",
     "lint:js": "eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",

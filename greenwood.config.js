@@ -1,9 +1,9 @@
-// const pluginGraphQL = require('@greenwood/plugin-graphql');
+import { greenwoodPluginGraphQL } from '@greenwood/plugin-gr>>>>>>> e57bcc13 (init upgrade graphql plugin to ESM)
 // const pluginIncludeHtml = require('@greenwood/plugin-include-html');
 import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
 import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
 // const pluginPolyfills = require('@greenwood/plugin-polyfills');
-// import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
+import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 // const rollupPluginAnalyzer = require('rollup-plugin-analyzer');
 import { URL } from 'url';
 
@@ -28,12 +28,11 @@ export default {
     { name: 'google-site-verification', content: '4rYd8k5aFD0jDnN0CCFgUXNe4eakLP4NnA18mNnK5P0' }
   ],
   plugins: [
-    // ...pluginGraphQL(),
+    ...greenwoodPluginGraphQL(),
     // ...pluginPolyfills(),
-    // greenwoodPluginPostCss(),
+    greenwoodPluginPostCss(),
     ...greenwoodPluginImportJson(),
     ...greenwoodPluginImportCss()
-    // pluginIncludeHtml
     // {
     //   type: 'rollup',
     //   name: 'rollup-plugin-analyzer',
@@ -48,6 +47,7 @@ export default {
     //     ];
     //   }
     // }
+    // ...pluginIncludeHtml()
   ],
   markdown: {
     plugins: [

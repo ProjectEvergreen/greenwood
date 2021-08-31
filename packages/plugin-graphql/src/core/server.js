@@ -1,12 +1,12 @@
-const { ApolloServer } = require('apollo-server');
+import { ApolloServer } from 'apollo-server';
 
-module.exports = (compilation) => {
+const graphqlServer = async (compilation) => {
   const { config, graph, context } = compilation;
-  const schema = require('../schema/schema')(compilation);
-  const createCache = require('./cache');
+  const { createSchema } = await import('../schema/schema.js');
+  const { createCache } = await import('./cache.js');
 
   const server = new ApolloServer({
-    schema,
+    schema: await createSchema(compilation),
     playground: {
       endpoint: '/graphql',
       settings: {
@@ -29,3 +29,5 @@ module.exports = (compilation) => {
 
   return server;
 };
+
+export { graphqlServer };

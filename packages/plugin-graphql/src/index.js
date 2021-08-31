@@ -1,9 +1,9 @@
-const fs = require('fs');
-const graphqlServer = require('./core/server');
-const path = require('path');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
-const { ServerInterface } = require('@greenwood/cli/src/lib/server-interface');
-const rollupPluginAlias = require('@rollup/plugin-alias');
+import fs from 'fs';
+import { graphqlServer } from './core/server.js';
+import path from 'path';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
+import { ServerInterface } from '@greenwood/cli/src/lib/server-interface.js';
+import rollupPluginAlias from '@rollup/plugin-alias';
 
 class GraphQLResource extends ResourceInterface {
   constructor(compilation, options = {}) {
@@ -44,7 +44,7 @@ class GraphQLResource extends ResourceInterface {
         const shimmedBody = body.replace('"imports": {', `
           "imports": {
             "@greenwood/plugin-graphql/core/client": "/node_modules/@greenwood/plugin-graphql/src/core/client.js",
-            "@greenwood/plugin-graphql/core/common": "/node_modules/@greenwood/plugin-graphql/src/core/common.client.js",
+            "@greenwood/plugin-graphql/core/common": "/node_modules/@greenwood/plugin-graphql/src/core/common.js",
             "@greenwood/plugin-graphql/queries/children": "/node_modules/@greenwood/plugin-graphql/src/queries/children.gql",
             "@greenwood/plugin-graphql/queries/config": "/node_modules/@greenwood/plugin-graphql/src/queries/config.gql",
             "@greenwood/plugin-graphql/queries/graph": "/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql",
@@ -86,13 +86,13 @@ class GraphQLServer extends ServerInterface {
   }
 
   async start() {
-    return graphqlServer(this.compilation).listen().then((server) => {
+    return (await graphqlServer(this.compilation)).listen().then((server) => {
       console.log(`GraphQLServer started at ${server.url}`);
     });
   }
 }
 
-module.exports = (options = {}) => {
+const greenwoodPluginGraphQL = (options = {}) => {
   return [{
     type: 'server',
     name: 'plugin-graphql:server',
@@ -108,7 +108,7 @@ module.exports = (options = {}) => {
       rollupPluginAlias({
         entries: [
           { find: '@greenwood/plugin-graphql/core/client', replacement: '@greenwood/plugin-graphql/src/core/client.js' },
-          { find: '@greenwood/plugin-graphql/core/common', replacement: '@greenwood/plugin-graphql/src/core/common.client.js' },
+          { find: '@greenwood/plugin-graphql/core/common', replacement: '@greenwood/plugin-graphql/src/core/common.js' },
           { find: '@greenwood/plugin-graphql/queries/menu', replacement: '@greenwood/plugin-graphql/src/queries/menu.gql' },
           { find: '@greenwood/plugin-graphql/queries/config', replacement: '@greenwood/plugin-graphql/src/queries/config.gql' },
           { find: '@greenwood/plugin-graphql/queries/children', replacement: '@greenwood/plugin-graphql/src/queries/children.gql' },
@@ -118,3 +118,5 @@ module.exports = (options = {}) => {
     ]
   }];
 };
+
+export { greenwoodPluginGraphQL };

@@ -27,7 +27,7 @@ const runDevServer = async () => {
         })];
 
         return Promise.all(servers.map(async (server) => {
-          return server.start();
+          return await server.start();
         }));
       });
     } catch (err) {
