@@ -13,12 +13,9 @@ async function getConfig (compilation, extendConfig = false) {
   const configFile = 'postcss.config.js';
   const defaultConfig = (await import(new URL(configFile, import.meta.url).pathname)).default; // JSON.parse(fs.readFileSync(new URL(`${configFile}.js`, import.meta.url), 'utf-8'));
   const userConfig = fs.existsSync(path.join(projectDirectory, `${configFile}`))
-    ? (await import(new URL(configFile, import.meta.url).pathname)).default
+    ? (await import(path.join(projectDirectory, `${configFile}`))).default
     : {};
   let finalConfig = Object.assign({}, userConfig);
-  
-  console.debug('defaultConfig', defaultConfig);
-  console.debug('userConfig', userConfig);
 
   if (userConfig && extendConfig) {    
     finalConfig.plugins = Array.isArray(userConfig.plugins)

@@ -1,5 +1,5 @@
 export default {
   plugins: [
-    'postcss-nested'
+    (await import('postcss-nested')).default
   ]
 };
