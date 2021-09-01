@@ -1,9 +1,4 @@
-/*
- * 
- * Manages web standard resource related operations for CSS.
- * This is a Greenwood default plugin.
- *
- */
+/* eslint-disable */
 const fs = require('fs');
 const path = require('path');
 const htmlparser = require('node-html-parser');
