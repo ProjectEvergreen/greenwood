@@ -11,7 +11,7 @@ You can use your favorite JavaScript package manager to install this package.
 _examples:_
 ```bash
 # npm
-npm -i @greenwood/plugin-babel --save-dev
+npm install @greenwood/plugin-babel --save-dev
 
 # yarn
 yarn add @greenwood/plugin-babel --dev
@@ -53,7 +53,7 @@ If you would like to use it, either standalone or with your own custom _babel.co
 1. Install `@babel/runtime` and `regenerator-runtime` as direct dependencies of your project
     ```bash
     # npm
-    npm -i @babel/runtime regenerator-runtime
+    npm install @babel/runtime regenerator-runtime
 
     # yarn
     yarn add @babel/runtime regenerator-runtime
