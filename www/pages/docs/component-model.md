@@ -8,7 +8,7 @@ index: 1
 ## Component Model
 Greenwood aims to support and optimize around the standard capabilities of the web platform and its features.  In particular, the concept of using Web Components as a way to add interactivity and dynamic content into your application and... that can all be prerendered for you, just like you could do with any server side templating language.
 
-The options for how to design your app efficetively come down to what you're trying to build, so if that's with the native `HTMLElement` or something based on it like **LitElement** (installed seperately), **Greenwood** will take care of the rest.
+The options for how to design your app effectively comes down to what you're trying to build, so if that's with the native `HTMLElement` or something based on it like **LitElement** (installed seperately), **Greenwood** will take care of the rest.
 
 Below are a couple examples to get you going.  
 
@@ -70,8 +70,8 @@ You can then use it within a page template.
 ```
 
 
-### Alternaties
-An alternaative like [**LitElement**](https://lit.dev/) would work the same way.  
+### Alternatives
+An alternative like [**LitElement**](https://lit.dev/) would work the same way.  
 
 > _Make sure you have installed LitElement with **npm** first!_
 
