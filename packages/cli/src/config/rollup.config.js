@@ -170,9 +170,8 @@ function greenwoodHtmlPlugin(compilation) {
 
           headScripts.forEach((scriptTag) => {
             const parsedAttributes = parseTagForAttributes(scriptTag);
-     
-            // handle <script type="module" src="some/path.js"></script>
-            if (!isRemoteUrl(parsedAttributes.src) && parsedAttributes.type === 'module' && parsedAttributes.src && !mappedScripts.get(parsedAttributes.src)) {
+            // handle <script [type="module"] src="some/path.js"></script>
+            if (!isRemoteUrl(parsedAttributes.src) && parsedAttributes.src && !mappedScripts.get(parsedAttributes.src)) {
               if (optimization === 'static' || parsedAttributes['data-gwd-opt'] === 'static') {
                 // dont need to bundle / emit this one
               } else {
@@ -309,8 +308,8 @@ function greenwoodHtmlPlugin(compilation) {
             headScripts.forEach((scriptTag) => {
               const parsedAttributes = parseTagForAttributes(scriptTag);
     
-              // handle <script type="module" src="some/path.js"></script>
-              if (!isRemoteUrl(parsedAttributes.src) && parsedAttributes.type === 'module' && parsedAttributes.src) {
+              // handle <script [type="module"] src="some/path.js"></script>
+              if (!isRemoteUrl(parsedAttributes.src) && parsedAttributes.src) {
                 for (const innerBundleId of Object.keys(bundles)) {
                   const { src } = parsedAttributes;
                   const facadeModuleId = bundles[innerBundleId].facadeModuleId
