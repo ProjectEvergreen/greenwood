@@ -29,7 +29,7 @@ You can follow along with, or clone and go, the [companion repo](https://github.
 Greenwood can be installed with your favorite JavaScript package manager.
 ```bash
 # npm
-npm -i @greenwood/cli --save-dev
+npm install @greenwood/cli --save-dev
 
 # yarn
 yarn add @greenwood/cli --dev

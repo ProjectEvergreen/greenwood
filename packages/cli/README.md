@@ -9,7 +9,7 @@ You can use your favorite JavaScript package manager to install this package.
 _examples:_
 ```bash
 # npm
-npm -i @greenwood/cli --save-dev
+npm install @greenwood/cli --save-dev
 
 # yarn
 yarn add @greenwood/cli --dev
