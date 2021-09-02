@@ -18,7 +18,7 @@ You can use your favorite JavaScript package manager to install this package.  T
 _examples:_
 ```bash
 # npm
-npm -i @greenwood/plugin-polyfills --save-dev
+npm install @greenwood/plugin-polyfills --save-dev
 
 # yarn
 yarn add @greenwood/plugin-polyfills --dev

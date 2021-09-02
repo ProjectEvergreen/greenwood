@@ -11,7 +11,7 @@ You can use your favorite JavaScript package manager to install this package.
 _examples:_
 ```bash
 # npm
-npm -i @greenwood/plugin-import-commonjs --save-dev
+npm install @greenwood/plugin-import-commonjs --save-dev
 
 # yarn
 yarn add @greenwood/plugin-import-commonjs --dev

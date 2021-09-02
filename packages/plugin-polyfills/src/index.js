@@ -41,7 +41,7 @@ class PolyfillsResource extends ResourceInterface {
 
         const newHtml = body.replace('<head>', `
           <head>
-            <script src="/${filename}"></script>
+            <script src="/${nodeModuleRoot}/${filename}"></script>
         `);
 
         resolve(newHtml);
