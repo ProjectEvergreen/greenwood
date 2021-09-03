@@ -51,9 +51,9 @@ describe('Build Greenwood With: ', function() {
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
     });
 
-    describe('<script type="module" src="..."></script> tag in the <head>', function() {
+    describe('<script type="module" src="..."></script> tags in the <head>', function() {
       it('should have one <script> tag for main.js loaded in the <head>', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head > script[src]');
+        const scriptTags = dom.window.document.querySelectorAll('head > script[type="module"]');
         const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return (/main.*.js/).test(script.src);
         });
@@ -62,7 +62,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have one <script> tag for other.js loaded in the <head>', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head > script[src]');
+        const scriptTags = dom.window.document.querySelectorAll('head > script[type="module"]');
         const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return (/other.*.js/).test(script.src);
         });
@@ -70,8 +70,9 @@ describe('Build Greenwood With: ', function() {
         expect(mainScriptTags.length).to.be.equal(1);
       });
 
+      // this includes the non module file in a spec below
       it('should have the expected number of bundled .js files in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(2);
+        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(3);
       });
 
       it('should have the expected main.js file in the output directory', async function() {
@@ -89,7 +90,7 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('<script>...</script> tag in the <head> with mixed attribute ordering', function() {
+    describe('<script ...>...</script> tag in the <head> with mixed attribute ordering', function() {
       it('should have two <script> tag with inline script in the <head>', function() {
         const scriptTagInline = dom.window.document.querySelectorAll('head > script:not([src])');
         
@@ -126,6 +127,27 @@ describe('Build Greenwood With: ', function() {
         expect(scriptTagSrcTwo.textContent).to.be.contain('document.getElementsByClassName(\'output-script-inline-three\')[0].innerHTML = three');
       });
 
+    });
+
+    describe('non module <script src="..."></script> tag in the <head>', function() {
+      it('should have one <script> tag for non-module.js loaded in the <head>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script[src]');
+        const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
+          return (/non-module.*.js/).test(script.src);
+        });
+        
+        expect(mainScriptTags.length).to.be.equal(1);
+      });
+
+      it('should have the expected non-module.js file in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'non-module.*.js'))).to.have.lengthOf(1);
+      });
+
+      it('should have the expected output from non-module.js file in index.html', async function() {
+        const scriptTagSrc = dom.window.document.querySelector('body > .output-script-non-module');
+
+        expect(scriptTagSrc.textContent).to.be.equal('script tag non module with src');
+      });
     });
 
     describe('<style>...</style> tag in the <head>', function() {

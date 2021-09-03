@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/cli",
-  "version": "0.15.2",
+  "version": "0.15.3",
   "description": "Greenwood CLI.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
