@@ -159,8 +159,6 @@ const walkPackageJson = (packageJson = {}) => {
           } else if (exportMapEntry.endsWith && (exportMapEntry.endsWith('.js') || exportMapEntry.endsWith('.mjs')) && exportMapEntry.indexOf('*') < 0) {
             // is probably a file, so _not_ an export array, package.json, or wildcard export
             packageExport = exportMapEntry;
-          } else {
-            // console.debug('22222????', exportMapEntry);
           }
   
           if (packageExport) {
