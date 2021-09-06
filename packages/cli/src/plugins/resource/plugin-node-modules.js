@@ -19,6 +19,8 @@ const updateImportMap = (entry, entryPath) => {
     entryPath = `${entryPath}/${entry}.js`;
   }
 
+  console.debug('updateImportMap entry', entry);
+  console.debug('updateImportMap entryPath', entryPath);
   importMap[entry] = entryPath;
 };
 
@@ -47,7 +49,9 @@ const walkModule = (module, dependency) => {
     ImportDeclaration(node) {
       let { value: sourceValue } = node.source;
 
+      console.debug('ImportDeclaration', sourceValue);
       if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {        
+        console.debug('aaaaaa');
         if (!importMap[sourceValue]) {
           // found a _new_ bare import for ${sourceValue}
           // we should add this to the importMap and walk its package.json for more transitive deps
@@ -57,6 +61,7 @@ const walkModule = (module, dependency) => {
         walkPackageJson(path.join(process.cwd(), 'node_modules', sourceValue, 'package.json'));
       } else if (sourceValue.indexOf('./') < 0) {
         // adding a relative import
+        console.debug('bbbbbb');
         updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
       } else {
         // walk this module for all its dependencies
@@ -64,9 +69,11 @@ const walkModule = (module, dependency) => {
           ? `${sourceValue}.js`
           : sourceValue;
 
+        console.debug('cccccc', dependency);
         if (fs.existsSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue))) {
           const moduleContents = fs.readFileSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue));
           walkModule(moduleContents, dependency);
+          updateImportMap(`${dependency}/${sourceValue.replace('./', '')}`, `/node_modules/${dependency}/${sourceValue.replace('./', '')}`);
         }
       }
     },
@@ -99,17 +106,22 @@ const walkPackageJson = (packageJson = {}) => {
     const entry = getPackageEntryPath(dependencyPackageJson);
     const isJavascriptPackage = Array.isArray(entry) || typeof entry === 'string' && entry.endsWith('.js') || entry.endsWith('.mjs');
 
+    console.debug('DEPENDENCY => ', dependency);
+    // console.debug('WITH ENTRY => ', entry);
     if (isJavascriptPackage) {
       // https://nodejs.org/api/packages.html#packages_determining_module_system
       if (Array.isArray(entry)) {
         // we have an exportMap
+        console.debug('we have an export map');
         const exportMap = entry;
   
         exportMap.forEach((entry) => {
           const exportMapEntry = dependencyPackageJson.exports[entry];
           let packageExport;
+          console.debug('ENTRY', entry);
   
           if (Array.isArray(exportMapEntry)) {
+            console.debug('00000000000');
             let fallbackPath;
             let esmPath;
   
@@ -130,6 +142,8 @@ const walkPackageJson = (packageJson = {}) => {
                   } else if (entryTypes.default) {
                     console.warn('The package you are requiring may need commonjs support.  If this module is not working for you, consider adding our commonjs plugin.');
                     fallbackPath = entryTypes.default;
+                  } else {
+                    console.debug('####################');
                   }
                   break;
                 default:
@@ -143,6 +157,7 @@ const walkPackageJson = (packageJson = {}) => {
               ? esmPath
               : fallbackPath;
           } else if (exportMapEntry.import || exportMapEntry.default) {
+            console.debug('00000000000 - 111111111');
             packageExport = exportMapEntry.import
               ? exportMapEntry.import
               : exportMapEntry.default;
@@ -153,20 +168,26 @@ const walkPackageJson = (packageJson = {}) => {
             }
           } else if (exportMapEntry.endsWith && (exportMapEntry.endsWith('.js') || exportMapEntry.endsWith('.mjs')) && exportMapEntry.indexOf('*') < 0) {
             // is probably a file, so _not_ an export array, package.json, or wildcard export
+            console.debug('11111');
             packageExport = exportMapEntry;
+          } else {
+            // console.debug('22222????', exportMapEntry);
           }
   
           if (packageExport) {
+            console.debug('package export', packageExport);
             const packageExportLocation = path.join(process.cwd(), 'node_modules', `${dependency}/${packageExport.replace('./', '')}`);
-
+            console.debug('packageExportLocation', packageExportLocation);
             // check all exports of an exportMap entry
             // to make sure those deps get added to the importMap
             if (packageExport.endsWith('js')) {
+              console.debug('222222');
               const moduleContents = fs.readFileSync(packageExportLocation);
 
               walkModule(moduleContents, dependency);
-              updateImportMap(`${dependency}/${packageExport.replace('./', '')}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
+              updateImportMap(`${dependency}${entry.replace('.', '')}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
             } else if (fs.lstatSync(packageExportLocation).isDirectory()) {
+              console.debug('3333333????');
               fs.readdirSync(packageExportLocation)
                 .filter(file => file.endsWith('.js') || file.endsWith('.mjs'))
                 .forEach((file) => {
@@ -181,6 +202,7 @@ const walkPackageJson = (packageJson = {}) => {
         walkPackageJson(dependencyPackageJson);
       } else {
         const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
+        console.debug('44444444444444', packageEntryPointPath);
         
         // sometimes a main file is actually just an empty string... :/
         if (fs.existsSync(packageEntryPointPath)) {
@@ -191,6 +213,8 @@ const walkPackageJson = (packageJson = {}) => {
           walkPackageJson(dependencyPackageJson);
         }
       }
+
+      console.debug('==========================');
     }
   });
 };
