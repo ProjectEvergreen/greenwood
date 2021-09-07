@@ -1,7 +1,7 @@
 {
   "name": "test-import-node-modules",
   "dependencies": {
-    "lit": "^2.0.0-rc.2",
+    "lit": "^2.0.0-rc.4",
     "lodash-es": "^4.17.20",
     "pwa-helpers": "^0.9.1",
     "redux": "^4.0.5",

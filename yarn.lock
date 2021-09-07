@@ -7523,6 +7523,13 @@ lit-html@^2.0.0-rc.3:
   dependencies:
     "@types/trusted-types" "^1.0.1"
 
+lit-html@^2.0.0-rc.4:
+  version "2.0.0-rc.5"
+  resolved "https://registry.yarnpkg.com/lit-html/-/lit-html-2.0.0-rc.5.tgz#2051f79418bc244853b6e1d93fdf3833cab2cadb"
+  integrity sha512-vFnjzqwQijC9By5F50c3sjI5PXPYoIvbGfpbbDOv+8BBRYdMR+FDYyMeCC3T3iIZx8EE6aIow2aTaG+HS5SV4A==
+  dependencies:
+    "@types/trusted-types" "^2.0.2"
+
 lit-redux-router@~0.19.0:
   version "0.19.0"
   resolved "https://registry.yarnpkg.com/lit-redux-router/-/lit-redux-router-0.19.0.tgz#5d294ac021848011c4c7f98f268a5e5ee9eb4194"
@@ -7538,6 +7545,15 @@ lit@^2.0.0-rc.2:
     "@lit/reactive-element" "^1.0.0-rc.2"
     lit-element "^3.0.0-rc.2"
     lit-html "^2.0.0-rc.3"
+
+lit@^2.0.0-rc.4:
+  version "2.0.0-rc.4"
+  resolved "https://registry.yarnpkg.com/lit/-/lit-2.0.0-rc.4.tgz#ea9eb44fa5cc974b7af4a45f8d82172d0b3f9c26"
+  integrity sha512-HPJrSvK377a1E5eSAUG+eTJWIOJFGNtnfbGPHY4vbc0Ud9GTFSwMEbeAOIJnA+5q92cafR38F1bWOyo4a2ncag==
+  dependencies:
+    "@lit/reactive-element" "^1.0.0-rc.2"
+    lit-element "^3.0.0-rc.2"
+    lit-html "^2.0.0-rc.4"
 
 livereload-js@^3.1.0:
   version "3.3.1"
