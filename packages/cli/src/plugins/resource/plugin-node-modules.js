@@ -47,7 +47,6 @@ const walkModule = (module, dependency) => {
     ImportDeclaration(node) {
       let { value: sourceValue } = node.source;
 
-      console.debug('ImportDeclaration', sourceValue);
       if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {        
         if (!importMap[sourceValue]) {
           // found a _new_ bare import for ${sourceValue}
@@ -101,7 +100,6 @@ const walkPackageJson = (packageJson = {}) => {
     const entry = getPackageEntryPath(dependencyPackageJson);
     const isJavascriptPackage = Array.isArray(entry) || typeof entry === 'string' && entry.endsWith('.js') || entry.endsWith('.mjs');
 
-    // console.debug('WITH ENTRY => ', entry);
     if (isJavascriptPackage) {
       // https://nodejs.org/api/packages.html#packages_determining_module_system
       if (Array.isArray(entry)) {
@@ -133,8 +131,6 @@ const walkPackageJson = (packageJson = {}) => {
                   } else if (entryTypes.default) {
                     console.warn('The package you are requiring may need commonjs support.  If this module is not working for you, consider adding our commonjs plugin.');
                     fallbackPath = entryTypes.default;
-                  } else {
-                    console.debug('####################');
                   }
                   break;
                 default:
