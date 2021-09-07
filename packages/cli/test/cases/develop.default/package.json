@@ -1,6 +1,6 @@
 {
   "name": "test-develop-command-default",
   "dependencies": {
-    "lit": "^2.0.0-rc.2"
+    "lit": "^2.0.0-rc.4"
   }
 }
