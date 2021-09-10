@@ -138,6 +138,10 @@ describe('Develop Greenwood With: ', function() {
         `${process.cwd()}/node_modules/@lion/localize/test-helpers/*.js`,
         `${outputPath}/node_modules/@lion/localize/test-helpers/`
       );
+      const lionLocalizeSrcLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/localize/src/*.js`,
+        `${outputPath}/node_modules/@lion/localize/src/`
+      );
       const owcDepupLibPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/@open-wc/dedupe-mixin/package.json`,
         `${outputPath}/node_modules/@open-wc/dedupe-mixin/`
@@ -147,8 +151,8 @@ describe('Develop Greenwood With: ', function() {
         `${outputPath}/node_modules/@open-wc/scoped-elements/`
       );
       const messageFormatLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@bundles-es-modules/message-format/MessageFormat.js`,
-        `${outputPath}/node_modules/@bundles-es-modules/message-format/`
+        `${process.cwd()}/node_modules/@bundled-es-modules/message-format/MessageFormat.js`,
+        `${outputPath}/node_modules/@bundled-es-modules/message-format/`
       );
       const messageFormatLibsPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/@bundled-es-modules/message-format/package.json`,
@@ -186,6 +190,7 @@ describe('Develop Greenwood With: ', function() {
         ...lionLocalizeLibs,
         ...lionLocalizeLibsPackageJson,
         ...lionLocalizeTesterLibs,
+        ...lionLocalizeSrcLibs,
         ...owcDepupLibPackageJson,
         ...owcScopedLibPackageJson,
         ...messageFormatLibs,
@@ -250,8 +255,8 @@ describe('Develop Greenwood With: ', function() {
         expect(importMap['@lion/button/define']).to.equal('/node_modules/@lion/button/lion-button.js');
 
         // https://github.com/ProjectEvergreen/greenwood/issues/715
-        // transient dependency imports
-        // TODO expect(importMap['@bundled-es-modules/message-format/MessageFormat.js']).to.equal('/node_modules/@bundled-es-modules/message-format/MessageFormat.js');
+        // transient dependency import / exports
+        expect(importMap['@bundled-es-modules/message-format/MessageFormat.js']).to.equal('/node_modules/@bundled-es-modules/message-format/MessageFormat.js');
 
         done();
       });

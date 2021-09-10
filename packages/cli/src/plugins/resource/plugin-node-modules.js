@@ -77,12 +77,24 @@ const walkModule = (module, dependency) => {
       if (sourceValue !== '' && sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
         updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
       }
+
+      if (sourceValue.indexOf('.') === 0 && fs.existsSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue))) {
+        const moduleContents = fs.readFileSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue));
+
+        walkModule(moduleContents, dependency);
+      }
     },
     ExportAllDeclaration(node) {
       const sourceValue = node && node.source ? node.source.value : '';
 
       if (sourceValue !== '' && sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
         updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
+      }
+
+      if (sourceValue.indexOf('.') === 0 && fs.existsSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue))) {
+        const moduleContents = fs.readFileSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue));
+
+        walkModule(moduleContents, dependency);
       }
     }
   });
