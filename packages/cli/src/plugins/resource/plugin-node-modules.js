@@ -229,7 +229,6 @@ class NodeModulesResource extends ResourceInterface {
           ? packageEntryLocation.split(packageName)[0] // we are in the user's node modules
           : packageEntryLocation.split(subPackage)[0]; // else we are in our monorepo
 
-        console.debug('packageRootPath', packageRootPath);
         nodeModulesUrl = `${packageRootPath}${subPackage}/${packagePathPieces.join('/')}`;
       } else {
         const packageRootPath = packageEntryLocation.split(packageName)[0];
