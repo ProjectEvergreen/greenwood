@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-google-analytics",
-  "version": "0.15.3",
+  "version": "0.16.0-alpha.0",
   "description": "A Greenwood plugin adding support for Google Analytics JavaScript tracker.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-google-analytics",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -22,6 +22,6 @@
     "@greenwood/cli": "^0.4.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.15.3"
+    "@greenwood/cli": "^0.16.0-alpha.0"
   }
 }
