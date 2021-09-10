@@ -1222,6 +1222,11 @@
     "@babel/helper-validator-identifier" "^7.14.0"
     to-fast-properties "^2.0.0"
 
+"@bundled-es-modules/message-format@6.0.4":
+  version "6.0.4"
+  resolved "https://registry.yarnpkg.com/@bundled-es-modules/message-format/-/message-format-6.0.4.tgz#232da6877adb960f6c8f598c72588a84352de147"
+  integrity sha512-NGUoPxqsBzDwvRhY3A3L/AhS1hzS9OWappfyDOyCwE7G3W4ua28gau7QwvJz7QzA6ArbAdeb8c1mLjvd1WUFAA==
+
 "@csstools/convert-colors@^1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@csstools/convert-colors/-/convert-colors-1.4.0.tgz#ad495dc41b12e75d588c6db8b9834f08fa131eb7"
@@ -2005,6 +2010,40 @@
     npmlog "^4.1.2"
     write-file-atomic "^2.3.0"
 
+"@lion/button@~0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@lion/button/-/button-0.12.0.tgz#e93d3772bf4f3384b76598b3d58efd9a9f18b897"
+  integrity sha512-kJ/NkSrnc6hPEtV7ICSGx9cH+H/NiBjSUoEPR6pp3+MQTzEwIfoSEPBe88xMflRLqnrq8GhjPKdhH8Ce/G5yRw==
+  dependencies:
+    "@lion/core" "0.17.0"
+
+"@lion/calendar@~0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@lion/calendar/-/calendar-0.15.0.tgz#9655448250805fd4247b1d1dad003b48682d6407"
+  integrity sha512-MaIZpxuF+tUAwPejI5/bns8VbJXftbAABk+i247fnUvI0Xi4tu0agKE2A13o9RXKQLm2IY/ohLWVjAffBuM9+A==
+  dependencies:
+    "@lion/core" "0.17.0"
+    "@lion/localize" "0.19.0"
+
+"@lion/core@0.17.0":
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/@lion/core/-/core-0.17.0.tgz#0af5d7873c1e110fd57d54c331fb22dd01702bb3"
+  integrity sha512-s4z7qxzX+bgMPyxRiZcLuBd3BePPvQRkgTlUxKf+4ao0QBgebuNyoFHUWvZifuWH2gFmcORy3aL7+0HYNMkqoQ==
+  dependencies:
+    "@open-wc/dedupe-mixin" "^1.2.18"
+    "@open-wc/scoped-elements" "^1.3.3"
+    lit-element "~2.4.0"
+    lit-html "^1.3.0"
+
+"@lion/localize@0.19.0":
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/@lion/localize/-/localize-0.19.0.tgz#7df884554f1a14d9184241c20bc1939139c566d3"
+  integrity sha512-zkFu5j2eiZYxtmweM96psO7rvzMZqdaX6/+wQwABKGmKdg02I4h1kwdfFvRw5MWZNiFlftyxES/yMY/Q2VJZuA==
+  dependencies:
+    "@bundled-es-modules/message-format" "6.0.4"
+    "@lion/core" "0.17.0"
+    singleton-manager "1.4.2"
+
 "@ls-lint/ls-lint@^1.9.2":
   version "1.9.2"
   resolved "https://registry.yarnpkg.com/@ls-lint/ls-lint/-/ls-lint-1.9.2.tgz#689f1f4c06072823a726802ba167340efcefe19c"
@@ -2161,6 +2200,19 @@
   integrity sha512-UZ1pErDue6bZNjYOotCNveTXArOMZQFG6hKJfOnGnulVCMcVVi7YIIuuR4WfBhjo7zgpmzn/BkPDnUXtNx+PcQ==
   dependencies:
     "@types/node" ">= 8"
+
+"@open-wc/dedupe-mixin@^1.2.18", "@open-wc/dedupe-mixin@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@open-wc/dedupe-mixin/-/dedupe-mixin-1.3.0.tgz#0df5d438285fc3482838786ee81895318f0ff778"
+  integrity sha512-UfdK1MPnR6T7f3svzzYBfu3qBkkZ/KsPhcpc3JYhsUY4hbpwNF9wEQtD4Z+/mRqMTJrKg++YSxIxE0FBhY3RIw==
+
+"@open-wc/scoped-elements@^1.3.3":
+  version "1.3.4"
+  resolved "https://registry.yarnpkg.com/@open-wc/scoped-elements/-/scoped-elements-1.3.4.tgz#96e27e13c8b09668ee631e9fccd5623a05af5cc2"
+  integrity sha512-WD+ObocdzcFCpBxnc8bQa7NoATeA+tJrK0/c/yV1Nx4leV+1PmJNNu+WCcuckBEGd0Op6FP8w1TidoqmVVba6g==
+  dependencies:
+    "@open-wc/dedupe-mixin" "^1.3.0"
+    lit-html "^1.0.0"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
@@ -7427,14 +7479,14 @@ list-item@^1.1.1:
     is-number "^2.1.0"
     repeat-string "^1.5.2"
 
-lit-element@^2.0.1, lit-element@^2.4.0:
+lit-element@^2.0.1, lit-element@^2.4.0, lit-element@~2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/lit-element/-/lit-element-2.4.0.tgz#b22607a037a8fc08f5a80736dddf7f3f5d401452"
   integrity sha512-pBGLglxyhq/Prk2H91nA0KByq/hx/wssJBQFiYqXhGDvEnY31PRGYf1RglVzyLeRysu0IHm2K0P196uLLWmwFg==
   dependencies:
     lit-html "^1.1.1"
 
-lit-html@^1.1.1:
+lit-html@^1.0.0, lit-html@^1.1.1, lit-html@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/lit-html/-/lit-html-1.3.0.tgz#c80f3cc5793a6dea6c07172be90a70ab20e56034"
   integrity sha512-0Q1bwmaFH9O14vycPHw8C/IeHMk/uSDldVLIefu/kfbTBGIc44KGH6A8p1bDfxUfHdc8q6Ct7kQklWoHgr4t1Q==
@@ -10815,6 +10867,11 @@ simpledotcss@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/simpledotcss/-/simpledotcss-1.0.0.tgz#b5ac8fcd73d111938def9c0f43f1839d6eae96be"
   integrity sha512-inneK6Wqh5rUdASxJMAKJORbDeKRySZPlY6H1Jqc6o6t5QbXhd5UZUi5snkKnB0ror0H72in0zlNeeA4Vw+Fiw==
+
+singleton-manager@1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/singleton-manager/-/singleton-manager-1.4.2.tgz#4649acafca3eccf987d828ab16369ee59c4a22a5"
+  integrity sha512-3/K7K61TiN0+tw32HRC3AZQBacN0Ky/NmHEnhofFPEFROqZ5T6BXK45Z94OQsvuFD2euOVOU40XDNeTal63Baw==
 
 slash@^2.0.0:
   version "2.0.0"
