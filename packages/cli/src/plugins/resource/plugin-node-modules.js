@@ -222,11 +222,14 @@ class NodeModulesResource extends ResourceInterface {
       const packageEntryLocation = require.resolve(packageName).replace(/\\/g, '/'); // force / for consistency and path matching
 
       if (packageName.indexOf('@greenwood') === 0) {
-        const subPackage = packageName.split('/')[1];
+        const subPackage = packageEntryLocation.indexOf('@greenwood') > 0
+          ? packageName // we are in the user's node modules
+          : packageName.split('/')[1]; // else we are in our monorepo
         const packageRootPath = packageEntryLocation.indexOf('@greenwood') > 0
           ? packageEntryLocation.split(packageName)[0] // we are in the user's node modules
           : packageEntryLocation.split(subPackage)[0]; // else we are in our monorepo
 
+        console.debug('packageRootPath', packageRootPath);
         nodeModulesUrl = `${packageRootPath}${subPackage}/${packagePathPieces.join('/')}`;
       } else {
         const packageRootPath = packageEntryLocation.split(packageName)[0];
