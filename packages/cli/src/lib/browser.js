@@ -19,7 +19,6 @@ class BrowserRunner {
 
   async init() {
     this.browser = await puppeteer.launch({
-      headless: true,
       args: ['--no-sandbox']
     });
   }
@@ -34,6 +33,7 @@ class BrowserRunner {
     page.evaluateOnNewDocument('ShadyDOM = {force: true}');
     page.evaluateOnNewDocument('ShadyCSS = {shimcssproperties: true}');
     
+    await page.setCacheEnabled(false); // https://github.com/ProjectEvergreen/greenwood/pull/699
     await page.setRequestInterception(true);
 
     // only allow puppeteer to load necessary (local) scripts needed for pre-rendering of the site itself

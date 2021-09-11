@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-graphql",
-  "version": "0.15.3",
+  "version": "0.16.0-alpha.1",
   "description": "A plugin for using GraphQL for querying your content.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -30,6 +30,6 @@
     "graphql-tag": "^2.10.1"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.15.3"
+    "@greenwood/cli": "^0.16.0-alpha.1"
   }
 }

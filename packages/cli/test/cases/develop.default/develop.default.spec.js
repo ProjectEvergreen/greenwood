@@ -234,6 +234,11 @@ describe('Develop Greenwood With: ', function() {
         });
       });
 
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('text/html');
+        done();
+      });
+
       it('should return a 200', function(done) {
         expect(response.statusCode).to.equal(200);
 
