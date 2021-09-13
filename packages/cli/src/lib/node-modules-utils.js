@@ -1,6 +1,5 @@
-// ideally let NodeJS do the look up for us, but in the evant that fails
-// do our best to resolve the file (helpful for theme pack testing and development) 
-// (where things are unpublished and routed around)
+// defer to NodeJS to find where on disk a package is located using require.resolve
+// and return the root absolute location
 function getNodeModulesResolveLocationForPackageName(packageName) {
   let nodeModulesUrl;
   
