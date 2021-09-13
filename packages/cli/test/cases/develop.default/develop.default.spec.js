@@ -151,7 +151,7 @@ describe('Develop Greenwood With: ', function() {
         `${outputPath}/node_modules/@open-wc/scoped-elements/`
       );
       const messageFormatLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@bundled-es-modules/message-format/MessageFormat.js`,
+        `${process.cwd()}/node_modules/@bundled-es-modules/message-format/*.js`,
         `${outputPath}/node_modules/@bundled-es-modules/message-format/`
       );
       const messageFormatLibsPackageJson = await getDependencyFiles(
