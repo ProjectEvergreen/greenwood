@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const replace = require('@rollup/plugin-replace');
+const { getNodeModulesResolveLocationForPackageName, getPackageNameFromUrl } = require('../../lib/node-modules-utils');
 const { ResourceInterface } = require('../../lib/resource-interface');
 const walk = require('acorn-walk');
 
@@ -205,50 +206,26 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   async resolve(url) {
-    const packagePathPieces = this.getBareUrlPath(url).split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
-    let packageName = packagePathPieces.shift();
-    let nodeModulesUrl;
+    const bareUrl = this.getBareUrlPath(url);
+    const { projectDirectory } = this.compilation.context;
+    const packageName = getPackageNameFromUrl(bareUrl);
+    const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(packageName);
+    const packagePathPieces = bareUrl.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
+    let absoluteNodeModulesUrl;
 
-    // handle scoped packages
-    if (packageName.indexOf('@') === 0) {
-      packageName = `${packageName}/${packagePathPieces.shift()}`;
-    }
-
-    // ideally let NodeJS do the look up for us, but in the evant that fails
-    // do our best to resolve the file (helpful for theme pack testing and development) 
-    // (where things are unpublished and routed around)
-    try {
-      const packageEntryLocation = require.resolve(packageName).replace(/\\/g, '/'); // force / for consistency and path matching
-
-      if (packageName.indexOf('@greenwood') === 0) {
-        const subPackage = packageEntryLocation.indexOf('@greenwood') > 0
-          ? packageName // we are in the user's node modules
-          : packageName.split('/')[1]; // else we are in our monorepo
-        const packageRootPath = packageEntryLocation.indexOf('@greenwood') > 0
-          ? packageEntryLocation.split(packageName)[0] // we are in the user's node modules
-          : packageEntryLocation.split(subPackage)[0]; // else we are in our monorepo
-
-        nodeModulesUrl = `${packageRootPath}${subPackage}/${packagePathPieces.join('/')}`;
-      } else {
-        const packageRootPath = packageEntryLocation.split(packageName)[0];
-
-        nodeModulesUrl = `${packageRootPath}${packageName}/${packagePathPieces.join('/')}`;
-      }
-
-      return Promise.resolve(nodeModulesUrl);
-    } catch (e) {
-      console.debug('Error looking of package with NodeJS, falling back to default greenwood node_modules resolution');
-      const { projectDirectory } = this.compilation.context;
-      const bareUrl = this.getBareUrlPath(url);
+    if (absoluteNodeModulesLocation) {
+      absoluteNodeModulesUrl = `${absoluteNodeModulesLocation}${packagePathPieces.join('/').replace(packageName, '')}`;
+    } else {
       const isAbsoluteNodeModulesFile = fs.existsSync(path.join(projectDirectory, bareUrl));
-      const nodeModulesUrl = isAbsoluteNodeModulesFile
+      
+      absoluteNodeModulesUrl = isAbsoluteNodeModulesFile
         ? path.join(projectDirectory, bareUrl)
         : this.resolveRelativeUrl(projectDirectory, bareUrl)
           ? path.join(projectDirectory, this.resolveRelativeUrl(projectDirectory, bareUrl))
           : bareUrl;
-
-      return Promise.resolve(nodeModulesUrl);
     }
+
+    return Promise.resolve(absoluteNodeModulesUrl);
   }
 
   async shouldServe(url) {
