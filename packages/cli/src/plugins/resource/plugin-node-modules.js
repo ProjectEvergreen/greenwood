@@ -33,7 +33,7 @@ const getPackageEntryPath = (packageJson) => {
         : 'index.js'; // lastly, fallback to index.js
 
   // use .mjs version if it exists, for packages like redux
-  if (!Array.isArray(entry) && fs.existsSync(`${process.cwd()}/node_modules/${packageJson.name}/${entry.replace('.js', '.mjs')}`)) {
+  if (!Array.isArray(entry) && fs.existsSync(`${getNodeModulesResolveLocationForPackageName(packageJson.name)}/${entry.replace('.js', '.mjs')}`)) {
     entry = entry.replace('.js', '.mjs');
   }
 
@@ -47,6 +47,7 @@ const walkModule = (module, dependency) => {
   }), {
     ImportDeclaration(node) {
       let { value: sourceValue } = node.source;
+      const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(dependency);
 
       if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {        
         if (!importMap[sourceValue]) {
@@ -55,7 +56,7 @@ const walkModule = (module, dependency) => {
           updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
         }
         
-        walkPackageJson(path.join(process.cwd(), 'node_modules', sourceValue, 'package.json'));
+        walkPackageJson(path.join(absoluteNodeModulesLocation, 'package.json'));
       } else if (sourceValue.indexOf('./') < 0) {
         // adding a relative import
         updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
@@ -65,8 +66,8 @@ const walkModule = (module, dependency) => {
           ? `${sourceValue}.js`
           : sourceValue;
 
-        if (fs.existsSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue))) {
-          const moduleContents = fs.readFileSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue));
+        if (fs.existsSync(path.join(absoluteNodeModulesLocation, sourceValue))) {
+          const moduleContents = fs.readFileSync(path.join(absoluteNodeModulesLocation, sourceValue));
           walkModule(moduleContents, dependency);
           updateImportMap(`${dependency}/${sourceValue.replace('./', '')}`, `/node_modules/${dependency}/${sourceValue.replace('./', '')}`);
         }
@@ -102,6 +103,8 @@ const walkPackageJson = (packageJson = {}) => {
     const isJavascriptPackage = Array.isArray(entry) || typeof entry === 'string' && entry.endsWith('.js') || entry.endsWith('.mjs');
 
     if (isJavascriptPackage) {
+      const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(dependency);
+
       // https://nodejs.org/api/packages.html#packages_determining_module_system
       if (Array.isArray(entry)) {
         // we have an exportMap
@@ -159,7 +162,8 @@ const walkPackageJson = (packageJson = {}) => {
           }
   
           if (packageExport) {
-            const packageExportLocation = path.join(process.cwd(), 'node_modules', `${dependency}/${packageExport.replace('./', '')}`);
+            const packageExportLocation = path.join(absoluteNodeModulesLocation, packageExport.replace('./', ''));
+
             // check all exports of an exportMap entry
             // to make sure those deps get added to the importMap
             if (packageExport.endsWith('js')) {
@@ -181,7 +185,8 @@ const walkPackageJson = (packageJson = {}) => {
 
         walkPackageJson(dependencyPackageJson);
       } else {
-        const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
+        const packageEntryPointPath = path.join(absoluteNodeModulesLocation, entry);
+
         // sometimes a main file is actually just an empty string... :/
         if (fs.existsSync(packageEntryPointPath)) {
           const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
