@@ -198,10 +198,12 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
 };
 
 const getUserScripts = (contents) => {
-  // polyfill chromium for WCs support
+  // polyfill chromium for WC support
+  // https://lit.dev/docs/tools/requirements/#polyfills
   if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
     contents = contents.replace('<head>', `
       <head>
+        <script src="/node_modules/lit/polyfill-support.js"></script>
         <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     `);
   }
@@ -404,6 +406,7 @@ class StandardHtmlResource extends ResourceInterface {
         if (hasHead && hasHead.length > 0) {
           let contents = hasHead[0];
 
+          contents = contents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
           contents = contents.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
           contents = contents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
           contents = contents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
