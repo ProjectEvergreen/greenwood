@@ -66,11 +66,14 @@ You can do the same in your HTML
 >
 > ```javascript
 > import { html, LitElement } from 'lit-element';
-> import logo from '../../assets/images/logo.png';
+> import headerCss from './header.css';
 >
 > class HeaderComponent extends LitElement {
 >  render() {
 >    return html`
+>      <style>
+>        ${headerCss}
+>      <style>
 >      <header>
 >        <h1>Welcome to My Site!</h1>
 >        <img alt="brand logo" src="${logo}" />
