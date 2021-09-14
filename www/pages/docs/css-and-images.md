@@ -62,7 +62,7 @@ You can do the same in your HTML
 ```
 
 
-> If you like your all-the-things-in-JS approach, Greenwood can be extended with [plugins](/plugins/) to support "webpack" like behavior as seen in the below example:
+> If you like an all-the-things-in-JS approach, Greenwood can be extended with [plugins](/plugins/) to support "webpack" like behavior as seen in the below example:
 >
 > ```javascript
 > import { html, LitElement } from 'lit-element';
