@@ -197,13 +197,24 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
   return appTemplateContents;
 };
 
-const getUserScripts = (contents) => {
+const getUserScripts = (contents, context) => {
   // polyfill chromium for WC support
   // https://lit.dev/docs/tools/requirements/#polyfills
   if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
+    const { projectDirectory, userWorkspace } = context;
+    const dependencies = fs.existsSync(path.join(userWorkspace, 'package.json')) // handle monorepos first
+      ? JSON.parse(fs.readFileSync(path.join(userWorkspace, 'package.json'), 'utf-8')).dependencies
+      : fs.existsSync(path.join(projectDirectory, 'package.json'))
+        ? JSON.parse(fs.readFileSync(path.join(projectDirectory, 'package.json'), 'utf-8')).dependencies
+        : {};
+
+    const litPolyfill = dependencies && dependencies.lit
+      ? '<script src="/node_modules/lit/polyfill-support.js"></script>\n'
+      : '';
+
     contents = contents.replace('<head>', `
       <head>
-        <script src="/node_modules/lit/polyfill-support.js"></script>
+        ${litPolyfill}
         <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     `);
   }
@@ -355,7 +366,7 @@ class StandardHtmlResource extends ResourceInterface {
         }
 
         body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins);  
-        body = getUserScripts(body, customImports);
+        body = getUserScripts(body, this.compilation.context);
         body = getMetaContent(normalizedUrl.replace(/\\/g, '/'), config, body);
         
         if (processedMarkdown) {
