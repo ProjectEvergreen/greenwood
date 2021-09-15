@@ -33,6 +33,7 @@ class IncludeHtmlCssResource extends ResourceInterface {
         // --------
 
         const includeLinksRegexMatches = body.match(/<link (.*)><\/link>/g);
+        const includeCustomElementssRegexMatches = body.match(/<[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)>/g);
 
         if (includeLinksRegexMatches) {
           includeLinksRegexMatches
@@ -43,6 +44,19 @@ class IncludeHtmlCssResource extends ResourceInterface {
 
               body = body.replace(link, includeContents);
             });
+        }
+
+        if (includeCustomElementssRegexMatches) {
+          const customElementTags = includeCustomElementssRegexMatches.filter(customElementTag => customElementTag.indexOf('src=') > 0)
+
+          for(const tag of customElementTags) {
+            const src = tag.match(/src="(.*)"/)[1];
+            const filepath = path.join(this.compilation.context.userWorkspace, this.getBareUrlPath(src.replace(/\.\.\//g, '')))
+            const getTemplate = require(filepath);
+            const includeContents = await getTemplate({ version: '0.15.3'});
+
+            body = body.replace(tag, includeContents);
+          }
         }
 
         resolve({ body });
