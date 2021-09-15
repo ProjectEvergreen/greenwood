@@ -52,8 +52,8 @@ class IncludeHtmlCssResource extends ResourceInterface {
           for(const tag of customElementTags) {
             const src = tag.match(/src="(.*)"/)[1];
             const filepath = path.join(this.compilation.context.userWorkspace, this.getBareUrlPath(src.replace(/\.\.\//g, '')))
-            const getTemplate = require(filepath);
-            const includeContents = await getTemplate({ version: '0.15.3'});
+            const { getData, getTemplate } = require(filepath);
+            const includeContents = await getTemplate(await getData());
 
             body = body.replace(tag, includeContents);
           }

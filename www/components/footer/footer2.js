@@ -36,4 +36,13 @@ const getTemplate = async (data) => {
     </app-footer2>`;
 };
 
-module.exports = getTemplate;
+const getData = async () => {
+  const version = require('../../package.json').version;
+
+  return { version };
+};
+
+module.exports = {
+  getTemplate,
+  getData
+};
