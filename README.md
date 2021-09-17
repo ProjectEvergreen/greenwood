@@ -69,3 +69,18 @@ We would love your [contribution](.github/CONTRIBUTING.md) to Greenwood!  Please
 
 ## License
 See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
+
+`yarn test`
+```sh
+  999 passing (5m)
+  8 pending
+  93 failing
+
+  1) Develop Greenwood With:
+       Default Greenwood Configuration and Workspace
+         Running Smoke Tests: Default Greenwood Configuration and Workspace
+           Serving Index (Home) page
+             "before all" hook for "should start the server and return 200 status":
+     Error: connect ECONNREFUSED 127.0.0.1:1984
+      at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1146:16)
+```

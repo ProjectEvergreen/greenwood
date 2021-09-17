@@ -43,7 +43,7 @@ describe('Serve Greenwood With: ', function() {
       return new Promise(async (resolve) => {
         setTimeout(() => {
           resolve();
-        }, 6000);
+        }, 10000);
 
         await runner.runCommand(cliPath, 'serve');
       });
