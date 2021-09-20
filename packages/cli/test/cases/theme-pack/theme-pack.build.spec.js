@@ -34,7 +34,7 @@ const Runner = require('gallinago').Runner;
 const runSmokeTest = require('../../../../../test/smoke-test');
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Developement environment for a heme Pack';
+  const LABEL = 'Developement environment for a Theme Pack';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
   let runner;
@@ -43,7 +43,7 @@ describe('Build Greenwood With: ', function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {

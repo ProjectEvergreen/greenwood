@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const replace = require('@rollup/plugin-replace');
+const { getNodeModulesResolveLocationForPackageName, getPackageNameFromUrl } = require('../../lib/node-modules-utils');
 const { ResourceInterface } = require('../../lib/resource-interface');
 const walk = require('acorn-walk');
 
@@ -32,7 +33,7 @@ const getPackageEntryPath = (packageJson) => {
         : 'index.js'; // lastly, fallback to index.js
 
   // use .mjs version if it exists, for packages like redux
-  if (!Array.isArray(entry) && fs.existsSync(`${process.cwd()}/node_modules/${packageJson.name}/${entry.replace('.js', '.mjs')}`)) {
+  if (!Array.isArray(entry) && fs.existsSync(`${getNodeModulesResolveLocationForPackageName(packageJson.name)}/${entry.replace('.js', '.mjs')}`)) {
     entry = entry.replace('.js', '.mjs');
   }
 
@@ -46,6 +47,7 @@ const walkModule = (module, dependency) => {
   }), {
     ImportDeclaration(node) {
       let { value: sourceValue } = node.source;
+      const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(dependency);
 
       if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {        
         if (!importMap[sourceValue]) {
@@ -54,7 +56,7 @@ const walkModule = (module, dependency) => {
           updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
         }
         
-        walkPackageJson(path.join(process.cwd(), 'node_modules', sourceValue, 'package.json'));
+        walkPackageJson(path.join(absoluteNodeModulesLocation, 'package.json'));
       } else if (sourceValue.indexOf('./') < 0) {
         // adding a relative import
         updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
@@ -64,9 +66,10 @@ const walkModule = (module, dependency) => {
           ? `${sourceValue}.js`
           : sourceValue;
 
-        if (fs.existsSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue))) {
-          const moduleContents = fs.readFileSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue));
+        if (fs.existsSync(path.join(absoluteNodeModulesLocation, sourceValue))) {
+          const moduleContents = fs.readFileSync(path.join(absoluteNodeModulesLocation, sourceValue));
           walkModule(moduleContents, dependency);
+          updateImportMap(`${dependency}/${sourceValue.replace('./', '')}`, `/node_modules/${dependency}/${sourceValue.replace('./', '')}`);
         }
       }
     },
@@ -100,6 +103,8 @@ const walkPackageJson = (packageJson = {}) => {
     const isJavascriptPackage = Array.isArray(entry) || typeof entry === 'string' && entry.endsWith('.js') || entry.endsWith('.mjs');
 
     if (isJavascriptPackage) {
+      const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(dependency);
+
       // https://nodejs.org/api/packages.html#packages_determining_module_system
       if (Array.isArray(entry)) {
         // we have an exportMap
@@ -157,7 +162,7 @@ const walkPackageJson = (packageJson = {}) => {
           }
   
           if (packageExport) {
-            const packageExportLocation = path.join(process.cwd(), 'node_modules', `${dependency}/${packageExport.replace('./', '')}`);
+            const packageExportLocation = path.join(absoluteNodeModulesLocation, packageExport.replace('./', ''));
 
             // check all exports of an exportMap entry
             // to make sure those deps get added to the importMap
@@ -165,7 +170,7 @@ const walkPackageJson = (packageJson = {}) => {
               const moduleContents = fs.readFileSync(packageExportLocation);
 
               walkModule(moduleContents, dependency);
-              updateImportMap(`${dependency}/${packageExport.replace('./', '')}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
+              updateImportMap(`${dependency}${entry.replace('.', '')}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
             } else if (fs.lstatSync(packageExportLocation).isDirectory()) {
               fs.readdirSync(packageExportLocation)
                 .filter(file => file.endsWith('.js') || file.endsWith('.mjs'))
@@ -180,8 +185,8 @@ const walkPackageJson = (packageJson = {}) => {
 
         walkPackageJson(dependencyPackageJson);
       } else {
-        const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
-        
+        const packageEntryPointPath = path.join(absoluteNodeModulesLocation, entry);
+
         // sometimes a main file is actually just an empty string... :/
         if (fs.existsSync(packageEntryPointPath)) {
           const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
@@ -206,50 +211,26 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   async resolve(url) {
-    const packagePathPieces = this.getBareUrlPath(url).split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
-    let packageName = packagePathPieces.shift();
-    let nodeModulesUrl;
+    const bareUrl = this.getBareUrlPath(url);
+    const { projectDirectory } = this.compilation.context;
+    const packageName = getPackageNameFromUrl(bareUrl);
+    const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(packageName);
+    const packagePathPieces = bareUrl.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
+    let absoluteNodeModulesUrl;
 
-    // handle scoped packages
-    if (packageName.indexOf('@') === 0) {
-      packageName = `${packageName}/${packagePathPieces.shift()}`;
-    }
-
-    // ideally let NodeJS do the look up for us, but in the evant that fails
-    // do our best to resolve the file (helpful for theme pack testing and development) 
-    // (where things are unpublished and routed around)
-    try {
-      const packageEntryLocation = require.resolve(packageName).replace(/\\/g, '/'); // force / for consistency and path matching
-
-      if (packageName.indexOf('@greenwood') === 0) {
-        const subPackage = packageEntryLocation.indexOf('@greenwood') > 0
-          ? packageName // we are in the user's node modules
-          : packageName.split('/')[1]; // else we are in our monorepo
-        const packageRootPath = packageEntryLocation.indexOf('@greenwood') > 0
-          ? packageEntryLocation.split(packageName)[0] // we are in the user's node modules
-          : packageEntryLocation.split(subPackage)[0]; // else we are in our monorepo
-
-        nodeModulesUrl = `${packageRootPath}${subPackage}/${packagePathPieces.join('/')}`;
-      } else {
-        const packageRootPath = packageEntryLocation.split(packageName)[0];
-
-        nodeModulesUrl = `${packageRootPath}${packageName}/${packagePathPieces.join('/')}`;
-      }
-
-      return Promise.resolve(nodeModulesUrl);
-    } catch (e) {
-      console.debug('Error looking of package with NodeJS, falling back to default greenwood node_modules resolution');
-      const { projectDirectory } = this.compilation.context;
-      const bareUrl = this.getBareUrlPath(url);
+    if (absoluteNodeModulesLocation) {
+      absoluteNodeModulesUrl = `${absoluteNodeModulesLocation}${packagePathPieces.join('/').replace(packageName, '')}`;
+    } else {
       const isAbsoluteNodeModulesFile = fs.existsSync(path.join(projectDirectory, bareUrl));
-      const nodeModulesUrl = isAbsoluteNodeModulesFile
+      
+      absoluteNodeModulesUrl = isAbsoluteNodeModulesFile
         ? path.join(projectDirectory, bareUrl)
         : this.resolveRelativeUrl(projectDirectory, bareUrl)
           ? path.join(projectDirectory, this.resolveRelativeUrl(projectDirectory, bareUrl))
           : bareUrl;
-
-      return Promise.resolve(nodeModulesUrl);
     }
+
+    return Promise.resolve(absoluteNodeModulesUrl);
   }
 
   async shouldServe(url) {

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { getNodeModulesResolveLocationForPackageName } = require('@greenwood/cli/src/lib/node-modules-utils');
 const path = require('path');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 
@@ -12,16 +13,16 @@ class PolyfillsResource extends ResourceInterface {
   }
 
   async optimize(url, body) {
+    const polyfillPackageName = '@webcomponents/webcomponentsjs';
     const filename = 'webcomponents-loader.js';
-    const nodeModuleRoot = 'node_modules/@webcomponents/webcomponentsjs';
+    const polyfillNodeModulesLocation = getNodeModulesResolveLocationForPackageName(polyfillPackageName);
 
     return new Promise(async (resolve, reject) => {
       try {
-        const cwd = process.cwd();
         const { outputDir } = this.compilation.context;
         const polyfillFiles = [
           'webcomponents-loader.js',
-          ...fs.readdirSync(path.join(process.cwd(), nodeModuleRoot, 'bundles')).map(file => {
+          ...fs.readdirSync(path.join(polyfillNodeModulesLocation, 'bundles')).map(file => {
             return `bundles/${file}`;
           })
         ];
@@ -31,7 +32,7 @@ class PolyfillsResource extends ResourceInterface {
         }
 
         await Promise.all(polyfillFiles.map(async (file) => {
-          const from = path.join(cwd, nodeModuleRoot, file);
+          const from = path.join(polyfillNodeModulesLocation, file);
           const to = path.join(outputDir, file);
           
           return !fs.existsSync(to)
@@ -41,7 +42,7 @@ class PolyfillsResource extends ResourceInterface {
 
         const newHtml = body.replace('<head>', `
           <head>
-            <script src="/${nodeModuleRoot}/${filename}"></script>
+            <script src="/node_modules/${polyfillPackageName}/${filename}"></script>
         `);
 
         resolve(newHtml);
