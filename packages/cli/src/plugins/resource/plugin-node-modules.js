@@ -67,6 +67,7 @@ const walkModule = (module, dependency) => {
         if (fs.existsSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue))) {
           const moduleContents = fs.readFileSync(path.join(process.cwd(), 'node_modules', dependency, sourceValue));
           walkModule(moduleContents, dependency);
+          updateImportMap(`${dependency}/${sourceValue.replace('./', '')}`, `/node_modules/${dependency}/${sourceValue.replace('./', '')}`);
         }
       }
     },
@@ -158,14 +159,13 @@ const walkPackageJson = (packageJson = {}) => {
   
           if (packageExport) {
             const packageExportLocation = path.join(process.cwd(), 'node_modules', `${dependency}/${packageExport.replace('./', '')}`);
-
             // check all exports of an exportMap entry
             // to make sure those deps get added to the importMap
             if (packageExport.endsWith('js')) {
               const moduleContents = fs.readFileSync(packageExportLocation);
 
               walkModule(moduleContents, dependency);
-              updateImportMap(`${dependency}/${packageExport.replace('./', '')}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
+              updateImportMap(`${dependency}${entry.replace('.', '')}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
             } else if (fs.lstatSync(packageExportLocation).isDirectory()) {
               fs.readdirSync(packageExportLocation)
                 .filter(file => file.endsWith('.js') || file.endsWith('.mjs'))
@@ -181,7 +181,6 @@ const walkPackageJson = (packageJson = {}) => {
         walkPackageJson(dependencyPackageJson);
       } else {
         const packageEntryPointPath = path.join(process.cwd(), './node_modules', dependency, entry);
-        
         // sometimes a main file is actually just an empty string... :/
         if (fs.existsSync(packageEntryPointPath)) {
           const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
