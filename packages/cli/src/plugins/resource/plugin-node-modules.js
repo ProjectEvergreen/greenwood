@@ -47,7 +47,9 @@ const walkModule = (module, dependency) => {
   }), {
     ImportDeclaration(node) {
       let { value: sourceValue } = node.source;
-      const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(dependency);
+      const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(dependency)
+        ? getNodeModulesResolveLocationForPackageName(dependency)
+        : path.join(process.cwd(), 'node_modules', dependency);
 
       if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {        
         if (!importMap[sourceValue]) {
@@ -103,7 +105,9 @@ const walkPackageJson = (packageJson = {}) => {
     const isJavascriptPackage = Array.isArray(entry) || typeof entry === 'string' && entry.endsWith('.js') || entry.endsWith('.mjs');
 
     if (isJavascriptPackage) {
-      const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(dependency);
+      const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(dependency)
+        ? getNodeModulesResolveLocationForPackageName(dependency)
+        : path.join(process.cwd(), 'node_modules', dependency);
 
       // https://nodejs.org/api/packages.html#packages_determining_module_system
       if (Array.isArray(entry)) {
