@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const replace = require('@rollup/plugin-replace');
-const { getNodeModulesResolveLocationForPackageName, getFallbackNodeModulesLocation, getPackageNameFromUrl } = require('../../lib/node-modules-utils');
+const { getNodeModulesLocationForPackage, getPackageNameFromUrl } = require('../../lib/node-modules-utils');
 const { ResourceInterface } = require('../../lib/resource-interface');
 const walk = require('acorn-walk');
 
@@ -33,7 +33,7 @@ const getPackageEntryPath = (packageJson) => {
         : 'index.js'; // lastly, fallback to index.js
 
   // use .mjs version if it exists, for packages like redux
-  if (!Array.isArray(entry) && fs.existsSync(`${getNodeModulesResolveLocationForPackageName(packageJson.name)}/${entry.replace('.js', '.mjs')}`)) {
+  if (!Array.isArray(entry) && fs.existsSync(`${getNodeModulesLocationForPackage(packageJson.name)}/${entry.replace('.js', '.mjs')}`)) {
     entry = entry.replace('.js', '.mjs');
   }
 
@@ -47,9 +47,7 @@ const walkModule = (module, dependency) => {
   }), {
     ImportDeclaration(node) {
       let { value: sourceValue } = node.source;
-      const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(dependency)
-        ? getNodeModulesResolveLocationForPackageName(dependency)
-        : getFallbackNodeModulesLocation(dependency);
+      const absoluteNodeModulesLocation = getNodeModulesLocationForPackage(dependency);
 
       if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {        
         if (!importMap[sourceValue]) {
@@ -105,9 +103,7 @@ const walkPackageJson = (packageJson = {}) => {
     const isJavascriptPackage = Array.isArray(entry) || typeof entry === 'string' && entry.endsWith('.js') || entry.endsWith('.mjs');
 
     if (isJavascriptPackage) {
-      const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(dependency)
-        ? getNodeModulesResolveLocationForPackageName(dependency)
-        : getFallbackNodeModulesLocation(dependency);
+      const absoluteNodeModulesLocation = getNodeModulesLocationForPackage(dependency);
 
       // https://nodejs.org/api/packages.html#packages_determining_module_system
       if (Array.isArray(entry)) {
@@ -218,7 +214,7 @@ class NodeModulesResource extends ResourceInterface {
     const bareUrl = this.getBareUrlPath(url);
     const { projectDirectory } = this.compilation.context;
     const packageName = getPackageNameFromUrl(bareUrl);
-    const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(packageName);
+    const absoluteNodeModulesLocation = getNodeModulesLocationForPackage(packageName);
     const packagePathPieces = bareUrl.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
     let absoluteNodeModulesUrl;
 
