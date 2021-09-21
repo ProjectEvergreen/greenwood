@@ -31,7 +31,6 @@ function getNodeModulesResolveLocationForPackageName(packageName) {
     if (fs.existsSync(pathToPackageJson)) {
       const packageJson = require(pathToPackageJson);
 
-      // console.debug('cccc', !!packageJson.main && packageJson.main !== '');
       if (!!packageJson.main && packageJson.main !== '') {
         console.debug(`Unable to look up package using NodeJS require.resolve for => ${packageName}.`);
       }
