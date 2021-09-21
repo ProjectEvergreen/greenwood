@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const replace = require('@rollup/plugin-replace');
-const { getNodeModulesResolveLocationForPackageName, getPackageNameFromUrl } = require('../../lib/node-modules-utils');
+const { getNodeModulesResolveLocationForPackageName, getFallbackNodeModulesLocation, getPackageNameFromUrl } = require('../../lib/node-modules-utils');
 const { ResourceInterface } = require('../../lib/resource-interface');
 const walk = require('acorn-walk');
 
@@ -49,7 +49,7 @@ const walkModule = (module, dependency) => {
       let { value: sourceValue } = node.source;
       const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(dependency)
         ? getNodeModulesResolveLocationForPackageName(dependency)
-        : path.join(process.cwd(), 'node_modules', dependency);
+        : getFallbackNodeModulesLocation(dependency);
 
       if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {        
         if (!importMap[sourceValue]) {
@@ -107,7 +107,7 @@ const walkPackageJson = (packageJson = {}) => {
     if (isJavascriptPackage) {
       const absoluteNodeModulesLocation = getNodeModulesResolveLocationForPackageName(dependency)
         ? getNodeModulesResolveLocationForPackageName(dependency)
-        : path.join(process.cwd(), 'node_modules', dependency);
+        : getFallbackNodeModulesLocation(dependency);
 
       // https://nodejs.org/api/packages.html#packages_determining_module_system
       if (Array.isArray(entry)) {

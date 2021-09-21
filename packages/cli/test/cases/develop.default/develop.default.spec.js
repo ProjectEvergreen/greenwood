@@ -166,6 +166,10 @@ describe('Develop Greenwood With: ', function() {
         `${process.cwd()}/node_modules/singleton-manager/package.json`,
         `${outputPath}/node_modules/singleton-manager/`
       );
+      const trustedTypesPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
+        `${outputPath}/node_modules/@types/trusted-types/`
+      );
 
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
@@ -196,7 +200,8 @@ describe('Develop Greenwood With: ', function() {
         ...messageFormatLibs,
         ...messageFormatLibsPackageJson,
         ...singletonManagerLibsPackageJson,
-        ...singletonManagerLibs
+        ...singletonManagerLibs,
+        ...trustedTypesPackageJson
       ]);
 
       return new Promise(async (resolve) => {
