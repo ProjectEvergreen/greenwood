@@ -1,6 +1,6 @@
 {
   "name": "plugin-graphql-test-menu-query",
   "dependencies": {
-    "lit": "^2.0.0-rc.4"
+    "lit": "^2.0.0"
   }
 }

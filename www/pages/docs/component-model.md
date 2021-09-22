@@ -77,7 +77,7 @@ An alternative like [**LitElement**](https://lit.dev/) would work the same way.
 
 _src/components/greeting.js_
 ```javascript
-import { html, LitElement } from 'lit-element';
+import { html, LitElement } from 'lit';
 
 class GreetingComponent extends LitElement {
 
@@ -118,7 +118,7 @@ customElements.define('x-greeting', GreetingComponent);
 
 
 > Some notes / recommendations about ShadowDOM from [our research](https://github.com/ProjectEvergreen/greenwood/pull/454)
-> - [`<slot>` should be named](https://github.com/Polymer/lit-element/issues/824#issuecomment-535574662)
+> - [`<slot>` should be named](https://github.com/Polymer/lit/issues/824#issuecomment-535574662)
 > - `<slot>` only supports a [shallow (one) level of nesting](https://javascript.info/slots-composition).  A `<slot>` tag must be within a direct descendant of its `:host`.
 > ```html
 > <h3>Content from inside the custom element. (inside HTMLElement)</h3>
