@@ -1,6 +1,8 @@
+const fs = require('fs');
+
 // defer to NodeJS to find where on disk a package is located using require.resolve
 // and return the root absolute location
-function getNodeModulesResolveLocationForPackageName(packageName) {
+function getNodeModulesLocationForPackage(packageName) {
   let nodeModulesUrl;
   
   try {
@@ -20,9 +22,24 @@ function getNodeModulesResolveLocationForPackageName(packageName) {
 
       nodeModulesUrl = `${packageRootPath}${packageName}`;
     }
-
   } catch (e) {
-    console.debug(`Unable to look up package using NodeJS require.resolve for => ${packageName}`);
+    // require.resolve may fail in the event a package has no main in its package.json
+    // so as a fallback, ask for node_modules paths and find its location manually
+    // https://github.com/ProjectEvergreen/greenwood/issues/557#issuecomment-923332104
+    const locations = require.resolve.paths(packageName);
+
+    for (const location in locations) {
+      const nodeModulesPackageRoot = `${locations[location]}/${packageName}`;
+      const packageJsonLocation = `${nodeModulesPackageRoot}/package.json`;
+
+      if (fs.existsSync(packageJsonLocation)) {
+        nodeModulesUrl = nodeModulesPackageRoot;
+      }
+    }
+
+    if (!nodeModulesUrl) {
+      console.debug(`Unable to look up ${packageName} using NodeJS require.resolve.`);
+    }
   }
 
   return nodeModulesUrl;
@@ -42,6 +59,6 @@ function getPackageNameFromUrl(url) {
 }
 
 module.exports = {
-  getNodeModulesResolveLocationForPackageName,
+  getNodeModulesLocationForPackage,
   getPackageNameFromUrl
 };
