@@ -126,12 +126,6 @@ describe('Develop Greenwood With: ', function() {
         `${process.cwd()}/node_modules/lit-html/directives/*.js`,
         `${outputPath}/node_modules/lit-html/directives/`
       );
-      // lit-html has a dependency on this
-      // https://github.com/lit/lit/blob/main/packages/lit-html/package.json#L82
-      const trustedTypes = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
-        `${outputPath}/node_modules/@types/trusted-types/`
-      );
       const litReactiveElement = await getDependencyFiles(
         `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
         `${outputPath}/node_modules/@lit/reactive-element/`
@@ -236,6 +230,14 @@ describe('Develop Greenwood With: ', function() {
         `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
         `${outputPath}/node_modules/@types/trusted-types/`
       );
+      const scopedCustomElementRegistryPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@webcomponents/scoped-custom-element-registry/package.json`,
+        `${outputPath}/node_modules/@webcomponents/scoped-custom-element-registry/`
+      );
+      const scopedCustomElementRegistryLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@webcomponents/scoped-custom-element-registry/*.js`,
+        `${outputPath}/node_modules/@webcomponents/scoped-custom-element-registry/`
+      );
 
       // manually copy all these @babel/runtime files recursively since there are too many of them to do it individually
       const babelRuntimeLibs = await rreaddir(`${process.cwd()}/node_modules/@babel/runtime`);
@@ -278,7 +280,6 @@ describe('Develop Greenwood With: ', function() {
         ...litHtmlPackageJson,
         ...litHtml,
         ...litHtmlDirectives,
-        ...trustedTypes,
         ...litReactiveElement,
         ...litReactiveElementDecorators,
         ...litReactiveElementPackageJson,
@@ -306,7 +307,9 @@ describe('Develop Greenwood With: ', function() {
         ...singletonManagerLibs,
         ...trustedTypesPackageJson,
         ...regeneratorRuntimeLibs,
-        ...regeneratorRuntimeLibsPackageJson
+        ...regeneratorRuntimeLibsPackageJson,
+        ...scopedCustomElementRegistryPackageJson,
+        ...scopedCustomElementRegistryLibs
       ]);
 
       return new Promise(async (resolve) => {
@@ -367,7 +370,7 @@ describe('Develop Greenwood With: ', function() {
         // https://github.com/ProjectEvergreen/greenwood/issues/715
         // export maps with "flat" entries
         expect(importMap['@lion/button']).to.equal('/node_modules/@lion/button/index.js');
-        expect(importMap['@lion/button/define']).to.equal('/node_modules/@lion/button/lion-button.js');
+        expect(importMap['@lion/button/define']).to.equal('/node_modules/@lion/button/define.js');
 
         // https://github.com/ProjectEvergreen/greenwood/issues/715
         // transient dependency import / exports
