@@ -56,7 +56,7 @@ describe('Develop Greenwood With: ', function() {
       return new Promise(async (resolve) => {
         setTimeout(() => {
           resolve();
-        }, 3000);
+        }, 5000);
 
         await runner.runCommand(cliPath, 'develop');
       });
