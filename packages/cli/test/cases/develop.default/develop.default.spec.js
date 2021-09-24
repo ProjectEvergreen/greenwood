@@ -26,15 +26,47 @@
  *     index.html
  *   styles/
  *     main.css
- *
+ * package.json
  */
 const expect = require('chai').expect;
+const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const { getDependencyFiles, getSetupFiles } = require('../../../../../test/utils');
 const request = require('request');
 const Runner = require('gallinago').Runner;
 const runSmokeTest = require('../../../../../test/smoke-test');
+
+async function rreaddir (dir, allFiles = []) {
+  const files = (await fs.promises.readdir(dir)).map(f => path.join(dir, f));
+
+  allFiles.push(...files);
+
+  await Promise.all(files.map(async f => (
+    await fs.promises.stat(f)).isDirectory() && rreaddir(f, allFiles
+  )));
+
+  return allFiles;
+}
+
+// https://stackoverflow.com/a/30405105/417806
+async function copyFile(source, target) {
+  const rd = fs.createReadStream(source);
+  const wr = fs.createWriteStream(target);
+
+  try {
+    return await new Promise((resolve, reject) => {
+      rd.on('error', reject);
+      wr.on('error', reject);
+      wr.on('finish', resolve);
+      rd.pipe(wr);
+    });
+  } catch (error) {
+    console.error('ERROR', error);
+    rd.destroy();
+    wr.end();
+  }
+}
 
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
@@ -90,6 +122,115 @@ describe('Develop Greenwood With: ', function() {
         `${process.cwd()}/node_modules/simpledotcss/package.json`,
         `${outputPath}/node_modules/simpledotcss/`
       );
+      const lionButtonLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/button/*.js`,
+        `${outputPath}/node_modules/@lion/button/`
+      );
+      const lionButtonLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/button/package.json`,
+        `${outputPath}/node_modules/@lion/button/`
+      );
+      const lionCoreTesterLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/core/test-helpers/*.js`,
+        `${outputPath}/node_modules/@lion/core/test-helpers/`
+      );
+      const lionCoreSrcLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/core/src/*.js`,
+        `${outputPath}/node_modules/@lion/core/src/`
+      );
+      const lionCoreLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/core/*.js`,
+        `${outputPath}/node_modules/@lion/core/`
+      );
+      const lionCoreLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/core/package.json`,
+        `${outputPath}/node_modules/@lion/core/`
+      );
+      const lionCalendarLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/calendar/*.js`,
+        `${outputPath}/node_modules/@lion/calendar/`
+      );
+      const lionCalendarLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/calendar/package.json`,
+        `${outputPath}/node_modules/@lion/calendar/`
+      );
+      const lionCalendarTesterLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/calendar/test-helpers/*.js`,
+        `${outputPath}/node_modules/@lion/calendar/test-helpers/`
+      );
+      const lionLocalizeLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/localize/*.js`,
+        `${outputPath}/node_modules/@lion/localize/`
+      );
+      const lionLocalizeLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/localize/package.json`,
+        `${outputPath}/node_modules/@lion/localize/`
+      );
+      const lionLocalizeTesterLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/localize/test-helpers/*.js`,
+        `${outputPath}/node_modules/@lion/localize/test-helpers/`
+      );
+      const lionLocalizeSrcLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lion/localize/src/*.js`,
+        `${outputPath}/node_modules/@lion/localize/src/`
+      );
+      const owcDepupLibPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@open-wc/dedupe-mixin/package.json`,
+        `${outputPath}/node_modules/@open-wc/dedupe-mixin/`
+      );
+      const owcScopedLibPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@open-wc/scoped-elements/package.json`,
+        `${outputPath}/node_modules/@open-wc/scoped-elements/`
+      );
+      const messageFormatLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@bundled-es-modules/message-format/*.js`,
+        `${outputPath}/node_modules/@bundled-es-modules/message-format/`
+      );
+      const messageFormatLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@bundled-es-modules/message-format/package.json`,
+        `${outputPath}/node_modules/@bundled-es-modules/message-format/`
+      );
+      const singletonManagerLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/singleton-manager/index.js`,
+        `${outputPath}/node_modules/singleton-manager/`
+      );
+      const singletonManagerLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/singleton-manager/package.json`,
+        `${outputPath}/node_modules/singleton-manager/`
+      );
+      const trustedTypesPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
+        `${outputPath}/node_modules/@types/trusted-types/`
+      );
+
+      // manually copy all these @babel/runtime files recursively since there are too many of them to do it individually
+      const babelRuntimeLibs = await rreaddir(`${process.cwd()}/node_modules/@babel/runtime`);
+
+      await fs.promises.mkdir(`${outputPath}/node_modules/@babel/runtime`, { recursive: true });
+      await fs.promises.copyFile(`${process.cwd()}/node_modules/@babel/runtime/package.json`, `${outputPath}/node_modules/@babel/runtime/package.json`);
+      await Promise.all(babelRuntimeLibs.filter((asset) => {
+        const target = asset.replace(process.cwd(), __dirname);
+        const isDirectory = path.extname(target) === '';
+
+        if (isDirectory && !fs.existsSync(target)) {
+          fs.mkdirSync(target);
+        } else if (!isDirectory) {
+          return asset;
+        }
+      }).map((asset) => {
+        const target = asset.replace(process.cwd(), __dirname);
+
+        return copyFile(asset, target);
+      }));
+
+      const regeneratorRuntimeLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/regenerator-runtime/*.js`,
+        `${outputPath}/node_modules/regenerator-runtime/`
+      );
+      const regeneratorRuntimeLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/regenerator-runtime/package.json`,
+        `${outputPath}/node_modules/regenerator-runtime/`
+      );
 
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
@@ -101,7 +242,29 @@ describe('Develop Greenwood With: ', function() {
         ...litHtmlLibs,
         ...litHtmlSourceMap,
         ...simpleCss,
-        ...simpleCssPackageJson
+        ...simpleCssPackageJson,
+        ...lionButtonLibs,
+        ...lionButtonLibsPackageJson,
+        ...lionCoreLibs,
+        ...lionCoreTesterLibs,
+        ...lionCoreLibsPackageJson,
+        ...lionCoreSrcLibs,
+        ...lionCalendarLibs,
+        ...lionCalendarLibsPackageJson,
+        ...lionCalendarTesterLibs,
+        ...lionLocalizeLibs,
+        ...lionLocalizeLibsPackageJson,
+        ...lionLocalizeTesterLibs,
+        ...lionLocalizeSrcLibs,
+        ...owcDepupLibPackageJson,
+        ...owcScopedLibPackageJson,
+        ...messageFormatLibs,
+        ...messageFormatLibsPackageJson,
+        ...singletonManagerLibsPackageJson,
+        ...singletonManagerLibs,
+        ...trustedTypesPackageJson,
+        ...regeneratorRuntimeLibs,
+        ...regeneratorRuntimeLibsPackageJson
       ]);
 
       return new Promise(async (resolve) => {
@@ -158,6 +321,15 @@ describe('Develop Greenwood With: ', function() {
         expect(importMap['lit-element']).to.equal('/node_modules/lit-element/lit-element.js');
         expect(importMap['lit-html/lit-html.js']).to.equal('/node_modules/lit-html/lit-html.js');
         expect(importMap['lit-html/lib/shady-render.js']).to.equal('/node_modules/lit-html/lib/shady-render.js');
+
+        // https://github.com/ProjectEvergreen/greenwood/issues/715
+        // export maps with "flat" entries
+        expect(importMap['@lion/button']).to.equal('/node_modules/@lion/button/index.js');
+        expect(importMap['@lion/button/define']).to.equal('/node_modules/@lion/button/lion-button.js');
+
+        // https://github.com/ProjectEvergreen/greenwood/issues/715
+        // transient dependency import / exports
+        expect(importMap['@bundled-es-modules/message-format/MessageFormat.js']).to.equal('/node_modules/@bundled-es-modules/message-format/MessageFormat.js');
 
         done();
       });
@@ -561,6 +733,77 @@ describe('Develop Greenwood With: ', function() {
 
       it('should return the correct response body', function(done) {
         expect(response.body).to.equal('console.debug(\'its just a prank bro!\');');
+        done();
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/715
+    describe('Develop command node_modules resolution for a transient dependency\'s own imports', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}:${port}/node_modules/@bundled-es-modules/message-format/MessageFormat.js`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal('text/javascript');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(response.body).to.contain('export default messageFormat;');
+        done();
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/715
+    // @lion/calendar/define -> /node_modules/@lion/calendar/lion-calendar.js
+    describe('Develop command node_modules resolution for a flat export map entry from a dependency (not import or default)', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}:${port}/node_modules/@lion/calendar/lion-calendar.js`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal('text/javascript');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(response.body).to.contain('customElements.define(\'lion-calendar\', LionCalendar);');
         done();
       });
     });

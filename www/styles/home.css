@@ -48,11 +48,11 @@ h3 {
 }
 
 .cards {
-  margin: 20px -0.25rem;
+  margin: 20px -0.25rem 3rem -0.25rem;
   display: flex;
   justify-content: space-around;
   flex-direction: row;
-  margin-bottom: 3rem;
+  width: 100%;
 
   @media (max-width: 1024px) {
     flex-direction: column;
