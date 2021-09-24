@@ -29,12 +29,44 @@
  * package.json
  */
 const expect = require('chai').expect;
+const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const { getDependencyFiles, getSetupFiles } = require('../../../../../test/utils');
 const request = require('request');
 const Runner = require('gallinago').Runner;
 const runSmokeTest = require('../../../../../test/smoke-test');
+
+async function rreaddir (dir, allFiles = []) {
+  const files = (await fs.promises.readdir(dir)).map(f => path.join(dir, f));
+
+  allFiles.push(...files);
+
+  await Promise.all(files.map(async f => (
+    await fs.promises.stat(f)).isDirectory() && rreaddir(f, allFiles
+  )));
+
+  return allFiles;
+}
+
+// https://stackoverflow.com/a/30405105/417806
+async function copyFile(source, target) {
+  const rd = fs.createReadStream(source);
+  const wr = fs.createWriteStream(target);
+
+  try {
+    return await new Promise((resolve, reject) => {
+      rd.on('error', reject);
+      wr.on('error', reject);
+      wr.on('finish', resolve);
+      rd.pipe(wr);
+    });
+  } catch (error) {
+    console.error('ERROR', error);
+    rd.destroy();
+    wr.end();
+  }
+}
 
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
@@ -166,6 +198,39 @@ describe('Develop Greenwood With: ', function() {
         `${process.cwd()}/node_modules/singleton-manager/package.json`,
         `${outputPath}/node_modules/singleton-manager/`
       );
+      const trustedTypesPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
+        `${outputPath}/node_modules/@types/trusted-types/`
+      );
+
+      // manually copy all these @babel/runtime files recursively since there are too many of them to do it individually
+      const babelRuntimeLibs = await rreaddir(`${process.cwd()}/node_modules/@babel/runtime`);
+
+      await fs.promises.mkdir(`${outputPath}/node_modules/@babel/runtime`, { recursive: true });
+      await fs.promises.copyFile(`${process.cwd()}/node_modules/@babel/runtime/package.json`, `${outputPath}/node_modules/@babel/runtime/package.json`);
+      await Promise.all(babelRuntimeLibs.filter((asset) => {
+        const target = asset.replace(process.cwd(), __dirname);
+        const isDirectory = path.extname(target) === '';
+
+        if (isDirectory && !fs.existsSync(target)) {
+          fs.mkdirSync(target);
+        } else if (!isDirectory) {
+          return asset;
+        }
+      }).map((asset) => {
+        const target = asset.replace(process.cwd(), __dirname);
+
+        return copyFile(asset, target);
+      }));
+
+      const regeneratorRuntimeLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/regenerator-runtime/*.js`,
+        `${outputPath}/node_modules/regenerator-runtime/`
+      );
+      const regeneratorRuntimeLibsPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/regenerator-runtime/package.json`,
+        `${outputPath}/node_modules/regenerator-runtime/`
+      );
 
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
@@ -196,7 +261,10 @@ describe('Develop Greenwood With: ', function() {
         ...messageFormatLibs,
         ...messageFormatLibsPackageJson,
         ...singletonManagerLibsPackageJson,
-        ...singletonManagerLibs
+        ...singletonManagerLibs,
+        ...trustedTypesPackageJson,
+        ...regeneratorRuntimeLibs,
+        ...regeneratorRuntimeLibsPackageJson
       ]);
 
       return new Promise(async (resolve) => {

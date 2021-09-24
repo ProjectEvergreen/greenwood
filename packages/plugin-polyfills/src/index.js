@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { getNodeModulesResolveLocationForPackageName } = require('@greenwood/cli/src/lib/node-modules-utils');
+const { getNodeModulesLocationForPackage } = require('@greenwood/cli/src/lib/node-modules-utils');
 const path = require('path');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 
@@ -15,7 +15,7 @@ class PolyfillsResource extends ResourceInterface {
   async optimize(url, body) {
     const polyfillPackageName = '@webcomponents/webcomponentsjs';
     const filename = 'webcomponents-loader.js';
-    const polyfillNodeModulesLocation = getNodeModulesResolveLocationForPackageName(polyfillPackageName);
+    const polyfillNodeModulesLocation = getNodeModulesLocationForPackage(polyfillPackageName);
 
     return new Promise(async (resolve, reject) => {
       try {
