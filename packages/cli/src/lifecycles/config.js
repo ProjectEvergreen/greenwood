@@ -5,6 +5,7 @@ const path = require('path');
 // and include as the default set, with all user plugins getting appended
 const greenwoodPluginsBasePath = path.join(__dirname, '../', 'plugins');
 const greenwoodPlugins = [
+  path.join(greenwoodPluginsBasePath, 'copy'),
   path.join(greenwoodPluginsBasePath, 'resource'),
   path.join(greenwoodPluginsBasePath, 'server')
 ].map((pluginDirectory) => {
@@ -26,6 +27,7 @@ const greenwoodPlugins = [
 
 const modes = ['ssg', 'mpa', 'spa'];
 const optimizations = ['default', 'none', 'static', 'inline'];
+const pluginTypes = ['copy', 'context', 'resource', 'rollup', 'server'];
 const defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {
@@ -103,11 +105,9 @@ module.exports = readAndMergeConfig = async() => {
         }
 
         if (plugins && plugins.length > 0) {
-          const types = ['context', 'resource', 'rollup', 'server'];
-
           plugins.forEach(plugin => {
-            if (!plugin.type || types.indexOf(plugin.type) < 0) {
-              reject(`Error: greenwood.config.js plugins must be one of type "${types.join(', ')}". got "${plugin.type}" instead.`);
+            if (!plugin.type || pluginTypes.indexOf(plugin.type) < 0) {
+              reject(`Error: greenwood.config.js plugins must be one of type "${pluginTypes.join(', ')}". got "${plugin.type}" instead.`);
             }
 
             if (!plugin.provider || typeof plugin.provider !== 'function') {
