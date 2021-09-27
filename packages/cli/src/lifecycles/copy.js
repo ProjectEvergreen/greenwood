@@ -15,6 +15,7 @@ async function rreaddir (dir, allFiles = []) {
 
 // https://stackoverflow.com/a/30405105/417806
 async function copyFile(source, target) {
+  console.info(`copying file... ${source.replace(`${process.cwd()}/`, '')}`);
   const rd = fs.createReadStream(source);
   const wr = fs.createWriteStream(target);
   
@@ -36,7 +37,7 @@ async function copyDirectory(from, to) {
   return new Promise(async(resolve, reject) => {
     try {
       if (fs.existsSync(from)) {
-        console.info(`copying ${from.replace(process.cwd(), '')} directory...`);
+        console.info(`copying directory... ${from.replace(`${process.cwd()}/`, '')}`);
         const files = await rreaddir(from);
 
         if (files.length > 0) {
@@ -70,8 +71,7 @@ module.exports = copyAssets = (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const { config, context } = compilation;
-      const copyPlugins = config.plugins.filter(plugin => plugin.type === 'copy');
+      const copyPlugins = compilation.config.plugins.filter(plugin => plugin.type === 'copy');
 
       for (plugin of copyPlugins) {
         const locations = plugin.provider(compilation);
@@ -84,12 +84,10 @@ module.exports = copyAssets = (compilation) => {
             await copyDirectory(from, to);
           } else {
             // copy file
+            await copyFile(from, to);
           }
         }
       }
-
-      console.info('copying graph.json...');
-      await copyFile(`${context.scratchDir}graph.json`, `${context.outputDir}/graph.json`);
 
       resolve();
     } catch (err) {
