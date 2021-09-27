@@ -15,11 +15,11 @@ async function rreaddir (dir, allFiles = []) {
 
 // https://stackoverflow.com/a/30405105/417806
 async function copyFile(source, target) {
-  console.info(`copying file... ${source.replace(`${process.cwd()}/`, '')}`);
-  const rd = fs.createReadStream(source);
-  const wr = fs.createWriteStream(target);
-  
   try {
+    console.info(`copying file... ${source.replace(`${process.cwd()}/`, '')}`);
+    const rd = fs.createReadStream(source);
+    const wr = fs.createWriteStream(target);
+
     return await new Promise((resolve, reject) => {
       rd.on('error', reject);
       wr.on('error', reject);
@@ -36,29 +36,27 @@ async function copyFile(source, target) {
 async function copyDirectory(from, to) {
   return new Promise(async(resolve, reject) => {
     try {
-      if (fs.existsSync(from)) {
-        console.info(`copying directory... ${from.replace(`${process.cwd()}/`, '')}`);
-        const files = await rreaddir(from);
+      console.info(`copying directory... ${from.replace(`${process.cwd()}/`, '')}`);
+      const files = await rreaddir(from);
 
-        if (files.length > 0) {
-          if (!fs.existsSync(to)) {
-            fs.mkdirSync(to);
-          }
-          await Promise.all(files.filter((asset) => {
-            const target = asset.replace(from, to);
-            const isDirectory = path.extname(target) === '';
-            
-            if (isDirectory && !fs.existsSync(target)) {
-              fs.mkdirSync(target);
-            } else if (!isDirectory) {
-              return asset;
-            }
-          }).map((asset) => {
-            const target = asset.replace(from, to);
-
-            return copyFile(asset, target);
-          }));
+      if (files.length > 0) {
+        if (!fs.existsSync(to)) {
+          fs.mkdirSync(to);
         }
+        await Promise.all(files.filter((asset) => {
+          const target = asset.replace(from, to);
+          const isDirectory = path.extname(target) === '';
+
+          if (isDirectory && !fs.existsSync(target)) {
+            fs.mkdirSync(target);
+          } else if (!isDirectory) {
+            return asset;
+          }
+        }).map((asset) => {
+          const target = asset.replace(from, to);
+
+          return copyFile(asset, target);
+        }));
       }
       resolve();
     } catch (e) {

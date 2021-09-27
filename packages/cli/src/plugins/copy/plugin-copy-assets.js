@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 
 module.exports = [{
@@ -5,10 +6,16 @@ module.exports = [{
   name: 'plugin-copy-assets',
   provider: (compilation) => {
     const { context } = compilation;
+    const fromAssetsDir = path.join(context.userWorkspace, 'assets');
+    const assets = [];
 
-    return [{
-      from: path.join(context.userWorkspace, 'assets'),
-      to: path.join(context.outputDir, 'assets')
-    }];
+    if (fs.existsSync(fromAssetsDir)) {
+      assets.push({
+        from: fromAssetsDir,
+        to: path.join(context.outputDir, 'assets')
+      });
+    }
+
+    return assets;
   }
 }];
