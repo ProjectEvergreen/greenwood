@@ -105,6 +105,12 @@ module.exports = {
 ### Plugin Types
 While each API has its own documentation section on the left sidebar of this page, here is a quick overview of the current set of Plugin APIs Greenwood supports.
 
+#### Copy Plugins
+[Copy plugins](/plugins/copy/) allow users to copy ad-hac files and folders as part of a production build.
+
+#### Context Plugins
+[Context plugins](/plugins/context/) allows usersto extend where Greenwood can look for certain files and folders, like [templates and pages](/docs/layouts/).
+
 #### Resource Plugins
 [Resource plugins](/plugins/resource/) allow users to interact with the request and response lifecycles of files at a variety of different ways.  These lifecycles provide the ability to do things like introduce new file types, to adding hosted 3rd party scripts to your site.
 

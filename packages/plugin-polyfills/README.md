@@ -34,7 +34,7 @@ module.exports = {
   ...
 
   plugins: [
-    polyfillsPlugin()
+    ...polyfillsPlugin() // notice the spread ... !
   ]
 }
 ```
