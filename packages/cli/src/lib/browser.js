@@ -54,7 +54,7 @@ class BrowserRunner {
       ) {
         interceptedRequest.continue();
       } else {
-        console.warn('aborting request', interceptedRequestUrl);
+        // console.warn('aborting request', interceptedRequestUrl);
         interceptedRequest.abort();
       }
     });
