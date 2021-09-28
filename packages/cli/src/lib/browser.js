@@ -19,7 +19,11 @@ class BrowserRunner {
 
   async init() {
     this.browser = await puppeteer.launch({
-      args: ['--no-sandbox']
+      defaultViewport: null,
+      args: [
+        '--no-sandbox',
+        '--enable-experimental-web-platform-features'
+      ]
     });
   }
 
@@ -29,7 +33,11 @@ class BrowserRunner {
 
     // Page may reload when setting isMobile
     // https://github.com/GoogleChrome/puppeteer/blob/v1.10.0/docs/api.md#pagesetviewportviewport
-    page.evaluateOnNewDocument('customElements.forcePolyfill = true');
+    // https://developers.google.com/web/tools/puppeteer/articles/ssr
+    // https://javascript.plainenglish.io/ssr-with-web-components-84ef006b18ef
+    // https://lit.dev/docs/tools/requirements/#building-for-legacy-browsers
+    // https://github.com/puppeteer/puppeteer/issues/1576
+    page.evaluateOnNewDocument('if (window.customElements) window.customElements.forcePolyfill = true;');
     page.evaluateOnNewDocument('ShadyDOM = {force: true}');
     page.evaluateOnNewDocument('ShadyCSS = {shimcssproperties: true}');
     
@@ -46,7 +54,7 @@ class BrowserRunner {
       ) {
         interceptedRequest.continue();
       } else {
-        // console.warn('aborting request', interceptedRequestUrl);
+        console.warn('aborting request', interceptedRequestUrl);
         interceptedRequest.abort();
       }
     });
@@ -71,8 +79,6 @@ class BrowserRunner {
 
     // Serialize page.
     const content = await page.content();
-
-    // console.debug('content????', content);
 
     await page.close();
 

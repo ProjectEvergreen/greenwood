@@ -22,7 +22,7 @@
     "@greenwood/cli": "^0.4.0"
   },
   "dependencies": {
-    "@webcomponents/webcomponentsjs": "^2.3.0"
+    "@webcomponents/webcomponentsjs": "^2.6.0"
   },
   "devDependencies": {
     "@greenwood/cli": "^0.16.0-alpha.3"
