@@ -26,6 +26,9 @@
     "lint:css": "stylelint \"./www/**/*.js\", \"./www/**/*.css\"",
     "lint": "ls-lint && yarn lint:js && yarn lint:ts && yarn lint:css"
   },
+  "resolutions": {
+    "lit": "^2.0.0"
+  },
   "devDependencies": {
     "@ls-lint/ls-lint": "^1.9.2",
     "@typescript-eslint/eslint-plugin": "^4.28.2",
