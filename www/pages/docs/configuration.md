@@ -86,7 +86,7 @@ module.exports = {
     { property: 'og:title', content: 'Greenwood' },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: 'https://www.greenwoodjs.io' },
-    { property: 'og:image', content: 'https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png' },
+    { property: 'og:image', content: 'https://www.greenwoodjs.io/assets/greenwood-logo-300w.png' },
     { property: 'og:description', content: META_DESCRIPTION },
     { rel: 'shortcut icon', href: FAVICON_HREF },
     { rel: 'icon', href: FAVICON_HREF }
@@ -102,7 +102,7 @@ Which would be equivalent to:
 <meta property="og:title" content="Greenwood">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.greenwoodjs.io/docs/">
-<meta property="og:image" content="https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png">
+<meta property="og:image" content="https://www.greenwoodjs.io/assets/greenwood-logo-300w.png">
 <meta property="og:description" content="A modern and performant static site generator supporting Web Component based development">
 <link rel="shortcut icon" href="/assets/favicon.ico">
 <link rel="icon" href="/assets/favicon.ico">
