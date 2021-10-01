@@ -81,7 +81,7 @@ class OptimizationMPAResource extends ResourceInterface {
           <body>\n
             
             <router-outlet>
-              ${bodyContents}\n
+              ${bodyContents.replace(/\$/g, '$$$')}\n
             </router-outlet>
             
             ${routeTags.join('\n')}
