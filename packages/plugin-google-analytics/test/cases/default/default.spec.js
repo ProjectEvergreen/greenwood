@@ -87,7 +87,6 @@ describe('Build Greenwood With: ', function() {
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', '${mockAnalyticsId}', { 'anonymize_ip': true });
-            gtag('config', '${mockAnalyticsId}');
         `;
 
         expect(inlineScript[0].textContent).to.contain(expectedContent);
