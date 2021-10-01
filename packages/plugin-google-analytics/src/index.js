@@ -37,7 +37,6 @@ class GoogleAnalyticsResource extends ResourceInterface {
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', '${analyticsId}', { 'anonymize_ip': ${trackAnon} });
-            gtag('config', '${analyticsId}');
           </script>
         </head>
         `);
