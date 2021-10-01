@@ -19,7 +19,9 @@ yarn add @greenwood/plugin-google-analytics --dev
 ```
 
 ## Usage
-Use this plugin in your _greenwood.config.js_ and pass in your Google Analytics ID, e.g. `UA-XXXXX`.
+Use this plugin in your _greenwood.config.js_ and pass in your Google Analytics ID, which can either be a
+* Measurement ID (**recommended**): ex. `G-XXXXXX`
+* Tracking ID (legacy): ex. `UA-XXXXXX`
 
 ```javascript
 const googleAnalyticsPlugin = require('@greenwood/plugin-google-analytics');
@@ -37,6 +39,7 @@ module.exports = {
 
 This will then add the Google Analytics [JavaScript tracker snippet](https://developers.google.com/analytics/devguides/collection/analyticsjs/) to your project's _index.html_.
 
+> _Learn more about [Measurement and Tracking IDs](https://support.google.com/analytics/answer/9539598)_.
 
 ## Options
 - `analyticsId` (required) - Your Google Analytics ID

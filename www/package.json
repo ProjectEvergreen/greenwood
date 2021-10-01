@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/www",
-  "version": "0.16.0-alpha.3",
+  "version": "0.16.1",
   "private": true,
   "description": "Greenwood website workspace.",
   "repository": "https://github.com/ProjectEvergreen/greenwood",

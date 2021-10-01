@@ -16,7 +16,7 @@ jobs:
     - name: Install Chromium Library Dependencies
       run: |
         sh ./.github/workflows/chromium-lib-install.sh
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js ${{ matrix.node }}
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node }}

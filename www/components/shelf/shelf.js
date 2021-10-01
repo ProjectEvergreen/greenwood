@@ -101,12 +101,12 @@ class Shelf extends LitElement {
   async updated(changedProperties) {
     if (changedProperties.has('page') && this.page !== '' && this.page !== '/') {
       const response = await this.fetchShelfData();
-      
-      this.shelfList = response.data.menu.children.map((item) => { 
-        return { 
+
+      this.shelfList = response.data.menu.children.map((item) => {
+        return {
           ...item.item,
           children: item.children
-        }; 
+        };
       });
       this.expandRoute(window.location.pathname);
       this.requestUpdate();
@@ -158,8 +158,6 @@ class Shelf extends LitElement {
             <a id="${id}" @click="${this.handleShelfClick}"><span class="pointer">${chevron}</span></a>
           </div>
 
-          <hr/>
-          
           ${renderListItems(item.route, item.children, item.selected)}
         </li>
       `;
