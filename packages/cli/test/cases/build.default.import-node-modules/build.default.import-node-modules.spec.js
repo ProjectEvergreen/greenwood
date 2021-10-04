@@ -268,13 +268,13 @@ describe('Build Greenwood With: ', function() {
         
         expect(inlineScriptTag.textContent.replace('\n', '')).to
           // eslint-disable-next-line max-len
-          .equal('import"/lit-element.23ccf9b1.js";import"/lit-html.5ab358db.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline"//# sourceMappingURL=171628389-scratch.f6bbfcb9.js.map');
+          .equal('import"/lit-element.ea26fec7.js";import"/lit-html.d69ea26f.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline"//# sourceMappingURL=1008626452-scratch.a5230e1a.js.map');
       });
 
       it('should have the expected inline node_modules content in the second inline script tag which should include extra code from rollup', async function() {
         const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[1];
-
-        expect(inlineScriptTag.textContent.replace('\n', '')).to.equal('import"/lit-element.23ccf9b1.js";import"/lit-html.5ab358db.js";//# sourceMappingURL=866723778-scratch.8010d3c7.js.map');
+        
+        expect(inlineScriptTag.textContent.replace('\n', '')).to.equal('import"/lit-element.ea26fec7.js";import"/lit-html.d69ea26f.js";//# sourceMappingURL=1832243663-scratch.c317be4c.js.map');xw
       });
 
       it('should have the expected output from the first inline <script> tag in the page output', async function() {

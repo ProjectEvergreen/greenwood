@@ -22,7 +22,7 @@
     "@greenwood/cli": "^0.4.0"
   },
   "dependencies": {
-    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-commonjs": "^21.0.0",
     "@rollup/stream": "^2.0.0",
     "cjs-module-lexer": "^1.0.0"
   },
