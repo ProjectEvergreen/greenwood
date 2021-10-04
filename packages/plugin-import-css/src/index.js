@@ -16,16 +16,10 @@ class ImportCssResource extends ResourceInterface {
     this.contentType = 'text/javascript';
   }
 
-
   // https://github.com/ProjectEvergreen/greenwood/issues/700
   async shouldResolve(url) {
-    console.debug('shouldIntercept url', url);
-    const isCssInDisguise =
-      url.endsWith(this.extensions[0]) &&
-      fs.existsSync(`${url}.js`)
+    const isCssInDisguise = url.endsWith(this.extensions[0]) && fs.existsSync(`${url}.js`);
 
-    console.debug('isCssInDisguise', isCssInDisguise);
-    console.debug('***************');
     return Promise.resolve(isCssInDisguise);
   }
 
