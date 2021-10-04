@@ -1,0 +1,6 @@
+{
+  "name": "plugin-polyfills-lit-spec",
+  "dependencies": {
+    "lit": "^2.0.0"
+  }
+}
