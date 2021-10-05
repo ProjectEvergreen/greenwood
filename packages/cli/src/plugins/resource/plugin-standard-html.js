@@ -80,7 +80,7 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     console.error('ERROR: INVALID HTML');
     appTemplateContents = appTemplateContents.replace('<body>', `
       <body>
-        <div style="float: right; width: 30%; border: solid 1px red; background-color: white; opacity: 0.67">
+        <div style="position: absolute; width: 30%; border: solid 1px red; background-color: white; opacity: 0.67">
           <p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="nopener noreferrer">HTML formatter</a>.</p>
           <details>
             <pre>
