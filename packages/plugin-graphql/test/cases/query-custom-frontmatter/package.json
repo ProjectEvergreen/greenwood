@@ -1,6 +1,6 @@
 {
   "name": "plugin-graphql-test-query-custom-frontmatter",
   "dependencies": {
-    "lit-element": "^2.4.0"
+    "lit": "^2.0.0"
   }
 }

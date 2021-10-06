@@ -1,43 +1,57 @@
 /*
  * Use Case
- * Run Greenwood build command with GraphQL calls to get data about the projects graph using ChildrenQuaery.
+ * Run Greenwood with Polyfills composite plugin with default options and using Lit.
  *
- * User Result
- * Should generate a Greenwood build that tests basic output from the ChildrenQuery.
- * 
+ * Uaer Result
+ * Should generate a bare bones Greenwood build with polyfills injected into index.html.
+ *
  * User Command
  * greenwood build
  *
- * Default Config
+ * User Config
+ * const polyfillsPlugin = require('@greenwod/plugin-polyfills');
  *
- * Custom Workspace
- * src/
- *   components/
- *     posts-list.js
- *   pages/
- *     blog/
- *       first-post/
- *         index.md
- *       second-post/
- *         index.md
- *     index.html
+ * {
+ *   plugins: [
+ *     polyfillsPlugin()
+ *  ]
+ *
+ * }
+ *
+ * User Workspace
+ * Greenwood default
  */
 const expect = require('chai').expect;
-const glob = require('glob-promise');
+const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
+const expectedLitPolyfillFiles = [
+  'polyfill-support.js'
+];
+
+const expectedPolyfillFiles = [
+  'webcomponents-loader.js',
+  'webcomponents-ce.js',
+  'webcomponents-ce.js.map',
+  'webcomponents-sd-ce-pf.js',
+  'webcomponents-sd-ce-pf.js.map',
+  'webcomponents-sd-ce.js',
+  'webcomponents-sd-ce.js.map',
+  'webcomponents-sd.js',
+  'webcomponents-sd.js.map'
+];
+
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Children from GraphQL';
-  const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
+  const LABEL = 'Lit Polyfill Plugin with default options and Default Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
   let runner;
 
-  before(function() {
+  before(async function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
@@ -45,16 +59,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe(LABEL, function() {
-
     before(async function() {
-      const greenwoodGraphqlCoreLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/plugin-graphql/src/core/*.js`, 
-        `${outputPath}/node_modules/@greenwood/plugin-graphql/src/core/`
-      );
-      const greenwoodGraphqlQueryLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`, 
-        `${outputPath}/node_modules/@greenwood/plugin-graphql/src/queries/`
-      );
       const lit = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit/*.js`, 
         `${outputPath}/node_modules/lit/`
@@ -116,9 +121,17 @@ describe('Build Greenwood With: ', function() {
 
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
-        ...greenwoodGraphqlCoreLibs,
-        ...greenwoodGraphqlQueryLibs, 
-        ...lit,
+        ...expectedPolyfillFiles.map((file) => {
+          const dir = file === 'webcomponents-loader.js'
+            ? 'node_modules/@webcomponents/webcomponentsjs'
+            : 'node_modules/@webcomponents/webcomponentsjs/bundles';
+  
+          return {
+            source: `${process.cwd()}/${dir}/${file}`,
+            destination: `${outputPath}/${dir}/${file}`
+          };
+        }),
+        ...lit, // includes polyfill-support.js
         ...litPackageJson,
         ...litDirectives,
         ...litDecorators,
@@ -138,50 +151,26 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('Home Page output w/ ChildrenQuery', function() {
-      
+    describe('Script tag in the <head> tag', function() {
+      let dom;
+
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
-      it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', function() {
-        const scriptTags = dom.window.document.querySelectorAll('script');
-        const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.getAttribute('data-state') === 'apollo';
+      it('should have one <script> tag for lit polyfills loaded in the <head> tag', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script');
+        const polyfillScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
+          return script.src.indexOf('polyfill-support') >= 0;
         });
-        const innerHTML = apolloScriptTags[0].innerHTML;
-
-        expect(apolloScriptTags.length).to.equal(1);
-        expect(innerHTML).to.match(apolloStateRegex);
-      });
-
-      it('should output a single (partial) *-cache.json file, one per each query made', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, './*-cache.json'))).to.have.lengthOf(1);
-      });
-
-      it('should output a (partial) *-cache.json files, one per each query made, that are all defined', async function() {
-        const cacheFiles = await glob.promise(path.join(this.context.publicDir, './*-cache.json'));
-
-        cacheFiles.forEach(file => {
-          const cache = require(file);
-
-          expect(cache).to.not.be.undefined;
-        });
-      });
-
-      it('should have a <ul> in the <body>', function() {
-        const lists = dom.window.document.querySelectorAll('body ul');
-
-        expect(lists.length).to.be.equal(1);
-      });
-      
-      it('should have a expected navigation output in the <header> based on pages with menu: navigation frontmatter', function() {
-        const listItems = dom.window.document.querySelectorAll('body ul li');
-
-        expect(listItems.length).to.be.equal(2);        
         
-        expect(listItems[0].innerHTML).to.be.contain('First Post');
-        expect(listItems[1].innerHTML).to.be.contain('Second Post');
+        expect(polyfillScriptTags.length).to.be.equal(1);
+      });
+
+      it('should have the expected lit polyfill files in the output directory', function() {
+        expectedLitPolyfillFiles.forEach((file) => {  
+          expect(fs.existsSync(path.join(this.context.publicDir, file))).to.be.equal(true);
+        });
       });
     });
   });

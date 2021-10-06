@@ -312,7 +312,7 @@ Then you can use `import` anywhere in your components!
 Now of course comes the fun part, actually seeing it all come together.  Here is an example from the Greenwood website's own [header component](https://github.com/ProjectEvergreen/greenwood/blob/master/www/components/header/header.js).
 
 ```javascript
-import { LitElement, html } from 'lit-element';
+import { LitElement, html } from 'lit';
 import client from '@greenwood/plugin-graphql/core/client';
 import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
 

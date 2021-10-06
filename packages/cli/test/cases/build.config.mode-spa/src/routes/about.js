@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit-element';
+import { html, LitElement } from 'lit';
 
 class AppAbout extends LitElement {
   render() {
@@ -6,4 +6,4 @@ class AppAbout extends LitElement {
   }
 }
 
-customElements.define('app-about', AppAbout);
+customElements.define('app-route-about', AppAbout);

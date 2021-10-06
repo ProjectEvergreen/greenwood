@@ -86,29 +86,57 @@ describe('Develop Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      const litElementLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/lib/*.js`,
-        `${outputPath}/node_modules/lit-element/lib/`
+      const lit = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit/*.js`,
+        `${outputPath}/node_modules/lit/`
+      );
+      const litDecorators = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit/decorators/*.js`,
+        `${outputPath}/node_modules/lit/decorators/`
+      );
+      const litDirectives = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit/directives/*.js`,
+        `${outputPath}/node_modules/lit/directives/`
+      );
+      const litPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit/package.json`,
+        `${outputPath}/node_modules/lit/`
       );
       const litElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/lit-element.js`,
+        `${process.cwd()}/node_modules/lit-element/*.js`,
         `${outputPath}/node_modules/lit-element/`
       );
       const litElementPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-element/package.json`,
         `${outputPath}/node_modules/lit-element/`
       );
+      const litElementDecorators = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-element/decorators/*.js`,
+        `${outputPath}/node_modules/lit-element/decorators/`
+      );
       const litHtml = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/lit-html.js`,
+        `${process.cwd()}/node_modules/lit-html/*.js`,
         `${outputPath}/node_modules/lit-html/`
       );
       const litHtmlPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-html/package.json`,
         `${outputPath}/node_modules/lit-html/`
       );
-      const litHtmlLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/lib/*.js`,
-        `${outputPath}/node_modules/lit-html/lib/`
+      const litHtmlDirectives = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/directives/*.js`,
+        `${outputPath}/node_modules/lit-html/directives/`
+      );
+      const litReactiveElement = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
+        `${outputPath}/node_modules/@lit/reactive-element/`
+      );
+      const litReactiveElementDecorators = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
+        `${outputPath}/node_modules/@lit/reactive-element/decorators/`
+      );
+      const litReactiveElementPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
+        `${outputPath}/node_modules/@lit/reactive-element/`
       );
       const litHtmlSourceMap = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-html/lit-html.js.map`,
@@ -202,6 +230,14 @@ describe('Develop Greenwood With: ', function() {
         `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
         `${outputPath}/node_modules/@types/trusted-types/`
       );
+      const scopedCustomElementRegistryPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@webcomponents/scoped-custom-element-registry/package.json`,
+        `${outputPath}/node_modules/@webcomponents/scoped-custom-element-registry/`
+      );
+      const scopedCustomElementRegistryLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@webcomponents/scoped-custom-element-registry/*.js`,
+        `${outputPath}/node_modules/@webcomponents/scoped-custom-element-registry/`
+      );
 
       // manually copy all these @babel/runtime files recursively since there are too many of them to do it individually
       const babelRuntimeLibs = await rreaddir(`${process.cwd()}/node_modules/@babel/runtime`);
@@ -234,12 +270,19 @@ describe('Develop Greenwood With: ', function() {
 
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
+        ...lit,
+        ...litPackageJson,
+        ...litDirectives,
+        ...litDecorators,
         ...litElementPackageJson,
         ...litElement,
-        ...litElementLibs,
+        ...litElementDecorators,
         ...litHtmlPackageJson,
         ...litHtml,
-        ...litHtmlLibs,
+        ...litHtmlDirectives,
+        ...litReactiveElement,
+        ...litReactiveElementDecorators,
+        ...litReactiveElementPackageJson,
         ...litHtmlSourceMap,
         ...simpleCss,
         ...simpleCssPackageJson,
@@ -264,7 +307,9 @@ describe('Develop Greenwood With: ', function() {
         ...singletonManagerLibs,
         ...trustedTypesPackageJson,
         ...regeneratorRuntimeLibs,
-        ...regeneratorRuntimeLibsPackageJson
+        ...regeneratorRuntimeLibsPackageJson,
+        ...scopedCustomElementRegistryPackageJson,
+        ...scopedCustomElementRegistryLibs
       ]);
 
       return new Promise(async (resolve) => {
@@ -316,16 +361,16 @@ describe('Develop Greenwood With: ', function() {
       it('should return an import map shim <script> in the <head> of the document', function(done) {
         const importMapTag = dom.window.document.querySelectorAll('head > script[type="importmap-shim"]')[0];
         const importMap = JSON.parse(importMapTag.textContent).imports;
+        const expectedImportMap = require('./import-map.snapshot.json');
 
-        expect(importMap['lit-html']).to.equal('/node_modules/lit-html/lit-html.js');
-        expect(importMap['lit-element']).to.equal('/node_modules/lit-element/lit-element.js');
-        expect(importMap['lit-html/lit-html.js']).to.equal('/node_modules/lit-html/lit-html.js');
-        expect(importMap['lit-html/lib/shady-render.js']).to.equal('/node_modules/lit-html/lib/shady-render.js');
+        Object.keys(expectedImportMap).forEach((key) => {
+          expect(importMap[key]).to.equal(expectedImportMap[key]);
+        });
 
         // https://github.com/ProjectEvergreen/greenwood/issues/715
         // export maps with "flat" entries
         expect(importMap['@lion/button']).to.equal('/node_modules/@lion/button/index.js');
-        expect(importMap['@lion/button/define']).to.equal('/node_modules/@lion/button/lion-button.js');
+        expect(importMap['@lion/button/define']).to.equal('/node_modules/@lion/button/define.js');
 
         // https://github.com/ProjectEvergreen/greenwood/issues/715
         // transient dependency import / exports
@@ -660,7 +705,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('Copyright (c) 2017 The Polymer Project Authors');
+        expect(response.body).to.contain('Copyright 2017 Google LLC');
         done();
       });
     });

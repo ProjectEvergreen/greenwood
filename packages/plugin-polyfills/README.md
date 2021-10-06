@@ -1,7 +1,7 @@
 # @greenwood/plugin-polyfills
 
 ## Overview
-A Greenwood plugin adding support for [Web Component related polyfills](https://github.com/webcomponents/polyfills) for browsers that need support for part of the Web Component spec like **Custom Elements** and **Shadow DOM**.  It uses [feature detection](https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs#using-webcomponents-loaderjs) to determine what polyfills are actually needed based on the user's browser, to ensure only the minumum extra code is loaded.
+A Greenwood plugin adding support for [Web Component related polyfills](https://github.com/webcomponents/polyfills) for browsers that need support for part of the Web Component spec like **Custom Elements** and **Shadow DOM**.  It uses [feature detection](https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs#using-webcomponents-loaderjs) to determine what polyfills are actually needed based on the user's browser, to ensure only the minumum extra code is loaded.  If you are using **Lit@2**, it also loads the needed [_polyfill-support.js_](https://lit.dev/docs/tools/requirements/#polyfills) file.
 
 As of right now, you will likely need this plugin to load additional polyfills if you want to support these browser(s):
 

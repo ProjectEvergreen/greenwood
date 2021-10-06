@@ -1,4 +1,4 @@
-import { css, html, LitElement, unsafeCSS } from 'lit-element';
+import { css, html, LitElement, unsafeCSS } from 'lit';
 import json from '../../package.json?type=json';
 import footerCss from './footer.css?type=css';
 
