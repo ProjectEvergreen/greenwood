@@ -13,14 +13,9 @@ class PolyfillsResource extends ResourceInterface {
   }
 
   async optimize(url, body) {
-    const polyfillPackageName = '@webcomponents/webcomponentsjs';
-    const filename = 'webcomponents-loader.js';
-    const polyfillNodeModulesLocation = getNodeModulesLocationForPackage(polyfillPackageName);
-    const litNodeModulesLocation = getNodeModulesLocationForPackage('lit');
-
     return new Promise(async (resolve, reject) => {
       try {
-        const { outputDir, projectDirectory, userWorkspace } = this.compilation.context;
+        const { projectDirectory, userWorkspace } = this.compilation.context;
         const dependencies = fs.existsSync(path.join(userWorkspace, 'package.json')) // handle monorepos first
           ? JSON.parse(fs.readFileSync(path.join(userWorkspace, 'package.json'), 'utf-8')).dependencies
           : fs.existsSync(path.join(projectDirectory, 'package.json'))
@@ -29,37 +24,11 @@ class PolyfillsResource extends ResourceInterface {
         const litPolyfill = dependencies && dependencies.lit
           ? '<script src="/node_modules/lit/polyfill-support.js"></script>\n'
           : '';
-        const polyfillFiles = [
-          'webcomponents-loader.js',
-          ...fs.readdirSync(path.join(polyfillNodeModulesLocation, 'bundles')).map(file => {
-            return `bundles/${file}`;
-          })
-        ];
-
-        if (!fs.existsSync(path.join(outputDir, 'bundles'))) {
-          fs.mkdirSync(path.join(outputDir, 'bundles'));
-        }
-
-        await Promise.all(polyfillFiles.map(async (file) => {
-          const from = path.join(polyfillNodeModulesLocation, file);
-          const to = path.join(outputDir, file);
-          
-          return !fs.existsSync(to)
-            ? fs.promises.copyFile(from, to)
-            : Promise.resolve();
-        }));
-
-        if (litPolyfill !== '' && !fs.existsSync(path.join(outputDir, 'polyfill-support.js'))) {
-          await fs.promises.copyFile(
-            path.join(litNodeModulesLocation, 'polyfill-support.js'),
-            path.join(outputDir, 'polyfill-support.js')
-          );
-        }
 
         const newHtml = body.replace('<head>', `
           <head>
             ${litPolyfill}
-            <script src="/node_modules/${polyfillPackageName}/${filename}"></script>
+            <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
         `);
 
         resolve(newHtml);
@@ -71,9 +40,34 @@ class PolyfillsResource extends ResourceInterface {
 }
 
 module.exports = (options = {}) => {
-  return {
+  return [{
     type: 'resource',
     name: 'plugin-polyfills',
     provider: (compilation) => new PolyfillsResource(compilation, options)
-  };
+  }, {
+    type: 'copy',
+    name: 'plugin-copy-polyfills',
+    provider: (compilation) => {
+      const { outputDir } = compilation.context;
+      const polyfillPackageName = '@webcomponents/webcomponentsjs';
+      const polyfillNodeModulesLocation = getNodeModulesLocationForPackage(polyfillPackageName);
+      const litNodeModulesLocation = getNodeModulesLocationForPackage('lit');
+      const litPolyfills = litNodeModulesLocation
+        ? [{
+          from: path.join(litNodeModulesLocation, 'polyfill-support.js'),
+          to: path.join(outputDir, 'polyfill-support.js')
+        }]
+        : [];
+
+      return [{
+        from: path.join(polyfillNodeModulesLocation, 'webcomponents-loader.js'),
+        to: path.join(outputDir, 'webcomponents-loader.js')
+      }, {
+        from: path.join(polyfillNodeModulesLocation, 'bundles'),
+        to: path.join(outputDir, 'bundles')
+      }, 
+      ...litPolyfills
+      ];
+    }
+  }];
 };

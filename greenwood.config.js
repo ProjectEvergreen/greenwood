@@ -28,7 +28,7 @@ module.exports = {
   ],
   plugins: [
     ...pluginGraphQL(),
-    pluginPolyfills(),
+    ...pluginPolyfills(),
     pluginPostCss(),
     ...pluginImportJson(),
     ...pluginImportCss(),
