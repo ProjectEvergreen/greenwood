@@ -1,7 +1,7 @@
 import { css, html, LitElement, unsafeCSS } from 'lit';
 import bannerCss from './banner.css?type=css';
 import buttonCss from './button.css?type=css';
-import '@evergreen-wc/eve-button';
+import './eve-button.js';
 import '@evergreen-wc/eve-container';
 
 class Banner extends LitElement {
@@ -22,7 +22,6 @@ class Banner extends LitElement {
 
   static get styles() {
     return css`
-      ${unsafeCSS(buttonCss)}
       ${unsafeCSS(bannerCss)}
     `;
   }
