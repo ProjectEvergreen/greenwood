@@ -25,6 +25,7 @@ class Button extends LitElement {
       ${unsafeCSS(eveButtonCss)}
     `;
   }
+
   updated() {
     const shadow = this.shadowRoot;
     const childNodes = Array.from(shadow.childNodes);
