@@ -1,0 +1,37 @@
+/* stylelint-disable */
+:host {
+  & .btn {
+    margin: 2px;
+    border: 1px solid var(--btn-border-color, var(--primary-color, green));
+    color: var(--btn-text-color, var(--primary-color, green));
+    background-color: var(--btn-background, var(--secondary-color, white) );
+    text-decoration:none;
+    position:relative;
+    display: inline-block;
+    border-radius: var(--btn-border-radius, 0px);
+
+    &:hover {
+      background-color: var(--btn-hover-background-color, var(--primary-color, green));
+      color: var(--btn-hover-text-color, var(--secondary-color, white));
+      border: 1px solid var(--btn-hover-border-color, var(--primary-color, green));
+    }
+  }
+  & .btn-xs {
+    padding:5px;
+    font-size:12px;
+  }
+
+  & .btn-sm {
+    padding:5px;
+    font-size:16px;
+  }
+
+  & .btn-md {
+    padding:10px;
+    font-size:20px;
+  }
+  & .btn-lg {
+    padding:15px;
+    font-size:25px;
+  }
+}
