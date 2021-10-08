@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable complexity */
 const fs = require('fs');
 const fm = require('front-matter');
 const path = require('path');
@@ -9,8 +10,9 @@ module.exports = generateGraph = async (compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { context, config } = compilation;
-      const { pagesDir, userWorkspace } = context;
+      const { outputDir, pagesDir, userWorkspace } = context;
       let graph = [{
+        outputPath: 'index.html',
         path: '/',
         route: '/',
         data: {}
@@ -108,6 +110,7 @@ module.exports = generateGraph = async (compilation) => {
              * id: filename without the extension
              * label: "pretty" text representation of the filename
              * imports: per page JS or CSS file imports to be included in HTML output
+             * outputPath: the filename to write to when generating static HTML
              * path: path to the file relative to the workspace
              * route: URL route for a given page on outputFilePath
              * template: page template to use as a base for a generated component
@@ -119,6 +122,9 @@ module.exports = generateGraph = async (compilation) => {
               id,
               label,
               imports,
+              outputPath: compilation.config.mode !== 'spa' && route === '/404/'
+                ? '404.html'
+                : `${outputDir}${route}index.html`,
               path: route === '/' || relativePagePath.lastIndexOf(path.sep) === 0
                 ? `${relativeWorkspacePath}${filename}`
                 : `${relativeWorkspacePath}${path.sep}${filename}`,
@@ -138,9 +144,19 @@ module.exports = generateGraph = async (compilation) => {
           path: `${userWorkspace}${path.sep}index.html`
         }];
       } else {
+        const oldGraph = graph[0];
+
         graph = fs.existsSync(pagesDir)
           ? walkDirectoryForPages(pagesDir)
           : graph;
+
+        // if the only page is a 404 page, still provide a default _index.html_
+        if (graph.length === 1 && graph[0].route === '/404/') {
+          graph = [
+            oldGraph,
+            ...graph
+          ];
+        }
       }
 
       compilation.graph = graph;

@@ -508,7 +508,7 @@ function greenwoodHtmlPlugin(compilation) {
 module.exports = getRollupConfig = async (compilation) => {
   const { scratchDir, outputDir } = compilation.context;
   const inputs = compilation.graph.map((page) => {
-    return path.normalize(`${scratchDir}${page.route}index.html`);
+    return path.normalize(`${scratchDir}${page.outputPath}`);
   });
 
   // order matters but so far nodeModulesResource resolve plugin is the first in our list (so far)
