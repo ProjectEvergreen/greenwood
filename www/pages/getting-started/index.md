@@ -6,7 +6,7 @@ index: 3
 ---
 
 ## Introduction
-First off, thank you for taking the time to check out **Greenwood**!  Under the hood Greenwood is taking advantage of the power of the modern web ([and friends !](/docs/tech-stack/)) to drive a modern development workflow that helps you deliver a modern, performant and pleasent experience for your users... using the web languages you already know!
+First off, thank you for taking the time to check out **Greenwood**!  Under the hood Greenwood is taking advantage of the power of the modern web ([and friends !](/docs/tech-stack/)) to drive a modern development workflow that helps you deliver a modern, performant and pleasant experience for your users... using the web languages you already know!
 
 ## Your First Project
 To get things started, we first want to make sure everyone can get their first project up and running as easily and quickly as possible, and so through this guide, we will walk through everything you need to get started with your first project, including:
