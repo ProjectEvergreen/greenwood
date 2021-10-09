@@ -110,7 +110,7 @@ module.exports = generateGraph = async (compilation) => {
              * Graph Properties (per page)
              *----------------------
              * data: custom page frontmatter
-             * filename: name of the file
+             * filename: base filename of the page
              * id: filename without the extension
              * label: "pretty" text representation of the filename
              * imports: per page JS or CSS file imports to be included in HTML output

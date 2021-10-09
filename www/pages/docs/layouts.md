@@ -180,6 +180,19 @@ And the directory structure for it:
 
 > _It is recommended to use the "file" based approaches for loading JavaScript and CSS; `<script src="...">` and `<link rel="stylesheet" href="...">` respectively.  This will allow Greenwood to optimize these assets during both development and build workflows.  However, inline `<script>` and `<style>` can both be super helpful for one-off cases, so in those cases we recommend only relying on "vanilla" JS / CSS syntax. For more context, examples, and background information, you can [review this PR](https://github.com/ProjectEvergreen/greenwood/pull/472)._
 
+### Not Found Page
+
+Greenwood will automatically generate a [default _404.html_](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/src/templates/app.html) for you but it is [fairly generic](https://greenwoodjs.io/404.html).  You can create your own though by simply creating a _404.html_ in your pages directory.
+
+
+```shell
+└── src
+      └── pages
+           └── 404.html
+```
+
+It will be emitted to the output directory as a top level _404.html_, which is the [commmon convention](https://docs.netlify.com/routing/redirects/redirect-options/#custom-404-page-handling) for most hosts and web servers.
+
 ### Single Page Applications
 
 If you would like to build a SPA and only deal with client side rendering, Greenwood can [support that](/docs/configuration#mode)!  As the name implies, your layout will be slightly different in this case.  Below is an example layout of a SPA, and you can see a working example in our [test suite](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/test/cases/build.config.mode-spa) where we validate using [**lit-redux-router**](https://github.com/fernandopasik/lit-redux-router) with route based code splitting.
