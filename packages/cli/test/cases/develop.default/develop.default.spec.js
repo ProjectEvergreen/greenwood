@@ -400,6 +400,58 @@ describe('Develop Greenwood With: ', function() {
       });   
     });
 
+    describe.only('Develop command specific 404 Not Found page HTML behaviors', function() {
+      let response = {};
+      let dom;
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get({
+            url: `http://127.0.0.1:${port}/404/`,
+            headers: {
+              accept: 'text/html'
+            }
+          }, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            
+            dom = new JSDOM(body);
+            resolve();
+          });
+        });
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('text/html');
+        done();
+      });
+
+      it('should return a 200', function(done) {
+        expect(response.statusCode).to.equal(200);
+
+        done();
+      });
+
+      it('should the correct default <title> tag in the <head>', function(done) {
+        const title = dom.window.document.querySelectorAll('head > title')[0];
+
+        expect(title.textContent).to.equal('Page Not Found');
+
+        done();
+      });
+
+      it('should the correct default <h1> tag in the <body>', function(done) {
+        const heading = dom.window.document.querySelectorAll('body > h1')[0];
+
+        expect(heading.textContent).to.equal('Sorry, unfortunately the page could not be found.');
+
+        done();
+      });
+    });
+
     describe('Develop command specific JavaScript behaviors', function() {
       let response = {};
 
