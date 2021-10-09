@@ -1,5 +1,6 @@
 import { BrowserRunner } from '../lib/browser.js';
 import fs from 'fs';
+import { hashString } from '../lib/hashing-utils.js';
 import path from 'path';
 import Koa from 'koa';
 import { ResourceInterface } from '../lib/resource-interface.js';
@@ -88,7 +89,7 @@ async function getDevServer(compilation) {
   });
 
   // allow intercepting of urls (response)
-  app.use(async (ctx) => {
+  app.use(async (ctx, next) => {
     const responseAccumulator = {
       body: ctx.body,
       contentType: ctx.response.headers['content-type']
@@ -120,6 +121,40 @@ async function getDevServer(compilation) {
 
     ctx.set('Content-Type', reducedResponse.contentType);
     ctx.body = reducedResponse.body;
+
+    await next();
+  });
+
+  // before or after processing?
+  // otherwise everything next() has to do null check on ctx.body
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
+  app.use(async (ctx) => {
+    console.warn(`?????? checking etag for => ${ctx.url}`);
+    const body = ctx.response.body;
+    // console.debug('body', body);
+
+    if (Buffer.isBuffer(body)) {
+      console.warn(`no body for => ${ctx.url}`);
+    } else {
+      console.debug('HEADERS', ctx.headers);
+      const inm = ctx.headers['if-none-match'];
+      const etagHash = hashString(body);
+
+      console.debug('inm', inm);
+      console.debug('etagHash', etagHash);
+
+      if (inm && inm === etagHash) {
+        console.debug('@@@@@@@@@ PARTY TIME (we can cache this one)!');
+        ctx.status = 304;
+        ctx.body = null;
+        ctx.set('Etag', etagHash);
+      } else if (!inm || inm !== etagHash) {
+        console.debug('!!!!! SET AN ETAG HERE');
+        ctx.set('Etag', etagHash);
+      }
+    }
+
+    console.debug('============================');
   });
 
   return Promise.resolve(app);
