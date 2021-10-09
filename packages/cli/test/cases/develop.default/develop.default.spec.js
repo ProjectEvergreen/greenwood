@@ -400,7 +400,7 @@ describe('Develop Greenwood With: ', function() {
       });   
     });
 
-    describe.only('Develop command specific 404 Not Found page HTML behaviors', function() {
+    describe('Develop command specific 404 Not Found page HTML behaviors', function() {
       let response = {};
       let dom;
 

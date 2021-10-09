@@ -29,6 +29,7 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], 
   const pageIsHtmlPath = `${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.html`;
   const customPluginDefaultPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
   const customPluginPageTemplates = getCustomPageTemplates(contextPlugins, template);
+  const is404Page = barePath.replace(pagesDir, '').indexOf('/404') === 0;
 
   if (template && customPluginPageTemplates.length > 0 || fs.existsSync(`${templatesDir}/${template}.html`)) {
     // use a custom template, usually from markdown frontmatter
@@ -42,12 +43,13 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], 
       : `${barePath}.html`;
     
     contents = fs.readFileSync(indexPath, 'utf-8');
-  } else if (customPluginDefaultPageTemplates.length > 0 || fs.existsSync(`${templatesDir}/page.html`)) {
+  } else if (customPluginDefaultPageTemplates.length > 0 || (!is404Page && fs.existsSync(`${templatesDir}/page.html`))) {
     // else look for default page template from the user
+    // and 404 pages should be their own "top level" template
     contents = customPluginDefaultPageTemplates.length > 0
       ? fs.readFileSync(`${customPluginDefaultPageTemplates[0]}/page.html`, 'utf-8')
       : fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
-  } else if (barePath.replace(pagesDir, '').indexOf('/404') === 0 && !fs.existsSync(path.join(pagesDir, '404.html'))) {
+  } else if (is404Page && !fs.existsSync(path.join(pagesDir, '404.html'))) {
     // handle default 404.html
     contents = fs.readFileSync(path.join(__dirname, '../../templates/404.html'), 'utf-8');
   } else {
