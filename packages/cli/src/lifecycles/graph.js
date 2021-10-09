@@ -10,9 +10,10 @@ module.exports = generateGraph = async (compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { context, config } = compilation;
-      const { outputDir, pagesDir, userWorkspace } = context;
+      const { pagesDir, userWorkspace } = context;
       let graph = [{
         outputPath: 'index.html',
+        filename: 'index.html',
         path: '/',
         route: '/',
         data: {}
@@ -122,9 +123,9 @@ module.exports = generateGraph = async (compilation) => {
               id,
               label,
               imports,
-              outputPath: compilation.config.mode !== 'spa' && route === '/404/'
+              outputPath: route === '/404/'
                 ? '404.html'
-                : `${outputDir}${route}index.html`,
+                : `${route}index.html`,
               path: route === '/' || relativePagePath.lastIndexOf(path.sep) === 0
                 ? `${relativeWorkspacePath}${filename}`
                 : `${relativeWorkspacePath}${path.sep}${filename}`,
@@ -150,11 +151,24 @@ module.exports = generateGraph = async (compilation) => {
           ? walkDirectoryForPages(pagesDir)
           : graph;
 
-        // if the only page is a 404 page, still provide a default _index.html_
-        if (graph.length === 1 && graph[0].route === '/404/') {
+        const has404Page = graph.filter(page => page.route === '/404/').length === 1;
+
+        // if the _only_ page is a 404 page, still provide a default index.html
+        if (has404Page && graph.length === 1) {
           graph = [
             oldGraph,
             ...graph
+          ];
+        } else if (!has404Page) {
+          graph = [
+            ...graph,
+            {
+              outputPath: '404.html',
+              filename: '404.html',
+              route: '/404/',
+              path: '404.html',
+              data: {}
+            }
           ];
         }
       }

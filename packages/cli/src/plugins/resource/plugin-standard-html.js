@@ -25,7 +25,7 @@ function getCustomPageTemplates(contextPlugins, templateName) {
     });
 }
 
-const getPageTemplate = (barePath, templatesDir, template, contextPlugins = []) => {
+const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], pagesDir) => {
   const pageIsHtmlPath = `${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.html`;
   const customPluginDefaultPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
   const customPluginPageTemplates = getCustomPageTemplates(contextPlugins, template);
@@ -47,6 +47,9 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = []) 
     contents = customPluginDefaultPageTemplates.length > 0
       ? fs.readFileSync(`${customPluginDefaultPageTemplates[0]}/page.html`, 'utf-8')
       : fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
+  } else if (barePath.replace(pagesDir, '').indexOf('/404') === 0 && !fs.existsSync(path.join(pagesDir, '404.html'))) {
+    // handle default 404.html
+    contents = fs.readFileSync(path.join(__dirname, '../../templates/404.html'), 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
     contents = fs.readFileSync(path.join(__dirname, '../../templates/page.html'), 'utf-8');
@@ -290,7 +293,7 @@ class StandardHtmlResource extends ResourceInterface {
     return new Promise(async (resolve, reject) => {
       try {
         const config = Object.assign({}, this.compilation.config);
-        const { pagesDir, userTemplatesDir } = this.compilation.context;
+        const { pagesDir, userTemplatesDir, userWorkspace } = this.compilation.context;
         const { mode } = this.compilation.config;
         const normalizedUrl = this.getRelativeUserworkspaceUrl(url);
         let customImports;
@@ -298,9 +301,11 @@ class StandardHtmlResource extends ResourceInterface {
         let body = '';
         let template = null;
         let processedMarkdown = null;
-        const barePath = normalizedUrl.endsWith(path.sep)
-          ? `${pagesDir}${normalizedUrl}index`
-          : `${pagesDir}${normalizedUrl.replace('.html', '')}`;
+        const barePath = url === '/404/' && fs.existsSync(path.join(userWorkspace, 'pages/404.html'))
+          ? path.join(userWorkspace, 'pages/404')
+          : normalizedUrl.endsWith(path.sep)
+            ? `${pagesDir}${normalizedUrl}index`
+            : `${pagesDir}${normalizedUrl.replace('.html', '')}`;
         const isMarkdownContent = fs.existsSync(`${barePath}.md`)
           || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
           || fs.existsSync(`${barePath.replace(`${path.sep}index`, '.md')}`);
@@ -365,7 +370,7 @@ class StandardHtmlResource extends ResourceInterface {
         if (mode === 'spa') {
           body = fs.readFileSync(this.compilation.graph[0].path, 'utf-8');
         } else {
-          body = getPageTemplate(barePath, userTemplatesDir, template, contextPlugins);
+          body = getPageTemplate(barePath, userTemplatesDir, template, contextPlugins, pagesDir);
         }
 
         body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins);  

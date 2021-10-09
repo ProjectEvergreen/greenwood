@@ -107,10 +107,10 @@ async function staticRenderCompilation(compilation) {
   console.info('pages to generate', `\n ${pages.map(page => page.path).join('\n ')}`);
   
   await Promise.all(pages.map(async (page) => {
-    const route = page.route;
+    const { route, outputPath } = page;
     const response = await htmlResource.serve(route);
 
-    await optimizePage(compilation, response.body, route, scratchDir);
+    await optimizePage(compilation, response.body, route, outputPath, scratchDir);
 
     return Promise.resolve();
   }));
