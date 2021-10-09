@@ -80,6 +80,14 @@ h3 > a > span.icon {
     padding: 0;
   }
 
+  #github-edit-button {
+    padding: 1rem;
+    background-color: black;
+    color: white;
+    margin-top: 2rem;
+    border-radius: 0.5rem;
+  }
+
   & h3 {
     font-size: 2rem;
     margin: 5px 0;
