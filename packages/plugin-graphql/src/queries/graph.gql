@@ -3,6 +3,7 @@ query {
     id,
     filename,
     label,
+    outputPath,
     path,
     route,
     template,

@@ -16,7 +16,10 @@ module.exports = generateGraph = async (compilation) => {
         filename: 'index.html',
         path: '/',
         route: '/',
-        data: {}
+        id: 'index',
+        label: 'Index',
+        data: {},
+        imports: []
       }];
 
       const walkDirectoryForPages = function(directory, pages = []) {
@@ -163,11 +166,14 @@ module.exports = generateGraph = async (compilation) => {
           graph = [
             ...graph,
             {
+              ...oldGraph,
               outputPath: '404.html',
               filename: '404.html',
               route: '/404/',
               path: '404.html',
-              data: {}
+              title: 'Not Found',
+              id: '404',
+              label: 'Not Found'
             }
           ];
         }

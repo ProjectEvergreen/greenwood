@@ -65,7 +65,7 @@ const sortMenuItems = (menuItems, order) => {
   return menuItems;
 };
 
-const getParsedHeadingsFromPage = (tableOfContents, headingLevel) => {
+const getParsedHeadingsFromPage = (tableOfContents = [], headingLevel) => {
   let children = [];
 
   if (tableOfContents.length > 0 && headingLevel > 0) {
@@ -108,6 +108,7 @@ const graphTypeDefs = gql`
     id: String,
     label: String,
     path: String,
+    outputPath: String,
     route: String,
     template: String,
     title: String
