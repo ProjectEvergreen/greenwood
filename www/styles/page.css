@@ -90,8 +90,8 @@ h3 > a > span.icon {
 
   #github-edit-button-container {
     display: flex;
-    justify-content:flex-end;
-    margin-right: 15px; 
+    justify-content: flex-end;
+    margin-right: 15px;
   }
 
   & h3 {
