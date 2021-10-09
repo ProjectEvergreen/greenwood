@@ -29,7 +29,7 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], 
   const pageIsHtmlPath = `${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.html`;
   const customPluginDefaultPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
   const customPluginPageTemplates = getCustomPageTemplates(contextPlugins, template);
-  const is404Page = barePath.replace(pagesDir, '').indexOf('/404') === 0;
+  const is404Page = barePath.replace(pagesDir, '').indexOf(`${path.sep}404`) === 0;
 
   if (template && customPluginPageTemplates.length > 0 || fs.existsSync(`${templatesDir}/${template}.html`)) {
     // use a custom template, usually from markdown frontmatter
