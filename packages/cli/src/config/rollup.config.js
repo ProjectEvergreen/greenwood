@@ -486,7 +486,7 @@ function greenwoodHtmlPlugin(compilation) {
           // would be nice if we could just prevent Rollup from generating sourcemaps for just our input files in the first place (GFI)
           // https://github.com/ProjectEvergreen/greenwood/issues/659
           scratchFiles[`${htmlPath.replace(outputDir, '')}.map`] = true;
-          html = html.replace('//# sourceMappingURL=index.html.map', '');
+          html = html.replace(/\/\/# sourceMappingURL=(.*)\.html\.map/, '');
 
           await fs.promises.writeFile(htmlPath, html);
         } else {

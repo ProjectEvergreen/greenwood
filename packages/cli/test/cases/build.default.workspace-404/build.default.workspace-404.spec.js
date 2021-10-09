@@ -23,6 +23,7 @@
  *     app.html
  */
 const expect = require('chai').expect;
+const fs = require('fs');
 const glob = require('glob-promise');
 const { JSDOM } = require('jsdom');
 const path = require('path');
@@ -128,7 +129,11 @@ describe('Build Greenwood With: ', function() {
           expect(heading[0].textContent).to.equal('This is not the page you are looking for.');
         });
         
-        // TODO sourceMappingURL=404.html.map
+        it('should not have any sourcemap inlining for Rollup HTML entry points', function() {
+          const html = fs.readFileSync(path.resolve(this.context.publicDir, '404.html'), 'utf-8');
+
+          expect(html).not.to.contain(/\/\/# sourceMappingURL=(.*)\.html\.map/);
+        });
       });
 
     });
