@@ -306,7 +306,9 @@ class NodeModulesResource extends ResourceInterface {
         // for each entry found in dependencies, find its entry point
         // then walk its entry point (e.g. index.js) for imports / exports to add to the importMap
         // and then walk its package.json for transitive dependencies and all those import / exports
-        await walkPackageJson(userPackageJson);
+        if (Object.keys(importMap).length === 0) {
+          await walkPackageJson(userPackageJson);
+        }
 
         // apply import map and shim for users
         newContents = newContents.replace('<head>', `
