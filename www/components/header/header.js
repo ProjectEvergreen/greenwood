@@ -30,7 +30,7 @@ class HeaderComponent extends LitElement {
     super.connectedCallback();
 
     const response = await client.query({
-      query: MenuQuery, 
+      query: MenuQuery,
       variables: {
         name: 'navigation',
         order: 'index_asc'
@@ -49,8 +49,7 @@ class HeaderComponent extends LitElement {
           <div class="head-wrap">
 
             <div class="brand">
-              <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer"
-                onclick="getOutboundLink('https://projectevergreen.github.io');">
+              <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer">
                 <img src="../../assets/evergreen.svg" alt="Greenwood logo"/>
               </a>
               <div class="project-name">
