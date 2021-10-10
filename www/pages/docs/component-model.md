@@ -8,7 +8,7 @@ index: 1
 ## Component Model
 Greenwood aims to support and optimize around the standard capabilities of the web platform and its features.  In particular, the concept of using Web Components as a way to add interactivity and dynamic content into your application and... that can all be prerendered for you, just like you could do with any server side templating language.
 
-The options for how to design your app effectively comes down to what you're trying to build, so if that's with the native `HTMLElement` or something based on it like **LitElement** (installed seperately), **Greenwood** will take care of the rest.
+The options for how to design your app effectively comes down to what you're trying to build, so if that's with the native `HTMLElement` or something based on it like **LitElement** (installed separately), **Greenwood** will take care of the rest.
 
 Below are a couple examples to get you going.  
 
@@ -26,11 +26,11 @@ Our component, in a file called _src/components/footer.js_ could look like this
 class FooterComponent extends HTMLElement {
   constructor() {
     super();
-    
+
     // create a closed Shadow DOM
     this.root = this.attachShadow({ mode: 'closed' });
   }
-  
+
   // run some code when the component is ready
   connectedCallback() {
     this.root.innerHTML = this.getTemplate();
@@ -65,7 +65,7 @@ You can then use it within a page template.
   <body>
     <my-footer></my-footer>
   </body>
-  
+
 </html>
 ```
 
@@ -108,7 +108,7 @@ customElements.define('x-greeting', GreetingComponent);
   <body>
     <x-greeting></x-greeting>
   </body>
-  
+
 </html>
 ```
 

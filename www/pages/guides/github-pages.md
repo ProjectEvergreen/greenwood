@@ -74,7 +74,7 @@ With the above in place, let's set everything up!
     ```
 1. Now `git` commit that and push it to your repo!
 
-If all was succesful, you should now see a [`gh-pages` branch](https://github.com/ProjectEvergreen/projectevergreen.github.io/tree/gh-pages) in your repo with the output of the _public/_ directory committed to it.  (your specific file output may differ, but it should match the output you see if you run `greenwood build` locally.)
+If all was successful, you should now see a [`gh-pages` branch](https://github.com/ProjectEvergreen/projectevergreen.github.io/tree/gh-pages) in your repo with the output of the _public/_ directory committed to it.  (your specific file output may differ, but it should match the output you see if you run `greenwood build` locally.)
 
 > _You can see the status of any Action by going to the [Actions tab](https://github.com/ProjectEvergreen/projectevergreen.github.io/actions) of your repo_
 
