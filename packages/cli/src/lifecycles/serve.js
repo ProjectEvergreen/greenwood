@@ -127,27 +127,20 @@ async function getDevServer(compilation) {
 
   // ETag Support - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
   app.use(async (ctx) => {
-    console.warn(`?????? checking etag for => ${ctx.url}`);
     const body = ctx.response.body;
     // console.debug('body', body);
 
     if (Buffer.isBuffer(body)) {
-      console.warn(`no body for => ${ctx.url}`);
+      // console.warn(`no body for => ${ctx.url}`);
     } else {
-      console.debug('HEADERS', ctx.headers);
       const inm = ctx.headers['if-none-match'];
       const etagHash = hashString(body);
 
-      console.debug('inm', inm);
-      console.debug('etagHash', etagHash);
-
       if (inm && inm === etagHash) {
-        console.debug('@@@@@@@@@ PARTY TIME (we can cache this one)!');
         ctx.status = 304;
         ctx.body = null;
         ctx.set('Etag', etagHash);
       } else if (!inm || inm !== etagHash) {
-        console.debug('!!!!! SET AN ETAG HERE');
         ctx.set('Etag', etagHash);
       }
     }
