@@ -125,9 +125,7 @@ async function getDevServer(compilation) {
     await next();
   });
 
-  // before or after processing?
-  // otherwise everything next() has to do null check on ctx.body
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
+  // ETag Support - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
   app.use(async (ctx) => {
     console.warn(`?????? checking etag for => ${ctx.url}`);
     const body = ctx.response.body;
@@ -154,7 +152,6 @@ async function getDevServer(compilation) {
       }
     }
 
-    console.debug('============================');
   });
 
   return Promise.resolve(app);
