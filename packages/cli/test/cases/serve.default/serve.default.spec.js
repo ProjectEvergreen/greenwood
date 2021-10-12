@@ -21,7 +21,7 @@ const request = require('request');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const Runner = require('gallinago').Runner;
 
-describe('Serve Greenwood With: ', function() {
+describe.only('Serve Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
@@ -83,6 +83,180 @@ describe('Serve Greenwood With: ', function() {
 
       it('should return the correct response body', function(done) {
         expect(response.body).to.have.lengthOf(1);
+        done();
+      });
+    });
+
+    describe('Develop command with image (png) specific behavior', function() {
+      const ext = 'png';
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+
+          request.get(`${hostname}/assets/logo.${ext}`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal(`image/${ext}`);
+        done();
+      });
+
+      it('should return binary data', function(done) {
+        expect(response.body).to.contain('PNG');
+        done();
+      });
+    });
+
+    describe('Develop command with image (ico) specific behavior', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/assets/favicon.ico`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve(response);
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal('image/x-icon');
+        done();
+      });
+
+      it('should return binary data', function(done) {
+        expect(response.body).to.contain('\u0000');
+        done();
+      });
+    });
+
+    describe('Develop command with SVG specific behavior', function() {
+      const ext = 'svg';
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/assets/webcomponents.${ext}`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal(`image/${ext}+xml`);
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(response.body.indexOf('<svg')).to.equal(0);
+        done();
+      });
+    });
+
+    describe('Develop command with font specific (.woff) behavior', function() {
+      const ext = 'woff';
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/assets/source-sans-pro.woff?v=1`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal(ext);
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(response.body).to.contain('wOFF');
+        done();
+      });
+    });
+
+    describe('Develop command with JSON specific behavior', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/assets/data.json`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = JSON.parse(body);
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('application/json');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(response.body.name).to.equal('Marvin');
         done();
       });
     });
