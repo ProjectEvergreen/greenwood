@@ -2,6 +2,8 @@ const pluginPostCss = require('../../../src/index');
 
 module.exports = {
   plugins: [
-    pluginPostCss()
+    pluginPostCss({
+      extendConfig: true
+    })
   ]
 };
