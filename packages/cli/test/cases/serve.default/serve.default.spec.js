@@ -21,7 +21,7 @@ const request = require('request');
 const runSmokeTest = require('../../../../../test/smoke-test');
 const Runner = require('gallinago').Runner;
 
-describe.only('Serve Greenwood With: ', function() {
+describe('Serve Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
