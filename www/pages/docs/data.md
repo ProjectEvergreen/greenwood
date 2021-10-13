@@ -24,7 +24,7 @@ As an example, if you are developing a blog site, like in our [Getting Started](
 
 But what happens over time, when that list grows to 10, 50, 100+ posts?  Imagine maintaining that list each time, over and over again?  Or just remembering to update that list each time you publish a new post?  Not only that, but wouldn't it also be great to sort, search, filter, and organize those posts to make them easier for users to navigate and find?
 
-So instead of a static list, you can do something like this! 
+So instead of a static list, you can do something like this!
 
 ```javascript
 render() {
@@ -44,7 +44,7 @@ To assist with this, Greenwood provides all your content as data, accessible fro
 
 
 ### Internal Sources
-Greenwood (via [**plugin-graphql**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql)) exposes an [Apollo](https://www.apollographql.com/docs/apollo-server/) server locally when developing available at `localhost:4000` that can be used to get information about your local content like path, "slug", title and other useful information that will be dynamic to the content you create.  Programmatic access to this data can provide you the oppourtunity to share your content with your users in a way that supports sorting, filter, organizing, and more!
+Greenwood (via [**plugin-graphql**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql)) exposes an [Apollo](https://www.apollographql.com/docs/apollo-server/) server locally when developing available at `localhost:4000` that can be used to get information about your local content like path, "slug", title and other useful information that will be dynamic to the content you create.  Programmatic access to this data can provide you the opportunity to share your content with your users in a way that supports sorting, filter, organizing, and more!
 
 ![graphql-playground](/assets/graphql-playground.png)
 
@@ -55,7 +55,7 @@ This is what the schema looks like:
 ```javascript
 graph {
   filename, // (string) file name without extension/path, so that it can be copied to scratch dir with same name
-  
+
   id, // (string) filename without the extension
 
   label, // (string) best guess pretty text / display based on filename
@@ -70,10 +70,10 @@ graph {
 }
 ```
 
-> All queries return subsets and / or derivitives of the `graph`.
+> All queries return subsets and / or derivatives of the `graph`.
 
 #### Queries
-To help facilitiate development, Greenwood provides a couple queries out of the box that you can use to get access to the `graph` and start using it in your components, which we'll get to next.
+To help facilitate development, Greenwood provides a couple queries out of the box that you can use to get access to the `graph` and start using it in your components, which we'll get to next.
 
 Below are the queries available:
 

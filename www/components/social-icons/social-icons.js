@@ -20,27 +20,24 @@ class SocialIcons extends LitElement {
     };
 
     return html`
-      <a class="icons" 
+      <a class="icons"
         href="${socialUrls.github}"
-        target="_blank" 
-        rel="noreferrer noopener" 
+        target="_blank"
+        rel="noreferrer noopener"
         aria-label="open github page"
-        onclick="getOutboundLink('${socialUrls.github}');" 
       >${githubIcon}</a>
-      
+
       <a href="${socialUrls.slack}"
-        class="icons slack-icon" 
-        target="_blank" 
+        class="icons slack-icon"
+        target="_blank"
         rel="noreferrer noopener"
         aria-label="slack"
-        onclick="getOutboundLink('${socialUrls.slack}')" 
       >${slackIcon}</a>
-      
-      <a href="${socialUrls.twitter}" 
-        target="_blank" 
-        rel="noreferrer noopener" 
+
+      <a href="${socialUrls.twitter}"
+        target="_blank"
+        rel="noreferrer noopener"
         aria-label="open twitter page"
-        onclick="getOutboundLink('${socialUrls.twitter}')" 
       >${twitterIcon}</a>
     `;
   }

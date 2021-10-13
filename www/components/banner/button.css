@@ -1,4 +1,17 @@
-/* stylelint-disable a11y/media-prefers-reduced-motion */
+@media screen and (prefers-reduced-motion: reduce) {
+  :host .btn {
+    display: inline-block;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    padding: 0.75rem;
+    color: white;
+    background-color: #201e2e;
+    border: 1px solid white;
+    transition: none;
+    text-decoration: none;
+  }
+}
+
 :host .btn {
   display: inline-block;
   border-radius: 10px;
@@ -8,10 +21,18 @@
   background-color: #201e2e;
   border: 1px solid white;
   transition: 0.3s;
+  text-decoration: none;
 }
 
 :host .btn:hover,
 :host .btn:focus {
   background-color: #425d58;
   border: 1px solid white;
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+  :host .btn:hover,
+  :host .btn:focus {
+    background-color: #201e2e;
+  }
 }

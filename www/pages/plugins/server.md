@@ -15,7 +15,7 @@ Server plugins allow developers to start and stop custom servers as part of the 
 ### API (Server Interface)
 Although JavaScript is loosely typed, a [server "interface"](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/lib/server-interface.js) has been provided by Greenwood that you can use to start building your own server plugins.  Effectively you just have to provide two methods
 - `start` - function to run to start your server
-- `stop`  - function to run to stop / teaddown your server
+- `stop`  - function to run to stop / teardown your server
 
 
 They can be used in a _greenwood.config.js_ just like any other plugin type.
@@ -40,7 +40,7 @@ The below is an excerpt of [Greenwood's internal LiveReload server](https://gith
 class LiveReloadServer extends ServerInterface {
   constructor(compilation, options = {}) {
     super(compilation, options);
-    
+
     this.liveReloadServer = livereload.createServer({ /* options */});
   }
 
