@@ -44,7 +44,7 @@ class PostCssResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise(async(resolve, reject) => {
       try {
-        const config = getConfig(this.compilation);
+        const config = getConfig(this.compilation, this.options.extendConfig);
         const plugins = config.plugins || [];
         const css = plugins.length > 0
           ? (await postcss(plugins).process(body, { from: url })).css

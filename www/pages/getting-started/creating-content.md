@@ -54,12 +54,12 @@ For this template, create a _page.html_ in a _src/templates/_ (make the _templat
   <body>
     <content-outlet></content-outlet>
   </body>
-  
+
 </html>
 ```
 
 ### Blog Posts Template
-We just made a template for our home page, but for our indivdual blog posts, we're going to want a different layout for those pages.  So what do we do?   Just create a new template!
+We just made a template for our home page, but for our individual blog posts, we're going to want a different layout for those pages.  So what do we do?   Just create a new template!
 
 Create a _blog.html_ in _src/templates/_ and include this code in it.
 ```html
@@ -68,7 +68,7 @@ Create a _blog.html_ in _src/templates/_ and include this code in it.
   <body>
     <content-outlet></content-outlet>
   </body>
-  
+
 </html>
 ```
 

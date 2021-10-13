@@ -139,7 +139,7 @@ Greenwood provides a number of different ways to send hints to Greenwood as to h
 |`none` | With this setting, _none_ of your JS or CSS will be minified or hinted at all. | The best choice if you want to handle everything yourself through custom [Resource plugins](/plugins/resource/). |
 |`static` | Only for `<script>` tags, but this setting will remove `<script>` tags from your HTML. | If your Web Components only need a single render just to emit some static HTML, or are otherwise not dynamic or needed at runtime, this will really speed up your site's performance by dropping uncessary HTTP requests. |
 
-> _These settings are currently considered expiremental.  Additional improvements and considerations include adding [`none` override support](https://github.com/ProjectEvergreen/greenwood/discussions/545#discussioncomment-957320), [SSR + hydration](https://github.com/ProjectEvergreen/greenwood/discussions/576), and [side effect free templates and pages](https://github.com/ProjectEvergreen/greenwood/discussions/644)._
+> _These settings are currently considered experimental.  Additional improvements and considerations include adding [`none` override support](https://github.com/ProjectEvergreen/greenwood/discussions/545#discussioncomment-957320), [SSR + hydration](https://github.com/ProjectEvergreen/greenwood/discussions/576), and [side effect free templates and pages](https://github.com/ProjectEvergreen/greenwood/discussions/644)._
 
 #### Example
 ```js
@@ -160,7 +160,7 @@ Additionally, you can apply overrides on a per `<link>` or `<script>` tag basis 
 <link rel="stylesheet" href="/path/to/file1.css" data-gwd-opt="inline"/>
 ```
 
-> _Just be mindful that style encapsulation provided by ShadowDOM (e.g. `:host`) for custom elements will now have their styles inlined in the `<head>` and mixed with all other global styles, and thus may collide and [be suceptible to the cascade](https://github.com/ProjectEvergreen/greenwood/pull/645#issuecomment-873125192) depending on their degree of specificity.  Increasing specificity of selectors or using only global styles will help resolve this._
+> _Just be mindful that style encapsulation provided by ShadowDOM (e.g. `:host`) for custom elements will now have their styles inlined in the `<head>` and mixed with all other global styles, and thus may collide and [be susceptible to the cascade](https://github.com/ProjectEvergreen/greenwood/pull/645#issuecomment-873125192) depending on their degree of specificity.  Increasing specificity of selectors or using only global styles will help resolve this._
 
 ### Pages Directory
 
@@ -182,7 +182,7 @@ _However_, you may not need that, like for a [SPA (Single Page Application)](/do
 #### Example
 ```js
 module.exports = {
-  prerender: false 
+  prerender: false
 }
 ```
 

@@ -10,9 +10,9 @@ linkheadings: 3
 
 ### Philosophy
 
-At its heart, Greenwood is all about web standards.  With the browser becoming such a powerful tool, especially with the advent of [ECMAScript Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) (ESM) now having ubiquitious support in modern browsers, an entirely new workflow paradigm has emerged in which the browser can do more of the heavy lifting in our web dev workflows.  In this way, less tooling and depedencies are needed to achieve excellent local development workflows as well as needing less overhead to maintain that stack.
+At its heart, Greenwood is all about web standards.  With the browser becoming such a powerful tool, especially with the advent of [ECMAScript Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) (ESM) now having ubiquitous support in modern browsers, an entirely new workflow paradigm has emerged in which the browser can do more of the heavy lifting in our web dev workflows.  In this way, less tooling and dependencies are needed to achieve excellent local development workflows as well as needing less overhead to maintain that stack.
 
-Greenwood wants to take advantage of this oppourtunity to join in with other projects that are re-evaluating the landscape and thinking of a more unbundled world.  One with less reliance on across the board bundling and transpilation, and one that just transforms on the fly only when needed.  This paradigm lends itself really well to speedy local development workflows as well as benefiting end users who can be shipped more modern code.  And for developers, now the code you write might actually look familiar while debugging in your browser!
+Greenwood wants to take advantage of this opportunity to join in with other projects that are re-evaluating the landscape and thinking of a more unbundled world.  One with less reliance on across the board bundling and transpilation, and one that just transforms on the fly only when needed.  This paradigm lends itself really well to speedy local development workflows as well as benefiting end users who can be shipped more modern code.  And for developers, now the code you write might actually look familiar while debugging in your browser!
 
 
 ### CLI
@@ -23,7 +23,7 @@ During _development_ the CLI will:
 - Instantaneously start a local web server with live reload.
 - Process requests on the fly only for the content or code you need for a given page.
 - Supports loading dependencies from _node_modules_ using an [`importMap`](https://github.com/WICG/import-maps) to avoid bundling.
-- While Greenwood is ESM first, we have a [plugin](/plugins/custom-plugins) to tranform CommonJS into ESM (🤞)
+- While Greenwood is ESM first, we have a [plugin](/plugins/custom-plugins) to transform CommonJS into ESM (🤞)
 
 For _production_ builds:
 - Combine all your code and dependencies into efficient modern bundles including minifying your JavaScript and CSS.
@@ -45,7 +45,7 @@ For when transpilation is desired (Babel, PostCSS), Greenwood recommends using a
 - [**Babel**](https://babeljs.io/) is a compiler for JavaScript that transforms modern JavaScript down to a specific "target" of JavaScript.  For example, source code can be written using 2018+ syntax, but transformed such that browsers that don't support that syntax can still run that JavaScript.
 - [**PostCSS**](https://postcss.org/), much like **Babel** is a compiler, but for CSS!  Just as with **Babel**, we can use modern CSS features without a transpilation process from a higher level version of CSS (LESS, SASS).  CSS has finally arrived in modern web applications! ✨
 
-Using the above tools and leveraging their respective `env` presets available, essentially, **Browserlist** will query CanIUse data to determine, based on the browser query provided, what features are / aren't needed for transpilation.  This in turn allows Babel and PostCSS to intelligenty transpile _only_ what's needed for the features that are missing from the browser you are targatting, thus ensuring an "evergreen" experience for users _and_ developers.  Nice. 😎
+Using the above tools and leveraging their respective `env` presets available, essentially, **Browserlist** will query CanIUse data to determine, based on the browser query provided, what features are / aren't needed for transpilation.  This in turn allows Babel and PostCSS to intelligenty transpile _only_ what's needed for the features that are missing from the browser you are targeting, thus ensuring an "evergreen" experience for users _and_ developers.  Nice. 😎
 
 So for example, a _.browserslistrc_ that looks like this:
 ```shell

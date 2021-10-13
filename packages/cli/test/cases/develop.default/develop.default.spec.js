@@ -579,7 +579,7 @@ describe('Develop Greenwood With: ', function() {
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/assets/source-sans-pro.woff`, (err, res, body) => {
+          request.get(`${hostname}:${port}/assets/source-sans-pro.woff?v=1`, (err, res, body) => {
             if (err) {
               reject();
             }
