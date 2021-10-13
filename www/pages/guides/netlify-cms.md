@@ -45,7 +45,7 @@ collections:
 ```
 > You can read more about these configuration options on [Netlify's guide](https://www.netlifycms.org/docs/add-to-your-site/#configuration)
 
-This will provide us with the bare minimum needed to configure the admin UI of the netlify CMS within our project.
+This will provide us with the bare minimum needed to configure the admin UI of the Netlify CMS within our project.
 
 
 #### Admin UI
@@ -71,7 +71,7 @@ Inside the `public/admin/` directory create another file called `index.html` thi
 
 #### Identity Widget
 
-Along with the admin UI, we also need to readd the identity widget script element within our app template so that it will be accessible from any page.  Within our `src/templates/app.html` you need to add the following script element within the function:
+Along with the admin UI, we also need to read the identity widget script element within our app template so that it will be accessible from any page.  Within our `src/templates/app.html` you need to add the following script element within the function:
 
 ```html
 <head>
@@ -159,7 +159,7 @@ When completed click **Save** at the top.  A pull request will automatically be 
 
 #### Review Your Content
 
-You can change the **status** to "In Review". Netlify CMS will then tag that same pull request as `netlify-cms/pending_review`.  Pending reviews can be read by selecting **Workflow** from netlify CMS navigation menu.
+You can change the **status** to "In Review". Netlify CMS will then tag that same pull request as `netlify-cms/pending_review`.  Pending reviews can be read by selecting **Workflow** from Netlify CMS navigation menu.
 
 <img src="/assets/netlify-workflow.png" alt="netlify-cms" style="max-width:800px;"/>
 
@@ -169,6 +169,6 @@ If you select your example page from the `In Review` section you can edit/update
 
 From the top of the page select **Publish** and then from the drop-down select **Publish now**
 
-Your pull request will now be merged to the master branch. The entire site will be recompiled on netlify. In a few moments your new page will be live at your netlify domain `https://yourgeneratedurl-ads6387.netlify.com/blog/example`.
+Your pull request will now be merged to the master branch. The entire site will be recompiled on Netlify. In a few moments your new page will be live at your netlify domain `https://yourgeneratedurl-ads6387.netlify.com/blog/example`.
 
 More information about Netlify CMS can be found on the [Netlify CMS project website](https://www.netlifycms.org/).
