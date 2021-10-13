@@ -75,7 +75,7 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     noscript: true,
     pre: true
   });
-  const body = root.querySelector('body').innerHTML;
+  const body = root.querySelector('body') ? root.querySelector('body').innerHTML : '';
   const headScripts = root.querySelectorAll('head script');
   const headLinks = root.querySelectorAll('head link');
   const headMeta = root.querySelectorAll('head meta');
