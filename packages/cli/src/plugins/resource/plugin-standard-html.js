@@ -271,16 +271,19 @@ class StandardHtmlResource extends ResourceInterface {
     return path.normalize(url.replace(this.compilation.context.userWorkspace, ''));
   }
 
-  async shouldServe(url) {
+  async shouldServe(url, headers) {
     const { pagesDir } = this.compilation.context;
     const relativeUrl = this.getRelativeUserworkspaceUrl(url);
+    const isClientSideRoute = this.compilation.config.mode === 'spa' && (headers.request.accept || '').indexOf(this.contentType) >= 0;
     const barePath = relativeUrl.endsWith(path.sep)
       ? `${pagesDir}${relativeUrl}index`
       : `${pagesDir}${relativeUrl.replace('.html', '')}`;
     
-    return Promise.resolve(this.extensions.indexOf(path.extname(relativeUrl)) >= 0 || path.extname(relativeUrl) === '') && 
-    (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index')
-    || fs.existsSync(`${barePath}.md`) || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`);
+    return Promise.resolve(this.extensions.indexOf(path.extname(relativeUrl)) >= 0
+      || path.extname(relativeUrl) === '') && (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index')
+      || fs.existsSync(`${barePath}.md`)
+      || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
+      || isClientSideRoute;
   }
 
   async serve(url) {
