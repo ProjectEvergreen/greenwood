@@ -181,7 +181,7 @@ function getProdServer(compilation) {
 
     const reducedResponse = await standardResources.reduce(async (responsePromise, resource) => {
       const response = await responsePromise;
-      const { url } = ctx;
+      const url = ctx.url.replace(/\?(.*)/, '');
       const { headers } = ctx.response;
       const outputPathUrl = path.join(compilation.context.outputDir, url);
       const shouldServe = await resource.shouldServe(outputPathUrl, {
