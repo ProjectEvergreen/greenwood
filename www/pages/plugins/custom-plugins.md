@@ -6,9 +6,9 @@ index: 6
 ---
 
 ## Custom Plugins
-Greenwood provides some custom plugins that can be used to enhance your project's default functionalty, using the [available plugin types](/plugins/) provided by Greenwood.
+Greenwood provides some custom plugins that can be used to enhance your project's default functionality, using the [available plugin types](/plugins/) provided by Greenwood.
 
-The available plugins built and maintained by Greenwood team and contibutors have been provided in the table below, with links to their README with the appropriate installation and usage steps.
+The available plugins built and maintained by Greenwood team and contributors have been provided in the table below, with links to their README with the appropriate installation and usage steps.
 
 | Name  | Description  |
 |---|---|
@@ -21,4 +21,4 @@ The available plugins built and maintained by Greenwood team and contibutors hav
 | [PostCSS](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss) | Allows usage of [**PostCSS**](https://postcss.org/) plugins and configuration in your project. |
 | [TypeScript](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-typescript) | Allows usage of [**TypeScript**](https://www.typescriptlang.org/) for writing JavaScript. |
 
-> See something missing?  Please review our [open issues](https://github.com/ProjectEvergreen/greenwood/issues), we might be [working on it](https://github.com/ProjectEvergreen/greenwood/projects)!  Or if not, please request it, we would be interested to learn how you need to use Greenwod and how the team can help!
+> See something missing?  Please review our [open issues](https://github.com/ProjectEvergreen/greenwood/issues), we might be [working on it](https://github.com/ProjectEvergreen/greenwood/projects)!  Or if not, please request it, we would be interested to learn how you need to use Greenwood and how the team can help!

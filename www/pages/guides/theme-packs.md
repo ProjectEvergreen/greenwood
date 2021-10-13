@@ -7,7 +7,7 @@ index: 3
 
 ## Creating a Theme Pack
 
-Introduced as a concept in the [Context Plugin docs](/plugins/context/), a theme pack is what Greenwood uses to refer to a plugin that aims to provide a set of reasuale templates, pages and more to a user (think of [**CSS Zen Garden**](http://www.csszengarden.com/)).  A good example (and the one this guide is based on) is [**greenwood-starter-presentation**](https://github.com/thescientist13/greenwood-starter-presentation), which provides the starting point for creating a [slide deck entirely from markdown](https://github.com/thescientist13/knowing-your-tco), using Greenwood!
+Introduced as a concept in the [Context Plugin docs](/plugins/context/), a theme pack is what Greenwood uses to refer to a plugin that aims to provide a set of reusable templates, pages and more to a user (think of [**CSS Zen Garden**](http://www.csszengarden.com/)).  A good example (and the one this guide is based on) is [**greenwood-starter-presentation**](https://github.com/thescientist13/greenwood-starter-presentation), which provides the starting point for creating a [slide deck entirely from markdown](https://github.com/thescientist13/knowing-your-tco), using Greenwood!
 
 ![greenwood-starter-presentation](/assets/greenwood-starter-presentation.png)
 
@@ -17,7 +17,7 @@ This guide will walk through the process of setting up Greenwood to support the 
 To try and focus on just the theme pack aspects, this guide assumes a couple things:
 1. You are already familiar with [setting up](/getting-started/) a Greenwood project.
 1. You are familiar with [publishing packages to npm](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages).
-1. Assumes a Unix "like" environment (in regards to commands and file path examples used), though the same can definifitely be done on Windows.
+1. Assumes a Unix "like" environment (in regards to commands and file path examples used), though the same can definitely be done on Windows.
 
 We encourage using Greenwood to develop your theme pack mainly so that you can ensure a seamless experience when publishing to npm knowing that things should just work. ™️
 
@@ -25,7 +25,7 @@ We encourage using Greenwood to develop your theme pack mainly so that you can e
 For the sake of development, you can create as much as you need to recreate a user workspace and to simulate what your theme pack would look like.  Think of it like creating a [Storybook](https://storybook.js.org/) for your theme pack.
 
 
-For this guide, we will be publishing _layouts/_ (templates) and _styles/_ to **npm**.  The _pages/_ diretory is just being used to pull in the template for local development and testing purposes for you as the plugin author.
+For this guide, we will be publishing _layouts/_ (templates) and _styles/_ to **npm**.  The _pages/_ directory is just being used to pull in the template for local development and testing purposes for you as the plugin author.
 ```shell
 src/
   pages/
@@ -62,7 +62,7 @@ module.exports = () => [{
   provider: () => {
     return {
       templates: [
-        // __dirname will be _node_modules/your-package/_ 
+        // __dirname will be _node_modules/your-package/_
         // when your plugin is run in a users project
         path.join(__dirname, 'dist/layouts')
       ]
@@ -190,12 +190,12 @@ You can also use Greenwood to test your theme pack using a production build so t
 ```json
 {
   "scripts": {
-    
+
     "build:pre": "mkdir -pv ./node_modules/greenwood-starter-presentation/dist && rsync -rv --exclude 'pages/' ./src/ ./node_modules/greenwood-starter-presentation/dist",
 
     "build": "npm run build:pre && greenwood build",
     "serve": "npm run build:pre && greenwood serve"
-    
+
   }
 }
 ```
@@ -229,7 +229,7 @@ For users, they would just need to do the following:
     ```shell
     $ npm install my-theme-pack --save-dev
     ```
-1. Add the plugin to their _greenwood.config.js_ 
+1. Add the plugin to their _greenwood.config.js_
     ```js
     const myThemePackPlugin = require('my-theme-pack');
 
