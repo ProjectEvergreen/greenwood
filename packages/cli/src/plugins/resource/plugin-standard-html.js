@@ -298,12 +298,13 @@ class StandardHtmlResource extends ResourceInterface {
         const { pagesDir, userTemplatesDir, userWorkspace } = this.compilation.context;
         const { mode } = this.compilation.config;
         const normalizedUrl = this.getRelativeUserworkspaceUrl(url);
+        const userHasOwn404 = fs.existsSync(path.join(userWorkspace, 'pages/404.html')) || fs.existsSync(path.join(userWorkspace, 'pages/404.md'));
         let customImports;
 
         let body = '';
         let template = null;
         let processedMarkdown = null;
-        const barePath = url === '/404/' && fs.existsSync(path.join(userWorkspace, 'pages/404.html'))
+        const barePath = url === '/404/' && userHasOwn404
           ? path.join(userWorkspace, 'pages/404')
           : normalizedUrl.endsWith(path.sep)
             ? `${pagesDir}${normalizedUrl}index`

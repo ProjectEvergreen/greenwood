@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with no config and custom 404 page (and app) template.
+ * Run Greenwood build command with no config and custom 404 page in markldown with custom frontmatter exports (and app) template.
  *
  * User Result
  * Should generate a bare bones Greenwood build with custom page template.
@@ -14,7 +14,7 @@
  * User Workspace
  * src/
  *   pages/
- *     404.html
+ *     404.md
  *   scripts/
  *     404.js
  *     header.js
@@ -34,7 +34,7 @@ const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/u
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom 404 Page and App Template';
+  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom 404 Page in markdown and App Template';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
   let runner;
