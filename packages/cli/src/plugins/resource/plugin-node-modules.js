@@ -17,7 +17,7 @@ const importMap = {};
 const updateImportMap = (entry, entryPath) => {
 
   if (path.extname(entryPath) === '') {
-    entryPath = `${entryPath}/${entry}.js`;
+    entryPath = `${entryPath}.js`;
   }
 
   importMap[entry] = entryPath;
