@@ -508,6 +508,11 @@ describe('Develop Greenwood With: ', function() {
         expect(importMap['@material/mwc-ripple/mwc-ripple']).to.equal('/node_modules/@material/mwc-ripple/mwc-ripple.js');
         expect(importMap['@material/mwc-ripple/mwc-ripple/@material/mwc-ripple/mwc-ripple.js']).to.be.undefined;
 
+        // https://github.com/ProjectEvergreen/greenwood/issues/773
+        expect(importMap['@material/base/component']).to.equal('/node_modules/@material/base/component.js');
+        expect(importMap['@material/base/foundation']).to.equal('/node_modules/@material/base/foundation.js');
+        expect(importMap['@material/base/types']).to.equal('/node_modules/@material/base/types.js');
+
         done();
       });
 
