@@ -34,7 +34,7 @@ describe('Build Greenwood With: ', function() {
     runner = new Runner();
   });
 
-  describe('Custom Configuration with a bad value for devServer.extensions', function() {
+  describe('Custom Configuration with a bad value for devServer.hud', function() {
     it('should throw an error that provided extensions is not valid', async function() {
       try {
         await runner.setup(outputPath);

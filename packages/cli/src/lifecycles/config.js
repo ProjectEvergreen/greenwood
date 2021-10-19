@@ -129,10 +129,12 @@ module.exports = readAndMergeConfig = async() => {
 
         if (devServer && Object.keys(devServer).length > 0) {
 
-          if (typeof devServer.hud === 'boolean') {
-            customConfig.devServer.hud = devServer.hud;
-          } else {
-            reject(`Error: greenwood.config.js devServer hud options must be a boolean.  Passed value was: ${devServer.hud}`);
+          if (devServer.hasOwnProperty('hud')) {
+            if (typeof devServer.hud === 'boolean') {
+              customConfig.devServer.hud = devServer.hud;
+            } else {
+              reject(`Error: greenwood.config.js devServer hud options must be a boolean.  Passed value was: ${devServer.hud}`);
+            }
           }
 
           if (devServer.port) {
