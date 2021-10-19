@@ -55,7 +55,7 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = []) 
   return contents;
 };
 
-const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugins) => {
+const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugins, enableHud) => {
   function sliceTemplate(template, pos, needle, replacer) {
     return template.slice(0, pos) + template.slice(pos).replace(needle, replacer);
   }
@@ -78,17 +78,20 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
 
   if (!root.valid) {
     console.debug('ERROR: Invalid HTML detected');
-    appTemplateContents = appTemplateContents.replace('<body>', `
-      <body>
-        <div style="position: absolute; width: 30%; border: solid 1px red; background-color: white; opacity: 0.67">
-          <p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="nopener noreferrer">HTML formatter</a>.</p>
-          <details>
-            <pre>
-              ${contents.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}
-            </pre>
-          </details>
-        </div>
-    `);
+
+    if (enableHud) {
+      appTemplateContents = appTemplateContents.replace('<body>', `
+        <body>
+          <div style="position: absolute; width: 30%; border: solid 1px red; background-color: white; opacity: 0.67">
+            <p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="nopener noreferrer">HTML formatter</a>.</p>
+            <details>
+              <pre>
+                ${contents.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}
+              </pre>
+            </details>
+          </div>
+      `);
+    }
 
     appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, '');
   } else {
@@ -386,7 +389,7 @@ class StandardHtmlResource extends ResourceInterface {
           body = getPageTemplate(barePath, userTemplatesDir, template, contextPlugins);
         }
 
-        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins);  
+        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);  
         body = getUserScripts(body, this.compilation.context);
         body = getMetaContent(normalizedUrl.replace(/\\/g, '/'), config, body);
         
