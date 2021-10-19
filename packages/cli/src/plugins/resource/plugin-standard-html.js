@@ -77,7 +77,7 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
   });
 
   if (!root.valid) {
-    console.error('ERROR: INVALID HTML');
+    console.debug('ERROR: Invalid HTML detected');
     appTemplateContents = appTemplateContents.replace('<body>', `
       <body>
         <div style="position: absolute; width: 30%; border: solid 1px red; background-color: white; opacity: 0.67">
@@ -88,7 +88,9 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
             </pre>
           </details>
         </div>
-  `);
+    `);
+
+    appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, '');
   } else {
     const body = root.querySelector('body') ? root.querySelector('body').innerHTML : '';
     const headScripts = root.querySelectorAll('head script');
