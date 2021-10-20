@@ -17,7 +17,7 @@ const importMap = {};
 const updateImportMap = (entry, entryPath) => {
 
   if (path.extname(entryPath) === '') {
-    entryPath = `${entryPath}/${entry}.js`;
+    entryPath = `${entryPath}.js`;
   }
 
   importMap[entry] = entryPath;
@@ -76,15 +76,23 @@ const walkModule = (module, dependency) => {
     ExportNamedDeclaration(node) {
       const sourceValue = node && node.source ? node.source.value : '';
 
-      if (sourceValue !== '' && sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
-        updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
+      if (sourceValue !== '' && sourceValue.indexOf('http') !== 0) {
+        if (sourceValue.indexOf('.') === 0) {
+          updateImportMap(`${dependency}/${sourceValue.replace('./', '')}`, `/node_modules/${dependency}/${sourceValue.replace('./', '')}`);
+        } else {
+          updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
+        }
       }
     },
     ExportAllDeclaration(node) {
       const sourceValue = node && node.source ? node.source.value : '';
 
-      if (sourceValue !== '' && sourceValue.indexOf('.') !== 0 && sourceValue.indexOf('http') !== 0) {
-        updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
+      if (sourceValue !== '' && sourceValue.indexOf('http') !== 0) {
+        if (sourceValue.indexOf('.') === 0) {
+          updateImportMap(`${dependency}/${sourceValue.replace('./', '')}`, `/node_modules/${dependency}/${sourceValue.replace('./', '')}`);
+        } else {
+          updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
+        }
       }
     }
   });

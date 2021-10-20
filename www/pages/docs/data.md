@@ -54,11 +54,13 @@ To kick things off, let's review what is available to you.  Currently, the main 
 This is what the schema looks like:
 ```javascript
 graph {
-  filename, // (string) file name without extension/path, so that it can be copied to scratch dir with same name
+  filename, // (string) base filename
 
   id, // (string) filename without the extension
 
   label, // (string) best guess pretty text / display based on filename
+
+  outputPath, // (string) the relative path to write to when generating static HTML
 
   path, // (string) path to the file
 
@@ -87,6 +89,7 @@ query {
     filename,
     id,
     label,
+    outputPath,
     path,
     route,
     template,
@@ -123,6 +126,7 @@ This will return the full `graph` of all pages as an array
     filename: "index.md",
     id: "index",
     label: "Index",
+    outputPath: "index.html",
     path: "./index.md",
     route: "/",
     template: "page",
@@ -131,6 +135,7 @@ This will return the full `graph` of all pages as an array
     filename: "first-post.md",
     id: "first-post",
     label: "First Post",
+    outputPath: "/blog/2019/first-post/index.html",
     path: "./blog/2019/first-post.md",
     route: "/blog/2019/first-post",
     template: "blog",
@@ -140,6 +145,7 @@ This will return the full `graph` of all pages as an array
     filename: "second-post.md",
     id: "second-post",
     label: "Second Post",
+    outputPath: "/blog/2019/second-post/index.html",
     path: "./blog/2019/second-post.md",
     route: "/blog/2019/second-post",
     template: "blog",
@@ -162,6 +168,7 @@ query {
     id,
     filename,
     label,
+    outputPath,
     path,
     route,
     template,
@@ -201,6 +208,7 @@ This will return the full `graph` of all pages as an array that are under a give
     filename: "first-post.md",
     id: "first-post",
     label: "First Post",
+    outputPath: "/blog/2019/first-post/index.html",
     path: "./blog/2019/first-post.md",
     route: "/blog/2019/first-post",
     template: "blog",
@@ -210,6 +218,7 @@ This will return the full `graph` of all pages as an array that are under a give
     filename: "second-post.md",
     id: "second-post",
     label: "Second Post",
+    outputPath: "/blog/2019/second-post/index.html",
     path: "./blog/2019/second-post.md",
     route: "/blog/2019/second-post",
     template: "blog",

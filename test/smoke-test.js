@@ -125,7 +125,7 @@ function commonIndexSpecs(dom, html) {
     });
 
     it('should not have any sourcemap inlining for Rollup HTML entry points', function() {
-      expect(html).not.to.contain('//# sourceMappingURL=index.html.map');
+      expect(html).not.to.contain(/\/\/# sourceMappingURL=(.*)\.html\.map/);
     });
   });
 }

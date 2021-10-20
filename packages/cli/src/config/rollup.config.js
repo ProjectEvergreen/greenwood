@@ -486,7 +486,7 @@ function greenwoodHtmlPlugin(compilation) {
           // would be nice if we could just prevent Rollup from generating sourcemaps for just our input files in the first place (GFI)
           // https://github.com/ProjectEvergreen/greenwood/issues/659
           scratchFiles[`${htmlPath.replace(outputDir, '')}.map`] = true;
-          html = html.replace('//# sourceMappingURL=index.html.map', '');
+          html = html.replace(/\/\/# sourceMappingURL=(.*)\.html\.map/, '');
 
           await fs.promises.writeFile(htmlPath, html);
         } else {
@@ -508,7 +508,7 @@ function greenwoodHtmlPlugin(compilation) {
 module.exports = getRollupConfig = async (compilation) => {
   const { scratchDir, outputDir } = compilation.context;
   const inputs = compilation.graph.map((page) => {
-    return path.normalize(`${scratchDir}${page.route}index.html`);
+    return path.normalize(`${scratchDir}${page.outputPath}`);
   });
 
   // order matters but so far nodeModulesResource resolve plugin is the first in our list (so far)
