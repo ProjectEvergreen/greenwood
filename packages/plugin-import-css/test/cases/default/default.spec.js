@@ -32,7 +32,7 @@ const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/u
 const Runner = require('gallinago').Runner;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Import Css Plugin with default options';
+  const LABEL = 'Import CSS Plugin with default options';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = __dirname;
   let runner;
