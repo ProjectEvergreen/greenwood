@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable complexity */
 const fs = require('fs');
 const fm = require('front-matter');
 const path = require('path');
@@ -11,9 +12,14 @@ module.exports = generateGraph = async (compilation) => {
       const { context, config } = compilation;
       const { pagesDir, userWorkspace } = context;
       let graph = [{
+        outputPath: 'index.html',
+        filename: 'index.html',
         path: '/',
         route: '/',
-        data: {}
+        id: 'index',
+        label: 'Index',
+        data: {},
+        imports: []
       }];
 
       const walkDirectoryForPages = function(directory, pages = []) {
@@ -104,10 +110,11 @@ module.exports = generateGraph = async (compilation) => {
              * Graph Properties (per page)
              *----------------------
              * data: custom page frontmatter
-             * filename: name of the file
+             * filename: base filename of the page
              * id: filename without the extension
              * label: "pretty" text representation of the filename
              * imports: per page JS or CSS file imports to be included in HTML output
+             * outputPath: the filename to write to when generating static HTML
              * path: path to the file relative to the workspace
              * route: URL route for a given page on outputFilePath
              * template: page template to use as a base for a generated component
@@ -119,6 +126,9 @@ module.exports = generateGraph = async (compilation) => {
               id,
               label,
               imports,
+              outputPath: route === '/404/'
+                ? '404.html'
+                : `${route}index.html`,
               path: route === '/' || relativePagePath.lastIndexOf(path.sep) === 0
                 ? `${relativeWorkspacePath}${filename}`
                 : `${relativeWorkspacePath}${path.sep}${filename}`,
@@ -138,9 +148,35 @@ module.exports = generateGraph = async (compilation) => {
           path: `${userWorkspace}${path.sep}index.html`
         }];
       } else {
+        const oldGraph = graph[0];
+
         graph = fs.existsSync(pagesDir)
           ? walkDirectoryForPages(pagesDir)
           : graph;
+
+        const has404Page = graph.filter(page => page.route === '/404/').length === 1;
+
+        // if the _only_ page is a 404 page, still provide a default index.html
+        if (has404Page && graph.length === 1) {
+          graph = [
+            oldGraph,
+            ...graph
+          ];
+        } else if (!has404Page) {
+          graph = [
+            ...graph,
+            {
+              ...oldGraph,
+              outputPath: '404.html',
+              filename: '404.html',
+              route: '/404/',
+              path: '404.html',
+              title: 'Not Found',
+              id: '404',
+              label: 'Not Found'
+            }
+          ];
+        }
       }
 
       compilation.graph = graph;

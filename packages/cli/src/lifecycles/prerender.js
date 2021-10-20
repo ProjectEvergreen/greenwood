@@ -2,8 +2,7 @@ const BrowserRunner = require('../lib/browser');
 const fs = require('fs');
 const path = require('path');
 
-async function optimizePage(compilation, contents, route, outputDir) {
-  const outputPath = `${outputDir}${route}index.html`;
+async function optimizePage(compilation, contents, route, outputPath, outputDir) {
   const optimizeResources = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
   }).map((plugin) => {
@@ -21,13 +20,13 @@ async function optimizePage(compilation, contents, route, outputDir) {
       : Promise.resolve(html);
   }, Promise.resolve(contents));
 
-  if (!fs.existsSync(path.join(outputDir, route))) {
+  if (route !== '/404/' && !fs.existsSync(path.join(outputDir, route))) {
     fs.mkdirSync(path.join(outputDir, route), {
       recursive: true
     });
   }
   
-  await fs.promises.writeFile(outputPath, htmlOptimized);
+  await fs.promises.writeFile(path.join(outputDir, outputPath), htmlOptimized);
 }
 
 async function preRenderCompilation(compilation) {
@@ -36,7 +35,7 @@ async function preRenderCompilation(compilation) {
   const runBrowser = async (serverUrl, pages, outputDir) => {
     try {
       return Promise.all(pages.map(async(page) => {
-        const { route } = page;
+        const { outputPath, route } = page;
         console.info('prerendering page...', route);
         
         return await browserRunner
@@ -44,7 +43,7 @@ async function preRenderCompilation(compilation) {
           .then(async (indexHtml) => {
             console.info(`prerendering complete for page ${route}.`);
             
-            await optimizePage(compilation, indexHtml, route, outputDir);
+            await optimizePage(compilation, indexHtml, route, outputPath, outputDir);
           });
       }));
     } catch (e) {
@@ -108,10 +107,10 @@ async function staticRenderCompilation(compilation) {
   console.info('pages to generate', `\n ${pages.map(page => page.path).join('\n ')}`);
   
   await Promise.all(pages.map(async (page) => {
-    const route = page.route;
+    const { route, outputPath } = page;
     const response = await htmlResource.serve(route);
 
-    await optimizePage(compilation, response.body, route, scratchDir);
+    await optimizePage(compilation, response.body, route, outputPath, scratchDir);
 
     return Promise.resolve();
   }));

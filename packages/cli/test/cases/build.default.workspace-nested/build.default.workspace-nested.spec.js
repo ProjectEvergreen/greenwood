@@ -82,7 +82,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have the expected ordering of pages in graph.json', function() {
-        expect(graph.length).to.equal(20);
+        expect(graph.length).to.equal(21);
         expect(graph[0].path).to.be.equal('src/pages/blog/2017/03/26/index.md');
         expect(graph[1].path).to.be.equal('src/pages/blog/2017/03/30/index.md');
         expect(graph[2].path).to.be.equal('src/pages/blog/2017/04/10/index.md');
@@ -103,6 +103,7 @@ describe('Build Greenwood With: ', function() {
         expect(graph[17].path).to.be.equal('src/pages/blog/2020/10/28/index.md');
         expect(graph[18].path).to.be.equal('src/pages/blog/index.md');
         expect(graph[19].path).to.be.equal('src/pages/index.html');
+        expect(graph[20].path).to.be.equal('404.html');
       });
 
       it('should create a top level blog pages directory', function() {
