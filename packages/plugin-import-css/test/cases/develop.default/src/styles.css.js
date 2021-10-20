@@ -1,0 +1,1 @@
+export const styles = css `.mdc-touch-target-wrapper{display:inline}`;

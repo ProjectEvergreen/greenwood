@@ -40,7 +40,7 @@ This will then allow you use `import` to include CSS in your JavaScript files by
 import cardCss from './card.css?type=css'; // must be a relative path per ESM spec
 ```
 
-> _**Note**: Due to a characteristic of using ESM with CSS, Greenwood will also try and detect `import` usage (without needing `?type=css`), but it is recommended to favor explicitness as much as possible, given this is not a standard._
+> _**Note**: Due to a characteristic of using ESM with CSS, Greenwood will also try and detect `import` usage (without needing `?type=css`), but it is recommended to favor explicitness as much as possible, given this is not a standard.  Also, for projects like Material Web Components, this plugin will [resolve references to _some-file.css_ if the equivalent exists that ends in _.js (e.g. styles.css.js)_](https://github.com/ProjectEvergreen/greenwood/issues/700)._
 
 ### CSS @import
 If you plan to use [CSS `@import` rules](https://developer.mozilla.org/en-US/docs/Web/CSS/@import) in any of the CSS you load with this plugin, then it is recommended to use our [**PostCSS plugin**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss) and make sure to add the **postcss-import** plugin to your _postcss.config.js_, to avoid [CSS bundling issues in production](https://github.com/ProjectEvergreen/greenwood/discussions/763)_.  ex:

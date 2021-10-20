@@ -90,6 +90,45 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
     });
+
+    // https://github.com/ProjectEvergreen/greenwood/pull/747
+    // https://unpkg.com/browse/@material/mwc-button@0.22.1/styles.css.js
+    describe('Develop command specific ESM .css.js files behaviors (CSS in disguise)', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get({
+            url: `http://127.0.0.1:${port}/styles.css.js`
+          }, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200', function(done) {
+        expect(response.statusCode).to.equal(200);
+
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal('text/javascript');
+        done();
+      });
+
+      it('should return an ECMASCript module', function(done) {
+        expect(response.body).to.equal('export const styles = css `.mdc-touch-target-wrapper{display:inline}`;');
+        done();
+      });
+    });
   });
 
   after(function() {
