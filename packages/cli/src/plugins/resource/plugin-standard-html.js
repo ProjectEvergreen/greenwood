@@ -87,7 +87,7 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     if (enableHud) {
       appTemplateContents = appTemplateContents.replace('<body>', `
         <body>
-          <div style="position: absolute; width: 30%; border: solid 1px red; background-color: white; opacity: 0.67">
+          <div style="position: absolute; width: auto; border: dotted 3px red; background-color: white; opacity: 0.75; padding: 1% 1% 0">
             <p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="nopener noreferrer">HTML formatter</a>.</p>
             <details>
               <pre>
