@@ -11,6 +11,10 @@ template: blog
     list-style-type: none;
     text-align: center;
   }
+
+  h1 {
+    text-align: center;
+  }
 </style>
 
 # News and Announcements
