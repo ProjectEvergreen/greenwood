@@ -14,6 +14,7 @@ The below is a _greenwood.config.js_ file reflecting default values:
 module.exports = {
   devServer: {
     extensions: [],
+    hud: true,
     port: 1984,
     host: 'localhost'
   },
@@ -35,6 +36,7 @@ module.exports = {
 ### Dev Server
 Configuration for Greenwood's development server is available using the `devServer` option.
 - `extensions`: Provide an array of to watch for changes and reload the live server with.  By default, Greenwood will already watch all "standard" web assets (HTML, CSS, JS, etc) it supports by default, as well as any extensions set by [resource plugins](/plugins/resource) you are using in your _greenwood.config.json_.
+- `hud`: The HUD option ([_head-up display_](https://en.wikipedia.org/wiki/Head-up_display)) is some additional HTML added to your site's page when Greenwood wants to help provide information to you in the brwoser.  For example, if your HTML is detected as malformed, which could break the parser.  Set this to `false` if you would like to turn it off.
 - `port`: Pick a different port when starting the dev server
 - `proxy`: A set of paths to match and re-route to other hosts.  Highest specificty should go at the end.
 
