@@ -6,6 +6,13 @@ index: 6
 template: blog
 ---
 
+<style>
+  ul {
+    list-style-type: none;
+    text-align: center;
+  }
+</style>
+
 # News and Announcements
 
 - [Release: v0.18.0](/blog/release/v0-18-0/) 📝
