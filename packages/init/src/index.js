@@ -128,9 +128,7 @@ const install = () => {
 
 const run = async () => {
   try {
-    // console.log('Preparing project directory...');
-    // await checkTargetDir();
-
+    // map all the template files and copy them to the current working directory
     console.log('Initialzing project with files...');
     await srcInit();
 
