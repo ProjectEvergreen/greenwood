@@ -1,0 +1,23 @@
+{
+  "name": "@greenwood/init",
+  "version": "0.17.0",
+  "description": "A package with script to scaffold greenwood projects\"",
+  "main": "src/index.js",
+  "keywords": [
+    "Greenwood",
+    "Static",
+    "Site",
+    "Generator",
+    "NodeJS",
+    "Scaffold"
+  ],
+  "scripts": {
+    "start": "node ."
+  },
+  "author": "Grant Hutchinson <grant@hutchdev.ca>",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^8.2.0"
+  }
+}
