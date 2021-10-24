@@ -73,7 +73,7 @@ const createGitIgnore = () => {
 
     const resolvedPath = path.join(TARGET_DIR, '.gitignore');
     const stream = fs.createWriteStream(resolvedPath);
-    const patterns = ['*DS_Store', '*.log', 'node_modules/', 'public/', 'reports/'];
+    const patterns = ['*DS_Store', '*.log', 'node_modules/', 'public/', '.greenwood/'];
 
     stream.once('open', () => {
       patterns.forEach(pattern => {
