@@ -100,6 +100,15 @@ const install = () => {
   return execCommand(command, args);
 };
 
+// start dev server
+const startDev = () => {
+  const pkgMng = program.yarn ? 'yarn' : 'npm'; // default to npm
+  const command = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
+  const args = ['start'];
+
+  return execCommand(command, args);
+};
+
 // execute a command with arguments  e.g. yarn/npm install, start
 const execCommand = (command, args) => {
   return new Promise((resolve, reject) => {
@@ -130,12 +139,9 @@ const run = async () => {
     console.log('Installing project dependencies...');
     await install();
 
-    // success!
-    console.log('-------------------------------------------------------');
-    console.log('Success, your project is ready to go!');
-    console.log(`Just run: cd ${TARGET_DIR}`);
-    console.log('And then launch your project with: npm start');
-    console.log('-------------------------------------------------------');
+    console.log('Starting greenwood dev server...');
+    await startDev();
+    
   } catch (err) {
     console.error(err);
   }
