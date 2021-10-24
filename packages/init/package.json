@@ -1,7 +1,7 @@
 {
   "name": "@greenwood/init",
   "version": "0.17.0",
-  "description": "A package with script to scaffold greenwood projects\"",
+  "description": "A package with a script to scaffold greenwood projects",
   "main": "src/index.js",
   "keywords": [
     "Greenwood",
