@@ -31,6 +31,7 @@ const pluginTypes = ['copy', 'context', 'resource', 'rollup', 'server'];
 const defaultConfig = {
   workspace: path.join(process.cwd(), 'src'),
   devServer: {
+    hud: true,
     port: 1984,
     extensions: []
   },
@@ -127,6 +128,14 @@ module.exports = readAndMergeConfig = async() => {
         }
 
         if (devServer && Object.keys(devServer).length > 0) {
+
+          if (devServer.hasOwnProperty('hud')) {
+            if (typeof devServer.hud === 'boolean') {
+              customConfig.devServer.hud = devServer.hud;
+            } else {
+              reject(`Error: greenwood.config.js devServer hud options must be a boolean.  Passed value was: ${devServer.hud}`);
+            }
+          }
 
           if (devServer.port) {
             // eslint-disable-next-line max-depth

@@ -3,6 +3,7 @@ query($parent: String!) {
     id,
     filename,
     label,
+    outputPath,
     path,
     route,
     template,

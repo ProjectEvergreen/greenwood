@@ -176,11 +176,12 @@ describe('Build Greenwood With: ', function() {
       it('should have a expected navigation output in the <header> based on pages with menu: navigation frontmatter', function() {
         const listItems = dom.window.document.querySelectorAll('body ul li');
 
-        expect(listItems.length).to.be.equal(3);        
+        expect(listItems.length).to.be.equal(4);
         
         expect(listItems[0].innerHTML).to.be.contain('First Post');
         expect(listItems[1].innerHTML).to.be.contain('Second Post');
         expect(listItems[2].innerHTML).to.be.contain('Index');
+        expect(listItems[3].innerHTML).to.be.contain('Not Found');
       });
     });
   });

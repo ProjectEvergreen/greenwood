@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/cli",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "Greenwood CLI.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -53,6 +53,7 @@
     "@lion/button": "^0.14.3",
     "@lion/calendar": "^0.16.5",
     "@mapbox/rehype-prism": "^0.5.0",
+    "@material/mwc-button": "^0.25.2",
     "@types/trusted-types": "^2.0.2",
     "lit": "^2.0.0",
     "lit-redux-router": "~0.20.0",

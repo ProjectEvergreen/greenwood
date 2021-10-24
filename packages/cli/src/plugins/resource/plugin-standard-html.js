@@ -25,10 +25,11 @@ function getCustomPageTemplates(contextPlugins, templateName) {
     });
 }
 
-const getPageTemplate = (barePath, templatesDir, template, contextPlugins = []) => {
+const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], pagesDir) => {
   const pageIsHtmlPath = `${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.html`;
   const customPluginDefaultPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
   const customPluginPageTemplates = getCustomPageTemplates(contextPlugins, template);
+  const is404Page = barePath.replace(pagesDir, '').indexOf(`${path.sep}404`) === 0;
 
   if (template && customPluginPageTemplates.length > 0 || fs.existsSync(`${templatesDir}/${template}.html`)) {
     // use a custom template, usually from markdown frontmatter
@@ -42,11 +43,15 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = []) 
       : `${barePath}.html`;
     
     contents = fs.readFileSync(indexPath, 'utf-8');
-  } else if (customPluginDefaultPageTemplates.length > 0 || fs.existsSync(`${templatesDir}/page.html`)) {
+  } else if (customPluginDefaultPageTemplates.length > 0 || (!is404Page && fs.existsSync(`${templatesDir}/page.html`))) {
     // else look for default page template from the user
+    // and 404 pages should be their own "top level" template
     contents = customPluginDefaultPageTemplates.length > 0
       ? fs.readFileSync(`${customPluginDefaultPageTemplates[0]}/page.html`, 'utf-8')
       : fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
+  } else if (is404Page && !fs.existsSync(path.join(pagesDir, '404.html'))) {
+    // handle default 404.html
+    contents = fs.readFileSync(path.join(__dirname, '../../templates/404.html'), 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
     contents = fs.readFileSync(path.join(__dirname, '../../templates/page.html'), 'utf-8');
@@ -55,7 +60,7 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = []) 
   return contents;
 };
 
-const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugins) => {
+const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugins, enableHud) => {
   function sliceTemplate(template, pos, needle, replacer) {
     return template.slice(0, pos) + template.slice(pos).replace(needle, replacer);
   }
@@ -75,124 +80,145 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     noscript: true,
     pre: true
   });
-  const body = root.querySelector('body') ? root.querySelector('body').innerHTML : '';
-  const headScripts = root.querySelectorAll('head script');
-  const headLinks = root.querySelectorAll('head link');
-  const headMeta = root.querySelectorAll('head meta');
-  const headStyles = root.querySelectorAll('head style');
-  const headTitle = root.querySelector('head title');
 
-  appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
+  if (!root.valid) {
+    console.debug('ERROR: Invalid HTML detected');
 
-  if (headTitle) {
-    appTemplateContents = appTemplateContents.replace(/<title>(.*)<\/title>/, `<title>${headTitle.rawText}</title>`);
-  }
-
-  headScripts.forEach((script) => {
-    const matchNeedle = '</script>';
-    const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
-
-    if (script.text === '') {
-      if (matchPos > 0) {
-        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</script>\n
-          <script ${script.rawAttrs}></script>\n
-        `);
-      } else {
-        appTemplateContents = appTemplateContents.replace('</head>', `
-            <script ${script.rawAttrs}></script>\n
-          </head>
-        `);
-      }
+    if (enableHud) {
+      appTemplateContents = appTemplateContents.replace('<body>', `
+        <body>
+          <div style="position: absolute; width: auto; border: dotted 3px red; background-color: white; opacity: 0.75; padding: 1% 1% 0">
+            <p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="nopener noreferrer">HTML formatter</a>.</p>
+            <details>
+              <pre>
+                ${contents.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}
+              </pre>
+            </details>
+          </div>
+      `);
     }
 
-    if (script.text !== '') {
-      const attributes = script.rawAttrs !== '' 
-        ? ` ${script.rawAttrs}`
-        : '';
-      const source = script.text
-        .replace(/\$/g, '$$$'); // https://github.com/ProjectEvergreen/greenwood/issues/656
+    appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, '');
+  } else {
+    const body = root.querySelector('body') ? root.querySelector('body').innerHTML : '';
+    const headScripts = root.querySelectorAll('head script');
+    const headLinks = root.querySelectorAll('head link');
+    const headMeta = root.querySelectorAll('head meta');
+    const headStyles = root.querySelectorAll('head style');
+    const headTitle = root.querySelector('head title');
 
-      if (matchPos > 0) {
-        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</script>\n
-          <script${attributes}>
-            ${source}
-          </script>\n
-        `);
-      } else {
-        appTemplateContents = appTemplateContents.replace('</head>', `
+    appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
+
+    if (headTitle) {
+      appTemplateContents = appTemplateContents.replace(/<title>(.*)<\/title>/, `<title>${headTitle.rawText}</title>`);
+    }
+
+    headScripts.forEach((script) => {
+      const matchNeedle = '</script>';
+      const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
+
+      if (script.text === '') {
+        if (matchPos > 0) {
+          appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</script>\n
+            <script ${script.rawAttrs}></script>\n
+          `);
+        } else {
+          appTemplateContents = appTemplateContents.replace('</head>', `
+              <script ${script.rawAttrs}></script>\n
+            </head>
+          `);
+        }
+      }
+
+      if (script.text !== '') {
+        const attributes = script.rawAttrs !== ''
+          ? ` ${script.rawAttrs}`
+          : '';
+        const source = script.text
+          .replace(/\$/g, '$$$'); // https://github.com/ProjectEvergreen/greenwood/issues/656
+
+        if (matchPos > 0) {
+          appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</script>\n
             <script${attributes}>
               ${source}
             </script>\n
-          </head>
-        `);
+          `);
+        } else {
+          appTemplateContents = appTemplateContents.replace('</head>', `
+              <script${attributes}>
+                ${source}
+              </script>\n
+            </head>
+          `);
+        }
       }
-    }
-  });
+    });
 
-  headLinks.forEach((link) => {
-    const matchNeedle = /<link .*/g;
-    const matches = appTemplateContents.match(matchNeedle);
-    const lastLink = matches && matches.length && matches.length > 0 
-      ? matches[matches.length - 1]
-      : '<head>';
+    headLinks.forEach((link) => {
+      const matchNeedle = /<link .*/g;
+      const matches = appTemplateContents.match(matchNeedle);
+      const lastLink = matches && matches.length && matches.length > 0
+        ? matches[matches.length - 1]
+        : '<head>';
 
-    appTemplateContents = appTemplateContents.replace(lastLink, `${lastLink}\n
-      <link ${link.rawAttrs}/>
-    `);
-  });
+      appTemplateContents = appTemplateContents.replace(lastLink, `${lastLink}\n
+        <link ${link.rawAttrs}/>
+      `);
+    });
 
-  headStyles.forEach((style) => {
-    const matchNeedle = '</style>';
-    const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
+    headStyles.forEach((style) => {
+      const matchNeedle = '</style>';
+      const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
 
-    if (style.rawAttrs === '') {
-      if (matchPos > 0) {
-        appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</style>\n
-          <style>
-            ${style.text}
-          </style>\n
-        `);
-      } else {
-        appTemplateContents = appTemplateContents.replace('<head>', `
-          <head> \n
+      if (style.rawAttrs === '') {
+        if (matchPos > 0) {
+          appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</style>\n
             <style>
               ${style.text}
             </style>\n
-        `);
+          `);
+        } else {
+          appTemplateContents = appTemplateContents.replace('<head>', `
+            <head> \n
+              <style>
+                ${style.text}
+              </style>\n
+          `);
+        }
       }
-    }
-  });
+    });
 
-  headMeta.forEach((meta) => {
-    appTemplateContents = appTemplateContents.replace('<head>', `
-      <head>
-        <meta ${meta.rawAttrs}/>
-    `);
-  });
+    headMeta.forEach((meta) => {
+      appTemplateContents = appTemplateContents.replace('<head>', `
+        <head>
+          <meta ${meta.rawAttrs}/>
+      `);
+    });
 
-  customImports.forEach((customImport) => {
-    const extension = path.extname(customImport);
+    customImports.forEach((customImport) => {
+      const extension = path.extname(customImport);
 
-    switch (extension) {
+      switch (extension) {
 
-      case '.js':
-        appTemplateContents = appTemplateContents.replace('</head>', `
-            <script src="${customImport}" type="module"></script>
-          </head>
-        `);
-        break;
-      case '.css':
-        appTemplateContents = appTemplateContents.replace('</head>', `
-          <link rel="stylesheet" href="${customImport}"></link>
-          </head>
-        `);
-        break;
+        case '.js':
+          appTemplateContents = appTemplateContents.replace('</head>', `
+              <script src="${customImport}" type="module"></script>
+            </head>
+          `);
+          break;
+        case '.css':
+          appTemplateContents = appTemplateContents.replace('</head>', `
+            <link rel="stylesheet" href="${customImport}"></link>
+            </head>
+          `);
+          break;
 
-      default:
-        break;
+        default:
+          break;
 
-    }
-  });
+      }
+    });
+  }
 
   return appTemplateContents;
 };
@@ -290,17 +316,20 @@ class StandardHtmlResource extends ResourceInterface {
     return new Promise(async (resolve, reject) => {
       try {
         const config = Object.assign({}, this.compilation.config);
-        const { pagesDir, userTemplatesDir } = this.compilation.context;
+        const { pagesDir, userTemplatesDir, userWorkspace } = this.compilation.context;
         const { mode } = this.compilation.config;
         const normalizedUrl = this.getRelativeUserworkspaceUrl(url);
+        const userHasOwn404 = fs.existsSync(path.join(userWorkspace, 'pages/404.html')) || fs.existsSync(path.join(userWorkspace, 'pages/404.md'));
         let customImports;
 
         let body = '';
         let template = null;
         let processedMarkdown = null;
-        const barePath = normalizedUrl.endsWith(path.sep)
-          ? `${pagesDir}${normalizedUrl}index`
-          : `${pagesDir}${normalizedUrl.replace('.html', '')}`;
+        const barePath = url === '/404/' && userHasOwn404
+          ? path.join(userWorkspace, 'pages/404')
+          : normalizedUrl.endsWith(path.sep)
+            ? `${pagesDir}${normalizedUrl}index`
+            : `${pagesDir}${normalizedUrl.replace('.html', '')}`;
         const isMarkdownContent = fs.existsSync(`${barePath}.md`)
           || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
           || fs.existsSync(`${barePath.replace(`${path.sep}index`, '.md')}`);
@@ -365,10 +394,10 @@ class StandardHtmlResource extends ResourceInterface {
         if (mode === 'spa') {
           body = fs.readFileSync(this.compilation.graph[0].path, 'utf-8');
         } else {
-          body = getPageTemplate(barePath, userTemplatesDir, template, contextPlugins);
+          body = getPageTemplate(barePath, userTemplatesDir, template, contextPlugins, pagesDir);
         }
 
-        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins);  
+        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);  
         body = getUserScripts(body, this.compilation.context);
         body = getMetaContent(normalizedUrl.replace(/\\/g, '/'), config, body);
         

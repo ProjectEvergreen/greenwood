@@ -45,21 +45,23 @@ class OptimizationMPAResource extends ResourceInterface {
         const outputBundlePath = path.normalize(`${outputDir}/_routes${url.replace(projectDirectory, '')}`)
           .replace(`.greenwood${path.sep}`, '');
 
-        const routeTags = this.compilation.graph.map((page) => {
-          const template = path.extname(page.filename) === '.html'
-            ? page.route
-            : page.template;
-          const key = page.route === '/'
-            ? ''
-            : page.route.slice(0, page.route.lastIndexOf('/'));
+        const routeTags = this.compilation.graph
+          .filter(page => page.route !== '/404/')
+          .map((page) => {
+            const template = path.extname(page.filename) === '.html'
+              ? page.route
+              : page.template;
+            const key = page.route === '/'
+              ? ''
+              : page.route.slice(0, page.route.lastIndexOf('/'));
 
-          if (url.replace(scratchDir, '') === `${page.route}index.html`) {
-            currentTemplate = template;
-          }
-          return `
-            <greenwood-route data-route="${page.route}" data-template="${template}" data-key="/_routes${key}/index.html"></greenwood-route>
-          `;
-        });
+            if (url.replace(scratchDir, '') === `${page.route}index.html`) {
+              currentTemplate = template;
+            }
+            return `
+              <greenwood-route data-route="${page.route}" data-template="${template}" data-key="/_routes${key}/index.html"></greenwood-route>
+            `;
+          });
 
         if (!fs.existsSync(path.dirname(outputBundlePath))) {
           fs.mkdirSync(path.dirname(outputBundlePath), {

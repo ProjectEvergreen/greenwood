@@ -238,6 +238,102 @@ describe('Develop Greenwood With: ', function() {
         `${process.cwd()}/node_modules/@webcomponents/scoped-custom-element-registry/*.js`,
         `${outputPath}/node_modules/@webcomponents/scoped-custom-element-registry/`
       );
+      const materialButtonPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/mwc-button/package.json`,
+        `${outputPath}/node_modules/@material/mwc-button/`
+      );
+      const materialButtonLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/mwc-button/*.js`,
+        `${outputPath}/node_modules/@material/mwc-button/`
+      );
+      const materialIconPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/mwc-icon/package.json`,
+        `${outputPath}/node_modules/@material/mwc-icon/`
+      );
+      const materialIconLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/mwc-icon/*.js`,
+        `${outputPath}/node_modules/@material/mwc-icon/`
+      );
+      const materialRipplePackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/mwc-ripple/package.json`,
+        `${outputPath}/node_modules/@material/mwc-ripple/`
+      );
+      const materialRippleLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/mwc-ripple/*.js`,
+        `${outputPath}/node_modules/@material/mwc-ripple/`
+      );
+      const materialRippledPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/ripple/package.json`,
+        `${outputPath}/node_modules/@material/ripple/`
+      );
+      const materialRippledLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/ripple/*.js`,
+        `${outputPath}/node_modules/@material/ripple/`
+      );
+      const materialBasePackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/mwc-base/package.json`,
+        `${outputPath}/node_modules/@material/mwc-base/`
+      );
+      const materialBaseLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/mwc-base/*.js`,
+        `${outputPath}/node_modules/@material/mwc-base/`
+      );
+      const materialBasedPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/base/package.json`,
+        `${outputPath}/node_modules/@material/base/`
+      );
+      const materialBasedLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/base/*.js`,
+        `${outputPath}/node_modules/@material/base/`
+      );
+      const materialDomPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/dom/package.json`,
+        `${outputPath}/node_modules/@material/dom/`
+      );
+      const materialDomLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/dom/*.js`,
+        `${outputPath}/node_modules/@material/dom/`
+      );
+      const materialFeatureTargetingJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/feature-targeting/package.json`,
+        `${outputPath}/node_modules/@material/feature-targeting/`
+      );
+      const materialFeatureTargetingLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/feature-targeting/*.js`,
+        `${outputPath}/node_modules/@material/feature-targeting/`
+      );
+      const materialAnimationPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/animation/package.json`,
+        `${outputPath}/node_modules/@material/animation/`
+      );
+      const materialAnimationLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/animation/*.js`,
+        `${outputPath}/node_modules/@material/animation/`
+      );
+      const materialRtlPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/rtl/package.json`,
+        `${outputPath}/node_modules/@material/rtl/`
+      );
+      const materialRtlLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/rtl/*.js`,
+        `${outputPath}/node_modules/@material/rtl/`
+      );
+      const materialThemePackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/theme/package.json`,
+        `${outputPath}/node_modules/@material/theme/`
+      );
+      const materialThemeLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@material/theme/*.js`,
+        `${outputPath}/node_modules/@material/theme/`
+      );
+      const tslibPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/tslib/package.json`,
+        `${outputPath}/node_modules/tslib/`
+      );
+      const tslibLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/tslib/*.js`,
+        `${outputPath}/node_modules/tslib/`
+      );
 
       // manually copy all these @babel/runtime files recursively since there are too many of them to do it individually
       const babelRuntimeLibs = await rreaddir(`${process.cwd()}/node_modules/@babel/runtime`);
@@ -309,7 +405,31 @@ describe('Develop Greenwood With: ', function() {
         ...regeneratorRuntimeLibs,
         ...regeneratorRuntimeLibsPackageJson,
         ...scopedCustomElementRegistryPackageJson,
-        ...scopedCustomElementRegistryLibs
+        ...scopedCustomElementRegistryLibs,
+        ...materialButtonPackageJson,
+        ...materialButtonLibs,
+        ...materialIconPackageJson,
+        ...materialIconLibs,
+        ...materialRipplePackageJson,
+        ...materialRippleLibs,
+        ...materialRippledPackageJson,
+        ...materialRippledLibs,
+        ...materialBasePackageJson,
+        ...materialBaseLibs,
+        ...materialBasedPackageJson,
+        ...materialBasedLibs,
+        ...materialDomPackageJson,
+        ...materialDomLibs,
+        ...materialFeatureTargetingJson,
+        ...materialFeatureTargetingLibs,
+        ...materialAnimationPackageJson,
+        ...materialAnimationLibs,
+        ...materialRtlPackageJson,
+        ...materialRtlLibs,
+        ...materialThemePackageJson,
+        ...materialThemeLibs,
+        ...tslibPackageJson,
+        ...tslibLibs
       ]);
 
       return new Promise(async (resolve) => {
@@ -376,6 +496,23 @@ describe('Develop Greenwood With: ', function() {
         // transient dependency import / exports
         expect(importMap['@bundled-es-modules/message-format/MessageFormat.js']).to.equal('/node_modules/@bundled-es-modules/message-format/MessageFormat.js');
 
+        // https://github.com/ProjectEvergreen/greenwood/issues/748
+        expect(importMap['@material/mwc-button']).to.equal('/node_modules/@material/mwc-button/mwc-button.js');
+        expect(importMap['@material/mwc-button/mwc-button-base.js']).to.equal('/node_modules/@material/mwc-button/mwc-button-base.js');
+
+        expect(importMap['@material/mwc-icon']).to.equal('/node_modules/@material/mwc-icon/mwc-icon.js');
+        expect(importMap['@material/mwc-icon/mwc-icon']).to.equal('/node_modules/@material/mwc-icon/mwc-icon.js');
+        expect(importMap['@material/mwc-icon/mwc-icon/@material/mwc-icon/mwc-icon.js']).to.be.undefined;
+
+        expect(importMap['@material/mwc-ripple']).to.equal('/node_modules/@material/mwc-ripple/mwc-ripple.js');
+        expect(importMap['@material/mwc-ripple/mwc-ripple']).to.equal('/node_modules/@material/mwc-ripple/mwc-ripple.js');
+        expect(importMap['@material/mwc-ripple/mwc-ripple/@material/mwc-ripple/mwc-ripple.js']).to.be.undefined;
+
+        // https://github.com/ProjectEvergreen/greenwood/issues/773
+        expect(importMap['@material/base/component']).to.equal('/node_modules/@material/base/component.js');
+        expect(importMap['@material/base/foundation']).to.equal('/node_modules/@material/base/foundation.js');
+        expect(importMap['@material/base/types']).to.equal('/node_modules/@material/base/types.js');
+
         done();
       });
 
@@ -398,6 +535,58 @@ describe('Develop Greenwood With: ', function() {
 
         done();
       });   
+    });
+
+    describe('Develop command specific 404 Not Found page HTML behaviors', function() {
+      let response = {};
+      let dom;
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get({
+            url: `http://127.0.0.1:${port}/404/`,
+            headers: {
+              accept: 'text/html'
+            }
+          }, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            
+            dom = new JSDOM(body);
+            resolve();
+          });
+        });
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('text/html');
+        done();
+      });
+
+      it('should return a 200', function(done) {
+        expect(response.statusCode).to.equal(200);
+
+        done();
+      });
+
+      it('should the correct default <title> tag in the <head>', function(done) {
+        const title = dom.window.document.querySelectorAll('head > title')[0];
+
+        expect(title.textContent).to.equal('Page Not Found');
+
+        done();
+      });
+
+      it('should the correct default <h1> tag in the <body>', function(done) {
+        const heading = dom.window.document.querySelectorAll('body > h1')[0];
+
+        expect(heading.textContent).to.equal('Sorry, unfortunately the page could not be found.');
+
+        done();
+      });
     });
 
     describe('Develop command specific JavaScript behaviors', function() {
