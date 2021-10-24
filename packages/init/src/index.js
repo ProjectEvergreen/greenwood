@@ -123,9 +123,6 @@ const run = async () => {
     // map all the template files and copy them to the current working directory
     console.log('Initialzing project with files...');
     await srcInit();
-
-    // change directory to target directory
-    process.chdir(path.resolve(process.cwd(), TARGET_DIR));
     
     console.log('Creating manifest (package.json)...');
     await npmInit();
