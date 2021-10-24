@@ -54,15 +54,6 @@ program
     cmdOption.all = cmd.all;
   });
 
-program
-  .command('eject')
-  .option('-a, --all', 'eject all configurations including babel, postcss, browserslistrc')
-  .description('Eject greenwood configurations.')
-  .action((cmd) => {
-    command = cmd._name;
-    cmdOption.all = cmd.all;
-  });
-
 program.parse(process.argv);
 
 if (program.parse.length === 0) {
