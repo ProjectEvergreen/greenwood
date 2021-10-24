@@ -4,7 +4,7 @@ const path = require('path');
 const { getSetupFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
 
-describe.only('Scaffold Greenwood With: ', function() {
+describe('Scaffold Greenwood With: ', function() {
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
   const outputPath = __dirname;
   let runner;
