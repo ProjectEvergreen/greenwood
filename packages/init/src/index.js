@@ -27,6 +27,9 @@ if (program.yarn) {
   console.log('Yarn Enabled');
 }
 
+const pkgMng = program.yarn ? 'yarn' : 'npm'; // default to npm
+const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
+
 // Create new package.json
 const npmInit = async () => {
   let appPkg = require(path.join(templateDir, 'package.json'));
@@ -92,33 +95,26 @@ const createGitIgnore = () => {
 
 // Install npm dependencies
 const install = () => {
-  const pkgMng = program.yarn ? 'yarn' : 'npm'; // default to npm
-  const command = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
   const installCommand = pkgMng === 'yarn' ? 'install' : 'ci';
-  const args = [installCommand, '--loglevel', 'error'];
-
-  return execCommand(command, args);
+  
+  return execCommand([installCommand, '--loglevel', 'error']);
 };
 
 // start dev server
 const startDev = () => {
-  const pkgMng = program.yarn ? 'yarn' : 'npm'; // default to npm
-  const command = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
-  const args = ['start'];
-
-  return execCommand(command, args);
+  return execCommand(['start']);
 };
 
 // execute a command with arguments  e.g. yarn/npm install, start
-const execCommand = (command, args) => {
+const execCommand = (args) => {
   return new Promise((resolve, reject) => {
 
-    const process = spawn(command, args, { stdio: 'inherit' });
+    const process = spawn(pkgCommand, args, { stdio: 'inherit' });
 
     process.on('close', code => {
       if (code !== 0) {
         reject({
-          command: `${command} ${args.join(' ')}`
+          command: `${pkgCommand} ${args.join(' ')}`
         });
         return;
       }
@@ -141,7 +137,7 @@ const run = async () => {
 
     console.log('Starting greenwood dev server...');
     await startDev();
-    
+
   } catch (err) {
     console.error(err);
   }
