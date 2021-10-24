@@ -9,6 +9,6 @@
   },
   "devDependencies": {
     "@greenwood/cli": "~0.17.0"
-   },
+  },
   "license": "ISC"
 }

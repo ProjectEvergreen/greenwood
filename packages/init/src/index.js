@@ -9,13 +9,12 @@ const { spawn } = require('child_process');
 const chalk = require('chalk');
 const commander = require('commander');
 const scriptPkg = require(path.join(__dirname, '..', '/package.json'));
-const { exec } = require("child_process");
-const templateDir = path.join(__dirname, '..', 'template');
+const templateDir = path.join(__dirname, 'template');
 
-let TARGET_DIR = process.cwd();  // potentially changed through an arg? 
+let TARGET_DIR = process.cwd(); // potentially changed through an arg? 
 
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
-console.log(`${chalk.rgb(175, 207, 71)('Initialize Evevrgreen Application ♻️')}`);
+console.log(`${chalk.rgb(175, 207, 71)('Initialize Greenwood Template ♻️')}`);
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
 
 const program = new commander.Command(scriptPkg.name)
@@ -28,22 +27,9 @@ if (program.yarn) {
   console.log('Yarn Enabled');
 }
 
-function execShell(cmd) {
-	const exec = require('child_process').exec;
-	return new Promise((resolve, reject) => {
-	 exec(cmd, (error, stdout, stderr) => {
-		if (error) {
-		 console.warn(error);
-		}
-		resolve(stdout? stdout : stderr);
-	 });
-	});
- }
-
 // Create new package.json
 const npmInit = async () => {
   let appPkg = require(path.join(templateDir, 'package.json'));
-
   
   // use installation path's folder name for packages
   appPkg.name = path.basename(process.cwd());
@@ -57,29 +43,28 @@ const npmInit = async () => {
 // Copy root and src files to target directory
 const srcInit = async () => {
 
-  templateFolder = path.join(__dirname, '..', 'template/')
+  templateFolder = path.join(__dirname, 'template/');
 
   await createGitIgnore();
 
-	templateFiles = [];
-	fs.readdirSync(templateFolder).forEach(file => {
-		console.log(file);
-		templateFiles.push(file);
-	});
+  templateFiles = [];
+  fs.readdirSync(templateFolder).forEach(file => {
+    templateFiles.push(file);
+  });
 
-	await Promise.all(
-		templateFiles.map(async file => {
-			const resolvedPath = path.join(__dirname, '..', 'template', file);
-			if (fs.lstatSync(resolvedPath).isDirectory()) {
-				return await copyFolder(resolvedPath, TARGET_DIR);
-			} else if (await fs.existsSync(resolvedPath)) {
-				return await fs.copyFileSync(
-					resolvedPath,
-					path.join(TARGET_DIR, file)
-				);
-			}
-		})
-	);
+  await Promise.all(
+    templateFiles.map(async file => {
+      const resolvedPath = path.join(__dirname, 'template', file);
+      if (fs.lstatSync(resolvedPath).isDirectory()) {
+        return await copyFolder(resolvedPath, TARGET_DIR);
+      } else if (await fs.existsSync(resolvedPath)) {
+        return await fs.copyFileSync(
+          resolvedPath,
+          path.join(TARGET_DIR, file)
+        );
+      }
+    })
+  );
 };
 
 // Create the missing gitignore because npm won't publish it https://docs.npmjs.com/files/package.json#files
@@ -107,11 +92,17 @@ const createGitIgnore = () => {
 
 // Install npm dependencies
 const install = () => {
+  const pkgMng = program.yarn ? 'yarn' : 'npm'; // default to npm
+  const command = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
+  const installCommand = pkgMng === 'yarn' ? 'install' : 'ci';
+  const args = [installCommand, '--loglevel', 'error'];
+
+  return execCommand(command, args);
+};
+
+const execCommand = (command, args) => {
   return new Promise((resolve, reject) => {
-    const pkgMng = program.yarn ? 'yarn' : 'npm'; // default to npm
-    const command = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
-    const installCommand = pkgMng === 'yarn' ? 'install' : 'ci';
-    const args = [installCommand, '--loglevel', 'error'];
+
     const process = spawn(command, args, { stdio: 'inherit' });
 
     process.on('close', code => {
@@ -135,9 +126,10 @@ const run = async () => {
     // change directory to target directory
     process.chdir(path.resolve(process.cwd(), TARGET_DIR));
     
-		console.log('Creating manifest (package.json)...');
+    console.log('Creating manifest (package.json)...');
     await npmInit();
 
+    console.log(path.resolve(process.cwd(), TARGET_DIR));
 
     console.log('Installing project dependencies...');
     await install();
