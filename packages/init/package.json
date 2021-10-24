@@ -16,6 +16,12 @@
   },
   "author": "Grant Hutchinson <grant@hutchdev.ca>",
   "license": "MIT",
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "chalk": "^4.1.2",
     "commander": "^8.2.0"
