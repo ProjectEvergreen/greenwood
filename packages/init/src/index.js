@@ -130,8 +130,6 @@ const run = async () => {
     console.log('Creating manifest (package.json)...');
     await npmInit();
 
-    console.log(path.resolve(process.cwd(), TARGET_DIR));
-
     console.log('Installing project dependencies...');
     await install();
 
