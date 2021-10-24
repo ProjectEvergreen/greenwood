@@ -100,6 +100,7 @@ const install = () => {
   return execCommand(command, args);
 };
 
+// execute a command with arguments  e.g. yarn/npm install, start
 const execCommand = (command, args) => {
   return new Promise((resolve, reject) => {
 
