@@ -14,3 +14,4 @@ ls:
 ignore: 
   - .git 
   - node_modules
+  - packages/init/node_modules
