@@ -8,6 +8,6 @@ Init package for Greenwood.  For more information and complete docs, please visi
 Create a directory and then run the command to scaffold from a minimal greenwood template, install dependencies, and launch the greenwood development server.
 
 ```bash
-mkdir myapp
+mkdir myapp && cd myapp
 npx @greenwood/init
 ```
