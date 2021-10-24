@@ -11,9 +11,6 @@
     "NodeJS",
     "Scaffold"
   ],
-  "scripts": {
-    "start": "node ."
-  },
   "author": "Grant Hutchinson <grant@hutchdev.ca>",
   "license": "MIT",
   "files": [
