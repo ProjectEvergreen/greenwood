@@ -21,7 +21,9 @@ const program = new commander.Command(scriptPkg.name)
   .version(scriptPkg.version)
   .usage(`${chalk.green('<application-directory>')} [options]`)
   .option('--yarn', 'Use yarn package manager instead of npm default')
-  .parse(process.argv);
+  .option('--scaffold-only', 'Only copy default template, dont install or run dev server')
+  .parse(process.argv)
+  .opts();
 
 if (program.yarn) {
   console.log('Yarn Enabled');
@@ -132,11 +134,13 @@ const run = async () => {
     console.log('Creating manifest (package.json)...');
     await npmInit();
 
-    console.log('Installing project dependencies...');
-    await install();
-
-    console.log('Starting greenwood dev server...');
-    await startDev();
+    if (!program.scaffoldOnly) {
+      console.log('Installing project dependencies...');
+      await install();
+  
+      console.log('Starting greenwood dev server...');
+      await startDev();
+    }
 
   } catch (err) {
     console.error(err);

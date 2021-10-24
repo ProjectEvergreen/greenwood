@@ -1,0 +1,66 @@
+const expect = require('chai').expect;
+const fs = require('fs');
+const path = require('path');
+const { getSetupFiles } = require('../../../../../test/utils');
+const Runner = require('gallinago').Runner;
+
+describe.only('Scaffold Greenwood With: ', function() {
+  const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
+  const outputPath = __dirname;
+  let runner;
+
+  before(function() {
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
+    };
+    runner = new Runner();
+  });
+
+  describe('default minimal template', function () {
+
+    before(async function() {
+      await runner.setup(outputPath, getSetupFiles(outputPath));
+      await runner.runCommand(initPath, '--scaffold-only');
+    });
+
+    describe('should copy project files', () => {
+      it('should create a src directory', function() {
+        expect(fs.existsSync(path.join(__dirname, 'src'))).to.be.true;
+      });
+      describe('in the src directory:', () => {
+        it('should create a pages directory', function() {
+          expect(fs.existsSync(path.join(__dirname, 'src', 'pages'))).to.be.true;
+        });
+        describe('in the src/pages directory:', () => {
+          it('should copy the index.md page', function() {
+            expect(fs.existsSync(path.join(__dirname, 'src', 'pages', 'index.md'))).to.be.true;
+          });
+        });
+      });
+      it('should copy the greenwood config file', function () {
+        expect(fs.existsSync(path.join(__dirname, 'greenwood.config.js'))).to.be.true;
+      });
+    });
+
+    it('should generate a gitignore file', function() {
+      expect(fs.existsSync(path.join(__dirname, '.gitignore'))).to.be.true;
+    });
+
+    it('should generate a package.json file', function() {
+      expect(fs.existsSync(path.join(__dirname, 'package.json'))).to.be.true;
+    });
+
+    it('the package.json should have the correct scripts', function() {
+      const scripts = require(path.join(__dirname, 'package.json')).scripts;
+
+      expect(scripts.start).to.equal('greenwood develop');
+      expect(scripts.build).to.equal('greenwood build');
+      expect(scripts.serve).to.equal('greenwood serve');
+
+    });
+
+    it('should copy the package-lock.json file', () => {
+      expect(fs.existsSync(path.join(__dirname, 'package-lock.json'))).to.be.true;
+    });
+  });
+});

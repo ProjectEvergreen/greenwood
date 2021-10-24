@@ -5,7 +5,7 @@
   "scripts": {
     "start": "greenwood develop",
     "build": "greenwood build",
-    "serve": "greenwood server"
+    "serve": "greenwood serve"
   },
   "devDependencies": {
     "@greenwood/cli": "~0.17.0"
