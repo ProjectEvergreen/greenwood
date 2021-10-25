@@ -21,16 +21,13 @@ const program = new commander.Command(scriptPkg.name)
   .version(scriptPkg.version)
   .usage(`${chalk.green('<application-directory>')} [options]`)
   .option('--yarn', 'Use yarn package manager instead of npm default')
-  .option('--scaffold-only', 'Only copy default template, dont install or run dev server')
+  .option('--install', 'Run yarn install after scaffold')
   .parse(process.argv)
   .opts();
 
 if (program.yarn) {
   console.log('Yarn Enabled');
 }
-
-const pkgMng = program.yarn ? 'yarn' : 'npm'; // default to npm
-const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
 
 // Create new package.json
 const npmInit = async () => {
@@ -97,18 +94,11 @@ const createGitIgnore = () => {
 
 // Install npm dependencies
 const install = () => {
+  const pkgMng = program.yarn ? 'yarn' : 'npm'; // default to npm
+  const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
   const installCommand = pkgMng === 'yarn' ? 'install' : 'ci';
-  
-  return execCommand([installCommand, '--loglevel', 'error']);
-};
+  const args = [installCommand, '--loglevel', 'error'];
 
-// start dev server
-const startDev = () => {
-  return execCommand(['start']);
-};
-
-// execute a command with arguments  e.g. yarn/npm install, start
-const execCommand = (args) => {
   return new Promise((resolve, reject) => {
 
     const process = spawn(pkgCommand, args, { stdio: 'inherit' });
@@ -134,12 +124,9 @@ const run = async () => {
     console.log('Creating manifest (package.json)...');
     await npmInit();
 
-    if (!program.scaffoldOnly) {
+    if (program.install) {
       console.log('Installing project dependencies...');
       await install();
-  
-      console.log('Starting greenwood dev server...');
-      await startDev();
     }
 
   } catch (err) {

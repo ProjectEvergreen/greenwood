@@ -20,7 +20,7 @@ describe('Scaffold Greenwood With: ', function() {
 
     before(async function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
-      await runner.runCommand(initPath, '--scaffold-only');
+      await runner.runCommand(initPath);
     });
 
     describe('should copy project files', () => {

@@ -14,8 +14,7 @@
   "author": "Grant Hutchinson <grant@hutchdev.ca>",
   "license": "MIT",
   "files": [
-    "src/",
-    "bleh"
+    "src/"
   ],
   "publishConfig": {
     "access": "public"
