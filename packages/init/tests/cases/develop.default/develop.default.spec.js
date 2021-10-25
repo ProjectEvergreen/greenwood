@@ -1,35 +1,23 @@
 /*
  * Use Case
- * Run Greenwood develop command with no config.
+ * Scaffold from minimal template and run Greenwood develop command with no config.
  *
  * User Result
- * Should start the development server and render a bare bones Greenwood build.
+ * Should scaffold from template and start the development server and render the template.
  *
  * User Command
+ * @greenwood/init
  * greenwood develop
- *
- * User Config
- * devServer: {
- *   proxy: {
- *     '/api': 'https://www.analogstudios.net'
- *   }
- * }
  *
  * User Workspace
  * src/
- *   assets/
- *     logo.png
- *     source-sans-pro.woff
- *   components/
- *     header.js
  *   pages/
- *     index.html
- *   styles/
- *     main.css
+ *     index.md
+ * greenwood.config.js
  * package.json
  */
 const expect = require('chai').expect;
-const { JSDOM } = require('jsdom');
+// const { JSDOM } = require('jsdom');
 const path = require('path');
 const { getDependencyFiles, getSetupFiles } = require('../../../../../test/utils');
 const request = require('request');

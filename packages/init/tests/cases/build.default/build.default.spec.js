@@ -1,3 +1,22 @@
+/*
+ * Use Case
+ * Scaffold from minimal template and run Greenwood build command with no config.
+ *
+ * User Result
+ * Should scaffold from template build.
+ *
+ * User Command
+ * @greenwood/init
+ * greenwood build
+ *
+ * User Workspace
+ * src/
+ *   pages/
+ *     index.md
+ * greenwood.config.js
+ * package.json
+ */
+
 const expect = require('chai').expect;
 const fs = require('fs');
 const path = require('path');
