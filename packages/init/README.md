@@ -5,9 +5,11 @@ Init package for Greenwood.  For more information and complete docs, please visi
 
 ## Usage
 
-Create a directory and then run the command to scaffold from a minimal greenwood template, install dependencies, and launch the greenwood development server.
+Create a directory and then run the command to scaffold from a minimal greenwood template.
 
 ```bash
 mkdir myapp && cd myapp
 npx @greenwood/init
 ```
+
+> add `--install` to immediately `npm/yarn install` after build.  Use `--yarn` to use yarn instead of npm default.
