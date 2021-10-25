@@ -1,10 +1,12 @@
 const expect = require('chai').expect;
 const fs = require('fs');
 const path = require('path');
-const { getSetupFiles } = require('../../../../../test/utils');
+const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
 const Runner = require('gallinago').Runner;
+const runSmokeTest = require('../../../../../test/smoke-test');
 
 describe('Scaffold Greenwood With: ', function() {
+  const LABEL = 'Default Greenwood Configuration and Workspace';
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
   const outputPath = __dirname;
   let runner;
@@ -62,5 +64,26 @@ describe('Scaffold Greenwood With: ', function() {
     it('should copy the package-lock.json file', () => {
       expect(fs.existsSync(path.join(__dirname, 'package-lock.json'))).to.be.true;
     });
+
+    describe(`should build ${LABEL}`, function () {
+      const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+
+      before(async function() {
+        await runner.setup(outputPath, getSetupFiles(outputPath));
+        await runner.runCommand(cliPath, 'build');
+      });
+      
+      runSmokeTest(['public', 'index'], LABEL);
+    });
+  });
+  after(function() {
+    runner.teardown([
+      ...getOutputTeardownFiles(outputPath),
+      path.join(outputPath, 'src'),
+      path.join(outputPath, 'greenwood.config.js'),
+      path.join(outputPath, 'package-lock.json'),
+      path.join(outputPath, 'package.json'),
+      path.join(outputPath, '.gitignore')
+    ]);
   });
 });
