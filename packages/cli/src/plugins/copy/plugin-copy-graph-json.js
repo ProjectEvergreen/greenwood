@@ -1,6 +1,6 @@
-const path = require('path');
+import path from 'path';
 
-module.exports = [{
+const greenwoodPluginCopyGraphJson = [{
   type: 'copy',
   name: 'plugin-copy-graph-json',
   provider: (compilation) => {
@@ -12,3 +12,5 @@ module.exports = [{
     }];
   }
 }];
+
+export { greenwoodPluginCopyGraphJson };

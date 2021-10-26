@@ -1,3 +1,4 @@
+/* eslint-disable max-depth,complexity */
 /*
  * 
  * Detects and fully resolves requests to node_modules and handles creating an importMap.
@@ -23,7 +24,7 @@ const updateImportMap = (entry, entryPath) => {
   importMap[entry] = entryPath;
 };
 
-const getPackageEntryPath = (packageJson) => {
+const getPackageEntryPath = async (packageJson) => {
   let entry = packageJson.exports
     ? Object.keys(packageJson.exports) // first favor export maps first
     : packageJson.module // next favor ESM entry points
@@ -33,21 +34,21 @@ const getPackageEntryPath = (packageJson) => {
         : 'index.js'; // lastly, fallback to index.js
 
   // use .mjs version if it exists, for packages like redux
-  if (!Array.isArray(entry) && fs.existsSync(`${getNodeModulesLocationForPackage(packageJson.name)}/${entry.replace('.js', '.mjs')}`)) {
+  if (!Array.isArray(entry) && fs.existsSync(`${await getNodeModulesLocationForPackage(packageJson.name)}/${entry.replace('.js', '.mjs')}`)) {
     entry = entry.replace('.js', '.mjs');
   }
 
   return entry;
 };
 
-const walkModule = (module, dependency) => {
+const walkModule = async (module, dependency) => {
   walk.simple(acorn.parse(module, {
     ecmaVersion: '2020',
     sourceType: 'module'
   }), {
-    ImportDeclaration(node) {
+    async ImportDeclaration(node) {
       let { value: sourceValue } = node.source;
-      const absoluteNodeModulesLocation = getNodeModulesLocationForPackage(dependency);
+      const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(dependency);
 
       if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {        
         if (!importMap[sourceValue]) {
@@ -56,7 +57,7 @@ const walkModule = (module, dependency) => {
           updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
         }
         
-        walkPackageJson(path.join(absoluteNodeModulesLocation, 'package.json'));
+        await walkPackageJson(path.join(absoluteNodeModulesLocation, 'package.json'));
       } else if (sourceValue.indexOf('./') < 0) {
         // adding a relative import
         updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
@@ -68,10 +69,12 @@ const walkModule = (module, dependency) => {
 
         if (fs.existsSync(path.join(absoluteNodeModulesLocation, sourceValue))) {
           const moduleContents = fs.readFileSync(path.join(absoluteNodeModulesLocation, sourceValue));
-          walkModule(moduleContents, dependency);
+          await walkModule(moduleContents, dependency);
           updateImportMap(`${dependency}/${sourceValue.replace('./', '')}`, `/node_modules/${dependency}/${sourceValue.replace('./', '')}`);
         }
       }
+
+      return Promise.resolve();
     },
     ExportNamedDeclaration(node) {
       const sourceValue = node && node.source ? node.source.value : '';
@@ -98,27 +101,27 @@ const walkModule = (module, dependency) => {
   });
 };
 
-const walkPackageJson = (packageJson = {}) => {
+const walkPackageJson = async (packageJson = {}) => {
   // while walking a package.json we need to find its entry point, e.g. index.js
   // and then walk that for import / export statements
   // and walk its package.json for its dependencies
 
-  Object.keys(packageJson.dependencies || {}).forEach(dependency => {
+  for (const dependency of Object.keys(packageJson.dependencies || {})) {
     const dependencyPackageRootPath = path.join(process.cwd(), './node_modules', dependency);
     const dependencyPackageJsonPath = path.join(dependencyPackageRootPath, 'package.json');
     const dependencyPackageJson = JSON.parse(fs.readFileSync(dependencyPackageJsonPath, 'utf-8'));
-    const entry = getPackageEntryPath(dependencyPackageJson);
+    const entry = await getPackageEntryPath(dependencyPackageJson);
     const isJavascriptPackage = Array.isArray(entry) || typeof entry === 'string' && entry.endsWith('.js') || entry.endsWith('.mjs');
 
     if (isJavascriptPackage) {
-      const absoluteNodeModulesLocation = getNodeModulesLocationForPackage(dependency);
+      const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(dependency);
 
       // https://nodejs.org/api/packages.html#packages_determining_module_system
       if (Array.isArray(entry)) {
         // we have an exportMap
         const exportMap = entry;
   
-        exportMap.forEach((entry) => {
+        for (const entry of exportMap) {
           const exportMapEntry = dependencyPackageJson.exports[entry];
           let packageExport;
   
@@ -177,7 +180,7 @@ const walkPackageJson = (packageJson = {}) => {
             if (packageExport.endsWith('js')) {
               const moduleContents = fs.readFileSync(packageExportLocation);
 
-              walkModule(moduleContents, dependency);
+              await walkModule(moduleContents, dependency);
               updateImportMap(`${dependency}${entry.replace('.', '')}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
             } else if (fs.lstatSync(packageExportLocation).isDirectory()) {
               fs.readdirSync(packageExportLocation)
@@ -189,9 +192,9 @@ const walkPackageJson = (packageJson = {}) => {
               console.warn('Warning, not able to handle export', `${dependency}/${packageExport}`);
             }
           }
-        });
+        }
 
-        walkPackageJson(dependencyPackageJson);
+        await walkPackageJson(dependencyPackageJson);
       } else {
         const packageEntryPointPath = path.join(absoluteNodeModulesLocation, entry);
 
@@ -199,13 +202,13 @@ const walkPackageJson = (packageJson = {}) => {
         if (fs.existsSync(packageEntryPointPath)) {
           const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
     
-          walkModule(packageEntryModule, dependency);
+          await walkModule(packageEntryModule, dependency);
           updateImportMap(dependency, `/node_modules/${dependency}/${entry}`);
-          walkPackageJson(dependencyPackageJson);
+          await walkPackageJson(dependencyPackageJson);
         }
       }
     }
-  });
+  }
 };
 
 class NodeModulesResource extends ResourceInterface {
@@ -222,7 +225,7 @@ class NodeModulesResource extends ResourceInterface {
     const bareUrl = this.getBareUrlPath(url);
     const { projectDirectory } = this.compilation.context;
     const packageName = getPackageNameFromUrl(bareUrl);
-    const absoluteNodeModulesLocation = getNodeModulesLocationForPackage(packageName);
+    const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(packageName);
     const packagePathPieces = bareUrl.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
     let absoluteNodeModulesUrl;
 
@@ -270,7 +273,7 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   async intercept(url, body) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
         const { userWorkspace } = this.compilation.context;
         let newContents = body;
@@ -293,7 +296,7 @@ class NodeModulesResource extends ResourceInterface {
         // for each entry found in dependencies, find its entry point
         // then walk its entry point (e.g. index.js) for imports / exports to add to the importMap
         // and then walk its package.json for transitive dependencies and all those import / exports
-        walkPackageJson(userPackageJson);
+        await walkPackageJson(userPackageJson);
 
         // apply import map and shim for users
         newContents = newContents.replace('<head>', `
