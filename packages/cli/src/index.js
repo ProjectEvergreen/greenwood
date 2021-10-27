@@ -14,7 +14,6 @@ import { runProductionBuild } from './commands/build.js';
 import { runProdServer } from './commands/serve.js';
 // const ejectConfiguration = require('./commands/eject');
 
-// TODO track / watch for improt json support - https://stackoverflow.com/a/62621693/417806
 const greenwoodPackageJson = JSON.parse(await fs.readFile(new URL('../package.json', import.meta.url), 'utf-8'));
 let cmdOption = {};
 let command = '';
