@@ -17,7 +17,7 @@
  * package.json
  */
 const expect = require('chai').expect;
-// const { JSDOM } = require('jsdom');
+const { JSDOM } = require('jsdom');
 const path = require('path');
 const { getSetupFiles } = require('../../../../../test/utils');
 const request = require('request');
@@ -79,7 +79,7 @@ describe('Scaffold Greenwood With: ', function() {
 
         describe('Develop command specific HTML behaviors', function() {
           let response = {};
-          // let dom;
+          let dom;
 
           before(async function() {
             return new Promise((resolve, reject) => {
@@ -88,14 +88,14 @@ describe('Scaffold Greenwood With: ', function() {
                 headers: {
                   accept: 'text/html'
                 }
-              }, (err, res) => {
+              }, (err, res, body) => {
                 if (err) {
                   reject();
                 }
 
                 response = res;
                 
-                // dom = new JSDOM(body);
+                dom = new JSDOM(body);
                 resolve();
               });
             });
@@ -108,6 +108,13 @@ describe('Scaffold Greenwood With: ', function() {
 
           it('should return a 200', function(done) {
             expect(response.statusCode).to.equal(200);
+
+            done();
+          });
+
+          it('should display helloworld heading', function(done) {
+            let heading = dom.window.document.querySelector('body > h2');
+            expect(heading.textContent).to.equal('Helloworld');
 
             done();
           });
