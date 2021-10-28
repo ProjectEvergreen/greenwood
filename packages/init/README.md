@@ -12,4 +12,12 @@ mkdir myapp && cd myapp
 npx @greenwood/init
 ```
 
-> Add `--install` to immediately `npm/yarn install` after build.  Use `--yarn` to use yarn instead of npm default.
+## API
+
+### Install
+
+To install dependencies after scaffold, use `--install` option to `npm install` after build.  
+
+### Install with yarn
+
+Use the `--yarn` option accompanied by the `--install` option to utilize yarn instead of npm default.

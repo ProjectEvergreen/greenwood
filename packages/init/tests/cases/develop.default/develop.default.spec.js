@@ -19,7 +19,7 @@
 const expect = require('chai').expect;
 // const { JSDOM } = require('jsdom');
 const path = require('path');
-const { getDependencyFiles, getSetupFiles } = require('../../../../../test/utils');
+const { getSetupFiles } = require('../../../../../test/utils');
 const request = require('request');
 const Runner = require('gallinago').Runner;
 const runSmokeTest = require('../../../../../test/smoke-test');
@@ -61,79 +61,9 @@ describe('Scaffold Greenwood With: ', function() {
       describe(LABEL, function() {
 
         before(async function() {
-          const lit = await getDependencyFiles(
-            `${process.cwd()}/node_modules/lit/*.js`,
-            `${outputPath}/node_modules/lit/`
-          );
-          const litDecorators = await getDependencyFiles(
-            `${process.cwd()}/node_modules/lit/decorators/*.js`,
-            `${outputPath}/node_modules/lit/decorators/`
-          );
-          const litDirectives = await getDependencyFiles(
-            `${process.cwd()}/node_modules/lit/directives/*.js`,
-            `${outputPath}/node_modules/lit/directives/`
-          );
-          const litPackageJson = await getDependencyFiles(
-            `${process.cwd()}/node_modules/lit/package.json`,
-            `${outputPath}/node_modules/lit/`
-          );
-          const litElement = await getDependencyFiles(
-            `${process.cwd()}/node_modules/lit-element/*.js`,
-            `${outputPath}/node_modules/lit-element/`
-          );
-          const litElementPackageJson = await getDependencyFiles(
-            `${process.cwd()}/node_modules/lit-element/package.json`,
-            `${outputPath}/node_modules/lit-element/`
-          );
-          const litElementDecorators = await getDependencyFiles(
-            `${process.cwd()}/node_modules/lit-element/decorators/*.js`,
-            `${outputPath}/node_modules/lit-element/decorators/`
-          );
-          const litHtml = await getDependencyFiles(
-            `${process.cwd()}/node_modules/lit-html/*.js`,
-            `${outputPath}/node_modules/lit-html/`
-          );
-          const litHtmlPackageJson = await getDependencyFiles(
-            `${process.cwd()}/node_modules/lit-html/package.json`,
-            `${outputPath}/node_modules/lit-html/`
-          );
-          const litHtmlDirectives = await getDependencyFiles(
-            `${process.cwd()}/node_modules/lit-html/directives/*.js`,
-            `${outputPath}/node_modules/lit-html/directives/`
-          );
-          const litReactiveElement = await getDependencyFiles(
-            `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
-            `${outputPath}/node_modules/@lit/reactive-element/`
-          );
-          const litReactiveElementDecorators = await getDependencyFiles(
-            `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
-            `${outputPath}/node_modules/@lit/reactive-element/decorators/`
-          );
-          const litReactiveElementPackageJson = await getDependencyFiles(
-            `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
-            `${outputPath}/node_modules/@lit/reactive-element/`
-          );
-          const litHtmlSourceMap = await getDependencyFiles(
-            `${process.cwd()}/node_modules/lit-html/lit-html.js.map`,
-            `${outputPath}/node_modules/lit-html/`
-          );
 
           await runner.setup(outputPath, [
-            ...getSetupFiles(outputPath),
-            ...lit,
-            ...litPackageJson,
-            ...litDirectives,
-            ...litDecorators,
-            ...litElementPackageJson,
-            ...litElement,
-            ...litElementDecorators,
-            ...litHtmlPackageJson,
-            ...litHtml,
-            ...litHtmlDirectives,
-            ...litReactiveElement,
-            ...litReactiveElementDecorators,
-            ...litReactiveElementPackageJson,
-            ...litHtmlSourceMap
+            ...getSetupFiles(outputPath)
           ]);
 
           return new Promise(async (resolve) => {
@@ -190,7 +120,6 @@ describe('Scaffold Greenwood With: ', function() {
             path.join(outputPath, 'node_modules'),
             path.join(outputPath, 'src'),
             path.join(outputPath, 'greenwood.config.js'),
-            path.join(outputPath, 'package-lock.json'),
             path.join(outputPath, 'package.json'),
             path.join(outputPath, '.gitignore')
           ]);

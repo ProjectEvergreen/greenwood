@@ -80,10 +80,6 @@ describe('Scaffold Greenwood With: ', function() {
 
     });
 
-    it('should copy the package-lock.json file', () => {
-      expect(fs.existsSync(path.join(__dirname, 'package-lock.json'))).to.be.true;
-    });
-
     describe(`should build ${LABEL}`, function () {
       const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
 
@@ -100,7 +96,6 @@ describe('Scaffold Greenwood With: ', function() {
       ...getOutputTeardownFiles(outputPath),
       path.join(outputPath, 'src'),
       path.join(outputPath, 'greenwood.config.js'),
-      path.join(outputPath, 'package-lock.json'),
       path.join(outputPath, 'package.json'),
       path.join(outputPath, '.gitignore')
     ]);

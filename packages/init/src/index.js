@@ -21,7 +21,7 @@ const program = new commander.Command(scriptPkg.name)
   .version(scriptPkg.version)
   .usage(`${chalk.green('<application-directory>')} [options]`)
   .option('--yarn', 'Use yarn package manager instead of npm default')
-  .option('--install', 'Run yarn install after scaffold')
+  .option('--install', 'Install dependencies upon init')
   .parse(process.argv)
   .opts();
 
@@ -96,8 +96,7 @@ const createGitIgnore = () => {
 const install = () => {
   const pkgMng = program.yarn ? 'yarn' : 'npm'; // default to npm
   const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
-  const installCommand = pkgMng === 'yarn' ? 'install' : 'ci';
-  const args = [installCommand, '--loglevel', 'error'];
+  const args = ['install', '--loglevel', 'error'];
 
   return new Promise((resolve, reject) => {
 

@@ -8,7 +8,7 @@
     "serve": "greenwood serve"
   },
   "devDependencies": {
-    "@greenwood/cli": "~0.17.0"
+    "@greenwood/cli": "^0.18.0"
   },
   "license": "ISC"
 }
