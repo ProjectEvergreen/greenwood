@@ -19,7 +19,7 @@ const request = require('request');
 const Runner = require('gallinago').Runner;
 const runSmokeTest = require('../../../../../test/smoke-test');
 
-describe('Scaffold Greenwood With: ', function() {
+describe('Scaffold Greenwood and Run Develop command: ', function() {
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
   const outputPath = path.join(__dirname, 'my-app');
   let runner;

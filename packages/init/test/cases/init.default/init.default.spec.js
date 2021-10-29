@@ -16,7 +16,7 @@ const fs = require('fs');
 const path = require('path');
 const Runner = require('gallinago').Runner;
 
-describe('Scaffold Greenwood With Default Configuration: ', function() {
+describe('Scaffold Greenwood With Default Template: ', function() {
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
   const outputPath = path.join(__dirname, 'my-app');
   let runner;
