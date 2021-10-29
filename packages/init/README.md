@@ -1,23 +1,43 @@
 # @greenwood/init
 
 ## Overview
-Init package for Greenwood.  For more information and complete docs, please visit the [Greenwood website](https://www.greenwoodjs.io/docs).
+Init package for scaffolding out a new Greenwood project.  For more information and complete docs, please visit the [Greenwood website](https://www.greenwoodjs.io/docs).
 
 ## Usage
 
-Create a directory and then run the command to scaffold from a minimal greenwood template.
+Create a directory and then run the `init` command to scaffold a minimal Greenwood project.
 
 ```bash
-mkdir myapp && cd myapp
+mkdir my-app && cd my-app
 npx @greenwood/init
+```
+
+This will then output the following
+```bash
+├── greenwood.config.js
+├── .gitignore
+├── package.json
+└── src/
+     └─ pages/
+         └─ index.md
 ```
 
 ## API
 
-### Install
+### NPM Install
 
-To install dependencies after scaffold, use `--install` option to `npm install` after build.  
+To automatically run `npm install` after scaffolding, pass the `--install` flag.
 
-### Install with yarn
+```bash
+# example
+npx @greenwood/init --install
+```
 
-Use the `--yarn` option accompanied by the `--install` option to utilize yarn instead of npm default.
+### Yarn Install
+
+To automatically run `yarn install` after scaffolding, pass the `--yarn` flag.
+
+```bash
+# example
+npx @greenwood/init --yarn
+```

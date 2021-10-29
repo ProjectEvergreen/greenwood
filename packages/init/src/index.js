@@ -126,6 +126,7 @@ const run = async () => {
       await install();
     }
 
+    console.log('Initializing complete!');
   } catch (err) {
     console.error(err);
   }
