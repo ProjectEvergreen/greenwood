@@ -126,7 +126,7 @@ const run = async () => {
       await install();
     }
 
-    console.log('Initializing complete!');
+    console.log(`${chalk.rgb(175, 207, 71)('Initializing new project complete!')}`);
   } catch (err) {
     console.error(err);
   }

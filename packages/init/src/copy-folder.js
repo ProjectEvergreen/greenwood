@@ -1,4 +1,3 @@
-// THIS SCRIPT SHOULD ONLY USE NATIVE NODE.JS APIs, NO PACKAGES FROM NPM ALLOWED
 const fs = require('fs');
 const path = require('path');
 
