@@ -1,6 +1,4 @@
-#!/usr/bin/env node
 /* eslint no-console: 0 */
-
 const copyFolder = require('./copy-folder');
 const fs = require('fs');
 const os = require('os');
@@ -11,7 +9,7 @@ const commander = require('commander');
 const scriptPkg = require(path.join(__dirname, '..', '/package.json'));
 const templateDir = path.join(__dirname, 'template');
 
-let TARGET_DIR = process.cwd(); // potentially changed through an arg? 
+const TARGET_DIR = process.cwd();
 
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
 console.log(`${chalk.rgb(175, 207, 71)('Initialize Greenwood Template ♻️')}`);
@@ -93,14 +91,14 @@ const createGitIgnore = () => {
 };
 
 // Install npm dependencies
-const install = () => {
+const install = async () => {
   const pkgMng = program.yarn ? 'yarn' : 'npm'; // default to npm
   const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
   const args = ['install', '--loglevel', 'error'];
 
   return new Promise((resolve, reject) => {
 
-    const process = spawn(pkgCommand, args, { stdio: 'inherit' });
+    const process = spawn(pkgCommand, args, { stdio: 'ignore' });
 
     process.on('close', code => {
       if (code !== 0) {
@@ -123,7 +121,7 @@ const run = async () => {
     console.log('Creating manifest (package.json)...');
     await npmInit();
 
-    if (program.install) {
+    if (program.install || program.yarn) {
       console.log('Installing project dependencies...');
       await install();
     }
