@@ -50,6 +50,10 @@ describe('Scaffold Greenwood and Run Build command: ', function() {
       it('should generate a package-lock.json file', function() {
         expect(fs.existsSync(path.join(outputPath, 'package-lock.json'))).to.be.true;
       });
+
+      it('should not generate a yarn.lock file', function() {
+        expect(fs.existsSync(path.join(outputPath, 'yarn.lock'))).to.be.false;
+      });
     });
   });
 

@@ -12,6 +12,7 @@
  * N / A
  */
 const expect = require('chai').expect;
+const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const path = require('path');
 const { getSetupFiles } = require('../../../../../test/utils');
@@ -70,6 +71,18 @@ describe('Scaffold Greenwood and Run Develop command: ', function() {
         });
 
         runSmokeTest(['serve'], LABEL);
+
+        it('should generate a package-lock.json file', function() {
+          expect(fs.existsSync(path.join(outputPath, 'package-lock.json'))).to.be.true;
+        });
+  
+        it('should not generate a yarn.lock file', function() {
+          expect(fs.existsSync(path.join(outputPath, 'yarn.lock'))).to.be.false;
+        });
+
+        it('should not generate a public directory', function() {
+          expect(fs.existsSync(path.join(outputPath, 'public'))).to.be.false;
+        });
 
         describe('Develop command specific HTML behaviors', function() {
           let response = {};

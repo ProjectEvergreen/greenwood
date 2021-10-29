@@ -49,6 +49,14 @@ describe('Scaffold Greenwood With Yarn: ', function() {
       it('should generate a yarn.lock file', function() {
         expect(fs.existsSync(path.join(outputPath, 'yarn.lock'))).to.be.true;
       });
+
+      it('should not generate a package-lock.json file', function() {
+        expect(fs.existsSync(path.join(outputPath, 'package-lock.json'))).to.be.false;
+      });
+
+      it('should generate a public directory', function() {
+        expect(fs.existsSync(path.join(outputPath, 'public'))).to.be.true;
+      });
     });
   });
 

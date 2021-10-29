@@ -53,6 +53,18 @@ describe('Scaffold Greenwood With Default Template: ', function() {
       it('should generate a package.json file', function() {
         expect(fs.existsSync(path.join(outputPath, 'package.json'))).to.be.true;
       });
+
+      it('should not generate a package-lock.json file', function() {
+        expect(fs.existsSync(path.join(outputPath, 'package-lock.json'))).to.be.false;
+      });
+
+      it('should not generate a yarn.lock file', function() {
+        expect(fs.existsSync(path.join(outputPath, 'yarn.lock'))).to.be.false;
+      });
+
+      it('should not generate a public directory', function() {
+        expect(fs.existsSync(path.join(outputPath, 'public'))).to.be.false;
+      });
     });
 
     describe('initial package.json contents', function() {
