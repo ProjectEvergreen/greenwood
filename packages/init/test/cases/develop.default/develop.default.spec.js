@@ -6,15 +6,10 @@
  * Should scaffold from template and start the development server and render the template.
  *
  * User Command
- * @greenwood/init
- * greenwood develop
+ * @greenwood/init --install && greenwood develop
  *
  * User Workspace
- * src/
- *   pages/
- *     index.md
- * greenwood.config.js
- * package.json
+ * N / A
  */
 const expect = require('chai').expect;
 const { JSDOM } = require('jsdom');
@@ -26,7 +21,7 @@ const runSmokeTest = require('../../../../../test/smoke-test');
 
 describe('Scaffold Greenwood With: ', function() {
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.join(__dirname, 'my-app');
   let runner;
 
   before(function() {
@@ -39,14 +34,13 @@ describe('Scaffold Greenwood With: ', function() {
   describe('default minimal template', function () {
 
     before(async function() {
-      await runner.setup(outputPath, getSetupFiles(outputPath));
-      await runner.runCommand(initPath);
+      await runner.setup(outputPath);
+      await runner.runCommand(initPath, '--install');
     });
 
     describe('Develop Greenwood With: ', function() {
       const LABEL = 'Default Greenwood Configuration and Workspace';
       const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-      const outputPath = __dirname;
       const hostname = 'http://localhost';
       const port = 1984;
       let runner;
@@ -112,9 +106,18 @@ describe('Scaffold Greenwood With: ', function() {
             done();
           });
 
-          it('should display helloworld heading', function(done) {
-            let heading = dom.window.document.querySelector('body > h2');
-            expect(heading.textContent).to.equal('Helloworld');
+          it('should display My Project heading', function(done) {
+            const heading = dom.window.document.querySelector('body > h2');
+            
+            expect(heading.textContent).to.equal('My Project');
+
+            done();
+          });
+
+          it('should display My Project title', function(done) {
+            const title = dom.window.document.querySelector('head > title');
+            
+            expect(title.textContent).to.equal('My Project');
 
             done();
           });
@@ -122,14 +125,7 @@ describe('Scaffold Greenwood With: ', function() {
 
         after(function() {
           runner.stopCommand();
-          runner.teardown([
-            path.join(outputPath, '.greenwood'),
-            path.join(outputPath, 'node_modules'),
-            path.join(outputPath, 'src'),
-            path.join(outputPath, 'greenwood.config.js'),
-            path.join(outputPath, 'package.json'),
-            path.join(outputPath, '.gitignore')
-          ]);
+          runner.teardown([outputPath]);
         });
       });
     });

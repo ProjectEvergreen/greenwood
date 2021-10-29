@@ -1,3 +1,3 @@
 module.exports = {
-  title: 'My Personal Blog'
+  title: 'My Project'
 };
