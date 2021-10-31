@@ -451,7 +451,8 @@ function greenwoodHtmlPlugin(compilation) {
                     if (id === marker) {
                       const cleaned = bundledSource
                         .replace(new RegExp(`,${markerExp};\n`), '')
-                        .replace(new RegExp(`${markerExp};\n`), '');
+                        .replace(new RegExp(`${markerExp};\n`), '')
+                        .replace(new RegExp(`${markerExp};`), '');
 
                       html = html.replace(scriptTag.rawText, cleaned);
                       scratchFiles[innerBundleId] = true;
