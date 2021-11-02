@@ -12,6 +12,9 @@
     "NodeJS",
     "Scaffold"
   ],
+  "bin": {
+    "init": "./src/index.js"
+  },
   "files": [
     "src/"
   ],
