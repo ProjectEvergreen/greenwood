@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* eslint no-console: 0 */
 const copyFolder = require('./copy-folder');
 const fs = require('fs');
