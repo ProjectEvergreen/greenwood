@@ -17,7 +17,7 @@ const path = require('path');
 const Runner = require('gallinago').Runner;
 const runSmokeTest = require('../../../../../test/smoke-test');
 
-xdescribe('Scaffold Greenwood With Yarn: ', function() {
+describe('Scaffold Greenwood With Yarn: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
   const outputPath = path.join(__dirname, 'my-app');
