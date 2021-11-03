@@ -99,7 +99,7 @@ const install = async () => {
 
   return new Promise((resolve, reject) => {
 
-    const process = spawn(pkgCommand, args, { stdio: 'ignore' });
+    const process = spawn(pkgCommand, args, { stdio: 'inherit' });
 
     process.on('close', code => {
       if (code !== 0) {
