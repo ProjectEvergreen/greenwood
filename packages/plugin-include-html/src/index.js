@@ -24,7 +24,6 @@ class IncludeHtmlResource extends ResourceInterface {
           includeLinksRegexMatches
             .filter(link => link.indexOf('rel="html"') > 0)
             .forEach((link) => {
-              console.debug('link', link)
               const href = link.match(/href="(.*)"/)[1];
               const includeContents = fs.readFileSync(path.join(this.compilation.context.userWorkspace, href), 'utf-8');
 
