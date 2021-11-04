@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 /*
  * 
  * Manages web standard resource related operations for HTML and markdown.
@@ -61,10 +62,6 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], 
 };
 
 const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugins, enableHud) => {
-  function sliceTemplate(template, pos, needle, replacer) {
-    return template.slice(0, pos) + template.slice(pos).replace(needle, replacer);
-  }
-  
   const userAppTemplatePath = `${templatesDir}app.html`;
   const customAppTemplates = getCustomPageTemplates(contextPlugins, 'app');
 
@@ -79,6 +76,10 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     style: true,
     noscript: true,
     pre: true
+  });
+  const appRoot = htmlparser.parse(appTemplateContents, {
+    script: true,
+    style: true
   });
 
   if (!root.valid) {
@@ -106,6 +107,7 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     const headMeta = root.querySelectorAll('head meta');
     const headStyles = root.querySelectorAll('head style');
     const headTitle = root.querySelector('head title');
+    const appTemplateHeadContents = appRoot.querySelector('head').innerHTML;
 
     appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
 
@@ -113,87 +115,101 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
       appTemplateContents = appTemplateContents.replace(/<title>(.*)<\/title>/, `<title>${headTitle.rawText}</title>`);
     }
 
-    headScripts.forEach((script) => {
-      const matchNeedle = '</script>';
-      const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
-
-      if (script.text === '') {
-        if (matchPos > 0) {
-          appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</script>\n
-            <script ${script.rawAttrs}></script>\n
-          `);
+    // merge <script> tags
+    if (headScripts.length > 0) {
+      const matchNeedleScript = /<script .*/g;
+      const appHeadScriptMatches = appTemplateHeadContents.match(matchNeedleScript);
+      const lastScript = appHeadScriptMatches && appHeadScriptMatches.length && appHeadScriptMatches.length > 0
+        ? appHeadScriptMatches[appHeadScriptMatches.length - 1]
+        : '</head>';
+      const pageBodyScripts = headScripts.map((script) => {
+        if (script.text === '') {
+          return `<script ${script.rawAttrs}></script>`;
         } else {
-          appTemplateContents = appTemplateContents.replace('</head>', `
-              <script ${script.rawAttrs}></script>\n
-            </head>
-          `);
-        }
-      }
+          const attributes = script.rawAttrs !== ''
+            ? ` ${script.rawAttrs}`
+            : '';
+          const source = script.text.replace(/\$/g, '$$$'); // https://github.com/ProjectEvergreen/greenwood/issues/656
 
-      if (script.text !== '') {
-        const attributes = script.rawAttrs !== ''
-          ? ` ${script.rawAttrs}`
-          : '';
-        const source = script.text
-          .replace(/\$/g, '$$$'); // https://github.com/ProjectEvergreen/greenwood/issues/656
-
-        if (matchPos > 0) {
-          appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</script>\n
+          return `
             <script${attributes}>
               ${source}
-            </script>\n
-          `);
-        } else {
-          appTemplateContents = appTemplateContents.replace('</head>', `
-              <script${attributes}>
-                ${source}
-              </script>\n
-            </head>
-          `);
+            </script>
+          `;
         }
-      }
-    });
+      });
 
-    headLinks.forEach((link) => {
-      const matchNeedle = /<link .*/g;
-      const matches = appTemplateContents.match(matchNeedle);
-      const lastLink = matches && matches.length && matches.length > 0
-        ? matches[matches.length - 1]
+      if (lastScript === '</head>') {
+        appTemplateContents = appTemplateContents.replace(lastScript, `
+          ${pageBodyScripts.join('\n')}
+        ${lastScript}\n
+      `);
+      } else {
+        appTemplateContents = appTemplateContents.replace(lastScript, `${lastScript}\n
+          ${pageBodyScripts.join('\n')}
+        `);
+      }
+    }
+
+    // merge <link> tags
+    if (headLinks.length > 0) {
+      const matchNeedleLink = /<link .*/g;
+      const appHeadLinkMatches = appTemplateHeadContents.match(matchNeedleLink);
+      const lastLink = appHeadLinkMatches && appHeadLinkMatches.length && appHeadLinkMatches.length > 0
+        ? appHeadLinkMatches[appHeadLinkMatches.length - 1]
+        : '</head>';
+      const pageHeadLinks = headLinks.map((link) => {
+        return `<link ${link.rawAttrs}/>`;
+      });
+
+      if (lastLink === '</head>') {
+        appTemplateContents = appTemplateContents.replace(lastLink, `
+          ${pageHeadLinks.join('\n')}
+        ${lastLink}\n
+      `);
+      } else {
+        appTemplateContents = appTemplateContents.replace(lastLink, `${lastLink}\n
+          ${pageHeadLinks.join('\n')}
+        `);
+      }
+    }
+
+    // merge <style> tags
+    if (headStyles.length > 0) {
+      const latestHeadContents = appTemplateContents.match(/<head>.*.<\/head>/s)[0];
+      const pageBodyStyles = headStyles.map((style) => {
+        const attributes = style.rawAttrs === '' ? '' : ` ${style.rawAttrs}`;
+
+        return `
+          <style${attributes}>
+            ${style.text}
+          </style>
+        `;
+      });
+      const lastIndex = latestHeadContents.lastIndexOf('</style>') === -1
+        ? latestHeadContents.lastIndexOf('</head>')
+        : latestHeadContents.lastIndexOf('</style>');
+      const offset = lastIndex === -1 ? '</head>'.length : '</style>'.length;
+      const result = latestHeadContents.substring(0, lastIndex + offset) + pageBodyStyles.join('\n') + latestHeadContents.substring(lastIndex);
+
+      appTemplateContents = appTemplateContents.replace(latestHeadContents, result);
+    }
+
+    // merge <meta>
+    if (headMeta.length > 0) {
+      const matchNeedleMeta = /<meta .*/g;
+      const appHeadMetaMatches = appTemplateHeadContents.match(matchNeedleMeta);
+      const lastMeta = appHeadMetaMatches && appHeadMetaMatches.length && appHeadMetaMatches.length > 0
+        ? appHeadMetaMatches[appHeadMetaMatches.length - 1]
         : '<head>';
+      const pageMeta = headMeta.map((meta) => {
+        return `<meta ${meta.rawAttrs}/>`;
+      });
 
-      appTemplateContents = appTemplateContents.replace(lastLink, `${lastLink}\n
-        <link ${link.rawAttrs}/>
+      appTemplateContents = appTemplateContents.replace(lastMeta.replace('>', '/>'), `${lastMeta.replace('>', '/>')}\n
+        ${pageMeta.join('\n')}
       `);
-    });
-
-    headStyles.forEach((style) => {
-      const matchNeedle = '</style>';
-      const matchPos = appTemplateContents.lastIndexOf(matchNeedle);
-
-      if (style.rawAttrs === '') {
-        if (matchPos > 0) {
-          appTemplateContents = sliceTemplate(appTemplateContents, matchPos, matchNeedle, `</style>\n
-            <style>
-              ${style.text}
-            </style>\n
-          `);
-        } else {
-          appTemplateContents = appTemplateContents.replace('<head>', `
-            <head> \n
-              <style>
-                ${style.text}
-              </style>\n
-          `);
-        }
-      }
-    });
-
-    headMeta.forEach((meta) => {
-      appTemplateContents = appTemplateContents.replace('<head>', `
-        <head>
-          <meta ${meta.rawAttrs}/>
-      `);
-    });
+    }
 
     customImports.forEach((customImport) => {
       const extension = path.extname(customImport);
