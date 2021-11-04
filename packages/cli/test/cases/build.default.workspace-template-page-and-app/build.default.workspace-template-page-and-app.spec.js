@@ -53,7 +53,7 @@ describe('Build Greenwood With: ', function() {
       await runner.runCommand(cliPath, 'build');
     });
 
-    runSmokeTest(['public', 'index'], LABEL);
+    runSmokeTest(['public'], LABEL);
 
     describe('Custom App and Page Templates', function() {
       let dom;
@@ -119,6 +119,30 @@ describe('Build Greenwood With: ', function() {
           expect(styleTags[2].textContent).to.contain('app-template-two-style');
           expect(styleTags[3].textContent).to.contain('page-template-one-style');
           expect(styleTags[4].textContent).to.contain('page-template-two-style');
+        });
+      });
+
+      describe('<head> "like" tags that should be in the <body>', function() {
+        let scriptTags;
+        let linkTags;
+        let styleTags;
+
+        before(function() {
+          scriptTags = dom.window.document.querySelectorAll('body > script');
+          linkTags = dom.window.document.querySelectorAll('body > link');
+          styleTags = dom.window.document.querySelectorAll('body > style');
+        });
+
+        it('should have 1 <script> tag in the <body>', function() {
+          expect(scriptTags.length).to.equal(1);
+        });
+
+        it('should have 1 <link> tag in the <body>', function() {
+          expect(linkTags.length).to.equal(1);
+        });
+
+        it('should have 1 <style> tag in the <body>', function() {
+          expect(styleTags.length).to.equal(1);
         });
       });
     });
