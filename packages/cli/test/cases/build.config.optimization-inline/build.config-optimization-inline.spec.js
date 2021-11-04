@@ -120,7 +120,7 @@ describe('Build Greenwood With: ', function() {
 
           expect(scriptTag.type).to.be.equal('module');
           // eslint-disable-next-line max-len
-          expect(scriptTag.textContent).to.be.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex(e=>new RegExp(`^${t}$`).test(e.route))}}console.log("644668726-scratch");export{t as Baz};');
+          expect(scriptTag.textContent).to.be.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex(e=>new RegExp(`^${t}$`).test(e.route))}}export{t as Baz};');
         });
       });
 
