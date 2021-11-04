@@ -22,7 +22,6 @@
       import '@evergreen-wc/eve-container';
     </script>
     
-    <script type="module" src="../components/footer/footer.js" data-gwd-opt="static"></script>
     <script type="module" src="../components/header/header.js" data-gwd-opt="static"></script>
     
   </head>
@@ -31,13 +30,10 @@
 
     <div class='gwd-wrapper'>
       <app-header></app-header>
-
-      <link rel="html" href="/includes/html-include-test.html"></link>
       
       <page-outlet></page-outlet>
       
-      <app-footer></app-footer>
-      <app-footer2 src="../components/footer/footer2.js"></app-footer2>
+      <app-footer src="../includes/footer.js"></app-footer2>
     </div>
 
   </body>

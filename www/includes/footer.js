@@ -1,6 +1,6 @@
 const getTemplate = async (data) => {
   return `
-    <app-footer2>
+    <app-footer>
       <style>
         footer {
           grid-area: footer;
@@ -33,11 +33,11 @@ const getTemplate = async (data) => {
           <a href="/">Greenwood v${data.version}</a> <span class="separator">&#9672</span> <a href="https://www.netlify.com/">This site is powered by Netlify</a>
         </h4>
       </footer>
-    </app-footer2>`;
+    </app-footer>`;
 };
 
 const getData = async () => {
-  const version = require('../../package.json').version;
+  const version = require('../package.json').version;
 
   return { version };
 };
