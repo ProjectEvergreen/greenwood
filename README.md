@@ -69,12 +69,3 @@ We would love your [contribution](.github/CONTRIBUTING.md) to Greenwood!  Please
 
 ## License
 See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
-
-
-% npx @greenwood/init
-Need to install the following packages:
-  @greenwood/init
-Ok to proceed? (y) y
-/Users/owenbuckley/.npm/_npx/ae5cf6ac02fe4bcd/node_modules/.bin/init: line 1: /Applications: is a directory
-/Users/owenbuckley/.npm/_npx/ae5cf6ac02fe4bcd/node_modules/.bin/init: line 2: syntax error near unexpected token `('
-/Users/owenbuckley/.npm/_npx/ae5cf6ac02fe4bcd/node_modules/.bin/init: line 2: `const copyFolder = require('./copy-folder');'
