@@ -1,0 +1,14 @@
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "greenwood develop",
+    "build": "greenwood build",
+    "serve": "greenwood serve"
+  },
+  "devDependencies": {
+    "@greenwood/cli": "^0.18.0"
+  },
+  "license": "ISC"
+}
