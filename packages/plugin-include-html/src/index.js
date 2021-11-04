@@ -4,7 +4,7 @@ const path = require('path');
 const htmlparser = require('node-html-parser');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
 
-class IncludeHtmlCssResource extends ResourceInterface {
+class IncludeHtmlResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
     this.extensions = ['.html'];
@@ -16,6 +16,7 @@ class IncludeHtmlCssResource extends ResourceInterface {
   }
 
   async intercept(url, body) {
+    console.debug('HTML Include plugin intercept?');
     return new Promise(async (resolve, reject) => {
       try {
         // TODO html-parser can't "handle" malformed HTML?
@@ -32,13 +33,16 @@ class IncludeHtmlCssResource extends ResourceInterface {
 
         // --------
 
-        const includeLinksRegexMatches = body.match(/<link (.*)><\/link>/g);
+        const includeLinksRegexMatches = body.match(/<link (.*)>/g);
         const includeCustomElementssRegexMatches = body.match(/<[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)>/g);
 
+        // console.debug('body', body)
+        // console.debug('includeLinksRegexMatches', includeLinksRegexMatches)
         if (includeLinksRegexMatches) {
           includeLinksRegexMatches
             .filter(link => link.indexOf('rel="html"') > 0)
             .forEach((link) => {
+              console.debug('link', link)
               const href = link.match(/href="(.*)"/)[1];
               const includeContents = fs.readFileSync(path.join(this.compilation.context.userWorkspace, href), 'utf-8');
 
@@ -70,5 +74,5 @@ class IncludeHtmlCssResource extends ResourceInterface {
 module.exports = (options = {}) => [{
   type: 'resource',
   name: 'plugin-include-html',
-  provider: (compilation) => new IncludeHtmlCssResource(compilation, options)
+  provider: (compilation) => new IncludeHtmlResource(compilation, options)
 }];
