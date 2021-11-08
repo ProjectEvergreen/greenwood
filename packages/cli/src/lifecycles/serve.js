@@ -129,8 +129,9 @@ function getProdServer(compilation) {
     // html is intentionally omitted
     return plugin.isGreenwoodDefaultPlugin
       && plugin.type === 'resource'
-      && plugin.name.indexOf('plugin-standard') >= 0
-      && plugin.name.indexOf('plugin-standard-html') < 0;
+      && ((plugin.name.indexOf('plugin-standard') >= 0 // allow standard web resources
+      && plugin.name.indexOf('plugin-standard-html') < 0) // but _not_ our markdown / HTML plugin
+      || plugin.name.indexOf('plugin-source-maps') >= 0); // and source maps
   }).map((plugin) => {
     return plugin.provider(compilation);
   });
