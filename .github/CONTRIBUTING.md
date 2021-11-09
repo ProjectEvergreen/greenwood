@@ -3,7 +3,7 @@
 ## Welcome!
 We're excited for your interest in Greenwood, and maybe even your contribution!
 
-> _We encourage all contributors to have first read about the project's vision and motivation's on the website's [About page](https://www.greenwoodjs.io/about/).  Greenwood is opinionated in the sense that is designed to support development for the web platform and deliver a first class developer experience tailored around that, so that anyone can create a modern and performant website (or webapp, if you prefer). So if that page is the "why", this page is the "how"._
+> _We encourage all contributors to have first read about the project's vision and motivation's on the website's [About page](https://www.greenwoodjs.io/about/).  Greenwood is opinionated in the sense that it is designed to support development for the web platform and deliver a first class developer experience tailored around that, so that anyone can create a modern and performant website (or webapp, if you prefer) knowing just standard web fundamentals. So if that page is the "why", this page is the "how"._
 
 ## Technical Design Overview
 
@@ -26,7 +26,7 @@ At a high level, this is how a command goes through the CLI:
 1. Lifecycles capture specific steps needed to build a site, serve it, generate a content dependency graph, etc.
 
 
-### Layout
+#### Layout
 The [layout](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src) of the CLI package is as follows:
 
 - _index.js_ - Front controller
@@ -38,10 +38,8 @@ The [layout](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/
 - _plugins/_ - Custom defaukt plugins maintained by the CLI project
 - _templates/_ - Default templates and / or pages provided by Grennwood.
 
-We'll focus on the most important two here:
 
-
-### Lifecycles
+#### Lifecycles
 Aside from the config and graph lifecycles, all lifecycles (and config files and plugins) typically expect a compilation object to be passed in.  
 
 Lifeycles include handling:
@@ -50,16 +48,34 @@ Lifeycles include handling:
 - prerendering a compilation for production
 - fetching external (content) data sources
 
+## Project Management
 
-## Issues
-Please make sure to have the following prepared (where applicable)
+We take advantage of quite a few features on GitHub to assist in tracking issues, bugs, ideas and more for the project.  We feel that being organized not only helps the team in planning out priorities and ownership, it's also a great way to add visisbility and transparency to those following the project.
+
+### Project Boardss
+
+Our [sequentially named project boards](https://github.com/ProjectEvergreen/greenwood/projects) help us organize work in quartery buckets with a small handful of "top line" goals and objectives we would like to focus on for the upcoming time box.  It also serves as a catch-all for the usual work and bug fixes that happen throughout general maintenance of the project and can also yield good oppourtunities for those interested in contributing to see what we would appreciate help with the most.
+
+### Discussions
+
+We believe good collaboration starts with good communication.  As with most of the open source community, Greenwood is a 100% volunteer project and we understand the importance of respecting everyones [time and expectations](https://www.jason.af/setting-expectations).  Although we don't mind issues being made, unless the issue is clearly actionable and falls in-line with the motiviations and trajectory of the project, then feel free to go ahead an open a [Discussion](https://github.com/ProjectEvergreen/greenwood/discussions) first.
+
+We encourage discussions as we believe it is better to hash out technical discussions and proposals ahead of time since coding and reviewing PRs is very time consuming and as maintainer's, we want to make sure everyone gets the time they are deserved for contributing and this helps us plan our time in advance to best ensure a smooth flow of contributions through the project.
+
+> _Put another way, we like to think of this approach as **measure twice, cut once**._
+
+### Issues
+We like to reserve issues for features and requests that are more or less "shovel" ready.  This could include prior discussions with the team or coming over from an existing Disussion.
+
+Our standard issue template reuests some of the following information to be prepared (where applicable)
 1. High Level Overview
-1. For bugs, please provide steps to reproduce 
-1. Code Sample
-1. Links / references
+1. Code Sample or API Design
+1. Links / references for more context
+
+For bugs, please provide steps to reproduce and expected vs actual behavior including screenshots.
 
 
-## Pull Requests
+### Pull Requests
 Pull requests are the best!  To best help facililate contributions to the project, here are some requests:
 - We generally prefer an issue be opened first, to help faciliate general discussion outside of the code review process itself and align on the ask and any expections.  However, for typos in docs and minor "chore" like tasks a PR is usually sufficient.  When in doubt, open an issue.
 - For bugs, please consider reviewing the issue tracker first.
@@ -83,7 +99,7 @@ To develop for the project, you'll want to follow these steps:
 1. Run `yarn install`
 1. Run `yarn lerna bootstrap`
 
-### Scripts
+### NPM Scripts
 The [Greenwood website](https://www.greenwoodjs.io/) is currently built by Greenwood, and all files for it are located in this repository under the [_www/_ directory](https://github.com/ProjectEvergreen/greenwood/tree/master/www) workspace.  In addition to unit tests, you will want to verify any changes by running the website locally.
 
 Below are the development tasks available for working on this project:
@@ -111,8 +127,8 @@ $ yarn add <package>
 Yarn workspaces will automatically handle installing _node_modules_ in the appropriate directory.
 
 
-## Unit Testing
-[TDD](https://en.wikipedia.org/wiki/Test-driven_development) is the recommended approach for developing for Greenwood and for the style of test writing we use [BDD style testing](https://en.wikipedia.org/wiki/Behavior-driven_development); "cases".  Cases are used to capture the various configurations and expected outputs of Gre enwood when running its commands, in a way that is closer to how a user would be expecting Greenwood to work.
+## Testing
+[TDD](https://en.wikipedia.org/wiki/Test-driven_development) is the recommended approach for developing for Greenwood and for the style of test writing we use [BDD style testing](https://en.wikipedia.org/wiki/Behavior-driven_development); "cases".  Cases are used to capture the various configurations and expected outputs of Greenwood when running its commands, in a way that mimics how a user would themselves be using Greenwood.
 
 ### Running Tests
 To run tests in watch mode, use:
@@ -150,7 +166,11 @@ Here are some thigns to keep in mind while writing your tests, due to the asynch
 - All usages of `JSDOM` should be wrapped in `async`
 - Avoid arrow functions in mocha tests (e.g. `() => `) as this [can cause unexpected behaviors.](https://mochajs.org/#arrow-functions).  Just use `function` instead.
 
-## Internet Explorer
+## Suppplemental Infomration
+
+Some additional information and context to help assist with developing for and contributing to Greenwood.
+
+### Internet Explorer / Windows
 For situations that require testing Internet Explorer or Edge browser, Microsoft provides [Virtual Machines](https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/) for various combinations of Windows and Internet Explorer versions.  [VirtualBox](https://www.virtualbox.org/) is a good platform to use for these VMs.
 
 To test from a VM, you can
@@ -159,7 +179,7 @@ To test from a VM, you can
 
 You can disable plugins in _webpack.config.prod.js_ to remove production optimizations for testing purposes.
 
-## npx Testing
+### npx Testing
 [`npx`](https://www.npmjs.com/package/npx) is a useful CLI utitlity bundled with NodeJS that allows users to run npm packages globally but without having to install them.
 
 ```sh
@@ -191,7 +211,7 @@ Running Greenwood with the  command.
           info at https://www.greenwoodjs.io/docs/.
 ```
 
-## Docker
+### Docker
 A Docker container is available within the project to use as a development environment if you like.  It is configured to use the same image that runs as part of the project's [Continuous Integration environment](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/ci.yml#L9).
 
 First make sure you have [Docker installed](https://www.docker.com/products/docker-desktop).
