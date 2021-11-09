@@ -231,3 +231,15 @@ When you're done with the container:
 1. Destroy the container: `$ docker rm greenwood`
 
 Note: If you have issues running tests due to timeouts, you can increase the setting in [package.json](https://github.com/ProjectEvergreen/greenwood/blob/master/package.json#L23)
+
+## Release Management
+
+Lerna is used to manage the publishing of packages within the workspace.  Assuming your are logged into **npm** locally and have 2FA access to publish, the command to run is
+```sh
+# from the root of the repo
+$ yarn lerna publish
+```
+
+Lerna should then prompt you through the steps to pick the version and all packages that will get updated.
+
+> _Sometimes when doing pre-minor releases, it will be required to manually bump the `version` in www/package.json_
