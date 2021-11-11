@@ -1,15 +1,16 @@
 {
-  "name": "@greenwood/plugin-google-analytics",
+  "name": "@greenwood/plugin-include-html",
   "version": "0.19.0",
-  "description": "A Greenwood plugin adding support for Google Analytics JavaScript tracker.",
-  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-google-analytics",
+  "description": "A Greenwood plugin to let you render server side JS from HTML or JS at build time as HTML.",
+  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-include-html",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "keywords": [
     "Greenwood",
     "Static Site Generator",
-    "Web Components",
-    "Google Analytics"
+    "NodeJS",
+    "HTML",
+    "HTML Include"
   ],
   "main": "src/index.js",
   "files": [

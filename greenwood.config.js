@@ -1,5 +1,6 @@
 const path = require('path');
 const pluginGraphQL = require('@greenwood/plugin-graphql');
+const pluginIncludeHtml = require('@greenwood/plugin-include-html');
 const pluginImportCss = require('@greenwood/plugin-import-css');
 const pluginImportJson = require('@greenwood/plugin-import-json');
 const pluginPolyfills = require('@greenwood/plugin-polyfills');
@@ -45,7 +46,8 @@ module.exports = {
           })
         ];
       }
-    }
+    },
+    ...pluginIncludeHtml()
   ],
   markdown: {
     plugins: [
