@@ -71,10 +71,10 @@ const copyAssets = (compilation) => {
     try {
       const copyPlugins = compilation.config.plugins.filter(plugin => plugin.type === 'copy');
 
-      for (plugin of copyPlugins) {
+      for (const plugin of copyPlugins) {
         const locations = plugin.provider(compilation);
 
-        for (location of locations) {
+        for (const location of locations) {
           const { from, to } = location;
 
           if (path.extname(from) === '') {
