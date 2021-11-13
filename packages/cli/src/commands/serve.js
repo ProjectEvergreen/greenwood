@@ -9,7 +9,7 @@ const runProdServer = async () => {
       const compilation = await generateCompilation();
       const port = 8080;
       
-      prodServer(compilation).listen(port, () => {
+      (await prodServer(compilation)).listen(port, () => {
         console.info(`Started production test server at localhost:${port}`);
       });
     } catch (err) {
