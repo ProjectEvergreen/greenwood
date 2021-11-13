@@ -87,7 +87,7 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command with image (png) specific behavior', function() {
+    describe('Serve command with image (png) specific behavior', function() {
       const ext = 'png';
       let response = {};
 
@@ -123,7 +123,7 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command with image (ico) specific behavior', function() {
+    describe('Serve command with image (ico) specific behavior', function() {
       let response = {};
 
       before(async function() {
@@ -157,7 +157,7 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command with SVG specific behavior', function() {
+    describe('Serve command with SVG specific behavior', function() {
       const ext = 'svg';
       let response = {};
 
@@ -192,7 +192,7 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command with font specific (.woff) behavior', function() {
+    describe('Serve command with font specific (.woff) behavior', function() {
       const ext = 'woff';
       let response = {};
 
@@ -227,7 +227,7 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command with JSON specific behavior', function() {
+    describe('Serve command with JSON specific behavior', function() {
       let response = {};
 
       before(async function() {
@@ -260,6 +260,41 @@ describe('Serve Greenwood With: ', function() {
         done();
       });
     });
+
+    describe('Serve command with source map specific behavior', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/assets/router.js.map`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('application/json');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(response.body).to.contain('"sources":["../packages/cli/src/lib/router.js"]');
+        done();
+      });
+    });
+
   });
 
   after(function() {
