@@ -61,12 +61,14 @@ describe('Build Greenwood With: ', function() {
     describe('MPA (Multi Page Application)', function() {
       let dom;
       let aboutDom;
+      let pages;
       let partials;
       let routerFiles;
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
         aboutDom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'about/index.html'));
+        pages = await glob(`${this.context.publicDir}/*.html`);
         partials = await glob(`${this.context.publicDir}/_routes/**/*.html`);
         routerFiles = await glob(`${this.context.publicDir}/router.*.js`);
       });
@@ -124,6 +126,14 @@ describe('Build Greenwood With: ', function() {
         expect(aboutRouteTag.length).to.be.equal(1);
         expect(dataset.template).to.be.equal('page');
         expect(dataset.key).to.be.equal('/_routes/index.html');
+      });
+
+      // tests to make sure we filter out 404 page from _route partials
+      it('should have the expected top level HTML files (index.html, 404.html) in the output', function() {
+        // const aboutPartial = fs.readFileSync(path.join(this.context.publicDir, '*.html'), 'utf-8');
+        // const aboutRouterOutlet = aboutDom.window.document.querySelectorAll('body > router-outlet')[0];
+
+        expect(pages.length).to.equal(2);
       });
 
       it('should have the expected number of _route partials in the output directory for each page', function() {

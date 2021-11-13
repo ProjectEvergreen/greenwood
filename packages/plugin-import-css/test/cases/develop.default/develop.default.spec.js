@@ -84,9 +84,12 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
 
+      // https://github.com/ProjectEvergreen/greenwood/issues/766
+      // https://unpkg.com/browse/bootstrap@4.6.1/dist/css/bootstrap.css
+      // https://unpkg.com/browse/font-awesome@4.7.0/css/font-awesome.css
       it('should return an ECMASCript module', function(done) {
-        expect(response.body.replace('\n', ''))
-          .to.equal('const css = `* {   color: \\\'blue\\\';   background-image: url("/assets/background.jpg");   content: \\"\\";   font-family: \'Arial\' }`;export default css;');
+        expect(response.body.replace('\n', '').replace(/ /g, '').trim())
+          .to.equal('constcss=`*{background-image:url("/assets/background.jpg");font-family:\'Arial\'}.blockquote-footer::before{content:"\\\\2014\\\\00A0";}.fa-chevron-right:before{content:"\\\\f054";}`;exportdefaultcss;'); // eslint-disable-line max-len
         done();
       });
     });

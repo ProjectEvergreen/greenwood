@@ -1,16 +1,16 @@
 {
-  "name": "@greenwood/plugin-import-css",
+  "name": "@greenwood/plugin-include-html",
   "version": "0.19.1",
-  "description": "A Greenwood plugin to allow you to use ESM (import) syntax to load your CSS.",
-  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-css",
+  "description": "A Greenwood plugin to let you render server side JS from HTML or JS at build time as HTML.",
+  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-include-html",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "keywords": [
     "Greenwood",
-    "CommonJS",
     "Static Site Generator",
     "NodeJS",
-    "Css-in-Js"
+    "HTML",
+    "HTML Include"
   ],
   "main": "src/index.js",
   "files": [
@@ -21,9 +21,6 @@
   },
   "peerDependencies": {
     "@greenwood/cli": "^0.4.0"
-  },
-  "dependencies": {
-    "rollup-plugin-postcss": "^3.1.5"
   },
   "devDependencies": {
     "@greenwood/cli": "^0.19.1"
