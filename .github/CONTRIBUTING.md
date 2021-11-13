@@ -3,7 +3,7 @@
 ## Welcome!
 We're excited for your interest in Greenwood, and maybe even your contribution!
 
-> _We encourage all contributors to have first read about the project's vision and motivation's on the website's [About page](https://www.greenwoodjs.io/about/).  Greenwood is opinionated in the sense that it is designed to support development for the web platform and deliver a first class developer experience tailored around that, so that anyone can create a modern and performant website (or webapp, if you prefer) knowing just standard web fundamentals. So if that page is the "why", this page is the "how"._
+> _We encourage all contributors to first read about the project's vision and motivation's on the website's [About page](https://www.greenwoodjs.io/about/).  Greenwood is opinionated in the sense that it is designed to support development for the modern web platform and aims to deliver a first class developer experience tailored for that expectation.  So if that page is the "why", this page is the "how"._
 
 ## Technical Design Overview
 
@@ -14,7 +14,7 @@ The two main directories are:
 - [_www/_](https://github.com/ProjectEvergreen/greenwood/tree/master/www) - [website](https://www.greenwoodjs.io) / documentation code
 
 
-> _This guide is mainly intended to walk through the **cli** package, it being the principal pacakge within the project supporting all other packages._
+> _This guide is mainly intended to walk through the **cli** package; it being the principal pacakge within the project supporting all other packages._
 
 ### CLI
 
@@ -52,20 +52,20 @@ Lifeycles include handling:
 
 We take advantage of quite a few features on GitHub to assist in tracking issues, bugs, ideas and more for the project.  We feel that being organized not only helps the team in planning out priorities and ownership, it's also a great way to add visisbility and transparency to those following the project.
 
-### Project Boardss
+### Project Boards
 
-Our [sequentially named project boards](https://github.com/ProjectEvergreen/greenwood/projects) help us organize work in quartery buckets with a small handful of "top line" goals and objectives we would like to focus on for the upcoming time box.  It also serves as a catch-all for the usual work and bug fixes that happen throughout general maintenance of the project and can also yield good oppourtunities for those interested in contributing to see what we would appreciate help with the most.
+Our [sequentially named project boards](https://github.com/ProjectEvergreen/greenwood/projects) help us organize work inro quarterly buckets that will generally include a small handful of "top line" goals and objectives we would like to focus on for that particular time box.  It also serves as a catch-all for the usual work and bug fixes that happens throughout general maintenance of the project.  Additionally, we leverage this as a means to shine insight into good opportunities for those interested in contributing as what the Greenwood team would appreciate help with the most.
 
 ### Discussions
 
-We believe good collaboration starts with good communication.  As with most of the open source community, Greenwood is a 100% volunteer project and we understand the importance of respecting everyones [time and expectations](https://www.jason.af/setting-expectations).  Although we don't mind issues being made, unless the issue is clearly actionable and falls in-line with the motiviations and trajectory of the project, then feel free to go ahead an open a [Discussion](https://github.com/ProjectEvergreen/greenwood/discussions) first.
+We believe good collaboration starts with good communication.  As with most of the open source community, Greenwood is a 100% volunteer project and so we understand the importance of respecting everyones [time and expectations](https://www.jason.af/setting-expectations) when it comes to contributing and investing in a project.  Although we don't mind issues being made, unless the issue is clearly actionable and falls in-line with the motiviations and trajectory of the project, then feel free to go ahead an open a [Discussion](https://github.com/ProjectEvergreen/greenwood/discussions) first.
 
-We encourage discussions as we believe it is better to hash out technical discussions and proposals ahead of time since coding and reviewing PRs is very time consuming and as maintainer's, we want to make sure everyone gets the time they are deserved for contributing and this helps us plan our time in advance to best ensure a smooth flow of contributions through the project.
+We encourage discussions as we believe it is better to hash out technical discussions and proposals ahead of time since coding and reviewing PRs are very time consuming activities.  As maintainer's, we want to make sure everyone gets the time they are desere for contributing and this this workflow helps us plan our time in advance to best ensure a smooth flow of contributions through the project.
 
 > _Put another way, we like to think of this approach as **measure twice, cut once**._
 
 ### Issues
-We like to reserve issues for features and requests that are more or less "shovel" ready.  This could include prior discussions with the team or coming over from an existing Disussion.
+We like to reserve issues for features and requests that are more or less "shovel" ready wtih clear implementation details at hand.  This could include prior discussions with the team or action items coming out from an existing disussion.
 
 Our standard issue template reuests some of the following information to be prepared (where applicable)
 1. High Level Overview
@@ -166,7 +166,7 @@ Here are some thigns to keep in mind while writing your tests, due to the asynch
 - All usages of `JSDOM` should be wrapped in `async`
 - Avoid arrow functions in mocha tests (e.g. `() => `) as this [can cause unexpected behaviors.](https://mochajs.org/#arrow-functions).  Just use `function` instead.
 
-## Suppplemental Infomration
+## Suppplemental Information
 
 Some additional information and context to help assist with developing for and contributing to Greenwood.
 
@@ -234,10 +234,13 @@ Note: If you have issues running tests due to timeouts, you can increase the set
 
 ## Release Management
 
-Lerna is used to manage the publishing of packages within the workspace.  Assuming your are logged into **npm** locally and have 2FA access to publish, the command to run is
+Lerna is used to manage the publishing of packages within the workspace under a single unified version.  Assuming your are logged into **npm** locally and have 2FA access to publish, the command to run is
 ```sh
 # from the root of the repo
 $ yarn lerna publish
+
+# if Lerna is not displaying all pacakges as needing publishing, cancel and use
+$ yarn lerna publish --force-publish
 ```
 
 Lerna should then prompt you through the steps to pick the version and all packages that will get updated.
