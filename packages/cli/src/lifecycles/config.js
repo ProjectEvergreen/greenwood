@@ -19,7 +19,12 @@ const greenwoodPlugins = (await Promise.all([
       ? plugin
       : [plugin];
   }))).flat();
-}).flat())).flat();
+}).flat())).flat().map((plugin) => {
+  return {
+    isGreenwoodDefaultPlugin: true,
+    ...plugin
+  };
+});
 
 const modes = ['ssg', 'mpa', 'spa'];
 const optimizations = ['default', 'none', 'static', 'inline'];

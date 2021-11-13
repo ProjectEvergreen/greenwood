@@ -208,7 +208,7 @@ const getProdServer = async(compilation) => {
     ctx.body = reducedResponse.body;
   });
     
-  return app;
+  return Promise.resolve(app);
 };
 
 export { 
