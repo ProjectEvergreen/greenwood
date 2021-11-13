@@ -10,10 +10,10 @@ import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js'
 
 async function getConfig (compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
-  const configFile = 'postcss.config.js';
-  const defaultConfig = (await import(new URL(configFile, import.meta.url).pathname)).default;
-  const userConfig = fs.existsSync(path.join(projectDirectory, `${configFile}`))
-    ? (await import(path.join(projectDirectory, `${configFile}`))).default
+  const configFile = 'postcss.config';
+  const defaultConfig = (await import(new URL(`${configFile}.js`, import.meta.url).pathname)).default;
+  const userConfig = fs.existsSync(path.join(projectDirectory, `${configFile}.mjs`))
+    ? (await import(path.join(projectDirectory, `${configFile}.mjs`))).default
     : {};
   let finalConfig = Object.assign({}, userConfig);
 
