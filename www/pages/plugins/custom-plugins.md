@@ -14,6 +14,7 @@ The available plugins built and maintained by Greenwood team and contributors ha
 |---|---|
 | [Babel](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-babel) | Allows usage of [**Babel**](https://babeljs.io/) plugins, presets, and configuration in your project. |
 | [Google Analytics](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-google-analytics) | Easily add usage tracking to your site with Google Analytics. |
+| [Include HTML](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-include-html) | Provides additional methods for generating static HTML at build time, inspired by the original [HTML Imports spec](https://www.html5rocks.com/en/tutorials/webcomponents/imports/). |
 | [Import CommonJs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-commonjs) | Enables usage of `import` syntax for loading CommonJS modules from _node_modules_. |
 | [Import CSS](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-css) | Enables usage of `import` syntax for loading CSS files. |
 | [Import JSON](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-json) | Enables usage of `import` syntax for loading JSON files. |
