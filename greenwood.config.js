@@ -5,7 +5,6 @@ import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
 // const pluginPolyfills = require('@greenwood/plugin-polyfills');
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
-// const rollupPluginAnalyzer = require('rollup-plugin-analyzer');
 import { URL } from 'url';
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
