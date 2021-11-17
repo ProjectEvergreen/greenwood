@@ -4,6 +4,7 @@ import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
 import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
 // const pluginPolyfills = require('@greenwood/plugin-polyfills');
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
+import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 // const rollupPluginAnalyzer = require('rollup-plugin-analyzer');
 import { URL } from 'url';
 
@@ -32,21 +33,21 @@ export default {
     // ...pluginPolyfills(),
     greenwoodPluginPostCss(),
     ...greenwoodPluginImportJson(),
-    ...greenwoodPluginImportCss()
-    // {
-    //   type: 'rollup',
-    //   name: 'rollup-plugin-analyzer',
-    //   provider: () => {
-    //     return [
-    //       rollupPluginAnalyzer({
-    //         summaryOnly: true,
-    //         filter: (module) => {
-    //           return !module.id.endsWith('.html');
-    //         }
-    //       })
-    //     ];
-    //   }
-    // }
+    ...greenwoodPluginImportCss(),
+    {
+      type: 'rollup',
+      name: 'rollup-plugin-analyzer',
+      provider: () => {
+        return [
+          rollupPluginAnalyzer({
+            summaryOnly: true,
+            filter: (module) => {
+              return !module.id.endsWith('.html');
+            }
+          })
+        ];
+      }
+    }
     // ...pluginIncludeHtml()
   ],
   markdown: {
