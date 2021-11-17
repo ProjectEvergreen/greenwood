@@ -1,4 +1,4 @@
-import { greenwoodPluginGraphQL } from '@greenwood/plugin-gr>>>>>>> e57bcc13 (init upgrade graphql plugin to ESM)
+import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
 // const pluginIncludeHtml = require('@greenwood/plugin-include-html');
 import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
 import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
