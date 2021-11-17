@@ -2,7 +2,7 @@ import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
 import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
 import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
 import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
-// const pluginPolyfills = require('@greenwood/plugin-polyfills');
+import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 import { URL } from 'url';
@@ -29,7 +29,7 @@ export default {
   ],
   plugins: [
     ...greenwoodPluginGraphQL(),
-    // ...pluginPolyfills(),
+    ...greenwoodPluginPolyfills(),
     greenwoodPluginPostCss(),
     ...greenwoodPluginImportJson(),
     ...greenwoodPluginImportCss(),

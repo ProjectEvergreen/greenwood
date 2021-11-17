@@ -72,7 +72,7 @@ const copyAssets = (compilation) => {
       const copyPlugins = compilation.config.plugins.filter(plugin => plugin.type === 'copy');
 
       for (const plugin of copyPlugins) {
-        const locations = plugin.provider(compilation);
+        const locations = await plugin.provider(compilation);
 
         for (const location of locations) {
           const { from, to } = location;
