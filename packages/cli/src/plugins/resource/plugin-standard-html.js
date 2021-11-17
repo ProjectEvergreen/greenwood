@@ -361,13 +361,13 @@ class StandardHtmlResource extends ResourceInterface {
           const rehypePlugins = [];
           const remarkPlugins = [];
 
-          for (const plugin in config.markdown.plugins) {
+          for (const plugin of config.markdown.plugins) {
             if (plugin.indexOf('rehype-') >= 0) {
-              rehypePlugins.push(await import(plugin));
+              rehypePlugins.push((await import(plugin)).default);
             }
 
             if (plugin.indexOf('remark-') >= 0) {
-              remarkPlugins.push(await import(plugin));
+              remarkPlugins.push((await import(plugin)).default);
             }
           }
 
