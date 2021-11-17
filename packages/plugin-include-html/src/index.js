@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
+import fs from 'fs';
+import path from 'path';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class IncludeHtmlResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -36,7 +36,7 @@ class IncludeHtmlResource extends ResourceInterface {
           for (const tag of customElementTags) {
             const src = tag.match(/src="(.*)"/)[1];
             const filepath = path.join(this.compilation.context.userWorkspace, this.getBareUrlPath(src.replace(/\.\.\//g, '')));
-            const { getData, getTemplate } = require(filepath);
+            const { getData, getTemplate } = await import(filepath);
             const includeContents = await getTemplate(await getData());
 
             body = body.replace(tag, includeContents);
@@ -51,8 +51,10 @@ class IncludeHtmlResource extends ResourceInterface {
   }
 }
 
-module.exports = (options = {}) => [{
+const greenwoodPluginIncludeHTML = (options = {}) => [{
   type: 'resource',
   name: 'plugin-include-html',
   provider: (compilation) => new IncludeHtmlResource(compilation, options)
 }];
+
+export { greenwoodPluginIncludeHTML };

@@ -1,5 +1,5 @@
 import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
-// const pluginIncludeHtml = require('@greenwood/plugin-include-html');
+import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
 import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
 import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
 // const pluginPolyfills = require('@greenwood/plugin-polyfills');
@@ -46,8 +46,8 @@ export default {
           })
         ];
       }
-    }
-    // ...pluginIncludeHtml()
+    },
+    ...greenwoodPluginIncludeHTML()
   ],
   markdown: {
     plugins: [
