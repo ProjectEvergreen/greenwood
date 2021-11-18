@@ -234,7 +234,7 @@ Note: If you have issues running tests due to timeouts, you can increase the set
 
 ## Release Management
 
-Lerna is used to manage the publishing of packages within the workspace under a single unified version.  Assuming your are logged into **npm** locally and have 2FA access to publish, the command to run is
+Lerna is used to manage the publishing of packages within the workspace under a single unified version.  Assuming you are logged into **npm** locally and have 2FA access to publish, the command to run is
 ```sh
 # from the root of the repo
 $ yarn lerna publish
