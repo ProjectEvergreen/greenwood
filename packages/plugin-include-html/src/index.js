@@ -1,4 +1,3 @@
-/* eslint-disable */
 const fs = require('fs');
 const path = require('path');
 const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
@@ -32,11 +31,11 @@ class IncludeHtmlResource extends ResourceInterface {
         }
 
         if (includeCustomElementssRegexMatches) {
-          const customElementTags = includeCustomElementssRegexMatches.filter(customElementTag => customElementTag.indexOf('src=') > 0)
+          const customElementTags = includeCustomElementssRegexMatches.filter(customElementTag => customElementTag.indexOf('src=') > 0);
 
-          for(const tag of customElementTags) {
+          for (const tag of customElementTags) {
             const src = tag.match(/src="(.*)"/)[1];
-            const filepath = path.join(this.compilation.context.userWorkspace, this.getBareUrlPath(src.replace(/\.\.\//g, '')))
+            const filepath = path.join(this.compilation.context.userWorkspace, this.getBareUrlPath(src.replace(/\.\.\//g, '')));
             const { getData, getTemplate } = require(filepath);
             const includeContents = await getTemplate(await getData());
 
