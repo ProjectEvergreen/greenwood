@@ -316,7 +316,7 @@ class StandardHtmlResource extends ResourceInterface {
   async shouldServe(url, headers) {
     const { pagesDir } = this.compilation.context;
     const relativeUrl = this.getRelativeUserworkspaceUrl(url);
-    const isClientSideRoute = this.compilation.config.mode === 'spa' && (headers.request.accept || '').indexOf(this.contentType) >= 0;
+    const isClientSideRoute = this.compilation.config.mode === 'spa' && path.extname(url) === '' && (headers.request.accept || '').indexOf(this.contentType) >= 0;
     const barePath = relativeUrl.endsWith(path.sep)
       ? `${pagesDir}${relativeUrl}index`
       : `${pagesDir}${relativeUrl.replace('.html', '')}`;
