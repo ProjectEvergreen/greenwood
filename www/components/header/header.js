@@ -43,6 +43,8 @@ class HeaderComponent extends LitElement {
   /* eslint-disable indent */
   render() {
     const { navigation } = this;
+    const activeRoute = window.location.pathname;
+
     return html`
       <header class="header">
         <eve-container fluid>
@@ -60,8 +62,13 @@ class HeaderComponent extends LitElement {
             <nav>
               <ul>
                 ${navigation.map((item) => {
+                  const isCurentPageLink = activeRoute.indexOf(item.route) >= 0;
+                  const activeClassName = isCurentPageLink ? 'active' : '';
+
                   return html`
-                    <li><a href="${item.route}" title="Click to visit the ${item.label} page">${item.label}</a></li>
+                    <li>
+                      <a href="${item.route}" title="Click to visit the ${item.label} page" class="${activeClassName}">${item.label}</a>
+                    </li>
                   `;
                 })}
               </ul>
