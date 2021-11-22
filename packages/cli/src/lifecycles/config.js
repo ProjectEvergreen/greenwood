@@ -25,7 +25,7 @@ const greenwoodPlugins = [
     };
   });
 
-const modes = ['ssg', 'mpa', 'spa'];
+const modes = ['ssg', 'mpa', 'spa', 'ssr'];
 const optimizations = ['default', 'none', 'static', 'inline'];
 const pluginTypes = ['copy', 'context', 'resource', 'rollup', 'server'];
 const defaultConfig = {
@@ -43,6 +43,7 @@ const defaultConfig = {
   markdown: { plugins: [], settings: {} },
   prerender: true,
   pagesDirectory: 'pages',
+  routesDirectory: 'routes',
   templatesDirectory: 'templates'
 };
 

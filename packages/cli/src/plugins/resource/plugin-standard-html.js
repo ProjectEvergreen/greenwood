@@ -314,9 +314,12 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async shouldServe(url, headers) {
-    const { pagesDir } = this.compilation.context;
+    const { pagesDir, routesDir } = this.compilation.context;
     const relativeUrl = this.getRelativeUserworkspaceUrl(url);
     const isClientSideRoute = this.compilation.config.mode === 'spa' && path.extname(url) === '' && (headers.request.accept || '').indexOf(this.contentType) >= 0;
+    const isServerSideRoute = this.compilation.config.mode === 'ssr' && path.extname(url) === ''
+      && (headers.request.accept || '').indexOf(this.contentType) >= 0
+      && fs.existsSync(path.join(routesDir, `${url.replace(/\//g, '')}.js`));
     const barePath = relativeUrl.endsWith(path.sep)
       ? `${pagesDir}${relativeUrl}index`
       : `${pagesDir}${relativeUrl.replace('.html', '')}`;
@@ -325,14 +328,15 @@ class StandardHtmlResource extends ResourceInterface {
       || path.extname(relativeUrl) === '') && (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index')
       || fs.existsSync(`${barePath}.md`)
       || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
-      || isClientSideRoute;
+      || isClientSideRoute
+      || isServerSideRoute;
   }
 
   async serve(url) {
     return new Promise(async (resolve, reject) => {
       try {
         const config = Object.assign({}, this.compilation.config);
-        const { pagesDir, userTemplatesDir, userWorkspace } = this.compilation.context;
+        const { pagesDir, routesDir, userTemplatesDir, userWorkspace } = this.compilation.context;
         const { mode } = this.compilation.config;
         const normalizedUrl = this.getRelativeUserworkspaceUrl(url);
         const userHasOwn404 = fs.existsSync(path.join(userWorkspace, 'pages/404.html')) || fs.existsSync(path.join(userWorkspace, 'pages/404.md'));
@@ -349,6 +353,7 @@ class StandardHtmlResource extends ResourceInterface {
         const isMarkdownContent = fs.existsSync(`${barePath}.md`)
           || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
           || fs.existsSync(`${barePath.replace(`${path.sep}index`, '.md')}`);
+        const isServerSideRoute = this.compilation.config.mode === 'ssr' && fs.existsSync(path.join(routesDir, `${url.replace(/\//g, '')}.js`));
         
         if (isMarkdownContent) {
           const markdownPath = fs.existsSync(`${barePath}.md`)
@@ -410,7 +415,21 @@ class StandardHtmlResource extends ResourceInterface {
         if (mode === 'spa') {
           body = fs.readFileSync(this.compilation.graph[0].path, 'utf-8');
         } else {
-          body = getPageTemplate(barePath, userTemplatesDir, template, contextPlugins, pagesDir);
+          if (isServerSideRoute) {
+            const routeLocation = path.join(routesDir, `${url.replace(/\//g, '')}.js`);
+
+            if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
+              delete require.cache[routeLocation];
+            }
+
+            const { getTemplate } = require(path.join(routesDir, `${url.replace(/\//g, '')}.js`));
+
+            if (getTemplate) {
+              body = await getTemplate();
+            }
+          } else {
+            body = getPageTemplate(barePath, userTemplatesDir, template, contextPlugins, pagesDir);
+          }
         }
 
         body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);  

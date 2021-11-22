@@ -11,6 +11,7 @@ module.exports = initContexts = async({ config }) => {
       const projectDirectory = process.cwd();
       const userWorkspace = path.join(config.workspace);
       const pagesDir = path.join(userWorkspace, `${config.pagesDirectory}/`);
+      const routesDir = path.join(userWorkspace, `${config.routesDirectory}/`);
       const userTemplatesDir = path.join(userWorkspace, `${config.templatesDirectory}/`);
 
       const context = {
@@ -18,6 +19,7 @@ module.exports = initContexts = async({ config }) => {
         outputDir,
         userWorkspace,
         pagesDir,
+        routesDir,
         userTemplatesDir,
         scratchDir,
         projectDirectory
