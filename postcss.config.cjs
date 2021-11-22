@@ -1,5 +1,5 @@
-export default {
+module.exports = {
   plugins: [
-    (await import('postcss-nested')).default
+    require('postcss-nested')
   ]
 };
