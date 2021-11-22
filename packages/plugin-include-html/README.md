@@ -1,7 +1,7 @@
 # @greenwood/plugin-include-html
 
 ## Overview
-In the spirit of the since [abandoned HTML Imports spec](https://www.html5rocks.com/en/tutorials/webcomponents/imports/) that was originally part of the init Web Components "feature suite", and given the renewed [interest in bringing it back](https://github.com/whatwg/html/issues/2791), this plugin adds expiremental support to realize the HTML Includes "spec" as a build time templating system for HTML.  The goal here is to enable developers the ability to ship more static HTML while allowing the authoring context to be JavaScript **and** leveraging standard semantics and web expectations._ 💚 
+In the spirit of the since [abandoned HTML Imports spec](https://www.html5rocks.com/en/tutorials/webcomponents/imports/) that was originally part of the init Web Components "feature suite", and given the renewed [interest in bringing it back](https://github.com/whatwg/html/issues/2791), this plugin adds expiremental support to realize the HTML Includes "spec" as a build time templating system for HTML.  The goal here is to enable developers the ability to ship more static HTML while allowing the authoring context to be JavaScript **and** leveraging standard semantics and web expectations. 💚 
 
 > **Note**: I think if you want this feature in its most strictest sense of the word, I would recommend the [**<html-include>**](https://github.com/justinfagnani/html-include-element) custom element, which provides a runtime implementation of this as a Web Component.
 
