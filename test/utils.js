@@ -1,5 +1,5 @@
-const glob = require('glob-promise');
-const path = require('path');
+import glob from 'glob-promise';
+import path from 'path';
 
 function tagsMatch(tagName, html, expected = null) {
   const openTagRegex = new RegExp(`<${tagName}`, 'g');
@@ -40,7 +40,7 @@ async function getDependencyFiles(sourcePath, outputPath) {
   });
 }
 
-module.exports = {
+export {
   getDependencyFiles,
   getOutputTeardownFiles,
   getSetupFiles,

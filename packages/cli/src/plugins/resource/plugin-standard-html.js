@@ -53,7 +53,8 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], 
       : fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
   } else if (is404Page && !fs.existsSync(path.join(pagesDir, '404.html'))) {
     // handle default 404.html
-    contents = fs.readFileSync(path.join(__dirname, '../../templates/404.html'), 'utf-8');
+    // path.dirname(new URL('', import.meta.url).pathname)
+    contents = fs.readFileSync(path.join(path.dirname(new URL('', import.meta.url).pathname), '../../templates/404.html'), 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
     contents = fs.readFileSync(new URL('../../templates/page.html', import.meta.url), 'utf-8');
