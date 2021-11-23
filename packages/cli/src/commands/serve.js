@@ -1,5 +1,5 @@
 const generateCompilation = require('../lifecycles/compile');
-const { prodServer } = require('../lifecycles/serve');
+const { staticServer, hybridServer } = require('../lifecycles/serve');
 
 module.exports = runProdServer = async () => {
 
@@ -8,9 +8,10 @@ module.exports = runProdServer = async () => {
     try {
       const compilation = await generateCompilation();
       const port = 8080;
-      
-      prodServer(compilation).listen(port, () => {
-        console.info(`Started production test server at localhost:${port}`);
+      const server = compilation.config.mode === 'ssr' ? hybridServer : staticServer;
+
+      server(compilation).listen(port, () => {
+        console.info(`Started server at localhost:${port}`);
       });
     } catch (err) {
       reject(err);

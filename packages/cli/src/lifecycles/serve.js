@@ -123,7 +123,7 @@ function getDevServer(compilation) {
   return app;
 }
 
-function getProdServer(compilation) {
+function getStaticServer(compilation, composable) {
   const app = new Koa();
   const standardResources = compilation.config.plugins.filter((plugin) => {
     // html is intentionally omitted
@@ -141,16 +141,20 @@ function getProdServer(compilation) {
     const { mode } = compilation.config;
     const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
 
+    // only handle static output routes, eg. public/about.html
     if (url.endsWith('/') || url.endsWith('.html')) {
       const barePath = mode === 'spa'
         ? 'index.html'
         : url.endsWith('/')
           ? path.join(url, 'index.html')
           : url;
-      const contents = await fs.promises.readFile(path.join(outputDir, barePath), 'utf-8');
-      
-      ctx.set('content-type', 'text/html');
-      ctx.body = contents;
+
+      if (fs.existsSync(path.join(outputDir, barePath))) {
+        const contents = await fs.promises.readFile(path.join(outputDir, barePath), 'utf-8');
+
+        ctx.set('content-type', 'text/html');
+        ctx.body = contents;
+      }
     }
 
     await next();
@@ -174,7 +178,7 @@ function getProdServer(compilation) {
     await next();
   });
 
-  app.use(async (ctx) => {
+  app.use(async (ctx, next) => {
     const responseAccumulator = {
       body: ctx.body,
       contentType: ctx.response.header['content-type']
@@ -207,12 +211,48 @@ function getProdServer(compilation) {
 
     ctx.set('content-type', reducedResponse.contentType);
     ctx.body = reducedResponse.body;
+
+    if (composable) {
+      await next();
+    }
+  });
+
+  return app;
+}
+
+function getHybridServer(compilation) {
+  const app = getStaticServer(compilation, true);
+
+  app.use(async (ctx, next) => {
+    const { routesDir } = compilation.context;
+    const { mode } = compilation.config;
+    const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
+
+    if (url.endsWith('/') && mode === 'ssr') {
+      if (fs.existsSync(path.join(routesDir, `${url.replace(/\//g, '')}.js`))) {
+        const standardHtmlResource = compilation.config.plugins.filter((plugin) => {
+          // html is intentionally omitted
+          return plugin.isGreenwoodDefaultPlugin
+            && plugin.type === 'resource'
+            && plugin.name.indexOf('plugin-standard-html') === 0;
+        }).map((plugin) => {
+          return plugin.provider(compilation);
+        })[0];
+        const response = await standardHtmlResource.serve(url);
+
+        ctx.status = 200;
+        ctx.set('content-type', response.contentType);
+        ctx.body = response.body;
+      }
+    };
   });
     
   return app;
 }
 
+
 module.exports = {
   devServer: getDevServer,
-  prodServer: getProdServer
-};
+  staticServer: getStaticServer,
+  hybridServer: getHybridServer
+}
