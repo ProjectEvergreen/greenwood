@@ -449,7 +449,7 @@ describe('Develop Greenwood With: ', function() {
     describe('Develop command specific HTML behaviors', function() {
       let response = {};
       let dom;
-      let expectedImportMap = {};
+      let expectedImportMap;
 
       before(async function() {
         return new Promise((resolve, reject) => {
@@ -466,7 +466,7 @@ describe('Develop Greenwood With: ', function() {
             response = res;
             
             dom = new JSDOM(body);
-            // expectedImportMap = JSON.parse(await fs.promises.readFile(new URL('./import-map.snapshot.json', import.meta.url), 'utf-8'));
+            expectedImportMap = JSON.parse(fs.readFileSync(new URL('./import-map.snapshot.json', import.meta.url), 'utf-8'));
             
             resolve();
           });
