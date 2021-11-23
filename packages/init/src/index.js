@@ -12,16 +12,17 @@
  * - init.yarn
  *
  */
-const copyFolder = require('./copy-folder');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { spawn } = require('child_process');
-const chalk = require('chalk');
-const commander = require('commander');
-const scriptPkg = require(path.join(__dirname, '..', '/package.json'));
-const templateDir = path.join(__dirname, 'template');
+import chalk from 'chalk';
+import commander from 'commander';
+import { copyFolder } from './copy-folder.js';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { spawn } from 'child_process';
+import { URL } from 'url';
 
+const scriptPkg = JSON.parse(fs.readFileSync(new URL(path.join(path.dirname(import.meta.url), '..', '/package.json')), 'utf-8'));
+const templateDir = path.join(path.dirname(new URL('', import.meta.url).pathname), 'template');
 const TARGET_DIR = process.cwd();
 
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
@@ -42,8 +43,8 @@ if (program.yarn) {
 
 // Create new package.json
 const npmInit = async () => {
-  let appPkg = require(path.join(templateDir, 'package.json'));
-  
+  const appPkg = JSON.parse(await fs.promises.readFile(path.join(templateDir, '/package.json'), 'utf-8'));
+
   // use installation path's folder name for packages
   appPkg.name = path.basename(process.cwd());
   
@@ -55,19 +56,19 @@ const npmInit = async () => {
 
 // Copy root and src files to target directory
 const srcInit = async () => {
-
-  templateFolder = path.join(__dirname, 'template/');
+  const templateFolder = new URL(path.join(path.dirname(import.meta.url), 'template/')).pathname;
+  const templateFiles = [];
 
   await createGitIgnore();
 
-  templateFiles = [];
   fs.readdirSync(templateFolder).forEach(file => {
     templateFiles.push(file);
   });
 
   await Promise.all(
     templateFiles.map(async file => {
-      const resolvedPath = path.join(__dirname, 'template', file);
+      const resolvedPath = new URL(path.join(path.dirname(import.meta.url), 'template', file)).pathname;
+      
       if (fs.lstatSync(resolvedPath).isDirectory()) {
         return await copyFolder(resolvedPath, TARGET_DIR);
       } else if (await fs.existsSync(resolvedPath)) {

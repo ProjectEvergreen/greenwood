@@ -11,18 +11,20 @@
  * User Workspace
  * N / A
  */
-const expect = require('chai').expect;
-const fs = require('fs');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const { getSetupFiles } = require('../../../../../test/utils');
-const request = require('request');
-const Runner = require('gallinago').Runner;
-const runSmokeTest = require('../../../../../test/smoke-test');
+import chai from 'chai';
+import fs from 'fs';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { getSetupFiles } from '../../../../../test/utils.js';
+import request from 'request';
+import { Runner } from 'gallinago';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+
+const expect = chai.expect;
 
 xdescribe('Scaffold Greenwood and Run Develop command: ', function() {
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
-  const outputPath = path.join(__dirname, 'my-app');
+  const outputPath = path.join(path.dirname(new URL('', import.meta.url).pathname), 'my-app');
   let runner;
 
   before(function() {

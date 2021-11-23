@@ -11,16 +11,18 @@
  * User Workspace
  * N / A
  */
-const expect = require('chai').expect;
-const fs = require('fs');
-const path = require('path');
-const Runner = require('gallinago').Runner;
-const runSmokeTest = require('../../../../../test/smoke-test');
+import chai from 'chai';
+import fs from 'fs';
+import path from 'path';
+import { Runner } from 'gallinago';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+
+const expect = chai.expect;
 
 xdescribe('Scaffold Greenwood With Yarn: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
-  const outputPath = path.join(__dirname, 'my-app');
+  const outputPath = path.join(path.dirname(new URL('', import.meta.url).pathname), 'my-app');
   let runner;
 
   before(function() {

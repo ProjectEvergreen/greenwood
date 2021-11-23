@@ -11,14 +11,16 @@
  * User Workspace
  * N / A
  */
-const expect = require('chai').expect;
-const fs = require('fs');
-const path = require('path');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import fs from 'fs';
+import path from 'path';
+import { Runner } from 'gallinago';
+
+const expect = chai.expect;
 
 describe('Scaffold Greenwood With Default Template: ', function() {
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
-  const outputPath = path.join(__dirname, 'my-app');
+  const outputPath = path.join(path.dirname(new URL('', import.meta.url).pathname), 'my-app');
   let runner;
 
   before(function() {
@@ -68,26 +70,34 @@ describe('Scaffold Greenwood With Default Template: ', function() {
     });
 
     describe('initial package.json contents', function() {
-      it('the should have the correct Greenwood scripts', function() {
-        const scripts = require(path.join(outputPath, 'package.json')).scripts;
+      let pkgJson;
 
+      before(async function() {
+        pkgJson = JSON.parse(fs.readFileSync(path.join(outputPath, 'package.json'), 'utf-8'));
+      });
+
+      it('the should have the correct Greenwood scripts', function() {
+        const scripts = pkgJson.scripts;
+        
         expect(scripts.start).to.equal('greenwood develop');
         expect(scripts.build).to.equal('greenwood build');
         expect(scripts.serve).to.equal('greenwood serve');
       });
 
       it('the should have the correct Greenwood devDependency', function() {
-        const devDependencies = require(path.join(outputPath, 'package.json')).devDependencies;
-
-        expect(devDependencies['@greenwood/cli']).to.equal('^0.18.0');
+        expect(pkgJson.devDependencies['@greenwood/cli']).to.equal('^0.18.0');
       });
     });
 
     describe('initial greenwood.config.js contents', function() {
-      it('should have the correct title configuration', function() {
-        const config = require(path.join(outputPath, 'greenwood.config.js'));
+      let greenwoodConfig;
 
-        expect(config.title).to.equal('My Project');
+      before(async function() {
+        greenwoodConfig = (await import(path.join(outputPath, 'greenwood.config.js'))).default;
+      });
+
+      it('should have the correct title configuration', function() {
+        expect(greenwoodConfig.title).to.equal('My Project');
       });
     });
 
