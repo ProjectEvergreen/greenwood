@@ -8,15 +8,19 @@
  * User Command
  * greenwood eject
  */
-const fs = require('fs');
-const path = require('path');
-const expect = require('chai').expect;
-const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import fs from 'fs';
+import path from 'path';
+import chai from 'chai';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Eject Greenwood', function() {
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   let runner;
   let configFiles;
 
@@ -33,7 +37,7 @@ describe('Eject Greenwood', function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'eject');
 
-      configFiles = fs.readdirSync(__dirname)
+      configFiles = fs.readdirSync(path.dirname(new URL('', import.meta.url).pathname))
         .filter((file) => path.extname(file) === '.js' && file.indexOf('spec.js') < 0);
     });
 
@@ -42,13 +46,13 @@ describe('Eject Greenwood', function() {
     });
 
     it('should output rollup config file', function() {
-      expect(fs.existsSync(path.join(__dirname, 'rollup.config.js'))).to.be.true;
+      expect(fs.existsSync(path.join(path.dirname(new URL('', import.meta.url).pathname), 'rollup.config.js'))).to.be.true;
     });
 
     after(function() {
       // remove test files
       configFiles.forEach(file => {
-        fs.unlinkSync(path.join(__dirname, file));
+        fs.unlinkSync(path.join(path.dirname(new URL('', import.meta.url).pathname), file));
       });
     });
   });
@@ -66,7 +70,7 @@ describe('Eject Greenwood', function() {
   after(function() {
     // remove test files
     configFiles.forEach(file => {
-      fs.unlinkSync(path.join(__dirname, file));
+      fs.unlinkSync(path.join(path.dirname(new URL('', import.meta.url).pathname), file));
     });
 
     runner.teardown(getOutputTeardownFiles(outputPath));

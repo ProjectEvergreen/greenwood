@@ -20,7 +20,7 @@ import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
-import { URL } from 'url'; 
+import { URL } from 'url';
 
 const expect = chai.expect;
 

@@ -25,18 +25,21 @@
  *   styles/
  *     theme.css
  */
-const expect = require('chai').expect;
-const glob = require('glob-promise');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
-const runSmokeTest = require('../../../../../test/smoke-test');
+import chai from 'chai';
+import glob from 'glob-promise';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Developement environment for a Theme Pack';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   let runner;
 
   before(function() {
@@ -50,15 +53,15 @@ describe('Build Greenwood With: ', function() {
 
     before(async function() {
       const themePacktemplates = await getDependencyFiles(
-        `${__dirname}/src/layouts/*.html`,
+        `${path.dirname(new URL('', import.meta.url).pathname)}/src/layouts/*.html`,
         `${outputPath}/node_modules/my-theme-pack/dist/layouts`
       );
       const themePackStyles = await getDependencyFiles(
-        `${__dirname}/src/styles/*.css`,
+        `${path.dirname(new URL('', import.meta.url).pathname)}/src/styles/*.css`,
         `${outputPath}/node_modules/my-theme-pack/dist/styles`
       );
       const themePackComponents = await getDependencyFiles(
-        `${__dirname}/src/components/*.js`,
+        `${path.dirname(new URL('', import.meta.url).pathname)}/src/components/*.js`,
         `${outputPath}/node_modules/my-theme-pack/dist/components`
       );
 

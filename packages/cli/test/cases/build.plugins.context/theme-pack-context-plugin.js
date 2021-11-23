@@ -1,9 +1,11 @@
-const os = require('os');
-const path = require('path');
-const packageJson = require('./package.json');
-const { spawnSync } = require('child_process');
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { spawnSync } from 'child_process';
+import { URL } from 'url';
 
-module.exports = () => [{
+const packageJson = JSON.parse(await fs.promises.readFile(new URL('./package.json', import.meta.url), 'utf-8'));
+const myThemePackPlugin = () => [{
   type: 'context',
   name: 'my-theme-pack:context',
   provider: () => {
@@ -14,7 +16,7 @@ module.exports = () => [{
     
     const isInstalled = ls.stdout.toString().indexOf('(empty)') < 0;
     const templateLocation = isInstalled
-      ? path.join(__dirname, `${baseDistDir}/layouts`)
+      ? path.join(path.dirname(new URL('', import.meta.url).pathname), `${baseDistDir}/layouts`)
       : path.join(process.cwd(), 'fixtures/layouts');
 
     return {
@@ -24,3 +26,7 @@ module.exports = () => [{
     };
   }
 }];
+
+export {
+  myThemePackPlugin
+};

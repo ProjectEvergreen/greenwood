@@ -12,7 +12,7 @@ import { URL } from 'url';
 import { runDevServer } from './commands/develop.js';
 import { runProductionBuild } from './commands/build.js';
 import { runProdServer } from './commands/serve.js';
-// const ejectConfiguration = require('./commands/eject');
+import { ejectConfiguration } from './commands/eject.js';
 
 const greenwoodPackageJson = JSON.parse(await fs.readFile(new URL('../package.json', import.meta.url), 'utf-8'));
 let cmdOption = {};
@@ -86,7 +86,7 @@ const run = async() => {
 
         break;
       case 'eject':
-        // await ejectConfiguration();
+        await ejectConfiguration();
 
         break;
       default: 

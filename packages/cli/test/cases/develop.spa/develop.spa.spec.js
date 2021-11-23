@@ -18,14 +18,16 @@
  *   index.html
  * 
  */
-const expect = require('chai').expect;
-const fs = require('fs');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const { getDependencyFiles } = require('../../../../../test/utils');
-const request = require('request');
-const Runner = require('gallinago').Runner;
-const runSmokeTest = require('../../../../../test/smoke-test');
+import chai from 'chai';
+import fs from 'fs';
+import path from 'path';
+import { getDependencyFiles } from '../../../../../test/utils.js';
+import request from 'request';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+
+const expect = chai.expect;
 
 function removeWhiteSpace(string = '') {
   return string
@@ -36,7 +38,7 @@ function removeWhiteSpace(string = '') {
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'SPA Mode';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   const hostname = 'http://localhost';
   const BODY_REGEX = /<body>(.*)<\/body>/s;
   const expected = removeWhiteSpace(fs.readFileSync(path.join(outputPath, 'src/index.html'), 'utf-8').match(BODY_REGEX)[0]);
@@ -82,14 +84,13 @@ describe('Develop Greenwood With: ', function() {
             headers: {
               accept: 'text/html'
             }
-          }, (err, res, body) => {
+          }, (err, res) => {
             if (err) {
               reject();
             }
 
             response = res;
             
-            dom = new JSDOM(body);
             resolve();
           });
         });
@@ -122,14 +123,13 @@ describe('Develop Greenwood With: ', function() {
             headers: {
               accept: 'text/html'
             }
-          }, (err, res, body) => {
+          }, (err, res) => {
             if (err) {
               reject();
             }
 
             response = res;
             
-            dom = new JSDOM(body);
             resolve();
           });
         });
@@ -162,14 +162,13 @@ describe('Develop Greenwood With: ', function() {
             headers: {
               accept: 'text/html'
             }
-          }, (err, res, body) => {
+          }, (err, res) => {
             if (err) {
               reject();
             }
 
             response = res;
             
-            dom = new JSDOM(body);
             resolve();
           });
         });

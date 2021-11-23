@@ -19,17 +19,20 @@
  *   styles/
  *     theme.css
  */
-const expect = require('chai').expect;
-const glob = require('glob-promise');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import glob from 'glob-promise';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Optimization Configuration';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   let runner;
 
   before(function() {

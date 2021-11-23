@@ -1,4 +1,5 @@
 {
   "name": "my-theme-pack",
-  "main": "my-theme-pack.js"
+  "main": "my-theme-pack.js",
+  "type": "module"
 }

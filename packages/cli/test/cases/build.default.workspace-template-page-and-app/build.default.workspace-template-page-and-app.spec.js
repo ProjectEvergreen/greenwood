@@ -27,17 +27,20 @@
  *     app.html
  *     page.html
  */
-const expect = require('chai').expect;
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace w/Custom App and Page Templates';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   let runner;
 
   before(function() {

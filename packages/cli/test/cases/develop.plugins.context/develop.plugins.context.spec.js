@@ -18,18 +18,22 @@
  *       index.md
  *     index.md
  */
-const expect = require('chai').expect;
-const { JSDOM } = require('jsdom');
-const packageJson = require('./package.json');
-const path = require('path');
-const request = require('request');
-const Runner = require('gallinago').Runner;
-const runSmokeTest = require('../../../../../test/smoke-test');
+import chai from 'chai';
+import fs from 'fs';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import request from 'request';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+
+const expect = chai.expect;
+const packageJson = JSON.parse(await fs.promises.readFile(new URL('./package.json', import.meta.url), 'utf-8'));
 
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'Custom Context Plugin and Default Workspace (aka Theme Packs)';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   const hostname = 'http://localhost';
   const port = 1984;
   let runner;

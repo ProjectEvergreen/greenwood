@@ -1,5 +1,5 @@
-const fs = require('fs');
-const { ResourceInterface } = require('../../../src/lib/resource-interface');
+import fs from 'fs';
+import { ResourceInterface } from '../../../src/lib/resource-interface.js';
 
 class FooResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -27,7 +27,7 @@ class FooResource extends ResourceInterface {
   }
 }
 
-module.exports = {
+export default {
   plugins: [{
     type: 'resource',
     name: 'plugin-foo',

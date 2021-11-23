@@ -18,16 +18,19 @@
  *   pages/
  *     index.md
  */
-const { JSDOM } = require('jsdom');
-const expect = require('chai').expect;
-const path = require('path');
-const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import { JSDOM } from 'jsdom';
+import chai from 'chai';
+import path from 'path';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Markdown Configuration and Custom Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   let runner;
 
   before(async function() {

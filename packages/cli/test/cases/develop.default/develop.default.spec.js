@@ -28,14 +28,17 @@
  *     main.css
  * package.json
  */
-const expect = require('chai').expect;
-const fs = require('fs');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const { getDependencyFiles, getSetupFiles } = require('../../../../../test/utils');
-const request = require('request');
-const Runner = require('gallinago').Runner;
-const runSmokeTest = require('../../../../../test/smoke-test');
+import chai from 'chai';
+import fs from 'fs';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { getDependencyFiles, getSetupFiles } from '../../../../../test/utils.js';
+import request from 'request';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+
+const expect = chai.expect;
 
 async function rreaddir (dir, allFiles = []) {
   const files = (await fs.promises.readdir(dir)).map(f => path.join(dir, f));
@@ -71,7 +74,7 @@ async function copyFile(source, target) {
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   const hostname = 'http://localhost';
   const port = 1984;
   let runner;
@@ -341,7 +344,7 @@ describe('Develop Greenwood With: ', function() {
       await fs.promises.mkdir(`${outputPath}/node_modules/@babel/runtime`, { recursive: true });
       await fs.promises.copyFile(`${process.cwd()}/node_modules/@babel/runtime/package.json`, `${outputPath}/node_modules/@babel/runtime/package.json`);
       await Promise.all(babelRuntimeLibs.filter((asset) => {
-        const target = asset.replace(process.cwd(), __dirname);
+        const target = asset.replace(process.cwd(), path.dirname(new URL('', import.meta.url).pathname));
         const isDirectory = path.extname(target) === '';
 
         if (isDirectory && !fs.existsSync(target)) {
@@ -350,7 +353,7 @@ describe('Develop Greenwood With: ', function() {
           return asset;
         }
       }).map((asset) => {
-        const target = asset.replace(process.cwd(), __dirname);
+        const target = asset.replace(process.cwd(), path.dirname(new URL('', import.meta.url).pathname));
 
         return copyFile(asset, target);
       }));
@@ -446,6 +449,7 @@ describe('Develop Greenwood With: ', function() {
     describe('Develop command specific HTML behaviors', function() {
       let response = {};
       let dom;
+      let expectedImportMap = {};
 
       before(async function() {
         return new Promise((resolve, reject) => {
@@ -462,6 +466,8 @@ describe('Develop Greenwood With: ', function() {
             response = res;
             
             dom = new JSDOM(body);
+            // expectedImportMap = JSON.parse(await fs.promises.readFile(new URL('./import-map.snapshot.json', import.meta.url), 'utf-8'));
+            
             resolve();
           });
         });
@@ -481,7 +487,6 @@ describe('Develop Greenwood With: ', function() {
       it('should return an import map shim <script> in the <head> of the document', function(done) {
         const importMapTag = dom.window.document.querySelectorAll('head > script[type="importmap-shim"]')[0];
         const importMap = JSON.parse(importMapTag.textContent).imports;
-        const expectedImportMap = require('./import-map.snapshot.json');
 
         Object.keys(expectedImportMap).forEach((key) => {
           expect(importMap[key]).to.equal(expectedImportMap[key]);

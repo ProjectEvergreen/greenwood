@@ -22,17 +22,20 @@
  *   styles/
  *     theme.css
  */
-const expect = require('chai').expect;
-const glob = require('glob-promise');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import glob from 'glob-promise';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Inline Optimization Configuration';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   let runner;
 
   before(async function() {
@@ -136,7 +139,7 @@ describe('Build Greenwood With: ', function() {
           
           // one for puppeteer
           expect(styleTags.length).to.be.equal(2);
-          expect(styleTags[1].textContent).to.be.contain('*{margin:0;padding:0;font-family:Comic Sans,sans-serif}');
+          expect(styleTags[1].textContent).to.be.contain('*{font-family:Comic Sans,sans-serif;margin:0;padding:0}');
         });
       });
     });

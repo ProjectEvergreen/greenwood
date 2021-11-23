@@ -41,16 +41,20 @@
  *     index.md
  *   index.md
  */
-const expect = require('chai').expect;
-const fs = require('fs');
-const path = require('path');
-const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import fs from 'fs';
+import path from 'path';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Default Workspace w/ Nested Directories';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   let runner;
 
   before(function() {
@@ -72,7 +76,7 @@ describe('Build Greenwood With: ', function() {
       let graph;
 
       before(async function() {
-        graph = require(path.join(this.context.publicDir, 'graph.json'))
+        graph = JSON.parse(await fs.promises.readFile(path.join(this.context.publicDir, 'graph.json'), 'utf-8'))
           .map(item => {
             return {
               ...item,

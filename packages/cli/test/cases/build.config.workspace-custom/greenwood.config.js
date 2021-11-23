@@ -1,5 +1,5 @@
-const path = require('path');
+import path from 'path';
 
-module.exports = {
-  workspace: path.join(__dirname, 'www')
+export default {
+  workspace: path.join(path.dirname(new URL('', import.meta.url).pathname), 'www')
 };
