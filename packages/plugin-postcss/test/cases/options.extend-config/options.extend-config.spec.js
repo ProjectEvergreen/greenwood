@@ -31,18 +31,21 @@
  *   ]
  * };
  */
-const fs = require('fs');
-const glob = require('glob-promise');
-const path = require('path');
-const expect = require('chai').expect;
-const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import fs from 'fs';
+import glob from 'glob-promise';
+import path from 'path';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom PostCSS configuration';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   let runner;
 
   before(function() {
@@ -63,7 +66,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('Page referencing external nested CSS file', function() {
       it('should output correctly processed nested CSS as non nested', function() {
-        const expectedCss = 'body{color:red}body h1{color:#00f}';
+        const expectedCss = 'body{color:red}body h1{color:blue}';
         const cssFiles = glob.sync(path.join(this.context.publicDir, 'styles', '*.css'));
         const css = fs.readFileSync(cssFiles[0], 'utf-8');
 
