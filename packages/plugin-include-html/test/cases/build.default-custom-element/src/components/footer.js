@@ -1,3 +1,7 @@
+import fs from 'fs';
+import path from 'path';
+import { URL } from 'url';
+
 const getTemplate = async (data) => {
   return `
     <app-footer>
@@ -9,12 +13,15 @@ const getTemplate = async (data) => {
 };
 
 const getData = async () => {
-  const version = require('../../package.json').version;
+  const dataPath = path.join(new URL('', import.meta.url).pathname, '../../../package.json');
+  const data = JSON.parse(await fs.promises.readFile(dataPath, 'utf-8'));
+
+  const { version } = data;
 
   return { version };
 };
 
-module.exports = {
+export {
   getTemplate,
   getData
 };
