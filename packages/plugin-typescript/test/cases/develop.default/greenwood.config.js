@@ -1,9 +1,9 @@
-const pluginTypeScript = require('../../../src/index');
+import { greenwoodPluginTypeScript } from '../../../src/index.js';
 
-module.exports = {
+export default {
   
   plugins: [
-    ...pluginTypeScript()
+    ...greenwoodPluginTypeScript()
   ]
 
 };
