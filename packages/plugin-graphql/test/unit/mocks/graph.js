@@ -1,5 +1,5 @@
 /* eslint-disable */
-module.exports = {
+const MOCK_GRAPH = {
   graph: [
     {
       data: {
@@ -2271,4 +2271,8 @@ module.exports = {
       ],
     },
   ],
+};
+
+export {
+  MOCK_GRAPH
 };
