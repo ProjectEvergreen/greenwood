@@ -1,7 +1,7 @@
-const googleAnalyticsPlugin = require('../../../src/index');
+import { greenwoodPluginGoogleAnalytics } from '../../../src/index.js';
 
-module.exports = {
+export default {
   plugins: [
-    googleAnalyticsPlugin()
+    greenwoodPluginGoogleAnalytics()
   ]
 };

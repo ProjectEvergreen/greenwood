@@ -9,11 +9,11 @@
  * greenwood build
  *
  * User Config
- * const polyfillsPlugin = require('@greenwod/plugin-polyfills');
+ * import { greenwoodPluginPolyfills } from '@greenwod/plugin-polyfills';
  *
  * {
  *   plugins: [
- *     polyfillsPlugin()
+ *     ...greenwoodPluginPolyfills()
  *  ]
  *
  * }
@@ -21,13 +21,16 @@
  * User Workspace
  * Greenwood default
  */
-const expect = require('chai').expect;
-const fs = require('fs');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import fs from 'fs';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+
+const expect = chai.expect;
 
 const expectedLitPolyfillFiles = [
   'polyfill-support.js'
@@ -48,7 +51,7 @@ const expectedPolyfillFiles = [
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Lit Polyfill Plugin with default options and Default Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   let runner;
 
   before(async function() {

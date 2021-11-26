@@ -1,8 +1,8 @@
-const googleAnalyticsPlugin = require('../../../src/index');
+import { greenwoodPluginGoogleAnalytics } from '../../../src/index.js';
 
-module.exports = {
+export default {
   plugins: [
-    googleAnalyticsPlugin({
+    greenwoodPluginGoogleAnalytics({
       analyticsId: 'UA-123456-1',
       anonymous: false
     })
