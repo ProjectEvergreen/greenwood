@@ -1,3 +1,4 @@
 {
-  "name": "test-develop-command-graphql-.gql"
+  "name": "test-develop-command-graphql-.gql",
+  "type": "module"
 }

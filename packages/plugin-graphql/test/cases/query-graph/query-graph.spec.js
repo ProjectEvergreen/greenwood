@@ -20,19 +20,23 @@
  *       second-post.md
  *     index.html
  */
-const expect = require('chai').expect;
-const glob = require('glob-promise');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import fs from 'fs';
+import glob from 'glob-promise';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Graph from GraphQL';
   const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   let runner;
 
   before(function() {
@@ -137,7 +141,8 @@ describe('Build Greenwood With: ', function() {
     runSmokeTest(['public', 'index'], LABEL);
 
     describe('Home Page output w/ GraphQuery', function() {
-      
+      let dom;
+
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
@@ -161,7 +166,7 @@ describe('Build Greenwood With: ', function() {
         const cacheFiles = await glob.promise(path.join(this.context.publicDir, './*-cache.json'));
 
         cacheFiles.forEach(file => {
-          const cache = require(file);
+          const cache = JSON.parse(fs.readFileSync(file, 'utf-8'));
 
           expect(cache).to.not.be.undefined;
         });

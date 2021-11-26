@@ -1,10 +1,10 @@
-const pluginGraphQL = require('../../../src/index');
+import { greenwoodPluginGraphQL } from '../../../src/index.js';
 
-module.exports = {
-  title: 'GraphQL ConfigQuery Spec',
-  
+export default {
+  title: 'GraphQL CHildrenQuery Spec',
+
   plugins: [
-    ...pluginGraphQL()
+    ...greenwoodPluginGraphQL()
   ]
 
 };

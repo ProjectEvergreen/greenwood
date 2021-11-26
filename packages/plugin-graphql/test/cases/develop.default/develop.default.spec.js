@@ -17,17 +17,20 @@
  *     gallery.gql
  *
  */
-const expect = require('chai').expect;
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const request = require('request');
-const Runner = require('gallinago').Runner;
-const runSmokeTest = require('../../../../../test/smoke-test');
+import chai from 'chai';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import request from 'request';
+import { Runner } from 'gallinago';
+import { URL } from 'url';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+
+const expect = chai.expect;
 
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'GraphQL plugin for resolving client facing files';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   const hostname = 'http://localhost';
   const port = 1984;
   let runner;
@@ -95,7 +98,7 @@ describe('Develop Greenwood With: ', function() {
         const importMap = JSON.parse(importMapTag.textContent).imports;
 
         expect(importMap['@greenwood/plugin-graphql/core/client']).to.equal('/node_modules/@greenwood/plugin-graphql/src/core/client.js');
-        expect(importMap['@greenwood/plugin-graphql/core/common']).to.equal('/node_modules/@greenwood/plugin-graphql/src/core/common.client.js');
+        expect(importMap['@greenwood/plugin-graphql/core/common']).to.equal('/node_modules/@greenwood/plugin-graphql/src/core/common.js');
         expect(importMap['@greenwood/plugin-graphql/queries/children']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/children.gql');
         expect(importMap['@greenwood/plugin-graphql/queries/config']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/config.gql');
         expect(importMap['@greenwood/plugin-graphql/queries/graph']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql');
@@ -112,14 +115,13 @@ describe('Develop Greenwood With: ', function() {
         return new Promise((resolve, reject) => {
           request.get({
             url: `http://127.0.0.1:${port}/node_modules/@greenwood/plugin-graphql/src/core/client.js`
-          }, (err, res, body) => {
+          }, (err, res) => {
             if (err) {
               reject();
             }
 
             response = res;
-            
-            dom = new JSDOM(body);
+
             resolve();
           });
         });
@@ -149,14 +151,13 @@ describe('Develop Greenwood With: ', function() {
         return new Promise((resolve, reject) => {
           request.get({
             url: `http://127.0.0.1:${port}/data/queries/gallery.gql`
-          }, (err, res, body) => {
+          }, (err, res) => {
             if (err) {
               reject();
             }
 
             response = res;
 
-            dom = new JSDOM(body);
             resolve();
           });
         });
