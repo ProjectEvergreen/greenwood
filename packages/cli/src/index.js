@@ -32,6 +32,14 @@ program
   });
 
 program
+  .command('serverless')
+  .description('Build a one off route and return the HTML.')
+  .action((cmd) => {
+    command = cmd._name;
+  });
+
+
+program
   .command('develop')
   .description('Start a local development server.')
   .action((cmd) => {
@@ -60,16 +68,16 @@ if (program.parse.length === 0) {
   program.help();
 }
 
-const run = async() => {  
+const run = async() => {
   try {
     console.info(`Running Greenwood with the ${command} command.`);
     process.env.__GWD_COMMAND__ = command;
     
     switch (command) {
 
-      case 'build':   
+      case 'build':
         await runProductionBuild();
-        
+
         break;
       case 'develop':
         await runDevServer();
@@ -77,7 +85,7 @@ const run = async() => {
         break;
       case 'serve':
         process.env.__GWD_COMMAND__ = 'build';
-        
+
         await runProductionBuild();
         await runProdServer();
 
@@ -86,20 +94,46 @@ const run = async() => {
         await ejectConfiguration();
 
         break;
-      default: 
+      default:
         console.warn(`
-          Error: not able to detect command. try using the --help flag if 
-          you're encountering issues running Greenwood.  Visit our docs for more 
+          Error: not able to detect command. try using the --help flag if
+          you're encountering issues running Greenwood.  Visit our docs for more
           info at https://www.greenwoodjs.io/docs/.
         `);
         break;
 
     }
-    process.exit(0); // eslint-disable-line no-process-exit
+
   } catch (err) {
     console.error(err);
     process.exit(1); // eslint-disable-line no-process-exit
   }
 };
 
-run();
+if (command === 'serverless') {
+  process.env.__GWD_COMMAND__ = 'serverless';
+} else {
+  run();
+}
+
+async function buildRoute(route) {
+  const compilation = await generateCompilation();
+
+  return `
+    <html>
+      <head>
+        <title>Greenwood The Edge - ${route}</title>
+      </head>
+      <body>
+        <h1>HTML from AWS Lambda</h1>
+        <pre>
+          ${JSON.stringify(compilation)}
+        </pre>
+      </body>
+    </html>
+  `.replace(/\n/g, '');
+}
+
+module.exports = {
+  buildRoute
+};

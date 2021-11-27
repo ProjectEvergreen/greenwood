@@ -185,7 +185,8 @@ module.exports = generateGraph = async (compilation) => {
         await fs.promises.mkdir(context.scratchDir);
       }
 
-      await fs.promises.writeFile(`${context.scratchDir}/graph.json`, JSON.stringify(compilation.graph));
+      // serverless (Lambda) doesnt like writing to files
+      // await fs.promises.writeFile(`${context.scratchDir}/graph.json`, JSON.stringify(compilation.graph));
 
       resolve(compilation);
     } catch (err) {

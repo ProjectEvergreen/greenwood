@@ -8,7 +8,7 @@
  * Wraps Puppeteer's interface to Headless Chrome to expose high level rendering
  * APIs that are able to handle web components and PWAs.
  */
-const puppeteer = require('puppeteer');
+// const puppeteer = require('puppeteer');
 
 class BrowserRunner {
 
