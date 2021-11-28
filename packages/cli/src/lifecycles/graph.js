@@ -143,6 +143,7 @@ const generateGraph = async (compilation) => {
         return pages;
       };
 
+      console.debug('building from local source...');
       if (config.mode === 'spa') {
         graph = [{
           ...graph[0],
@@ -177,6 +178,24 @@ const generateGraph = async (compilation) => {
               label: 'Not Found'
             }
           ];
+        }
+      }
+
+      console.debug('building from external sources...');
+      for (const plugin of compilation.config.plugins.filter(plugin => plugin.type === 'source')) {
+        const instance = plugin.provider(this.compilation);
+        const data = await instance();
+
+        for (const node of data) {
+          graph.push({
+            filename: null,
+            path: null,
+            data: {},
+            imports: [],
+            outputPath: 'index.html', // TODO should this even be public?
+            ...node,
+            external: true
+          });
         }
       }
 

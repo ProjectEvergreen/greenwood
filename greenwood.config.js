@@ -1,3 +1,4 @@
+import fetch from 'fetch';
 import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
 import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
 import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
@@ -9,6 +10,35 @@ import { fileURLToPath, URL } from 'url';
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
+
+const customExternalSourcesPlugin = {
+  type: 'source',
+  name: 'source-plugin-analogstudios',
+  provider: () => {
+    return async function () {
+      const artists = await fetch('http://www.analogstudios.net/api/artists').then(resp => resp.json());
+
+      return artists.map((artist) => {
+        const { bio, id, imageUrl, name } = artist;
+        const file = name.toLowerCase().replace(/ /g, '-');
+
+        return {
+          title: name,
+          content: `
+            ${bio}
+            <img src='${imageUrl}'/>
+          `,
+          route: `/artists/${file}/`,
+          id,
+          label: name,
+          data: {
+            imageUrl
+          }
+        };
+      });
+    };
+  }
+};
 
 export default {
   workspace: fileURLToPath(new URL('./www', import.meta.url)),
@@ -47,7 +77,8 @@ export default {
         ];
       }
     },
-    ...greenwoodPluginIncludeHTML()
+    ...greenwoodPluginIncludeHTML(),
+    customExternalSourcesPlugin
   ],
   markdown: {
     plugins: [
