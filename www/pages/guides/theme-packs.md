@@ -46,6 +46,7 @@ _package.json_
   "version": "0.1.0",
   "description": "My Custom Greenwood Theme Pack",
   "main": "my-theme-pack.js",
+  "type": "module",
   "files": [
     "dist/"
   ]
@@ -54,9 +55,9 @@ _package.json_
 
 _my-theme-pack.js_
 ```js
-const path = require('path');
+import path from 'path';
 
-module.exports = () => [{
+const myThemePack = () => [{
   type: 'context',
   name: 'my-theme-pack:context',
   provider: () => {
@@ -69,6 +70,10 @@ module.exports = () => [{
     };
   }
 }];
+
+export {
+  myThemePack
+};
 ```
 
 _src/layouts/blog-post.html_
@@ -118,16 +123,17 @@ The main consideration needed for development is that your files won't be in _no
 
 So using our current example, our final _my-theme-pack.js_ would look like this:
 ```js
-const path = require('path');
+import path from 'path';
+import { URL } from 'url';
 
-module.exports = (options = {}) => [{
+const myThemePackPlugin = (options = {}) => [{
   type: 'context',
   name: 'my-theme-pack:context',
   provider: compilation) => {
     // you can use other directory names besides templates/ this way!
     const templateLocation = options.__isDevelopment
       ? path.join(compilation.context.userWorkspace, 'layouts')
-      : path.join(__dirname, 'dist/layouts');
+      : path.join(new URL('', import.meta.url).pathname, 'dist/layouts');
 
     return {
       templates: [
@@ -136,6 +142,10 @@ module.exports = (options = {}) => [{
     };
   }
 }];
+
+export {
+  myThemePackPlugin
+};
 ```
 
 And our final _greenwood.config.js_ would look like this, which adds a "one-off" [resource plugin](/plugins/resource/) to tell Greenwood to route requests to your theme pack files away from _node_modules+ and to the location of your projects files for development.  
@@ -143,10 +153,12 @@ And our final _greenwood.config.js_ would look like this, which adds a "one-off"
 Additionally, we make sure to pass the flag from above for `__isDevelopment` to our plugin.
 ```js
 // shared from another test
-const myThemePackPlugin = require('./my-theme-pack');
-const packageName = require('./package.json').name;
-const path = require('path');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
+import { myThemePackPlugin } from './my-theme-pack.js';
+import fs from 'fs';
+import path from 'path';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
+
+const packageName = JSON.parse(fs.readFileSync('./package.json', 'utf-8')).name;
 
 class MyThemePackDevelopmentResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -167,7 +179,7 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
   }
 }
 
-module.exports = {
+export default {
   plugins: [
     ...myThemePackPlugin({
       __isDevelopment: true
@@ -210,6 +222,7 @@ When it comes to publishing, it should be fairly straightforward, and you'll jus
       "version": "0.1.0",
       "description": "My Custom Greenwood Theme Pack",
       "main": "my-theme-pack.js",
+      "tyoe": "module",
       "files": [
         "dist/"
       ],

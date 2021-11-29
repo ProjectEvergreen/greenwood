@@ -11,7 +11,7 @@ These are all the supported configuration options in **Greenwood**, which you ca
 
 The below is a _greenwood.config.js_ file reflecting default values:
 ```js
-module.exports = {
+export default {
   devServer: {
     extensions: [],
     hud: true,
@@ -42,7 +42,7 @@ Configuration for Greenwood's development server is available using the `devServ
 
 #### Example
 ```js
-module.exports = {
+export default {
   devServer: {
     extensions: ['.txt', '.rtf'],
     port: 8181,
@@ -60,7 +60,7 @@ You can install and provide custom **unifiedjs** [presets](https://github.com/un
 #### Example
 
 ```js
-module.exports = {
+export default {
   markdown: {
     settings: { commonmark: true },
     plugins: [
@@ -81,7 +81,7 @@ This is an example of the `meta` configuration for the [Greenwood website](https
 const FAVICON_HREF = '/assets/favicon.ico';
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 
-module.exports = {
+export default {
   meta: [
     { name: 'description', content: META_DESCRIPTION },
     { name: 'twitter:site', content: '@PrjEvergreen' },
@@ -122,7 +122,7 @@ Greenwood provides a couple different "modes" by which you can indicate the type
 
 #### Example
 ```js
-module.exports = {
+export default {
   mode: 'mpa'
 }
 ```
@@ -145,7 +145,7 @@ Greenwood provides a number of different ways to send hints to Greenwood as to h
 
 #### Example
 ```js
-module.exports = {
+export default {
   optimization: 'inline'
 }
 ```
@@ -170,7 +170,7 @@ By default the directory Greenwood will use to look for your local content is _p
 
 #### Example
 ```js
-module.exports = {
+export default {
   pagesDirectory: 'docs' // Greenwood will look for pages at src/docs/
 }
 ```
@@ -183,7 +183,7 @@ _However_, you may not need that, like for a [SPA (Single Page Application)](/do
 
 #### Example
 ```js
-module.exports = {
+export default {
   prerender: false
 }
 ```
@@ -196,7 +196,7 @@ By default the directory Greenwood will use to look for your templates is _templ
 
 #### Example
 ```js
-module.exports = {
+export default {
   templatesDirectory: 'layouts' // Greenwood will look for templates at src/layouts/
 }
 ```
@@ -207,7 +207,7 @@ A default `<title>` element for all pages can be configured with the `title` opt
 #### Example
 An example of configuring your app's title:
 ```js
-module.exports = {
+export default {
   title: 'My Static Site'
 }
 ```
@@ -220,9 +220,9 @@ Path to where all your project files will be located.  Using an absolute path is
 Setting the workspace path to be the _www/_ folder in the current directory from where Greenwood is being run.
 
 ```js
-const path = require('path');
+import path from 'path';
 
-module.exports = {
+export default {
   workspace: path.join(process.cwd(), 'www')
 }
 ```

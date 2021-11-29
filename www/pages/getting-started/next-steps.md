@@ -16,7 +16,7 @@ Although configuration is a topic all on its own, we do want to walk through set
 To change the title of the project (like in the companion repo), create a (NodeJS) module called _greenwood.config.js_ at the root of your project and configure the `export` object with a title property.
 
 ```javascript
-module.exports = {
+export default {
   title: 'My Personal Site'
 };
 ```
