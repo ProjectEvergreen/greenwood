@@ -24,13 +24,13 @@ Use this plugin in your _greenwood.config.js_ and pass in your Google Analytics 
 * Tracking ID (legacy): ex. `UA-XXXXXX`
 
 ```javascript
-const googleAnalyticsPlugin = require('@greenwood/plugin-google-analytics');
+import { greenwoodPluginGoogleAnalytics } from '@greenwood/plugin-google-analytics';
 
-module.exports = {
+export default {
   ...
 
   plugins: [
-    googleAnalyticsPlugin({
+    greenwoodPluginGoogleAnalytics({
       analyticsId: 'UA-XXXXXX'
     })
   ]

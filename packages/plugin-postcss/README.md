@@ -21,42 +21,54 @@ yarn add @greenwood/plugin-postcss --dev
 Add this plugin to your _greenwood.config.js_.
 
 ```javascript
-const pluginPostCss = require('@greenwood/plugin-postcss');
+import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 
-module.exports = {
+export default {
   ...
 
   plugins: [
-    pluginPostCss()
+    greenwoodPluginPostCss()
   ]
 }
 ```
 
 > 👉 _If you are using this along with [**plugin-import-css**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-css), make sure **plugin-postcss** comes first.  All non stanrd transformation need to come last._ 
 
-Optionally, create a _postcss.config.js_ in the root of your project with your own custom plugins / settings that you've installed.
+Optionally, to use your own PostCSS configuration, you'll need to create _two (2)_ config files in the root of your project, by which you can provide your own custom plugins / settings that you've installed.
+- _postcss.config.js_
+- _postcss.config.mjs_
 
+Example
 ```javascript
+// postcss.config.js
 module.exports = {
   plugins: [
     require('postcss-nested')
   ]
 };
+
+// postcss.config.mjs
+export default {
+  plugins: [
+    (await import('postcss-nested')).default
+  ]
+};
 ```
 
+_Eventually once [PostCSS adds support for ESM configuration files](https://github.com/postcss/postcss-cli/issues/387), then this will drop to only needing one file._
 
 ## Options
 This plugin provides a default _postcss.config.js_ that includes support for [**postcss-preset-env**](https://github.com/csstools/postcss-preset-env) using [**browserslist**](https://github.com/browserslist/browserslist) with reasonable [default configs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss/src/) for each.  
 
 If you would like to use it with your own custom _postcss.config.js_, you will need to enable the `extendConfig` option
 ```js
-const pluginPostcss = require('@greenwood/plugin-postcss');
+import { greenwoodPluginPostcss } from '@greenwood/plugin-postcss';
 
-module.exports = {
+export default {
   ...
 
   plugins: [
-    pluginPostcss({
+    greenwoodPluginPostcss({
       extendConfig: true
     })
   ]
@@ -65,10 +77,10 @@ module.exports = {
 
 By default, the configuration provided by this plugin is:
 ```javascript
-module.exports = {
+export default {
   plugins: [
-    require('cssnano'), // just for production builds
-    require('postcss-preset-env')
+    (await import('cssnano')).default, // just for production builds
+    (await import('postcss-preset-env')).default
   ]
 };
 ```

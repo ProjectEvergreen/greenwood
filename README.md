@@ -35,12 +35,15 @@ npm install @greenwood/cli --save-dev
 yarn add @greenwood/cli --dev
 ```
 
-Then in your _package.json_, you can run the CLI like so:
-```javascript
-"scripts": {
-  "build": "greenwood build",
-  "start": "greenwood develop",
-  "serve": "greenwood serve"
+Then in your _package.json_, add the `type` field and `scripts` for the CLI, like so:
+```json
+{
+  "type": "module",
+  "scripts": {
+    "build": "greenwood build",
+    "start": "greenwood develop",
+    "serve": "greenwood serve"
+  }
 }
 ```
 
