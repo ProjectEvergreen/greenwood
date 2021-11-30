@@ -41,7 +41,7 @@ describe('Develop Greenwood With: ', function() {
   const outputPath = path.dirname(new URL('', import.meta.url).pathname);
   const hostname = 'http://localhost';
   const BODY_REGEX = /<body>(.*)<\/body>/s;
-  const expected = removeWhiteSpace(fs.readFileSync(path.join(outputPath, 'src/index.html'), 'utf-8').match(BODY_REGEX)[0]);
+  const expected = removeWhiteSpace(fs.readFileSync(path.join(outputPath, `src${path.sep}index.html`), 'utf-8').match(BODY_REGEX)[0]);
 
   const port = 1984;
   let runner;
