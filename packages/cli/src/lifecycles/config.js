@@ -1,9 +1,11 @@
 import fs from 'fs';
 import path from 'path';
+import {URL, pathToFileURL } from 'url';
 
 // get and "tag" all plugins provided / maintained by the @greenwood/cli
 // and include as the default set, with all user plugins getting appended
-const greenwoodPluginsBasePath = new URL('../plugins', import.meta.url).pathname;
+const greenwoodPluginsBasePath = path.join(new URL('', import.meta.url).pathname, '../../plugins').replace('\\', '');
+
 const greenwoodPlugins = (await Promise.all([
   path.join(greenwoodPluginsBasePath, 'copy'),  
   path.join(greenwoodPluginsBasePath, 'resource'),
@@ -12,7 +14,9 @@ const greenwoodPlugins = (await Promise.all([
   const files = await fs.promises.readdir(pluginDirectory);
 
   return (await Promise.all(files.map(async(file) => {
-    const pluginImport = await import(`${pluginDirectory}/${file}`);
+    const importPaTh = pathToFileURL(`${pluginDirectory}${path.sep}${file}`);
+    console.debug('greenwood plugin importPaTh', importPaTh);
+    const pluginImport = await import(importPaTh);
     const plugin = pluginImport[Object.keys(pluginImport)[0]];
 
     return Array.isArray(plugin)
@@ -55,7 +59,7 @@ const readAndMergeConfig = async() => {
       let customConfig = Object.assign({}, defaultConfig);
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
-        const userCfgFile = (await import(path.join(process.cwd(), 'greenwood.config.js'))).default;
+        const userCfgFile = (await import(pathToFileURL(path.join(process.cwd(), 'greenwood.config.js')))).default;
         const { workspace, devServer, title, markdown, meta, mode, optimization, plugins, prerender, pagesDirectory, templatesDirectory } = userCfgFile;
 
         // workspace validation
@@ -74,7 +78,8 @@ const readAndMergeConfig = async() => {
             customConfig.workspace = workspace;
           }
 
-          if (!fs.existsSync(customConfig.workspace)) {
+          console.debug('customConfig.workspace', customConfig.workspace);
+          if (!fs.existsSync(customConfig.workspace.replace('/', ''))) {
             reject('Error: greenwood.config.js workspace doesn\'t exist! \n' +
               'common issues to check might be: \n' +
               '- typo in your workspace directory name, or in greenwood.config.js \n' +
