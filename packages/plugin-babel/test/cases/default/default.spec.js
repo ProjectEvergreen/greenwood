@@ -36,7 +36,7 @@ import { URL } from 'url';
 
 const expect = chai.expect;
 
-describe.only('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Babel configuration';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = path.dirname(new URL('', import.meta.url).pathname);
