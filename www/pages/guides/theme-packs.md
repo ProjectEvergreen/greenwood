@@ -118,13 +118,12 @@ Lorum Ipsum, this is a test.
 
 The main consideration needed for development is that your files won't be in _node_modules_, which is what the case would be for users when you publish.  So for that reason, we need to add a little boilerplate to _my-theme-pack.js_.  There might be others way to solve it, but for right now, accepting a "developer only" flag can easily make the plugin pivot into local or "published" modes.
 
-1. If the flag _is_ passed, then use `__dirname` (which would resolve to somewhere inside _node_modules_) as the base path
+1. If the flag _is_ passed, then use `new URL('.', import.meta.url)` (which would resolve to the package's location inside _node_modules_) as the base path
 1. If the flag _is not_ installed (like we want for local development) then you can use use whatever location you have defined in your repository.  Most common would just be to use `process.cwd`
 
 So using our current example, our final _my-theme-pack.js_ would look like this:
 ```js
-import path from 'path';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const myThemePackPlugin = (options = {}) => [{
   type: 'context',
@@ -132,8 +131,8 @@ const myThemePackPlugin = (options = {}) => [{
   provider: compilation) => {
     // you can use other directory names besides templates/ this way!
     const templateLocation = options.__isDevelopment
-      ? path.join(compilation.context.userWorkspace, 'layouts')
-      : path.join(new URL('', import.meta.url).pathname, 'dist/layouts');
+      ? fileURLToPath(new URL('./layouts', compilation.context.userWorkspace))
+      : fileURLToPath(new URL('dist/layouts', import.meta.url));
 
     return {
       templates: [

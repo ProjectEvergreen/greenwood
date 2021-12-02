@@ -19,12 +19,13 @@ import { getSetupFiles } from '../../../../../test/utils.js';
 import request from 'request';
 import { Runner } from 'gallinago';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
 xdescribe('Scaffold Greenwood and Run Develop command: ', function() {
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
-  const outputPath = path.join(path.dirname(new URL('', import.meta.url).pathname), 'my-app');
+  const outputPath = fileURLToPath(new URL('./my-app', import.meta.url));
   let runner;
 
   before(function() {

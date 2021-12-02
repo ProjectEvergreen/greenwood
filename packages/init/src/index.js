@@ -19,10 +19,10 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { spawn } from 'child_process';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
-const scriptPkg = JSON.parse(fs.readFileSync(new URL(path.join(path.dirname(import.meta.url), '..', '/package.json')), 'utf-8'));
-const templateDir = path.join(path.dirname(new URL('', import.meta.url).pathname), 'template');
+const scriptPkg = JSON.parse(fs.readFileSync(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf-8'));
+const templateDir = fileURLToPath(new URL('./template', import.meta.url));
 const TARGET_DIR = process.cwd();
 
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
@@ -56,18 +56,18 @@ const npmInit = async () => {
 
 // Copy root and src files to target directory
 const srcInit = async () => {
-  const templateFolder = new URL(path.join(path.dirname(import.meta.url), 'template/')).pathname;
+  // const templateFolder = fileURLToPath(new URL('./template', import.meta.url));
   const templateFiles = [];
 
   await createGitIgnore();
 
-  fs.readdirSync(templateFolder).forEach(file => {
+  fs.readdirSync(templateDir).forEach(file => {
     templateFiles.push(file);
   });
 
   await Promise.all(
     templateFiles.map(async file => {
-      const resolvedPath = new URL(path.join(path.dirname(import.meta.url), 'template', file)).pathname;
+      const resolvedPath = path.join(templateDir, file);
       
       if (fs.lstatSync(resolvedPath).isDirectory()) {
         return await copyFolder(resolvedPath, TARGET_DIR);

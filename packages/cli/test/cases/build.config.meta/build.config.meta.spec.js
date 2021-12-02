@@ -37,7 +37,7 @@ import chai from 'chai';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
@@ -45,7 +45,7 @@ describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Meta Configuration and Nested Workspace';
   const meta = greenwoodConfig.meta;
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(function() {

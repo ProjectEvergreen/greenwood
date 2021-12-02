@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const packageJson = JSON.parse(await fs.promises.readFile(new URL('./package.json', import.meta.url), 'utf-8'));
 const myThemePack = (options = {}) => [{
@@ -9,7 +9,7 @@ const myThemePack = (options = {}) => [{
   provider: (compilation) => {
     const templateLocation = options.__isDevelopment // eslint-disable-line no-underscore-dangle
       ? path.join(compilation.context.userWorkspace, 'layouts')
-      : path.join(path.dirname(new URL('', import.meta.url).pathname), 'dist/layouts');
+      : fileURLToPath(new URL('./dist/layouts', import.meta.url));
 
     return {
       templates: [

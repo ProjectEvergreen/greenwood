@@ -7,6 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { ResourceInterface } from '../../lib/resource-interface.js';
+import { fileURLToPath, URL } from 'url';
 
 class OptimizationMPAResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -23,7 +24,7 @@ class OptimizationMPAResource extends ResourceInterface {
   async resolve() {
     return new Promise(async (resolve, reject) => {
       try {
-        const routerUrl = new URL('../../lib/router.js', import.meta.url).pathname;
+        const routerUrl = fileURLToPath(new URL('../../lib/router.js', import.meta.url));
 
         resolve(routerUrl);
       } catch (e) {

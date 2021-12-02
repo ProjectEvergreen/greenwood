@@ -31,14 +31,14 @@ import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Mode';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(async function() {

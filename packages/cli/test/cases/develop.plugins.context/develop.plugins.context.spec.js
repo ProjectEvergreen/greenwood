@@ -25,7 +25,7 @@ import path from 'path';
 import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 const packageJson = JSON.parse(await fs.promises.readFile(new URL('./package.json', import.meta.url), 'utf-8'));
@@ -33,7 +33,7 @@ const packageJson = JSON.parse(await fs.promises.readFile(new URL('./package.jso
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'Custom Context Plugin and Default Workspace (aka Theme Packs)';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://localhost';
   const port = 1984;
   let runner;
