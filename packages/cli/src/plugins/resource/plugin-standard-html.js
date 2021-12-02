@@ -16,7 +16,7 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import unified from 'unified';
-import { URL, pathToFileURL } from 'url';
+import { URL } from 'url';
 
 function getCustomPageTemplates(contextPlugins, templateName) {
   return contextPlugins
@@ -55,10 +55,10 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], 
   } else if (is404Page && !fs.existsSync(path.join(pagesDir, '404.html'))) {
     // handle default 404.html
     // path.dirname(new URL('', import.meta.url).pathname)
-    contents = fs.readFileSync(pathToFileURL(path.join(new URL('', import.meta.url).pathname, '../../../templates/404.html')), 'utf-8');
+    contents = fs.readFileSync(path.join(new URL('', import.meta.url).pathname, '../../../templates/404.html').replace('\\', ''), 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
-    contents = fs.readFileSync(new URL('../../templates/page.html', import.meta.url), 'utf-8');
+    contents = fs.readFileSync(path.join(new URL('', import.meta.url).pathname, '../../../templates/page.html').replace('\\', ''), 'utf-8');
   }
 
   return contents;
@@ -72,7 +72,7 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     ? fs.readFileSync(`${customAppTemplates[0]}/app.html`, 'utf-8')
     : fs.existsSync(userAppTemplatePath)
       ? fs.readFileSync(userAppTemplatePath, 'utf-8')
-      : fs.readFileSync(new URL('../../templates/app.html', import.meta.url), 'utf-8');
+      : fs.readFileSync(path.join(new URL('', import.meta.url).pathname, '../../../templates/app.html').replace('\\', ''), 'utf-8');
 
   const root = htmlparser.parse(contents, {
     script: true,

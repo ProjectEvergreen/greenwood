@@ -27,7 +27,7 @@ const expect = chai.expect;
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
+  const outputPath = path.dirname(new URL('', import.meta.url).pathname.replace('/', ''));
   let runner;
 
   before(function() {
