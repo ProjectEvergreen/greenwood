@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import {URL, pathToFileURL } from 'url';
+import { pathToFileURL, URL } from 'url';
 
 // get and "tag" all plugins provided / maintained by the @greenwood/cli
 // and include as the default set, with all user plugins getting appended
@@ -15,7 +15,6 @@ const greenwoodPlugins = (await Promise.all([
 
   return (await Promise.all(files.map(async(file) => {
     const importPaTh = pathToFileURL(`${pluginDirectory}${path.sep}${file}`);
-    console.debug('greenwood plugin importPaTh', importPaTh);
     const pluginImport = await import(importPaTh);
     const plugin = pluginImport[Object.keys(pluginImport)[0]];
 

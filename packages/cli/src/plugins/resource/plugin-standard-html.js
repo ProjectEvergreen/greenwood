@@ -15,7 +15,8 @@ import remarkFrontmatter from 'remark-frontmatter';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import unified from 'unified'; 
+import unified from 'unified';
+import { URL, pathToFileURL } from 'url';
 
 function getCustomPageTemplates(contextPlugins, templateName) {
   return contextPlugins
@@ -54,7 +55,7 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], 
   } else if (is404Page && !fs.existsSync(path.join(pagesDir, '404.html'))) {
     // handle default 404.html
     // path.dirname(new URL('', import.meta.url).pathname)
-    contents = fs.readFileSync(path.join(path.dirname(new URL('', import.meta.url).pathname), '../../templates/404.html'), 'utf-8');
+    contents = fs.readFileSync(pathToFileURL(path.join(new URL('', import.meta.url).pathname, '../../../templates/404.html')), 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
     contents = fs.readFileSync(new URL('../../templates/page.html', import.meta.url), 'utf-8');

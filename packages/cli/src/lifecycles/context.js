@@ -9,7 +9,7 @@ const initContext = async({ config }) => {
   return new Promise(async (resolve, reject) => {
     try {
       const projectDirectory = process.cwd();
-      const userWorkspace = path.join(config.workspace);
+      const userWorkspace = path.join(config.workspace).replace('\\', '');
       const pagesDir = path.join(userWorkspace, `${config.pagesDirectory}/`);
       const userTemplatesDir = path.join(userWorkspace, `${config.templatesDirectory}/`);
 
