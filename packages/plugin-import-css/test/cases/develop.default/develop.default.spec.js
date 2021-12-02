@@ -26,7 +26,7 @@ import chai from 'chai';
 import path from 'path';
 import request from 'request';
 import { Runner } from 'gallinago';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 
 const expect = chai.expect;
@@ -34,7 +34,7 @@ const expect = chai.expect;
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'Import CSS plugin for using ESM with .css files';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://localhost';
   const port = 1984;
   let runner;

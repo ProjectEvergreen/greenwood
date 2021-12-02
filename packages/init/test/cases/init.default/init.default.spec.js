@@ -19,7 +19,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Scaffold Greenwood With Default Template: ', function() {
+xdescribe('Scaffold Greenwood With Default Template: ', function() {
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
   const outputPath = fileURLToPath(new URL('./my-app', import.meta.url));
   let runner;

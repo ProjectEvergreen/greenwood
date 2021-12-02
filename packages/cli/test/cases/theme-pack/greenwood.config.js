@@ -2,7 +2,7 @@ import fs from 'fs';
 import { myThemePack } from './my-theme-pack.js';
 import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const packageName = JSON.parse(await fs.promises.readFile(new URL('./package.json', import.meta.url), 'utf-8')).name;
 

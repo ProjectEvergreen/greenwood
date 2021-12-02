@@ -18,14 +18,14 @@ import chai from 'chai';
 import request from 'request';
 import path from 'path';
 import { Runner } from 'gallinago';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'GraphQL Server';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = '127.0.0.1';
   const port = 4000;
   let runner;

@@ -2,7 +2,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { spawnSync } from 'child_process';
-import { URL } from 'url';
+import { fileURLToPaTh, URL } from 'url';
 
 const packageJson = JSON.parse(await fs.promises.readFile(new URL('./package.json', import.meta.url), 'utf-8'));
 const myThemePackPlugin = () => [{
