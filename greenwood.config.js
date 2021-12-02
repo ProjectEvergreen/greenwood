@@ -5,13 +5,13 @@ import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
 import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
 
 export default {
-  workspace: new URL('www', import.meta.url).pathname,
+  workspace: fileURLToPath(new URL('./www', import.meta.url)),
   mode: 'mpa',
   optimization: 'inline',
   title: 'Greenwood',

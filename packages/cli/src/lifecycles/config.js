@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { pathToFileURL, URL } from 'url';
+import { fileURLToPath, pathToFileURL, URL } from 'url';
 
 // get and "tag" all plugins provided / maintained by the @greenwood/cli
 // and include as the default set, with all user plugins getting appended
-const greenwoodPluginsBasePath = path.join(new URL('', import.meta.url).pathname, '../../plugins').replace('\\', '');
+const greenwoodPluginsBasePath = fileURLToPath(new URL('../plugins', import.meta.url));
 
 const greenwoodPlugins = (await Promise.all([
   path.join(greenwoodPluginsBasePath, 'copy'),  
@@ -77,8 +77,7 @@ const readAndMergeConfig = async() => {
             customConfig.workspace = workspace;
           }
 
-          console.debug('customConfig.workspace', customConfig.workspace);
-          if (!fs.existsSync(customConfig.workspace.replace('/', ''))) {
+          if (!fs.existsSync(customConfig.workspace)) {
             reject('Error: greenwood.config.js workspace doesn\'t exist! \n' +
               'common issues to check might be: \n' +
               '- typo in your workspace directory name, or in greenwood.config.js \n' +
