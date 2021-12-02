@@ -10,7 +10,7 @@
  *
  * User Config
  * {
- *   workspace: path.join(path.dirname(new URL('', import.meta.url).pathname), 'noop')
+ *   workspace: fileURLToPath(new URL('./noop', import.meta.url))
  * }
  *
  * User Workspace

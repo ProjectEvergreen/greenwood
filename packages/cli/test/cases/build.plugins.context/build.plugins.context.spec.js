@@ -48,15 +48,15 @@ describe('Build Greenwood With: ', function() {
       // copy fixtures into node_modules
       // to match the location specified in the plugin under test
       const themePacktemplates = await getDependencyFiles(
-        `${path.dirname(new URL('', import.meta.url).pathname)}/fixtures/layouts/*.html`,
+        `${outputPath}/fixtures/layouts/*.html`,
         `${outputPath}/node_modules/my-theme-pack/dist/layouts`
       );
       const themePackStyles = await getDependencyFiles(
-        `${path.dirname(new URL('', import.meta.url).pathname)}/fixtures/styles/*.css`,
+        `${outputPath}/fixtures/styles/*.css`,
         `${outputPath}/node_modules/my-theme-pack/dist/styles`
       );
       const themePackComponents = await getDependencyFiles(
-        `${path.dirname(new URL('', import.meta.url).pathname)}/fixtures/components/*.js`,
+        `${outputPath}/fixtures/components/*.js`,
         `${outputPath}/node_modules/my-theme-pack/dist/components`
       );
 

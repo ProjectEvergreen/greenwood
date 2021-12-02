@@ -344,7 +344,7 @@ describe('Develop Greenwood With: ', function() {
       await fs.promises.mkdir(`${outputPath}/node_modules/@babel/runtime`, { recursive: true });
       await fs.promises.copyFile(`${process.cwd()}/node_modules/@babel/runtime/package.json`, `${outputPath}/node_modules/@babel/runtime/package.json`);
       await Promise.all(babelRuntimeLibs.filter((asset) => {
-        const target = asset.replace(process.cwd(), path.dirname(new URL('', import.meta.url).pathname));
+        const target = asset.replace(process.cwd(), fileURLToPath(new URL('.', import.meta.url)));
         const isDirectory = path.extname(target) === '';
 
         if (isDirectory && !fs.existsSync(target)) {
@@ -353,7 +353,7 @@ describe('Develop Greenwood With: ', function() {
           return asset;
         }
       }).map((asset) => {
-        const target = asset.replace(process.cwd(), path.dirname(new URL('', import.meta.url).pathname));
+        const target = asset.replace(process.cwd(), fileURLToPath(new URL('.', import.meta.url)));
 
         return copyFile(asset, target);
       }));

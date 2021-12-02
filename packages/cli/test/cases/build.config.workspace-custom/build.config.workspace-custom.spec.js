@@ -10,7 +10,7 @@
  *
  * User Config
  * {
- *   workspace: path.join(path.dirname(new URL('', import.meta.url).pathname);, 'www')
+ *   workspace: fileURLToPath(new URL('./www', import.meta.url))
  * }
  *
  * User Workspace

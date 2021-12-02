@@ -53,15 +53,15 @@ describe('Build Greenwood With: ', function() {
 
     before(async function() {
       const themePacktemplates = await getDependencyFiles(
-        `${path.dirname(new URL('', import.meta.url).pathname)}/src/layouts/*.html`,
+        `${outputPath}/src/layouts/*.html`,
         `${outputPath}/node_modules/my-theme-pack/dist/layouts`
       );
       const themePackStyles = await getDependencyFiles(
-        `${path.dirname(new URL('', import.meta.url).pathname)}/src/styles/*.css`,
+        `${outputPath}/src/styles/*.css`,
         `${outputPath}/node_modules/my-theme-pack/dist/styles`
       );
       const themePackComponents = await getDependencyFiles(
-        `${path.dirname(new URL('', import.meta.url).pathname)}/src/components/*.js`,
+        `${outputPath}/src/components/*.js`,
         `${outputPath}/node_modules/my-theme-pack/dist/components`
       );
 

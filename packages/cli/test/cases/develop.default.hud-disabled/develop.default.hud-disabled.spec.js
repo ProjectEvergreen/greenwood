@@ -22,10 +22,10 @@ import path from 'path';
 import { getSetupFiles } from '../../../../../test/utils.js';
 import request from 'request';
 import { Runner } from 'gallinago';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
 
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
@@ -78,7 +78,7 @@ describe('Develop Greenwood With: ', function() {
             response = res;
             
             dom = new JSDOM(body);
-            sourceHtml = fs.readFileSync(path.join(path.dirname(new URL('', import.meta.url).pathname), 'src/pages/index.html'), 'utf-8');
+            sourceHtml = fs.readFileSync(fileURLToPath(new URL('./src/pages/index.html', import.meta.url)), 'utf-8');
 
             resolve();
           });
