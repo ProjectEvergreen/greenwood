@@ -3,7 +3,7 @@ import fs from 'fs';
 import { myThemePackPlugin } from '../build.plugins.context/theme-pack-context-plugin.js';
 import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
-import { fileURLToPath, URL } from 'url';
+import { URL } from 'url';
 
 const packageName = JSON.parse(await fs.promises.readFile(new URL('./package.json', import.meta.url), 'utf-8')).name;
 

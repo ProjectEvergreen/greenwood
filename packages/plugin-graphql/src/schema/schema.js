@@ -4,6 +4,7 @@ import { graphTypeDefs, graphResolvers } from './graph.js';
 import fs from 'fs';
 import gql from 'graphql-tag';
 import path from 'path';
+import { pathToFileURL } from 'url';
 
 const createSchema = async (compilation) => {
   const { graph } = compilation;
@@ -41,7 +42,7 @@ const createSchema = async (compilation) => {
         .filter(file => path.extname(file) === '.js');
 
       for (const schemaPath of schemaPaths) {
-        const { customTypeDefs, customResolvers } = await import(`${customSchemasPath}/${schemaPath}`);
+        const { customTypeDefs, customResolvers } = await import(pathToFileURL(`${customSchemasPath}/${schemaPath}`));
         
         customUserDefs.push(customTypeDefs);
         customUserResolvers.push(customResolvers);

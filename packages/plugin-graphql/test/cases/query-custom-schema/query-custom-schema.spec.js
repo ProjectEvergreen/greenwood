@@ -32,7 +32,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe.only('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Query from GraphQL';
   const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');

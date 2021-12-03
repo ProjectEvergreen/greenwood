@@ -56,7 +56,6 @@ const npmInit = async () => {
 
 // Copy root and src files to target directory
 const srcInit = async () => {
-  // const templateFolder = fileURLToPath(new URL('./template', import.meta.url));
   const templateFiles = [];
 
   await createGitIgnore();

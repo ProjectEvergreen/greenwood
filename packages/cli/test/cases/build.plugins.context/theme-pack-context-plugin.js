@@ -2,7 +2,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { spawnSync } from 'child_process';
-import { fileURLToPaTh, URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const packageJson = JSON.parse(await fs.promises.readFile(new URL('./package.json', import.meta.url), 'utf-8'));
 const myThemePackPlugin = () => [{
@@ -16,7 +16,7 @@ const myThemePackPlugin = () => [{
     
     const isInstalled = ls.stdout.toString().indexOf('(empty)') < 0;
     const templateLocation = isInstalled
-      ? path.join(path.dirname(new URL('', import.meta.url).pathname), `${baseDistDir}/layouts`)
+      ? fileURLToPath(new URL(`${baseDistDir}/layouts`, import.meta.url))
       : path.join(process.cwd(), 'fixtures/layouts');
 
     return {
