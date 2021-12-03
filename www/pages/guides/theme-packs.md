@@ -123,6 +123,7 @@ The main consideration needed for development is that your files won't be in _no
 
 So using our current example, our final _my-theme-pack.js_ would look like this:
 ```js
+import path from 'path';
 import { fileURLToPath, URL } from 'url';
 
 const myThemePackPlugin = (options = {}) => [{
@@ -131,7 +132,7 @@ const myThemePackPlugin = (options = {}) => [{
   provider: compilation) => {
     // you can use other directory names besides templates/ this way!
     const templateLocation = options.__isDevelopment
-      ? fileURLToPath(new URL('./layouts', compilation.context.userWorkspace))
+      ? path.join(compilation.context.userWorkspace, 'layouts')
       : fileURLToPath(new URL('dist/layouts', import.meta.url));
 
     return {
