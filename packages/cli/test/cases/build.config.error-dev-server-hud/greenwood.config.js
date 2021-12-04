@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   devServer: {
     hud: 1234
   }

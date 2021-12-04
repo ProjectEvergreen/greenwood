@@ -45,20 +45,22 @@ Your plugin might look like this:
  *     acme-theme-pack.js
  *     package.json
  */
-const path = require('path');
+import path from 'path');
 
-module.exports = () => [{
-  type: 'context',
-  name: 'acme-theme-pack:context',
-  provider: () => {
-    return {
-      templates: [
-        // when the plugin is installed __dirname will be /path/to/node_modules/<your-package>/
-        path.join(__dirname, 'dist/layouts')
-      ]
-    };
+export function myCopyPlugin() {
+  return {
+    type: 'context',
+    name: 'acme-theme-pack:context',
+    provider: () => {
+      return {
+        templates: [
+          // when the plugin is installed __dirname will be /path/to/node_modules/<your-package>/
+          path.join(__dirname, 'dist/layouts')
+        ]
+      };
+    }
   }
-}];
+}
 ```
 
 > Additionally, you can provide the default _app.html_ and _page.html_ templates this way as well!

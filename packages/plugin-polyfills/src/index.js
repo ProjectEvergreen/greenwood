@@ -1,7 +1,7 @@
-const fs = require('fs');
-const { getNodeModulesLocationForPackage } = require('@greenwood/cli/src/lib/node-modules-utils');
-const path = require('path');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
+import fs from 'fs';
+import { getNodeModulesLocationForPackage } from '@greenwood/cli/src/lib/node-modules-utils.js';
+import path from 'path';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class PolyfillsResource extends ResourceInterface {
   constructor(compilation, options = {}) {
@@ -39,7 +39,7 @@ class PolyfillsResource extends ResourceInterface {
   }
 }
 
-module.exports = (options = {}) => {
+const greenwoodPluginPolyfills = (options = {}) => {
   return [{
     type: 'resource',
     name: 'plugin-polyfills',
@@ -47,11 +47,11 @@ module.exports = (options = {}) => {
   }, {
     type: 'copy',
     name: 'plugin-copy-polyfills',
-    provider: (compilation) => {
+    provider: async (compilation) => {
       const { outputDir } = compilation.context;
       const polyfillPackageName = '@webcomponents/webcomponentsjs';
-      const polyfillNodeModulesLocation = getNodeModulesLocationForPackage(polyfillPackageName);
-      const litNodeModulesLocation = getNodeModulesLocationForPackage('lit');
+      const polyfillNodeModulesLocation = await getNodeModulesLocationForPackage(polyfillPackageName);
+      const litNodeModulesLocation = await getNodeModulesLocationForPackage('lit');
       const litPolyfills = litNodeModulesLocation
         ? [{
           from: path.join(litNodeModulesLocation, 'polyfill-support.js'),
@@ -70,4 +70,8 @@ module.exports = (options = {}) => {
       ];
     }
   }];
+};
+
+export {
+  greenwoodPluginPolyfills
 };

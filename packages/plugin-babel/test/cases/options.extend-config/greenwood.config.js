@@ -1,8 +1,8 @@
-const pluginBabel = require('../../../src/index');
+import { greenwoodPluginBabel } from '../../../src/index.js';
 
-module.exports = {
+export default {
   plugins: [
-    ...pluginBabel({
+    ...greenwoodPluginBabel({
       extendConfig: true
     })
   ]

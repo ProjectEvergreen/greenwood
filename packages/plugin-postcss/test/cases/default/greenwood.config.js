@@ -1,7 +1,7 @@
-const pluginPostCss = require('../../../src/index');
+import { greenwoodPluginPostCss } from '../../../src/index.js';
 
-module.exports = {
+export default {
   plugins: [
-    pluginPostCss()
+    greenwoodPluginPostCss()
   ]
 };

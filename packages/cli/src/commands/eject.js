@@ -1,15 +1,17 @@
-const fs = require('fs');
-const generateCompilation = require('../lifecycles/compile');
-const path = require('path');
+import fs from 'fs';
+import { generateCompilation } from '../lifecycles/compile.js';
+import path from 'path';
+import { fileURLToPath, URL } from 'url';
 
-module.exports = ejectConfiguration = async () => {
+const ejectConfiguration = async () => {
   return new Promise(async (resolve, reject) => {
     try {
       const compilation = await generateCompilation();
-      const configFilePaths = fs.readdirSync(path.join(__dirname, '../config'));
-
-      configFilePaths.forEach((configFile) => {
-        const from = path.join(__dirname, '../config', configFile);
+      const configFilePath = fileURLToPath(new URL('../config', import.meta.url));
+      const configFiles = fs.readdirSync(configFilePath);
+      
+      configFiles.forEach((configFile) => {
+        const from = path.join(configFilePath, configFile);
         const to = `${compilation.context.projectDirectory}/${configFile}`;
 
         fs.copyFileSync(from, to);
@@ -25,3 +27,5 @@ module.exports = ejectConfiguration = async () => {
     }
   });
 };
+
+export { ejectConfiguration };

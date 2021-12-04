@@ -29,16 +29,19 @@
  *     my-custom-file.foo
  *     my-other-custom-file.foo
  */
-const expect = require('chai').expect;
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { Runner } from 'gallinago';
+import { fileURLToPath, URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom FooResource Plugin and Default Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(function() {

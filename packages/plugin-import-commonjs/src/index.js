@@ -3,12 +3,12 @@
  * Detects and fully resolves import requests for CommonJS files in node_modules.
  *
  */
-const commonjs = require('@rollup/plugin-commonjs');
-const fs = require('fs');
-const path = require('path');
-const { parse } = require('cjs-module-lexer');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
-const rollupStream = require('@rollup/stream');
+import commonjs from '@rollup/plugin-commonjs';
+import fs from 'fs';
+import path from 'path';
+import { parse, init } from 'cjs-module-lexer';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
+import rollupStream from '@rollup/stream';
 
 // bit of a workaround for now, but maybe this could be supported by cjs-module-lexar natively?
 // https://github.com/guybedford/cjs-module-lexer/issues/35
@@ -17,6 +17,7 @@ const testForCjsModule = async(url) => {
 
   if (path.extname(url) === '.js' && (/node_modules/).test(url) && url.indexOf('es-module-shims.js') < 0) {
     try {
+      await init();
       const body = await fs.promises.readFile(url, 'utf-8');
       await parse(body);
 
@@ -81,7 +82,7 @@ class ImportCommonJsResource extends ResourceInterface {
   }
 }
 
-module.exports = (options = {}) => {
+const greenwodPluginImportCommonJs = (options = {}) => {
   return [{
     type: 'resource',
     name: 'plugin-import-commonjs:resource',
@@ -93,4 +94,8 @@ module.exports = (options = {}) => {
       commonjs()
     ]
   }];
+};
+
+export {
+  greenwodPluginImportCommonJs
 };

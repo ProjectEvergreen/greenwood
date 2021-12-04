@@ -1,8 +1,8 @@
-const generateCompilation = require('../lifecycles/compile');
-const { ServerInterface } = require('../lib/server-interface');
-const { devServer } = require('../lifecycles/serve');
+import { generateCompilation } from '../lifecycles/compile.js';
+import { ServerInterface } from '../lib/server-interface.js';
+import { devServer } from '../lifecycles/serve.js';
 
-module.exports = runDevServer = async () => {
+const runDevServer = async () => {
 
   return new Promise(async (resolve, reject) => {
 
@@ -10,7 +10,7 @@ module.exports = runDevServer = async () => {
       const compilation = await generateCompilation();
       const { port } = compilation.config.devServer;
       
-      devServer(compilation).listen(port, () => {
+      (await devServer(compilation)).listen(port, () => {
         
         console.info(`Started local development server at localhost:${port}`);
 
@@ -27,7 +27,7 @@ module.exports = runDevServer = async () => {
         })];
 
         return Promise.all(servers.map(async (server) => {
-          return server.start();
+          return await server.start();
         }));
       });
     } catch (err) {
@@ -36,3 +36,5 @@ module.exports = runDevServer = async () => {
 
   });
 };
+
+export { runDevServer };

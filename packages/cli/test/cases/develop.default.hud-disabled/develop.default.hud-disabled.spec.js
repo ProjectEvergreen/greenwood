@@ -15,19 +15,22 @@
  *   pages/
  *     index.html
  */
-const expect = require('chai').expect;
-const fs = require('fs');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const { getSetupFiles } = require('../../../../../test/utils');
-const request = require('request');
-const Runner = require('gallinago').Runner;
-const runSmokeTest = require('../../../../../test/smoke-test');
+import chai from 'chai';
+import fs from 'fs';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { getSetupFiles } from '../../../../../test/utils.js';
+import request from 'request';
+import { Runner } from 'gallinago';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { fileURLToPath, URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://localhost';
   const port = 1984;
   let runner;
@@ -75,7 +78,7 @@ describe('Develop Greenwood With: ', function() {
             response = res;
             
             dom = new JSDOM(body);
-            sourceHtml = fs.readFileSync(path.join(__dirname, 'src/pages/index.html'), 'utf-8');
+            sourceHtml = fs.readFileSync(fileURLToPath(new URL('./src/pages/index.html', import.meta.url)), 'utf-8');
 
             resolve();
           });

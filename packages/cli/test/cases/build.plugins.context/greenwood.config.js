@@ -1,7 +1,7 @@
 // shared with another test develop.plugins.context
-const myThemePackPlugin = require('./theme-pack-context-plugin');
+import { myThemePackPlugin } from './theme-pack-context-plugin.js';
 
-module.exports = {
+export default {
   plugins: [
     ...myThemePackPlugin()
   ]

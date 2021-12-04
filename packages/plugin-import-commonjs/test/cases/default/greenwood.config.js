@@ -1,7 +1,7 @@
-const pluginImportCommonJs = require('../../../src/index');
+import { greenwodPluginImportCommonJs } from '../../../src/index.js';
 
-module.exports = {
+export default {
   plugins: [
-    ...pluginImportCommonJs()
+    ...greenwodPluginImportCommonJs()
   ]
 };

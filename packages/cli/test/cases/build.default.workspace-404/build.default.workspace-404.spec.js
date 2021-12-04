@@ -24,19 +24,22 @@
  *   templates/
  *     app.html
  */
-const expect = require('chai').expect;
-const fs = require('fs');
-const glob = require('glob-promise');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import fs from 'fs';
+import glob from 'glob-promise';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { Runner } from 'gallinago';
+import { fileURLToPath, URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace w/Custom 404 Page and App Template';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(function() {
@@ -58,6 +61,8 @@ describe('Build Greenwood With: ', function() {
       let dom;
       let jsFiles;
       let cssFiles;
+      let scriptTags;
+      let linkTags;
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, '404.html'));
@@ -68,7 +73,6 @@ describe('Build Greenwood With: ', function() {
       before(function() {
         scriptTags = dom.window.document.querySelectorAll('head > script');
         linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"');
-        headingTags = dom.window.document.querySelectorAll('body > h1');
       });
 
       describe('404 page static assets in the output directory', function() {

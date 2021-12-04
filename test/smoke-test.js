@@ -6,13 +6,15 @@
  * There are a number of examples in the CLI package you can use as a reference.
  *
  */
-const expect = require('chai').expect;
-const fs = require('fs');
-const glob = require('glob-promise');
-const http = require('http');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const { tagsMatch } = require('./utils');
+import chai from 'chai';
+import fs from 'fs';
+import glob from 'glob-promise';
+import http from 'http';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { tagsMatch } from './utils.js';
+
+const expect = chai.expect;
 
 function commonIndexSpecs(dom, html, label) {
   describe(`Running Common Index Smoke Tests for ${label}`, function() {
@@ -221,7 +223,7 @@ function serve(label) {
   });
 }
 
-module.exports = runSmokeTest = async function(testCases, label) {
+async function runSmokeTest(testCases, label) {
 
   testCases.forEach(async (testCase) => {
     switch (testCase) {
@@ -241,4 +243,8 @@ module.exports = runSmokeTest = async function(testCases, label) {
 
     }
   });
+}
+
+export {
+  runSmokeTest
 };
