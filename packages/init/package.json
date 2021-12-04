@@ -6,6 +6,7 @@
   "author": "Grant Hutchinson <grant@hutchdev.ca>",
   "license": "MIT",
   "main": "src/index.js",
+  "type": "module",
   "keywords": [
     "Greenwood",
     "Static Site Generator",

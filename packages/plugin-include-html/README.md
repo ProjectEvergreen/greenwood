@@ -9,13 +9,13 @@ In the spirit of the since [abandoned HTML Imports spec](https://www.html5rocks.
 Add this plugin to your _greenwood.config.js_ and spread the `export`.
 
 ```javascript
-const pluginIncludeHtml = require('@greenwood/plugin-include-html');
+import { greenwoodPluginIncludeHtml } from '@greenwood/plugin-include-html';
 
-module.exports = {
+export default {
   ...
 
   plugins: [
-    ...pluginIncludeHtml() // notice the spread ... !
+    ...greenwoodPluginIncludeHtml() // notice the spread ... !
   ]
 }
 ```
@@ -110,7 +110,7 @@ const getData = async () => {
   return { version };
 };
 
-module.exports = {
+export {
   getTemplate,
   getData
 }; 

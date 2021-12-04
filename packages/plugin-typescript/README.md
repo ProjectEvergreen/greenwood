@@ -21,13 +21,13 @@ yarn add @greenwood/plugin-typescript --dev
 Add this plugin to your _greenwood.config.js_.
 
 ```javascript
-const pluginTypeScript = require('@greenwood/plugin-typescript');
+import { greenwoodPluginTypeScript } from '@greenwood/plugin-typescript';
 
-module.exports = {
+export default {
   ...
 
   plugins: [
-    ...pluginTypeScript() // notice the spread ... !
+    ...greenwoodPluginTypeScript() // notice the spread ... !
   ]
 }
 ```
@@ -78,16 +78,16 @@ If you would like to extend / override these options:
       }
     }
     ```
-1. When adding `pluginTypeScript` to your _greenwood.config.js_, enable the `extendConfig` option
+1. When adding `greenwoodPluginTypeScript` to your _greenwood.config.js_, enable the `extendConfig` option
     ```js
-    const pluginTypeScript = require('@greenwood/plugin-typescript');
+    import { greenwoodPluginTypeScript } from '@greenwood/plugin-typescript';
 
-    module.exports = {
+    export default {
       ...
 
       plugins: [
         // notice the spread ... !
-        ...pluginTypeScript({
+        ...greenwoodPluginTypeScript({
           extendConfig: true
         })
       ]

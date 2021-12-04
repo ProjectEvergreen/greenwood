@@ -4,9 +4,9 @@
  * This is a Greenwood default plugin.
  *
  */
-const fs = require('fs');
-const { ResourceInterface } = require('../../lib/resource-interface');
-const { terser } = require('rollup-plugin-terser');
+import fs from 'fs';
+import { ResourceInterface } from '../../lib/resource-interface.js';
+import { terser } from 'rollup-plugin-terser';
 
 class StandardJavaScriptResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -31,7 +31,7 @@ class StandardJavaScriptResource extends ResourceInterface {
   }
 }
 
-module.exports = [{
+const greenwoodPluginStandardJavascript = [{
   type: 'resource',
   name: 'plugin-standard-javascript:resource',
   provider: (compilation, options) => new StandardJavaScriptResource(compilation, options)
@@ -44,3 +44,5 @@ module.exports = [{
       : [];
   }
 }];
+
+export { greenwoodPluginStandardJavascript };

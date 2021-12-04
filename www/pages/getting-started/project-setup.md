@@ -36,9 +36,10 @@ All set!
 ### Configuring Workflows
 With Greenwood installed, let's create a couple of **npm** scripts so that we can automate our development workflows with easy to remember commands.
 
-In _package.json_, edit the `scripts` section accordingly by adding:
+In _package.json_, edit the `scripts` and `type` sections accordingly by adding:
 ```json
 {
+  "type": "module",
   "scripts": {
     "...": "....",
 

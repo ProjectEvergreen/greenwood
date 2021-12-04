@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 async function rreaddir (dir, allFiles = []) {
   const files = (await fs.promises.readdir(dir)).map(f => path.join(dir, f));
@@ -65,16 +65,16 @@ async function copyDirectory(from, to) {
   });
 }
 
-module.exports = copyAssets = (compilation) => {
+const copyAssets = (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
       const copyPlugins = compilation.config.plugins.filter(plugin => plugin.type === 'copy');
 
-      for (plugin of copyPlugins) {
-        const locations = plugin.provider(compilation);
+      for (const plugin of copyPlugins) {
+        const locations = await plugin.provider(compilation);
 
-        for (location of locations) {
+        for (const location of locations) {
           const { from, to } = location;
 
           if (path.extname(from) === '') {
@@ -93,3 +93,5 @@ module.exports = copyAssets = (compilation) => {
     }
   });
 };
+
+export { copyAssets };

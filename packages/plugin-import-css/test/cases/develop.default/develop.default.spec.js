@@ -9,23 +9,32 @@
  * greenwood develop
  *
  * User Config
- * Import CSS Plugin
+ * import { greenwoodPluginImportCss } from '@greenwod/plugin-import-css';
+ *
+ * {
+ *   plugins: [{
+ *      ...greenwoodPluginImportCss()
+ *  }]
+ * }
  *
  * User Workspace
  * src/
  *   main.css
  *
  */
-const expect = require('chai').expect;
-const path = require('path');
-const request = require('request');
-const Runner = require('gallinago').Runner;
-const runSmokeTest = require('../../../../../test/smoke-test');
+import chai from 'chai';
+import path from 'path';
+import request from 'request';
+import { Runner } from 'gallinago';
+import { fileURLToPath, URL } from 'url';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+
+const expect = chai.expect;
 
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'Import CSS plugin for using ESM with .css files';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://localhost';
   const port = 1984;
   let runner;

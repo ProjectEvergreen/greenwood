@@ -1,7 +1,7 @@
-const pluginIncludeHtml = require('../../../src/index');
+import { greenwoodPluginIncludeHTML } from '../../../src/index.js';
 
-module.exports = {
+export default {
   plugins: [
-    ...pluginIncludeHtml()
+    ...greenwoodPluginIncludeHTML()
   ]
 };

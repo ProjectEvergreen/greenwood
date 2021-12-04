@@ -1,5 +1,5 @@
-module.exports = {
+export default {
   plugins: [
-    require('postcss-preset-env')
+    (await import('postcss-preset-env')).default
   ]
 };

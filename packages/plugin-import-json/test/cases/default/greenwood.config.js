@@ -1,7 +1,9 @@
-const pluginImportJson = require('../../../src/index');
+import { greenwoodPluginImportJson } from '../../../src/index.js';
 
-module.exports = {
+export default {
+  
   plugins: [
-    ...pluginImportJson()
+    ...greenwoodPluginImportJson()
   ]
+
 };

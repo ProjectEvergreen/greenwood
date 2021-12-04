@@ -1,8 +1,8 @@
-const fs = require('fs');
-const livereload = require('livereload');
-const path = require('path');
-const { ResourceInterface } = require('../../lib/resource-interface');
-const { ServerInterface } = require('../../lib/server-interface');
+import fs from 'fs';
+import livereload from 'livereload';
+import { ResourceInterface } from '../../lib/resource-interface.js';
+import { ServerInterface } from '../../lib/server-interface.js';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 class LiveReloadServer extends ServerInterface {
   constructor(compilation, options = {}) {
@@ -11,12 +11,15 @@ class LiveReloadServer extends ServerInterface {
 
   async start() {
     const { userWorkspace } = this.compilation.context;
-    const standardPluginsPath = path.join(__dirname, '../', 'resource');
-    const standardPluginsExtensions = fs.readdirSync(standardPluginsPath)
-      .filter(filename => filename.indexOf('plugin-standard') === 0)
-      .map((filename) => {
-        return require(`${standardPluginsPath}/${filename}`);
-      })
+    const standardPluginsPath = fileURLToPath(new URL('../resource', import.meta.url));
+    const standardPluginsNames = fs.readdirSync(standardPluginsPath)
+      .filter(filename => filename.indexOf('plugin-standard') === 0);
+    const standardPluginsExtensions = (await Promise.all(standardPluginsNames.map(async (filename) => {
+      const pluginImport = await import(pathToFileURL(`${standardPluginsPath}/${filename}`));
+      const plugin = pluginImport[Object.keys(pluginImport)[0]];
+      
+      return plugin;
+    })))
       .map((plugin) => {
         // assume that if it is an array, the second item is a rollup plugin
         const instance = plugin.length
@@ -77,7 +80,7 @@ class LiveReloadResource extends ResourceInterface {
   }
 }
 
-module.exports = [{
+const greenwoodPluginLivereload = [{
   type: 'server',
   name: 'plugin-live-reload:server',
   provider: (compilation) => new LiveReloadServer(compilation)
@@ -86,3 +89,5 @@ module.exports = [{
   name: 'plugin-live-reload:resource',
   provider: (compilation) => new LiveReloadResource(compilation)
 }];
+
+export { greenwoodPluginLivereload };

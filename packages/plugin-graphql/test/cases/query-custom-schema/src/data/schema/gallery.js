@@ -1,4 +1,4 @@
-const gql = require('graphql-tag');
+import gql from 'graphql-tag';
 
 const getGallery = async (root, query) => {
   if (query.name === 'logos') {
@@ -38,7 +38,7 @@ const galleryResolvers = {
   }
 };
 
-module.exports = {
-  customTypeDefs: galleryTypeDefs,
-  customResolvers: galleryResolvers
+export {
+  galleryTypeDefs as customTypeDefs,
+  galleryResolvers as customResolvers
 };

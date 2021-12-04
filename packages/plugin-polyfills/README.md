@@ -28,13 +28,13 @@ yarn add @greenwood/plugin-polyfills --dev
 Use this plugin in your _greenwood.config.js_.
 
 ```javascript
-const polyfillsPlugin = require('@greenwood/plugin-polyfills');
+import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
 
-module.exports = {
+export default {
   ...
 
   plugins: [
-    ...polyfillsPlugin() // notice the spread ... !
+    ...greenwoodPluginPolyfills() // notice the spread ... !
   ]
 }
 ```

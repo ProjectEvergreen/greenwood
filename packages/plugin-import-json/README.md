@@ -21,13 +21,13 @@ yarn add @greenwood/plugin-import-json --dev
 Add this plugin to your _greenwood.config.js_ and spread the `export`.
 
 ```javascript
-const pluginImportJson = require('@greenwood/plugin-import-json');
+import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
 
-module.exports = {
+export default {
   ...
 
   plugins: [
-    ...pluginImportJson() // notice the spread ... !
+    ...greenwoodPluginImportJson() // notice the spread ... !
   ]
 }
 ```

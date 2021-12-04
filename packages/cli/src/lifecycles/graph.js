@@ -1,11 +1,12 @@
-#!/usr/bin/env node
 /* eslint-disable complexity */
-const fs = require('fs');
-const fm = require('front-matter');
-const path = require('path');
-const toc = require('markdown-toc');
+import fs from 'fs';
+import fm from 'front-matter';
+import path from 'path';
+import toc from 'markdown-toc';
+// const fm = require('front-matter');
+// const toc = require('markdown-toc');
 
-module.exports = generateGraph = async (compilation) => {
+const generateGraph = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
@@ -194,3 +195,5 @@ module.exports = generateGraph = async (compilation) => {
 
   });
 };
+
+export { generateGraph };

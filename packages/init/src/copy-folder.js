@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // https://stackoverflow.com/a/26038979
 function copyFileSync(source, target) {
@@ -40,4 +40,6 @@ function copyFolderRecursiveSync(source, target) {
   }
 }
 
-module.exports = copyFolder = copyFolderRecursiveSync;
+export {
+  copyFolderRecursiveSync as copyFolder
+};

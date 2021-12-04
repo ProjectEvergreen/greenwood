@@ -1,7 +1,10 @@
-const myThemePack = require('./my-theme-pack');
-const packageName = require('./package.json').name;
-const path = require('path');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
+import fs from 'fs';
+import { myThemePack } from './my-theme-pack.js';
+import path from 'path';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
+import { URL } from 'url';
+
+const packageName = JSON.parse(await fs.promises.readFile(new URL('./package.json', import.meta.url), 'utf-8')).name;
 
 class MyThemePackDevelopmentResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -19,7 +22,7 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
   }
 }
 
-module.exports = {
+export default {
   plugins: [
     ...myThemePack({
       __isDevelopment: true

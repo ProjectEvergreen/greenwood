@@ -1,5 +1,6 @@
 {
   "name": "test-develop-command-default",
+  "type": "module",
   "dependencies": {
     "@babel/runtime": "^7.10.4",
     "@lion/button": "^0.14.3",

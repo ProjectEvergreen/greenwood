@@ -1,5 +1,5 @@
-const path = require('path');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
+import path from 'path';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class GoogleAnalyticsResource extends ResourceInterface {
   constructor(compilation, options = {}) {
@@ -49,10 +49,14 @@ class GoogleAnalyticsResource extends ResourceInterface {
   }
 }
 
-module.exports = (options = {}) => {
+const greenwoodPluginGoogleAnalytics = (options = {}) => {
   return {
     type: 'resource',
     name: 'plugin-google-analytics',
     provider: (compilation) => new GoogleAnalyticsResource(compilation, options)
   };
+};
+
+export {
+  greenwoodPluginGoogleAnalytics
 };

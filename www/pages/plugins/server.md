@@ -20,14 +20,14 @@ Although JavaScript is loosely typed, a [server "interface"](https://github.com/
 
 They can be used in a _greenwood.config.js_ just like any other plugin type.
 ```javascript
-const pluginMyServerFoo = require('./plugin-my-server');
+import { myServerPlugin } from './my-server-plugin.js';
 
-module.exports = {
+export default {
 
   ...
 
   plugins: [
-    pluginMyServer()
+    myServerPlugin()
   ]
 
 }
@@ -54,7 +54,7 @@ class LiveReloadServer extends ServerInterface {
   }
 }
 
-module.exports = (options = {}) => {
+export function myServerPlugin(options = {}) {
   return {
     type: 'server',
     name: 'plugin-livereload',

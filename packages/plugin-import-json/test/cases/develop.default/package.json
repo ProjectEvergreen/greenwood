@@ -1,3 +1,4 @@
 {
-  "name": "test-develop-command-typescript-.ts"
+  "name": "test-plugin-import-json-develop-default",
+  "type": "module"
 }

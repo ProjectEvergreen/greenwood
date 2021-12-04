@@ -12,4 +12,6 @@ const MOCK_CONFIG = {
   }
 };
 
-module.exports = MOCK_CONFIG;
+export { 
+  MOCK_CONFIG
+};

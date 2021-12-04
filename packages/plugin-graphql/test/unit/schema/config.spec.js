@@ -1,6 +1,8 @@
-const expect = require('chai').expect;
-const MOCK_CONFIG = require('../mocks/config');
-const { configResolvers } = require('../../../src/schema/config');
+import chai from 'chai';
+import { configResolvers } from '../../../src/schema/config.js';
+import { MOCK_CONFIG } from '../mocks/config.js';
+
+const expect = chai.expect;
 
 describe('Unit Test: Data', function() {
 

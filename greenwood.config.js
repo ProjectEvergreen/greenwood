@@ -1,17 +1,17 @@
-const path = require('path');
-const pluginGraphQL = require('@greenwood/plugin-graphql');
-const pluginIncludeHtml = require('@greenwood/plugin-include-html');
-const pluginImportCss = require('@greenwood/plugin-import-css');
-const pluginImportJson = require('@greenwood/plugin-import-json');
-const pluginPolyfills = require('@greenwood/plugin-polyfills');
-const pluginPostCss = require('@greenwood/plugin-postcss');
-const rollupPluginAnalyzer = require('rollup-plugin-analyzer');
+import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
+import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
+import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
+import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
+import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
+import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
+import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
+import { fileURLToPath, URL } from 'url';
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
 
-module.exports = {
-  workspace: path.join(__dirname, 'www'),
+export default {
+  workspace: fileURLToPath(new URL('./www', import.meta.url)),
   mode: 'mpa',
   optimization: 'inline',
   title: 'Greenwood',
@@ -28,11 +28,11 @@ module.exports = {
     { name: 'google-site-verification', content: '4rYd8k5aFD0jDnN0CCFgUXNe4eakLP4NnA18mNnK5P0' }
   ],
   plugins: [
-    ...pluginGraphQL(),
-    ...pluginPolyfills(),
-    pluginPostCss(),
-    ...pluginImportJson(),
-    ...pluginImportCss(),
+    ...greenwoodPluginGraphQL(),
+    ...greenwoodPluginPolyfills(),
+    greenwoodPluginPostCss(),
+    ...greenwoodPluginImportJson(),
+    ...greenwoodPluginImportCss(),
     {
       type: 'rollup',
       name: 'rollup-plugin-analyzer',
@@ -47,7 +47,7 @@ module.exports = {
         ];
       }
     },
-    ...pluginIncludeHtml()
+    ...greenwoodPluginIncludeHTML()
   ],
   markdown: {
     plugins: [

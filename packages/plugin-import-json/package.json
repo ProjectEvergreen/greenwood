@@ -13,6 +13,7 @@
     "JSON"
   ],
   "main": "src/index.js",
+  "type": "module",
   "files": [
     "src/"
   ],

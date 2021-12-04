@@ -21,13 +21,16 @@
  *
  */
 
-const expect = require('chai').expect;
-const path = require('path');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import path from 'path';
+import { Runner } from 'gallinago';
+import { fileURLToPath, URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(async function() {

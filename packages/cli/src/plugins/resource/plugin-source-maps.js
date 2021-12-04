@@ -3,9 +3,9 @@
  * Detects and fully resolve requests to source map (.map) files.
  *
  */
-const fs = require('fs');
-const path = require('path');
-const { ResourceInterface } = require('../../lib/resource-interface');
+import fs from 'fs';
+import path from 'path';
+import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class SourceMapsResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -33,8 +33,10 @@ class SourceMapsResource extends ResourceInterface {
   }
 }
 
-module.exports = {
+const greenwoodPluginSourceMaps = {
   type: 'resource',
   name: 'plugin-source-maps',
   provider: (compilation, options) => new SourceMapsResource(compilation, options)
 };
+
+export { greenwoodPluginSourceMaps };

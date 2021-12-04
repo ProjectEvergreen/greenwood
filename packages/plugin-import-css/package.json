@@ -13,6 +13,7 @@
     "Css-in-Js"
   ],
   "main": "src/index.js",
+  "type": "module",
   "files": [
     "src/"
   ],
@@ -20,10 +21,11 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.4.0"
+    "@greenwood/cli": "^0.4.0",
+    "postcss": "^8.3.11"
   },
   "dependencies": {
-    "rollup-plugin-postcss": "^3.1.5"
+    "rollup-plugin-postcss": "^4.0.2"
   },
   "devDependencies": {
     "@greenwood/cli": "^0.19.3"
