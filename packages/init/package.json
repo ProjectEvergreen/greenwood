@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/init",
-  "version": "0.19.4",
+  "version": "0.20.0-alpha.0",
   "description": "A package for scaffolding a new Greenwood project.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/init",
   "author": "Grant Hutchinson <grant@hutchdev.ca>",
