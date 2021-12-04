@@ -13,25 +13,27 @@ The copy plugins allow users to copy files around as part of the [build](/docs/#
 This plugin supports providing an array of "location" objects that can either be files or directories.
 
 ```js
-const path = require('path');
+import path from 'path';
 
-module.exports = () => [{
-  type: 'copy',
-  name: 'plugin-copy-some-files',
-  provider: (compilation) => {
-    const { context } = compilation;
+export function myCopyPlugin(options = {}) {
+  return {
+    type: 'copy',
+    name: 'plugin-copy-some-files',
+    provider: (compilation) => {
+      const { context } = compilation;
 
-    return [{
-      // can only copy a file to a file
-      from: path.join(context.userWorkspace, 'robots.txt'),
-      to: path.join(context.outputDir, 'robots.txt')
-    }, {
-      // can only copy a directory to a directory
-      from: path.join(context.userWorkspace, 'pdfs'),
-      to: path.join(context.outputDir, 'pdfs')
-    }];
+      return [{
+        // can only copy a file to a file
+        from: path.join(context.userWorkspace, 'robots.txt'),
+        to: path.join(context.outputDir, 'robots.txt')
+      }, {
+        // can only copy a directory to a directory
+        from: path.join(context.userWorkspace, 'pdfs'),
+        to: path.join(context.outputDir, 'pdfs')
+      }];
+    }
   }
-}];
+};
 ```
 
 

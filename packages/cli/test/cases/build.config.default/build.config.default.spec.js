@@ -14,15 +14,16 @@
  * User Workspace
  * Greenwood default (src/)
  */
-const path = require('path');
-const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import path from 'path';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { Runner } from 'gallinago';
+import { fileURLToPath, URL } from 'url';
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Empty Configuration and Default Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(function() {

@@ -3,8 +3,8 @@
  * Manages routing devServer.proxy entries to their destination.
  *
  */
-const fetch = require('node-fetch');
-const { ResourceInterface } = require('../../lib/resource-interface');
+import fetch from 'node-fetch';
+import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class DevProxyResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -38,8 +38,10 @@ class DevProxyResource extends ResourceInterface {
   }
 }
 
-module.exports = {
+const greenwoodPluginDevProxy = {
   type: 'resource',
   name: 'plugin-dev-proxy',
   provider: (compilation, options) => new DevProxyResource(compilation, options)
 };
+
+export { greenwoodPluginDevProxy };

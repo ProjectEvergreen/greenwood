@@ -1,7 +1,7 @@
-const polyfillsPlugin = require('../../../src/index');
+import { greenwoodPluginPolyfills } from '../../../src/index.js';
 
-module.exports = {
+export default {
   plugins: [
-    ...polyfillsPlugin()
+    ...greenwoodPluginPolyfills()
   ]
 };

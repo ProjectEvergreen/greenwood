@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-module.exports = [{
+const greenwoodPluginCopyAssets = [{
   type: 'copy',
   name: 'plugin-copy-assets',
   provider: (compilation) => {
@@ -19,3 +19,5 @@ module.exports = [{
     return assets;
   }
 }];
+
+export { greenwoodPluginCopyAssets };

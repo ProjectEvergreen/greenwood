@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   markdown: {
     settings: { gfm: false }
   }

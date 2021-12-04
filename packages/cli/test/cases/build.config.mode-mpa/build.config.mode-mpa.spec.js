@@ -20,18 +20,22 @@
  *     about.md
  *     index.md
  */
-const expect = require('chai').expect;
-const fs = require('fs');
-const glob = require('glob-promise');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import fs from 'fs';
+import glob from 'glob-promise';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { Runner } from 'gallinago';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { fileURLToPath, URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Mode';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(async function() {

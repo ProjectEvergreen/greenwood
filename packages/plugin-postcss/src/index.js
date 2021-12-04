@@ -3,20 +3,21 @@
  * Enable using PostCSS process for CSS files.
  *
  */
-const fs = require('fs');
-const path = require('path');
-const postcss = require('postcss');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
+import fs from 'fs';
+import path from 'path';
+import postcss from 'postcss';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
+import { pathToFileURL } from 'url';
 
-function getConfig (compilation, extendConfig = false) {
+async function getConfig (compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = 'postcss.config';
-  const defaultConfig = require(path.join(__dirname, configFile));
-  const userConfig = fs.existsSync(path.join(projectDirectory, `${configFile}.js`))
-    ? require(`${projectDirectory}/${configFile}`)
+  const defaultConfig = (await import(new URL(`${configFile}.js`, import.meta.url).pathname)).default;
+  const userConfig = fs.existsSync(path.join(projectDirectory, `${configFile}.mjs`))
+    ? (await import(pathToFileURL(path.join(projectDirectory, `${configFile}.mjs`)))).default
     : {};
   let finalConfig = Object.assign({}, userConfig);
-  
+
   if (userConfig && extendConfig) {    
     finalConfig.plugins = Array.isArray(userConfig.plugins)
       ? [...defaultConfig.plugins, ...userConfig.plugins]
@@ -44,7 +45,7 @@ class PostCssResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise(async(resolve, reject) => {
       try {
-        const config = getConfig(this.compilation, this.options.extendConfig);
+        const config = await getConfig(this.compilation, this.options.extendConfig);
         const plugins = config.plugins || [];
         const css = plugins.length > 0
           ? (await postcss(plugins).process(body, { from: url })).css
@@ -66,11 +67,11 @@ class PostCssResource extends ResourceInterface {
   async optimize(url, body) {
     const { outputDir, userWorkspace } = this.compilation.context;
     const workspaceUrl = url.replace(outputDir, userWorkspace);
-    const config = getConfig(this.compilation, this.options.extendConfig);
+    const config = await getConfig(this.compilation, this.options.extendConfig);
     const plugins = config.plugins || [];
     
     plugins.push(
-      require('cssnano')
+      (await import('cssnano')).default
     );
     
     const css = plugins.length > 0
@@ -81,10 +82,12 @@ class PostCssResource extends ResourceInterface {
   }
 }
 
-module.exports = (options = {}) => {
+const greenwoodPluginPostCss = (options = {}) => {
   return {
     type: 'resource',
     name: 'plugin-postcss',
     provider: (compilation) => new PostCssResource(compilation, options)
   };
 };
+
+export { greenwoodPluginPostCss };

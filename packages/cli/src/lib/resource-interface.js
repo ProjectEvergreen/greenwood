@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 class ResourceInterface {
   constructor(compilation, options = {}) {
@@ -90,6 +90,4 @@ class ResourceInterface {
   }
 }
 
-module.exports = {
-  ResourceInterface
-};
+export { ResourceInterface };

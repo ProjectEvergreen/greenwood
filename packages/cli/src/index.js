@@ -5,13 +5,16 @@
 // https://github.com/ProjectEvergreen/greenwood/issues/141
 process.setMaxListeners(0);
 
-const program = require('commander');
-const runProductionBuild = require('./commands/build');
-const runDevServer = require('./commands/develop');
-const runProdServer = require('./commands/serve');
-const ejectConfiguration = require('./commands/eject');
-const greenwoodPackageJson = require('../package.json');
+import program from 'commander';
+import fs from 'fs/promises';
+import { URL } from 'url';
 
+import { runDevServer } from './commands/develop.js';
+import { runProductionBuild } from './commands/build.js';
+import { runProdServer } from './commands/serve.js';
+import { ejectConfiguration } from './commands/eject.js';
+
+const greenwoodPackageJson = JSON.parse(await fs.readFile(new URL('../package.json', import.meta.url), 'utf-8'));
 let cmdOption = {};
 let command = '';
 

@@ -1,7 +1,7 @@
-const generateCompilation = require('../lifecycles/compile');
-const { prodServer } = require('../lifecycles/serve');
+import { generateCompilation } from '../lifecycles/compile.js';
+import { prodServer } from '../lifecycles/serve.js';
 
-module.exports = runProdServer = async () => {
+const runProdServer = async () => {
 
   return new Promise(async (resolve, reject) => {
 
@@ -9,7 +9,7 @@ module.exports = runProdServer = async () => {
       const compilation = await generateCompilation();
       const port = 8080;
       
-      prodServer(compilation).listen(port, () => {
+      (await prodServer(compilation)).listen(port, () => {
         console.info(`Started production test server at localhost:${port}`);
       });
     } catch (err) {
@@ -18,3 +18,5 @@ module.exports = runProdServer = async () => {
 
   });
 };
+
+export { runProdServer };

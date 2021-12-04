@@ -1,4 +1,4 @@
-const gql = require('graphql-tag');
+import gql from 'graphql-tag';
 
 const getConfiguration = async (root, query, context) => {
   return context.config;
@@ -40,7 +40,7 @@ const configResolvers = {
   }
 };
 
-module.exports = {
+export {
   configTypeDefs,
   configResolvers
 };

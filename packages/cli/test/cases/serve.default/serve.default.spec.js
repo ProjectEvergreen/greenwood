@@ -14,17 +14,20 @@
  * User Workspace
  * Greenwood default (src/)
  */
-const expect = require('chai').expect;
-const path = require('path');
-const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const request = require('request');
-const runSmokeTest = require('../../../../../test/smoke-test');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import path from 'path';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import request from 'request';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { Runner } from 'gallinago';
+import { fileURLToPath, URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Serve Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://127.0.0.1:8080';
   let runner;
 

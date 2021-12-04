@@ -1,12 +1,12 @@
-const bundleCompilation = require('../lifecycles/bundle');
-const copyAssets = require('../lifecycles/copy');
-const { devServer } = require('../lifecycles/serve');
-const fs = require('fs');
-const generateCompilation = require('../lifecycles/compile');
-const { preRenderCompilation, staticRenderCompilation } = require('../lifecycles/prerender');
-const { ServerInterface } = require('../lib/server-interface');
+import { bundleCompilation } from '../lifecycles/bundle.js';
+import { copyAssets } from '../lifecycles/copy.js';
+import { devServer } from '../lifecycles/serve.js';
+import fs from 'fs';
+import { generateCompilation } from '../lifecycles/compile.js';
+import { preRenderCompilation, staticRenderCompilation } from '../lifecycles/prerender.js';
+import { ServerInterface } from '../lib/server-interface.js';
 
-module.exports = runProductionBuild = async () => {
+const runProductionBuild = async () => {
 
   return new Promise(async (resolve, reject) => {
 
@@ -21,9 +21,9 @@ module.exports = runProductionBuild = async () => {
       }
       
       if (prerender) {
-        await new Promise((resolve, reject) => {
+        await new Promise(async (resolve, reject) => {
           try {
-            devServer(compilation).listen(port, async () => {
+            (await devServer(compilation)).listen(port, async () => {
               console.info(`Started local development server at localhost:${port}`);
   
               const servers = [...compilation.config.plugins.filter((plugin) => {
@@ -66,3 +66,5 @@ module.exports = runProductionBuild = async () => {
   });
   
 };
+
+export { runProductionBuild };

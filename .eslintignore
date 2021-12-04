@@ -1,6 +1,6 @@
 **/.greenwood/**
 **/public/**
 **/node_modules/**
-!.eslintrc.js
+!.eslintrc.cjs
 !.mocharc.js
 packages/plugin-babel/test/cases/**/*main.js

@@ -18,17 +18,21 @@
  *       index.md
  *     index.md
  */
-const expect = require('chai').expect;
-const glob = require('glob-promise');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import glob from 'glob-promise';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { Runner } from 'gallinago';
+import { fileURLToPath, URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Context Plugin and Default Workspace (aka Theme Packs)';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(function() {
@@ -44,15 +48,15 @@ describe('Build Greenwood With: ', function() {
       // copy fixtures into node_modules
       // to match the location specified in the plugin under test
       const themePacktemplates = await getDependencyFiles(
-        `${__dirname}/fixtures/layouts/*.html`,
+        `${outputPath}/fixtures/layouts/*.html`,
         `${outputPath}/node_modules/my-theme-pack/dist/layouts`
       );
       const themePackStyles = await getDependencyFiles(
-        `${__dirname}/fixtures/styles/*.css`,
+        `${outputPath}/fixtures/styles/*.css`,
         `${outputPath}/node_modules/my-theme-pack/dist/styles`
       );
       const themePackComponents = await getDependencyFiles(
-        `${__dirname}/fixtures/components/*.js`,
+        `${outputPath}/fixtures/components/*.js`,
         `${outputPath}/node_modules/my-theme-pack/dist/components`
       );
 

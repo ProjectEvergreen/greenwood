@@ -21,13 +21,13 @@ yarn add @greenwood/plugin-graphql --dev
 Add this plugin to your _greenwood.config.js_ and spread the `export`.
 
 ```javascript
-const pluginGraphQL = require('@greenwood/plugin-graphql');
+import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
 
-module.exports = {
+export default {
   ...
 
   plugins: [
-    ...pluginGraphQL() // notice the spread ... !
+    ...greenwoodPluginGraphQL() // notice the spread ... !
   ]
 }
 ```
@@ -93,7 +93,7 @@ Just create a _data/schema_ directory and then Greenwood will look for any files
 
 For example, you could create a "gallery" schema that could be used to group and organize photos for your frontend using variable.
 ```js
-const gql = require('graphql-tag');
+import gql from 'graphql-tag';
 
 const getGallery = async (root, query) => {
   if (query.name === 'logos') {
@@ -134,9 +134,10 @@ const galleryResolvers = {
   }
 };
 
-module.exports = {
-  customTypeDefs: galleryTypeDefs,
-  customResolvers: galleryResolvers
+// naming is up to you as long as the final export is correct
+export {
+  galleryTypeDefs as customTypeDefs,
+  galleryResolvers as customResolvers
 };
 ```
 

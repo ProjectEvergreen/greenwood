@@ -3,11 +3,11 @@
  * Enables using JavaScript to import TypeScript files, using ESM syntax.
  *
  */
-const rollupPluginTypescript = require('@rollup/plugin-typescript');
-const fs = require('fs').promises;
-const path = require('path');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
-const tsc = require('typescript');
+import rollupPluginTypescript from '@rollup/plugin-typescript';
+import fs from 'fs';
+import path from 'path';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
+import tsc from 'typescript';
 
 const defaultcompilerOptions = {
   target: 'es2020',
@@ -18,10 +18,10 @@ const defaultcompilerOptions = {
 
 function getCompilerOptions (projectDirectory, extendConfig) {
   const customOptions = extendConfig
-    ? require(path.join(projectDirectory, 'tsconfig.json'))
+    ? JSON.parse(fs.readFileSync(path.join(projectDirectory, 'tsconfig.json'), 'utf-8'))
     : { compilerOptions: {} };
 
-  return compilerOptions = {
+  return {
     ...defaultcompilerOptions,
     ...customOptions.compilerOptions
   };
@@ -38,7 +38,7 @@ class TypeScriptResource extends ResourceInterface {
     return new Promise(async (resolve, reject) => {
       try {
         const { projectDirectory } = this.compilation.context;
-        const source = await fs.readFile(url, 'utf-8');
+        const source = await fs.promises.readFile(url, 'utf-8');
         const compilerOptions = getCompilerOptions(projectDirectory, this.options.extendConfig);
 
         // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
@@ -55,7 +55,7 @@ class TypeScriptResource extends ResourceInterface {
   }
 }
 
-module.exports = (options = {}) => {
+const greenwoodPluginTypeScript = (options = {}) => {
   return [{
     type: 'resource',
     name: 'plugin-import-typescript:resource',
@@ -71,4 +71,8 @@ module.exports = (options = {}) => {
       ];
     }
   }];
+};
+
+export {
+  greenwoodPluginTypeScript
 };

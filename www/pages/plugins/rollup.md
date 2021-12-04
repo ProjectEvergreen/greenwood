@@ -13,19 +13,21 @@ These plugins allow users to tap into the [Rollup](https://rollupjs.org/) config
 Install your favorite rollup plugin(s), then create a simple object to provide those plugins to Greenwood.
 
 ```javascript
-const bannerRollup = require('rollup-plugin-banner');
-const packageJson = require('./package.json'); 
+import bannerRollup = from 'rollup-plugin-banner';
+import fs from 'fs';
 
-module.exports = (options = {}) => {
+const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8')); 
+
+export function myRollupPlugin(options = {}) {
   const now = new Date().now();
 
-  return [{
+  return {
     type: 'rollup',
     name: 'plugin-something-something',
     provider: () => [
       banner(`/* ${packageJson.name} v${packageJson.version} - built at ${now}. */`)
     ]
-  }];
+  };
 };
 ```
 

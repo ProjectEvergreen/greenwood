@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   title: 'My Custom Greenwood App',
   meta: [
     { property: 'og:site', content: 'The Greenhouse I/O' },
