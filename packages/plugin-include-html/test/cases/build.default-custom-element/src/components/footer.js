@@ -1,6 +1,5 @@
 import fs from 'fs';
-import path from 'path';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const getTemplate = async (data) => {
   return `
@@ -13,7 +12,7 @@ const getTemplate = async (data) => {
 };
 
 const getData = async () => {
-  const dataPath = path.join(new URL('', import.meta.url).pathname, '../../../package.json');
+  const dataPath = fileURLToPath(new URL('../../package.json', import.meta.url));
   const data = JSON.parse(await fs.promises.readFile(dataPath, 'utf-8'));
 
   const { version } = data;

@@ -36,7 +36,7 @@ import { getDependencyFiles, getSetupFiles } from '../../../../../test/utils.js'
 import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
@@ -74,7 +74,7 @@ async function copyFile(source, target) {
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://localhost';
   const port = 1984;
   let runner;
@@ -344,7 +344,7 @@ describe('Develop Greenwood With: ', function() {
       await fs.promises.mkdir(`${outputPath}/node_modules/@babel/runtime`, { recursive: true });
       await fs.promises.copyFile(`${process.cwd()}/node_modules/@babel/runtime/package.json`, `${outputPath}/node_modules/@babel/runtime/package.json`);
       await Promise.all(babelRuntimeLibs.filter((asset) => {
-        const target = asset.replace(process.cwd(), path.dirname(new URL('', import.meta.url).pathname));
+        const target = asset.replace(process.cwd(), fileURLToPath(new URL('.', import.meta.url)));
         const isDirectory = path.extname(target) === '';
 
         if (isDirectory && !fs.existsSync(target)) {
@@ -353,7 +353,7 @@ describe('Develop Greenwood With: ', function() {
           return asset;
         }
       }).map((asset) => {
-        const target = asset.replace(process.cwd(), path.dirname(new URL('', import.meta.url).pathname));
+        const target = asset.replace(process.cwd(), fileURLToPath(new URL('.', import.meta.url)));
 
         return copyFile(asset, target);
       }));

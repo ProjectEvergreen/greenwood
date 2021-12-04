@@ -20,14 +20,14 @@ import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils
 import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
 describe('Serve Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://127.0.0.1:8080';
   let runner;
 

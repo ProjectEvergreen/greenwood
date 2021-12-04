@@ -15,17 +15,18 @@ import chai from 'chai';
 import fs from 'fs';
 import path from 'path';
 import { Runner } from 'gallinago';
+import { fileURLToPath, pathToFileURL, URL } from 'url';
 
 const expect = chai.expect;
 
 describe('Scaffold Greenwood With Default Template: ', function() {
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
-  const outputPath = path.join(path.dirname(new URL('', import.meta.url).pathname), 'my-app');
+  const outputPath = fileURLToPath(new URL('./my-app', import.meta.url));
   let runner;
 
   before(function() {
     this.context = {
-      publicDir: path.join(outputPath, 'my-app')
+      publicDir: outputPath
     };
     runner = new Runner();
   });
@@ -93,7 +94,7 @@ describe('Scaffold Greenwood With Default Template: ', function() {
       let greenwoodConfig;
 
       before(async function() {
-        greenwoodConfig = (await import(path.join(outputPath, 'greenwood.config.js'))).default;
+        greenwoodConfig = (await import(pathToFileURL(path.join(outputPath, './greenwood.config.js')))).default;
       });
 
       it('should have the correct title configuration', function() {

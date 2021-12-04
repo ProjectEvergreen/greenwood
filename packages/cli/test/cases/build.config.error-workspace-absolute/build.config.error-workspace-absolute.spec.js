@@ -10,7 +10,7 @@
  *
  * User Config
  * {
- *   workspace: path.join(path.dirname(new URL('', import.meta.url).pathname), 'noop')
+ *   workspace: fileURLToPath(new URL('./noop', import.meta.url))
  * }
  *
  * User Workspace
@@ -19,13 +19,13 @@
 import chai from 'chai';
 import path from 'path';
 import { Runner } from 'gallinago';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(async function() {

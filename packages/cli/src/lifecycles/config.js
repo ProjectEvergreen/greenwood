@@ -1,9 +1,11 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath, pathToFileURL, URL } from 'url';
 
 // get and "tag" all plugins provided / maintained by the @greenwood/cli
 // and include as the default set, with all user plugins getting appended
-const greenwoodPluginsBasePath = new URL('../plugins', import.meta.url).pathname;
+const greenwoodPluginsBasePath = fileURLToPath(new URL('../plugins', import.meta.url));
+
 const greenwoodPlugins = (await Promise.all([
   path.join(greenwoodPluginsBasePath, 'copy'),  
   path.join(greenwoodPluginsBasePath, 'resource'),
@@ -12,7 +14,8 @@ const greenwoodPlugins = (await Promise.all([
   const files = await fs.promises.readdir(pluginDirectory);
 
   return (await Promise.all(files.map(async(file) => {
-    const pluginImport = await import(`${pluginDirectory}/${file}`);
+    const importPaTh = pathToFileURL(`${pluginDirectory}${path.sep}${file}`);
+    const pluginImport = await import(importPaTh);
     const plugin = pluginImport[Object.keys(pluginImport)[0]];
 
     return Array.isArray(plugin)
@@ -55,7 +58,7 @@ const readAndMergeConfig = async() => {
       let customConfig = Object.assign({}, defaultConfig);
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
-        const userCfgFile = (await import(path.join(process.cwd(), 'greenwood.config.js'))).default;
+        const userCfgFile = (await import(pathToFileURL(path.join(process.cwd(), 'greenwood.config.js')))).default;
         const { workspace, devServer, title, markdown, meta, mode, optimization, plugins, prerender, pagesDirectory, templatesDirectory } = userCfgFile;
 
         // workspace validation

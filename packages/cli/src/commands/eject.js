@@ -1,17 +1,17 @@
 import fs from 'fs';
 import { generateCompilation } from '../lifecycles/compile.js';
 import path from 'path';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const ejectConfiguration = async () => {
   return new Promise(async (resolve, reject) => {
     try {
       const compilation = await generateCompilation();
-      const configFilePath = new URL(path.join(path.dirname(import.meta.url), '..', 'config'));
+      const configFilePath = fileURLToPath(new URL('../config', import.meta.url));
       const configFiles = fs.readdirSync(configFilePath);
       
       configFiles.forEach((configFile) => {
-        const from = path.join(configFilePath.pathname, configFile);
+        const from = path.join(configFilePath, configFile);
         const to = `${compilation.context.projectDirectory}/${configFile}`;
 
         fs.copyFileSync(from, to);

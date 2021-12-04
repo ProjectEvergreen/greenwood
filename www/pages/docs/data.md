@@ -284,7 +284,7 @@ This will return an object of your _greenwood.config.js_ as an object.  Example:
     { rel: 'icon', href: '/assets/favicon.ico' }
   ],
   title: 'My App',
-  workspace: 'src'
+  workspace: 'src' // equivalent to => fileURLToPath(new URL('./www', import.meta.url))
 }
 ```
 

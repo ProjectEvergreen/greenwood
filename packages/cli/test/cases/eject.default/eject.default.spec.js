@@ -14,13 +14,13 @@ import chai from 'chai';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
 describe('Eject Greenwood', function() {
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
   let configFiles;
 
@@ -37,7 +37,7 @@ describe('Eject Greenwood', function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'eject');
 
-      configFiles = fs.readdirSync(path.dirname(new URL('', import.meta.url).pathname))
+      configFiles = fs.readdirSync(fileURLToPath(new URL('.', import.meta.url)))
         .filter((file) => path.extname(file) === '.js' && file.indexOf('spec.js') < 0);
     });
 
@@ -46,13 +46,13 @@ describe('Eject Greenwood', function() {
     });
 
     it('should output rollup config file', function() {
-      expect(fs.existsSync(path.join(path.dirname(new URL('', import.meta.url).pathname), 'rollup.config.js'))).to.be.true;
+      expect(fs.existsSync(fileURLToPath(new URL('./rollup.config.js', import.meta.url)))).to.be.true;
     });
 
     after(function() {
       // remove test files
       configFiles.forEach(file => {
-        fs.unlinkSync(path.join(path.dirname(new URL('', import.meta.url).pathname), file));
+        fs.unlinkSync(fileURLToPath(new URL(`./${file}`, import.meta.url)));
       });
     });
   });
@@ -70,7 +70,7 @@ describe('Eject Greenwood', function() {
   after(function() {
     // remove test files
     configFiles.forEach(file => {
-      fs.unlinkSync(path.join(path.dirname(new URL('', import.meta.url).pathname), file));
+      fs.unlinkSync(fileURLToPath(new URL(`./${file}`, import.meta.url)));
     });
 
     runner.teardown(getOutputTeardownFiles(outputPath));

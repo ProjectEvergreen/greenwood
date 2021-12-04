@@ -25,14 +25,14 @@ import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Context Plugin and Default Workspace (aka Theme Packs)';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(function() {
@@ -48,15 +48,15 @@ describe('Build Greenwood With: ', function() {
       // copy fixtures into node_modules
       // to match the location specified in the plugin under test
       const themePacktemplates = await getDependencyFiles(
-        `${path.dirname(new URL('', import.meta.url).pathname)}/fixtures/layouts/*.html`,
+        `${outputPath}/fixtures/layouts/*.html`,
         `${outputPath}/node_modules/my-theme-pack/dist/layouts`
       );
       const themePackStyles = await getDependencyFiles(
-        `${path.dirname(new URL('', import.meta.url).pathname)}/fixtures/styles/*.css`,
+        `${outputPath}/fixtures/styles/*.css`,
         `${outputPath}/node_modules/my-theme-pack/dist/styles`
       );
       const themePackComponents = await getDependencyFiles(
-        `${path.dirname(new URL('', import.meta.url).pathname)}/fixtures/components/*.js`,
+        `${outputPath}/fixtures/components/*.js`,
         `${outputPath}/node_modules/my-theme-pack/dist/components`
       );
 

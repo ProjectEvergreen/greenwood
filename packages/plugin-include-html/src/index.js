@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
+import { pathToFileURL } from 'url';
 
 class IncludeHtmlResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -36,7 +37,7 @@ class IncludeHtmlResource extends ResourceInterface {
           for (const tag of customElementTags) {
             const src = tag.match(/src="(.*)"/)[1];
             const filepath = path.join(this.compilation.context.userWorkspace, this.getBareUrlPath(src.replace(/\.\.\//g, '')));
-            const { getData, getTemplate } = await import(filepath);
+            const { getData, getTemplate } = await import(pathToFileURL(filepath));
             const includeContents = await getTemplate(await getData());
 
             body = body.replace(tag, includeContents);

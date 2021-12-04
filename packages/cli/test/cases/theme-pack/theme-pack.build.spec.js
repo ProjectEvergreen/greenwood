@@ -32,14 +32,14 @@ import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
-import { URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Developement environment for a Theme Pack';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = path.dirname(new URL('', import.meta.url).pathname);
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(function() {
@@ -53,15 +53,15 @@ describe('Build Greenwood With: ', function() {
 
     before(async function() {
       const themePacktemplates = await getDependencyFiles(
-        `${path.dirname(new URL('', import.meta.url).pathname)}/src/layouts/*.html`,
+        `${outputPath}/src/layouts/*.html`,
         `${outputPath}/node_modules/my-theme-pack/dist/layouts`
       );
       const themePackStyles = await getDependencyFiles(
-        `${path.dirname(new URL('', import.meta.url).pathname)}/src/styles/*.css`,
+        `${outputPath}/src/styles/*.css`,
         `${outputPath}/node_modules/my-theme-pack/dist/styles`
       );
       const themePackComponents = await getDependencyFiles(
-        `${path.dirname(new URL('', import.meta.url).pathname)}/src/components/*.js`,
+        `${outputPath}/src/components/*.js`,
         `${outputPath}/node_modules/my-theme-pack/dist/components`
       );
 

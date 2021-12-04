@@ -15,7 +15,8 @@ import remarkFrontmatter from 'remark-frontmatter';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import unified from 'unified'; 
+import unified from 'unified';
+import { fileURLToPath, URL } from 'url';
 
 function getCustomPageTemplates(contextPlugins, templateName) {
   return contextPlugins
@@ -52,12 +53,10 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], 
       ? fs.readFileSync(`${customPluginDefaultPageTemplates[0]}/page.html`, 'utf-8')
       : fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
   } else if (is404Page && !fs.existsSync(path.join(pagesDir, '404.html'))) {
-    // handle default 404.html
-    // path.dirname(new URL('', import.meta.url).pathname)
-    contents = fs.readFileSync(path.join(path.dirname(new URL('', import.meta.url).pathname), '../../templates/404.html'), 'utf-8');
+    contents = fs.readFileSync(fileURLToPath(new URL('../../templates/404.html', import.meta.url)), 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
-    contents = fs.readFileSync(new URL('../../templates/page.html', import.meta.url), 'utf-8');
+    contents = fs.readFileSync(fileURLToPath(new URL('../../templates/page.html', import.meta.url)), 'utf-8');
   }
 
   return contents;
@@ -71,7 +70,7 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     ? fs.readFileSync(`${customAppTemplates[0]}/app.html`, 'utf-8')
     : fs.existsSync(userAppTemplatePath)
       ? fs.readFileSync(userAppTemplatePath, 'utf-8')
-      : fs.readFileSync(new URL('../../templates/app.html', import.meta.url), 'utf-8');
+      : fs.readFileSync(fileURLToPath(new URL('../../templates/app.html', import.meta.url)), 'utf-8');
 
   const root = htmlparser.parse(contents, {
     script: true,
@@ -415,7 +414,7 @@ class StandardHtmlResource extends ResourceInterface {
           body = getPageTemplate(barePath, userTemplatesDir, template, contextPlugins, pagesDir);
         }
 
-        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);  
+        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);
         body = getUserScripts(body, this.compilation.context);
         body = getMetaContent(normalizedUrl.replace(/\\/g, '/'), config, body);
         

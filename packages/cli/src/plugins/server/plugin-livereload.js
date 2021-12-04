@@ -2,6 +2,7 @@ import fs from 'fs';
 import livereload from 'livereload';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { ServerInterface } from '../../lib/server-interface.js';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 class LiveReloadServer extends ServerInterface {
   constructor(compilation, options = {}) {
@@ -10,11 +11,11 @@ class LiveReloadServer extends ServerInterface {
 
   async start() {
     const { userWorkspace } = this.compilation.context;
-    const standardPluginsPath = new URL('../resource', import.meta.url);
+    const standardPluginsPath = fileURLToPath(new URL('../resource', import.meta.url));
     const standardPluginsNames = fs.readdirSync(standardPluginsPath)
       .filter(filename => filename.indexOf('plugin-standard') === 0);
     const standardPluginsExtensions = (await Promise.all(standardPluginsNames.map(async (filename) => {
-      const pluginImport = await import(`${standardPluginsPath}/${filename}`);
+      const pluginImport = await import(pathToFileURL(`${standardPluginsPath}/${filename}`));
       const plugin = pluginImport[Object.keys(pluginImport)[0]];
       
       return plugin;
