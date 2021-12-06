@@ -48,7 +48,7 @@ const npmInit = async () => {
   // use installation path's folder name for packages
   appPkg.name = path.basename(process.cwd());
   
-  // make sure users gets latest and greatest version of Greenwood
+  // make sure users get latest and greatest version of Greenwood
   // https://github.com/ProjectEvergreen/greenwood/issues/781
   // https://github.com/ProjectEvergreen/greenwood/issues/809
   appPkg.devDependencies['@greenwood/cli'] = `~${scriptPkg.version}`;
