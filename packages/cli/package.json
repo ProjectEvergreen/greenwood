@@ -36,6 +36,7 @@
     "livereload": "^0.9.1",
     "markdown-toc": "^1.2.0",
     "node-html-parser": "^1.2.21",
+    "node-fetch": "^2.6.1",
     "postcss": "^7.0.32",
     "postcss-import": "^12.0.0",
     "puppeteer": "^10.2.0",
