@@ -86,7 +86,9 @@ describe('Scaffold Greenwood With Default Template: ', function() {
       });
 
       it('the should have the correct Greenwood devDependency', function() {
-        expect(pkgJson.devDependencies['@greenwood/cli']).to.equal('^0.18.0');
+        const scriptPkg = JSON.parse(fs.readFileSync(fileURLToPath(new URL('../../../package.json', import.meta.url)), 'utf-8'));
+
+        expect(pkgJson.devDependencies['@greenwood/cli']).to.equal(`~${scriptPkg.version}`);
       });
     });
 
