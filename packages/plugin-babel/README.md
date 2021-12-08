@@ -32,10 +32,10 @@ export default {
 }
 ```
 
-Create a _babel.config.js_ in the root of your project with your own custom plugins / settings that you've installed and want to use.
+Create a _babel.config.cjs_ in the root of your project with your own custom plugins / settings that you've installed and want to use.
 
 ```javascript
-export default {
+module.exports = {
   plugins: [
     '@babel/plugin-proposal-class-properties',
     '@babel/plugin-proposal-private-methods'
@@ -44,6 +44,8 @@ export default {
 ```
 
 This will then process your JavaScript with Babel with the configurated plugins / settings you provide.  
+
+> _For now Babel configuration needs to be in CJS.  Will we be adding ESM support soon!_
 
 ## Options
 This plugin provides a default _babel.config.js_ that includes support for [**@babel/preset-env**](https://babeljs.io/docs/en/babel-preset-env) using [**browserslist**](https://github.com/browserslist/browserslist) with reasonable [default configs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-babel/src/) for each.  
