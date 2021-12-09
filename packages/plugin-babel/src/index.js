@@ -69,7 +69,7 @@ const greenwoodPluginBabel = (options = {}) => {
     provider: (compilation) => [
       rollupBabelPlugin.default({
         // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
-        babelHelpers: options.extendConfig ? 'runtime' : 'bundled',
+        babelHelpers: 'bundled',
         
         ...getConfig(compilation, options.extendConfig)
       })
