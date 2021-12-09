@@ -87,7 +87,7 @@ jobs:
          sh ./.github/workflows/chromium-lib-install.sh
       - uses: actions/setup-node@v1
         with:
-           node-version: "12.x"
+           node-version: "14.x"
       - name: Install deps
         run: npm install
       - name: Build docs
