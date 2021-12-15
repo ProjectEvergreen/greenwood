@@ -2,7 +2,7 @@
 label: 'templates-and-pages'
 menu: side
 title: 'Templates and Pages'
-index: 6
+index: 7
 linkheadings: 3
 ---
 
