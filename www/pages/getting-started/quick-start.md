@@ -22,7 +22,7 @@ You can use Greenwood's [`init` package](https://github.com/ProjectEvergreen/gre
 ```bash
 mkdir my-app && cd my-app
 
-npx @greenwood/init
+npx @greenwood/init@latest
 ```
 
 ### Command Line
