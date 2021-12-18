@@ -2,7 +2,7 @@
 label: 'stack'
 menu: side
 title: 'Tech Stack'
-index: 9
+index: 10
 linkheadings: 3
 ---
 
