@@ -23,7 +23,7 @@ $ yarn add @greeenwood/cli --dev
 Though we recommend installing it locally to your project, you can also run Greenwood globally.  For global usage we recommend using `npx`
 
 ```bash
-$ npx @greenwood/cli <command>
+$ npx @greenwood/cli@latest <command>
 ```
 
 ### CLI
