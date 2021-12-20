@@ -17,8 +17,8 @@ Although JavaScript is loosely typed, a [resource "interface"](https://github.co
 - `contentType`: A browser compatible contentType to ensure browsers correctly interpret you transformations
 
 ```javascript
-const fs = require('fs');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
+import fs from 'fs';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class ResourceInterface {
   constructor(compilation, options = {}) {
@@ -77,7 +77,7 @@ class ResourceInterface {
   }
 }
 
-module.exports = (options = {}) => {
+export function myResourcePlugin(options = {}) {
   return {
     type: 'resource',
     name: 'plugin-example',
@@ -103,8 +103,8 @@ console.log('hello from file.foo with non standard JavaScript in it.');
 
 ```js
 // plugin-foo.js
-const fs = require('fs');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
+import fs from 'fs';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class FooResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -134,7 +134,7 @@ class FooResource extends ResourceInterface {
   }
 }
 
-module.exports = (options = {}) => {
+export function myFooPlugin(options = {}) {
   return {
     type: 'resource',
     name: 'plugin-foo',
@@ -143,14 +143,14 @@ module.exports = (options = {}) => {
 };
 
 // greenwood.config.js
-const pluginFoo = require('./plugin-foo');
+import { myFooPlugin } from './plugin-foo.js';
 
-module.exports = {
+export default {
 
   ...
 
   plugins: [
-    pluginFoo()
+    myFooPlugin()
   ]
 
 }

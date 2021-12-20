@@ -1,4 +1,4 @@
-const gql = require('graphql-tag');
+import gql from 'graphql-tag';
 
 const getMenuFromGraph = async (root, { name, pathname, orderBy }, context) => {
   const { graph } = context;
@@ -146,7 +146,7 @@ const graphResolvers = {
   }
 };
 
-module.exports = {
+export {
   graphTypeDefs,
   graphResolvers
 };

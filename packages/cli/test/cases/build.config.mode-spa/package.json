@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "dependencies": {
     "lit": "^2.0.0",
     "lit-redux-router": "~0.20.0",

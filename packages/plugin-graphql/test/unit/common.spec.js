@@ -1,5 +1,7 @@
-const expect = require('chai').expect;
-const { getQueryHash } = require('../../src/core/common.server');
+import chai from 'chai';
+import { getQueryHash } from '../../src/core/common.js';
+
+const expect = chai.expect;
 
 describe('Unit Test: Data', function() {
 

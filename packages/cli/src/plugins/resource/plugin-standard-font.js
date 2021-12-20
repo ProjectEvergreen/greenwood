@@ -4,9 +4,9 @@
  * This is a Greenwood default plugin.
  *
  */
-const fs = require('fs');
-const path = require('path');
-const { ResourceInterface } = require('../../lib/resource-interface');
+import fs from 'fs';
+import path from 'path';
+import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardFontResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -31,8 +31,10 @@ class StandardFontResource extends ResourceInterface {
   }
 }
 
-module.exports = {
+const pluginGreenwoodStandardFont = {
   type: 'resource',
   name: 'plugin-standard-font',
   provider: (compilation, options) => new StandardFontResource(compilation, options)
 };
+
+export { pluginGreenwoodStandardFont };

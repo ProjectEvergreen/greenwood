@@ -1,5 +1,5 @@
-const path = require('path');
+import { fileURLToPath, URL } from 'url';
 
-module.exports = {
-  workspace: path.join(__dirname, 'noop')
+export default {
+  workspace: fileURLToPath(new URL('./noop', import.meta.url))
 };

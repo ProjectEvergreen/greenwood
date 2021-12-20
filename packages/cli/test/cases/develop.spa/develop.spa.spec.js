@@ -18,13 +18,16 @@
  *   index.html
  * 
  */
-const expect = require('chai').expect;
-const fs = require('fs');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const request = require('request');
-const Runner = require('gallinago').Runner;
-const runSmokeTest = require('../../../../../test/smoke-test');
+import chai from 'chai';
+import fs from 'fs';
+import path from 'path';
+import { getDependencyFiles } from '../../../../../test/utils.js';
+import request from 'request';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { Runner } from 'gallinago';
+import { fileURLToPath, URL } from 'url';
+
+const expect = chai.expect;
 
 function removeWhiteSpace(string = '') {
   return string
@@ -35,10 +38,10 @@ function removeWhiteSpace(string = '') {
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'SPA Mode';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://localhost';
   const BODY_REGEX = /<body>(.*)<\/body>/s;
-  const expected = removeWhiteSpace(fs.readFileSync(path.join(outputPath, 'src/index.html'), 'utf-8').match(BODY_REGEX)[0]);
+  const expected = removeWhiteSpace(fs.readFileSync(path.join(outputPath, `src${path.sep}index.html`), 'utf-8').match(BODY_REGEX)[0]);
 
   const port = 1984;
   let runner;
@@ -47,13 +50,18 @@ describe('Develop Greenwood With: ', function() {
     this.context = {
       hostname: `${hostname}:${port}`
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
 
     before(async function() {
-      await runner.setup(outputPath);
+      const simpleCss = await getDependencyFiles(
+        `${process.cwd()}/node_modules/simpledotcss/simple.css`,
+        `${outputPath}/node_modules/simpledotcss/`
+      );
+
+      await runner.setup(outputPath, [...simpleCss]);
 
       return new Promise(async (resolve) => {
         setTimeout(() => {
@@ -76,14 +84,13 @@ describe('Develop Greenwood With: ', function() {
             headers: {
               accept: 'text/html'
             }
-          }, (err, res, body) => {
+          }, (err, res) => {
             if (err) {
               reject();
             }
 
             response = res;
             
-            dom = new JSDOM(body);
             resolve();
           });
         });
@@ -116,14 +123,13 @@ describe('Develop Greenwood With: ', function() {
             headers: {
               accept: 'text/html'
             }
-          }, (err, res, body) => {
+          }, (err, res) => {
             if (err) {
               reject();
             }
 
             response = res;
             
-            dom = new JSDOM(body);
             resolve();
           });
         });
@@ -156,14 +162,13 @@ describe('Develop Greenwood With: ', function() {
             headers: {
               accept: 'text/html'
             }
-          }, (err, res, body) => {
+          }, (err, res) => {
             if (err) {
               reject();
             }
 
             response = res;
             
-            dom = new JSDOM(body);
             resolve();
           });
         });
@@ -185,12 +190,53 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
     });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/803
+    describe('Develop command specific node modules resolution behavior that doesnt think its a client side route', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get({
+            url: `http://127.0.0.1:${port}/node_modules/simpledotcss/simple.css`,
+            headers: {
+              accept: 'ext/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+            }
+          }, (err, res) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('text/css');
+        done();
+      });
+
+      it('should return a 200', function(done) {
+        expect(response.statusCode).to.equal(200);
+
+        done();
+      });
+
+      it('should return the expected body contents', function(done) {
+        expect(response.body.indexOf('/* Set the global variables for everything. Change these to use your own fonts/colours. */')).to.equal(0);
+        done();
+      });
+    });
   });
 
   after(function() {
     runner.stopCommand();
     runner.teardown([
-      path.join(outputPath, '.greenwood')
+      path.join(outputPath, '.greenwood'),
+      path.join(outputPath, 'node_modules')
     ]);
   });
 });

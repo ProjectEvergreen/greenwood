@@ -10,6 +10,10 @@
       text-decoration: none;
     }
 
+    & a.active {
+      border-bottom: 2px solid white;
+    }
+
     & .project-name {
       margin: -2px 0 auto;
       padding: 0;

@@ -1,6 +1,8 @@
-const expect = require('chai').expect;
-const MOCK_GRAPH = require('../mocks/graph');
-const { graphResolvers } = require('../../../src/schema/graph');
+import chai from 'chai';
+import { graphResolvers } from '../../../src/schema/graph.js';
+import { MOCK_GRAPH } from '../mocks/graph.js';
+
+const expect = chai.expect;
 
 describe('Unit Test: Data', function() {
 

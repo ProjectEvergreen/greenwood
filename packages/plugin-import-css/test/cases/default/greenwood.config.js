@@ -1,7 +1,7 @@
-const pluginImportCss = require('../../../src/index');
+import { greenwoodPluginImportCss } from '../../../src/index.js';
 
-module.exports = {
+export default {
   plugins: [
-    ...pluginImportCss()
+    ...greenwoodPluginImportCss()
   ]
 };

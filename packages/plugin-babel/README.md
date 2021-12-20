@@ -21,18 +21,18 @@ yarn add @greenwood/plugin-babel --dev
 Add this plugin to your _greenwood.config.js_.
 
 ```javascript
-const pluginBabel = require('@greenwood/plugin-babel');
+import { greenwoodPluginBabel } from '@greenwood/plugin-babel';
 
-module.exports = {
+export default {
   ...
 
   plugins: [
-    ...pluginBabel() // notice the spread ... !
+    ...greenwoodPluginBabel() // notice the spread ... !
   ]
 }
 ```
 
-Create a _babel.config.js_ in the root of your project with your own custom plugins / settings that you've installed and want to use.
+Create a _babel.config.cjs_ in the root of your project with your own custom plugins / settings that you've installed and want to use.
 
 ```javascript
 module.exports = {
@@ -44,6 +44,8 @@ module.exports = {
 ```
 
 This will then process your JavaScript with Babel with the configurated plugins / settings you provide.  
+
+> _For now Babel configuration needs to be in CJS.  Will we be adding ESM support soon!_
 
 ## Options
 This plugin provides a default _babel.config.js_ that includes support for [**@babel/preset-env**](https://babeljs.io/docs/en/babel-preset-env) using [**browserslist**](https://github.com/browserslist/browserslist) with reasonable [default configs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-babel/src/) for each.  
@@ -58,16 +60,16 @@ If you would like to use it, either standalone or with your own custom _babel.co
     # yarn
     yarn add @babel/runtime regenerator-runtime
     ```
-1. When adding `pluginBabel` to your _greenwood.config.js_, enable the `extendConfig` option
+1. When adding `greenwoodPluginBabel` to your _greenwood.config.js_, enable the `extendConfig` option
     ```js
-    const pluginBabel = require('@greenwood/plugin-babel');
+    import { greenwoodPluginBabel } from '@greenwood/plugin-babel';
 
-    module.exports = {
+    export default {
       ...
 
       plugins: [
         // notice the spread ... !
-        ...pluginBabel({
+        ...greenwoodPluginBabel({
           extendConfig: true
         })
       ]

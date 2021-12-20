@@ -1,20 +1,20 @@
-const { ApolloClient, InMemoryCache, HttpLink } = require('@apollo/client/core');
-const fetch = require('node-fetch');
-const fs = require('fs');
-const { gql } = require('apollo-server');
-const { getQueryHash } = require('./common.server');
+import ApolloCore from '@apollo/client/core/core.cjs.js';
+import fetch from 'node-fetch';
+import fs from 'fs';
+import { gql } from 'apollo-server';
+import { getQueryHash } from './common.js';
 
 /* Extract cache server-side */
-module.exports = async (req, context) => {
+const createCache = async (req, context) => {
 
   return new Promise(async(resolve, reject) => {
     try {
-      const client = await new ApolloClient({
-        link: new HttpLink({
+      const client = await new ApolloCore.ApolloClient({
+        link: new ApolloCore.HttpLink({
           uri: 'http://localhost:4000?q=internal', /* internal flag to prevent looping cache on request */
           fetch
         }),
-        cache: new InMemoryCache()
+        cache: new ApolloCore.InMemoryCache()
       });
 
       /* Take the same query from request, and repeat the query for our server side cache */
@@ -46,4 +46,6 @@ module.exports = async (req, context) => {
       reject(err);
     }
   });
-}; 
+};
+
+export { createCache };

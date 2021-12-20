@@ -4,9 +4,10 @@
  * This is a Greenwood default plugin.
  *
  */
-const fs = require('fs');
-const path = require('path');
-const { ResourceInterface } = require('../../lib/resource-interface');
+import fs from 'fs';
+import path from 'path';
+import { ResourceInterface } from '../../lib/resource-interface.js';
+import { fileURLToPath, URL } from 'url';
 
 class OptimizationMPAResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -23,7 +24,7 @@ class OptimizationMPAResource extends ResourceInterface {
   async resolve() {
     return new Promise(async (resolve, reject) => {
       try {
-        const routerUrl = path.join(__dirname, '../../', 'lib/router.js');
+        const routerUrl = fileURLToPath(new URL('../../lib/router.js', import.meta.url));
 
         resolve(routerUrl);
       } catch (e) {
@@ -33,7 +34,7 @@ class OptimizationMPAResource extends ResourceInterface {
   }
 
   async shouldOptimize(url) {
-    return Promise.resolve(path.extname(url) === '.html' && this.compilation.config.mode === 'mpa');
+    return Promise.resolve(url !== '404.html' && path.extname(url) === '.html' && this.compilation.config.mode === 'mpa');
   }
 
   async optimize(url, body) {
@@ -98,8 +99,10 @@ class OptimizationMPAResource extends ResourceInterface {
   }
 }
 
-module.exports = {
+const greenwoodPluginOptimzationMpa = {
   type: 'resource',
   name: 'plugin-optimization-mpa',
   provider: (compilation, options) => new OptimizationMPAResource(compilation, options)
-}; 
+};
+
+export { greenwoodPluginOptimzationMpa };

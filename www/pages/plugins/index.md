@@ -29,7 +29,7 @@ Each plugin must return a function that has the following three properties:.
 
 Here is an example of creating a plugin in a _greenwood.config.js_.
 ```javascript
-module.exports = {
+export default {
 
   ...
 
@@ -54,7 +54,7 @@ module.exports = {
 This is Greenwood's default configuration options merged with any user provided configuration options in _greenwood.config.js_.  See the [configuration docs](/docs/configuration/) for more info.
 
 ```javascript
-module.exports = {
+export default {
 
   title: 'My Blog',
 
@@ -84,10 +84,10 @@ Here are paths you can get from `context`, all of which are absolute URLs:
 
 Example using `context` to write to `publicDir` from _greenwood.config.js_
 ```javascript
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-module.exports = {
+export default {
 
   plugins: [{
     name: 'my-plugin'

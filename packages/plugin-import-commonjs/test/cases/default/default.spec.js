@@ -9,11 +9,11 @@
  * greenwood build
  *
  * User Config
- * const pluginImportCommonjs = require('@greenwod/plugin-import-commonjs');
+ * import { greenwodPluginImportCommonJs } from '@greenwod/plugin-import-commonjs';
  *
  * {
  *   plugins: [{
- *     ...pluginImportCommonjs()
+ *     ...greenwodPluginImportCommonJs()
  *  }]
  * }
  *
@@ -24,18 +24,21 @@
  *   scripts/
  *     main.js
  */
-const expect = require('chai').expect;
-const glob = require('glob-promise');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const runSmokeTest = require('../../../../../test/smoke-test');
-const { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import glob from 'glob-promise';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { Runner } from 'gallinago';
+import { fileURLToPath, URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Import CommonJs Plugin with default options';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(async function() {

@@ -4,9 +4,9 @@
  * This sets the default value for requests in Greenwood.
  *
  */
-const fs = require('fs');
-const path = require('path');
-const { ResourceInterface } = require('../../lib/resource-interface');
+import fs from 'fs';
+import path from 'path';
+import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class UserWorkspaceResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -43,8 +43,10 @@ class UserWorkspaceResource extends ResourceInterface {
   }
 }
 
-module.exports = {
+const greenwoodPluginUserWorkspace = {
   type: 'resource',
   name: 'plugin-user-workspace',
   provider: (compilation, options) => new UserWorkspaceResource(compilation, options)
 };
+
+export { greenwoodPluginUserWorkspace };

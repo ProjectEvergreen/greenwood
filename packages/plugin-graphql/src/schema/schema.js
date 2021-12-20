@@ -1,11 +1,12 @@
-const { makeExecutableSchema } = require('apollo-server-express');
-const { configTypeDefs, configResolvers } = require('./config');
-const { graphTypeDefs, graphResolvers } = require('./graph');
-const fs = require('fs');
-const gql = require('graphql-tag');
-const path = require('path');
+import { makeExecutableSchema } from 'apollo-server-express';
+import { configTypeDefs, configResolvers } from './config.js';
+import { graphTypeDefs, graphResolvers } from './graph.js';
+import fs from 'fs';
+import gql from 'graphql-tag';
+import path from 'path';
+import { pathToFileURL } from 'url';
 
-module.exports = (compilation) => {
+const createSchema = async (compilation) => {
   const { graph } = compilation;
   const uniqueCustomDataDefKeys = {};
   const customSchemasPath = `${compilation.context.userWorkspace}/data/schema`;
@@ -37,13 +38,15 @@ module.exports = (compilation) => {
 
     if (fs.existsSync(customSchemasPath)) {
       console.log('custom schemas directory detected, scanning...');
-      fs.readdirSync(customSchemasPath)
-        .filter(file => path.extname(file) === '.js')
-        .forEach(file => {
-          const { customTypeDefs, customResolvers } = require(`${customSchemasPath}/${file}`);
-          customUserDefs.push(customTypeDefs);
-          customUserResolvers.push(customResolvers);
-        });
+      const schemaPaths = (await fs.promises.readdir(customSchemasPath))
+        .filter(file => path.extname(file) === '.js');
+
+      for (const schemaPath of schemaPaths) {
+        const { customTypeDefs, customResolvers } = await import(pathToFileURL(`${customSchemasPath}/${schemaPath}`));
+        
+        customUserDefs.push(customTypeDefs);
+        customUserResolvers.push(customResolvers);
+      }
     }
   
     const mergedResolvers = Object.assign({}, {
@@ -76,3 +79,5 @@ module.exports = (compilation) => {
     console.error(e);
   }
 };
+
+export { createSchema };

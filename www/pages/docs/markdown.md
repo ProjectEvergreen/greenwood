@@ -34,7 +34,7 @@ Using your _greenwood.config.js_ you can have additional [markdown customization
 For example, to add support for [**Prism**](https://prismjs.com/) for syntax highlighting, after installing `@mapbox/rehype-prism` via **npm**, just add following to your config file:
 
 ```js
-module.exports = {
+export default {
   
   ...
 

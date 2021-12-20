@@ -1,3 +1,4 @@
 {
-  "name": "my-theme-pack"
+  "name": "my-theme-pack",
+  "type": "module"
 }

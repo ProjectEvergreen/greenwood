@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 
   // https://github.com/zloirock/core-js/blob/master/docs/2019-03-19-core-js-3-babel-and-a-look-into-the-future.md#babelpreset-env
   presets: [
@@ -21,7 +21,7 @@ module.exports = {
         },
 
         // https://babeljs.io/docs/en/babel-preset-env#configpath
-        configPath: __dirname
+        configPath: import.meta.url
       }
     ]
   ],

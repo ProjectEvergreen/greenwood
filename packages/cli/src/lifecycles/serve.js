@@ -1,10 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const Koa = require('koa');
+import fs from 'fs';
+import path from 'path';
+import Koa from 'koa';
+import { ResourceInterface } from '../lib/resource-interface.js';
 
-const { ResourceInterface } = require('../lib/resource-interface');
-
-function getDevServer(compilation) {
+const getDevServer = async(compilation) => {
   const app = new Koa();
   const compilationCopy = Object.assign({}, compilation);
   const resources = [
@@ -120,17 +119,18 @@ function getDevServer(compilation) {
     ctx.body = reducedResponse.body;
   });
 
-  return app;
-}
+  return Promise.resolve(app);
+};
 
-function getProdServer(compilation) {
+const getProdServer = async(compilation) => {
   const app = new Koa();
   const standardResources = compilation.config.plugins.filter((plugin) => {
     // html is intentionally omitted
     return plugin.isGreenwoodDefaultPlugin
       && plugin.type === 'resource'
-      && plugin.name.indexOf('plugin-standard') >= 0
-      && plugin.name.indexOf('plugin-standard-html') < 0;
+      && ((plugin.name.indexOf('plugin-standard') >= 0 // allow standard web resources
+      && plugin.name.indexOf('plugin-standard-html') < 0) // but _not_ our markdown / HTML plugin
+      || plugin.name.indexOf('plugin-source-maps') >= 0); // and source maps
   }).map((plugin) => {
     return plugin.provider(compilation);
   });
@@ -208,10 +208,10 @@ function getProdServer(compilation) {
     ctx.body = reducedResponse.body;
   });
     
-  return app;
-}
+  return Promise.resolve(app);
+};
 
-module.exports = {
-  devServer: getDevServer,
-  prodServer: getProdServer
+export { 
+  getDevServer as devServer,
+  getProdServer as prodServer
 };

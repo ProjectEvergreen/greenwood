@@ -3,18 +3,18 @@
  * Enable using Babel for processing JavaScript files.
  *
  */
-const babel = require('@babel/core');
-const fs = require('fs');
-const path = require('path');
-const { ResourceInterface } = require('@greenwood/cli/src/lib/resource-interface');
-const rollupBabelPlugin = require('@rollup/plugin-babel').default;
+import babel from '@babel/core';
+import fs from 'fs';
+import path from 'path';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
+import rollupBabelPlugin from '@rollup/plugin-babel';
 
-function getConfig (compilation, extendConfig = false) {
+async function getConfig (compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
-  const configFile = 'babel.config';
-  const defaultConfig = require(path.join(__dirname, configFile));
-  const userConfig = fs.existsSync(path.join(projectDirectory, `${configFile}.js`))
-    ? require(`${projectDirectory}/${configFile}`)
+  const configFile = 'babel.config.mjs';
+  const defaultConfig = (await import(new URL(configFile, import.meta.url).pathname)).default;
+  const userConfig = fs.existsSync(path.join(projectDirectory, configFile))
+    ? (await import(`${projectDirectory}/${configFile}`)).default
     : {};
   let finalConfig = Object.assign({}, userConfig);
   
@@ -45,7 +45,7 @@ class BabelResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise(async(resolve, reject) => {
       try {
-        const config = getConfig(this.compilation, this.options.extendConfig);
+        const config = await getConfig(this.compilation, this.options.extendConfig);
         const result = await babel.transform(body, config);
         
         resolve({
@@ -57,8 +57,8 @@ class BabelResource extends ResourceInterface {
     });
   }
 }
-
-module.exports = (options = {}) => {
+ 
+const greenwoodPluginBabel = (options = {}) => {
   return [{
     type: 'resource',
     name: 'plugin-babel:resource',
@@ -67,12 +67,14 @@ module.exports = (options = {}) => {
     type: 'rollup',
     name: 'plugin-babel:rollup',
     provider: (compilation) => [
-      rollupBabelPlugin({
+      rollupBabelPlugin.default({
         // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
-        babelHelpers: options.extendConfig ? 'runtime' : 'bundled',
+        babelHelpers: 'bundled',
         
         ...getConfig(compilation, options.extendConfig)
       })
     ]
   }];
 };
+
+export { greenwoodPluginBabel };

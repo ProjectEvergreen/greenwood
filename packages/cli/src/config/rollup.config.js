@@ -1,9 +1,10 @@
 /* eslint-disable max-depth, no-loop-func */
-const fs = require('fs');
-const htmlparser = require('node-html-parser');
-const path = require('path');
-const postcss = require('postcss');
-const postcssImport = require('postcss-import');
+import fs from 'fs';
+import htmlparser from 'node-html-parser';
+import path from 'path';
+import postcss from 'postcss';
+import postcssImport from 'postcss-import';
+
 const tokenSuffix = 'scratch';
 const tokenNodeModules = 'node_modules';
 
@@ -475,7 +476,15 @@ function greenwoodHtmlPlugin(compilation) {
                 const css = fs.readFileSync(outputPath, 'utf-8');
                 scratchFiles[href] = true;
 
+                // https://github.com/ProjectEvergreen/greenwood/issues/810
+                // when preendering, puppeteer normalizes everything to <link .../>
+                // but if not using prerendering, then it could come out as <link ...></link>
+                // not great, but best we can do for now until #742
                 html = html.replace(`<link ${linkTag.rawAttrs}>`, `
+                  <style>
+                    ${css}
+                  </style>
+                `).replace(`<link ${linkTag.rawAttrs}/>`, `
                   <style>
                     ${css}
                   </style>
@@ -506,7 +515,7 @@ function greenwoodHtmlPlugin(compilation) {
   };
 }
 
-module.exports = getRollupConfig = async (compilation) => {
+const getRollupConfig = async (compilation) => {
   const { scratchDir, outputDir } = compilation.context;
   const inputs = compilation.graph.map((page) => {
     return path.normalize(`${scratchDir}${page.outputPath}`);
@@ -571,3 +580,5 @@ module.exports = getRollupConfig = async (compilation) => {
   }];
 
 };
+
+export { getRollupConfig };

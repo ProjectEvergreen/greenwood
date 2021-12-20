@@ -1,7 +1,7 @@
-const getRollupConfig = require('../config/rollup.config');
-const rollup = require('rollup');
+import { getRollupConfig } from '../config/rollup.config.js';
+import { rollup } from 'rollup';
 
-module.exports = bundleCompilation = async (compilation) => {
+const bundleCompilation = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
@@ -9,7 +9,7 @@ module.exports = bundleCompilation = async (compilation) => {
 
       if (compilation.graph.length > 0) {
         const rollupConfigs = await getRollupConfig(compilation);
-        const bundle = await rollup.rollup(rollupConfigs[0]);
+        const bundle = await rollup(rollupConfigs[0]);
 
         await bundle.write(rollupConfigs[0].output);
       }
@@ -20,3 +20,5 @@ module.exports = bundleCompilation = async (compilation) => {
     }
   });
 };
+
+export { bundleCompilation };

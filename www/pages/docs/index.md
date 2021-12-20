@@ -23,7 +23,7 @@ $ yarn add @greeenwood/cli --dev
 Though we recommend installing it locally to your project, you can also run Greenwood globally.  For global usage we recommend using `npx`
 
 ```bash
-$ npx @greenwood/cli <command>
+$ npx @greenwood/cli@latest <command>
 ```
 
 ### CLI
@@ -33,11 +33,10 @@ With Greenwood installed, you can run its CLI to generate your site.  The princi
 - `greenwood serve`: Generates a production build of the project and serves it locally on a simple web server.
 - `greenwood eject`: Ejects CLI configurations (Just Rollup right now) to your working directory for more advanced customization.  [YMMV](https://www.howtogeek.com/693183/what-does-ymmv-mean-and-how-do-you-use-it/).
 
-You can define npm scripts in _package.json_ like so to automate your workflows:
-
+You can define npm scripts in _package.json_ like so to automate your workflows.  You also need to define a `type` field with the value of `module`:
 ```json
 {
-
+  "type": "module",
   "scripts": {
     "build": "greenwood build",
     "start": "greenwood develop",

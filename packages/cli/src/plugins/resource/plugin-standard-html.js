@@ -5,17 +5,18 @@
  * This is a Greenwood default plugin.
  *
  */
-const frontmatter = require('front-matter');
-const fs = require('fs');
-const htmlparser = require('node-html-parser');
-const path = require('path');
-const rehypeStringify = require('rehype-stringify');
-const rehypeRaw = require('rehype-raw');
-const remarkFrontmatter = require('remark-frontmatter');
-const remarkParse = require('remark-parse');
-const remarkRehype = require('remark-rehype');
-const { ResourceInterface } = require('../../lib/resource-interface');
-const unified = require('unified');
+import frontmatter from 'front-matter';
+import fs from 'fs';
+import htmlparser from 'node-html-parser';
+import path from 'path';
+import rehypeStringify from 'rehype-stringify';
+import rehypeRaw from 'rehype-raw';
+import remarkFrontmatter from 'remark-frontmatter';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import { ResourceInterface } from '../../lib/resource-interface.js';
+import unified from 'unified';
+import { fileURLToPath, URL } from 'url';
 
 function getCustomPageTemplates(contextPlugins, templateName) {
   return contextPlugins
@@ -31,6 +32,7 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], 
   const customPluginDefaultPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
   const customPluginPageTemplates = getCustomPageTemplates(contextPlugins, template);
   const is404Page = barePath.replace(pagesDir, '').indexOf(`${path.sep}404`) === 0;
+  let contents;
 
   if (template && customPluginPageTemplates.length > 0 || fs.existsSync(`${templatesDir}/${template}.html`)) {
     // use a custom template, usually from markdown frontmatter
@@ -51,11 +53,10 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], 
       ? fs.readFileSync(`${customPluginDefaultPageTemplates[0]}/page.html`, 'utf-8')
       : fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
   } else if (is404Page && !fs.existsSync(path.join(pagesDir, '404.html'))) {
-    // handle default 404.html
-    contents = fs.readFileSync(path.join(__dirname, '../../templates/404.html'), 'utf-8');
+    contents = fs.readFileSync(fileURLToPath(new URL('../../templates/404.html', import.meta.url)), 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
-    contents = fs.readFileSync(path.join(__dirname, '../../templates/page.html'), 'utf-8');
+    contents = fs.readFileSync(fileURLToPath(new URL('../../templates/page.html', import.meta.url)), 'utf-8');
   }
 
   return contents;
@@ -69,7 +70,7 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     ? fs.readFileSync(`${customAppTemplates[0]}/app.html`, 'utf-8')
     : fs.existsSync(userAppTemplatePath)
       ? fs.readFileSync(userAppTemplatePath, 'utf-8')
-      : fs.readFileSync(path.join(__dirname, '../../templates/app.html'), 'utf-8');
+      : fs.readFileSync(fileURLToPath(new URL('../../templates/app.html', import.meta.url)), 'utf-8');
 
   const root = htmlparser.parse(contents, {
     script: true,
@@ -316,7 +317,7 @@ class StandardHtmlResource extends ResourceInterface {
   async shouldServe(url, headers) {
     const { pagesDir } = this.compilation.context;
     const relativeUrl = this.getRelativeUserworkspaceUrl(url);
-    const isClientSideRoute = this.compilation.config.mode === 'spa' && (headers.request.accept || '').indexOf(this.contentType) >= 0;
+    const isClientSideRoute = this.compilation.config.mode === 'spa' && path.extname(url) === '' && (headers.request.accept || '').indexOf(this.contentType) >= 0;
     const barePath = relativeUrl.endsWith(path.sep)
       ? `${pagesDir}${relativeUrl}index`
       : `${pagesDir}${relativeUrl.replace('.html', '')}`;
@@ -360,15 +361,15 @@ class StandardHtmlResource extends ResourceInterface {
           const rehypePlugins = [];
           const remarkPlugins = [];
 
-          config.markdown.plugins.forEach(plugin => {
+          for (const plugin of config.markdown.plugins) {
             if (plugin.indexOf('rehype-') >= 0) {
-              rehypePlugins.push(require(plugin));
+              rehypePlugins.push((await import(plugin)).default);
             }
 
             if (plugin.indexOf('remark-') >= 0) {
-              remarkPlugins.push(require(plugin));
+              remarkPlugins.push((await import(plugin)).default);
             }
-          });
+          }
 
           const settings = config.markdown.settings || {};
           const fm = frontmatter(markdownContents);
@@ -413,7 +414,7 @@ class StandardHtmlResource extends ResourceInterface {
           body = getPageTemplate(barePath, userTemplatesDir, template, contextPlugins, pagesDir);
         }
 
-        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);  
+        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);
         body = getUserScripts(body, this.compilation.context);
         body = getMetaContent(normalizedUrl.replace(/\\/g, '/'), config, body);
         
@@ -482,8 +483,10 @@ class StandardHtmlResource extends ResourceInterface {
   }
 }
 
-module.exports = {
+const greenwoodPluginStandardHtml = {
   type: 'resource',
   name: 'plugin-standard-html',
   provider: (compilation, options) => new StandardHtmlResource(compilation, options)
 };
+
+export { greenwoodPluginStandardHtml };

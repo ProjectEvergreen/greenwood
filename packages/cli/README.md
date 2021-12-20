@@ -16,11 +16,14 @@ yarn add @greenwood/cli --dev
 ```
 
 ## Usage
-Then in your _package.json_, you can run the CLI like so:
-```javascript
-"scripts": {
-  "build": "greenwood build",
-  "start": "greenwood develop"
+Then in your _package.json_, add the `type` field and `scripts` for the CLI like so:
+```json
+{
+  "type": "module",
+  "scripts": {
+    "build": "greenwood build",
+    "start": "greenwood develop"
+  }
 }
 ```
 

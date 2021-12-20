@@ -16,23 +16,28 @@
  * Custom Workspace
  * src/
  *   components/
+ *     foobar.js
  *     header.js
  *   pages/
  *     index.html
  *   styles/
+ *     color.css
  *     theme.css
  */
-const expect = require('chai').expect;
-const glob = require('glob-promise');
-const { JSDOM } = require('jsdom');
-const path = require('path');
-const { getSetupFiles, getOutputTeardownFiles } = require('../../../../../test/utils');
-const Runner = require('gallinago').Runner;
+import chai from 'chai';
+import glob from 'glob-promise';
+import { JSDOM } from 'jsdom';
+import path from 'path';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { Runner } from 'gallinago';
+import { fileURLToPath, URL } from 'url';
+
+const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Inline Optimization Configuration';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = __dirname;
+  const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(async function() {
@@ -131,12 +136,25 @@ describe('Build Greenwood With: ', function() {
           expect(cssFiles).to.have.lengthOf(0);
         });
 
-        it('should contain one <style> tag with the expected CSS content inlined', function() {
+        it('should contain two <style> tags with the expected CSS content inlined for theme.css and pages.css', function() {
           const styleTags = dom.window.document.querySelectorAll('head style');
-          
+
           // one for puppeteer
-          expect(styleTags.length).to.be.equal(2);
-          expect(styleTags[1].textContent).to.be.contain('*{margin:0;padding:0;font-family:Comic Sans,sans-serif}');
+          expect(styleTags.length).to.be.equal(3);
+        });
+
+        it('should contain the expected CSS content inlined for theme.css', function() {
+          const styleTags = dom.window.document.querySelectorAll('head style');
+
+          // one for puppeteer
+          expect(styleTags[1].textContent).to.be.contain('*{font-family:Comic Sans,sans-serif;margin:0;padding:0}');
+        });
+
+        it('should contain the expected CSS content inlined for page.css', function() {
+          const styleTags = dom.window.document.querySelectorAll('head style');
+
+          // one for puppeteer
+          expect(styleTags[2].textContent).to.be.contain('body{color:red}');
         });
       });
     });
