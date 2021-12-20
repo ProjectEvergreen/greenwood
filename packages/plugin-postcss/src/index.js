@@ -68,12 +68,12 @@ class PostCssResource extends ResourceInterface {
     const { outputDir, userWorkspace } = this.compilation.context;
     const workspaceUrl = url.replace(outputDir, userWorkspace);
     const config = await getConfig(this.compilation, this.options.extendConfig);
-    const plugins = config.plugins || [];
+    const plugins = config.plugins && config.plugins.length ? [...config.plugins] : [];
     
     plugins.push(
       (await import('cssnano')).default
     );
-    
+
     const css = plugins.length > 0
       ? (await postcss(plugins).process(body, { from: workspaceUrl })).css
       : body;
