@@ -42,8 +42,8 @@ const getPackageEntryPath = async (packageJson) => {
 };
 
 const walkModule = async (module, dependency, packageEntryPointPath) => {
-  console.debug('WALK MODULE', dependency);
-  console.debug('packageEntryPointPath', packageEntryPointPath);
+  // console.debug('WALK MODULE', dependency);
+  // console.debug('packageEntryPointPath', packageEntryPointPath);
   walk.simple(acorn.parse(module, {
     ecmaVersion: '2020',
     sourceType: 'module'
@@ -52,14 +52,14 @@ const walkModule = async (module, dependency, packageEntryPointPath) => {
       let { value: sourceValue } = node.source;
       const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(dependency);
 
-      console.debug('@@@@@@@@@@ ImportDeclaration', sourceValue);
+      // console.debug('@@@@@@@@@@ ImportDeclaration', sourceValue);
       if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('.') < 0) {        
         if (!importMap[sourceValue]) {
           // found a _new_ bare import for ${sourceValue}
           // we should add this to the importMap and walk its package.json for more transitive deps
           const realLocation = path.join(absoluteNodeModulesLocation.replace(dependency, ''), `${sourceValue}/index.js`);
-          console.debug('realLocation', realLocation);
-          // TODO
+          // console.debug('realLocation', realLocation);
+          // TODO "barrel" files support
           if (fs.existsSync(realLocation)) {
             // updateImportMap(sourceValue, `/node_modules/${sourceValue}/index.js`);
             // const moduleContents = fs.readFileSync(realLocation, 'utf-8');
@@ -83,9 +83,8 @@ const walkModule = async (module, dependency, packageEntryPointPath) => {
         if (fs.existsSync(path.join(absoluteNodeModulesLocation, sourceValue))) {
           const moduleContents = fs.readFileSync(path.join(absoluteNodeModulesLocation, sourceValue));
           await walkModule(moduleContents, dependency, packageEntryPointPath);
-          // TODO should be handled just like a ./ or ../../../
-          // console.debug('SOURCE VALUE????', sourceValue);
-          updateImportMap(`${dependency}/${sourceValue.replace('./', '')}`, `/node_modules/${dependency}/${sourceValue.replace('./', '')}`);
+
+          updateImportMap(path.join(dependency, sourceValue), `/node_modules/${path.join(dependency, sourceValue)}`);
         }
       }
     },
@@ -94,7 +93,6 @@ const walkModule = async (module, dependency, packageEntryPointPath) => {
       // const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(dependency);
 
       if (sourceValue !== '' && sourceValue.indexOf('http') !== 0) {
-        // TODO should be handled just like a ./ or ../../../
         if (sourceValue.indexOf('.') === 0) {
           // TODO should be handled just like a ./ or ../../../
           if (sourceValue.indexOf('../') === 0) {
@@ -107,9 +105,8 @@ const walkModule = async (module, dependency, packageEntryPointPath) => {
             // console.debug('PATH', entryPath);
             // updateImportMap(entry, entryPath);
           } else {
-            console.debug('it has one dot!', sourceValue);
-            // TODO should be handled just like a ./ or ../../../
-            updateImportMap(`${dependency}/${sourceValue.replace('./', '')}`, `/node_modules/${dependency}/${sourceValue.replace('./', '')}`);
+            // console.debug('it has one dot!', sourceValue);
+            updateImportMap(path.join(dependency, sourceValue), `/node_modules/${path.join(dependency, sourceValue)}`);
           }
         } else {
           // console.debug('it has NO dots!!!!');
@@ -121,14 +118,12 @@ const walkModule = async (module, dependency, packageEntryPointPath) => {
     ExportAllDeclaration(node) {
       const sourceValue = node && node.source ? node.source.value : '';
 
-      console.debug('export all!', sourceValue);
       if (sourceValue !== '' && sourceValue.indexOf('http') !== 0) {
         if (sourceValue.indexOf('.') === 0) {
-          // TODO should be handled just like a ./ or ../../../
-          updateImportMap(`${dependency}/${sourceValue.replace('./', '')}`, `/node_modules/${dependency}/${sourceValue.replace('./', '')}`);
+          updateImportMap(path.join(dependency, sourceValue), `/node_modules/${path.join(dependency, sourceValue)}`);
         } else {
           updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
-          // TODO updateImportMap(sourceValue, `/node_modules/${sourceValue}/index.js`);
+          // TODO "barrel" file support - updateImportMap(sourceValue, `/node_modules/${sourceValue}/index.js`);
         }
       }
     }
