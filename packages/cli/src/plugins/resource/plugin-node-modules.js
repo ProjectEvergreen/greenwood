@@ -53,8 +53,7 @@ const walkModule = async (module, dependency, packageEntryPointPath) => {
       const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(dependency);
 
       console.debug('@@@@@@@@@@ ImportDeclaration', sourceValue);
-      // TODO should be handled just like a ./ or ../../../
-      if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {        
+      if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('.') < 0) {        
         if (!importMap[sourceValue]) {
           // found a _new_ bare import for ${sourceValue}
           // we should add this to the importMap and walk its package.json for more transitive deps
@@ -72,10 +71,9 @@ const walkModule = async (module, dependency, packageEntryPointPath) => {
         }
         
         await walkPackageJson(path.join(absoluteNodeModulesLocation, 'package.json'));
-        // TODO should be handled just like a ./ or ../../../
-      } else if (sourceValue.indexOf('./') < 0) {
+      } else if (sourceValue.indexOf('.') < 0) {
         // adding a relative import
-        updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
+        // TODO delete updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
       } else {
         // walk this module for all its dependencies
         sourceValue = sourceValue.indexOf('.js') < 0
@@ -84,8 +82,9 @@ const walkModule = async (module, dependency, packageEntryPointPath) => {
 
         if (fs.existsSync(path.join(absoluteNodeModulesLocation, sourceValue))) {
           const moduleContents = fs.readFileSync(path.join(absoluteNodeModulesLocation, sourceValue));
-          await walkModule(moduleContents, dependency);
+          await walkModule(moduleContents, dependency, packageEntryPointPath);
           // TODO should be handled just like a ./ or ../../../
+          // console.debug('SOURCE VALUE????', sourceValue);
           updateImportMap(`${dependency}/${sourceValue.replace('./', '')}`, `/node_modules/${dependency}/${sourceValue.replace('./', '')}`);
         }
       }
@@ -142,7 +141,8 @@ const walkPackageJson = async (packageJson = {}) => {
   // and walk its package.json for its dependencies
 
   for (const dependency of Object.keys(packageJson.dependencies || {})) {
-    const dependencyPackageRootPath = path.join(process.cwd(), './node_modules', dependency);
+    // TODO should NOT be hardcoded to process.cwd()
+    const dependencyPackageRootPath = path.join(process.cwd(), 'node_modules', dependency);
     const dependencyPackageJsonPath = path.join(dependencyPackageRootPath, 'package.json');
     const dependencyPackageJson = JSON.parse(fs.readFileSync(dependencyPackageJsonPath, 'utf-8'));
     const entry = await getPackageEntryPath(dependencyPackageJson);
@@ -199,9 +199,8 @@ const walkPackageJson = async (packageJson = {}) => {
               : exportMapEntry.default;
             
             // use the dependency itself as an entry in the importMap
-            // TODO should be handled just like a ./ or ../../../
             if (entry === '.') {
-              updateImportMap(dependency, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
+              updateImportMap(dependency, `/node_modules/${path.join(dependency, packageExport)}`);
             }
           } else if (exportMapEntry.endsWith && (exportMapEntry.endsWith('.js') || exportMapEntry.endsWith('.mjs')) && exportMapEntry.indexOf('*') < 0) {
             // is probably a file, so _not_ an export array, package.json, or wildcard export
@@ -209,26 +208,24 @@ const walkPackageJson = async (packageJson = {}) => {
           }
   
           if (packageExport) {
-            // TODO should be handled just like a ./ or ../../../
-            const packageExportLocation = path.join(absoluteNodeModulesLocation, packageExport.replace('./', ''));
+            const packageExportLocation = path.resolve(absoluteNodeModulesLocation, packageExport);
 
             // check all exports of an exportMap entry
             // to make sure those deps get added to the importMap
             if (packageExport.endsWith('js')) {
               const moduleContents = fs.readFileSync(packageExportLocation);
 
-              await walkModule(moduleContents, dependency);
-              // TODO should be handled just like a ./ or ../../../
-              updateImportMap(`${dependency}${entry.replace('.', '')}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}`);
+              await walkModule(moduleContents, dependency, packageExportLocation);
+
+              updateImportMap(path.join(dependency, entry), `/node_modules/${path.join(dependency, packageExport)}`);
             } else if (fs.lstatSync(packageExportLocation).isDirectory()) {
               fs.readdirSync(packageExportLocation)
                 .filter(file => file.endsWith('.js') || file.endsWith('.mjs'))
                 .forEach((file) => {
-                  // TODO should be handled just like a ./ or ../../../
-                  updateImportMap(`${dependency}/${packageExport.replace('./', '')}${file}`, `/node_modules/${dependency}/${packageExport.replace('./', '')}${file}`);
+                  updateImportMap(path.join(dependency, packageExport, file), `/node_modules/${path.join(dependency, packageExport, file)}`);
                 });
             } else {
-              console.warn('Warning, not able to handle export', `${dependency}/${packageExport}`);
+              console.warn('Warning, not able to handle export', path.join(dependency, packageExport));
             }
           }
         }
@@ -241,10 +238,9 @@ const walkPackageJson = async (packageJson = {}) => {
         if (fs.existsSync(packageEntryPointPath)) {
           const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
     
-          console.debug('1111', dependency);
-          await walkModule(packageEntryModule, dependency, packageEntryPointPath);
-          // TODO should be handled just like a ./ or ../../../
-          updateImportMap(dependency, `/node_modules/${dependency}/${entry.replace('./', '')}`);
+          updateImportMap(dependency, `/node_modules/${path.join(dependency, entry)}`);
+
+          await walkModule(packageEntryModule, dependency, packageEntryPointPath);          
           await walkPackageJson(dependencyPackageJson);
         }
       }
