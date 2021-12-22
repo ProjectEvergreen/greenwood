@@ -189,10 +189,11 @@ const generateGraph = async (compilation) => {
         for (const node of data) {
           graph.push({
             filename: null,
+            // TODO template: 'page',
             path: null,
             data: {},
             imports: [],
-            outputPath: 'index.html', // TODO should this even be public?
+            outputPath: path.join(node.route, 'index.html'), // TODO should this even be public?
             ...node,
             external: true
           });

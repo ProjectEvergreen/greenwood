@@ -20,7 +20,7 @@ const customExternalSourcesPlugin = {
 
       return artists.map((artist) => {
         const { bio, id, imageUrl, name } = artist;
-        const file = name.toLowerCase().replace(/ /g, '-');
+        const route = `/artists/${name.toLowerCase().replace(/ /g, '-')}/`;
 
         return {
           title: name,
@@ -28,7 +28,7 @@ const customExternalSourcesPlugin = {
             ${bio}
             <img src='${imageUrl}'/>
           `,
-          route: `/artists/${file}/`,
+          route,
           id,
           label: name,
           data: {
