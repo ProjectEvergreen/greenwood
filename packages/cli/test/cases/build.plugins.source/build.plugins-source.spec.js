@@ -110,8 +110,7 @@ describe.only('Build Greenwood With: ', function() {
         expect(pages.length).to.equal(3);
       });
 
-      // TODO  with custom template
-      xit('should have expected heading content for each artist page template', function() {
+      it('should have expected heading content for each artist page template', function() {
   
         doms.forEach((dom) => {
           const headings = dom.window.document.querySelectorAll('body h1');
@@ -138,8 +137,8 @@ describe.only('Build Greenwood With: ', function() {
           expect(images[0].getAttribute('src')).to.equal(fixtureData[idx].imageUrl);
         });
       });
-
     });
+
   });
 
   after(function() {

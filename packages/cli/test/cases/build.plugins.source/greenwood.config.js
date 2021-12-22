@@ -19,6 +19,7 @@ const customExternalSourcesPlugin = {
           `,
           route,
           id,
+          template: 'artist',
           label: name,
           data: {
             imageUrl

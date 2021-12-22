@@ -143,7 +143,7 @@ const generateGraph = async (compilation) => {
         return pages;
       };
 
-      console.debug('building from local source...');
+      console.debug('building from local sources...');
       if (config.mode === 'spa') {
         graph = [{
           ...graph[0],
@@ -181,22 +181,27 @@ const generateGraph = async (compilation) => {
         }
       }
 
-      console.debug('building from external sources...');
-      for (const plugin of compilation.config.plugins.filter(plugin => plugin.type === 'source')) {
-        const instance = plugin.provider(compilation);
-        const data = await instance();
+      const sourcePlugins = compilation.config.plugins.filter(plugin => plugin.type === 'source');
 
-        for (const node of data) {
-          graph.push({
-            filename: null,
-            // TODO template: 'page',
-            path: null,
-            data: {},
-            imports: [],
-            outputPath: path.join(node.route, 'index.html'), // TODO should this even be public?
-            ...node,
-            external: true
-          });
+      if (sourcePlugins.length > 0) {
+        console.debug('building from external sources...');
+
+        for (const plugin of sourcePlugins) {
+          const instance = plugin.provider(compilation);
+          const data = await instance();
+
+          // TODO minimum validation - content, route
+          for (const node of data) {
+            graph.push({
+              filename: null,
+              path: null,
+              data: {},
+              imports: [],
+              outputPath: path.join(node.route, 'index.html'), // TODO should this even be public?
+              ...node,
+              external: true
+            });
+          }
         }
       }
 

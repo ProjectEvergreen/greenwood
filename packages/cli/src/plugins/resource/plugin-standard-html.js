@@ -358,6 +358,10 @@ class StandardHtmlResource extends ResourceInterface {
           return node.external && node.route.indexOf(url) >= 0;
         });
 
+        if (externalSource.length === 1) {
+          template = externalSource[0].template || template;
+        }
+
         if (isMarkdownContent) {
           const markdownPath = fs.existsSync(`${barePath}.md`)
             ? `${barePath}.md`
