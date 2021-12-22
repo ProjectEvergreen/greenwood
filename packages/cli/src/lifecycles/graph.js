@@ -183,7 +183,7 @@ const generateGraph = async (compilation) => {
 
       console.debug('building from external sources...');
       for (const plugin of compilation.config.plugins.filter(plugin => plugin.type === 'source')) {
-        const instance = plugin.provider(this.compilation);
+        const instance = plugin.provider(compilation);
         const data = await instance();
 
         for (const node of data) {

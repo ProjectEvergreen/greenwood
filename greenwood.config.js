@@ -1,4 +1,4 @@
-import fetch from 'fetch';
+import fetch from 'node-fetch';
 import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
 import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
 import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
