@@ -26,7 +26,8 @@
  * Custom Workspace
  * src/
  *   pages/
- *     about.html
+ *     about.md
+ *     index.md
  *   templates/
  *     artist.html
  */
