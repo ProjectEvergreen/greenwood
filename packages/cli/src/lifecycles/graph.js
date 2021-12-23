@@ -186,8 +186,13 @@ const generateGraph = async (compilation) => {
           const instance = plugin.provider(compilation);
           const data = await instance();
 
-          // TODO minimum validation - content, route
           for (const node of data) {
+            if (!node.content || !node.route) {
+              const missingKey = !node.content ? 'content' : 'route';
+
+              reject(`ERROR: provided node does not provide a ${missingKey} property.`);
+            }
+
             graph.push({
               filename: null,
               path: null,

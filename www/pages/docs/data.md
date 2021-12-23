@@ -389,8 +389,9 @@ graph {
   content, // REQUIRED (string of your content)
   id,
   label,
-  route,  // REQUIRED
+  route,  // REQUIRED and MUST end in a forward slash
   template,
-  title
+  title,
+  data
 }
 ```
