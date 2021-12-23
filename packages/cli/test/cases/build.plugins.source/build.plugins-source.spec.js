@@ -42,7 +42,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe.only('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Sources Plugin and Custom Template';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -53,7 +53,7 @@ describe.only('Build Greenwood With: ', function() {
     this.context = {
       publicDir
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
