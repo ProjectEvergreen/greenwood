@@ -11,6 +11,7 @@ import { fileURLToPath, URL } from 'url';
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
 
+// this could just as easily come from an API, DB, Headless CMS, etc
 const customExternalSourcesPlugin = {
   type: 'source',
   name: 'source-plugin-analogstudios',
@@ -25,7 +26,7 @@ const customExternalSourcesPlugin = {
         return {
           title: name,
           content: `
-            ${bio}
+            <p>${bio}</p>
             <img src='${imageUrl}'/>
           `,
           route,
