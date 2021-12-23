@@ -386,7 +386,7 @@ Using our [Source plugin](/plugins/source/), just as you can get your content as
 The supported [fields from Greenwood's schema](/docs/data/#internal-sources) are:
 ```javascript
 graph {
-  content, // REQUIRED (string of your content)
+  body, // REQUIRED (string of your content)
   id,
   label,
   route,  // REQUIRED and MUST end in a forward slash

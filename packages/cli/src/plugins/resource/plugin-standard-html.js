@@ -447,7 +447,7 @@ class StandardHtmlResource extends ResourceInterface {
 
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
         } else if (externalSource.length === 1) {
-          body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, externalSource[0].content);
+          body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, externalSource[0].body);
         }
 
         // give the user something to see so they know it works, if they have no content

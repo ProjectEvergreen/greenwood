@@ -25,7 +25,7 @@ const customExternalSourcesPlugin = {
 
         return {
           title: name,
-          content: `
+          body: `
             <p>${bio}</p>
             <img src='${imageUrl}'/>
           `,

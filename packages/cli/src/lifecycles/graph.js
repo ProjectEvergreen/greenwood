@@ -188,8 +188,8 @@ const generateGraph = async (compilation) => {
           const data = await instance();
 
           for (const node of data) {
-            if (!node.content || !node.route) {
-              const missingKey = !node.content ? 'content' : 'route';
+            if (!node.body || !node.route) {
+              const missingKey = !node.body ? 'body' : 'route';
 
               reject(`ERROR: provided node does not provide a ${missingKey} property.`);
             }

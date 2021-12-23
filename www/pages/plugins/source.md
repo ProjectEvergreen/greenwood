@@ -30,7 +30,7 @@ export const customExternalSourcesPlugin = (options = {}) => {
 
         return {
           title: name,
-          content: `
+          body: `
             <h1>${name}</h1>
             <p>${bio}</p>
             <img src='${imageUrl}'/>
