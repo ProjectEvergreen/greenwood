@@ -62,8 +62,7 @@ describe('Build Greenwood With: ', function() {
       await runner.runCommand(cliPath, 'build');
     });
 
-    // no home page?
-    // runSmokeTest(['public', 'index'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('About Page', function() {
       let pages;
