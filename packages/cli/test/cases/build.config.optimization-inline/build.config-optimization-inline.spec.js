@@ -16,10 +16,12 @@
  * Custom Workspace
  * src/
  *   components/
+ *     foobar.js
  *     header.js
  *   pages/
  *     index.html
  *   styles/
+ *     color.css
  *     theme.css
  */
 import chai from 'chai';
@@ -134,12 +136,25 @@ describe('Build Greenwood With: ', function() {
           expect(cssFiles).to.have.lengthOf(0);
         });
 
-        it('should contain one <style> tag with the expected CSS content inlined', function() {
+        it('should contain two <style> tags with the expected CSS content inlined for theme.css and pages.css', function() {
           const styleTags = dom.window.document.querySelectorAll('head style');
-          
+
           // one for puppeteer
-          expect(styleTags.length).to.be.equal(2);
+          expect(styleTags.length).to.be.equal(3);
+        });
+
+        it('should contain the expected CSS content inlined for theme.css', function() {
+          const styleTags = dom.window.document.querySelectorAll('head style');
+
+          // one for puppeteer
           expect(styleTags[1].textContent).to.be.contain('*{font-family:Comic Sans,sans-serif;margin:0;padding:0}');
+        });
+
+        it('should contain the expected CSS content inlined for page.css', function() {
+          const styleTags = dom.window.document.querySelectorAll('head style');
+
+          // one for puppeteer
+          expect(styleTags[2].textContent).to.be.contain('body{color:red}');
         });
       });
     });
