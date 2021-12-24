@@ -476,7 +476,15 @@ function greenwoodHtmlPlugin(compilation) {
                 const css = fs.readFileSync(outputPath, 'utf-8');
                 scratchFiles[href] = true;
 
+                // https://github.com/ProjectEvergreen/greenwood/issues/810
+                // when preendering, puppeteer normalizes everything to <link .../>
+                // but if not using prerendering, then it could come out as <link ...></link>
+                // not great, but best we can do for now until #742
                 html = html.replace(`<link ${linkTag.rawAttrs}>`, `
+                  <style>
+                    ${css}
+                  </style>
+                `).replace(`<link ${linkTag.rawAttrs}/>`, `
                   <style>
                     ${css}
                   </style>
