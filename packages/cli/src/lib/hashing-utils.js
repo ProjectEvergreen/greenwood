@@ -9,6 +9,6 @@ function hashString(inputString) {
   return Math.abs(h).toString();
 }
 
-module.exports = {
+export {
   hashString
 };
