@@ -65,8 +65,6 @@ class PostCssResource extends ResourceInterface {
   }
   
   async optimize(url, body) {
-    const { outputDir, userWorkspace } = this.compilation.context;
-    const workspaceUrl = url.replace(outputDir, userWorkspace);
     const config = await getConfig(this.compilation, this.options.extendConfig);
     const plugins = config.plugins && config.plugins.length ? [...config.plugins] : [];
     
@@ -75,7 +73,7 @@ class PostCssResource extends ResourceInterface {
     );
 
     const css = plugins.length > 0
-      ? (await postcss(plugins).process(body, { from: workspaceUrl })).css
+      ? (await postcss(plugins).process(body, { from: url })).css
       : body;
     
     return Promise.resolve(css);

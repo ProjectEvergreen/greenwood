@@ -5,6 +5,27 @@ We're excited for your interest in Greenwood, and maybe even your contribution!
 
 > _We encourage all contributors to first read about the project's vision and motivation's on the website's [About page](https://www.greenwoodjs.io/about/).  Greenwood is opinionated in the sense that it is designed to support development for the modern web platform and aims to deliver a first class developer experience tailored for that expectation.  So if that page is the "why", this page is the "how"._
 
+## Setup
+
+To develop for the project, you'll want to follow these steps:
+
+1. Have [NodeJS LTS](https://nodejs.org) installed (>= 14.17.0) and [Yarn](https://yarnpkg.com/)
+1. Clone the repository
+1. Run `yarn install`
+
+If developing with Node Version Manager:
+
+- Windows: [NVM for Windows](https://github.com/coreybutler/nvm-windows/releases)
+- Linux/MacOS: [Node Version Manager](https://github.com/nvm-sh/nvm)
+
+You can confirm by running the following
+
+```sh
+$ nvm use
+Found '/Users/<directory_location>/greenwood/.nvmrc' with version <14.17.0>
+Now using node v14.17.0 (npm v6.14.13)
+```
+
 ## Technical Design Overview
 
 The Greenwood GitHub repository is a combination [Yarn workspace](https://classic.yarnpkg.com/en/docs/workspaces/) and [Lerna monorepo](https://github.com/lerna/lerna).  The root level _package.json_ defines the workspaces and shared tooling used throughout the project, like for linting, testing, etc.
@@ -40,7 +61,7 @@ The [layout](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/
 
 
 #### Lifecycles
-Aside from the config and graph lifecycles, all lifecycles (and config files and plugins) typically expect a compilation object to be passed in.  
+Aside from the config and graph lifecycles, all lifecycles (and config files and plugins) typically expect a compilation object to be passed in.
 
 Lifeycles include handling:
 - starting a production or development server for a compilation
@@ -219,7 +240,7 @@ First make sure you have [Docker installed](https://www.docker.com/products/dock
 Then from the root of this repository do the following:
 1. Build the container: `$ docker build -t nodejs-dev .`
 1. Connect to the container: `$ docker run --name greenwood -v $(pwd):/workspace -i -t nodejs-dev`
-1. Now you can run all the usual commands, e.g.  
+1. Now you can run all the usual commands, e.g.
   - `$ yarn install`
   - `$ yarn build`
   - `$ yarn test`
