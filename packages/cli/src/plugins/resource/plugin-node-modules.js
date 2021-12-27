@@ -51,9 +51,11 @@ const walkModule = async (module, dependency, packageEntryPointPath) => {
     async ImportDeclaration(node) {
       let { value: sourceValue } = node.source;
       const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(dependency);
+      const isBarePath = sourceValue.indexOf('http') !== 0 && sourceValue.charAt(0) !== '.' && sourceValue.charAt(0) !== '/';
+      const hasExtension = path.extname(sourceValue) !== '';
 
       // TODO better handling of ./ check
-      if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {        
+      if (isBarePath && !hasExtension) {
         if (!importMap[sourceValue]) {
           // found a _new_ bare import for ${sourceValue}
           // we should add this to the importMap and walk its package.json for more transitive deps
@@ -71,14 +73,14 @@ const walkModule = async (module, dependency, packageEntryPointPath) => {
         }
         
         await walkPackageJson(path.join(absoluteNodeModulesLocation, 'package.json'));
-      } else if (sourceValue.indexOf('./') < 0) {
+      } else if (isBarePath) {
         // adding a bare import with extension
         // TODO better handling of ./ check
         updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
         // TODO delete or refactor with above conditional?
       } else {
         // walk this module for all its dependencies
-        sourceValue = sourceValue.indexOf('.js') < 0
+        sourceValue = !hasExtension
           ? `${sourceValue}.js`
           : sourceValue;
 
