@@ -52,8 +52,8 @@ const walkModule = async (module, dependency, packageEntryPointPath) => {
       let { value: sourceValue } = node.source;
       const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(dependency);
 
-      // console.debug('@@@@@@@@@@ ImportDeclaration', sourceValue);
-      if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('.') < 0) {        
+      // TODO better handling of ./ check
+      if (path.extname(sourceValue) === '' && sourceValue.indexOf('http') !== 0 && sourceValue.indexOf('./') < 0) {        
         if (!importMap[sourceValue]) {
           // found a _new_ bare import for ${sourceValue}
           // we should add this to the importMap and walk its package.json for more transitive deps
@@ -71,9 +71,11 @@ const walkModule = async (module, dependency, packageEntryPointPath) => {
         }
         
         await walkPackageJson(path.join(absoluteNodeModulesLocation, 'package.json'));
-      } else if (sourceValue.indexOf('.') < 0) {
-        // adding a relative import
-        // TODO delete updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
+      } else if (sourceValue.indexOf('./') < 0) {
+        // adding a bare import with extension
+        // TODO better handling of ./ check
+        updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
+        // TODO delete or refactor with above conditional?
       } else {
         // walk this module for all its dependencies
         sourceValue = sourceValue.indexOf('.js') < 0
@@ -94,23 +96,10 @@ const walkModule = async (module, dependency, packageEntryPointPath) => {
 
       if (sourceValue !== '' && sourceValue.indexOf('http') !== 0) {
         if (sourceValue.indexOf('.') === 0) {
-          // TODO should be handled just like a ./ or ../../../
-          if (sourceValue.indexOf('../') === 0) {
-            // const absolutePath = path.resolve(path.dirname(packageEntryPointPath), sourceValue);
-            // const entry = `${dependency}/${sourceValue.replace('../', 'internal/')}`;
-            // const entryPath = absolutePath.replace(process.cwd(), '');
-            // console.debug('it has two dot(s)!', sourceValue);
-            // console.debug('absolutePath???????', absolutePath);
-            // console.debug('ENTRY', entry);
-            // console.debug('PATH', entryPath);
-            // updateImportMap(entry, entryPath);
-          } else {
-            // console.debug('it has one dot!', sourceValue);
-            updateImportMap(path.join(dependency, sourceValue), `/node_modules/${path.join(dependency, sourceValue)}`);
-          }
+          updateImportMap(path.join(dependency, sourceValue), `/node_modules/${path.join(dependency, sourceValue)}`);
         } else {
           // console.debug('it has NO dots!!!!');
-          // updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
+          updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
           // updateImportMap(sourceValue, `/node_modules/${sourceValue}/index.js`);
         }
       }
@@ -232,10 +221,10 @@ const walkPackageJson = async (packageJson = {}) => {
         // sometimes a main file is actually just an empty string... :/
         if (fs.existsSync(packageEntryPointPath)) {
           const packageEntryModule = fs.readFileSync(packageEntryPointPath, 'utf-8');
-    
+
           updateImportMap(dependency, `/node_modules/${path.join(dependency, entry)}`);
 
-          await walkModule(packageEntryModule, dependency, packageEntryPointPath);          
+          await walkModule(packageEntryModule, dependency, packageEntryPointPath);
           await walkPackageJson(dependencyPackageJson);
         }
       }
