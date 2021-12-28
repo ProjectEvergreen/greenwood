@@ -59,7 +59,7 @@ const walkModule = async (modulePath, dependency) => {
     async ImportDeclaration(node) {
       let { value: sourceValue } = node.source;
       const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(dependency);
-      const isBarePath = sourceValue.indexOf('http') !== 0 && sourceValue.charAt(0) !== '.' && sourceValue.charAt(0) !== '/';
+      const isBarePath = sourceValue.indexOf('http') !== 0 && sourceValue.charAt(0) !== '.' && sourceValue.charAt(0) !== path.sep;
       const hasExtension = path.extname(sourceValue) !== '';
 
       if (isBarePath && !hasExtension) {
@@ -152,7 +152,7 @@ const walkPackageJson = async (packageJson = {}) => {
                   break;
                 case 'object':
                   const entryTypes = Object.keys(mapItem);
-  
+
                   if (entryTypes.import) {
                     esmPath = entryTypes.import;
                   } else if (entryTypes.require) {
@@ -186,15 +186,13 @@ const walkPackageJson = async (packageJson = {}) => {
             // is probably a file, so _not_ an export array, package.json, or wildcard export
             packageExport = exportMapEntry;
           }
-  
+
           if (packageExport) {
             const packageExportLocation = path.resolve(absoluteNodeModulesLocation, packageExport);
 
             // check all exports of an exportMap entry
             // to make sure those deps get added to the importMap
             if (packageExport.endsWith('js')) {
-              await walkModule(packageExportLocation, dependency);
-
               updateImportMap(path.join(dependency, entry), `/node_modules/${path.join(dependency, packageExport)}`);
             } else if (fs.lstatSync(packageExportLocation).isDirectory()) {
               fs.readdirSync(packageExportLocation)
