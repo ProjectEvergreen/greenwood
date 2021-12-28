@@ -190,8 +190,6 @@ const walkPackageJson = async (packageJson = {}) => {
           if (packageExport) {
             const packageExportLocation = path.resolve(absoluteNodeModulesLocation, packageExport);
 
-            // check all exports of an exportMap entry
-            // to make sure those deps get added to the importMap
             if (packageExport.endsWith('js')) {
               updateImportMap(path.join(dependency, entry), `/node_modules/${path.join(dependency, packageExport)}`);
             } else if (fs.lstatSync(packageExportLocation).isDirectory()) {
