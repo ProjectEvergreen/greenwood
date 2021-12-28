@@ -70,7 +70,6 @@ const walkModule = async (modulePath, dependency) => {
         await walkPackageJson(path.join(absoluteNodeModulesLocation, 'package.json'));
       } else if (isBarePath) {
         updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
-        // TODO delete or refactor with above conditional?
       } else {
         // walk this module for all its dependencies
         sourceValue = !hasExtension
@@ -78,9 +77,10 @@ const walkModule = async (modulePath, dependency) => {
           : sourceValue;
 
         if (fs.existsSync(path.join(absoluteNodeModulesLocation, sourceValue))) {
+          const entry = `/node_modules/${await resolveRelativeSpecifier(sourceValue, modulePath, dependency)}`;
           await walkModule(path.join(absoluteNodeModulesLocation, sourceValue), dependency);
 
-          updateImportMap(path.join(dependency, sourceValue), `/node_modules/${path.join(dependency, sourceValue)}`);
+          updateImportMap(path.join(dependency, sourceValue), entry);
         }
       }
     },
@@ -99,12 +99,14 @@ const walkModule = async (modulePath, dependency) => {
         }
       }
     },
-    ExportAllDeclaration(node) {
+    async ExportAllDeclaration(node) {
       const sourceValue = node && node.source ? node.source.value : '';
 
       if (sourceValue !== '' && sourceValue.indexOf('http') !== 0) {
         if (sourceValue.indexOf('.') === 0) {
-          updateImportMap(path.join(dependency, sourceValue), `/node_modules/${path.join(dependency, sourceValue)}`);
+          const entry = `/node_modules/${await resolveRelativeSpecifier(sourceValue, modulePath, dependency)}`;
+
+          updateImportMap(path.join(dependency, sourceValue), entry);
         } else {
           updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
         }
