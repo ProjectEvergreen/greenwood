@@ -1,6 +1,6 @@
 import { bundleCompilation } from '../lifecycles/bundle.js';
 import { copyAssets } from '../lifecycles/copy.js';
-import { devServer } from '../lifecycles/serve.js';
+import { getDevServer } from '../lifecycles/serve.js';
 import fs from 'fs';
 import { generateCompilation } from '../lifecycles/compile.js';
 import { preRenderCompilation, staticRenderCompilation } from '../lifecycles/prerender.js';
@@ -23,7 +23,7 @@ const runProductionBuild = async () => {
       if (prerender) {
         await new Promise(async (resolve, reject) => {
           try {
-            (await devServer(compilation)).listen(port, async () => {
+            (await getDevServer(compilation)).listen(port, async () => {
               console.info(`Started local development server at localhost:${port}`);
   
               const servers = [...compilation.config.plugins.filter((plugin) => {

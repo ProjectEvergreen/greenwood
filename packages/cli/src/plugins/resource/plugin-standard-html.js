@@ -16,7 +16,7 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import unified from 'unified';
-import { fileURLToPath, URL } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 function getCustomPageTemplates(contextPlugins, templateName) {
   return contextPlugins
@@ -323,6 +323,9 @@ class StandardHtmlResource extends ResourceInterface {
     const hasMatchingRoute = this.compilation.graph.filter((node) => {
       return node.route === relativeUrl;
     }).length === 1;
+    // const isServerSideRoute = this.compilation.config.mode === 'ssr' && path.extname(url) === ''
+    //   && (headers.request.accept || '').indexOf(this.contentType) >= 0
+    //   && fs.existsSync(path.join(routesDir, `${relativeUrl.replace(/\//g, '')}.js`));
 
     return Promise.resolve(hasMatchingRoute || isClientSideRoute);
   }
@@ -342,15 +345,15 @@ class StandardHtmlResource extends ResourceInterface {
         const fullPath = !matchingRoute.external ? matchingRoute.path : '';
         const isMarkdownContent = path.extname(fullPath) === '.md';
 
+        let customImports;
         let body = '';
         let template = null;
-        let customImports;
         let processedMarkdown = null;
 
         if (matchingRoute.external) {
           template = matchingRoute.template || template;
         }
-
+        
         if (isMarkdownContent) {
           const markdownContents = await fs.promises.readFile(fullPath, 'utf-8');
           const rehypePlugins = [];
@@ -406,7 +409,22 @@ class StandardHtmlResource extends ResourceInterface {
         if (mode === 'spa') {
           body = fs.readFileSync(fullPath, 'utf-8');
         } else {
-          body = getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir);
+          if (isServerSideRoute) {
+            const routeLocation = path.join(routesDir, `${url.replace(/\//g, '')}.js`);
+
+            // TODO
+            // if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
+            //   delete require.cache[routeLocation];
+            // }
+
+            const { getTemplate } = await import(pathToFileURL(routeLocation));
+
+            if (getTemplate) {
+              body = await getTemplate();
+            }
+          } else {
+            body = getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir);
+          }
         }
 
         body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);       

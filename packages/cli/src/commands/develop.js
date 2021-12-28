@@ -1,6 +1,6 @@
 import { generateCompilation } from '../lifecycles/compile.js';
 import { ServerInterface } from '../lib/server-interface.js';
-import { devServer } from '../lifecycles/serve.js';
+import { getDevServer } from '../lifecycles/serve.js';
 
 const runDevServer = async () => {
 
@@ -10,7 +10,7 @@ const runDevServer = async () => {
       const compilation = await generateCompilation();
       const { port } = compilation.config.devServer;
       
-      (await devServer(compilation)).listen(port, () => {
+      (await getDevServer(compilation)).listen(port, () => {
         
         console.info(`Started local development server at localhost:${port}`);
 

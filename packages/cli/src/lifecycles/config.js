@@ -29,7 +29,7 @@ const greenwoodPlugins = (await Promise.all([
   };
 });
 
-const modes = ['ssg', 'mpa', 'spa'];
+const modes = ['ssg', 'mpa', 'spa', 'ssr'];
 const optimizations = ['default', 'none', 'static', 'inline'];
 const pluginTypes = ['copy', 'context', 'resource', 'rollup', 'server', 'source'];
 const defaultConfig = {
@@ -47,7 +47,8 @@ const defaultConfig = {
   markdown: { plugins: [], settings: {} },
   prerender: true,
   pagesDirectory: 'pages',
-  templatesDirectory: 'templates'
+  templatesDirectory: 'templates',
+  routesDirectory: 'routes'
 };
 
 const readAndMergeConfig = async() => {
