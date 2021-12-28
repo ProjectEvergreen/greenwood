@@ -270,5 +270,7 @@
   "@bundled-es-modules/message-format/MessageFormat.js": "/node_modules/@bundled-es-modules/message-format/MessageFormat.js",
   "@bundled-es-modules/message-format": "/node_modules/@bundled-es-modules/message-format/index.js",
   "singleton-manager/src/SingletonManagerClass.js": "/node_modules/singleton-manager/src/SingletonManagerClass.js",
-  "singleton-manager": "/node_modules/singleton-manager/index.js"
+  "singleton-manager": "/node_modules/singleton-manager/index.js",
+  "@stencil/core": "/node_modules/@stencil/core/internal/stencil-core/index.js",
+  "@stencil/client/index.js": "/node_modules/@stencil/core/internal/client/index.js"
 }
