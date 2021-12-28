@@ -2,6 +2,7 @@
   "name": "@greenwood/www",
   "version": "0.20.3",
   "private": true,
+  "type": "module",
   "description": "Greenwood website workspace.",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
