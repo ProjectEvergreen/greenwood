@@ -1,3 +1,5 @@
+import fs from 'fs/promises';
+
 const getTemplate = async (data) => {
   return `
     <app-footer>
@@ -37,12 +39,12 @@ const getTemplate = async (data) => {
 };
 
 const getData = async () => {
-  const version = require('../package.json').version;
+  const version = JSON.parse(await fs.readFile(new URL('../package.json', import.meta.url), 'utf-8')).version;
 
   return { version };
 };
 
-module.exports = {
+export {
   getTemplate,
   getData
 };
