@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
 import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
 import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
@@ -10,36 +9,6 @@ import { fileURLToPath, URL } from 'url';
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
 const FAVICON_HREF = '/assets/favicon.ico';
-
-// this could just as easily come from an API, DB, Headless CMS, etc
-const customExternalSourcesPlugin = {
-  type: 'source',
-  name: 'source-plugin-analogstudios',
-  provider: () => {
-    return async function () {
-      const artists = await fetch('http://www.analogstudios.net/api/artists').then(resp => resp.json());
-
-      return artists.map((artist) => {
-        const { bio, id, imageUrl, name } = artist;
-        const route = `/artists/${name.toLowerCase().replace(/ /g, '-')}/`;
-
-        return {
-          title: name,
-          body: `
-            <p>${bio}</p>
-            <img src='${imageUrl}'/>
-          `,
-          route,
-          id,
-          label: name,
-          data: {
-            imageUrl
-          }
-        };
-      });
-    };
-  }
-};
 
 export default {
   workspace: fileURLToPath(new URL('./www', import.meta.url)),
@@ -78,8 +47,7 @@ export default {
         ];
       }
     },
-    ...greenwoodPluginIncludeHTML(),
-    customExternalSourcesPlugin
+    ...greenwoodPluginIncludeHTML()
   ],
   markdown: {
     plugins: [
