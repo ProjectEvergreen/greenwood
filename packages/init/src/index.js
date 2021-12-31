@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 /* eslint no-console: 0 */
+/* eslint-disable camelcase */
 /*
  * **Note**
  * For the time being, there is an issue that prevents us from running the install based specs for this package as part of CI.
@@ -160,12 +161,12 @@ const listAndSelectTemplate = async () => {
           console.log('Couldn\'t locate any templates, check your connection and try again');
           throw new HTTPResponseError(response);
         }
-      }
+      };
 
       const repos = await fetch(PROJECT_API_URL).then(resp => checkStatus(resp));
 
       // assuming it did resolve but there are no templates listed
-      if(!repos || repos.length === 0) {
+      if (!repos || repos.length === 0) {
         console.log('Couldn\'t locate any templates, check your connection and try again');
         return [];
       }
@@ -174,14 +175,14 @@ const listAndSelectTemplate = async () => {
         return repo.name.includes('greenwood-template');
       });
       
-      return templateRepos.map(({ clone_url, name }) =>  {
+      return templateRepos.map(({ clone_url, name }) => {
         const templateName = name.substring(templateStandardName.length, name.length);
-        return { clone_url, name: templateName }
+        return { clone_url, name: templateName };
       });
-    } catch(err) {
+    } catch (err) {
       throw err;
     }
-  }
+  };
 
   const templates = await getTemplates();
 
@@ -196,8 +197,8 @@ const listAndSelectTemplate = async () => {
       choices: templates.map(template => template.name),
       filter(val) {
         return val.toLowerCase();
-      },
-    },
+      }
+    }
   ];
 
   return inquirer.prompt(questions).then((answers) => {
@@ -206,7 +207,7 @@ const listAndSelectTemplate = async () => {
       return template.name === answers.template;
     });
 
-    if(selectedTemplate) {
+    if (selectedTemplate) {
       console.log('\Installing Selected Template:', selectedTemplate.name);
     }
   });
@@ -225,15 +226,14 @@ const cloneTemplate = async () => {
   try {
     await git.clone(selectedTemplate.clone_url, clonedTemplateDir);
     templateDir = clonedTemplateDir;
-  }
-  catch (e) { throw e }
-}
+  } catch (e) { throw e; }
+};
 
 const run = async () => {
   try {
-    if(program.template) {
+    if (program.template) {
       await listAndSelectTemplate();
-      if(!selectedTemplate) {
+      if (!selectedTemplate) {
         return;
       }
       await cloneTemplate();
