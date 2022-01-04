@@ -324,9 +324,6 @@ class StandardHtmlResource extends ResourceInterface {
     const hasMatchingRoute = this.compilation.graph.filter((node) => {
       return node.route === relativeUrl;
     }).length === 1;
-    // const isServerSideRoute = this.compilation.config.mode === 'ssr' && path.extname(url) === ''
-    //   && (headers.request.accept || '').indexOf(this.contentType) >= 0
-    //   && fs.existsSync(path.join(routesDir, `${relativeUrl.replace(/\//g, '')}.js`));
 
     return Promise.resolve(hasMatchingRoute || isClientSideRoute);
   }
@@ -349,6 +346,9 @@ class StandardHtmlResource extends ResourceInterface {
         let customImports;
         let body = '';
         let template = null;
+        let ssrBody;
+        let ssrTemplate;
+        let ssrMetadata;
         let processedMarkdown = null;
 
         if (matchingRoute.external) {
@@ -399,6 +399,56 @@ class StandardHtmlResource extends ResourceInterface {
             }
           }
         }
+
+        if (isServerSideRoute) {
+          const routeLocation = path.join(routesDir, `${url.replace(/\//g, '')}.js`);
+
+          if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
+            // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
+            await new Promise((resolve, reject) => {
+              const worker = new Worker(new URL('../../lib/ssr-route-worker.js', import.meta.url), {
+                workerData: {
+                  modulePath: routeLocation,
+                  compilation: JSON.stringify(this.compilation)
+                }
+              });
+              worker.on('message', (result) => {
+                if (result.template) {
+                  ssrTemplate = result.template;
+                }
+                if (result.body) {
+                  ssrBody = result.body;
+                }
+                if (result.metadata) {
+                  ssrMetadata = result.metadata;
+                }
+                resolve();
+              });
+              worker.on('error', reject);
+              worker.on('exit', (code) => {
+                if (code !== 0) {
+                  reject(new Error(`Worker stopped with exit code ${code}`));
+                }
+              });
+            });
+          } else {
+            const { getTemplate = null, getBody = null, getMetadata = null } = await import(routeLocation);
+
+            if (getTemplate) {
+              ssrTemplate = await getTemplate(this.compilation);
+            }
+
+            if (getBody) {
+              ssrBody = await getBody(this.compilation);
+            }
+
+            if (getMetadata) {
+              ssrMetadata = await getMetadata(this.compilation);
+            }
+          }
+        }
+
+        console.debug('metadata', ssrMetadata);
 
         // get context plugins
         const contextPlugins = this.compilation.config.plugins.filter((plugin) => {
@@ -459,7 +509,7 @@ class StandardHtmlResource extends ResourceInterface {
               body = template;
             }
           } else {
-            body = getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir);
+            body = ssrTemplate ? ssrTemplate : getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir, ssrTemplate);
           }
         }
 
@@ -486,6 +536,8 @@ class StandardHtmlResource extends ResourceInterface {
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
         } else if (matchingRoute.external) {
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
+        } else if (ssrBody) {
+          body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, ssrBody);
         }
 
         // give the user something to see so they know it works, if they have no content

@@ -1,6 +1,36 @@
 import fetch from 'node-fetch';
 
-async function getTemplate() {
+async function getTemplate(compilation) {
+  return `
+    <html>
+      <head>
+
+        <script>
+          console.log(${JSON.stringify(compilation.graph.map(page => page.title).join(''))});
+        </script>
+
+        <style>
+          * {
+            color: blue;
+          }
+
+          h1 {
+            width: 50%;
+            margin: 0 auto;
+            text-align: center;
+            color: red;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>This heading was rendered server side!</h1>
+        <content-outlet></content-outlet>
+      </body>
+    </html>
+  `;
+}
+
+async function getBody() {
   const artists = await fetch('http://www.analogstudios.net/api/artists').then(resp => resp.json());
   const timestamp = new Date().getTime();
   const artistsListItems = artists
@@ -54,16 +84,14 @@ async function getTemplate() {
   `;
 }
 
-async function getContent() {
-  return '<h1>Content goes here</h1>';
-}
-
 async function getMetadata() {
-  return { meta: 'data' };
+  return {
+    title: 'This is title generated server side'
+  };
 }
 
 export {
   getTemplate,
-  getContent,
+  getBody,
   getMetadata
 }; 

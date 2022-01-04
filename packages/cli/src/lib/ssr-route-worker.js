@@ -1,7 +1,8 @@
 import { workerData, parentPort } from 'worker_threads';
 
-async function executeModule({ modulePath }) {
+async function executeRouteModule({ modulePath, compilation }) {
   const { getTemplate = null, getBody = null, getMetadata = null } = await import(modulePath).then(module => module);
+  const parsedCompilation = JSON.parse(compilation);
   const data = {
     template: null,
     body: null,
@@ -9,18 +10,18 @@ async function executeModule({ modulePath }) {
   };
 
   if (getTemplate) {
-    data.template = await getTemplate();
+    data.template = await getTemplate(parsedCompilation);
   }
 
   if (getBody) {
-    data.body = await getBody();
+    data.body = await getBody(parsedCompilation);
   }
 
   if (getMetadata) {
-    data.metadata = await getMetadata();
+    data.metadata = await getMetadata(parsedCompilation);
   }
 
   parentPort.postMessage(data);
 }
 
-executeModule(workerData);
+executeRouteModule(workerData);
