@@ -1,4 +1,4 @@
-/* eslint-disable complexity */
+/* eslint-disable complexity, max-depth */
 /*
  * 
  * Manages web standard resource related operations for HTML and markdown.
@@ -16,7 +16,8 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import unified from 'unified';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { fileURLToPath } from 'url';
+import { Worker } from 'worker_threads';
 
 function getCustomPageTemplates(contextPlugins, templateName) {
   return contextPlugins
@@ -411,16 +412,51 @@ class StandardHtmlResource extends ResourceInterface {
         } else {
           if (isServerSideRoute) {
             const routeLocation = path.join(routesDir, `${url.replace(/\//g, '')}.js`);
+            let template, page, metadata;
 
-            // TODO
-            // if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
-            //   delete require.cache[routeLocation];
-            // }
+            if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
+              // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
+              await new Promise((resolve, reject) => {
+                const worker = new Worker(new URL('../../lib/worker-utils.js', import.meta.url), {
+                  workerData: {
+                    modulePath: routeLocation
+                  }
+                });
+                worker.on('message', (result) => {
+                  if (result.template) {
+                    template = result.template;
+                  }
+                  resolve();
+                });
+                worker.on('error', reject);
+                worker.on('exit', (code) => {
+                  if (code !== 0) {
+                    reject(new Error(`Worker stopped with exit code ${code}`));
+                  }
+                });
+              });
+            } else {
+              const { getTemplate = null, getBody = null, getMetadata = null } = await import(routeLocation);
 
-            const { getTemplate } = await import(pathToFileURL(routeLocation));
+              if (getTemplate) {
+                template = await getTemplate();
+              }
 
-            if (getTemplate) {
-              body = await getTemplate();
+              if (getBody) {
+                page = await getBody();
+              }
+
+              if (getMetadata) {
+                metadata = await getMetadata();
+              }
+            }
+
+            console.debug(template);
+            console.debug(page);
+            console.debug(metadata);
+
+            if (template) {
+              body = template;
             }
           } else {
             body = getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir);
