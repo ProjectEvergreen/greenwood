@@ -104,7 +104,7 @@ describe('Build Greenwood With: ', function() {
         expect(routerOutlets.length).to.be.equal(1);
       });
 
-      it('should have two <greenwood-route> tags in the <body> for the content', function() {
+      it('should have expected <greenwood-route> tags in the <body> for each page', function() {
         const routeTags = dom.window.document.querySelectorAll('body > greenwood-route');
 
         expect(routeTags.length).to.be.equal(3);

@@ -230,7 +230,6 @@ async function getHybridServer(compilation) {
     if (url.endsWith('/') && mode === 'ssr') {
       if (fs.existsSync(path.join(routesDir, `${url.replace(/\//g, '')}.js`))) {
         const standardHtmlResource = compilation.config.plugins.filter((plugin) => {
-          // html is intentionally omitted
           return plugin.isGreenwoodDefaultPlugin
             && plugin.type === 'resource'
             && plugin.name.indexOf('plugin-standard-html') === 0;
@@ -238,6 +237,10 @@ async function getHybridServer(compilation) {
           return plugin.provider(compilation);
         })[0];
         const response = await standardHtmlResource.serve(url);
+
+        // TODO should optimize
+        // TODO should prerender
+        // TODO should bundle
 
         ctx.status = 200;
         ctx.set('content-type', response.contentType);

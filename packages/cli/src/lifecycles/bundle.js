@@ -5,8 +5,9 @@ const bundleCompilation = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
+      compilation.graph = compilation.graph.filter(page => !page.isSSR);
 
+      // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
       if (compilation.graph.length > 0) {
         const rollupConfigs = await getRollupConfig(compilation);
         const bundle = await rollup(rollupConfigs[0]);

@@ -106,7 +106,8 @@ const generateGraph = async (compilation) => {
               path: route,
               route,
               template,
-              title
+              title,
+              isSSR: true
             });
           }
         }));
