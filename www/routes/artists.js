@@ -87,14 +87,20 @@ async function getBody(compilation) {
   `;
 }
 
-async function getMetadata(compilation) {
-  const titlePrefix = `${compilation.config.title} - `;
+async function getFrontmatter(compilation, route, label) {
+  const title = `${compilation.config.title} - ${label}`;
 
   return {
-    title: `${titlePrefix} This is a title generated server side!!`,
-    data: {
-      timestamp: new Date().getTime()
-    },
+    menu: 'navigation',
+    index: 7,
+    title
+  };
+}
+
+async function getMetadata(compilation, route) {
+  const titlePrefix = `${compilation.config.title} - ${route}`;
+
+  return {
     meta: [{
       name: 'description', content: `${titlePrefix} This is a title generated server side!!`
     }]
@@ -104,5 +110,6 @@ async function getMetadata(compilation) {
 export {
   getTemplate,
   getBody,
+  getFrontmatter,
   getMetadata
 }; 

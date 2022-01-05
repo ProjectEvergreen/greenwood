@@ -413,7 +413,8 @@ class StandardHtmlResource extends ResourceInterface {
               const worker = new Worker(new URL('../../lib/ssr-route-worker.js', import.meta.url), {
                 workerData: {
                   modulePath: routeLocation,
-                  compilation: JSON.stringify(this.compilation)
+                  compilation: JSON.stringify(this.compilation),
+                  route: barePath
                 }
               });
               worker.on('message', (result) => {

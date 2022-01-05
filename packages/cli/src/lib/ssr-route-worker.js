@@ -1,24 +1,29 @@
 import { workerData, parentPort } from 'worker_threads';
 
-async function executeRouteModule({ modulePath, compilation }) {
-  const { getTemplate = null, getBody = null, getMetadata = null } = await import(modulePath).then(module => module);
+async function executeRouteModule({ modulePath, compilation, route, label, id }) {
+  const { getTemplate = null, getBody = null, getMetadata = null, getFrontmatter } = await import(modulePath).then(module => module);
   const parsedCompilation = JSON.parse(compilation);
   const data = {
     template: null,
     body: null,
-    metadata: null
+    metadata: null,
+    frontmatter: null
   };
 
   if (getTemplate) {
-    data.template = await getTemplate(parsedCompilation);
+    data.template = await getTemplate(parsedCompilation, route);
   }
 
   if (getBody) {
-    data.body = await getBody(parsedCompilation);
+    data.body = await getBody(parsedCompilation, route);
   }
 
   if (getMetadata) {
-    data.metadata = await getMetadata(parsedCompilation);
+    data.metadata = await getMetadata(parsedCompilation, route);
+  }
+
+  if (getFrontmatter) {
+    data.frontmatter = await getMetadata(parsedCompilation, route, label, id);
   }
 
   parentPort.postMessage(data);
