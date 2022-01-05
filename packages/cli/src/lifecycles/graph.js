@@ -30,7 +30,6 @@ const generateGraph = async (compilation) => {
           } else {
             const { getFrontmatter } = await import(fullPath);
             const relativePagePath = fullPath.substring(routesDir.length - 1, fullPath.length);
-            const relativeWorkspacePath = directory.replace(process.cwd(), '').replace(path.sep, '');
             const id = filename.split(path.sep)[filename.split(path.sep).length - 1].replace('.js', '');
             const label = id.split('-')
               .map((idPart) => {
