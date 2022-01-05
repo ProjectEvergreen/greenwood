@@ -4,6 +4,10 @@ async function getTemplate(compilation) {
   return `
     <html>
       <head>
+        <script>
+          console.log(${JSON.stringify(compilation.graph.map(page => page.title).join(''))});
+        </script>
+
         <style>
           * {
             color: blue;

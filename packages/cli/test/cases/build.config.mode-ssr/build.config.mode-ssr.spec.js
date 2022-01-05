@@ -35,7 +35,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom Mode';
+  const LABEL = 'Custom Mode SSR';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -44,7 +44,7 @@ describe('Build Greenwood With: ', function() {
     this.context = { 
       publicDir: path.join(outputPath, 'public') 
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
@@ -108,74 +108,6 @@ describe('Build Greenwood With: ', function() {
         `${process.cwd()}/node_modules/@lit/reactive-element/package.json`, 
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
-      const litReduxRouterPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-redux-router/package.json`,
-        `${outputPath}/node_modules/lit-redux-router/`
-      );
-      const litReduxRouter = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-redux-router/*.js`,
-        `${outputPath}/node_modules/lit-redux-router/`
-      );
-      const litReduxRouterLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-redux-router/lib/*.js`,
-        `${outputPath}/node_modules/lit-redux-router/lib/`
-      );
-      const pwaHelpersLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/pwa-helpers/*.js`,
-        `${outputPath}/node_modules/pwa-helpers/`
-      );
-      const pwaHelpersPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/pwa-helpers/package.json`,
-        `${outputPath}/node_modules/pwa-helpers/`
-      );
-      const reduxLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/redux/es/redux.mjs`,
-        `${outputPath}/node_modules/redux/es`
-      );
-      const reduxPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/redux/package.json`,
-        `${outputPath}/node_modules/redux/`
-      );
-      const regexParam = await getDependencyFiles(
-        `${process.cwd()}/node_modules/regexparam/dist/*`,
-        `${outputPath}/node_modules/regexparam/dist/`
-      );
-      const regexParamPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/regexparam/package.json`,
-        `${outputPath}/node_modules/regexparam/`
-      );
-      const looseLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/loose-envify/index.js`,
-        `${outputPath}/node_modules/loose-envify`
-      );
-      const looseLibsPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/loose-envify/package.json`,
-        `${outputPath}/node_modules/loose-envify/`
-      );
-      const tokensLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/js-tokens/index.js`,
-        `${outputPath}/node_modules/js-tokens`
-      );
-      const tokensLibsPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/js-tokens/package.json`,
-        `${outputPath}/node_modules/js-tokens/`
-      );
-      const symbolLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/symbol-observable/es/*.js`,
-        `${outputPath}/node_modules/symbol-observable/es`
-      );
-      const symobolLibsPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/symbol-observable/package.json`,
-        `${outputPath}/node_modules/symbol-observable/`
-      );
-      const reduxThunk = await getDependencyFiles(
-        `${process.cwd()}/node_modules/redux-thunk/es/*.js`,
-        `${outputPath}/node_modules/redux-thunk/es`
-      );
-      const reduxThunkPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/redux-thunk/package.json`,
-        `${outputPath}/node_modules/redux-thunk/`
-      );
 
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
@@ -192,24 +124,7 @@ describe('Build Greenwood With: ', function() {
         ...trustedTypes,
         ...litReactiveElement,
         ...litReactiveElementDecorators,
-        ...litReactiveElementPackageJson,
-        // ...litReduxRouterPackageJson,
-        // ...litReduxRouter,
-        // ...litReduxRouterLibs,
-        // ...pwaHelpersLibs,
-        // ...pwaHelpersPackageJson,
-        // ...reduxLibs,
-        // ...reduxPackageJson,
-        // ...regexParam,
-        // ...regexParamPackageJson,
-        // ...looseLibs,
-        // ...looseLibsPackageJson,
-        // ...tokensLibs,
-        // ...tokensLibsPackageJson,
-        // ...symbolLibs,
-        // ...symobolLibsPackageJson,
-        // ...reduxThunkPackageJson,
-        // ...reduxThunk
+        ...litReactiveElementPackageJson
       ]);
       await runner.runCommand(cliPath, 'build');
     });
@@ -299,7 +214,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    // runner.teardown(getOutputTeardownFiles(outputPath));
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 
 });

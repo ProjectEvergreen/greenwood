@@ -243,12 +243,10 @@ const generateGraph = async (compilation) => {
         }];
       } else {
         const oldGraph = graph[0];
-        const pages = fs.existsSync(pagesDir) ? walkDirectoryForPages(pagesDir) : [];
+        const pages = fs.existsSync(pagesDir) ? walkDirectoryForPages(pagesDir) : graph;
         const routes = fs.existsSync(routesDir) ? await walkDirectoryForRoutes(routesDir) : [];
 
-        graph = pages.length || routes.length
-          ? [...pages, ...routes]
-          : graph;
+        graph = [...pages, ...routes];
 
         const has404Page = graph.filter(page => page.route === '/404/').length === 1;
 
