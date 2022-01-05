@@ -24,10 +24,10 @@
  *     app.html
  */
 import chai from 'chai';
-import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
@@ -38,6 +38,7 @@ describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Mode SSR';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
+  const hostname = 'http://127.0.0.1:8080';
   let runner;
 
   before(async function() {
@@ -126,95 +127,122 @@ describe('Build Greenwood With: ', function() {
         ...litReactiveElementDecorators,
         ...litReactiveElementPackageJson
       ]);
-      await runner.runCommand(cliPath, 'build');
+
+      return new Promise(async (resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 10000);
+
+        await runner.runCommand(cliPath, 'serve');
+      });
     });
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    xdescribe('SSR (Server Side Rendering)', function() {
-      let dom;
-      let htmlFiles;
-      let jsFiles;
+    let response = {};
+    let dom;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-        htmlFiles = await glob(`${this.context.publicDir}/**/*.html`);
-        jsFiles = await glob(`${this.context.publicDir}/**/*.js`);
+    before(async function() {
+      return new Promise((resolve, reject) => {
+        request.get(`${hostname}/artists/`, (err, res, body) => {
+          if (err) {
+            reject();
+          }
+
+          console.debug({ body });
+
+          response = res;
+          response.body = body;
+          dom = new JSDOM(body);
+
+          resolve();
+        });
       });
-      
-      it('should only have one HTML file in the output directory', function() {
-        expect(htmlFiles.length).to.be.equal(1);
-      });
+    });
 
-      it('should output five script files in the output directory', function() {
-        // one for each route (home, about)
-        // one for the footer.js
-        // one for index.js
-        // one for lit element bundle
-        expect(jsFiles.length).to.be.equal(5);
-      });
+    describe('Serve command with HTML route response', function() {
 
-      it('should have custom <title> tag in the <head>', function() {
-        const title = dom.window.document.querySelectorAll('head > title');
-
-        expect(title.length).to.be.equal(1);
-        expect(title[0].textContent).to.be.equal('My Super SPA');
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
       });
 
-      it('should have custom <meta> tag in the <head>', function() {
-        const customMeta = Array.from(dom.window.document.querySelectorAll('head > meta'))
-          .filter(meta => meta.getAttribute('property') === 'og:description');
-
-        expect(customMeta.length).to.be.equal(1);
-        expect(customMeta[0].getAttribute('content')).to.be.equal('My custom meta content.');
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('text/html');
+        done();
       });
 
-      it('should only have two script tags in the <head>', function() {
-        expect(htmlFiles.length).to.be.equal(1);
+      it('should return a response body', function(done) {
+        expect(response.body).to.not.be.undefined;
+        done();
       });
 
-      it('should have one <script> tag in the <head> for index.js', function() {
-        const indexScript = Array.from(dom.window.document.querySelectorAll('head > script[type]'))
-          .filter(script => (/index.*.js/).test(script.src));
-
-        expect(indexScript.length).to.be.equal(1);
-        expect(indexScript[0].type).to.be.equal('module');
+      it('the response body should be valid HTML from JSDOM', function(done) {
+        expect(dom).to.not.be.undefined;
+        done();
       });
 
-      it('should have one <script> tag in the <head> for the footer.js', function() {
+      // TODO describe app and page templates
+      it('should have two style tags', function() {
+        const styles = dom.window.document.querySelectorAll('head > style');
+
+        expect(styles.length).to.equal(1);
+      });
+
+      it('should have two script tags', function() {
+        const scripts = dom.window.document.querySelectorAll('head > script');
+
+        expect(scripts.length).to.equal(2);
+      });
+
+      it('should have expected SSR content from the non module script tag', function() {
+        const scripts = Array.from(dom.window.document.querySelectorAll('head > script'))
+          .filter(tag => !tag.getAttribute('type'));
+
+        expect(scripts.length).to.equal(1);
+        expect(scripts[0].textContent).to.contain('console.log');
+      });
+
+      xit('should have a bundled script for the footer component', function() {
         const footerScript = Array.from(dom.window.document.querySelectorAll('head > script[type]'))
-          .filter(script => (/footer.*.js/).test(script.src));
+          .filter(script => (/footer.*[a-z0-9].js/).test(script.src));
 
+        console.debug({ footerScript })
+        console.debug(footerScript[0].src)
         expect(footerScript.length).to.be.equal(1);
         expect(footerScript[0].type).to.be.equal('module');
       });
 
-      it('should have two code split route javascript files emitted based code splitting', function() {
-        const aboutBundle = jsFiles.filter(file => (/about.*.js/).test(path.basename(file)));
-        const homeBundle = jsFiles.filter(file => (/home.*.js/).test(path.basename(file)));
-        
-        expect(aboutBundle.length).to.equal(1);
-        expect(homeBundle.length).to.equal(1);
+      // TODO describe route contents
+      it('should have the expected number of table rows of content', function() {
+        const rows = dom.window.document.querySelectorAll('body > table tr');
+
+        expect(rows.length).to.equal(11);
       });
 
-      it('should not have a pre-rendered custom footer', function() {
-        const footer = dom.window.document.querySelector('app-footer');
+      xit('should have the expected pre-rendered content for the app-footer', function() {
+        const footer = dom.window.document.querySelectorAll('body > app-footer');
 
-        expect(footer.textContent).to.be.equal('');
+        expect(footer.length).to.equal(1);
+        expect(footer[0].textContent).to.contain('v0.11.1');
+      });
+
+      // TODO metadata and frontmatter
+      // - metadata
+      // - graph
+      // - imports
+      it('should have the expected <title> content', function() {
+        const title = dom.window.document.querySelectorAll('head > title');
+
+        expect(title.length).to.equal(1);
+        expect(title[0].textContent).to.equal('this is the SSR config file title');
       });
     });
-
-    // TOOD test server
-    // title
-    // - template (app, page)
-    // - body
-    // - metadata
-    // - graph
-
   });
 
   after(function() {
     runner.teardown(getOutputTeardownFiles(outputPath));
+    runner.stopCommand();
   });
 
 });

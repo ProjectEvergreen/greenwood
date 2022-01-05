@@ -238,8 +238,9 @@ async function getHybridServer(compilation) {
         })[0];
         const response = await standardHtmlResource.serve(url);
 
-        // TODO should optimize
-        // TODO should prerender
+        response.body = await standardHtmlResource.optimize(null, response.body);
+
+        // TODO should prerender (conditionally)
         // TODO should bundle
 
         ctx.status = 200;
