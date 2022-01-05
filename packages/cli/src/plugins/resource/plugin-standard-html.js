@@ -268,14 +268,18 @@ const getUserScripts = (contents, context) => {
   return contents;
 };
 
-const getMetaContent = (url, config, contents) => {
+const getMetaContent = (url, config, contents, ssrMetadata = {}) => {
   const existingTitleMatch = contents.match(/<title>(.*)<\/title>/);
   const existingTitleCheck = !!(existingTitleMatch && existingTitleMatch[1] && existingTitleMatch[1] !== '');
 
   const title = existingTitleCheck
     ? existingTitleMatch[1]
-    : config.title;
-  const metaContent = config.meta.map(item => {
+    : ssrMetadata.title
+      ? ssrMetadata.title
+      : config.title
+        ? config.title
+        : '';
+  const metaContent = [...config.meta || [], ...ssrMetadata.meta || []].map(item => {
     let metaHtml = '';
 
     for (const [key, value] of Object.entries(item)) {
@@ -448,8 +452,6 @@ class StandardHtmlResource extends ResourceInterface {
           }
         }
 
-        console.debug('metadata', ssrMetadata);
-
         // get context plugins
         const contextPlugins = this.compilation.config.plugins.filter((plugin) => {
           return plugin.type === 'context';
@@ -515,7 +517,7 @@ class StandardHtmlResource extends ResourceInterface {
 
         body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);       
         body = getUserScripts(body, this.compilation.context);
-        body = getMetaContent(matchingRoute.route.replace(/\\/g, '/'), config, body);
+        body = getMetaContent(matchingRoute.route.replace(/\\/g, '/'), config, body, ssrMetadata);
         
         if (processedMarkdown) {
           const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;

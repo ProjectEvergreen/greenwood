@@ -30,7 +30,7 @@ async function getTemplate(compilation) {
   `;
 }
 
-async function getBody() {
+async function getBody(compilation) {
   const artists = await fetch('http://www.analogstudios.net/api/artists').then(resp => resp.json());
   const timestamp = new Date().getTime();
   const artistsListItems = artists
@@ -79,14 +79,25 @@ async function getBody() {
           ${artistsListItems.join('')}
         </table>
         <h6>Fetched at: ${timestamp}</h6>
+        <pre>
+          ${JSON.stringify(compilation.graph.map(page => page.title).join(''))}
+        </pre>
       </body>
     </html>
   `;
 }
 
-async function getMetadata() {
+async function getMetadata(compilation) {
+  const titlePrefix = `${compilation.config.title} - `;
+
   return {
-    title: 'This is title generated server side'
+    title: `${titlePrefix} This is a title generated server side!!`,
+    data: {
+      timestamp: new Date().getTime()
+    },
+    meta: [{
+      name: 'description', content: `${titlePrefix} This is a title generated server side!!`
+    }]
   };
 }
 
