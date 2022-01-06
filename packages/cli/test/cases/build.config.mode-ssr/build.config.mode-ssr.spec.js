@@ -203,8 +203,7 @@ describe('Build Greenwood With: ', function() {
         expect(scripts[0].textContent).to.contain('console.log');
       });
 
-      // TODO describe app and page templates
-      xit('should have a bundled script for the footer component', function() {
+      it('should have a bundled script for the footer component', function() {
         const footerScript = Array.from(dom.window.document.querySelectorAll('head > script[type]'))
           .filter(script => (/footer.*[a-z0-9].js/).test(script.src));
 
