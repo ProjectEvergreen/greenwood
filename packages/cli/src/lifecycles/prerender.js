@@ -52,6 +52,8 @@ async function optimizePage(compilation, contents, route, outputPath, outputDir)
   }
   
   await fs.promises.writeFile(path.join(outputDir, outputPath), htmlOptimized);
+
+  return htmlOptimized;
 }
 
 async function preRenderCompilation(compilation) {

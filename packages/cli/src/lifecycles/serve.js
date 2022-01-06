@@ -1,3 +1,4 @@
+import { BrowserRunner } from '../lib/browser.js';
 import fs from 'fs';
 import path from 'path';
 import Koa from 'koa';
@@ -221,6 +222,14 @@ async function getStaticServer(compilation, composable) {
 
 async function getHybridServer(compilation) {
   const app = await getStaticServer(compilation, true);
+  const { prerender } = compilation.config;
+  let browserRunner;
+
+  if (prerender) {
+    browserRunner = new BrowserRunner();
+
+    await browserRunner.init();
+  }
 
   app.use(async (ctx) => {
     const { routesDir } = compilation.context;
@@ -236,16 +245,24 @@ async function getHybridServer(compilation) {
         }).map((plugin) => {
           return plugin.provider(compilation);
         })[0];
-        const response = await standardHtmlResource.serve(url);
+        let body = '';
 
-        response.body = await standardHtmlResource.optimize(null, response.body);
+        if (prerender) {
+          const { port } = compilation.config.devServer;
+          const serverAddress = `http://127.0.0.1:${port}`;
 
-        // TODO should prerender (conditionally)
+          body = await browserRunner.serialize(`${serverAddress}${url}`);
+        } else {
+          body = await standardHtmlResource.serve(url);
+        }
+
+        body = await standardHtmlResource.optimize(null, body);
+
         // TODO should bundle
 
         ctx.status = 200;
-        ctx.set('content-type', response.contentType);
-        ctx.body = response.body;
+        ctx.set('content-type', 'text/html');
+        ctx.body = body;
       }
     }
   });

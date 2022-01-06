@@ -182,11 +182,11 @@ describe('Build Greenwood With: ', function() {
         done();
       });
 
-      // TODO describe app and page templates
       it('should have two style tags', function() {
         const styles = dom.window.document.querySelectorAll('head > style');
 
-        expect(styles.length).to.equal(1);
+        // two (?) for puppeteer
+        expect(styles.length).to.equal(3);
       });
 
       it('should have two script tags', function() {
@@ -203,24 +203,22 @@ describe('Build Greenwood With: ', function() {
         expect(scripts[0].textContent).to.contain('console.log');
       });
 
+      // TODO describe app and page templates
       xit('should have a bundled script for the footer component', function() {
         const footerScript = Array.from(dom.window.document.querySelectorAll('head > script[type]'))
           .filter(script => (/footer.*[a-z0-9].js/).test(script.src));
 
-        console.debug({ footerScript })
-        console.debug(footerScript[0].src)
         expect(footerScript.length).to.be.equal(1);
         expect(footerScript[0].type).to.be.equal('module');
       });
 
-      // TODO describe route contents
       it('should have the expected number of table rows of content', function() {
         const rows = dom.window.document.querySelectorAll('body > table tr');
 
         expect(rows.length).to.equal(11);
       });
 
-      xit('should have the expected pre-rendered content for the app-footer', function() {
+      it('should have the expected pre-rendered content for the app-footer', function() {
         const footer = dom.window.document.querySelectorAll('body > app-footer');
 
         expect(footer.length).to.equal(1);
