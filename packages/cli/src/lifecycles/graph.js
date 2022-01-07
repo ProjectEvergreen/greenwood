@@ -50,6 +50,14 @@ const generateGraph = async (compilation) => {
               template = ssrFmData.template ? ssrFmData.template : template;
               title = ssrFmData.title ? ssrFmData.title : title;
               imports = ssrFmData.imports ? ssrFmData.imports : imports;
+              customData = ssrFmData.data ? ssrFmData.data : customData;
+
+              // prune "reserved" attributes that are supported by Greenwood
+              // https://www.greenwoodjs.io/docs/front-matter
+              delete ssrFmData.label;
+              delete ssrFmData.imports;
+              delete ssrFmData.title;
+              delete ssrFmData.template;
 
               /* Menu Query
                * Custom front matter - Variable Definitions
@@ -61,23 +69,6 @@ const generateGraph = async (compilation) => {
                */
               customData.menu = ssrFmData.menu || '';
               customData.index = ssrFmData.index || '';
-
-              // TODO?
-              // set flag whether to gather a list of headings on a page as menu items
-              // customData.linkheadings = ssrFmData.linkheadings || 0;
-              // customData.tableOfContents = [];
-  
-              // if (customData.linkheadings > 0) {
-              //   // parse markdown for table of contents and output to json
-              //   customData.tableOfContents = toc(fileContents).json;
-              //   customData.tableOfContents.shift();
-  
-              //   // parse table of contents for only the pages user wants linked
-              //   if (customData.tableOfContents.length > 0 && customData.linkheadings > 0) {
-              //     customData.tableOfContents = customData.tableOfContents
-              //       .filter((item) => item.lvl === customData.linkheadings);
-              //   }
-              // }
             }
 
             /*

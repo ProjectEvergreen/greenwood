@@ -1,9 +1,11 @@
 import fetch from 'node-fetch';
 
-async function getTemplate(compilation) {
+async function getTemplate(compilation, route) {
   return `
     <html>
       <head>
+        <meta name="description" content="${compilation.config.title} - ${route} (this was generated server side!!!)">
+
         <script>
           console.log(${JSON.stringify(compilation.graph.map(page => page.title).join(''))});
         </script>
@@ -86,29 +88,23 @@ async function getBody(compilation) {
   `;
 }
 
-async function getFrontmatter(compilation, route, label) {
-  const title = `${compilation.config.title} - ${label}`;
-
+async function getFrontmatter(compilation, route) {
   return {
     menu: 'navigation',
     index: 7,
-    title
-  };
-}
-
-async function getMetadata(compilation, route) {
-  const titlePrefix = `${compilation.config.title} - ${route}`;
-
-  return {
-    meta: [{
-      name: 'description', content: `${titlePrefix} This is a title generated server side!!`
-    }]
+    title: `${compilation.config.title} - ${route}`,
+    imports: [
+      '/components/counter.js'
+    ],
+    data: {
+      author: 'Project Evergreen',
+      date: '01-01-2021'
+    }
   };
 }
 
 export {
   getTemplate,
   getBody,
-  getFrontmatter,
-  getMetadata
+  getFrontmatter
 }; 

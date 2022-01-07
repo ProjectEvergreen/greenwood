@@ -87,8 +87,8 @@ async function getBody(compilation) {
   `;
 }
 
-async function getFrontmatter(compilation, route, label) {
-  const title = `${compilation.config.title} - ${label}`;
+async function getFrontmatter(compilation, route) {
+  const title = `${compilation.config.title} - ${route}`;
 
   return {
     menu: 'navigation',
@@ -97,19 +97,8 @@ async function getFrontmatter(compilation, route, label) {
   };
 }
 
-async function getMetadata(compilation, route) {
-  const titlePrefix = `${compilation.config.title} - ${route}`;
-
-  return {
-    meta: [{
-      name: 'description', content: `${titlePrefix} This is a title generated server side!!`
-    }]
-  };
-}
-
 export {
   getTemplate,
   getBody,
-  getFrontmatter,
-  getMetadata
+  getFrontmatter
 }; 

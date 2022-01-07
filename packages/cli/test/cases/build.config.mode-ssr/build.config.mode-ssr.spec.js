@@ -14,7 +14,6 @@
  * }
  *
  * User Workspace
- * Greenwood default w/ single index.html file
  *  src/
  *   components/
  *     footer.js
@@ -24,6 +23,7 @@
  *     app.html
  */
 import chai from 'chai';
+import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
@@ -141,15 +141,18 @@ describe('Build Greenwood With: ', function() {
 
     let response = {};
     let dom;
+    let aboutPageGraphData;
 
     before(async function() {
+      const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
+
+      aboutPageGraphData = graph.filter(page => page.route === '/artists/')[0];
+
       return new Promise((resolve, reject) => {
         request.get(`${hostname}/artists/`, (err, res, body) => {
           if (err) {
             reject();
           }
-
-          console.debug({ body });
 
           response = res;
           response.body = body;
@@ -189,10 +192,10 @@ describe('Build Greenwood With: ', function() {
         expect(styles.length).to.equal(3);
       });
 
-      it('should have two script tags', function() {
+      it('should have three script tags', function() {
         const scripts = dom.window.document.querySelectorAll('head > script');
 
-        expect(scripts.length).to.equal(2);
+        expect(scripts.length).to.equal(3);
       });
 
       it('should have expected SSR content from the non module script tag', function() {
@@ -224,15 +227,42 @@ describe('Build Greenwood With: ', function() {
         expect(footer[0].textContent).to.contain('v0.11.1');
       });
 
-      // TODO metadata and frontmatter
-      // - metadata
-      // - graph
-      // - imports
-      it('should have the expected <title> content', function() {
+      it('should have the expected <title> content in the <head>', function() {
         const title = dom.window.document.querySelectorAll('head > title');
 
         expect(title.length).to.equal(1);
-        expect(title[0].textContent).to.equal('this is the SSR config file title');
+        expect(title[0].textContent).to.equal('My App - /artists/');
+      });
+
+      it('should have custom metadata in the <head>', function() {
+        const metaDescription = Array.from(dom.window.document.querySelectorAll('head > meta'))
+          .filter((tag) => tag.getAttribute('name') === 'description');
+
+        expect(metaDescription.length).to.equal(1);
+        expect(metaDescription[0].getAttribute('content')).to.equal('My App - /artists/ (this was generated server side!!!)');
+      });
+
+      it('should be a part of graph.json', function() {
+        expect(aboutPageGraphData).to.not.be.undefined;
+      });
+
+      it('should have the expected menu and index values in the graph', function() {
+        expect(aboutPageGraphData.data.menu).to.equal('navigation');
+        expect(aboutPageGraphData.data.index).to.equal(7);
+      });
+
+      it('should have expected custom data values in its graph data', function() {
+        expect(aboutPageGraphData.data.author).to.equal('Project Evergreen');
+        expect(aboutPageGraphData.data.date).to.equal('01-01-2021');
+      });
+
+      it('should append the expected <script> tag for a frontmatter import <x-counter> component', function() {
+        const componentName = 'counter';
+        const counterScript = Array.from(dom.window.document.querySelectorAll('head > script[src]'))
+          .filter((tag) => tag.getAttribute('src').indexOf(`/${componentName}.`) === 0);
+
+        expect(aboutPageGraphData.imports[0]).to.equal(`/components/${componentName}.js`);
+        expect(counterScript.length).to.equal(1);
       });
     });
   });

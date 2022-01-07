@@ -268,18 +268,18 @@ const getUserScripts = (contents, context) => {
   return contents;
 };
 
-const getMetaContent = (url, config, contents, ssrMetadata = {}) => {
+const getMetaContent = (url, config, contents, ssrFrontmatter = {}) => {
   const existingTitleMatch = contents.match(/<title>(.*)<\/title>/);
   const existingTitleCheck = !!(existingTitleMatch && existingTitleMatch[1] && existingTitleMatch[1] !== '');
 
   const title = existingTitleCheck
     ? existingTitleMatch[1]
-    : ssrMetadata.title
-      ? ssrMetadata.title
+    : ssrFrontmatter.title
+      ? ssrFrontmatter.title
       : config.title
         ? config.title
         : '';
-  const metaContent = [...config.meta || [], ...ssrMetadata.meta || []].map(item => {
+  const metaContent = [...config.meta || []].map(item => {
     let metaHtml = '';
 
     for (const [key, value] of Object.entries(item)) {
@@ -347,12 +347,12 @@ class StandardHtmlResource extends ResourceInterface {
         const fullPath = !matchingRoute.external ? matchingRoute.path : '';
         const isMarkdownContent = path.extname(fullPath) === '.md';
 
-        let customImports;
+        let customImports = [];
         let body = '';
         let template = null;
         let ssrBody;
         let ssrTemplate;
-        let ssrMetadata;
+        let ssrFrontmatter;
         let processedMarkdown = null;
 
         if (matchingRoute.external) {
@@ -437,18 +437,22 @@ class StandardHtmlResource extends ResourceInterface {
               });
             });
           } else {
-            const { getTemplate = null, getBody = null, getMetadata = null } = await import(routeLocation);
+            const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(routeLocation);
 
             if (getTemplate) {
-              ssrTemplate = await getTemplate(this.compilation);
+              ssrTemplate = await getTemplate(this.compilation, url);
             }
 
             if (getBody) {
-              ssrBody = await getBody(this.compilation);
+              ssrBody = await getBody(this.compilation, url);
             }
 
-            if (getMetadata) {
-              ssrMetadata = await getMetadata(this.compilation);
+            if (getFrontmatter) {
+              ssrFrontmatter = await getFrontmatter(this.compilation, url);
+
+              if (ssrFrontmatter.imports) {
+                customImports = customImports.concat(ssrFrontmatter.imports);
+              }
             }
           }
         }
@@ -518,7 +522,7 @@ class StandardHtmlResource extends ResourceInterface {
 
         body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);       
         body = getUserScripts(body, this.compilation.context);
-        body = getMetaContent(matchingRoute.route.replace(/\\/g, '/'), config, body, ssrMetadata);
+        body = getMetaContent(matchingRoute.route.replace(/\\/g, '/'), config, body, ssrFrontmatter);
         
         if (processedMarkdown) {
           const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
