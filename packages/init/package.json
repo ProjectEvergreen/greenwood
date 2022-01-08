@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/init",
-  "version": "0.20.3",
+  "version": "0.21.0",
   "description": "A package for scaffolding a new Greenwood project.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/init",
   "author": "Grant Hutchinson <grant@hutchdev.ca>",
@@ -24,6 +24,8 @@
   },
   "dependencies": {
     "chalk": "^4.1.2",
-    "commander": "^8.2.0"
+    "commander": "^8.2.0",
+    "node-fetch": "^3.1.0",
+    "simple-git": "^2.48.0"
   }
 }
