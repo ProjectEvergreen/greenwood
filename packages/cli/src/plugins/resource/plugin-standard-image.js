@@ -12,6 +12,7 @@ class StandardFontResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
 
+    // https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Image_types
     this.extensions = ['.avif', '.webp', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico'];
   }
 

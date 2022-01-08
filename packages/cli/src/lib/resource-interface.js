@@ -6,7 +6,7 @@ class ResourceInterface {
     this.compilation = compilation;
     this.options = options;
     this.extensions = [];
-    this.contentType = '';
+    this.contentType = ''; // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
   }
 
   // get rid of things like query string parameters
