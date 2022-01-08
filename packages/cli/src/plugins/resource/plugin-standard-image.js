@@ -11,7 +11,8 @@ import { ResourceInterface } from '../../lib/resource-interface.js';
 class StandardFontResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.jpg', '.png', '.gif', '.svg', '.ico'];
+
+    this.extensions = ['.avif', '.webp', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico'];
   }
 
   async serve(url) {
@@ -24,7 +25,7 @@ class StandardFontResource extends ResourceInterface {
           ? `${ext.replace('.', '')}+xml`
           : ext.replace('.', '');
 
-        if (['.jpg', '.png', '.gif', '.svg'].includes(ext)) {
+        if (['.avif', '.webp', '.jpg', '.jpeg', '.png', '.gif', '.svg'].includes(ext)) {
           contentType = `image/${type}`;
 
           if (ext === '.svg') {
