@@ -41,7 +41,7 @@ const program = new commander.Command(scriptPkg.name)
   .usage(`${chalk.green('<application-directory>')} [options]`)
   .option('--yarn', 'Use yarn package manager instead of npm default')
   .option('--install', 'Install dependencies upon init')
-  .option('--template', 'Select from list of Greenwood curated templates')
+  .option('--template [type]', 'Select from list of Greenwood curated templates')
   .parse(process.argv)
   .opts();
 
@@ -197,16 +197,31 @@ const listAndSelectTemplate = async () => {
     }
   ];
 
-  return inquirer.prompt(questions).then((answers) => {
-    // set the selected template based on the selected template name
-    selectedTemplate = templates.find(template => {
-      return template.name === answers.template;
-    });
+  // if the user has provided one, use that, else prompt from the list
+  if (typeof program.template !== 'boolean') {
+    const userSelection = program.template;
+    const matchedTemplate = templates.find((template) => template.name === userSelection);
+    
+    if (matchedTemplate) {
+      console.debug(`using user provided template => ${userSelection}...`);
+      selectedTemplate = matchedTemplate;
+    } else {
+      const choices = templates.map(template => template.name).join('\n');
 
-    if (selectedTemplate) {
-      console.log('\Installing Selected Template:', selectedTemplate.name);
+      console.error(`unable to match user provided template "${userSelection}". please try again.  choices are ${choices}`);
     }
-  });
+  } else {
+    return inquirer.prompt(questions).then((answers) => {
+      // set the selected template based on the selected template name
+      selectedTemplate = templates.find(template => {
+        return template.name === answers.template;
+      });
+
+      if (selectedTemplate) {
+        console.log('\Installing Selected Template:', selectedTemplate.name);
+      }
+    });
+  }
 };
 
 const cloneTemplate = async () => {
@@ -235,6 +250,7 @@ const run = async () => {
   try {
     if (program.template) {
       await listAndSelectTemplate();
+
       if (!selectedTemplate) {
         return;
       }

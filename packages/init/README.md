@@ -39,6 +39,12 @@ Initialize Greenwood Template ♻️
 ❯ blog 
 ```
 
+You can also pass the template you want from the CLI as well.
+```bash
+# example
+npx @greenwood/init --template=blog 
+```
+
 ### NPM Install
 
 To automatically run `npm install` after scaffolding, pass the `--install` flag.
