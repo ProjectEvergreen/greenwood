@@ -321,12 +321,16 @@ class StandardHtmlResource extends ResourceInterface {
     const barePath = relativeUrl.endsWith(path.sep)
       ? `${pagesDir}${relativeUrl}index`
       : `${pagesDir}${relativeUrl.replace('.html', '')}`;
-    
+    const isExternalSource = this.compilation.graph.filter((node) => {
+      return node.external && node.route.indexOf(url) >= 0;
+    }).length === 1;
+
     return Promise.resolve(this.extensions.indexOf(path.extname(relativeUrl)) >= 0
       || path.extname(relativeUrl) === '') && (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index')
       || fs.existsSync(`${barePath}.md`)
       || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
-      || isClientSideRoute;
+      || isClientSideRoute
+      || isExternalSource;
   }
 
   async serve(url) {
@@ -350,7 +354,14 @@ class StandardHtmlResource extends ResourceInterface {
         const isMarkdownContent = fs.existsSync(`${barePath}.md`)
           || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
           || fs.existsSync(`${barePath.replace(`${path.sep}index`, '.md')}`);
-        
+        const externalSource = this.compilation.graph.filter((node) => {
+          return node.external && node.route.indexOf(url) >= 0;
+        });
+
+        if (externalSource.length === 1) {
+          template = externalSource[0].template || template;
+        }
+
         if (isMarkdownContent) {
           const markdownPath = fs.existsSync(`${barePath}.md`)
             ? `${barePath}.md`
@@ -435,6 +446,8 @@ class StandardHtmlResource extends ResourceInterface {
           }
 
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
+        } else if (externalSource.length === 1) {
+          body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, externalSource[0].body);
         }
 
         // give the user something to see so they know it works, if they have no content

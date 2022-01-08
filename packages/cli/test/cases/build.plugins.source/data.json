@@ -1,0 +1,34 @@
+[{
+  "id": "1",
+  "name": "Analog",
+  "imageUrl": "//d34k5cjnk2rcze.cloudfront.net/images/artists/analog.jpg",
+  "genre": "Rock and Roll",
+  "location": "Block Island. RI",
+  "label": "Analog Studios",
+  "contactPhone": null,
+  "contactEmail": "dave@analogstudios.net",
+  "bio": "Analog, a power duo consisting of guitar and drums, formed and has performed on Block Island for over 2 years...",
+  "isActive": "1"
+}, {
+  "id": "2",
+  "name": "Electro Calrissian",
+  "imageUrl": "//d34k5cjnk2rcze.cloudfront.net/images/artists/electro-calrissian.jpg",
+  "genre": "Punk Rock",
+  "location": "North Conway, NH",
+  "label": "Analog Studios",
+  "contactPhone": null,
+  "contactEmail": "electrocalrissian@gmail.com",
+  "bio": "A hard rock band from Conway, NH, Electro Calrissian knows how to crank out the tunes. Once a solid three piece...",
+  "isActive": "1"
+}, {
+  "id": "3",
+  "name": "Rory Boyan",
+  "imageUrl": "//d34k5cjnk2rcze.cloudfront.net/images/artists/rory.jpg",
+  "genre": "Jam/Instrumental",
+  "location": "Lowell, MA",
+  "label": "Analog Studios",
+  "contactPhone": null,
+  "contactEmail": "roryboyan@yahoo.com",
+  "bio": "One of my best friends, Rory plays instrumental music in a genre all to his own. Combining elements of blues, reggae, and percussion...",
+  "isActive": "1"
+}]

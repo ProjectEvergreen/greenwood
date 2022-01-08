@@ -40,7 +40,7 @@ render() {
 }
 ```
 
-To assist with this, Greenwood provides all your content as data, accessible from a single _graph.json_ file that you can simply [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) RESTfully or, if you install our [plugin for GraphQL](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql), you can use a GraphQL interfact to make all this a reality! 💯
+To assist with this, Greenwood provides all your content as data, accessible from a single _graph.json_ file that you can simply [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) RESTfully or, if you install our [plugin for GraphQL](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql), you can use a GraphQL from your client side code instead! 💯
 
 
 ### Internal Sources
@@ -380,4 +380,18 @@ customElements.define('app-header', HeaderComponent);
 > _For more information on using GraphQL with Greenwood, please see our [GraphQL plugin's README](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql)._
 
 ### External Sources
-Coming [soon](https://github.com/ProjectEvergreen/greenwood/issues/21)!
+
+Using our [Source plugin](/plugins/source/), just as you can get your content as data _out_ of Greenwood, so can you provide your own sources of data _to_ Greenwood.  This is great for pulling content from a headless CMS, database, or anything else you can imagine!
+
+The supported [fields from Greenwood's schema](/docs/data/#internal-sources) are:
+```javascript
+graph {
+  body, // REQUIRED (string of your content)
+  id,
+  label,
+  route,  // REQUIRED and MUST end in a forward slash
+  template,
+  title,
+  data
+}
+```
