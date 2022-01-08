@@ -24,6 +24,21 @@ This will then output the following
 
 ## API
 
+### Template
+
+To scaffold your new project based on one of [Greenwood's starter templates](https://github.com/orgs/ProjectEvergreen/repositories?q=greenwood-template-&type=all&language=&sort=), pass the `--template` flag and then follow the prompts to complete the scaffolding.
+
+```bash
+# example
+npx @greenwood/init --template
+
+-------------------------------------------------------
+Initialize Greenwood Template ♻️
+-------------------------------------------------------
+? Which template would you like to use? (Use arrow keys)
+❯ blog 
+```
+
 ### NPM Install
 
 To automatically run `npm install` after scaffolding, pass the `--install` flag.
@@ -41,3 +56,9 @@ To automatically run `yarn install` after scaffolding, pass the `--yarn` flag.
 # example
 npx @greenwood/init --yarn
 ```
+
+> _Flags can be chained together!_
+> ```sh
+> # This will use Yarn, install dependencies, and scaffold from the blog template
+> $ npx @greenwood/init --template --yarn --install
+> ```
