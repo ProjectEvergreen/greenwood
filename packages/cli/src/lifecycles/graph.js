@@ -3,8 +3,6 @@ import fs from 'fs';
 import fm from 'front-matter';
 import path from 'path';
 import toc from 'markdown-toc';
-// const fm = require('front-matter');
-// const toc = require('markdown-toc');
 
 const generateGraph = async (compilation) => {
 
@@ -143,6 +141,7 @@ const generateGraph = async (compilation) => {
         return pages;
       };
 
+      console.debug('building from local sources...');
       if (config.mode === 'spa') {
         graph = [{
           ...graph[0],
@@ -177,6 +176,34 @@ const generateGraph = async (compilation) => {
               label: 'Not Found'
             }
           ];
+        }
+      }
+
+      const sourcePlugins = compilation.config.plugins.filter(plugin => plugin.type === 'source');
+
+      if (sourcePlugins.length > 0) {
+        console.debug('building from external sources...');
+        for (const plugin of sourcePlugins) {
+          const instance = plugin.provider(compilation);
+          const data = await instance();
+
+          for (const node of data) {
+            if (!node.body || !node.route) {
+              const missingKey = !node.body ? 'body' : 'route';
+
+              reject(`ERROR: provided node does not provide a ${missingKey} property.`);
+            }
+
+            graph.push({
+              filename: null,
+              path: null,
+              data: {},
+              imports: [],
+              outputPath: path.join(node.route, 'index.html'),
+              ...node,
+              external: true
+            });
+          }
         }
       }
 

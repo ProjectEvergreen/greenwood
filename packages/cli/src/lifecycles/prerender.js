@@ -81,7 +81,7 @@ async function preRenderCompilation(compilation) {
       const serverAddress = `http://127.0.0.1:${port}`;
 
       console.info(`Prerendering pages at ${serverAddress}`);
-      console.debug('pages to render', `\n ${pages.map(page => page.path).join('\n ')}`);
+      console.debug('pages to render', `\n ${pages.map(page => page.route).join('\n ')}`);
   
       await runBrowser(serverAddress, pages, outputDir);
       
