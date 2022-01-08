@@ -13,17 +13,24 @@
  *
  */
 import chalk from 'chalk';
+import simpleGit from 'simple-git';
 import commander from 'commander';
 import { copyFolder } from './copy-folder.js';
+import fetch from 'node-fetch';
 import fs from 'fs';
+import inquirer from 'inquirer';
 import os from 'os';
 import path from 'path';
 import { spawn } from 'child_process';
 import { fileURLToPath, URL } from 'url';
 
+const projectGitHubAPIUrl = 'https://api.github.com/orgs/ProjectEvergreen/repos';
+const templateStandardName = 'greenwood-template-';
+let selectedTemplate = null;
 const scriptPkg = JSON.parse(fs.readFileSync(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf-8'));
-const templateDir = fileURLToPath(new URL('./template', import.meta.url));
+let templateDir = fileURLToPath(new URL('./template', import.meta.url));
 const TARGET_DIR = process.cwd();
+const clonedTemplateDir = path.join(TARGET_DIR, '.greenwood', '.template');
 
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
 console.log(`${chalk.rgb(175, 207, 71)('Initialize Greenwood Template ♻️')}`);
@@ -34,6 +41,7 @@ const program = new commander.Command(scriptPkg.name)
   .usage(`${chalk.green('<application-directory>')} [options]`)
   .option('--yarn', 'Use yarn package manager instead of npm default')
   .option('--install', 'Install dependencies upon init')
+  .option('--template [type]', 'Select from list of Greenwood curated templates')
   .parse(process.argv)
   .opts();
 
@@ -130,8 +138,125 @@ const install = async () => {
   });
 };
 
+const listAndSelectTemplate = async () => {
+  
+  const getTemplates = async () => {
+    try {
+
+      // create error response 
+      class HTTPResponseError extends Error {
+        constructor(response, ...args) {
+          super(`HTTP Error Response: ${response.status} ${response.statusText}`, ...args);
+          this.response = response;
+        }
+      }
+      
+      // check response from repo list fetch
+      const checkStatus = response => {
+        if (response.ok) {
+          // response.status >= 200 && response.status < 300
+          return response.json();
+        } else {
+          console.log('Couldn\'t locate any templates, check your connection and try again');
+          throw new HTTPResponseError(response);
+        }
+      };
+
+      const repos = await fetch(projectGitHubAPIUrl).then(resp => checkStatus(resp));
+
+      // assuming it did resolve but there are no templates listed
+      if (!repos || repos.length === 0) {
+        console.log('Couldn\'t locate any templates, check your connection and try again');
+        return [];
+      }
+
+      const templateRepos = repos.filter(repo => {
+        return repo.name.includes(templateStandardName);
+      });
+      
+      return templateRepos.map(({ clone_url, name }) => { // eslint-disable-line camelcase
+        const templateName = name.substring(templateStandardName.length, name.length);
+        return { clone_url, name: templateName }; // eslint-disable-line camelcase
+      });
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const templates = await getTemplates();
+
+  const questions = [
+    {
+      type: 'list',
+      name: 'template',
+      message: 'Which template would you like to use?',
+      choices: templates.map(template => template.name),
+      filter(val) {
+        return val.toLowerCase();
+      }
+    }
+  ];
+
+  // if the user has provided one, use that, else prompt from the list
+  if (typeof program.template !== 'boolean') {
+    const userSelection = program.template;
+    const matchedTemplate = templates.find((template) => template.name === userSelection);
+    
+    if (matchedTemplate) {
+      console.debug(`using user provided template => ${userSelection}...`);
+      selectedTemplate = matchedTemplate;
+    } else {
+      const choices = templates.map(template => template.name).join('\n');
+
+      console.error(`unable to match user provided template "${userSelection}". please try again.  choices are ${choices}`);
+    }
+  } else {
+    return inquirer.prompt(questions).then((answers) => {
+      // set the selected template based on the selected template name
+      selectedTemplate = templates.find(template => {
+        return template.name === answers.template;
+      });
+
+      if (selectedTemplate) {
+        console.log('\Installing Selected Template:', selectedTemplate.name);
+      }
+    });
+  }
+};
+
+const cloneTemplate = async () => {
+  const git = simpleGit();
+
+  // check if .template directory already exists, if so remove it
+  if (fs.existsSync(clonedTemplateDir)) {
+    fs.rmSync(clonedTemplateDir, { recursive: true, force: true });
+  }
+
+  // clone to .template directory 
+  console.log('clone template', selectedTemplate.name, 'to directory', clonedTemplateDir);
+  try {
+    await git.clone(selectedTemplate.clone_url, clonedTemplateDir);
+    templateDir = clonedTemplateDir;
+  } catch (e) { throw e; }
+};
+
+const cleanUp = async () => {
+  if (fs.existsSync(clonedTemplateDir)) {
+    fs.rmSync(clonedTemplateDir, { recursive: true, force: true });
+  }
+};
+
 const run = async () => {
   try {
+    if (program.template) {
+      await listAndSelectTemplate();
+
+      if (!selectedTemplate) {
+        return;
+      }
+      await cloneTemplate();
+    }
+
     // map all the template files and copy them to the current working directory
     console.log('Initialzing project with files...');
     await srcInit();
@@ -143,6 +268,8 @@ const run = async () => {
       console.log('Installing project dependencies...');
       await install();
     }
+
+    await cleanUp();
 
     console.log(`${chalk.rgb(175, 207, 71)('Initializing new project complete!')}`);
   } catch (err) {
