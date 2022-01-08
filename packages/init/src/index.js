@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 /* eslint no-console: 0 */
-/* eslint-disable camelcase */
 /*
  * **Note**
  * For the time being, there is an issue that prevents us from running the install based specs for this package as part of CI.
@@ -25,13 +24,13 @@ import path from 'path';
 import { spawn } from 'child_process';
 import { fileURLToPath, URL } from 'url';
 
-const PROJECT_API_URL = 'https://api.github.com/orgs/ProjectEvergreen/repos';
+const projectGitHubAPIUrl = 'https://api.github.com/orgs/ProjectEvergreen/repos';
 const templateStandardName = 'greenwood-template-';
 let selectedTemplate = null;
 const scriptPkg = JSON.parse(fs.readFileSync(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf-8'));
 let templateDir = fileURLToPath(new URL('./template', import.meta.url));
 const TARGET_DIR = process.cwd();
-const clonedTemplateDir = path.join(TARGET_DIR, '.template');
+const clonedTemplateDir = path.join(TARGET_DIR, '.greenwood', '.template');
 
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
 console.log(`${chalk.rgb(175, 207, 71)('Initialize Greenwood Template ♻️')}`);
@@ -163,7 +162,7 @@ const listAndSelectTemplate = async () => {
         }
       };
 
-      const repos = await fetch(PROJECT_API_URL).then(resp => checkStatus(resp));
+      const repos = await fetch(projectGitHubAPIUrl).then(resp => checkStatus(resp));
 
       // assuming it did resolve but there are no templates listed
       if (!repos || repos.length === 0) {
@@ -172,12 +171,12 @@ const listAndSelectTemplate = async () => {
       }
 
       const templateRepos = repos.filter(repo => {
-        return repo.name.includes('greenwood-template');
+        return repo.name.includes(templateStandardName);
       });
       
-      return templateRepos.map(({ clone_url, name }) => {
+      return templateRepos.map(({ clone_url, name }) => { // eslint-disable-line camelcase
         const templateName = name.substring(templateStandardName.length, name.length);
-        return { clone_url, name: templateName };
+        return { clone_url, name: templateName }; // eslint-disable-line camelcase
       });
     } catch (err) {
       throw err;
@@ -185,9 +184,6 @@ const listAndSelectTemplate = async () => {
   };
 
   const templates = await getTemplates();
-
-  // Debug list templates 
-  // console.log('templates', templates);
 
   const questions = [
     {
@@ -217,8 +213,8 @@ const cloneTemplate = async () => {
   const git = simpleGit();
 
   // check if .template directory already exists, if so remove it
-  if (await fs.existsSync(clonedTemplateDir)) {
-    await fs.rmSync(clonedTemplateDir, { recursive: true, force: true });
+  if (fs.existsSync(clonedTemplateDir)) {
+    fs.rmSync(clonedTemplateDir, { recursive: true, force: true });
   }
 
   // clone to .template directory 
@@ -227,6 +223,12 @@ const cloneTemplate = async () => {
     await git.clone(selectedTemplate.clone_url, clonedTemplateDir);
     templateDir = clonedTemplateDir;
   } catch (e) { throw e; }
+};
+
+const cleanUp = async () => {
+  if (fs.existsSync(clonedTemplateDir)) {
+    fs.rmSync(clonedTemplateDir, { recursive: true, force: true });
+  }
 };
 
 const run = async () => {
@@ -250,6 +252,8 @@ const run = async () => {
       console.log('Installing project dependencies...');
       await install();
     }
+
+    await cleanUp();
 
     console.log(`${chalk.rgb(175, 207, 71)('Initializing new project complete!')}`);
   } catch (err) {
