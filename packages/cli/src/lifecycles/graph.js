@@ -3,6 +3,7 @@ import fs from 'fs';
 import fm from 'front-matter';
 import path from 'path';
 import toc from 'markdown-toc';
+import { pathToFileURL } from 'url';
 
 const generateGraph = async (compilation) => {
 
@@ -28,7 +29,7 @@ const generateGraph = async (compilation) => {
           if (fs.statSync(fullPath).isDirectory()) {
             routes = await walkDirectoryForRoutes(fullPath, routes);
           } else {
-            const { getFrontmatter } = await import(fullPath);
+            const { getFrontmatter } = await import(pathToFileURL(fullPath));
             const relativePagePath = fullPath.substring(routesDir.length - 1, fullPath.length);
             const id = filename.split(path.sep)[filename.split(path.sep).length - 1].replace('.js', '');
             const label = id.split('-')

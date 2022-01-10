@@ -16,7 +16,7 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import unified from 'unified';
-import { fileURLToPath } from 'url';
+import { pathToFileURL, fileURLToPath } from 'url';
 import { Worker } from 'worker_threads';
 
 function getCustomPageTemplates(contextPlugins, templateName) {
@@ -437,7 +437,7 @@ class StandardHtmlResource extends ResourceInterface {
               });
             });
           } else {
-            const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(routeLocation);
+            const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(pathToFileURL(routeLocation));
 
             if (getTemplate) {
               ssrTemplate = await getTemplate(this.compilation, url);

@@ -1,7 +1,8 @@
+import { pathToFileURL } from 'url';
 import { workerData, parentPort } from 'worker_threads';
 
 async function executeRouteModule({ modulePath, compilation, route, label, id }) {
-  const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(modulePath).then(module => module);
+  const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(pathToFileURL(modulePath)).then(module => module);
   const parsedCompilation = JSON.parse(compilation);
   const data = {
     template: null,
