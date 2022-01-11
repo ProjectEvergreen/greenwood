@@ -176,7 +176,7 @@ const readAndMergeConfig = async() => {
           }
         }
         
-        // SPA should _not_ prerender if user has specified prerender should be true
+        // SPA mode should _not_ prerender unless user has chosen to set it to true
         if (prerender === undefined && mode === 'spa') {
           customConfig.prerender = false;
         }
