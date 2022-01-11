@@ -2,14 +2,16 @@
  * Use Case
  * Run Greenwood build command with GraphQL calls to get data about the projects graph using MenuQuery, simluting 
  * a site navigation based on top level page routes.  Also uses LitElement.
- *
+ * 
+ * Needs prerender to be true to get SSR and client side GQL fetching.
+ * 
  * User Result
  * Should generate a Greenwood build that dynamically serializes data from the graph from the header.
  *
  * User Command
  * greenwood build
  *
- * Default Config (+ plugin-graphql)
+ * Default Config (+ plugin-graphql and prerender)
  *
  * Custom Workspace
  * src/

@@ -35,7 +35,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With HTML Include Plugin: ', function() {
+xdescribe('Build Greenwood With HTML Include Plugin: ', function() {
   const LABEL = 'Using Custom Element feature';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));

@@ -2,13 +2,15 @@
  * Use Case
  * Run Greenwood build command with GraphQL calls to get data about the projects graph using ChildrenQuaery.
  *
+ * Needs prerender to be true to get SSR and client side GQL fetching.
+ * 
  * User Result
  * Should generate a Greenwood build that tests basic output from the ChildrenQuery.
  * 
  * User Command
  * greenwood build
  *
- * Default Config
+ * Default Config (+ plugin-graphql and prerender)
  *
  * Custom Workspace
  * src/

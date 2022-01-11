@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with a custom resource plugin and default workspace.
+ * Run Greenwood with a custom resource plugin and default workspace.  Uses prerender to validate this functionality.
  *
  * Uaer Result
  * Should generate a bare bones Greenwood build with expected custom file (.foo) behavior.
@@ -14,6 +14,7 @@
  * }
  * 
  * {
+ *   prerender: true,
  *   plugins: [{
  *     type: 'resource',
  *     name: 'plugin-foo',

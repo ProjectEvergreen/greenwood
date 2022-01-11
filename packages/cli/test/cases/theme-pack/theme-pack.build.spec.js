@@ -140,10 +140,10 @@ describe('Build Greenwood With: ', function() {
         expect(scriptTag.length).to.equal(1);
       });
 
-      it('should have expected heading component content', function() {
-        const header = dom.window.document.querySelector('body x-header header');
+      it('should have expected <x-header> component', function() {
+        const header = dom.window.document.querySelectorAll('body x-header');
 
-        expect(header.textContent).to.equal('Welcome to my blog!');
+        expect(header.length).to.equal(1);
       });
     });
   });

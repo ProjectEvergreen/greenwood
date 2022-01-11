@@ -169,10 +169,10 @@ describe('Build Greenwood With: ', function() {
         expect(scriptTag.length).to.equal(1);
       });
 
-      it('should have expected greeting component content', function() {
-        const greetingComponent = dom.window.document.querySelector('body x-greeting p');
+      it('should have expected <x-greeting> component', function() {
+        const greetingComponent = dom.window.document.querySelectorAll('body x-greeting');
 
-        expect(greetingComponent.textContent).to.equal('Hello from the greeting component!');
+        expect(greetingComponent.length).to.equal(1);
       });
     });
   });

@@ -148,17 +148,15 @@ describe('Build Greenwood With: ', function() {
         });
 
         it('should have content output for the <app-footer> component', function() {
-          const footer = dom.window.document.querySelectorAll('body footer');
+          const footer = dom.window.document.querySelectorAll('body app-footer');
 
           expect(footer.length).to.be.equal(1);
-          expect(footer[0].textContent).to.be.equal('This is the footer component.');
         });
 
         it('should have content output for the <app-header> component', function() {
-          const header = dom.window.document.querySelectorAll('body header');
+          const header = dom.window.document.querySelectorAll('body app-header');
 
           expect(header.length).to.be.equal(1);
-          expect(header[0].textContent).to.be.equal('This is the header component.');
         });
 
         it('should have content output for the page', function() {
@@ -223,17 +221,15 @@ describe('Build Greenwood With: ', function() {
         });
 
         it('should have content output for the <app-footer> component', function() {
-          const footer = dom.window.document.querySelectorAll('body footer');
+          const footer = dom.window.document.querySelectorAll('body app-footer');
 
           expect(footer.length).to.be.equal(1);
-          expect(footer[0].textContent).to.be.equal('This is the footer component.');
         });
 
         it('should have content output for the <app-header> component', function() {
-          const header = dom.window.document.querySelectorAll('body header');
+          const header = dom.window.document.querySelectorAll('body app-header');
 
           expect(header.length).to.be.equal(1);
-          expect(header[0].textContent).to.be.equal('This is the header component.');
         });
 
         it('should have content output for the page', function() {
@@ -241,13 +237,6 @@ describe('Build Greenwood With: ', function() {
 
           expect(content.length).to.be.equal(1);
           expect(content[0].textContent).to.be.equal('One Two Three');
-        });
-
-        it('should have content output for the x-greeting component from front matter import', function() {
-          const content = dom.window.document.querySelectorAll('body > x-greeting > h3');
-
-          expect(content.length).to.be.equal(1);
-          expect(content[0].textContent).to.be.equal('Hello from the greeting component!');
         });
       });
 

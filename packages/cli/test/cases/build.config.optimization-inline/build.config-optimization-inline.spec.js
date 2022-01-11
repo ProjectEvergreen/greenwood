@@ -96,13 +96,6 @@ describe('Build Greenwood With: ', function() {
           // eslint-disable-next-line max-len
           expect(scriptTag.textContent).to.be.contain('class e extends HTMLElement{constructor(){super(),this.root=this.attachShadow({mode:"open"}),this.root.innerHTML="\\n      <header>This is the header component.</header>\\n    "}}customElements.define("app-header",e);');
         });
-
-        it('should contain the expected content from <app-header> in the <body>', function() {
-          const header = dom.window.document.querySelectorAll('body header');
-
-          expect(header.length).to.be.equal(1);
-          expect(header[0].textContent).to.be.equal('This is the header component.');
-        });
       });
 
       // assume the second tag is for FooBar
@@ -139,22 +132,19 @@ describe('Build Greenwood With: ', function() {
         it('should contain two <style> tags with the expected CSS content inlined for theme.css and pages.css', function() {
           const styleTags = dom.window.document.querySelectorAll('head style');
 
-          // one for puppeteer
-          expect(styleTags.length).to.be.equal(3);
+          expect(styleTags.length).to.be.equal(2);
         });
 
         it('should contain the expected CSS content inlined for theme.css', function() {
           const styleTags = dom.window.document.querySelectorAll('head style');
 
-          // one for puppeteer
-          expect(styleTags[1].textContent).to.be.contain('*{font-family:Comic Sans,sans-serif;margin:0;padding:0}');
+          expect(styleTags[0].textContent).to.be.contain('*{font-family:Comic Sans,sans-serif;margin:0;padding:0}');
         });
 
         it('should contain the expected CSS content inlined for page.css', function() {
           const styleTags = dom.window.document.querySelectorAll('head style');
 
-          // one for puppeteer
-          expect(styleTags[2].textContent).to.be.contain('body{color:red}');
+          expect(styleTags[1].textContent).to.be.contain('body{color:red}');
         });
       });
     });
