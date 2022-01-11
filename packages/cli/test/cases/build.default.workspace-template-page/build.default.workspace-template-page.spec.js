@@ -50,8 +50,7 @@ describe('Build Greenwood With: ', function() {
       await runner.runCommand(cliPath, 'build');
     });
 
-    // TODO restore index
-    runSmokeTest(['public'], LABEL);
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Custom Page Template', function() {
       let dom;
