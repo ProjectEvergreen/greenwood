@@ -104,20 +104,6 @@ describe('Build Greenwood With: ', function() {
           expect(amwasbsMeta.getAttribute('content')).to.be.equal('black');
         });
       });
-
-      describe('content in the <body>', function() {
-        it('should have the expected content within the <app-header> tag', function() {
-          const heading = dom.window.document.querySelector('body app-header header').textContent;
-
-          expect(heading).to.equal('This is the header component.');
-        });
-
-        it('should have expected h2 tag in the <body>', function() {
-          const heading = dom.window.document.querySelector('body h2').textContent;
-    
-          expect(heading).to.be.equal('hello world');
-        });
-      });
     });
   });
 

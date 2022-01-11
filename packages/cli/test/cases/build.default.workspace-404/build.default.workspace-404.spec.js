@@ -121,11 +121,10 @@ describe('Build Greenwood With: ', function() {
       });
 
       describe('404 page <body>', function() {
-        it('should have <app-header> compoonent pre-rendered content in the <body>', function() {
-          const header = dom.window.document.querySelectorAll('body header');
+        it('should have <app-header> component in the <body>', function() {
+          const header = dom.window.document.querySelectorAll('body app-header');
           
           expect(header.length).to.equal(1);
-          expect(header[0].textContent).to.equal('This is the header component.');
         });
 
         it('should have 404 page specific content in the <body>', function() {

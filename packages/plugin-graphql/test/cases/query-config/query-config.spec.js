@@ -2,13 +2,15 @@
  * Use Case
  * Run Greenwood build command with GraphQL calls to get data from the project configuration.
  *
+ * Needs prerender to be true to get SSR and client side GQL fetching.
+ * 
  * User Result
  * Should generate a Greenwood build that dynamically serializes data from the config in the footer.
  *
  * User Command
  * greenwood build
  *
- * Default Config (+ plugin-graphql)
+ * Default Config (+ plugin-graphql and prerender)
  *
  * Custom Workspace
  * greenwood.config.js

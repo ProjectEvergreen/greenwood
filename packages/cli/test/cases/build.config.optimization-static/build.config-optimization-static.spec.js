@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with static setting for optimization.
+ * Run Greenwood build command with static setting for optimization and adds prerender to true to validate with puppeteer.
  *
  * User Result
  * Should generate a Greenwood build that strips all <script> tags and files from the final HTML and output.
@@ -10,7 +10,8 @@
  *
  * User Config
  * {
- *   optimization: 'static'
+ *   optimization: 'static',
+ *   prerender: true
  * }
  *
  * Custom Workspace

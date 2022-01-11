@@ -1,3 +1,4 @@
 export default {
-  optimization: 'static'
+  optimization: 'static',
+  prerender: true
 };

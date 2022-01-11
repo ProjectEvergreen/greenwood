@@ -45,7 +45,7 @@ const defaultConfig = {
   meta: [],
   plugins: greenwoodPlugins,
   markdown: { plugins: [], settings: {} },
-  prerender: true,
+  prerender: false,
   pagesDirectory: 'pages',
   templatesDirectory: 'templates'
 };

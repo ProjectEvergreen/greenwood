@@ -3,6 +3,8 @@
  * Run Greenwood build command with GraphQL calls to get data about the projects graph using ChildrenQuery, simulating 
  * a link of blog posts derivered from a pages/blog directory with custom frontmatter.  Also uses LitElement.
  *
+ * Needs prerender to be true to get SSR and client side GQL fetching.
+ * 
  * User Result
  * Should generate a Greenwood build that dynamically serializes data from the graph in the body 
  * of the home page as a list of blog post links.
@@ -10,7 +12,7 @@
  * User Command
  * greenwood build
  *
- * Default Config (+ plugin-graphql)
+ * Default Config (+ plugin-graphql and prerender)
  *
  * Custom Workspace
  * src/

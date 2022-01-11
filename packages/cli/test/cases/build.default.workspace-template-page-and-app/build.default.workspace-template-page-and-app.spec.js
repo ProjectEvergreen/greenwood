@@ -90,8 +90,8 @@ describe('Build Greenwood With: ', function() {
           expect(linkTags.length).to.equal(4);
         });
 
-        it('should have 5 <style> tags in the <head> (4 + one from Puppeteer)', function() {
-          expect(styleTags.length).to.equal(5);
+        it('should have 5 <style> tags in the <head>', function() {
+          expect(styleTags.length).to.equal(4);
         });
 
         it('should merge page template <script> tags after app template <script> tags', function() {
@@ -117,11 +117,10 @@ describe('Build Greenwood With: ', function() {
         });
 
         it('should merge page template <style> tags after app template <style> tags', function() {
-          // offset index by one since first <style> tag is from Puppeteer
-          expect(styleTags[1].textContent).to.contain('app-template-one-style');
-          expect(styleTags[2].textContent).to.contain('app-template-two-style');
-          expect(styleTags[3].textContent).to.contain('page-template-one-style');
-          expect(styleTags[4].textContent).to.contain('page-template-two-style');
+          expect(styleTags[0].textContent).to.contain('app-template-one-style');
+          expect(styleTags[1].textContent).to.contain('app-template-two-style');
+          expect(styleTags[2].textContent).to.contain('page-template-one-style');
+          expect(styleTags[3].textContent).to.contain('page-template-two-style');
         });
       });
 
