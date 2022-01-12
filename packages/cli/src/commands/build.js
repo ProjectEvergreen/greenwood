@@ -2,16 +2,14 @@ import { bundleCompilation } from '../lifecycles/bundle.js';
 import { copyAssets } from '../lifecycles/copy.js';
 import { devServer } from '../lifecycles/serve.js';
 import fs from 'fs';
-import { generateCompilation } from '../lifecycles/compile.js';
 import { preRenderCompilation, staticRenderCompilation } from '../lifecycles/prerender.js';
 import { ServerInterface } from '../lib/server-interface.js';
 
-const runProductionBuild = async () => {
+const runProductionBuild = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
 
     try {
-      const compilation = await generateCompilation();
       const { prerender } = compilation.config;
       const port = compilation.config.devServer.port;
       const outputDir = compilation.context.outputDir;

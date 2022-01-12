@@ -23,6 +23,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "peerDependencies": {
+    "puppeteer": "^10.2.0"
+  },
   "dependencies": {
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@rollup/plugin-replace": "^2.3.4",
@@ -40,7 +43,6 @@
     "node-html-parser": "^1.2.21",
     "postcss": "^8.3.11",
     "postcss-import": "^13.0.0",
-    "puppeteer": "^10.2.0",
     "rehype-raw": "^5.0.0",
     "rehype-stringify": "^8.0.0",
     "remark-frontmatter": "^2.0.0",

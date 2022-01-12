@@ -1,13 +1,11 @@
-import { generateCompilation } from '../lifecycles/compile.js';
 import { ServerInterface } from '../lib/server-interface.js';
 import { devServer } from '../lifecycles/serve.js';
 
-const runDevServer = async () => {
+const runDevServer = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
 
     try {
-      const compilation = await generateCompilation();
       const { port } = compilation.config.devServer;
       
       (await devServer(compilation)).listen(port, () => {
