@@ -310,7 +310,7 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async shouldServe(url, headers) {
-    const relativeUrl = this.getRelativeUserworkspaceUrl(url);
+    const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows
     const isClientSideRoute = this.compilation.config.mode === 'spa' && path.extname(url) === '' && (headers.request.accept || '').indexOf(this.contentType) >= 0;
     const hasMatchingRoute = this.compilation.graph.filter((node) => {
       return node.route === relativeUrl;
@@ -325,7 +325,7 @@ class StandardHtmlResource extends ResourceInterface {
         const config = Object.assign({}, this.compilation.config);
         const { pagesDir, userTemplatesDir } = this.compilation.context;
         const { mode } = this.compilation.config;
-        const relativeUrl = this.getRelativeUserworkspaceUrl(url);
+        const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows;
         const matchingRoute = mode === 'spa'
           ? this.compilation.graph[0]
           : this.compilation.graph.filter((node) => {
