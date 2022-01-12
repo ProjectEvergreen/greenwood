@@ -86,8 +86,8 @@ describe('Build Greenwood With: ', function() {
           expect(linkTags.length).to.equal(1);
         });
 
-        it('should have 2 <style> tags in the <head> (1 + one from Puppeteer)', function() {
-          expect(styleTags.length).to.equal(2);
+        it('should have 1 <style> tags in the <head>', function() {
+          expect(styleTags.length).to.equal(1);
         });
 
         it('should add one page template <script> tag', function() {
@@ -101,8 +101,7 @@ describe('Build Greenwood With: ', function() {
         });
 
         it('should add one page template <style> tag', function() {
-          // offset index by one since first <style> tag is from Puppeteer
-          expect(styleTags[1].textContent).to.contain('.owen-test');
+          expect(styleTags[0].textContent).to.contain('.owen-test');
         });
       });
   
