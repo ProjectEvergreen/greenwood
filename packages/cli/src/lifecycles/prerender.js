@@ -2,6 +2,31 @@ import { BrowserRunner } from '../lib/browser.js';
 import fs from 'fs';
 import path from 'path';
 
+async function interceptPage(compilation, contents, route) {
+  const headers = {
+    request: { 'accept': 'text/hml', 'content-type': 'text/html' },
+    response: { 'content-type': 'text/html' }
+  };
+  const interceptResources = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
+  }).map((plugin) => {
+    return plugin.provider(compilation);
+  }).filter((provider) => {
+    return provider.shouldIntercept && provider.intercept;
+  });
+
+  const htmlIntercepted = await interceptResources.reduce(async (htmlPromise, resource) => {
+    const html = (await htmlPromise).body || '';
+    const shouldIntercept = await resource.shouldIntercept(route, html, headers);
+
+    return shouldIntercept
+      ? resource.intercept(route, html, headers)
+      : Promise.resolve(html);
+  }, Promise.resolve(contents));
+
+  return htmlIntercepted;
+}
+
 async function optimizePage(compilation, contents, route, outputPath, outputDir) {
   const optimizeResources = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
@@ -108,7 +133,9 @@ async function staticRenderCompilation(compilation) {
   
   await Promise.all(pages.map(async (page) => {
     const { route, outputPath } = page;
-    const response = await htmlResource.serve(route);
+    let response = await htmlResource.serve(route);
+
+    response = await interceptPage(compilation, response, route);
 
     await optimizePage(compilation, response.body, route, outputPath, scratchDir);
 
