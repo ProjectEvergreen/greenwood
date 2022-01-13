@@ -4,7 +4,7 @@ import path from 'path';
 
 async function interceptPage(compilation, contents, route) {
   const headers = {
-    request: { 'accept': 'text/hml', 'content-type': 'text/html' },
+    request: { 'accept': 'text/html', 'content-type': 'text/html' },
     response: { 'content-type': 'text/html' }
   };
   const interceptResources = compilation.config.plugins.filter((plugin) => {
@@ -16,12 +16,12 @@ async function interceptPage(compilation, contents, route) {
   });
 
   const htmlIntercepted = await interceptResources.reduce(async (htmlPromise, resource) => {
-    const html = (await htmlPromise).body || '';
+    const html = (await htmlPromise).body;
     const shouldIntercept = await resource.shouldIntercept(route, html, headers);
 
     return shouldIntercept
       ? resource.intercept(route, html, headers)
-      : Promise.resolve(html);
+      : htmlPromise;
   }, Promise.resolve(contents));
 
   return htmlIntercepted;
