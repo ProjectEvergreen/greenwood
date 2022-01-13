@@ -4,9 +4,13 @@
 *.sh      text eol=lf
 
 *.jpg     binary
+*.jpeg    binary
 *.png     binary
+*.avif    binary
+*.webp    binary
 *.gif     binary
 *.ico     binary
 *.woff    binary
 *.woff2   binary
 *.ttf     binary
+*.eot     binary
