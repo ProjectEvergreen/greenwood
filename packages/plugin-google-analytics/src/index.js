@@ -14,7 +14,7 @@ class GoogleAnalyticsResource extends ResourceInterface {
   }
 
   async shouldIntercept(url, body, headers) {
-    return Promise.resolve(headers.request.accept || ''.indexOf(this.contentType) >= 0);
+    return Promise.resolve((headers.request.accept || '').indexOf(this.contentType) >= 0);
   }
 
   async intercept(url, body) {
