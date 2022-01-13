@@ -27,11 +27,10 @@ function getCustomPageTemplates(contextPlugins, templateName) {
     });
 }
 
-const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], pagesDir) => {
-  const pageIsHtmlPath = `${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.html`;
+const getPageTemplate = (fullPath, templatesDir, template, contextPlugins = [], pagesDir) => {
   const customPluginDefaultPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
   const customPluginPageTemplates = getCustomPageTemplates(contextPlugins, template);
-  const is404Page = barePath.replace(pagesDir, '').indexOf(`${path.sep}404`) === 0;
+  const is404Page = path.basename(fullPath).indexOf('404') === 0 && path.extname(fullPath) === '.html';
   let contents;
 
   if (template && customPluginPageTemplates.length > 0 || fs.existsSync(`${templatesDir}/${template}.html`)) {
@@ -39,13 +38,9 @@ const getPageTemplate = (barePath, templatesDir, template, contextPlugins = [], 
     contents = customPluginPageTemplates.length > 0
       ? fs.readFileSync(`${customPluginPageTemplates[0]}/${template}.html`, 'utf-8')
       : fs.readFileSync(`${templatesDir}/${template}.html`, 'utf-8');
-  } else if (fs.existsSync(`${barePath}.html`) || fs.existsSync(pageIsHtmlPath)) {
-    // if the page is already HTML, use that as the template
-    const indexPath = fs.existsSync(pageIsHtmlPath)
-      ? pageIsHtmlPath
-      : `${barePath}.html`;
-    
-    contents = fs.readFileSync(indexPath, 'utf-8');
+  } else if (path.extname(fullPath) === '.html' && fs.existsSync(fullPath)) {
+    // if the page is already HTML, use that as the template, NOT accounting for 404 pages 
+    contents = fs.readFileSync(fullPath, 'utf-8');
   } else if (customPluginDefaultPageTemplates.length > 0 || (!is404Page && fs.existsSync(`${templatesDir}/page.html`))) {
     // else look for default page template from the user
     // and 404 pages should be their own "top level" template
@@ -323,60 +318,41 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async shouldServe(url, headers) {
-    const { pagesDir } = this.compilation.context;
-    const relativeUrl = this.getRelativeUserworkspaceUrl(url);
+    const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows
     const isClientSideRoute = this.compilation.config.mode === 'spa' && path.extname(url) === '' && (headers.request.accept || '').indexOf(this.contentType) >= 0;
-    const barePath = relativeUrl.endsWith(path.sep)
-      ? `${pagesDir}${relativeUrl}index`
-      : `${pagesDir}${relativeUrl.replace('.html', '')}`;
-    const isExternalSource = this.compilation.graph.filter((node) => {
-      return node.external && node.route.indexOf(url) >= 0;
+    const hasMatchingRoute = this.compilation.graph.filter((node) => {
+      return node.route === relativeUrl;
     }).length === 1;
 
-    return Promise.resolve(this.extensions.indexOf(path.extname(relativeUrl)) >= 0
-      || path.extname(relativeUrl) === '') && (fs.existsSync(`${barePath}.html`) || barePath.substring(barePath.length - 5, barePath.length) === 'index')
-      || fs.existsSync(`${barePath}.md`)
-      || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
-      || isClientSideRoute
-      || isExternalSource;
+    return Promise.resolve(hasMatchingRoute || isClientSideRoute);
   }
 
   async serve(url) {
     return new Promise(async (resolve, reject) => {
       try {
         const config = Object.assign({}, this.compilation.config);
-        const { pagesDir, userTemplatesDir, userWorkspace } = this.compilation.context;
+        const { pagesDir, userTemplatesDir } = this.compilation.context;
         const { mode } = this.compilation.config;
-        const normalizedUrl = this.getRelativeUserworkspaceUrl(url);
-        const userHasOwn404 = fs.existsSync(path.join(userWorkspace, 'pages/404.html')) || fs.existsSync(path.join(userWorkspace, 'pages/404.md'));
-        let customImports;
+        const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows;
+        const matchingRoute = mode === 'spa'
+          ? this.compilation.graph[0]
+          : this.compilation.graph.filter((node) => {
+            return node.route === relativeUrl;
+          })[0];
+        const fullPath = !matchingRoute.external ? matchingRoute.path : '';
+        const isMarkdownContent = path.extname(fullPath) === '.md';
 
         let body = '';
         let template = null;
+        let customImports;
         let processedMarkdown = null;
-        const barePath = url === '/404/' && userHasOwn404
-          ? path.join(userWorkspace, 'pages/404')
-          : normalizedUrl.endsWith(path.sep)
-            ? `${pagesDir}${normalizedUrl}index`
-            : `${pagesDir}${normalizedUrl.replace('.html', '')}`;
-        const isMarkdownContent = fs.existsSync(`${barePath}.md`)
-          || fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
-          || fs.existsSync(`${barePath.replace(`${path.sep}index`, '.md')}`);
-        const externalSource = this.compilation.graph.filter((node) => {
-          return node.external && node.route.indexOf(url) >= 0;
-        });
 
-        if (externalSource.length === 1) {
-          template = externalSource[0].template || template;
+        if (matchingRoute.external) {
+          template = matchingRoute.template || template;
         }
 
         if (isMarkdownContent) {
-          const markdownPath = fs.existsSync(`${barePath}.md`)
-            ? `${barePath}.md`
-            : fs.existsSync(`${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`)
-              ? `${barePath.substring(0, barePath.lastIndexOf(`${path.sep}index`))}.md`
-              : `${pagesDir}${url.replace(`${path.sep}index.html`, '.md')}`;
-          const markdownContents = await fs.promises.readFile(markdownPath, 'utf-8');
+          const markdownContents = await fs.promises.readFile(fullPath, 'utf-8');
           const rehypePlugins = [];
           const remarkPlugins = [];
 
@@ -428,14 +404,14 @@ class StandardHtmlResource extends ResourceInterface {
         });
 
         if (mode === 'spa') {
-          body = fs.readFileSync(this.compilation.graph[0].path, 'utf-8');
+          body = fs.readFileSync(fullPath, 'utf-8');
         } else {
-          body = getPageTemplate(barePath, userTemplatesDir, template, contextPlugins, pagesDir);
+          body = getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir);
         }
 
-        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);
+        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);       
         body = getUserScripts(body, this.compilation.context);
-        body = getMetaContent(normalizedUrl.replace(/\\/g, '/'), config, body);
+        body = getMetaContent(matchingRoute.route.replace(/\\/g, '/'), config, body);
         
         if (processedMarkdown) {
           const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
@@ -454,8 +430,8 @@ class StandardHtmlResource extends ResourceInterface {
           }
 
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
-        } else if (externalSource.length === 1) {
-          body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, externalSource[0].body);
+        } else if (matchingRoute.external) {
+          body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
         }
 
         // give the user something to see so they know it works, if they have no content
