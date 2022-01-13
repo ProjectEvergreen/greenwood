@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-import-commonjs",
-  "version": "0.21.1",
+  "version": "0.22.0",
   "description": "A plugin for loading CommonJS based modules in the browser using ESM (import / export) syntax.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-commonjs",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -28,7 +28,7 @@
     "cjs-module-lexer": "^1.0.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.21.1",
+    "@greenwood/cli": "^0.22.0",
     "lodash": "^4.17.20"
   }
 }
