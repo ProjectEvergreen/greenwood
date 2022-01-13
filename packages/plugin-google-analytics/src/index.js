@@ -1,4 +1,3 @@
-import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class GoogleAnalyticsResource extends ResourceInterface {
@@ -10,13 +9,15 @@ class GoogleAnalyticsResource extends ResourceInterface {
     if (!analyticsId || typeof analyticsId !== 'string') {
       throw new Error(`Error: analyticsId should be of type string.  got "${typeof analyticsId}" instead.`);
     }
+
+    this.contentType = 'text/html';
   }
 
-  async shouldOptimize(url) {
-    return Promise.resolve(path.extname(url) === '.html');
+  async shouldIntercept(url, body, headers) {
+    return Promise.resolve(headers.request.accept || ''.indexOf(this.contentType) >= 0);
   }
 
-  async optimize(url, body) {
+  async intercept(url, body) {
     const { analyticsId, anonymous } = this.options;
     const trackAnon = typeof anonymous === 'boolean' ? anonymous : true;
 
@@ -41,7 +42,7 @@ class GoogleAnalyticsResource extends ResourceInterface {
         </head>
         `);
 
-        resolve(newHtml);
+        resolve({ body: newHtml });
       } catch (e) {
         reject(e);
       }
