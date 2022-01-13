@@ -18,8 +18,13 @@
  * User Workspace
  * src/
  *   assets/
+ *     data.json
+ *     favicon.ico
+ *     fox.avif
  *     logo.png
+ *     river-valley.webp
  *     source-sans-pro.woff
+ *     webcomponents.svg
  *   components/
  *     header.js
  *   pages/
@@ -732,7 +737,75 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command with SVG specific behavior', function() {
+    describe('Develop command with image (webp) specific behavior', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}:${port}/assets/river-valley.webp`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve(response);
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal('image/webp');
+        done();
+      });
+
+      it('should return binary data', function(done) {
+        expect(response.body).to.contain('\u0000');
+        done();
+      });
+    });
+
+    describe('Develop command with image (avif) specific behavior', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}:${port}/assets/fox.avif`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve(response);
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal('image/avif');
+        done();
+      });
+
+      it('should return binary data', function(done) {
+        expect(response.body).to.contain('\u0000');
+        done();
+      });
+    });
+
+    describe('Develop command with image (svg) specific behavior', function() {
       const ext = 'svg';
       let response = {};
 

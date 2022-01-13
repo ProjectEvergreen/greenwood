@@ -172,7 +172,11 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
 
     // merge <style> tags
     if (headStyles.length > 0) {
-      const latestHeadContents = appTemplateContents.match(/<head>.*.<\/head>/s)[0];
+      const matchNeedleStyle = /<style .*/g;
+      const appHeadStyleMatches = appTemplateHeadContents.match(matchNeedleStyle);
+      const lastStyle = appHeadStyleMatches && appHeadStyleMatches.length && appHeadStyleMatches.length > 0
+        ? appHeadStyleMatches[appHeadStyleMatches.length - 1]
+        : '</head>';
       const pageBodyStyles = headStyles.map((style) => {
         const attributes = style.rawAttrs === '' ? '' : ` ${style.rawAttrs}`;
 
@@ -182,13 +186,17 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
           </style>
         `;
       });
-      const lastIndex = latestHeadContents.lastIndexOf('</style>') === -1
-        ? latestHeadContents.lastIndexOf('</head>')
-        : latestHeadContents.lastIndexOf('</style>');
-      const offset = lastIndex === -1 ? '</head>'.length : '</style>'.length;
-      const result = latestHeadContents.substring(0, lastIndex + offset) + pageBodyStyles.join('\n') + latestHeadContents.substring(lastIndex);
 
-      appTemplateContents = appTemplateContents.replace(latestHeadContents, result);
+      if (lastStyle === '</head>') {
+        appTemplateContents = appTemplateContents.replace(lastStyle, `
+          ${pageBodyStyles.join('\n')}
+        ${lastStyle}\n
+      `);
+      } else {
+        appTemplateContents = appTemplateContents.replace(lastStyle, `${lastStyle}\n
+          ${pageBodyStyles.join('\n')}
+        `);
+      }
     }
 
     // merge <meta>

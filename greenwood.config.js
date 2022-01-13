@@ -8,7 +8,7 @@ import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 import { fileURLToPath, URL } from 'url';
 
 const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
-const FAVICON_HREF = '/assets/favicon.ico';
+const FAVICON_HREF = '/favicon.ico';
 
 export default {
   workspace: fileURLToPath(new URL('./www', import.meta.url)),

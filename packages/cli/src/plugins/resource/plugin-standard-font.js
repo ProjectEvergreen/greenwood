@@ -11,13 +11,16 @@ import { ResourceInterface } from '../../lib/resource-interface.js';
 class StandardFontResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.woff2', '.woff', '.ttf'];
+
+    // https://developer.mozilla.org/en-US/docs/Learn/CSS/Styling_text/Web_fonts
+    this.extensions = ['.woff2', '.woff', '.ttf', '.eot'];
   }
 
   async serve(url) {
     return new Promise(async (resolve, reject) => {
       try {
-        const contentType = path.extname(url).replace('.', '');
+        const ext = path.extname(url).replace('.', '');
+        const contentType = ext === 'eot' ? 'application/vnd.ms-fontobject' : ext;
         const body = await fs.promises.readFile(url);
 
         resolve({
