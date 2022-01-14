@@ -336,7 +336,7 @@ class StandardHtmlResource extends ResourceInterface {
     return new Promise(async (resolve, reject) => {
       try {
         const config = Object.assign({}, this.compilation.config);
-        const { pagesDir, userTemplatesDir } = this.compilation.context;
+        const { pagesDir, routesDir, userTemplatesDir } = this.compilation.context;
         const { mode } = this.compilation.config;
         const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows;
         const matchingRoute = mode === 'spa'
@@ -346,6 +346,7 @@ class StandardHtmlResource extends ResourceInterface {
           })[0];
         const fullPath = !matchingRoute.external ? matchingRoute.path : '';
         const isMarkdownContent = path.extname(fullPath) === '.md';
+        const isServerSideRoute = this.compilation.config.mode === 'ssr' && fs.existsSync(path.join(routesDir, `${url.replace(/\//g, '')}.js`));
 
         let customImports = [];
         let body = '';
@@ -414,7 +415,7 @@ class StandardHtmlResource extends ResourceInterface {
                 workerData: {
                   modulePath: routeLocation,
                   compilation: JSON.stringify(this.compilation),
-                  route: barePath
+                  route: fullPath
                 }
               });
               worker.on('message', (result) => {
@@ -467,57 +468,7 @@ class StandardHtmlResource extends ResourceInterface {
         if (mode === 'spa') {
           body = fs.readFileSync(fullPath, 'utf-8');
         } else {
-          if (isServerSideRoute) {
-            const routeLocation = path.join(routesDir, `${url.replace(/\//g, '')}.js`);
-            let template, page, metadata;
-
-            if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
-              // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
-              await new Promise((resolve, reject) => {
-                const worker = new Worker(new URL('../../lib/worker-utils.js', import.meta.url), {
-                  workerData: {
-                    modulePath: routeLocation
-                  }
-                });
-                worker.on('message', (result) => {
-                  if (result.template) {
-                    template = result.template;
-                  }
-                  resolve();
-                });
-                worker.on('error', reject);
-                worker.on('exit', (code) => {
-                  if (code !== 0) {
-                    reject(new Error(`Worker stopped with exit code ${code}`));
-                  }
-                });
-              });
-            } else {
-              const { getTemplate = null, getBody = null, getMetadata = null } = await import(routeLocation);
-
-              if (getTemplate) {
-                template = await getTemplate();
-              }
-
-              if (getBody) {
-                page = await getBody();
-              }
-
-              if (getMetadata) {
-                metadata = await getMetadata();
-              }
-            }
-
-            console.debug(template);
-            console.debug(page);
-            console.debug(metadata);
-
-            if (template) {
-              body = template;
-            }
-          } else {
-            body = ssrTemplate ? ssrTemplate : getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir, ssrTemplate);
-          }
+          body = ssrTemplate ? ssrTemplate : getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir, ssrTemplate);
         }
 
         body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);       
