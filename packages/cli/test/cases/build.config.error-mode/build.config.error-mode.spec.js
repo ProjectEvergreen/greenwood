@@ -41,7 +41,7 @@ describe('Build Greenwood With: ', function() {
         await runner.setup(outputPath);
         await runner.runCommand(cliPath, 'build');
       } catch (err) {
-        expect(err).to.contain('Error: provided mode "loremipsum" is not supported.  Please use one of: ssg, mpa, spa.');
+        expect(err).to.contain('Error: provided mode "loremipsum" is not supported.  Please use one of: ssg, mpa, spa, ssr.');
       }
     });
   });

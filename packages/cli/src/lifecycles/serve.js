@@ -1,9 +1,12 @@
+import { BrowserRunner } from '../lib/browser.js';
 import fs from 'fs';
 import path from 'path';
 import Koa from 'koa';
 import { ResourceInterface } from '../lib/resource-interface.js';
+import { getRollupConfig } from '../config/rollup.config.js';
+import { rollup } from 'rollup';
 
-const getDevServer = async(compilation) => {
+async function getDevServer(compilation) {
   const app = new Koa();
   const compilationCopy = Object.assign({}, compilation);
   const resources = [
@@ -120,9 +123,9 @@ const getDevServer = async(compilation) => {
   });
 
   return Promise.resolve(app);
-};
+}
 
-const getProdServer = async(compilation) => {
+async function getStaticServer(compilation, composable) {
   const app = new Koa();
   const standardResources = compilation.config.plugins.filter((plugin) => {
     // html is intentionally omitted
@@ -140,16 +143,20 @@ const getProdServer = async(compilation) => {
     const { mode } = compilation.config;
     const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
 
+    // only handle static output routes, eg. public/about.html
     if (url.endsWith('/') || url.endsWith('.html')) {
       const barePath = mode === 'spa'
         ? 'index.html'
         : url.endsWith('/')
           ? path.join(url, 'index.html')
           : url;
-      const contents = await fs.promises.readFile(path.join(outputDir, barePath), 'utf-8');
-      
-      ctx.set('content-type', 'text/html');
-      ctx.body = contents;
+
+      if (fs.existsSync(path.join(outputDir, barePath))) {
+        const contents = await fs.promises.readFile(path.join(outputDir, barePath), 'utf-8');
+
+        ctx.set('content-type', 'text/html');
+        ctx.body = contents;
+      }
     }
 
     await next();
@@ -173,7 +180,7 @@ const getProdServer = async(compilation) => {
     await next();
   });
 
-  app.use(async (ctx) => {
+  app.use(async (ctx, next) => {
     const responseAccumulator = {
       body: ctx.body,
       contentType: ctx.response.header['content-type']
@@ -206,12 +213,76 @@ const getProdServer = async(compilation) => {
 
     ctx.set('content-type', reducedResponse.contentType);
     ctx.body = reducedResponse.body;
+
+    if (composable) {
+      await next();
+    }
   });
     
-  return Promise.resolve(app);
-};
+  return app;
+}
+
+async function getHybridServer(compilation) {
+  const app = await getStaticServer(compilation, true);
+  const { prerender } = compilation.config;
+  let browserRunner;
+
+  if (prerender) {
+    browserRunner = new BrowserRunner();
+
+    await browserRunner.init();
+  }
+
+  app.use(async (ctx) => {
+    const { routesDir } = compilation.context;
+    const { mode } = compilation.config;
+    const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
+
+    if (url.endsWith('/') && mode === 'ssr') {
+      if (fs.existsSync(path.join(routesDir, `${url.replace(/\//g, '')}.js`))) {
+        const standardHtmlResource = compilation.config.plugins.filter((plugin) => {
+          return plugin.isGreenwoodDefaultPlugin
+            && plugin.type === 'resource'
+            && plugin.name.indexOf('plugin-standard-html') === 0;
+        }).map((plugin) => {
+          return plugin.provider(compilation);
+        })[0];
+        let body = '';
+
+        if (prerender) {
+          const { port } = compilation.config.devServer;
+          const serverAddress = `http://127.0.0.1:${port}`;
+
+          body = await browserRunner.serialize(`${serverAddress}${url}`);
+        } else {
+          body = await standardHtmlResource.serve(url);
+        }
+
+        body = await standardHtmlResource.optimize(null, body);
+
+        await fs.promises.mkdir(path.join(compilation.context.scratchDir, url), { recursive: true });
+        await fs.promises.writeFile(path.join(compilation.context.scratchDir, url, 'index.html'), body);
+
+        compilation.graph = compilation.graph.filter(page => page.isSSR && page.route === url);
+
+        const rollupConfigs = await getRollupConfig(compilation);
+        const bundle = await rollup(rollupConfigs[0]);  
+        await bundle.write(rollupConfigs[0].output);
+
+        body = await fs.promises.readFile(path.join(compilation.context.outputDir, url, 'index.html'), 'utf-8');
+
+        ctx.status = 200;
+        ctx.set('content-type', 'text/html');
+        ctx.body = body;
+      }
+    }
+  });
+
+  return app;
+}
 
 export { 
-  getDevServer as devServer,
-  getProdServer as prodServer
+  getDevServer,
+  getStaticServer,
+  getHybridServer
 };

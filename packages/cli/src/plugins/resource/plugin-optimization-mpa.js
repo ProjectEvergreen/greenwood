@@ -47,6 +47,7 @@ class OptimizationMPAResource extends ResourceInterface {
           .replace(`.greenwood${path.sep}`, '');
 
         const routeTags = this.compilation.graph
+          .filter(page => !page.isSSR)
           .filter(page => page.route !== '/404/')
           .map((page) => {
             const template = page.filename && path.extname(page.filename) === '.html'

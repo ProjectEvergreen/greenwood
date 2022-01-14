@@ -72,8 +72,6 @@ class BrowserRunner {
     // Serialize page.
     const content = await page.content();
 
-    // console.debug('content????', content);
-
     await page.close();
 
     return content;

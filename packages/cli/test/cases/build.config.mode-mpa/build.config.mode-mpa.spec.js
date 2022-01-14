@@ -33,7 +33,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom Mode';
+  const LABEL = 'Custom Mode MPA';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -104,7 +104,7 @@ describe('Build Greenwood With: ', function() {
         expect(routerOutlets.length).to.be.equal(1);
       });
 
-      it('should have two <greenwood-route> tags in the <body> for the content', function() {
+      it('should have expected <greenwood-route> tags in the <body> for each page', function() {
         const routeTags = dom.window.document.querySelectorAll('body > greenwood-route');
 
         expect(routeTags.length).to.be.equal(3);
