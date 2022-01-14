@@ -1,5 +1,5 @@
 import { generateCompilation } from '../lifecycles/compile.js';
-import { prodServer } from '../lifecycles/serve.js';
+import { getStaticServer, getHybridServer } from '../lifecycles/serve.js';
 
 const runProdServer = async () => {
 
@@ -8,9 +8,10 @@ const runProdServer = async () => {
     try {
       const compilation = await generateCompilation();
       const port = 8080;
-      
-      (await prodServer(compilation)).listen(port, () => {
-        console.info(`Started production test server at localhost:${port}`);
+      const server = compilation.config.mode === 'ssr' ? getHybridServer : getStaticServer;
+
+      (await server(compilation)).listen(port, () => {
+        console.info(`Started server at localhost:${port}`);
       });
     } catch (err) {
       reject(err);

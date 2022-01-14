@@ -1,4 +1,4 @@
-/* eslint-disable complexity */
+/* eslint-disable complexity, max-depth */
 /*
  * 
  * Manages web standard resource related operations for HTML and markdown.
@@ -16,7 +16,8 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import unified from 'unified';
-import { fileURLToPath, URL } from 'url';
+import { pathToFileURL, fileURLToPath } from 'url';
+import { Worker } from 'worker_threads';
 
 function getCustomPageTemplates(contextPlugins, templateName) {
   return contextPlugins
@@ -267,14 +268,18 @@ const getUserScripts = (contents, context) => {
   return contents;
 };
 
-const getMetaContent = (url, config, contents) => {
+const getMetaContent = (url, config, contents, ssrFrontmatter = {}) => {
   const existingTitleMatch = contents.match(/<title>(.*)<\/title>/);
   const existingTitleCheck = !!(existingTitleMatch && existingTitleMatch[1] && existingTitleMatch[1] !== '');
 
   const title = existingTitleCheck
     ? existingTitleMatch[1]
-    : config.title;
-  const metaContent = config.meta.map(item => {
+    : ssrFrontmatter.title
+      ? ssrFrontmatter.title
+      : config.title
+        ? config.title
+        : '';
+  const metaContent = [...config.meta || []].map(item => {
     let metaHtml = '';
 
     for (const [key, value] of Object.entries(item)) {
@@ -331,7 +336,7 @@ class StandardHtmlResource extends ResourceInterface {
     return new Promise(async (resolve, reject) => {
       try {
         const config = Object.assign({}, this.compilation.config);
-        const { pagesDir, userTemplatesDir } = this.compilation.context;
+        const { pagesDir, routesDir, userTemplatesDir } = this.compilation.context;
         const { mode } = this.compilation.config;
         const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows;
         const matchingRoute = mode === 'spa'
@@ -341,16 +346,20 @@ class StandardHtmlResource extends ResourceInterface {
           })[0];
         const fullPath = !matchingRoute.external ? matchingRoute.path : '';
         const isMarkdownContent = path.extname(fullPath) === '.md';
+        const isServerSideRoute = this.compilation.config.mode === 'ssr' && fs.existsSync(path.join(routesDir, `${url.replace(/\//g, '')}.js`));
 
+        let customImports = [];
         let body = '';
         let template = null;
-        let customImports;
+        let ssrBody;
+        let ssrTemplate;
+        let ssrFrontmatter;
         let processedMarkdown = null;
 
         if (matchingRoute.external) {
           template = matchingRoute.template || template;
         }
-
+        
         if (isMarkdownContent) {
           const markdownContents = await fs.promises.readFile(fullPath, 'utf-8');
           const rehypePlugins = [];
@@ -396,6 +405,59 @@ class StandardHtmlResource extends ResourceInterface {
           }
         }
 
+        if (isServerSideRoute) {
+          const routeLocation = path.join(routesDir, `${url.replace(/\//g, '')}.js`);
+
+          if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
+            // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
+            await new Promise((resolve, reject) => {
+              const worker = new Worker(new URL('../../lib/ssr-route-worker.js', import.meta.url), {
+                workerData: {
+                  modulePath: routeLocation,
+                  compilation: JSON.stringify(this.compilation),
+                  route: fullPath
+                }
+              });
+              worker.on('message', (result) => {
+                if (result.template) {
+                  ssrTemplate = result.template;
+                }
+                if (result.body) {
+                  ssrBody = result.body;
+                }
+                if (result.metadata) {
+                  ssrMetadata = result.metadata;
+                }
+                resolve();
+              });
+              worker.on('error', reject);
+              worker.on('exit', (code) => {
+                if (code !== 0) {
+                  reject(new Error(`Worker stopped with exit code ${code}`));
+                }
+              });
+            });
+          } else {
+            const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(pathToFileURL(routeLocation));
+
+            if (getTemplate) {
+              ssrTemplate = await getTemplate(this.compilation, url);
+            }
+
+            if (getBody) {
+              ssrBody = await getBody(this.compilation, url);
+            }
+
+            if (getFrontmatter) {
+              ssrFrontmatter = await getFrontmatter(this.compilation, url);
+
+              if (ssrFrontmatter.imports) {
+                customImports = customImports.concat(ssrFrontmatter.imports);
+              }
+            }
+          }
+        }
+
         // get context plugins
         const contextPlugins = this.compilation.config.plugins.filter((plugin) => {
           return plugin.type === 'context';
@@ -406,12 +468,12 @@ class StandardHtmlResource extends ResourceInterface {
         if (mode === 'spa') {
           body = fs.readFileSync(fullPath, 'utf-8');
         } else {
-          body = getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir);
+          body = ssrTemplate ? ssrTemplate : getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir, ssrTemplate);
         }
 
         body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);       
         body = getUserScripts(body, this.compilation.context);
-        body = getMetaContent(matchingRoute.route.replace(/\\/g, '/'), config, body);
+        body = getMetaContent(matchingRoute.route.replace(/\\/g, '/'), config, body, ssrFrontmatter);
         
         if (processedMarkdown) {
           const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
@@ -432,6 +494,8 @@ class StandardHtmlResource extends ResourceInterface {
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
         } else if (matchingRoute.external) {
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
+        } else if (ssrBody) {
+          body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, ssrBody);
         }
 
         // give the user something to see so they know it works, if they have no content

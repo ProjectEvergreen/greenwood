@@ -49,7 +49,7 @@ Then in your _package.json_, add the `type` field and `scripts` for the CLI, lik
 
 - `greenwood build`: Generates a production build of your project
 - `greenwood develop`: Starts a local development server for your project
-- `greenwood serve`: Generates a production build of the project and serves it locally on a simple web server.
+- `greenwood serve`: Generates a production build of your project and runs it on a NodeJS based web server
 
 ## Documentation
 All of our documentation is on our [website](https://www.greenwoodjs.io/) (which itself is built by Greenwood!).  See our website documentation to learn more about:

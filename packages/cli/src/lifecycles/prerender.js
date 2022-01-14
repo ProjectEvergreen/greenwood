@@ -52,6 +52,8 @@ async function optimizePage(compilation, contents, route, outputPath, outputDir)
   }
   
   await fs.promises.writeFile(path.join(outputDir, outputPath), htmlOptimized);
+
+  return htmlOptimized;
 }
 
 async function preRenderCompilation(compilation) {
@@ -100,7 +102,7 @@ async function preRenderCompilation(compilation) {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const pages = compilation.graph;
+      const pages = compilation.graph.filter(page => !page.isSSR);
       const port = compilation.config.devServer.port;
       const outputDir = compilation.context.scratchDir;
       const serverAddress = `http://127.0.0.1:${port}`;
@@ -121,7 +123,7 @@ async function preRenderCompilation(compilation) {
 }
 
 async function staticRenderCompilation(compilation) {
-  const pages = compilation.graph;
+  const pages = compilation.graph.filter(page => !page.isSSR);
   const scratchDir = compilation.context.scratchDir;
   const htmlResource = compilation.config.plugins.filter((plugin) => {
     return plugin.name === 'plugin-standard-html';
