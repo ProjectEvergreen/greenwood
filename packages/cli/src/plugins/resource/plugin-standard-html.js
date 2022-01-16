@@ -423,7 +423,12 @@ class StandardHtmlResource extends ResourceInterface {
                   ssrTemplate = result.template;
                 }
                 if (result.body) {
-                  ssrBody = result.body;
+                  // TODO detect / use custom renderer
+                  if (routeLocation.indexOf('artists') >= 0) {
+                    ssrBody = result.body;
+                  } else {
+                    ssrBody = result.body;
+                  }
                 }
                 if (result.metadata) {
                   ssrMetadata = result.metadata;

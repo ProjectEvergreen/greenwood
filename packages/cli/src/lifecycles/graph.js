@@ -4,6 +4,7 @@ import fm from 'front-matter';
 import path from 'path';
 import toc from 'markdown-toc';
 import { pathToFileURL } from 'url';
+import { Worker } from 'worker_threads';
 
 const generateGraph = async (compilation) => {
 
@@ -29,7 +30,9 @@ const generateGraph = async (compilation) => {
           if (fs.statSync(fullPath).isDirectory()) {
             routes = await walkDirectoryForRoutes(fullPath, routes);
           } else {
-            const { getFrontmatter } = await import(pathToFileURL(fullPath));
+            let getFrontmatter;
+            let frontmatter;
+
             const relativePagePath = fullPath.substring(routesDir.length - 1, fullPath.length);
             const id = filename.split(path.sep)[filename.split(path.sep).length - 1].replace('.js', '');
             const label = id.split('-')
@@ -45,8 +48,36 @@ const generateGraph = async (compilation) => {
             let customData = {};
             let imports = [];
 
-            if (getFrontmatter) {
-              const ssrFmData = await getFrontmatter(compilation, route, label, id);
+            // TODO detect / use custom renderer
+            if (filename.indexOf('artists') >= 0) {
+              // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
+              await new Promise((resolve, reject) => {
+                const worker = new Worker(new URL('../lib/ssr-route-worker.js', import.meta.url), {
+                  workerData: {
+                    modulePath: fullPath,
+                    compilation: JSON.stringify(compilation),
+                    route
+                  }
+                });
+                worker.on('message', (result) => {
+                  if (result.frontmatter) {
+                    frontmatter = result.frontmatter;
+                  }
+                  resolve();
+                });
+                worker.on('error', reject);
+                worker.on('exit', (code) => {
+                  if (code !== 0) {
+                    reject(new Error(`Worker stopped with exit code ${code}`));
+                  }
+                });
+              });
+            } else {
+              getFrontmatter = (await import(pathToFileURL(fullPath))).getFrontmatter;
+            }
+
+            if (getFrontmatter || frontmatter) {
+              const ssrFmData = getFrontmatter ? await getFrontmatter(compilation, route, label, id) : frontmatter;
 
               template = ssrFmData.template ? ssrFmData.template : template;
               title = ssrFmData.title ? ssrFmData.title : title;
