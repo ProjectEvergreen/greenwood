@@ -429,7 +429,7 @@ class StandardHtmlResource extends ResourceInterface {
                   ssrBody = result.body;
                 }
                 if (result.frontmatter) {
-                  ssrMetadata = result.frontmatter;
+                  ssrFrontmatter = result.frontmatter;
                 }
                 resolve();
               });
