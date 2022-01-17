@@ -428,8 +428,8 @@ class StandardHtmlResource extends ResourceInterface {
                 if (result.body) {
                   ssrBody = result.body;
                 }
-                if (result.metadata) {
-                  ssrMetadata = result.metadata;
+                if (result.frontmatter) {
+                  ssrMetadata = result.frontmatter;
                 }
                 resolve();
               });
@@ -441,21 +441,52 @@ class StandardHtmlResource extends ResourceInterface {
               });
             });
           } else {
-            const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(pathToFileURL(routeLocation));
+            if (this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer').length === 1) {
+              const workerUrl = this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
+              await new Promise((resolve, reject) => {
+                const worker = new Worker(workerUrl, {
+                  workerData: {
+                    modulePath: routeLocation,
+                    compilation: JSON.stringify(this.compilation),
+                    route: fullPath
+                  }
+                });
+                worker.on('message', (result) => {
+                  if (result.template) {
+                    ssrTemplate = result.template;
+                  }
+                  if (result.body) {
+                    ssrBody = result.body;
+                  }
+                  if (result.frontmatter) {
+                    ssrFrontmatter = result.frontmatter;
+                  }
+                  resolve();
+                });
+                worker.on('error', reject);
+                worker.on('exit', (code) => {
+                  if (code !== 0) {
+                    reject(new Error(`Worker stopped with exit code ${code}`));
+                  }
+                });
+              });
+            } else {
+              const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(pathToFileURL(routeLocation));
 
-            if (getTemplate) {
-              ssrTemplate = await getTemplate(this.compilation, url);
-            }
+              if (getTemplate) {
+                ssrTemplate = await getTemplate(this.compilation, url);
+              }
 
-            if (getBody) {
-              ssrBody = await getBody(this.compilation, url);
-            }
+              if (getBody) {
+                ssrBody = await getBody(this.compilation, url);
+              }
 
-            if (getFrontmatter) {
-              ssrFrontmatter = await getFrontmatter(this.compilation, url);
+              if (getFrontmatter) {
+                ssrFrontmatter = await getFrontmatter(this.compilation, url);
 
-              if (ssrFrontmatter.imports) {
-                customImports = customImports.concat(ssrFrontmatter.imports);
+                if (ssrFrontmatter.imports) {
+                  customImports = customImports.concat(ssrFrontmatter.imports);
+                }
               }
             }
           }
