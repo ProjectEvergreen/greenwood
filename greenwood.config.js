@@ -4,6 +4,7 @@ import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
 import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
 import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
+import { greenwoodPluginRendererLit } from '@greenwood/plugin-renderer-lit';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 import { fileURLToPath, URL } from 'url';
 
@@ -47,15 +48,7 @@ export default {
       }
     },
     ...greenwoodPluginIncludeHTML(),
-    {
-      type: 'renderer',
-      name: 'renderer-plugin-lit',
-      provider: () => {
-        return {
-          workerUrl: new URL('./ssr-route-worker-lit.js', import.meta.url)
-        };
-      }
-    }
+    greenwoodPluginRendererLit()
   ],
   markdown: {
     plugins: [
