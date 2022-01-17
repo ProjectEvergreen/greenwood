@@ -25,8 +25,8 @@ export async function getBody() {
               <td>${name}</td>
               <td>${bio}</td>
               <td>
-                <a href="http://www.analogstudios.net/artists/${artist.id}" target="_blank">
-                  <simple-greeting .name="${artist.name}"></simple-greeting>
+                <a href="http://www.analogstudios.net/artists/${id}" target="_blank">
+                  <simple-greeting .name="${name}"></simple-greeting>
                 </a>
               </td>
               <td><img src="${imageUrl}"/></td>
