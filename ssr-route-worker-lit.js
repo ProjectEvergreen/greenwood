@@ -1,6 +1,18 @@
-// https://github.com/nodejs/modules/issues/307#issuecomment-858729422
+import { render } from '@lit-labs/ssr/lib/render-with-global-dom-shim.js';
+import { Buffer } from 'buffer';
 import { pathToFileURL } from 'url';
+import { Readable } from 'stream';
 import { workerData, parentPort } from 'worker_threads';
+
+async function streamToString (stream) {
+  const chunks = [];
+
+  for await (let chunk of stream) {
+    chunks.push(Buffer.from(chunk));
+  }
+
+  return Buffer.concat(chunks).toString('utf-8');
+}
 
 async function executeRouteModule({ modulePath, compilation, route, label, id }) {
   const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(pathToFileURL(modulePath)).then(module => module);
@@ -16,7 +28,10 @@ async function executeRouteModule({ modulePath, compilation, route, label, id })
   }
 
   if (getBody) {
-    data.body = await getBody(parsedCompilation, route);
+    const result = await getBody(parsedCompilation, route);
+    const resultString = await streamToString(Readable.from(render(result)));
+
+    data.body = resultString;
   }
 
   if (getFrontmatter) {

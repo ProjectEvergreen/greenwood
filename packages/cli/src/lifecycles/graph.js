@@ -30,9 +30,6 @@ const generateGraph = async (compilation) => {
           if (fs.statSync(fullPath).isDirectory()) {
             routes = await walkDirectoryForRoutes(fullPath, routes);
           } else {
-            let getFrontmatter;
-            let frontmatter;
-
             const relativePagePath = fullPath.substring(routesDir.length - 1, fullPath.length);
             const id = filename.split(path.sep)[filename.split(path.sep).length - 1].replace('.js', '');
             const label = id.split('-')
@@ -47,12 +44,13 @@ const generateGraph = async (compilation) => {
             let title = `${compilation.config.title} - ${label}`;
             let customData = {};
             let imports = [];
+            let ssrFrontmatter;
 
-            // TODO detect / use custom renderer
-            if (filename.indexOf('artists') >= 0) {
-              // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
+            if (compilation.config.plugins.filter(plugin => plugin.type === 'renderer').length === 1) {
+              const workerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
+
               await new Promise((resolve, reject) => {
-                const worker = new Worker(new URL('../lib/ssr-route-worker.js', import.meta.url), {
+                const worker = new Worker(workerUrl, {
                   workerData: {
                     modulePath: fullPath,
                     compilation: JSON.stringify(compilation),
@@ -61,7 +59,7 @@ const generateGraph = async (compilation) => {
                 });
                 worker.on('message', (result) => {
                   if (result.frontmatter) {
-                    frontmatter = result.frontmatter;
+                    ssrFrontmatter = result.frontmatter;
                   }
                   resolve();
                 });
@@ -73,23 +71,14 @@ const generateGraph = async (compilation) => {
                 });
               });
             } else {
-              getFrontmatter = (await import(pathToFileURL(fullPath))).getFrontmatter;
+              ssrFrontmatter = await (await import(pathToFileURL(fullPath))).getFrontmatter(compilation, route, label, id);
             }
 
-            if (getFrontmatter || frontmatter) {
-              const ssrFmData = getFrontmatter ? await getFrontmatter(compilation, route, label, id) : frontmatter;
-
-              template = ssrFmData.template ? ssrFmData.template : template;
-              title = ssrFmData.title ? ssrFmData.title : title;
-              imports = ssrFmData.imports ? ssrFmData.imports : imports;
-              customData = ssrFmData.data ? ssrFmData.data : customData;
-
-              // prune "reserved" attributes that are supported by Greenwood
-              // https://www.greenwoodjs.io/docs/front-matter
-              delete ssrFmData.label;
-              delete ssrFmData.imports;
-              delete ssrFmData.title;
-              delete ssrFmData.template;
+            if (ssrFrontmatter) {
+              template = ssrFrontmatter.template || template;
+              title = ssrFrontmatter.title || title;
+              imports = ssrFrontmatter.imports || imports;
+              customData = ssrFrontmatter.data || customData;
 
               /* Menu Query
                * Custom front matter - Variable Definitions
@@ -99,8 +88,8 @@ const generateGraph = async (compilation) => {
                * linkheadings: flag to tell us where to add page's table of contents as menu items
                * tableOfContents: json object containing page's table of contents(list of headings)
                */
-              customData.menu = ssrFmData.menu || '';
-              customData.index = ssrFmData.index || '';
+              customData.menu = ssrFrontmatter.menu || '';
+              customData.index = ssrFrontmatter.index || '';
             }
 
             /*

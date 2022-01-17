@@ -15,25 +15,25 @@ export async function getBody() {
         <th>Message</th>
         <th>Picture</th>
       </tr>
-    ${
-      artists.map((artist) => {
-        const { id, name, bio, imageUrl } = artist;
+      ${
+        artists.map((artist) => {
+          const { id, name, bio, imageUrl } = artist;
 
-        return html`
-          <tr>
-            <td>${id}</td>
-            <td>${name}</td>
-            <td>${bio}</td>
-            <td>
-              <a href="http://www.analogstudios.net/artists/${artist.id}" target="_blank">
-                <simple-greeting .name="${artist.name}"></simple-greeting>
-              </a>
-            </td>
-            <td><img src="${imageUrl}"/></td>
-          </tr>
-        `;
-      })
-    }
+          return html`
+            <tr>
+              <td>${id}</td>
+              <td>${name}</td>
+              <td>${bio}</td>
+              <td>
+                <a href="http://www.analogstudios.net/artists/${artist.id}" target="_blank">
+                  <simple-greeting .name="${artist.name}"></simple-greeting>
+                </a>
+              </td>
+              <td><img src="${imageUrl}"/></td>
+            </tr>
+          `;
+        })
+      }
     </table>
   `;
 }

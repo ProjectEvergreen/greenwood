@@ -346,7 +346,7 @@ class StandardHtmlResource extends ResourceInterface {
           })[0];
         const fullPath = !matchingRoute.external ? matchingRoute.path : '';
         const isMarkdownContent = path.extname(fullPath) === '.md';
-        const isServerSideRoute = this.compilation.config.mode === 'ssr' && fs.existsSync(path.join(routesDir, `${url.replace(/\//g, '')}.js`));
+        const isServerSideRoute = this.compilation.config.mode === 'ssr' && matchingRoute.isSSR;
 
         let customImports = [];
         let body = '';
@@ -409,9 +409,12 @@ class StandardHtmlResource extends ResourceInterface {
           const routeLocation = path.join(routesDir, `${url.replace(/\//g, '')}.js`);
 
           if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
-            // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
+            const workerUrl = this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer').length === 1
+              ? this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl
+              : new URL('../../lib/ssr-route-worker.js', import.meta.url);
+
             await new Promise((resolve, reject) => {
-              const worker = new Worker(new URL('../../lib/ssr-route-worker.js', import.meta.url), {
+              const worker = new Worker(workerUrl, {
                 workerData: {
                   modulePath: routeLocation,
                   compilation: JSON.stringify(this.compilation),
@@ -423,12 +426,7 @@ class StandardHtmlResource extends ResourceInterface {
                   ssrTemplate = result.template;
                 }
                 if (result.body) {
-                  // TODO detect / use custom renderer
-                  if (routeLocation.indexOf('artists') >= 0) {
-                    ssrBody = result.body;
-                  } else {
-                    ssrBody = result.body;
-                  }
+                  ssrBody = result.body;
                 }
                 if (result.metadata) {
                   ssrMetadata = result.metadata;

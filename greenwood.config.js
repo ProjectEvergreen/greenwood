@@ -46,7 +46,16 @@ export default {
         ];
       }
     },
-    ...greenwoodPluginIncludeHTML()
+    ...greenwoodPluginIncludeHTML(),
+    {
+      type: 'renderer',
+      name: 'renderer-plugin-lit',
+      provider: () => {
+        return {
+          workerUrl: new URL('./ssr-route-worker-lit.js', import.meta.url)
+        };
+      }
+    }
   ],
   markdown: {
     plugins: [
