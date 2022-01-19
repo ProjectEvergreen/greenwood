@@ -8,6 +8,7 @@ const greenwoodPluginsBasePath = fileURLToPath(new URL('../plugins', import.meta
 
 const greenwoodPlugins = (await Promise.all([
   path.join(greenwoodPluginsBasePath, 'copy'),  
+  path.join(greenwoodPluginsBasePath, 'renderer'),
   path.join(greenwoodPluginsBasePath, 'resource'),
   path.join(greenwoodPluginsBasePath, 'server')
 ].map(async (pluginDirectory) => {
@@ -128,6 +129,13 @@ const readAndMergeConfig = async() => {
               reject(`Error: greenwood.config.js plugins must have a name. got ${nameTypeof} instead.`);
             }
           });
+
+          // if user provides a custom renderer, replace ours with theirs
+          if (plugins.filter(plugin => plugin.type === 'renderer').length === 1) {
+            customConfig.plugins = customConfig.plugins.filter((plugin) => {
+              return plugin.type !== 'renderer';
+            });
+          }
 
           customConfig.plugins = customConfig.plugins.concat(plugins);
         }

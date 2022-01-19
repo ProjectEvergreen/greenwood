@@ -16,7 +16,7 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import unified from 'unified';
-import { pathToFileURL, fileURLToPath } from 'url';
+import { fileURLToPath } from 'url';
 import { Worker } from 'worker_threads';
 
 function getCustomPageTemplates(contextPlugins, templateName) {
@@ -406,90 +406,40 @@ class StandardHtmlResource extends ResourceInterface {
         }
 
         if (isServerSideRoute) {
-          const routeLocation = path.join(routesDir, `${url.replace(/\//g, '')}.js`);
+          const routeModuleLocation = path.join(routesDir, matchingRoute.filename);
+          const routeWorkerUrl = this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
 
-          if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
-            const workerUrl = this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer').length === 1
-              ? this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl
-              : new URL('../../lib/ssr-route-worker.js', import.meta.url);
-
-            await new Promise((resolve, reject) => {
-              const worker = new Worker(workerUrl, {
-                workerData: {
-                  modulePath: routeLocation,
-                  compilation: JSON.stringify(this.compilation),
-                  route: fullPath
-                }
-              });
-              worker.on('message', (result) => {
-                if (result.template) {
-                  ssrTemplate = result.template;
-                }
-                if (result.body) {
-                  ssrBody = result.body;
-                }
-                if (result.frontmatter) {
-                  ssrFrontmatter = result.frontmatter;
-                }
-                resolve();
-              });
-              worker.on('error', reject);
-              worker.on('exit', (code) => {
-                if (code !== 0) {
-                  reject(new Error(`Worker stopped with exit code ${code}`));
-                }
-              });
+          await new Promise((resolve, reject) => {
+            const worker = new Worker(routeWorkerUrl, {
+              workerData: {
+                modulePath: routeModuleLocation,
+                compilation: JSON.stringify(this.compilation),
+                route: fullPath
+              }
             });
-          } else {
-            if (this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer').length === 1) {
-              const workerUrl = this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
-              await new Promise((resolve, reject) => {
-                const worker = new Worker(workerUrl, {
-                  workerData: {
-                    modulePath: routeLocation,
-                    compilation: JSON.stringify(this.compilation),
-                    route: fullPath
-                  }
-                });
-                worker.on('message', (result) => {
-                  if (result.template) {
-                    ssrTemplate = result.template;
-                  }
-                  if (result.body) {
-                    ssrBody = result.body;
-                  }
-                  if (result.frontmatter) {
-                    ssrFrontmatter = result.frontmatter;
-                  }
-                  resolve();
-                });
-                worker.on('error', reject);
-                worker.on('exit', (code) => {
-                  if (code !== 0) {
-                    reject(new Error(`Worker stopped with exit code ${code}`));
-                  }
-                });
-              });
-            } else {
-              const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(pathToFileURL(routeLocation));
-
-              if (getTemplate) {
-                ssrTemplate = await getTemplate(this.compilation, url);
+            worker.on('message', (result) => {
+              if (result.template) {
+                ssrTemplate = result.template;
               }
-
-              if (getBody) {
-                ssrBody = await getBody(this.compilation, url);
+              if (result.body) {
+                ssrBody = result.body;
               }
-
-              if (getFrontmatter) {
-                ssrFrontmatter = await getFrontmatter(this.compilation, url);
+              if (result.frontmatter) {
+                ssrFrontmatter = result.frontmatter;
 
                 if (ssrFrontmatter.imports) {
                   customImports = customImports.concat(ssrFrontmatter.imports);
                 }
               }
-            }
-          }
+              resolve();
+            });
+            worker.on('error', reject);
+            worker.on('exit', (code) => {
+              if (code !== 0) {
+                reject(new Error(`Worker stopped with exit code ${code}`));
+              }
+            });
+          });
         }
 
         // get context plugins

@@ -1,7 +1,7 @@
 const greenwoodPluginRendererLit = () => {
   return {
     type: 'renderer',
-    name: 'renderer-plugin-lit',
+    name: 'plugin-renderer-lit',
     provider: () => {
       return {
         workerUrl: new URL('./ssr-route-worker-lit.js', import.meta.url)

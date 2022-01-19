@@ -3,7 +3,6 @@ import fs from 'fs';
 import fm from 'front-matter';
 import path from 'path';
 import toc from 'markdown-toc';
-import { pathToFileURL } from 'url';
 import { Worker } from 'worker_threads';
 
 const generateGraph = async (compilation) => {
@@ -30,6 +29,7 @@ const generateGraph = async (compilation) => {
           if (fs.statSync(fullPath).isDirectory()) {
             routes = await walkDirectoryForRoutes(fullPath, routes);
           } else {
+            const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
             const relativePagePath = fullPath.substring(routesDir.length - 1, fullPath.length);
             const id = filename.split(path.sep)[filename.split(path.sep).length - 1].replace('.js', '');
             const label = id.split('-')
@@ -46,33 +46,27 @@ const generateGraph = async (compilation) => {
             let imports = [];
             let ssrFrontmatter;
 
-            if (compilation.config.plugins.filter(plugin => plugin.type === 'renderer').length === 1) {
-              const workerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
-
-              await new Promise((resolve, reject) => {
-                const worker = new Worker(workerUrl, {
-                  workerData: {
-                    modulePath: fullPath,
-                    compilation: JSON.stringify(compilation),
-                    route
-                  }
-                });
-                worker.on('message', (result) => {
-                  if (result.frontmatter) {
-                    ssrFrontmatter = result.frontmatter;
-                  }
-                  resolve();
-                });
-                worker.on('error', reject);
-                worker.on('exit', (code) => {
-                  if (code !== 0) {
-                    reject(new Error(`Worker stopped with exit code ${code}`));
-                  }
-                });
+            await new Promise((resolve, reject) => {
+              const worker = new Worker(routeWorkerUrl, {
+                workerData: {
+                  modulePath: fullPath,
+                  compilation: JSON.stringify(compilation),
+                  route
+                }
               });
-            } else {
-              ssrFrontmatter = await (await import(pathToFileURL(fullPath))).getFrontmatter(compilation, route, label, id);
-            }
+              worker.on('message', (result) => {
+                if (result.frontmatter) {
+                  ssrFrontmatter = result.frontmatter;
+                }
+                resolve();
+              });
+              worker.on('error', reject);
+              worker.on('exit', (code) => {
+                if (code !== 0) {
+                  reject(new Error(`Worker stopped with exit code ${code}`));
+                }
+              });
+            });
 
             if (ssrFrontmatter) {
               template = ssrFrontmatter.template || template;

@@ -235,10 +235,11 @@ async function getHybridServer(compilation) {
 
   app.use(async (ctx) => {
     const { routesDir } = compilation.context;
-    const { mode } = compilation.config;
+    const { mode, prerender } = compilation.config;
     const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
 
     if (url.endsWith('/') && mode === 'ssr') {
+      // TODO match against route in the graph instead
       if (fs.existsSync(path.join(routesDir, `${url.replace(/\//g, '')}.js`))) {
         const standardHtmlResource = compilation.config.plugins.filter((plugin) => {
           return plugin.isGreenwoodDefaultPlugin
@@ -247,15 +248,18 @@ async function getHybridServer(compilation) {
         }).map((plugin) => {
           return plugin.provider(compilation);
         })[0];
-        let body = '';
+        let body;
 
+        // TODO if custom renderer says so?
+        // TODO if page frontmatter says so?
         if (prerender) {
           const { port } = compilation.config.devServer;
           const serverAddress = `http://127.0.0.1:${port}`;
 
           body = await browserRunner.serialize(`${serverAddress}${url}`);
         } else {
-          body = await standardHtmlResource.serve(url);
+          // TODO handle includes and intercepts from plugins?
+          body = (await standardHtmlResource.serve(url)).body;
         }
 
         body = await standardHtmlResource.optimize(null, body);
