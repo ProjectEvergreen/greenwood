@@ -234,51 +234,82 @@ async function getHybridServer(compilation) {
   }
 
   app.use(async (ctx) => {
-    const { routesDir } = compilation.context;
-    const { mode, prerender } = compilation.config;
+    const { mode } = compilation.config;
     const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
+    const matchingRoute = compilation.graph.filter((node) => {
+      return node.route === url;
+    })[0] || { data: {} };
 
-    if (url.endsWith('/') && mode === 'ssr') {
-      // TODO match against route in the graph instead
-      if (fs.existsSync(path.join(routesDir, `${url.replace(/\//g, '')}.js`))) {
-        const standardHtmlResource = compilation.config.plugins.filter((plugin) => {
-          return plugin.isGreenwoodDefaultPlugin
-            && plugin.type === 'resource'
-            && plugin.name.indexOf('plugin-standard-html') === 0;
+    if (mode === 'ssr' && matchingRoute.isSSR) {
+      const headers = {
+        request: { 'accept': 'text/html', 'content-type': 'text/html' },
+        response: { 'content-type': 'text/html' }
+      };
+      const standardHtmlResource = compilation.config.plugins.filter((plugin) => {
+        return plugin.isGreenwoodDefaultPlugin
+          && plugin.type === 'resource'
+          && plugin.name.indexOf('plugin-standard-html') === 0;
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      })[0];
+      let body;
+
+      if (matchingRoute.data.prerender) {
+        const { port } = compilation.config.devServer;
+        const serverAddress = `http://127.0.0.1:${port}`;
+
+        body = await browserRunner.serialize(`${serverAddress}${url}`);
+      } else {
+        const interceptResources = compilation.config.plugins.filter((plugin) => {
+          return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
         }).map((plugin) => {
           return plugin.provider(compilation);
-        })[0];
-        let body;
+        }).filter((provider) => {
+          return provider.shouldIntercept && provider.intercept;
+        });
 
-        // TODO if custom renderer says so?
-        // TODO if page frontmatter says so?
-        if (prerender) {
-          const { port } = compilation.config.devServer;
-          const serverAddress = `http://127.0.0.1:${port}`;
+        body = (await standardHtmlResource.serve(url)).body;
+        body = (await interceptResources.reduce(async (htmlPromise, resource) => {
+          const html = (await htmlPromise).body;
+          const shouldIntercept = await resource.shouldIntercept(url, html, headers);
 
-          body = await browserRunner.serialize(`${serverAddress}${url}`);
-        } else {
-          // TODO handle includes and intercepts from plugins?
-          body = (await standardHtmlResource.serve(url)).body;
-        }
-
-        body = await standardHtmlResource.optimize(null, body);
-
-        await fs.promises.mkdir(path.join(compilation.context.scratchDir, url), { recursive: true });
-        await fs.promises.writeFile(path.join(compilation.context.scratchDir, url, 'index.html'), body);
-
-        compilation.graph = compilation.graph.filter(page => page.isSSR && page.route === url);
-
-        const rollupConfigs = await getRollupConfig(compilation);
-        const bundle = await rollup(rollupConfigs[0]);  
-        await bundle.write(rollupConfigs[0].output);
-
-        body = await fs.promises.readFile(path.join(compilation.context.outputDir, url, 'index.html'), 'utf-8');
-
-        ctx.status = 200;
-        ctx.set('content-type', 'text/html');
-        ctx.body = body;
+          return shouldIntercept
+            ? resource.intercept(url, html, headers)
+            : htmlPromise;
+        }, Promise.resolve({ url, body }))).body;
       }
+
+      const optimizeResources = compilation.config.plugins.filter((plugin) => {
+        return plugin.type === 'resource';
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      }).filter((provider) => {
+        return provider.shouldOptimize && provider.optimize;
+      });
+
+      body = await optimizeResources.reduce(async (htmlPromise, resource) => {
+        const html = await htmlPromise;
+        const shouldOptimize = await resource.shouldOptimize(url, html, headers);
+
+        return shouldOptimize
+          ? resource.optimize(url, html, headers)
+          : Promise.resolve(html);
+      }, Promise.resolve(body));
+
+      await fs.promises.mkdir(path.join(compilation.context.scratchDir, url), { recursive: true });
+      await fs.promises.writeFile(path.join(compilation.context.scratchDir, url, 'index.html'), body);
+
+      compilation.graph = compilation.graph.filter(page => page.isSSR && page.route === url);
+
+      const rollupConfigs = await getRollupConfig(compilation);
+      const bundle = await rollup(rollupConfigs[0]);
+      await bundle.write(rollupConfigs[0].output);
+
+      body = await fs.promises.readFile(path.join(compilation.context.outputDir, url, 'index.html'), 'utf-8');
+
+      ctx.status = 200;
+      ctx.set('content-type', 'text/html');
+      ctx.body = body;
     }
   });
 

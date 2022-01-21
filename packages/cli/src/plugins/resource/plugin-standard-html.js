@@ -499,8 +499,8 @@ class StandardHtmlResource extends ResourceInterface {
     });
   }
 
-  async shouldOptimize(url) {
-    return Promise.resolve(path.extname(url) === '.html');
+  async shouldOptimize(url = '', body, headers = {}) {
+    return Promise.resolve(path.extname(url) === '.html' || (headers.request && headers.request['content-type'].indexOf('text/html') >= 0));
   }
 
   async optimize(url, body) {
