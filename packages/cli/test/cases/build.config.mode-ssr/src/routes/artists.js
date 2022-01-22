@@ -98,7 +98,8 @@ async function getFrontmatter(compilation, route) {
     ],
     data: {
       author: 'Project Evergreen',
-      date: '01-01-2021'
+      date: '01-01-2021',
+      prerender: true
     }
   };
 }
