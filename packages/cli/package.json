@@ -36,7 +36,7 @@
     "koa": "^2.13.0",
     "livereload": "^0.9.1",
     "markdown-toc": "^1.2.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "node-html-parser": "^1.2.21",
     "postcss": "^8.3.11",
     "postcss-import": "^13.0.0",
