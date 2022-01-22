@@ -427,6 +427,14 @@ class StandardHtmlResource extends ResourceInterface {
               if (result.frontmatter) {
                 ssrFrontmatter = result.frontmatter;
 
+                if (ssrFrontmatter.title) {
+                  config.title = `${config.title} - ${ssrFrontmatter.title}`;
+                }
+
+                if (ssrFrontmatter.template) {
+                  template = ssrFrontmatter.template;
+                }
+
                 if (ssrFrontmatter.imports) {
                   customImports = customImports.concat(ssrFrontmatter.imports);
                 }

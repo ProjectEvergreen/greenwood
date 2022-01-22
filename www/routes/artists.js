@@ -40,8 +40,12 @@ export async function getBody() {
 
 export async function getFrontmatter(compilation, route) {
   return {
+    template: 'blog',
     menu: 'navigation',
     index: 7,
-    title: `${compilation.config.title} - ${route}`
+    title: `${compilation.config.title} - ${route}`,
+    data: {
+      prerender: true
+    }
   };
 }
