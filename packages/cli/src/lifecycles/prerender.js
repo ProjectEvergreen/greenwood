@@ -1,6 +1,9 @@
 import { BrowserRunner } from '../lib/browser.js';
 import fs from 'fs';
+import htmlparser from 'node-html-parser';
 import path from 'path';
+import { Worker } from 'worker_threads';
+import { pathToFileURL } from 'url';
 
 async function interceptPage(compilation, contents, route) {
   const headers = {
@@ -50,8 +53,6 @@ async function optimizePage(compilation, contents, route, outputPath, outputDir)
       recursive: true
     });
   }
-  
-  await fs.promises.writeFile(path.join(outputDir, outputPath), htmlOptimized);
 
   return htmlOptimized;
 }
@@ -70,7 +71,8 @@ async function preRenderCompilation(compilation) {
           .then(async (indexHtml) => {
             console.info(`prerendering complete for page ${route}.`);
             
-            await optimizePage(compilation, indexHtml, route, outputPath, outputDir);
+            const html = await optimizePage(compilation, indexHtml, route, outputPath, outputDir);
+            await fs.promises.writeFile(path.join(outputDir, outputPath), html);
           });
       }));
     } catch (e) {
@@ -106,14 +108,84 @@ async function preRenderCompilation(compilation) {
       const port = compilation.config.devServer.port;
       const outputDir = compilation.context.scratchDir;
       const serverAddress = `http://127.0.0.1:${port}`;
+      const customPrerender = (compilation.config.plugins.filter(plugin => plugin.type === 'renderer' && !plugin.isGreenwoodDefaultPlugin) || []).length === 1
+        ? compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation)
+        : {};
 
-      console.info(`Prerendering pages at ${serverAddress}`);
       console.debug('pages to render', `\n ${pages.map(page => page.route).join('\n ')}`);
   
-      await runBrowser(serverAddress, pages, outputDir);
+      if (customPrerender.prerender) {
+        console.debug('use users custom renderer for prerendering!!!!!');
+        for (const page of pages) {
+          const { outputPath, route } = page;
+          const outputPathDir = path.join(outputDir, route);
+          const htmlResource = compilation.config.plugins.filter((plugin) => {
+            return plugin.name === 'plugin-standard-html';
+          }).map((plugin) => {
+            return plugin.provider(compilation);
+          })[0];
+          let html;
+
+          html = (await htmlResource.serve(page.route)).body;
+          // TODO html = await interceptPage(compilation, html, route);
+
+          const root = htmlparser.parse(html, {
+            script: true,
+            style: true
+          });
+
+          const headScripts = root.querySelectorAll('script')
+            .filter(script => {
+              return script.getAttribute('type') === 'module'
+                && script.getAttribute('src') && script.getAttribute('src').indexOf('http') < 0;
+            }).map(script => {
+              console.debug('src??', `./${script.getAttribute('src').replace(/\.\.\//g, '').replace('./', '')}`);
+              return pathToFileURL(path.join(compilation.context.userWorkspace, script.getAttribute('src').replace(/\.\.\//g, '').replace('./', '')));
+            });
+
+          await new Promise((resolve, reject) => {
+            const worker = new Worker(customPrerender.workerUrl, {
+              workerData: {
+                modulePath: null,
+                compilation: JSON.stringify(compilation),
+                route,
+                prerender: true,
+                htmlContents: html,
+                scripts: JSON.stringify(headScripts)
+              }
+            });
+            worker.on('message', (result) => {
+              if (result.html) {
+                html = result.html;
+              }
+              resolve();
+            });
+            worker.on('error', reject);
+            worker.on('exit', (code) => {
+              if (code !== 0) {
+                reject(new Error(`Worker stopped with exit code ${code}`));
+              }
+            });
+          });
+
+          // TODO html = await optimizePage(compilation, html, route, outputPath, outputDir);
+          // console.debug({ html });
+
+          if (!fs.existsSync(outputPathDir)) {
+            fs.mkdirSync(outputPathDir, {
+              recursive: true
+            });
+          }
+
+          await fs.promises.writeFile(path.join(outputDir, outputPath), html);
+        }
+      } else {
+        console.info(`Prerendering pages at ${serverAddress}`);
+        await runBrowser(serverAddress, pages, outputDir);
+        browserRunner.close();
+      }
       
       console.info('done prerendering all pages');
-      browserRunner.close();
 
       resolve();
     } catch (err) {
@@ -139,7 +211,8 @@ async function staticRenderCompilation(compilation) {
 
     response = await interceptPage(compilation, response, route);
 
-    await optimizePage(compilation, response.body, route, outputPath, scratchDir);
+    const html = await optimizePage(compilation, response.body, route, outputPath, scratchDir);
+    await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
 
     return Promise.resolve();
   }));

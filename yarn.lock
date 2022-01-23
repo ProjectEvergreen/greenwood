@@ -7598,14 +7598,6 @@ list-item@^1.1.1:
     is-number "^2.1.0"
     repeat-string "^1.5.2"
 
-lit-element@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/lit-element/-/lit-element-3.0.0.tgz#0e9e64ddbc3dd6a8da4d6fbfadbc070a54cf0597"
-  integrity sha512-oPqRhhBBhs+AlI62QLwtWQNU/bNK/h2L1jI3IDroqZubo6XVAkyNy2dW3CRfjij8mrNlY7wULOfyyKKOnfEePA==
-  dependencies:
-    "@lit/reactive-element" "^1.0.0"
-    lit-html "^2.0.0"
-
 lit-element@^3.1.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/lit-element/-/lit-element-3.1.1.tgz#562d5ccbc8ba0c01d8ba4a0ac3576263167d2ccb"
@@ -7635,16 +7627,7 @@ lit-redux-router@~0.20.0:
   dependencies:
     regexparam "^2.0.0"
 
-lit@^2.0.0, lit@^2.0.0-rc.2, lit@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/lit/-/lit-2.0.2.tgz#5e6f422924e0732258629fb379556b6d23f7179c"
-  integrity sha512-hKA/1YaSB+P+DvKWuR2q1Xzy/iayhNrJ3aveD0OQ9CKn6wUjsdnF/7LavDOJsKP/K5jzW/kXsuduPgRvTFrFJw==
-  dependencies:
-    "@lit/reactive-element" "^1.0.0"
-    lit-element "^3.0.0"
-    lit-html "^2.0.0"
-
-lit@^2.1.0, lit@^2.1.1:
+lit@^2.0.0, lit@^2.0.0-rc.2, lit@^2.0.2, lit@^2.1.0, lit@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/lit/-/lit-2.1.1.tgz#65f43abca945988f696391f762c645ba51966b0b"
   integrity sha512-yqDqf36IhXwOxIQSFqCMgpfvDCRdxLCLZl7m/+tO5C9W/OBHUj17qZpiMBT35v97QMVKcKEi1KZ3hZRyTwBNsQ==

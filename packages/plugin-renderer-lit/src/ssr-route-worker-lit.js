@@ -1,6 +1,8 @@
 // this needs to come first
 import { render } from '@lit-labs/ssr/lib/render-with-global-dom-shim.js';
 import { Buffer } from 'buffer';
+import { html } from 'lit';
+import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import { pathToFileURL } from 'url';
 import { Readable } from 'stream';
 import { workerData, parentPort } from 'worker_threads';
@@ -19,29 +21,43 @@ async function getTemplateResultString(template) {
   return await streamToString(Readable.from(render(template)));
 }
 
-async function executeRouteModule({ modulePath, compilation, route, label, id }) {
-  const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(pathToFileURL(modulePath)).then(module => module);
+async function executeRouteModule({ modulePath, compilation, route, label, id, prerender, htmlContents, scripts }) {
   const parsedCompilation = JSON.parse(compilation);
+  const parsedScripts = scripts ? JSON.parse(scripts) : [];
   const data = {
     template: null,
     body: null,
-    frontmatter: null
+    frontmatter: null,
+    html: null
   };
 
-  if (getTemplate) {
-    const templateResult = await getTemplate(parsedCompilation, route);
+  // prerender static content
+  if (prerender) {
+    for (const script of parsedScripts) {
+      await import(script);
+    }
 
-    data.template = await getTemplateResultString(templateResult);
-  }
+    const templateResult = html`${unsafeHTML(htmlContents)}`;
 
-  if (getBody) {
-    const templateResult = await getBody(parsedCompilation, route);
+    data.html = await getTemplateResultString(templateResult);
+  } else {
+    const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(pathToFileURL(modulePath)).then(module => module);
 
-    data.body = await getTemplateResultString(templateResult);
-  }
+    if (getTemplate) {
+      const templateResult = await getTemplate(parsedCompilation, route);
 
-  if (getFrontmatter) {
-    data.frontmatter = await getFrontmatter(parsedCompilation, route, label, id);
+      data.template = await getTemplateResultString(templateResult);
+    }
+
+    if (getBody) {
+      const templateResult = await getBody(parsedCompilation, route);
+
+      data.body = await getTemplateResultString(templateResult);
+    }
+
+    if (getFrontmatter) {
+      data.frontmatter = await getFrontmatter(parsedCompilation, route, label, id);
+    }
   }
 
   parentPort.postMessage(data);
