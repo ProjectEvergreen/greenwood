@@ -1,5 +1,5 @@
 {
-  "name": "plugin-prerender-lit-build-prerender-getting-started",
+  "name": "plugin-prerender-lit-build-default",
   "type": "module",
   "dependencies": {
     "lit": "^2.1.1"
