@@ -50,7 +50,7 @@ export {
   getBody,
   getTemplate
 }
-``` 
+```
 
 #### Frontmatter
 
@@ -75,6 +75,9 @@ async function getFrontmatter(compilation, route) {
   };
 }
 ```
+
+Specifically for SSR routes, you can also provide the following additional options via `data`:
+- `prerender`: After server rendering the route, additionally run the result through Greenwood's prerender (Puppeteer)
 
 > _For defining custom dynamic based metadata, like for `<meta>` tags, use `getTemplate` and define those tags right in your HTML._
 
@@ -180,3 +183,19 @@ src/
 ```
 
 Greenwood will now build and serve all the static content from the _pages/_ directory, BUT will also start a server that will fulfill requests to anything in the _routes/_ directory.  In this case at `http://localhost:8080/users/`!
+
+### Render vs Prerender
+
+Greenwood provides the ability to [prerender](/docs/prerender/) your project and Web Components using Puppeteer.  So what is the difference between that and rendering?   In the context of Greenwood, _rendering_ is the process of generating the _initial_ HTML in a completely static manner intended to be run on a server.  _Prerendering_ is the ability to execute exclusively browser code in a browser and capture that result as static HTML.
+
+So what does that mean, exactly?  Basically, you can think of them as being complimentary, where in you might have server side routes that pull content server side (`getBody`), but can be composed of static HTML templates (in your _src/templates_ directory) that can have client side code (Web Components) with `<script>` tags that could be run after through a headless browser.
+
+The hope with Greenwood is that user's can choose the best blend of server rendering and browser prerendering that fits their projects best because running in a browser unlocks more client side capabilities that will (likely) never be available in a server context, like:
+- `window` / `document` objects
+- Full suite of web component lifecycles
+- import maps
+- Better UX when JS is turned off
+
+So server rendering, when constraints are understood, can be a lot a faster to execute compared to a headless browser.  However, with good caching strategies, the cost of rendering HTML once with either technique (or both), when amortized over all the subsequent requests and responses, usually ends up being neligble in the long run.
+
+> _So we hope users find a workflow that works best for them and see Greenwood as more of a knob or spectrum, rather than a toggle._  ⚙️

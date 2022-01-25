@@ -1,7 +1,7 @@
 {
   "name": "@greenwood/plugin-renderer-lit",
   "version": "0.22.1",
-  "description": "A renderer plugin for Greenwood for Lit based projects.",
+  "description": "A server-side renderering plugin for Lit based Greenwood projects.",
   "type": "module",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-lit",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -9,7 +9,8 @@
   "keywords": [
     "Greenwood",
     "Web Components",
-    "Lit"
+    "Lit",
+    "SSR"
   ],
   "main": "./src/index.js",
   "files": [
@@ -19,12 +20,14 @@
     "access": "public"
   },
   "peerDependencies": {
+    "@greenwood/cli": "^0.22.1",
     "lit": "^2.1.1"
   },
   "dependencies": {
     "@lit-labs/ssr": "^2.0.1"
   },
   "devDependencies": {
+    "@greenwood/cli": "^0.22.1",
     "lit": "^2.1.1"
   }
 }
