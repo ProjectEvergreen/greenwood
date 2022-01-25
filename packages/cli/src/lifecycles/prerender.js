@@ -25,7 +25,7 @@ async function interceptPage(compilation, contents, route) {
     return shouldIntercept
       ? resource.intercept(route, html, headers)
       : htmlPromise;
-  }, Promise.resolve(contents));
+  }, Promise.resolve({ body: contents }));
 
   return htmlIntercepted;
 }
@@ -115,7 +115,6 @@ async function preRenderCompilation(compilation) {
       console.debug('pages to render', `\n ${pages.map(page => page.route).join('\n ')}`);
   
       if (customPrerender.prerender) {
-        console.debug('use users custom renderer for prerendering!!!!!');
         for (const page of pages) {
           const { outputPath, route } = page;
           const outputPathDir = path.join(outputDir, route);
@@ -127,7 +126,7 @@ async function preRenderCompilation(compilation) {
           let html;
 
           html = (await htmlResource.serve(page.route)).body;
-          // TODO html = await interceptPage(compilation, html, route);
+          html = (await interceptPage(compilation, html, route)).body;
 
           const root = htmlparser.parse(html, {
             script: true,
@@ -139,7 +138,6 @@ async function preRenderCompilation(compilation) {
               return script.getAttribute('type') === 'module'
                 && script.getAttribute('src') && script.getAttribute('src').indexOf('http') < 0;
             }).map(script => {
-              console.debug('src??', `./${script.getAttribute('src').replace(/\.\.\//g, '').replace('./', '')}`);
               return pathToFileURL(path.join(compilation.context.userWorkspace, script.getAttribute('src').replace(/\.\.\//g, '').replace('./', '')));
             });
 
@@ -168,8 +166,7 @@ async function preRenderCompilation(compilation) {
             });
           });
 
-          // TODO html = await optimizePage(compilation, html, route, outputPath, outputDir);
-          // console.debug({ html });
+          html = await optimizePage(compilation, html, route, outputPath, outputDir);
 
           if (!fs.existsSync(outputPathDir)) {
             fs.mkdirSync(outputPathDir, {
@@ -207,11 +204,11 @@ async function staticRenderCompilation(compilation) {
   
   await Promise.all(pages.map(async (page) => {
     const { route, outputPath } = page;
-    let response = await htmlResource.serve(route);
+    let html = (await htmlResource.serve(route)).body;
 
-    response = await interceptPage(compilation, response, route);
+    html = (await interceptPage(compilation, html, route)).body;
+    html = await optimizePage(compilation, html, route, outputPath, scratchDir);
 
-    const html = await optimizePage(compilation, response.body, route, outputPath, scratchDir);
     await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
 
     return Promise.resolve();
