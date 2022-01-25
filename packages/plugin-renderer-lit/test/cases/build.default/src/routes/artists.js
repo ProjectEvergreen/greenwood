@@ -3,10 +3,7 @@ import { html } from 'lit';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import '../components/greeting.js';
 
-// TODO compilation,graph is [] and Lit does not code (console) iand /r =<scriot> tags???
 async function getTemplate(compilation, route) {
-  // const debugData = JSON.stringify(compilation.graph.map(page => page.title));
-
   return html`
     <html>
       <head>

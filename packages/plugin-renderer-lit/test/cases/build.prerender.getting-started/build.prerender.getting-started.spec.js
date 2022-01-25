@@ -145,11 +145,23 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
       ]);
       await runner.runCommand(cliPath, 'build');
     });
-    
-    // TODO index
-    runSmokeTest(['public'], LABEL);
 
-    // TODO remove script tags
+    runSmokeTest(['public', 'index'], LABEL);
+
+    describe('<head> of the page with data-gwd-opt="static" script tags removed', function() {
+      let dom;
+
+      before(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+      });
+
+      it('should have expected footer <h4> tag content in the <body>', function() {
+        const scripTags = dom.window.document.querySelectorAll('body script');
+        
+        expect(scripTags.length).to.be.equal(0);
+      });
+    });
+
     describe('LitElement <app-header> statically rendered into index.html', function() {
       let body;
 
