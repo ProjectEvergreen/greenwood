@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import { html } from 'lit';
+import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import '../components/greeting.js';
 
 export async function getBody() {
@@ -23,7 +24,7 @@ export async function getBody() {
             <tr>
               <td>${id}</td>
               <td>${name}</td>
-              <td>${bio}</td>
+              <td>${unsafeHTML(bio)}</td>
               <td>
                 <a href="http://www.analogstudios.net/artists/${id}" target="_blank">
                   <simple-greeting .name="${name}"></simple-greeting>
@@ -43,9 +44,6 @@ export async function getFrontmatter(compilation, route) {
     template: 'blog',
     menu: 'navigation',
     index: 7,
-    title: `${compilation.config.title} - ${route}`,
-    data: {
-      prerender: true
-    }
+    title: `${compilation.config.title} - ${route}`
   };
 }

@@ -97,7 +97,7 @@ export { getBody };
 
 ### Prerender (experimental)
 
-The plugin provides a setting that can be used to override Greenwood's [default _prerender_](/docs/) which is Puppeteer, and to instead use Lit.
+The plugin provides a setting that can be used to override Greenwood's [default _prerender_](/docs/configuration/#prerender) which is Puppeteer, and to instead use Lit.
 
 ```javascript
 import { greenwoodPluginRendererLit } from '@greenwood/plugin-renderer-lit';

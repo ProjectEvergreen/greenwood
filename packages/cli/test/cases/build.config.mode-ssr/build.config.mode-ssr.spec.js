@@ -185,11 +185,10 @@ describe('Build Greenwood With: ', function() {
         done();
       });
 
-      it('should have two style tags', function() {
+      it('should have one style tags', function() {
         const styles = dom.window.document.querySelectorAll('head > style');
 
-        // two (?) for puppeteer
-        expect(styles.length).to.equal(3);
+        expect(styles.length).to.equal(1);
       });
 
       it('should have three script tags', function() {
@@ -218,13 +217,6 @@ describe('Build Greenwood With: ', function() {
         const rows = dom.window.document.querySelectorAll('body > table tr');
 
         expect(rows.length).to.equal(11);
-      });
-
-      it('should have the expected pre-rendered content for the app-footer', function() {
-        const footer = dom.window.document.querySelectorAll('body > app-footer');
-
-        expect(footer.length).to.equal(1);
-        expect(footer[0].textContent).to.contain('v0.11.1');
       });
 
       it('should have the expected <title> content in the <head>', function() {

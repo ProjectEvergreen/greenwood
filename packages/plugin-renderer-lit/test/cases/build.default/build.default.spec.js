@@ -142,11 +142,13 @@ describe('Build Greenwood With: ', function() {
     runSmokeTest(['public', 'index'], LABEL);
 
     let response = {};
+    let artists = [];
     let dom;
     let aboutPageGraphData;
 
     before(async function() {
       const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
+      artists = JSON.parse(await fs.promises.readFile(new URL('./artists.json', import.meta.url), 'utf-8'));
 
       aboutPageGraphData = graph.filter(page => page.route === '/artists/')[0];
 
@@ -159,8 +161,6 @@ describe('Build Greenwood With: ', function() {
           response = res;
           response.body = body;
           dom = new JSDOM(body);
-
-          // console.debug({body});
 
           resolve();
         });
@@ -201,14 +201,6 @@ describe('Build Greenwood With: ', function() {
         expect(scripts.length).to.equal(0);
       });
 
-      xit('should have expected SSR content from the non module script tag', function() {
-        const scripts = Array.from(dom.window.document.querySelectorAll('head > script'))
-          .filter(tag => !tag.getAttribute('type'));
-
-        expect(scripts.length).to.equal(1);
-        expect(scripts[0].textContent).to.contain('console.log');
-      });
-
       it('should have the expected number of <tr> tags of content', function() {
         const rows = dom.window.document.querySelectorAll('body > table tr');
 
@@ -221,9 +213,9 @@ describe('Build Greenwood With: ', function() {
 
         expect(greetings.length).to.equal(11);
 
-        greetings.forEach((greeting) => {
+        greetings.forEach((greeting, index) => {
           // it should not be the default of Somebody, since real data should be in there
-          expect(greeting.innerHTML).to.not.contain('Hello, <!--lit-part-->Somebody');
+          expect(greeting.innerHTML).to.contain(`Hello, <!--lit-part-->${artists[index].name}`);
         });
       });
 

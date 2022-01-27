@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import fs from 'fs';
 import { html } from 'lit';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import '../components/greeting.js';
@@ -30,7 +30,7 @@ async function getTemplate(compilation, route) {
 }
 
 async function getBody() {
-  const artists = await fetch('http://www.analogstudios.net/api/artists').then(resp => resp.json());
+  const artists = JSON.parse(await fs.promises.readFile(new URL('../../artists.json', import.meta.url), 'utf-8'));
 
   return html`
     <h1>Lit SSR response</h1>

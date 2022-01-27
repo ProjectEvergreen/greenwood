@@ -76,9 +76,6 @@ async function getFrontmatter(compilation, route) {
 }
 ```
 
-Specifically for SSR routes, you can also provide the following additional options via `data`:
-- `prerender`: After server rendering the route, additionally run the result through Greenwood's prerender (Puppeteer)
-
 > _For defining custom dynamic based metadata, like for `<meta>` tags, use `getTemplate` and define those tags right in your HTML._
 
 #### Body
@@ -196,6 +193,6 @@ The hope with Greenwood is that user's can choose the best blend of server rende
 - import maps
 - Better UX when JS is turned off
 
-So server rendering, when constraints are understood, can be a lot a faster to execute compared to a headless browser.  However, with good caching strategies, the cost of rendering HTML once with either technique (or both), when amortized over all the subsequent requests and responses, usually ends up being neligble in the long run.
+So server rendering, when constraints are understood, can be a lot a faster to execute compared to a headless browser.  However, with good caching strategies, the cost of rendering HTML once with either technique, when amortized over all the subsequent requests and responses, usually ends up being neligble in the long run.
 
 > _So we hope users find a workflow that works best for them and see Greenwood as more of a knob or spectrum, rather than a toggle._  ⚙️

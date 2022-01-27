@@ -254,30 +254,23 @@ async function getHybridServer(compilation) {
       })[0];
       let body;
 
-      if (matchingRoute.data.prerender) {
-        const { port } = compilation.config.devServer;
-        const serverAddress = `http://127.0.0.1:${port}`;
+      const interceptResources = compilation.config.plugins.filter((plugin) => {
+        return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      }).filter((provider) => {
+        return provider.shouldIntercept && provider.intercept;
+      });
 
-        body = await browserRunner.serialize(`${serverAddress}${url}`);
-      } else {
-        const interceptResources = compilation.config.plugins.filter((plugin) => {
-          return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
-        }).map((plugin) => {
-          return plugin.provider(compilation);
-        }).filter((provider) => {
-          return provider.shouldIntercept && provider.intercept;
-        });
+      body = (await standardHtmlResource.serve(url)).body;
+      body = (await interceptResources.reduce(async (htmlPromise, resource) => {
+        const html = (await htmlPromise).body;
+        const shouldIntercept = await resource.shouldIntercept(url, html, headers);
 
-        body = (await standardHtmlResource.serve(url)).body;
-        body = (await interceptResources.reduce(async (htmlPromise, resource) => {
-          const html = (await htmlPromise).body;
-          const shouldIntercept = await resource.shouldIntercept(url, html, headers);
-
-          return shouldIntercept
-            ? resource.intercept(url, html, headers)
-            : htmlPromise;
-        }, Promise.resolve({ url, body }))).body;
-      }
+        return shouldIntercept
+          ? resource.intercept(url, html, headers)
+          : htmlPromise;
+      }, Promise.resolve({ url, body }))).body;
 
       const optimizeResources = compilation.config.plugins.filter((plugin) => {
         return plugin.type === 'resource';
