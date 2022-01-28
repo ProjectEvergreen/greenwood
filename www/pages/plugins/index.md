@@ -114,8 +114,14 @@ While each API has its own documentation section on the left sidebar of this pag
 #### Resource Plugins
 [Resource plugins](/plugins/resource/) allow users to interact with the request and response lifecycles of files at a variety of different ways.  These lifecycles provide the ability to do things like introduce new file types, to adding hosted 3rd party scripts to your site.
 
-#### Server Plugins
+#### Renderer Plugins
+[Renderer plugins](/plugins/renderer/) allow developers to choose alternate forms of rendering for server side routes, typically for use with a particular Web Component based library.
+
+#### Rollup Plugins
 [Rollup plugins](/plugins/rollup/) allow providing Rollup plugins directly to Greenwood during the optimization part of the build command.
 
 #### Server Plugins
 [Server plugins](/plugins/server/) allow developers to start and stop custom servers as part of the **serve** lifecycle of Greenwood.  These lifecycles provide the ability to do things like start a GraphQL server, or reverse proy requests to a custom server.
+
+#### Source Plugins
+[Source plugins](/plugins/source/) allow developers to pull in content from external sources (Headless CMS, DB, API, etc) and render that out as content as part of their project.

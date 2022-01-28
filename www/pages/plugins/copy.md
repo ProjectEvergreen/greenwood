@@ -7,7 +7,7 @@ index: 2
 
 ## Copy
 
-The copy plugin allows users to copy files around as part of the [build](/docs/#cli) command.  For example,, Greenwood uses this feature to copy all files in the user's _/assets/_ directory to final output directory automatically.  You can use this plugin to copy single files, or entire directories.
+The copy plugin allows users to copy files around as part of the [build](/docs/#cli) command.  For example, Greenwood uses this feature to copy all files in the user's _/assets/_ directory to final output directory automatically.  You can use this plugin to copy single files, or entire directories.
 
 ## API
 This plugin supports providing an array of "location" objects that can either be files or directories.

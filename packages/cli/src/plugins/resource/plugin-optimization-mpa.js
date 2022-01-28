@@ -33,8 +33,10 @@ class OptimizationMPAResource extends ResourceInterface {
     });
   }
 
-  async shouldOptimize(url) {
-    return Promise.resolve(url !== '404.html' && path.extname(url) === '.html' && this.compilation.config.mode === 'mpa');
+  async shouldOptimize(url, body, headers) {
+    return Promise.resolve(this.compilation.config.mode === 'mpa'
+      && url !== '404.html'
+      && (path.extname(url) === '.html' || (headers.request && headers.request['content-type'].indexOf('text/html') >= 0)));
   }
 
   async optimize(url, body) {

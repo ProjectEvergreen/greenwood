@@ -21,7 +21,7 @@ function commonIndexSpecs(dom, html, label) {
 
     describe('document <html>', function() {
       it('should have an <html> tag with the DOCTYPE attribute', function() {
-        expect(html.indexOf('<!DOCTYPE html>')).to.be.equal(0);
+        expect(html.replace(/<!--*.*-->/, '').indexOf('<!DOCTYPE html>')).to.be.equal(0);
       });
 
       it('should have a <head> tag with the lang attribute on it', function() {

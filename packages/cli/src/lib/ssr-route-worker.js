@@ -1,3 +1,4 @@
+// https://github.com/nodejs/modules/issues/307#issuecomment-858729422
 import { pathToFileURL } from 'url';
 import { workerData, parentPort } from 'worker_threads';
 
