@@ -1,6 +1,6 @@
 /* eslint-disable complexity, max-depth */
 /*
- * 
+ *
  * Manages web standard resource related operations for HTML and markdown.
  * This is a Greenwood default plugin.
  *
@@ -40,7 +40,7 @@ const getPageTemplate = (fullPath, templatesDir, template, contextPlugins = [], 
       ? fs.readFileSync(`${customPluginPageTemplates[0]}/${template}.html`, 'utf-8')
       : fs.readFileSync(`${templatesDir}/${template}.html`, 'utf-8');
   } else if (path.extname(fullPath) === '.html' && fs.existsSync(fullPath)) {
-    // if the page is already HTML, use that as the template, NOT accounting for 404 pages 
+    // if the page is already HTML, use that as the template, NOT accounting for 404 pages
     contents = fs.readFileSync(fullPath, 'utf-8');
   } else if (customPluginDefaultPageTemplates.length > 0 || (!is404Page && fs.existsSync(`${templatesDir}/page.html`))) {
     // else look for default page template from the user
@@ -290,7 +290,7 @@ const getMetaContent = (url, config, contents, ssrFrontmatter = {}) => {
           ? `${value}${url.replace('/', '')}`
           : `${value}${url === '/' ? '' : url}`
         : value;
-        
+
       metaHtml += ` ${key}="${contextualValue}"`;
     }
 
@@ -313,7 +313,7 @@ const getMetaContent = (url, config, contents, ssrFrontmatter = {}) => {
 class StandardHtmlResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    
+
     this.extensions = ['.html', '.md'];
     this.contentType = 'text/html';
   }
@@ -337,6 +337,7 @@ class StandardHtmlResource extends ResourceInterface {
       try {
         const config = Object.assign({}, this.compilation.config);
         const { pagesDir, userTemplatesDir } = this.compilation.context;
+        const { interpolateFrontmatter } = this.compilation.config;
         const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows;
         const isClientSideRoute = this.compilation.graph[0].isSPA;
         const matchingRoute = isClientSideRoute
@@ -350,6 +351,7 @@ class StandardHtmlResource extends ResourceInterface {
         let customImports = [];
         let body = '';
         let template = null;
+        let frontMatter = {};
         let ssrBody;
         let ssrTemplate;
         let ssrFrontmatter;
@@ -358,7 +360,7 @@ class StandardHtmlResource extends ResourceInterface {
         if (matchingRoute.external) {
           template = matchingRoute.template || template;
         }
-        
+
         if (isMarkdownContent) {
           const markdownContents = await fs.promises.readFile(fullPath, 'utf-8');
           const rehypePlugins = [];
@@ -376,6 +378,7 @@ class StandardHtmlResource extends ResourceInterface {
 
           const settings = config.markdown.settings || {};
           const fm = frontmatter(markdownContents);
+
           processedMarkdown = await unified()
             .use(remarkParse, settings) // parse markdown into AST
             .use(remarkFrontmatter) // extract frontmatter from AST
@@ -388,18 +391,18 @@ class StandardHtmlResource extends ResourceInterface {
 
           // configure via frontmatter
           if (fm.attributes) {
-            const { attributes } = fm;
+            frontMatter = fm.attributes;
 
-            if (attributes.title) {
-              config.title = `${config.title} - ${attributes.title}`;
-            }
-  
-            if (attributes.template) {
-              template = attributes.template;
+            if (frontMatter.title) {
+              config.title = `${config.title} - ${frontMatter.title}`;
             }
 
-            if (attributes.imports) {
-              customImports = attributes.imports;
+            if (frontMatter.template) {
+              template = frontMatter.template;
+            }
+
+            if (frontMatter.imports) {
+              customImports = frontMatter.imports;
             }
           }
         }
@@ -462,10 +465,10 @@ class StandardHtmlResource extends ResourceInterface {
           body = ssrTemplate ? ssrTemplate : getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir, ssrTemplate);
         }
 
-        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);       
+        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);
         body = getUserScripts(body, this.compilation.context);
         body = getMetaContent(matchingRoute.route.replace(/\\/g, '/'), config, body, ssrFrontmatter);
-        
+
         if (processedMarkdown) {
           const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
           const ceTest = wrappedCustomElementRegex.test(processedMarkdown.contents);
@@ -483,6 +486,14 @@ class StandardHtmlResource extends ResourceInterface {
           }
 
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
+
+          if (interpolateFrontmatter) {
+            for (const fm in frontMatter) {
+              const interpolatedFrontmatter = '\\$\\{globalThis.page.' + fm + '\\}';
+
+              body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), frontMatter[fm]);
+            }
+          }
         } else if (matchingRoute.external) {
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
         } else if (ssrBody) {
@@ -526,7 +537,7 @@ class StandardHtmlResource extends ResourceInterface {
 
           body = body.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
         }
-    
+
         resolve(body);
       } catch (e) {
         reject(e);
