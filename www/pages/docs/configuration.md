@@ -19,6 +19,7 @@ export default {
     host: 'localhost'
   },
   port: 8080,
+  interpolateFrontmatter: false,
   markdown: {
     plugins: [],
     settings: {}
@@ -53,6 +54,52 @@ export default {
     }
   }
 }
+```
+
+### Interpolate Frontmatter
+
+To support simple static templating in HTML and markdown pages and templates, the `interpolateFrontmatter` option can be set to `true` to allow the following kinds of simple static substitions using a syntax convention based on JavaScript [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
+
+#### Example
+Given some frontmatter in a markdown file:
+```md
+---
+template: post
+title: Git Explorer
+published: 04.07.2020
+description: Local git repository viewer
+author: Owen Buckley
+image: /assets/blog-post-images/git.png
+---
+```
+
+It can be accessed and substited statically in either markdown or HTML.
+
+##### Markdown
+```md
+# My Blog Post
+
+Published: ${globalThis.page.published}
+
+Lorum Ipsum.
+```
+
+##### HTML
+```html
+<html>
+  <head>
+    <title>My Blog - ${globalThis.page.title}</title>
+    <meta name="author" content="${globalThis.page.author}">
+    <meta property="og:title" content="My Blog">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.myblog.dev">
+    <meta property="og:image" content="https://www.myblog.dev/${globalThis.page.image}">
+    <meta property="og:description" content="My Blog - ${globalThis.page.description}">
+  </head>
+  <body>
+    ...
+  </body>
+</html>
 ```
 
 ### Markdown
