@@ -3,7 +3,7 @@ import fs from 'fs';
 import fm from 'front-matter';
 import path from 'path';
 import toc from 'markdown-toc';
-import { pathToFileURL } from 'url';
+import { Worker } from 'worker_threads';
 
 const generateGraph = async (compilation) => {
 
@@ -29,7 +29,7 @@ const generateGraph = async (compilation) => {
           if (fs.statSync(fullPath).isDirectory()) {
             routes = await walkDirectoryForRoutes(fullPath, routes);
           } else {
-            const { getFrontmatter } = await import(pathToFileURL(fullPath));
+            const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
             const relativePagePath = fullPath.substring(routesDir.length - 1, fullPath.length);
             const id = filename.split(path.sep)[filename.split(path.sep).length - 1].replace('.js', '');
             const label = id.split('-')
@@ -44,21 +44,35 @@ const generateGraph = async (compilation) => {
             let title = `${compilation.config.title} - ${label}`;
             let customData = {};
             let imports = [];
+            let ssrFrontmatter;
 
-            if (getFrontmatter) {
-              const ssrFmData = await getFrontmatter(compilation, route, label, id);
+            await new Promise((resolve, reject) => {
+              const worker = new Worker(routeWorkerUrl, {
+                workerData: {
+                  modulePath: fullPath,
+                  compilation: JSON.stringify(compilation),
+                  route
+                }
+              });
+              worker.on('message', (result) => {
+                if (result.frontmatter) {
+                  ssrFrontmatter = result.frontmatter;
+                }
+                resolve();
+              });
+              worker.on('error', reject);
+              worker.on('exit', (code) => {
+                if (code !== 0) {
+                  reject(new Error(`Worker stopped with exit code ${code}`));
+                }
+              });
+            });
 
-              template = ssrFmData.template ? ssrFmData.template : template;
-              title = ssrFmData.title ? ssrFmData.title : title;
-              imports = ssrFmData.imports ? ssrFmData.imports : imports;
-              customData = ssrFmData.data ? ssrFmData.data : customData;
-
-              // prune "reserved" attributes that are supported by Greenwood
-              // https://www.greenwoodjs.io/docs/front-matter
-              delete ssrFmData.label;
-              delete ssrFmData.imports;
-              delete ssrFmData.title;
-              delete ssrFmData.template;
+            if (ssrFrontmatter) {
+              template = ssrFrontmatter.template || template;
+              title = ssrFrontmatter.title || title;
+              imports = ssrFrontmatter.imports || imports;
+              customData = ssrFrontmatter.data || customData;
 
               /* Menu Query
                * Custom front matter - Variable Definitions
@@ -68,8 +82,8 @@ const generateGraph = async (compilation) => {
                * linkheadings: flag to tell us where to add page's table of contents as menu items
                * tableOfContents: json object containing page's table of contents(list of headings)
                */
-              customData.menu = ssrFmData.menu || '';
-              customData.index = ssrFmData.index || '';
+              customData.menu = ssrFrontmatter.menu || '';
+              customData.index = ssrFrontmatter.index || '';
             }
 
             /*

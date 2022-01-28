@@ -10,7 +10,7 @@
   "dependencies": {
     "@evergreen-wc/eve-button": "^0.1.1",
     "@evergreen-wc/eve-container": "^0.1.1",
-    "lit": "^2.0.0",
+    "lit": "^2.1.1",
     "prismjs": "^1.21.0"
   },
   "devDependencies": {

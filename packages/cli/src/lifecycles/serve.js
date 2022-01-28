@@ -234,47 +234,75 @@ async function getHybridServer(compilation) {
   }
 
   app.use(async (ctx) => {
-    const { routesDir } = compilation.context;
     const { mode } = compilation.config;
     const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
+    const matchingRoute = compilation.graph.filter((node) => {
+      return node.route === url;
+    })[0] || { data: {} };
 
-    if (url.endsWith('/') && mode === 'ssr') {
-      if (fs.existsSync(path.join(routesDir, `${url.replace(/\//g, '')}.js`))) {
-        const standardHtmlResource = compilation.config.plugins.filter((plugin) => {
-          return plugin.isGreenwoodDefaultPlugin
-            && plugin.type === 'resource'
-            && plugin.name.indexOf('plugin-standard-html') === 0;
-        }).map((plugin) => {
-          return plugin.provider(compilation);
-        })[0];
-        let body = '';
+    if (mode === 'ssr' && matchingRoute.isSSR) {
+      const headers = {
+        request: { 'accept': 'text/html', 'content-type': 'text/html' },
+        response: { 'content-type': 'text/html' }
+      };
+      const standardHtmlResource = compilation.config.plugins.filter((plugin) => {
+        return plugin.isGreenwoodDefaultPlugin
+          && plugin.type === 'resource'
+          && plugin.name.indexOf('plugin-standard-html') === 0;
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      })[0];
+      let body;
 
-        if (prerender) {
-          const { port } = compilation.config.devServer;
-          const serverAddress = `http://127.0.0.1:${port}`;
+      const interceptResources = compilation.config.plugins.filter((plugin) => {
+        return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      }).filter((provider) => {
+        return provider.shouldIntercept && provider.intercept;
+      });
 
-          body = await browserRunner.serialize(`${serverAddress}${url}`);
-        } else {
-          body = await standardHtmlResource.serve(url);
-        }
+      body = (await standardHtmlResource.serve(url)).body;
+      body = (await interceptResources.reduce(async (htmlPromise, resource) => {
+        const html = (await htmlPromise).body;
+        const shouldIntercept = await resource.shouldIntercept(url, html, headers);
 
-        body = await standardHtmlResource.optimize(null, body);
+        return shouldIntercept
+          ? resource.intercept(url, html, headers)
+          : htmlPromise;
+      }, Promise.resolve({ url, body }))).body;
 
-        await fs.promises.mkdir(path.join(compilation.context.scratchDir, url), { recursive: true });
-        await fs.promises.writeFile(path.join(compilation.context.scratchDir, url, 'index.html'), body);
+      const optimizeResources = compilation.config.plugins.filter((plugin) => {
+        return plugin.type === 'resource';
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      }).filter((provider) => {
+        return provider.shouldOptimize && provider.optimize;
+      });
 
-        compilation.graph = compilation.graph.filter(page => page.isSSR && page.route === url);
+      body = await optimizeResources.reduce(async (htmlPromise, resource) => {
+        const html = await htmlPromise;
+        const shouldOptimize = await resource.shouldOptimize(url, html, headers);
 
-        const rollupConfigs = await getRollupConfig(compilation);
-        const bundle = await rollup(rollupConfigs[0]);  
-        await bundle.write(rollupConfigs[0].output);
+        return shouldOptimize
+          ? resource.optimize(url, html, headers)
+          : Promise.resolve(html);
+      }, Promise.resolve(body));
 
-        body = await fs.promises.readFile(path.join(compilation.context.outputDir, url, 'index.html'), 'utf-8');
+      await fs.promises.mkdir(path.join(compilation.context.scratchDir, url), { recursive: true });
+      await fs.promises.writeFile(path.join(compilation.context.scratchDir, url, 'index.html'), body);
 
-        ctx.status = 200;
-        ctx.set('content-type', 'text/html');
-        ctx.body = body;
-      }
+      compilation.graph = compilation.graph.filter(page => page.isSSR && page.route === url);
+
+      const rollupConfigs = await getRollupConfig(compilation);
+      const bundle = await rollup(rollupConfigs[0]);
+      await bundle.write(rollupConfigs[0].output);
+
+      body = await fs.promises.readFile(path.join(compilation.context.outputDir, url, 'index.html'), 'utf-8');
+
+      ctx.status = 200;
+      ctx.set('content-type', 'text/html');
+      ctx.body = body;
     }
   });
 

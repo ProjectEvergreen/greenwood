@@ -4,6 +4,7 @@ import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
 import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
 import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
+import { greenwoodPluginRendererLit } from '@greenwood/plugin-renderer-lit';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 import { fileURLToPath, URL } from 'url';
 
@@ -12,7 +13,7 @@ const FAVICON_HREF = '/favicon.ico';
 
 export default {
   workspace: fileURLToPath(new URL('./www', import.meta.url)),
-  mode: 'ssr',
+  mode: 'mpa',
   optimization: 'inline',
   title: 'Greenwood',
   meta: [
@@ -46,7 +47,8 @@ export default {
         ];
       }
     },
-    ...greenwoodPluginIncludeHTML()
+    ...greenwoodPluginIncludeHTML(),
+    greenwoodPluginRendererLit()
   ],
   markdown: {
     plugins: [

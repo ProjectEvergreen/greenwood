@@ -16,7 +16,7 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import unified from 'unified';
-import { pathToFileURL, fileURLToPath } from 'url';
+import { fileURLToPath } from 'url';
 import { Worker } from 'worker_threads';
 
 function getCustomPageTemplates(contextPlugins, templateName) {
@@ -346,7 +346,7 @@ class StandardHtmlResource extends ResourceInterface {
           })[0];
         const fullPath = !matchingRoute.external ? matchingRoute.path : '';
         const isMarkdownContent = path.extname(fullPath) === '.md';
-        const isServerSideRoute = this.compilation.config.mode === 'ssr' && fs.existsSync(path.join(routesDir, `${url.replace(/\//g, '')}.js`));
+        const isServerSideRoute = this.compilation.config.mode === 'ssr' && matchingRoute.isSSR;
 
         let customImports = [];
         let body = '';
@@ -406,56 +406,48 @@ class StandardHtmlResource extends ResourceInterface {
         }
 
         if (isServerSideRoute) {
-          const routeLocation = path.join(routesDir, `${url.replace(/\//g, '')}.js`);
+          const routeModuleLocation = path.join(routesDir, matchingRoute.filename);
+          const routeWorkerUrl = this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
 
-          if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
-            // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
-            await new Promise((resolve, reject) => {
-              const worker = new Worker(new URL('../../lib/ssr-route-worker.js', import.meta.url), {
-                workerData: {
-                  modulePath: routeLocation,
-                  compilation: JSON.stringify(this.compilation),
-                  route: fullPath
-                }
-              });
-              worker.on('message', (result) => {
-                if (result.template) {
-                  ssrTemplate = result.template;
-                }
-                if (result.body) {
-                  ssrBody = result.body;
-                }
-                if (result.metadata) {
-                  ssrMetadata = result.metadata;
-                }
-                resolve();
-              });
-              worker.on('error', reject);
-              worker.on('exit', (code) => {
-                if (code !== 0) {
-                  reject(new Error(`Worker stopped with exit code ${code}`));
-                }
-              });
-            });
-          } else {
-            const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(pathToFileURL(routeLocation));
-
-            if (getTemplate) {
-              ssrTemplate = await getTemplate(this.compilation, url);
-            }
-
-            if (getBody) {
-              ssrBody = await getBody(this.compilation, url);
-            }
-
-            if (getFrontmatter) {
-              ssrFrontmatter = await getFrontmatter(this.compilation, url);
-
-              if (ssrFrontmatter.imports) {
-                customImports = customImports.concat(ssrFrontmatter.imports);
+          await new Promise((resolve, reject) => {
+            const worker = new Worker(routeWorkerUrl, {
+              workerData: {
+                modulePath: routeModuleLocation,
+                compilation: JSON.stringify(this.compilation),
+                route: fullPath
               }
-            }
-          }
+            });
+            worker.on('message', (result) => {
+              if (result.template) {
+                ssrTemplate = result.template;
+              }
+              if (result.body) {
+                ssrBody = result.body;
+              }
+              if (result.frontmatter) {
+                ssrFrontmatter = result.frontmatter;
+
+                if (ssrFrontmatter.title) {
+                  config.title = `${config.title} - ${ssrFrontmatter.title}`;
+                }
+
+                if (ssrFrontmatter.template) {
+                  template = ssrFrontmatter.template;
+                }
+
+                if (ssrFrontmatter.imports) {
+                  customImports = customImports.concat(ssrFrontmatter.imports);
+                }
+              }
+              resolve();
+            });
+            worker.on('error', reject);
+            worker.on('exit', (code) => {
+              if (code !== 0) {
+                reject(new Error(`Worker stopped with exit code ${code}`));
+              }
+            });
+          });
         }
 
         // get context plugins
@@ -515,8 +507,8 @@ class StandardHtmlResource extends ResourceInterface {
     });
   }
 
-  async shouldOptimize(url) {
-    return Promise.resolve(path.extname(url) === '.html');
+  async shouldOptimize(url = '', body, headers = {}) {
+    return Promise.resolve(path.extname(url) === '.html' || (headers.request && headers.request['content-type'].indexOf('text/html') >= 0));
   }
 
   async optimize(url, body) {

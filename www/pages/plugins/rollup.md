@@ -2,7 +2,7 @@
 label: 'Rollup'
 menu: side
 title: 'Rollup'
-index: 4
+index: 5
 ---
 
 ## Rollup
@@ -16,7 +16,7 @@ Install your favorite rollup plugin(s), then create a simple object to provide t
 import bannerRollup = from 'rollup-plugin-banner';
 import fs from 'fs';
 
-const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8')); 
+const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));
 
 export function myRollupPlugin(options = {}) {
   const now = new Date().now();

@@ -79,13 +79,13 @@ class ResourceInterface {
   // ex: add a "banner" to all .js files with a timestamp of the build, or minifying files
   // return true | false
   // eslint-disable-next-line no-unused-vars
-  async shouldOptimize(url, body) {
+  async shouldOptimize(url, body, headers) {
     return Promise.resolve(false);
   }
 
   // return the new body
   // eslint-disable-next-line no-unused-vars
-  async optimize (url, body) {
+  async optimize (url, body, headers) {
     return Promise.resolve(body);
   }
 }

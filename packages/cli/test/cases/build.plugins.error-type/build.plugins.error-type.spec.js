@@ -43,11 +43,13 @@ describe('Build Greenwood With: ', function() {
 
   describe('Custom Configuration with a bad value for plugin type', function() {
     it('should throw an error that plugin.type is not a valid value', async function() {
+      const pluginTypes = ['copy', 'context', 'resource', 'rollup', 'server', 'source', 'renderer'];
+
       try {
         await runner.setup(outputPath);
         await runner.runCommand(cliPath, 'build');
       } catch (err) {
-        expect(err).to.contain('Error: greenwood.config.js plugins must be one of type "copy, context, resource, rollup, server, source". got "indexxx" instead.');
+        expect(err).to.contain(`Error: greenwood.config.js plugins must be one of type "${pluginTypes.join(', ')}". got "indexxx" instead.`);
       }
     });
   });
