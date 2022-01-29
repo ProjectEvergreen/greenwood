@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-polyfills",
-  "version": "0.22.1",
+  "version": "0.23.0-alpha.0",
   "description": "A Greenwood plugin adding support for Web Component related polyfills like Custom Elements and Shadow DOM.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-polyfills",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -26,6 +26,6 @@
     "@webcomponents/webcomponentsjs": "^2.6.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.22.1"
+    "@greenwood/cli": "^0.23.0-alpha.0"
   }
 }
