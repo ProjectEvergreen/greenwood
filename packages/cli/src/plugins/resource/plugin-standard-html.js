@@ -324,7 +324,7 @@ class StandardHtmlResource extends ResourceInterface {
 
   async shouldServe(url, headers) {
     const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows
-    const isClientSideRoute = this.compilation.config.mode === 'spa' && path.extname(url) === '' && (headers.request.accept || '').indexOf(this.contentType) >= 0;
+    const isClientSideRoute = this.compilation.graph[0].isSPA && path.extname(url) === '' && (headers.request.accept || '').indexOf(this.contentType) >= 0;
     const hasMatchingRoute = this.compilation.graph.filter((node) => {
       return node.route === relativeUrl;
     }).length === 1;
@@ -337,9 +337,9 @@ class StandardHtmlResource extends ResourceInterface {
       try {
         const config = Object.assign({}, this.compilation.config);
         const { pagesDir, userTemplatesDir } = this.compilation.context;
-        const { mode } = this.compilation.config;
         const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows;
-        const matchingRoute = mode === 'spa'
+        const isClientSideRoute = this.compilation.graph[0].isSPA;
+        const matchingRoute = isClientSideRoute
           ? this.compilation.graph[0]
           : this.compilation.graph.filter((node) => {
             return node.route === relativeUrl;
@@ -456,7 +456,7 @@ class StandardHtmlResource extends ResourceInterface {
           return plugin.provider(this.compilation);
         });
 
-        if (mode === 'spa') {
+        if (isClientSideRoute) {
           body = fs.readFileSync(fullPath, 'utf-8');
         } else {
           body = ssrTemplate ? ssrTemplate : getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir, ssrTemplate);

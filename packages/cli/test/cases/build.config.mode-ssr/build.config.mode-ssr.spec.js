@@ -33,7 +33,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom Mode SSR';
+  const LABEL = 'A Server Rendered Application (SSR)';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://127.0.0.1:8080';

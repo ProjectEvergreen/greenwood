@@ -1,17 +1,15 @@
 /*
  * Use Case
- * Run Greenwood develop command with SPA mode setting.
+ * Run Greenwood develop command for SPA based project.
  *
  * User Result
- * Should start the development server in SPA mode with client side routing support.
+ * Should start the development server for a SPA with client side routing support.
  *
  * User Command
  * greenwood develop
  *
  * User Config
- * {
- *   mode: 'spa'
- * }
+ * {}
  *
  * User Workspace
  * src/
@@ -35,8 +33,8 @@ function removeWhiteSpace(string = '') {
     .replace(/ /g, '');
 }
 
-xdescribe('Develop Greenwood With: ', function() {
-  const LABEL = 'SPA Mode';
+describe('Develop Greenwood With: ', function() {
+  const LABEL = 'A Single Page Application (SPA)';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://localhost';

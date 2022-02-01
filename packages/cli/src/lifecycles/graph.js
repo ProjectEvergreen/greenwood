@@ -9,7 +9,7 @@ const generateGraph = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const { context, config } = compilation;
+      const { context } = compilation;
       const { pagesDir, userWorkspace } = context;
       let graph = [{
         outputPath: 'index.html',
@@ -215,10 +215,11 @@ const generateGraph = async (compilation) => {
       };
 
       console.debug('building from local sources...');
-      if (config.mode === 'spa') {
+      if (fs.existsSync(path.join(userWorkspace, 'index.html'))) { // SPA
         graph = [{
           ...graph[0],
-          path: `${userWorkspace}${path.sep}index.html`
+          path: `${userWorkspace}${path.sep}index.html`,
+          isSPA: true
         }];
       } else {
         const oldGraph = graph[0];

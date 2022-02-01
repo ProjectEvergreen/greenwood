@@ -58,7 +58,7 @@ const readAndMergeConfig = async() => {
       
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = (await import(pathToFileURL(path.join(process.cwd(), 'greenwood.config.js')))).default;
-        const { workspace, devServer, title, markdown, meta, mode, optimization, plugins, prerender, pagesDirectory, templatesDirectory } = userCfgFile;
+        const { workspace, devServer, title, markdown, meta, optimization, plugins, prerender, staticRouter, pagesDirectory, templatesDirectory } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -168,19 +168,6 @@ const readAndMergeConfig = async() => {
           customConfig.markdown.settings = markdown.settings ? markdown.settings : {};
         }
 
-        if (prerender !== undefined) {
-          if (typeof prerender === 'boolean') {
-            customConfig.prerender = prerender;
-          } else {
-            reject(`Error: greenwood.config.js prerender must be a boolean; true or false.  Passed value was typeof: ${typeof prerender}`);
-          }
-        }
-        
-        // SPA should _not_ prerender if user has specified prerender should be true
-        if (prerender === undefined && mode === 'spa') {
-          customConfig.prerender = false;
-        }
-
         if (pagesDirectory && typeof pagesDirectory === 'string') {
           customConfig.pagesDirectory = pagesDirectory;
         } else if (pagesDirectory) {
@@ -191,6 +178,27 @@ const readAndMergeConfig = async() => {
           customConfig.templatesDirectory = templatesDirectory;
         } else if (templatesDirectory) {
           reject(`Error: provided templatesDirectory "${templatesDirectory}" is not supported.  Please make sure to pass something like 'layouts/'`);
+        }
+
+        if (prerender !== undefined) {
+          if (typeof prerender === 'boolean') {
+            customConfig.prerender = prerender;
+          } else {
+            reject(`Error: greenwood.config.js prerender must be a boolean; true or false.  Passed value was typeof: ${typeof prerender}`);
+          }
+        }
+
+        // SPA should _not_ prerender unless if user has specified prerender should be true
+        if (prerender === undefined && fs.existsSync(path.join(customConfig.workspace, 'index.html'))) {
+          customConfig.prerender = false;
+        }
+
+        if (staticRouter !== undefined) {
+          if (typeof staticRouter === 'boolean') {
+            customConfig.staticRouter = staticRouter;
+          } else {
+            reject(`Error: greenwood.config.js staticRouter must be a boolean; true or false.  Passed value was typeof: ${typeof staticRouter}`);
+          }
         }
       }
 

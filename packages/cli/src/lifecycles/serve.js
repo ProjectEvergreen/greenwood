@@ -139,13 +139,12 @@ async function getStaticServer(compilation, composable) {
   });
 
   app.use(async (ctx, next) => {
-    const { outputDir } = compilation.context;
-    const { mode } = compilation.config;
+    const { outputDir, userWorkspace } = compilation.context;
     const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
 
     // only handle static output routes, eg. public/about.html
     if (url.endsWith('/') || url.endsWith('.html')) {
-      const barePath = mode === 'spa'
+      const barePath = fs.existsSync(path.join(userWorkspace, 'index.html')) // SPA
         ? 'index.html'
         : url.endsWith('/')
           ? path.join(url, 'index.html')

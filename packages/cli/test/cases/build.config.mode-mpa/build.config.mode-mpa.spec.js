@@ -1,16 +1,16 @@
 /*
  * Use Case
- * Run Greenwood with mode setting in Greenwood config set to mpa.
+ * Run Greenwood with staticRouter setting in Greenwood to enable MPA like routing.
  *
  * User Result
- * Should generate a bare bones Greenwood build with bundle JavaScript and routes.
+ * Should generate a bare bones Greenwood build with support for static router navigation.
  *
  * User Command
  * greenwood build
  *
  * User Config
  * {
- *   mode: 'mpa'
+ *   staticRouter: true
  * }
  *
  * User Workspace
@@ -32,8 +32,8 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-xdescribe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom Mode MPA';
+describe('Build Greenwood With: ', function() {
+  const LABEL = 'Static Router';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
