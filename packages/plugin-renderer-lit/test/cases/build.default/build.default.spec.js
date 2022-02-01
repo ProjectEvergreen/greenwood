@@ -30,7 +30,6 @@ import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import request from 'request';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -138,8 +137,6 @@ describe('Build Greenwood With: ', function() {
         await runner.runCommand(cliPath, 'serve');
       });
     });
-
-    runSmokeTest(['public', 'index'], LABEL);
 
     let response = {};
     let artists = [];

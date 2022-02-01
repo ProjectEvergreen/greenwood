@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with mode setting in Greenwood config set to ssr.
+ * Run Greenwood with an SSR route.
  *
  * User Result
  * Should generate a bare bones Greenwood build for hosting a server rendered application.
@@ -9,15 +9,13 @@
  * greenwood build
  *
  * User Config
- * {
- *   mode: 'ssr'
- * }
+ * None
  *
  * User Workspace
  *  src/
  *   components/
  *     footer.js
- *   routes/
+ *   pages/
  *     artists.js
  *   templates/
  *     app.html

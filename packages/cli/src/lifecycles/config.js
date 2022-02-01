@@ -30,7 +30,6 @@ const greenwoodPlugins = (await Promise.all([
   };
 });
 
-const modes = ['ssg', 'mpa', 'spa', 'ssr'];
 const optimizations = ['default', 'none', 'static', 'inline'];
 const pluginTypes = ['copy', 'context', 'resource', 'rollup', 'server', 'source', 'renderer'];
 const defaultConfig = {
@@ -40,7 +39,6 @@ const defaultConfig = {
     port: 1984,
     extensions: []
   },
-  mode: modes[0],
   optimization: optimizations[0],
   title: 'My App',
   meta: [],
@@ -48,8 +46,7 @@ const defaultConfig = {
   markdown: { plugins: [], settings: {} },
   prerender: true,
   pagesDirectory: 'pages',
-  templatesDirectory: 'templates',
-  routesDirectory: 'routes'
+  templatesDirectory: 'templates'
 };
 
 const readAndMergeConfig = async() => {
@@ -97,12 +94,6 @@ const readAndMergeConfig = async() => {
 
         if (meta && meta.length > 0) {
           customConfig.meta = meta;
-        }
-
-        if (typeof mode === 'string' && modes.indexOf(mode.toLowerCase()) >= 0) {
-          customConfig.mode = mode;
-        } else if (mode) {
-          reject(`Error: provided mode "${mode}" is not supported.  Please use one of: ${modes.join(', ')}.`);
         }
 
         if (typeof optimization === 'string' && optimizations.indexOf(optimization.toLowerCase()) >= 0) {

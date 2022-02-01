@@ -336,7 +336,7 @@ class StandardHtmlResource extends ResourceInterface {
     return new Promise(async (resolve, reject) => {
       try {
         const config = Object.assign({}, this.compilation.config);
-        const { pagesDir, routesDir, userTemplatesDir } = this.compilation.context;
+        const { pagesDir, userTemplatesDir } = this.compilation.context;
         const { mode } = this.compilation.config;
         const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows;
         const matchingRoute = mode === 'spa'
@@ -346,7 +346,6 @@ class StandardHtmlResource extends ResourceInterface {
           })[0];
         const fullPath = !matchingRoute.external ? matchingRoute.path : '';
         const isMarkdownContent = path.extname(fullPath) === '.md';
-        const isServerSideRoute = this.compilation.config.mode === 'ssr' && matchingRoute.isSSR;
 
         let customImports = [];
         let body = '';
@@ -405,8 +404,8 @@ class StandardHtmlResource extends ResourceInterface {
           }
         }
 
-        if (isServerSideRoute) {
-          const routeModuleLocation = path.join(routesDir, matchingRoute.filename);
+        if (matchingRoute.isSSR) {
+          const routeModuleLocation = path.join(pagesDir, matchingRoute.filename);
           const routeWorkerUrl = this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
 
           await new Promise((resolve, reject) => {

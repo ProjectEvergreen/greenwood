@@ -35,7 +35,7 @@ function removeWhiteSpace(string = '') {
     .replace(/ /g, '');
 }
 
-describe('Develop Greenwood With: ', function() {
+xdescribe('Develop Greenwood With: ', function() {
   const LABEL = 'SPA Mode';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));

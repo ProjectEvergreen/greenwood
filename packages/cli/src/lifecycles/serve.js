@@ -234,13 +234,12 @@ async function getHybridServer(compilation) {
   }
 
   app.use(async (ctx) => {
-    const { mode } = compilation.config;
     const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
     const matchingRoute = compilation.graph.filter((node) => {
       return node.route === url;
     })[0] || { data: {} };
 
-    if (mode === 'ssr' && matchingRoute.isSSR) {
+    if (matchingRoute.isSSR) {
       const headers = {
         request: { 'accept': 'text/html', 'content-type': 'text/html' },
         response: { 'content-type': 'text/html' }
