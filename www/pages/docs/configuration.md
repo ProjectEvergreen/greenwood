@@ -23,7 +23,7 @@ export default {
     settings: {}
   },
   meta: [],
-  mode: 'ssg',
+  staticRouter: false,
   optimization: 'default',
   plugins: [],
   title: 'My App',
@@ -110,24 +110,6 @@ Which would be equivalent to:
 <link rel="icon" href="/assets/favicon.ico">
 ```
 
-### Mode
-
-Greenwood provides a couple different "modes" by which you can indicate the type of project your are making:
-
-| Option | Description | Use Cases |
-| ------ | ----------- | --------- |
-|`ssg` | (_Default_) Generates a pre-rendered statically generated website from [pages and templates](/docs/layouts/)at build time. | Blog, portfolio, anything really! |
-|`mpa` | Assumes an `ssg` based site, but additionally adds a client side router to create a _Multi Page Application_. | Any `ssg` based site where content lines up well with templates to help with transition between similar pages, like blogs and documentation sites. |
-|`spa` | For building and bundling a _Single Page Application (SPA)_ with client side routing and a [single _index.html_ file](/docs/layouts/#single-page-applications). | Any type of client side only rendered application. |
-|`ssr` | For building and serving a project with [server rendered routes](/docs/server-rendering/), and can also support building static pages. | Any server rendered context for dynamic content. |
-
-#### Example
-```js
-export default {
-  mode: 'mpa'
-}
-```
-
 ### Optimization
 
 Greenwood provides a number of different ways to send hints to Greenwood as to how JavaScript and CSS tags in your HTML should get loaded by the browser.  Greenwood supplements, and builds up on top of existing [resource "hints" like `preload` and `prefetch`](https://developer.mozilla.org/en-US/docs/Web/HTML/Preloading_content).  These optimization settings are intended to compliment any `mode` setting you may have selected.
@@ -177,7 +159,7 @@ export default {
 
 By default, [Greenwood pre-renders](/about/how-it-works/) all your _runtime_ JavaScript (Web Components, GraphQL calls, etc) across all your pages and captures the output as part of the final built HTML output.  This means you can have ["static" components](/docs/configuration/#optimization) that can just render once and generate all their initial HTML at build time.  This aims to provide a fully complete HTML document to the user, so even if JavaScript is disabled or something breaks in their browser, the user gets all the initial content.  And from there, progessive enhancement can take over.
 
-_However_, you may not need that, like for a [SPA (Single Page Application)](/docs/configuration#mode).  If you _don't_ want any sort of pre-rendering and just want to render out your markdown / HTML, add this setting to your _greenwood.config.js_ and set it to `false`.
+_However_, you may not need that, like for a [SPA (Single Page Application)](/docs/layouts/#single-page-applications).  If you _don't_ want any sort of pre-rendering and just want to render out your markdown / HTML as is, add this setting to your _greenwood.config.js_ and set it to `false`.
 
 #### Example
 ```js
@@ -187,6 +169,19 @@ export default {
 ```
 
 > _**As of now, if you are using [plugin-graphql](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql) you cannot change this setting.**  We are working on improving support for server [side rendering and templating](https://github.com/ProjectEvergreen/greenwood/discussions/576) (with Web Components) as part of our [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3)._
+
+### Static Router
+
+Setting the `staticRouter` option to `true` will add a small router runtime in production for static pages to provent needing full page reloads when navigation between pages that share a template.  For example, the Greenwood website is entirely static, outputting an HTML file per page however, if you navigate from the _Docs_ page to the _Getting Started_ page, you will notice the site does not require a full page load.  Instead, the router will just swap out the content of the page much like client-side SPA router would.  This technique is similar to how projects like [**pjax**](https://github.com/defunkt/jquery-pjax) and [**Turbolinks**](https://github.com/turbolinks/turbolinks) work, and like what you can see on websites like GitHub.
+
+
+#### Example
+
+```js
+export default {
+  staticRouter: true
+}
+```
 
 ### Templates Directory
 
