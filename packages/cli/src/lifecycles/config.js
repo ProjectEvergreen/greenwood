@@ -7,7 +7,7 @@ import { fileURLToPath, pathToFileURL, URL } from 'url';
 const greenwoodPluginsBasePath = fileURLToPath(new URL('../plugins', import.meta.url));
 
 const greenwoodPlugins = (await Promise.all([
-  path.join(greenwoodPluginsBasePath, 'copy'),  
+  path.join(greenwoodPluginsBasePath, 'copy'),
   path.join(greenwoodPluginsBasePath, 'renderer'),
   path.join(greenwoodPluginsBasePath, 'resource'),
   path.join(greenwoodPluginsBasePath, 'server')
@@ -39,6 +39,7 @@ const defaultConfig = {
     port: 1984,
     extensions: []
   },
+  port: 8080,
   optimization: optimizations[0],
   title: 'My App',
   meta: [],
@@ -55,10 +56,10 @@ const readAndMergeConfig = async() => {
     try {
       // deep clone of default config
       let customConfig = Object.assign({}, defaultConfig);
-      
+
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = (await import(pathToFileURL(path.join(process.cwd(), 'greenwood.config.js')))).default;
-        const { workspace, devServer, title, markdown, meta, optimization, plugins, prerender, staticRouter, pagesDirectory, templatesDirectory } = userCfgFile;
+        const { workspace, devServer, title, markdown, meta, optimization, plugins, port, prerender, staticRouter, pagesDirectory, templatesDirectory } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -166,6 +167,15 @@ const readAndMergeConfig = async() => {
         if (markdown && Object.keys(markdown).length > 0) {
           customConfig.markdown.plugins = markdown.plugins && markdown.plugins.length > 0 ? markdown.plugins : [];
           customConfig.markdown.settings = markdown.settings ? markdown.settings : {};
+        }
+
+        if (port) {
+          // eslint-disable-next-line max-depth
+          if (!Number.isInteger(port)) {
+            reject(`Error: greenwood.config.js port must be an integer.  Passed value was: ${port}`);
+          } else {
+            customConfig.port = port;
+          }
         }
 
         if (pagesDirectory && typeof pagesDirectory === 'string') {

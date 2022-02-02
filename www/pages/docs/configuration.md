@@ -18,6 +18,7 @@ export default {
     port: 1984,
     host: 'localhost'
   },
+  port: 8080,
   markdown: {
     plugins: [],
     settings: {}
@@ -45,7 +46,7 @@ Configuration for Greenwood's development server is available using the `devServ
 export default {
   devServer: {
     extensions: ['.txt', '.rtf'],
-    port: 8181,
+    port: 3000,
     proxy: {
       '/api': 'https://stage.myapp.com',
       '/api/foo': 'https://foo.otherdomain.net'
@@ -152,6 +153,16 @@ By default the directory Greenwood will use to look for your local content is _p
 ```js
 export default {
   pagesDirectory: 'docs' // Greenwood will look for pages at src/docs/
+}
+```
+
+### Port
+Unlike the port option for `devServer` configuration, this option allows you to configure the port that your production server will run on when running `greenwood serve`.
+
+#### Example
+```js
+export default {
+  port: 8181
 }
 ```
 

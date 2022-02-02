@@ -7,7 +7,7 @@ const runProdServer = async () => {
 
     try {
       const compilation = await generateCompilation();
-      const port = 8080;
+      const port = compilation.config.port;
       const hasRoutes = compilation.graph.find(page => page.isSSR);
       const server = hasRoutes ? getHybridServer : getStaticServer;
 
