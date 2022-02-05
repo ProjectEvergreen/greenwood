@@ -14,11 +14,11 @@ In additional to suppoting [static and Single Page applications](/docs/layouts/)
 
 ### Routes
 
-File based routing also applies to server routes.  By creating a _routes/_ folder and a corresponding JavaScript file, you can create a corresponding page to view in the browser.
+File based routing also applies to server routes.  Just create JavaScript file in the _pages/_ directory and that's it!
 
 ```shell
 src/
-  routes/
+  pages/
     users.js
 greenwood.config.js
 ```
@@ -27,7 +27,7 @@ The above would serve content in a browser at `/users/`.
 
 ### API
 
-In your _route.js_ file, Greenwood supports three functions you can `export` for providing server rendererd configuration and content:
+In your _[page].js_ file, Greenwood supports three functions you can `export` for providing server rendererd configuration and content:
 - `getFrontmatter`: Static [frontmatter](/docs/front-matter/), useful in conjunction with [menus](/docs/menus/) or otherwise static configuration / meta data.
 - `getBody`: Effectively anything that you could put into a [`<content-outlet></content-outlet>`](/docs/layouts/#page-templates).
 - `getTemplate`: Effectively the same as a [page template](/docs/layouts/#page-templates).
@@ -108,7 +108,7 @@ async function getBody(compilation) {
           <th>Name</th>
           <th>Image</th>
         </tr>
-        ${artistsListItems.join('')}
+        ${usersListItems.join('')}
       </table>
       <h6>Fetched at: ${timestamp}</h6>
     </body>
@@ -175,11 +175,10 @@ src/
   pages/
     index.md
     about.md
-  routes
     user.js
 ```
 
-Greenwood will now build and serve all the static content from the _pages/_ directory, BUT will also start a server that will fulfill requests to anything in the _routes/_ directory.  In this case at `http://localhost:8080/users/`!
+Greenwood will now build and serve all the static content from the _pages/_ directory BUT will also start a server that will fulfill requests to anything server rendered pages.  Neat!
 
 ### Render vs Prerender
 

@@ -13,8 +13,8 @@ const FAVICON_HREF = '/favicon.ico';
 
 export default {
   workspace: fileURLToPath(new URL('./www', import.meta.url)),
-  mode: 'mpa',
   optimization: 'inline',
+  staticRouter: true,
   title: 'Greenwood',
   meta: [
     { name: 'description', content: META_DESCRIPTION },

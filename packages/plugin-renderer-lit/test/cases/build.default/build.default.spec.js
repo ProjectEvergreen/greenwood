@@ -1,17 +1,15 @@
 /*
  * Use Case
- * Run Greenwood with mode setting in Greenwood config set to ssr.
+ * Run Greenwood with an SSR route.
  *
  * User Result
- * Should generate a bare bones Greenwood build for hosting a server rendered application.
+ * Should generate a Greenwood build for hosting a server rendered application.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * {
- *   mode: 'ssr'
- * }
+ * {}
  *
  * User Workspace
  *  src/
@@ -19,7 +17,7 @@
  *     counter.js
  *     footer.js
  *     greeting.js
- *   routes/
+ *   pages/
  *     artists.js
  *   templates/
  *     app.html
@@ -30,7 +28,6 @@ import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import request from 'request';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -138,8 +135,6 @@ describe('Build Greenwood With: ', function() {
         await runner.runCommand(cliPath, 'serve');
       });
     });
-
-    runSmokeTest(['public', 'index'], LABEL);
 
     let response = {};
     let artists = [];

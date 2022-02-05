@@ -1,26 +1,21 @@
 /*
  * Use Case
- * Run Greenwood with mode setting in Greenwood config set to spa.
+ * Run Greenwood with a single index.html file to build a SPA based project.
  *
  * User Result
- * Should generate a bare bones Greenwood build for hosting a Single Page Application.
+ * Should generate a Greenwood build for a SPA.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * {
- *   mode: 'spa'
- * }
+ * {}
  *
  * User Workspace
  * Greenwood default w/ single index.html file
  *  src/
  *   components/
  *     footer.js
- *   routes/
- *     about.js
- *     home.js
  *   index.js
  *   index.html
  */
@@ -36,7 +31,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom Mode SPA';
+  const LABEL = 'A Single Page Application (SPA)';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;

@@ -22,7 +22,7 @@ const configTypeDefs = gql`
   type Config {
     devServer: DevServer,
     meta: [Meta],
-    mode: String,
+    staticRouter: Boolean,
     optimization: String,
     prerender: Boolean,
     title: String,

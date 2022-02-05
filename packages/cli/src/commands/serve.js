@@ -8,7 +8,8 @@ const runProdServer = async () => {
     try {
       const compilation = await generateCompilation();
       const port = 8080;
-      const server = compilation.config.mode === 'ssr' ? getHybridServer : getStaticServer;
+      const hasRoutes = compilation.graph.find(page => page.isSSR);
+      const server = hasRoutes ? getHybridServer : getStaticServer;
 
       (await server(compilation)).listen(port, () => {
         console.info(`Started server at localhost:${port}`);

@@ -34,7 +34,7 @@ class OptimizationMPAResource extends ResourceInterface {
   }
 
   async shouldOptimize(url, body, headers) {
-    return Promise.resolve(this.compilation.config.mode === 'mpa'
+    return Promise.resolve(this.compilation.config.staticRouter
       && url !== '404.html'
       && (path.extname(url) === '.html' || (headers.request && headers.request['content-type'].indexOf('text/html') >= 0)));
   }
