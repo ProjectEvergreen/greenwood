@@ -3,5 +3,6 @@ export default {
     proxy: {
       '/api': 'https://www.analogstudios.net'
     }
-  }
+  },
+  port: 8181
 };
