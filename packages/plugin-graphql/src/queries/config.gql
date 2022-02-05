@@ -11,7 +11,7 @@ query {
       value,
       href
     },
-    mode,
+    staticRouter,
     optimization,
     prerender,
     title,

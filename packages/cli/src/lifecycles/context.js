@@ -13,7 +13,6 @@ const initContext = async({ config }) => {
       const userWorkspace = path.join(config.workspace);
       const pagesDir = path.join(userWorkspace, `${config.pagesDirectory}/`);
       const userTemplatesDir = path.join(userWorkspace, `${config.templatesDirectory}/`);
-      const routesDir = path.join(userWorkspace, `${config.routesDirectory}/`);
 
       const context = {
         dataDir,
@@ -22,8 +21,7 @@ const initContext = async({ config }) => {
         pagesDir,
         userTemplatesDir,
         scratchDir,
-        projectDirectory,
-        routesDir
+        projectDirectory
       };
 
       if (!fs.existsSync(scratchDir)) {

@@ -195,7 +195,9 @@ It will be emitted to the output directory as a top level _404.html_, which is t
 
 ### Single Page Applications
 
-If you would like to build a SPA and only deal with client side rendering, Greenwood can [support that](/docs/configuration#mode)!  As the name implies, your layout will be slightly different in this case.  Below is an example layout of a SPA, and you can see a working example in our [test suite](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/test/cases/build.config.mode-spa) where we validate using [**lit-redux-router**](https://github.com/fernandopasik/lit-redux-router) with route based code splitting.
+If you would like to build a SPA and only deal with client side rendering, Greenwood can support that too  As the name implies, you will just need to have an _index.html_ file in your workspace (no _pages/_ directory) and that's it!
+
+Below is an example layout of a SPA, and you can see a working example in our [test suite](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/test/cases/build.config.mode-spa) where we validate using [**lit-redux-router**](https://github.com/fernandopasik/lit-redux-router) with route based code splitting.
 
 ```shell
 

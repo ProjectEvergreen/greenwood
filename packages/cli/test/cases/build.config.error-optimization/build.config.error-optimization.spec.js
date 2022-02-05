@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with a bad value for mode in a custom config.
+ * Run Greenwood build command with a bad value for optimization in a custom config.
  *
  * User Result
  * Should throw an error.
