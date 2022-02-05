@@ -41,6 +41,7 @@ const defaultConfig = {
   },
   port: 8080,
   optimization: optimizations[0],
+  interpolateFrontmatter: false,
   title: 'My App',
   meta: [],
   plugins: greenwoodPlugins,
@@ -59,7 +60,7 @@ const readAndMergeConfig = async() => {
 
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = (await import(pathToFileURL(path.join(process.cwd(), 'greenwood.config.js')))).default;
-        const { workspace, devServer, title, markdown, meta, optimization, plugins, port, prerender, staticRouter, pagesDirectory, templatesDirectory } = userCfgFile;
+        const { workspace, devServer, title, markdown, meta, optimization, plugins, port, prerender, staticRouter, pagesDirectory, templatesDirectory, interpolateFrontmatter } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -101,6 +102,13 @@ const readAndMergeConfig = async() => {
           customConfig.optimization = optimization;
         } else if (optimization) {
           reject(`Error: provided optimization "${optimization}" is not supported.  Please use one of: ${optimizations.join(', ')}.`);
+        }
+
+        if (interpolateFrontmatter) {
+          if (typeof interpolateFrontmatter !== 'boolean') {
+            reject('Error: greenwood.config.js interpolateFrontmatter must be a boolean');
+          }
+          customConfig.interpolateFrontmatter = interpolateFrontmatter;
         }
 
         if (plugins && plugins.length > 0) {
