@@ -72,7 +72,7 @@ Any regular HTML will do.  You will just need to include a `<content-outlet></co
       <span>&copy My Website</span>
     </footer>
   </body>
-  
+
 </html>
 ```
 
