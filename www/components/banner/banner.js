@@ -54,8 +54,8 @@ class Banner extends LitElement {
       <div class='banner'>
         <eve-container>
           <div class='content'>
-            <img 
-              src="../../assets/greenwood-logo-300w.png" 
+            <img
+              src="../../assets/greenwood-logo-300w.png"
               alt="Greenwood Logo"
               srcset="../../assets/greenwood-logo-300w.png 1x,
                       ../../assets/greenwood-logo-500w.png 2x,
@@ -63,7 +63,7 @@ class Banner extends LitElement {
                       ../../assets/greenwood-logo-1000w.png 4x,
                       ../../assets/greenwood-logo-1500w.png 5x"/>
 
-            <h3>The static site generator for your. . . <br /><span class="${this.animateState}">${currentProjectType}.</span></h3>
+            <h3>Ready to help you build your next. . . <br /><span class="${this.animateState}">${currentProjectType}.</span></h3>
 
             <eve-button size="md" href="/getting-started/" style="${buttonCss}">Get Started</eve-button>
           </div>
