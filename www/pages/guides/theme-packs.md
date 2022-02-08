@@ -55,7 +55,7 @@ _package.json_
 
 _my-theme-pack.js_
 ```js
-import path from 'path';
+import { fileURLToPath } from 'url';
 
 const myThemePack = () => [{
   type: 'context',
@@ -63,9 +63,9 @@ const myThemePack = () => [{
   provider: () => {
     return {
       templates: [
-        // __dirname will be _node_modules/your-package/_
-        // when your plugin is run in a users project
-        path.join(__dirname, 'dist/layouts')
+        // import.meta.url will be located at _node_modules/your-package/_
+        // when your plugin is run in a user's project
+        fileURLToPath(new URL('./dist/layouts', import.meta.url))
       ]
     };
   }
@@ -148,7 +148,7 @@ export {
 };
 ```
 
-And our final _greenwood.config.js_ would look like this, which adds a "one-off" [resource plugin](/plugins/resource/) to tell Greenwood to route requests to your theme pack files away from _node_modules+ and to the location of your projects files for development.  
+And our final _greenwood.config.js_ would look like this, which adds a "one-off" [resource plugin](/plugins/resource/) to tell Greenwood to route requests to your theme pack files away from _node_modules+ and to the location of your projects files for development.
 
 Additionally, we make sure to pass the flag from above for `__isDevelopment` to our plugin.
 ```js
