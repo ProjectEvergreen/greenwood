@@ -29,8 +29,8 @@ $ npx @greenwood/cli@latest <command>
 ### CLI
 With Greenwood installed, you can run its CLI to generate your site.  The principal commands available are:
 - `greenwood develop`: Starts a local development server for your project.
-- `greenwood build`: Generates a production build of your project.
-- `greenwood serve`: Generates a production build of your project and runs it on a NodeJS based web server.
+- `greenwood build`: Generates a production build of your project for just static assets.
+- `greenwood serve`: Generates a production build of your project and runs it on a NodeJS based web server, for both static and server renderer pages.
 - `greenwood eject`: Ejects CLI configurations (Just Rollup right now) to your working directory for more advanced customization.  [YMMV](https://www.howtogeek.com/693183/what-does-ymmv-mean-and-how-do-you-use-it/).
 
 You can define npm scripts in _package.json_ like so to automate your workflows.  You also need to define a `type` field with the value of `module`:

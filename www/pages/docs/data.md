@@ -44,7 +44,7 @@ To assist with this, Greenwood provides all your content as data, accessible fro
 
 
 ### Internal Sources
-Greenwood (via [**plugin-graphql**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql)) exposes an [Apollo](https://www.apollographql.com/docs/apollo-server/) server locally when developing available at `localhost:4000` that can be used to get information about your local content like path, "slug", title and other useful information that will be dynamic to the content you create.  Programmatic access to this data can provide you the opportunity to share your content with your users in a way that supports sorting, filter, organizing, and more!
+Greenwood (via [**plugin-graphql**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql)) exposes an [Apollo](https://www.apollographql.com/docs/apollo-server/) server locally available at `localhost:4000` as well as a custom Apollo client that can both be used when developing to get information about your local content like path, "slug", title and other useful information that will be dynamic to the content you create.  Programmatic access to this data can provide you the opportunity to share your content with your users in a way that supports sorting, filter, organizing, and more!
 
 ![graphql-playground](/assets/graphql-playground.png)
 
@@ -245,8 +245,9 @@ query {
       value,
       href
     },
-    mode,
     optimization,
+    port,
+    staticRouter,
     title,
     workspace
   }

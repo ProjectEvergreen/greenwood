@@ -8,7 +8,7 @@ linkheadings: 3
 
 ## Server Rendering
 
-In additional to suppoting [static and Single Page applications](/docs/layouts/), you can also use Greenwood to author routes completely in JavaScript and host these on a server.
+In additional to suppoting [static and Single Page application projec types](/docs/layouts/), you can also use Greenwood to author routes completely in JavaScript and host these on a server.
 
 > 👉 _To run a Greenwood project with SSR routes for production, just use the [`serve` command](/docs/#cli)._
 
@@ -178,7 +178,7 @@ src/
     user.js
 ```
 
-Greenwood will now build and serve all the static content from the _pages/_ directory BUT will also start a server that will fulfill requests to anything server rendered pages.  Neat!
+Greenwood will now build and serve all the static content from the _pages/_ directory as before _BUT_ will also start a server that will now fulfill requests to the newly added server rendered pages too.  Neat!
 
 ### Render vs Prerender
 
