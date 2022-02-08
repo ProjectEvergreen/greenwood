@@ -19,6 +19,7 @@ template: blog
 
 # News and Announcements
 
+- [State of Greenwood (2022)](/blog/state-of-greenwood-2022/) 📣
 - [Release: v0.23.0](/blog/release/v0-23-0/) 📝
 - [Release: v0.21.0](/blog/release/v0-21-0/) 📝
 - [Release: v0.20.0](/blog/release/v0-20-0/) 📝
