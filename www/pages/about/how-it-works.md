@@ -17,7 +17,7 @@ Greenwood wants to take advantage of this opportunity to join in with other proj
 
 ### CLI
 
-To actually use Greenwood, everyone is required to install the CLI.  The CLI is what powers all the workflows available by Greenwood and builds your project for local development and production builds.  It is plugin based so that it can be extended by users to support additional workflows not intended to be maintained in core.
+To actually use Greenwood, users will interact with the Greenwood CLI.  The CLI is what powers all the workflows available by Greenwood and builds your project for local development and production builds.  It is plugin based so that it can be extended to support additional workflows not intended to be maintained in core.
 
 During _development_ the CLI will:
 - Instantaneously start a local web server with live reload.
@@ -28,22 +28,23 @@ During _development_ the CLI will:
 For _production_ builds:
 - Combine all your code and dependencies into efficient modern bundles including minifying your JavaScript and CSS.
 - Optimizes loading of JavaScript and CSS assets using web hints like `preload` and `prefetch`.
-- All JavaScript (Web Components) are pre-rendered to static HTML (using **puppeteer**) for web standards templating with no runtime cost.
-- Can [output](docs/config#mode) a standard static site (SSG), a multi-page application (MPA), or single-page application (SPA).
-- Supports [further optimization](docs/config#optimization) for additional hints like inlining or only statically pre-rendering JavaScript.
+- Provides the option to pre-render your JavaScript (e.g. Web Components) to static HTML (using **puppeteer** or the server rendering solution of your choice) to provide a web standards based templating solution.
+- Can [support](/docs/layouts/) a static site (SSG) or server rendered site (SSR), or a hybrid of the two!  Single Page Application's (SPA) also welcome!
+- Supports [further optimization](docs/config#optimization) for additional hints like inlining or only statically pre-rendering JavaScript with no runtime cost.
 
 Lastly, Greenwood aims to be a low point of friction as part of a standard development workflow.  In this way, there will be a balance between what tools and dependencies are considered core to Greenwood.  We aim to avoid the common "meta" framework paradigm and instead want to hone in on a lean and efficient core with good extension points for longer term maintainability and technical design.
 
 ### Plugins
 
-The Greenwood CLI will aim to support development for all modern web standards and file types out of the box, in addition to markdown.  Otherwise, additional languages and tools can be added to extend the core development experience using Greenwood's [plugin](/plugins/) system.  In fact, Greenwood even maintains a few of its own to help you get started!  In this way the Greenwood team aims to keep a strong focus on a core experience that everyone will benefit from no matter what their building, while allowing a DIY / BYOP (bring your own plugin) workflow that anyone can use.
+The Greenwood CLI will aim to support development for all modern web standards and file types out of the box, in addition to markdown.  Otherwise, Greenwood can be extended through plugins.  In fact, Greenwood even maintains a [few of its own plugins](/plugins/) to help you get started!  In this way the Greenwood team aims to keep a strong focus on a core experience that everyone will benefit from no matter what their building, while allowing a DIY / BYOP (bring your own plugin) workflow that anyone can use.
 
 
 ### Browser Support
-For when transpilation is desired (Babel, PostCSS), Greenwood recommends using an **"evergreen build"** approach that ensures that the code delivered to users is as modern as modern as possible, with the least amount of processing and tranformations applied.  Greenwood has two [plugins](/plugins/) that already support taking advantage of the two amazing tools that makes this all possible; [**Browserslist**](https://github.com/browserslist/browserslist) and [caniuse.com](https://caniuse.com/).
+
+Greenwood aims to support all modern evergreen browsers out of the box and so advocates for a bundless, untranspiled workflow by default.  For when transpilation is needed (Babel, PostCSS), Greenwood recommends using an **"evergreen build"** approach that ensures that the code delivered to users is as modern as modern as possible, with the least amount of processing and tranformations applied.  Greenwood has two [plugins](/plugins/) that already supports this recommending by taking advantage of two a great tools; [**Browserslist**](https://github.com/browserslist/browserslist) and [caniuse.com](https://caniuse.com/).
 
 - [**Babel**](https://babeljs.io/) is a compiler for JavaScript that transforms modern JavaScript down to a specific "target" of JavaScript.  For example, source code can be written using 2018+ syntax, but transformed such that browsers that don't support that syntax can still run that JavaScript.
-- [**PostCSS**](https://postcss.org/), much like **Babel** is a compiler, but for CSS!  Just as with **Babel**, we can use modern CSS features without a transpilation process from a higher level version of CSS (LESS, SASS).  CSS has finally arrived in modern web applications! ✨
+- [**PostCSS**](https://postcss.org/), much like **Babel** is a compiler, but for CSS!  Just as with **Babel**, we can use modern CSS features without a transpilation process from a higher level version of CSS (LESS, SASS).
 
 Using the above tools and leveraging their respective `env` presets available, essentially, **Browserlist** will query CanIUse data to determine, based on the browser query provided, what features are / aren't needed for transpilation.  This in turn allows Babel and PostCSS to intelligenty transpile _only_ what's needed for the features that are missing from the browser you are targeting, thus ensuring an "evergreen" experience for users _and_ developers.  Nice. 😎
 
