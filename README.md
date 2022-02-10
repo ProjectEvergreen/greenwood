@@ -7,7 +7,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
 ## Overview
-Greenwood is a modern and performant static site generator supporting Web Component based development.  For more information about how to get started, read our docs, or learn more about the project and how it works, please visit our [website](https://www.greenwoodjs.io/).
+Greenwood is a modern framework focused on web standards to help you build your next project. For more information about how to get started, read our docs, or learn more about the project and how it works, please visit our [website](https://www.greenwoodjs.io/).
 
 Features:
 - ⚡ [No bundle development](https://www.greenwoodjs.io/about/how-it-works/). Pages are built on the fly.

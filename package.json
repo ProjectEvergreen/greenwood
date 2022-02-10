@@ -1,7 +1,7 @@
 {
   "name": "greenwood",
   "private": true,
-  "description": "A modern and performant static site generator supporting Web Component based development.",
+  "description": "A modern framework focused on web standards to help you build your next project.",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",

@@ -8,7 +8,7 @@ import { greenwoodPluginRendererLit } from '@greenwood/plugin-renderer-lit';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 import { fileURLToPath, URL } from 'url';
 
-const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
+const META_DESCRIPTION = 'A modern framework focused on web standards to help you build your next project.';
 const FAVICON_HREF = '/favicon.ico';
 
 export default {
