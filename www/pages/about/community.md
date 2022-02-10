@@ -7,7 +7,7 @@ index: 3
 
 ## Community
 
-Greenwood understands the role of community in open source, technology, and learning and we want to embrace that in this project as well.  There are many great tools and projects available in the web ecosystem that we want to highlight here for their importance and influence towards the development of Greenwood (in no particular order).
+Greenwood understands the role of community in open source, technology, and learning, and so we want to embrace that in this project as well.  There are many great tools and projects available in the web ecosystem that we want to highlight here for their importance and influence towards the development of Greenwood and the web dev community at large.
 
 - [**MDN**](https://developer.mozilla.org/) - Mozilla Developer Network, the one reference documentation site to rule them all.
 - [**Rollup**](https://rollupjs.org/) - For helping push the bundler world forward towards (shipping) ESM

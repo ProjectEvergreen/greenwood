@@ -11,7 +11,7 @@ Introduced as a concept in the [Context Plugin docs](/plugins/context/), a theme
 
 ![greenwood-starter-presentation](/assets/greenwood-starter-presentation.png)
 
-### Prerequistes
+### Prerequisites
 This guide will walk through the process of setting up Greenwood to support the developing and publishing of your package (theme pack) to **npm**.
 
 To try and focus on just the theme pack aspects, this guide assumes a couple things:
@@ -222,7 +222,7 @@ When it comes to publishing, it should be fairly straightforward, and you'll jus
       "version": "0.1.0",
       "description": "My Custom Greenwood Theme Pack",
       "main": "my-theme-pack.js",
-      "tyoe": "module",
+      "type": "module",
       "files": [
         "dist/"
       ],
@@ -298,7 +298,7 @@ ex.
 </html>
 ```
 
-Good question!  We tried that approach initially as it would help alleivate the open issues and needing to work around local development vs published development identified above, but the issue that was faced was that relative paths like the above [don't preserve their location / context on disk](https://github.com/ProjectEvergreen/greenwood/issues/689#issuecomment-895519561) when coming through the development server
+Good question!  We tried that approach initially as it would help alleviate the open issues and needing to work around local development vs published development identified above, but the issue that was faced was that relative paths like the above [don't preserve their location / context on disk](https://github.com/ProjectEvergreen/greenwood/issues/689#issuecomment-895519561) when coming through the development server
 ```html
 # with explicit path that includes node_modules (is exactly the same)
 url -> /node_modules/my-theme-pack/dist/styles/theme.css

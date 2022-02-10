@@ -191,7 +191,7 @@ Greenwood will automatically generate a [default _404.html_](https://github.com/
            └── 404.html
 ```
 
-It will be emitted to the output directory as a top level _404.html_, which is the [commmon convention](https://docs.netlify.com/routing/redirects/redirect-options/#custom-404-page-handling) for most hosts and web servers.
+It will be emitted to the output directory as a top level _404.html_, which is the [common convention](https://docs.netlify.com/routing/redirects/redirect-options/#custom-404-page-handling) for most hosts and web servers.
 
 ### Single Page Applications
 

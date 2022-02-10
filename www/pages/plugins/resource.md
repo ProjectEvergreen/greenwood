@@ -28,7 +28,7 @@ class ResourceInterface {
     this.contentType = '';
   }
 
-  // test if this plugin should change a relative URL from the browser to an absolute path on disk 
+  // test if this plugin should change a relative URL from the browser to an absolute path on disk
   // like for node_modules/ resolution. not commonly needed by most resource plugins
   // return true | false
   async shouldResolve(url) {
@@ -64,7 +64,7 @@ class ResourceInterface {
     return Promise.resolve({ body });
   }
 
-  // test if this plugin should manipulate any files prior to any final optmizations happening 
+  // test if this plugin should manipulate any files prior to any final optimizations happening
   // ex: add a "banner" to all .js files with a timestamp of the build, or minifying files
   // return true | false
   async shouldOptimize(url, body) {
@@ -109,7 +109,7 @@ import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js'
 class FooResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    
+
     this.extensions = ['.foo'];
     this.contentType = 'text/javascript';
   }

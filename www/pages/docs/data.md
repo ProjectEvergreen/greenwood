@@ -139,7 +139,7 @@ This will return the full `graph` of all pages as an array
     path: "./blog/2019/first-post.md",
     route: "/blog/2019/first-post",
     template: "blog",
-    title: "My First Blog Poast"
+    title: "My First Blog Post"
   },
   {
     filename: "second-post.md",
@@ -149,7 +149,7 @@ This will return the full `graph` of all pages as an array
     path: "./blog/2019/second-post.md",
     route: "/blog/2019/second-post",
     template: "blog",
-    title: "My Second Blog Poast"
+    title: "My Second Blog Post"
   }
 ]
 ```
@@ -212,7 +212,7 @@ This will return the full `graph` of all pages as an array that are under a give
     path: "./blog/2019/first-post.md",
     route: "/blog/2019/first-post",
     template: "blog",
-    title: "My First Blog Poast"
+    title: "My First Blog Post"
   },
   {
     filename: "second-post.md",
@@ -222,7 +222,7 @@ This will return the full `graph` of all pages as an array that are under a give
     path: "./blog/2019/second-post.md",
     route: "/blog/2019/second-post",
     template: "blog",
-    title: "My Second Blog Poast"
+    title: "My Second Blog Post"
   }
 ]
 ```

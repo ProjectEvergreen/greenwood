@@ -41,7 +41,7 @@ $ npx @greenwood/cli develop
 ```
 
 ### Clone GitHub Repo
-If you just want to _clone and go_ then we welcome you to check out the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started) we made to accompany this guide.  To get the code from this walkthrough, you can simply clone the repo, install dependencies, and off you go!
+If you just want to _clone and go_ then we welcome you to check out the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started) we made to accompany this guide.  To get the code from this walk-through, you can simply clone the repo, install dependencies, and off you go!
 
 ```bash
 $ git clone https://github.com/ProjectEvergreen/greenwood-getting-started

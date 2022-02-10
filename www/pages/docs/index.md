@@ -17,7 +17,7 @@ Greenwood can be installed with any of the common package managers available tod
 $ npm install @greenwood/cli --save-dev
 
 # yarn
-$ yarn add @greeenwood/cli --dev
+$ yarn add @greenwood/cli --dev
 ```
 
 Though we recommend installing it locally to your project, you can also run Greenwood globally.  For global usage we recommend using `npx`
