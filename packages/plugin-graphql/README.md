@@ -1,4 +1,4 @@
-# @greenwood/plugin-graphl
+# @greenwood/plugin-graphql
 
 ## Overview
 A plugin for Greenwood to support using [GraphQL](https://graphql.org/) to query your content graph.  It runs [**apollo-server**](https://www.apollographql.com/docs/apollo-server/) on the backend and provides an [**@apollo/client** like](https://www.apollographql.com/docs/react/api/core/ApolloClient/#ApolloClient.readQuery) interface for the frontend.
@@ -48,7 +48,7 @@ class HeaderComponent extends HTMLElement {
 
   connectedCallback() {
     const response = await client.query({
-      query: MenuQuery, 
+      query: MenuQuery,
       variables: {
         name: 'navigation',
         order: 'index_asc'
@@ -67,7 +67,7 @@ class HeaderComponent extends HTMLElement {
         </li>
       `;
     }).join();
-    
+
     return `
       <header>
         <nav>

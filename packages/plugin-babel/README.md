@@ -43,12 +43,12 @@ module.exports = {
 };
 ```
 
-This will then process your JavaScript with Babel with the configurated plugins / settings you provide.  
+This will then process your JavaScript with Babel using the configured plugins and settings you provide.
 
 > _For now Babel configuration needs to be in CJS.  Will we be adding ESM support soon!_
 
 ## Options
-This plugin provides a default _babel.config.js_ that includes support for [**@babel/preset-env**](https://babeljs.io/docs/en/babel-preset-env) using [**browserslist**](https://github.com/browserslist/browserslist) with reasonable [default configs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-babel/src/) for each.  
+This plugin provides a default _babel.config.js_ that includes support for [**@babel/preset-env**](https://babeljs.io/docs/en/babel-preset-env) using [**browserslist**](https://github.com/browserslist/browserslist) with reasonable [default configs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-babel/src/) for each.
 
 If you would like to use it, either standalone or with your own custom _babel.config.js_, you will need to take the following extra steps:
 

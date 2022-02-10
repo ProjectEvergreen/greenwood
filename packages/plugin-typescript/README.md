@@ -65,7 +65,7 @@ This plugin provides the following default `compilerOptions`.
     "moduleResolution": "node",
     "sourceMap": true
   }
-} 
+}
 ```
 
 If you would like to extend / override these options:
@@ -74,7 +74,7 @@ If you would like to extend / override these options:
     ```json
     {
       "compilerOptions": {
-        "expirementalDecorators": true
+        "experimentalDecorators": true
       }
     }
     ```
@@ -94,4 +94,4 @@ If you would like to extend / override these options:
     }
     ```
 
-This will then process your JavaScript with TypeScript with the additional configurated settings you provide.  This also allows you to configure the rest of _tsconfig.json_ to support your IDE and local development environment settings.
+This will then process your JavaScript with TypeScript with the additional configuration settings you provide.  This also allows you to configure the rest of _tsconfig.json_ to support your IDE and local development environment settings.
