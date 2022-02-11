@@ -16,15 +16,15 @@ import chalk from 'chalk';
 import simpleGit from 'simple-git';
 import commander from 'commander';
 import { copyFolder } from './copy-folder.js';
-import fetch from 'node-fetch';
 import fs from 'fs';
 import inquirer from 'inquirer';
+import { Octokit } from 'octokit';
 import os from 'os';
 import path from 'path';
 import { spawn } from 'child_process';
 import { fileURLToPath, URL } from 'url';
 
-const projectGitHubAPIUrl = 'https://api.github.com/orgs/ProjectEvergreen/repos';
+const projectGitHubOrgName = 'ProjectEvergreen';
 const templateStandardName = 'greenwood-template-';
 let selectedTemplate = null;
 const scriptPkg = JSON.parse(fs.readFileSync(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf-8'));
@@ -55,7 +55,7 @@ const npmInit = async () => {
 
   // use installation path's folder name for packages
   appPkg.name = path.basename(process.cwd());
-  
+
   // make sure users get latest and greatest version of Greenwood
   // https://github.com/ProjectEvergreen/greenwood/issues/781
   // https://github.com/ProjectEvergreen/greenwood/issues/809
@@ -80,7 +80,7 @@ const srcInit = async () => {
   await Promise.all(
     templateFiles.map(async file => {
       const resolvedPath = path.join(templateDir, file);
-      
+
       if (fs.lstatSync(resolvedPath).isDirectory()) {
         return await copyFolder(resolvedPath, TARGET_DIR);
       } else if (await fs.existsSync(resolvedPath)) {
@@ -139,30 +139,13 @@ const install = async () => {
 };
 
 const listAndSelectTemplate = async () => {
-  
+
   const getTemplates = async () => {
     try {
-
-      // create error response 
-      class HTTPResponseError extends Error {
-        constructor(response, ...args) {
-          super(`HTTP Error Response: ${response.status} ${response.statusText}`, ...args);
-          this.response = response;
-        }
-      }
-      
-      // check response from repo list fetch
-      const checkStatus = response => {
-        if (response.ok) {
-          // response.status >= 200 && response.status < 300
-          return response.json();
-        } else {
-          console.log('Couldn\'t locate any templates, check your connection and try again');
-          throw new HTTPResponseError(response);
-        }
-      };
-
-      const repos = await fetch(projectGitHubAPIUrl).then(resp => checkStatus(resp));
+      const octokit = new Octokit();
+      const repos = (await octokit.request(`GET /orgs/${projectGitHubOrgName}/repos`, {
+        org: projectGitHubOrgName
+      })).data;
 
       // assuming it did resolve but there are no templates listed
       if (!repos || repos.length === 0) {
@@ -173,7 +156,7 @@ const listAndSelectTemplate = async () => {
       const templateRepos = repos.filter(repo => {
         return repo.name.includes(templateStandardName);
       });
-      
+
       return templateRepos.map(({ clone_url, name }) => { // eslint-disable-line camelcase
         const templateName = name.substring(templateStandardName.length, name.length);
         return { clone_url, name: templateName }; // eslint-disable-line camelcase
@@ -201,7 +184,7 @@ const listAndSelectTemplate = async () => {
   if (typeof program.template !== 'boolean') {
     const userSelection = program.template;
     const matchedTemplate = templates.find((template) => template.name === userSelection);
-    
+
     if (matchedTemplate) {
       console.debug(`using user provided template => ${userSelection}...`);
       selectedTemplate = matchedTemplate;
@@ -232,7 +215,7 @@ const cloneTemplate = async () => {
     fs.rmSync(clonedTemplateDir, { recursive: true, force: true });
   }
 
-  // clone to .template directory 
+  // clone to .template directory
   console.log('clone template', selectedTemplate.name, 'to directory', clonedTemplateDir);
   try {
     await git.clone(selectedTemplate.clone_url, clonedTemplateDir);
@@ -260,7 +243,7 @@ const run = async () => {
     // map all the template files and copy them to the current working directory
     console.log('Initialzing project with files...');
     await srcInit();
-    
+
     console.log('Creating manifest (package.json)...');
     await npmInit();
 
