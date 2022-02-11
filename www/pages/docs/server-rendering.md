@@ -194,4 +194,4 @@ The hope with Greenwood is that user's can choose the best blend of server rende
 
 So server rendering, when constraints are understood, can be a lot a faster to execute compared to a headless browser.  However, with good caching strategies, the cost of rendering HTML once with either technique, when amortized over all the subsequent requests and responses, usually ends up being negligible in the long run.
 
-> _So we hope users find a workflow that works best for them and see Greenwood as more of a knob or spectrum, rather than a toggle._  ⚙️
+> _So we hope users find a workflow that works best for them and see Greenwood as more of a knob or spectrum, rather than a toggle.  This [blog post](https://developers.google.com/web/updates/2019/02/rendering-on-the-web) also provides a lot of good information on the various rendering strategies implemented these days._  ⚙️
