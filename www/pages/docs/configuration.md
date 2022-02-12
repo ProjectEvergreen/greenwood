@@ -38,9 +38,9 @@ export default {
 ### Dev Server
 Configuration for Greenwood's development server is available using the `devServer` option.
 - `extensions`: Provide an array of to watch for changes and reload the live server with.  By default, Greenwood will already watch all "standard" web assets (HTML, CSS, JS, etc) it supports by default, as well as any extensions set by [resource plugins](/plugins/resource) you are using in your _greenwood.config.json_.
-- `hud`: The HUD option ([_head-up display_](https://en.wikipedia.org/wiki/Head-up_display)) is some additional HTML added to your site's page when Greenwood wants to help provide information to you in the brwoser.  For example, if your HTML is detected as malformed, which could break the parser.  Set this to `false` if you would like to turn it off.
+- `hud`: The HUD option ([_head-up display_](https://en.wikipedia.org/wiki/Head-up_display)) is some additional HTML added to your site's page when Greenwood wants to help provide information to you in the browser.  For example, if your HTML is detected as malformed, which could break the parser.  Set this to `false` if you would like to turn it off.
 - `port`: Pick a different port when starting the dev server
-- `proxy`: A set of paths to match and re-route to other hosts.  Highest specificty should go at the end.
+- `proxy`: A set of paths to match and re-route to other hosts.  Highest specificity should go at the end.
 
 #### Example
 ```js
@@ -73,7 +73,7 @@ image: /assets/blog-post-images/git.png
 ---
 ```
 
-It can be accessed and substited statically in either markdown or HTML.
+It can be accessed and substituted statically in either markdown or HTML.
 
 ##### Markdown
 ```md
@@ -167,7 +167,7 @@ Greenwood provides a number of different ways to send hints to Greenwood as to h
 |`default` | Will add a `<link rel="..." src="..." as="..."></link>` tag for every `<script>` or `<link>` tag in the `<head>` of your HTML using `preload` for styles and `modulepreload` for scripts.  This setting will also minify all your JS and CSS files. | General purpose. |
 |`inline` | Using this setting, all your `<script>` and `<link>` tags will get inlined right into your HTML. | For  sites with smaller payloads, this could work best as with inlining, you do so at the expense of long-term caching. |
 |`none` | With this setting, _none_ of your JS or CSS will be minified or hinted at all. | The best choice if you want to handle everything yourself through custom [Resource plugins](/plugins/resource/). |
-|`static` | Only for `<script>` tags, but this setting will remove `<script>` tags from your HTML. | If your Web Components only need a single render just to emit some static HTML, or are otherwise not dynamic or needed at runtime, this will really speed up your site's performance by dropping uncessary HTTP requests. |
+|`static` | Only for `<script>` tags, but this setting will remove `<script>` tags from your HTML. | If your Web Components only need a single render just to emit some static HTML, or are otherwise not dynamic or needed at runtime, this will really speed up your site's performance by dropping unnecessary HTTP requests. |
 
 > _These settings are currently considered experimental.  Additional improvements and considerations include adding [`none` override support](https://github.com/ProjectEvergreen/greenwood/discussions/545#discussioncomment-957320), [SSR + hydration](https://github.com/ProjectEvergreen/greenwood/discussions/576), and [side effect free templates and pages](https://github.com/ProjectEvergreen/greenwood/discussions/644)._
 
@@ -179,7 +179,7 @@ export default {
 ```
 
 #### Overrides
-Additionally, you can apply overrides on a per `<link>` or `<script>` tag basis by addding a custom `data-gwd-opt` attribute to your HTML.  The following is supported for JavaScript and CSS.
+Additionally, you can apply overrides on a per `<link>` or `<script>` tag basis by adding a custom `data-gwd-opt` attribute to your HTML.  The following is supported for JavaScript and CSS.
 
 ```html
 <!-- Javascript -->
@@ -215,7 +215,7 @@ export default {
 
 ### Prerender
 
-By default, [Greenwood pre-renders](/about/how-it-works/) all your _runtime_ JavaScript (Web Components, GraphQL calls, etc) across all your pages and captures the output as part of the final built HTML output.  This means you can have ["static" components](/docs/configuration/#optimization) that can just render once and generate all their initial HTML at build time.  This aims to provide a fully complete HTML document to the user, so even if JavaScript is disabled or something breaks in their browser, the user gets all the initial content.  And from there, progessive enhancement can take over.
+By default, [Greenwood pre-renders](/about/how-it-works/) all your _runtime_ JavaScript (Web Components, GraphQL calls, etc) across all your pages and captures the output as part of the final built HTML output.  This means you can have ["static" components](/docs/configuration/#optimization) that can just render once and generate all their initial HTML at build time.  This aims to provide a fully complete HTML document to the user, so even if JavaScript is disabled or something breaks in their browser, the user gets all the initial content.  And from there, progressive enhancement can take over.
 
 _However_, you may not need that, like for a [SPA (Single Page Application)](/docs/layouts/#single-page-applications).  If you _don't_ want any sort of pre-rendering and just want to render out your markdown / HTML as is, add this setting to your _greenwood.config.js_ and set it to `false`.
 
@@ -230,7 +230,7 @@ export default {
 
 ### Static Router
 
-Setting the `staticRouter` option to `true` will add a small router runtime in production for static pages to provent needing full page reloads when navigation between pages that share a template.  For example, the Greenwood website is entirely static, outputting an HTML file per page however, if you navigate from the _Docs_ page to the _Getting Started_ page, you will notice the site does not require a full page load.  Instead, the router will just swap out the content of the page much like client-side SPA router would.  This technique is similar to how projects like [**pjax**](https://github.com/defunkt/jquery-pjax) and [**Turbolinks**](https://github.com/turbolinks/turbolinks) work, and like what you can see on websites like GitHub.
+Setting the `staticRouter` option to `true` will add a small router runtime in production for static pages to prevent needing full page reloads when navigation between pages that share a template.  For example, the Greenwood website is entirely static, outputting an HTML file per page however, if you navigate from the _Docs_ page to the _Getting Started_ page, you will notice the site does not require a full page load.  Instead, the router will just swap out the content of the page much like client-side SPA router would.  This technique is similar to how projects like [**pjax**](https://github.com/defunkt/jquery-pjax) and [**Turbolinks**](https://github.com/turbolinks/turbolinks) work, and like what you can see on websites like GitHub.
 
 
 #### Example

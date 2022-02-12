@@ -8,7 +8,7 @@ linkheadings: 3
 
 ## Server Rendering
 
-In additional to suppoting [static and Single Page applications](/docs/layouts/), you can also use Greenwood to author routes completely in JavaScript and host these on a server.
+In addition to supporting [static and Single Page application project types](/docs/layouts/), you can also use Greenwood to author routes completely in JavaScript and host these on a server.
 
 > 👉 _To run a Greenwood project with SSR routes for production, just use the [`serve` command](/docs/#cli)._
 
@@ -27,7 +27,7 @@ The above would serve content in a browser at `/users/`.
 
 ### API
 
-In your _[page].js_ file, Greenwood supports three functions you can `export` for providing server rendererd configuration and content:
+In your _[page].js_ file, Greenwood supports three functions you can `export` for providing server rendered configuration and content:
 - `getFrontmatter`: Static [frontmatter](/docs/front-matter/), useful in conjunction with [menus](/docs/menus/) or otherwise static configuration / meta data.
 - `getBody`: Effectively anything that you could put into a [`<content-outlet></content-outlet>`](/docs/layouts/#page-templates).
 - `getTemplate`: Effectively the same as a [page template](/docs/layouts/#page-templates).
@@ -54,7 +54,7 @@ export {
 
 #### Frontmatter
 
-Any Greenwood supported frontmatter can be returned here.  _This is only run once when the server is started_ to populate the graph, which is helpful if you want your dyanmic route to show up in a menu like in your header for navigation.
+Any Greenwood supported frontmatter can be returned here.  _This is only run once when the server is started_ to populate the graph, which is helpful if you want your dynamic route to show up in a menu like in your header for navigation.
 
 You can even define a `template` and reuse all your existing [templates](/docs/layouts/), even for server routes!
 
@@ -178,11 +178,11 @@ src/
     user.js
 ```
 
-Greenwood will now build and serve all the static content from the _pages/_ directory BUT will also start a server that will fulfill requests to anything server rendered pages.  Neat!
+Greenwood will now build and serve all the static content from the _pages/_ directory as before _BUT_ will also start a server that will now fulfill requests to the newly added server rendered pages too.  Neat!
 
 ### Render vs Prerender
 
-Greenwood provides the ability to [prerender](/docs/prerender/) your project and Web Components using Puppeteer.  So what is the difference between that and rendering?   In the context of Greenwood, _rendering_ is the process of generating the _initial_ HTML in a completely static manner intended to be run on a server.  _Prerendering_ is the ability to execute exclusively browser code in a browser and capture that result as static HTML.
+Greenwood provides the ability to [prerender](/docs/prerender/) your project and Web Components using Puppeteer.  So what is the difference between that and rendering?   In the context of Greenwood, _rendering_ is the process of generating the _initial_ HTML as you would when running on a server.  _Prerendering_ is the ability to execute exclusively browser code in a browser and capture that result as static HTML.
 
 So what does that mean, exactly?  Basically, you can think of them as being complimentary, where in you might have server side routes that pull content server side (`getBody`), but can be composed of static HTML templates (in your _src/templates_ directory) that can have client side code (Web Components) with `<script>` tags that could be run after through a headless browser.
 
@@ -192,6 +192,6 @@ The hope with Greenwood is that user's can choose the best blend of server rende
 - import maps
 - Better UX when JS is turned off
 
-So server rendering, when constraints are understood, can be a lot a faster to execute compared to a headless browser.  However, with good caching strategies, the cost of rendering HTML once with either technique, when amortized over all the subsequent requests and responses, usually ends up being neligble in the long run.
+So server rendering, when constraints are understood, can be a lot a faster to execute compared to a headless browser.  However, with good caching strategies, the cost of rendering HTML once with either technique, when amortized over all the subsequent requests and responses, usually ends up being negligible in the long run.
 
-> _So we hope users find a workflow that works best for them and see Greenwood as more of a knob or spectrum, rather than a toggle._  ⚙️
+> _So we hope users find a workflow that works best for them and see Greenwood as more of a knob or spectrum, rather than a toggle.  This [blog post](https://developers.google.com/web/updates/2019/02/rendering-on-the-web) also provides a lot of good information on the various rendering strategies implemented these days._  ⚙️

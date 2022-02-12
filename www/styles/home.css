@@ -13,7 +13,8 @@ h3 {
   }
 
   & a {
-    color: #201e2e;
+    color: #504b65;
+    text-decoration: underline;
   }
 }
 

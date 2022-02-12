@@ -8,7 +8,7 @@ linkheadings: 3
 
 ## Templates and Pages
 
-Greenwood has two types of templates to help layout your pages:
+Greenwood defines two types of templates to help layout your pages:
 
 - _App Template_: The ["app shell"](https://developers.google.com/web/fundamentals/architecture/app-shell) that will wrap all pages.  One is provided for you by Greenwood, but you can override it if needed.
 - _Page Templates_:  A template for each unique page layout within your site.  Common layouts are great for documentation and blog sites, but also great for single pages as well (like a splash layout for the home page).
@@ -16,12 +16,12 @@ Greenwood has two types of templates to help layout your pages:
 > _**Note:** You can use either relative (`../`) or absolute (`/`) paths in your templates since using `../` will allow for IDE autocomplete on your filesystem, but is marginally slower than using `/`._
 
 ### Page Templates
-Pages in your project will generally want a template so you can control the output of the HTML and include all your own custom components and styles.  By default all pages will default to looking for a _page.html_ in _templates/ directory within your workspace.  
+Pages in your project will generally want a template so you can control the output of the HTML and include all your own custom components and styles.  By default all pages will default to looking for a _page.html_ in _templates/ directory within your workspace.
 
 
 In order to make a page template, you just need to write up some HTML that can be enhanced with these special custom elements:
 - Include `<content-outlet></content-outlet>` to position where the processed markdown from the page will appear
-- Include `<meta-outlet></meta-outlet>` to position where `<meta>` tags should go 
+- Include `<meta-outlet></meta-outlet>` to position where `<meta>` tags should go
 
 
 Below is an example of a simple _page.html_.  You can just copy / paste this to start your own page templates and by default all your pages will start rendering using this layout.
@@ -33,16 +33,16 @@ Below is an example of a simple _page.html_.  You can just copy / paste this to 
   <head>
     <meta-outlet></meta-outlet>
   </head>
-  
+
   <body>
     <header>
       <h1>Welcome to my site!</h1>
     </header>
-      
+
     <content-outlet></content-outlet>
 
   </body>
-  
+
 </html>
 ```
 
@@ -80,7 +80,7 @@ As with page templates, app templates are just HTML.
     <header>
       <h1>Welcome to My Site!</h1>
     </header>
-      
+
     <section>
       <page-outlet></page-outlet>
     </section>
@@ -90,7 +90,7 @@ As with page templates, app templates are just HTML.
     </footer>
 
   </body>
-  
+
 </html>
 ```
 
@@ -151,15 +151,15 @@ For example, here is what a standard app template might look like:
     <script type="module" src="/components/app-header.js"></script>
     <script type="module" src="/components/app-footer.js"></script>
   </head>
-  
+
   <body>
     <app-header></app-header>
-      
+
     <page-outlet></page-outlet>
 
     <app-footer></app-footer>
   </body>
-  
+
 </html>
 ```
 
@@ -191,7 +191,7 @@ Greenwood will automatically generate a [default _404.html_](https://github.com/
            └── 404.html
 ```
 
-It will be emitted to the output directory as a top level _404.html_, which is the [commmon convention](https://docs.netlify.com/routing/redirects/redirect-options/#custom-404-page-handling) for most hosts and web servers.
+It will be emitted to the output directory as a top level _404.html_, which is the [common convention](https://docs.netlify.com/routing/redirects/redirect-options/#custom-404-page-handling) for most hosts and web servers.
 
 ### Single Page Applications
 

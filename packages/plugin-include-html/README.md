@@ -1,7 +1,7 @@
 # @greenwood/plugin-include-html
 
 ## Overview
-In the spirit of the since [abandoned HTML Imports spec](https://www.html5rocks.com/en/tutorials/webcomponents/imports/) that was originally part of the init Web Components "feature suite", and given the renewed [interest in bringing it back](https://github.com/whatwg/html/issues/2791), this plugin adds expiremental support to realize the HTML Includes "spec" as a build time templating system for HTML.  The goal here is to enable developers the ability to ship more static HTML while allowing the authoring context to be JavaScript **and** leveraging standard semantics and web expectations. 💚 
+In the spirit of the since [abandoned HTML Imports spec](https://www.html5rocks.com/en/tutorials/webcomponents/imports/) that was originally part of the init Web Components "feature suite", and given the renewed [interest in bringing it back](https://github.com/whatwg/html/issues/2791), this plugin adds experimental support to realize the HTML Includes "spec" as a build time templating system for HTML.  The goal here is to enable developers the ability to ship more static HTML while allowing the authoring context to be JavaScript **and** leveraging standard semantics and web expectations. 💚
 
 > **Note**: I think if you want this feature in its most strictest sense of the word, I would recommend the [**<html-include>**](https://github.com/justinfagnani/html-include-element) custom element, which provides a runtime implementation of this as a Web Component.
 
@@ -37,7 +37,7 @@ So given a snippet of HTML, e.g.
 
 <header class="my-include">
   <h1>Welcome to my website!<h1>
-</header> 
+</header>
 ```
 
 In a page template, you could then do this
@@ -49,7 +49,7 @@ In a page template, you could then do this
     <link rel="html" href="/includes/header.html"></link>
 
     <h2>Hello 👋</h2>
-  
+
   </body>
 
 <html>
@@ -69,10 +69,10 @@ And Greenwood will statically generate this
 
     <header class="my-include">
       <h1>Welcome to my website!<h1>
-    </header> 
+    </header>
 
     <h2>Hello 👋</h2>
-  
+
   </body>
 
 <html>
@@ -113,7 +113,7 @@ const getData = async () => {
 export {
   getTemplate,
   getData
-}; 
+};
 ```
 
 In a page template, you can now do this
@@ -123,7 +123,7 @@ In a page template, you can now do this
   <body>
     <h2>Hello 👋</h2>
 
-    <app-footer src="../includes/footer.js"></app-footer>  
+    <app-footer src="../includes/footer.js"></app-footer>
   </body>
 
 <html>
@@ -148,10 +148,10 @@ And Greenwood would statically generate this
           <a href="/">Greenwood v0.19.0-alpha.2</a>
         </h4>
       </footer>
-    </app-footer>  
+    </app-footer>
   </body>
 
 <html>
 ```
 
-> We think the JS flavor will really come to shine more when Greenwood adds support for [SSR](https://github.com/ProjectEvergreen/greenwood/issues/708), and then you could use this TECHNIQUE for displaying user / session data, or serverlessly at the edge!
+> We think the JS flavor will really come to shine more when Greenwood adds support for [SSR](https://github.com/ProjectEvergreen/greenwood/issues/708), and then you could use this TECHNIQUE for displaying user / session data, or serverless at the edge!

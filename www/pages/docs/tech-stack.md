@@ -8,12 +8,10 @@ linkheadings: 3
 
 ## Tech Stack
 
-**Greenwood** uses a variety of open source JavaScript tools to help faciliate development and production building of Greenwood projects.  By putting all these tools together and configuring them for you, Greenwood helps you focus more on what matters; building your project.  Greenwood takes care of the performance and optimizations for you and provides static build output that you can host on any web server or cloud host, be it Netlify, S3 / CloudFront, Express, Apache, etc.  It's entirely up to you and what fits your workflow the best.
+**Greenwood** uses a handful of open source JavaScript tools to help facilitate development and production building of Greenwood projects.  By curating the minimal set of tools needed to provide a good developer experience based on modern web standards, Greenwood helps you focus more on what matters; building your project.  Greenwood takes care of the performance and optimizations for you and provides static build output that you can host on any web server or cloud host, be it Netlify, S3 / CloudFront, Express, Apache, etc.  It's entirely up to you and what fits your workflow the best.
 
 ### NodeJS
-For development, Greenwood requires **NodeJS** (LTS) to be available on the command line. This allows us (and you!) to tap into all the amazing web development tools and libraries available on **npm**.
-
-To pre-render a site, we use [puppeteer](https://developers.google.com/web/tools/puppeteer/).
+For local development or server rendered environments, Greenwood leverages **NodeJS**. This allows us (and you!) to tap into all the amazing web development tools and libraries available on **npm** as well as the stability and long term roadmap of NodeJS.
 
 ### Unified
 For processing markdown, **Greenwood** taps into the unified ecosystem taking advantage of and supporting tools like **remark** and **rehype**
@@ -27,7 +25,7 @@ Web standards like Web Components and ES Modules, coupled with network standards
 Greenwood makes use of [**Rollup**](https://rollupjs.org/) as part of build phase to optimize all the HTML / CSS and JavaScript for a given project.  This affords **Greenwood** the ability to bundle, minify and otherwise prepare the site for final deployment in the best way possible based on the code you've written.
 
 ### Puppeteer
-When pre-rendering content for Web Components, Greenwood  makes use of [**Puppeteer**](https://developers.google.com/web/tools/puppeteer) as part of build phase to generate all the appropriate static HTML and CSS.
+When pre-rendering content for Web Components, Greenwood  makes use of [**Puppeteer**](https://developers.google.com/web/tools/puppeteer) as part of build phase to generate all the appropriate static HTML and CSS.  Other (server) rendering options are available through [plugins](/plugins/).
 
 
 ### Development

@@ -77,7 +77,7 @@ Here are paths you can get from `context`, all of which are absolute URLs:
 - `outputDir`: Where Greenwood outputs the final static site
 - `pagesDir`: Path to the _pages/_ directory in the user's workspace
 - `projectDirectory`: Path to the root of the current project
-- `scratchDir`: Path to Greenwood's temporay output file directory (`${process.cwd()}.greenwood/`)s
+- `scratchDir`: Path to Greenwood's temporary output file directory (`${process.cwd()}.greenwood/`)s
 - `userTemplatesDir`: Path to the _templates/_ directory in the user's workspace
 - `userWorkspace`: Path to the workspace directory (_src/_ by default)
 
@@ -109,7 +109,7 @@ While each API has its own documentation section on the left sidebar of this pag
 [Copy plugins](/plugins/copy/) allow users to copy ad-hac files and folders as part of a production build.
 
 #### Context Plugins
-[Context plugins](/plugins/context/) allows usersto extend where Greenwood can look for certain files and folders, like [templates and pages](/docs/layouts/).
+[Context plugins](/plugins/context/) allows users to extend where Greenwood can look for certain files and folders, like [templates and pages](/docs/layouts/).
 
 #### Resource Plugins
 [Resource plugins](/plugins/resource/) allow users to interact with the request and response lifecycles of files at a variety of different ways.  These lifecycles provide the ability to do things like introduce new file types, to adding hosted 3rd party scripts to your site.
@@ -121,7 +121,7 @@ While each API has its own documentation section on the left sidebar of this pag
 [Rollup plugins](/plugins/rollup/) allow providing Rollup plugins directly to Greenwood during the optimization part of the build command.
 
 #### Server Plugins
-[Server plugins](/plugins/server/) allow developers to start and stop custom servers as part of the **serve** lifecycle of Greenwood.  These lifecycles provide the ability to do things like start a GraphQL server, or reverse proy requests to a custom server.
+[Server plugins](/plugins/server/) allow developers to start and stop custom servers as part of the **serve** lifecycle of Greenwood.  These lifecycles provide the ability to do things like start a GraphQL server, or reverse proxy requests to a custom server.
 
 #### Source Plugins
 [Source plugins](/plugins/source/) allow developers to pull in content from external sources (Headless CMS, DB, API, etc) and render that out as content as part of their project.

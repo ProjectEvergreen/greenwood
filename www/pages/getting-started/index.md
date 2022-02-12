@@ -18,9 +18,9 @@ To get things started, we first want to make sure everyone can get their first p
 1. Configuration
 1. Building and hosting for production
 
-> _If you already have NodeJS installed on your machine and are comfortable with Git, you can skip the prequisites and jump right to [project setup](/getting-started/project-setup)._
+> _If you already have NodeJS installed on your machine and are comfortable with Git, you can skip the prerequisites and jump right to [project setup](/getting-started/project-setup)._
 
-## Prequisites
+## Prerequisites
 Before going into the setup section of the tutorial, we want to make sure that you are familiar with some of the expectations and assumptions this guide (and Greenwood) make.
 
 #### NodeJS and the Command Line (CLI)
@@ -36,7 +36,7 @@ $ npm -v
 
 # for example
 $ node -v
-v12.13.0
+v14.16.0
 
 $ npm -v
 6.4.1

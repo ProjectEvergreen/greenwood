@@ -24,7 +24,7 @@ export default {
 That's it!  You can learn more about configuring Greenwood [here](/docs/configuration).
 
 ### Resources
-Since Greenwood aims to be a web "first" tool, all the great web development resources for the web already apply to Greenwood!  Below are some resources that we think might be useful as part of a broader understanding of the topic of web development and that we have found invalualable for our own development and learning.
+Since Greenwood aims to be a web "first" tool, all the great web development resources for the web already apply to Greenwood!  Below are some resources that we think might be useful as part of a broader understanding of the topic of web development and that we have found invaluable for our own development and learning.
 - [MDN](https://developer.mozilla.org/) - Mozilla Developer Network has some of the best technical and sample content available for learning about all the features and capabilities of the web.
 - [Web Components](https://www.webcomponents.org/introduction) - A brief introduction to the specs that make up Web Components.
 - [CSS / Shadow DOM](https://developers.google.com/web/fundamentals/web-components/shadowdom)
