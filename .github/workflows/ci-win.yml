@@ -19,7 +19,7 @@ jobs:
         node-version: ${{ matrix.node }}
     - name: Installing project dependencies
       run: |
-        yarn install --frozen-lockfile && yarn lerna bootstrap
+        yarn install --frozen-lockfile --network-timeout 1000000 && yarn lerna bootstrap
     - name: Lint
       run: |
         yarn lint
