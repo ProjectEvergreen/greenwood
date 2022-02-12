@@ -4,11 +4,10 @@ import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
 import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
 import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
-import { greenwoodPluginRendererLit } from '@greenwood/plugin-renderer-lit';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 import { fileURLToPath, URL } from 'url';
 
-const META_DESCRIPTION = 'A modern and performant static site generator supporting Web Component based development';
+const META_DESCRIPTION = 'A modern framework focused on web standards to help you build your next project.';
 const FAVICON_HREF = '/favicon.ico';
 
 export default {
@@ -47,8 +46,7 @@ export default {
         ];
       }
     },
-    ...greenwoodPluginIncludeHTML(),
-    greenwoodPluginRendererLit()
+    ...greenwoodPluginIncludeHTML()
   ],
   markdown: {
     plugins: [

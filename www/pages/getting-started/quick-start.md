@@ -8,7 +8,7 @@ linkheadings: 3
 
 ## Quick Start
 
-If you want to get right into some code, we have a few options to get you started with building with Greenwood right away:
+If you want to get right into the code, we have a few options to get you started Greenwood:
 
 - Init Command
 - Command Line (w/ `npx`)
@@ -17,7 +17,7 @@ If you want to get right into some code, we have a few options to get you starte
 
 ### Init Package
 
-You can use Greenwood's [`init` package](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/init/README.md) to scaffold out a new Greenwood project for you that will be all set and ready for you start using.
+You can use Greenwood's [`init` package](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/init/README.md) to scaffold out a new empty Greenwood project, or from a template.
 
 ```bash
 mkdir my-app && cd my-app
@@ -41,7 +41,7 @@ $ npx @greenwood/cli develop
 ```
 
 ### Clone GitHub Repo
-If you just want to _clone and go_ then we welcome you to check out the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started) we made to accompany this guide.  To get the code from this walkthrough, you can simply clone the repo, install dependencies, and off you go!
+If you just want to _clone and go_ then we welcome you to check out the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started) we made to accompany this guide.  To get the code from this walk-through, you can simply clone the repo, install dependencies, and off you go!
 
 ```bash
 $ git clone https://github.com/ProjectEvergreen/greenwood-getting-started

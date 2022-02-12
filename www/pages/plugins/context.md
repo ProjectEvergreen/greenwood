@@ -7,7 +7,7 @@ index: 1
 
 ## Context
 
-Context plugins allow users to extend where Greenwood can look for certain files and folders, like [templates and pages](/docs/layouts/).  This allows plugin authors to publish a full set of assets like HTML, CSS and images (a "theme pack") so that Greenwood users can simply "wrap up" their content in a nice custom layout and theme just by installing a package from npm!  💯  
+Context plugins allow users to extend where Greenwood can look for certain files and folders, like [templates and pages](/docs/layouts/).  This allows plugin authors to publish a full set of assets like HTML, CSS and images (a "theme pack") so that Greenwood users can simply "wrap up" their content in a nice custom layout and theme just by installing a package from npm!  💯
 
 Similar in spirit to [**CSS Zen Garden**](http://www.csszengarden.com/)
 
@@ -32,11 +32,11 @@ template: 'acme-theme-blog-layout'
 
 Your plugin might look like this:
 ```js
-/* 
- * For context, when your plugin is installed via npm or Yarn, __dirname will be /path/to/node_modules/  <your-package-name>/
+/*
+ * For context, when your plugin is installed via npm or Yarn, import.meta.url will be /path/to/node_modules/<your-package-name>/
  *
  * You can then choose how to organize and publish your files.  In this case, we have published the template under a _dist/_ folder, which was specified in the package.json `files` field.
- * 
+ *
  * node_modules/
  *   acme-theme-pack/
  *     dist/
@@ -45,7 +45,7 @@ Your plugin might look like this:
  *     acme-theme-pack.js
  *     package.json
  */
-import path from 'path');
+import { fileURLToPath } from 'url';
 
 export function myCopyPlugin() {
   return {
@@ -54,8 +54,8 @@ export function myCopyPlugin() {
     provider: () => {
       return {
         templates: [
-          // when the plugin is installed __dirname will be /path/to/node_modules/<your-package>/
-          path.join(__dirname, 'dist/layouts')
+          // when the plugin is installed import.meta.url will be /path/to/node_modules/<your-package>/
+          fileURLToPath(new URL('./dist/layouts', import.meta.url))
         ]
       };
     }

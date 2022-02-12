@@ -32,7 +32,7 @@ export default {
 }
 ```
 
-This will then allow you to use a CommonJS based modules in the browser.   For example, here is how you could use [**lodash**](https://lodash.com/) (although as mentioend above, in this case, you would want to use [**lodash-es**](https://www.npmjs.com/package/lodash-es) instead.)
+This will then allow you to use a CommonJS based modules in the browser.   For example, here is how you could use [**lodash**](https://lodash.com/) (although as mentioned above, in this case, you would want to use [**lodash-es**](https://www.npmjs.com/package/lodash-es) instead.)
 
 ```javascript
 // <script src="my-file.js">

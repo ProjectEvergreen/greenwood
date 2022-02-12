@@ -35,7 +35,7 @@ Styles can be done in any standards compliant way that will work in a browser.  
   <body>
     <!-- content goes here -->
   </body>
-  
+
 </html>
 ```
 

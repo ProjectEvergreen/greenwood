@@ -32,7 +32,7 @@ export default {
 }
 ```
 
-> 👉 _If you are using this along with [**PostCSS plugin**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss), make sure **plugin-postcss** comes first!  All non standard transformations need to come last._ 
+> 👉 _If you are using this along with [**PostCSS plugin**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss), make sure **plugin-postcss** comes first!  All non standard transformations need to come last._
 
 
 This will then allow you use `import` to include CSS in your JavaScript files by appending `?type=css` to the end of the `import` statement.

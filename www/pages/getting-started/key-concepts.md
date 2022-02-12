@@ -34,7 +34,7 @@ This gives our project the following structure:
 
 
 ### Templates
-Templates are used to define the various layouts you will need for your site and should be put into a _templates/_ directory in your workspace directory.  You will need to define at least one page template for your project in order to get control over the output of your site, called _page-tempate.js_.
+Templates are used to define the various layouts you will need for your site and should be put into a _templates/_ directory in your workspace directory.  You will need to define at least one page template for your project in order to get control over the output of your site, called _page-template.js_.
 
 
 So using the project structure we setup previously, adding your own custom page layout would leave you with a directory layout like this:
@@ -72,7 +72,7 @@ Any regular HTML will do.  You will just need to include a `<content-outlet></co
       <span>&copy My Website</span>
     </footer>
   </body>
-  
+
 </html>
 ```
 

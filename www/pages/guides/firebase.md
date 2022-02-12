@@ -47,7 +47,7 @@ then
 firebase use --add
 ```
 
-select the targeted project, add an alias (referenced in the .firebaserc file at the root of your project, you can just use 'default') for the deployment, then
+select the targeted project, add an alias (referenced in the _.firebaserc_ file at the root of your project, you can just use 'default') for the deployment, then
 
  ```bash
 firebase deploy

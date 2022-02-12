@@ -103,7 +103,7 @@ Finally, select your project's repository then and the build command: `npm run b
 
 <img src="/assets/netlify-deploy.png" alt="netlify-deploy" style="max-width:700px;"/>
 
-Click **Deploy Site** and you're site will now be deployed to a randomly generated url at netlfy.com
+Click **Deploy Site** and you're site will now be deployed to a randomly generated url at netlify.com
 
 ### Configure Authentication
 
@@ -151,7 +151,7 @@ Click **New Blog** button. You will be greeted with a WYSIWYG(what you see is wh
 
 <img src="/assets/netlify-cms.jpg" alt="netlify-cms" style="max-width:800px;"/>
 
-Add a **title** of `example` which will be used for our page's URL, as defined by our configuration. For example the title `Hello World Howdy` would be available at the url https://yourgeneratedurl-ads6387.netlify.com/blog/hello-world-howdy when publsihed.
+Add a **title** of `example` which will be used for our page's URL, as defined by our configuration. For example the title `Hello World Howdy` would be available at the url https://yourgeneratedurl-ads6387.netlify.com/blog/hello-world-howdy when published.
 
 Add whatever content you would like.  If you wish to upload images through netlify's CMS they will be placed in `/public/assets` as defined by your netlify configuration.
 

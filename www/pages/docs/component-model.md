@@ -6,11 +6,11 @@ index: 1
 ---
 
 ## Component Model
-Greenwood aims to support and optimize around the standard capabilities of the web platform and its features.  In particular, the concept of using Web Components as a way to add interactivity and dynamic content into your application and... that can all be prerendered for you, just like you could do with any server side templating language.
+Greenwood aims to support and optimize around the standard capabilities of the web platform and its features.  In particular, the concept of using Web Components as a way to add and isolate interactivity and dynamic content into your application and that it can all be prerendered for you, just like you could do with any server side templating language.
 
 The options for how to design your app effectively comes down to what you're trying to build, so if that's with the native `HTMLElement` or something based on it like **LitElement** (installed separately), **Greenwood** will take care of the rest.
 
-Below are a couple examples to get you going.  
+Below are a couple examples to get you going.
 
 > _Check out our [README](https://github.com/ProjectEvergreen/greenwood#built-with-greenwood) for more examples of sites built with **Greenwood** to see what's possible._
 
@@ -59,7 +59,7 @@ You can then use it within a page template.
 <html lang="en" prefix="og:http://ogp.me/ns#">
 
   <head>
-    <script type="module" src="/components/footer.js"></script>  
+    <script type="module" src="/components/footer.js"></script>
   </head>
 
   <body>
@@ -71,7 +71,7 @@ You can then use it within a page template.
 
 
 ### Alternatives
-An alternative like [**LitElement**](https://lit.dev/) would work the same way.  
+An alternative like [**LitElement**](https://lit.dev/) would work the same way.
 
 > _Make sure you have installed LitElement with **npm** first!_
 
@@ -102,7 +102,7 @@ customElements.define('x-greeting', GreetingComponent);
 <html lang="en" prefix="og:http://ogp.me/ns#">
 
   <head>
-    <script type="module" src="/components/greeting.js"></script>  
+    <script type="module" src="/components/greeting.js"></script>
   </head>
 
   <body>

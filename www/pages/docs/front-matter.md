@@ -8,7 +8,7 @@ linkheadings: 3
 
 ## Front Matter
 
-"Front matter" is a [YAML](https://yaml.org/) block at the top of any markdown file.  It gives you the ability to define variables that are made available to Greenwood's build process. You can also use it to `import` additional files.
+"Front matter" is a [YAML](https://yaml.org/) block at the top of any markdown file.  It gives you the ability to define variables that are made available to Greenwood's build process and then your code. You can also use it to `import` additional files.
 
 ### Element Label
 
@@ -25,7 +25,7 @@ label: 'My Blog Post from 3/5/2020'
 
 
 ### Imports
-If you want to include files on a _per **page** basis_, you can use the predefined `imports` feature from Greenwood.  This is great for one off use cases where you dont want to ship a third party lib in all your templates, but just for this one particular page.  This is effectively a naive form of code splitting.  🤓
+If you want to include files on a _per **page** basis_, you can use the predefined `imports` feature from Greenwood.  This is great for one off use cases where you don't want to ship a third party lib in all your templates, but just for this one particular page.  This is effectively a naive form of code splitting.  🤓
 
 #### Example
 ```md

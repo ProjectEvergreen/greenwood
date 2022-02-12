@@ -20,7 +20,7 @@ In this section, we will kick off our Greenwood project by:
 ### Installing Greenwood
 With Greenwood installed, you will be able to use its CLI to power the development of your project though automated scripts and configuration.
 
-First thing we need to do is generate a _package.json_ file so we can install Greenwood.  The easist way to do that is by running `npm init` from the root directory of where you want to start your project:
+First thing we need to do is generate a _package.json_ file so we can install Greenwood.  The easiest way to do that is by running `npm init` from the root directory of where you want to start your project:
 ```shell
 # hit enter to accept all defaults, or provide your own values
 $ npm init
