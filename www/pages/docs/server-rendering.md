@@ -6,7 +6,7 @@ index: 8
 linkheadings: 3
 ---
 
-## Server Rendering
+## Server Rendering (Beta)
 
 In addition to supporting [static and Single Page application project types](/docs/layouts/), you can also use Greenwood to author routes completely in JavaScript and host these on a server.
 
@@ -33,7 +33,7 @@ In your _[page].js_ file, Greenwood supports three functions you can `export` fo
 - `getTemplate`: Effectively the same as a [page template](/docs/layouts/#page-templates).
 
 ```js
-async function getFrontmatter(compilation, route, route, id) {
+async function getFrontmatter(compilation, route, label, id) {
   return { /* ... */ };
 }
 
