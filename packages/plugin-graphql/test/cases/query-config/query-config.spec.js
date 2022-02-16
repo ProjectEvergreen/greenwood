@@ -30,7 +30,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'ConfigQuery from GraphQL';
   const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
@@ -76,7 +76,7 @@ xdescribe('Build Greenwood With: ', function() {
       it('should have a <footer> in the <body> with greenwoodConfig#title as the text value', function() {
         const footer = dom.window.document.querySelector('body footer');
 
-        expect(footer.innerHTML).to.be.equal('ssg');
+        expect(footer.innerHTML).to.be.equal('default');
       });
 
       it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', function() {

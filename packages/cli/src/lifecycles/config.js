@@ -206,7 +206,7 @@ const readAndMergeConfig = async() => {
           }
         }
       } else {
-        // SPA should not prerender by default
+        // SPA should _not_ prerender unless if user has specified prerender should be true
         if (fs.existsSync(path.join(customConfig.workspace, 'index.html'))) {
           customConfig.prerender = false;
         }

@@ -33,7 +33,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'A Single Page Application (SPA)';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));

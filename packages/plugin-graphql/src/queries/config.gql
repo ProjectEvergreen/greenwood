@@ -3,18 +3,9 @@ query {
   	devServer {
       port
     },
-    meta {
-      name,
-      rel,
-      content,
-      property,
-      value,
-      href
-    },
     staticRouter,
     optimization,
     prerender,
-    title,
     workspace
   }
 }

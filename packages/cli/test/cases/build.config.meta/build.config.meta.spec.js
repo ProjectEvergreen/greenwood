@@ -85,7 +85,6 @@ describe('Build Greenwood With: ', function() {
       it('should have a <meta> tag with custom og:site content in the <head>', function() {
         const metaElement = dom.window.document.querySelector('head meta[property="og:site"');
 
-        console.debug({ metaElement });
         expect(metaElement.getAttribute('content')).to.be.equal('The Greenhouse I/O');
       });
 
@@ -116,7 +115,6 @@ describe('Build Greenwood With: ', function() {
       it('should have a <meta> tag with custom og:site content in the <head>', function() {
         const metaElement = dom.window.document.querySelector('head meta[property="og:site"');
 
-        console.debug({ metaElement });
         expect(metaElement.getAttribute('content')).to.be.equal('The Greenhouse I/O');
       });
 

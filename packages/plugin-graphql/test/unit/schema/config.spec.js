@@ -23,30 +23,6 @@ describe('Unit Test: Data', function() {
         });
       });
 
-      describe('Meta', function() {
-        const { meta } = MOCK_CONFIG.config;
-
-        it('should have the expected name meta in the first indexx', function() {
-          const nameMeta = config.meta[0];
-
-          expect(nameMeta.name).to.equal(meta[0].name);
-        });
-
-        it('should have the expected rel meta in the second index', function() {
-          const relMeta = config.meta[1];
-
-          expect(relMeta.rel).to.equal(meta[1].rel);
-        });
-      });
-
-      describe('Mode', function() {
-
-        it('should have a default mode setting of mode', function() {
-          expect(config.mode).to.equal(MOCK_CONFIG.config.mode);
-        });
-
-      });
-
       describe('Optimization', function() {
 
         it('should have a default optimization setting of default', function() {
@@ -61,14 +37,6 @@ describe('Unit Test: Data', function() {
           expect(config.optimization).to.equal(MOCK_CONFIG.config.prerender);
         });
 
-      });
-
-      describe('Title', function() {
-        const { title } = MOCK_CONFIG.config;
-
-        it('should have the expected title', function() {  
-          expect(title).to.equal(config.title);
-        });
       });
 
       describe('Workspace', function() {
