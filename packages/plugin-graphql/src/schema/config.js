@@ -10,22 +10,11 @@ const configTypeDefs = gql`
     port: Int
   }
 
-  type Meta {
-    name: String,
-    value: String,
-    content: String,
-    rel: String,
-    property: String,
-    href: String
-  }
-
   type Config {
     devServer: DevServer,
-    meta: [Meta],
     staticRouter: Boolean,
     optimization: String,
     prerender: Boolean,
-    title: String,
     workspace: String
   }
 

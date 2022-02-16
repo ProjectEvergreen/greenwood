@@ -9,9 +9,7 @@
  * greenwood build
  *
  * User Config
- * {
- *   title: 'a title to test correct title merging'
- * }
+ * None
  *
  * User Workspace
  * Greenwood default
@@ -52,13 +50,6 @@ describe('Build Greenwood With: ', function() {
     
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-      });
-    
-      it('should have custom <title> tag in the <head>', function() {
-        const title = dom.window.document.querySelectorAll('head > title');
-
-        expect(title.length).to.be.equal(1);
-        expect(title[0].textContent).to.be.equal('this is the title from the config - this is a custom markdown title');
       });
 
       it('should correctly rendering an <h3> tag', function() {

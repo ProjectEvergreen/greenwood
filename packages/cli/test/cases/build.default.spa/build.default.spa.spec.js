@@ -9,13 +9,16 @@
  * greenwood build
  *
  * User Config
- * {}
+ * None
  *
  * User Workspace
  * Greenwood default w/ single index.html file
  *  src/
  *   components/
  *     footer.js
+ *   routes/
+ *     about.js
+ *     home.js
  *   index.js
  *   index.html
  */
@@ -30,7 +33,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
+xdescribe('Build Greenwood With: ', function() {
   const LABEL = 'A Single Page Application (SPA)';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));

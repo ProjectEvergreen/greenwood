@@ -15,7 +15,7 @@ import chai from 'chai';
 import fs from 'fs';
 import path from 'path';
 import { Runner } from 'gallinago';
-import { fileURLToPath, pathToFileURL, URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
@@ -43,10 +43,6 @@ describe('Scaffold Greenwood With Default Template: ', function() {
       
       it('should create a src/pages directory', function() {
         expect(fs.existsSync(path.join(outputPath, 'src', 'pages'))).to.be.true;
-      });
-
-      it('should generate a greenwood.config.js file', function() {
-        expect(fs.existsSync(path.join(outputPath, 'greenwood.config.js'))).to.be.true;
       });
 
       it('should generate a .gitignore file', function() {
@@ -89,18 +85,6 @@ describe('Scaffold Greenwood With Default Template: ', function() {
         const scriptPkg = JSON.parse(fs.readFileSync(fileURLToPath(new URL('../../../package.json', import.meta.url)), 'utf-8'));
 
         expect(pkgJson.devDependencies['@greenwood/cli']).to.equal(`~${scriptPkg.version}`);
-      });
-    });
-
-    describe('initial greenwood.config.js contents', function() {
-      let greenwoodConfig;
-
-      before(async function() {
-        greenwoodConfig = (await import(pathToFileURL(path.join(outputPath, './greenwood.config.js')))).default;
-      });
-
-      it('should have the correct title configuration', function() {
-        expect(greenwoodConfig.title).to.equal('My Project');
       });
     });
 

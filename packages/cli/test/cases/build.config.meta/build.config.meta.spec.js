@@ -9,16 +9,7 @@
  * greenwood build
  *
  * User Config
- * {
- *   title: 'My Custom Greenwood App',
- *   meta: [
- *     { property: 'og:site', content: 'The Greenhouse I/O' },
- *     { property: 'og:url', content: 'https://www.thegreenhouse.io' },
- *     { name: 'twitter:site', content: '@thegreenhouseio' }
- *     { rel: 'shortcut icon', href: '/assets/images/favicon.ico' }
- *     { rel: 'icon', href: '/assets/images/favicon.ico' }
- *   ]
- * }
+ * None
  *
  * User Workspace
  * Greenwood default w/ nested page
@@ -28,9 +19,11 @@
  *       index.md
  *     hello.md
  *     index.md
+ *   template/
+ *     app.html
+ *     page.html
  */
 import fs from 'fs';
-import greenwoodConfig from './greenwood.config.js';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import chai from 'chai';
@@ -43,7 +36,6 @@ const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom Meta Configuration and Nested Workspace';
-  const meta = greenwoodConfig.meta;
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -56,14 +48,6 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe(LABEL, function() {
-    const metaFilter = (metaKey) => {
-      return meta.filter((item) => {
-        if (item.property === metaKey || item.name === metaKey || item.rel === metaKey) {
-          return item;
-        }
-      })[0];
-    };
-
     before(async function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
@@ -81,7 +65,7 @@ describe('Build Greenwood With: ', function() {
       it('should have a <title> tag in the <head>', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
-        expect(title).to.be.equal(greenwoodConfig.title);
+        expect(title).to.be.equal('My Custom Greenwood App');
       });
 
       it('should have the expected heading text within the index page in the public directory', function() {
@@ -99,24 +83,22 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have a <meta> tag with custom og:site content in the <head>', function() {
-        const ogSiteMeta = metaFilter('og:site');
-        const metaElement = dom.window.document.querySelector(`head meta[property="${ogSiteMeta.property}`);
+        const metaElement = dom.window.document.querySelector('head meta[property="og:site"');
 
-        expect(metaElement.getAttribute('content')).to.be.equal(ogSiteMeta.content);
+        console.debug({ metaElement });
+        expect(metaElement.getAttribute('content')).to.be.equal('The Greenhouse I/O');
       });
 
       it('should have a <meta> tag with custom og:url content in the <head>', function() {
-        const ogUrlMeta = metaFilter('og:url');
-        const metaElement = dom.window.document.querySelector(`head meta[property="${ogUrlMeta.property}"]`);
+        const metaElement = dom.window.document.querySelector('head meta[property="og:url"]');
 
-        expect(metaElement.getAttribute('content')).to.be.equal(ogUrlMeta.content);
+        expect(metaElement.getAttribute('content')).to.be.equal('https://www.thegreenhouse.io');
       });
 
       it('should have a <meta> tag with custom twitter:site content in the <head>', function() {
-        const twitterSiteMeta = metaFilter('twitter:site');
-        const metaElement = dom.window.document.querySelector(`head meta[name="${twitterSiteMeta.name}"]`);
+        const metaElement = dom.window.document.querySelector('head meta[property="twitter:site"]');
 
-        expect(metaElement.getAttribute('content')).to.be.equal(twitterSiteMeta.content);
+        expect(metaElement.getAttribute('content')).to.be.equal('@thegreenhouseio');
       });
     });
 
@@ -132,24 +114,22 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have a <meta> tag with custom og:site content in the <head>', function() {
-        const ogSiteMeta = metaFilter('og:site');
-        const metaElement = dom.window.document.querySelector(`head meta[property="${ogSiteMeta.property}`);
+        const metaElement = dom.window.document.querySelector('head meta[property="og:site"');
 
-        expect(metaElement.getAttribute('content')).to.be.equal(ogSiteMeta.content);
+        console.debug({ metaElement });
+        expect(metaElement.getAttribute('content')).to.be.equal('The Greenhouse I/O');
       });
 
-      it('should have custom config <meta> tag with og:url property in the <head>', function() {
-        const ogUrlMeta = metaFilter('og:url');
-        const metaElement = dom.window.document.querySelector(`head meta[property="${ogUrlMeta.property}"]`);
+      it('should have a <meta> tag with custom og:url content in the <head>', function() {
+        const metaElement = dom.window.document.querySelector('head meta[property="og:url"]');
 
-        expect(metaElement.getAttribute('content')).to.be.equal(`${ogUrlMeta.content}/about/`);
+        expect(metaElement.getAttribute('content')).to.be.equal('https://www.thegreenhouse.io');
       });
 
-      it('should have our custom config <meta> tag with twitter:site name in the <head>', function() {
-        const twitterSiteMeta = metaFilter('twitter:site');
-        const metaElement = dom.window.document.querySelector(`head meta[name="${twitterSiteMeta.name}"]`);
+      it('should have a <meta> tag with custom twitter:site content in the <head>', function() {
+        const metaElement = dom.window.document.querySelector('head meta[property="twitter:site"]');
 
-        expect(metaElement.getAttribute('content')).to.be.equal(twitterSiteMeta.content);
+        expect(metaElement.getAttribute('content')).to.be.equal('@thegreenhouseio');
       });
     });
 
@@ -160,18 +140,16 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      it('should have our custom config <link> tag with shortcut icon in the <head>', function() {
-        const shortcutIconLink = metaFilter('shortcut icon');
-        const linkElement = dom.window.document.querySelector(`head link[rel="${shortcutIconLink.rel}"]`);
+      it('should have our custom config <link> tag with shortcut icon in the <head> for the index page', function() {
+        const linkElement = dom.window.document.querySelector('head link[rel="shortcut icon"]');
 
-        expect(linkElement.getAttribute('href')).to.be.equal(shortcutIconLink.href);
+        expect(linkElement.getAttribute('href')).to.be.equal('/assets/images/favicon.ico');
       });
 
-      it('should have our custom config <link> tag with icon in the <head>', function() {
-        const iconLink = metaFilter('icon');
-        const linkElement = dom.window.document.querySelector(`head link[rel="${iconLink.rel}"]`);
+      it('should have our custom config <link> tag with icon in the <head> for the index page', function() {
+        const linkElement = dom.window.document.querySelector('head link[rel="icon"]');
 
-        expect(linkElement.getAttribute('href')).to.be.equal(iconLink.href);
+        expect(linkElement.getAttribute('href')).to.be.equal('/assets/images/favicon.ico');
       });
     });
   });

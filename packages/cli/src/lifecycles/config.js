@@ -42,8 +42,6 @@ const defaultConfig = {
   port: 8080,
   optimization: optimizations[0],
   interpolateFrontmatter: false,
-  title: 'My App',
-  meta: [],
   plugins: greenwoodPlugins,
   markdown: { plugins: [], settings: {} },
   prerender: true,
@@ -60,7 +58,7 @@ const readAndMergeConfig = async() => {
 
       if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
         const userCfgFile = (await import(pathToFileURL(path.join(process.cwd(), 'greenwood.config.js')))).default;
-        const { workspace, devServer, title, markdown, meta, optimization, plugins, port, prerender, staticRouter, pagesDirectory, templatesDirectory, interpolateFrontmatter } = userCfgFile;
+        const { workspace, devServer, markdown, optimization, plugins, port, prerender, staticRouter, pagesDirectory, templatesDirectory, interpolateFrontmatter } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -85,17 +83,6 @@ const readAndMergeConfig = async() => {
               '- if using relative paths, make sure your workspace is in the same cwd as _greenwood.config.js_ \n' +
               '- consider using an absolute path, e.g. new URL(\'/your/relative/path/\', import.meta.url)');
           }
-        }
-
-        if (title) {
-          if (typeof title !== 'string') {
-            reject('Error: greenwood.config.js title must be a string');
-          }
-          customConfig.title = title;
-        }
-
-        if (meta && meta.length > 0) {
-          customConfig.meta = meta;
         }
 
         if (typeof optimization === 'string' && optimizations.indexOf(optimization.toLowerCase()) >= 0) {

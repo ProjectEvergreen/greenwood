@@ -58,7 +58,7 @@ const getPageTemplate = (fullPath, templatesDir, template, contextPlugins = [], 
   return contents;
 };
 
-const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugins, enableHud) => {
+const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugins, enableHud, frontmatterTitle) => {
   const userAppTemplatePath = `${templatesDir}app.html`;
   const customAppTemplates = getCustomPageTemplates(contextPlugins, 'app');
 
@@ -105,11 +105,15 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     const headStyles = root.querySelectorAll('head style');
     const headTitle = root.querySelector('head title');
     const appTemplateHeadContents = appRoot.querySelector('head').innerHTML;
-
+    const title = frontmatterTitle || (headTitle ? headTitle.rawText : null);
     appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
 
-    if (headTitle) {
-      appTemplateContents = appTemplateContents.replace(/<title>(.*)<\/title>/, `<title>${headTitle.rawText}</title>`);
+    if (title) {
+      if (!appRoot.querySelector('head title')) {
+        appTemplateContents = appTemplateContents.replace('<head>', '<head>\n <title></title>');
+      }
+
+      appTemplateContents = appTemplateContents.replace(/<title>(.*)<\/title>/, `<title>${title}</title>`);
     }
 
     // merge <script> tags
@@ -206,12 +210,12 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
       const appHeadMetaMatches = appTemplateHeadContents.match(matchNeedleMeta);
       const lastMeta = appHeadMetaMatches && appHeadMetaMatches.length && appHeadMetaMatches.length > 0
         ? appHeadMetaMatches[appHeadMetaMatches.length - 1]
-        : '<head>';
+        : '</title>';
       const pageMeta = headMeta.map((meta) => {
         return `<meta ${meta.rawAttrs}/>`;
       });
 
-      appTemplateContents = appTemplateContents.replace(lastMeta.replace('>', '/>'), `${lastMeta.replace('>', '/>')}\n
+      appTemplateContents = appTemplateContents.replace(lastMeta.replace('>', '/>'), `${lastMeta.replace('>', '/>')}
         ${pageMeta.join('\n')}
       `);
     }
@@ -268,48 +272,6 @@ const getUserScripts = (contents, context) => {
   return contents;
 };
 
-const getMetaContent = (url, config, contents, ssrFrontmatter = {}) => {
-  const existingTitleMatch = contents.match(/<title>(.*)<\/title>/);
-  const existingTitleCheck = !!(existingTitleMatch && existingTitleMatch[1] && existingTitleMatch[1] !== '');
-
-  const title = existingTitleCheck
-    ? existingTitleMatch[1]
-    : ssrFrontmatter.title
-      ? ssrFrontmatter.title
-      : config.title
-        ? config.title
-        : '';
-  const metaContent = [...config.meta || []].map(item => {
-    let metaHtml = '';
-
-    for (const [key, value] of Object.entries(item)) {
-      const isOgUrl = item.property === 'og:url' && key === 'content';
-      const hasTrailingSlash = isOgUrl && value[value.length - 1] === '/';
-      const contextualValue = isOgUrl
-        ? hasTrailingSlash
-          ? `${value}${url.replace('/', '')}`
-          : `${value}${url === '/' ? '' : url}`
-        : value;
-
-      metaHtml += ` ${key}="${contextualValue}"`;
-    }
-
-    return item.rel
-      ? `<link${metaHtml}/>`
-      : `<meta${metaHtml}/>`;
-  }).join('\n');
-
-  // add an empty <title> if it's not already there
-  if (!existingTitleMatch) {
-    contents = contents.replace('<head>', '<head><title></title>');
-  }
-
-  contents = contents.replace(/<title>(.*)<\/title>/, `<title>${title}</title>`);
-  contents = contents.replace('<meta-outlet></meta-outlet>', metaContent);
-
-  return contents;
-};
-
 class StandardHtmlResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
@@ -350,6 +312,7 @@ class StandardHtmlResource extends ResourceInterface {
 
         let customImports = [];
         let body = '';
+        let title = null;
         let template = null;
         let frontMatter = {};
         let ssrBody;
@@ -394,7 +357,7 @@ class StandardHtmlResource extends ResourceInterface {
             frontMatter = fm.attributes;
 
             if (frontMatter.title) {
-              config.title = `${config.title} - ${frontMatter.title}`;
+              title = frontMatter.title;
             }
 
             if (frontMatter.template) {
@@ -430,7 +393,7 @@ class StandardHtmlResource extends ResourceInterface {
                 ssrFrontmatter = result.frontmatter;
 
                 if (ssrFrontmatter.title) {
-                  config.title = `${config.title} - ${ssrFrontmatter.title}`;
+                  title = ssrFrontmatter.title;
                 }
 
                 if (ssrFrontmatter.template) {
@@ -462,12 +425,11 @@ class StandardHtmlResource extends ResourceInterface {
         if (isClientSideRoute) {
           body = fs.readFileSync(fullPath, 'utf-8');
         } else {
-          body = ssrTemplate ? ssrTemplate : getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir, ssrTemplate);
+          body = ssrTemplate ? ssrTemplate : getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir);
         }
 
-        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud);
+        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud, title);
         body = getUserScripts(body, this.compilation.context);
-        body = getMetaContent(matchingRoute.route.replace(/\\/g, '/'), config, body, ssrFrontmatter);
 
         if (processedMarkdown) {
           const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;

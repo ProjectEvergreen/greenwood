@@ -7,7 +7,7 @@ async function getTemplate(compilation, route) {
   return html`
     <html>
       <head>
-        <meta name="description" content="${compilation.config.title} - ${route} (this was generated server side!!!)"/>
+        <meta name="description" content="${route} (this was generated server side!!!)"/>
         <style>
           * {
             color: blue;
@@ -38,7 +38,7 @@ async function getBody() {
       <tr>
         <th>ID</th>
         <th>Name</th>
-        <th>Decription</th>
+        <th>Description</th>
         <th>Message</th>
         <th>Picture</th>
       </tr>
@@ -69,7 +69,7 @@ async function getFrontmatter(compilation, route) {
   return {
     menu: 'navigation',
     index: 7,
-    title: `${compilation.config.title} - ${route}`,
+    title: `My App - ${route}`,
     data: {
       author: 'Project Evergreen',
       date: '01-01-2021'
