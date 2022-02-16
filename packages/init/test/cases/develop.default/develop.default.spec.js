@@ -133,7 +133,7 @@ xdescribe('Scaffold Greenwood and Run Develop command: ', function() {
           it('should display My Project title', function(done) {
             const title = dom.window.document.querySelector('head > title');
             
-            expect(title.textContent).to.equal('My Project');
+            expect(title.textContent).to.equal('My App');
 
             done();
           });
