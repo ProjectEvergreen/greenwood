@@ -98,6 +98,7 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
 
     appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, '');
   } else {
+    const appTitle = appRoot ? appRoot.querySelector('head title') : null;
     const body = root.querySelector('body') ? root.querySelector('body').innerHTML : '';
     const headScripts = root.querySelectorAll('head script');
     const headLinks = root.querySelectorAll('head link');
@@ -105,11 +106,23 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     const headStyles = root.querySelectorAll('head style');
     const headTitle = root.querySelector('head title');
     const appTemplateHeadContents = appRoot.querySelector('head').innerHTML;
-    const title = frontmatterTitle || (headTitle ? headTitle.rawText : null);
+    const hasInterpolatedFrontmatter = headTitle && headTitle.rawText.indexOf('${globalThis.page.title}') >= 0
+     || appTitle && appTitle.rawText.indexOf('${globalThis.page.title}') >= 0;
+    const title = hasInterpolatedFrontmatter // favor frontmatter interpolation first
+      ? headTitle && headTitle.rawText
+        ? headTitle.rawText
+        : appTitle.rawText
+      : frontmatterTitle // otherwise, work in order of specificity from page -> page template -> app template
+        ? frontmatterTitle
+        : headTitle && headTitle.rawText
+          ? headTitle.rawText
+          : appTitle && appTitle.rawText
+            ? appTitle.rawText
+            : 'My App';
     appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
 
     if (title) {
-      if (!appRoot.querySelector('head title')) {
+      if (!appTitle) {
         appTemplateContents = appTemplateContents.replace('<head>', '<head>\n <title></title>');
       }
 
