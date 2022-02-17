@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood with string title in config and default workspace.
+ * Run Greenwood and tests for correct `<title>` tag merging for pages and templates.
  *
  * User Result
- * Should generate a bare bones Greenwood build.  (same as build.default.spec.js) with custom title in header
+ * Should generate a bare bones Greenwood build with expected <title> values.
  *
  * User Command
  * greenwood build

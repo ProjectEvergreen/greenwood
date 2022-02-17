@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood with meta in Greenwood config and a default workspace with a nested route.
+ * Run Greenwood and tests for correct `<meta>` tag merging for pages and templates.
  *
  * User Result
- * Should generate a bare bones Greenwood build with one nested About page w/ custom meta data.
+ * Should generate a bare bones Greenwood build with one nested About page with expected meta values.
  *
  * User Command
  * greenwood build
@@ -35,7 +35,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom Meta Configuration and Nested Workspace';
+  const LABEL = 'Custom Meta Tags and Nested Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
