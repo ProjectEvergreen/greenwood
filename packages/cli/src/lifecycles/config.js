@@ -218,6 +218,11 @@ const readAndMergeConfig = async() => {
             reject(`Error: greenwood.config.js staticRouter must be a boolean; true or false.  Passed value was typeof: ${typeof staticRouter}`);
           }
         }
+      } else {
+        // SPA should not prerender by default
+        if (fs.existsSync(path.join(customConfig.workspace, 'index.html'))) {
+          customConfig.prerender = false;
+        }
       }
 
       resolve({ ...defaultConfig, ...customConfig });
