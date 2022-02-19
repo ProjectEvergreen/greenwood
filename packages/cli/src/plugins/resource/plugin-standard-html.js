@@ -114,7 +114,7 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
 
     // merge <script> tags
     if (headScripts.length > 0) {
-      const matchNeedleScript = /<script .*/g;
+      const matchNeedleScript = /<script .*<\/script>/g;
       const appHeadScriptMatches = appTemplateHeadContents.match(matchNeedleScript);
       const lastScript = appHeadScriptMatches && appHeadScriptMatches.length && appHeadScriptMatches.length > 0
         ? appHeadScriptMatches[appHeadScriptMatches.length - 1]
