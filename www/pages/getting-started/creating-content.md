@@ -36,6 +36,7 @@ To go along with this guide, check out our [companion repo](https://github.com/P
     ├── styles
     │   └── theme.css
     └── templates
+        ├── app.html
         ├── blog.html
         └── page.html
 ```
@@ -58,6 +59,8 @@ For this template, create a _page.html_ in a _src/templates/_ (make the _templat
 </html>
 ```
 
+> _This will now be used as the default layout used for all your pages.  We'll discuss overriding this later on in the guide._
+
 ### Blog Posts Template
 We just made a template for our home page, but for our individual blog posts, we're going to want a different layout for those pages.  So what do we do?   Just create a new template!
 
@@ -73,6 +76,23 @@ Create a _blog.html_ in _src/templates/_ and include this code in it.
 ```
 
 > _Right now both of these templates are the same, but we'll be customizing these both shortly._  👇
+
+### App Template
+Now that we've created a couple page templates, it probably makes sense to wrap our site with a common layout.  By creating an _app.html_ in the _templates/_ directory, we can create a common layout for all templates and pages.
+
+This is a great way to manage global styles, loading the header and footer, or for shared site meta data.
+
+```html
+<html>
+  <head>
+    <title>My Personal Website</title>
+  </head>
+  <body>
+    <page-outlet></page-outlet>
+  </body>
+</html>
+```
+
 
 ### Creating Pages
 To make our home page which will use the default _page.html_ layout we just created, create an _index.md_ file in the _src/pages/_ directory.
@@ -119,7 +139,7 @@ Sed ut perspiciatis
 We are using something called ["front matter"](/docs/front-matter) to specify that these pages should use the _blog_ template we just created.
 
 ### Development Server
-At this point we have two page templates and three pages of content, so let's fire up the Greenwood development server and see what things look like!
+At this point we have our templates and three pages of content, so let's fire up the Greenwood development server and see what things look like!
 
 ```bash
 # using the npm script we made during project setup
