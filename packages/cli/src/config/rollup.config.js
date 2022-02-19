@@ -450,12 +450,17 @@ function greenwoodHtmlPlugin(compilation) {
                     const marker = bundledSource.match(new RegExp(`[0-9]+-${tokenSuffix}`))[0].split('-')[0];
                     
                     if (id === marker) {
-                      const cleaned = bundledSource
-                        .replace(new RegExp(`,${markerExp};\n`), '')
-                        .replace(new RegExp(`${markerExp};\n`), '')
-                        .replace(new RegExp(`${markerExp};`), '');
+                      if (parsedAttributes['data-gwd-opt'] === 'static') {
+                        html = html.replace(`<script type="module" data-gwd-opt="static">${scriptTag.rawText}</script>`, '');
+                      } else {
+                        const cleaned = bundledSource
+                          .replace(new RegExp(`,${markerExp};\n`), '')
+                          .replace(new RegExp(`${markerExp};\n`), '')
+                          .replace(new RegExp(`${markerExp};`), '');
 
-                      html = html.replace(scriptTag.rawText, cleaned);
+                        html = html.replace(scriptTag.rawText, cleaned);
+                      }
+
                       scratchFiles[innerBundleId] = true;
                     }
                   }
