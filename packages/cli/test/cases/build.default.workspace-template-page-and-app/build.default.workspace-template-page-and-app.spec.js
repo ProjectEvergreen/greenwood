@@ -82,7 +82,7 @@ describe('Build Greenwood With: ', function() {
           styleTags = dom.window.document.querySelectorAll('head > style');
         });
 
-        it('should have 45<script> tags in the <head>', function() {
+        it('should have 5 <script> tags in the <head>', function() {
           expect(scriptTags.length).to.equal(5);
         });
 
