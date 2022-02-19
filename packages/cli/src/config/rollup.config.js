@@ -451,7 +451,7 @@ function greenwoodHtmlPlugin(compilation) {
                     
                     if (id === marker) {
                       if (parsedAttributes['data-gwd-opt'] === 'static') {
-                        html = html.replace(`<script type="module" data-gwd-opt="static">${scriptTag.rawText}</script>`, '');
+                        html = html.replace(scriptTag.rawText, '').replace(/<script .*data-gwd-opt="static".*><\/script>/, '');
                       } else {
                         const cleaned = bundledSource
                           .replace(new RegExp(`,${markerExp};\n`), '')
