@@ -126,6 +126,7 @@ async function getDevServer(compilation) {
   });
 
   // ETag Support - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
+  // https://stackoverflow.com/questions/43659756/chrome-ignores-the-etag-header-and-just-uses-the-in-memory-cache-disk-cache
   app.use(async (ctx) => {
     const body = ctx.response.body;
     const { url } = ctx;
