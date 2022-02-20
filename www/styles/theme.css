@@ -42,9 +42,8 @@ ul > li {
 }
 
 a {
-  & .title {
-    text-decoration: underline;
-  }
+  color: #504b65;
+  text-decoration: underline;
 
   & .step {
     margin: 2px;
