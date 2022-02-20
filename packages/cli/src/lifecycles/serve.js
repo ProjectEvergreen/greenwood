@@ -143,6 +143,7 @@ async function getDevServer(compilation) {
           ctx.status = 304;
           ctx.body = null;
           ctx.set('Etag', etagHash);
+          ctx.set('Cache-Control', 'no-cache');
         } else if (!inm || inm !== etagHash) {
           ctx.set('Etag', etagHash);
         }
