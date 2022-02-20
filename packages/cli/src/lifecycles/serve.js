@@ -130,8 +130,9 @@ async function getDevServer(compilation) {
     const body = ctx.response.body;
     const { url } = ctx;
 
-    // don't interfere with extrenal requests or API calls
-    if (path.extname(url) !== '' && url.indexOf('http') !== 0) {
+    // don't interfere with external requests or API calls
+    // and only run in development
+    if (process.env.__GWD_COMMAND__ === 'develop' && path.extname(url) !== '' && url.indexOf('http') !== 0) { // eslint-disable-line no-underscore-dangle
       if (Buffer.isBuffer(body)) {
         // console.warn(`no body for => ${ctx.url}`);
       } else {
