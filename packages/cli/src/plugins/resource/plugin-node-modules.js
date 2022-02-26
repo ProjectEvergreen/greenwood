@@ -21,7 +21,8 @@ const updateImportMap = (entry, entryPath) => {
     entryPath = `${entryPath}.js`;
   }
 
-  importMap[entry] = entryPath;
+  // handle WIn v Unix-style path separators and force to /
+  importMap[entry.replace(/\\/g, '/')] = entryPath.replace(/\\/g, '/');
 };
 
 // handle ESM paths that have varying levels of nesting, e.g. export * from '../../something.js'
@@ -29,7 +30,8 @@ const updateImportMap = (entry, entryPath) => {
 async function resolveRelativeSpecifier(specifier, modulePath, dependency) {
   const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(dependency);
 
-  return `${dependency}${path.join(path.dirname(modulePath), specifier).replace(absoluteNodeModulesLocation, '')}`;
+  // handle WIn v Unix-style path separators and force to /
+  return `${dependency}${path.join(path.dirname(modulePath), specifier).replace(/\\/g, '/').replace(absoluteNodeModulesLocation.replace(/\\/g, '/', ''), '')}`;
 }
 
 const getPackageEntryPath = async (packageJson) => {
