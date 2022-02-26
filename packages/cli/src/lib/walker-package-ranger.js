@@ -26,7 +26,7 @@ async function resolveRelativeSpecifier(specifier, modulePath, dependency) {
   return `${dependency}${path.join(path.dirname(modulePath), specifier).replace(/\\/g, '/').replace(absoluteNodeModulesLocation.replace(/\\/g, '/', ''), '')}`;
 }
 
-const getPackageEntryPath = async (packageJson) => {
+async function getPackageEntryPath(packageJson) {
   let entry = packageJson.exports
     ? Object.keys(packageJson.exports) // first favor export maps first
     : packageJson.module // next favor ESM entry points
@@ -41,9 +41,9 @@ const getPackageEntryPath = async (packageJson) => {
   }
 
   return entry;
-};
+}
 
-const walkModule = async (module, dependency) => {
+async function walkModule(module, dependency) {
   const moduleContents = fs.readFileSync(modulePath, 'utf-8');
 
   walk.simple(acorn.parse(moduleContents, {
@@ -107,9 +107,9 @@ const walkModule = async (module, dependency) => {
       }
     }
   });
-};
+}
 
-const walkPackageJson = async (packageJson = {}) => {
+async function walkPackageJson(packageJson = {}) {
   // while walking a package.json we need to find its entry point, e.g. index.js
   // and then walk that for import / export statements
   // and walk its package.json for its dependencies
@@ -213,9 +213,23 @@ const walkPackageJson = async (packageJson = {}) => {
   }
 
   return importMap;
-};
+}
+
+function mergeImportMap(html = '', map = {}) {
+  // es-modules-shims breaks on dangling commas in an importMap :/
+  const danglingComma = html.indexOf('"imports": {}') > 0 ? '' : ',';
+  const importMap = JSON.stringify(map).replace('}', '').replace('{', '');
+
+  const merged = html.replace('"imports": {', `
+    "imports": {
+      ${importMap}${danglingComma}
+  `);
+
+  return merged;
+}
 
 export {
+  mergeImportMap,
   walkPackageJson,
   walkModule
 };

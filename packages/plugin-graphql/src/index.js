@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { graphqlServer } from './core/server.js';
+import { mergeImportMap } from '@greenwood/cli/src/lib/walker-package-ranger.js';
 import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 import { ServerInterface } from '@greenwood/cli/src/lib/server-interface.js';
@@ -37,22 +38,18 @@ class GraphQLResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise(async (resolve, reject) => {
       try {
-        // es-modules-shims breaks on dangling commas in an importMap :/
-        const danglingComma = body.indexOf('"imports": {}') > 0 
-          ? ''
-          : ',';
-        const shimmedBody = body.replace('"imports": {', `
-          "imports": {
-            "@greenwood/cli/src/lib/hashing-utils.js": "/node_modules/@greenwood/cli/src/lib/hashing-utils.js",
-            "@greenwood/plugin-graphql/core/client": "/node_modules/@greenwood/plugin-graphql/src/core/client.js",
-            "@greenwood/plugin-graphql/core/common": "/node_modules/@greenwood/plugin-graphql/src/core/common.js",
-            "@greenwood/plugin-graphql/queries/children": "/node_modules/@greenwood/plugin-graphql/src/queries/children.gql",
-            "@greenwood/plugin-graphql/queries/config": "/node_modules/@greenwood/plugin-graphql/src/queries/config.gql",
-            "@greenwood/plugin-graphql/queries/graph": "/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql",
-            "@greenwood/plugin-graphql/queries/menu": "/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql"${danglingComma}
-        `);
+        const map = {
+          '@greenwood/cli/src/lib/hashing-utils.js': '/node_modules/@greenwood/cli/src/lib/hashing-utils.js',
+          '@greenwood/plugin-graphql/core/client': '/node_modules/@greenwood/plugin-graphql/src/core/client.js',
+          '@greenwood/plugin-graphql/core/common': '/node_modules/@greenwood/plugin-graphql/src/core/common.js',
+          '@greenwood/plugin-graphql/queries/children': '/node_modules/@greenwood/plugin-graphql/src/queries/children.gql',
+          '@greenwood/plugin-graphql/queries/config': '/node_modules/@greenwood/plugin-graphql/src/queries/config.gql',
+          '@greenwood/plugin-graphql/queries/graph': '/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql',
+          '@greenwood/plugin-graphql/queries/menu': '/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql'
+        };
+        const newBody = mergeImportMap(body, map);
 
-        resolve({ body: shimmedBody });
+        resolve({ body: newBody });
       } catch (e) {
         reject(e);
       }
