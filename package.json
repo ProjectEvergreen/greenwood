@@ -1,7 +1,7 @@
 {
   "name": "greenwood",
   "private": true,
-  "description": "A modern framework focused on web standards to help you build your next project.",
+  "description": "Your workbench for the web.  Focused on supporting modern web standards and development to help you create your next project.",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",

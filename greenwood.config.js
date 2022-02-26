@@ -7,7 +7,7 @@ import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 import { fileURLToPath, URL } from 'url';
 
-const META_DESCRIPTION = 'A modern framework focused on web standards to help you build your next project.';
+const META_DESCRIPTION = 'Your workbench for the web.  Focused on supporting modern web standards and development to help you create your next project.';
 const FAVICON_HREF = '/favicon.ico';
 
 export default {

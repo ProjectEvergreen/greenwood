@@ -7,7 +7,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
 ## Overview
-Greenwood is a framework focused on supporting modern web standards and development to help you build your next project.  For more information about how to get started, read our docs, or learn more about the project and how it works, please visit our [website](https://www.greenwoodjs.io/).
+**Greenwood** is your _workbench for the web_; focused on supporting modern web standards and development to help you create your next project. For information on getting started, reviewing our docs, or to learn more about the project and how it works, please [visit our website](https://www.greenwoodjs.io/).
 
 Features:
 - ⚡ [No bundle development](https://www.greenwoodjs.io/about/how-it-works/). Pages are built on the fly.
@@ -16,7 +16,7 @@ Features:
 - 🚫 No JavaScript by default.
 - 📖 Prerendering support for Web Components.
 - ⚒️ Extensible via [plugins](https://www.greenwoodjs.io/plugins/).
-- ⚙️ Supports [SSG, MPA, SPA, and SSR* (or a hybrid!) project types](https://www.greenwoodjs.io/docs/configuration/#mode).
+- ⚙️ Supports [SSG, MPA, SPA, and SSR project types](https://www.greenwoodjs.io/docs/layouts/). (or a hybrid!)
 
 > Greenwood is currently working towards a [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3) with our recent [`v0.10.0`](https://github.com/ProjectEvergreen/greenwood/releases/tag/v0.10.0) introducing some exciting new changes and concepts  to the project.  If you're interested in learning more about the web and web development (at any skill level!), or interested in checking out our high level roadmap and how Greenwood got where it is today, please see our [Open Beta + RFC Google doc](https://docs.google.com/document/d/1MwDkszKvq81QgIYa8utJgyUgSpLZQx9eKCWjIikvfHU/).  We would love to have your help making Greenwood! ✌️
 

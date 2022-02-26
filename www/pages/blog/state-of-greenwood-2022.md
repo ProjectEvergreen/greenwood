@@ -10,11 +10,12 @@ template: blog
 
 In looking back on the past year of Greenwood's development, it was a pleasant retrospective for us as it often takes time to see the span or breadth of the work and effort you put into a goal;  something all the more measurable over time relative to the specific moments you're working on any one particular task.  Going back even a little bit further than that when the team was thinking about [what sort of technical and mission focused approach to take with the project](https://projectevergreen.github.io/blog/always-bet-on-html/), the trail of PR breadcrumbs and releases over the course of 2021 now helps us realize, all the more tangibly, our vision of Greenwood as a _"faithful" workbench for the web_.
 
-At the time of that blog post, we were thinking introspectively in regards to not only technical direction, but also how we could ensure Greenwood would be differentiated from the other projects in this space.  Going bundleless for development and adopting ESM were not new ideas, but we still found ourselves looking at the web dev landscape and thinking; what if we started from the "bottom" up with HTML, and then fanned out the workflow from there?  We wanted to be able to layer greater and greater capabilities on top of each other, but with a critical eye on core vs plugin, longevity vs convenience, pragmatic vs popular.  We knew though that we would never want to sacrifice that core workflow of the trusted _index.html_ file, or getting so clever that user's of Greenwood would end up back in the arms of some custom DSL over HTML, or even worse, being required to start with JavaScript just to author a basic site.  
+At the time of that blog post, we were thinking introspectively in regards to not only technical direction, but also how we could ensure Greenwood would be differentiated from the other projects in this space.  Going bundleless for development and adopting ESM were not new ideas, but we still found ourselves looking at the web dev landscape and thinking; what if we started from the "bottom" up with HTML, and then fanned out the workflow from there?  We wanted to be able to layer greater and greater capabilities on top of each other, but _with a critical eye on core vs plugin, longevity vs convenience, pragmatic vs popular_.  We knew though that we would never want to sacrifice that core workflow of the trusted _index.html_ file, or getting so clever that user's of Greenwood would end up back in the arms of some custom DSL over HTML, or even worse, being required to start with JavaScript just to author a basic site.  
 
-Now we obviously don't mean this sentiment so literally to the point that there would have been no point in even building Greenwood, but the fact of the matter is, the web (probably) won't "build" things like local dev servers and minifiers, or CDNs and serverless functions, but we do feel that for building a great website, it provides quite a lot!  So why not at least see how far it can get us and optimize for that?  Our bet is that by leveraging the web as your framework, you and your contributors, and users (!), can benefit from the richness and resiliency the web platform provides natively.
+Now we obviously don't mean this sentiment so literally to the point that there would have been no point in even building Greenwood, but the fact of the matter is, the web (probably) won't "build" things like local dev servers and minifiers, npm, or CDNs and serverless functions, but we do feel that for building a great website, it provides quite a lot!  So why not at least see how far it can get us and optimize for that?  Our bet is that by [leveraging the web platform as your framework](/about/how-it-works/), you and your contributors, and users (!), can benefit from the richness and resiliency the web provides.
 
 All in all, this refreshing of our mindset was just the motivation we needed to be able come to you here now, a year later, with some highlights of our work in 2021 that we felt really stood out.
+
 
 ## The Year In Review
 
@@ -145,19 +146,61 @@ And Greenwood will statically generate this
 
 > _Check out the docs on how to [use both options](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/plugin-include-html/README.md) with this plugin._
 
+### Interpolate Frontmatter
+When setting the [`interpolateFrontmatter`](/docs/configuration/#interpolate-frontmatter) flag in your _greenwood.config.js_, frontmatter in your markdown will be available in your HTML or markdown similar to how variable interpolation works in JavaScript.  Great for `<meta>` tags!
 
-### HUD UI
+#### How It Works
+So given the following frontmatter
+```md
+---
+template: 'post'
+title: 'Git Explorer'
+emoji: '💡'
+date: '04.07.2020'
+description: 'Local git repository viewer'
+image: '/assets/blog-post-images/git.png'
+---
+```
 
-It can be annoying during development to refresh the page and not see anything change even though your code has been saved and updated in your editor.  Greenwood understands how important it is to get fast feedback during development and nothing is worse than an error in your terminal when you're deep into your browser and editor workflow.  It's just a start, but Greenwood supports detecting invalid HTML that it can't parse, and will raise a message to you in the browser with a "heads up" to let you know about it.
+And enabling the feature in _greenwood.config.js_
+```js
+export default {
+  interpolateFrontmatter: true
+}
+```
 
-![HUD UI](/assets/blog-images/hud.png)
+You access the frontmatter data in the markdown or HTML on a _per page instance_ following the convention of JavaScript [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals), and Greenwood will interpolate those values at build time.
+
+```md
+# My Blog Post
+
+<img src="${globalThis.page.image}" alt="Banner image for ${globalThis.page.description}">
+
+Lorum Ipsum.
+```
+
+```html
+<html>
+  <head>
+    <title>My Blog - ${globalThis.page.title}</title>
+    <meta property="og:title" content="My Blog">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.myblog.dev">
+    <meta property="og:image" content="https://www.myblog.dev/${globalThis.page.image}">
+    <meta property="og:description" content="My Blog - ${globalThis.page.description}">
+  </head>
+  <body>
+    <content-outlet></content-outlet>
+  </body>
+</html>
+```
 
 ----
 
 This is just a sampling of the work that we wanted to shout-out over the course of 2021.  You can read about all our releases over in the [blog section](/blog/) of our website.  Some honorable mentions include:
 * [_Greenwood `init`_](/blog/release/v0-19-0/#new-project-scaffolding) - With the power of `npx`, quickly scaffold out a new Greenwood project right from the command line 📦
 * [_External Data Sources_](/blog/release/v0-21-0/#external-data-sources) - No good Jamstack framework would be complete without the ability to pull in content from a database, CMS, or API ✍️
-* [_Interpolate Frontmatter_](/blog/release/v0-23-0/#interpolate-frontmatter) - A small enhancement boost to your frontmatter, by allowing JavaScript-like "interpolation" of data from your markdown.  Great for quick SEO and simple templating needs ⚡
+* [_HUD UI_](/blog/release/v0-18-0/#hud-ui) - An overlay UI that can surface build related terminal errors like invalid HTML, right in the browser!  We want to keep you in that browser /editor flow. ⚡
 
 ## The Year In Front of Us
 
@@ -170,12 +213,13 @@ For Greenwood's roadmap specifically, we want to focus on getting to that [1.0 m
 - [Native `HTMLElement` for SSR](https://github.com/ProjectEvergreen/greenwood/discussions/548) (drop hard dependency on puppeteer)
 - [Incorporating support for CSS / JSON modules](https://github.com/ProjectEvergreen/greenwood/discussions/606) (import assertions)
 - [Bypassing the server altogether and going straight to the edge](https://github.com/ProjectEvergreen/greenwood/discussions/626)!  (serverless)
-- Helping advance community protocols
+- Continued testing and integration of [community Web Component projects](https://github.com/ProjectEvergreen/greenwood/discussions/523)
 
 In addition to building up Greenwood, we also hope to keep contributing to great community efforts and conversations around the web platform like the [Web Components Community Group](https://github.com/w3c/webcomponents-cg) are doing, and supporting their initiatives towards pushing web standards forward, as well as helping curate "community" protocols.  Their [report](https://w3c.github.io/webcomponents-cg/) and presentation at least years TPAC aims to advance specs and standards that are meaningful to all developers and users of the web, and we're here for it!  The **Lit** team is also working hard on advancing techniques for SSR that naturally we are eager to see gain more traction.  Topics that we'll have our eye on include:
 - [Declarative Shadow DOM](https://github.com/whatwg/dom/issues/831) (wider implementation)
 - [HTML Modules](https://github.com/WICG/webcomponents/issues/645)
 - [Declarative Custom Elements](https://github.com/WICG/webcomponents/blob/gh-pages/proposals/Declarative-Custom-Elements-Strawman.md)
+- Helping advance [community protocols](https://github.com/webcomponents-cg/community-protocols) like [HMR](https://github.com/webcomponents-cg/community-protocols/issues/6) and [hydration](https://github.com/webcomponents-cg/community-protocols/issues/16)
 
 ## In Closing
 
@@ -185,4 +229,4 @@ For us, it's great to see support for Web Components rising and we hope to be a 
 
 > _We all think different, and so for us the more we thought about our approach and the implications this could have on long term maintainability, knowledge sharing, and just general practicality, has only cemented our motivations even further to optimize for a web first world._
 
-We want to not only be a framework (and we use that term loosely when applied to Greenwood), but a way to build for the web that looks past the #hypegiest and instead focuses on familiar and pragmatic APIs that aim to shy away from a lot of the magic in the code and configuration often found in today's modern (meta) frameworks.  Developing for the web isn't the burden it once was, and an honest discussion around the efforts to build around and on top of it we feel are worth having.  Looking inside your _node_modules_ or network tab should be a common exercise and should be encouraging to ask of yourself; _**what can the web do for me now**_?
+We want to not only be _your workbench for the web_, but a way to build for the web that looks past the #hypegiest and instead emphasizes usage of web APIs in an aim to shy away from the over complexity and magic often found in today's modern (meta) frameworks.  Developing for the web isn't the burden it once was, and an honest discussion around the efforts to build around and on top of it we feel are worth having.  Looking inside your _node_modules_ or network tab should be a common exercise and should be encouraging to ask of yourself; _**what can the web do for me now**_?
