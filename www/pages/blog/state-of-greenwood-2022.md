@@ -6,7 +6,7 @@ template: blog
 
 # State of Greenwood (2022)
 
-## Published: TBD
+**Published: March 2, 2022**
 
 Looking back on the past year of Greenwood's development was a pleasant retrospective for us, as it often takes time to see the span or breadth of the work and effort you've put into a goal.  Going back even a little bit further than that when the team was thinking about [what sort of technical and mission focused approach to take with the project](https://projectevergreen.github.io/blog/always-bet-on-html/), the trail of PR breadcrumbs and releases since then has now helped us realize our vision of Greenwood as a _workbench for the web_.
 
@@ -229,4 +229,4 @@ For us, it's great to see support for Web Components rising and we hope to be a 
 
 > _We all think different, and so for us the more we thought about our approach and the implications this could have on long term maintainability, knowledge sharing, and just general practicality, has only cemented our motivations even further to optimize for a web first world._
 
-We want to not only be _your workbench for the web_, but a way to build for the web that looks past the **#hypegeist** and instead emphasizes usage of web APIs in an effort to shy away, where possible, from the complexity and magic often found in today's modern (meta) frameworks.  Owning your code and owning your content is important to us, and developing for the web isn't the burden it once was.  We feel an honest discussion around the efforts to build around and on top of it are worth having.  Looking inside your _node_modules_ or network tab should be encouraging of you to ask yourself; _**what can the web do for me now**_? ♻️
+We want to not only be _your workbench for the web_, but a way to build for the web that looks past the **#hypegeist** and instead emphasizes usage of web APIs in an effort to shy away, where possible, from the complexity and magic often found in today's modern (meta) frameworks.  Owning your code and owning your content is important to us, and developing for the web isn't the burden it once was.  We feel an honest discussion around the efforts to build around and on top of it are worth having.  Looking inside your _node_modules_ or network tab should be encouraging of you to ask yourself; _**what can the web do for me now**_? <img style="width: 15px; display: inline-block" src="/assets/evergreen.svg" alt="Project Evergreen logo"/>
