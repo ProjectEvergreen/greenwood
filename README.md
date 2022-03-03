@@ -64,9 +64,10 @@ We would love your [contribution](.github/CONTRIBUTING.md) to Greenwood!  Please
 
 ## Built With Greenwood
 | Site  | Repo  | Project Details  |
-|---|---|---|
+|-------|-------|------------------|
 | [The Greenhouse I/O](https://www.thegreenhouse.io/)  | [thegreenhouseio/www.thegreenhouse.io](https://github.com/thegreenhouseio/www.thegreenhouse.io)  | Personal portfolio / blog website for @thescientist13 (Greenwood maintainer). |
-| [Contributary](https://www.contributary.community/)  | [ContributaryCommunity/www.contributary.community](https://github.com/ContributaryCommunity/www.contributary.community)  | A website (SPA) for browsing open source projects that are looking for contributions. |
+| [Contributary](https://www.contributary.community/)  | [ContributaryCommunity/www.contributary.community](https://github.com/ContributaryCommunity/www.contributary.community)  | A website (SPA) for browsing open source projects that are open to contributions. Built with Lit and hosted with AWS (S3 / CloudFront). |
+| [Analog Studios](https://www.analogstudios.net/)  | [AnalogStudiosRI/www.analogstudios.net](https://github.com/AnalogStudiosRI/www.analogstudios.net)  | A local music studio SPA website, originally written in Angular 2, recently migrated to Lit.  It is currently transitioning to a [hybrid static + serverless website](https://github.com/AnalogStudiosRI/www.analogstudios.net/discussions/37) showing off the full potential of Greenwood and Web Components.  Follow along for all the fun! 🤘 |
 
 > Built a site with Greenwood?  Open a PR and add it here!
 
