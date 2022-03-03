@@ -76,7 +76,7 @@ h3 > a > span.icon {
   padding: 2rem;
 
   @media (max-width: 768px) {
-    padding: 0;
+    padding: 2rem 0 0;
   }
 
   #github-edit-button {
