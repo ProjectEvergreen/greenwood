@@ -24,6 +24,7 @@ During _development_ the CLI will:
 - Process requests on the fly only for the content or code you need for a given page.
 - Supports loading dependencies from _node_modules_ using an [`importMap`](https://github.com/WICG/import-maps) to avoid bundling.
 - While Greenwood is ESM first, we have a [plugin](/plugins/custom-plugins/) to transform CommonJS into ESM (🤞)
+- Leverage `E-Tag` headers to apply [caching techniques for unchanged assets](/blog/release/v0-24-0/#local-development-enhancements)
 
 For _production_ builds:
 - Combine all your code and dependencies into efficient modern bundles including minifying your JavaScript and CSS.
