@@ -123,7 +123,6 @@ const walkPackageJson = async (packageJson = {}) => {
   // and walk its package.json for its dependencies
 
   for (const dependency of Object.keys(packageJson.dependencies || {})) {
-    // TODO should NOT be hardcoded to process.cwd()
     const dependencyPackageRootPath = path.join(process.cwd(), 'node_modules', dependency);
     const dependencyPackageJsonPath = path.join(dependencyPackageRootPath, 'package.json');
     const dependencyPackageJson = JSON.parse(fs.readFileSync(dependencyPackageJsonPath, 'utf-8'));
