@@ -20,7 +20,6 @@
  */
 import chai from 'chai';
 import fs from 'fs';
-import greenwoodConfig from './greenwood.config.js';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
@@ -67,7 +66,7 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('displaying config title in the footer using ConfigQuery', function() {
+    describe('displaying config optimization in the footer using ConfigQuery', function() {
       let dom;
 
       before(async function() {
@@ -77,7 +76,7 @@ describe('Build Greenwood With: ', function() {
       it('should have a <footer> in the <body> with greenwoodConfig#title as the text value', function() {
         const footer = dom.window.document.querySelector('body footer');
 
-        expect(footer.innerHTML).to.be.equal(greenwoodConfig.title);
+        expect(footer.innerHTML).to.be.equal('default');
       });
 
       it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', function() {

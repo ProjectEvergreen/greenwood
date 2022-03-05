@@ -13,7 +13,7 @@ class FooterComponent extends HTMLElement {
       query: ConfigQuery
     }).then((response) => {
       this.root.innerHTML = `
-        <footer>${response.data.config.title}</footer>
+        <footer>${response.data.config.optimization}</footer>
       `;
     });
   }

@@ -13,6 +13,8 @@ Greenwood defines two types of templates to help layout your pages:
 - _App Template_: The ["app shell"](https://developers.google.com/web/fundamentals/architecture/app-shell) that will wrap all pages.  One is provided for you by Greenwood, but you can override it if needed.
 - _Page Templates_:  A template for each unique page layout within your site.  Common layouts are great for documentation and blog sites, but also great for single pages as well (like a splash layout for the home page).
 
+Greenwood will handle merging the `<body>` and  `<head>` tag contents when building up pages and templates.
+
 > _**Note:** You can use either relative (`../`) or absolute (`/`) paths in your templates since using `../` will allow for IDE autocomplete on your filesystem, but is marginally slower than using `/`._
 
 ### Page Templates
@@ -20,8 +22,7 @@ Pages in your project will generally want a template so you can control the outp
 
 
 In order to make a page template, you just need to write up some HTML that can be enhanced with these special custom elements:
-- Include `<content-outlet></content-outlet>` to position where the processed markdown from the page will appear
-- Include `<meta-outlet></meta-outlet>` to position where `<meta>` tags should go
+- Include `<content-outlet></content-outlet>` to position where the processed content from the page will appear
 
 
 Below is an example of a simple _page.html_.  You can just copy / paste this to start your own page templates and by default all your pages will start rendering using this layout.
@@ -29,10 +30,6 @@ Below is an example of a simple _page.html_.  You can just copy / paste this to 
 ```html
 <!DOCTYPE html>
 <html lang="en" prefix="og:http://ogp.me/ns#">
-
-  <head>
-    <meta-outlet></meta-outlet>
-  </head>
 
   <body>
     <header>
@@ -64,17 +61,12 @@ You can create more templates and use them for pages by doing two things:
 
 If you want to customize the outer most wrapping layout of your site, in the _templates/_ directory you can do this by creating an _app.html_ file.  Like a page template, this will just be another HTML document, with some additional capabilities:
 - Include `<page-outlet></page-outlet>` to position where the content from the processed page template will appear
-- Include `<meta-outlet></meta-outlet>` to position where `<meta>` tags goes.  _Make sure not to include this in your page templates!_
 
 As with page templates, app templates are just HTML.
 
 ```html
 <!DOCTYPE html>
 <html lang="en" prefix="og:http://ogp.me/ns#">
-
-  <head>
-    <meta-outlet></meta-outlet>
-  </head>
 
   <body>
     <header>
@@ -136,7 +128,7 @@ And the following file output in the _public/_ directory
 
 > _See our [Front Matter Docs](/docs/front-matter#define-template) for more information on how you can extend fontmatter in **Greenwood**._
 
-## Scripts and Styles
+### Scripts and Styles
 
 Since all pages and templates are just HTML with Greenwood, you can use `<script>`, `<style>`, and `<link>` tags as normal, referencing paths from your template to the location of the files in your project's workspace.
 
@@ -146,7 +138,6 @@ For example, here is what a standard app template might look like:
 <html lang="en" prefix="og:http://ogp.me/ns#">
 
   <head>
-    <meta-outlet></meta-outlet>
     <link rel="stylesheet" href="/styles/theme.css"/>
     <script type="module" src="/components/app-header.js"></script>
     <script type="module" src="/components/app-footer.js"></script>

@@ -9,13 +9,16 @@
  * greenwood build
  *
  * User Config
- * {}
+ * None
  *
  * User Workspace
  * Greenwood default w/ single index.html file
  *  src/
  *   components/
  *     footer.js
+ *   routes/
+ *     about.js
+ *     home.js
  *   index.js
  *   index.html
  */

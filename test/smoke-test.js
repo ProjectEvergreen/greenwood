@@ -45,7 +45,7 @@ function commonIndexSpecs(dom, html, label) {
       });
 
       it('should have matching opening and closing <head> tags in the <head>', function() {
-        // add an expclit > here to avoid conflicting with <header>
+        // add an explicit > here to avoid conflicting with <header>
         // which is used in a lot of test case scaffolding
         expect(tagsMatch('head>', html, 1)).to.be.equal(true);
       });

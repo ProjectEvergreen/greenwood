@@ -53,7 +53,7 @@ class FooterComponent extends HTMLElement {
 customElements.define('app-footer', FooterComponent);
 ```
 
-Now we can use it in a template by:
+Now we can use it in our app template by:
 1. Referencing our component file via a `<script>` tag with the `type="module"` attribute
 1. Using our custom element's tag name of `<app-footer>` in our `<body>`
 
@@ -65,7 +65,7 @@ Now we can use it in a template by:
   </head>
   
   <body>
-    <content-outlet></content-outlet>
+    <page-outlet></page-outlet>
 
     <app-footer></app-footer>
   </body>
@@ -73,7 +73,7 @@ Now we can use it in a template by:
 </html>
 ```
 
-Now you can do the same for an `<app-header>`.  See the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started/) for a complete working example.
+Now you can do the same for an `<app-header>`.  See the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started/) for a complete working example.  Voila!  All our pages now have a header and footer!  🎉
 
 > _You can find more information about component models and Greenwood [here](/docs/component-model/)._
 

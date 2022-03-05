@@ -202,7 +202,7 @@ describe('Develop Greenwood With: ', function() {
         const title = dom.window.document.querySelectorAll('head > title');
 
         expect(title.length).to.equal(1);
-        expect(title[0].textContent).to.equal('My App - /artists/');
+        expect(title[0].textContent).to.equal('/artists/');
       });
 
       it('should have custom metadata in the <head>', function() {
@@ -210,7 +210,7 @@ describe('Develop Greenwood With: ', function() {
           .filter((tag) => tag.getAttribute('name') === 'description');
 
         expect(metaDescription.length).to.equal(1);
-        expect(metaDescription[0].getAttribute('content')).to.equal('My App - /artists/ (this was generated server side!!!)');
+        expect(metaDescription[0].getAttribute('content')).to.equal('/artists/ (this was generated server side!!!)');
       });
 
       it('should be a part of graph.json', function() {

@@ -39,7 +39,7 @@ const generateGraph = async (compilation) => {
               .replace(extension, '')
               .replace(/\\/g, '/');
             let template = 'page';
-            let title = '';
+            let title = null;
             let imports = [];
             let label = '';
             let id;
@@ -51,7 +51,7 @@ const generateGraph = async (compilation) => {
               const { attributes } = fm(fileContents);
               
               template = attributes.template || 'page';
-              title = attributes.title || compilation.config.title || '';
+              title = attributes.title || title;
               id = attributes.label || filename.split(path.sep)[filename.split(path.sep).length - 1].replace(extension, '');
               imports = attributes.imports || [];
               label = id.split('-')
@@ -133,7 +133,6 @@ const generateGraph = async (compilation) => {
                 .replace(extension, '')
                 .replace(/\\/g, '/')
                 .concat('/');
-              title = `${compilation.config.title} - ${label}`;
               let ssrFrontmatter;
 
               filePath = route;
@@ -243,7 +242,6 @@ const generateGraph = async (compilation) => {
               filename: '404.html',
               route: '/404/',
               path: '404.html',
-              title: 'Not Found',
               id: '404',
               label: 'Not Found'
             }

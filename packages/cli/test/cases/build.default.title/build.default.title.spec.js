@@ -1,17 +1,15 @@
 /*
  * Use Case
- * Run Greenwood with string title in config and default workspace.
+ * Run Greenwood and tests for correct `<title>` tag merging for pages and templates.
  *
  * User Result
- * Should generate a bare bones Greenwood build.  (same as build.default.spec.js) with custom title in header
+ * Should generate a bare bones Greenwood build with expected <title> values.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * {
- *   title: 'My Custom Greenwood App'
- * }
+ * None
  *
  * User Workspace
  * Greenwood default
@@ -19,9 +17,10 @@
  *   pages/
  *     index.md
  *     hello.md
+ *   templates/
+ *     page.html
  */
 import fs from 'fs';
-import greenwoodConfig from './greenwood.config.js';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import chai from 'chai';
@@ -30,11 +29,10 @@ import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
-const configTitle = greenwoodConfig.title;
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom Title Configuration and Default Workspace';
+  const LABEL = 'Custom Title Tag and Default Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -65,12 +63,11 @@ describe('Build Greenwood With: ', function() {
       it('should have our custom config <title> tag in the <head>', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
-        expect(title).to.be.equal(configTitle);
+        expect(title).to.be.equal('My Custom Greenwood App');
       });
     });
 
     describe('Custom Front-Matter Title', function() {
-      const pageTitle = 'About Page';
       let dom;
 
       before(async function() {
@@ -84,7 +81,7 @@ describe('Build Greenwood With: ', function() {
       it('should have a overridden meta <title> tag in the <head> using markdown front-matter', function() {
         const title = dom.window.document.querySelector('head title').textContent;
 
-        expect(title).to.be.equal(`${configTitle} - ${pageTitle}`);
+        expect(title).to.be.equal('About Page');
       });
     });
   });

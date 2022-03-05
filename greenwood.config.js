@@ -7,25 +7,11 @@ import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 import { fileURLToPath, URL } from 'url';
 
-const META_DESCRIPTION = 'Your workbench for the web.  Focused on supporting modern web standards and development to help you create your next project.';
-const FAVICON_HREF = '/favicon.ico';
-
 export default {
   workspace: fileURLToPath(new URL('./www', import.meta.url)),
   optimization: 'inline',
   staticRouter: true,
-  title: 'Greenwood',
-  meta: [
-    { name: 'description', content: META_DESCRIPTION },
-    { name: 'twitter:site', content: '@PrjEvergreen' },
-    { property: 'og:title', content: 'Greenwood' },
-    { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'https://www.greenwoodjs.io' },
-    { property: 'og:image', content: 'https://www.greenwoodjs.io/assets/greenwood-logo-300w.png' },
-    { property: 'og:description', content: META_DESCRIPTION },
-    { rel: 'shortcut icon', href: FAVICON_HREF },
-    { rel: 'icon', href: FAVICON_HREF }
-  ],
+  interpolateFrontmatter: true,
   plugins: [
     ...greenwoodPluginGraphQL(),
     ...greenwoodPluginPolyfills(),
