@@ -550,6 +550,7 @@ const getRollupConfig = async (compilation) => {
       chunkFileNames: '[name].[hash].js',
       sourcemap: true
     },
+    context: 'window',
     onwarn: (errorObj) => {
       const { code, message } = errorObj;
 
