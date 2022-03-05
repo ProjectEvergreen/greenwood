@@ -342,6 +342,18 @@ describe('Develop Greenwood With: ', function() {
         `${process.cwd()}/node_modules/tslib/*.js`,
         `${outputPath}/node_modules/tslib/`
       );
+      const stencilCorePackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@stencil/core/package.json`,
+        `${outputPath}/node_modules/@stencil/core/`
+      );
+      const stencilCoreCoreLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@stencil/core/internal/stencil-core/*.js`,
+        `${outputPath}/node_modules/@stencil/core/internal/stencil-core/`
+      );
+      const stencilCoreClientLibs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@stencil/core/internal/client/*.js`,
+        `${outputPath}/node_modules/@stencil/core/internal/client/`
+      );
 
       // manually copy all these @babel/runtime files recursively since there are too many of them to do it individually
       const babelRuntimeLibs = await rreaddir(`${process.cwd()}/node_modules/@babel/runtime`);
@@ -437,7 +449,10 @@ describe('Develop Greenwood With: ', function() {
         ...materialThemePackageJson,
         ...materialThemeLibs,
         ...tslibPackageJson,
-        ...tslibLibs
+        ...tslibLibs,
+        ...stencilCorePackageJson,
+        ...stencilCoreCoreLibs,
+        ...stencilCoreClientLibs
       ]);
 
       return new Promise(async (resolve) => {
