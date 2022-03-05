@@ -204,7 +204,7 @@ This is just a sampling of the work that we wanted to shout-out over the course 
 
 ## The Year In Front of Us
 
-As I write this now, we have just soft launched a significant release and stepping stone for Greenwood; [Server Side Rendering (SSR)](/blog/release/v0-23-0/#server-side-rendering-ssr)!  We couldn't be more excited about the future of Web Components and with work like this, we are eager to help take Web Components even further than the CDN; all the way to the edge!  In support of this feature, we also released a new API and plugin so you can try this feature out with [**Lit**](https://lit.dev/). It is all still early days, but this is what we plan to work on and refine in the year ahead and we are super excited for the potential and possibilities.
+To kick off 2022, we have just soft launched a significant release and stepping stone for Greenwood; [Server Side Rendering (SSR)](/blog/release/v0-23-0/#server-side-rendering-ssr)!  We couldn't be more excited about the future of Web Components and with work like this, we are eager to help take Web Components even further than the CDN; all the way to the edge!  In support of this feature, we also released a new API and plugin so you can try this feature out with [**Lit**](https://lit.dev/). It is all still early days, but this is what we plan to work on and refine in the year ahead and we are super excited for the potential and possibilities.
 
 > _Greenwood wants to help you get more HTML from your JS!_
 
