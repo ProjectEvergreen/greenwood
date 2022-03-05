@@ -1,5 +1,6 @@
 import { BrowserRunner } from '../lib/browser.js';
 import fs from 'fs';
+import { hashString } from '../lib/hashing-utils.js';
 import path from 'path';
 import Koa from 'koa';
 import { ResourceInterface } from '../lib/resource-interface.js';
@@ -88,7 +89,7 @@ async function getDevServer(compilation) {
   });
 
   // allow intercepting of urls (response)
-  app.use(async (ctx) => {
+  app.use(async (ctx, next) => {
     const responseAccumulator = {
       body: ctx.body,
       contentType: ctx.response.headers['content-type']
@@ -120,6 +121,36 @@ async function getDevServer(compilation) {
 
     ctx.set('Content-Type', reducedResponse.contentType);
     ctx.body = reducedResponse.body;
+
+    await next();
+  });
+
+  // ETag Support - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
+  // https://stackoverflow.com/questions/43659756/chrome-ignores-the-etag-header-and-just-uses-the-in-memory-cache-disk-cache
+  app.use(async (ctx) => {
+    const body = ctx.response.body;
+    const { url } = ctx;
+
+    // don't interfere with external requests or API calls
+    // and only run in development
+    if (process.env.__GWD_COMMAND__ === 'develop' && path.extname(url) !== '' && url.indexOf('http') !== 0) { // eslint-disable-line no-underscore-dangle
+      if (Buffer.isBuffer(body)) {
+        // console.warn(`no body for => ${ctx.url}`);
+      } else {
+        const inm = ctx.headers['if-none-match'];
+        const etagHash = hashString(body);
+
+        if (inm && inm === etagHash) {
+          ctx.status = 304;
+          ctx.body = null;
+          ctx.set('Etag', etagHash);
+          ctx.set('Cache-Control', 'no-cache');
+        } else if (!inm || inm !== etagHash) {
+          ctx.set('Etag', etagHash);
+        }
+      }
+    }
+
   });
 
   return Promise.resolve(app);

@@ -43,6 +43,7 @@ class GraphQLResource extends ResourceInterface {
           : ',';
         const shimmedBody = body.replace('"imports": {', `
           "imports": {
+            "@greenwood/cli/src/lib/hashing-utils.js": "/node_modules/@greenwood/cli/src/lib/hashing-utils.js",
             "@greenwood/plugin-graphql/core/client": "/node_modules/@greenwood/plugin-graphql/src/core/client.js",
             "@greenwood/plugin-graphql/core/common": "/node_modules/@greenwood/plugin-graphql/src/core/common.js",
             "@greenwood/plugin-graphql/queries/children": "/node_modules/@greenwood/plugin-graphql/src/queries/children.gql",
