@@ -18,6 +18,10 @@ class ResourceInterface {
   // turn relative paths into relatively absolute based on a known root directory
   // e.g. "../styles/theme.css" -> `${userWorkspace}/styles/theme.css`
   resolveRelativeUrl(root, url) {
+    if (fs.existsSync(path.join(root, url))) {
+      return url;
+    }
+
     let reducedUrl;
 
     url.split('/')
