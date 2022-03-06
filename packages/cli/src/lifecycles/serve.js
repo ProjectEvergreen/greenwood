@@ -131,10 +131,10 @@ async function getDevServer(compilation) {
     const body = ctx.response.body;
     const { url } = ctx;
 
-    // don't interfere with external requests or API calls
+    // don't interfere with external requests or API calls, binary files, or JSON
     // and only run in development
     if (process.env.__GWD_COMMAND__ === 'develop' && path.extname(url) !== '' && url.indexOf('http') !== 0) { // eslint-disable-line no-underscore-dangle
-      if (Buffer.isBuffer(body)) {
+      if (Buffer.isBuffer(body) || path.extname(ctx.request.headers.originalUrl) === '.json') {
         // console.warn(`no body for => ${ctx.url}`);
       } else {
         const inm = ctx.headers['if-none-match'];
