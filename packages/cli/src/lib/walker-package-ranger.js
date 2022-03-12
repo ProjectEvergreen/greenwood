@@ -43,7 +43,7 @@ async function getPackageEntryPath(packageJson) {
   return entry;
 }
 
-async function walkModule(module, dependency) {
+async function walkModule(modulePath, dependency) {
   const moduleContents = fs.readFileSync(modulePath, 'utf-8');
 
   walk.simple(acorn.parse(moduleContents, {

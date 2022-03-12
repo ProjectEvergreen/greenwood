@@ -11,6 +11,8 @@ import { getNodeModulesLocationForPackage, getPackageNameFromUrl } from '../../l
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { walkPackageJson } from '../../lib/walker-package-ranger.js';
 
+let importMap;
+
 class NodeModulesResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
