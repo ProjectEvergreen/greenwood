@@ -134,11 +134,13 @@ async function getDevServer(compilation) {
     // don't interfere with external requests or API calls, binary files, or JSON
     // and only run in development
     if (process.env.__GWD_COMMAND__ === 'develop' && path.extname(url) !== '' && url.indexOf('http') !== 0) { // eslint-disable-line no-underscore-dangle
-      if (Buffer.isBuffer(body) || path.extname(ctx.request.headers.originalUrl) === '.json') {
+      if (!body || Buffer.isBuffer(body)) {
         // console.warn(`no body for => ${ctx.url}`);
       } else {
         const inm = ctx.headers['if-none-match'];
-        const etagHash = hashString(body);
+        const etagHash = path.extname(ctx.request.headers.originalUrl) === '.json'
+          ? hashString(JSON.stringify(body))
+          : hashString(body);
 
         if (inm && inm === etagHash) {
           ctx.status = 304;
