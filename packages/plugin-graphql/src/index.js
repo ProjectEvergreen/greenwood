@@ -1,9 +1,20 @@
 import fs from 'fs';
 import { graphqlServer } from './core/server.js';
+import { mergeImportMap } from '@greenwood/cli/src/lib/walker-package-ranger.js';
 import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 import { ServerInterface } from '@greenwood/cli/src/lib/server-interface.js';
 import rollupPluginAlias from '@rollup/plugin-alias';
+
+const importMap = {
+  '@greenwood/cli/src/lib/hashing-utils.js': '/node_modules/@greenwood/cli/src/lib/hashing-utils.js',
+  '@greenwood/plugin-graphql/core/client': '/node_modules/@greenwood/plugin-graphql/src/core/client.js',
+  '@greenwood/plugin-graphql/core/common': '/node_modules/@greenwood/plugin-graphql/src/core/common.js',
+  '@greenwood/plugin-graphql/queries/children': '/node_modules/@greenwood/plugin-graphql/src/queries/children.gql',
+  '@greenwood/plugin-graphql/queries/config': '/node_modules/@greenwood/plugin-graphql/src/queries/config.gql',
+  '@greenwood/plugin-graphql/queries/graph': '/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql',
+  '@greenwood/plugin-graphql/queries/menu': '/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql'
+};
 
 class GraphQLResource extends ResourceInterface {
   constructor(compilation, options = {}) {
@@ -37,22 +48,9 @@ class GraphQLResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise(async (resolve, reject) => {
       try {
-        // es-modules-shims breaks on dangling commas in an importMap :/
-        const danglingComma = body.indexOf('"imports": {}') > 0 
-          ? ''
-          : ',';
-        const shimmedBody = body.replace('"imports": {', `
-          "imports": {
-            "@greenwood/cli/src/lib/hashing-utils.js": "/node_modules/@greenwood/cli/src/lib/hashing-utils.js",
-            "@greenwood/plugin-graphql/core/client": "/node_modules/@greenwood/plugin-graphql/src/core/client.js",
-            "@greenwood/plugin-graphql/core/common": "/node_modules/@greenwood/plugin-graphql/src/core/common.js",
-            "@greenwood/plugin-graphql/queries/children": "/node_modules/@greenwood/plugin-graphql/src/queries/children.gql",
-            "@greenwood/plugin-graphql/queries/config": "/node_modules/@greenwood/plugin-graphql/src/queries/config.gql",
-            "@greenwood/plugin-graphql/queries/graph": "/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql",
-            "@greenwood/plugin-graphql/queries/menu": "/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql"${danglingComma}
-        `);
+        const newBody = mergeImportMap(body, importMap);
 
-        resolve({ body: shimmedBody });
+        resolve({ body: newBody });
       } catch (e) {
         reject(e);
       }
@@ -105,18 +103,18 @@ const greenwoodPluginGraphQL = (options = {}) => {
   }, {
     type: 'rollup',
     name: 'plugin-graphql:rollup',
-    provider: () => [
-      rollupPluginAlias({
-        entries: [
-          { find: '@greenwood/plugin-graphql/core/client', replacement: '@greenwood/plugin-graphql/src/core/client.js' },
-          { find: '@greenwood/plugin-graphql/core/common', replacement: '@greenwood/plugin-graphql/src/core/common.js' },
-          { find: '@greenwood/plugin-graphql/queries/menu', replacement: '@greenwood/plugin-graphql/src/queries/menu.gql' },
-          { find: '@greenwood/plugin-graphql/queries/config', replacement: '@greenwood/plugin-graphql/src/queries/config.gql' },
-          { find: '@greenwood/plugin-graphql/queries/children', replacement: '@greenwood/plugin-graphql/src/queries/children.gql' },
-          { find: '@greenwood/plugin-graphql/queries/graph', replacement: '@greenwood/plugin-graphql/src/queries/graph.gql' }
-        ]
-      })
-    ]
+    provider: () => {
+      const aliasEntries = Object.keys(importMap).map(key => {
+        return {
+          find: key,
+          replacement: importMap[key].replace('/node_modules/', '')
+        };
+      });
+    
+      return [
+        rollupPluginAlias({ entries: aliasEntries })
+      ];
+    }
   }];
 };
 
