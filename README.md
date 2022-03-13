@@ -18,7 +18,7 @@ Features:
 - ⚒️ Extensible via [plugins](https://www.greenwoodjs.io/plugins/).
 - ⚙️ Supports [SSG, MPA, SPA, and SSR project types](https://www.greenwoodjs.io/docs/layouts/). (or a hybrid!)
 
-> Greenwood is currently working towards a [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3).  If you're interested in learning more about the web and web development (at any skill level!), or interested in checking out our high level roadmap and how Greenwood got where it is today, you can read our [State of GreenwoodJS blog post](https://www.greenwoodjs.ioblog/state-of-greenwood-2022/).  We would love to have your help making Greenwood! ✌️
+> Greenwood is currently working towards a [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3).  If you're interested in learning more about the web and web development (at any skill level!), or interested in checking out our high level roadmap and how Greenwood got where it is today, you can read our [State of GreenwoodJS blog post](https://www.greenwoodjs.io/blog/state-of-greenwood-2022/).  We would love to have your help making Greenwood! ✌️
 
 ## Getting Started
 Our website has a complete [Getting Started](http://www.greenwoodjs.io/getting-started) section that will walk you through creating a Greenwood project from scratch.
