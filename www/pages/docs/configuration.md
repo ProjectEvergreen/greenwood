@@ -24,6 +24,7 @@ export default {
     plugins: [],
     settings: {}
   },
+  prerender: false,
   staticRouter: false,
   optimization: 'default',
   plugins: [],
@@ -174,14 +175,14 @@ export default {
 
 ### Prerender
 
-By default, [Greenwood pre-renders](/about/how-it-works/) all your _runtime_ JavaScript (Web Components, GraphQL calls, etc) across all your pages and captures the output as part of the final built HTML output.  This means you can have ["static" components](/docs/configuration/#optimization) that can just render once and generate all their initial HTML at build time.  This aims to provide a fully complete HTML document to the user, so even if JavaScript is disabled or something breaks in their browser, the user gets all the initial content.  And from there, progressive enhancement can take over.
+Though `false` by default, when this feature is enabled, [Greenwood will pre-render](/about/how-it-works/) your application using a browser, including your _runtime_ JavaScript (Web Components, GraphQL calls, etc) across all your pages and capture the output as part of the final static HTML build output.
 
-_However_, you may not need that, like for a [SPA (Single Page Application)](/docs/layouts/#single-page-applications).  If you _don't_ want any sort of pre-rendering and just want to render out your markdown / HTML as is, add this setting to your _greenwood.config.js_ and set it to `false`.
+You can combine this with ["static" components](/docs/configuration/#optimization) so that you can just do single pass rendering of your Web Components and get their output as static HTML and CSS at build time without having to ship any runtime JavaScript!
 
 #### Example
 ```js
 export default {
-  prerender: false
+  prerender: true
 }
 ```
 
