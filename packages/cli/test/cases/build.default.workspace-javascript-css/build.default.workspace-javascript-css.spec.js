@@ -1,7 +1,8 @@
 /*
  * Use Case
  * Run Greenwood with various usages of JavaScript (<script>) and CSS (<style> / <link>) tags, with inlined or file based content.
- *
+ * Takes advantage of prerendering to validate a more complete (server rendered) example.
+ * 
  * Uaer Result
  * Should generate a bare bones Greenwood build without erroring.
  *
@@ -9,7 +10,9 @@
  * greenwood build
  *
  * User Config
- * None
+ * export default {
+ *   prerender: true
+ * };
  *
  * User Workspace
  * src/

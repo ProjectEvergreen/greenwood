@@ -1,16 +1,16 @@
 /*
  * Use Case
- * Run Greenwood build command with prerender config set to false.
+ * Run Greenwood build command with prerender config set to true.
  *
  * User Result
- * Should generate a Greenwood build with no puppeteer generated output.
+ * Should generate a Greenwood build with puppeteer generated output for Web Components.
  *
  * User Command
  * greenwood build
  *
  * User Config
  * {
- *   prerender: false
+ *   prerender: true
  * }
  *
  * User Workspace
@@ -104,12 +104,13 @@ describe('Build Greenwood With: ', function() {
         expect(heading).to.equal('Welcome to Greenwood!');
       });
 
-      it('should not have any prerendered content from <app-header> component', function() {
+      it('should have prerendered content from <app-header> component', function() {
         const appHeader = dom.window.document.querySelectorAll('body app-header');
         const header = dom.window.document.querySelectorAll('body header');
 
         expect(appHeader.length).to.equal(1);
-        expect(header.length).to.equal(0);
+        expect(header.length).to.equal(1);
+        expect(header[0].textContent).to.equal('This is the header component.');
       });
     });
   });

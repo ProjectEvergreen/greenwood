@@ -88,11 +88,10 @@ describe('Build Greenwood With: ', function() {
           expect(scriptTags.length).to.be.equal(1);
         });
 
-        it('should contain the expected content from <app-header> in the <body>', function() {
-          const header = dom.window.document.querySelectorAll('body header');
+        it('should contain the expected <app-header> in the <body>', function() {
+          const header = dom.window.document.querySelectorAll('body app-header');
 
           expect(header.length).to.be.equal(1);
-          expect(header[0].textContent).to.be.equal('This is the header component.');
         });
       });
 

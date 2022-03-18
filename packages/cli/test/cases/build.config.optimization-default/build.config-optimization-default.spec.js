@@ -75,13 +75,6 @@ describe('Build Greenwood With: ', function() {
           expect(preloadScriptTags.length).to.be.equal(1);
           expect(preloadScriptTags[0].href).to.match(/header.*.js/);
         });
-
-        it('should contain the expected content from <app-header> in the <body>', function() {
-          const header = dom.window.document.querySelectorAll('body header');
-
-          expect(header.length).to.be.equal(1);
-          expect(header[0].textContent).to.be.equal('This is the header component.');
-        });
       });
 
       describe('<link> tag and preloading', function() {

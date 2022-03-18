@@ -86,7 +86,7 @@ describe('Build Greenwood With: ', function() {
           expect(linkTags.length).to.equal(1);
         });
 
-        it('should have 1 <style> tags in the <head>', function() {
+        it('should have 1 <style> tag in the <head>', function() {
           expect(styleTags.length).to.equal(1);
         });
 

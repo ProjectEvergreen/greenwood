@@ -1,6 +1,7 @@
 /*
  * Use Case
  * Run Greenwood build command with a workspace that uses frontmatter imports.
+ * Added prerender: true to showcase prerendering WCs in markdown
  *
  * User Result
  * Should generate a bare bones Greenwood build.
@@ -9,7 +10,9 @@
  * greenwood build
  *
  * User Config
- * None (Greenwood Default)
+ * export default {
+ *   prerender: true
+ * }
  *
  * User Workspace
  * src/

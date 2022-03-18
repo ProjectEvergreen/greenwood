@@ -1,7 +1,8 @@
 /*
  * Use Case
  * Run Greenwood with and loading different references to node_module types to ensure proper support.
- *
+ * Sets prerender: true to validate the functionality.
+ * 
  * Uaer Result
  * Should generate a bare bones Greenwood build without erroring.
  *

@@ -1,7 +1,8 @@
 /*
  * Use Case
  * Run Greenwood with pluginImportCss plugin with default options.
- *
+ * Sets prerender: true to validate the functionality.
+ * 
  * Uaer Result
  * Should generate a bare bones Greenwood build without erroring when using ESM (import) with CSS.
  *

@@ -96,11 +96,10 @@ describe('Build Greenwood With: ', function() {
         expect(p.textContent).to.be.equal('This is the home page built by Greenwood. Make your own pages in src/pages/index.js!');
       });
 
-      it('should have a <header> tag in the <body>', function() {
-        const header = dom.window.document.querySelectorAll('body header');
+      it('should have a <x-header> tag in the <body>', function() {
+        const header = dom.window.document.querySelectorAll('body x-header');
 
         expect(header.length).to.be.equal(1);
-        expect(header[0].textContent).to.be.equal('This is the header component.');
       });
     });
 
@@ -133,11 +132,10 @@ describe('Build Greenwood With: ', function() {
         expect(p.textContent).to.be.equal('This is a custom about page built by Greenwood.');
       });
 
-      it('should have a <header> tag in the <body>', function() {
-        const header = dom.window.document.querySelectorAll('body header');
+      it('should have a <x-header> tag in the <body>', function() {
+        const header = dom.window.document.querySelectorAll('body x-header');
 
         expect(header.length).to.be.equal(1);
-        expect(header[0].textContent).to.be.equal('This is the header component.');
       });
     });
 

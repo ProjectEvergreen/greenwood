@@ -76,11 +76,10 @@ describe('Build Greenwood With: ', function() {
         expect(scriptTags.length).to.be.equal(1);
       });
 
-      // one of these tags comes from puppeteer
       it('should have two <style> tags in the <head>', function() {
         const styleTags = dom.window.document.querySelectorAll('head style');
 
-        expect(styleTags.length).to.be.equal(2);
+        expect(styleTags.length).to.be.equal(1);
       });
 
       it('should have no <link> tags in the <head>', function() {
@@ -110,13 +109,6 @@ describe('Build Greenwood With: ', function() {
 
         expect(headerScriptTags.length).to.be.equal(0);
       });
-
-      it('should contain the expected content from <app-header> in the <body>', function() {
-        const headerScriptTags = dom.window.document.querySelectorAll('body header');
-
-        expect(headerScriptTags.length).to.be.equal(1);
-        expect(headerScriptTags[0].textContent).to.be.equal('This is the header component.');
-      });
     });
 
     describe('JavaScript <script> tag and inline optimization override for <app-footer>', function() {
@@ -142,13 +134,6 @@ describe('Build Greenwood With: ', function() {
           });
 
         expect(footerScriptTags.length).to.be.equal(1);
-      });
-
-      it('should contain the expected content from <app-footer> in the <body>', function() {
-        const footer = dom.window.document.querySelectorAll('body footer');
-
-        expect(footer.length).to.be.equal(1);
-        expect(footer[0].textContent).to.be.equal('This is the footer component.');
       });
     });
 
