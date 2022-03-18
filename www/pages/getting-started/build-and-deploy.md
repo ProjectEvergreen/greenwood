@@ -35,4 +35,4 @@ For the Greenwood website, our code is in [GitHub](https://github.com/ProjectEve
 
 We hope to add more guides for common hosting solutions but the beauty of Greenwood and static sites is that they can run just about anywhere with little or no configuration at all.
 
-Ok, let's [wrap this all up](/getting-started/next-steps/) and let you get on with building the rest of your site!
+Before we wrap up, let's show so you some of the [default optimization options](/getting-started/optimizing/) available with Greenwood.

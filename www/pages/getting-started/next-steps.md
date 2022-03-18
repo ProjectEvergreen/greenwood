@@ -2,7 +2,7 @@
 label: 'next-steps'
 menu: side
 title: 'Next Steps'
-index: 7
+index: 8
 ---
 
 ## Next Steps

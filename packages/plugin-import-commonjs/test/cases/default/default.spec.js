@@ -1,7 +1,8 @@
 /*
  * Use Case
  * Run Greenwood with pluginImportCommonjs plugin with default options.
- *
+ * Sets prerender: true to validate the functionality.
+ * 
  * Uaer Result
  * Should generate a bare bones Greenwood build without erroring on a CommonJS module.
  *

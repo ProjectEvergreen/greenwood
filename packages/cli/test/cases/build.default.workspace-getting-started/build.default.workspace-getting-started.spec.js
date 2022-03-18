@@ -154,10 +154,10 @@ describe('Build Greenwood With: ', function() {
           expect(await glob.promise(`${path.join(this.context.publicDir, 'styles')}/theme.*.css`)).to.have.lengthOf(1);
         });
   
-        it('should output two <style> tag in the <head> (one from puppeteer)', async function() {
+        it('should output one <style> tag in the <head>', async function() {
           const styleTags = dom.window.document.querySelectorAll('head style');
   
-          expect(styleTags.length).to.be.equal(2);
+          expect(styleTags.length).to.be.equal(1);
         });
   
         it('should output one <link> tag in the <head>', async function() {
@@ -192,18 +192,16 @@ describe('Build Greenwood With: ', function() {
           expect(links[1].textContent).to.be.equal('my-first-post');
         });
   
-        it('should have a <header> tag in the <body>', function() {
-          const header = dom.window.document.querySelectorAll('body header');
+        it('should have a <app-header> tag in the <body>', function() {
+          const header = dom.window.document.querySelectorAll('body app-header');
   
           expect(header.length).to.be.equal(1);
-          expect(header[0].textContent).to.be.equal('This is the header component.');
         });
   
-        it('should have a <footer> tag in the <body>', function() {
-          const footer = dom.window.document.querySelectorAll('body footer');
+        it('should have a <app-footer> tag in the <body>', function() {
+          const footer = dom.window.document.querySelectorAll('body app-footer');
   
           expect(footer.length).to.be.equal(1);
-          expect(footer[0].textContent).to.be.equal('This is the footer component.');
         });
       });
     });
@@ -229,10 +227,10 @@ describe('Build Greenwood With: ', function() {
         expect(scriptTags.length).to.be.equal(2);
       });
 
-      it('should output one <style> tag in the <head> (one from puppeteer)', async function() {
+      it('should output no <style> tags in the <head>', async function() {
         const styleTags = dom.window.document.querySelectorAll('head style');
 
-        expect(styleTags.length).to.be.equal(1);
+        expect(styleTags.length).to.be.equal(0);
       });
 
       it('should output one <link> tag in the <head>', async function() {
@@ -241,11 +239,10 @@ describe('Build Greenwood With: ', function() {
         expect(linkTags.length).to.be.equal(1);
       });
 
-      it('should have a <header> tag in the <body>', function() {
-        const header = dom.window.document.querySelectorAll('body header');
+      it('should have a <app-header> tag in the <body>', function() {
+        const header = dom.window.document.querySelectorAll('body app-header');
 
         expect(header.length).to.be.equal(1);
-        expect(header[0].textContent).to.be.equal('This is the header component.');
       });
 
       it('should have an the expected content in the <body>', function() {
@@ -260,18 +257,10 @@ describe('Build Greenwood With: ', function() {
         expect(p[1].textContent).to.be.equal('back');
       });
 
-      it('should have a <footer> tag in the <body>', function() {
-        const footer = dom.window.document.querySelectorAll('body footer');
+      it('should have a <app-footer> tag in the <body>', function() {
+        const footer = dom.window.document.querySelectorAll('body app-footer');
 
         expect(footer.length).to.be.equal(1);
-        expect(footer[0].textContent).to.be.equal('This is the footer component.');
-      });
-
-      it('should have the expected content for the first blog post', function() {
-        const footer = dom.window.document.querySelectorAll('body footer');
-
-        expect(footer.length).to.be.equal(1);
-        expect(footer[0].textContent).to.be.equal('This is the footer component.');
       });
     });
 
@@ -296,10 +285,10 @@ describe('Build Greenwood With: ', function() {
         expect(scriptTags.length).to.be.equal(2);
       });
 
-      it('should output one <style> tag in the <head> (one from puppeteer)', async function() {
+      it('should output no <style> tags in the <head>', async function() {
         const styleTags = dom.window.document.querySelectorAll('head style');
 
-        expect(styleTags.length).to.be.equal(1);
+        expect(styleTags.length).to.be.equal(0);
       });
 
       it('should output one <link> tag in the <head>', async function() {
@@ -308,11 +297,10 @@ describe('Build Greenwood With: ', function() {
         expect(linkTags.length).to.be.equal(1);
       });
 
-      it('should have a <header> tag in the <body>', function() {
-        const header = dom.window.document.querySelectorAll('body header');
+      it('should have a <app-header> tag in the <body>', function() {
+        const header = dom.window.document.querySelectorAll('body app-header');
 
         expect(header.length).to.be.equal(1);
-        expect(header[0].textContent).to.be.equal('This is the header component.');
       });
 
       it('should have an the expected content in the <body>', function() {
@@ -327,18 +315,10 @@ describe('Build Greenwood With: ', function() {
         expect(p[1].textContent).to.be.equal('back');
       });
 
-      it('should have a <footer> tag in the <body>', function() {
-        const footer = dom.window.document.querySelectorAll('body footer');
+      it('should have a <app-footer> tag in the <body>', function() {
+        const footer = dom.window.document.querySelectorAll('body app-footer');
 
         expect(footer.length).to.be.equal(1);
-        expect(footer[0].textContent).to.be.equal('This is the footer component.');
-      });
-
-      it('should have the expected content for the first blog post', function() {
-        const footer = dom.window.document.querySelectorAll('body footer');
-
-        expect(footer.length).to.be.equal(1);
-        expect(footer[0].textContent).to.be.equal('This is the footer component.');
       });
     });
 
