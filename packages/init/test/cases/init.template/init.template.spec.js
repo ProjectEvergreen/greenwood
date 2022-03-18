@@ -44,10 +44,6 @@ describe('Scaffold Greenwood From a (Blog) Template: ', function() {
         expect(fs.existsSync(path.join(outputPath, 'src', 'pages'))).to.be.true;
       });
 
-      it('should generate a greenwood.config.js file', function() {
-        expect(fs.existsSync(path.join(outputPath, 'greenwood.config.js'))).to.be.true;
-      });
-
       it('should generate a .gitignore file', function() {
         expect(fs.existsSync(path.join(outputPath, '.gitignore'))).to.be.true;
       });
