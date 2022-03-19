@@ -5,16 +5,12 @@
 // https://github.com/ProjectEvergreen/greenwood/issues/141
 process.setMaxListeners(0);
 
+import { generateCompilation } from './lifecycles/compile.js';
+import fs from 'fs';
 import program from 'commander';
-import fs from 'fs/promises';
 import { URL } from 'url';
 
-import { runDevServer } from './commands/develop.js';
-import { runProductionBuild } from './commands/build.js';
-import { runProdServer } from './commands/serve.js';
-import { ejectConfiguration } from './commands/eject.js';
-
-const greenwoodPackageJson = JSON.parse(await fs.readFile(new URL('../package.json', import.meta.url), 'utf-8'));
+const greenwoodPackageJson = JSON.parse(await fs.promises.readFile(new URL('../package.json', import.meta.url), 'utf-8'));
 let cmdOption = {};
 let command = '';
 
@@ -63,30 +59,62 @@ if (program.parse.length === 0) {
   program.help();
 }
 
-const run = async() => {  
+const run = async() => {
+  const compilation = await generateCompilation();
+
   try {
     console.info(`Running Greenwood with the ${command} command.`);
     process.env.__GWD_COMMAND__ = command;
     
+    // auto install puppeteer if user has enabled prerendering and not installed it already
+    if (compilation.config.prerender && !fs.existsSync(new URL('./node_modules/puppeteer', import.meta.url))) {
+      const os = await import('os');
+      const spawn = (await import('child_process')).spawn;
+      const pkgMng = 'yarn'; // TODO program.yarn ? 'yarn' : 'npm'; // default to npm
+      const command = pkgMng === 'yarn' ? 'add' : 'install';
+      const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
+      const args = [command, 'puppeteer@^10.2.0']; // TODO pull version from Greenwood
+
+      try {
+        await new Promise((resolve, reject) => {
+
+          const process = spawn(pkgCommand, args, { stdio: 'ignore' });
+
+          process.on('close', code => {
+            if (code !== 0) {
+              reject({
+                command: `${pkgCommand} ${args.join(' ')}`
+              });
+              return;
+            }
+            console.debug('auto installation successful!');
+            resolve();
+          });
+        });
+      } catch (err) {
+        console.error('not able to handle installing puppeteer', err); // TODO provide manual step
+      }
+    }
+
     switch (command) {
 
-      case 'build':   
-        await runProductionBuild();
-        
+      case 'build':
+        await (await import('./commands/build.js')).runProductionBuild(compilation);
+
         break;
       case 'develop':
-        await runDevServer();
+        await (await import('./commands/develop.js')).runDevServer(compilation);
 
         break;
       case 'serve':
         process.env.__GWD_COMMAND__ = 'build';
-        
-        await runProductionBuild();
-        await runProdServer();
+
+        await (await import('./commands/build.js')).runProductionBuild(compilation);
+        await (await import('./commands/serve.js')).runProdServer(compilation);
 
         break;
       case 'eject':
-        await ejectConfiguration();
+        await (await import('./commands/eject.js')).ejectConfiguration(compilation);
 
         break;
       default: 
