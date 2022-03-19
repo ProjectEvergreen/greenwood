@@ -69,7 +69,7 @@ const run = async() => {
     
     // auto install puppeteer if user has enabled prerendering and not installed it already
     console.debug('@@@@@@@@@@@@@@', path.join(process.cwd(), '/node_modules/puppeteer'));
-    console.debug('PUP UP', fs.existsSync(path.join(process.cwd(), '/node_modules/puppeteer')));
+    console.debug('PUP EXISTS', fs.existsSync(path.join(process.cwd(), '/node_modules/puppeteer')));
     if (compilation.config.prerender && !fs.existsSync(path.join(process.cwd(), '/node_modules/puppeteer'))) {
       console.log('prerender configuration detected but puppeteer is not installed');
       console.log('attempting to auto-install puppeteer...');
@@ -98,7 +98,7 @@ const run = async() => {
           });
         });
       } catch (err) {
-        console.error('not able to handle installing puppeteer', err); // TODO provide manual step
+        console.error('not able to handle installing puppeteer', err); // TODO provide manual steps
       }
     }
 
@@ -115,7 +115,7 @@ const run = async() => {
       case 'serve':
         process.env.__GWD_COMMAND__ = 'build';
 
-        await (await import('./commands/build.js')).runProductionBuild(compilation);
+        await (await import('./commands/build.js')).runProductionBuild(Object.assign({}, compilation));
         await (await import('./commands/serve.js')).runProdServer(compilation);
 
         break;

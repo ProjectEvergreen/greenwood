@@ -23,7 +23,7 @@ import chai from 'chai';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { copyDirectory, getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -161,9 +161,15 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/simpledotcss/`
       );
       const prismCss = await getDependencyFiles(
-        `${process.cwd()}/node_modules/prismjs/themes/prism-tomorrow.css`, 
+        `${process.cwd()}/node_modules/prismjs/themes/prism-tomorrow.css`,
         `${outputPath}/node_modules/prismjs/themes/`
       );
+      const prismPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/prismjs/package.json`, 
+        `${outputPath}/node_modules/prismjs/`
+      );
+
+      await copyDirectory(`${process.cwd()}/node_modules/puppeteer`, `${outputPath}node_modules/puppeteer`);
 
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
@@ -194,6 +200,7 @@ describe('Build Greenwood With: ', function() {
         ...pwaHelpersPackageJson,    
         ...pwaHelpersLibs,
         ...prismCss,
+        ...prismPackageJson,
         ...simpleCss,
         ...simpleCssPackageJson
       ]);
@@ -267,7 +274,7 @@ describe('Build Greenwood With: ', function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'lit-element.*.js'))).to.have.lengthOf(1);
       });
 
-      xit('should have the expected inline node_modules content in the first inline script', async function() {
+      it('should have the expected inline node_modules content in the first inline script', async function() {
         const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[0];
         
         expect(inlineScriptTag.textContent.replace('\n', '')).to
@@ -275,7 +282,7 @@ describe('Build Greenwood With: ', function() {
           .equal('import"/lit-element.ae169679.js";import"/lit-html.7f7a9139.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline"//# sourceMappingURL=1807818843-scratch.ee52d4f0.js.map');
       });
 
-      xit('should have the expected inline node_modules content in the second inline script tag which should include extra code from rollup', async function() {
+      it('should have the expected inline node_modules content in the second inline script tag which should include extra code from rollup', async function() {
         const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[1];
 
         expect(inlineScriptTag.textContent.replace('\n', '')).to.equal('import"/lit-element.ae169679.js";import"/lit-html.7f7a9139.js";//# sourceMappingURL=2012376258-scratch.0a6fc17c.js.map');

@@ -118,7 +118,9 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
 
+      // stub puppeteer dependency to avoid package manager installation when running specs that need prerendering
       await copyDirectory(`${process.cwd()}/node_modules/puppeteer`, `${outputPath}node_modules/puppeteer`);
+
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...greenwoodGraphqlCoreLibs,

@@ -73,26 +73,21 @@ async function getDependencyFiles(sourcePath, outputPath) {
 }
 
 async function copyDirectory(sourcePath, outputPath) {
-  const sourceContents = await rreaddir(sourcePath);
-
-  console.debug({ sourcePath });
-  console.debug({ outputPath });
+  const sourceRootFiles = await rreaddir(sourcePath);
 
   await fs.promises.mkdir(outputPath, { recursive: true });
 
-  sourceContents.forEach((filepath) => {
-    const target = decodeURIComponent(path.normalize(filepath.replace(sourcePath, outputPath)));
+  for (const filepath of sourceRootFiles) {
+    const target = filepath.replace(sourcePath, outputPath);
     const stats = fs.lstatSync(filepath);
 
-    console.debug({ filepath });
-    console.debug({ target });
-    if (stats.isDirectory() && (!filepath.endsWith('Contents') || !filepath.endsWith('LICENSE')) && !fs.existsSync(target)) {
-      console.debug('mkdir', target);
-      fs.mkdirSync(target);
+    // TODO possible race condition?
+    if (stats.isDirectory() && !filepath.endsWith('LICENSE') && !fs.existsSync(target)) {
+      await fs.promises.mkdir(target, { recursive: true });
     } else if (stats.isFile()) {
-      copyFile(filepath, target);
+      await copyFile(filepath, target);
     }
-  });
+  }
 }
 
 export {
