@@ -199,6 +199,8 @@ async function walkPackageJson(packageJson = {}) {
 
         await walkPackageJson(dependencyPackageJson);
       } else {
+        console.debug({ absoluteNodeModulesLocation });
+        console.debug({ entry });
         const packageEntryPointPath = path.join(absoluteNodeModulesLocation, entry);
 
         // sometimes a main file is actually just an empty string... :/

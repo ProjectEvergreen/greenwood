@@ -7,6 +7,7 @@ process.setMaxListeners(0);
 
 import { generateCompilation } from './lifecycles/compile.js';
 import fs from 'fs';
+import path from 'path';
 import program from 'commander';
 import { URL } from 'url';
 
@@ -67,13 +68,18 @@ const run = async() => {
     process.env.__GWD_COMMAND__ = command;
     
     // auto install puppeteer if user has enabled prerendering and not installed it already
-    if (compilation.config.prerender && !fs.existsSync(new URL('./node_modules/puppeteer', import.meta.url))) {
+    console.debug('@@@@@@@@@@@@@@', path.join(process.cwd(), '/node_modules/puppeteer'));
+    console.debug('PUP UP', fs.existsSync(path.join(process.cwd(), '/node_modules/puppeteer')));
+    if (compilation.config.prerender && !fs.existsSync(path.join(process.cwd(), '/node_modules/puppeteer'))) {
+      console.log('prerender configuration detected but puppeteer is not installed');
+      console.log('attempting to auto-install puppeteer...');
       const os = await import('os');
       const spawn = (await import('child_process')).spawn;
       const pkgMng = 'yarn'; // TODO program.yarn ? 'yarn' : 'npm'; // default to npm
-      const command = pkgMng === 'yarn' ? 'add' : 'install';
+      const command = pkgMng === 'yarn' ? 'add' : 'install --dev';
+      const suffix = pkgMng === 'yarn' ? '--save-dev' : '--save-dev'; // TODO
       const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
-      const args = [command, 'puppeteer@^10.2.0']; // TODO pull version from Greenwood
+      const args = [command, `puppeteer@^10.2.0 ${suffix}`]; // TODO pull version from Greenwood
 
       try {
         await new Promise((resolve, reject) => {
@@ -87,7 +93,7 @@ const run = async() => {
               });
               return;
             }
-            console.debug('auto installation successful!');
+            console.log('auto installation successful!');
             resolve();
           });
         });
