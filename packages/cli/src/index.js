@@ -68,29 +68,25 @@ const run = async() => {
     process.env.__GWD_COMMAND__ = command;
     
     // auto install puppeteer if user has enabled prerendering and not installed it already
-    console.debug('@@@@@@@@@@@@@@', path.join(process.cwd(), '/node_modules/puppeteer'));
-    console.debug('PUP EXISTS', fs.existsSync(path.join(process.cwd(), '/node_modules/puppeteer')));
     if (compilation.config.prerender && !fs.existsSync(path.join(process.cwd(), '/node_modules/puppeteer'))) {
       console.log('prerender configuration detected but puppeteer is not installed');
       console.log('attempting to auto-install puppeteer...');
       const os = await import('os');
       const spawn = (await import('child_process')).spawn;
-      const pkgMng = 'yarn'; // TODO program.yarn ? 'yarn' : 'npm'; // default to npm
-      const command = pkgMng === 'yarn' ? 'add' : 'install --dev';
-      const suffix = pkgMng === 'yarn' ? '--save-dev' : '--save-dev'; // TODO
+      const pkgMng = fs.existsSync(path.join(process.cwd(), 'yarn.lock')) ? 'yarn' : 'npm';
+      const command = pkgMng === 'yarn' ? 'add' : 'install';
+      const suffix = pkgMng === 'yarn' ? '--dev' : '--save-dev';
       const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
-      const args = [command, `puppeteer@^10.2.0 ${suffix}`]; // TODO pull version from Greenwood
+      const args = [command, 'puppeteer@^10.2.0', suffix]; // TODO pull version from Greenwood
 
       try {
         await new Promise((resolve, reject) => {
 
-          const process = spawn(pkgCommand, args, { stdio: 'ignore' });
+          const childProcess = spawn(pkgCommand, args, { stdio: 'ignore' });
 
-          process.on('close', code => {
+          childProcess.on('close', code => {
             if (code !== 0) {
-              reject({
-                command: `${pkgCommand} ${args.join(' ')}`
-              });
+              reject();
               return;
             }
             console.log('auto installation successful!');
@@ -98,7 +94,7 @@ const run = async() => {
           });
         });
       } catch (err) {
-        console.error('not able to handle installing puppeteer', err); // TODO provide manual steps
+        console.error('not able to handle installing puppeteer'); // TODO provide manual steps
       }
     }
 
