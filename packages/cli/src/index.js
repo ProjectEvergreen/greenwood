@@ -69,7 +69,7 @@ const run = async() => {
     
     // auto install puppeteer if user has enabled prerendering and not installed it already
     if (compilation.config.prerender && !fs.existsSync(path.join(process.cwd(), '/node_modules/puppeteer'))) {
-      console.log('prerender configuration detected but puppeteer is not installed');
+      console.log('prerender configuration detected but puppeteer is not installed.');
       console.log('attempting to auto-install puppeteer...');
       const os = await import('os');
       const spawn = (await import('child_process')).spawn;
@@ -94,7 +94,8 @@ const run = async() => {
           });
         });
       } catch (err) {
-        console.error('not able to handle installing puppeteer'); // TODO provide manual steps
+        console.error('Sorry, we were not able to handle auto-installing puppeteer.');
+        console.log('Please visit our website for more information on self-installation: https://www.greenwoodjs.io/docs/configuration/#prerender');
       }
     }
 
