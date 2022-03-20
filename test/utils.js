@@ -78,7 +78,7 @@ async function copyDirectory(sourcePath, outputPath) {
   await fs.promises.mkdir(outputPath, { recursive: true });
 
   for (const filepath of sourceRootFiles) {
-    const target = filepath.replace(sourcePath, outputPath);
+    const target = filepath.replace(path.normalize(sourcePath), path.normalize(outputPath));
     const stats = fs.lstatSync(filepath);
 
     // TODO possible race condition?
