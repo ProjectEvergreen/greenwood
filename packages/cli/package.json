@@ -23,7 +23,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "peerDependencies": {
+  "optionalDependency": {
     "puppeteer": "^10.2.0"
   },
   "dependencies": {
