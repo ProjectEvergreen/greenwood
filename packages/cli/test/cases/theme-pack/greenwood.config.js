@@ -1,6 +1,5 @@
 import fs from 'fs';
 import { myThemePack } from './my-theme-pack.js';
-import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 import { URL } from 'url';
 
@@ -18,7 +17,7 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
   }
 
   async resolve(url) {
-    return Promise.resolve(this.getBareUrlPath(url).replace(`/node_modules/${packageName}/dist/`, path.join(process.cwd(), '/src/')));
+    return Promise.resolve(this.getBareUrlPath(url).replace(`/node_modules/${packageName}/dist/`, '/src/'));
   }
 }
 

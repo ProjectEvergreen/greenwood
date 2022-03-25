@@ -38,7 +38,7 @@ const expect = chai.expect;
 const packageJson = JSON.parse(await fs.promises.readFile(new URL('./package.json', import.meta.url), 'utf-8'));
 
 describe('Develop Greenwood With: ', function() {
-  const LABEL = 'Developement environment for a Theme Pack';
+  const LABEL = 'Development environment for a Theme Pack';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://localhost';

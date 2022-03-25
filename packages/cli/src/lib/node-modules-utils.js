@@ -1,5 +1,6 @@
 import { createRequire } from 'module'; // https://stackoverflow.com/a/62499498/417806
 import fs from 'fs';
+import path from 'path';
 
 // defer to NodeJS to find where on disk a package is located using import.meta.resolve
 // and return the root absolute location
@@ -40,7 +41,8 @@ async function getNodeModulesLocationForPackage(packageName) {
     }
 
     if (!nodeModulesUrl) {
-      console.debug(`Unable to look up ${packageName} using NodeJS require.resolve.`);
+      console.debug(`Unable to look up ${packageName} using NodeJS require.resolve.  Falling back to process.cwd()`);
+      nodeModulesUrl = path.join(process.cwd(), 'node_modules', packageName);
     }
   }
 
