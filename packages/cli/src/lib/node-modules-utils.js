@@ -42,7 +42,7 @@ async function getNodeModulesLocationForPackage(packageName) {
 
     if (!nodeModulesUrl) {
       console.debug(`Unable to look up ${packageName} using NodeJS require.resolve.  Falling back to process.cwd()`);
-      nodeModulesUrl = path.join(process.cwd(), 'node_modules', packageName);
+      nodeModulesUrl = path.join(process.cwd(), 'node_modules', packageName.replace(/\\/g, '/')); // force / for consistency and path matching);
     }
   }
 
