@@ -262,7 +262,7 @@ async function getHybridServer(compilation) {
       return node.route === url;
     })[0] || { data: {} };
 
-    if (matchingRoute.isSSR) {
+    if (matchingRoute.isSSR && !matchingRoute.data.static) {
       const headers = {
         request: { 'accept': 'text/html', 'content-type': 'text/html' },
         response: { 'content-type': 'text/html' }

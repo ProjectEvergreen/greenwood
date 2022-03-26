@@ -120,6 +120,14 @@ describe('Build Greenwood With: ', function() {
         done();
       });
 
+      // TODO
+      xit('should not emit a static file', function(done) {
+        const ssrPageOutput = fs.existsSync(path.join(outputPath, 'public/artists/index.html'));
+
+        expect(ssrPageOutput).to.be.false;
+        done();
+      });
+
       it('the response body should be valid HTML from JSDOM', function(done) {
         expect(artistsPageDom).to.not.be.undefined;
         done();
