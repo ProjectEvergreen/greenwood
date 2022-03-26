@@ -21,10 +21,11 @@
  *     index.html
  */
 import chai from 'chai';
+import fs from 'fs/promises';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { copyDirectory, getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getSetupFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -46,11 +47,6 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      // TODO would like to actually have puppeteer auto install happen as part of the test, but gallinago cleanup does not seem to run
-      // and then tests fail the next time because of no type="module" in package.json
-      // stub puppeteer dependency to avoid package manager installation when running specs that need prerendering
-      await copyDirectory(`${process.cwd()}/node_modules/puppeteer`, `${outputPath}node_modules/puppeteer`);
-
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });
@@ -118,9 +114,15 @@ describe('Build Greenwood With: ', function() {
         expect(header[0].textContent).to.equal('This is the header component.');
       });
     });
-  });
 
-  after(function() {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+    after(async function() {
+      // using unlink instead of runner.teardown since when auto-install puppeteer
+      // our spawned process of a spawned process does not clean up as expected
+      await fs.unlink(path.join(outputPath, 'package.json'));
+      await fs.unlink(path.join(outputPath, 'package-lock.json'));
+      await fs.rm(path.join(outputPath, '.greenwood'), { recursive: true, force: true });
+      await fs.rm(path.join(outputPath, 'node_modules'), { recursive: true, force: true });
+      await fs.rm(path.join(outputPath, 'public'), { recursive: true, force: true });
+    });
   });
 });
