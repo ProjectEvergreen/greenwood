@@ -120,7 +120,7 @@ describe('Build Greenwood With: ', function() {
         done();
       });
 
-      // TODO
+      // this is limited by the fact SSR routes have to write to the fs in order to bundle a page on the fly
       xit('should not emit a static file', function(done) {
         const ssrPageOutput = fs.existsSync(path.join(outputPath, 'public/artists/index.html'));
 
