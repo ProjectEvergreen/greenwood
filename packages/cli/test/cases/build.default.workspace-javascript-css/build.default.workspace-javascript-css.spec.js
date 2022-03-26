@@ -28,7 +28,7 @@ import chai from 'chai';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { copyDirectory, getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -51,6 +51,9 @@ describe('Build Greenwood With: ', function() {
     let dom;
 
     before(async function() {
+      // stub puppeteer dependency to avoid package manager installation when running specs that need prerendering
+      await copyDirectory(`${process.cwd()}/node_modules/puppeteer`, `${outputPath}node_modules/puppeteer`);
+
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
 

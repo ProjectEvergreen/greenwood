@@ -71,17 +71,17 @@ const run = async() => {
     if (compilation.config.prerender && !fs.existsSync(path.join(process.cwd(), '/node_modules/puppeteer'))) {
       console.log('prerender configuration detected but puppeteer is not installed.');
       console.log('attempting to auto-install puppeteer...');
-      const os = await import('os');
-      const spawn = (await import('child_process')).spawn;
-      const pkgMng = fs.existsSync(path.join(process.cwd(), 'yarn.lock')) ? 'yarn' : 'npm';
-      const command = pkgMng === 'yarn' ? 'add' : 'install';
-      const suffix = pkgMng === 'yarn' ? '--dev' : '--save-dev';
-      const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
-      const args = [command, 'puppeteer@^10.2.0', suffix]; // TODO pull version from Greenwood
 
       try {
-        await new Promise((resolve, reject) => {
-
+        await new Promise(async (resolve, reject) => {
+          const os = await import('os');
+          const spawn = (await import('child_process')).spawn;
+          const pkgMng = fs.existsSync(path.join(process.cwd(), 'yarn.lock')) ? 'yarn' : 'npm';
+          const command = pkgMng === 'yarn' ? 'add' : 'install';
+          const commandFlags = pkgMng === 'yarn' ? '--dev' : '--save-dev';
+          const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
+          const puppeteerVersion = greenwoodPackageJson.peerDependencies.puppeteer;
+          const args = [command, `puppeteer@${puppeteerVersion}`, commandFlags];
           const childProcess = spawn(pkgCommand, args, { stdio: 'ignore' });
 
           childProcess.on('close', code => {
@@ -93,7 +93,7 @@ const run = async() => {
             resolve();
           });
         });
-      } catch (err) {
+      } catch (e) {
         console.error('Sorry, we were not able to handle auto-installing puppeteer.');
         console.log('Please visit our website for more information on self-installation: https://www.greenwoodjs.io/docs/configuration/#prerender');
       }

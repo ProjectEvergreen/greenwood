@@ -24,7 +24,7 @@ import chai from 'chai';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { copyDirectory, getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -46,6 +46,11 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
+      // TODO would like to actually have puppeteer auto install happen as part of the test, but gallinago cleanup does not seem to run
+      // and then tests fail the next time because of no type="module" in package.json
+      // stub puppeteer dependency to avoid package manager installation when running specs that need prerendering
+      await copyDirectory(`${process.cwd()}/node_modules/puppeteer`, `${outputPath}node_modules/puppeteer`);
+
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });

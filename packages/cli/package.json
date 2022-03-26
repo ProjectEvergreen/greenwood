@@ -26,6 +26,11 @@
   "peerDependencies": {
     "puppeteer": "^10.2.0"
   },
+  "peerDependenciesMeta": {
+    "puppeteer": {
+      "optional": true
+    }
+  },
   "dependencies": {
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@rollup/plugin-replace": "^2.3.4",
