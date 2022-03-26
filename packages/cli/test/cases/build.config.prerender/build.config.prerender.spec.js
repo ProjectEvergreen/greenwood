@@ -118,8 +118,8 @@ describe('Build Greenwood With: ', function() {
     after(async function() {
       // using unlink instead of runner.teardown since when auto-install puppeteer
       // our spawned process of a spawned process does not clean up as expected
-      await fs.unlink(path.join(outputPath, 'package.json'));
-      await fs.unlink(path.join(outputPath, 'package-lock.json'));
+      await fs.rm(path.join(outputPath, 'package.json'), { recursive: true, force: true });
+      await fs.rm(path.join(outputPath, 'package-lock.json'), { recursive: true, force: true });
       await fs.rm(path.join(outputPath, '.greenwood'), { recursive: true, force: true });
       await fs.rm(path.join(outputPath, 'node_modules'), { recursive: true, force: true });
       await fs.rm(path.join(outputPath, 'public'), { recursive: true, force: true });
