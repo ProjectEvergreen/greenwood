@@ -14,6 +14,7 @@
  * User Workspace
  *  src/
  *   components/
+ *     counter.js
  *     footer.js
  *   pages/
  *     artists.js
