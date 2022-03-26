@@ -10,15 +10,13 @@
  * greenwood build
  *
  * User Config
- * import { greenwoodPluginIncludeHTML } from '@greenwod/plugin-include-html';
- *
- * {
- *   plugins: [{
+ * export default {
+ *   plugins: [
  *     greenwoodPluginRendererLit({
  *       prerender: true
  *     })
- *   }]
- * }
+ *   ]
+ * };
  *
  * User Workspace
  * src/
@@ -48,7 +46,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', function() {
+describe('Build Greenwood With Custom Lit Renderer: ', function() {
   const LABEL = 'For SSG prerendering of Getting Started example';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));

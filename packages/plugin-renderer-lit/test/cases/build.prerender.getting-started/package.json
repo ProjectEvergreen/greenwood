@@ -1,7 +1,0 @@
-{
-  "name": "plugin-prerender-lit-build-prerender-getting-started",
-  "type": "module",
-  "dependencies": {
-    "lit": "^2.1.1"
-  }
-}

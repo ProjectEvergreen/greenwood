@@ -9,7 +9,11 @@
  * greenwood build
  *
  * User Config
- * {}
+ * export default {
+ *   plugins: [
+ *     greenwoodPluginRendererLit()
+ *   ]
+ * };
  *
  * User Workspace
  *  src/
@@ -33,7 +37,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
+describe('Serve Greenwood With: ', function() {
   const LABEL = 'Custom Lit Renderer for SSR';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
