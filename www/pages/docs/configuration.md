@@ -186,7 +186,7 @@ export default {
 }
 ```
 
-_You will need to install puppeteer to use this feature_, as given how heavy the dependency of a full browser is, Greenwood does not install puppeteer by default.  Greenwood will try and install it for you automatically if you set this to `true` and have not installed it yourself, but if that fails or there are any issues with auto-installation, you can just install it with your favorite preferred manager.
+Given how heavy the dependency of a full browser is, _you will need to have puppeteer installed to use this feature_,as Greenwood does not include puppeteer by default.  Greenwood _will_ try and install it for you automatically if you set this to `true` and have not installed it already, but if that fails for any reason, you can just install it with your preferred manager.
 ```shell
 # npm
 $ npm install puppeteer --save-dev
