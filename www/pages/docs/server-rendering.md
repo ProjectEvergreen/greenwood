@@ -113,6 +113,25 @@ async function getFrontmatter(compilation, route) {
 
 > _For defining custom dynamic based metadata, like for `<meta>` tags, use `getTemplate` and define those tags right in your HTML._
 
+##### Static Export
+
+To export server routes as just static HTML, you can set the `static` property within the `data` object of your frontmatter.
+
+```js
+// example
+async function getFrontmatter(compilation, route) {
+  return {
+    /* ... */
+
+    data: {
+      static: true
+    }
+  };
+}
+```
+
+So for example, `/pages/artist.js` would render out as `/artists/index.html` and would not require the serve task.  So if you need more flexibility in how you create your pages, but still want to just serve it statically, you can!
+
 #### Body
 
 For just returning content, you can use `getBody`.  For example, return a list of users from an API as the HTML you need.
