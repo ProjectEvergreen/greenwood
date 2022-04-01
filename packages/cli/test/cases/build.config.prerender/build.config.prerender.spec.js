@@ -21,10 +21,11 @@
  *     index.html
  */
 import chai from 'chai';
+import fs from 'fs/promises';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getSetupFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -113,9 +114,15 @@ describe('Build Greenwood With: ', function() {
         expect(header[0].textContent).to.equal('This is the header component.');
       });
     });
-  });
 
-  after(function() {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+    after(async function() {
+      // using unlink instead of runner.teardown since when auto-install puppeteer
+      // our spawned process of a spawned process does not clean up as expected
+      await fs.rm(path.join(outputPath, 'package.json'), { recursive: true, force: true });
+      await fs.rm(path.join(outputPath, 'package-lock.json'), { recursive: true, force: true });
+      await fs.rm(path.join(outputPath, '.greenwood'), { recursive: true, force: true });
+      await fs.rm(path.join(outputPath, 'node_modules'), { recursive: true, force: true });
+      await fs.rm(path.join(outputPath, 'public'), { recursive: true, force: true });
+    });
   });
 });

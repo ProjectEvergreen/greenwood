@@ -5,16 +5,13 @@
 // https://github.com/ProjectEvergreen/greenwood/issues/141
 process.setMaxListeners(0);
 
+import { generateCompilation } from './lifecycles/compile.js';
+import fs from 'fs';
+import path from 'path';
 import program from 'commander';
-import fs from 'fs/promises';
 import { URL } from 'url';
 
-import { runDevServer } from './commands/develop.js';
-import { runProductionBuild } from './commands/build.js';
-import { runProdServer } from './commands/serve.js';
-import { ejectConfiguration } from './commands/eject.js';
-
-const greenwoodPackageJson = JSON.parse(await fs.readFile(new URL('../package.json', import.meta.url), 'utf-8'));
+const greenwoodPackageJson = JSON.parse(await fs.promises.readFile(new URL('../package.json', import.meta.url), 'utf-8'));
 let cmdOption = {};
 let command = '';
 
@@ -63,30 +60,64 @@ if (program.parse.length === 0) {
   program.help();
 }
 
-const run = async() => {  
+const run = async() => {
+  const compilation = await generateCompilation();
+
   try {
     console.info(`Running Greenwood with the ${command} command.`);
     process.env.__GWD_COMMAND__ = command;
     
+    // auto install puppeteer if user has enabled prerendering and not installed it already
+    if (compilation.config.prerender && !fs.existsSync(path.join(process.cwd(), '/node_modules/puppeteer'))) {
+      console.log('prerender configuration detected but puppeteer is not installed.');
+      console.log('attempting to auto-install puppeteer...');
+
+      try {
+        await new Promise(async (resolve, reject) => {
+          const os = await import('os');
+          const spawn = (await import('child_process')).spawn;
+          const pkgMng = fs.existsSync(path.join(process.cwd(), 'yarn.lock')) ? 'yarn' : 'npm';
+          const command = pkgMng === 'yarn' ? 'add' : 'install';
+          const commandFlags = pkgMng === 'yarn' ? '--dev' : '--save-dev';
+          const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
+          const puppeteerVersion = greenwoodPackageJson.peerDependencies.puppeteer;
+          const args = [command, `puppeteer@${puppeteerVersion}`, commandFlags];
+          const childProcess = spawn(pkgCommand, args, { stdio: 'ignore' });
+
+          childProcess.on('close', code => {
+            if (code !== 0) {
+              reject();
+              return;
+            }
+            console.log('auto installation successful!');
+            resolve();
+          });
+        });
+      } catch (e) {
+        console.error('Sorry, we were not able to handle auto-installing puppeteer.');
+        console.log('Please visit our website for more information on self-installation: https://www.greenwoodjs.io/docs/configuration/#prerender');
+      }
+    }
+
     switch (command) {
 
-      case 'build':   
-        await runProductionBuild();
-        
+      case 'build':
+        await (await import('./commands/build.js')).runProductionBuild(compilation);
+
         break;
       case 'develop':
-        await runDevServer();
+        await (await import('./commands/develop.js')).runDevServer(compilation);
 
         break;
       case 'serve':
         process.env.__GWD_COMMAND__ = 'build';
-        
-        await runProductionBuild();
-        await runProdServer();
+
+        await (await import('./commands/build.js')).runProductionBuild(Object.assign({}, compilation));
+        await (await import('./commands/serve.js')).runProdServer(compilation);
 
         break;
       case 'eject':
-        await ejectConfiguration();
+        await (await import('./commands/eject.js')).ejectConfiguration(compilation);
 
         break;
       default: 

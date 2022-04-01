@@ -175,7 +175,7 @@ export default {
 
 ### Prerender
 
-Though `false` by default, when this feature is enabled, [Greenwood will pre-render](/about/how-it-works/) your application using a browser, including your _runtime_ JavaScript (Web Components, GraphQL calls, etc) across all your pages and capture the output as part of the final static HTML build output.
+Though `false` by default, when this feature is enabled, [Greenwood will pre-render](/about/how-it-works/) your application using a browser (**puppeteer**), including your _runtime_ JavaScript (Web Components, GraphQL calls, etc) across all your pages and capture the output as part of the final static HTML build output.
 
 You can combine this with ["static" components](/docs/configuration/#optimization) so that you can just do single pass rendering of your Web Components and get their output as static HTML and CSS at build time without having to ship any runtime JavaScript!
 
@@ -186,7 +186,16 @@ export default {
 }
 ```
 
-> _**As of now, if you are using [plugin-graphql](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql) you cannot change this setting.**  We are working on improving support for server [side rendering and templating](https://github.com/ProjectEvergreen/greenwood/discussions/576) (with Web Components) as part of our [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3)._
+Given how heavy the dependency of a full browser is, _you will need to have puppeteer installed to use this feature_,as Greenwood does not include puppeteer by default.  Greenwood _will_ try and install it for you automatically if you set this to `true` and have not installed it already, but if that fails for any reason, you can just install it with your preferred manager.
+```shell
+# npm
+$ npm install puppeteer --save-dev
+
+# yarn
+$ yarn add puppeteer --dev
+```
+
+> _**As of now, if you are using [plugin-graphql](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql) you must set this to `true`.**  We are working on improving support for server [side rendering and templating](https://github.com/ProjectEvergreen/greenwood/discussions/576) (with Web Components) as part of our [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3)._
 
 ### Static Router
 

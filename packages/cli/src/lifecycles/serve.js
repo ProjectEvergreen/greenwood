@@ -1,4 +1,3 @@
-import { BrowserRunner } from '../lib/browser.js';
 import fs from 'fs';
 import { hashString } from '../lib/hashing-utils.js';
 import path from 'path';
@@ -256,14 +255,6 @@ async function getStaticServer(compilation, composable) {
 
 async function getHybridServer(compilation) {
   const app = await getStaticServer(compilation, true);
-  const { prerender } = compilation.config;
-  let browserRunner;
-
-  if (prerender) {
-    browserRunner = new BrowserRunner();
-
-    await browserRunner.init();
-  }
 
   app.use(async (ctx) => {
     const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
