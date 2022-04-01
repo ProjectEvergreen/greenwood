@@ -1,12 +1,10 @@
-import { generateCompilation } from '../lifecycles/compile.js';
 import { getStaticServer, getHybridServer } from '../lifecycles/serve.js';
 
-const runProdServer = async () => {
+const runProdServer = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
 
     try {
-      const compilation = await generateCompilation();
       const port = compilation.config.port;
       const hasRoutes = compilation.graph.find(page => page.isSSR);
       const server = hasRoutes ? getHybridServer : getStaticServer;

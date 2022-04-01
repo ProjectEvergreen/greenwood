@@ -23,7 +23,7 @@ import chai from 'chai';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { copyDirectory, getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -161,9 +161,15 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/simpledotcss/`
       );
       const prismCss = await getDependencyFiles(
-        `${process.cwd()}/node_modules/prismjs/themes/prism-tomorrow.css`, 
+        `${process.cwd()}/node_modules/prismjs/themes/prism-tomorrow.css`,
         `${outputPath}/node_modules/prismjs/themes/`
       );
+      const prismPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/prismjs/package.json`, 
+        `${outputPath}/node_modules/prismjs/`
+      );
+
+      await copyDirectory(`${process.cwd()}/node_modules/puppeteer`, `${outputPath}node_modules/puppeteer`);
 
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
@@ -194,6 +200,7 @@ describe('Build Greenwood With: ', function() {
         ...pwaHelpersPackageJson,    
         ...pwaHelpersLibs,
         ...prismCss,
+        ...prismPackageJson,
         ...simpleCss,
         ...simpleCssPackageJson
       ]);
