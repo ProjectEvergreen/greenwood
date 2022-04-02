@@ -1,4 +1,3 @@
-import { BrowserRunner } from '../lib/browser.js';
 import fs from 'fs';
 import htmlparser from 'node-html-parser';
 import path from 'path';
@@ -125,6 +124,7 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
 }
 
 async function preRenderCompilationDefault(compilation) {
+  const BrowserRunner = (await import('../lib/browser.js')).BrowserRunner;
   const browserRunner = new BrowserRunner();
 
   const runBrowser = async (serverUrl, pages, outputDir) => {
