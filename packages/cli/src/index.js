@@ -60,48 +60,51 @@ if (program.parse.length === 0) {
   program.help();
 }
 
+// auto install puppeteer if user has enabled prerendering and not installed it already
+async function checkForPuppeteer(compilation) {
+  if (compilation.config.prerender && !fs.existsSync(path.join(process.cwd(), '/node_modules/puppeteer'))) {
+    const puppeteerVersion = greenwoodPackageJson.peerDependencies.puppeteer;
+    console.log('prerender configuration detected but puppeteer is not detected.');
+    console.log(`attempting to auto-install puppeteer@${puppeteerVersion} ...`);
+
+    try {
+      await new Promise(async (resolve, reject) => {
+        const os = await import('os');
+        const spawn = (await import('child_process')).spawn;
+        const pkgMng = fs.existsSync(path.join(process.cwd(), 'yarn.lock')) ? 'yarn' : 'npm';
+        const command = pkgMng === 'yarn' ? 'add' : 'install';
+        const commandFlags = pkgMng === 'yarn' ? '--dev' : '--save-dev';
+        const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
+        const args = [command, `puppeteer@${puppeteerVersion}`, commandFlags];
+        const childProcess = spawn(pkgCommand, args, { stdio: 'ignore' });
+
+        childProcess.on('close', code => {
+          if (code !== 0) {
+            reject();
+            return;
+          }
+          console.log('auto installation successful!');
+          resolve();
+        });
+      });
+    } catch (e) {
+      console.error(`Sorry, we were unable to auto-install puppeteer@${puppeteerVersion}.`);
+      console.log('Please visit our website for more information on self-installation: https://www.greenwoodjs.io/docs/configuration/#prerender');
+    }
+  }
+}
+
 const run = async() => {
   const compilation = await generateCompilation();
 
   try {
     console.info(`Running Greenwood with the ${command} command.`);
     process.env.__GWD_COMMAND__ = command;
-    
-    // auto install puppeteer if user has enabled prerendering and not installed it already
-    if (compilation.config.prerender && !fs.existsSync(path.join(process.cwd(), '/node_modules/puppeteer'))) {
-      console.log('prerender configuration detected but puppeteer is not installed.');
-      console.log('attempting to auto-install puppeteer...');
-
-      try {
-        await new Promise(async (resolve, reject) => {
-          const os = await import('os');
-          const spawn = (await import('child_process')).spawn;
-          const pkgMng = fs.existsSync(path.join(process.cwd(), 'yarn.lock')) ? 'yarn' : 'npm';
-          const command = pkgMng === 'yarn' ? 'add' : 'install';
-          const commandFlags = pkgMng === 'yarn' ? '--dev' : '--save-dev';
-          const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
-          const puppeteerVersion = greenwoodPackageJson.peerDependencies.puppeteer;
-          const args = [command, `puppeteer@${puppeteerVersion}`, commandFlags];
-          const childProcess = spawn(pkgCommand, args, { stdio: 'ignore' });
-
-          childProcess.on('close', code => {
-            if (code !== 0) {
-              reject();
-              return;
-            }
-            console.log('auto installation successful!');
-            resolve();
-          });
-        });
-      } catch (e) {
-        console.error('Sorry, we were not able to handle auto-installing puppeteer.');
-        console.log('Please visit our website for more information on self-installation: https://www.greenwoodjs.io/docs/configuration/#prerender');
-      }
-    }
 
     switch (command) {
 
       case 'build':
+        await checkForPuppeteer(compilation);
         await (await import('./commands/build.js')).runProductionBuild(compilation);
 
         break;
@@ -112,6 +115,7 @@ const run = async() => {
       case 'serve':
         process.env.__GWD_COMMAND__ = 'build';
 
+        await checkForPuppeteer(compilation);
         await (await import('./commands/build.js')).runProductionBuild(Object.assign({}, compilation));
         await (await import('./commands/serve.js')).runProdServer(compilation);
 
