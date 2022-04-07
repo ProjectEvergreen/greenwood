@@ -27,6 +27,6 @@
     "commander": "^8.2.0",
     "inquirer": "^8.2.0",
     "node-fetch": "^2.6.7",
-    "simple-git": "^2.48.0"
+    "simple-git": "^3.3.0"
   }
 }
