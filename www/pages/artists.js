@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import html from './content.html';
+import css from './artist.css';
 
 async function getTemplate(compilation, route) {
   return `
@@ -13,16 +14,7 @@ async function getTemplate(compilation, route) {
         </script>
 
         <style>
-          * {
-            color: blue;
-          }
-
-          h1 {
-            width: 50%;
-            margin: 0 auto;
-            text-align: center;
-            color: red;
-          }
+          ${css}
         </style>
       </head>
       <body>
