@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --experimental-loader ./node_modules/@greenwood/cli/src/bootstrap.js
 
 /* eslint-disable no-underscore-dangle */
 
