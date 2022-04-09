@@ -3,14 +3,18 @@ console.debug('@@@@@@@@@@@ bootstrap!!!!!!');
 
 import path from 'path';
 import { readAndMergeConfig as initConfig } from './lifecycles/config.js';
-import { URL, pathToFileURL } from 'url';
+import { URL, pathToFileURL, fileURLToPath } from 'url';
 
 const baseURL = pathToFileURL(`${process.cwd()}/`).href;
 const config = await initConfig();
-const plugins = config.plugins.filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin).map(plugin => plugin.provider({}));
+const plugins = config.plugins.filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin).map(plugin => plugin.provider({
+  context: {
+    projectDirectory: process.cwd()
+  }
+}));
 
-function getCustomLoaderPlugins(url, body) {
-  return plugins.filter(plugin => plugin.extensions.includes(path.extname(url)) && (plugin.shouldServe(url) || plugin.shouldIntercept(url, body)));
+function getCustomLoaderPlugins(url, body, headers) {
+  return plugins.filter(plugin => plugin.extensions.includes(path.extname(url)) && (plugin.shouldServe(url, body, headers) || plugin.shouldIntercept(url, body, headers)));
 }
 
 export function resolve(specifier, context, defaultResolve) {
@@ -18,9 +22,7 @@ export function resolve(specifier, context, defaultResolve) {
 
   // Node.js normally errors on unknown file extensions, so return a URL for
   // specifiers ending in the specified file extensions.
-  // TODO remove .html demo code
-  if (getCustomLoaderPlugins(specifier).length > 0 || specifier.endsWith('.html')) {
-    console.log('resolve custom extension', new URL(specifier, parentURL).href);
+  if (getCustomLoaderPlugins(specifier).length > 0) {
     return {
       url: new URL(specifier, parentURL).href
     };
@@ -32,8 +34,7 @@ export function resolve(specifier, context, defaultResolve) {
 export function getFormat(url, context, defaultGetFormat) {
   // Now that we patched resolve to let new file types through, we need to
   // tell Node.js what format such URLs should be interpreted as.
-  // TODO remove .html demo code
-  if (getCustomLoaderPlugins(url).length > 0 || url.endsWith('.html')) {
+  if (getCustomLoaderPlugins(url).length > 0) {
     return {
       format: 'module'
     };
@@ -44,28 +45,40 @@ export function getFormat(url, context, defaultGetFormat) {
 
 export async function transformSource(source, context, defaultTransformSource) {
   const { url } = context;
-  console.debug('!!!!!!!!!!!!!! transformSource url', url);
-  const serverPlugins = getCustomLoaderPlugins(url, source); // plugins.filter(plugin => plugin.extensions.includes(ext) && plugin.shouldServe);
+  const serverPlugins = getCustomLoaderPlugins(url, source);
 
-  console.debug({ source });
-  console.debug({ serverPlugins });
+  if (serverPlugins.length) {
+    let contents = source.toString();
 
-  // TODO remove .html demo code
-  if (url.endsWith('.html')) {
+    for (const plugin of serverPlugins) {
+      const headers = {
+        request: {
+          originalUrl: `${url}?type=${path.extname(url).replace('.', '')}`,
+          accept: ''
+        }
+      };
+      if (await plugin.shouldServe(url, headers)) {
+        contents = (await plugin.serve(url, headers)).body || contents;
+      }
+    }
+
+    for (const plugin of serverPlugins) {
+      const headers = {
+        request: {
+          originalUrl: `${url}?type=${path.extname(url).replace('.', '')}`,
+          accept: ''
+        }
+      };
+
+      if (await plugin.shouldIntercept(fileURLToPath(url), contents, headers)) {
+        contents = (await plugin.intercept(fileURLToPath(url), contents, headers)).body || contents;
+      }
+    }
+
     return {
-      source: `export default ${JSON.stringify(source.toString())}`
+      source: contents
     };
   }
-
-  if (serverPlugins.length > 0 && url.endsWith('.css')) {
-    console.log('transformSource custom extension', url);
-    console.log('serverPlugins[0].serve(url)', await serverPlugins[1].intercept(url, source.toString()));
-    return {
-      source: (await serverPlugins[1].intercept(url, source.toString())).body // `export default ${JSON.stringify(source.toString())}`
-    };
-  }
-
-  console.debug('======================');
 
   // Let Node.js handle all other sources.
   return Promise.resolve(defaultTransformSource(source, context, defaultTransformSource));

@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
-import html from './content.html';
 import css from './artist.css';
+import json from '../package.json';
 
 async function getTemplate(compilation, route) {
   return `
@@ -19,7 +19,7 @@ async function getTemplate(compilation, route) {
       </head>
       <body>
         <h1>This heading was rendered server side!</h1>
-        ${html}
+        <marquee>Data From package.json: ${json.description} @ v${json.version}</marquee>
         <content-outlet></content-outlet>
       </body>
     </html>
