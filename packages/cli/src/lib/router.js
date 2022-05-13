@@ -30,7 +30,7 @@ document.addEventListener('click', function(e) {
   }
 });
 
-window.addEventListener('popstate', event => {
+window.addEventListener('popstate', () => {
   try {
     if (window.__greenwood.lastRoutes.length > 0) {
       const lastRoute = window.__greenwood.lastRoutes.pop();
@@ -42,7 +42,7 @@ window.addEventListener('popstate', event => {
     } else {
       history.go(-1);
     }
-  } catch(e) {
+  } catch (e) {
     console.debug('Unexpected error trying to go back.');
     console.error(e);
   }
