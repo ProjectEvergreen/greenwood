@@ -9,7 +9,7 @@ We're excited for your interest in Greenwood, and maybe even your contribution!
 
 To develop for the project, you'll want to follow these steps:
 
-1. Have [NodeJS LTS](https://nodejs.org) installed (>= 14.17.0) and [Yarn](https://yarnpkg.com/)
+1. Have [NodeJS LTS](https://nodejs.org) installed and [Yarn](https://yarnpkg.com/)
 1. Clone the repository
 1. Run `yarn install`
 
@@ -35,7 +35,7 @@ The two main directories are:
 - [_www/_](https://github.com/ProjectEvergreen/greenwood/tree/master/www) - [website](https://www.greenwoodjs.io) / documentation code
 
 
-> _This guide is mainly intended to walk through the **cli** package; it being the principal pacakge within the project supporting all other packages._
+> _This guide is mainly intended to walk through the **cli** package; it being the principal package within the project supporting all other packages._
 
 ### CLI
 
@@ -54,10 +54,10 @@ The [layout](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/
 - _commands/_ - map to runnable userland commands
 - _config/_ - Tooling configuration that Greenwood creates
 - _data/_ - Custom GraphQL server and client side utilities
-- _lib/_ - Customfized Local third party libraries and utility files
+- _lib/_ - Custom utility and client facing files
 - _lifecycles/_ - Tasks that can be composed by commands to support the full needs of that command
-- _plugins/_ - Custom defaukt plugins maintained by the CLI project
-- _templates/_ - Default templates and / or pages provided by Grennwood.
+- _plugins/_ - Custom default plugins maintained by the CLI project
+- _templates/_ - Default templates and / or pages provided by Greenwood.
 
 
 #### Lifecycles
@@ -71,24 +71,24 @@ Lifeycles include handling:
 
 ## Project Management
 
-We take advantage of quite a few features on GitHub to assist in tracking issues, bugs, ideas and more for the project.  We feel that being organized not only helps the team in planning out priorities and ownership, it's also a great way to add visisbility and transparency to those following the project.
+We take advantage of quite a few features on GitHub to assist in tracking issues, bugs, ideas and more for the project.  We feel that being organized not only helps the team in planning out priorities and ownership, it's also a great way to add visibility and transparency to those following the project.
 
 ### Project Boards
 
-Our [sequentially named project boards](https://github.com/ProjectEvergreen/greenwood/projects) help us organize work inro quarterly buckets that will generally include a small handful of "top line" goals and objectives we would like to focus on for that particular time box.  It also serves as a catch-all for the usual work and bug fixes that happens throughout general maintenance of the project.  Additionally, we leverage this as a means to shine insight into good opportunities for those interested in contributing as what the Greenwood team would appreciate help with the most.
+Our [sequentially named project boards](https://github.com/ProjectEvergreen/greenwood/projects) help us organize work into quarterly buckets that will generally include a small handful of "top line" goals and objectives we would like to focus on for that particular time box.  It also serves as a catch-all for the usual work and bug fixes that happens throughout general maintenance of the project.  Additionally, we leverage this as a means to shine insight into good opportunities for those interested in contributing as what the Greenwood team would appreciate help with the most.
 
 ### Discussions
 
-We believe good collaboration starts with good communication.  As with most of the open source community, Greenwood is a 100% volunteer project and so we understand the importance of respecting everyones [time and expectations](https://www.jason.af/setting-expectations) when it comes to contributing and investing in a project.  Although we don't mind issues being made, unless the issue is clearly actionable and falls in-line with the motiviations and trajectory of the project, then feel free to go ahead an open a [Discussion](https://github.com/ProjectEvergreen/greenwood/discussions) first.
+We believe good collaboration starts with good communication.  As with most of the open source community, Greenwood is a 100% volunteer project and so we understand the importance of respecting everyone's [time and expectations](https://www.jason.af/setting-expectations) when it comes to contributing and investing in a project.  Although we don't mind issues being made, unless the issue is clearly actionable and falls in-line with the motivations and trajectory of the project, then feel free to go ahead an open a [Discussion](https://github.com/ProjectEvergreen/greenwood/discussions) first.
 
-We encourage discussions as we believe it is better to hash out technical discussions and proposals ahead of time since coding and reviewing PRs are very time consuming activities.  As maintainer's, we want to make sure everyone gets the time they are desere for contributing and this this workflow helps us plan our time in advance to best ensure a smooth flow of contributions through the project.
+We encourage discussions as we believe it is better to hash out technical discussions and proposals ahead of time since coding and reviewing PRs are very time consuming activities.  As maintainer's, we want to make sure everyone gets the time they are desire for contributing and this this workflow helps us plan our time in advance to best ensure a smooth flow of contributions through the project.
 
 > _Put another way, we like to think of this approach as **measure twice, cut once**._
 
 ### Issues
-We like to reserve issues for features and requests that are more or less "shovel" ready wtih clear implementation details at hand.  This could include prior discussions with the team or action items coming out from an existing disussion.
+We like to reserve issues for features and requests that are more or less "shovel" ready with clear implementation details at hand.  This could include prior discussions with the team or action items coming out from an existing discussion.
 
-Our standard issue template reuests some of the following information to be prepared (where applicable)
+Our standard issue template requests some of the following information to be prepared (where applicable)
 1. High Level Overview
 1. Code Sample or API Design
 1. Links / references for more context
@@ -97,8 +97,8 @@ For bugs, please provide steps to reproduce and expected vs actual behavior incl
 
 
 ### Pull Requests
-Pull requests are the best!  To best help facililate contributions to the project, here are some requests:
-- We generally prefer an issue be opened first, to help faciliate general discussion outside of the code review process itself and align on the ask and any expections.  However, for typos in docs and minor "chore" like tasks a PR is usually sufficient.  When in doubt, open an issue.
+Pull requests are the best!  To best help facilitate contributions to the project, here are some requests:
+- We generally prefer an issue be opened first, to help facilitate general discussion outside of the code review process itself and align on the ask and any expectations.  However, for typos in docs and minor "chore" like tasks a PR is usually sufficient.  When in doubt, open an issue.
 - For bugs, please consider reviewing the issue tracker first.
 - For branching, we generally follow the convention `<issue-label>/issue-<number>-<issue-title>`, e.g. _bug/issue-12-fixed-bug-with-yada-yada-yada_
 - To test the CI build scripts locally, run the `yarn` commands mentioned in the below section on CI.
@@ -134,7 +134,7 @@ As mentioned above, Greenwood is organized into packages as a monorepo, managed 
 - README
 - Test Cases
 
-Lerna (specifically `lerna publish`) will be used to release all packagess under a single version.  Lerna configuration can be found in _lerna.json_.
+Lerna (specifically `lerna publish`) will be used to release all packages under a single version.  Lerna configuration can be found in _lerna.json_.
 
 ### Dependencies
 To `yarn add` / `yarn remove` packages from anything in _packages/_ or _www/_, please make sure you `cd` into the directory with the _package.json_ first.
@@ -164,7 +164,7 @@ $ yarn test
 
 Below are some tips to help with running / debugging tests:
 - `describe.only` / `it.only`: only runs this block
-- `xdescribe` / `xit`: dont run this block
+- `xdescribe` / `xit`: don't run this block
 - Uncomment `runner.teardown()` in a case to see the build output without it getting cleaned up post test run
 - Use `new Runner(true)` get debug output from Greenwood when running tests
 
@@ -182,12 +182,12 @@ Examples:
 - _build.config.workspace-dev-server-port.spec.js_ - Would test `greenwood build` with a config that had a custom `workspace` and `devServer.port` set.
 
 ### Notes
-Here are some thigns to keep in mind while writing your tests, due to the asynchronous nature of Greenwwood:
+Here are some things to keep in mind while writing your tests, due to the asynchronous nature of Greenwood:
 - Make sure to wrap all calls to `TestBed` with `async`
 - All usages of `JSDOM` should be wrapped in `async`
 - Avoid arrow functions in mocha tests (e.g. `() => `) as this [can cause unexpected behaviors.](https://mochajs.org/#arrow-functions).  Just use `function` instead.
 
-## Suppplemental Information
+## Supplemental Information
 
 Some additional information and context to help assist with developing for and contributing to Greenwood.
 
@@ -201,7 +201,7 @@ To test from a VM, you can
 You can disable plugins in _webpack.config.prod.js_ to remove production optimizations for testing purposes.
 
 ### npx Testing
-[`npx`](https://www.npmjs.com/package/npx) is a useful CLI utitlity bundled with NodeJS that allows users to run npm packages globally but without having to install them.
+[`npx`](https://www.npmjs.com/package/npx) is a useful CLI utility bundled with NodeJS that allows users to run npm packages globally but without having to install them.
 
 ```sh
 % npx http-server
@@ -260,7 +260,7 @@ Lerna is used to manage the publishing of packages within the workspace under a 
 # from the root of the repo
 $ yarn lerna publish
 
-# if Lerna is not displaying all pacakges as needing publishing, cancel and use
+# if Lerna is not displaying all packages as needing publishing, cancel and use
 $ yarn lerna publish --force-publish
 ```
 
