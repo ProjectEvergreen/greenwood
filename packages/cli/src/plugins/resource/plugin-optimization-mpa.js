@@ -80,6 +80,7 @@ class OptimizationMPAResource extends ResourceInterface {
           <script>
             window.__greenwood = window.__greenwood || {};
             
+            window.__greenwood.lastRoutes = [];
             window.__greenwood.currentTemplate = "${currentTemplate}";
           </script> 
           </head>

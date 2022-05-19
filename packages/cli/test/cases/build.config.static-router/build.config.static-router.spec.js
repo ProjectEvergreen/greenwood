@@ -95,6 +95,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(inlineScriptTags.length).to.be.equal(1);
         expect(inlineScriptTags[0].textContent).to.contain('window.__greenwood = window.__greenwood || {};');
+        expect(inlineScriptTags[0].textContent).to.contain('window.__greenwood.lastRoutes = [];');
         expect(inlineScriptTags[0].textContent).to.contain('window.__greenwood.currentTemplate = "page"');
       });
 
