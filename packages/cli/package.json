@@ -55,7 +55,8 @@
     "remark-rehype": "^7.0.0",
     "rollup": "^2.58.0",
     "rollup-plugin-terser": "^7.0.0",
-    "unified": "^9.2.0"
+    "unified": "^9.2.0",
+    "wc-compiler": "^0.2.1"
   },
   "devDependencies": {
     "@babel/runtime": "^7.10.4",
