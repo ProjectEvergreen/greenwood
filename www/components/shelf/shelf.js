@@ -35,7 +35,7 @@ class Shelf extends LitElement {
 
   goTo(path) {
     location.hash = path;
-    window.history.pushState({}, '', path);
+    // window.history.pushState({}, '', path);
   }
 
   expandRoute(path) {
