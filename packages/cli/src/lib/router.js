@@ -19,6 +19,7 @@ document.addEventListener('click', function(e) {
   console.debug({ href });
   console.debug('can client side route', canClientSideRoute);
   if (canClientSideRoute) {
+    window.__greenwood.enableRouter = true;
     e.preventDefault();
 
     const url = new URL(href, window.location.origin);
@@ -64,53 +65,55 @@ window.addEventListener('popstate', (e) => {
   console.debug(window.location);
   console.debug(e);
 
-  try {
-    console.debug('BROWSER MOVING TO....', window.location.pathname);
-    if (window.__greenwood.lastRoutes.length > 1) {
-      console.debug('lastRoutes exists.  DOING SOMETHING....');
-      const lastRoute = window.__greenwood.lastRoutes[window.__greenwood.lastRoutes.length - 1];
-      const targetRoute = window.__greenwood.lastRoutes[window.__greenwood.lastRoutes.length - 2];
-      console.debug('TARGET MOVING TO....', targetRoute.pathname);
-      // const targetRoute = window.location;
+  if (window.__greenwood.enableRouter) {
+    try {
+      console.debug('BROWSER MOVING TO....', window.location.pathname);
+      if (window.__greenwood.lastRoutes.length > 1) {
+        console.debug('lastRoutes exists.  DOING SOMETHING....');
+        const lastRoute = window.__greenwood.lastRoutes[window.__greenwood.lastRoutes.length - 1];
+        const targetRoute = window.__greenwood.lastRoutes[window.__greenwood.lastRoutes.length - 2];
+        console.debug('TARGET MOVING TO....', targetRoute.pathname);
+        // const targetRoute = window.location;
 
-      console.debug({ lastRoute });
-      console.debug({ targetRoute });
+        console.debug({ lastRoute });
+        console.debug({ targetRoute });
 
-      if (window.location.hash === lastRoute.hash && lastRoute.hash !== '') {
-        console.debug('this was a forward hash navigation, do nothing????');
-      } else if (targetRoute.pathname !== lastRoute.pathname) {
-        console.debug('pathnames are different, something to see here; loadRoute()');
-        const routerOutlet = Array.from(document.getElementsByTagName('greenwood-route')).filter(outlet => {
-          return outlet.getAttribute('data-route') === targetRoute.pathname;
-        })[0];
+        if (window.location.hash === lastRoute.hash && lastRoute.hash !== '') {
+          console.debug('this was a forward hash navigation, do nothing????');
+        } else if (targetRoute.pathname !== lastRoute.pathname) {
+          console.debug('pathnames are different, something to see here; loadRoute()');
+          const routerOutlet = Array.from(document.getElementsByTagName('greenwood-route')).filter(outlet => {
+            return outlet.getAttribute('data-route') === targetRoute.pathname;
+          })[0];
 
-        console.debug('load this routerOutlet ===> ', routerOutlet.getAttribute('data-route'));
+          console.debug('load this routerOutlet ===> ', routerOutlet.getAttribute('data-route'));
 
-        routerOutlet.loadRoute();
+          routerOutlet.loadRoute();
 
-        console.debug('pop!');
+          console.debug('pop!');
+          window.__greenwood.lastRoutes.pop();
+        } else if (lastRoute.pathname === targetRoute.pathname) {
+          console.debug('else if some other scenario, like a hash change. nothing to see here??');
+          console.debug('should pop?');
+          window.__greenwood.lastRoutes.pop();
+        } else {
+          console.debug('something else entirely different just happened????');
+          console.debug('should pop?');
+        }
+      } else if (window.__greenwood.lastRoutes.length === 1) {
+        console.debug('Last in the stack, pop and go(-1)');
         window.__greenwood.lastRoutes.pop();
-      } else if (lastRoute.pathname === targetRoute.pathname) {
-        console.debug('else if some other scenario, like a hash change. nothing to see here??');
-        console.debug('should pop?');
-        window.__greenwood.lastRoutes.pop();
+        history.go(-1);
       } else {
-        console.debug('something else entirely different just happened????');
-        console.debug('should pop?');
+        console.debug('NOTHING IN LAST ROUTES.  DO SOMETHING like history.go(-1)???');
+        history.go(-1);
       }
-    } else if (window.__greenwood.lastRoutes.length === 1) {
-      console.debug('Last in the stack, pop and go(-1)');
-      window.__greenwood.lastRoutes.pop();
-      history.go(-1);
-    } else {
-      console.debug('NOTHING IN LAST ROUTES.  DO SOMETHING like history.go(-1)???');
-      history.go(-1);
+    } catch (err) {
+      console.debug('Unexpected error trying to go back.');
+      console.error(err);
     }
-  } catch (err) {
-    console.debug('Unexpected error trying to go back.');
-    console.error(err);
+    console.debug('=================================');
   }
-  console.debug('=================================');
 });
 
 class RouteComponent extends HTMLElement {

@@ -39,8 +39,8 @@ describe('Build Greenwood With: ', function() {
   let runner;
 
   before(async function() {
-    this.context = { 
-      publicDir: path.join(outputPath, 'public') 
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
     };
     runner = new Runner();
   });
@@ -49,7 +49,7 @@ describe('Build Greenwood With: ', function() {
 
     before(async function() {
       const greenwoodRouterLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/cli/src/lib/router.js`, 
+        `${process.cwd()}/packages/cli/src/lib/router.js`,
         `${outputPath}/node_modules/@greenwood/cli/src/lib`
       );
 
@@ -76,7 +76,7 @@ describe('Build Greenwood With: ', function() {
         partials = await glob(`${this.context.publicDir}/_routes/**/*.html`);
         routerFiles = await glob(`${this.context.publicDir}/router.*.js`);
       });
-      
+
       it('should have one <script> tag in the <head> for the router', function() {
         const scriptTags = dom.window.document.querySelectorAll('head > script[type]');
 
@@ -96,6 +96,7 @@ describe('Build Greenwood With: ', function() {
         expect(inlineScriptTags.length).to.be.equal(1);
         expect(inlineScriptTags[0].textContent).to.contain('window.__greenwood = window.__greenwood || {};');
         expect(inlineScriptTags[0].textContent).to.contain('window.__greenwood.lastRoutes = [];');
+        expect(inlineScriptTags[0].textContent).to.contain('window.__greenwood.enableRouter = false;');
         expect(inlineScriptTags[0].textContent).to.contain('window.__greenwood.currentTemplate = "page"');
       });
 
@@ -110,7 +111,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(routeTags.length).to.be.equal(3);
       });
-                  
+
       it('should have the expected properties for each <greenwood-route> tag for the about page', function() {
         const aboutRouteTag = Array
           .from(dom.window.document.querySelectorAll('body > greenwood-route'))
@@ -155,10 +156,10 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected partial output to match the contents of the about page in the <router-outlet> tag in the <body>', function() {
         const homePartial = fs.readFileSync(path.join(this.context.publicDir, '_routes/index.html'), 'utf-8');
         const homeRouterOutlet = dom.window.document.querySelectorAll('body > router-outlet')[0];
-        
+
         expect(homeRouterOutlet.innerHTML).to.contain(homePartial);
       });
-      
+
     });
 
     // https://github.com/ProjectEvergreen/greenwood/pull/743
@@ -168,7 +169,7 @@ describe('Build Greenwood With: ', function() {
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'regex-test/index.html'));
       });
-      
+
       it('should not have duplicate <app-footer> custom elements', function() {
         const footer = dom.window.document.querySelectorAll('body footer');
 

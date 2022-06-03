@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Manages web standard resource related operations for JavaScript.
  * This is a Greenwood default plugin.
  *
@@ -79,18 +79,19 @@ class OptimizationMPAResource extends ResourceInterface {
           <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
           <script>
             window.__greenwood = window.__greenwood || {};
-            
+
             window.__greenwood.lastRoutes = [];
+            window.__greenwood.enableRouter = false;
             window.__greenwood.currentTemplate = "${currentTemplate}";
-          </script> 
+          </script>
           </head>
         `).replace(/<body>(.*)<\/body>/s, `
           <body>\n
-            
+
             <router-outlet>
               ${bodyContents.replace(/\$/g, '$$$')}\n
             </router-outlet>
-            
+
             ${routeTags.join('\n')}
           </body>
         `);
