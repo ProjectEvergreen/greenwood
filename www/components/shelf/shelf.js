@@ -33,11 +33,6 @@ class Shelf extends LitElement {
     this.collapseAll();
   }
 
-  goTo(path) {
-    location.hash = path;
-    // window.history.pushState({}, '', path);
-  }
-
   expandRoute(path) {
     let routeShelfListIndex = this.shelfList.findIndex(item => {
       let expRoute = new RegExp(`^${path}$`);
@@ -113,15 +108,6 @@ class Shelf extends LitElement {
     }
   }
 
-  handleSubItemSelect(mainRoute, itemRoute) {
-    // check if we're on the same page as subitem anchor
-    if (window.location.pathname.substr(0, window.location.pathname.length - 1) !== mainRoute) {
-      window.location.href = mainRoute + itemRoute;
-    } else {
-      this.goTo(`${item.route}`);
-    }
-  }
-
   renderList() {
     /* eslint-disable indent */
     const renderListItems = (mainRoute, children, selected) => {
@@ -133,7 +119,7 @@ class Shelf extends LitElement {
             ${children.map((child) => {
               return html`
                 <li class="${selected ? '' : 'hidden'}">
-                  <a @click=${() => this.handleSubItemSelect(mainRoute, child.item.route)}>${child.item.label}</a>
+                  <a href="${mainRoute}${child.item.route}">${child.item.label}</a>
                 </li>
               `;
             })}
