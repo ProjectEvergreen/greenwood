@@ -17,6 +17,10 @@ async function executeRouteModule({ modulePath, compilation, route, label, id })
     data.frontmatter = await getFrontmatter(parsedCompilation, route, label, id);
   }
 
+  if (getTemplate) {
+    data.template = await getTemplate(parsedCompilation, route);
+  }
+
   if (module.default) {
     console.debug('exporting a native custom element', modulePath);
     const { html, metadata } = await renderToString(new URL(modulePath, import.meta.url));
@@ -24,10 +28,6 @@ async function executeRouteModule({ modulePath, compilation, route, label, id })
 
     data.body = html;
   } else {
-    if (getTemplate) {
-      data.template = await getTemplate(parsedCompilation, route);
-    }
-
     if (getBody) {
       data.body = await getBody(parsedCompilation, route);
     }
