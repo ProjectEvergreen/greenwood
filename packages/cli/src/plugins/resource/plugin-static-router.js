@@ -10,7 +10,7 @@ import path from 'path';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { fileURLToPath, URL } from 'url';
 
-class OptimizationMPAResource extends ResourceInterface {
+class StaticRouterResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
     this.extensions = ['.html'];
@@ -106,10 +106,10 @@ class OptimizationMPAResource extends ResourceInterface {
   }
 }
 
-const greenwoodPluginOptimzationMpa = {
+const greenwoodPluginStaticRouter = {
   type: 'resource',
-  name: 'plugin-optimization-mpa',
-  provider: (compilation, options) => new OptimizationMPAResource(compilation, options)
+  name: 'plugin-static-router',
+  provider: (compilation, options) => new StaticRouterResource(compilation, options)
 };
 
-export { greenwoodPluginOptimzationMpa };
+export { greenwoodPluginStaticRouter };
