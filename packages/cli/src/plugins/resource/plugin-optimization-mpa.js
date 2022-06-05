@@ -41,16 +41,15 @@ class OptimizationMPAResource extends ResourceInterface {
   }
 
   async optimize(url, body) {
-    console.debug('optimize', url);
     return new Promise(async (resolve, reject) => {
       try {
         let currentTemplate;
+        const isStaticRoute = path.extname(url) === '.html';
         const { projectDirectory, scratchDir, outputDir } = this.compilation.context;
         const bodyContents = body.match(/<body>(.*)<\/body>/s)[0].replace('<body>', '').replace('</body>', '');
         const outputBundlePath = path.normalize(`${outputDir}/_routes${url.replace(projectDirectory, '')}`)
           .replace(`.greenwood${path.sep}`, '');
-        const outputBundlePathDir = path.extname(outputBundlePath) === '.html' ? path.dirname(outputBundlePath) : outputBundlePath;
-        
+
         const routeTags = this.compilation.graph
           .filter(page => !page.isSSR)
           .filter(page => page.route !== '/404/')
@@ -70,26 +69,15 @@ class OptimizationMPAResource extends ResourceInterface {
             `;
           });
 
-        // console.debug({ routeTags });
-        console.debug({ outputBundlePath });
-        console.debug({ outputBundlePathDir });
-        if (!fs.existsSync(outputBundlePathDir)) {
-          fs.mkdirSync(outputBundlePathDir, {
-            recursive: true
-          });
+        if (isStaticRoute) {
+          if (!fs.existsSync(path.dirname(outputBundlePath))) {
+            fs.mkdirSync(path.dirname(outputBundlePath), {
+              recursive: true
+            });
+          }
+
+          await fs.promises.writeFile(outputBundlePath, bodyContents);
         }
-
-        console.debug('WRITE??????');
-
-        const writePath = path.extname(outputBundlePath) === '.html' 
-          ? outputBundlePath
-          : `${outputBundlePath}.html`;
-
-        console.debug({ writePath });
-
-        await fs.promises.writeFile(writePath, bodyContents);
-
-        console.debug('@#$#@$#@$@#$#@$@');
 
         body = body.replace('</head>', `
           <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
