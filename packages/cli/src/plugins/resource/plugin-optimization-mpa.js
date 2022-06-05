@@ -1,6 +1,7 @@
 /*
  *
- * Manages web standard resource related operations for JavaScript.
+ * 
+ * Manages SPA like client side routing for static pages.
  * This is a Greenwood default plugin.
  *
  */
@@ -40,6 +41,7 @@ class OptimizationMPAResource extends ResourceInterface {
   }
 
   async optimize(url, body) {
+    console.debug('optimize', url);
     return new Promise(async (resolve, reject) => {
       try {
         let currentTemplate;
@@ -47,7 +49,8 @@ class OptimizationMPAResource extends ResourceInterface {
         const bodyContents = body.match(/<body>(.*)<\/body>/s)[0].replace('<body>', '').replace('</body>', '');
         const outputBundlePath = path.normalize(`${outputDir}/_routes${url.replace(projectDirectory, '')}`)
           .replace(`.greenwood${path.sep}`, '');
-
+        const outputBundlePathDir = path.extname(outputBundlePath) === '.html' ? path.dirname(outputBundlePath) : outputBundlePath;
+        
         const routeTags = this.compilation.graph
           .filter(page => !page.isSSR)
           .filter(page => page.route !== '/404/')
@@ -67,13 +70,26 @@ class OptimizationMPAResource extends ResourceInterface {
             `;
           });
 
-        if (!fs.existsSync(path.dirname(outputBundlePath))) {
-          fs.mkdirSync(path.dirname(outputBundlePath), {
+        // console.debug({ routeTags });
+        console.debug({ outputBundlePath });
+        console.debug({ outputBundlePathDir });
+        if (!fs.existsSync(outputBundlePathDir)) {
+          fs.mkdirSync(outputBundlePathDir, {
             recursive: true
           });
         }
 
-        await fs.promises.writeFile(outputBundlePath, bodyContents);
+        console.debug('WRITE??????');
+
+        const writePath = path.extname(outputBundlePath) === '.html' 
+          ? outputBundlePath
+          : `${outputBundlePath}.html`;
+
+        console.debug({ writePath });
+
+        await fs.promises.writeFile(writePath, bodyContents);
+
+        console.debug('@#$#@$#@$@#$#@$@');
 
         body = body.replace('</head>', `
           <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
@@ -93,6 +109,7 @@ class OptimizationMPAResource extends ResourceInterface {
           </body>
         `);
 
+        console.debug('SO FAR SO GOOD?????');
         resolve(body);
       } catch (e) {
         reject(e);

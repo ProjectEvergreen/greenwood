@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with staticRouter setting in Greenwood to enable MPA like routing.
+ * Run Greenwood with staticRouter setting in Greenwood to enable SPA like routing.
  *
  * User Result
  * Should generate a bare bones Greenwood build with support for static router navigation.
@@ -33,7 +33,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Static Router';
+  const LABEL = 'Static Router Configuration and Hybrid Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -62,7 +62,7 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('MPA (Multi Page Application)', function() {
+    describe('Static content routes', function() {
       let dom;
       let aboutDom;
       let pages;
@@ -134,9 +134,6 @@ describe('Build Greenwood With: ', function() {
 
       // tests to make sure we filter out 404 page from _route partials
       it('should have the expected top level HTML files (index.html, 404.html) in the output', function() {
-        // const aboutPartial = fs.readFileSync(path.join(this.context.publicDir, '*.html'), 'utf-8');
-        // const aboutRouterOutlet = aboutDom.window.document.querySelectorAll('body > router-outlet')[0];
-
         expect(pages.length).to.equal(2);
       });
 
