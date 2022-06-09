@@ -90,6 +90,10 @@ window.addEventListener('popstate', (e) => {
 
           routerOutlet.loadRoute();
 
+          if (targetRoute.hash) {
+            location.hash = targetRoute.hash;
+          }
+
           console.debug('pop!');
           window.__greenwood.lastRoutes.pop();
         } else if (lastRoute.pathname === targetRoute.pathname) {
