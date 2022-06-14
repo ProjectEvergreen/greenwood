@@ -4,7 +4,8 @@ import { workerData, parentPort } from 'worker_threads';
 import { renderToString } from 'wc-compiler';
 
 async function executeRouteModule({ modulePath, compilation, route, label, id }) {
-  const module = await import(pathToFileURL(modulePath)).then(module => module);
+  const moduleURL = pathToFileURL(modulePath);
+  const module = await import(moduleURL).then(module => module);
   const { getFrontmatter = null, getBody = null, getTemplate = null } = module;
   const parsedCompilation = JSON.parse(compilation);
   const data = {
@@ -22,8 +23,7 @@ async function executeRouteModule({ modulePath, compilation, route, label, id })
   }
 
   if (module.default) {
-    console.debug('exporting a native custom element', modulePath);
-    const { html, metadata } = await renderToString(new URL(modulePath, import.meta.url));
+    const { html, metadata } = await renderToString(moduleURL);
     console.debug({ metadata });
 
     data.body = html;
