@@ -45,14 +45,8 @@ document.addEventListener('click', function(e) {
       // window.__greenwood.lastRoutes.push(url);
 
       if (targetUrl.hash !== '') {
-        console.debug('targetUrl has a hash :o!');
-        if (window.location.pathname !== targetUrl.pathname) {
-          console.debug('pathname is different, need to update entire location');
-          // window.location = href;
-        } else {
-          console.debug('just a hash change');
-          location = targetUrl.hash;
-        }
+        console.debug('just a hash change');
+        location = targetUrl.hash;
       } else {
         console.debug('else use routerOutlet to load the new route');
         routerOutlet.loadRoute();
