@@ -70,9 +70,10 @@ async function getBody(compilation) {
   `;
 }
 
-async function getFrontmatter() {
+async function getFrontmatter(compilation, route) {
   return {
     menu: 'navigation',
+    title: route,
     index: 7,
     imports: [
       '/components/counter.js'
@@ -89,4 +90,4 @@ export {
   getTemplate,
   getBody,
   getFrontmatter
-}; 
+};

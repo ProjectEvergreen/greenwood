@@ -40,8 +40,8 @@ describe('Build Greenwood With: ', function() {
   let runner;
 
   before(async function() {
-    this.context = { 
-      publicDir: path.join(outputPath, 'public') 
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
     };
     runner = new Runner();
   });
@@ -50,43 +50,43 @@ describe('Build Greenwood With: ', function() {
 
     before(async function() {
       const lit = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/*.js`, 
+        `${process.cwd()}/node_modules/lit/*.js`,
         `${outputPath}/node_modules/lit/`
       );
       const litDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/decorators/*.js`, 
+        `${process.cwd()}/node_modules/lit/decorators/*.js`,
         `${outputPath}/node_modules/lit/decorators/`
       );
       const litDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/directives/*.js`, 
+        `${process.cwd()}/node_modules/lit/directives/*.js`,
         `${outputPath}/node_modules/lit/directives/`
       );
       const litPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/package.json`, 
+        `${process.cwd()}/node_modules/lit/package.json`,
         `${outputPath}/node_modules/lit/`
       );
       const litElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/*.js`, 
+        `${process.cwd()}/node_modules/lit-element/*.js`,
         `${outputPath}/node_modules/lit-element/`
       );
       const litElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/package.json`, 
+        `${process.cwd()}/node_modules/lit-element/package.json`,
         `${outputPath}/node_modules/lit-element/`
       );
       const litElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/decorators/*.js`, 
+        `${process.cwd()}/node_modules/lit-element/decorators/*.js`,
         `${outputPath}/node_modules/lit-element/decorators/`
       );
       const litHtml = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/*.js`, 
+        `${process.cwd()}/node_modules/lit-html/*.js`,
         `${outputPath}/node_modules/lit-html/`
       );
       const litHtmlPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/package.json`, 
+        `${process.cwd()}/node_modules/lit-html/package.json`,
         `${outputPath}/node_modules/lit-html/`
       );
       const litHtmlDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/directives/*.js`, 
+        `${process.cwd()}/node_modules/lit-html/directives/*.js`,
         `${outputPath}/node_modules/lit-html/directives/`
       );
       // lit-html has a dependency on this
@@ -96,15 +96,15 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/@types/trusted-types/`
       );
       const litReactiveElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`, 
+        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
       const litReactiveElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`, 
+        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
         `${outputPath}/node_modules/@lit/reactive-element/decorators/`
       );
       const litReactiveElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`, 
+        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
 
@@ -139,12 +139,12 @@ describe('Build Greenwood With: ', function() {
 
     let response = {};
     let dom;
-    let aboutPageGraphData;
+    let artistsPageGraphData;
 
     before(async function() {
       const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
 
-      aboutPageGraphData = graph.filter(page => page.route === '/artists/')[0];
+      artistsPageGraphData = graph.filter(page => page.route === '/artists/')[0];
 
       return new Promise((resolve, reject) => {
         request.get(`${hostname}/artists/`, (err, res, body) => {
@@ -233,17 +233,17 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should be a part of graph.json', function() {
-        expect(aboutPageGraphData).to.not.be.undefined;
+        expect(artistsPageGraphData).to.not.be.undefined;
       });
 
       it('should have the expected menu and index values in the graph', function() {
-        expect(aboutPageGraphData.data.menu).to.equal('navigation');
-        expect(aboutPageGraphData.data.index).to.equal(7);
+        expect(artistsPageGraphData.data.menu).to.equal('navigation');
+        expect(artistsPageGraphData.data.index).to.equal(7);
       });
 
       it('should have expected custom data values in its graph data', function() {
-        expect(aboutPageGraphData.data.author).to.equal('Project Evergreen');
-        expect(aboutPageGraphData.data.date).to.equal('01-01-2021');
+        expect(artistsPageGraphData.data.author).to.equal('Project Evergreen');
+        expect(artistsPageGraphData.data.date).to.equal('01-01-2021');
       });
 
       it('should append the expected <script> tag for a frontmatter import <x-counter> component', function() {
@@ -251,7 +251,7 @@ describe('Build Greenwood With: ', function() {
         const counterScript = Array.from(dom.window.document.querySelectorAll('head > script[src]'))
           .filter((tag) => tag.getAttribute('src').indexOf(`/${componentName}.`) === 0);
 
-        expect(aboutPageGraphData.imports[0]).to.equal(`/components/${componentName}.js`);
+        expect(artistsPageGraphData.imports[0]).to.equal(`/components/${componentName}.js`);
         expect(counterScript.length).to.equal(1);
       });
     });
