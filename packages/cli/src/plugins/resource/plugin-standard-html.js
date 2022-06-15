@@ -416,6 +416,7 @@ class StandardHtmlResource extends ResourceInterface {
                 ssrFrontmatter = result.frontmatter;
 
                 if (ssrFrontmatter.title) {
+                  title = ssrFrontmatter.title;
                   frontMatter.title = ssrFrontmatter.title;
                 }
 
