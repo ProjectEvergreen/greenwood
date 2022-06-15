@@ -51,11 +51,10 @@ document.addEventListener('click', function(e) {
           // window.location = href;
         } else {
           console.debug('just a hash change');
-          // location.hash = url.hash;
+          location = targetUrl.hash;
         }
       } else {
         console.debug('else use routerOutlet to load the new route');
-        // window.location.pathname = href;
         routerOutlet.loadRoute();
         history.pushState({}, '', targetUrl.pathname);
       }
