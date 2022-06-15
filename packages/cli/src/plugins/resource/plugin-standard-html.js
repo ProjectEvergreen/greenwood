@@ -109,11 +109,6 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     const hasInterpolatedFrontmatter = headTitle && headTitle.rawText.indexOf('${globalThis.page.title}') >= 0
      || appTitle && appTitle.rawText.indexOf('${globalThis.page.title}') >= 0;
 
-    console.debug({ hasInterpolatedFrontmatter });
-    console.debug({ headTitle });
-    console.debug({ appTitle });
-    console.debug({ frontmatterTitle });
-
     const title = hasInterpolatedFrontmatter // favor frontmatter interpolation first
       ? headTitle && headTitle.rawText
         ? headTitle.rawText
@@ -127,8 +122,6 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
             : 'My App';
     appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
 
-    console.debug({ title });
-
     if (title) {
       if (!appTitle) {
         appTemplateContents = appTemplateContents.replace('<head>', '<head>\n <title></title>');
@@ -136,8 +129,6 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
 
       appTemplateContents = appTemplateContents.replace(/<title>(.*)<\/title>/, `<title>${title}</title>`);
     }
-
-    console.debug({ appTemplateContents });
 
     // merge <script> tags
     if (headScripts.length > 0) {
@@ -452,12 +443,9 @@ class StandardHtmlResource extends ResourceInterface {
           body = ssrTemplate ? ssrTemplate : getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir);
         }
 
-        console.debug({ title });
-        console.debug(frontMatter.title);
         body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud, title);
         body = getUserScripts(body, this.compilation.context);
 
-        console.debug({ processedMarkdown });
         if (processedMarkdown) {
           const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
           const ceTest = wrappedCustomElementRegex.test(processedMarkdown.contents);
@@ -475,8 +463,6 @@ class StandardHtmlResource extends ResourceInterface {
           }
 
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
-
-          console.debug({ interpolateFrontmatter });
         } else if (matchingRoute.external) {
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
         } else if (ssrBody) {
@@ -484,7 +470,6 @@ class StandardHtmlResource extends ResourceInterface {
         }
 
         if (interpolateFrontmatter) {
-          console.debug('interpolateFrontmatter', frontMatter);
           for (const fm in frontMatter) {
             const interpolatedFrontmatter = '\\$\\{globalThis.page.' + fm + '\\}';
 
