@@ -79,8 +79,6 @@ class OptimizationMPAResource extends ResourceInterface {
           <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
           <script>
             window.__greenwood = window.__greenwood || {};
-
-            window.__greenwood.enableRouter = false;
             window.__greenwood.currentTemplate = "${currentTemplate}";
           </script>
           </head>

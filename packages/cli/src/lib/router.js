@@ -20,8 +20,6 @@ document.addEventListener('click', function(e) {
   console.debug('can client side route', canClientSideRoute);
   if (canClientSideRoute) {
     console.debug('STARTING FROM -> ', window.location.pathname);
-
-    window.__greenwood.enableRouter = true;
     e.preventDefault();
 
     const targetUrl = new URL(href, window.location.origin);
@@ -58,8 +56,6 @@ window.addEventListener('popstate', (e) => {
   console.debug('!!!!!!! POP STATE <MOVING << OR >>', window.location);
   console.debug(e);
 
-  // TODO
-  // if (window.__greenwood.enableRouter) {
   try {
     const targetRoute = window.location;
     console.debug('BROWSER MOVING TO....', targetRoute.pathname);
@@ -77,7 +73,6 @@ window.addEventListener('popstate', (e) => {
     console.error(err);
   }
   console.debug('=================================');
-  //  }
 });
 
 class RouteComponent extends HTMLElement {
