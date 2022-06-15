@@ -43,14 +43,16 @@ document.addEventListener('click', function(e) {
         console.debug(window.location);
         if (window.location.pathname !== url.pathname) {
           console.debug('pathname is different, need to update entire location');
-          window.location = href;
+          // window.location = href;
         } else {
           console.debug('just a hash change');
           location.hash = url.hash;
         }
       } else {
         console.debug('else just load the new route');
+        // window.location.pathname = href;
         routerOutlet.loadRoute();
+        history.pushState({}, null, url.pathname);
       }
       console.debug('*******************');
     } else {
@@ -87,15 +89,17 @@ window.addEventListener('popstate', (e) => {
           })[0];
 
           console.debug('load this routerOutlet ===> ', routerOutlet.getAttribute('data-route'));
-
           routerOutlet.loadRoute();
-
-          if (targetRoute.hash) {
-            location.hash = targetRoute.hash;
-          }
-
+          
           console.debug('pop!');
           window.__greenwood.lastRoutes.pop();
+
+          console.debug('has hash???', targetRoute.hash);
+          // eslint-disable-next-line max-depth
+          if (targetRoute.hash) {
+            console.debug('hash it up!!!!!');
+            location.hash = targetRoute.hash;
+          }
         } else if (lastRoute.pathname === targetRoute.pathname) {
           console.debug('else if some other scenario, like a hash change. nothing to see here??');
           console.debug('should pop?');
@@ -122,13 +126,11 @@ window.addEventListener('popstate', (e) => {
 
 class RouteComponent extends HTMLElement {
   loadRoute() {
-    const route = this.getAttribute('data-route');
     const key = this.getAttribute('data-key');
 
     fetch(key)
       .then(res => res.text())
       .then((response) => {
-        history.pushState(response, route, route);
         document.getElementsByTagName('router-outlet')[0].innerHTML = response;
       });
   }

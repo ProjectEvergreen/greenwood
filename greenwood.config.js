@@ -11,7 +11,7 @@ export default {
   workspace: fileURLToPath(new URL('./www', import.meta.url)),
   prerender: true,
   optimization: 'inline',
-  // staticRouter: true,
+  staticRouter: true,
   interpolateFrontmatter: true,
   plugins: [
     ...greenwoodPluginGraphQL(),
