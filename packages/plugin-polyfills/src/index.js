@@ -1,4 +1,3 @@
-import fs from 'fs';
 import { getNodeModulesLocationForPackage } from '@greenwood/cli/src/lib/node-modules-utils.js';
 import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
@@ -6,6 +5,13 @@ import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js'
 class PolyfillsResource extends ResourceInterface {
   constructor(compilation, options = {}) {
     super(compilation, options);
+
+    this.options = {
+      wc: true,
+      dsd: false,
+      lit: false,
+      ...options
+    };
   }
 
   async shouldOptimize(url = '', body, headers = {}) {
@@ -15,21 +21,41 @@ class PolyfillsResource extends ResourceInterface {
   async optimize(url, body) {
     return new Promise(async (resolve, reject) => {
       try {
-        const { projectDirectory, userWorkspace } = this.compilation.context;
-        const dependencies = fs.existsSync(path.join(userWorkspace, 'package.json')) // handle monorepos first
-          ? JSON.parse(fs.readFileSync(path.join(userWorkspace, 'package.json'), 'utf-8')).dependencies
-          : fs.existsSync(path.join(projectDirectory, 'package.json'))
-            ? JSON.parse(fs.readFileSync(path.join(projectDirectory, 'package.json'), 'utf-8')).dependencies
-            : {};
-        const litPolyfill = dependencies && dependencies.lit
-          ? '<script src="/node_modules/lit/polyfill-support.js"></script>\n'
-          : '';
+        let newHtml = body;
 
-        const newHtml = body.replace('<head>', `
-          <head>
-            ${litPolyfill}
-            <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-        `);
+        // standard WC polyfill
+        if (this.options.wc) {
+          newHtml = newHtml.replace('<head>', `
+            <head>
+              <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+          `);
+        }
+
+        // append Lit polyfill next to make sure it comes before WC polyfill
+        if (this.options.lit) {
+          newHtml = newHtml.replace('<head>', `
+            <head>
+              <script src="/node_modules/lit/polyfill-support.js"></script>
+          `);
+        }
+
+        // lastly, Declarative Shadow DOM polyfill
+        if (this.options.dsd) {
+          newHtml = newHtml.replace('</body>', `
+              <script>
+                (function attachShadowRoots(root) {
+                  root.querySelectorAll("template[shadowroot]").forEach(template => {
+                    const mode = template.getAttribute("shadowroot");
+                    const shadowRoot = template.parentNode.attachShadow({ mode });
+                    shadowRoot.appendChild(template.content);
+                    template.remove();
+                    attachShadowRoots(shadowRoot);
+                  });
+                })(document);
+              </script>
+            </body>
+          `);
+        }
 
         resolve(newHtml);
       } catch (e) {
@@ -52,21 +78,21 @@ const greenwoodPluginPolyfills = (options = {}) => {
       const polyfillPackageName = '@webcomponents/webcomponentsjs';
       const polyfillNodeModulesLocation = await getNodeModulesLocationForPackage(polyfillPackageName);
       const litNodeModulesLocation = await getNodeModulesLocationForPackage('lit');
-      const litPolyfills = litNodeModulesLocation
-        ? [{
-          from: path.join(litNodeModulesLocation, 'polyfill-support.js'),
-          to: path.join(outputDir, 'polyfill-support.js')
-        }]
-        : [];
-
-      return [{
+      const standardPolyfills = [{
         from: path.join(polyfillNodeModulesLocation, 'webcomponents-loader.js'),
         to: path.join(outputDir, 'webcomponents-loader.js')
       }, {
         from: path.join(polyfillNodeModulesLocation, 'bundles'),
         to: path.join(outputDir, 'bundles')
-      }, 
-      ...litPolyfills
+      }];
+      const litPolyfills = [{
+        from: path.join(litNodeModulesLocation, 'polyfill-support.js'),
+        to: path.join(outputDir, 'polyfill-support.js')
+      }];
+
+      return [
+        ...!!options.wc ? [] : standardPolyfills, // eslint-disable-line no-extra-boolean-cast
+        ...options.lit ? litPolyfills : []
       ];
     }
   }];
