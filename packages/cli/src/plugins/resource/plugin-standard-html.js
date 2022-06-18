@@ -108,6 +108,7 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     const appTemplateHeadContents = appRoot.querySelector('head').innerHTML;
     const hasInterpolatedFrontmatter = headTitle && headTitle.rawText.indexOf('${globalThis.page.title}') >= 0
      || appTitle && appTitle.rawText.indexOf('${globalThis.page.title}') >= 0;
+
     const title = hasInterpolatedFrontmatter // favor frontmatter interpolation first
       ? headTitle && headTitle.rawText
         ? headTitle.rawText
@@ -407,6 +408,7 @@ class StandardHtmlResource extends ResourceInterface {
 
                 if (ssrFrontmatter.title) {
                   title = ssrFrontmatter.title;
+                  frontMatter.title = ssrFrontmatter.title;
                 }
 
                 if (ssrFrontmatter.template) {
@@ -461,18 +463,18 @@ class StandardHtmlResource extends ResourceInterface {
           }
 
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
-
-          if (interpolateFrontmatter) {
-            for (const fm in frontMatter) {
-              const interpolatedFrontmatter = '\\$\\{globalThis.page.' + fm + '\\}';
-
-              body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), frontMatter[fm]);
-            }
-          }
         } else if (matchingRoute.external) {
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
         } else if (ssrBody) {
           body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, ssrBody);
+        }
+
+        if (interpolateFrontmatter) {
+          for (const fm in frontMatter) {
+            const interpolatedFrontmatter = '\\$\\{globalThis.page.' + fm + '\\}';
+
+            body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), frontMatter[fm]);
+          }
         }
 
         // give the user something to see so they know it works, if they have no content
