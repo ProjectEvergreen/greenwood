@@ -5,7 +5,7 @@ const bundleCompilation = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      compilation.graph = compilation.graph.filter(page => !page.isSSR);
+      compilation.graph = compilation.graph.filter(page => !page.isSSR || page.isSSR && page.data.prerender);
 
       // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
       if (compilation.graph.length > 0) {

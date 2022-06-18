@@ -2,7 +2,7 @@ import { bundleCompilation } from '../lifecycles/bundle.js';
 import { copyAssets } from '../lifecycles/copy.js';
 import { getDevServer } from '../lifecycles/serve.js';
 import fs from 'fs';
-import { preRenderCompilationCustom, preRenderCompilationDefault, staticRenderCompilation } from '../lifecycles/prerender.js';
+import { preRenderCompilationCustom, preRenderCompilationDefault, preRenderCompilationPuppeteer, staticRenderCompilation } from '../lifecycles/prerender.js';
 import { ServerInterface } from '../lib/server-interface.js';
 
 const runProductionBuild = async (compilation) => {
@@ -16,15 +16,21 @@ const runProductionBuild = async (compilation) => {
       const customPrerender = (compilation.config.plugins.filter(plugin => plugin.type === 'renderer' && !plugin.isGreenwoodDefaultPlugin) || []).length === 1
         ? compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation)
         : {};
+      const hasServerExports = compilation.graph.filter(page => page.isSSR && page.data.prerender).length > 0;
 
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir);
       }
 
-      if (prerender || customPrerender.prerender) {
+      if (prerender || customPrerender.prerender || hasServerExports) {
         if (customPrerender.prerender) {
           await preRenderCompilationCustom(compilation, customPrerender);
         } else {
+          console.debug('default prerender');
+          if (hasServerExports) {
+            await preRenderCompilationDefault(compilation);
+          }
+
           await new Promise(async (resolve, reject) => {
             try {
               (await getDevServer(compilation)).listen(port, async () => {
@@ -48,7 +54,7 @@ const runProductionBuild = async (compilation) => {
                   return Promise.resolve(server);
                 }));
 
-                await preRenderCompilationDefault(compilation);
+                await preRenderCompilationPuppeteer(compilation);
     
                 resolve();
               });

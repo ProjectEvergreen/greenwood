@@ -24,7 +24,7 @@ import chai from 'chai';
 import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
@@ -43,88 +43,13 @@ describe('Build Greenwood With: ', function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function() {
 
     before(async function() {
-      const lit = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/*.js`,
-        `${outputPath}/node_modules/lit/`
-      );
-      const litDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/decorators/*.js`,
-        `${outputPath}/node_modules/lit/decorators/`
-      );
-      const litDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/directives/*.js`,
-        `${outputPath}/node_modules/lit/directives/`
-      );
-      const litPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/package.json`,
-        `${outputPath}/node_modules/lit/`
-      );
-      const litElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/*.js`,
-        `${outputPath}/node_modules/lit-element/`
-      );
-      const litElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/package.json`,
-        `${outputPath}/node_modules/lit-element/`
-      );
-      const litElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/decorators/*.js`,
-        `${outputPath}/node_modules/lit-element/decorators/`
-      );
-      const litHtml = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/*.js`,
-        `${outputPath}/node_modules/lit-html/`
-      );
-      const litHtmlPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/package.json`,
-        `${outputPath}/node_modules/lit-html/`
-      );
-      const litHtmlDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/directives/*.js`,
-        `${outputPath}/node_modules/lit-html/directives/`
-      );
-      // lit-html has a dependency on this
-      // https://github.com/lit/lit/blob/main/packages/lit-html/package.json#L82
-      const trustedTypes = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
-        `${outputPath}/node_modules/@types/trusted-types/`
-      );
-      const litReactiveElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/`
-      );
-      const litReactiveElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/decorators/`
-      );
-      const litReactiveElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
-        `${outputPath}/node_modules/@lit/reactive-element/`
-      );
-
-      await runner.setup(outputPath, [
-        ...getSetupFiles(outputPath),
-        ...lit,
-        ...litPackageJson,
-        ...litDirectives,
-        ...litDecorators,
-        ...litElementPackageJson,
-        ...litElement,
-        ...litElementDecorators,
-        ...litHtmlPackageJson,
-        ...litHtml,
-        ...litHtmlDirectives,
-        ...trustedTypes,
-        ...litReactiveElement,
-        ...litReactiveElementDecorators,
-        ...litReactiveElementPackageJson
-      ]);
+      await runner.setup(outputPath, getSetupFiles(outputPath));
 
       return new Promise(async (resolve) => {
         setTimeout(() => {
@@ -139,11 +64,13 @@ describe('Build Greenwood With: ', function() {
 
     let response = {};
     let dom;
+    let usersPageDom;
     let artistsPageGraphData;
 
     before(async function() {
       const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
-
+      const usersPageHtml = await fs.promises.readFile(path.join(outputPath, 'public/users/index.html'));
+      
       artistsPageGraphData = graph.filter(page => page.route === '/artists/')[0];
 
       return new Promise((resolve, reject) => {
@@ -155,13 +82,14 @@ describe('Build Greenwood With: ', function() {
           response = res;
           response.body = body;
           dom = new JSDOM(body);
+          usersPageDom = new JSDOM(usersPageHtml);
 
           resolve();
         });
       });
     });
 
-    describe('Serve command with HTML route response', function() {
+    describe('Serve command with HTML route response for page using "get" functions', function() {
 
       it('should return a 200 status', function(done) {
         expect(response.statusCode).to.equal(200);
@@ -189,10 +117,10 @@ describe('Build Greenwood With: ', function() {
         expect(styles.length).to.equal(1);
       });
 
-      it('should have three script tags', function() {
+      it('should have the expected number of <script> tags in the <head>', function() {
         const scripts = dom.window.document.querySelectorAll('head > script');
 
-        expect(scripts.length).to.equal(3);
+        expect(scripts.length).to.equal(2);
       });
 
       it('should have expected SSR content from the non module script tag', function() {
@@ -203,7 +131,8 @@ describe('Build Greenwood With: ', function() {
         expect(scripts[0].textContent).to.contain('console.log');
       });
 
-      it('should have a bundled script for the footer component', function() {
+      // have WCC server render WCs within page templates / markdown
+      xit('should have a bundled script for the footer component', function() {
         const footerScript = Array.from(dom.window.document.querySelectorAll('head > script[type]'))
           .filter(script => (/footer.*[a-z0-9].js/).test(script.src));
 
@@ -253,6 +182,37 @@ describe('Build Greenwood With: ', function() {
 
         expect(artistsPageGraphData.imports[0]).to.equal(`/components/${componentName}.js`);
         expect(counterScript.length).to.equal(1);
+      });
+    });
+
+    describe('Prerender an HTML route response for page exporting an HTMLElement as default export', function() {
+      it('the response body should be valid HTML from JSDOM', function(done) {
+        expect(usersPageDom).to.not.be.undefined;
+        done();
+      });
+
+      it('should have the expected <h1> text in the <body>', function() {
+        const heading = usersPageDom.window.document.querySelectorAll('body > h1');
+        const userLength = parseInt(heading[0].querySelector('span').textContent, 10);
+
+        expect(heading.length).to.be.equal(1);
+        expect(heading[0].textContent).to.contain('List of Users:');
+        expect(userLength).to.greaterThan(0);
+      });
+
+      it('should have the expected number of <wc-card> tags in the <head>', function() {
+        const cards = usersPageDom.window.document.querySelectorAll('body > wc-card template[shadowroot="open"]');
+
+        expect(cards.length).to.be.greaterThan(0);
+      });
+
+      // have WCC server render WCs within page templates / markdown
+      xit('should have a bundled script for the footer component', function() {
+        const footerScript = Array.from(dom.window.document.querySelectorAll('head > script[type]'))
+          .filter(script => (/footer.*[a-z0-9].js/).test(script.src));
+
+        expect(footerScript.length).to.be.equal(1);
+        expect(footerScript[0].type).to.be.equal('module');
       });
     });
   });
