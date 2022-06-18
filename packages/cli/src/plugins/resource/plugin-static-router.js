@@ -97,7 +97,6 @@ class StaticRouterResource extends ResourceInterface {
           </body>
         `);
 
-        console.debug('SO FAR SO GOOD?????');
         resolve(body);
       } catch (e) {
         reject(e);
