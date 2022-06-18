@@ -2,9 +2,7 @@
 
 // ** THIS DOES NOT WORK ON SAFARI **
 // It will just load pages as if staticRouter was not enabled
-
 document.addEventListener('click', function(e) {
-  console.debug(window.location);
   const href = (e.path && e.path[0]
     ? e.path[0].href // chrome + edge
     : e.originalTarget && e.originalTarget.href
@@ -16,63 +14,46 @@ document.addEventListener('click', function(e) {
   const isOnCurrentDomain = href.indexOf(window.location.hostname) >= 0 || href.indexOf('localhost') >= 0;
   const canClientSideRoute = href !== '' && isOnCurrentDomain;
 
-  console.debug({ href });
-  console.debug('can client side route', canClientSideRoute);
   if (canClientSideRoute) {
-    console.debug('STARTING FROM -> ', window.location.pathname);
     e.preventDefault();
 
     const targetUrl = new URL(href, window.location.origin);
-    console.debug({ targetUrl });
-
-    console.debug('TARGET URL -> ', targetUrl.pathname);
-
     const routerOutlet = Array.from(document.getElementsByTagName('greenwood-route')).filter(outlet => {
       return outlet.getAttribute('data-route') === targetUrl.pathname;
     })[0];
-    console.debug({ routerOutlet });
 
+    // maintain the app shell if we are navigating between pages that are built from the page template
     if (routerOutlet.getAttribute('data-template') === window.__greenwood.currentTemplate) {
-      console.debug('same template, persist template');
-      console.debug('HASH ???????', targetUrl.hash);
-
+      
+      // only update the hash if it just the hash changing
+      // else, request and load the partial for the page, and push page to the browser history stack
       if (targetUrl.hash !== '') {
-        console.debug('just a hash change');
         location = targetUrl.hash;
       } else {
-        console.debug('else use routerOutlet to load the new route');
         routerOutlet.loadRoute();
         history.pushState({}, '', targetUrl.pathname);
       }
-      console.debug('*******************');
     } else {
-      console.debug('different template, hard load href', href);
+      // this page uses is a completely different page template from the current page
+      // so just load the new page
       window.location.href = href;
     }
   }
 });
 
-window.addEventListener('popstate', (e) => {
-  console.debug('!!!!!!! POP STATE <MOVING << OR >>', window.location);
-  console.debug(e);
-
+window.addEventListener('popstate', () => {
   try {
     const targetRoute = window.location;
-    console.debug('BROWSER MOVING TO....', targetRoute.pathname);
-    console.debug('WITH HASH ???', targetRoute.hash);
     const routerOutlet = Array.from(document.getElementsByTagName('greenwood-route')).filter(outlet => {
       return outlet.getAttribute('data-route') === targetRoute.pathname;
     })[0];
 
-    console.debug({ routerOutlet });
     if (routerOutlet) {
       routerOutlet.loadRoute();
     }
   } catch (err) {
-    console.debug('Unexpected error trying to go back.');
-    console.error(err);
+    console.error('Unexpected error trying to go back.', err);
   }
-  console.debug('=================================');
 });
 
 class RouteComponent extends HTMLElement {
