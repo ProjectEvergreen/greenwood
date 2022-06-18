@@ -1,6 +1,7 @@
 /*
  *
- * Manages web standard resource related operations for JavaScript.
+ * 
+ * Manages SPA like client side routing for static pages.
  * This is a Greenwood default plugin.
  *
  */
@@ -9,7 +10,7 @@ import path from 'path';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { fileURLToPath, URL } from 'url';
 
-class OptimizationMPAResource extends ResourceInterface {
+class StaticRouterResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
     this.extensions = ['.html'];
@@ -43,6 +44,7 @@ class OptimizationMPAResource extends ResourceInterface {
     return new Promise(async (resolve, reject) => {
       try {
         let currentTemplate;
+        const isStaticRoute = path.extname(url) === '.html';
         const { projectDirectory, scratchDir, outputDir } = this.compilation.context;
         const bodyContents = body.match(/<body>(.*)<\/body>/s)[0].replace('<body>', '').replace('</body>', '');
         const outputBundlePath = path.normalize(`${outputDir}/_routes${url.replace(projectDirectory, '')}`)
@@ -67,13 +69,15 @@ class OptimizationMPAResource extends ResourceInterface {
             `;
           });
 
-        if (!fs.existsSync(path.dirname(outputBundlePath))) {
-          fs.mkdirSync(path.dirname(outputBundlePath), {
-            recursive: true
-          });
-        }
+        if (isStaticRoute) {
+          if (!fs.existsSync(path.dirname(outputBundlePath))) {
+            fs.mkdirSync(path.dirname(outputBundlePath), {
+              recursive: true
+            });
+          }
 
-        await fs.promises.writeFile(outputBundlePath, bodyContents);
+          await fs.promises.writeFile(outputBundlePath, bodyContents);
+        }
 
         body = body.replace('</head>', `
           <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
@@ -101,10 +105,10 @@ class OptimizationMPAResource extends ResourceInterface {
   }
 }
 
-const greenwoodPluginOptimzationMpa = {
+const greenwoodPluginStaticRouter = {
   type: 'resource',
-  name: 'plugin-optimization-mpa',
-  provider: (compilation, options) => new OptimizationMPAResource(compilation, options)
+  name: 'plugin-static-router',
+  provider: (compilation, options) => new StaticRouterResource(compilation, options)
 };
 
-export { greenwoodPluginOptimzationMpa };
+export { greenwoodPluginStaticRouter };

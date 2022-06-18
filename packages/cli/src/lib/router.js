@@ -22,8 +22,9 @@ document.addEventListener('click', function(e) {
       return outlet.getAttribute('data-route') === targetUrl.pathname;
     })[0];
 
-    // maintain the app shell if we are navigating between pages that are built from the page template
-    if (routerOutlet.getAttribute('data-template') === window.__greenwood.currentTemplate) {
+    // maintain the app shell if we are navigating between pages that are built from the same page template
+    // also, some routes may be SSR, so we may not always match on a static route
+    if (routerOutlet && routerOutlet.getAttribute('data-template') === window.__greenwood.currentTemplate) {
       
       // only update the hash if it just the hash changing
       // else, request and load the partial for the page, and push page to the browser history stack
