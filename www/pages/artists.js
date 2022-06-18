@@ -15,7 +15,11 @@ export default class ArtistsPage extends HTMLElement {
       }).join('');
 
       this.attachShadow({ mode: 'open' });
-      this.shadowRoot.innerHTML = html;
+      this.shadowRoot.innerHTML = `
+        <template shadowroot="open">
+          ${html}
+        </template>
+      `;
     }
   }
 }

@@ -10,7 +10,7 @@ template.innerHTML = `
     }
 
     [name="title"] {
-      color: green;
+      color: red;
     }
 
     ::slotted(img) {
