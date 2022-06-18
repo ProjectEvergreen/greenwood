@@ -22,7 +22,7 @@ document.addEventListener('click', function(e) {
       return outlet.getAttribute('data-route') === targetUrl.pathname;
     })[0];
 
-    // maintain the app shell if we are navigating between pages that are built from the page template
+    // maintain the app shell if we are navigating between pages that are built from the same page template
     // also, some routes may be SSR, so we may not always match on a static route
     if (routerOutlet && routerOutlet.getAttribute('data-template') === window.__greenwood.currentTemplate) {
       
