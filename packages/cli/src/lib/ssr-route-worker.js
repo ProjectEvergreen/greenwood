@@ -23,8 +23,7 @@ async function executeRouteModule({ modulePath, compilation, route, label, id })
   }
 
   if (module.default) {
-    const { html, metadata } = await renderToString(moduleURL);
-    console.debug({ metadata });
+    const { html } = await renderToString(moduleURL);
 
     data.body = html;
   } else {

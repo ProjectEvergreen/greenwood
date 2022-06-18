@@ -24,8 +24,7 @@ export default class ArtistsPage extends HTMLElement {
   }
 }
 
-async function getFrontmatter(compilation, route) {
-  console.debug({ route });
+async function getFrontmatter() {
   return {
     menu: 'navigation',
     index: 7
