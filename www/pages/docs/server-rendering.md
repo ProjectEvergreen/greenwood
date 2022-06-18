@@ -27,7 +27,8 @@ The above would serve content in a browser at `/users/`.
 
 ### API
 
-In your _[page].js_ file, Greenwood supports three functions you can `export` for providing server rendered configuration and content:
+In your _[page].js_ file, Greenwood supports the following functions you can `export` for providing server rendered configuration and content:
+- `default`: Use a custom element to render your page content.  Will take precedence over `getBody`.
 - `getFrontmatter`: Static [frontmatter](/docs/front-matter/), useful in conjunction with [menus](/docs/menus/) or otherwise static configuration / meta data.
 - `getBody`: Effectively anything that you could put into a [`<content-outlet></content-outlet>`](/docs/layouts/#page-templates).
 - `getTemplate`: Effectively the same as a [page template](/docs/layouts/#page-templates).
@@ -45,10 +46,40 @@ async function getTemplate(compilation, route) {
   return `/* some HTML here */`;
 }
 
+export default MyComponent extends HTMLElement {
+  constructor() { }
+  connectedCallback() { }
+}
+
 export {
   getFrontmatter,
   getBody,
   getTemplate
+}
+```
+
+#### Custom Element (default)
+
+When using `export default`, Greenwood supports providing a custom element as the export for your page content.  It uses [**WCC**](https://github.com/ProjectEvergreen/wcc) by default which also includes support for rendering [Declarative Shadow DOM](https://web.dev/declarative-shadow-dom/).
+
+```js
+import '../components/card/card.js';  // <wc-card></wc-card>
+import fetch from 'node-fetch';
+
+export default class UsersPage extends HTMLElement {
+  async connectedCallback() {
+    const users = await fetch('https://www.example.com/api/users').then(resp => resp.json());
+    const html = users.map(user => {
+      return `
+        <wc-card>
+          <h2 slot="title">${user.name}</h2>
+          <img slot="image" src="${user.imageUrl}" alt="${user.name}"/>
+        </wc-card>
+      `;
+    }).join('');
+
+    this.innerHTML = html;
+  }
 }
 ```
 
@@ -154,6 +185,7 @@ async function getTemplate(compilation, route) {
 One of the great things about Greenwood is that you can seamlessly move from completely static to server rendered, without giving up either one! 💯
 
 Given the following workspace of just pages
+
 ```shell
 src/
   pages/
