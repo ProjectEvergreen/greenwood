@@ -28,7 +28,7 @@ The above would serve content in a browser at `/users/`.
 ### API
 
 In your _[page].js_ file, Greenwood supports the following functions you can `export` for providing server rendered configuration and content:
-- `default`: Use a custom element to render your page content.  Will take precedence over `getBody`.
+- `default`: Use a custom element to render your page content.  Will take precedence over `getBody`.  Will also automatically track your custom element dependencies, in place of having to define [frontmatter imports](/docs/front-matter/#imports) in `getFrontmatter`.
 - `getFrontmatter`: Static [frontmatter](/docs/front-matter/), useful in conjunction with [menus](/docs/menus/) or otherwise static configuration / meta data.
 - `getBody`: Effectively anything that you could put into a [`<content-outlet></content-outlet>`](/docs/layouts/#page-templates).
 - `getTemplate`: Effectively the same as a [page template](/docs/layouts/#page-templates).
@@ -82,6 +82,8 @@ export default class UsersPage extends HTMLElement {
   }
 }
 ```
+
+In the above example, _card.js_ will automatically be bundled for you on the client side!  🙌
 
 #### Frontmatter
 

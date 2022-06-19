@@ -23,9 +23,20 @@ async function executeRouteModule({ modulePath, compilation, route, label, id })
   }
 
   if (module.default) {
-    const { html } = await renderToString(moduleURL);
+    const { html, metadata } = await renderToString(moduleURL);
 
     data.body = html;
+
+    if (Object.keys(metadata).length > 0) {
+      data.frontmatter = data.frontmatter || {};
+      data.frontmatter.imports = data.frontmatter.imports || [];
+
+      for (const entry in metadata) {
+        data.frontmatter.imports.push(
+          metadata[entry].moduleURL.pathname.replace(parsedCompilation.context.userWorkspace, '')
+        );
+      }
+    }
   } else {
     if (getBody) {
       data.body = await getBody(parsedCompilation, route);

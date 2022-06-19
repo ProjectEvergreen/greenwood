@@ -56,7 +56,7 @@ describe('Build Greenwood With: ', function() {
       return new Promise(async (resolve) => {
         setTimeout(() => {
           resolve();
-        }, 15000);
+        }, 10000);
 
         await runner.runCommand(cliPath, 'serve');
       });
@@ -145,15 +145,6 @@ describe('Build Greenwood With: ', function() {
         expect(scripts[0].textContent).to.contain('console.log');
       });
 
-      // have WCC server render WCs within page templates / markdown
-      xit('should have a bundled script for the footer component', function() {
-        const footerScript = Array.from(artistsPageDom.window.document.querySelectorAll('head > script[type]'))
-          .filter(script => (/footer.*[a-z0-9].js/).test(script.src));
-
-        expect(footerScript.length).to.be.equal(1);
-        expect(footerScript[0].type).to.be.equal('module');
-      });
-
       it('should have the expected number of table rows of content', function() {
         const rows = artistsPageDom.window.document.querySelectorAll('body > table tr');
 
@@ -220,13 +211,12 @@ describe('Build Greenwood With: ', function() {
         expect(cards.length).to.be.greaterThan(0);
       });
 
-      // have WCC server render WCs within page templates / markdown
-      xit('should have a bundled script for the footer component', function() {
-        const footerScript = Array.from(artistsPageDom.window.document.querySelectorAll('head > script[type]'))
-          .filter(script => (/footer.*[a-z0-9].js/).test(script.src));
+      it('should have a bundled <script> for the card component', function() {
+        const cardScript = Array.from(usersPageDom.window.document.querySelectorAll('head > script[type]'))
+          .filter(script => (/card.*[a-z0-9].js/).test(script.src));
 
-        expect(footerScript.length).to.be.equal(1);
-        expect(footerScript[0].type).to.be.equal('module');
+        expect(cardScript.length).to.be.equal(1);
+        expect(cardScript[0].type).to.be.equal('module');
       });
     });
   });
