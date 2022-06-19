@@ -19,15 +19,3 @@ export default class UsersPage extends HTMLElement {
     `;
   }
 }
-
-async function getFrontmatter() {
-  return {
-    data: {
-      prerender: true
-    }
-  };
-}
-
-export {
-  getFrontmatter
-};

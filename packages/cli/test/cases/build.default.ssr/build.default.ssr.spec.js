@@ -17,6 +17,8 @@
  *     footer.js
  *   pages/
  *     artists.js
+ *     index.md
+ *     users.js
  *   templates/
  *     app.html
  */
@@ -43,7 +45,7 @@ describe('Build Greenwood With: ', function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
@@ -54,7 +56,7 @@ describe('Build Greenwood With: ', function() {
       return new Promise(async (resolve) => {
         setTimeout(() => {
           resolve();
-        }, 10000);
+        }, 15000);
 
         await runner.runCommand(cliPath, 'serve');
       });
@@ -63,13 +65,12 @@ describe('Build Greenwood With: ', function() {
     runSmokeTest(['public', 'index'], LABEL);
 
     let response = {};
-    let dom;
+    let artistsPageDom;
     let usersPageDom;
     let artistsPageGraphData;
 
     before(async function() {
       const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
-      const usersPageHtml = await fs.promises.readFile(path.join(outputPath, 'public/users/index.html'));
       
       artistsPageGraphData = graph.filter(page => page.route === '/artists/')[0];
 
@@ -81,8 +82,21 @@ describe('Build Greenwood With: ', function() {
 
           response = res;
           response.body = body;
-          dom = new JSDOM(body);
-          usersPageDom = new JSDOM(usersPageHtml);
+
+          artistsPageDom = new JSDOM(body);
+
+          resolve();
+        });
+      });
+    });
+
+    before(async function() {
+      return new Promise((resolve, reject) => {
+        request.get(`${hostname}/users/`, (err, res, body) => {
+          if (err) {
+            reject();
+          }
+          usersPageDom = new JSDOM(body);
 
           resolve();
         });
@@ -107,24 +121,24 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('the response body should be valid HTML from JSDOM', function(done) {
-        expect(dom).to.not.be.undefined;
+        expect(artistsPageDom).to.not.be.undefined;
         done();
       });
 
       it('should have one style tags', function() {
-        const styles = dom.window.document.querySelectorAll('head > style');
+        const styles = artistsPageDom.window.document.querySelectorAll('head > style');
 
         expect(styles.length).to.equal(1);
       });
 
       it('should have the expected number of <script> tags in the <head>', function() {
-        const scripts = dom.window.document.querySelectorAll('head > script');
+        const scripts = artistsPageDom.window.document.querySelectorAll('head > script');
 
         expect(scripts.length).to.equal(2);
       });
 
       it('should have expected SSR content from the non module script tag', function() {
-        const scripts = Array.from(dom.window.document.querySelectorAll('head > script'))
+        const scripts = Array.from(artistsPageDom.window.document.querySelectorAll('head > script'))
           .filter(tag => !tag.getAttribute('type'));
 
         expect(scripts.length).to.equal(1);
@@ -133,7 +147,7 @@ describe('Build Greenwood With: ', function() {
 
       // have WCC server render WCs within page templates / markdown
       xit('should have a bundled script for the footer component', function() {
-        const footerScript = Array.from(dom.window.document.querySelectorAll('head > script[type]'))
+        const footerScript = Array.from(artistsPageDom.window.document.querySelectorAll('head > script[type]'))
           .filter(script => (/footer.*[a-z0-9].js/).test(script.src));
 
         expect(footerScript.length).to.be.equal(1);
@@ -141,20 +155,20 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have the expected number of table rows of content', function() {
-        const rows = dom.window.document.querySelectorAll('body > table tr');
+        const rows = artistsPageDom.window.document.querySelectorAll('body > table tr');
 
         expect(rows.length).to.equal(11);
       });
 
       it('should have the expected <title> content in the <head>', function() {
-        const title = dom.window.document.querySelectorAll('head > title');
+        const title = artistsPageDom.window.document.querySelectorAll('head > title');
 
         expect(title.length).to.equal(1);
         expect(title[0].textContent).to.equal('/artists/');
       });
 
       it('should have custom metadata in the <head>', function() {
-        const metaDescription = Array.from(dom.window.document.querySelectorAll('head > meta'))
+        const metaDescription = Array.from(artistsPageDom.window.document.querySelectorAll('head > meta'))
           .filter((tag) => tag.getAttribute('name') === 'description');
 
         expect(metaDescription.length).to.equal(1);
@@ -177,7 +191,7 @@ describe('Build Greenwood With: ', function() {
 
       it('should append the expected <script> tag for a frontmatter import <x-counter> component', function() {
         const componentName = 'counter';
-        const counterScript = Array.from(dom.window.document.querySelectorAll('head > script[src]'))
+        const counterScript = Array.from(artistsPageDom.window.document.querySelectorAll('head > script[src]'))
           .filter((tag) => tag.getAttribute('src').indexOf(`/${componentName}.`) === 0);
 
         expect(artistsPageGraphData.imports[0]).to.equal(`/components/${componentName}.js`);
@@ -208,7 +222,7 @@ describe('Build Greenwood With: ', function() {
 
       // have WCC server render WCs within page templates / markdown
       xit('should have a bundled script for the footer component', function() {
-        const footerScript = Array.from(dom.window.document.querySelectorAll('head > script[type]'))
+        const footerScript = Array.from(artistsPageDom.window.document.querySelectorAll('head > script[type]'))
           .filter(script => (/footer.*[a-z0-9].js/).test(script.src));
 
         expect(footerScript.length).to.be.equal(1);

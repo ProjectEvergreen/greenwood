@@ -124,34 +124,6 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
 }
 
 async function preRenderCompilationDefault(compilation) {
-  const pages = compilation.graph.filter(page => page.isSSR && page.data.prerender);
-  const outputDir = compilation.context.scratchDir;
-
-  for (const page of pages) {
-    const { outputPath, route } = page;
-    const outputPathDir = path.join(outputDir, route);
-    const htmlResource = compilation.config.plugins.filter((plugin) => {
-      return plugin.name === 'plugin-standard-html';
-    }).map((plugin) => {
-      return plugin.provider(compilation);
-    })[0];
-    let html;
-
-    html = (await htmlResource.serve(page.route)).body;
-    html = (await interceptPage(compilation, html, route)).body;
-    html = await optimizePage(compilation, html, route, outputPath, outputDir);
-
-    if (!fs.existsSync(outputPathDir)) {
-      fs.mkdirSync(outputPathDir, {
-        recursive: true
-      });
-    }
-
-    await fs.promises.writeFile(path.join(outputDir, outputPath), html);
-  }
-}
-
-async function preRenderCompilationPuppeteer(compilation) {
   const BrowserRunner = (await import('../lib/browser.js')).BrowserRunner;
   const browserRunner = new BrowserRunner();
 
@@ -248,6 +220,5 @@ async function staticRenderCompilation(compilation) {
 export {
   preRenderCompilationCustom,
   preRenderCompilationDefault,
-  preRenderCompilationPuppeteer,
   staticRenderCompilation
 };
