@@ -41,18 +41,26 @@ async function executeRouteModule({ modulePath, compilation, route, label, id, p
 
     data.html = await getTemplateResultString(templateResult);
   } else {
-    const { getTemplate = null, getBody = null, getFrontmatter = null } = await import(pathToFileURL(modulePath)).then(module => module);
+    const module = await import(pathToFileURL(modulePath)).then(module => module);
+    const { getTemplate = null, getBody = null, getFrontmatter = null } = module;
+
+    if (module.default && module.tagName) {
+      const { tagName } = module;
+      const templateResult = html`
+        ${unsafeHTML(`<${tagName}></${tagName}>`)}
+      `;
+
+      data.body = await getTemplateResultString(templateResult);
+    } else if (getBody) {
+      const templateResult = await getBody(parsedCompilation, route);
+
+      data.body = await getTemplateResultString(templateResult);
+    }
 
     if (getTemplate) {
       const templateResult = await getTemplate(parsedCompilation, route);
 
       data.template = await getTemplateResultString(templateResult);
-    }
-
-    if (getBody) {
-      const templateResult = await getBody(parsedCompilation, route);
-
-      data.body = await getTemplateResultString(templateResult);
     }
 
     if (getFrontmatter) {

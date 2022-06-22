@@ -19,6 +19,7 @@
  *     greeting.js
  *   pages/
  *     artists.js
+ *     users.js
  *   templates/
  *     app.html
  */
@@ -44,7 +45,7 @@ describe('Build Greenwood With: ', function() {
     this.context = { 
       publicDir: path.join(outputPath, 'public') 
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function() {
@@ -139,6 +140,8 @@ describe('Build Greenwood With: ', function() {
     let response = {};
     let artists = [];
     let dom;
+    let usersPageDom;
+    let usersPageHtml;
     let aboutPageGraphData;
 
     before(async function() {
@@ -157,12 +160,21 @@ describe('Build Greenwood With: ', function() {
           response.body = body;
           dom = new JSDOM(body);
 
-          resolve();
+          request.get(`${hostname}/users/`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+  
+            usersPageHtml = body;
+            usersPageDom = new JSDOM(body);
+  
+            resolve();
+          });
         });
       });
     });
 
-    describe('Serve command with HTML route response', function() {
+    describe('Serve command with HTML route response using getBody, getTemplate and getFrontmatter', function() {
 
       it('should return a 200 status', function(done) {
         expect(response.statusCode).to.equal(200);
@@ -241,6 +253,25 @@ describe('Build Greenwood With: ', function() {
       it('should have expected custom data values in its graph data', function() {
         expect(aboutPageGraphData.data.author).to.equal('Project Evergreen');
         expect(aboutPageGraphData.data.date).to.equal('01-01-2021');
+      });
+    });
+
+    describe('Serve command with HTML route response using LitElement as default export', function() {
+      it('the response body should be valid HTML from JSDOM', function(done) {
+        expect(usersPageDom).to.not.be.undefined;
+        done();
+      });
+
+      it('should have the expected <h1> text in the <body>', function() {
+        expect(usersPageHtml).to.contain('Users Page');
+      });
+
+      xit('should have the expected users length text in the <body>', function() {
+        expect(usersPageHtml).to.contain(`<div id="users">${artists.length}</div>`);
+      });
+
+      it('should have the expected <app-footer> content in the <body>', function() {
+        expect(usersPageHtml).to.contain('<footer class="footer">');
       });
     });
   });
