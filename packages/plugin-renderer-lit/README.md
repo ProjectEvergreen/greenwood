@@ -50,18 +50,19 @@ export default {
 
 Now, you can write some [SSR routes](/docs/server-rendering/) using Lit including all the [available APIs](docs/server-rendering/#api).  The below example uses the standard [SimpleGreeting](https://lit.dev/playground/) component from the Lit docs by also using a LitElement as the `default export`!
 ```js
-import fetch from 'node-fetch';
 import { html, LitElement } from 'lit';
 import './path/to/greeting.js';
 
-class ArtistsPage extends LitElement {
+export default class ArtistsPage extends LitElement {
 
   constructor() {
     super();
-    this.artists = JSON.parse(fs.readFileSync(new URL('./artists.json', import.meta.url), 'utf-8'));
+    this.artists = [{ /* ... */ }];
   }
 
   render() {
+    const { artists } = this;
+
     return html`
       ${
         artists.map((artist) => {
@@ -72,7 +73,7 @@ class ArtistsPage extends LitElement {
               <simple-greeting .name="${name}"></simple-greeting>
             </a>
 
-            <img src="${imageUrl}"/>
+            <img src="${imageUrl}" loading="lazy"/>
 
             <br/>
           `;
@@ -82,10 +83,9 @@ class ArtistsPage extends LitElement {
   }
 }
 
+// for now these are needed for the Lit specific implementations
 customElements.define('artists-page', ArtistsPage);
-
-export const tagName = 'artists-page'; // this is needed for Lit specific implementations
-export default ArtistsPage;
+export const tagName = 'artists-page';
 ```
 
 ## Options
