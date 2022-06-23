@@ -63,8 +63,8 @@ export {
 When using `export default`, Greenwood supports providing a custom element as the export for your page content.  It uses [**WCC**](https://github.com/ProjectEvergreen/wcc) by default which also includes support for rendering [Declarative Shadow DOM](https://web.dev/declarative-shadow-dom/).
 
 ```js
-import '../components/card/card.js';  // <wc-card></wc-card>
 import fetch from 'node-fetch';
+import '../components/card/card.js';  // <wc-card></wc-card>
 
 export default class UsersPage extends HTMLElement {
   async connectedCallback() {
@@ -84,6 +84,8 @@ export default class UsersPage extends HTMLElement {
 ```
 
 In the above example, _card.js_ will automatically be bundled for you on the client side!  🙌
+
+> _**Note**: Keep in mind that for these "page" components, you will likely want to _avoid_ Declarative Shadow for rendering the top level (to avoid wrapping static content in `<template>` tags), but definitely use Declarative Shadow DOM within any dependent custom elements of your page._
 
 #### Frontmatter
 

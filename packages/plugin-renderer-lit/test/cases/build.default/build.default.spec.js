@@ -45,7 +45,7 @@ describe('Build Greenwood With: ', function() {
     this.context = { 
       publicDir: path.join(outputPath, 'public') 
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
@@ -266,8 +266,8 @@ describe('Build Greenwood With: ', function() {
         expect(usersPageHtml).to.contain('Users Page');
       });
 
-      xit('should have the expected users length text in the <body>', function() {
-        expect(usersPageHtml).to.contain(`<div id="users">${artists.length}</div>`);
+      it('should have the expected users length text in the <body>', function() {
+        expect(usersPageHtml).to.contain(`<div id="users"><!--lit-part-->${artists.length}<!--/lit-part--></div>`);
       });
 
       it('should have the expected <app-footer> content in the <body>', function() {

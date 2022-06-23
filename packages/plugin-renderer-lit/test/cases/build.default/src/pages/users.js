@@ -1,4 +1,4 @@
-// import fs from 'fs';
+import fs from 'fs';
 import { html, LitElement } from 'lit';
 import '../components/footer.js';
 
@@ -6,13 +6,8 @@ class UsersComponent extends LitElement {
 
   constructor() {
     super();
-    this.users = [];
+    this.users = JSON.parse(fs.readFileSync(new URL('../../artists.json', import.meta.url), 'utf-8'));
   }
-
-  // TODO
-  // connectedCallback() {
-  //   this.users = JSON.parse(fs.readFile(new URL('../../artists.json', import.meta.url), 'utf-8'));
-  // }
 
   render() {
     return html`
