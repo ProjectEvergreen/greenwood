@@ -43,8 +43,8 @@ class Banner extends LitElement {
         this.cycleProjectTypes();
         this.animateState = 'on';
         this.update();
-      }, 1000);
-    }, 3000);
+      }, 500);
+    }, 4000);
   }
 
   render() {
