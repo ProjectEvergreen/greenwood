@@ -88,6 +88,8 @@ customElements.define('artists-page', ArtistsPage);
 export const tagName = 'artists-page';
 ```
 
+> **Note**: _Lit SSR [**only** renders into declarative shadow roots](https://github.com/lit/lit/issues/3080#issuecomment-1165158794) so you will have to keep browser support and polyfill usage in mind depending on your use case_.
+
 ## Options
 
 ### Prerender (experimental)
