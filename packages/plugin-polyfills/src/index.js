@@ -43,15 +43,17 @@ class PolyfillsResource extends ResourceInterface {
         if (this.options.dsd) {
           newHtml = newHtml.replace('</body>', `
               <script>
-                (function attachShadowRoots(root) {
-                  root.querySelectorAll("template[shadowroot]").forEach(template => {
-                    const mode = template.getAttribute("shadowroot");
-                    const shadowRoot = template.parentNode.attachShadow({ mode });
-                    shadowRoot.appendChild(template.content);
-                    template.remove();
-                    attachShadowRoots(shadowRoot);
-                  });
-                })(document);
+                if (!HTMLTemplateElement.prototype.hasOwnProperty('shadowRoot')) {
+                  (function attachShadowRoots(root) {
+                    root.querySelectorAll("template[shadowroot]").forEach(template => {
+                      const mode = template.getAttribute("shadowroot");
+                      const shadowRoot = template.parentNode.attachShadow({ mode });
+                      shadowRoot.appendChild(template.content);
+                      template.remove();
+                      attachShadowRoots(shadowRoot);
+                    });
+                  })(document);
+                }
               </script>
             </body>
           `);
