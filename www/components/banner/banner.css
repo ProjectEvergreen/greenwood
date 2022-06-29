@@ -75,7 +75,7 @@
     }
 
     & span.on {
-      animation: 1s fadeIn linear;
+      animation: 1.5s fadeIn linear;
     }
   }
 
