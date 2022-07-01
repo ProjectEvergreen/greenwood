@@ -314,9 +314,10 @@ async function getHybridServer(compilation) {
       await fs.promises.mkdir(path.join(compilation.context.scratchDir, url), { recursive: true });
       await fs.promises.writeFile(path.join(compilation.context.scratchDir, url, 'index.html'), body);
 
-      compilation.graph = compilation.graph.filter(page => page.isSSR && page.route === url);
-
-      const rollupConfigs = await getRollupConfig(compilation);
+      const rollupConfigs = await getRollupConfig({
+        ...compilation,
+        graph: [matchingRoute]
+      });
       const bundle = await rollup(rollupConfigs[0]);
       await bundle.write(rollupConfigs[0].output);
 
