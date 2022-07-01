@@ -6,8 +6,8 @@ const runProdServer = async (compilation) => {
 
     try {
       const port = compilation.config.port;
-      const hasRoutes = compilation.graph.find(page => page.isSSR);
-      const server = hasRoutes ? getHybridServer : getStaticServer;
+      const hasDynamicRoutes = compilation.graph.filter(page => page.isSSR && !page.data.static);
+      const server = hasDynamicRoutes.length > 0 ? getHybridServer : getStaticServer;
 
       (await server(compilation)).listen(port, () => {
         console.info(`Started server at localhost:${port}`);

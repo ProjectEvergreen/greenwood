@@ -192,7 +192,7 @@ async function preRenderCompilationDefault(compilation) {
 }
 
 async function staticRenderCompilation(compilation) {
-  const pages = compilation.graph.filter(page => !page.isSSR);
+  const pages = compilation.graph.filter(page => !page.isSSR || page.isSSR && page.data.static);
   const scratchDir = compilation.context.scratchDir;
   const htmlResource = compilation.config.plugins.filter((plugin) => {
     return plugin.name === 'plugin-standard-html';
