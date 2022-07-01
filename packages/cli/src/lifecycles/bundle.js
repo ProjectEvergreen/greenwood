@@ -10,8 +10,7 @@ const bundleCompilation = async (compilation) => {
       // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
       if (compilation.graph.length > 0) {
         const rollupConfigs = await getRollupConfig({
-          ...compilation,
-          graph: compilation.graph.filter(page => !page.isSSR)
+          ...compilation
         });
         const bundle = await rollup(rollupConfigs[0]);
 
