@@ -39,12 +39,12 @@ class Banner extends LitElement {
       this.animateState = 'off';
       this.update();
 
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         this.cycleProjectTypes();
         this.animateState = 'on';
         this.update();
-      }, 1000);
-    }, 3000);
+      });
+    }, 4000);
   }
 
   render() {
