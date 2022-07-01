@@ -7,6 +7,7 @@ As of right now, you will likely need this plugin to load additional polyfills i
 
 - Internet Explorer <= 11
 - Mobile Browsers
+- Declarative Shadow DOM
 
 See Greenwood's [browser support](https://www.greenwoodjs.io/about/how-it-works#browser-support) and [evergreen build](https://www.greenwoodjs.io/about/how-it-works#evergreen-build) docs for more information on how Greenwood handles browser support out of the box.  Or visit [caniuse.com](https://caniuse.com/) to look up specific support for specific browsers.
 
@@ -41,4 +42,29 @@ export default {
 
 Now when your project builds for production, you will see a _bundles/_ directory in your output directory, as well as a file called _webcomponents-loader.js_, as well as a `<script>` tag for that file in the  `<head>` of your _index.html_ files.  When a page is loaded, the feature detection capabilities will then load the necessary polyfills to have your project work for a user's given browser.
 
-> Note: we would like to add support for [differntial loading](https://github.com/ProjectEvergreen/greenwood/issues/224) to avoid the cost of this for newer browsers.
+> Note: we would like to add support for [differential loading](https://github.com/ProjectEvergreen/greenwood/issues/224) to avoid the cost of this for newer browsers.
+
+## Options
+
+This plugin supports the following polyfills and configuration options:
+1. [Web Components Loader](https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs#using-webcomponents-loaderjs) - `wc`
+1. [Declarative Shadow DOM](https://web.dev/declarative-shadow-dom/#polyfill) - `dsd`
+1. [Lit](https://lit.dev/docs/tools/requirements/#polyfills) - `lit` (Use this in conjunction with Web Components Loader)
+
+You can adjust either of these default behaviors by providing `true` or `false` for each polyfill type.
+
+```javascript
+import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
+
+export default {
+  ...
+
+  // default values shown here
+  plugins: [
+    ...greenwoodPluginPolyfills({
+      wc: true,
+      dsd: false,
+      lit: false
+    })
+  ]
+}
