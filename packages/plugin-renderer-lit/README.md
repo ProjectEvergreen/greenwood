@@ -48,50 +48,47 @@ export default {
 }
 ```
 
-Now, you can write some [SSR routes](/docs/server-rendering/) using Lit!  The below example even uses the standard [SimpleGreeting](https://lit.dev/playground/) component from the Lit docs.
+Now, you can write some [SSR routes](/docs/server-rendering/) using Lit including all the [available APIs](docs/server-rendering/#api).  The below example uses the standard [SimpleGreeting](https://lit.dev/playground/) component from the Lit docs by also using a LitElement as the `default export`!
 ```js
-import fetch from 'node-fetch';
-import { html } from 'lit';
-import '../components/greeting.js';
+import { html, LitElement } from 'lit';
+import './path/to/greeting.js';
 
-async function getBody() {
-  const artists = await fetch('http://www.mydomain.com/api/artists').then(resp => resp.json());
+export default class ArtistsPage extends LitElement {
 
-  return html`
-    <h1>Lit SSR response</h1>
-    <table>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Message</th>
-        <th>Picture</th>
-      </tr>
+  constructor() {
+    super();
+    this.artists = [{ /* ... */ }];
+  }
+
+  render() {
+    const { artists } = this;
+
+    return html`
       ${
         artists.map((artist) => {
-          const { id, name, bio, imageUrl } = artist;
+          const { id, name, imageUrl } = artist;
 
           return html`
-            <tr>
-              <td>${id}</td>
-              <td>${name}</td>
-              <td>${bio}</td>
-              <td>
-                <a href="http://www.mydomain.com/artists/${id}" target="_blank">
-                  <simple-greeting .name="${name}"></simple-greeting>
-                </a>
-              </td>
-              <td><img src="${imageUrl}"/></td>
-            </tr>
+            <a href="/artists/${id}" target="_blank">
+              <simple-greeting .name="${name}"></simple-greeting>
+            </a>
+
+            <img src="${imageUrl}" loading="lazy"/>
+
+            <br/>
           `;
         })
       }
-    </table>
-  `;
+    `;
+  }
 }
 
-export { getBody };
+// for now these are needed for the Lit specific implementations
+customElements.define('artists-page', ArtistsPage);
+export const tagName = 'artists-page';
 ```
+
+> **Note**: _Lit SSR [**only** renders into declarative shadow roots](https://github.com/lit/lit/issues/3080#issuecomment-1165158794) so you will have to keep browser support and polyfill usage in mind depending on your use case_.
 
 ## Options
 
