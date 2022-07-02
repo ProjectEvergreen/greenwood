@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/www",
-  "version": "0.25.2",
+  "version": "0.26.0-alpha.0",
   "private": true,
   "type": "module",
   "description": "Greenwood website workspace.",
