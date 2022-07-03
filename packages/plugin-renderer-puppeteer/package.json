@@ -1,0 +1,32 @@
+{
+  "name": "@greenwood/plugin-renderer-puppeteer",
+  "version": "0.26.0-alpha.0",
+  "description": "A Greenwood plugin to allow headless rendering with Puppeteer.",
+  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-puppeteer",
+  "author": "Owen Buckley <owen@thegreenhouse.io>",
+  "license": "MIT",
+  "keywords": [
+    "Greenwood",
+    "Static Site Generator",
+    "Web Components",
+    "Puppeteer"
+  ],
+  "main": "src/index.js",
+  "type": "module",
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@greenwood/cli": "^0.4.0"
+  },
+  "dependencies": {
+    "@webcomponents/webcomponentsjs": "^2.6.0",
+    "puppeteer": "^13.5.2"
+  },
+  "devDependencies": {
+    "@greenwood/cli": "^0.26.0-alpha.0"
+  }
+}

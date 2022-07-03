@@ -23,18 +23,9 @@
   "publishConfig": {
     "access": "public"
   },
-  "peerDependencies": {
-    "puppeteer": "^13.5.2"
-  },
-  "peerDependenciesMeta": {
-    "puppeteer": {
-      "optional": true
-    }
-  },
   "dependencies": {
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@rollup/plugin-replace": "^2.3.4",
-    "@webcomponents/webcomponentsjs": "^2.6.0",
     "acorn": "^8.0.1",
     "acorn-walk": "^8.0.0",
     "commander": "^2.20.0",
