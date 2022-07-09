@@ -56,7 +56,7 @@ async function optimizePage(compilation, contents, route, outputPath, outputDir)
   return htmlOptimized;
 }
 
-async function preRenderCompilationCustom(compilation, customPrerender) {
+async function preRenderCompilationWorker(compilation, customPrerender) {
   const pages = compilation.graph.filter(page => !page.isSSR);
   const outputDir = compilation.context.scratchDir;
 
@@ -123,71 +123,15 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
   }
 }
 
-async function preRenderCompilationDefault(compilation) {
-  const BrowserRunner = (await import('../lib/browser.js')).BrowserRunner;
-  const browserRunner = new BrowserRunner();
+async function preRenderCompilationCustom(compilation, customPrerender) {
+  const { scratchDir } = compilation.context;
+  const renderer = (await import(customPrerender.customUrl)).default;
 
-  const runBrowser = async (serverUrl, pages, outputDir) => {
-    try {
-      return Promise.all(pages.map(async(page) => {
-        const { outputPath, route } = page;
-        console.info('prerendering page...', route);
-        
-        return await browserRunner
-          .serialize(`${serverUrl}${route}`)
-          .then(async (indexHtml) => {
-            console.info(`prerendering complete for page ${route}.`);
-            
-            const html = await optimizePage(compilation, indexHtml, route, outputPath, outputDir);
-            await fs.promises.writeFile(path.join(outputDir, outputPath), html);
-          });
-      }));
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(err);
-      return false;
-    }
-  };
+  await renderer(compilation, async (page, contents) => {
+    const { outputPath, route } = page;
 
-  // gracefully handle if puppeteer is not installed correctly
-  // like may happen in a stackblitz environment and just reject early
-  // otherwise we can feel confident attempting to prerender all pages
-  // https://github.com/ProjectEvergreen/greenwood/discussions/639
-  try {
-    await browserRunner.init();
-  } catch (e) {
-    console.error(e);
-
-    console.error('*******************************************************************');
-    console.error('*******************************************************************');
-
-    console.error('There was an error trying to initialize puppeteer for pre-rendering.');
-
-    console.info('To troubleshoot, please check your environment for any npm install or postinstall errors, as may be the case in a Stackblitz or other sandbox like environment.');
-    console.info('For more information please see this guide - https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md');
-
-    return Promise.reject();
-  }
-
-  return new Promise(async (resolve, reject) => {
-    try {
-      const pages = compilation.graph.filter(page => !page.isSSR);
-      const port = compilation.config.devServer.port;
-      const outputDir = compilation.context.scratchDir;
-      const serverAddress = `http://127.0.0.1:${port}`;
-
-      console.debug('pages to render', `\n ${pages.map(page => page.route).join('\n ')}`);
-      console.info(`Prerendering pages at ${serverAddress}`);
-
-      await runBrowser(serverAddress, pages, outputDir);
-      browserRunner.close();
-
-      console.info('done prerendering all pages');
-
-      resolve();
-    } catch (err) {
-      reject(err);
-    }
+    const html = await optimizePage(compilation, contents, route, outputPath, scratchDir);
+    await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
   });
 }
 
@@ -218,7 +162,7 @@ async function staticRenderCompilation(compilation) {
 }
 
 export {
+  preRenderCompilationWorker,
   preRenderCompilationCustom,
-  preRenderCompilationDefault,
   staticRenderCompilation
 };
