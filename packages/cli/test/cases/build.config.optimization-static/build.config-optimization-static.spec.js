@@ -10,8 +10,7 @@
  *
  * User Config
  * {
- *   optimization: 'static',
- *   prerender: true
+ *   optimization: 'static'
  * }
  *
  * Custom Workspace

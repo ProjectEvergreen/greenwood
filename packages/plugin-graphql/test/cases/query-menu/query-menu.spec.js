@@ -36,7 +36,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', async function() {
+xdescribe('Build Greenwood With: ', async function() {
   const LABEL = 'MenuQuery from GraphQL';
   const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');

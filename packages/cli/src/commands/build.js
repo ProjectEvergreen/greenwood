@@ -22,23 +22,6 @@ const runProductionBuild = async (compilation) => {
         fs.mkdirSync(outputDir);
       }
 
-      // Options
-      // 1. default (greenwood.config.js) - Worker
-      // 2. plugin
-
-      // Options
-      // - Worker (e.g. Node.js SSR)
-      // - Headless (e.g. Browsers)
-      
-      // TODO
-      // 1. Start all custom servers
-      // 2. Detect plugin and type
-      // 2a. worker
-      // 2b. headless
-      // 3. Else detect default render
-      // 3a. prerender
-      // 3b. static
-
       if (prerender || customPrerender.prerender) {
         // start any servers if needed
         const servers = [...compilation.config.plugins.filter((plugin) => {

@@ -22,7 +22,7 @@ async function executeRouteModule({ modulePath, compilation, route, label, id, p
     const { getTemplate = null, getBody = null, getFrontmatter = null } = module;
 
     if (module.default) {
-      const { html } = await renderToString(moduleURL);
+      const { html } = await renderToString(pathToFileURL(modulePath));
 
       data.body = html;
     } else {

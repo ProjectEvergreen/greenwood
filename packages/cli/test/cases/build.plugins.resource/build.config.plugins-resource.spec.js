@@ -39,7 +39,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
+xdescribe('Build Greenwood With: ', function() {
   const LABEL = 'Custom FooResource Plugin and Default Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
