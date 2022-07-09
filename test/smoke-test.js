@@ -66,7 +66,6 @@ function commonIndexSpecs(dom, html, label) {
         expect(tagsMatch('link', html)).to.be.equal(true);
       });
 
-      // note: one will always be present when using puppeteer
       it('should have matching opening and closing <style> tags in the <head>', function() {
         expect(tagsMatch('style', html)).to.be.equal(true);
       });
