@@ -64,7 +64,7 @@ const runProductionBuild = async (compilation) => {
           await preRenderCompilationWorker(compilation, customPrerender);
         } else if (customPrerender.customUrl) {
           await preRenderCompilationCustom(compilation, customPrerender);
-        } else if (!customPrerender && defaultPrerender && prerender) {
+        } else if (defaultPrerender && prerender) {
           console.debug('TODO preRenderCompilationWorker with default prerender');
           await preRenderCompilationWorker(compilation, defaultPrerender);
         } else {

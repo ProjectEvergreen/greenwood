@@ -56,7 +56,7 @@ async function optimizePage(compilation, contents, route, outputPath, outputDir)
   return htmlOptimized;
 }
 
-async function preRenderCompilationWorker(compilation, customPrerender) {
+async function preRenderCompilationWorker(compilation, workerPrerender) {
   const pages = compilation.graph.filter(page => !page.isSSR);
   const outputDir = compilation.context.scratchDir;
 
@@ -87,7 +87,7 @@ async function preRenderCompilationWorker(compilation, customPrerender) {
       });
 
     await new Promise((resolve, reject) => {
-      const worker = new Worker(customPrerender.workerUrl, {
+      const worker = new Worker(workerPrerender.workerUrl, {
         workerData: {
           modulePath: null,
           compilation: JSON.stringify(compilation),

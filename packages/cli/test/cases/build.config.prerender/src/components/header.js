@@ -1,4 +1,6 @@
-class HeaderComponent extends HTMLElement {
+// note: this example is misleading in its understanding / use of shadow dom
+// but leaving it as since it should also technically work as written too
+export default class HeaderComponent extends HTMLElement {
   constructor() {
     super();
 
