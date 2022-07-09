@@ -14,7 +14,6 @@ class BrowserRunner {
 
   constructor() {
     this.browser = {};
-    this.renderer = {};
   }
 
   async init() {

@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@webcomponents/webcomponentsjs": "^2.6.0",
-    "puppeteer": "^13.5.2"
+    "puppeteer": "^15.3.2"
   },
   "devDependencies": {
     "@greenwood/cli": "^0.26.0-alpha.0"
