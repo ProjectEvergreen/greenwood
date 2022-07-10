@@ -61,7 +61,6 @@
     "lit-redux-router": "~0.20.0",
     "lodash-es": "^4.17.20",
     "postcss-nested": "^4.1.2",
-    "puppeteer": "^13.5.2",
     "pwa-helpers": "^0.9.1",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",

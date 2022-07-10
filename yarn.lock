@@ -4896,11 +4896,6 @@ devtools-protocol@0.0.1011705:
   resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.1011705.tgz#2582ed29f84848df83fba488122015540a744539"
   integrity sha512-OKvTvu9n3swmgYshvsyVHYX0+aPzCoYUnyXUacfQMmFtBtBKewV/gT4I9jkAbpTqtTi2E4S9MXLlvzBDUlqg0Q==
 
-devtools-protocol@0.0.969999:
-  version "0.0.969999"
-  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.969999.tgz#3d6be0a126b3607bb399ae2719b471dda71f3478"
-  integrity sha512-6GfzuDWU0OFAuOvBokXpXPLxjOJ5DZ157Ue3sGQQM3LgAamb8m0R0ruSfN0DDu+XG5XJgT50i6zZ/0o8RglreQ==
-
 dezalgo@^1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/dezalgo/-/dezalgo-1.0.3.tgz#7f742de066fc748bc8db820569dddce49bf0d456"
@@ -6616,14 +6611,6 @@ http-signature@~1.2.0:
     assert-plus "^1.0.0"
     jsprim "^1.2.2"
     sshpk "^1.7.0"
-
-https-proxy-agent@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-5.0.0.tgz#e2a90542abb68a762e0a0850f6c9edadfd8506b2"
-  integrity sha512-EkYm5BcKUGiduxzSt3Eppko+PiNWNEpa4ySk9vTC6wDsQJW9rHSa+UhGNJoRYp7bz6Ht1eaRIa6QaJqO5rCFbA==
-  dependencies:
-    agent-base "6"
-    debug "4"
 
 https-proxy-agent@5.0.1:
   version "5.0.1"
@@ -9944,24 +9931,6 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-puppeteer@^13.5.2:
-  version "13.5.2"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-13.5.2.tgz#73ae84969cbf514aeee871a05ec4549d67f6abee"
-  integrity sha512-DJAyXODBikZ3xPs8C35CtExEw78LZR9RyelGDAs0tX1dERv3OfW7qpQ9VPBgsfz+hG2HiMTO/Tyf7BuMVWsrxg==
-  dependencies:
-    cross-fetch "3.1.5"
-    debug "4.3.4"
-    devtools-protocol "0.0.969999"
-    extract-zip "2.0.1"
-    https-proxy-agent "5.0.0"
-    pkg-dir "4.2.0"
-    progress "2.0.3"
-    proxy-from-env "1.1.0"
-    rimraf "3.0.2"
-    tar-fs "2.1.1"
-    unbzip2-stream "1.4.3"
-    ws "8.5.0"
-
 puppeteer@^15.3.2:
   version "15.3.2"
   resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-15.3.2.tgz#62162739044d570ab9907f85b1e1bbcf52adc79e"
@@ -12448,11 +12417,6 @@ write@1.0.3:
   integrity sha512-/lg70HAjtkUgWPVZhZcm+T4hkL8Zbtp1nFNOn3lRrxnlv50SRBv7cR7RqR+GMsd3hUXy9hWBo4CHTbFTcOYwig==
   dependencies:
     mkdirp "^0.5.1"
-
-ws@8.5.0:
-  version "8.5.0"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-8.5.0.tgz#bfb4be96600757fe5382de12c670dab984a1ed4f"
-  integrity sha512-BWX0SWVgLPzYwF8lTzEy1egjhS4S4OEAHfsO8o65WOVsrnSRGaSiUaa9e0ggGlkMTtBlmOpEXiie9RUcBO86qg==
 
 ws@8.8.0:
   version "8.8.0"
