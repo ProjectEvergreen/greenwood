@@ -1,7 +1,6 @@
 /*
  * Use Case
  * Run Greenwood with pluginImportCss plugin with default options.
- * Sets prerender: true to validate the functionality.
  * 
  * Uaer Result
  * Should generate a bare bones Greenwood build without erroring when using ESM (import) with CSS.
@@ -28,16 +27,17 @@
  *     main.js
  */
 import chai from 'chai';
-import { JSDOM } from 'jsdom';
+import fs from 'fs';
+import glob from 'glob-promise';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { copyDirectory, getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Import JSON Plugin with default options';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -52,9 +52,6 @@ xdescribe('Build Greenwood With: ', function() {
 
   describe(LABEL, function() {
     before(async function() {
-      // stub puppeteer dependency to avoid package manager installation when running specs that need prerendering
-      await copyDirectory(`${process.cwd()}/node_modules/puppeteer`, `${outputPath}node_modules/puppeteer`);
-
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });
@@ -62,16 +59,20 @@ xdescribe('Build Greenwood With: ', function() {
     runSmokeTest(['public', 'index'], LABEL);
 
     describe('importing JSON using ESM (import)', function() {
-      let dom;
+      let scripts;
 
       before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+        scripts = await glob.promise(path.join(this.context.publicDir, '*.js'));
       });
     
-      it('should have the expected output from importing data.json in main.js', async function() {
-        const scriptTagOneOutput = dom.window.document.querySelector('body > .output-json-import');
+      it('should contain one javascript file in the output directory', function() {
+        expect(scripts.length).to.be.equal(1);
+      });
 
-        expect(scriptTagOneOutput.textContent).to.be.equal('got json via import, status is - 200');
+      it('should have the expected output from importing data.json in main.js', function() {
+        const contents = fs.readFileSync(scripts[0], 'utf-8');
+
+        expect(contents).to.be.contain('const t=`${"got json"} via import, status is - ${200}`');
       });
     });
   });
