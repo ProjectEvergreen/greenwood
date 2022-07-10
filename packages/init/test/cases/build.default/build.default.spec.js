@@ -20,6 +20,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
+// https://github.com/ProjectEvergreen/greenwood/issues/787
 xdescribe('Scaffold Greenwood and Run Build command: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
