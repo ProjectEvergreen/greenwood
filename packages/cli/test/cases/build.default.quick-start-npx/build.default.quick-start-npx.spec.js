@@ -55,7 +55,7 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      xdescribe('head section tags', function() {
+      describe('head section tags', function() {
         let metaTags;
 
         before(function() {

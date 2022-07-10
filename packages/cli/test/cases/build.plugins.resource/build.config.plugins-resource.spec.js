@@ -1,8 +1,8 @@
 /*
  * Use Case
- * Run Greenwood with a custom resource plugin and default workspace.  Uses prerender to validate this functionality.
+ * Run Greenwood with a custom resource plugin and default workspace.
  *
- * Uaer Result
+ * User Result
  * Should generate a bare bones Greenwood build with expected custom file (.foo) behavior.
  *
  * User Command
@@ -14,7 +14,6 @@
  * }
  * 
  * {
- *   prerender: true,
  *   plugins: [{
  *     type: 'resource',
  *     name: 'plugin-foo',
@@ -31,15 +30,16 @@
  *     my-other-custom-file.foo
  */
 import chai from 'chai';
-import { JSDOM } from 'jsdom';
+import fs from 'fs';
+import glob from 'glob-promise';
 import path from 'path';
-import { copyDirectory, getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Custom FooResource Plugin and Default Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -54,24 +54,25 @@ xdescribe('Build Greenwood With: ', function() {
 
   describe(LABEL, function() {
     before(async function() {
-      // stub puppeteer dependency to avoid package manager installation when running specs that need prerendering
-      await copyDirectory(`${process.cwd()}/node_modules/puppeteer`, `${outputPath}node_modules/puppeteer`);
-
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });
 
     describe('Transpiling and DOM Manipulation', function() {
-      let dom;
+      let files;
 
       before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+        files = await glob.promise(path.join(this.context.publicDir, '*.js'));
       });
 
-      it('should have expected text executed from my-custom-file.foo in the DOM', function() {
-        const placeholder = dom.window.document.querySelector('body h6');
+      it('should have the expected JavaScript equivalent file in the output directory', function() {
+        expect(files).to.have.lengthOf(1);
+      });
 
-        expect(placeholder.textContent).to.be.equal('hello from my-custom-file.foo');
+      it('should have expected text from from my-other-custom-file.foo in the script output file', function() {
+        const contents = fs.readFileSync(files[0], 'utf-8');
+
+        expect(contents).to.contain('hello from some-other-custom-file.foo!');
       });
     });
   });

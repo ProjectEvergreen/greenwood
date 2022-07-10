@@ -1,3 +1,3 @@
 export default {
-  prerender: true
+  // prerender: true
 };
