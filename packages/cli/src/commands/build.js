@@ -43,12 +43,10 @@ const runProductionBuild = async (compilation) => {
         }));
 
         if (customPrerender.workerUrl) {
-          console.debug('TODO preRenderCompilationWorker');
           await preRenderCompilationWorker(compilation, customPrerender);
         } else if (customPrerender.customUrl) {
           await preRenderCompilationCustom(compilation, customPrerender);
         } else if (defaultPrerender && prerender) {
-          console.debug('TODO preRenderCompilationWorker with default prerender');
           await preRenderCompilationWorker(compilation, defaultPrerender);
         } else {
           reject('This is an unhandled pre-rendering case!  Please report.');

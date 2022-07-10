@@ -2,7 +2,7 @@
  * Use Case
  * Run Greenwood with various usages of JavaScript (<script>) and CSS (<style> / <link>) tags.
  * 
- * User Result
+ * Uaer Result
  * Should generate a bare bones Greenwood build without erroring.
  *
  * User Command

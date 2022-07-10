@@ -1,6 +1,6 @@
 import { LitElement } from 'lit';
 import { defaults } from 'lodash-es';
-// import { lazyReducerEnhancer } from 'pwa-helpers';
+import { lazyReducerEnhancer } from 'pwa-helpers';
 import { createStore } from 'redux';
 
 try {

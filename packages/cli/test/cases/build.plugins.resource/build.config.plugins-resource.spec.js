@@ -2,7 +2,7 @@
  * Use Case
  * Run Greenwood with a custom resource plugin and default workspace.
  *
- * User Result
+ * Uaer Result
  * Should generate a bare bones Greenwood build with expected custom file (.foo) behavior.
  *
  * User Command
