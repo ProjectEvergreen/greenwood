@@ -10,11 +10,11 @@
  * greenwood build
  *
  * User Config
- * import { greenwodPluginImportCommonJs } from '@greenwod/plugin-import-commonjs';
+ * import { greenwoodPluginImportCommonJs } from '@greenwod/plugin-import-commonjs';
  *
  * {
  *   plugins: [{
- *     ...greenwodPluginImportCommonJs()
+ *     ...greenwoodPluginImportCommonJs()
  *  }]
  * }
  *
