@@ -9,7 +9,7 @@
  * greenwood build
  *
  * User Config
- * import { greenwoodPluginPolyfills } from '@greenwod/plugin-polyfills';
+ * import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
  *
  * {
  *   plugins: [

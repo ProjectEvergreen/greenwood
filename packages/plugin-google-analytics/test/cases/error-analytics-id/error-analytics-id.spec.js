@@ -2,14 +2,14 @@
  * Use Case
  * Run Greenwood with Google Analytics composite plugin.
  *
- * Uaer Result
+ * User Result
  * Should generate an error when not passing in a valid analyticsId.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * import { greenwoodPluginGoogleAnalytics } from '@greenwod/plugin-google-analytics';
+ * import { greenwoodPluginGoogleAnalytics } from '@greenwood/plugin-google-analytics';
  *
  * {
  *   plugins: [{

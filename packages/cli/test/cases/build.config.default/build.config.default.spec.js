@@ -2,7 +2,7 @@
  * Use Case
  * Run Greenwood with empty config object and default workspace.
  *
- * Uaer Result
+ * User Result
  * Should generate a bare bones Greenwood build.  (same as build.default.spec.js)
  *
  * User Command

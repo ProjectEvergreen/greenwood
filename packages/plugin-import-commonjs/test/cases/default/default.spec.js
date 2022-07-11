@@ -3,14 +3,14 @@
  * Run Greenwood with pluginImportCommonjs plugin with default options.
  * Sets prerender: true to validate the functionality.
  * 
- * Uaer Result
+ * User Result
  * Should generate a bare bones Greenwood build without erroring on a CommonJS module.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * import { greenwoodPluginImportCommonJs } from '@greenwod/plugin-import-commonjs';
+ * import { greenwoodPluginImportCommonJs } from '@greenwood/plugin-import-commonjs';
  *
  * {
  *   plugins: [{

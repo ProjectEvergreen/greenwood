@@ -9,7 +9,7 @@
  * greenwood build
  *
  * User Config
- * const pluginPostCss = require('@greenwod/plugin-postcss');
+ * const pluginPostCss = require('@greenwood/plugin-postcss');
  *
  * {
  *   plugins: [
