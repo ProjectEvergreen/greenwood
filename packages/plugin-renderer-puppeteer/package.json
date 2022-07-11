@@ -1,7 +1,7 @@
 {
   "name": "@greenwood/plugin-renderer-puppeteer",
   "version": "0.26.0-alpha.0",
-  "description": "A Greenwood plugin to allow headless rendering with Puppeteer.",
+  "description": "A Greenwood plugin to allow headless pre-rendering with Puppeteer.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-puppeteer",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
