@@ -12218,10 +12218,10 @@ w3c-xmlserializer@^1.1.2:
     webidl-conversions "^4.0.2"
     xml-name-validator "^3.0.0"
 
-wc-compiler@~0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.3.1.tgz#fedd4249947092ef8d30c41156911a2891c7cef4"
-  integrity sha512-hY72m2EX6WW9k8+kXzrOCxyJetaTRKmGODnW3Ftl2u1d5pOw6mXSZkBI6/5SEw07jbQK/CLs/Tem/SF2PBO0mQ==
+wc-compiler@~0.4.0:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.4.1.tgz#7a970760f6decaedfba4d99939d590b43a5ad6a2"
+  integrity sha512-TmjrquaS83Ra+q58L7fhHY2sJPM22oFRbrAnC6Djvq5Ex+qc/iAn/jg4pXRgLzWHlhLwI+6Z8C3sBpINFq0O4Q==
   dependencies:
     acorn "^8.7.0"
     acorn-walk "^8.2.0"
