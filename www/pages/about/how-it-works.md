@@ -29,7 +29,7 @@ During _development_ the CLI will:
 For _production_ builds:
 - Combine all your code and dependencies into efficient modern bundles including minifying your JavaScript and CSS.
 - Optimizes loading of JavaScript and CSS assets using web hints like `preload` and `prefetch`.
-- Provides the option to pre-render your JavaScript (e.g. Web Components) to static HTML (using **puppeteer** or the server rendering solution of your choice) to provide a web standards based templating solution.
+- Provides the option to server render or pre-render your JavaScript (e.g. Web Components) to static HTML using [**WCC**](https://github.com/ProjectEvergreen/wcc) as a means of providing a fully web standards based templating solution.
 - Can [support](/docs/layouts/) a static site (SSG) or server rendered site (SSR), or a hybrid of the two!  Single Page Application's (SPA) also welcome!
 - Supports [further optimization](/docs/config#optimization) for additional hints like inlining or only statically pre-rendering JavaScript with no runtime cost.
 
