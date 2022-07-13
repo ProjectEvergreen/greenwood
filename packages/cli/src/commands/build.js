@@ -55,6 +55,8 @@ const runProductionBuild = async (compilation) => {
         await staticRenderCompilation(compilation);
       }
 
+      console.info('success, done generating all pages!');
+
       await bundleCompilation(compilation);
       await copyAssets(compilation);
 

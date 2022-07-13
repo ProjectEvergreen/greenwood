@@ -49,13 +49,8 @@ export default async function(compilation, callback) {
       const port = compilation.config.devServer.port;
       const serverAddress = `http://127.0.0.1:${port}`;
 
-      console.debug('pages to render', `\n ${pages.map(page => page.route).join('\n ')}`);
-      console.info(`Prerendering pages at ${serverAddress}`);
-
       await runBrowser(serverAddress, pages);
       browserRunner.close();
-
-      console.info('done prerendering all pages');
 
       resolve();
     } catch (err) {

@@ -60,7 +60,9 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
   const pages = compilation.graph.filter(page => !page.isSSR);
   const outputDir = compilation.context.scratchDir;
 
-  for (const page of pages) {
+  console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
+
+  await Promise.all(pages.map(async (page) => {
     const { outputPath, route } = page;
     const outputPathDir = path.join(outputDir, route);
     const htmlResource = compilation.config.plugins.filter((plugin) => {
@@ -119,16 +121,22 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       });
     }
 
+    console.info('generated page...', route);
+
     await fs.promises.writeFile(path.join(outputDir, outputPath), html);
-  }
+  }));
 }
 
 async function preRenderCompilationCustom(compilation, customPrerender) {
   const { scratchDir } = compilation.context;
   const renderer = (await import(customPrerender.customUrl)).default;
 
+  console.info('pages to generate', `\n ${compilation.graph.map(page => page.route).join('\n ')}`);
+
   await renderer(compilation, async (page, contents) => {
     const { outputPath, route } = page;
+
+    console.info('generated page...', route);
 
     const html = await optimizePage(compilation, contents, route, outputPath, scratchDir);
     await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
@@ -144,7 +152,7 @@ async function staticRenderCompilation(compilation) {
     return plugin.provider(compilation);
   })[0];
 
-  console.info('pages to generate', `\n ${pages.map(page => page.path).join('\n ')}`);
+  console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
   
   await Promise.all(pages.map(async (page) => {
     const { route, outputPath } = page;
@@ -155,10 +163,10 @@ async function staticRenderCompilation(compilation) {
 
     await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
 
+    console.info('generated page...', route);
+
     return Promise.resolve();
   }));
-  
-  console.info('success, done generating all pages!');
 }
 
 export {
