@@ -246,46 +246,46 @@ describe('Build Greenwood With: ', function() {
         expect(heading).to.equal('Welcome to Greenwood!');
       });
 
-      xit('should have the expected output from main.js for lit (ESM) in the page output', async function() {
+      it('should have the expected output from main.js for lit (ESM) in the page output', async function() {
         const litOutput = dom.window.document.querySelectorAll('body > .output-lit');
         
         expect(litOutput.length).to.be.equal(1);
         expect(litOutput[0].textContent).to.be.equal('import from lit W29iamVjdCBIVE1M');
       });
 
-      xit('should have the expected output from main.js for lodash-es (ESM) in the page output', async function() {
+      it('should have the expected output from main.js for lodash-es (ESM) in the page output', async function() {
         const litOutput = dom.window.document.querySelectorAll('body > .output-lodash');
         
         expect(litOutput.length).to.be.equal(1);
         expect(litOutput[0].textContent).to.be.equal('import from lodash-es {"a":1,"b":2}');
       });
 
-      xit('should have the expected output from main.js for pwa-helpers (ESM) in the page output', async function() {
+      it('should have the expected output from main.js for pwa-helpers (ESM) in the page output', async function() {
         const litOutput = dom.window.document.querySelectorAll('body > .output-pwa');
         
         expect(litOutput.length).to.be.equal(1);
         expect(litOutput[0].textContent).to.be.equal('import from pwa-helpers KGNvbWJpbmVSZWR1');
       });
 
-      xit('should have the expected output from main.js for Redux (MJS) in the page output', async function() {
+      it('should have the expected output from main.js for Redux (MJS) in the page output', async function() {
         const reduxOutput = dom.window.document.querySelectorAll('body > .output-redux');
         
         expect(reduxOutput.length).to.be.equal(1);
         expect(reduxOutput[0].textContent).to.be.equal('import from redux ZnVuY3Rpb24gbyh0');
       });
 
-      it('should have the expected output from main.js for try / catch error of no error text', async function() {
-        const errorOutput = dom.window.document.querySelectorAll('body > .output-error');
-        
-        expect(errorOutput.length).to.be.equal(1);
-        expect(errorOutput[0].textContent).to.be.equal('');
-      });
-
-      xit('should have the expected output from the first inline <script> tag in the page output', async function() {
+      it('should have the expected output from the first inline <script> tag in the page output', async function() {
         const inlineScriptOutput = dom.window.document.querySelectorAll('body > .output-script-inline');
         
         expect(inlineScriptOutput.length).to.be.equal(1);
         expect(inlineScriptOutput[0].textContent).to.be.equal('script tag module inline');
+      });
+
+      it('should have the expected output from main.js for try / catch error of no error text', async function() {
+        const errorOutput = dom.window.document.querySelectorAll('body > .output-error');
+
+        expect(errorOutput.length).to.be.equal(1);
+        expect(errorOutput[0].textContent).to.be.equal('');
       });
 
       it('should have the expected inline node_modules content in the first inline script tag which should include extra code from rollup', async function() {
