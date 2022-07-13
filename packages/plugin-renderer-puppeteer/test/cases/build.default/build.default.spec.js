@@ -137,7 +137,7 @@ describe('Build Greenwood With: ', function() {
         `${process.cwd()}/node_modules/symbol-observable/es/*.js`, 
         `${outputPath}/node_modules/symbol-observable/es`
       );
-      const symobolLibsPackageJson = await getDependencyFiles(
+      const symbolLibsPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/symbol-observable/package.json`, 
         `${outputPath}/node_modules/symbol-observable/`
       );
@@ -183,7 +183,7 @@ describe('Build Greenwood With: ', function() {
         ...tokensLibs,
         ...tokensLibsPackageJson,
         ...symbolLibs,
-        ...symobolLibsPackageJson,
+        ...symbolLibsPackageJson,
         ...lit,
         ...litPackageJson,
         ...litDirectives,
