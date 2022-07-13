@@ -1,14 +1,28 @@
 # @greenwood/plugin-graphql
 
 ## Overview
-A plugin for Greenwood to support using [GraphQL](https://graphql.org/) to query your content graph.  It runs [**apollo-server**](https://www.apollographql.com/docs/apollo-server/) on the backend and provides an [**@apollo/client** like](https://www.apollographql.com/docs/react/api/core/ApolloClient/#ApolloClient.readQuery) interface for the frontend.
+A plugin for Greenwood to support using [GraphQL](https://graphql.org/) to query Greenwood's content graph.  It runs [**apollo-server**](https://www.apollographql.com/docs/apollo-server/) on the backend and provides an [**@apollo/client** _"like"_](https://www.apollographql.com/docs/react/api/core/ApolloClient/#ApolloClient.readQuery) interface for the frontend that you can use.
 
 > This package assumes you already have `@greenwood/cli` installed.
+
+## Caveats
+
+As of now, this plugin can only be used in conjunction with our [Puppeteer rendering plugin](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-puppeteer).  Please make sure you have it installed first to get the benefits of this plugin.
+
+```bash
+# npm
+npm install @greenwood/plugin-renderer-puppeteer --save-dev
+
+# yarn
+yarn add  @greenwood/plugin-renderer-puppeteer --dev
+```
+
+> _We are working on re-evaluating and improving our [data loading](https://github.com/ProjectEvergreen/greenwood/issues/952) and [rendering strategies](https://github.com/ProjectEvergreen/greenwood/issues/951) as part of our [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3)._
+
 
 ## Installation
 You can use your favorite JavaScript package manager to install this package.
 
-_examples:_
 ```bash
 # npm
 npm install @greenwood/plugin-graphql --save-dev
@@ -18,22 +32,24 @@ yarn add @greenwood/plugin-graphql --dev
 ```
 
 ## Usage
-Add this plugin to your _greenwood.config.js_ and spread the `export`.
+Add this plugin and the Puppeteer plugins to your _greenwood.config.js_.
 
 ```javascript
 import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
+import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
 
 export default {
   ...
 
   plugins: [
-    ...greenwoodPluginGraphQL() // notice the spread ... !
+    ...greenwoodPluginGraphQL(), // notice the spread ... !
+    ...greenwoodPluginRendererPuppeteer() // notice the spread ... !
   ]
 }
 ```
 
 ## Example
-This will then allow you to use GraphQL to query your content.
+This will then allow you to use GraphQL to query your content from your client side.  At build time, it will generate JSON files so that the data is still accessible statically.
 
 ```js
 import client from '@greenwood/plugin-graphql/core/client';
