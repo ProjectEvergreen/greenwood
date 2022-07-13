@@ -10,7 +10,7 @@ class PuppeteerResource extends ResourceInterface {
   }
 
   async shouldIntercept(url, body, headers = {}) {
-    const shouldIntercept = url.endsWith('/') && headers.request && headers.request.accept.indexOf(this.contentType) >= 0;
+    const shouldIntercept = url.endsWith(path.sep) && headers.request && headers.request.accept.indexOf(this.contentType) >= 0;
   
     return process.env.__GWD_COMMAND__ === 'build' && shouldIntercept;// eslint-disable-line no-underscore-dangle
   }
