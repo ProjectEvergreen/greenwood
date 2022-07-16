@@ -18,14 +18,14 @@ For processing markdown, **Greenwood** taps into the unified ecosystem taking ad
 
 ### Browsers
 
-Web standards like Web Components and ES Modules, coupled with network standards like HTTP caching, makes the browser a great platform not only for the browsing experience, but for the developer experience as well.  Philosophies adopted by Greenwood like bundleless development take full advantage of what the platform offers, so as to enable rapid development as well as ensure performant and optimized sites for users.
+Web standards like Web Components and ES Modules, coupled with network standards like HTTP caching, makes the browser a great platform not only for the browsing experience, but for the developer experience as well.  Philosophies adopted by Greenwood like bundle-less development take full advantage of what the platform offers, so as to enable rapid development as well as ensure performant and optimized sites for users.
 
 
 ### Rollup
 Greenwood makes use of [**Rollup**](https://rollupjs.org/) as part of build phase to optimize all the HTML / CSS and JavaScript for a given project.  This affords **Greenwood** the ability to bundle, minify and otherwise prepare the site for final deployment in the best way possible based on the code you've written.
 
-### Puppeteer
-When pre-rendering content for Web Components, Greenwood  makes use of [**Puppeteer**](https://developers.google.com/web/tools/puppeteer) as part of build phase to generate all the appropriate static HTML and CSS.  Other (server) rendering options are available through [plugins](/plugins/).
+### WCC
+The Project Evergreen team has been hard at work on creating [**WCC**](https://github.com/ProjectEvergreen/wcc) as part of our commitment to providing more first-party solutions for building websites with Greenwood.
 
 
 ### Development

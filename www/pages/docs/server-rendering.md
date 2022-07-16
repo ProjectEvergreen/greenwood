@@ -237,7 +237,7 @@ Greenwood will now build and serve all the static content from the _pages/_ dire
 
 ### Render vs Prerender
 
-Greenwood provides the ability to [prerender](/docs/configuration/#prerender) your project and Web Components using Puppeteer.  So what is the difference between that and rendering?   In the context of Greenwood, _rendering_ is the process of generating the _initial_ HTML as you would when running on a server.  _Prerendering_ is the ability to execute exclusively browser code in a browser and capture that result as static HTML.
+Greenwood provides the ability to [prerender](/docs/configuration/#prerender) your project and Web Components.  So what is the difference between that and rendering?   In the context of Greenwood, _rendering_ is the process of generating the _initial_ HTML as you would when running on a server.  _Prerendering_ is the ability to execute exclusively browser code in a browser and capture that result as static HTML.
 
 So what does that mean, exactly?  Basically, you can think of them as being complimentary, where in you might have server side routes that pull content server side (`getBody`), but can be composed of static HTML templates (in your _src/templates_ directory) that can have client side code (Web Components) with `<script>` tags that could be run after through a headless browser.
 

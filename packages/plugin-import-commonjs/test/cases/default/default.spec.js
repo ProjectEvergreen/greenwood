@@ -26,11 +26,12 @@
  *     main.js
  */
 import chai from 'chai';
+import fs from 'fs';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { copyDirectory, getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -60,9 +61,6 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/lodash/`
       );
 
-      // stub puppeteer dependency to avoid package manager installation when running specs that need prerendering
-      await copyDirectory(`${process.cwd()}/node_modules/puppeteer`, `${outputPath}node_modules/puppeteer`);
-
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...lodashLibs,
@@ -75,9 +73,11 @@ describe('Build Greenwood With: ', function() {
 
     describe('Script tag in the <head> tag', function() {
       let dom;
+      let scripts;
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+        scripts = await glob.promise(path.join(this.context.publicDir, 'main.*.js'));
       });
 
       it('should have one <script> tag for main.js loaded in the <head> tag', function() {
@@ -90,14 +90,14 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have the expected main.js file in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, 'main.*.js'))).to.have.lengthOf(1);
+        expect(scripts.length).to.be.equal(1);
       });
 
-      it('should have the expected output from main.js (lodash) in the page output', async function() {
-        const spanTags = dom.window.document.querySelectorAll('body > span');
-        
-        expect(spanTags.length).to.be.equal(1);
-        expect(spanTags[0].textContent).to.be.equal('import from lodash {"a":1,"b":2}');
+      it('should have the expected CommonJS contents from main.js (lodash) in the output', async function() {
+        const contents = fs.readFileSync(scripts[0], 'utf-8');
+
+        expect(contents).to.contain('n=e,t=e.exports,function()');
+        expect(contents).to.contain('document.getElementsByTagName("span")[0].innerHTML="import from lodash "+i;');
       });
     });
   });

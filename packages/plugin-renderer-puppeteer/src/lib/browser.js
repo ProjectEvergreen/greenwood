@@ -14,7 +14,6 @@ class BrowserRunner {
 
   constructor() {
     this.browser = {};
-    this.renderer = {};
   }
 
   async init() {
@@ -52,7 +51,7 @@ class BrowserRunner {
     });
 
     try {
-      // Navigate to page. Wait until there are no oustanding network requests.
+      // Navigate to page. Wait until there are no outstanding network requests.
       // https://pptr.dev/#?product=Puppeteer&version=v1.8.0&show=api-pagegotourl-options
       response = await page.goto(requestUrl, {
         waitUntil: 'networkidle0',

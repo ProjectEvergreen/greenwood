@@ -1,8 +1,7 @@
 import { bundleCompilation } from '../lifecycles/bundle.js';
 import { copyAssets } from '../lifecycles/copy.js';
-import { getDevServer } from '../lifecycles/serve.js';
 import fs from 'fs';
-import { preRenderCompilationCustom, preRenderCompilationDefault, staticRenderCompilation } from '../lifecycles/prerender.js';
+import { preRenderCompilationWorker, preRenderCompilationCustom, staticRenderCompilation } from '../lifecycles/prerender.js';
 import { ServerInterface } from '../lib/server-interface.js';
 
 const runProductionBuild = async (compilation) => {
@@ -11,8 +10,10 @@ const runProductionBuild = async (compilation) => {
 
     try {
       const { prerender } = compilation.config;
-      const port = compilation.config.devServer.port;
       const outputDir = compilation.context.outputDir;
+      const defaultPrerender = (compilation.config.plugins.filter(plugin => plugin.type === 'renderer' && plugin.isGreenwoodDefaultPlugin) || []).length === 1
+        ? compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation)
+        : {};
       const customPrerender = (compilation.config.plugins.filter(plugin => plugin.type === 'renderer' && !plugin.isGreenwoodDefaultPlugin) || []).length === 1
         ? compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation)
         : {};
@@ -22,44 +23,39 @@ const runProductionBuild = async (compilation) => {
       }
 
       if (prerender || customPrerender.prerender) {
-        if (customPrerender.prerender) {
+        // start any servers if needed
+        const servers = [...compilation.config.plugins.filter((plugin) => {
+          return plugin.type === 'server';
+        }).map((plugin) => {
+          const provider = plugin.provider(compilation);
+  
+          if (!(provider instanceof ServerInterface)) {
+            console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`);
+          }
+  
+          return provider;
+        })];
+  
+        await Promise.all(servers.map(async (server) => {
+          await server.start();
+  
+          return Promise.resolve(server);
+        }));
+
+        if (customPrerender.workerUrl) {
+          await preRenderCompilationWorker(compilation, customPrerender);
+        } else if (customPrerender.customUrl) {
           await preRenderCompilationCustom(compilation, customPrerender);
+        } else if (defaultPrerender && prerender) {
+          await preRenderCompilationWorker(compilation, defaultPrerender);
         } else {
-          await new Promise(async (resolve, reject) => {
-            try {
-              (await getDevServer(compilation)).listen(port, async () => {
-                console.info(`Started prerender server at localhost:${port}`);
-
-                const servers = [...compilation.config.plugins.filter((plugin) => {
-                  return plugin.type === 'server';
-                }).map((plugin) => {
-                  const provider = plugin.provider(compilation);
-
-                  if (!(provider instanceof ServerInterface)) {
-                    console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`);
-                  }
-
-                  return provider;
-                })];
-
-                await Promise.all(servers.map(async (server) => {
-                  server.start();
-
-                  return Promise.resolve(server);
-                }));
-
-                await preRenderCompilationDefault(compilation);
-    
-                resolve();
-              });
-            } catch (e) {
-              reject(e);
-            }
-          });
+          reject('This is an unhandled pre-rendering case!  Please report.');
         }
       } else {
         await staticRenderCompilation(compilation);
       }
+
+      console.info('success, done generating all pages!');
 
       await bundleCompilation(compilation);
       await copyAssets(compilation);

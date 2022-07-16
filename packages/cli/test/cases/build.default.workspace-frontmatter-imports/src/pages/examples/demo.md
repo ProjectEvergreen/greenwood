@@ -1,14 +1,13 @@
 ---
-title: Counter Page
+title: Demo Page
 imports:
   - /components/counter/counter.js
   - /components/counter/counter.css
+  - /components/multi-hyphen/multi-hyphen.js
 ---
 
-## Counter Page Example
+## Demo Page Example
 
 <x-counter></x-counter>
-
-<app-header>I am a header</app-header>
 
 <multihyphen-custom-element></multihyphen-custom-element>

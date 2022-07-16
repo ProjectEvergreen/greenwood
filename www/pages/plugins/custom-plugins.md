@@ -21,6 +21,7 @@ The available plugins built and maintained by Greenwood team and contributors ha
 | [Polyfills](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-polyfills) | Although most modern browsers now support the APIs that make up Web Component, for older browsers use this plugin to Let Greenwood automatically take care of progressively loading polyfills for you. |
 | [PostCSS](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss) | Allows usage of [**PostCSS**](https://postcss.org/) plugins and configuration in your project. |
 | [Renderer Lit](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-lit) | A server-side rendering plugin for Lit based Greenwood projects. |
+| [Renderer Puppeteer](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-puppeteer) | A rendering plugin to support prerendering a Greenwood project using Puppeteer. |
 | [TypeScript](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-typescript) | Allows usage of [**TypeScript**](https://www.typescriptlang.org/) for writing JavaScript. |
 
 > See something missing?  Please review our [open issues](https://github.com/ProjectEvergreen/greenwood/issues), we might be [working on it](https://github.com/ProjectEvergreen/greenwood/projects)!  Or if not, please request it, we would be interested to learn how you need to use Greenwood and how the team can help!

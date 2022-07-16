@@ -1,12 +1,12 @@
 import { greenwoodPluginGraphQL } from '../../../src/index.js';
+import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
 
 export default {
-  title: 'GraphQL CHildrenQuery Spec',
-
-  prerender: true,
+  title: 'GraphQL ChildrenQuery Spec',
 
   plugins: [
-    ...greenwoodPluginGraphQL()
+    ...greenwoodPluginGraphQL(),
+    ...greenwoodPluginRendererPuppeteer() // automatically invokes prerendering
   ]
 
 };

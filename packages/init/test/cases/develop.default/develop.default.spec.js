@@ -23,6 +23,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
+// https://github.com/ProjectEvergreen/greenwood/issues/787
 xdescribe('Scaffold Greenwood and Run Develop command: ', function() {
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
   const outputPath = fileURLToPath(new URL('./my-app', import.meta.url));
