@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="module" src="../scripts/main.js"></script>
+    <script type="module">
+      import { html } from 'lit';
+
+      document.getElementsByClassName('output-script-inline')[0].innerHTML = 'script tag module inline';
+    </script>
+    <script type="module" src="/components/header.js"></script>
+  </head>
+
+  <body>
+    <app-header></app-header>
+
+    <content-outlet></content-outlet>
+
+    <span class="output-lit"></span>
+    <span class="output-lodash"></span>
+    <span class="output-pwa"></span>
+    <span class="output-redux"></span>
+    <span class="output-script-inline"></span>
+    <span class="output-error"></span>
+  </body>
+
+</html>

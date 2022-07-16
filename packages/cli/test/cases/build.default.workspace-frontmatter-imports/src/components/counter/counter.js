@@ -12,18 +12,17 @@ template.innerHTML = `
   <button id="inc">+</button>
 `;
 
-class MyCounter extends HTMLElement {
+export default class MyCounter extends HTMLElement {
   constructor() {
     super();
     this.count = 0;
-    this.attachShadow({ mode: 'open' });
   }
 
-  async connectedCallback() {    
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
-    this.shadowRoot.getElementById('inc').onclick = () => this.inc();
-    this.shadowRoot.getElementById('dec').onclick = () => this.dec();
-    this.update();
+  async connectedCallback() {
+    if (!this.shadowRoot) {
+      this.attachShadow({ mode: 'open' });
+      this.shadowRoot.appendChild(template.content.cloneNode(true));
+    }
   }
 
   inc() {

@@ -4,6 +4,7 @@ import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
 import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
 import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
+import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 import { fileURLToPath, URL } from 'url';
 
@@ -33,7 +34,8 @@ export default {
         ];
       }
     },
-    ...greenwoodPluginIncludeHTML()
+    ...greenwoodPluginIncludeHTML(),
+    ...greenwoodPluginRendererPuppeteer()
   ],
   markdown: {
     plugins: [

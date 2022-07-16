@@ -1,7 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with various usages of JavaScript (<script>) and CSS (<style> / <link>) tags, with inlined or file based content.
- * Takes advantage of prerendering to validate a more complete (server rendered) example.
+ * Run Greenwood with various usages of JavaScript (<script>) and CSS (<style> / <link>) tags.
  * 
  * Uaer Result
  * Should generate a bare bones Greenwood build without erroring.
@@ -10,15 +9,13 @@
  * greenwood build
  *
  * User Config
- * export default {
- *   prerender: true
- * };
  *
  * User Workspace
  * src/
  *   pages/
  *     index.html
  *   scripts/
+ *     non-module.js
  *     other.js
  *   styles/
  *     main.css
@@ -28,7 +25,7 @@ import chai from 'chai';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { copyDirectory, getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -51,9 +48,6 @@ describe('Build Greenwood With: ', function() {
     let dom;
 
     before(async function() {
-      // stub puppeteer dependency to avoid package manager installation when running specs that need prerendering
-      await copyDirectory(`${process.cwd()}/node_modules/puppeteer`, `${outputPath}node_modules/puppeteer`);
-
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
 
@@ -61,15 +55,6 @@ describe('Build Greenwood With: ', function() {
     });
 
     describe('<script type="module" src="..."></script> tags in the <head>', function() {
-      it('should have one <script> tag for main.js loaded in the <head>', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head > script[type="module"]');
-        const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
-          return (/main.*.js/).test(script.src);
-        });
-        
-        expect(mainScriptTags.length).to.be.equal(1);
-      });
-
       it('should have one <script> tag for other.js loaded in the <head>', function() {
         const scriptTags = dom.window.document.querySelectorAll('head > script[type="module"]');
         const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
@@ -81,21 +66,11 @@ describe('Build Greenwood With: ', function() {
 
       // this includes the non module file in a spec below
       it('should have the expected number of bundled .js files in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(3);
-      });
-
-      it('should have the expected main.js file in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, 'main.*.js'))).to.have.lengthOf(1);
+        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(2);
       });
 
       it('should have the expected other.js file in the output directory', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'other.*.js'))).to.have.lengthOf(1);
-      });
-
-      it('should have the expected output from main.js file in index.html', async function() {
-        const scriptTagSrc = dom.window.document.querySelector('body > .output-script-src');
-
-        expect(scriptTagSrc.textContent).to.be.equal('script tag module with src');
       });
     });
 
@@ -112,22 +87,10 @@ describe('Build Greenwood With: ', function() {
         expect(scriptTagSrcOne.textContent).to.be.contain('document.getElementsByClassName("output-script-inline-one")[0].innerHTML="script tag module inline one"');
       });
 
-      it('should have the expected output from inline <script> tag one in index.html', async function() {
-        const scriptTagOneOutput = dom.window.document.querySelector('body > .output-script-inline-one');
-
-        expect(scriptTagOneOutput.textContent).to.be.equal('script tag module inline one');
-      });
-
       it('should have the expected inline content from inline <script> tag two in index.html', async function() {
         const scriptTagSrcTwo = dom.window.document.querySelectorAll('head > script:not([src])')[1];
 
         expect(scriptTagSrcTwo.textContent).to.be.contain('document.getElementsByClassName("output-script-inline-two")[0].innerHTML="script tag module inline two"');
-      });
-      
-      it('should have the expected output from inline <script> tag two in index.html', async function() {
-        const scriptTagTwoOutput = dom.window.document.querySelector('body > .output-script-inline-two');
-
-        expect(scriptTagTwoOutput.textContent).to.be.contain('script tag module inline two');
       });
 
       it('should have the expected inline content from inline <script> tag three in index.html', async function() {
@@ -151,34 +114,25 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected non-module.js file in the output directory', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'non-module.*.js'))).to.have.lengthOf(1);
       });
-
-      it('should have the expected output from non-module.js file in index.html', async function() {
-        const scriptTagSrc = dom.window.document.querySelector('body > .output-script-non-module');
-
-        expect(scriptTagSrc.textContent).to.be.equal('script tag non module with src');
-      });
     });
 
     describe('<style>...</style> tag in the <head>', function() {
       it('should have one <style> tag in the <head>', function() {
         const styleTags = dom.window.document.querySelectorAll('head > style');
-        
-        // first <style> tag comes from puppeteer output
-        expect(styleTags.length).to.be.equal(3);
+
+        expect(styleTags.length).to.be.equal(2);
       });
 
       it('should have the expected output from the first inline <style> tag in index.html', async function() {
         const styleTags = dom.window.document.querySelectorAll('head > style');
 
-        // first <style> tag comes from puppeteer output
-        expect(styleTags[1].textContent.replace(/\n/g, '').trim().replace(' ', '')).to.be.contain('p.output-style{        color: green;      }');
+        expect(styleTags[0].textContent.replace(/\n/g, '').trim().replace(' ', '')).to.be.contain('p.output-style{        color: green;      }');
       });
 
       it('should have the expected output from the second inline <style> tag in index.html', async function() {
         const styleTags = dom.window.document.querySelectorAll('head > style');
 
-        // first <style> tag comes from puppeteer output
-        expect(styleTags[2].textContent.replace(/\n/g, '').trim().replace(' ', '')).to.be.contain('span.output-style{        color: red;      }');
+        expect(styleTags[1].textContent.replace(/\n/g, '').trim().replace(' ', '')).to.be.contain('span.output-style{        color: red;      }');
       });
 
       it('should have the color style for the output element', function() {

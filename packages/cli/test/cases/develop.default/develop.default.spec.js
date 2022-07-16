@@ -614,7 +614,7 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command specific JavaScript behaviors', function() {
+    describe('Develop command specific JavaScript behaviors for user authored custom element', function() {
       let response = {};
 
       before(async function() {

@@ -28,7 +28,6 @@ class FooResource extends ResourceInterface {
 }
 
 export default {
-  prerender: true,
   plugins: [{
     type: 'resource',
     name: 'plugin-foo',

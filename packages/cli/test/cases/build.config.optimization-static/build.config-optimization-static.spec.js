@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with static setting for optimization and adds prerender to true to validate with puppeteer.
+ * Run Greenwood build command with static setting for optimization.
  *
  * User Result
  * Should generate a Greenwood build that strips all <script> tags and files from the final HTML and output.
@@ -10,8 +10,7 @@
  *
  * User Config
  * {
- *   optimization: 'static',
- *   prerender: true
+ *   optimization: 'static'
  * }
  *
  * Custom Workspace
@@ -25,7 +24,7 @@ import chai from 'chai';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { copyDirectory, getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -47,9 +46,6 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      // stub puppeteer dependency to avoid package manager installation when running specs that need prerendering
-      await copyDirectory(`${process.cwd()}/node_modules/puppeteer`, `${outputPath}node_modules/puppeteer`);
-
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });
@@ -77,13 +73,6 @@ describe('Build Greenwood With: ', function() {
         const scriptTags = dom.window.document.querySelectorAll('head script');
 
         expect(scriptTags.length).to.be.equal(0);
-      });
-
-      it('should contain the expected content from <app-header> in the <body>', function() {
-        const header = dom.window.document.querySelectorAll('body header');
-
-        expect(header.length).to.be.equal(1);
-        expect(header[0].textContent).to.be.equal('This is the header component.');
       });
     });
   });

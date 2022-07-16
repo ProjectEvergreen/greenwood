@@ -23,7 +23,7 @@ import chai from 'chai';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { copyDirectory, getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -132,7 +132,7 @@ describe('Build Greenwood With: ', function() {
         `${process.cwd()}/node_modules/symbol-observable/es/*.js`, 
         `${outputPath}/node_modules/symbol-observable/es`
       );
-      const symobolLibsPackageJson = await getDependencyFiles(
+      const symbolLibsPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/symbol-observable/package.json`, 
         `${outputPath}/node_modules/symbol-observable/`
       );
@@ -169,8 +169,6 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/prismjs/`
       );
 
-      await copyDirectory(`${process.cwd()}/node_modules/puppeteer`, `${outputPath}node_modules/puppeteer`);
-
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...reduxLibs,
@@ -180,7 +178,7 @@ describe('Build Greenwood With: ', function() {
         ...tokensLibs,
         ...tokensLibsPackageJson,
         ...symbolLibs,
-        ...symobolLibsPackageJson,
+        ...symbolLibsPackageJson,
         ...lit,
         ...litPackageJson,
         ...litDirectives,
@@ -226,48 +224,13 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected main.js file in the output directory', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'main.*.js'))).to.have.lengthOf(1);
       });
-
-      it('should have the expected output from main.js for lit (ESM) in the page output', async function() {
-        const litOutput = dom.window.document.querySelectorAll('body > .output-lit');
-        
-        expect(litOutput.length).to.be.equal(1);
-        expect(litOutput[0].textContent).to.be.equal('import from lit W29iamVjdCBIVE1M');
-      });
-
-      it('should have the expected output from main.js for lodash-es (ESM) in the page output', async function() {
-        const litOutput = dom.window.document.querySelectorAll('body > .output-lodash');
-        
-        expect(litOutput.length).to.be.equal(1);
-        expect(litOutput[0].textContent).to.be.equal('import from lodash-es {"a":1,"b":2}');
-      });
-
-      it('should have the expected output from main.js for pwa-helpers (ESM) in the page output', async function() {
-        const litOutput = dom.window.document.querySelectorAll('body > .output-pwa');
-        
-        expect(litOutput.length).to.be.equal(1);
-        expect(litOutput[0].textContent).to.be.equal('import from pwa-helpers KGNvbWJpbmVSZWR1');
-      });
-
-      it('should have the expected output from main.js for Redux (MJS) in the page output', async function() {
-        const reduxOutput = dom.window.document.querySelectorAll('body > .output-redux');
-        
-        expect(reduxOutput.length).to.be.equal(1);
-        expect(reduxOutput[0].textContent).to.be.equal('import from redux ZnVuY3Rpb24gbyh0');
-      });
-
-      it('should have the expected output from main.js for try / catch error of no error text', async function() {
-        const errorOutput = dom.window.document.querySelectorAll('body > .output-error');
-        
-        expect(errorOutput.length).to.be.equal(1);
-        expect(errorOutput[0].textContent).to.be.equal('');
-      });
     });
 
     describe('<script> tag with inline code in the <head> tag', function() {
       it('should have one <script> tag with inline code loaded in the <head> tag', function() {
         const scriptTagsInline = dom.window.document.querySelectorAll('head > script:not([src])');
         
-        expect(scriptTagsInline.length).to.be.equal(2);
+        expect(scriptTagsInline.length).to.be.equal(1);
       });
 
       it('should have the expected lit related files in the output directory', async function() {
@@ -278,21 +241,7 @@ describe('Build Greenwood With: ', function() {
         const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[0];
         
         expect(inlineScriptTag.textContent.replace('\n', '')).to
-          // eslint-disable-next-line max-len
-          .equal('import"/lit-element.ae169679.js";import"/lit-html.7f7a9139.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline"//# sourceMappingURL=1807818843-scratch.ee52d4f0.js.map');
-      });
-
-      it('should have the expected inline node_modules content in the second inline script tag which should include extra code from rollup', async function() {
-        const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[1];
-
-        expect(inlineScriptTag.textContent.replace('\n', '')).to.equal('import"/lit-element.ae169679.js";import"/lit-html.7f7a9139.js";//# sourceMappingURL=2012376258-scratch.0a6fc17c.js.map');
-      });
-
-      it('should have the expected output from the first inline <script> tag in the page output', async function() {
-        const inlineScriptOutput = dom.window.document.querySelectorAll('body > .output-script-inline');
-        
-        expect(inlineScriptOutput.length).to.be.equal(1);
-        expect(inlineScriptOutput[0].textContent).to.be.equal('script tag module inline');
+          .equal('import"/lit-element.ae169679.js";import"/lit-html.7f7a9139.js";//# sourceMappingURL=2012376258-scratch.0a6fc17c.js.map');
       });
     });
 

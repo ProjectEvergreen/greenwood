@@ -30,7 +30,7 @@ import fs from 'fs';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { copyDirectory, getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
@@ -53,21 +53,18 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      // stub puppeteer dependency to avoid package manager installation when running specs that need prerendering
-      await copyDirectory(`${process.cwd()}/node_modules/puppeteer`, `${outputPath}node_modules/puppeteer`);
-
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });
-    
+
     runSmokeTest(['public', 'index'], LABEL);
-  
-    describe('Content and file output for the Counter page', function() {
+
+    describe('Content and file output for the Demo page', function() {
       let dom;
       let html;
 
       before(async function() {
-        const htmlPath = path.resolve(this.context.publicDir, 'examples/counter', 'index.html');
+        const htmlPath = path.resolve(this.context.publicDir, 'examples/demo', 'index.html');
 
         dom = await JSDOM.fromFile(path.resolve(htmlPath));
         html = await fs.promises.readFile(htmlPath, 'utf-8');
@@ -85,14 +82,20 @@ describe('Build Greenwood With: ', function() {
         expect(jsFiles).to.have.lengthOf(1);
       });
 
+      it('should output a multi-hyphen.js file from frontmatter import', async function() {
+        const jsFiles = await glob.promise(`${this.context.publicDir}**/**/multi-hyphen.*.js`);
+          
+        expect(jsFiles).to.have.lengthOf(1);
+      });
+
       it('should a page heading', function() {
         const heading = dom.window.document.querySelectorAll('body h2');
 
         expect(heading.length).to.be.equal(1);
-        expect(heading[0].textContent).to.be.equal('Counter Page Example');
+        expect(heading[0].textContent).to.be.equal('Demo Page Example');
       });
 
-      describe('Counter <x-counter> component from front matter', () => {
+      describe('Counter <x-counter> component from front matter that is prerendered', () => {
         it('should output a custom <x-counter> tag that', function() {
           const counter = dom.window.document.querySelectorAll('body x-counter');
   
@@ -105,42 +108,24 @@ describe('Build Greenwood With: ', function() {
         });
   
         it('should output a heading tag from the custom element', function() {
-          const heading = dom.window.document.querySelectorAll('body h3');
-  
-          expect(heading.length).to.be.equal(1);
-          expect(heading[0].textContent).to.be.equal('My Counter');
+          expect(html).to.contain('<h3>My Counter</h3>');
         });
       });
 
-      describe('Custom <app-header> component', () => {
-        it('should output a custom <app-header> tag that', function() {
-          const header = dom.window.document.querySelectorAll('body app-header');
+      describe('Custom Multihyphen component', () => {
+        it('should output a custom <multihyphen-custom-element> tag', function() {
+          const hyphen = dom.window.document.querySelectorAll('body multihyphen-custom-element');
   
-          expect(header.length).to.be.equal(1);
-        });
-  
-        it('should output a <app-header> tag that is _not_ wrapped in a <p> tag', function() {
-          expect((/<p><app-header>/).test(html)).to.be.false;
-          expect((/<\/app-header><\/p>/).test(html)).to.be.false;
-        });
-  
-        it('should output a <app-header> tag with expected content', function() {
-          const header = dom.window.document.querySelectorAll('body app-header');
-  
-          expect(header[0].textContent).to.be.equal('I am a header');
-        });
-      });
-
-      describe('Custom Multihypen component', () => {
-        it('should output a custom <multihyphen-custom-element> tag that', function() {
-          const header = dom.window.document.querySelectorAll('body multihyphen-custom-element');
-  
-          expect(header.length).to.be.equal(1);
+          expect(hyphen.length).to.be.equal(1);
         });
   
         it('should output a <multihyphen-custom-element> tag that is _not_ wrapped in a <p> tag', function() {
           expect((/<p><multihyphen-custom-element>/).test(html)).to.be.false;
           expect((/<\/multihyphen-custom-element><\/p>/).test(html)).to.be.false;
+        });
+
+        it('should have the expected prerendered content', function() {
+          expect(html).to.contain('I have multiple hyphens in my tag name!');
         });
       });
     });
