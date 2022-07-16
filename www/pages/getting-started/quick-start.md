@@ -37,7 +37,7 @@ $ mkdir -p src/pages
 $ echo "## hello world" > src/pages/index.md
 
 # run one of Greenwood's commands, and that's it!
-$ npx @greenwood/cli develop
+$ npx @greenwood/cli@latest develop
 ```
 
 ### Clone GitHub Repo
