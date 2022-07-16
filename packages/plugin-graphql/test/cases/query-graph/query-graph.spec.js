@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with GraphQL calls to get data about the projects graph using GraphQuaery.
+ * Run Greenwood build command with GraphQL calls to get data about the projects graph using GraphQuery.
  *
  * Needs prerender to be true to get SSR and client side GQL fetching.
  * 

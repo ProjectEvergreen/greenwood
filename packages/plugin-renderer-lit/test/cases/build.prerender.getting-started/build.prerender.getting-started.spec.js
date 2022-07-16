@@ -10,7 +10,7 @@
  * greenwood build
  *
  * User Config
- * import { greenwoodPluginIncludeHTML } from '@greenwod/plugin-include-html';
+ * import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
  *
  * {
  *   plugins: [{

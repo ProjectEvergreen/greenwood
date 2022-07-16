@@ -9,7 +9,7 @@
  * greenwood develop
  *
  * User Config
- * import { greenwoodPluginImportCss } from '@greenwod/plugin-import-css';
+ * import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
  *
  * {
  *   plugins: [{

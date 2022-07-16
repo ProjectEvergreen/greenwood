@@ -1,8 +1,8 @@
-import { greenwodPluginImportCommonJs } from '../../../src/index.js';
+import { greenwoodPluginImportCommonJs } from '../../../src/index.js';
 
 export default {
 
   plugins: [
-    ...greenwodPluginImportCommonJs()
+    ...greenwoodPluginImportCommonJs()
   ]
 };
