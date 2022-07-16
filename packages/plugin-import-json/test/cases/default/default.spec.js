@@ -2,14 +2,14 @@
  * Use Case
  * Run Greenwood with pluginImportCss plugin with default options.
  * 
- * Uaer Result
+ * User Result
  * Should generate a bare bones Greenwood build without erroring when using ESM (import) with CSS.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * const { greenwoodPluginImportJson } from '@greenwod/plugin-import-json';
+ * const { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
  *
  * {
  *   plugins: [{

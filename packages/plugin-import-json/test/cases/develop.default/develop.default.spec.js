@@ -9,7 +9,7 @@
  * greenwood develop
  *
  * User Config
- * const { greenwoodPluginImportJson } from '@greenwod/plugin-import-json';
+ * const { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
  *
  * {
  *   plugins: [{

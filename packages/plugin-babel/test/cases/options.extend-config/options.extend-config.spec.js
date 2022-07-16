@@ -10,7 +10,7 @@
  * greenwood build
  *
  * User Config
- * const pluginBabel = require('@greenwod/plugin-babel');
+ * const pluginBabel = require('@greenwood/plugin-babel');
  *
  * {
  *   plugins: [

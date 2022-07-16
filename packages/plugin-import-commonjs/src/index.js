@@ -82,7 +82,7 @@ class ImportCommonJsResource extends ResourceInterface {
   }
 }
 
-const greenwodPluginImportCommonJs = (options = {}) => {
+const greenwoodPluginImportCommonJs = (options = {}) => {
   return [{
     type: 'resource',
     name: 'plugin-import-commonjs:resource',
@@ -97,5 +97,5 @@ const greenwodPluginImportCommonJs = (options = {}) => {
 };
 
 export {
-  greenwodPluginImportCommonJs
+  greenwoodPluginImportCommonJs
 };

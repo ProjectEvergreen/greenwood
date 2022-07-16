@@ -9,7 +9,7 @@
  * greenwood build
  *
  * User Config
- * const pluginTypeScript = require('@greenwod/plugin-typescript);
+ * const pluginTypeScript = require('@greenwood/plugin-typescript);
  *
  * {
  *   plugins: [

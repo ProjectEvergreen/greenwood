@@ -2,14 +2,14 @@
  * Use Case
  * Run Greenwood with Google Analytics composite plugin with default options.
  *
- * Uaer Result
+ * User Result
  * Should generate a bare bones Greenwood build with Google Analytics tracking snippet injected into index.html.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * import { greenwoodPluginGoogleAnalytics } from '@greenwod/plugin-google-analytics';
+ * import { greenwoodPluginGoogleAnalytics } from '@greenwood/plugin-google-analytics';
  *
  * {
  *   plugins: [{

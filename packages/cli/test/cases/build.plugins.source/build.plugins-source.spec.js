@@ -2,7 +2,7 @@
  * Use Case
  * Run Greenwood and get external  custom resource plugin and default workspace.
  *
- * Uaer Result
+ * User Result
  * Should generate a bare bones Greenwood build with expected artists data as static files using a custom template.
  *
  * User Command

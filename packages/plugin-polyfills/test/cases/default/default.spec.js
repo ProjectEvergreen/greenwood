@@ -2,14 +2,14 @@
  * Use Case
  * Run Greenwood with Polyfills composite plugin with default options.
  *
- * Uaer Result
+ * User Result
  * Should generate a bare bones Greenwood build with polyfills injected into index.html.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * import { greenwoodPluginPolyfills } from '@greenwod/plugin-polyfills';
+ * import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
  *
  * {
  *   plugins: [{
