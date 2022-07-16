@@ -9,7 +9,7 @@ Create a directory and then run the `init` command to scaffold a minimal Greenwo
 
 ```bash
 mkdir my-app && cd my-app
-npx @greenwood/init
+npx @greenwood/init@latest
 ```
 
 This will then output the following
@@ -30,7 +30,7 @@ To scaffold your new project based on one of [Greenwood's starter templates](htt
 
 ```bash
 # example
-npx @greenwood/init --template
+npx @greenwood/init@latest --template
 
 -------------------------------------------------------
 Initialize Greenwood Template ♻️
@@ -42,7 +42,7 @@ Initialize Greenwood Template ♻️
 You can also pass the template you want from the CLI as well.
 ```bash
 # example
-npx @greenwood/init --template=blog 
+npx @greenwood/init@latest --template=blog 
 ```
 
 ### NPM Install
@@ -51,7 +51,7 @@ To automatically run `npm install` after scaffolding, pass the `--install` flag.
 
 ```bash
 # example
-npx @greenwood/init --install
+npx @greenwood/init@latest --install
 ```
 
 ### Yarn Install
@@ -60,11 +60,11 @@ To automatically run `yarn install` after scaffolding, pass the `--yarn` flag.
 
 ```bash
 # example
-npx @greenwood/init --yarn
+npx @greenwood/init@latest --yarn
 ```
 
 > _Flags can be chained together!_
 > ```sh
 > # This will use Yarn, install dependencies, and scaffold from the blog template
-> $ npx @greenwood/init --template --yarn --install
+> $ npx @greenwood/init@latest --template --yarn --install
 > ```
