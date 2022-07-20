@@ -6,9 +6,47 @@ A Greenwood plugin for using [**Puppeteer**](https://pptr.dev) as a custom [pre-
 
 ### Caveats
 
+#### Limitations
 Given this plugin instruments an entire browser, this plugin _only_ supports Greenwood's [`prerender` configuration](/docs/configuration/#prerender) option and so will NOT be viable for any [SSR](/docs/server-rendering/) or [Serverless and Edge](https://github.com/ProjectEvergreen/greenwood/discussions/626) features.  Instead, Greenwood will be focusing on making [**WCC**](https://github.com/ProjectEvergreen/wcc) the default and recommended first-party solution.
 
-> This package assumes you already have `@greenwood/cli` installed.
+#### Dependencies
+
+You may need to install additional Operating System level libraries and dependencies depending on the system you are running on to support headless Chrome. For example for a Docker based environment like [GitHub Actions](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/master.yml#L19), you would to add [this below setup script](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/chromium-lib-install.sh) to your runner
+```shell
+#!/usr/bin/bash
+
+# path/to/your/chromium-lib-install.sh
+sudo apt-get update \\
+  && sudo apt-get install -yq libgconf-2-4 \\
+  && sudo apt-get install -y wget --no-install-recommends \\
+  && sudo wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - \\
+  && sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \\
+  && sudo apt-get update \\
+  && sudo apt-get install -y google-chrome-unstable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf --no-install-recommends \\
+  && sudo rm -rf /var/lib/apt/lists/*
+```
+
+```yml
+
+.
+.
+
+jobs:
+ build:
+   runs-on: ubuntu-latest
+   steps:
+      - uses: actions/checkout@v1
+      - name: Install Chromium Library Dependencies
+        run: |
+         sh path/to/your/chromium-lib-install.sh
+      - uses: actions/setup-node@v1
+        with:
+           node-version: "14.x"
+      .
+      .
+```
+
+See the Puppeteer [Troubleshooting docs](https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md) for more info on setting up your specific environment.
 
 ## Installation
 
@@ -21,6 +59,8 @@ npm install @greenwood/plugin-renderer-puppeteer --save-dev
 # yarn
 yarn add @greenwood/plugin-renderer-puppeteer --dev
 ```
+
+> This package assumes you already have `@greenwood/cli` installed.
 
 ## Usage
 Add this plugin to your _greenwood.config.js_.
