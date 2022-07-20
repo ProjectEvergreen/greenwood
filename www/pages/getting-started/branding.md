@@ -19,22 +19,15 @@ In this section, we will add the following to your project:
 For this guide, we'll use a "vanilla" custom element for our footer.
 
 Start by creating a file called _src/components/footer.js_ with the following code in it.
+
 ```javascript
 class FooterComponent extends HTMLElement {
-  constructor() {
-    super();
-
-    // creates a Shadow DOM root
-    this.root = this.attachShadow({ mode: 'closed' });
-  }
-
-  // run some code when the component is ready
-  // like initializing our component's DOM / innerHTML
+  // run some code to set HTML when the component is ready
   connectedCallback() {
-    this.root.innerHTML = this.getTemplate();
+    this.innerHTML = this.getTemplate();
   }
 
-  // create templates that can interpolate variables and HTML!
+  // create templates that interpolate variables and HTML!
   getTemplate() {
     const year = new Date().getFullYear();
 
@@ -120,20 +113,14 @@ Within our components, we can easily add some styles right within the component 
 
 ```javascript
 class FooterComponent extends HTMLElement {
-  constructor() {
-    super();
-
-    this.root = this.attachShadow({ mode: 'closed' });
-  }
-
   connectedCallback() {
-    this.root.innerHTML = this.getTemplate();
+    this.innerHTML = this.getTemplate();
   }
 
   getTemplate() {
     return `
       <style>
-        :host footer {
+        footer {
           color: blue;
         }
       </style>
@@ -151,4 +138,4 @@ customElements.define('app-footer', FooterComponent);
 Taking this all the way with [the code from companion repo](https://vuejs.org/v2/guide/single-file-components.html), you should be able to get a result that looks like this:
 ![greenwood-getting-started-styled](/assets/getting-started-repo-styled.png)
 
-Phew!!  What a journey, but now you have a blog ready to publish!  The last step is to build  and host your project, so let's move on to the [build and deploy section](/getting-started/build-and-deploy/) and make it happen!
+Phew!!  What a journey, but now you have a blog ready to publish!  The last step is to build and host your project, so let's move on to the [build and deploy section](/getting-started/build-and-deploy/) and make it happen!
