@@ -2,7 +2,7 @@
 
 ## Overview
 
-A Greenwood plugin for using [**Puppeteer**](https://pptr.dev) as a custom [pre-rendering solution](/docs/server-rendering/#render-vs-prerender).  As Puppeteer is a headless browser, it provides a lot more power and capabilities for fully rendering things like Web Components Web Components, GraphQL calls, and other very browser dependent features.
+A Greenwood plugin for using [**Puppeteer**](https://pptr.dev) as a custom [_pre-rendering_ solution](/docs/server-rendering/#render-vs-prerender).  As Puppeteer is a headless browser, it provides a lot more power and capabilities for fully rendering things like Web Components, GraphQL calls, and other very browser dependent features.
 
 ### Caveats
 
@@ -11,7 +11,7 @@ Given this plugin instruments an entire browser, this plugin _only_ supports Gre
 
 #### Dependencies
 
-You may need to install additional Operating System level libraries and dependencies depending on the system you are running on to support headless Chrome. For example for a Docker based environment like [GitHub Actions](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/master.yml#L19), you would to add [this below setup script](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/chromium-lib-install.sh) to your runner
+You may need to install additional Operating System level libraries and dependencies depending on the system you are running on to support headless Chrome. For example, for a Docker based environment like [GitHub Actions](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/master.yml#L19), you would need to add [this below setup script (or similar)](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/chromium-lib-install.sh) to your runner
 ```shell
 #!/usr/bin/bash
 
