@@ -30,7 +30,7 @@ For _production_ builds:
 - Combine all your code and dependencies into efficient modern bundles including minifying your JavaScript and CSS.
 - Optimizes loading of JavaScript and CSS assets using web hints like `preload` and `prefetch`.
 - Provides the option to server render or pre-render your JavaScript (e.g. Web Components) to static HTML using [**WCC**](https://github.com/ProjectEvergreen/wcc) as a means of providing a fully web standards based templating solution.
-- Can [support](/docs/layouts/) a static site (SSG) or server rendered site (SSR), or a hybrid of the two!  Single Page Application's (SPA) also welcome!
+- Can [support](/docs/layouts/) a static site (SSG) or server rendered site (SSR), or a hybrid of the two!  Single Page Applications (SPA) also welcome!
 - Supports [further optimization](/docs/config#optimization) for additional hints like inlining or only statically pre-rendering JavaScript with no runtime cost.
 
 Lastly, Greenwood aims to be a low point of friction as part of a standard development workflow.  In this way, there will be a balance between what tools and dependencies are considered core to Greenwood.  We aim to avoid the common "meta" framework paradigm and instead want to hone in on a lean and efficient core with good extension points for longer term maintainability and technical design.

@@ -56,7 +56,7 @@ Done!
 
 ### Stackblitz
 
-Greenwood thinks there's a world where you never have to leave the browser to build and author content for your site, and after you see our starter working [in Stackblitz](https://stackblitz.com/github/projectevergreen/greenwood-getting-started?embed=1), we think you'll be a believer too!
+Greenwood thinks there's a world where you never have to leave the browser to build and author content for your site, and after you see our starter working [in Stackblitz](https://stackblitz.com/github/projectevergreen/greenwood-getting-started), we think you'll be a believer too!
 
 <iframe src="https://stackblitz.com/github/projectevergreen/greenwood-getting-started?embed=1" class="stackblitz" loading="lazy"></iframe>
 
