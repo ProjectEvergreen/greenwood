@@ -100,31 +100,38 @@ const readAndMergeConfig = async() => {
 
         if (plugins && plugins.length > 0) {
           plugins.forEach(plugin => {
-            if (!plugin.type || pluginTypes.indexOf(plugin.type) < 0) {
-              reject(`Error: greenwood.config.js plugins must be one of type "${pluginTypes.join(', ')}". got "${plugin.type}" instead.`);
-            }
+            const flattened = (Array.isArray(plugin) ? plugin : [plugin]).flat();
 
-            if (!plugin.provider || typeof plugin.provider !== 'function') {
-              const providerTypeof = typeof plugin.provider;
+            flattened.forEach(plugin => {
+              if (!plugin.type || pluginTypes.indexOf(plugin.type) < 0) {
+                reject(`Error: greenwood.config.js plugins must be one of type "${pluginTypes.join(', ')}". got "${plugin.type}" instead.`);
+              }
 
-              reject(`Error: greenwood.config.js plugins provider must be a function. got ${providerTypeof} instead.`);
-            }
+              if (!plugin.provider || typeof plugin.provider !== 'function') {
+                const providerTypeof = typeof plugin.provider;
 
-            if (!plugin.name || typeof plugin.name !== 'string') {
-              const nameTypeof = typeof plugin.name;
+                reject(`Error: greenwood.config.js plugins provider must be a function. got ${providerTypeof} instead.`);
+              }
 
-              reject(`Error: greenwood.config.js plugins must have a name. got ${nameTypeof} instead.`);
-            }
+              if (!plugin.name || typeof plugin.name !== 'string') {
+                const nameTypeof = typeof plugin.name;
+
+                reject(`Error: greenwood.config.js plugins must have a name. got ${nameTypeof} instead.`);
+              }
+            });
+
+            customConfig.plugins = [
+              ...customConfig.plugins,
+              ...flattened
+            ];
           });
 
-          // if user provides a custom renderer, replace ours with theirs
-          if (plugins.filter(plugin => plugin.type === 'renderer').length === 1) {
+          // if user provided a custom renderer, filter out Greenwood's default renderer
+          if (customConfig.plugins.filter(plugin => plugin.type === 'renderer').length > 1) {
             customConfig.plugins = customConfig.plugins.filter((plugin) => {
-              return plugin.type !== 'renderer';
+              return plugin.type !== 'renderer' || plugin.type === 'renderer' && !plugin.isGreenwoodDefaultPlugin;
             });
           }
-
-          customConfig.plugins = customConfig.plugins.concat(plugins);
         }
 
         if (devServer && Object.keys(devServer).length > 0) {
