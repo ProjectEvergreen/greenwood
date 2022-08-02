@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL, URL } from 'url';
 // get and "tag" all plugins provided / maintained by the @greenwood/cli
 // and include as the default set, with all user plugins getting appended
 const greenwoodPluginsBasePath = fileURLToPath(new URL('../plugins', import.meta.url));
+const PLUGINS_FLATTENED_DEPTH = 2;
 
 const greenwoodPlugins = (await Promise.all([
   path.join(greenwoodPluginsBasePath, 'copy'),
@@ -14,7 +15,7 @@ const greenwoodPlugins = (await Promise.all([
 ].map(async (pluginDirectory) => {
   const files = await fs.promises.readdir(pluginDirectory);
 
-  return (await Promise.all(files.map(async(file) => {
+  return await Promise.all(files.map(async(file) => {
     const importPaTh = pathToFileURL(`${pluginDirectory}${path.sep}${file}`);
     const pluginImport = await import(importPaTh);
     const plugin = pluginImport[Object.keys(pluginImport)[0]];
@@ -22,8 +23,8 @@ const greenwoodPlugins = (await Promise.all([
     return Array.isArray(plugin)
       ? plugin
       : [plugin];
-  }))).flat();
-}).flat())).flat().map((plugin) => {
+  }));
+}))).flat(PLUGINS_FLATTENED_DEPTH).map((plugin) => {
   return {
     isGreenwoodDefaultPlugin: true,
     ...plugin
@@ -99,39 +100,42 @@ const readAndMergeConfig = async() => {
         }
 
         if (plugins && plugins.length > 0) {
-          plugins.forEach(plugin => {
-            const flattened = (Array.isArray(plugin) ? plugin : [plugin]).flat();
+          const flattened = plugins.flat(PLUGINS_FLATTENED_DEPTH);
 
-            flattened.forEach(plugin => {
-              if (!plugin.type || pluginTypes.indexOf(plugin.type) < 0) {
-                reject(`Error: greenwood.config.js plugins must be one of type "${pluginTypes.join(', ')}". got "${plugin.type}" instead.`);
-              }
+          flattened.forEach(plugin => {
+            if (!plugin.type || pluginTypes.indexOf(plugin.type) < 0) {
+              reject(`Error: greenwood.config.js plugins must be one of type "${pluginTypes.join(', ')}". got "${plugin.type}" instead.`);
+            }
 
-              if (!plugin.provider || typeof plugin.provider !== 'function') {
-                const providerTypeof = typeof plugin.provider;
+            if (!plugin.provider || typeof plugin.provider !== 'function') {
+              const providerTypeof = typeof plugin.provider;
 
-                reject(`Error: greenwood.config.js plugins provider must be a function. got ${providerTypeof} instead.`);
-              }
+              reject(`Error: greenwood.config.js plugins provider must be a function. got ${providerTypeof} instead.`);
+            }
 
-              if (!plugin.name || typeof plugin.name !== 'string') {
-                const nameTypeof = typeof plugin.name;
+            if (!plugin.name || typeof plugin.name !== 'string') {
+              const nameTypeof = typeof plugin.name;
 
-                reject(`Error: greenwood.config.js plugins must have a name. got ${nameTypeof} instead.`);
-              }
-            });
-
-            customConfig.plugins = [
-              ...customConfig.plugins,
-              ...flattened
-            ];
+              reject(`Error: greenwood.config.js plugins must have a name. got ${nameTypeof} instead.`);
+            }
           });
 
           // if user provided a custom renderer, filter out Greenwood's default renderer
-          if (customConfig.plugins.filter(plugin => plugin.type === 'renderer').length > 1) {
+          const customRendererPlugins = flattened.filter(plugin => plugin.type === 'renderer').length;
+
+          if (customRendererPlugins === 1) {
             customConfig.plugins = customConfig.plugins.filter((plugin) => {
-              return plugin.type !== 'renderer' || plugin.type === 'renderer' && !plugin.isGreenwoodDefaultPlugin;
+              return plugin.type !== 'renderer';
             });
+          } else if (customRendererPlugins > 1) {
+            console.warn('More than one custom renderer plugin detected.  Please make sure you are only loading one.');
+            console.debug(plugins.filter(plugin => plugin.type === 'renderer'));
           }
+
+          customConfig.plugins = [
+            ...customConfig.plugins,
+            ...flattened
+          ];
         }
 
         if (devServer && Object.keys(devServer).length > 0) {

@@ -35,7 +35,7 @@ export default {
       }
     },
     greenwoodPluginIncludeHTML(),
-    ...greenwoodPluginRendererPuppeteer()
+    greenwoodPluginRendererPuppeteer()
   ],
   markdown: {
     plugins: [
