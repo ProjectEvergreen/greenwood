@@ -27,7 +27,7 @@ export default {
   ...
 
   plugins: [
-    ...greenwoodPluginBabel() // notice the spread ... !
+    greenwoodPluginBabel()
   ]
 }
 ```
@@ -68,8 +68,7 @@ If you would like to use it, either standalone or with your own custom _babel.co
       ...
 
       plugins: [
-        // notice the spread ... !
-        ...greenwoodPluginBabel({
+        greenwoodPluginBabel({
           extendConfig: true
         })
       ]
