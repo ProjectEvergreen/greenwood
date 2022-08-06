@@ -4,6 +4,51 @@ import path from 'path';
 import { Worker } from 'worker_threads';
 import { pathToFileURL } from 'url';
 
+function modelResource(userWorkspace, sourcePath) {
+  return {
+    sourcePath,
+    workspaceURL: pathToFileURL(path.join(userWorkspace, sourcePath.replace(/\.\.\//g, '').replace('./', ''))),
+    optimizedFileName: undefined
+  };
+}
+
+// TODO does this make more sense in bundle lifecycle?
+// TODO or could this be done sooner (like in appTemplate building in html resource plugin)?
+// Or do we need to ensure userland code / plugins have gone first
+// before we can curate the final list of <script> / <style> / <link> tags to bundle
+function getResourcesForRoute(html, compilation, route) {
+  const { userWorkspace } = compilation.context;
+  const root = htmlparser.parse(html, {
+    script: true,
+    style: true
+  });
+
+  // TODO inline scripts
+  const scripts = root.querySelectorAll('script')
+    .filter(script => {
+      return script.getAttribute('src') && script.getAttribute('src').indexOf('http') < 0;
+    }).map(script => {
+      return modelResource(userWorkspace, script.getAttribute('src'));
+    });
+
+  // TODO inline styles
+  // const styles = root.querySelectorAll('style')
+
+  const links = root.querySelectorAll('link')
+    .filter(link => {
+      return link.getAttribute('rel') === 'stylesheet'
+        && link.getAttribute('href') && link.getAttribute('href').indexOf('http') < 0;
+    }).map(link => {
+      return modelResource(userWorkspace, link.getAttribute('href'));
+    });
+
+  compilation.graph.find(page => page.route === route).imports = [
+    ...scripts,
+    // ...styles,
+    ...links
+  ];
+}
+
 async function interceptPage(compilation, contents, route) {
   const headers = {
     request: { 'accept': 'text/html', 'content-type': 'text/html' },
@@ -159,7 +204,8 @@ async function staticRenderCompilation(compilation) {
     let html = (await htmlResource.serve(route)).body;
 
     html = (await interceptPage(compilation, html, route)).body;
-    html = await optimizePage(compilation, html, route, outputPath, scratchDir);
+
+    getResourcesForRoute(html, compilation, route);
 
     await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
 
