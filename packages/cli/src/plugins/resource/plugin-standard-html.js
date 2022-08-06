@@ -497,12 +497,19 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async optimize(url, body) {
+    console.debug('OPTIMIZE URL!!!!', url);
+    const resources = this.compilation.graph.find(page => page.outputPath === url).imports;
+
     return new Promise((resolve, reject) => {
       try {
         const hasHead = body.match(/\<head>(.*)<\/head>/s);
 
         if (hasHead && hasHead.length > 0) {
           let contents = hasHead[0];
+
+          for (const resource of resources) {
+            contents = contents.replace(resource.sourcePath, `/${resource.optimizedFileName}`);
+          }
 
           contents = contents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
           contents = contents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
@@ -511,6 +518,8 @@ class StandardHtmlResource extends ResourceInterface {
 
           body = body.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
         }
+
+        console.debug({ body });
 
         resolve(body);
       } catch (e) {
