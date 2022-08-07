@@ -4,9 +4,10 @@ import path from 'path';
 import { Worker } from 'worker_threads';
 import { pathToFileURL } from 'url';
 
-function modelResource(userWorkspace, sourcePath) {
+function modelResource(userWorkspace, sourcePath, type) {
   return {
     sourcePath,
+    type,
     workspaceURL: pathToFileURL(path.join(userWorkspace, sourcePath.replace(/\.\.\//g, '').replace('./', ''))),
     optimizedFileName: undefined
   };
@@ -16,7 +17,7 @@ function modelResource(userWorkspace, sourcePath) {
 // TODO or could this be done sooner (like in appTemplate building in html resource plugin)?
 // Or do we need to ensure userland code / plugins have gone first
 // before we can curate the final list of <script> / <style> / <link> tags to bundle
-function getResourcesForRoute(html, compilation, route) {
+function trackResourcesForRoute(html, compilation, route) {
   const { userWorkspace } = compilation.context;
   const root = htmlparser.parse(html, {
     script: true,
@@ -28,7 +29,7 @@ function getResourcesForRoute(html, compilation, route) {
     .filter(script => {
       return script.getAttribute('src') && script.getAttribute('src').indexOf('http') < 0;
     }).map(script => {
-      return modelResource(userWorkspace, script.getAttribute('src'));
+      return modelResource(userWorkspace, script.getAttribute('src'), 'script');
     });
 
   // TODO inline styles
@@ -39,7 +40,7 @@ function getResourcesForRoute(html, compilation, route) {
       return link.getAttribute('rel') === 'stylesheet'
         && link.getAttribute('href') && link.getAttribute('href').indexOf('http') < 0;
     }).map(link => {
-      return modelResource(userWorkspace, link.getAttribute('href'));
+      return modelResource(userWorkspace, link.getAttribute('href'), 'style');
     });
 
   compilation.graph.find(page => page.route === route).imports = [
@@ -205,7 +206,7 @@ async function staticRenderCompilation(compilation) {
 
     html = (await interceptPage(compilation, html, route)).body;
 
-    getResourcesForRoute(html, compilation, route);
+    trackResourcesForRoute(html, compilation, route);
 
     await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
 

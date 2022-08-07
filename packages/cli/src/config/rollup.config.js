@@ -1,9 +1,7 @@
-import path from 'path';
-
-function greenwoodSyncPageResourcesPathsPlugin(compilation) {
+function greenwoodSyncPageResourcesPlugin(compilation) {
   return {
     name: 'greenwood-sync-page-resource-paths',
-    async writeBundle(outputOptions, bundles) {
+    writeBundle(outputOptions, bundles) {
       for (const idx in compilation.graph) {
         const page = compilation.graph[idx];
         const resources = page.imports;
@@ -20,16 +18,11 @@ function greenwoodSyncPageResourcesPathsPlugin(compilation) {
   };
 }
 
-const getRollupConfig = async (compilation) => {
+const getRollupConfig = async (compilation, resources) => {
   const { outputDir } = compilation.context;
-  const input = compilation.graph.map((page) => {
-    return page.imports.map(resource => resource.workspaceURL.pathname);
-  })
-    .flat()
-    .filter(url => path.extname(url) === '.js');
 
   return [{
-    input,
+    input: resources,
     output: { 
       dir: outputDir,
       entryFileNames: '[name].[hash].js',
@@ -66,7 +59,7 @@ const getRollupConfig = async (compilation) => {
       }
     },
     plugins: [
-      greenwoodSyncPageResourcesPathsPlugin(compilation)
+      greenwoodSyncPageResourcesPlugin(compilation)
     ]
   }];
 };
