@@ -497,7 +497,6 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async optimize(url, body) {
-    console.debug('OPTIMIZE URL!!!!', url);
     const resources = this.compilation.graph.find(page => page.outputPath === url).imports;
 
     return new Promise((resolve, reject) => {
@@ -518,8 +517,6 @@ class StandardHtmlResource extends ResourceInterface {
 
           body = body.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
         }
-
-        console.debug({ body });
 
         resolve(body);
       } catch (e) {

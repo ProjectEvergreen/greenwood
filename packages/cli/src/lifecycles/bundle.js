@@ -38,6 +38,7 @@ async function bundleStyleResources(compilation, resources, optimizationPlugins)
     const outputPath = resource.sourcePath.replace(/\.\.\//g, '').replace('./', '');
     const root = path.join(outputDir, path.dirname(outputPath));
     const hashPieces = path.basename(outputPath).split('.');
+    const optimizedFileName = `${hashPieces[0]}.${hashString(outputPath)}.${hashPieces[1]}`;
     const optimizedStyles = await optimizationPlugins.reduce(async (contents, optimizePromise) => {
       return await optimizePromise.optimize(resource.workspaceURL.pathname, contents);
     }, undefined);
@@ -48,20 +49,16 @@ async function bundleStyleResources(compilation, resources, optimizationPlugins)
       });
     }
 
-    // for (const idx in compilation.graph) {
-    //   const page = compilation.graph[idx];
-    //   const resources = page.imports;
+    // TODO further optimize?
+    for (const pageIdx in compilation.graph) {
+      for (const resourceIdx in compilation.graph[pageIdx].imports) {
+        if (compilation.graph[pageIdx].imports[resourceIdx].workspaceURL.pathname === resource.workspaceURL.pathname) {
+          compilation.graph[pageIdx].imports[resourceIdx].optimizedFileName = optimizedFileName;
+        }
+      }
+    }
 
-    //   for (const resourceIdx in resources) {
-    //     for (const bundle in bundles) {
-    //       if (resources[resourceIdx].workspaceURL.pathname === bundles[bundle].facadeModuleId) {
-    //         compilation.graph[idx].imports[resourceIdx].optimizedFileName = bundles[bundle].fileName;
-    //       }
-    //     }
-    //   }
-    // }
-
-    await fs.promises.writeFile(path.join(root, `${hashPieces[0]}.${hashString(outputPath)}.${hashPieces[1]}`), optimizedStyles);
+    await fs.promises.writeFile(path.join(root, optimizedFileName), optimizedStyles);
   }
 }
 
