@@ -507,7 +507,9 @@ class StandardHtmlResource extends ResourceInterface {
           let contents = hasHead[0];
 
           for (const resource of resources) {
-            contents = contents.replace(resource.sourcePath, `/${resource.optimizedFileName}`);
+            if (resource.src) {
+              contents = contents.replace(resource.src, `/${resource.optimizedFileName}`);
+            }
           }
 
           contents = contents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
