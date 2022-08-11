@@ -1,14 +1,28 @@
 import fs from 'fs';
+import { hashString } from '../lib/hashing-utils.js';
 import htmlparser from 'node-html-parser';
 import path from 'path';
 import { Worker } from 'worker_threads';
 import { pathToFileURL } from 'url';
 
-function modelResource(userWorkspace, sourcePath, type) {
+function modelResource(context, type, src = null, contents = null) {
+  const { scratchDir, userWorkspace } = context;
+  let sourcePathURL;
+
+  if (src) {
+    sourcePathURL = pathToFileURL(path.join(userWorkspace, src.replace(/\.\.\//g, '').replace('./', '')));
+  } else {
+    const scratchFileName = hashString(contents);
+
+    sourcePathURL = pathToFileURL(path.join(scratchDir, `${scratchFileName}.js`));
+    fs.writeFileSync(sourcePathURL, contents);
+  }
+
   return {
-    sourcePath,
+    src, // if <script src="..."></script> or <link href="..."></link>
+    sourcePathURL, // where the contents of the file are
     type,
-    workspaceURL: pathToFileURL(path.join(userWorkspace, sourcePath.replace(/\.\.\//g, '').replace('./', ''))),
+    contents, // for inline <script> or <style> tags
     optimizedFileName: undefined
   };
 }
@@ -18,7 +32,7 @@ function modelResource(userWorkspace, sourcePath, type) {
 // Or do we need to ensure userland code / plugins have gone first
 // before we can curate the final list of <script> / <style> / <link> tags to bundle
 function trackResourcesForRoute(html, compilation, route) {
-  const { userWorkspace } = compilation.context;
+  const { context } = compilation;
   const root = htmlparser.parse(html, {
     script: true,
     style: true
@@ -26,10 +40,14 @@ function trackResourcesForRoute(html, compilation, route) {
 
   // TODO inline scripts
   const scripts = root.querySelectorAll('script')
-    .filter(script => {
-      return script.getAttribute('src') && script.getAttribute('src').indexOf('http') < 0;
-    }).map(script => {
-      return modelResource(userWorkspace, script.getAttribute('src'), 'script');
+    .map(script => {
+      if (script.getAttribute('src') && script.getAttribute('src').indexOf('http') < 0) {
+        // <script src="...."></script>
+        return modelResource(context, 'script', script.getAttribute('src'));
+      } else {
+        // <script>...</script>
+        return modelResource(context, 'script', null, script.rawText);
+      }
     });
 
   // TODO inline styles
@@ -37,10 +55,11 @@ function trackResourcesForRoute(html, compilation, route) {
 
   const links = root.querySelectorAll('link')
     .filter(link => {
+      // <link rel="stylesheet" href="..."></link>
       return link.getAttribute('rel') === 'stylesheet'
         && link.getAttribute('href') && link.getAttribute('href').indexOf('http') < 0;
     }).map(link => {
-      return modelResource(userWorkspace, link.getAttribute('href'), 'style');
+      return modelResource(context, 'style', link.getAttribute('href'));
     });
 
   compilation.graph.find(page => page.route === route).imports = [

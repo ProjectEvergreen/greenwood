@@ -4,6 +4,17 @@ import { getRollupConfig } from '../config/rollup.config.js';
 import path from 'path';
 import { rollup } from 'rollup';
 
+async function cleanUpResources(compilation) {
+  const { scratchDir, outputDir } = compilation.context;
+
+  for (const resource of compilation.resources) {
+    if (resource.contents) {
+      const src = path.basename(resource.sourcePathURL.pathname);
+      fs.unlinkSync(resource.sourcePathURL.pathname.replace(scratchDir, `${outputDir}/`).replace(src, resource.optimizedFileName));
+    }
+  }
+}
+
 async function optimizePages(compilation, optimizeResources) {
   const { scratchDir, outputDir } = compilation.context;
 
@@ -30,44 +41,40 @@ async function optimizePages(compilation, optimizeResources) {
   }));
 }
 
-async function bundleStyleResources(compilation, resources, optimizationPlugins) {
-  const styleResources = resources.filter(resource => resource.type === 'style');
+async function bundleStyleResources(compilation, optimizationPlugins) {
+  const resources = compilation.resources;
   const { outputDir } = compilation.context;
 
-  for (const resource of styleResources) {
-    const outputPath = resource.sourcePath.replace(/\.\.\//g, '').replace('./', '');
-    const root = path.join(outputDir, path.dirname(outputPath));
-    const hashPieces = path.basename(outputPath).split('.');
-    const optimizedFileName = `${hashPieces[0]}.${hashString(outputPath)}.${hashPieces[1]}`;
-    const optimizedStyles = await optimizationPlugins.reduce(async (contents, optimizePromise) => {
-      return await optimizePromise.optimize(resource.workspaceURL.pathname, contents);
-    }, undefined);
+  for (const resourceIdx in resources) {
+    const resource = resources[resourceIdx];
+    if (resource.type === 'style') {
+      const outputPath = resource.src.replace(/\.\.\//g, '').replace('./', '');
+      const root = path.join(outputDir, path.dirname(outputPath));
+      const hashPieces = path.basename(outputPath).split('.');
+      const optimizedFileName = `${hashPieces[0]}.${hashString(outputPath)}.${hashPieces[1]}`;
+      const optimizedStyles = await optimizationPlugins.reduce(async (contents, optimizePromise) => {
+        return await optimizePromise.optimize(resource.sourcePathURL.pathname, contents);
+      }, undefined);
 
-    if (!fs.existsSync(root)) {
-      fs.mkdirSync(root, {
-        recursive: true
-      });
-    }
-
-    // TODO further optimize?
-    for (const pageIdx in compilation.graph) {
-      for (const resourceIdx in compilation.graph[pageIdx].imports) {
-        if (compilation.graph[pageIdx].imports[resourceIdx].workspaceURL.pathname === resource.workspaceURL.pathname) {
-          compilation.graph[pageIdx].imports[resourceIdx].optimizedFileName = optimizedFileName;
-        }
+      if (!fs.existsSync(root)) {
+        fs.mkdirSync(root, {
+          recursive: true
+        });
       }
-    }
 
-    await fs.promises.writeFile(path.join(root, optimizedFileName), optimizedStyles);
+      compilation.resources[resourceIdx].optimizedFileName = optimizedFileName;
+
+      await fs.promises.writeFile(path.join(root, optimizedFileName), optimizedStyles);
+    }
   }
 }
 
 // TODO needs to optimize too?
-async function bundleScriptResources(compilation, resources) {
+async function bundleScriptResources(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const rollupConfigs = await getRollupConfig(compilation, resources
+  const rollupConfigs = await getRollupConfig(compilation, compilation.resources
     .filter(resource => resource.type === 'script')
-    .map(resource => resource.workspaceURL.pathname));
+    .map(resource => resource.sourcePathURL.pathname));
   const bundle = await rollup(rollupConfigs[0]);
 
   await bundle.write(rollupConfigs[0].output);
@@ -77,7 +84,7 @@ const bundleCompilation = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const resources = compilation.graph.map((page) => {
+      compilation.resources = compilation.graph.map((page) => {
         return page.imports;
       }).flat();
       const optimizeResourcePlugins = compilation.config.plugins.filter((plugin) => {
@@ -94,11 +101,12 @@ const bundleCompilation = async (compilation) => {
       console.info('optimizing pages...');
 
       await Promise.all([
-        bundleScriptResources(compilation, resources),
-        bundleStyleResources(compilation, resources, optimizeResourcePlugins.filter(plugin => plugin.contentType.includes('text/css')))
+        await bundleScriptResources(compilation),
+        await bundleStyleResources(compilation, optimizeResourcePlugins.filter(plugin => plugin.contentType.includes('text/css')))
       ]);
 
       await optimizePages(compilation, optimizeResourcePlugins.filter(plugin => plugin.contentType.includes('text/html')));
+      await cleanUpResources(compilation);
 
       resolve();
     } catch (err) {

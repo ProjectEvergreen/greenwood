@@ -2,15 +2,12 @@ function greenwoodSyncPageResourcesPlugin(compilation) {
   return {
     name: 'greenwood-sync-page-resource-paths',
     writeBundle(outputOptions, bundles) {
-      for (const idx in compilation.graph) {
-        const page = compilation.graph[idx];
-        const resources = page.imports;
+      const resources = compilation.resources;
 
-        for (const resourceIdx in resources) {
-          for (const bundle in bundles) {
-            if (resources[resourceIdx].workspaceURL.pathname === bundles[bundle].facadeModuleId) {
-              compilation.graph[idx].imports[resourceIdx].optimizedFileName = bundles[bundle].fileName;
-            }
+      for (const resourceIdx in resources) {
+        for (const bundle in bundles) {
+          if (resources[resourceIdx].sourcePathURL.pathname === bundles[bundle].facadeModuleId) {
+            compilation.resources[resourceIdx].optimizedFileName = bundles[bundle].fileName;
           }
         }
       }
@@ -18,11 +15,13 @@ function greenwoodSyncPageResourcesPlugin(compilation) {
   };
 }
 
-const getRollupConfig = async (compilation, resources) => {
+const getRollupConfig = async (compilation) => {
   const { outputDir } = compilation.context;
 
   return [{
-    input: resources,
+    input: compilation.resources
+      .filter(resource => resource.type === 'script')
+      .map(resource => resource.sourcePathURL.pathname),
     output: { 
       dir: outputDir,
       entryFileNames: '[name].[hash].js',
