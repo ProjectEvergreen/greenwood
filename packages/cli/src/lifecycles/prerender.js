@@ -5,6 +5,7 @@ import path from 'path';
 import { Worker } from 'worker_threads';
 import { pathToFileURL } from 'url';
 
+// TODO move to bundle lifecycle
 function modelResource(context, type, src = null, contents = null) {
   const { scratchDir, userWorkspace } = context;
   let sourcePathURL;
@@ -23,7 +24,8 @@ function modelResource(context, type, src = null, contents = null) {
     sourcePathURL, // where the contents of the file are
     type,
     contents, // for inline <script> or <style> tags
-    optimizedFileName: undefined
+    optimizedFileName: undefined,
+    optimizedFileContents: undefined
   };
 }
 

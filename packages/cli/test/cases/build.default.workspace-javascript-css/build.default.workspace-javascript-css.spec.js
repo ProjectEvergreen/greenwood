@@ -58,7 +58,7 @@ describe('Build Greenwood With: ', function() {
       it('should have one <script> tag for other.js loaded in the <head>', function() {
         const scriptTags = dom.window.document.querySelectorAll('head > script[type="module"]');
         const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
-          return (/other.*.js/).test(script.src);
+          return (/other.*[a-z0-9].js/).test(script.src);
         });
         
         expect(mainScriptTags.length).to.be.equal(1);
@@ -66,11 +66,11 @@ describe('Build Greenwood With: ', function() {
 
       // this includes the non module file in a spec below
       it('should have the expected number of bundled .js files in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(2);
+        expect(await glob.promise(path.join(this.context.publicDir, '*.*[a-z0-9].js'))).to.have.lengthOf(2);
       });
 
       it('should have the expected other.js file in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, 'other.*.js'))).to.have.lengthOf(1);
+        expect(await glob.promise(path.join(this.context.publicDir, 'other.*[a-z0-9].js'))).to.have.lengthOf(1);
       });
     });
 
@@ -96,7 +96,7 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected inline content from inline <script> tag three in index.html', async function() {
         const scriptTagSrcTwo = dom.window.document.querySelectorAll('head > script:not([src])')[2];
 
-        expect(scriptTagSrcTwo.textContent).to.be.contain('document.getElementsByClassName(\'output-script-inline-three\')[0].innerHTML = three');
+        expect(scriptTagSrcTwo.textContent).to.be.contain('document.getElementsByClassName("output-script-inline-three")[0].innerHTML="script tag module inline three"');
       });
 
     });
@@ -105,14 +105,14 @@ describe('Build Greenwood With: ', function() {
       it('should have one <script> tag for non-module.js loaded in the <head>', function() {
         const scriptTags = dom.window.document.querySelectorAll('head > script[src]');
         const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
-          return (/non-module.*.js/).test(script.src);
+          return (/non-module.*[a-z0-9].js/).test(script.src);
         });
         
         expect(mainScriptTags.length).to.be.equal(1);
       });
 
       it('should have the expected non-module.js file in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, 'non-module.*.js'))).to.have.lengthOf(1);
+        expect(await glob.promise(path.join(this.context.publicDir, 'non-module.*[a-z0-9].js'))).to.have.lengthOf(1);
       });
     });
 
@@ -123,12 +123,14 @@ describe('Build Greenwood With: ', function() {
         expect(styleTags.length).to.be.equal(2);
       });
 
+      // TODO - should this be optimized?
       it('should have the expected output from the first inline <style> tag in index.html', async function() {
         const styleTags = dom.window.document.querySelectorAll('head > style');
 
         expect(styleTags[0].textContent.replace(/\n/g, '').trim().replace(' ', '')).to.be.contain('p.output-style{        color: green;      }');
       });
 
+      // TODO - should this be optimized?
       it('should have the expected output from the second inline <style> tag in index.html', async function() {
         const styleTags = dom.window.document.querySelectorAll('head > style');
 
@@ -148,14 +150,17 @@ describe('Build Greenwood With: ', function() {
         const linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"]');
         
         expect(linkTags.length).to.be.equal(2);
+        linkTags.forEach(link => {
+          expect((/.*[a-z0-9].css/).test(link.href)).to.be.equal(true);
+        });
       });
 
       it('should have the expected main.css file in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, 'styles', 'main.*.css'))).to.have.lengthOf(1);
+        expect(await glob.promise(path.join(this.context.publicDir, 'styles', 'main.*[a-z0-9].css'))).to.have.lengthOf(1);
       });
 
       it('should have the expected other.css file in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, 'styles', 'other.*.css'))).to.have.lengthOf(1);
+        expect(await glob.promise(path.join(this.context.publicDir, 'styles', 'other.*[a-z0-9].css'))).to.have.lengthOf(1);
       });
 
       // JSDOM may not support this case of computing styles when using a <link> tag?

@@ -509,6 +509,8 @@ class StandardHtmlResource extends ResourceInterface {
           for (const resource of resources) {
             if (resource.src) {
               contents = contents.replace(resource.src, `/${resource.optimizedFileName}`);
+            } else if (resource.contents) {
+              contents = contents.replace(resource.contents, resource.optimizedFileContents);
             }
           }
 
