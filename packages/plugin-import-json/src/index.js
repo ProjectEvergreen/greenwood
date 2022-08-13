@@ -5,7 +5,6 @@
  *
  */
 import fs from 'fs';
-import pluginRollupJson from '@rollup/plugin-json';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class ImportJsonResource extends ResourceInterface {
@@ -42,14 +41,6 @@ const greenwoodPluginImportJson = (options = {}) => [{
   type: 'resource',
   name: 'plugin-import-json:resource',
   provider: (compilation) => new ImportJsonResource(compilation, options)
-}, {
-  type: 'rollup',
-  name: 'plugin-import-json:rollup',
-  provider: () => {
-    return [
-      pluginRollupJson()
-    ];
-  }
 }];
 
 export { greenwoodPluginImportJson };

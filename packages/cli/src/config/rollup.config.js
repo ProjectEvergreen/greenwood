@@ -2,6 +2,70 @@ import fs from 'fs';
 import path from 'path';
 import { terser } from 'rollup-plugin-terser';
 
+function greenwoodWorkspaceResolver (compilation) {
+  const resourcePlugins = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'resource';
+  }).map((plugin) => {
+    return plugin.provider(compilation);
+  });
+
+  return {
+    name: 'greenwood-workspace-resolver',
+    async resolveId(source) {
+      // assumes relative paths are coming from the user's workspace
+      if (source.indexOf('.') === 0) {
+        const workspacePath = await resourcePlugins.reduce(async (responsePromise, resource) => {
+          const response = await responsePromise;
+          const resourceShouldResolveUrl = await resource.shouldResolve(response);
+          return resourceShouldResolveUrl
+            ? resource.resolve(response)
+            : Promise.resolve(response);
+        }, Promise.resolve(source.replace(/\.\.\//g, '')));
+
+        return workspacePath;
+      }
+
+      // TODO handle inline script / style bundling ?
+      // if (source.indexOf(`-${tokenSuffix}`) > 0 && fs.existsSync(path.join(scratchDir, source))) {
+      //   return source.replace(source, path.join(scratchDir, source));
+      // }
+
+      return null;
+    },
+    // re-use resource plugins to handle custom resource types like .ts, .gql, etc
+    async load(id) {
+      const extension = path.extname(id);
+
+      // TODO should we do JS files too, or let Rollup handle it?
+      if (extension !== '.js') {
+
+        for (const plugin of resourcePlugins) {
+          if (await plugin.shouldServe(id)) {
+            const body = (await plugin.serve(id)).body;
+            const contents = await resourcePlugins.reduce(async (body, resource) => {
+              const headers = {
+                request: {
+                  originalUrl: `${id}?type=${extension.replace('.', '')}`
+                },
+                response: {
+                  'content-type': resource.contentType
+                }
+              };
+              const shouldIntercept = await resource.shouldIntercept(id, body, headers);
+
+              return shouldIntercept
+                ? (await resource.intercept(id, body, headers)).body
+                : Promise.resolve(body);
+            }, Promise.resolve(body));
+
+            return contents;
+          }
+        }
+      }
+    }
+  };
+}
+
 function greenwoodSyncPageResourcesPlugin(compilation) {
   return {
     name: 'greenwood-sync-page-resource-paths',
@@ -38,10 +102,12 @@ const getRollupConfig = async (compilation) => {
       chunkFileNames: '[name].[hash].js',
       sourcemap: true
     },
-    // TODO will we need Rollup plugins from greenwood plugins?
+    // TODO will we need _any_ other Rollup plugins from greenwood plugins?
+    // commonjs, nodeResolve, etc
     plugins: [
-      terser(),
-      greenwoodSyncPageResourcesPlugin(compilation)
+      greenwoodSyncPageResourcesPlugin(compilation),
+      greenwoodWorkspaceResolver(compilation),
+      terser()
     ],
     context: 'window',
     onwarn: (errorObj) => {
