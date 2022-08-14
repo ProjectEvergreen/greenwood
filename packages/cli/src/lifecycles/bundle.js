@@ -74,12 +74,14 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
 // TODO needs to optimize too?
 async function bundleScriptResources(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const rollupConfigs = await getRollupConfig(compilation, compilation.resources
+  const [rollupConfig] = await getRollupConfig(compilation, compilation.resources
     .filter(resource => resource.type === 'script')
     .map(resource => resource.sourcePathURL.pathname));
-  const bundle = await rollup(rollupConfigs[0]);
 
-  await bundle.write(rollupConfigs[0].output);
+  if (rollupConfig.input.length !== 0) {
+    const bundle = await rollup(rollupConfig);
+    await bundle.write(rollupConfig.output);
+  }
 }
 
 const bundleCompilation = async (compilation) => {

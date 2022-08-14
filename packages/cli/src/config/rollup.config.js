@@ -70,6 +70,9 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
 
 const getRollupConfig = async (compilation) => {
   const { outputDir } = compilation.context;
+  const input = compilation.resources
+    .filter(resource => resource.type === 'script')
+    .map(resource => resource.sourcePathURL.pathname);
   const customRollupPlugins = compilation.config.plugins.filter(plugin => {
     return plugin.type === 'rollup';
   }).map(plugin => {
@@ -77,9 +80,7 @@ const getRollupConfig = async (compilation) => {
   }).flat();
 
   return [{
-    input: compilation.resources
-      .filter(resource => resource.type === 'script')
-      .map(resource => resource.sourcePathURL.pathname),
+    input,
     output: { 
       dir: outputDir,
       entryFileNames: '[name].[hash].js',
