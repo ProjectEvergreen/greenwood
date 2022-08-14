@@ -79,7 +79,7 @@ describe('Build Greenwood With: ', function() {
           const js = fs.readFileSync(jsFiles[0], 'utf-8');
 
           // eslint-disable-next-line max-len
-          expect(js).to.be.contain('class HeaderComponent extends HTMLElement {\n  constructor() {\n    super();\n\n    this.root = this.attachShadow({ mode: \'open\' });\n    this.root.innerHTML = `\n      <header>This is the header component.</header>\n    `;\n  }\n}\n\ncustomElements.define(\'app-header\', HeaderComponent);\n');
+          expect(js).to.contain('class HeaderComponent extends HTMLElement {\n  constructor() {\n    super();\n\n    this.root = this.attachShadow({ mode: \'open\' });\n    this.root.innerHTML = `\n      <header>This is the header component.</header>\n    `;\n  }\n}\n\ncustomElements.define(\'app-header\', HeaderComponent);\n');
         });
 
         it('should have the expected <script> tag in the <head>', function() {
@@ -103,7 +103,7 @@ describe('Build Greenwood With: ', function() {
         it('should output the contents of the CSS file unminified', function() {
           const css = fs.readFileSync(cssFiles[0], 'utf-8');
           
-          expect(css).to.be.contain('{\n  margin: 0;\n  padding: 0;\n  font-family: \'Comic Sans\', sans-serif;\n}');
+          expect(css).to.contain('{\n  margin: 0;\n  padding: 0;\n  font-family: \'Comic Sans\', sans-serif;\n}');
         });
 
         it('should have only one expected <link> tag in the <head>', function() {

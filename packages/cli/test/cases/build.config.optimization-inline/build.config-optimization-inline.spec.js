@@ -94,7 +94,7 @@ describe('Build Greenwood With: ', function() {
           
           expect(scriptTag.type).to.be.equal('module');
           // eslint-disable-next-line max-len
-          expect(scriptTag.textContent).to.be.contain('class e extends HTMLElement{constructor(){super(),this.root=this.attachShadow({mode:"open"}),this.root.innerHTML="\\n      <header>This is the header component.</header>\\n    "}}customElements.define("app-header",e);');
+          expect(scriptTag.textContent).to.contain('class e extends HTMLElement{constructor(){super(),this.root=this.attachShadow({mode:"open"}),this.root.innerHTML="\\n      <header>This is the header component.</header>\\n    "}}customElements.define("app-header",e);');
         });
       });
 
@@ -106,7 +106,7 @@ describe('Build Greenwood With: ', function() {
 
           expect(scriptTag.type).to.be.equal('module');
           // eslint-disable-next-line max-len
-          expect(scriptTag.textContent).to.be.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex(e=>new RegExp(`^${t}$`).test(e.route))}}export{t as Foobar};');
+          expect(scriptTag.textContent).to.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex(e=>new RegExp(`^${t}$`).test(e.route))}}export{t as Foobar};');
         });
       });
 
@@ -118,7 +118,7 @@ describe('Build Greenwood With: ', function() {
 
           expect(scriptTag.type).to.be.equal('module');
           // eslint-disable-next-line max-len
-          expect(scriptTag.textContent).to.be.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex(e=>new RegExp(`^${t}$`).test(e.route))}}export{t as Baz};');
+          expect(scriptTag.textContent).to.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex(e=>new RegExp(`^${t}$`).test(e.route))}}export{t as Baz};');
         });
       });
 
@@ -138,13 +138,13 @@ describe('Build Greenwood With: ', function() {
         it('should contain the expected CSS content inlined for theme.css', function() {
           const styleTags = dom.window.document.querySelectorAll('head style');
 
-          expect(styleTags[0].textContent).to.be.contain('*{font-family:Comic Sans,sans-serif;margin:0;padding:0}');
+          expect(styleTags[0].textContent).to.contain('*{font-family:Comic Sans,sans-serif;margin:0;padding:0}');
         });
 
         it('should contain the expected CSS content inlined for page.css', function() {
           const styleTags = dom.window.document.querySelectorAll('head style');
 
-          expect(styleTags[1].textContent).to.be.contain('body{color:red}');
+          expect(styleTags[1].textContent).to.contain('body{color:red}');
         });
       });
     });
