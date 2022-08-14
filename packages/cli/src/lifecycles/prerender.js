@@ -7,11 +7,13 @@ import { pathToFileURL } from 'url';
 
 // TODO move to bundle lifecycle
 function modelResource(context, type, src = null, contents = null) {
-  const { scratchDir, userWorkspace } = context;
+  const { projectDirectory, scratchDir, userWorkspace } = context;
   let sourcePathURL;
 
   if (src) {
-    sourcePathURL = pathToFileURL(path.join(userWorkspace, src.replace(/\.\.\//g, '').replace('./', '')));
+    sourcePathURL = src.indexOf('/node_modules') === 0
+      ? pathToFileURL(path.join(projectDirectory, src)) // TODO get "real" location of node modules
+      : pathToFileURL(path.join(userWorkspace, src.replace(/\.\.\//g, '').replace('./', '')));
   } else {
     const scratchFileName = hashString(contents);
 

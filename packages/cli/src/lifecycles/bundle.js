@@ -48,23 +48,25 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
   for (const resourceIdx in resources) {
     const resource = resources[resourceIdx];
     if (resource.type === 'style') {
-      const outputPath = resource.src.replace(/\.\.\//g, '').replace('./', '');
-      const root = path.join(outputDir, path.dirname(outputPath));
-      const hashPieces = path.basename(outputPath).split('.');
-      const optimizedFileName = `${hashPieces[0]}.${hashString(outputPath)}.${hashPieces[1]}`;
+      const srcPath = resource.src.replace(/\.\.\//g, '').replace('./', '');
+      const hashPieces = path.basename(srcPath).split('.');
+      const optimizedFileName = `${hashPieces[0]}.${hashString(srcPath)}.${hashPieces[1]}`;
       const optimizedStyles = await optimizationPlugins.reduce(async (contents, optimizePromise) => {
         return await optimizePromise.optimize(resource.sourcePathURL.pathname, contents);
       }, undefined);
+      const outputPathRoot = srcPath.indexOf('/node_modules') === 0
+        ? outputDir
+        : path.join(outputDir, path.dirname(srcPath));
 
-      if (!fs.existsSync(root)) {
-        fs.mkdirSync(root, {
+      if (!fs.existsSync(outputPathRoot)) {
+        fs.mkdirSync(outputPathRoot, {
           recursive: true
         });
       }
 
       compilation.resources[resourceIdx].optimizedFileName = optimizedFileName;
 
-      await fs.promises.writeFile(path.join(root, optimizedFileName), optimizedStyles);
+      await fs.promises.writeFile(path.join(outputPathRoot, optimizedFileName), optimizedStyles);
     }
   }
 }

@@ -217,8 +217,9 @@ describe('Build Greenwood With: ', function() {
         expect(mainScriptTags.length).to.be.equal(1);
       });
 
+      // TODO shouldn't lit polyfill support stay _in_?
       it('should have the total expected number of .js file in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(3);
+        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(4);
       });
 
       it('should have the expected main.js file in the output directory', async function() {
@@ -240,8 +241,8 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected inline node_modules content in the first inline script', async function() {
         const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[0];
         
-        expect(inlineScriptTag.textContent.replace('\n', '')).to
-          .equal('import"/lit-element.ae169679.js";import"/lit-html.7f7a9139.js";//# sourceMappingURL=2012376258-scratch.0a6fc17c.js.map');
+        expect(inlineScriptTag.textContent.replace(/\n/g, '')).to
+          .equal('import"/lit-element.ae169679.js";import"/lit-html.7f7a9139.js";//# sourceMappingURL=2012376258.adf31273.js.map');
       });
     });
 

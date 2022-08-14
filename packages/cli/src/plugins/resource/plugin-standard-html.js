@@ -510,10 +510,11 @@ class StandardHtmlResource extends ResourceInterface {
             if (resource.src) {
               contents = contents.replace(resource.src, `/${resource.optimizedFileName}`);
             } else if (resource.contents) {
-              contents = contents.replace(resource.contents, resource.optimizedFileContents);
+              contents = contents.replace(resource.contents, resource.optimizedFileContents.replace(/\.\//g, '/'));
             }
           }
 
+          // TODO shouldn't lit polyfill support stay _in_?
           contents = contents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
           contents = contents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
           contents = contents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
