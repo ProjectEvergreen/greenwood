@@ -91,6 +91,11 @@ function greenwoodSyncPageResourcesPlugin(compilation) {
 
 const getRollupConfig = async (compilation) => {
   const { outputDir } = compilation.context;
+  const customRollupPlugins = compilation.config.plugins.filter(plugin => {
+    return plugin.type === 'rollup';
+  }).map(plugin => {
+    return plugin.provider(compilation);
+  }).flat();
 
   return [{
     input: compilation.resources
@@ -107,6 +112,7 @@ const getRollupConfig = async (compilation) => {
     plugins: [
       greenwoodSyncPageResourcesPlugin(compilation),
       greenwoodWorkspaceResolver(compilation),
+      ...customRollupPlugins,
       terser()
     ],
     context: 'window',

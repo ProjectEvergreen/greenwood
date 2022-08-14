@@ -72,7 +72,7 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected output from importing data.json in main.js', function() {
         const contents = fs.readFileSync(scripts[0], 'utf-8');
 
-        expect(contents).to.be.contain('const t=`${"got json"} via import, status is - ${200}`');
+        expect(contents).to.be.contain('document.getElementsByClassName("output-json-import")[0].innerHTML="got json via import, status is - 200"');
       });
     });
   });
