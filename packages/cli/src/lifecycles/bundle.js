@@ -47,16 +47,26 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
 
   for (const resourceIdx in resources) {
     const resource = resources[resourceIdx];
+
     if (resource.type === 'style') {
-      const srcPath = resource.src.replace(/\.\.\//g, '').replace('./', '');
-      const hashPieces = path.basename(srcPath).split('.');
-      const optimizedFileName = `${hashPieces[0]}.${hashString(srcPath)}.${hashPieces[1]}`;
+      const { contents, src = '' } = resource;
+      const srcPath = src && src.replace(/\.\.\//g, '').replace('./', '');
+      let optimizedFileName;
+
+      if (src) {
+        const hashPieces = path.basename(srcPath).split('.');
+
+        optimizedFileName = `${hashPieces[0]}.${hashString(src)}.css`;
+      } else {
+        optimizedFileName = `${hashString(contents)}.css`;
+      }
+
       const optimizedStyles = await optimizationPlugins.reduce(async (contents, optimizePromise) => {
         return await optimizePromise.optimize(resource.sourcePathURL.pathname, contents);
-      }, undefined);
-      const outputPathRoot = srcPath.indexOf('/node_modules') === 0
-        ? outputDir
-        : path.join(outputDir, path.dirname(srcPath));
+      }, contents || undefined);
+      const outputPathRoot = srcPath && srcPath.indexOf('/node_modules') !== 0
+        ? path.join(outputDir, path.dirname(srcPath))
+        : outputDir;
 
       if (!fs.existsSync(outputPathRoot)) {
         fs.mkdirSync(outputPathRoot, {
@@ -65,6 +75,10 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
       }
 
       compilation.resources[resourceIdx].optimizedFileName = optimizedFileName;
+
+      if (!src) {
+        compilation.resources[resourceIdx].optimizedFileContents = optimizedStyles;
+      }
 
       await fs.promises.writeFile(path.join(outputPathRoot, optimizedFileName), optimizedStyles);
     }
