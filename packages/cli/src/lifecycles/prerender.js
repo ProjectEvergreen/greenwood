@@ -25,7 +25,7 @@ function modelResource(context, type, src = null, contents = null) {
     src, // if <script src="..."></script> or <link href="..."></link>
     sourcePathURL, // where the contents of the file are
     type,
-    contents, // for inline <script> or <style> tags
+    contents, // for inline <script>...</script> or <style>...</style> tags
     optimizedFileName: undefined,
     optimizedFileContents: undefined
   };
@@ -42,7 +42,6 @@ function trackResourcesForRoute(html, compilation, route) {
     style: true
   });
 
-  // TODO inline scripts
   const scripts = root.querySelectorAll('script')
     .map(script => {
       if (script.getAttribute('src') && script.getAttribute('src').indexOf('http') < 0) {
@@ -54,8 +53,8 @@ function trackResourcesForRoute(html, compilation, route) {
       }
     });
 
-  // TODO inline styles
-  // const styles = root.querySelectorAll('style')
+  const styles = root.querySelectorAll('style')
+    .map(style => modelResource(context, 'style', null, style.rawText));
 
   const links = root.querySelectorAll('link')
     .filter(link => {
@@ -68,7 +67,7 @@ function trackResourcesForRoute(html, compilation, route) {
 
   compilation.graph.find(page => page.route === route).imports = [
     ...scripts,
-    // ...styles,
+    ...styles,
     ...links
   ];
 }
