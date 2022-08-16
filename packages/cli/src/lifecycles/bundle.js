@@ -47,8 +47,9 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
 
   for (const resourceIdx in resources) {
     const resource = resources[resourceIdx];
+    const { type } = resource;
 
-    if (resource.type === 'style') {
+    if (['style', 'link'].includes(type)) {
       const { contents, src = '' } = resource;
       const srcPath = src && src.replace(/\.\.\//g, '').replace('./', '');
       let optimizedFileName;
