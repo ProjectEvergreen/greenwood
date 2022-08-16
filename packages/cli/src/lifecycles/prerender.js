@@ -6,7 +6,7 @@ import { Worker } from 'worker_threads';
 import { pathToFileURL } from 'url';
 
 // TODO move to bundle lifecycle
-function modelResource(context, type, src = null, contents = null) {
+function modelResource(context, type, src = null, contents = null, optimizationAttr) {
   const { projectDirectory, scratchDir, userWorkspace } = context;
   let sourcePathURL;
 
@@ -27,7 +27,8 @@ function modelResource(context, type, src = null, contents = null) {
     type,
     contents, // for inline <script>...</script> or <style>...</style> tags
     optimizedFileName: undefined,
-    optimizedFileContents: undefined
+    optimizedFileContents: undefined,
+    optimizationAttr
   };
 }
 
@@ -44,17 +45,19 @@ function trackResourcesForRoute(html, compilation, route) {
 
   const scripts = root.querySelectorAll('script')
     .map(script => {
-      if (script.getAttribute('src') && script.getAttribute('src').indexOf('http') < 0) {
+      const src = script.getAttribute('src');
+      const optimizationAttr = script.getAttribute('data-gwd-opt');
+      if (src && src.indexOf('http') < 0) {
         // <script src="...."></script>
-        return modelResource(context, 'script', script.getAttribute('src'));
+        return modelResource(context, 'script', src, null, optimizationAttr);
       } else {
         // <script>...</script>
-        return modelResource(context, 'script', null, script.rawText);
+        return modelResource(context, 'script', null, script.rawText, optimizationAttr);
       }
     });
 
   const styles = root.querySelectorAll('style')
-    .map(style => modelResource(context, 'style', null, style.rawText));
+    .map(style => modelResource(context, 'style', null, style.rawText, null, style.getAttribute('data-gwd-opt')));
 
   const links = root.querySelectorAll('link')
     .filter(link => {
@@ -62,7 +65,7 @@ function trackResourcesForRoute(html, compilation, route) {
       return link.getAttribute('rel') === 'stylesheet'
         && link.getAttribute('href') && link.getAttribute('href').indexOf('http') < 0;
     }).map(link => {
-      return modelResource(context, 'style', link.getAttribute('href'));
+      return modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'));
     });
 
   compilation.graph.find(page => page.route === route).imports = [

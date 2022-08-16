@@ -497,6 +497,7 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async optimize(url, body) {
+    const { optimization } = this.compilation.config;
     const resources = this.compilation.graph.find(page => page.outputPath === url).imports;
 
     return new Promise((resolve, reject) => {
@@ -504,23 +505,37 @@ class StandardHtmlResource extends ResourceInterface {
         const hasHead = body.match(/\<head>(.*)<\/head>/s);
 
         if (hasHead && hasHead.length > 0) {
-          let contents = hasHead[0];
+          let headContents = hasHead[0];
 
           for (const resource of resources) {
-            if (resource.src) {
-              contents = contents.replace(resource.src, `/${resource.optimizedFileName}`);
+            const { contents, src, type, optimizationAttr } = resource;
+
+            if (src) {
+              headContents = headContents.replace(src, `/${resource.optimizedFileName}`);
+
+              if (type === 'script' && !optimizationAttr && optimization === 'default') {
+                headContents = headContents.replace('<head>', `
+                  <head>
+                  <link rel="modulepreload" href="${src}" as="script">
+                `);
+              } else if (type === 'link' && !optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
+                headContents = headContents.replace('<head>', `
+                  <head>
+                  <link rel="preload" href="${src}" as="style" crossorigin="anonymous"></link>
+                `);
+              }
             } else if (resource.contents) {
-              contents = contents.replace(resource.contents, resource.optimizedFileContents.replace(/\.\//g, '/'));
+              headContents = headContents.replace(contents, resource.optimizedFileContents.replace(/\.\//g, '/'));
             }
           }
 
           // TODO shouldn't lit polyfill support stay _in_?
-          contents = contents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
-          contents = contents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
-          contents = contents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
-          contents = contents.replace(/type="module-shim"/g, 'type="module"');
+          headContents = headContents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
+          headContents = headContents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
+          headContents = headContents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
+          headContents = headContents.replace(/type="module-shim"/g, 'type="module"');
 
-          body = body.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
+          body = body.replace(/\<head>(.*)<\/head>/s, headContents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
         }
 
         resolve(body);
