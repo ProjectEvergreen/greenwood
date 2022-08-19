@@ -111,14 +111,14 @@ describe('Build Greenwood With: ', function() {
         it('should have a expected src attribute value for all three <img> tags', function() {
           images.forEach((image, i) => {
             const count = i += 1;
-            expect(image.src).to.be.contain(`/assets/logo${count}.png`);
+            expect(image.src).to.contain(`/assets/logo${count}.png`);
           });
         });
 
         it('should have a expected title attribute value for all three <img> tags', function() {
           images.forEach((image, i) => {
             const count = i += 1;
-            expect(image.title).to.be.contain(`${title} - Logo #${count}`);
+            expect(image.title).to.contain(`${title} - Logo #${count}`);
           });
         });
 

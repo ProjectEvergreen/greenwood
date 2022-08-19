@@ -84,19 +84,19 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected inline content from inline <script> tag one in index.html', async function() {
         const scriptTagSrcOne = dom.window.document.querySelectorAll('head > script:not([src])')[0];
 
-        expect(scriptTagSrcOne.textContent).to.be.contain('document.getElementsByClassName("output-script-inline-one")[0].innerHTML="script tag module inline one"');
+        expect(scriptTagSrcOne.textContent).to.contain('document.getElementsByClassName("output-script-inline-one")[0].innerHTML="script tag module inline one"');
       });
 
       it('should have the expected inline content from inline <script> tag two in index.html', async function() {
         const scriptTagSrcTwo = dom.window.document.querySelectorAll('head > script:not([src])')[1];
 
-        expect(scriptTagSrcTwo.textContent).to.be.contain('document.getElementsByClassName("output-script-inline-two")[0].innerHTML="script tag module inline two"');
+        expect(scriptTagSrcTwo.textContent).to.contain('document.getElementsByClassName("output-script-inline-two")[0].innerHTML="script tag module inline two"');
       });
 
       it('should have the expected inline content from inline <script> tag three in index.html', async function() {
         const scriptTagSrcTwo = dom.window.document.querySelectorAll('head > script:not([src])')[2];
 
-        expect(scriptTagSrcTwo.textContent).to.be.contain('document.getElementsByClassName(\'output-script-inline-three\')[0].innerHTML = three');
+        expect(scriptTagSrcTwo.textContent).to.contain('document.getElementsByClassName(\'output-script-inline-three\')[0].innerHTML = three');
       });
 
     });
@@ -126,13 +126,13 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected output from the first inline <style> tag in index.html', async function() {
         const styleTags = dom.window.document.querySelectorAll('head > style');
 
-        expect(styleTags[0].textContent.replace(/\n/g, '').trim().replace(' ', '')).to.be.contain('p.output-style{        color: green;      }');
+        expect(styleTags[0].textContent.replace(/\n/g, '').trim().replace(' ', '')).to.contain('p.output-style{        color: green;      }');
       });
 
       it('should have the expected output from the second inline <style> tag in index.html', async function() {
         const styleTags = dom.window.document.querySelectorAll('head > style');
 
-        expect(styleTags[1].textContent.replace(/\n/g, '').trim().replace(' ', '')).to.be.contain('span.output-style{        color: red;      }');
+        expect(styleTags[1].textContent.replace(/\n/g, '').trim().replace(' ', '')).to.contain('span.output-style{        color: red;      }');
       });
 
       it('should have the color style for the output element', function() {

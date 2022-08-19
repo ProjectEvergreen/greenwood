@@ -81,7 +81,7 @@ describe('Build Greenwood With: ', function() {
         const scriptTags = dom.window.document.querySelectorAll('head > script[type]');
 
         expect(scriptTags.length).to.be.equal(1);
-        expect(scriptTags[0].href).to.be.contain(/router.*.js/);
+        expect(scriptTags[0].href).to.contain(/router.*.js/);
         expect(scriptTags[0].type).to.be.equal('module');
       });
 
