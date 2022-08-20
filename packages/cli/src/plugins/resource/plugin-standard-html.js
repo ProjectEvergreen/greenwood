@@ -414,7 +414,6 @@ class StandardHtmlResource extends ResourceInterface {
 
           for (const resource of resources) {
             const { contents, src, type, optimizationAttr, optimizedFileContents, rawAttributes } = resource;
-            const inlineContents = optimizedFileContents.replace(/\$/g, '$$$');
 
             // TODO I'm sure this could all be very heavily refactored
             if (src) {
@@ -430,7 +429,7 @@ class StandardHtmlResource extends ResourceInterface {
 
                   headContents = headContents.replace(`<script ${rawAttributes}></script>`, `
                     <script ${isModule}>
-                      ${inlineContents}
+                      ${optimizedFileContents.replace(/\$/g, '$$$')}
                     </script>
                   `);
                 } else if (optimizationAttr === 'static' || optimization === 'static') {
@@ -464,7 +463,7 @@ class StandardHtmlResource extends ResourceInterface {
                 if (optimizationAttr === 'static' || optimization === 'static') {
                   headContents = headContents.replace(`<script ${rawAttributes}>${contents}</script>`, '');
                 } else {
-                  headContents = headContents.replace(contents, inlineContents);
+                  headContents = headContents.replace(contents, optimizedFileContents.replace(/\$/g, '$$$'));
                 }
               } else if (type === 'style') {
                 headContents = headContents.replace(contents, optimizedFileContents);

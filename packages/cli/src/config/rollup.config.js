@@ -56,9 +56,16 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
         for (const bundle in bundles) {
           if (resources[resourceIdx].sourcePathURL.pathname === bundles[bundle].facadeModuleId) {
             const { fileName } = bundles[bundle];
+            const { rawAttributes, contents } = resources[resourceIdx];
+            const noop = rawAttributes.indexOf('data-gwd-opt="none"') >= 0 || compilation.config.optimization === 'none';
+            const outputPath = path.join(outputDir, fileName);
 
-            compilation.resources[resourceIdx].optimizedFileName = fileName;
-            compilation.resources[resourceIdx].optimizedFileContents = fs.readFileSync(path.join(outputDir, fileName), 'utf-8');
+            if (noop) {
+              fs.writeFileSync(outputPath, contents);
+            } else {
+              compilation.resources[resourceIdx].optimizedFileName = fileName;
+              compilation.resources[resourceIdx].optimizedFileContents = fs.readFileSync(outputPath, 'utf-8');
+            }
           }
         }
       }
