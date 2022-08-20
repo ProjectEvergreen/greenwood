@@ -8,9 +8,11 @@ async function cleanUpResources(compilation) {
   const { outputDir } = compilation.context;
 
   for (const resource of compilation.resources) {
-    const { src, optimizedFileName } = resource;
+    const { src, optimizedFileName, optimizationAttr } = resource;
+    const optConfig = ['inline', 'static'].indexOf(compilation.config.optimization) >= 0;
+    const optAttr = ['inline', 'static'].indexOf(optimizationAttr) >= 0; // rawAttributes.indexOf('data-gwd-opt="static"') >= 0 || rawAttributes.indexOf('data-gwd-opt="inline"') >= 0;
 
-    if (!src || (compilation.config.optimization === 'inline')) {
+    if (!src || (optAttr || optConfig)) {
       // TODO dedupe resources
       if (fs.existsSync(path.join(outputDir, optimizedFileName))) {
         fs.unlinkSync(path.join(outputDir, optimizedFileName));
@@ -51,7 +53,7 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
 
   for (const resourceIdx in resources) {
     const resource = resources[resourceIdx];
-    const { contents, rawAttributes = '', src = '', type } = resource;
+    const { contents, optimizationAttr, src = '', type } = resource;
 
     if (['style', 'link'].includes(type)) {
       const srcPath = src && src.replace(/\.\.\//g, '').replace('./', '');
@@ -74,7 +76,7 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
         });
       }
 
-      if (compilation.config.optimization === 'none' || rawAttributes.indexOf('data-gwd-opt="none"') >= 0) {
+      if (compilation.config.optimization === 'none' || optimizationAttr === 'none') {
         compilation.resources[resourceIdx].optimizedFileContents = contents;
 
         await fs.promises.writeFile(path.join(outputDir, optimizedFileName), contents);

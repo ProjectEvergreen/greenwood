@@ -433,7 +433,7 @@ class StandardHtmlResource extends ResourceInterface {
                     </script>
                   `);
                 } else if (optimizationAttr === 'static' || optimization === 'static') {
-                  headContents = headContents.replace(`<script ${rawAttributes}>(.*.)</script>`, '');
+                  headContents = headContents.replace(`<script ${rawAttributes}></script>`, '');
                 }
               } else if (type === 'link') {
                 if (!optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
