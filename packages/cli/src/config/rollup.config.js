@@ -60,11 +60,12 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
             const noop = rawAttributes.indexOf('data-gwd-opt="none"') >= 0 || compilation.config.optimization === 'none';
             const outputPath = path.join(outputDir, fileName);
 
+            compilation.resources[resourceIdx].optimizedFileName = fileName;
+            compilation.resources[resourceIdx].optimizedFileContents = fs.readFileSync(outputPath, 'utf-8').replace(/\.\//g, '/');
+            compilation.resources[resourceIdx].contents = contents.replace(/\.\//g, '/');
+
             if (noop) {
               fs.writeFileSync(outputPath, contents);
-            } else {
-              compilation.resources[resourceIdx].optimizedFileName = fileName;
-              compilation.resources[resourceIdx].optimizedFileContents = fs.readFileSync(outputPath, 'utf-8');
             }
           }
         }

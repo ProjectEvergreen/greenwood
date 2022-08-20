@@ -63,7 +63,9 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
         const basename = path.basename(srcPath);
         const basenamePieces = path.basename(srcPath).split('.');
 
-        optimizedFileName = srcPath.replace(basename, `${basenamePieces[0]}.${hashString(contents)}.css`);
+        optimizedFileName = srcPath.indexOf('/node_modules') >= 0
+          ? `${basenamePieces[0]}.${hashString(contents)}.css`
+          : srcPath.replace(basename, `${basenamePieces[0]}.${hashString(contents)}.css`);
       } else {
         optimizedFileName = `${hashString(contents)}.css`;
       }
