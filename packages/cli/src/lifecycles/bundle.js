@@ -5,12 +5,17 @@ import path from 'path';
 import { rollup } from 'rollup';
 
 async function cleanUpResources(compilation) {
-  const { scratchDir, outputDir } = compilation.context;
+  const { outputDir } = compilation.context;
 
   for (const resource of compilation.resources) {
-    if (resource.contents) {
-      const src = path.basename(resource.sourcePathURL.pathname);
-      fs.unlinkSync(resource.sourcePathURL.pathname.replace(scratchDir, `${outputDir}/`).replace(src, resource.optimizedFileName));
+    const { src, optimizedFileName } = resource;
+
+    if (!src || (compilation.config.optimization === 'inline')) { //  && (compilation.config.optimization === 'inline' || rawAttributes.indexOf('data-gwd-opt="inline"') >= 0)) {
+
+      // TODO dedupe resources
+      if (fs.existsSync(path.join(outputDir, optimizedFileName))) {
+        fs.unlinkSync(path.join(outputDir, optimizedFileName));
+      }
     }
   }
 }
@@ -55,19 +60,18 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
       let optimizedFileName;
 
       if (src) {
-        const hashPieces = path.basename(srcPath).split('.');
+        const basename = path.basename(srcPath);
+        const basenamePieces = path.basename(srcPath).split('.');
 
-        optimizedFileName = `${hashPieces[0]}.${hashString(src)}.css`;
+        optimizedFileName = srcPath.replace(basename, `${basenamePieces[0]}.${hashString(contents)}.css`); // `${path.basename(srcPath)}/${hashString(path.basename(srcPath))}.css`;
       } else {
         optimizedFileName = `${hashString(contents)}.css`;
       }
 
+      const outputPathRoot = path.join(outputDir, path.dirname(optimizedFileName));
       const optimizedStyles = await optimizationPlugins.reduce(async (contents, optimizePromise) => {
         return await optimizePromise.optimize(resource.sourcePathURL.pathname, contents);
       }, contents || undefined);
-      const outputPathRoot = srcPath && srcPath.indexOf('/node_modules') !== 0
-        ? path.join(outputDir, path.dirname(srcPath))
-        : outputDir;
 
       if (!fs.existsSync(outputPathRoot)) {
         fs.mkdirSync(outputPathRoot, {
@@ -76,12 +80,9 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
       }
 
       compilation.resources[resourceIdx].optimizedFileName = optimizedFileName;
+      compilation.resources[resourceIdx].optimizedFileContents = optimizedStyles;
 
-      if (!src) {
-        compilation.resources[resourceIdx].optimizedFileContents = optimizedStyles;
-      }
-
-      await fs.promises.writeFile(path.join(outputPathRoot, optimizedFileName), optimizedStyles);
+      await fs.promises.writeFile(path.join(outputDir, optimizedFileName), optimizedStyles);
     }
   }
 }

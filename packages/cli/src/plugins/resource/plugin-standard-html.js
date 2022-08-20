@@ -413,24 +413,62 @@ class StandardHtmlResource extends ResourceInterface {
           let headContents = hasHead[0];
 
           for (const resource of resources) {
-            const { contents, src, type, optimizationAttr } = resource;
+            const { contents, src, type, optimizationAttr, optimizedFileContents, rawAttributes } = resource;
+            const inlineContents = optimizedFileContents.replace(/\$/g, '$$$');
 
+            // TODO I'm sure this could all be very heavily refactored
             if (src) {
-              headContents = headContents.replace(src, `/${resource.optimizedFileName}`);
+              if (type === 'script') {
+                if (!optimizationAttr && optimization === 'default') {
+                  headContents = headContents.replace(src, `/${resource.optimizedFileName}`);
+                  headContents = headContents.replace('<head>', `
+                    <head>
+                    <link rel="modulepreload" href="${src}" as="script">
+                  `);
+                } else if (optimizationAttr === 'inline' || optimization === 'inline') {
+                  const isModule = rawAttributes.indexOf('type="module') >= 0 ? ' type="module"' : '';
 
-              if (type === 'script' && !optimizationAttr && optimization === 'default') {
-                headContents = headContents.replace('<head>', `
-                  <head>
-                  <link rel="modulepreload" href="${src}" as="script">
-                `);
-              } else if (type === 'link' && !optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
-                headContents = headContents.replace('<head>', `
-                  <head>
-                  <link rel="preload" href="${src}" as="style" crossorigin="anonymous"></link>
-                `);
+                  headContents = headContents.replace(`<script ${rawAttributes}></script>`, `
+                    <script ${isModule}>
+                      ${inlineContents}
+                    </script>
+                  `);
+                } else if (optimizationAttr === 'static' || optimization === 'static') {
+                  headContents = headContents.replace(`<script ${rawAttributes}>(.*.)</script>`, '');
+                }
+              } else if (type === 'link') {
+                if (!optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
+                  headContents = headContents.replace(src, `/${resource.optimizedFileName}`);
+                  headContents = headContents.replace('<head>', `
+                    <head>
+                    <link rel="preload" href="${src}" as="style" crossorigin="anonymous"></link>
+                  `);
+                } else if (optimizationAttr === 'inline' || optimization === 'inline') {
+                  // https://github.com/ProjectEvergreen/greenwood/issues/810
+                  // when pre-rendering, puppeteer normalizes everything to <link .../>
+                  // but if not using pre-rendering, then it could come out as <link ...></link>
+                  // not great, but best we can do for now until #742
+                  headContents = headContents.replace(`<link ${rawAttributes}>`, `
+                    <style>
+                      ${optimizedFileContents}
+                    </style>
+                  `).replace(`<link ${rawAttributes}/>`, `
+                    <style>
+                      ${optimizedFileContents}
+                    </style>
+                  `);
+                }
               }
-            } else if (resource.contents) {
-              headContents = headContents.replace(contents, resource.optimizedFileContents.replace(/\.\//g, '/'));
+            } else {
+              if (type === 'script') {
+                if (optimizationAttr === 'static' || optimization === 'static') {
+                  headContents = headContents.replace(`<script ${rawAttributes}>${contents}</script>`, '');
+                } else {
+                  headContents = headContents.replace(contents, inlineContents);
+                }
+              } else if (type === 'style') {
+                headContents = headContents.replace(contents, optimizedFileContents);
+              }
             }
           }
 

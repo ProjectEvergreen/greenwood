@@ -56,11 +56,9 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
         for (const bundle in bundles) {
           if (resources[resourceIdx].sourcePathURL.pathname === bundles[bundle].facadeModuleId) {
             const { fileName } = bundles[bundle];
-            compilation.resources[resourceIdx].optimizedFileName = fileName;
 
-            if (compilation.resources[resourceIdx].contents) {
-              compilation.resources[resourceIdx].optimizedFileContents = fs.readFileSync(path.join(outputDir, fileName), 'utf-8');
-            }
+            compilation.resources[resourceIdx].optimizedFileName = fileName;
+            compilation.resources[resourceIdx].optimizedFileContents = fs.readFileSync(path.join(outputDir, fileName), 'utf-8');
           }
         }
       }

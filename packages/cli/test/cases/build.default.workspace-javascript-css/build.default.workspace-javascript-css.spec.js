@@ -123,14 +123,12 @@ describe('Build Greenwood With: ', function() {
         expect(styleTags.length).to.be.equal(2);
       });
 
-      // TODO - should this be optimized?
       it('should have the expected output from the first inline <style> tag in index.html', async function() {
         const styleTags = dom.window.document.querySelectorAll('head > style');
 
         expect(styleTags[0].textContent.replace(/\n/g, '').trim().replace(' ', '')).to.contain('p.output-style{color:green}');
       });
 
-      // TODO - should this be optimized?
       it('should have the expected output from the second inline <style> tag in index.html', async function() {
         const styleTags = dom.window.document.querySelectorAll('head > style');
 
