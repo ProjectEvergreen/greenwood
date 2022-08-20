@@ -6,7 +6,7 @@ import { Worker } from 'worker_threads';
 import { pathToFileURL } from 'url';
 
 // TODO move to bundle lifecycle
-function modelResource(context, type, src = null, contents = null, optimizationAttr) {
+function modelResource(context, type, src = null, contents = null, optimizationAttr = null, rawAttributes = null) {
   const { projectDirectory, scratchDir, userWorkspace } = context;
   let sourcePathURL;
 
@@ -14,6 +14,8 @@ function modelResource(context, type, src = null, contents = null, optimizationA
     sourcePathURL = src.indexOf('/node_modules') === 0
       ? pathToFileURL(path.join(projectDirectory, src)) // TODO get "real" location of node modules
       : pathToFileURL(path.join(userWorkspace, src.replace(/\.\.\//g, '').replace('./', '')));
+
+    contents = fs.readFileSync(sourcePathURL, 'utf-8');
   } else {
     const scratchFileName = hashString(contents);
 
@@ -25,10 +27,11 @@ function modelResource(context, type, src = null, contents = null, optimizationA
     src, // if <script src="..."></script> or <link href="..."></link>
     sourcePathURL, // where the contents of the file are
     type,
-    contents, // for inline <script>...</script> or <style>...</style> tags
+    contents,
     optimizedFileName: undefined,
     optimizedFileContents: undefined,
-    optimizationAttr
+    optimizationAttr,
+    rawAttributes
   };
 }
 
@@ -47,12 +50,14 @@ function trackResourcesForRoute(html, compilation, route) {
     .map(script => {
       const src = script.getAttribute('src');
       const optimizationAttr = script.getAttribute('data-gwd-opt');
+      const { rawAttrs } = script;
+
       if (src && src.indexOf('http') < 0) {
         // <script src="...."></script>
-        return modelResource(context, 'script', src, null, optimizationAttr);
+        return modelResource(context, 'script', src, null, optimizationAttr, rawAttrs);
       } else {
         // <script>...</script>
-        return modelResource(context, 'script', null, script.rawText, optimizationAttr);
+        return modelResource(context, 'script', null, script.rawText, optimizationAttr, rawAttrs);
       }
     });
 
@@ -65,7 +70,7 @@ function trackResourcesForRoute(html, compilation, route) {
       return link.getAttribute('rel') === 'stylesheet'
         && link.getAttribute('href') && link.getAttribute('href').indexOf('http') < 0;
     }).map(link => {
-      return modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'));
+      return modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'), link.rawAttrs);
     });
 
   compilation.graph.find(page => page.route === route).imports = [
