@@ -10,8 +10,7 @@ async function cleanUpResources(compilation) {
   for (const resource of compilation.resources) {
     const { src, optimizedFileName } = resource;
 
-    if (!src || (compilation.config.optimization === 'inline')) { //  && (compilation.config.optimization === 'inline' || rawAttributes.indexOf('data-gwd-opt="inline"') >= 0)) {
-
+    if (!src || (compilation.config.optimization === 'inline')) {
       // TODO dedupe resources
       if (fs.existsSync(path.join(outputDir, optimizedFileName))) {
         fs.unlinkSync(path.join(outputDir, optimizedFileName));
@@ -52,10 +51,9 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
 
   for (const resourceIdx in resources) {
     const resource = resources[resourceIdx];
-    const { type } = resource;
+    const { contents, rawAttributes = '', src = '', type } = resource;
 
     if (['style', 'link'].includes(type)) {
-      const { contents, src = '' } = resource;
       const srcPath = src && src.replace(/\.\.\//g, '').replace('./', '');
       let optimizedFileName;
 
@@ -63,15 +61,12 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
         const basename = path.basename(srcPath);
         const basenamePieces = path.basename(srcPath).split('.');
 
-        optimizedFileName = srcPath.replace(basename, `${basenamePieces[0]}.${hashString(contents)}.css`); // `${path.basename(srcPath)}/${hashString(path.basename(srcPath))}.css`;
+        optimizedFileName = srcPath.replace(basename, `${basenamePieces[0]}.${hashString(contents)}.css`);
       } else {
         optimizedFileName = `${hashString(contents)}.css`;
       }
 
       const outputPathRoot = path.join(outputDir, path.dirname(optimizedFileName));
-      const optimizedStyles = await optimizationPlugins.reduce(async (contents, optimizePromise) => {
-        return await optimizePromise.optimize(resource.sourcePathURL.pathname, contents);
-      }, contents || undefined);
 
       if (!fs.existsSync(outputPathRoot)) {
         fs.mkdirSync(outputPathRoot, {
@@ -79,15 +74,24 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
         });
       }
 
-      compilation.resources[resourceIdx].optimizedFileName = optimizedFileName;
-      compilation.resources[resourceIdx].optimizedFileContents = optimizedStyles;
+      if (compilation.config.optimization === 'none' || rawAttributes.indexOf('data-gwd-opt="none"') >= 0) {
+        compilation.resources[resourceIdx].optimizedFileContents = contents;
 
-      await fs.promises.writeFile(path.join(outputDir, optimizedFileName), optimizedStyles);
+        await fs.promises.writeFile(path.join(outputDir, optimizedFileName), contents);
+      } else {
+        const optimizedStyles = await optimizationPlugins.reduce(async (contents, optimizePromise) => {
+          return await optimizePromise.optimize(resource.sourcePathURL.pathname, contents);
+        }, contents || undefined);
+
+        compilation.resources[resourceIdx].optimizedFileContents = optimizedStyles;
+        await fs.promises.writeFile(path.join(outputDir, optimizedFileName), optimizedStyles);
+      }
+
+      compilation.resources[resourceIdx].optimizedFileName = optimizedFileName;
     }
   }
 }
 
-// TODO needs to optimize too?
 async function bundleScriptResources(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
   const [rollupConfig] = await getRollupConfig(compilation, compilation.resources

@@ -6,7 +6,7 @@ import { Worker } from 'worker_threads';
 import { pathToFileURL } from 'url';
 
 // TODO move to bundle lifecycle
-function modelResource(context, type, src = null, contents = null, optimizationAttr = null, rawAttributes = null) {
+function modelResource(context, type, src = undefined, contents = undefined, optimizationAttr = undefined, rawAttributes = undefined) {
   const { projectDirectory, scratchDir, userWorkspace } = context;
   let sourcePathURL;
 
