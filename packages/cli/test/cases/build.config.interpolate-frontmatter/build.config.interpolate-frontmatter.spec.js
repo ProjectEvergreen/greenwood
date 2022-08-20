@@ -64,13 +64,13 @@ describe('Build Greenwood With: ', function() {
         expect(authorMeta).to.be.equal('Owen Buckley');
       });
 
-      it('should have the correct value for publised in the <h3> tag', function() {
+      it('should have the correct value for published in the <h3> tag', function() {
         const heading = dom.window.document.querySelector('body h3').textContent;
 
         expect(heading).to.be.equal('Published: 11/11/2022');
       });
 
-      it('should have the correct value for authro in the <h4> tag', function() {
+      it('should have the correct value for author in the <h4> tag', function() {
         const heading = dom.window.document.querySelector('body h4').textContent;
 
         expect(heading).to.be.equal('Author: Owen Buckley');

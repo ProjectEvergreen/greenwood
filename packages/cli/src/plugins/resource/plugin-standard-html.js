@@ -419,10 +419,12 @@ class StandardHtmlResource extends ResourceInterface {
             if (src) {
               if (type === 'script') {
                 if (!optimizationAttr && optimization === 'default') {
-                  headContents = headContents.replace(src, `/${resource.optimizedFileName}`);
+                  const optimizedFilePath = `/${resource.optimizedFileName}`;
+
+                  headContents = headContents.replace(src, optimizedFilePath);
                   headContents = headContents.replace('<head>', `
                     <head>
-                    <link rel="modulepreload" href="${src}" as="script">
+                    <link rel="modulepreload" href="${optimizedFilePath}" as="script">
                   `);
                 } else if (optimizationAttr === 'inline' || optimization === 'inline') {
                   const isModule = rawAttributes.indexOf('type="module') >= 0 ? ' type="module"' : '';
@@ -437,10 +439,12 @@ class StandardHtmlResource extends ResourceInterface {
                 }
               } else if (type === 'link') {
                 if (!optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
-                  headContents = headContents.replace(src, `/${resource.optimizedFileName}`);
+                  const optimizedFilePath = `/${resource.optimizedFileName}`;
+
+                  headContents = headContents.replace(src, optimizedFilePath);
                   headContents = headContents.replace('<head>', `
                     <head>
-                    <link rel="preload" href="${src}" as="style" crossorigin="anonymous"></link>
+                    <link rel="preload" href="${optimizedFilePath}" as="style" crossorigin="anonymous"></link>
                   `);
                 } else if (optimizationAttr === 'inline' || optimization === 'inline') {
                   // https://github.com/ProjectEvergreen/greenwood/issues/810

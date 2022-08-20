@@ -8,6 +8,7 @@ import { pathToFileURL } from 'url';
 // TODO move to bundle lifecycle
 function modelResource(context, type, src = undefined, contents = undefined, optimizationAttr = undefined, rawAttributes = undefined) {
   const { projectDirectory, scratchDir, userWorkspace } = context;
+  const extension = type === 'script' ? 'js' : 'css';
   let sourcePathURL;
 
   if (src) {
@@ -19,7 +20,7 @@ function modelResource(context, type, src = undefined, contents = undefined, opt
   } else {
     const scratchFileName = hashString(contents);
 
-    sourcePathURL = pathToFileURL(path.join(scratchDir, `${scratchFileName}.js`));
+    sourcePathURL = pathToFileURL(path.join(scratchDir, `${scratchFileName}.${extension}`));
     fs.writeFileSync(sourcePathURL, contents);
   }
 
@@ -105,33 +106,6 @@ async function interceptPage(compilation, contents, route) {
   return htmlIntercepted;
 }
 
-async function optimizePage(compilation, contents, route, outputPath, outputDir) {
-  const optimizeResources = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'resource';
-  }).map((plugin) => {
-    return plugin.provider(compilation);
-  }).filter((provider) => {
-    return provider.shouldOptimize && provider.optimize;
-  });
-
-  const htmlOptimized = await optimizeResources.reduce(async (htmlPromise, resource) => {
-    const html = await htmlPromise;
-    const shouldOptimize = await resource.shouldOptimize(outputPath, html);
-    
-    return shouldOptimize
-      ? resource.optimize(outputPath, html)
-      : Promise.resolve(html);
-  }, Promise.resolve(contents));
-
-  if (route !== '/404/' && !fs.existsSync(path.join(outputDir, route))) {
-    fs.mkdirSync(path.join(outputDir, route), {
-      recursive: true
-    });
-  }
-
-  return htmlOptimized;
-}
-
 async function preRenderCompilationWorker(compilation, workerPrerender) {
   const pages = compilation.graph.filter(page => !page.isSSR);
   const outputDir = compilation.context.scratchDir;
@@ -140,7 +114,6 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
 
   await Promise.all(pages.map(async (page) => {
     const { outputPath, route } = page;
-    const outputPathDir = path.join(outputDir, route);
     const htmlResource = compilation.config.plugins.filter((plugin) => {
       return plugin.name === 'plugin-standard-html';
     }).map((plugin) => {
@@ -189,14 +162,6 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       });
     });
 
-    html = await optimizePage(compilation, html, route, outputPath, outputDir);
-
-    if (!fs.existsSync(outputPathDir)) {
-      fs.mkdirSync(outputPathDir, {
-        recursive: true
-      });
-    }
-
     console.info('generated page...', route);
 
     await fs.promises.writeFile(path.join(outputDir, outputPath), html);
@@ -214,14 +179,13 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
 
     console.info('generated page...', route);
 
-    const html = await optimizePage(compilation, contents, route, outputPath, scratchDir);
-    await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
+    await fs.promises.writeFile(path.join(scratchDir, outputPath), contents);
   });
 }
 
 async function staticRenderCompilation(compilation) {
+  const { scratchDir } = compilation.context;
   const pages = compilation.graph.filter(page => !page.isSSR || page.isSSR && page.data.static);
-  const scratchDir = compilation.context.scratchDir;
   const htmlResource = compilation.config.plugins.filter((plugin) => {
     return plugin.name === 'plugin-standard-html';
   }).map((plugin) => {
@@ -232,11 +196,19 @@ async function staticRenderCompilation(compilation) {
   
   await Promise.all(pages.map(async (page) => {
     const { route, outputPath } = page;
+    const outputPathDir = path.join(scratchDir, route);
     let html = (await htmlResource.serve(route)).body;
+
+    trackResourcesForRoute(html, compilation, route);
 
     html = (await interceptPage(compilation, html, route)).body;
 
-    trackResourcesForRoute(html, compilation, route);
+    // TODO should this be done for all renderers?
+    if (route !== '/404/' && !fs.existsSync(outputPathDir)) {
+      fs.mkdirSync(outputPathDir, {
+        recursive: true
+      });
+    }
 
     await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
 

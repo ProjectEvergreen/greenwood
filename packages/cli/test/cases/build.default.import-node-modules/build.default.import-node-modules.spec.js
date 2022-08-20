@@ -242,7 +242,7 @@ describe('Build Greenwood With: ', function() {
         const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[0];
         
         expect(inlineScriptTag.textContent.replace(/\n/g, '')).to
-          .equal('import"/lit-element.ae169679.js";import"/lit-html.7f7a9139.js";//# sourceMappingURL=2012376258.adf31273.js.map');
+          .equal('import"/lit-element.ae169679.js";import"/lit-html.7f7a9139.js";//# sourceMappingURL=116321042.6c5eb91c.js.map');
       });
     });
 
