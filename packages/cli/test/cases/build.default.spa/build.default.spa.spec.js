@@ -235,7 +235,8 @@ describe('Build Greenwood With: ', function() {
         // one for the footer.js
         // one for index.js
         // one for lit element bundle
-        expect(jsFiles.length).to.be.equal(5);
+        // TODO one for lit polyfill, right?
+        expect(jsFiles.length).to.be.equal(6);
       });
 
       it('should have custom <title> tag in the <head>', function() {

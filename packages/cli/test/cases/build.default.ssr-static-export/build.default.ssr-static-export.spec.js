@@ -155,15 +155,16 @@ describe('Build Greenwood With: ', function() {
         expect(styles.length).to.equal(1);
       });
 
-      it('should have three script tags', function() {
+      // TODO one for lit polyfill, right?
+      it('should have four script tags', function() {
         const scripts = dom.window.document.querySelectorAll('head > script');
 
-        expect(scripts.length).to.equal(3);
+        expect(scripts.length).to.equal(4);
       });
 
       it('should have expected SSR content from the non module script tag', function() {
         const scripts = Array.from(dom.window.document.querySelectorAll('head > script'))
-          .filter(tag => !tag.getAttribute('type'));
+          .filter(tag => !tag.getAttribute('type') && !tag.getAttribute('src'));
 
         expect(scripts.length).to.equal(1);
         expect(scripts[0].textContent).to.contain('console.log');

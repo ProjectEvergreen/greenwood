@@ -3,8 +3,6 @@ import { hashString } from '../lib/hashing-utils.js';
 import path from 'path';
 import Koa from 'koa';
 import { ResourceInterface } from '../lib/resource-interface.js';
-import { getRollupConfig } from '../config/rollup.config.js';
-import { rollup } from 'rollup';
 
 async function getDevServer(compilation) {
   const app = new Koa();
@@ -276,6 +274,7 @@ async function getHybridServer(compilation) {
       })[0];
       let body;
 
+      // TODO try and share this with prerendering lifecycle?
       const interceptResources = compilation.config.plugins.filter((plugin) => {
         return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
       }).map((plugin) => {
@@ -311,17 +310,7 @@ async function getHybridServer(compilation) {
           : Promise.resolve(html);
       }, Promise.resolve(body));
 
-      await fs.promises.mkdir(path.join(compilation.context.scratchDir, url), { recursive: true });
-      await fs.promises.writeFile(path.join(compilation.context.scratchDir, url, 'index.html'), body);
-
-      const rollupConfigs = await getRollupConfig({
-        ...compilation,
-        graph: [matchingRoute]
-      });
-      const bundle = await rollup(rollupConfigs[0]);
-      await bundle.write(rollupConfigs[0].output);
-
-      body = await fs.promises.readFile(path.join(compilation.context.outputDir, url, 'index.html'), 'utf-8');
+      // TODO no need for double bundle?
 
       ctx.status = 200;
       ctx.set('content-type', 'text/html');

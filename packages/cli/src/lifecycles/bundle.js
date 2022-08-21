@@ -10,7 +10,7 @@ async function cleanUpResources(compilation) {
   for (const resource of compilation.resources) {
     const { src, optimizedFileName, optimizationAttr } = resource;
     const optConfig = ['inline', 'static'].indexOf(compilation.config.optimization) >= 0;
-    const optAttr = ['inline', 'static'].indexOf(optimizationAttr) >= 0; // rawAttributes.indexOf('data-gwd-opt="static"') >= 0 || rawAttributes.indexOf('data-gwd-opt="inline"') >= 0;
+    const optAttr = ['inline', 'static'].indexOf(optimizationAttr) >= 0;
 
     if (!src || (optAttr || optConfig)) {
       // TODO dedupe resources
@@ -98,9 +98,7 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
 
 async function bundleScriptResources(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const [rollupConfig] = await getRollupConfig(compilation, compilation.resources
-    .filter(resource => resource.type === 'script')
-    .map(resource => resource.sourcePathURL.pathname));
+  const [rollupConfig] = await getRollupConfig(compilation);
 
   if (rollupConfig.input.length !== 0) {
     const bundle = await rollup(rollupConfig);

@@ -82,8 +82,7 @@ class NodeModulesResource extends ResourceInterface {
         const hasHead = body.match(/\<head>(.*)<\/head>/s);
 
         if (hasHead && hasHead.length > 0) {
-          const contents = hasHead[0]
-            .replace(/type="module"/g, 'type="module-shim"');
+          const contents = hasHead[0].replace(/type="module"/g, 'type="module-shim"');
 
           newContents = newContents.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
         }

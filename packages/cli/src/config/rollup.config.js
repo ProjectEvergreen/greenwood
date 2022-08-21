@@ -61,7 +61,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
             const outputPath = path.join(outputDir, fileName);
 
             compilation.resources[resourceIdx].optimizedFileName = fileName;
-            compilation.resources[resourceIdx].optimizedFileContents = fs.readFileSync(outputPath, 'utf-8').replace(/\.\//g, '/');
+            compilation.resources[resourceIdx].optimizedFileContents = fs.readFileSync(outputPath, 'utf-8');
             compilation.resources[resourceIdx].contents = contents.replace(/\.\//g, '/');
 
             if (noop) {
