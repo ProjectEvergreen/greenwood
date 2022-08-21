@@ -191,6 +191,7 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
 
   await renderer(compilation, async (page, contents) => {
     const { outputPath, route } = page;
+    const outputPathDir = path.join(scratchDir, route);
 
     // TODO should this be done for all renderers?
     if (route !== '/404/' && !fs.existsSync(outputPathDir)) {
