@@ -403,7 +403,8 @@ class StandardHtmlResource extends ResourceInterface {
   async optimize(url, body) {
     const { optimization } = this.compilation.config;
     // TODO why not just use compilation.resources here instead?
-    const resources = this.compilation.graph.find(page => page.outputPath === url).imports;
+    // TODO optimize could take a url or file path first param
+    const resources = this.compilation.graph.find(page => page.outputPath === url || page.route === url).imports;
 
     return new Promise((resolve, reject) => {
       try {
@@ -431,7 +432,7 @@ class StandardHtmlResource extends ResourceInterface {
 
                   headContents = headContents.replace(`<script ${rawAttributes}></script>`, `
                     <script ${isModule}>
-                      ${optimizedFileContents.replace(/\$/g, '$$$')}
+                      ${optimizedFileContents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}
                     </script>
                   `);
                 } else if (optimizationAttr === 'static' || optimization === 'static') {
@@ -465,9 +466,9 @@ class StandardHtmlResource extends ResourceInterface {
             } else {
               if (type === 'script') {
                 if (optimizationAttr === 'static' || optimization === 'static') {
-                  headContents = headContents.replace(`<script ${rawAttributes}>${contents}</script>`, '');
+                  headContents = headContents.replace(`<script ${rawAttributes}>${contents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}</script>`, '');
                 } else {
-                  headContents = headContents.replace(contents, optimizedFileContents.replace(/\$/g, '$$$'));
+                  headContents = headContents.replace(contents, optimizedFileContents.replace(/\.\//g, '/').replace(/\$/g, '$$$'));
                 }
               } else if (type === 'style') {
                 headContents = headContents.replace(contents, optimizedFileContents);

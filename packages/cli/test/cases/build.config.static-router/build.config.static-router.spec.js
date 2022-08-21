@@ -94,8 +94,7 @@ describe('Build Greenwood With: ', function() {
           .filter(tag => !tag.type);
 
         expect(inlineScriptTags.length).to.be.equal(1);
-        expect(inlineScriptTags[0].textContent).to.contain('window.__greenwood = window.__greenwood || {};');
-        expect(inlineScriptTags[0].textContent).to.contain('window.__greenwood.currentTemplate = "page"');
+        expect(inlineScriptTags[0].textContent).to.contain('window.__greenwood=window.__greenwood||{},window.__greenwood.currentTemplate="page";');
       });
 
       it('should have one <router-outlet> tag in the <body> for the content', function() {
