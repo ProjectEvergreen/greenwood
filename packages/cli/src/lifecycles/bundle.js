@@ -1,6 +1,6 @@
 import fs from 'fs';
-import { hashString } from '../lib/hashing-utils.js';
 import { getRollupConfig } from '../config/rollup.config.js';
+import { hashString } from '../lib/hashing-utils.js';
 import path from 'path';
 import { rollup } from 'rollup';
 

@@ -57,7 +57,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
           if (resources[resourceIdx].sourcePathURL.pathname === bundles[bundle].facadeModuleId) {
             const { fileName } = bundles[bundle];
             const { rawAttributes, contents } = resources[resourceIdx];
-            const noop = rawAttributes.indexOf('data-gwd-opt="none"') >= 0 || compilation.config.optimization === 'none';
+            const noop = rawAttributes && rawAttributes.indexOf('data-gwd-opt="none"') >= 0 || compilation.config.optimization === 'none';
             const outputPath = path.join(outputDir, fileName);
 
             compilation.resources[resourceIdx].optimizedFileName = fileName;
