@@ -21,30 +21,33 @@ async function cleanUpResources(compilation) {
   }
 }
 
-async function optimizePages(compilation, optimizeResources) {
+async function optimizeStaticPages(compilation, optimizeResources) {
   const { scratchDir, outputDir } = compilation.context;
 
-  return Promise.all(compilation.graph.map(async (page) => {
-    const { route, outputPath } = page;
-    const html = await fs.promises.readFile(path.join(scratchDir, outputPath), 'utf-8');
+  return Promise.all(compilation.graph
+    .filter(page => !page.isSSR || (page.isSSR && page.data.static))
+    .map(async (page) => {
+      const { route, outputPath } = page;
+      const html = await fs.promises.readFile(path.join(scratchDir, outputPath), 'utf-8');
 
-    if (route !== '/404/' && !fs.existsSync(path.join(outputDir, route))) {
-      fs.mkdirSync(path.join(outputDir, route), {
-        recursive: true
-      });
-    }
+      if (route !== '/404/' && !fs.existsSync(path.join(outputDir, route))) {
+        fs.mkdirSync(path.join(outputDir, route), {
+          recursive: true
+        });
+      }
 
-    const htmlOptimized = await optimizeResources.reduce(async (htmlPromise, resource) => {
-      const contents = await htmlPromise;
-      const shouldOptimize = await resource.shouldOptimize(outputPath, contents);
+      const htmlOptimized = await optimizeResources.reduce(async (htmlPromise, resource) => {
+        const contents = await htmlPromise;
+        const shouldOptimize = await resource.shouldOptimize(outputPath, contents);
 
-      return shouldOptimize
-        ? resource.optimize(outputPath, contents)
-        : Promise.resolve(contents);
-    }, Promise.resolve(html));
+        return shouldOptimize
+          ? resource.optimize(outputPath, contents)
+          : Promise.resolve(contents);
+      }, Promise.resolve(html));
 
-    await fs.promises.writeFile(path.join(outputDir, outputPath), htmlOptimized);
-  }));
+      await fs.promises.writeFile(path.join(outputDir, outputPath), htmlOptimized);
+    })
+  );
 }
 
 async function bundleStyleResources(compilation, optimizationPlugins) {
@@ -121,17 +124,16 @@ const bundleCompilation = async (compilation) => {
         return provider.shouldOptimize && provider.optimize;
       });
 
-      // TODO do we still need to mutate this?
-      compilation.graph = compilation.graph.filter(page => !page.isSSR || (page.isSSR && page.data.static));
-
-      console.info('optimizing pages...');
+      console.info('bundling static assets...');
 
       await Promise.all([
         await bundleScriptResources(compilation),
         await bundleStyleResources(compilation, optimizeResourcePlugins.filter(plugin => plugin.contentType.includes('text/css')))
       ]);
 
-      await optimizePages(compilation, optimizeResourcePlugins.filter(plugin => plugin.contentType.includes('text/html')));
+      console.info('optimizing static pages....');
+
+      await optimizeStaticPages(compilation, optimizeResourcePlugins.filter(plugin => plugin.contentType.includes('text/html')));
       await cleanUpResources(compilation);
 
       resolve();
