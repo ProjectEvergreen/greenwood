@@ -14,11 +14,11 @@ class PolyfillsResource extends ResourceInterface {
     };
   }
 
-  async shouldOptimize(url = '', body, headers = {}) {
-    return Promise.resolve(path.extname(url) === '.html' || (headers.request && headers.request['content-type'].indexOf('text/html') >= 0));
+  async shouldIntercept(url, body, headers = {}) {
+    return Promise.resolve(headers.request && headers.request['content-type'].indexOf('text/html') >= 0);
   }
 
-  async optimize(url, body) {
+  async intercept(url, body) {
     return new Promise(async (resolve, reject) => {
       try {
         let newHtml = body;
@@ -59,7 +59,7 @@ class PolyfillsResource extends ResourceInterface {
           `);
         }
 
-        resolve(newHtml);
+        resolve({ body: newHtml });
       } catch (e) {
         reject(e);
       }
