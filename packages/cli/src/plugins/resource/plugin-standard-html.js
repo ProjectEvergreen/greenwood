@@ -467,6 +467,8 @@ class StandardHtmlResource extends ResourceInterface {
               if (type === 'script') {
                 if (optimizationAttr === 'static' || optimization === 'static') {
                   headContents = headContents.replace(`<script ${rawAttributes}>${contents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}</script>`, '');
+                } else if (optimizationAttr === 'none') {
+                  headContents = headContents.replace(contents, contents.replace(/\.\//g, '/').replace(/\$/g, '$$$'));
                 } else {
                   headContents = headContents.replace(contents, optimizedFileContents.replace(/\.\//g, '/').replace(/\$/g, '$$$'));
                 }
@@ -477,6 +479,7 @@ class StandardHtmlResource extends ResourceInterface {
           }
 
           // TODO shouldn't lit polyfill support stay _in_?
+          // TODO clean up all gwd-data-opt=* markers from HTML
           headContents = headContents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
           headContents = headContents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
           headContents = headContents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
