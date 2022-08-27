@@ -11,13 +11,21 @@ function greenwoodResourceLoader (compilation) {
 
   return {
     name: 'greenwood-resource-loader',
+    resolveId(id) {
+      const { userWorkspace } = compilation.context;
+
+      if ((id.indexOf('./') === 0 || id.indexOf('/') === 0) && fs.existsSync(path.join(userWorkspace, id))) {
+        return path.join(userWorkspace, id);
+      }
+
+      return null;
+    },
     async load(id) {
       const importAsIdAsUrl = id.replace(/\?type=(.*)/, '');
       const extension = path.extname(importAsIdAsUrl);
 
       // TODO should we do JS files too, or let Rollup handle it?
       if (extension !== '.js') {
-
         for (const plugin of resourcePlugins) {
           if (await plugin.shouldServe(importAsIdAsUrl)) {
             const body = (await plugin.serve(importAsIdAsUrl)).body;
