@@ -21,7 +21,9 @@ function trackResourcesForRoute(html, compilation, route) {
   });
 
   const scripts = root.querySelectorAll('head script')
-    .filter(script => isLocalLink(script.getAttribute('src')) || script.rawText)
+    .filter(script => (
+      isLocalLink(script.getAttribute('src')) || script.rawText)
+      && script.rawAttrs.indexOf('importmap') < 0)
     .map(script => {
       const src = script.getAttribute('src');
       const optimizationAttr = script.getAttribute('data-gwd-opt');
@@ -106,7 +108,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       style: true
     });
 
-    // TODO get this from resources
+    // TODO get this from graph / resources
     const headScripts = root.querySelectorAll('script')
       .filter(script => {
         return script.getAttribute('type') === 'module'
@@ -170,6 +172,8 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     }
 
     console.info('generated page...', route);
+
+    trackResourcesForRoute(contents, compilation, route);
 
     await fs.promises.writeFile(path.join(scratchDir, outputPath), contents);
   });
