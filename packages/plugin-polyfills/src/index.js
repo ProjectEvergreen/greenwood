@@ -14,8 +14,8 @@ class PolyfillsResource extends ResourceInterface {
     };
   }
 
-  async shouldIntercept(url, body, headers = {}) {
-    return Promise.resolve(headers.request && headers.request['content-type'].indexOf('text/html') >= 0);
+  async shouldIntercept(url, body, headers = { request: {} }) {
+    return Promise.resolve(headers.request['content-type'] && headers.request['content-type'].indexOf('text/html') >= 0);
   }
 
   async intercept(url, body) {
