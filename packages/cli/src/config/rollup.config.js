@@ -15,7 +15,7 @@ function greenwoodResourceLoader (compilation) {
       const { userWorkspace } = compilation.context;
 
       if ((id.indexOf('./') === 0 || id.indexOf('/') === 0) && fs.existsSync(path.join(userWorkspace, id))) {
-        return path.join(userWorkspace, id);
+        return path.join(userWorkspace, id.replace(/\?type=(.*)/, ''));
       }
 
       return null;
@@ -26,28 +26,28 @@ function greenwoodResourceLoader (compilation) {
 
       // TODO should we do JS files too, or let Rollup handle it?
       if (extension !== '.js') {
+        let contents;
+
         for (const plugin of resourcePlugins) {
-          if (await plugin.shouldServe(importAsIdAsUrl)) {
-            const body = (await plugin.serve(importAsIdAsUrl)).body;
-            const contents = await resourcePlugins.reduce(async (body, resource) => {
-              const headers = {
-                request: {
-                  originalUrl: id
-                },
-                response: {
-                  'content-type': resource.contentType
-                }
-              };
-              const shouldIntercept = await resource.shouldIntercept(importAsIdAsUrl, body, headers);
+          const headers = {
+            request: {
+              originalUrl: id
+            },
+            response: {
+              'content-type': plugin.contentType
+            }
+          };
 
-              return shouldIntercept
-                ? (await resource.intercept(importAsIdAsUrl, body, headers)).body
-                : Promise.resolve(body);
-            }, Promise.resolve(body));
+          contents = await plugin.shouldServe(importAsIdAsUrl)
+            ? (await plugin.serve(importAsIdAsUrl)).body
+            : contents;
 
-            return contents;
+          if (await plugin.shouldIntercept(importAsIdAsUrl, contents, headers)) {
+            contents = (await plugin.intercept(importAsIdAsUrl, contents, headers)).body;
           }
         }
+
+        return contents;
       }
     }
   };
