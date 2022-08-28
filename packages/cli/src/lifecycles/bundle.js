@@ -86,9 +86,14 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
 
         await fs.promises.writeFile(path.join(outputDir, optimizedFileName), contents);
       } else {
-        const optimizedStyles = await optimizationPlugins.reduce(async (contents, optimizePromise) => {
-          return await optimizePromise.optimize(resource.sourcePathURL.pathname, contents);
-        }, contents || undefined);
+        const url = resource.sourcePathURL.pathname;
+        let optimizedStyles = await fs.promises.readFile(url, 'utf-8');
+
+        for (const plugin of optimizationPlugins) {
+          optimizedStyles = await plugin.shouldOptimize(url, optimizedStyles)
+            ? await plugin.optimize(url, optimizedStyles)
+            : optimizedStyles;
+        }
 
         compilation.resources[resourceIdx].optimizedFileContents = optimizedStyles;
         await fs.promises.writeFile(path.join(outputDir, optimizedFileName), optimizedStyles);

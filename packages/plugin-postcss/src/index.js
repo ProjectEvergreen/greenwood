@@ -34,6 +34,10 @@ class PostCssResource extends ResourceInterface {
     this.contentType = ['text/css'];
   }
 
+  async shouldServe() {
+    return false;
+  }
+
   isCssFile(url) {
     return path.extname(url) === '.css';
   }
@@ -65,6 +69,7 @@ class PostCssResource extends ResourceInterface {
   }
   
   async optimize(url, body) {
+    const contents = body || await fs.promises.readFile(url, 'utf-8');
     const config = await getConfig(this.compilation, this.options.extendConfig);
     const plugins = config.plugins && config.plugins.length ? [...config.plugins] : [];
     
@@ -73,7 +78,7 @@ class PostCssResource extends ResourceInterface {
     );
 
     const css = plugins.length > 0
-      ? (await postcss(plugins).process(body, { from: url })).css
+      ? (await postcss(plugins).process(contents, { from: url })).css
       : body;
     
     return Promise.resolve(css);

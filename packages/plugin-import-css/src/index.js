@@ -6,7 +6,6 @@
  */
 import fs from 'fs';
 import path from 'path';
-import postcssRollup from 'rollup-plugin-postcss';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class ImportCssResource extends ResourceInterface {
@@ -14,6 +13,11 @@ class ImportCssResource extends ResourceInterface {
     super(compilation, options);
     this.extensions = ['.css'];
     this.contentType = 'text/javascript';
+  }
+
+  // TODO should we re-think how default ResourceInterface handles things?
+  async shouldServe() {
+    return false;
   }
 
   // https://github.com/ProjectEvergreen/greenwood/issues/700
@@ -60,16 +64,6 @@ const greenwoodPluginImportCss = (options = {}) => {
     type: 'resource',
     name: 'plugin-import-css:resource',
     provider: (compilation) => new ImportCssResource(compilation, options)
-  }, {
-    type: 'rollup',
-    name: 'plugin-import-css:rollup',
-    provider: () => [
-      postcssRollup({
-        extract: false,
-        minimize: true,
-        inject: false
-      })
-    ]
   }];
 };
 

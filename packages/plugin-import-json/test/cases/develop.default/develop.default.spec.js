@@ -93,8 +93,8 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
 
-      it('should return an ECMASCript module', function(done) {
-        expect(response.body.replace(/\n/g, '')).to.equal('export default {  "status": 200,  "message": "got json"}');
+      it('should return an ECMAScript module', function(done) {
+        expect(response.body).to.equal('export default {"status":200,"message":"got json"}');
         done();
       });
     });
