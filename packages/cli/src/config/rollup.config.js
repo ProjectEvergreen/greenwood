@@ -25,6 +25,7 @@ function greenwoodResourceLoader (compilation) {
       const extension = path.extname(importAsIdAsUrl);
 
       // TODO should we do JS files too, or let Rollup handle it?
+      // If Greenwood handled it, this would support Import CommonJS plugin for free
       if (extension !== '.js') {
         let contents;
 

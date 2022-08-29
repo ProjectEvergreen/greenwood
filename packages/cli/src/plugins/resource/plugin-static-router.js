@@ -34,11 +34,13 @@ class StaticRouterResource extends ResourceInterface {
     });
   }
 
-  async shouldIntercept(url, body, headers) {
+  async shouldIntercept(url, body, headers = { request: {} }) {
+    const contentType = headers.request['content-type'];
+
     return Promise.resolve(process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
       && this.compilation.config.staticRouter
       && url !== '404.html'
-      && (path.extname(url) === '.html' || (headers.request && headers.request['content-type'].indexOf('text/html') >= 0)));
+      && (path.extname(url) === '.html' || (contentType && contentType.indexOf('text/html') >= 0)));
   }
 
   async intercept(url, body) {

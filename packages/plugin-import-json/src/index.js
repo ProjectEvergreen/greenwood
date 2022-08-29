@@ -18,6 +18,7 @@ class ImportJsonResource extends ResourceInterface {
     return false;
   }
 
+  // TODO handle it from node_modules too, when without `?type=json`
   async shouldIntercept(url, body, headers) {
     const { originalUrl } = headers.request;
     const type = this.extensions[0].replace('.', '');
