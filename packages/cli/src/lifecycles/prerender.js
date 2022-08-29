@@ -39,6 +39,7 @@ function trackResourcesForRoute(html, compilation, route) {
     });
 
   const styles = root.querySelectorAll('head style')
+    .filter(style => !(/\$/).test(style.rawText) && !(/<!-- Shady DOM styles for -->/).test(style.rawText)) // filter out Shady DOM <style> tags that happen when using puppeteer
     .map(style => modelResource(context, 'style', null, style.rawText, null, style.getAttribute('data-gwd-opt')));
 
   const links = root.querySelectorAll('head link')
@@ -101,6 +102,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     html = (await htmlResource.serve(route)).body;
     html = (await interceptPage(compilation, html, route)).body;
 
+    // TODO should this be done for all renderers?
     trackResourcesForRoute(html, compilation, route);
 
     const root = htmlparser.parse(html, {
@@ -173,6 +175,7 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
 
     console.info('generated page...', route);
 
+    // TODO should this be done for all renderers?
     trackResourcesForRoute(contents, compilation, route);
 
     await fs.promises.writeFile(path.join(scratchDir, outputPath), contents);
@@ -196,6 +199,7 @@ async function staticRenderCompilation(compilation) {
     let html = (await htmlResource.serve(route)).body;
     html = (await interceptPage(compilation, html, route)).body;
 
+    // TODO should this be done for all renderers?
     trackResourcesForRoute(html, compilation, route);
 
     // TODO should this be done for all renderers?
