@@ -430,9 +430,10 @@ class StandardHtmlResource extends ResourceInterface {
                 } else if (optimizationAttr === 'inline' || optimization === 'inline') {
                   const isModule = rawAttributes.indexOf('type="module') >= 0 ? ' type="module"' : '';
 
+                  // TODO handle missing optimizedFileContents, like from router.js
                   headContents = headContents.replace(`<script ${rawAttributes}></script>`, `
                     <script ${isModule}>
-                      ${optimizedFileContents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}
+                      ${(optimizedFileContents || contents).replace(/\.\//g, '/').replace(/\$/g, '$$$')}
                     </script>
                   `);
                 } else if (optimizationAttr === 'static' || optimization === 'static') {
