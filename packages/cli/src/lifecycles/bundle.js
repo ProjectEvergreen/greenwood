@@ -12,7 +12,8 @@ async function cleanUpResources(compilation) {
     const optConfig = ['inline', 'static'].indexOf(compilation.config.optimization) >= 0;
     const optAttr = ['inline', 'static'].indexOf(optimizationAttr) >= 0;
 
-    if (!src || (optAttr || optConfig)) {
+    // TODO why wouldn't optimizedFileName, like for router.js
+    if (optimizedFileName && (!src || (optAttr || optConfig))) {
       // TODO dedupe resources
       if (fs.existsSync(path.join(outputDir, optimizedFileName))) {
         fs.unlinkSync(path.join(outputDir, optimizedFileName));

@@ -176,6 +176,7 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     console.info('generated page...', route);
 
     // TODO should this be done for all renderers?
+    contents = (await interceptPage(compilation, contents, route)).body;
     trackResourcesForRoute(contents, compilation, route);
 
     await fs.promises.writeFile(path.join(scratchDir, outputPath), contents);
