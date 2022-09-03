@@ -432,7 +432,7 @@ class StandardHtmlResource extends ResourceInterface {
                   // TODO handle missing optimizedFileContents, like from router.js
                   headContents = headContents.replace(`<script ${rawAttributes}></script>`, `
                     <script ${isModule}>
-                      ${(optimizedFileContents || contents).replace(/\.\//g, '/').replace(/\$/g, '$$$')}
+                      ${optimizedFileContents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}
                     </script>
                   `);
                 } else if (optimizationAttr === 'static' || optimization === 'static') {

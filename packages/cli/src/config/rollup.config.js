@@ -62,8 +62,33 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
 
       for (const resource of compilation.resources.values()) {
         const resourceKey = resource.sourcePathURL.pathname;
+
         for (const bundle in bundles) {
-          if (resourceKey === bundles[bundle].facadeModuleId) {
+          let { facadeModuleId } = bundles[bundle];
+
+          /*
+           * this is an odd issue related to symlinking in our Greenwood monorepo when building the website
+           * and managing packages that we create as "virtual" modules, like for the mpa router
+           *
+           * ex. import @greenwood/router/router.js -> /node_modules/@greenwood/cli/src/lib/router.js
+           *
+           * when running our tests, which better emulates a real user
+           * facadeModuleId will be in node_modules, which is like how it would be for a user:
+           * /node_modules/@greenwood/cli/src/lib/router.js
+           *
+           * however, when building our website, where symlinking points back to our packages/ directory
+           * facadeModuleId will look like this:
+           * /<workspace>/greenwood/packages/cli/src/lib/router.js
+           *
+           * so we need to massage pathToMatch a bit for Rollup for our internal development
+           * pathToMatch (before): /node_modules/@greenwood/cli/src/lib/router.js
+           * pathToMatch (after): /cli/src/lib/router.js
+           */
+          if (facadeModuleId && resourceKey.indexOf('/node_modules/@greenwood/cli') > 0 && fs.existsSync(facadeModuleId) && facadeModuleId.indexOf('greenwood/packages/cli') > 0) {
+            facadeModuleId = facadeModuleId.replace('/greenwood/packages/cli', '/greenwood/node_modules/@greenwood/cli');
+          }
+
+          if (resourceKey === facadeModuleId) {
             const { fileName } = bundles[bundle];
             const { rawAttributes, contents } = resource;
             const noop = rawAttributes && rawAttributes.indexOf('data-gwd-opt="none"') >= 0 || compilation.config.optimization === 'none';
