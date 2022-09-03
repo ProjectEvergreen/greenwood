@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import cssnano from 'cssnano';
 import postcss from 'postcss';
+import postcssImport from 'postcss-import';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardCssResource extends ResourceInterface {
@@ -44,7 +45,9 @@ class StandardCssResource extends ResourceInterface {
         const { outputDir, userWorkspace } = this.compilation.context;
         const workspaceUrl = url.replace(outputDir, userWorkspace);
         const contents = body || await fs.promises.readFile(url, 'utf-8');
-        const css = (await postcss([cssnano]).process(contents, { from: workspaceUrl })).css;
+        const css = (await postcss([cssnano])
+          .use(postcssImport())
+          .process(contents, { from: workspaceUrl })).css;
 
         resolve(css);
       } catch (e) {
