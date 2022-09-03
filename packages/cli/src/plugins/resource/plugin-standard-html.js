@@ -402,9 +402,7 @@ class StandardHtmlResource extends ResourceInterface {
 
   async optimize(url, body) {
     const { optimization } = this.compilation.config;
-    // TODO why not just use compilation.resources here instead?
-    // TODO optimize could take a url or file path first param
-    const resources = this.compilation.graph.find(page => page.outputPath === url || page.route === url).imports;
+    const pageResources = this.compilation.graph.find(page => page.outputPath === url || page.route === url).imports;
 
     return new Promise((resolve, reject) => {
       try {
@@ -413,14 +411,15 @@ class StandardHtmlResource extends ResourceInterface {
         if (hasHead && hasHead.length > 0) {
           let headContents = hasHead[0];
 
-          for (const resource of resources) {
-            const { contents, src, type, optimizationAttr, optimizedFileContents, rawAttributes } = resource;
+          for (const pageResource of pageResources) {
+            const keyedResource = this.compilation.resources.get(pageResource.sourcePathURL.pathname);
+            const { contents, src, type, optimizationAttr, optimizedFileContents, optimizedFileName, rawAttributes } = keyedResource;
 
             // TODO I'm sure this could all be very heavily refactored
             if (src) {
               if (type === 'script') {
                 if (!optimizationAttr && optimization === 'default') {
-                  const optimizedFilePath = `/${resource.optimizedFileName}`;
+                  const optimizedFilePath = `/${optimizedFileName}`;
 
                   headContents = headContents.replace(src, optimizedFilePath);
                   headContents = headContents.replace('<head>', `
@@ -441,7 +440,7 @@ class StandardHtmlResource extends ResourceInterface {
                 }
               } else if (type === 'link') {
                 if (!optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
-                  const optimizedFilePath = `/${resource.optimizedFileName}`;
+                  const optimizedFilePath = `/${optimizedFileName}`;
 
                   headContents = headContents.replace(src, optimizedFilePath);
                   headContents = headContents.replace('<head>', `

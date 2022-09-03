@@ -7,17 +7,14 @@ import { rollup } from 'rollup';
 async function cleanUpResources(compilation) {
   const { outputDir } = compilation.context;
 
-  for (const resource of compilation.resources) {
+  for (const resource of compilation.resources.values()) {
     const { src, optimizedFileName, optimizationAttr } = resource;
     const optConfig = ['inline', 'static'].indexOf(compilation.config.optimization) >= 0;
     const optAttr = ['inline', 'static'].indexOf(optimizationAttr) >= 0;
 
     // TODO why wouldn't optimizedFileName, like for router.js
     if (optimizedFileName && (!src || (optAttr || optConfig))) {
-      // TODO dedupe resources
-      if (fs.existsSync(path.join(outputDir, optimizedFileName))) {
-        fs.unlinkSync(path.join(outputDir, optimizedFileName));
-      }
+      fs.unlinkSync(path.join(outputDir, optimizedFileName));
     }
   }
 }
@@ -52,16 +49,16 @@ async function optimizeStaticPages(compilation, optimizeResources) {
 }
 
 async function bundleStyleResources(compilation, optimizationPlugins) {
-  const resources = compilation.resources;
   const { outputDir } = compilation.context;
 
-  for (const resourceIdx in resources) {
-    const resource = resources[resourceIdx];
+  for (const resource of compilation.resources.values()) {
     const { contents, optimizationAttr, src = '', type } = resource;
 
     if (['style', 'link'].includes(type)) {
+      const resourceKey = resource.sourcePathURL.pathname;
       const srcPath = src && src.replace(/\.\.\//g, '').replace('./', '');
       let optimizedFileName;
+      let optimizedFileContents;
 
       if (src) {
         const basename = path.basename(srcPath);
@@ -83,9 +80,7 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
       }
 
       if (compilation.config.optimization === 'none' || optimizationAttr === 'none') {
-        compilation.resources[resourceIdx].optimizedFileContents = contents;
-
-        await fs.promises.writeFile(path.join(outputDir, optimizedFileName), contents);
+        optimizedFileContents = contents;
       } else {
         const url = resource.sourcePathURL.pathname;
         let optimizedStyles = await fs.promises.readFile(url, 'utf-8');
@@ -96,11 +91,16 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
             : optimizedStyles;
         }
 
-        compilation.resources[resourceIdx].optimizedFileContents = optimizedStyles;
-        await fs.promises.writeFile(path.join(outputDir, optimizedFileName), optimizedStyles);
+        optimizedFileContents = optimizedStyles;
       }
 
-      compilation.resources[resourceIdx].optimizedFileName = optimizedFileName;
+      compilation.resources.set(resourceKey, {
+        ...compilation.resources.get(resourceKey),
+        optimizedFileName,
+        optimizedFileContents
+      });
+
+      await fs.promises.writeFile(path.join(outputDir, optimizedFileName), optimizedFileContents);
     }
   }
 }
@@ -119,15 +119,18 @@ const bundleCompilation = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      compilation.resources = compilation.graph.map((page) => {
-        return page.imports;
-      }).flat();
       const optimizeResourcePlugins = compilation.config.plugins.filter((plugin) => {
         return plugin.type === 'resource';
       }).map((plugin) => {
         return plugin.provider(compilation);
       }).filter((provider) => {
         return provider.shouldOptimize && provider.optimize;
+      });
+      // centrally register all static resources
+      compilation.graph.map((page) => {
+        return page.imports;
+      }).flat().forEach(resource => {
+        compilation.resources.set(resource.sourcePathURL.pathname, resource);
       });
 
       console.info('bundling static assets...');

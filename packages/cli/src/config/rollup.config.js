@@ -59,19 +59,22 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
     name: 'greenwood-sync-page-resource-bundles-plugin',
     writeBundle(outputOptions, bundles) {
       const { outputDir } = compilation.context;
-      const resources = compilation.resources;
 
-      for (const resourceIdx in resources) {
+      for (const resource of compilation.resources.values()) {
+        const resourceKey = resource.sourcePathURL.pathname;
         for (const bundle in bundles) {
-          if (resources[resourceIdx].sourcePathURL.pathname === bundles[bundle].facadeModuleId) {
+          if (resourceKey === bundles[bundle].facadeModuleId) {
             const { fileName } = bundles[bundle];
-            const { rawAttributes, contents } = resources[resourceIdx];
+            const { rawAttributes, contents } = resource;
             const noop = rawAttributes && rawAttributes.indexOf('data-gwd-opt="none"') >= 0 || compilation.config.optimization === 'none';
             const outputPath = path.join(outputDir, fileName);
 
-            compilation.resources[resourceIdx].optimizedFileName = fileName;
-            compilation.resources[resourceIdx].optimizedFileContents = fs.readFileSync(outputPath, 'utf-8');
-            compilation.resources[resourceIdx].contents = contents.replace(/\.\//g, '/');
+            compilation.resources.set(resourceKey, {
+              ...compilation.resources.get(resourceKey),
+              optimizedFileName: fileName,
+              optimizedFileContents: fs.readFileSync(outputPath, 'utf-8'),
+              contents: contents.replace(/\.\//g, '/')
+            });
 
             if (noop) {
               fs.writeFileSync(outputPath, contents);
@@ -85,7 +88,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
 
 const getRollupConfig = async (compilation) => {
   const { outputDir } = compilation.context;
-  const input = compilation.resources
+  const input = [...compilation.resources.values()]
     .filter(resource => resource.type === 'script')
     .map(resource => resource.sourcePathURL.pathname);
   const customRollupPlugins = compilation.config.plugins.filter(plugin => {

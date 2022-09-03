@@ -10,7 +10,7 @@ const generateCompilation = () => {
         graph: [],
         context: {},
         config: {},
-        resources: []
+        resources: new Map()
       };
 
       console.info('Initializing project config');
