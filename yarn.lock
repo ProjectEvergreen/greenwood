@@ -2351,6 +2351,62 @@
     "@open-wc/dedupe-mixin" "^1.3.0"
     "@webcomponents/scoped-custom-element-registry" "^0.0.3"
 
+"@parcel/css-darwin-arm64@1.13.1":
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/@parcel/css-darwin-arm64/-/css-darwin-arm64-1.13.1.tgz#b857c162c5750b3417079ad5a6fead15427444d0"
+  integrity sha512-46LVidYcao8zurVPOZ4ZWJQ/50o4N+Z0K4CRmCCqWE+5gIWlx+md+W0h8XQTRb/GQ3j3+mlZvYCQxHpKy5M1lA==
+
+"@parcel/css-darwin-x64@1.13.1":
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/@parcel/css-darwin-x64/-/css-darwin-x64-1.13.1.tgz#be7e73a61fcace9a78e3664a0ca8845e69747f96"
+  integrity sha512-vX1/Ut06UL5MQzWr5fPg51n6NYrzfjW9A+jXH3KeBloWtX+NllhLilmtcO4X1y/ZqaFjqHWpk4yrNVdtk1r4zA==
+
+"@parcel/css-linux-arm-gnueabihf@1.13.1":
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/@parcel/css-linux-arm-gnueabihf/-/css-linux-arm-gnueabihf-1.13.1.tgz#bae1e86f9cb03646b48cf4604dded78a7757922f"
+  integrity sha512-qxQKUeXLHqehLmuJODQ7GNp0Syj2Kl35X4YvXGoPOI7Eq/y2ny3G5NCKUWkGDwOasIP3hKvVVfJRJv9fLJWnDQ==
+
+"@parcel/css-linux-arm64-gnu@1.13.1":
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/@parcel/css-linux-arm64-gnu/-/css-linux-arm64-gnu-1.13.1.tgz#fa4c43564b6bfc5434ab779cbef58de7b1228994"
+  integrity sha512-FxnOONVo8WBW58uzjqv/mwSBDgGMp1qxK+fovjqLPCP3zcNgxkUG0l6ElWpqtiWWH3mTMzSHe+7hSaeVov12yQ==
+
+"@parcel/css-linux-arm64-musl@1.13.1":
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/@parcel/css-linux-arm64-musl/-/css-linux-arm64-musl-1.13.1.tgz#17c1c1bb085d95a983cab0299312be9bc7ceae4d"
+  integrity sha512-6RDhL36HBAtt1mHa/y+34fHRImEJT/rd9hy1Z2qz117WUgzpZ3m4tFw33VrG7MKACugs9C2zG1MdVfy1Rz5+Uw==
+
+"@parcel/css-linux-x64-gnu@1.13.1":
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/@parcel/css-linux-x64-gnu/-/css-linux-x64-gnu-1.13.1.tgz#f363d661961ccee3f88fb94dac372de5e1f97fe0"
+  integrity sha512-4VsduFKs35J1I3iQJuBCTp66K5mLh8nrtfXzkBDgP9tc6cLqw9PFodby9NhW9SJSn0ZVdrciIXW0C8Lp3Ev+bw==
+
+"@parcel/css-linux-x64-musl@1.13.1":
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/@parcel/css-linux-x64-musl/-/css-linux-x64-musl-1.13.1.tgz#b29b660b9b39c9810d6dc351b77f925f6d5171cf"
+  integrity sha512-Ws34m9fW/0UuNTkC359nbnURzvSbCsstRG6QQ3UxdeNJ+crrgEsmvHPcN3WiIz/P2seP1Hu6GobKQAnOy6g3HA==
+
+"@parcel/css-win32-x64-msvc@1.13.1":
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/@parcel/css-win32-x64-msvc/-/css-win32-x64-msvc-1.13.1.tgz#55c572528100ef91dd60db655b367dc648c0c99c"
+  integrity sha512-4yPYFQqUW4ZepIWa8rWiXnSDU6Nki2H9PB1NfTvr7IjN3WsNFrrVZFKsTg/KU2euYnasBXSZ+CMTUutvLZoVaA==
+
+"@parcel/css@^1.13.1":
+  version "1.13.1"
+  resolved "https://registry.yarnpkg.com/@parcel/css/-/css-1.13.1.tgz#67e3acd3a328e65ddaa8fdb31ae7a47c4a7ee6c9"
+  integrity sha512-pDv+1tPCk2ggGZ1Msl4r+lq7dPKjUBpZXJf/DMydTnYPxupwAjtmlmOd67CF3QHVLyKYB+viU4g5M8pVXCbaeA==
+  dependencies:
+    detect-libc "^1.0.3"
+  optionalDependencies:
+    "@parcel/css-darwin-arm64" "1.13.1"
+    "@parcel/css-darwin-x64" "1.13.1"
+    "@parcel/css-linux-arm-gnueabihf" "1.13.1"
+    "@parcel/css-linux-arm64-gnu" "1.13.1"
+    "@parcel/css-linux-arm64-musl" "1.13.1"
+    "@parcel/css-linux-x64-gnu" "1.13.1"
+    "@parcel/css-linux-x64-musl" "1.13.1"
+    "@parcel/css-win32-x64-msvc" "1.13.1"
+
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@protobufjs/aspromise/-/aspromise-1.1.2.tgz#9b8b0cc663d669a7d8f6f5d0893a14d348f30fbf"
@@ -4865,6 +4921,11 @@ detect-indent@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/detect-indent/-/detect-indent-5.0.0.tgz#3871cc0a6a002e8c3e5b3cf7f336264675f06b9d"
   integrity sha1-OHHMCmoALow+Wzz38zYmRnXwa50=
+
+detect-libc@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-1.0.3.tgz#fa137c4bd698edf55cd5cd02ac559f91a4c4ba9b"
+  integrity sha512-pGjwhsmsp4kL2RTz08wcOlGN83otlqHeD/Z5T8GXZB+/YcpQ/dgo+lbU8ZsGxV0HIvqqxo9l7mqYwyYMD9bKDg==
 
 devtools-protocol@0.0.1011705:
   version "0.0.1011705"

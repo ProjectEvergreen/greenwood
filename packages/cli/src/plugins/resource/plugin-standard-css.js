@@ -6,9 +6,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import cssnano from 'cssnano';
-import postcss from 'postcss';
-import postcssImport from 'postcss-import';
+import * as css from '@parcel/css';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardCssResource extends ResourceInterface {
@@ -42,14 +40,12 @@ class StandardCssResource extends ResourceInterface {
   async optimize(url, body) {
     return new Promise(async (resolve, reject) => {
       try {  
-        const { outputDir, userWorkspace } = this.compilation.context;
-        const workspaceUrl = url.replace(outputDir, userWorkspace);
-        const contents = body || await fs.promises.readFile(url, 'utf-8');
-        const css = (await postcss([cssnano])
-          .use(postcssImport())
-          .process(contents, { from: workspaceUrl })).css;
+        const { code } = css.transform({
+          code: new TextEncoder().encode(body),
+          minify: true
+        });
 
-        resolve(css);
+        resolve(code);
       } catch (e) {
         reject(e);
       }
