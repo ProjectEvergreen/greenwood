@@ -80,14 +80,18 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
            * facadeModuleId will look like this:
            * /<workspace>/greenwood/packages/cli/src/lib/router.js
            *
-           * so we need to massage pathToMatch a bit for Rollup for our internal development
+           * so we need to massage facadeModuleId a bit for Rollup for our internal development
            * pathToMatch (before): /node_modules/@greenwood/cli/src/lib/router.js
            * pathToMatch (after): /cli/src/lib/router.js
            */
-          if (facadeModuleId && resourceKey.indexOf('/node_modules/@greenwood/cli') > 0 && fs.existsSync(facadeModuleId) && facadeModuleId.indexOf('greenwood/packages/cli') > 0) {
-            facadeModuleId = facadeModuleId.replace('/greenwood/packages/cli', '/greenwood/node_modules/@greenwood/cli');
+          // TODO will probably  need to fix this for Windows since / is hardcoded
+          console.debug({ resourceKey });
+          console.debug('BEFORE', { facadeModuleId });
+          if (facadeModuleId && resourceKey.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId.indexOf('/packages/cli') > 0 && fs.existsSync(facadeModuleId)) {
+            facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');
           }
-
+          console.debug('AFTER', { facadeModuleId });
+          console.debug('==============');
           if (resourceKey === facadeModuleId) {
             const { fileName } = bundles[bundle];
             const { rawAttributes, contents } = resource;
