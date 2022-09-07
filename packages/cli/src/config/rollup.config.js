@@ -58,8 +58,11 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
   return {
     name: 'greenwood-sync-page-resource-bundles-plugin',
     writeBundle(outputOptions, bundles) {
+      console.log('greenwood-sync-page-resource-bundles-plugin!!!!!');
       const { outputDir } = compilation.context;
 
+      console.log(compilation.resources.values());
+      console.log(bundles);
       for (const resource of compilation.resources.values()) {
         const resourceKey = resource.sourcePathURL.pathname;
 
@@ -85,13 +88,13 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
            * pathToMatch (after): /cli/src/lib/router.js
            */
           // TODO will probably  need to fix this for Windows since / is hardcoded
-          console.debug({ resourceKey });
-          console.debug('BEFORE', { facadeModuleId });
+          console.log({ resourceKey });
+          console.log('BEFORE', { facadeModuleId });
           if (facadeModuleId && resourceKey.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId.indexOf('/packages/cli') > 0 && fs.existsSync(facadeModuleId)) {
             facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');
           }
-          console.debug('AFTER', { facadeModuleId });
-          console.debug('==============');
+          console.log('AFTER', { facadeModuleId });
+          console.log('==============');
           if (resourceKey === facadeModuleId) {
             const { fileName } = bundles[bundle];
             const { rawAttributes, contents } = resource;
