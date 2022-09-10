@@ -61,10 +61,12 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
       const { outputDir } = compilation.context;
 
       for (const resource of compilation.resources.values()) {
-        const resourceKey = resource.sourcePathURL.pathname;
+        // TODO normalize handling of Windows paths centrally
+        const resourceKey = resource.sourcePathURL.pathname.replace('/C:', 'C:');
 
         for (const bundle in bundles) {
-          let { facadeModuleId } = bundles[bundle];
+          // TODO normalize handling of Windows paths centrally
+          let facadeModuleId = (bundles[bundle].facadeModuleId || '').replace(/\\/g, '/');
 
           /*
            * this is an odd issue related to symlinking in our Greenwood monorepo when building the website
@@ -84,7 +86,6 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
            * pathToMatch (before): /node_modules/@greenwood/cli/src/lib/router.js
            * pathToMatch (after): /cli/src/lib/router.js
            */
-          // TODO will probably need to fix this for Windows since / is hardcoded
           if (facadeModuleId && resourceKey.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId.indexOf('/packages/cli') > 0 && fs.existsSync(facadeModuleId)) {
             facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');
           }
@@ -116,7 +117,7 @@ const getRollupConfig = async (compilation) => {
   const { outputDir } = compilation.context;
   const input = [...compilation.resources.values()]
     .filter(resource => resource.type === 'script')
-    .map(resource => resource.sourcePathURL.pathname);
+    .map(resource => resource.sourcePathURL.pathname.replace('/C:', 'C:')); // TODO hardcoded, but why does it no carry over from bundle.js?
   const customRollupPlugins = compilation.config.plugins.filter(plugin => {
     return plugin.type === 'rollup';
   }).map(plugin => {

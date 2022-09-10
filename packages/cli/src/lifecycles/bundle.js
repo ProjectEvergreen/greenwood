@@ -55,6 +55,7 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
     const { contents, optimizationAttr, src = '', type } = resource;
 
     if (['style', 'link'].includes(type)) {
+      // TODO normalize handling of Windows paths centrally
       const resourceKey = resource.sourcePathURL.pathname;
       const srcPath = src && src.replace(/\.\.\//g, '').replace('./', '');
       let optimizedFileName;
@@ -83,19 +84,22 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
         optimizedFileContents = contents;
       } else {
         const url = resource.sourcePathURL.pathname;
-        let optimizedStyles = await fs.promises.readFile(url, 'utf-8');
+        // TODO normalize handling of Windows paths centrally
+        let optimizedStyles = await fs.promises.readFile(url.replace('/C:/', 'C:/'), 'utf-8');
 
         for (const plugin of optimizationPlugins) {
-          optimizedStyles = await plugin.shouldOptimize(url, optimizedStyles)
-            ? await plugin.optimize(url, optimizedStyles)
+          // TODO normalize handling of Windows paths centrally
+          optimizedStyles = await plugin.shouldOptimize(url.replace('C:/', ''), optimizedStyles)
+            ? await plugin.optimize(url.replace('C:/', ''), optimizedStyles)
             : optimizedStyles;
         }
 
         optimizedFileContents = optimizedStyles;
       }
 
-      compilation.resources.set(resourceKey, {
-        ...compilation.resources.get(resourceKey),
+      // TODO normalize handling of Windows paths centrally
+      compilation.resources.set(resourceKey.replace('/C:', 'C:'), {
+        ...compilation.resources.get(resourceKey.replace('/C:', 'C:')),
         optimizedFileName,
         optimizedFileContents
       });
@@ -130,7 +134,9 @@ const bundleCompilation = async (compilation) => {
       compilation.graph.map((page) => {
         return page.imports;
       }).flat().forEach(resource => {
-        compilation.resources.set(resource.sourcePathURL.pathname, resource);
+        // TODO hardcoded windows hack
+        resource.sourcePathURL.pathname = resource.sourcePathURL.pathname.replace('/C:', 'C:');
+        compilation.resources.set(resource.sourcePathURL.pathname.replace('/C:', 'C:'), resource);
       });
 
       console.info('bundling static assets...');

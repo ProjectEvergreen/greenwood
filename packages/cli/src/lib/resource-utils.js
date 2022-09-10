@@ -23,7 +23,7 @@ function modelResource(context, type, src = undefined, contents = undefined, opt
 
   return {
     src, // if <script src="..."></script> or <link href="..."></link>
-    sourcePathURL, // where the contents of the file are
+    sourcePathURL, // src as a URL
     type,
     contents,
     optimizedFileName: undefined,
