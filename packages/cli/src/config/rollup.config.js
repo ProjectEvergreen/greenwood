@@ -61,10 +61,12 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
       const { outputDir } = compilation.context;
 
       for (const resource of compilation.resources.values()) {
+        // TODO normalize handling of Windows paths centrally
         const resourceKey = resource.sourcePathURL.pathname;
 
         for (const bundle in bundles) {
-          let { facadeModuleId } = bundles[bundle];
+          // TODO normalize handling of Windows paths centrally
+          let facadeModuleId = (bundles[bundle].facadeModuleId || '').replace(/\\/g, '/');
 
           /*
            * this is an odd issue related to symlinking in our Greenwood monorepo when building the website
@@ -84,7 +86,6 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
            * pathToMatch (before): /node_modules/@greenwood/cli/src/lib/router.js
            * pathToMatch (after): /cli/src/lib/router.js
            */
-          // TODO will probably need to fix this for Windows since / is hardcoded
           if (facadeModuleId && resourceKey.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId.indexOf('/packages/cli') > 0 && fs.existsSync(facadeModuleId)) {
             facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');
           }
