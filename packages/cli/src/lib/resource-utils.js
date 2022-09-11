@@ -26,14 +26,14 @@ function modelResource(context, type, src = undefined, contents = undefined, opt
   // handle for Windows adding extra / in front of drive letter for whatever reason :(
   // e.g. turn /C:/... -> C:/...
   // and also URL is readonly in NodeJS??
-  if(windowsDriveRegex.test(sourcePathURL.pathname)) {
+  if (windowsDriveRegex.test(sourcePathURL.pathname)) {
     const driveMatch = sourcePathURL.pathname.match(windowsDriveRegex)[0];
 
     sourcePathURL = {
       ...sourcePathURL,
       pathname: sourcePathURL.pathname.replace(driveMatch, driveMatch.replace('/', '')),
-      href: sourcePathURL.href.replace(driveMatch, driveMatch.replace('/', '')),
-    }
+      href: sourcePathURL.href.replace(driveMatch, driveMatch.replace('/', ''))
+    };
   }
 
   return {
