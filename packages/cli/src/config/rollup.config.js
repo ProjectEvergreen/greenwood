@@ -62,7 +62,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
 
       for (const resource of compilation.resources.values()) {
         // TODO normalize handling of Windows paths centrally
-        const resourceKey = resource.sourcePathURL.pathname.replace('/C:', 'C:');
+        const resourceKey = resource.sourcePathURL.pathname;
 
         for (const bundle in bundles) {
           // TODO normalize handling of Windows paths centrally
@@ -117,7 +117,7 @@ const getRollupConfig = async (compilation) => {
   const { outputDir } = compilation.context;
   const input = [...compilation.resources.values()]
     .filter(resource => resource.type === 'script')
-    .map(resource => resource.sourcePathURL.pathname.replace('/C:', 'C:')); // TODO hardcoded, but why does it no carry over from bundle.js?
+    .map(resource => resource.sourcePathURL.pathname);
   const customRollupPlugins = compilation.config.plugins.filter(plugin => {
     return plugin.type === 'rollup';
   }).map(plugin => {

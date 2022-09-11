@@ -412,8 +412,7 @@ class StandardHtmlResource extends ResourceInterface {
           let headContents = hasHead[0];
 
           for (const pageResource of pageResources) {
-            // TODO normalize handling of Windows paths
-            const keyedResource = this.compilation.resources.get(pageResource.sourcePathURL.pathname.replace('/C:', 'C:'));
+            const keyedResource = this.compilation.resources.get(pageResource.sourcePathURL.pathname);
             const { contents, src, type, optimizationAttr, optimizedFileContents, optimizedFileName, rawAttributes } = keyedResource;
 
             // TODO I'm sure this could all be very heavily refactored
