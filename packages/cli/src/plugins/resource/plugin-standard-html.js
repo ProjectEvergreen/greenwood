@@ -478,12 +478,7 @@ class StandardHtmlResource extends ResourceInterface {
             }
           }
 
-          // TODO shouldn't lit polyfill support stay _in_?
-          // TODO clean up all gwd-data-opt=* markers from HTML
           headContents = headContents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
-          headContents = headContents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
-          headContents = headContents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
-          headContents = headContents.replace(/type="module-shim"/g, 'type="module"');
 
           body = body.replace(/\<head>(.*)<\/head>/s, headContents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
         }

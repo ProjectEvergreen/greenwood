@@ -12,7 +12,7 @@ async function cleanUpResources(compilation) {
     const optConfig = ['inline', 'static'].indexOf(compilation.config.optimization) >= 0;
     const optAttr = ['inline', 'static'].indexOf(optimizationAttr) >= 0;
 
-    // TODO why wouldn't optimizedFileName, like for router.js
+    // TODO why wouldn't optimizedFileName exist - happens with static router.js
     if (optimizedFileName && (!src || (optAttr || optConfig))) {
       fs.unlinkSync(path.join(outputDir, optimizedFileName));
     }

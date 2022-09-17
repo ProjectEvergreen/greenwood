@@ -26,6 +26,7 @@
  */
 import chai from 'chai';
 import fs from 'fs/promises';
+import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
@@ -244,6 +245,10 @@ describe('Build Greenwood With: ', function() {
         const heading = dom.window.document.querySelector('body h1').textContent;
 
         expect(heading).to.equal('Welcome to Greenwood!');
+      });
+
+      it('should contain the expected number of javascript files in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(3);
       });
 
       it('should have the expected output from main.js for lit (ESM) in the page output', async function() {

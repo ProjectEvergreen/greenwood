@@ -175,8 +175,12 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
 
     console.info('generated page...', route);
 
-    // TODO should this be done for all renderers?
-    contents = (await interceptPage(compilation, contents, route)).body;
+    // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
+    contents = contents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
+    contents = contents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
+    contents = contents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
+    contents = contents.replace(/type="module-shim"/g, 'type="module"');
+
     trackResourcesForRoute(contents, compilation, route);
 
     await fs.promises.writeFile(path.join(scratchDir, outputPath), contents);
