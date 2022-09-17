@@ -24,8 +24,6 @@ function greenwoodResourceLoader (compilation) {
       const importAsIdAsUrl = id.replace(/\?type=(.*)/, '');
       const extension = path.extname(importAsIdAsUrl);
 
-      // TODO should we do JS files too, or let Rollup handle it?
-      // If Greenwood handled it, this would support Import CommonJS plugin for free
       if (extension !== '.js') {
         let contents;
 
@@ -61,11 +59,9 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
       const { outputDir } = compilation.context;
 
       for (const resource of compilation.resources.values()) {
-        // TODO normalize handling of Windows paths centrally
         const resourceKey = resource.sourcePathURL.pathname;
 
         for (const bundle in bundles) {
-          // TODO normalize handling of Windows paths centrally
           let facadeModuleId = (bundles[bundle].facadeModuleId || '').replace(/\\/g, '/');
 
           /*
@@ -132,8 +128,6 @@ const getRollupConfig = async (compilation) => {
       chunkFileNames: '[name].[hash].js',
       sourcemap: true
     },
-    // TODO will we need _any_ other Rollup plugins from greenwood plugins?
-    // commonjs, nodeResolve, etc
     plugins: [
       greenwoodResourceLoader(compilation),
       greenwoodSyncPageResourceBundlesPlugin(compilation),

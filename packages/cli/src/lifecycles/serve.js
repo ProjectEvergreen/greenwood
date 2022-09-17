@@ -274,7 +274,6 @@ async function getHybridServer(compilation) {
       })[0];
       let body;
 
-      // TODO try and share this with prerendering lifecycle?
       const interceptResources = compilation.config.plugins.filter((plugin) => {
         return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
       }).map((plugin) => {
@@ -309,8 +308,6 @@ async function getHybridServer(compilation) {
           ? resource.optimize(url, html, headers)
           : Promise.resolve(html);
       }, Promise.resolve(body));
-
-      // TODO no need for double bundle?
 
       ctx.status = 200;
       ctx.set('content-type', 'text/html');

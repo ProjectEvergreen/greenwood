@@ -22,8 +22,7 @@ function modelResource(context, type, src = undefined, contents = undefined, opt
     fs.writeFileSync(sourcePathURL, contents);
   }
 
-  // TODO figure out why if possible
-  // handle for Windows adding extra / in front of drive letter for whatever reason :(
+  // TODO handle for Windows adding extra / in front of drive letter for whatever reason :(
   // e.g. turn /C:/... -> C:/...
   // and also URL is readonly in NodeJS??
   if (windowsDriveRegex.test(sourcePathURL.pathname)) {

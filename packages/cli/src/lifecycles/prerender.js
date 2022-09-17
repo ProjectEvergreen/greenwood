@@ -10,7 +10,7 @@ function isLocalLink(url = '') {
 }
 
 // TODO does this make more sense in bundle lifecycle?
-// TODO or could this be done sooner (like in appTemplate building in html resource plugin)?
+// or could this be done sooner (like in appTemplate building in html resource plugin)?
 // Or do we need to ensure userland code / plugins have gone first
 // before we can curate the final list of <script> / <style> / <link> tags to bundle
 function trackResourcesForRoute(html, compilation, route) {
@@ -102,7 +102,6 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     html = (await htmlResource.serve(route)).body;
     html = (await interceptPage(compilation, html, route)).body;
 
-    // TODO should this be done for all renderers?
     trackResourcesForRoute(html, compilation, route);
 
     const root = htmlparser.parse(html, {
