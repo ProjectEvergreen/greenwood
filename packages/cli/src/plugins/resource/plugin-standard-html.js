@@ -79,8 +79,11 @@ const getAppTemplate = (pageTemplateContents, templatesDir, customImports = [], 
     style: true
   });
 
-  if (!pageRoot.valid) {
+  if (!pageRoot.valid || !appRoot.valid) {
     console.debug('ERROR: Invalid HTML detected');
+    const invalidContents = !pageRoot.valid
+      ? pageTemplateContents
+      : appTemplateContents;
 
     if (enableHud) {
       appTemplateContents = appTemplateContents.replace('<body>', `
@@ -89,7 +92,7 @@ const getAppTemplate = (pageTemplateContents, templatesDir, customImports = [], 
             <p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="nopener noreferrer">HTML formatter</a>.</p>
             <details>
               <pre>
-                ${pageTemplateContents.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}
+                ${invalidContents.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}
               </pre>
             </details>
           </div>
