@@ -60,14 +60,32 @@ function commonIndexSpecs(dom, html, label) {
         expect(tagsMatch('script', html)).to.be.equal(true);
       });
 
+      it('should not have nested <script> tags in the <head>', function() {
+        const scripts = dom.window.document.querySelectorAll('head script > script');
+
+        expect(scripts.length).to.be.equal(0);
+      });
+
       it('should have matching opening and closing <link> tags in the <head>', function() {
         const html = dom.window.document.querySelector('html').textContent;
 
         expect(tagsMatch('link', html)).to.be.equal(true);
       });
 
+      it('should not have nested <link> tags in the <head>', function() {
+        const link = dom.window.document.querySelectorAll('head link > link');
+
+        expect(link.length).to.be.equal(0);
+      });
+
       it('should have matching opening and closing <style> tags in the <head>', function() {
         expect(tagsMatch('style', html)).to.be.equal(true);
+      });
+
+      it('should not have nested <style> tags in the <head>', function() {
+        const style = dom.window.document.querySelectorAll('head style > style');
+
+        expect(style.length).to.be.equal(0);
       });
 
       it('should have default viewport <meta> tag', function() {
