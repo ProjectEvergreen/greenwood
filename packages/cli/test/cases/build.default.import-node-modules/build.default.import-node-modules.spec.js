@@ -217,7 +217,7 @@ describe('Build Greenwood With: ', function() {
         expect(mainScriptTags.length).to.be.equal(1);
       });
 
-      // TODO shouldn't lit polyfill support stay _in_?
+      // TODO clean up lit-polyfill as part of https://github.com/ProjectEvergreen/greenwood/issues/728
       it('should have the total expected number of .js file in the output directory', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(4);
       });

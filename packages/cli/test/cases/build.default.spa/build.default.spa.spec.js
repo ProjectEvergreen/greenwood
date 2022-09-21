@@ -235,7 +235,7 @@ describe('Build Greenwood With: ', function() {
         // one for the footer.js
         // one for index.js
         // one for lit element bundle
-        // TODO one for lit polyfill, right?
+        // TODO clean up lit-polyfill as part of https://github.com/ProjectEvergreen/greenwood/issues/728
         expect(jsFiles.length).to.be.equal(6);
       });
 

@@ -155,7 +155,7 @@ describe('Build Greenwood With: ', function() {
         expect(styles.length).to.equal(1);
       });
 
-      // TODO one for lit polyfill, right?
+      // TODO clean up lit-polyfill as part of https://github.com/ProjectEvergreen/greenwood/issues/728
       it('should have four script tags', function() {
         const scripts = dom.window.document.querySelectorAll('head > script');
 

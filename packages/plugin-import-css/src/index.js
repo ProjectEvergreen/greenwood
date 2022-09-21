@@ -15,7 +15,7 @@ class ImportCssResource extends ResourceInterface {
     this.contentType = 'text/javascript';
   }
 
-  // TODO should we re-think how default ResourceInterface handles things?
+  // TODO resolve as part of https://github.com/ProjectEvergreen/greenwood/issues/952
   async shouldServe() {
     return false;
   }

@@ -11,7 +11,7 @@ function modelResource(context, type, src = undefined, contents = undefined, opt
 
   if (src) {
     sourcePathURL = src.indexOf('/node_modules') === 0
-      ? pathToFileURL(path.join(projectDirectory, src)) // TODO get "real" location of node modules
+      ? pathToFileURL(path.join(projectDirectory, src)) // TODO (good first issue) get "real" location of node modules
       : pathToFileURL(path.join(userWorkspace, src.replace(/\.\.\//g, '').replace('./', '')));
 
     contents = fs.readFileSync(sourcePathURL, 'utf-8');
@@ -22,7 +22,7 @@ function modelResource(context, type, src = undefined, contents = undefined, opt
     fs.writeFileSync(sourcePathURL, contents);
   }
 
-  // TODO handle for Windows adding extra / in front of drive letter for whatever reason :(
+  // TODO (good first issue) handle for Windows adding extra / in front of drive letter for whatever reason :(
   // e.g. turn /C:/... -> C:/...
   // and also URL is readonly in NodeJS??
   if (windowsDriveRegex.test(sourcePathURL.pathname)) {

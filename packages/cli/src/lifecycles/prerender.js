@@ -2,14 +2,22 @@ import fs from 'fs';
 import htmlparser from 'node-html-parser';
 import { modelResource } from '../lib/resource-utils.js';
 import path from 'path';
-import { pathToFileURL } from 'url';
 import { Worker } from 'worker_threads';
 
 function isLocalLink(url = '') {
   return url.indexOf('http') !== 0 && url.indexOf('//') !== 0;
 }
 
+function createOutputDirectory(route, outputPathDir) {
+  if (route !== '/404/' && !fs.existsSync(outputPathDir)) {
+    fs.mkdirSync(outputPathDir, {
+      recursive: true
+    });
+  }
+}
+
 // TODO does this make more sense in bundle lifecycle?
+// https://github.com/ProjectEvergreen/greenwood/issues/970
 // or could this be done sooner (like in appTemplate building in html resource plugin)?
 // Or do we need to ensure userland code / plugins have gone first
 // before we can curate the final list of <script> / <style> / <link> tags to bundle
@@ -51,11 +59,15 @@ function trackResourcesForRoute(html, compilation, route) {
       return modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'), link.rawAttrs);
     });
 
-  compilation.graph.find(page => page.route === route).imports = [
+  const resources = [
     ...scripts,
     ...styles,
     ...links
   ];
+
+  compilation.graph.find(page => page.route === route).imports = resources;
+
+  return resources;
 }
 
 async function interceptPage(compilation, contents, route) {
@@ -102,21 +114,12 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     html = (await htmlResource.serve(route)).body;
     html = (await interceptPage(compilation, html, route)).body;
 
-    trackResourcesForRoute(html, compilation, route);
+    createOutputDirectory(route, outputPathDir);
 
-    const root = htmlparser.parse(html, {
-      script: true,
-      style: true
-    });
-
-    // TODO get this from graph / resources
-    const headScripts = root.querySelectorAll('script')
-      .filter(script => {
-        return script.getAttribute('type') === 'module'
-          && script.getAttribute('src') && script.getAttribute('src').indexOf('http') < 0;
-      }).map(script => {
-        return pathToFileURL(path.join(compilation.context.userWorkspace, script.getAttribute('src').replace(/\.\.\//g, '').replace('./', '')));
-      });
+    const resources = trackResourcesForRoute(html, compilation, route);
+    const scripts = resources
+      .filter(resource => resource.type === 'script')
+      .map(resource => resource.sourcePathURL);
 
     await new Promise((resolve, reject) => {
       const worker = new Worker(workerPrerender.workerUrl, {
@@ -126,7 +129,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
           route,
           prerender: true,
           htmlContents: html,
-          scripts: JSON.stringify(headScripts)
+          scripts: JSON.stringify(scripts)
         }
       });
       worker.on('message', (result) => {
@@ -143,15 +146,9 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       });
     });
 
-    console.info('generated page...', route);
-    // TODO should this be done for all renderers?
-    if (route !== '/404/' && !fs.existsSync(outputPathDir)) {
-      fs.mkdirSync(outputPathDir, {
-        recursive: true
-      });
-    }
-
     await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
+
+    console.info('generated page...', route);
   }));
 }
 
@@ -165,15 +162,6 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     const { outputPath, route } = page;
     const outputPathDir = path.join(scratchDir, route);
 
-    // TODO should this be done for all renderers?
-    if (route !== '/404/' && !fs.existsSync(outputPathDir)) {
-      fs.mkdirSync(outputPathDir, {
-        recursive: true
-      });
-    }
-
-    console.info('generated page...', route);
-
     // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
     contents = contents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
     contents = contents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
@@ -181,8 +169,11 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     contents = contents.replace(/type="module-shim"/g, 'type="module"');
 
     trackResourcesForRoute(contents, compilation, route);
+    createOutputDirectory(route, outputPathDir);
 
     await fs.promises.writeFile(path.join(scratchDir, outputPath), contents);
+
+    console.info('generated page...', route);
   });
 }
 
@@ -203,15 +194,8 @@ async function staticRenderCompilation(compilation) {
     let html = (await htmlResource.serve(route)).body;
     html = (await interceptPage(compilation, html, route)).body;
 
-    // TODO should this be done for all renderers?
     trackResourcesForRoute(html, compilation, route);
-
-    // TODO should this be done for all renderers?
-    if (route !== '/404/' && !fs.existsSync(outputPathDir)) {
-      fs.mkdirSync(outputPathDir, {
-        recursive: true
-      });
-    }
+    createOutputDirectory(route, outputPathDir);
 
     await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
 

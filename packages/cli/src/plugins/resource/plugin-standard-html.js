@@ -418,7 +418,6 @@ class StandardHtmlResource extends ResourceInterface {
             const keyedResource = this.compilation.resources.get(pageResource.sourcePathURL.pathname);
             const { contents, src, type, optimizationAttr, optimizedFileContents, optimizedFileName, rawAttributes } = keyedResource;
 
-            // TODO I'm sure this could all be very heavily refactored
             if (src) {
               if (type === 'script') {
                 if (!optimizationAttr && optimization === 'default') {
