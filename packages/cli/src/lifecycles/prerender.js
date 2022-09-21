@@ -168,6 +168,11 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     contents = contents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
     contents = contents.replace(/type="module-shim"/g, 'type="module"');
 
+    contents = (await interceptPage(compilation, contents, route)).body;
+
+    // clean this up here to avoid sending webcomponents-bundle to rollup
+    contents = contents.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
+
     trackResourcesForRoute(contents, compilation, route);
     createOutputDirectory(route, outputPathDir);
 
