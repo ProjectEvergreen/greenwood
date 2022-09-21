@@ -119,7 +119,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     const resources = trackResourcesForRoute(html, compilation, route);
     const scripts = resources
       .filter(resource => resource.type === 'script')
-      .map(resource => resource.sourcePathURL);
+      .map(resource => resource.sourcePathURL.href);
 
     await new Promise((resolve, reject) => {
       const worker = new Worker(workerPrerender.workerUrl, {
