@@ -73,7 +73,7 @@ describe('Build Greenwood With: ', function() {
         expect(inlineScript.length).to.be.equal(1);
       });
 
-      it('should have the expected code with users analyicsId', function() {
+      it('should have the expected code with users analyticsId', function() {
         const expectedContent = `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}

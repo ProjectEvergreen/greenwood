@@ -3,13 +3,12 @@
  * Enables using JavaScript to import TypeScript files, using ESM syntax.
  *
  */
-import rollupPluginTypescript from '@rollup/plugin-typescript';
 import fs from 'fs';
 import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 import tsc from 'typescript';
 
-const defaultcompilerOptions = {
+const defaultCompilerOptions = {
   target: 'es2020',
   module: 'es2020',
   moduleResolution: 'node',
@@ -22,7 +21,7 @@ function getCompilerOptions (projectDirectory, extendConfig) {
     : { compilerOptions: {} };
 
   return {
-    ...defaultcompilerOptions,
+    ...defaultCompilerOptions,
     ...customOptions.compilerOptions
   };
 }
@@ -60,16 +59,6 @@ const greenwoodPluginTypeScript = (options = {}) => {
     type: 'resource',
     name: 'plugin-import-typescript:resource',
     provider: (compilation) => new TypeScriptResource(compilation, options)
-  }, {
-    type: 'rollup',
-    name: 'plugin-import-typescript:rollup',
-    provider: (compilation) => {
-      const compilerOptions = getCompilerOptions(compilation.context.projectDirectory, options.extendConfig);
-
-      return [
-        rollupPluginTypescript(compilerOptions)
-      ];
-    }
   }];
 };
 

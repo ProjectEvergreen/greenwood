@@ -34,21 +34,46 @@ class StaticRouterResource extends ResourceInterface {
     });
   }
 
-  async shouldOptimize(url, body, headers) {
+  async shouldIntercept(url, body, headers = { request: {} }) {
+    const contentType = headers.request['content-type'];
+
+    return Promise.resolve(process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
+      && this.compilation.config.staticRouter
+      && url !== '404.html'
+      && (path.extname(url) === '.html' || (contentType && contentType.indexOf('text/html') >= 0)));
+  }
+
+  async intercept(url, body) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        body = body.replace('</head>', `
+          <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
+          </head>
+        `);
+
+        resolve({ body });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  async shouldOptimize(url, body, headers = { request: {} }) {
+    const contentType = headers.request['content-type'];
+
     return Promise.resolve(this.compilation.config.staticRouter
       && url !== '404.html'
-      && (path.extname(url) === '.html' || (headers.request && headers.request['content-type'].indexOf('text/html') >= 0)));
+      && (path.extname(url) === '.html' || (contentType && contentType.indexOf('text/html') >= 0)));
   }
 
   async optimize(url, body) {
     return new Promise(async (resolve, reject) => {
       try {
         let currentTemplate;
-        const isStaticRoute = path.extname(url) === '.html';
-        const { projectDirectory, scratchDir, outputDir } = this.compilation.context;
+        const isStaticRoute = this.compilation.graph.filter(page => page.outputPath === url && url !== '/404/' && !page.isSSR).length === 1;
+        const { outputDir } = this.compilation.context;
         const bodyContents = body.match(/<body>(.*)<\/body>/s)[0].replace('<body>', '').replace('</body>', '');
-        const outputBundlePath = path.normalize(`${outputDir}/_routes${url.replace(projectDirectory, '')}`)
-          .replace(`.greenwood${path.sep}`, '');
+        const outputBundlePath = path.join(`${outputDir}/_routes${url}`);
 
         const routeTags = this.compilation.graph
           .filter(page => !page.isSSR)
@@ -61,7 +86,7 @@ class StaticRouterResource extends ResourceInterface {
               ? ''
               : page.route.slice(0, page.route.lastIndexOf('/'));
 
-            if (url.replace(scratchDir, '') === `${page.route}index.html`) {
+            if (url === page.outputPath) {
               currentTemplate = template;
             }
             return `
@@ -80,22 +105,22 @@ class StaticRouterResource extends ResourceInterface {
         }
 
         body = body.replace('</head>', `
-          <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
           <script>
             window.__greenwood = window.__greenwood || {};
             window.__greenwood.currentTemplate = "${currentTemplate}";
           </script>
           </head>
-        `).replace(/<body>(.*)<\/body>/s, `
-          <body>\n
+        `.replace(/\n/g, '').replace(/ /g, ''))
+          .replace(/<body>(.*)<\/body>/s, `
+            <body>\n
 
-            <router-outlet>
-              ${bodyContents.replace(/\$/g, '$$$')}\n
-            </router-outlet>
+              <router-outlet>
+                ${bodyContents.replace(/\$/g, '$$$')}\n
+              </router-outlet>
 
-            ${routeTags.join('\n')}
-          </body>
-        `);
+              ${routeTags.join('\n')}
+            </body>
+          `);
 
         resolve(body);
       } catch (e) {

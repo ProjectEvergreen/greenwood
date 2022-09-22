@@ -9,7 +9,8 @@ const generateCompilation = () => {
       let compilation = {
         graph: [],
         context: {},
-        config: {}
+        config: {},
+        resources: new Map()
       };
 
       console.info('Initializing project config');

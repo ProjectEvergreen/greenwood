@@ -5,6 +5,7 @@
  *
  */
 import fs from 'fs';
+import path from 'path';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardJsonResource extends ResourceInterface {
@@ -12,6 +13,13 @@ class StandardJsonResource extends ResourceInterface {
     super(compilation, options);
     this.extensions = ['.json'];
     this.contentType = 'application/json';
+  }
+
+  async shouldServe(url) {
+    return Promise.resolve(
+      url.indexOf('graph.json') >= 0 ||
+      path.extname(url) === '.json' && fs.existsSync(url)
+    );
   }
 
   async serve(url) {

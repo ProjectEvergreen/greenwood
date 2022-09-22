@@ -20,7 +20,7 @@ class GraphQLResource extends ResourceInterface {
   constructor(compilation, options = {}) {
     super(compilation, options);
     this.extensions = ['.gql'];
-    this.contentType = ['text/javascript'];
+    this.contentType = ['text/javascript', 'text/html'];
   }
 
   async serve(url) {
@@ -33,7 +33,7 @@ class GraphQLResource extends ResourceInterface {
 
         resolve({
           body,
-          contentType: this.contentType
+          contentType: this.contentType[0]
         });
       } catch (e) {
         reject(e);
@@ -42,7 +42,7 @@ class GraphQLResource extends ResourceInterface {
   }
   
   async shouldIntercept(url, body, headers) {
-    return Promise.resolve(headers.request.accept && headers.request.accept.indexOf('text/html') >= 0);
+    return Promise.resolve(headers.request.accept && headers.request.accept.indexOf(this.contentType[1]) >= 0);
   }
 
   async intercept(url, body) {
@@ -58,14 +58,14 @@ class GraphQLResource extends ResourceInterface {
   }
 
   async shouldOptimize(url = '', body, headers = {}) {
-    return Promise.resolve((url && path.extname(url) === '.html') || (headers.request && headers.request['content-type'].indexOf('text/html') >= 0));
+    return Promise.resolve(path.extname(url) === '.html' || (headers.request && headers.request['content-type'].indexOf('text/html') >= 0));
   }
 
   async optimize(url, body) {
     return new Promise((resolve, reject) => {
       try {
         body = body.replace('<head>', `
-          <script data-state="apollo">
+          <script data-state="apollo" data-gwd-opt="none">
             window.__APOLLO_STATE__ = true;
           </script>
           <head>

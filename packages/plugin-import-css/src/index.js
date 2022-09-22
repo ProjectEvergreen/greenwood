@@ -6,7 +6,6 @@
  */
 import fs from 'fs';
 import path from 'path';
-import postcssRollup from 'rollup-plugin-postcss';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class ImportCssResource extends ResourceInterface {
@@ -14,6 +13,11 @@ class ImportCssResource extends ResourceInterface {
     super(compilation, options);
     this.extensions = ['.css'];
     this.contentType = 'text/javascript';
+  }
+
+  // TODO resolve as part of https://github.com/ProjectEvergreen/greenwood/issues/952
+  async shouldServe() {
+    return false;
   }
 
   // https://github.com/ProjectEvergreen/greenwood/issues/700
@@ -27,14 +31,16 @@ class ImportCssResource extends ResourceInterface {
     return Promise.resolve(`${url}.js`);
   }
 
-  async shouldIntercept(url, body, headers) {
-    const { originalUrl } = headers.request;
+  async shouldIntercept(url, body, headers = { request: {} }) {
+    const { originalUrl = '' } = headers.request;
+    const accept = headers.request.accept || '';
+    const isCssFile = path.extname(url) === this.extensions[0];
+    const notFromBrowser = accept.indexOf('text/css') < 0 && accept.indexOf('application/signed-exchange') < 0;
 
     // https://github.com/ProjectEvergreen/greenwood/issues/492
-    const isCssInJs = (originalUrl && originalUrl.indexOf('?type=css') >= 0) 
-      || (path.extname(url) === this.extensions[0]
-        && headers.request.accept.indexOf('text/css') < 0
-        && headers.request.accept.indexOf('application/signed-exchange') < 0);
+    const isCssInJs = originalUrl.indexOf('?type=css') >= 0
+      || isCssFile && notFromBrowser
+      || isCssFile && notFromBrowser && url.indexOf('/node_modules/') >= 0;
 
     return Promise.resolve(isCssInJs);
   }
@@ -60,16 +66,6 @@ const greenwoodPluginImportCss = (options = {}) => {
     type: 'resource',
     name: 'plugin-import-css:resource',
     provider: (compilation) => new ImportCssResource(compilation, options)
-  }, {
-    type: 'rollup',
-    name: 'plugin-import-css:rollup',
-    provider: () => [
-      postcssRollup({
-        extract: false,
-        minimize: true,
-        inject: false
-      })
-    ]
   }];
 };
 
