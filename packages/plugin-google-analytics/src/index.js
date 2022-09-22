@@ -26,7 +26,7 @@ class GoogleAnalyticsResource extends ResourceInterface {
         const newHtml = body.replace('</head>', `
           <link rel="preconnect" href="https://www.google-analytics.com/">
           <script async src="https://www.googletagmanager.com/gtag/js?id=${analyticsId}"></script>
-          <script>
+          <script data-gwd-opt="none">
             var getOutboundLink = function(url) {
               gtag('event', 'click', {
                 'event_category': 'outbound',

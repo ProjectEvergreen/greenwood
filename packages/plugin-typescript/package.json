@@ -20,11 +20,9 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.4.0",
-    "typescript": "^4.3.5"
+    "@greenwood/cli": "^0.4.0"
   },
   "dependencies": {
-    "@rollup/plugin-typescript": "^8.2.1",
     "typescript": "^4.3.5"
   },
   "devDependencies": {

@@ -26,6 +26,7 @@
  */
 import chai from 'chai';
 import fs from 'fs/promises';
+import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
@@ -246,6 +247,10 @@ describe('Build Greenwood With: ', function() {
         expect(heading).to.equal('Welcome to Greenwood!');
       });
 
+      it('should contain the expected number of javascript files in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(3);
+      });
+
       it('should have the expected output from main.js for lit (ESM) in the page output', async function() {
         const litOutput = dom.window.document.querySelectorAll('body > .output-lit');
         
@@ -293,7 +298,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(inlineScriptTag.textContent.replace('\n', '')).to
           // eslint-disable-next-line max-len
-          .equal('import"/lit-element.6ff69bae.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline"//# sourceMappingURL=1807818843-scratch.537e8f03.js.map');
+          .contain('import"/lit-element.6ff69bae.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline";//# sourceMappingURL=');
       });
 
       it('should have prerendered content from <app-header> component', function() {
