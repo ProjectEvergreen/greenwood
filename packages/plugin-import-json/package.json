@@ -23,9 +23,6 @@
   "peerDependencies": {
     "@greenwood/cli": "^0.12.3"
   },
-  "dependencies": {
-    "@rollup/plugin-json": "^4.1.0"
-  },
   "devDependencies": {
     "@greenwood/cli": "^0.26.2"
   }

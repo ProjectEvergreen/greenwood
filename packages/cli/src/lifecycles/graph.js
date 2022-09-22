@@ -1,6 +1,7 @@
 /* eslint-disable complexity, max-depth */
 import fs from 'fs';
 import fm from 'front-matter';
+import { modelResource } from '../lib/resource-utils.js';
 import path from 'path';
 import toc from 'markdown-toc';
 import { Worker } from 'worker_threads';
@@ -133,6 +134,13 @@ const generateGraph = async (compilation) => {
                 });
                 worker.on('message', (result) => {
                   if (result.frontmatter) {
+                    const resources = (result.frontmatter.imports || []).map((resource) => {
+                      const type = path.extname(resource) === '.js' ? 'script' : 'link';
+
+                      return modelResource(compilation.context, type, resource);
+                    });
+
+                    result.frontmatter.imports = resources;
                     ssrFrontmatter = result.frontmatter;
                   }
                   resolve();

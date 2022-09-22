@@ -57,7 +57,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       describe('<script> tag and preloading', function() {
-        it('should contain one javasccript file in the output directory', async function() {
+        it('should contain one javascript file in the output directory', async function() {
           expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(1);
         });
 

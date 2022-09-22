@@ -4,8 +4,6 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from 'fs';
-import pluginRollupJson from '@rollup/plugin-json';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class ImportJsonResource extends ResourceInterface {
@@ -15,20 +13,25 @@ class ImportJsonResource extends ResourceInterface {
     this.contentType = 'text/javascript';
   }
 
-  async shouldIntercept(url, body, headers) {
-    const { originalUrl } = headers.request;
-
-    return Promise.resolve(originalUrl && originalUrl.indexOf('?type=json') >= 0);
+  // TODO resolve as part of https://github.com/ProjectEvergreen/greenwood/issues/952
+  async shouldServe() {
+    return false;
   }
 
-  async intercept(url) {
+  // TODO handle it from node_modules too, when without `?type=json`
+  async shouldIntercept(url, body, headers) {
+    const { originalUrl } = headers.request;
+    const type = this.extensions[0].replace('.', '');
+
+    return Promise.resolve(originalUrl && originalUrl.indexOf(`?type=${type}`) >= 0);
+  }
+
+  async intercept(url, body) {
     return new Promise(async (resolve, reject) => {
       try {
-        const contents = await fs.promises.readFile(url, 'utf-8');
-        const body = `export default ${contents}`;
 
         resolve({
-          body,
+          body: `export default ${JSON.stringify(body)}`,
           contentType: this.contentType
         });
       } catch (e) {
@@ -42,14 +45,6 @@ const greenwoodPluginImportJson = (options = {}) => [{
   type: 'resource',
   name: 'plugin-import-json:resource',
   provider: (compilation) => new ImportJsonResource(compilation, options)
-}, {
-  type: 'rollup',
-  name: 'plugin-import-json:rollup',
-  provider: () => {
-    return [
-      pluginRollupJson()
-    ];
-  }
 }];
 
 export { greenwoodPluginImportJson };

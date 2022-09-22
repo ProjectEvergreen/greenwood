@@ -97,7 +97,7 @@ describe('Build Greenwood With: ', function() {
 
         it('should add one page template <link> tag', function() {
           expect(linkTags[0].rel).to.equal('stylesheet');
-          expect(linkTags[0].href).to.match(/styles\/theme.[a-z0-9]{8}.css/);
+          expect(linkTags[0].href).to.match(/styles\/theme.[a-z0-9]{10}.css/);
         });
 
         it('should add one page template <style> tag', function() {

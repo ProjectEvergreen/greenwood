@@ -70,14 +70,11 @@ describe('Build Greenwood With: ', function() {
 
     describe('TypeScript should process JavaScript that uses an interface', function() {
       it('should output correctly processed JavaScript without the interface', function() {
-        // Rollup is giving different [hash] filenames for us in Windows vs Linux / macOS so cant do a to.equal here :/
-        // https://github.com/ProjectEvergreen/greenwood/pull/650#issuecomment-877614947
-        const expectedJavaScript = 'const o="Angela",l="Davis",s="Professor";console.log(`Hello ${s} ${o} ${l}!`);//# sourceMappingURL=main.ts.';
         const jsFiles = glob.sync(path.join(this.context.publicDir, '*.js'));
         const javascript = fs.readFileSync(jsFiles[0], 'utf-8');
 
         expect(jsFiles.length).to.equal(1);
-        expect(javascript.replace(/\n/g, '')).to.contain(expectedJavaScript);
+        expect(javascript.replace(/\n/g, '')).to.contain('Hello Professor Angela Davis!');
       });
     });
   });
