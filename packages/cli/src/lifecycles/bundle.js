@@ -33,7 +33,7 @@ async function optimizeStaticPages(compilation, optimizeResources) {
         });
       }
 
-      const htmlOptimized = await optimizeResources.reduce(async (htmlPromise, resource) => {
+      let htmlOptimized = await optimizeResources.reduce(async (htmlPromise, resource) => {
         const contents = await htmlPromise;
         const shouldOptimize = await resource.shouldOptimize(outputPath, contents);
 
@@ -41,6 +41,9 @@ async function optimizeStaticPages(compilation, optimizeResources) {
           ? resource.optimize(outputPath, contents)
           : Promise.resolve(contents);
       }, Promise.resolve(html));
+
+      // clean up optimization markers
+      htmlOptimized = htmlOptimized.replace(/data-gwd-opt=".*[a-z]"/g, '');
 
       await fs.promises.writeFile(path.join(outputDir, outputPath), htmlOptimized);
     })

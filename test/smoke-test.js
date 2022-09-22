@@ -97,10 +97,14 @@ function commonIndexSpecs(dom, html, label) {
       });
 
       it('should have default charset <meta> tag', function() {
-        const chartsetMeta = Array.from(metaTags).filter(meta => meta.getAttribute('charset') === 'utf-8');
+        const charsetMeta = Array.from(metaTags).filter(meta => meta.getAttribute('charset') === 'utf-8');
 
-        expect(chartsetMeta.length).to.be.equal(1);
-        expect(chartsetMeta[0].getAttribute('charset')).to.be.equal('utf-8');
+        expect(charsetMeta.length).to.be.equal(1);
+        expect(charsetMeta[0].getAttribute('charset')).to.be.equal('utf-8');
+      });
+
+      it('should not have any optimization markers left in the HTML', function() {
+        expect(html.match(/data-gwd-opt=".*[a-z]"/)).to.be.equal(null);
       });
     });
 
