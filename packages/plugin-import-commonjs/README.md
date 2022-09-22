@@ -27,7 +27,7 @@ export default {
   ...
 
   plugins: [
-    ...greenwoodPluginImportCommonJs() // notice the spread ... !
+    greenwoodPluginImportCommonJs()
   ]
 }
 ```

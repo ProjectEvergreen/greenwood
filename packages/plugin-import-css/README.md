@@ -31,7 +31,7 @@ export default {
   ...
 
   plugins: [
-    ...greenwoodPluginImportCss() // notice the spread ... !
+    greenwoodPluginImportCss()
   ]
 }
 ```

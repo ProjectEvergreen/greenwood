@@ -75,7 +75,7 @@ export default {
   ...
 
   plugins: [
-    ...greenwoodPluginRendererPuppeteer() // notice the spread!
+    greenwoodPluginRendererPuppeteer()
   ]
 }
 ```

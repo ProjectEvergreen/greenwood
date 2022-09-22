@@ -15,11 +15,11 @@ export default {
   staticRouter: true,
   interpolateFrontmatter: true,
   plugins: [
-    ...greenwoodPluginGraphQL(),
-    ...greenwoodPluginPolyfills(),
+    greenwoodPluginGraphQL(),
+    greenwoodPluginPolyfills(),
     greenwoodPluginPostCss(),
-    ...greenwoodPluginImportJson(),
-    ...greenwoodPluginImportCss(),
+    greenwoodPluginImportJson(),
+    greenwoodPluginImportCss(),
     {
       type: 'rollup',
       name: 'rollup-plugin-analyzer',
@@ -34,8 +34,8 @@ export default {
         ];
       }
     },
-    ...greenwoodPluginIncludeHTML(),
-    ...greenwoodPluginRendererPuppeteer()
+    greenwoodPluginIncludeHTML(),
+    greenwoodPluginRendererPuppeteer()
   ],
   markdown: {
     plugins: [
