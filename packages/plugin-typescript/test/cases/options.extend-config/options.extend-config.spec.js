@@ -29,7 +29,7 @@
  * User tsconfig.json (example)
  * {
  *   "compilerOptions": {
- *     "expirementalDecorators": true,
+ *     "experimentalDecorators": true,
  *     "noImplicitAny": true,
  *     "strict": true
  *   }

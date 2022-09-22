@@ -79,7 +79,7 @@ const run = async() => {
       case 'serve':
         process.env.__GWD_COMMAND__ = 'build';
 
-        await (await import('./commands/build.js')).runProductionBuild(Object.assign({}, compilation));
+        await (await import('./commands/build.js')).runProductionBuild(compilation);
         await (await import('./commands/serve.js')).runProdServer(compilation);
 
         break;

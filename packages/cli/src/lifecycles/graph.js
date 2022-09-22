@@ -1,6 +1,7 @@
 /* eslint-disable complexity, max-depth */
 import fs from 'fs';
 import fm from 'front-matter';
+import { modelResource } from '../lib/resource-utils.js';
 import path from 'path';
 import toc from 'markdown-toc';
 import { Worker } from 'worker_threads';
@@ -123,7 +124,6 @@ const generateGraph = async (compilation) => {
               /* ---------End Menu Query-------------------- */
             } else {
               const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
-              // const relativePagePath = fullPath.substring(pagesDir.length - 1, fullPath.length);
               id = filename.split(path.sep)[filename.split(path.sep).length - 1].replace(extension, '');
               label = id.split('-')
                 .map((idPart) => {
@@ -147,6 +147,13 @@ const generateGraph = async (compilation) => {
                 });
                 worker.on('message', (result) => {
                   if (result.frontmatter) {
+                    const resources = (result.frontmatter.imports || []).map((resource) => {
+                      const type = path.extname(resource) === '.js' ? 'script' : 'link';
+
+                      return modelResource(compilation.context, type, resource);
+                    });
+
+                    result.frontmatter.imports = resources;
                     ssrFrontmatter = result.frontmatter;
                   }
                   resolve();

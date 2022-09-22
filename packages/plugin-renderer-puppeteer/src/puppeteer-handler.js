@@ -10,10 +10,13 @@ export default async function(compilation, callback) {
         
         return await browserRunner
           .serialize(`${serverUrl}${route}`)
-          .then(async (contents) => {
+          .then(async (html) => {
             console.info(`prerendering complete for page ${route}.`);
-            
-            await callback(page, contents);
+
+            // clean this up here to avoid sending webcomponents-bundle to rollup
+            html = html.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
+
+            await callback(page, html);
           });
       }));
     } catch (e) {

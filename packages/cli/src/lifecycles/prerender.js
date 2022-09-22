@@ -1,8 +1,74 @@
 import fs from 'fs';
 import htmlparser from 'node-html-parser';
+import { modelResource } from '../lib/resource-utils.js';
 import path from 'path';
 import { Worker } from 'worker_threads';
-import { pathToFileURL } from 'url';
+
+function isLocalLink(url = '') {
+  return url.indexOf('http') !== 0 && url.indexOf('//') !== 0;
+}
+
+function createOutputDirectory(route, outputPathDir) {
+  if (route !== '/404/' && !fs.existsSync(outputPathDir)) {
+    fs.mkdirSync(outputPathDir, {
+      recursive: true
+    });
+  }
+}
+
+// TODO does this make more sense in bundle lifecycle?
+// https://github.com/ProjectEvergreen/greenwood/issues/970
+// or could this be done sooner (like in appTemplate building in html resource plugin)?
+// Or do we need to ensure userland code / plugins have gone first
+// before we can curate the final list of <script> / <style> / <link> tags to bundle
+function trackResourcesForRoute(html, compilation, route) {
+  const { context } = compilation;
+  const root = htmlparser.parse(html, {
+    script: true,
+    style: true
+  });
+
+  const scripts = root.querySelectorAll('head script')
+    .filter(script => (
+      isLocalLink(script.getAttribute('src')) || script.rawText)
+      && script.rawAttrs.indexOf('importmap') < 0)
+    .map(script => {
+      const src = script.getAttribute('src');
+      const optimizationAttr = script.getAttribute('data-gwd-opt');
+      const { rawAttrs } = script;
+
+      if (src) {
+        // <script src="...."></script>
+        return modelResource(context, 'script', src, null, optimizationAttr, rawAttrs);
+      } else if (script.rawText) {
+        // <script>...</script>
+        return modelResource(context, 'script', null, script.rawText, optimizationAttr, rawAttrs);
+      }
+    });
+
+  const styles = root.querySelectorAll('head style')
+    .filter(style => !(/\$/).test(style.rawText) && !(/<!-- Shady DOM styles for -->/).test(style.rawText)) // filter out Shady DOM <style> tags that happen when using puppeteer
+    .map(style => modelResource(context, 'style', null, style.rawText, null, style.getAttribute('data-gwd-opt')));
+
+  const links = root.querySelectorAll('head link')
+    .filter(link => {
+      // <link rel="stylesheet" href="..."></link>
+      return link.getAttribute('rel') === 'stylesheet'
+        && link.getAttribute('href') && isLocalLink(link.getAttribute('href'));
+    }).map(link => {
+      return modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'), link.rawAttrs);
+    });
+
+  const resources = [
+    ...scripts,
+    ...styles,
+    ...links
+  ];
+
+  compilation.graph.find(page => page.route === route).imports = resources;
+
+  return resources;
+}
 
 async function interceptPage(compilation, contents, route) {
   const headers = {
@@ -10,7 +76,7 @@ async function interceptPage(compilation, contents, route) {
     response: { 'content-type': 'text/html' }
   };
   const interceptResources = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
+    return plugin.type === 'resource' && plugin.name !== 'plugin-node-modules:resource';
   }).map((plugin) => {
     return plugin.provider(compilation);
   }).filter((provider) => {
@@ -29,42 +95,15 @@ async function interceptPage(compilation, contents, route) {
   return htmlIntercepted;
 }
 
-async function optimizePage(compilation, contents, route, outputPath, outputDir) {
-  const optimizeResources = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'resource';
-  }).map((plugin) => {
-    return plugin.provider(compilation);
-  }).filter((provider) => {
-    return provider.shouldOptimize && provider.optimize;
-  });
-
-  const htmlOptimized = await optimizeResources.reduce(async (htmlPromise, resource) => {
-    const html = await htmlPromise;
-    const shouldOptimize = await resource.shouldOptimize(outputPath, html);
-    
-    return shouldOptimize
-      ? resource.optimize(outputPath, html)
-      : Promise.resolve(html);
-  }, Promise.resolve(contents));
-
-  if (route !== '/404/' && !fs.existsSync(path.join(outputDir, route))) {
-    fs.mkdirSync(path.join(outputDir, route), {
-      recursive: true
-    });
-  }
-
-  return htmlOptimized;
-}
-
 async function preRenderCompilationWorker(compilation, workerPrerender) {
   const pages = compilation.graph.filter(page => !page.isSSR);
-  const outputDir = compilation.context.scratchDir;
+  const { scratchDir } = compilation.context;
 
   console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
 
   await Promise.all(pages.map(async (page) => {
     const { outputPath, route } = page;
-    const outputPathDir = path.join(outputDir, route);
+    const outputPathDir = path.join(scratchDir, route);
     const htmlResource = compilation.config.plugins.filter((plugin) => {
       return plugin.name === 'plugin-standard-html';
     }).map((plugin) => {
@@ -72,21 +111,15 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     })[0];
     let html;
 
-    html = (await htmlResource.serve(page.route)).body;
+    html = (await htmlResource.serve(route)).body;
     html = (await interceptPage(compilation, html, route)).body;
 
-    const root = htmlparser.parse(html, {
-      script: true,
-      style: true
-    });
+    createOutputDirectory(route, outputPathDir);
 
-    const headScripts = root.querySelectorAll('script')
-      .filter(script => {
-        return script.getAttribute('type') === 'module'
-          && script.getAttribute('src') && script.getAttribute('src').indexOf('http') < 0;
-      }).map(script => {
-        return pathToFileURL(path.join(compilation.context.userWorkspace, script.getAttribute('src').replace(/\.\.\//g, '').replace('./', '')));
-      });
+    const resources = trackResourcesForRoute(html, compilation, route);
+    const scripts = resources
+      .filter(resource => resource.type === 'script')
+      .map(resource => resource.sourcePathURL.href);
 
     await new Promise((resolve, reject) => {
       const worker = new Worker(workerPrerender.workerUrl, {
@@ -96,7 +129,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
           route,
           prerender: true,
           htmlContents: html,
-          scripts: JSON.stringify(headScripts)
+          scripts: JSON.stringify(scripts)
         }
       });
       worker.on('message', (result) => {
@@ -113,17 +146,9 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       });
     });
 
-    html = await optimizePage(compilation, html, route, outputPath, outputDir);
-
-    if (!fs.existsSync(outputPathDir)) {
-      fs.mkdirSync(outputPathDir, {
-        recursive: true
-      });
-    }
+    await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
 
     console.info('generated page...', route);
-
-    await fs.promises.writeFile(path.join(outputDir, outputPath), html);
   }));
 }
 
@@ -135,17 +160,31 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
 
   await renderer(compilation, async (page, contents) => {
     const { outputPath, route } = page;
+    const outputPathDir = path.join(scratchDir, route);
+
+    // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
+    contents = contents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
+    contents = contents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
+    contents = contents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
+    contents = contents.replace(/type="module-shim"/g, 'type="module"');
+
+    contents = (await interceptPage(compilation, contents, route)).body;
+
+    // clean this up here to avoid sending webcomponents-bundle to rollup
+    contents = contents.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
+
+    trackResourcesForRoute(contents, compilation, route);
+    createOutputDirectory(route, outputPathDir);
+
+    await fs.promises.writeFile(path.join(scratchDir, outputPath), contents);
 
     console.info('generated page...', route);
-
-    const html = await optimizePage(compilation, contents, route, outputPath, scratchDir);
-    await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
   });
 }
 
 async function staticRenderCompilation(compilation) {
+  const { scratchDir } = compilation.context;
   const pages = compilation.graph.filter(page => !page.isSSR || page.isSSR && page.data.static);
-  const scratchDir = compilation.context.scratchDir;
   const htmlResource = compilation.config.plugins.filter((plugin) => {
     return plugin.name === 'plugin-standard-html';
   }).map((plugin) => {
@@ -156,10 +195,12 @@ async function staticRenderCompilation(compilation) {
   
   await Promise.all(pages.map(async (page) => {
     const { route, outputPath } = page;
+    const outputPathDir = path.join(scratchDir, route);
     let html = (await htmlResource.serve(route)).body;
-
     html = (await interceptPage(compilation, html, route)).body;
-    html = await optimizePage(compilation, html, route, outputPath, scratchDir);
+
+    trackResourcesForRoute(html, compilation, route);
+    createOutputDirectory(route, outputPathDir);
 
     await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
 

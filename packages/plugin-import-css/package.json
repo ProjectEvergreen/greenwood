@@ -21,11 +21,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.4.0",
-    "postcss": "^8.3.11"
-  },
-  "dependencies": {
-    "rollup-plugin-postcss": "^4.0.2"
+    "@greenwood/cli": "^0.4.0"
   },
   "devDependencies": {
     "@greenwood/cli": "^0.26.0"

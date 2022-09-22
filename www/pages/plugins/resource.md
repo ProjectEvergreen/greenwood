@@ -7,17 +7,23 @@ index: 3
 
 ## Resource
 
-Resource plugins allow developers to interact with the request and response lifecycles of files at a variety of different points along the development and build workflow, when running the `develop` and `build` commands.  These lifecycles provide the ability to do things like:
-- Integrating Site Analytics (Google, Snowplow) in each generated _index.html_ page
-- Introduce additional file types, like TypeScript
+Resource plugins allow the manipulation of files loaded through ESM.  Depending on if you need to support a file with a custom extension, or to manipulate standard file extensions, Resource plugins provide the lifecycle hooks into Greenwood to do things like:
+- Integrating Site Analytics (Google, Snowplow) or third snippets into generated _index.html_ pages
+- Processing TypeScript into JavaScript
+
+This API is also used as part of our bundling process to "teach" Rollup how to process any non JavaScript files!
 
 ### API (Resource Interface)
+
+> _**Note**: This API is [planning to change soon](https://github.com/ProjectEvergreen/greenwood/issues/948) as part of a general alignment within Greenwood to align the signatures of these lifecycle method to be more consistent with web standards in support of Greenwood adopting compatibility with [serverless and edge runtimes](https://github.com/ProjectEvergreen/greenwood/issues/953)_.
+
 Although JavaScript is loosely typed, a [resource "interface"](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/lib/resource-interface.js) has been provided by Greenwood that you can use to start building your own resource plugins.  Effectively you have to define two things:
 - `extensions`: The file types your plugin will operate on
 - `contentType`: A browser compatible contentType to ensure browsers correctly interpret you transformations
 
 ```javascript
 import fs from 'fs';
+import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class ResourceInterface {
@@ -61,10 +67,10 @@ class ResourceInterface {
 
   // return the new body
   async intercept(url, body, headers) {
-    return Promise.resolve({ body });
+    return Promise.resolve({ body, contentType: 'text/...' });
   }
 
-  // test if this plugin should manipulate any files prior to any final optimizations happening
+  // test if this plugin should manipulate the body and return a new body prior to any final optimizations happening
   // ex: add a "banner" to all .js files with a timestamp of the build, or minifying files
   // return true | false
   async shouldOptimize(url, body) {

@@ -155,15 +155,16 @@ describe('Build Greenwood With: ', function() {
         expect(styles.length).to.equal(1);
       });
 
-      it('should have three script tags', function() {
+      // TODO clean up lit-polyfill as part of https://github.com/ProjectEvergreen/greenwood/issues/728
+      it('should have four script tags', function() {
         const scripts = dom.window.document.querySelectorAll('head > script');
 
-        expect(scripts.length).to.equal(3);
+        expect(scripts.length).to.equal(4);
       });
 
       it('should have expected SSR content from the non module script tag', function() {
         const scripts = Array.from(dom.window.document.querySelectorAll('head > script'))
-          .filter(tag => !tag.getAttribute('type'));
+          .filter(tag => !tag.getAttribute('type') && !tag.getAttribute('src'));
 
         expect(scripts.length).to.equal(1);
         expect(scripts[0].textContent).to.contain('console.log');
@@ -217,7 +218,7 @@ describe('Build Greenwood With: ', function() {
         const counterScript = Array.from(dom.window.document.querySelectorAll('head > script[src]'))
           .filter((tag) => tag.getAttribute('src').indexOf(`/${componentName}.`) === 0);
 
-        expect(artistsPageGraphData.imports[0]).to.equal(`/components/${componentName}.js`);
+        expect(artistsPageGraphData.imports[0].src).to.equal(`/components/${componentName}.js`);
         expect(counterScript.length).to.equal(1);
       });
     });
