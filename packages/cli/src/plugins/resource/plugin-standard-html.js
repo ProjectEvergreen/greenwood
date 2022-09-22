@@ -58,17 +58,17 @@ const getPageTemplate = (fullPath, templatesDir, template, contextPlugins = [], 
   return contents;
 };
 
-const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugins, enableHud, frontmatterTitle) => {
+const getAppTemplate = (pageTemplateContents, templatesDir, customImports = [], contextPlugins, enableHud, frontmatterTitle) => {
   const userAppTemplatePath = `${templatesDir}app.html`;
   const customAppTemplates = getCustomPageTemplates(contextPlugins, 'app');
-
+  let mergedTemplateContents = '';
   let appTemplateContents = customAppTemplates.length > 0
     ? fs.readFileSync(`${customAppTemplates[0]}/app.html`, 'utf-8')
     : fs.existsSync(userAppTemplatePath)
       ? fs.readFileSync(userAppTemplatePath, 'utf-8')
       : fs.readFileSync(fileURLToPath(new URL('../../templates/app.html', import.meta.url)), 'utf-8');
 
-  const root = htmlparser.parse(contents, {
+  const pageRoot = htmlparser.parse(pageTemplateContents, {
     script: true,
     style: true,
     noscript: true,
@@ -79,8 +79,11 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
     style: true
   });
 
-  if (!root.valid) {
+  if (!pageRoot.valid || !appRoot.valid) {
     console.debug('ERROR: Invalid HTML detected');
+    const invalidContents = !pageRoot.valid
+      ? pageTemplateContents
+      : appTemplateContents;
 
     if (enableHud) {
       appTemplateContents = appTemplateContents.replace('<body>', `
@@ -89,177 +92,81 @@ const getAppTemplate = (contents, templatesDir, customImports = [], contextPlugi
             <p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="noreferrer">HTML formatter</a>.</p>
             <details>
               <pre>
-                ${contents.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}
+                ${invalidContents.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}
               </pre>
             </details>
           </div>
       `);
     }
 
-    appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, '');
+    mergedTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, '');
   } else {
     const appTitle = appRoot ? appRoot.querySelector('head title') : null;
-    const body = root.querySelector('body') ? root.querySelector('body').innerHTML : '';
-    const headScripts = root.querySelectorAll('head script');
-    const headLinks = root.querySelectorAll('head link');
-    const headMeta = root.querySelectorAll('head meta');
-    const headStyles = root.querySelectorAll('head style');
-    const headTitle = root.querySelector('head title');
-    const appTemplateHeadContents = appRoot.querySelector('head').innerHTML;
-    const hasInterpolatedFrontmatter = headTitle && headTitle.rawText.indexOf('${globalThis.page.title}') >= 0
+    const appBody = appRoot.querySelector('body') ? appRoot.querySelector('body').innerHTML : '';
+    const pageBody = pageRoot.querySelector('body') ? pageRoot.querySelector('body').innerHTML : '';
+    const pageTitle = pageRoot.querySelector('head title');
+    const hasInterpolatedFrontmatter = pageTitle && pageTitle.rawText.indexOf('${globalThis.page.title}') >= 0
      || appTitle && appTitle.rawText.indexOf('${globalThis.page.title}') >= 0;
 
     const title = hasInterpolatedFrontmatter // favor frontmatter interpolation first
-      ? headTitle && headTitle.rawText
-        ? headTitle.rawText
+      ? pageTitle && pageTitle.rawText
+        ? pageTitle.rawText
         : appTitle.rawText
       : frontmatterTitle // otherwise, work in order of specificity from page -> page template -> app template
         ? frontmatterTitle
-        : headTitle && headTitle.rawText
-          ? headTitle.rawText
+        : pageTitle && pageTitle.rawText
+          ? pageTitle.rawText
           : appTitle && appTitle.rawText
             ? appTitle.rawText
             : 'My App';
-    appTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, body);
 
-    if (title) {
-      if (!appTitle) {
-        appTemplateContents = appTemplateContents.replace('<head>', '<head>\n <title></title>');
-      }
+    const mergedHtml = pageRoot.querySelector('html').rawAttrs !== ''
+      ? `<html ${pageRoot.querySelector('html').rawAttrs}>`
+      : appRoot.querySelector('html').rawAttrs !== ''
+        ? `<html ${appRoot.querySelector('html').rawAttrs}>`
+        : '<html>';
 
-      appTemplateContents = appTemplateContents.replace(/<title>(.*)<\/title>/, `<title>${title}</title>`);
-    }
+    const mergedMeta = [
+      ...appRoot.querySelectorAll('head meta'),
+      ...pageRoot.querySelectorAll('head meta')
+    ].join('\n');
 
-    // merge <script> tags
-    if (headScripts.length > 0) {
-      const matchNeedleScript = /<script .*<\/script>/g;
-      const appHeadScriptMatches = appTemplateHeadContents.match(matchNeedleScript);
-      const lastScript = appHeadScriptMatches && appHeadScriptMatches.length && appHeadScriptMatches.length > 0
-        ? appHeadScriptMatches[appHeadScriptMatches.length - 1]
-        : '</head>';
-      const pageBodyScripts = headScripts.map((script) => {
-        if (script.text === '') {
-          return `<script ${script.rawAttrs}></script>`;
-        } else {
-          const attributes = script.rawAttrs !== ''
-            ? ` ${script.rawAttrs}`
-            : '';
-          const source = script.text.replace(/\$/g, '$$$'); // https://github.com/ProjectEvergreen/greenwood/issues/656
+    const mergedLinks = [
+      ...appRoot.querySelectorAll('head link'),
+      ...pageRoot.querySelectorAll('head link')
+    ].join('\n');
 
-          return `
-            <script${attributes}>
-              ${source}
-            </script>
-          `;
-        }
-      });
+    const mergedStyles = [
+      ...appRoot.querySelectorAll('head style'),
+      ...pageRoot.querySelectorAll('head style'),
+      ...customImports.filter(resource => path.extname(resource) === '.css')
+        .map(resource => `<link rel="stylesheet" href="${resource}"></link>`)
+    ].join('\n');
 
-      if (lastScript === '</head>') {
-        appTemplateContents = appTemplateContents.replace(lastScript, `
-          ${pageBodyScripts.join('\n')}
-        ${lastScript}\n
-      `);
-      } else {
-        appTemplateContents = appTemplateContents.replace(lastScript, `${lastScript}\n
-          ${pageBodyScripts.join('\n')}
-        `);
-      }
-    }
+    const mergedScripts = [
+      ...appRoot.querySelectorAll('head script'),
+      ...pageRoot.querySelectorAll('head script'),
+      ...customImports.filter(resource => path.extname(resource) === '.js')
+        .map(resource => `<script src="${resource}" type="module"></script>`)
+    ].join('\n');
 
-    // merge <link> tags
-    if (headLinks.length > 0) {
-      const matchNeedleLink = /<link .*/g;
-      const appHeadLinkMatches = appTemplateHeadContents.match(matchNeedleLink);
-      const lastLink = appHeadLinkMatches && appHeadLinkMatches.length && appHeadLinkMatches.length > 0
-        ? appHeadLinkMatches[appHeadLinkMatches.length - 1]
-        : '</head>';
-      const pageHeadLinks = headLinks.map((link) => {
-        return `<link ${link.rawAttrs}/>`;
-      });
-
-      if (lastLink === '</head>') {
-        appTemplateContents = appTemplateContents.replace(lastLink, `
-          ${pageHeadLinks.join('\n')}
-        ${lastLink}\n
-      `);
-      } else {
-        appTemplateContents = appTemplateContents.replace(lastLink, `${lastLink}\n
-          ${pageHeadLinks.join('\n')}
-        `);
-      }
-    }
-
-    // merge <style> tags
-    if (headStyles.length > 0) {
-      const matchNeedleStyle = /<style .*/g;
-      const appHeadStyleMatches = appTemplateHeadContents.match(matchNeedleStyle);
-      const lastStyle = appHeadStyleMatches && appHeadStyleMatches.length && appHeadStyleMatches.length > 0
-        ? appHeadStyleMatches[appHeadStyleMatches.length - 1]
-        : '</head>';
-      const pageBodyStyles = headStyles.map((style) => {
-        const attributes = style.rawAttrs === '' ? '' : ` ${style.rawAttrs}`;
-
-        return `
-          <style${attributes}>
-            ${style.text}
-          </style>
-        `;
-      });
-
-      if (lastStyle === '</head>') {
-        appTemplateContents = appTemplateContents.replace(lastStyle, `
-          ${pageBodyStyles.join('\n')}
-        ${lastStyle}\n
-      `);
-      } else {
-        appTemplateContents = appTemplateContents.replace(lastStyle, `${lastStyle}\n
-          ${pageBodyStyles.join('\n')}
-        `);
-      }
-    }
-
-    // merge <meta>
-    if (headMeta.length > 0) {
-      const matchNeedleMeta = /<meta .*/g;
-      const appHeadMetaMatches = appTemplateHeadContents.match(matchNeedleMeta);
-      const lastMeta = appHeadMetaMatches && appHeadMetaMatches.length && appHeadMetaMatches.length > 0
-        ? appHeadMetaMatches[appHeadMetaMatches.length - 1]
-        : '</title>';
-      const pageMeta = headMeta.map((meta) => {
-        return `<meta ${meta.rawAttrs}/>`;
-      });
-
-      appTemplateContents = appTemplateContents.replace(lastMeta.replace('>', '/>'), `${lastMeta.replace('>', '/>')}
-        ${pageMeta.join('\n')}
-      `);
-    }
-
-    customImports.forEach((customImport) => {
-      const extension = path.extname(customImport);
-
-      switch (extension) {
-
-        case '.js':
-          appTemplateContents = appTemplateContents.replace('</head>', `
-              <script src="${customImport}" type="module"></script>
-            </head>
-          `);
-          break;
-        case '.css':
-          appTemplateContents = appTemplateContents.replace('</head>', `
-            <link rel="stylesheet" href="${customImport}"></link>
-            </head>
-          `);
-          break;
-
-        default:
-          break;
-
-      }
-    });
+    mergedTemplateContents = `<!DOCTYPE html>
+      ${mergedHtml}
+        <head>
+          <title>${title}</title>
+          ${mergedMeta}
+          ${mergedLinks}
+          ${mergedStyles}
+          ${mergedScripts}
+        </head>
+        <body>
+          ${appBody.replace(/<page-outlet><\/page-outlet>/, pageBody)}
+        </body>
+      </html>
+    `;
   }
 
-  return appTemplateContents;
+  return mergedTemplateContents;
 };
 
 const getUserScripts = (contents, context) => {
@@ -497,19 +404,85 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async optimize(url, body) {
+    const { optimization } = this.compilation.config;
+    const pageResources = this.compilation.graph.find(page => page.outputPath === url || page.route === url).imports;
+
     return new Promise((resolve, reject) => {
       try {
         const hasHead = body.match(/\<head>(.*)<\/head>/s);
 
         if (hasHead && hasHead.length > 0) {
-          let contents = hasHead[0];
+          let headContents = hasHead[0];
 
-          contents = contents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
-          contents = contents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
-          contents = contents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
-          contents = contents.replace(/type="module-shim"/g, 'type="module"');
+          for (const pageResource of pageResources) {
+            const keyedResource = this.compilation.resources.get(pageResource.sourcePathURL.pathname);
+            const { contents, src, type, optimizationAttr, optimizedFileContents, optimizedFileName, rawAttributes } = keyedResource;
 
-          body = body.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
+            if (src) {
+              if (type === 'script') {
+                if (!optimizationAttr && optimization === 'default') {
+                  const optimizedFilePath = `/${optimizedFileName}`;
+
+                  headContents = headContents.replace(src, optimizedFilePath);
+                  headContents = headContents.replace('<head>', `
+                    <head>
+                    <link rel="modulepreload" href="${optimizedFilePath}" as="script">
+                  `);
+                } else if (optimizationAttr === 'inline' || optimization === 'inline') {
+                  const isModule = rawAttributes.indexOf('type="module') >= 0 ? ' type="module"' : '';
+
+                  headContents = headContents.replace(`<script ${rawAttributes}></script>`, `
+                    <script ${isModule}>
+                      ${optimizedFileContents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}
+                    </script>
+                  `);
+                } else if (optimizationAttr === 'static' || optimization === 'static') {
+                  headContents = headContents.replace(`<script ${rawAttributes}></script>`, '');
+                }
+              } else if (type === 'link') {
+                if (!optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
+                  const optimizedFilePath = `/${optimizedFileName}`;
+
+                  headContents = headContents.replace(src, optimizedFilePath);
+                  headContents = headContents.replace('<head>', `
+                    <head>
+                    <link rel="preload" href="${optimizedFilePath}" as="style" crossorigin="anonymous"></link>
+                  `);
+                } else if (optimizationAttr === 'inline' || optimization === 'inline') {
+                  // https://github.com/ProjectEvergreen/greenwood/issues/810
+                  // when pre-rendering, puppeteer normalizes everything to <link .../>
+                  // but if not using pre-rendering, then it could come out as <link ...></link>
+                  // not great, but best we can do for now until #742
+                  headContents = headContents.replace(`<link ${rawAttributes}>`, `
+                    <style>
+                      ${optimizedFileContents}
+                    </style>
+                  `).replace(`<link ${rawAttributes}/>`, `
+                    <style>
+                      ${optimizedFileContents}
+                    </style>
+                  `);
+                }
+              }
+            } else {
+              if (type === 'script') {
+                if (optimizationAttr === 'static' || optimization === 'static') {
+                  headContents = headContents.replace(`<script ${rawAttributes}>${contents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}</script>`, '');
+                } else if (optimizationAttr === 'none') {
+                  headContents = headContents.replace(contents, contents.replace(/\.\//g, '/').replace(/\$/g, '$$$'));
+                } else {
+                  headContents = headContents.replace(contents, optimizedFileContents.replace(/\.\//g, '/').replace(/\$/g, '$$$'));
+                }
+              } else if (type === 'style') {
+                headContents = headContents.replace(contents, optimizedFileContents);
+              }
+            }
+          }
+
+          // TODO clean up lit-polyfill as part of https://github.com/ProjectEvergreen/greenwood/issues/728
+          headContents = headContents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
+
+          body = body.replace(/\<head>(.*)<\/head>/s, headContents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
         }
 
         resolve(body);

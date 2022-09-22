@@ -60,14 +60,32 @@ function commonIndexSpecs(dom, html, label) {
         expect(tagsMatch('script', html)).to.be.equal(true);
       });
 
+      it('should not have nested <script> tags in the <head>', function() {
+        const scripts = dom.window.document.querySelectorAll('head script > script');
+
+        expect(scripts.length).to.be.equal(0);
+      });
+
       it('should have matching opening and closing <link> tags in the <head>', function() {
         const html = dom.window.document.querySelector('html').textContent;
 
         expect(tagsMatch('link', html)).to.be.equal(true);
       });
 
+      it('should not have nested <link> tags in the <head>', function() {
+        const link = dom.window.document.querySelectorAll('head link > link');
+
+        expect(link.length).to.be.equal(0);
+      });
+
       it('should have matching opening and closing <style> tags in the <head>', function() {
         expect(tagsMatch('style', html)).to.be.equal(true);
+      });
+
+      it('should not have nested <style> tags in the <head>', function() {
+        const style = dom.window.document.querySelectorAll('head style > style');
+
+        expect(style.length).to.be.equal(0);
       });
 
       it('should have default viewport <meta> tag', function() {
@@ -79,10 +97,14 @@ function commonIndexSpecs(dom, html, label) {
       });
 
       it('should have default charset <meta> tag', function() {
-        const chartsetMeta = Array.from(metaTags).filter(meta => meta.getAttribute('charset') === 'utf-8');
+        const charsetMeta = Array.from(metaTags).filter(meta => meta.getAttribute('charset') === 'utf-8');
 
-        expect(chartsetMeta.length).to.be.equal(1);
-        expect(chartsetMeta[0].getAttribute('charset')).to.be.equal('utf-8');
+        expect(charsetMeta.length).to.be.equal(1);
+        expect(charsetMeta[0].getAttribute('charset')).to.be.equal('utf-8');
+      });
+
+      it('should not have any optimization markers left in the HTML', function() {
+        expect(html.match(/data-gwd-opt=".*[a-z]"/)).to.be.equal(null);
       });
     });
 

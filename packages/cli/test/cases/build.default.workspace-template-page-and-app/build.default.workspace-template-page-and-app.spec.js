@@ -90,15 +90,16 @@ describe('Build Greenwood With: ', function() {
           expect(linkTags.length).to.equal(4);
         });
 
-        it('should have 5 <style> tags in the <head>', function() {
+        it('should have 4 <style> tags in the <head>', function() {
           expect(styleTags.length).to.equal(4);
         });
 
         it('should merge page template <script> tags after app template <script> tags', function() {
           expect(scriptTags[0].src).to.match(/app-template-one.*.js/);
           expect(scriptTags[1].src).to.match(/app-template-two.*.js/);
-          expect(scriptTags[2].src).to.match(/page-template-one.*.js/);
-          expect(scriptTags[3].src).to.match(/page-template-two.*.js/);
+          expect(scriptTags[2].textContent).to.contain('console.log("this should not break anything :)");');
+          expect(scriptTags[3].src).to.match(/page-template-one.*.js/);
+          expect(scriptTags[4].src).to.match(/page-template-two.*.js/);
 
           scriptTags.forEach((scriptTag) => {
             expect(scriptTag.type).to.equal('module');
@@ -117,10 +118,10 @@ describe('Build Greenwood With: ', function() {
         });
 
         it('should merge page template <style> tags after app template <style> tags', function() {
-          expect(styleTags[0].textContent).to.contain('app-template-one-style');
-          expect(styleTags[1].textContent).to.contain('app-template-two-style');
-          expect(styleTags[2].textContent).to.contain('page-template-one-style');
-          expect(styleTags[3].textContent).to.contain('page-template-two-style');
+          expect(styleTags[0].textContent).to.equal('span{text-align:center}');
+          expect(styleTags[1].textContent).to.equal('p{margin:0 auto}');
+          expect(styleTags[2].textContent).to.equal('ol{list-style:none}');
+          expect(styleTags[3].textContent).to.equal('h3{text-decoration:underline}');
         });
       });
 

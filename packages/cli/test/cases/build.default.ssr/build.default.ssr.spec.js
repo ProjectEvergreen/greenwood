@@ -193,7 +193,7 @@ describe('Build Greenwood With: ', function() {
         const counterScript = Array.from(artistsPageDom.window.document.querySelectorAll('head > script[src]'))
           .filter((tag) => tag.getAttribute('src').indexOf(`/${componentName}.`) === 0);
 
-        expect(artistsPageGraphData.imports[0]).to.equal(`/components/${componentName}.js`);
+        expect(artistsPageGraphData.imports[0].src).to.equal(`/components/${componentName}.js`);
         expect(counterScript.length).to.equal(1);
       });
     });

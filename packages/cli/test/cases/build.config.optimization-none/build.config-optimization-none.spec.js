@@ -71,15 +71,15 @@ describe('Build Greenwood With: ', function() {
       });
       
       describe('<script> tag and preloading', function() {
-        it('should contain one unminifed javascript file in the output directory', async function() {
+        it('should contain one un-minified javascript file in the output directory', async function() {
           expect(jsFiles).to.have.lengthOf(1);
         });
 
-        it('should output the contents of the JavaScript file unminified', function() {
+        it('should output the contents of the JavaScript file un-minified', function() {
           const js = fs.readFileSync(jsFiles[0], 'utf-8');
 
           // eslint-disable-next-line max-len
-          expect(js).to.be.contain('class HeaderComponent extends HTMLElement {\n  constructor() {\n    super();\n\n    this.root = this.attachShadow({ mode: \'open\' });\n    this.root.innerHTML = `\n      <header>This is the header component.</header>\n    `;\n  }\n}\n\ncustomElements.define(\'app-header\', HeaderComponent);\n');
+          expect(js).to.contain('class HeaderComponent extends HTMLElement {\n  constructor() {\n    super();\n\n    this.root = this.attachShadow({ mode: \'open\' });\n    this.root.innerHTML = `\n      <header>This is the header component.</header>\n    `;\n  }\n}\n\ncustomElements.define(\'app-header\', HeaderComponent);');
         });
 
         it('should have the expected <script> tag in the <head>', function() {
@@ -96,14 +96,14 @@ describe('Build Greenwood With: ', function() {
       });
 
       describe('<link> tags should not be preloaded', function() {
-        it('should contain one style.css in the output directory with unminifed content', async function() {
+        it('should contain one style.css in the output directory', async function() {
           expect(cssFiles).to.have.lengthOf(1);
         });
 
-        it('should output the contents of the CSS file unminified', function() {
+        it('should output the contents of the one CSS file', function() {
           const css = fs.readFileSync(cssFiles[0], 'utf-8');
           
-          expect(css).to.be.contain('{\n  margin: 0;\n  padding: 0;\n  font-family: \'Comic Sans\', sans-serif;\n}');
+          expect(css).to.contain('{\n  margin: 0;\n  padding: 0;\n  font-family: \'Comic Sans\', sans-serif;\n}');
         });
 
         it('should have only one expected <link> tag in the <head>', function() {

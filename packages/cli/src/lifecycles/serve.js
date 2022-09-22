@@ -3,8 +3,6 @@ import { hashString } from '../lib/hashing-utils.js';
 import path from 'path';
 import Koa from 'koa';
 import { ResourceInterface } from '../lib/resource-interface.js';
-import { getRollupConfig } from '../config/rollup.config.js';
-import { rollup } from 'rollup';
 
 async function getDevServer(compilation) {
   const app = new Koa();
@@ -310,18 +308,6 @@ async function getHybridServer(compilation) {
           ? resource.optimize(url, html, headers)
           : Promise.resolve(html);
       }, Promise.resolve(body));
-
-      await fs.promises.mkdir(path.join(compilation.context.scratchDir, url), { recursive: true });
-      await fs.promises.writeFile(path.join(compilation.context.scratchDir, url, 'index.html'), body);
-
-      const rollupConfigs = await getRollupConfig({
-        ...compilation,
-        graph: [matchingRoute]
-      });
-      const bundle = await rollup(rollupConfigs[0]);
-      await bundle.write(rollupConfigs[0].output);
-
-      body = await fs.promises.readFile(path.join(compilation.context.outputDir, url, 'index.html'), 'utf-8');
 
       ctx.status = 200;
       ctx.set('content-type', 'text/html');
