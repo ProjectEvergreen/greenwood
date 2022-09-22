@@ -31,7 +31,7 @@ export default {
   ...
 
   plugins: [
-    ...greenwoodPluginTypeScript() // notice the spread ... !
+    greenwoodPluginTypeScript()
   ]
 }
 ```
@@ -90,8 +90,7 @@ If you would like to extend / override these options:
       ...
 
       plugins: [
-        // notice the spread ... !
-        ...greenwoodPluginTypeScript({
+        greenwoodPluginTypeScript({
           extendConfig: true
         })
       ]
