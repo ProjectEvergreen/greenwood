@@ -11,10 +11,7 @@ const runProductionBuild = async (compilation) => {
     try {
       const { prerender } = compilation.config;
       const outputDir = compilation.context.outputDir;
-      const defaultPrerender = (compilation.config.plugins.filter(plugin => plugin.type === 'renderer' && plugin.isGreenwoodDefaultPlugin) || []).length === 1
-        ? compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation)
-        : {};
-      const customPrerender = (compilation.config.plugins.filter(plugin => plugin.type === 'renderer' && !plugin.isGreenwoodDefaultPlugin) || []).length === 1
+      const prerenderPlugin = (compilation.config.plugins.filter(plugin => plugin.type === 'renderer') || []).length === 1
         ? compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation)
         : {};
 
@@ -22,7 +19,7 @@ const runProductionBuild = async (compilation) => {
         fs.mkdirSync(outputDir);
       }
 
-      if (prerender || customPrerender.prerender) {
+      if (prerender || prerenderPlugin.prerender) {
         // start any servers if needed
         const servers = [...compilation.config.plugins.filter((plugin) => {
           return plugin.type === 'server';
@@ -42,14 +39,10 @@ const runProductionBuild = async (compilation) => {
           return Promise.resolve(server);
         }));
 
-        if (customPrerender.workerUrl) {
-          await preRenderCompilationWorker(compilation, customPrerender);
-        } else if (customPrerender.customUrl) {
-          await preRenderCompilationCustom(compilation, customPrerender);
-        } else if (defaultPrerender && prerender) {
-          await preRenderCompilationWorker(compilation, defaultPrerender);
+        if (prerenderPlugin.workerUrl) {
+          await preRenderCompilationWorker(compilation, prerenderPlugin);
         } else {
-          reject('This is an unhandled pre-rendering case!  Please report.');
+          await preRenderCompilationCustom(compilation, prerenderPlugin);
         }
       } else {
         await staticRenderCompilation(compilation);
