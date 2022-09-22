@@ -42,8 +42,8 @@ export default {
   ...
 
   plugins: [
-    ...greenwoodPluginGraphQL(), // notice the spread ... !
-    ...greenwoodPluginRendererPuppeteer() // notice the spread ... !
+    greenwoodPluginGraphQL(),
+    greenwoodPluginRendererPuppeteer()
   ]
 }
 ```

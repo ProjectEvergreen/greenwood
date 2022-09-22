@@ -15,7 +15,7 @@ export default {
   ...
 
   plugins: [
-    ...greenwoodPluginIncludeHtml() // notice the spread ... !
+    greenwoodPluginIncludeHtml()
   ]
 }
 ```
