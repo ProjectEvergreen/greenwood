@@ -153,7 +153,7 @@ describe('Build Greenwood With: ', function() {
       
       it('should have an inline <style> tag in the <head>', function() {
         const themeStyleTags = Array.from(dom.window.document.querySelectorAll('head style'))
-          .filter(style => style.textContent.indexOf('*{color:blue}') >= 0);
+          .filter(style => style.textContent.indexOf('*{color:#00f}') >= 0);
 
         expect(themeStyleTags.length).to.be.equal(1);
       });

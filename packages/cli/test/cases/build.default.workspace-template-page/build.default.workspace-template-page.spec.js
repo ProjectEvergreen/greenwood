@@ -122,7 +122,7 @@ describe('Build Greenwood With: ', function() {
           const customElement = dom.window.document.querySelector('.owen-test');
           const computedStyle = dom.window.getComputedStyle(customElement);
   
-          expect(computedStyle.color).to.equal('blue');
+          expect(computedStyle.color).to.equal('rgb(0, 0, 255)');
         });
   
         it('should have the color styles for the h3 element that we defined as part of our custom style', function() {

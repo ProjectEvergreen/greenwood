@@ -43,7 +43,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom PostCSS configuration';
+  const LABEL = 'Custom PostCSS configuration with extended options';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -66,7 +66,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('Page referencing external nested CSS file', function() {
       it('should output correctly processed nested CSS as non nested', function() {
-        const expectedCss = 'body{color:red}body h1{color:blue}';
+        const expectedCss = 'body{color:red}body h1{color:#00f}';
         const cssFiles = glob.sync(path.join(this.context.publicDir, 'styles', '*.css'));
         const css = fs.readFileSync(cssFiles[0], 'utf-8');
 

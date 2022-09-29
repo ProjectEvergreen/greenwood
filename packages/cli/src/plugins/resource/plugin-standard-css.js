@@ -6,9 +6,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import cssnano from 'cssnano';
-import postcss from 'postcss';
-import postcssImport from 'postcss-import';
+import * as css from '@parcel/css';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardCssResource extends ResourceInterface {
@@ -39,17 +37,36 @@ class StandardCssResource extends ResourceInterface {
     return Promise.resolve(isValidCss);
   }
 
-  async optimize(url, body) {
+  async optimize(url) {
+    console.debug({ url });
+    const { outputDir, userWorkspace } = this.compilation.context;
+
     return new Promise(async (resolve, reject) => {
       try {  
-        const { outputDir, userWorkspace } = this.compilation.context;
-        const workspaceUrl = url.replace(outputDir, userWorkspace);
-        const contents = body || await fs.promises.readFile(url, 'utf-8');
-        const css = (await postcss([cssnano])
-          .use(postcssImport())
-          .process(contents, { from: workspaceUrl })).css;
+        // const { code } = css.transform({
+        //   code: new TextEncoder().encode(body),
+        //   minify: true
+        // });
+        const { code } = await css.bundleAsync({
+          filename: url,
+          minify: true,
+          resolver: {
+            resolve(specifier, from) {
+              console.debug('resolve', path.dirname(url.replace(outputDir, userWorkspace)));
+              console.debug({ from });
+              console.debug({ specifier });
+              if (specifier.indexOf('http') !== 0 && specifier.indexOf('//') !== 0) {
+                return path.resolve(path.dirname(url.replace(outputDir, userWorkspace)), specifier);
+              } else {
+                return specifier;
+              }
+            }
+          }
+        });
 
-        resolve(css);
+        console.debug({ code });
+
+        resolve(code);
       } catch (e) {
         reject(e);
       }

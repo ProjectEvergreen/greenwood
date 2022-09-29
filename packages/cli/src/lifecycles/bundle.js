@@ -74,6 +74,7 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
       }
 
       const outputPathRoot = path.join(outputDir, path.dirname(optimizedFileName));
+      const outputPath = path.join(outputDir, optimizedFileName);
 
       if (!fs.existsSync(outputPathRoot)) {
         fs.mkdirSync(outputPathRoot, {
@@ -88,12 +89,22 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
         let optimizedStyles = await fs.promises.readFile(url, 'utf-8');
 
         for (const plugin of optimizationPlugins) {
-          optimizedStyles = await plugin.shouldOptimize(url, optimizedStyles)
-            ? await plugin.optimize(url, optimizedStyles)
+          optimizedStyles = await plugin.shouldIntercept(url, optimizedStyles)
+            ? (await plugin.intercept(url, optimizedStyles)).body
             : optimizedStyles;
         }
 
         optimizedFileContents = optimizedStyles;
+      }
+
+      // have to do this to support ParcelCSS since bundling can only work with the filesystem
+      await fs.promises.writeFile(outputPath, optimizedFileContents);
+
+      for (const plugin of optimizationPlugins) {
+        if (await plugin.shouldOptimize(outputPath, optimizedFileContents)) {
+          optimizedFileContents = await plugin.optimize(outputPath, optimizedFileContents);
+          await fs.promises.writeFile(outputPath, optimizedFileContents);
+        }
       }
 
       compilation.resources.set(resourceKey, {
@@ -102,7 +113,7 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
         optimizedFileContents
       });
 
-      await fs.promises.writeFile(path.join(outputDir, optimizedFileName), optimizedFileContents);
+      await fs.promises.writeFile(outputPath, optimizedFileContents);
     }
   }
 }
@@ -126,7 +137,8 @@ const bundleCompilation = async (compilation) => {
       }).map((plugin) => {
         return plugin.provider(compilation);
       }).filter((provider) => {
-        return provider.shouldOptimize && provider.optimize;
+        return provider.shouldOptimize && provider.optimize ||
+          provider.shouldIntercept && provider.intercept;
       });
       // centrally register all static resources
       compilation.graph.map((page) => {

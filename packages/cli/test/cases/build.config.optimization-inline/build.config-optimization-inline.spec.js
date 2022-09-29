@@ -138,7 +138,7 @@ describe('Build Greenwood With: ', function() {
         it('should contain the expected CSS content inlined for theme.css', function() {
           const styleTags = dom.window.document.querySelectorAll('head style');
 
-          expect(styleTags[0].textContent).to.contain('*{font-family:Comic Sans,sans-serif;margin:0;padding:0}');
+          expect(styleTags[0].textContent).to.contain('*{margin:0;padding:0;font-family:Comic Sans,sans-serif}');
         });
 
         it('should contain the expected CSS content inlined for page.css', function() {
