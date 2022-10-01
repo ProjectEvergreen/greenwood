@@ -79,7 +79,6 @@ By default, the configuration provided by this plugin is:
 ```javascript
 export default {
   plugins: [
-    (await import('cssnano')).default, // just for production builds
     (await import('postcss-preset-env')).default
   ]
 };

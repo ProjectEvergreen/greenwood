@@ -5,10 +5,8 @@
  *
  */
 import fs from 'fs';
+import { parse, walk } from 'css-tree';
 import path from 'path';
-import cssnano from 'cssnano';
-import postcss from 'postcss';
-import postcssImport from 'postcss-import';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardCssResource extends ResourceInterface {
@@ -41,15 +39,21 @@ class StandardCssResource extends ResourceInterface {
 
   async optimize(url, body) {
     return new Promise(async (resolve, reject) => {
-      try {  
-        const { outputDir, userWorkspace } = this.compilation.context;
-        const workspaceUrl = url.replace(outputDir, userWorkspace);
-        const contents = body || await fs.promises.readFile(url, 'utf-8');
-        const css = (await postcss([cssnano])
-          .use(postcssImport())
-          .process(contents, { from: workspaceUrl })).css;
+      try {
+        const ast = parse(body, { positions: true });
+        let optimizedCss = '';
 
-        resolve(css);
+        walk(ast, function(node, item, list) { // eslint-disable-line
+          const { type, loc } = node;
+
+          if (type === 'Atrule') {
+            optimizedCss += `${body.slice(loc.start.offset, loc.end.offset)} \n`;
+          } else if (type === 'Rule' && !this.atrule) {
+            optimizedCss += `${body.slice(loc.start.offset, loc.end.offset)} \n`;
+          }
+        });
+
+        resolve(optimizedCss);
       } catch (e) {
         reject(e);
       }
