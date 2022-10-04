@@ -7,6 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
+import { pathToFileURL } from 'url';
 
 class ImportCssResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -48,7 +49,8 @@ class ImportCssResource extends ResourceInterface {
   async intercept(url, body) {
     return new Promise(async (resolve, reject) => {
       try {
-        const cssInJsBody = `const css = \`${body.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\')}\`;\nexport default css;`;
+        const finalBody = body || await fs.promises.readFile(pathToFileURL(url), 'utf-8');
+        const cssInJsBody = `const css = \`${finalBody.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\')}\`;\nexport default css;`;
         
         resolve({
           body: cssInJsBody,
