@@ -20,6 +20,7 @@
  *     theme.css
  */
 import chai from 'chai';
+import fs from 'fs';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
@@ -79,7 +80,7 @@ describe('Build Greenwood With: ', function() {
 
       describe('<link> tag and preloading', function() {
         it('should contain one style.css in the output directory', async function() {
-          expect(await glob.promise(`${path.join(this.context.publicDir, 'styles')}/theme.*.css`)).to.have.lengthOf(1);
+          expect(await glob.promise(`${path.join(this.context.publicDir, 'styles')}/main.*.css`)).to.have.lengthOf(1);
         });
 
         it('should have the expected <link> tag in the <head>', function() {
@@ -96,8 +97,19 @@ describe('Build Greenwood With: ', function() {
             .filter(link => link.getAttribute('as') === 'style');
 
           expect(preloadLinkTags.length).to.be.equal(1);
-          expect(preloadLinkTags[0].href).to.match(/\/styles\/theme.*.css/);
+          expect(preloadLinkTags[0].href).to.match(/\/styles\/main.*.css/);
           expect(preloadLinkTags[0].getAttribute('crossorigin')).to.equal('anonymous');
+        });
+
+        // test custom CSS bundling
+        it('should have the expect preload CSS content in the file', async function() {
+          const cssFiles = await glob.promise(path.join(this.context.publicDir, 'styles/*.css'));
+          const customCss = await fs.promises.readFile(cssFiles[0], 'utf-8'); // .to.have.lengthOf(1);
+          
+          expect(cssFiles.length).to.be.equal(1);
+          expect(customCss).to.be.equal(
+            '*{margin:0;padding:0;font-family:\'Comic Sans\',sans-serif;}body{color:red;}h1{border:0.5px solid #dddde1;}'
+          );
         });
       });
     });

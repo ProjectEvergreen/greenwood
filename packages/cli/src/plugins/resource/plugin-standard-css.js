@@ -43,15 +43,60 @@ class StandardCssResource extends ResourceInterface {
         const ast = parse(body, { positions: true });
         let optimizedCss = '';
 
-        walk(ast, function(node, item, list) { // eslint-disable-line
-          const { type, loc } = node;
+        walk(ast, function(node, item) {
+          const { type } = node;
 
           if (type === 'Atrule') {
-            optimizedCss += `${body.slice(loc.start.offset, loc.end.offset)} \n`;
-          } else if (type === 'Rule' && !this.atrule) {
-            optimizedCss += `${body.slice(loc.start.offset, loc.end.offset)} \n`;
+            // TODO
+          } else if (type === 'Rule') {
+            if (item.prev) {
+              optimizedCss += '}';
+            }
+          } if (type === 'TypeSelector') {
+            optimizedCss += `${node.name}`;
+          } else if (type === 'Declaration') {
+            if (!item.prev) {
+              optimizedCss += '{';
+            }
+            
+            optimizedCss += `${node.property}:`;
+          } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || type === 'String' || type === 'Operator') {
+            if (item.prev && type !== 'Operator' && item.prev.data.type !== 'Operator') {
+              optimizedCss += ' ';
+            }
+
+            switch (type) {
+
+              case 'Dimension':
+                optimizedCss += `${node.value}${node.unit}`;
+                break;
+              case 'Hash':
+                optimizedCss += `#${node.value}`;
+                break;
+              case 'Identifier':
+                optimizedCss += `${node.name}`;
+                break;
+              case 'Number':
+                optimizedCss += `${node.value}`;
+                break;
+              case 'Operator':
+                optimizedCss += `${node.value}`;
+                break;
+              case 'String':
+                optimizedCss += `'${node.value}'`;
+                break;
+              default:
+                break;
+            
+            }
+
+            if (!item.next) {
+              optimizedCss += ';';
+            }
           }
         });
+
+        optimizedCss += '}';
 
         resolve(optimizedCss);
       } catch (e) {
