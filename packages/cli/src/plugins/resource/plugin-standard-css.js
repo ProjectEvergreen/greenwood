@@ -9,8 +9,8 @@ import { parse, walk } from 'css-tree';
 import path from 'path';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
-function optimizeCss(css) {
-  const ast = parse(css);
+function bundleCss(body, url) {
+  const ast = parse(body);
   let optimizedCss = '';
 
   walk(ast, function(node, item, list) { // eslint-disable-line
@@ -22,7 +22,7 @@ function optimizeCss(css) {
       if (value.indexOf('.') === 0) {
         const importContents = fs.readFileSync(path.resolve(path.dirname(url), value), 'utf-8');
 
-        optimizedCss += optimizeCss(importContents);
+        optimizedCss += bundleCss(importContents, url);
       }
     } else if (type === 'Rule' && item.prev && item.prev.data.type !== 'Atrule') {
       optimizedCss += '}';
@@ -111,76 +111,7 @@ class StandardCssResource extends ResourceInterface {
   async optimize(url, body) {
     return new Promise(async (resolve, reject) => {
       try {
-        const ast = parse(body);
-        let optimizedCss = '';
-
-        walk(ast, function(node, item, list) { // eslint-disable-line
-          const { type } = node;
-
-          console.debug({type});
-          if (type === 'String' && this.atrulePrelude) {
-            const { value } = item.data;
-
-            if (value.indexOf('.') === 0) {
-              const importContents = fs.readFileSync(path.resolve(path.dirname(url), value), 'utf-8');
-
-              optimizedCss += optimizeCss(importContents);
-            }
-          } else if (type === 'Rule' && item.prev && item.prev.data.type !== 'Atrule') {
-            optimizedCss += '}';
-          } if (type === 'TypeSelector') {
-            optimizedCss += `${node.name}`;
-          } if (type === 'PseudoClassSelector') {
-            optimizedCss += `:${node.name}`;
-          } if (type === 'Selector') {
-            if (item.prev) {
-              optimizedCss += ',';
-            }
-          } else if (type === 'Declaration') {
-            if (!item.prev) {
-              optimizedCss += '{';
-            }
-            
-            optimizedCss += `${node.property}:`;
-          } else if ((type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && !this.atrule) || type === 'Operator')) {
-            if (item.prev && type !== 'Operator' && item.prev.data.type !== 'Operator') {
-              optimizedCss += ' ';
-            }
-
-            switch (type) {
-
-              case 'Dimension':
-                optimizedCss += `${node.value}${node.unit}`;
-                break;
-              case 'Hash':
-                optimizedCss += `#${node.value}`;
-                break;
-              case 'Identifier':
-                optimizedCss += `${node.name}`;
-                break;
-              case 'Number':
-                optimizedCss += `${node.value}`;
-                break;
-              case 'Operator':
-                optimizedCss += `${node.value}`;
-                break;
-              case 'String':
-                optimizedCss += `'${node.value}'`;
-                break;
-              default:
-                break;
-            
-            }
-
-            if (!item.next) {
-              optimizedCss += ';';
-            }
-          }
-        });
-
-        optimizedCss += '}';
-
-        resolve(optimizedCss);
+        resolve(bundleCss(body, url));
       } catch (e) {
         reject(e);
       }
