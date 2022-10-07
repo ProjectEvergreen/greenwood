@@ -108,7 +108,7 @@ describe('Build Greenwood With: ', function() {
           
           expect(cssFiles.length).to.be.equal(1);
           expect(customCss).to.be.equal(
-            '*{margin:0;padding:0;font-family:\'Comic Sans\',sans-serif;}body{color:red;}h1{border:0.5px solid #dddde1;}'
+            ':root,:host{color:blue;}*{margin:0;padding:0;font-family:\'Comic Sans\',sans-serif;}body{color:red;}h1,h2{border:0.5px solid #dddde1;}'
           );
         });
       });

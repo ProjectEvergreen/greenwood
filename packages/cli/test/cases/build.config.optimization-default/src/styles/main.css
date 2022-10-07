@@ -1,4 +1,15 @@
-/* TODO */
-:root, :host {
+@import './theme.css';
 
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Comic Sans', sans-serif;
+}
+
+body {
+  color: red;
+}
+
+h1, h2 {
+  border: 0.5px solid #dddde1;
 }
