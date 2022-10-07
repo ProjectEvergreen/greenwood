@@ -44,11 +44,7 @@ function bundleCss(body, url) {
       optimizedCss += `${node.property}:`;
 
       if (node.value.type === 'Raw') {
-        optimizedCss += node.value.value.trim();
-
-        if (item.next) {
-          optimizedCss += ';';
-        }
+        optimizedCss += `${node.value.value.trim()};`;
       }
     } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && !this.atrule) || type === 'Operator') {
       if (item.prev && type !== 'Operator' && item.prev.data.type !== 'Operator') {
@@ -93,6 +89,7 @@ function bundleCss(body, url) {
 
   return optimizedCss;
 }
+
 class StandardCssResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
