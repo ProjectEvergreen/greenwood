@@ -7,9 +7,14 @@
 }
 
 body {
-  color: red;
+  background-color: green;
 }
 
 h1, h2 {
+  color: var(--primary-color);
   border: 0.5px solid #dddde1;
+}
+
+p {
+  color: var(--secondary-color);
 }

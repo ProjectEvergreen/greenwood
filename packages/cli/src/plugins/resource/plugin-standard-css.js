@@ -34,13 +34,23 @@ function bundleCss(body, url) {
       if (item.prev) {
         optimizedCss += ',';
       }
+    } if (type === 'Function') {
+      optimizedCss += `${node.name}(`;
     } else if (type === 'Declaration') {
       if (!item.prev) {
         optimizedCss += '{';
       }
 
       optimizedCss += `${node.property}:`;
-    } else if ((type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && !this.atrule) || type === 'Operator')) {
+
+      if (node.value.type === 'Raw') {
+        optimizedCss += node.value.value.trim();
+
+        if (item.next) {
+          optimizedCss += ';';
+        }
+      }
+    } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && !this.atrule) || type === 'Operator') {
       if (item.prev && type !== 'Operator' && item.prev.data.type !== 'Operator') {
         optimizedCss += ' ';
       }
@@ -55,6 +65,9 @@ function bundleCss(body, url) {
           break;
         case 'Identifier':
           optimizedCss += `${node.name}`;
+          if (this.function) {
+            optimizedCss += ')';
+          }
           break;
         case 'Number':
           optimizedCss += `${node.value}`;
