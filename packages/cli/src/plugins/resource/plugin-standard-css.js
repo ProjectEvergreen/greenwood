@@ -14,7 +14,7 @@ function bundleCss(body, url) {
   let optimizedCss = '';
 
   walk(ast, {
-    enter: function (node, item) { // eslint-disable-line
+    enter: function (node, item) { // eslint-disable-line complexity
       const { type, name, value } = node;
 
       if (type === 'String' && this.atrulePrelude) {
