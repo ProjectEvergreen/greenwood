@@ -108,7 +108,7 @@ describe('Build Greenwood With: ', function() {
           
           expect(cssFiles.length).to.be.equal(1);
           expect(customCss).to.be.equal(
-            ':root,:host{--primary-color:#16f;--secondary-color:#ff7;}*{margin:0;padding:0;font-family:\'Comic Sans\',sans-serif;}body{background-color:green;}h1,h2{color:var(--primary-color);border:0.5px solid #dddde1;}p{color:var(--secondary-color);}' // eslint-disable-line max-len
+            ':root,:host{--primary-color:#16f;--secondary-color:#ff7;}*{margin:0;padding:0;font-family:\'Comic Sans\',sans-serif;}body{background-color:green;}h1,h2{color:var(--primary-color);border:0.5px solid #dddde1;}#foo,.bar{color:var(--secondary-color);}div>p{display:none;}a[title]{color:purple;}@media screen and (max-width:992px){body{background-color:blue;}}p::first-line{color:blue;text-transform:uppercase;}' // eslint-disable-line max-len
           );
         });
       });

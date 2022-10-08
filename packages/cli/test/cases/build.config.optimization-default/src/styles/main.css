@@ -15,6 +15,25 @@ h1, h2 {
   border: 0.5px solid #dddde1;
 }
 
-p {
+#foo, .bar {
   color: var(--secondary-color);
+}
+
+div > p {
+  display: none;
+}
+
+a[title] {
+  color: purple;
+}
+
+@media screen and (max-width: 992px) {
+  body {
+    background-color: blue;
+  }
+}
+
+p::first-line {
+  color: blue;
+  text-transform: uppercase;
 }

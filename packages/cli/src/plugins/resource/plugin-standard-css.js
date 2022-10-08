@@ -15,7 +15,7 @@ function bundleCss(body, url) {
 
   walk(ast, {
     enter: function (node, item) { // eslint-disable-line
-      const { type } = node;
+      const { type, name, value } = node;
 
       if (type === 'String' && this.atrulePrelude) {
         const { value } = item.data;
@@ -25,14 +25,28 @@ function bundleCss(body, url) {
 
           optimizedCss += bundleCss(importContents, url);
         }
-      } if (type === 'TypeSelector') {
-        optimizedCss += `${node.name}`;
-      } if (type === 'PseudoClassSelector') {
-        optimizedCss += `:${node.name}`;
-      } if (type === 'Function') {
-        optimizedCss += `${node.name}(`;
-      } if (type === 'Block') {
+      } else if (type === 'Atrule' && name !== 'import') {
+        optimizedCss += `@${name} `;
+      } else if (type === 'TypeSelector') {
+        optimizedCss += name;
+      } else if (type === 'IdSelector') {
+        optimizedCss += `#${name}`;
+      } else if (type === 'ClassSelector') {
+        optimizedCss += `.${name}`;
+      } else if (type === 'PseudoClassSelector') {
+        optimizedCss += `:${name}`;
+      } else if (type === 'Function') {
+        optimizedCss += `${name}(`;
+      } else if (type === 'MediaFeature') {
+        optimizedCss += ` (${name}:`;
+      } else if (type === 'PseudoElementSelector') {
+        optimizedCss += `::${name}`;
+      } else if (type === 'Block') {
         optimizedCss += '{';
+      } else if (type === 'AttributeSelector') {
+        optimizedCss += '[';
+      } else if (type === 'Combinator') {
+        optimizedCss += name;
       } else if (type === 'Declaration') {
         optimizedCss += `${node.property}:`;
       } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && !this.atrule) || type === 'Operator' || type === 'Raw') {
@@ -43,25 +57,25 @@ function bundleCss(body, url) {
         switch (type) {
 
           case 'Dimension':
-            optimizedCss += `${node.value}${node.unit}`;
+            optimizedCss += `${value}${node.unit}`;
             break;
           case 'Hash':
-            optimizedCss += `#${node.value}`;
+            optimizedCss += `#${value}`;
             break;
           case 'Identifier':
-            optimizedCss += `${node.name}`;
+            optimizedCss += name;
             break;
           case 'Number':
-            optimizedCss += `${node.value}`;
+            optimizedCss += value;
             break;
           case 'Operator':
-            optimizedCss += `${node.value}`;
+            optimizedCss += value;
             break;
           case 'String':
-            optimizedCss += `'${node.value}'`;
+            optimizedCss += `'${value}'`;
             break;
           case 'Raw':
-            optimizedCss += `${node.value.trim()}`;
+            optimizedCss += `${value.trim()}`;
             break;
           default:
             break;
@@ -72,10 +86,16 @@ function bundleCss(body, url) {
     leave: function(node, item) {
       switch (node.type) {
 
+        case 'Atrule':
+          if (node.name !== 'import') {
+            optimizedCss += '}';
+          }
+          break;
         case 'Rule':
           optimizedCss += '}';
           break;
         case 'Function':
+        case 'MediaFeature':
           optimizedCss += ')';
           break;
         case 'Declaration':
@@ -85,6 +105,9 @@ function bundleCss(body, url) {
           if (item.next) {
             optimizedCss += ',';  
           }
+          break;
+        case 'AttributeSelector':
+          optimizedCss += ']';
           break;
         default:
           break;
