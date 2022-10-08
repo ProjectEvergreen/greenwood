@@ -104,11 +104,11 @@ describe('Build Greenwood With: ', function() {
         // test custom CSS bundling
         it('should have the expect preload CSS content in the file', async function() {
           const cssFiles = await glob.promise(path.join(this.context.publicDir, 'styles/*.css'));
-          const customCss = await fs.promises.readFile(cssFiles[0], 'utf-8'); // .to.have.lengthOf(1);
+          const customCss = await fs.promises.readFile(cssFiles[0], 'utf-8');
           
           expect(cssFiles.length).to.be.equal(1);
           expect(customCss).to.be.equal(
-            ':root,:host{color:blue;}*{margin:0;padding:0;font-family:\'Comic Sans\',sans-serif;}body{color:red;}h1,h2{border:0.5px solid #dddde1;}'
+            ':root,:host{--primary-color:#16f;--secondary-color:#ff7;}*{margin:0;padding:0;font-family:\'Comic Sans\',sans-serif;}body{background-color:green;}h1,h2{color:var(--primary-color);border:0.5px solid #dddde1;}p{color:var(--secondary-color);}' // eslint-disable-line max-len
           );
         });
       });

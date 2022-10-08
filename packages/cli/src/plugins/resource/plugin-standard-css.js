@@ -13,79 +13,81 @@ function bundleCss(body, url) {
   const ast = parse(body);
   let optimizedCss = '';
 
-  walk(ast, function(node, item, list) { // eslint-disable-line
-    const { type } = node;
+  walk(ast, {
+    enter: function (node, item) { // eslint-disable-line
+      const { type } = node;
 
-    if (type === 'String' && this.atrulePrelude) {
-      const { value } = item.data;
+      if (type === 'String' && this.atrulePrelude) {
+        const { value } = item.data;
 
-      if (value.indexOf('.') === 0) {
-        const importContents = fs.readFileSync(path.resolve(path.dirname(url), value), 'utf-8');
+        if (value.indexOf('.') === 0) {
+          const importContents = fs.readFileSync(path.resolve(path.dirname(url), value), 'utf-8');
 
-        optimizedCss += bundleCss(importContents, url);
+          optimizedCss += bundleCss(importContents, url);
+        }
+      } if (type === 'TypeSelector') {
+        optimizedCss += `${node.name}`;
+      } if (type === 'PseudoClassSelector') {
+        optimizedCss += `:${node.name}`;
+      } if (type === 'Selector') {
+        if (item.prev) {
+          optimizedCss += ',';
+        }
+      } if (type === 'Function') {
+        optimizedCss += `${node.name}(`;
+      } else if (type === 'Declaration') {
+        if (!item.prev) {
+          optimizedCss += '{';
+        }
+
+        optimizedCss += `${node.property}:`;
+      } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && !this.atrule) || type === 'Operator' || type === 'Raw') {
+        if (item && item.prev && type !== 'Operator' && item.prev.data.type !== 'Operator') {
+          optimizedCss += ' ';
+        }
+
+        switch (type) {
+
+          case 'Dimension':
+            optimizedCss += `${node.value}${node.unit}`;
+            break;
+          case 'Hash':
+            optimizedCss += `#${node.value}`;
+            break;
+          case 'Identifier':
+            optimizedCss += `${node.name}`;
+            if (this.function) {
+              optimizedCss += ')';
+            }
+            break;
+          case 'Number':
+            optimizedCss += `${node.value}`;
+            break;
+          case 'Operator':
+            optimizedCss += `${node.value}`;
+            break;
+          case 'String':
+            optimizedCss += `'${node.value}'`;
+            break;
+          case 'Raw':
+            optimizedCss += `${node.value.trim()};`;
+            break;
+          default:
+            break;
+
+        }
+
+        if (item && !item.next) {
+          optimizedCss += ';';
+        }
       }
-    } else if (type === 'Rule' && item.prev && item.prev.data.type !== 'Atrule') {
-      optimizedCss += '}';
-    } if (type === 'TypeSelector') {
-      optimizedCss += `${node.name}`;
-    } if (type === 'PseudoClassSelector') {
-      optimizedCss += `:${node.name}`;
-    } if (type === 'Selector') {
-      if (item.prev) {
-        optimizedCss += ',';
-      }
-    } if (type === 'Function') {
-      optimizedCss += `${node.name}(`;
-    } else if (type === 'Declaration') {
-      if (!item.prev) {
-        optimizedCss += '{';
-      }
-
-      optimizedCss += `${node.property}:`;
-
-      if (node.value.type === 'Raw') {
-        optimizedCss += `${node.value.value.trim()};`;
-      }
-    } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && !this.atrule) || type === 'Operator') {
-      if (item.prev && type !== 'Operator' && item.prev.data.type !== 'Operator') {
-        optimizedCss += ' ';
-      }
-
-      switch (type) {
-
-        case 'Dimension':
-          optimizedCss += `${node.value}${node.unit}`;
-          break;
-        case 'Hash':
-          optimizedCss += `#${node.value}`;
-          break;
-        case 'Identifier':
-          optimizedCss += `${node.name}`;
-          if (this.function) {
-            optimizedCss += ')';
-          }
-          break;
-        case 'Number':
-          optimizedCss += `${node.value}`;
-          break;
-        case 'Operator':
-          optimizedCss += `${node.value}`;
-          break;
-        case 'String':
-          optimizedCss += `'${node.value}'`;
-          break;
-        default:
-          break;
-
-      }
-
-      if (!item.next) {
-        optimizedCss += ';';
+    },
+    leave: function(node) {
+      if (node.type === 'Rule') {
+        optimizedCss += '}';
       }
     }
   });
-
-  optimizedCss += '}';
 
   return optimizedCss;
 }
