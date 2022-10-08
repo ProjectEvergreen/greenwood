@@ -29,17 +29,11 @@ function bundleCss(body, url) {
         optimizedCss += `${node.name}`;
       } if (type === 'PseudoClassSelector') {
         optimizedCss += `:${node.name}`;
-      } if (type === 'Selector') {
-        if (item.prev) {
-          optimizedCss += ',';
-        }
       } if (type === 'Function') {
         optimizedCss += `${node.name}(`;
+      } if (type === 'Block') {
+        optimizedCss += '{';
       } else if (type === 'Declaration') {
-        if (!item.prev) {
-          optimizedCss += '{';
-        }
-
         optimizedCss += `${node.property}:`;
       } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && !this.atrule) || type === 'Operator' || type === 'Raw') {
         if (item && item.prev && type !== 'Operator' && item.prev.data.type !== 'Operator') {
@@ -56,9 +50,6 @@ function bundleCss(body, url) {
             break;
           case 'Identifier':
             optimizedCss += `${node.name}`;
-            if (this.function) {
-              optimizedCss += ')';
-            }
             break;
           case 'Number':
             optimizedCss += `${node.value}`;
@@ -70,21 +61,34 @@ function bundleCss(body, url) {
             optimizedCss += `'${node.value}'`;
             break;
           case 'Raw':
-            optimizedCss += `${node.value.trim()};`;
+            optimizedCss += `${node.value.trim()}`;
             break;
           default:
             break;
 
         }
-
-        if (item && !item.next) {
-          optimizedCss += ';';
-        }
       }
     },
-    leave: function(node) {
-      if (node.type === 'Rule') {
-        optimizedCss += '}';
+    leave: function(node, item) {
+      switch (node.type) {
+
+        case 'Rule':
+          optimizedCss += '}';
+          break;
+        case 'Function':
+          optimizedCss += ')';
+          break;
+        case 'Declaration':
+          optimizedCss += ';';
+          break;
+        case 'Selector':
+          if (item.next) {
+            optimizedCss += ',';  
+          }
+          break;
+        default:
+          break;
+
       }
     }
   });
