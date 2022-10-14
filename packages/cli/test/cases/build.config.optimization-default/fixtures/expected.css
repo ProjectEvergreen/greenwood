@@ -14,4 +14,4 @@ a[title]{color:purple;}
 
 @media screen and (max-width:992px){body{background-color:blue;}}
 
-p::first-line{color:blue;text-transform:uppercase;}
+p::first-line{color:blue;width:100%;}
