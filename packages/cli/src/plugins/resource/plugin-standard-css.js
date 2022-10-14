@@ -17,8 +17,8 @@ function bundleCss(body, url) {
     enter: function (node, item) { // eslint-disable-line complexity
       const { type, name, value } = node;
 
-      if (type === 'String' && this.atrulePrelude) {
-        const { value } = item.data;
+      if ((type === 'String' || type === 'Url') && this.atrulePrelude && this.atrule.name === 'import') {
+        const { value } = node;
 
         if (value.indexOf('.') === 0) {
           const importContents = fs.readFileSync(path.resolve(path.dirname(url), value), 'utf-8');
@@ -49,7 +49,9 @@ function bundleCss(body, url) {
         optimizedCss += name;
       } else if (type === 'Declaration') {
         optimizedCss += `${node.property}:`;
-      } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && !this.atrule) || type === 'Operator' || type === 'Raw' || type === 'Percentage') { // eslint-disable-line max-len
+      } else if (type === 'Url' && this.atrule?.name !== 'import') {
+        optimizedCss += `url('${node.value}')`;
+      } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && (this.atrule?.type !== 'import')) || type === 'Operator' || type === 'Raw' || type === 'Percentage') { // eslint-disable-line max-len
         if (item && item.prev && type !== 'Operator' && item.prev.data.type !== 'Operator') {
           optimizedCss += ' ';
         }
