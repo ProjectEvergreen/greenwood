@@ -49,7 +49,7 @@ function bundleCss(body, url) {
         optimizedCss += name;
       } else if (type === 'Declaration') {
         optimizedCss += `${node.property}:`;
-      } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && !this.atrule) || type === 'Operator' || type === 'Raw') {
+      } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && !this.atrule) || type === 'Operator' || type === 'Raw' || type === 'Percentage') { // eslint-disable-line max-len
         if (item && item.prev && type !== 'Operator' && item.prev.data.type !== 'Operator') {
           optimizedCss += ' ';
         }
@@ -58,6 +58,9 @@ function bundleCss(body, url) {
 
           case 'Dimension':
             optimizedCss += `${value}${node.unit}`;
+            break;
+          case 'Percentage':
+            optimizedCss += `${value}%`;
             break;
           case 'Hash':
             optimizedCss += `#${value}`;
