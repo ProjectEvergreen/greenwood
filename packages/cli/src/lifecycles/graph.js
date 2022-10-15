@@ -138,13 +138,8 @@ const generateGraph = async (compilation) => {
               filePath = route;
   
               await new Promise((resolve, reject) => {
-                const worker = new Worker(routeWorkerUrl, {
-                  workerData: {
-                    modulePath: fullPath,
-                    compilation: JSON.stringify(compilation),
-                    route
-                  }
-                });
+                const worker = new Worker(routeWorkerUrl);
+
                 worker.on('message', (result) => {
                   if (result.frontmatter) {
                     const resources = (result.frontmatter.imports || []).map((resource) => {
@@ -163,6 +158,12 @@ const generateGraph = async (compilation) => {
                   if (code !== 0) {
                     reject(new Error(`Worker stopped with exit code ${code}`));
                   }
+                });
+
+                worker.postMessage({
+                  modulePath: fullPath,
+                  compilation: JSON.stringify(compilation),
+                  route
                 });
               });
   
