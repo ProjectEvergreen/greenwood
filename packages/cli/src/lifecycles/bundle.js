@@ -67,10 +67,6 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
         const basenamePieces = path.basename(srcPath).split('.');
         const fileNamePieces = srcPath.split('/').filter(piece => piece !== ''); // normalize by removing any leading /'s  
 
-        console.debug({ srcPath });
-        console.debug({ basename });
-        console.debug({ basenamePieces });
-        console.debug({ fileNamePieces });
         optimizedFileName = srcPath.indexOf('/node_modules') >= 0
           ? `${basenamePieces[0]}.${hashString(contents)}.css`
           : fileNamePieces.join('/').replace(basename, `${basenamePieces[0]}.${hashString(contents)}.css`);
@@ -101,8 +97,6 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
         optimizedFileContents = optimizedStyles;
       }
 
-      console.debug({ optimizedFileName });
-      console.debug('==============================');
       compilation.resources.set(resourceKey, {
         ...compilation.resources.get(resourceKey),
         optimizedFileName,
