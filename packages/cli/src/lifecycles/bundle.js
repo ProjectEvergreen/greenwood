@@ -65,10 +65,11 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
       if (src) {
         const basename = path.basename(srcPath);
         const basenamePieces = path.basename(srcPath).split('.');
+        const fileNamePieces = srcPath.split('/').filter(piece => piece !== ''); // normalize by removing any leading /'s  
 
         optimizedFileName = srcPath.indexOf('/node_modules') >= 0
           ? `${basenamePieces[0]}.${hashString(contents)}.css`
-          : srcPath.replace(basename, `${basenamePieces[0]}.${hashString(contents)}.css`);
+          : fileNamePieces.join('/').replace(basename, `${basenamePieces[0]}.${hashString(contents)}.css`);
       } else {
         optimizedFileName = `${hashString(contents)}.css`;
       }
