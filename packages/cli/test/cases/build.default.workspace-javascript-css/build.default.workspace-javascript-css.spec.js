@@ -105,7 +105,9 @@ describe('Build Greenwood With: ', function() {
       it('should have one <script> tag for non-module.js loaded in the <head>', function() {
         const scriptTags = dom.window.document.querySelectorAll('head > script[src]');
         const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
-          return (/non-module.*[a-z0-9].js/).test(script.src);
+          const src = script.getAttribute('src');
+
+          return (/non-module.*[a-z0-9].js/).test(src) && src.indexOf('//') < 0;
         });
         
         expect(mainScriptTags.length).to.be.equal(1);
@@ -148,8 +150,12 @@ describe('Build Greenwood With: ', function() {
         const linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"]');
         
         expect(linkTags.length).to.be.equal(2);
+
         linkTags.forEach(link => {
-          expect((/.*[a-z0-9].css/).test(link.href)).to.be.equal(true);
+          const href = link.getAttribute('href');
+          const hrefPieces = link.getAttribute('href').split('/');
+
+          expect(href).to.be.equal(`/styles/${hrefPieces[2]}`);
         });
       });
 
