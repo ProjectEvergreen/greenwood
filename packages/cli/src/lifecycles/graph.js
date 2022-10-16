@@ -33,50 +33,50 @@ const generateGraph = async (compilation) => {
           } else {
             const extension = path.extname(filename);
             const isStatic = extension === '.md' || extension === '.html';
+            const isDynamic = extension === '.js';
             const relativePagePath = fullPath.substring(pagesDir.length - 1, fullPath.length);
             const relativeWorkspacePath = directory.replace(process.cwd(), '').replace(path.sep, '');
             let route = relativePagePath
               .replace(extension, '')
               .replace(/\\/g, '/');
+            let id = filename.split(path.sep)[filename.split(path.sep).length - 1].replace(extension, '');
+            let label = id.split('-')
+              .map((idPart) => {
+                return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
+              }).join(' ');
             let template = 'page';
             let title = null;
             let imports = [];
-            let label = '';
-            let id;
             let customData = {};
             let filePath;
-            
+
+            /*
+             * check if additional nested directories exist to correctly determine route (minus filename)
+             * examples:
+             * - pages/index.{html,md,js} -> /
+             * - pages/about.{html,md,js} -> /about/
+             * - pages/blog/index.{html,md,js} -> /blog/
+             * - pages/blog/some-post.{html,md,js} -> /blog/some-post/
+             */
+            if (relativePagePath.lastIndexOf(path.sep) > 0) {
+              // https://github.com/ProjectEvergreen/greenwood/issues/455
+              route = id === 'index' || route.replace('/index', '') === `/${id}`
+                ? route.replace('index', '')
+                : `${route}/`;
+            } else {
+              route = route === '/index'
+                ? '/'
+                : `${route}/`;
+            }
+
             if (isStatic) {
               const fileContents = fs.readFileSync(fullPath, 'utf8');
               const { attributes } = fm(fileContents);
               
               template = attributes.template || 'page';
               title = attributes.title || title;
-              id = attributes.label || filename.split(path.sep)[filename.split(path.sep).length - 1].replace(extension, '');
+              id = attributes.label || id; // filename.split(path.sep)[filename.split(path.sep).length - 1].replace(extension, '');
               imports = attributes.imports || [];
-              label = id.split('-')
-                .map((idPart) => {
-                  return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
-                }).join(' ');
-
-              /*
-               * check if additional nested directories exist to correctly determine route (minus filename)
-               * examples:
-               * - pages/index.{html,md} -> /
-               * - pages/about.{html,md} -> /about/
-               * - pages/blog/index.{html,md} -> /blog/
-               * - pages/blog/some-post.{html,md} -> /blog/some-post/
-               */
-              if (relativePagePath.lastIndexOf(path.sep) > 0) {
-                // https://github.com/ProjectEvergreen/greenwood/issues/455
-                route = id === 'index' || route.replace('/index', '') === `/${id}`
-                  ? route.replace('index', '')
-                  : `${route}/`;
-              } else {
-                route = route === '/index'
-                  ? '/'
-                  : `${route}/`;
-              }
               
               filePath = route === '/' || relativePagePath.lastIndexOf(path.sep) === 0
                 ? `${relativeWorkspacePath}${filename}`
@@ -121,18 +121,8 @@ const generateGraph = async (compilation) => {
                 }
               }
               /* ---------End Menu Query-------------------- */
-            } else {
+            } else if (isDynamic) {
               const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
-              // const relativePagePath = fullPath.substring(pagesDir.length - 1, fullPath.length);
-              id = filename.split(path.sep)[filename.split(path.sep).length - 1].replace(extension, '');
-              label = id.split('-')
-                .map((idPart) => {
-                  return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
-                }).join(' ');
-              route = relativePagePath
-                .replace(extension, '')
-                .replace(/\\/g, '/')
-                .concat('/');
               let ssrFrontmatter;
 
               filePath = route;
@@ -176,6 +166,8 @@ const generateGraph = async (compilation) => {
                 customData.menu = ssrFrontmatter.menu || '';
                 customData.index = ssrFrontmatter.index || '';
               }  
+            } else {
+              console.debug(`Unhandled extension (.${extension}) for route => ${route}`);
             }
 
             /*
