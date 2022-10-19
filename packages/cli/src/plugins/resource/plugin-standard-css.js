@@ -104,6 +104,10 @@ function bundleCss(body, url) {
           optimizedCss += ')';
           break;
         case 'Declaration':
+          if (node.important) {
+            optimizedCss += '!important';
+          }
+
           optimizedCss += ';';
           break;
         case 'Selector':

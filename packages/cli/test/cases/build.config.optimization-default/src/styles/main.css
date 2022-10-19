@@ -35,5 +35,5 @@ a[title] {
 
 p::first-line {
   color: blue;
-  width: 100%;
+  width: 100%!important;
 }
