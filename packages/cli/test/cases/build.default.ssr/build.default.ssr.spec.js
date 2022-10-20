@@ -16,8 +16,9 @@
  *   components/
  *     footer.js
  *   pages/
- *     artists.js
  *     about.md
+ *     artists.js
+ *     index.js
  *     users.js
  *   templates/
  *     app.html

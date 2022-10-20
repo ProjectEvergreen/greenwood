@@ -75,7 +75,7 @@ const generateGraph = async (compilation) => {
               
               template = attributes.template || 'page';
               title = attributes.title || title;
-              id = attributes.label || id; // filename.split(path.sep)[filename.split(path.sep).length - 1].replace(extension, '');
+              id = attributes.label || id;
               imports = attributes.imports || [];
               
               filePath = route === '/' || relativePagePath.lastIndexOf(path.sep) === 0
