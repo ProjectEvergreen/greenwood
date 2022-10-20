@@ -16,8 +16,9 @@
  *   components/
  *     footer.js
  *   pages/
+ *     about.md
  *     artists.js
- *     index.md
+ *     index.js
  *     users.js
  *   templates/
  *     app.html
@@ -66,8 +67,23 @@ describe('Build Greenwood With: ', function() {
 
     let response = {};
     let artistsPageDom;
+    let homePageDom;
     let usersPageDom;
     let artistsPageGraphData;
+
+    before(async function() {
+      return new Promise((resolve, reject) => {
+        request.get(`${hostname}/`, (err, res, body) => {
+          if (err) {
+            reject();
+          }
+
+          homePageDom = new JSDOM(body);
+
+          resolve();
+        });
+      });
+    });
 
     before(async function() {
       const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
@@ -103,7 +119,16 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('Serve command with HTML route response for page using "get" functions', function() {
+    describe('Serve command with HTML route response for the home page using "get" functions', function() {
+      it('should have the expected output for the page', function() {
+        const headings = homePageDom.window.document.querySelectorAll('body > h1');
+
+        expect(headings.length).to.equal(1);
+        expect(headings[0].textContent).to.equal('Hello from the server rendered home page!');
+      });
+    });
+
+    describe('Serve command with HTML route response for artists page using "get" functions', function() {
 
       it('should return a 200 status', function(done) {
         expect(response.statusCode).to.equal(200);
@@ -179,6 +204,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have the expected menu and index values in the graph', function() {
+        expect(artistsPageGraphData.label).to.equal('Artists');
         expect(artistsPageGraphData.data.menu).to.equal('navigation');
         expect(artistsPageGraphData.data.index).to.equal(7);
       });
@@ -198,7 +224,7 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('Prerender an HTML route response for page exporting an HTMLElement as default export', function() {
+    describe('Prerender an HTML route response for users page exporting an HTMLElement as default export', function() {
       it('the response body should be valid HTML from JSDOM', function(done) {
         expect(usersPageDom).to.not.be.undefined;
         done();

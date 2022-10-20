@@ -23,6 +23,7 @@ describe('Unit Test: Data', function() {
 
         it('should have all expected properties for each page', function() {
           pages.forEach(function(page) {
+            expect(page.label).to.exist;
             expect(page.id).to.exist;
             expect(page.path).to.exist;
             expect(page.filename).to.exist;
@@ -41,7 +42,6 @@ describe('Unit Test: Data', function() {
         });
 
         it('should have 8 children', function() {
-          // console.debug(children);
           expect(children.length).to.equal(7);
         });
 
