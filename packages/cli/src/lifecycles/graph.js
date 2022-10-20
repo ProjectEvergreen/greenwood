@@ -40,10 +40,6 @@ const generateGraph = async (compilation) => {
               .replace(extension, '')
               .replace(/\\/g, '/');
             let id = filename.split(path.sep)[filename.split(path.sep).length - 1].replace(extension, '');
-            let label = id.split('-')
-              .map((idPart) => {
-                return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
-              }).join(' ');
             let template = 'page';
             let title = null;
             let imports = [];
@@ -188,7 +184,10 @@ const generateGraph = async (compilation) => {
               data: customData || {},
               filename,
               id,
-              label,
+              label: id.split('-')
+                .map((idPart) => {
+                  return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
+                }).join(' '),
               imports,
               outputPath: route === '/404/'
                 ? '404.html'

@@ -204,6 +204,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have the expected menu and index values in the graph', function() {
+        expect(artistsPageGraphData.label).to.equal('Artists');
         expect(artistsPageGraphData.data.menu).to.equal('navigation');
         expect(artistsPageGraphData.data.index).to.equal(7);
       });

@@ -57,9 +57,18 @@ describe('Build Greenwood With: ', function() {
 
     describe('Index (home) page with custom meta data', function() {
       let dom;
+      let graph;
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+        graph = JSON.parse(await fs.promises.readFile(path.join(this.context.publicDir, 'graph.json'), 'utf-8'));
+      });
+
+      it('should have the correct custom label from frontmatter for an index page in the graph', function() {
+        const home = graph.filter(page => page.route === '/');
+
+        expect(home.length).to.be.equal(1);
+        expect(home[0].label).to.be.equal('Home');
       });
 
       it('should have a <title> tag in the <head>', function() {
