@@ -116,6 +116,11 @@ function bundleCss(body, url) {
           }
           break;
         case 'AttributeSelector':
+          if (node.matcher) {
+            // TODO better way to do this?
+            // https://github.com/csstree/csstree/issues/207
+            optimizedCss = optimizedCss.replace(`${node.name.name}'${node.value.value}'`, `${node.name.name}${node.matcher}'${node.value.value}'`);
+          }
           optimizedCss += ']';
           break;
         default:

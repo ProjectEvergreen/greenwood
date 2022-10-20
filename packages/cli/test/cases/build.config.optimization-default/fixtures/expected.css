@@ -17,3 +17,5 @@ a[title]{color:purple;}
 @media screen and (max-width:992px){body{background-color:blue;}}
 
 p::first-line{color:blue;width:100%!important;}
+
+pre[class*='language-']{color:#ccc;background:none;}

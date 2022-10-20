@@ -37,3 +37,8 @@ p::first-line {
   color: blue;
   width: 100%!important;
 }
+
+pre[class*="language-"] {
+  color: #ccc;
+  background: none;
+}
