@@ -14,7 +14,8 @@
  * User Workspace
  *  src/
  *   components/
- *     footer.js
+ *     card.js
+ *     counter.js
  *   pages/
  *     about.md
  *     artists.js
