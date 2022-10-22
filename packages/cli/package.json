@@ -12,7 +12,7 @@
     "Web Components"
   ],
   "engines": {
-    "node": ">=14"
+    "node": "^16.15.0"
   },
   "bin": {
     "greenwood": "./src/index.js"
