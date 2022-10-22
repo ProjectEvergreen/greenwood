@@ -38,7 +38,12 @@ function bundleCss(body, url) {
 
         switch (name) {
 
+          case 'lang':
           case 'not':
+          case 'nth-child':
+          case 'nth-last-child':
+          case 'nth-of-type':
+          case 'nth-last-of-type':
             optimizedCss += '(';
             break;
           default:
@@ -57,6 +62,23 @@ function bundleCss(body, url) {
         optimizedCss += '[';
       } else if (type === 'Combinator') {
         optimizedCss += name;
+      } else if (type === 'Nth') {
+        const { nth } = node;
+
+        switch (nth.type) {
+
+          case 'AnPlusB':
+            if (nth.a) {
+              optimizedCss += nth.a === '-1' ? '-n' : `${nth.a}n`;
+            }
+            if (nth.b) {
+              optimizedCss += nth.a ? `+${nth.b}` : nth.b;
+            }
+            break;
+          default:
+            break;
+
+        }
       } else if (type === 'Declaration') {
         optimizedCss += `${node.property}:`;
       } else if (type === 'Url' && this.atrule?.name !== 'import') {
@@ -116,7 +138,12 @@ function bundleCss(body, url) {
         case 'PseudoClassSelector':
           switch (node.name) {
 
+            case 'lang':
             case 'not':
+            case 'nth-child':
+            case 'nth-last-child':
+            case 'nth-last-of-type':
+            case 'nth-of-type':
               optimizedCss += ')';
               break;
             default:

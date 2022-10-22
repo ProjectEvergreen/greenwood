@@ -43,6 +43,36 @@ pre[class*="language-"] {
   background: none;
 }
 
+dd:only-of-type {
+  background-color: bisque;
+}
+
 :not(pre) > code[class*="language-"] {
-	background: #2d2d2d;
+  background: #2d2d2d;
+}
+
+li:nth-child(-n+3) {
+  border: 2px solid orange;
+  margin-bottom: 1px;
+}
+
+li:nth-child(even) {
+  background-color: lightyellow;
+}
+
+li:nth-last-child(5n) {
+  border: 2px solid orange;
+  margin-top: 1px;
+}
+
+dd:nth-last-of-type(odd) {
+  border: 2px solid orange;
+}
+
+p:nth-of-type(2n + 1) {
+  color: red;
+}
+
+*:lang(en-US) {
+  outline: 2px solid deeppink;
 }
