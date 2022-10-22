@@ -42,3 +42,7 @@ pre[class*="language-"] {
   color: #ccc;
   background: none;
 }
+
+:not(pre) > code[class*="language-"] {
+	background: #2d2d2d;
+}
