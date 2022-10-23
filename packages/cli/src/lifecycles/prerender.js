@@ -57,7 +57,7 @@ async function optimizePage(compilation, contents, route, outputPath, outputDir)
 }
 
 async function preRenderCompilationWorker(compilation, workerPrerender) {
-  const pages = compilation.graph.filter(page => !page.isSSR);
+  const pages = compilation.graph.filter(page => !page.isSSR || (page.isSSR && page.data.static) || (page.isSSR && compilation.config.prerender));
   const outputDir = compilation.context.scratchDir;
 
   console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);

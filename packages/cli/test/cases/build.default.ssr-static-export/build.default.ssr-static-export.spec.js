@@ -124,14 +124,7 @@ describe('Build Greenwood With: ', function() {
         ...litReactiveElementDecorators,
         ...litReactiveElementPackageJson
       ]);
-
-      return new Promise(async (resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 10000);
-
-        await runner.runCommand(cliPath, 'build');
-      });
+      await runner.runCommand(cliPath, 'build');
     });
 
     runSmokeTest(['public', 'index'], LABEL);

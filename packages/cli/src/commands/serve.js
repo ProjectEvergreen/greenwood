@@ -6,7 +6,7 @@ const runProdServer = async (compilation) => {
 
     try {
       const port = compilation.config.port;
-      const hasDynamicRoutes = compilation.graph.filter(page => page.isSSR && !page.data.static);
+      const hasDynamicRoutes = compilation.graph.filter(page => page.isSSR && ((page.data.hasOwnProperty('static') && !page.data.static) || !compilation.config.prerender));
       const server = hasDynamicRoutes.length > 0 ? getHybridServer : getStaticServer;
 
       (await server(compilation)).listen(port, () => {
