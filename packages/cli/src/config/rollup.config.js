@@ -121,6 +121,7 @@ const getRollupConfig = async (compilation) => {
   }).flat();
 
   return [{
+    preserveEntrySignatures: 'strict',
     input,
     output: { 
       dir: outputDir,
