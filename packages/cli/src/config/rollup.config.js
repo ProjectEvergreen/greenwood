@@ -25,12 +25,13 @@ function greenwoodResourceLoader (compilation) {
       const extension = path.extname(importAsIdAsUrl);
 
       if (extension !== '.js') {
+        const originalUrl = `${id}?type=${extension.replace('.', '')}`;
         let contents;
 
         for (const plugin of resourcePlugins) {
           const headers = {
             request: {
-              originalUrl: id
+              originalUrl
             },
             response: {
               'content-type': plugin.contentType
