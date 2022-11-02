@@ -70,7 +70,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have the expected other.js file in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, 'popup.*[a-z0-9].js'))).to.have.lengthOf(1);
+        expect(await glob.promise(path.join(this.context.publicDir, 'other.*[a-z0-9].js'))).to.have.lengthOf(1);
       });
     });
 
@@ -119,7 +119,7 @@ describe('Build Greenwood With: ', function() {
     });
 
     describe('popup <script src="..."></script> tag in the <body>', function() {
-      it('should have one <script> tag for non-module.js loaded in the <head>', function() {
+      it('should have one <script> tag for popup.js loaded in the <head>', function() {
         const scriptTags = dom.window.document.querySelectorAll('body > script[src]');
         const popupScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           const src = script.getAttribute('src');
@@ -130,7 +130,7 @@ describe('Build Greenwood With: ', function() {
         expect(popupScriptTags.length).to.be.equal(1);
       });
 
-      it('should have the expected non-module.js file in the output directory', async function() {
+      it('should have the expected popup.js file in the output directory', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'popup.*[a-z0-9].js'))).to.have.lengthOf(1);
       });
     });
