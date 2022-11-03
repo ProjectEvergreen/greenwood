@@ -66,7 +66,7 @@ describe('Build Greenwood With: ', function() {
 
       // this includes the non module file in a spec below
       it('should have the expected number of bundled .js files in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, '*.*[a-z0-9].js'))).to.have.lengthOf(2);
+        expect(await glob.promise(path.join(this.context.publicDir, '*.*[a-z0-9].js'))).to.have.lengthOf(3);
       });
 
       it('should have the expected other.js file in the output directory', async function() {
@@ -118,6 +118,23 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
+    describe('popup <script src="..."></script> tag in the <body>', function() {
+      it('should have one <script> tag for popup.js loaded in the <head>', function() {
+        const scriptTags = dom.window.document.querySelectorAll('body > script[src]');
+        const popupScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
+          const src = script.getAttribute('src');
+
+          return (/popup.*[a-z0-9].js/).test(src) && src.indexOf('//') < 0;
+        });
+
+        expect(popupScriptTags.length).to.be.equal(1);
+      });
+
+      it('should have the expected popup.js file in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'popup.*[a-z0-9].js'))).to.have.lengthOf(1);
+      });
+    });
+
     describe('<style>...</style> tag in the <head>', function() {
       it('should have one <style> tag in the <head>', function() {
         const styleTags = dom.window.document.querySelectorAll('head > style');
@@ -134,7 +151,7 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected output from the second inline <style> tag in index.html', async function() {
         const styleTags = dom.window.document.querySelectorAll('head > style');
 
-        expect(styleTags[1].textContent.replace(/\n/g, '').trim().replace(' ', '')).to.contain('span.output-style{color:red}');
+        expect(styleTags[1].textContent.replace(/\n/g, '').replace(/ /g, '')).to.contain('span.output-style{color:red}');
       });
 
       it('should have the color style for the output element', function() {
@@ -142,6 +159,20 @@ describe('Build Greenwood With: ', function() {
         const computedStyle = dom.window.getComputedStyle(output);
 
         expect(computedStyle.color).to.equal('green');
+      });
+    });
+
+    describe('<style>...</style> tag in the <body>', function() {
+      it('should have one <style> tag in the <body>', function() {
+        const styleTags = dom.window.document.querySelectorAll('body > style');
+
+        expect(styleTags.length).to.be.equal(1);
+      });
+
+      it('should have the expected output from the first inline <style> tag in index.html in the <body>', async function() {
+        const styleTags = dom.window.document.querySelectorAll('body > style');
+
+        expect(styleTags[0].textContent.replace(/\n/g, '').replace(/ /g, '')).to.contain('h1.popup{color:red;}');
       });
     });
 
