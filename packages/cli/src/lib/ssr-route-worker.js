@@ -1,6 +1,6 @@
 // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
 import { pathToFileURL } from 'url';
-import { workerData, parentPort } from 'worker_threads';
+import { parentPort } from 'worker_threads';
 import { renderToString, renderFromHTML } from 'wc-compiler';
 
 async function executeRouteModule({ modulePath, compilation, route, label, id, prerender, htmlContents, scripts }) {
@@ -43,4 +43,6 @@ async function executeRouteModule({ modulePath, compilation, route, label, id, p
   parentPort.postMessage(data);
 }
 
-executeRouteModule(workerData);
+parentPort.on('message', async (task) => {
+  await executeRouteModule(task);
+});

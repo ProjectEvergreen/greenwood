@@ -1,8 +1,9 @@
 import fs from 'fs';
 import htmlparser from 'node-html-parser';
 import { modelResource } from '../lib/resource-utils.js';
+import os from 'os';
 import path from 'path';
-import { Worker } from 'worker_threads';
+import { WorkerPool } from '../lib/threadpool.js';
 
 function isLocalLink(url = '') {
   return url.indexOf('http') !== 0 && url.indexOf('//') !== 0;
@@ -101,7 +102,9 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
 
   console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
 
-  await Promise.all(pages.map(async (page) => {
+  const pool = new WorkerPool(os.cpus().length, workerPrerender.workerUrl);
+
+  for (const page of pages) {
     const { outputPath, route } = page;
     const outputPathDir = path.join(scratchDir, route);
     const htmlResource = compilation.config.plugins.filter((plugin) => {
@@ -121,35 +124,27 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       .filter(resource => resource.type === 'script')
       .map(resource => resource.sourcePathURL.href);
 
-    await new Promise((resolve, reject) => {
-      const worker = new Worker(workerPrerender.workerUrl, {
-        workerData: {
-          modulePath: null,
-          compilation: JSON.stringify(compilation),
-          route,
-          prerender: true,
-          htmlContents: html,
-          scripts: JSON.stringify(scripts)
+    html = await new Promise((resolve, reject) => {
+      pool.runTask({
+        modulePath: null,
+        compilation: JSON.stringify(compilation),
+        route,
+        prerender: true,
+        htmlContents: html,
+        scripts: JSON.stringify(scripts)
+      }, (err, result) => {
+        if (err) {
+          return reject(err);
         }
-      });
-      worker.on('message', (result) => {
-        if (result.html) {
-          html = result.html;
-        }
-        resolve();
-      });
-      worker.on('error', reject);
-      worker.on('exit', (code) => {
-        if (code !== 0) {
-          reject(new Error(`Worker stopped with exit code ${code}`));
-        }
+
+        return resolve(result.html);
       });
     });
 
     await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
 
     console.info('generated page...', route);
-  }));
+  }
 }
 
 async function preRenderCompilationCustom(compilation, customPrerender) {
