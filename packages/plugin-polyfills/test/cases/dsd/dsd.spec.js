@@ -74,7 +74,7 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected DSD polyfill content in the polyfill <script> tag', function() {
         const scriptTags = dom.window.document.querySelectorAll('body > script');
 
-        expect(scriptTags[0].textContent).to.contain('(function attachShadowRoots(root) {');
+        expect(scriptTags[0].textContent).to.contain('HTMLTemplateElement.prototype.hasOwnProperty("shadowRoot")||function t(o){o.querySelectorAll("template[shadowroot]")');
       });
     });
   });
