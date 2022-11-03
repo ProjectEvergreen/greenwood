@@ -5,7 +5,7 @@ import { html } from 'lit';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import { pathToFileURL } from 'url';
 import { Readable } from 'stream';
-import { workerData, parentPort } from 'worker_threads';
+import { parentPort } from 'worker_threads';
 
 async function streamToString (stream) {
   const chunks = [];
@@ -71,4 +71,6 @@ async function executeRouteModule({ modulePath, compilation, route, label, id, p
   parentPort.postMessage(data);
 }
 
-executeRouteModule(workerData);
+parentPort.on('message', async (task) => {
+  await executeRouteModule(task);
+});

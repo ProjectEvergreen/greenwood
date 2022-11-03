@@ -294,13 +294,8 @@ class StandardHtmlResource extends ResourceInterface {
           const routeWorkerUrl = this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
 
           await new Promise((resolve, reject) => {
-            const worker = new Worker(routeWorkerUrl, {
-              workerData: {
-                modulePath: routeModuleLocation,
-                compilation: JSON.stringify(this.compilation),
-                route: fullPath
-              }
-            });
+            const worker = new Worker(routeWorkerUrl);
+
             worker.on('message', (result) => {
               if (result.template) {
                 ssrTemplate = result.template;
@@ -331,6 +326,12 @@ class StandardHtmlResource extends ResourceInterface {
               if (code !== 0) {
                 reject(new Error(`Worker stopped with exit code ${code}`));
               }
+            });
+
+            worker.postMessage({
+              modulePath: routeModuleLocation,
+              compilation: JSON.stringify(this.compilation),
+              route: fullPath
             });
           });
         }
