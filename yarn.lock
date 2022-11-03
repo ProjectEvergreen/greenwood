@@ -2930,6 +2930,11 @@ acorn-jsx@^5.2.0:
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.1.tgz#fc8661e11b7ac1539c47dbfea2e72b3af34d267b"
   integrity sha512-K0Ptm/47OKfQRpNQ2J/oIN/3QYiK6FwW+eJbILhsdxh2WTLdl+30o8aGdTbm5JbffpFFAg/g+zi1E+jvJha5ng==
 
+acorn-jsx@^5.3.2:
+  version "5.3.2"
+  resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"
+  integrity sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==
+
 acorn-walk@^7.1.1:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/acorn-walk/-/acorn-walk-7.2.0.tgz#0de889a601203909b0fbe07b8938dc21d2e967bc"
@@ -12023,13 +12028,15 @@ w3c-xmlserializer@^2.0.0:
   dependencies:
     xml-name-validator "^3.0.0"
 
-wc-compiler@~0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.5.0.tgz#869739ba765e41ac699b08a5991c52231ef2fbe0"
-  integrity sha512-ScHbrtd81cvMEg8tn7L/iSc1WhckNKIB77VGhZYxMNELHmgQdMuC/r36E/LhAHdqAJYxi4y77DXmU56BZzeBng==
+wc-compiler@~0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.6.1.tgz#acae127206c4fb028dccd530efa948c91efa7c20"
+  integrity sha512-riK9RNwus8U1O9VFjZ3Zph8nFGj6ivzWGQbWHZxkHkKbhS1/W/mwIw4e+20V9Uy8CsLy3u0j2HLDOxzAro5pJg==
   dependencies:
     acorn "^8.7.0"
+    acorn-jsx "^5.3.2"
     acorn-walk "^8.2.0"
+    escodegen "^2.0.0"
     parse5 "^6.0.1"
 
 wcwidth@^1.0.0, wcwidth@^1.0.1:
