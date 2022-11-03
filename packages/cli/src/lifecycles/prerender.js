@@ -6,7 +6,7 @@ import path from 'path';
 import { WorkerPool } from '../lib/threadpool.js';
 
 function isLocalLink(url = '') {
-  return url.indexOf('http') !== 0 && url.indexOf('//') !== 0;
+  return url !== '' && (url.indexOf('http') !== 0 && url.indexOf('//') !== 0);
 }
 
 function createOutputDirectory(route, outputPathDir) {
@@ -29,7 +29,8 @@ function trackResourcesForRoute(html, compilation, route) {
     style: true
   });
 
-  const scripts = root.querySelectorAll('head script')
+  // intentionally support <script> tags from the <head> or <body>
+  const scripts = root.querySelectorAll('script')
     .filter(script => (
       isLocalLink(script.getAttribute('src')) || script.rawText)
       && script.rawAttrs.indexOf('importmap') < 0)

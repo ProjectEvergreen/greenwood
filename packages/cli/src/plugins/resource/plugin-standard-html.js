@@ -410,81 +410,73 @@ class StandardHtmlResource extends ResourceInterface {
 
     return new Promise((resolve, reject) => {
       try {
-        const hasHead = body.match(/\<head>(.*)<\/head>/s);
+        for (const pageResource of pageResources) {
+          const keyedResource = this.compilation.resources.get(pageResource.sourcePathURL.pathname);
+          const { contents, src, type, optimizationAttr, optimizedFileContents, optimizedFileName, rawAttributes } = keyedResource;
 
-        if (hasHead && hasHead.length > 0) {
-          let headContents = hasHead[0];
+          if (src) {
+            if (type === 'script') {
+              if (!optimizationAttr && optimization === 'default') {
+                const optimizedFilePath = `/${optimizedFileName}`;
 
-          for (const pageResource of pageResources) {
-            const keyedResource = this.compilation.resources.get(pageResource.sourcePathURL.pathname);
-            const { contents, src, type, optimizationAttr, optimizedFileContents, optimizedFileName, rawAttributes } = keyedResource;
+                body = body.replace(src, optimizedFilePath);
+                body = body.replace('<head>', `
+                  <head>
+                  <link rel="modulepreload" href="${optimizedFilePath}" as="script">
+                `);
+              } else if (optimizationAttr === 'inline' || optimization === 'inline') {
+                const isModule = rawAttributes.indexOf('type="module') >= 0 ? ' type="module"' : '';
 
-            if (src) {
-              if (type === 'script') {
-                if (!optimizationAttr && optimization === 'default') {
-                  const optimizedFilePath = `/${optimizedFileName}`;
-
-                  headContents = headContents.replace(src, optimizedFilePath);
-                  headContents = headContents.replace('<head>', `
-                    <head>
-                    <link rel="modulepreload" href="${optimizedFilePath}" as="script">
-                  `);
-                } else if (optimizationAttr === 'inline' || optimization === 'inline') {
-                  const isModule = rawAttributes.indexOf('type="module') >= 0 ? ' type="module"' : '';
-
-                  headContents = headContents.replace(`<script ${rawAttributes}></script>`, `
-                    <script ${isModule}>
-                      ${optimizedFileContents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}
-                    </script>
-                  `);
-                } else if (optimizationAttr === 'static' || optimization === 'static') {
-                  headContents = headContents.replace(`<script ${rawAttributes}></script>`, '');
-                }
-              } else if (type === 'link') {
-                if (!optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
-                  const optimizedFilePath = `/${optimizedFileName}`;
-
-                  headContents = headContents.replace(src, optimizedFilePath);
-                  headContents = headContents.replace('<head>', `
-                    <head>
-                    <link rel="preload" href="${optimizedFilePath}" as="style" crossorigin="anonymous"></link>
-                  `);
-                } else if (optimizationAttr === 'inline' || optimization === 'inline') {
-                  // https://github.com/ProjectEvergreen/greenwood/issues/810
-                  // when pre-rendering, puppeteer normalizes everything to <link .../>
-                  // but if not using pre-rendering, then it could come out as <link ...></link>
-                  // not great, but best we can do for now until #742
-                  headContents = headContents.replace(`<link ${rawAttributes}>`, `
-                    <style>
-                      ${optimizedFileContents}
-                    </style>
-                  `).replace(`<link ${rawAttributes}/>`, `
-                    <style>
-                      ${optimizedFileContents}
-                    </style>
-                  `);
-                }
+                body = body.replace(`<script ${rawAttributes}></script>`, `
+                  <script ${isModule}>
+                    ${optimizedFileContents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}
+                  </script>
+                `);
+              } else if (optimizationAttr === 'static' || optimization === 'static') {
+                body = body.replace(`<script ${rawAttributes}></script>`, '');
               }
-            } else {
-              if (type === 'script') {
-                if (optimizationAttr === 'static' || optimization === 'static') {
-                  headContents = headContents.replace(`<script ${rawAttributes}>${contents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}</script>`, '');
-                } else if (optimizationAttr === 'none') {
-                  headContents = headContents.replace(contents, contents.replace(/\.\//g, '/').replace(/\$/g, '$$$'));
-                } else {
-                  headContents = headContents.replace(contents, optimizedFileContents.replace(/\.\//g, '/').replace(/\$/g, '$$$'));
-                }
-              } else if (type === 'style') {
-                headContents = headContents.replace(contents, optimizedFileContents);
+            } else if (type === 'link') {
+              if (!optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
+                const optimizedFilePath = `/${optimizedFileName}`;
+
+                body = body.replace(src, optimizedFilePath);
+                body = body.replace('<head>', `
+                  <head>
+                  <link rel="preload" href="${optimizedFilePath}" as="style" crossorigin="anonymous"></link>
+                `);
+              } else if (optimizationAttr === 'inline' || optimization === 'inline') {
+                // https://github.com/ProjectEvergreen/greenwood/issues/810
+                // when pre-rendering, puppeteer normalizes everything to <link .../>
+                // but if not using pre-rendering, then it could come out as <link ...></link>
+                // not great, but best we can do for now until #742
+                body = body.replace(`<link ${rawAttributes}>`, `
+                  <style>
+                    ${optimizedFileContents}
+                  </style>
+                `).replace(`<link ${rawAttributes}/>`, `
+                  <style>
+                    ${optimizedFileContents}
+                  </style>
+                `);
               }
             }
+          } else {
+            if (type === 'script') {
+              if (optimizationAttr === 'static' || optimization === 'static') {
+                body = body.replace(`<script ${rawAttributes}>${contents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}</script>`, '');
+              } else if (optimizationAttr === 'none') {
+                body = body.replace(contents, contents.replace(/\.\//g, '/').replace(/\$/g, '$$$'));
+              } else {
+                body = body.replace(contents, optimizedFileContents.replace(/\.\//g, '/').replace(/\$/g, '$$$'));
+              }
+            } else if (type === 'style') {
+              body = body.replace(contents, optimizedFileContents);
+            }
           }
-
-          // TODO clean up lit-polyfill as part of https://github.com/ProjectEvergreen/greenwood/issues/728
-          headContents = headContents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
-
-          body = body.replace(/\<head>(.*)<\/head>/s, headContents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
         }
+
+        // TODO clean up lit-polyfill as part of https://github.com/ProjectEvergreen/greenwood/issues/728
+        body = body.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
 
         resolve(body);
       } catch (e) {
