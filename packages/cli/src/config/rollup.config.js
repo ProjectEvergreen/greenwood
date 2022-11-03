@@ -121,6 +121,7 @@ const getRollupConfig = async (compilation) => {
   }).flat();
 
   return [{
+    preserveEntrySignatures: 'strict', // https://github.com/ProjectEvergreen/greenwood/pull/990
     input,
     output: { 
       dir: outputDir,
