@@ -30,7 +30,6 @@ import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import request from 'request';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -63,8 +62,6 @@ describe('Build Greenwood With: ', function() {
         await runner.runCommand(cliPath, 'serve');
       });
     });
-
-    runSmokeTest(['public', 'index'], LABEL);
 
     let response = {};
     let artistsPageDom;
@@ -147,7 +144,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       // this is limited by the fact SSR routes have to write to the fs in order to bundle a page on the fly
-      xit('should not emit a static file', function(done) {
+      it('should not emit a static file', function(done) {
         const ssrPageOutput = fs.existsSync(path.join(outputPath, 'public/artists/index.html'));
 
         expect(ssrPageOutput).to.be.false;

@@ -22,7 +22,7 @@ async function optimizeStaticPages(compilation, optimizeResources) {
   const { scratchDir, outputDir } = compilation.context;
 
   return Promise.all(compilation.graph
-    .filter(page => !page.isSSR || (page.isSSR && page.data.static))
+    .filter(page => !page.isSSR || (page.isSSR && page.data.static) || (page.isSSR && compilation.config.prerender))
     .map(async (page) => {
       const { route, outputPath } = page;
       const html = await fs.promises.readFile(path.join(scratchDir, outputPath), 'utf-8');
@@ -122,8 +122,6 @@ const bundleCompilation = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      compilation.graph = compilation.graph.filter(page => !page.isSSR || (page.isSSR && page.data.static) || (page.isSSR && compilation.config.prerender));
-
       const optimizeResourcePlugins = compilation.config.plugins.filter((plugin) => {
         return plugin.type === 'resource';
       }).map((plugin) => {
