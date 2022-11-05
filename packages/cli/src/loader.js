@@ -16,6 +16,7 @@ function getCustomLoaderPlugins(url, body, headers) {
   return plugins.filter(plugin => plugin.extensions.includes(path.extname(url)) && (plugin.shouldServe(url, body, headers) || plugin.shouldIntercept(url, body, headers)));
 }
 
+// https://nodejs.org/docs/latest-v16.x/api/esm.html#resolvespecifier-context-nextresolve
 export function resolve(specifier, context, defaultResolve) {
   const { parentURL = baseURL } = context;
 
@@ -28,13 +29,15 @@ export function resolve(specifier, context, defaultResolve) {
   return defaultResolve(specifier, context, defaultResolve);
 }
 
+// https://nodejs.org/docs/latest-v16.x/api/esm.html#loadurl-context-nextload
 export async function load(source, context, defaultLoad) {
   const resourcePlugins = getCustomLoaderPlugins(source);
+  const extension = path.extname(source).replace('.', '');
   
   if (resourcePlugins.length) {
     const headers = {
       request: {
-        originalUrl: `${source}?type=${path.extname(source).replace('.', '')}`,
+        originalUrl: `${source}?type=${extension}`,
         accept: ''
       }
     };
@@ -52,9 +55,11 @@ export async function load(source, context, defaultLoad) {
       }
     }
 
+    // TODO better way to handle remove export default?
+    // https://github.com/ProjectEvergreen/greenwood/issues/948
     return {
-      format: 'module',
-      source: contents
+      format: extension === 'json' ? 'json' : 'module',
+      source: extension === 'json' ? JSON.parse(contents.replace('export default ', '')) : contents
     };
   }
 
