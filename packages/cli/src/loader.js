@@ -1,4 +1,4 @@
-// Node ^16.15.0
+// Node ^16.17.0
 import path from 'path';
 import { readAndMergeConfig as initConfig } from './lifecycles/config.js';
 import { URL, pathToFileURL, fileURLToPath } from 'url';
@@ -22,7 +22,8 @@ export function resolve(specifier, context, defaultResolve) {
 
   if (getCustomLoaderPlugins(specifier).length > 0) {
     return {
-      url: new URL(specifier, parentURL).href
+      url: new URL(specifier, parentURL).href,
+      shortCircuit: true
     };
   }
 
@@ -33,7 +34,7 @@ export function resolve(specifier, context, defaultResolve) {
 export async function load(source, context, defaultLoad) {
   const resourcePlugins = getCustomLoaderPlugins(source);
   const extension = path.extname(source).replace('.', '');
-  
+
   if (resourcePlugins.length) {
     const headers = {
       request: {
@@ -59,7 +60,8 @@ export async function load(source, context, defaultLoad) {
     // https://github.com/ProjectEvergreen/greenwood/issues/948
     return {
       format: extension === 'json' ? 'json' : 'module',
-      source: extension === 'json' ? JSON.parse(contents.replace('export default ', '')) : contents
+      source: extension === 'json' ? JSON.parse(contents.replace('export default ', '')) : contents,
+      shortCircuit: true
     };
   }
 
