@@ -21,7 +21,7 @@
     "serve": "node --experimental-loader ./packages/cli/src/loader.js . serve",
     "develop": "node --experimental-loader ./packages/cli/src/experimental-loader.js . develop",
     "test": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict c8 mocha --exclude \"./packages/*/test/cases/**/exp-*/**\"",
-    "test:exp": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 c8 node --experimental-loader ./test/test-loader.js ./node_modules/mocha/bin/mocha",
+    "test:exp": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 c8 node --experimental-loader $(pwd)/test/test-loader.js ./node_modules/mocha/bin/mocha",
     "test:tdd": "yarn test --watch",
     "lint:js": "eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
     "lint:ts": "eslint \"./packages/**/**/*.ts\"",
