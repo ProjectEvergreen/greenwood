@@ -10,7 +10,11 @@ import path from 'path';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 function bundleCss(body, url) {
-  const ast = parse(body);
+  const ast = parse(body, {
+    onParseError(error) {
+      console.log(error.formattedMessage);
+    }
+  });
   let optimizedCss = '';
 
   walk(ast, {
