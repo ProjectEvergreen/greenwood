@@ -48,7 +48,7 @@ describe('(Experimental) Build Greenwood With: ', function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner();
+    runner = new Runner(false, true);
   });
 
   describe(LABEL, function() {
