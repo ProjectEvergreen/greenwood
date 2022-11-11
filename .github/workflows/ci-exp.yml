@@ -1,4 +1,4 @@
-name: Continuous Integration (Experimental Testing)
+name: Continuous Integration (Experimental)
 
 on: [pull_request]
 
