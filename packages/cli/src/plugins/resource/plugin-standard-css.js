@@ -167,7 +167,10 @@ function bundleCss(body, url) {
           if (node.matcher) {
             // TODO better way to do this?
             // https://github.com/csstree/csstree/issues/207
-            optimizedCss = optimizedCss.replace(`${node.name.name}'${node.value.value}'`, `${node.name.name}${node.matcher}'${node.value.value}'`);
+            const name = node.name.name;
+            const value = node.value.type === 'Identifier' ? node.value.name : `'${node.value.value}'`;
+
+            optimizedCss = optimizedCss.replace(`${name}${value}`, `${name}${node.matcher}${value}`);
           }
           optimizedCss += ']';
           break;
