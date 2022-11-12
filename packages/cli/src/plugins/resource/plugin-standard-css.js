@@ -28,6 +28,8 @@ function bundleCss(body, url) {
           const importContents = fs.readFileSync(path.resolve(path.dirname(url), value), 'utf-8');
 
           optimizedCss += bundleCss(importContents, url);
+        } else {
+          optimizedCss += `@import url('${value}');`;
         }
       } else if (type === 'Atrule' && name !== 'import') {
         optimizedCss += `@${name} `;
