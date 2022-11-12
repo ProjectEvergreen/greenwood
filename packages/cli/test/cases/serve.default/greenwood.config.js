@@ -1,7 +1,7 @@
 export default {
   devServer: {
     proxy: {
-      '/api': 'https://www.analogstudios.net'
+      '/posts': 'https://jsonplaceholder.typicode.com'
     }
   },
   port: 8181
