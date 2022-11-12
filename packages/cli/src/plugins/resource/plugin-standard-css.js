@@ -126,15 +126,15 @@ function bundleCss(body, url) {
         }
       }
     },
-    leave: function(node, item) {
+    leave: function(node, item) { // eslint-disable-line complexity
       switch (node.type) {
 
         case 'Atrule':
-          if (node.name !== 'import') {
-            optimizedCss += '}';
+          if (!node.block && node.name !== 'import') {
+            optimizedCss += ';';
           }
           break;
-        case 'Rule':
+        case 'Block':
           optimizedCss += '}';
           break;
         case 'Function':
