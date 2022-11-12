@@ -7,7 +7,6 @@
   "license": "MIT",
   "keywords": [
     "Greenwood",
-    "CommonJS",
     "Static Site Generator",
     "NodeJS",
     "PostCSS"
@@ -21,11 +20,10 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.4.0",
-    "postcss": "^8.3.11"
+    "@greenwood/cli": "^0.4.0"
   },
   "dependencies": {
-    "cssnano": "^5.0.11",
+    "postcss": "^8.3.11",
     "postcss-preset-env": "^7.0.1"
   },
   "devDependencies": {

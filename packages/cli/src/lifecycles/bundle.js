@@ -89,6 +89,12 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
         let optimizedStyles = await fs.promises.readFile(url, 'utf-8');
 
         for (const plugin of optimizationPlugins) {
+          optimizedStyles = await plugin.shouldIntercept(url, optimizedStyles)
+            ? (await plugin.intercept(url, optimizedStyles)).body
+            : optimizedStyles;
+        }
+
+        for (const plugin of optimizationPlugins) {
           optimizedStyles = await plugin.shouldOptimize(url, optimizedStyles)
             ? await plugin.optimize(url, optimizedStyles)
             : optimizedStyles;
@@ -127,7 +133,8 @@ const bundleCompilation = async (compilation) => {
       }).map((plugin) => {
         return plugin.provider(compilation);
       }).filter((provider) => {
-        return provider.shouldOptimize && provider.optimize;
+        return provider.shouldIntercept && provider.intercept
+          || provider.shouldOptimize && provider.optimize;
       });
       // centrally register all static resources
       compilation.graph.map((page) => {
