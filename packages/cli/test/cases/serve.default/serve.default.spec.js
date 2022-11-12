@@ -12,7 +12,7 @@
  * {
  *   devServer: {
  *    proxy: {
-        '/api': 'https://www.analogstudios.net'
+        '/post': 'https://jsonplaceholder.typicode.com'
       }
  *   },
  *   port: 8181
@@ -61,14 +61,13 @@ describe('Serve Greenwood With: ', function() {
 
     runSmokeTest(['serve'], LABEL);
 
-    // proxies to analogstudios.net/api/events vis greenwood.config.js
-    // ideally should find something else to avoid using something "live" in our tests
+    // proxies to https://jsonplaceholder.typicode.com/posts via greenwood.config.js
     describe('Serve command with dev proxy', function() {
       let response = {};
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          request.get(`${hostname}/api/albums?artistId=2`, (err, res, body) => {
+          request.get(`${hostname}/posts?id=7`, (err, res, body) => {
             if (err) {
               reject();
             }
