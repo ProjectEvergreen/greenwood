@@ -63,26 +63,6 @@ class PostCssResource extends ResourceInterface {
       }
     });
   }
-
-  async shouldOptimize(url) {
-    return Promise.resolve(this.isCssFile(url));
-  }
-  
-  async optimize(url, body) {
-    const contents = body || await fs.promises.readFile(url, 'utf-8');
-    const config = await getConfig(this.compilation, this.options.extendConfig);
-    const plugins = config.plugins && config.plugins.length ? [...config.plugins] : [];
-    
-    plugins.push(
-      (await import('cssnano')).default
-    );
-
-    const css = plugins.length > 0
-      ? (await postcss(plugins).process(contents, { from: url })).css
-      : body;
-    
-    return Promise.resolve(css);
-  }
 }
 
 const greenwoodPluginPostCss = (options = {}) => {
