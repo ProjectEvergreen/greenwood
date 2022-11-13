@@ -144,7 +144,7 @@ describe('Build Greenwood With: ', function() {
         it('should contain the expected CSS content inlined for page.css', function() {
           const styleTags = dom.window.document.querySelectorAll('head style');
 
-          expect(styleTags[1].textContent).to.contain('body{color:red;}');
+          expect(styleTags[1].textContent).to.contain('body{color:red}');
         });
       });
     });
