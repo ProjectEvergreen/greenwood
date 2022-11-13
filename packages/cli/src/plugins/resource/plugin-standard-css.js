@@ -60,6 +60,8 @@ function bundleCss(body, url) {
         optimizedCss += `${name}(`;
       } else if (type === 'MediaFeature') {
         optimizedCss += ` (${name}:`;
+      } else if (type === 'Parentheses') {
+        optimizedCss += '(';
       } else if (type === 'PseudoElementSelector') {
         optimizedCss += `::${name}`;
       } else if (type === 'Block') {
@@ -139,6 +141,7 @@ function bundleCss(body, url) {
           break;
         case 'Function':
         case 'MediaFeature':
+        case 'Parentheses':
           optimizedCss += ')';
           break;
         case 'PseudoClassSelector':
@@ -162,7 +165,10 @@ function bundleCss(body, url) {
             optimizedCss += '!important';
           }
 
-          optimizedCss += ';';
+          if (item.next || (item.prev && !item.next)) {
+            optimizedCss += ';';
+          }
+
           break;
         case 'Selector':
           if (item.next) {

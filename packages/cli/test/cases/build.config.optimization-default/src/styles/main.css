@@ -88,3 +88,24 @@ a[href*="greenwood"], a[href$=".pdf"] {
 [title~=flower], a[href^="https"], [lang|=en] {
   text-decoration: underline;
 }
+
+@keyframes slidein {
+  from {
+    transform: translateX(0%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@supports (display: flex) {
+  .flex-container > * {
+    text-shadow: 0px 0px 2px blue;
+    float: none;
+  }
+
+  .flex-container {
+    display: flex;
+  }
+}

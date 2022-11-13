@@ -10,40 +10,44 @@
 
 *{margin:0;padding:0;font-family:'Comic Sans',sans-serif;}
 
-body{background-color:green;}
+body{background-color:green}
 
 h1,h2{color:var(--primary-color);border:0.5px solid #dddde1;}
 
-#foo,.bar{color:var(--secondary-color);}
+#foo,.bar{color:var(--secondary-color)}
 
-div>p{display:none;}
+div>p{display:none}
 
-a[title]{color:purple;}
+a[title]{color:purple}
 
-@media screen and (max-width:992px){body{background-color:blue;}}
+@media screen and (max-width:992px){body{background-color:blue}}
 
 p::first-line{color:blue;width:100%!important;}
 
 pre[class*='language-']{color:#ccc;background:none;}
 
-dd:only-of-type{background-color:bisque;}
+dd:only-of-type{background-color:bisque}
 
-:not(pre)>code[class*='language-']{background:#2d2d2d;}
+:not(pre)>code[class*='language-']{background:#2d2d2d}
 
 li:nth-child(-n+3){border:2px solid orange;margin-bottom:1px;}
 
-li:nth-child(even){background-color:lightyellow;}
+li:nth-child(even){background-color:lightyellow}
 
 li:nth-last-child(5n){border:2px solid orange;margin-top:1px;}
 
-dd:nth-last-of-type(odd){border:2px solid orange;}
+dd:nth-last-of-type(odd){border:2px solid orange}
 
-p:nth-of-type(2n+1){color:red;}
+p:nth-of-type(2n+1){color:red}
 
-*:lang(en-US){outline:2px solid deeppink;}
+*:lang(en-US){outline:2px solid deeppink}
 
-p~ul{font-weight:bold;}
+p~ul{font-weight:bold}
 
-a[href*='greenwood'],a[href$='.pdf']{color:orange;}
+a[href*='greenwood'],a[href$='.pdf']{color:orange}
 
-[title~=flower],a[href^='https'],[lang|=en]{text-decoration:underline;}
+[title~=flower],a[href^='https'],[lang|=en]{text-decoration:underline}
+
+@keyframes slidein{from{transform:translateX(0%)}to{transform:translateX(100%)}}
+
+@supports (display:flex){.flex-container>*{text-shadow:0px 0px 2px blue;float:none;}.flex-container{display:flex}}
