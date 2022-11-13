@@ -109,3 +109,14 @@ a[href*="greenwood"], a[href$=".pdf"] {
     display: flex;
   }
 }
+
+@page {
+  size: 8.5in 9in;
+  margin-top: 4in;
+}
+
+@font-feature-values Font One {
+  @styleset {
+    nice-style: 12;
+  }
+}

@@ -51,3 +51,7 @@ a[href*='greenwood'],a[href$='.pdf']{color:orange}
 @keyframes slidein{from{transform:translateX(0%)}to{transform:translateX(100%)}}
 
 @supports (display:flex){.flex-container>*{text-shadow:0px 0px 2px blue;float:none;}.flex-container{display:flex}}
+
+@page {size:8.5in 9in;margin-top:4in;}
+
+@font-feature-values Font One{@styleset {nice-style:12}}
