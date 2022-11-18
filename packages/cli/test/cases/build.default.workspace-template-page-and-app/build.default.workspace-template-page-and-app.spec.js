@@ -118,10 +118,10 @@ describe('Build Greenwood With: ', function() {
         });
 
         it('should merge page template <style> tags after app template <style> tags', function() {
-          expect(styleTags[0].textContent).to.equal('span{text-align:center;}');
-          expect(styleTags[1].textContent).to.equal('p{margin:0 auto;}');
-          expect(styleTags[2].textContent).to.equal('ol{list-style:none;}');
-          expect(styleTags[3].textContent).to.equal('h3{text-decoration:underline;}');
+          expect(styleTags[0].textContent).to.equal('span{text-align:center}');
+          expect(styleTags[1].textContent).to.equal('p{margin:0 auto}');
+          expect(styleTags[2].textContent).to.equal('ol{list-style:none}');
+          expect(styleTags[3].textContent).to.equal('h3{text-decoration:underline}');
         });
       });
 
