@@ -28,6 +28,8 @@ function bundleCss(body, url) {
           const importContents = fs.readFileSync(path.resolve(path.dirname(url), value), 'utf-8');
 
           optimizedCss += bundleCss(importContents, url);
+        } else {
+          optimizedCss += `@import url('${value}');`;
         }
       } else if (type === 'Atrule' && name !== 'import') {
         optimizedCss += `@${name} `;
@@ -58,6 +60,8 @@ function bundleCss(body, url) {
         optimizedCss += `${name}(`;
       } else if (type === 'MediaFeature') {
         optimizedCss += ` (${name}:`;
+      } else if (type === 'Parentheses') {
+        optimizedCss += '(';
       } else if (type === 'PseudoElementSelector') {
         optimizedCss += `::${name}`;
       } else if (type === 'Block') {
@@ -124,19 +128,20 @@ function bundleCss(body, url) {
         }
       }
     },
-    leave: function(node, item) {
+    leave: function(node, item) { // eslint-disable-line complexity
       switch (node.type) {
 
         case 'Atrule':
-          if (node.name !== 'import') {
-            optimizedCss += '}';
+          if (!node.block && node.name !== 'import') {
+            optimizedCss += ';';
           }
           break;
-        case 'Rule':
+        case 'Block':
           optimizedCss += '}';
           break;
         case 'Function':
         case 'MediaFeature':
+        case 'Parentheses':
           optimizedCss += ')';
           break;
         case 'PseudoClassSelector':
@@ -160,7 +165,10 @@ function bundleCss(body, url) {
             optimizedCss += '!important';
           }
 
-          optimizedCss += ';';
+          if (item.next || (item.prev && !item.next)) {
+            optimizedCss += ';';
+          }
+
           break;
         case 'Selector':
           if (item.next) {

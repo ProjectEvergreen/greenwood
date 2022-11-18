@@ -66,7 +66,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('Page referencing external nested CSS file', function() {
       it('should output correctly processed nested CSS as non nested', function() {
-        const expectedCss = 'body{color:red;}body h1{color:blue;}';
+        const expectedCss = 'body{color:red}body h1{color:blue}';
         const cssFiles = glob.sync(path.join(this.context.publicDir, 'styles', '*.css'));
         const css = fs.readFileSync(cssFiles[0], 'utf-8');
 
