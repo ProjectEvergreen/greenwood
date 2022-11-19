@@ -20,9 +20,6 @@ jobs:
     - name: Installing project dependencies
       run: |
         yarn install --frozen-lockfile --network-timeout 1000000 && yarn lerna bootstrap
-    - name: Lint
-      run: |
-        yarn lint
     - name: Test
       run: |
         yarn test:exp
