@@ -22,6 +22,7 @@
     "develop": "node . develop",
     "test": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict c8 mocha --exclude \"./packages/**/test/cases/exp-*/**\" \"./packages/**/**/*.spec.js\"",
     "test:exp": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 c8 node --experimental-loader $(pwd)/test/test-loader.js ./node_modules/mocha/bin/mocha \"./packages/**/**/*.spec.js\"",
+    "test:exp:win": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 c8 node --experimental-loader file:\\\\%cd%\\test\\test-loader.js ./node_modules/mocha/bin/mocha \"./packages/**/**/*.spec.js\"",
     "test:tdd": "yarn test --watch",
     "lint:js": "eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
     "lint:ts": "eslint \"./packages/**/**/*.ts\"",
