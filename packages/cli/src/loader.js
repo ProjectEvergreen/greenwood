@@ -1,9 +1,8 @@
 // Node ^16.17.0
 import path from 'path';
 import { readAndMergeConfig as initConfig } from './lifecycles/config.js';
-import { URL, pathToFileURL, fileURLToPath } from 'url';
+import { URL, fileURLToPath } from 'url';
 
-const baseURL = pathToFileURL(`${process.cwd()}/`).href;
 const config = await initConfig();
 const plugins = config.plugins.filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin).map(plugin => plugin.provider({
   context: {
@@ -18,11 +17,11 @@ function getCustomLoaderPlugins(url, body, headers) {
 
 // https://nodejs.org/docs/latest-v16.x/api/esm.html#resolvespecifier-context-nextresolve
 export function resolve(specifier, context, defaultResolve) {
-  const { parentURL = baseURL } = context;
+  const { baseURL } = context;
 
   if (getCustomLoaderPlugins(specifier).length > 0) {
     return {
-      url: new URL(specifier, parentURL).href,
+      url: new URL(specifier, baseURL).href,
       shortCircuit: true
     };
   }
