@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "postcss": "^8.3.11",
+    "postcss-import": "^13.0.0",
     "postcss-preset-env": "^7.0.1"
   },
   "devDependencies": {
