@@ -203,6 +203,26 @@ async function getTemplate(compilation, route) {
 }
 ```
 
+### Custom Imports (Experimental)
+
+Through the support of the following plugins, Greenwood also supports loading custom file formats on the server side using ESM
+- [CSS](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/plugin-import-css/README.md#usage)
+- [JSON](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/plugin-import-json/README.md#usage)
+
+For example, you can now import JSON in your SSR pages and components.
+```js
+import json from '../path/to/data.json';
+
+console.log(json) // { status: 200, message: 'some data' }
+```
+
+**Steps**
+1. Make sure you are using Node `v16.17.0`
+1. Run the Greenwood CLI using the `--experimental-loaders` flag and pass Greenwood's custom loader
+    ```shell
+    $ node --experimental-loader ./node_modules/@greenwood/cli/src/loader.js ./node_modules/mocha/bin/greenwood <command>
+    ```
+
 ### Hybrid Projects
 
 One of the great things about Greenwood is that you can seamlessly move from completely static to server rendered, without giving up either one! 💯

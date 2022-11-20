@@ -40,10 +40,12 @@ import css from '../path/to/styles.css';  // must be a relative path per ESM spe
 console.log(css) // h1 { color: red }
 ```
 
-For client side code, it is recommended to append `?type=css`.
-```js
-import css from '../path/to/styles.css?type=css';
-```
+A couple notes:
+- For SSR and `prerender` use cases, [follow these steps](/docs/server-rendering/#custom-imports-experimental)
+- For client side / browser code specifically, it is recommended to append `?type=css`, e.g.
+    ```js
+    import css from '../path/to/styles.css?type=css';
+    ```
 
 For libraries like Material Web Components, this plugin will [resolve references to _some-file.css_ if the equivalent exists that ends in _.js_ (e.g. _styles.css.js_)](https://github.com/ProjectEvergreen/greenwood/issues/700).
 

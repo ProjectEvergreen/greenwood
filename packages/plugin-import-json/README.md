@@ -39,9 +39,11 @@ import json from '../path/to/data.json';  // must be a relative path per ESM spe
 console.log(json) // { status: 200, message: 'some data' }
 ```
 
-For client side / browser code, it is recommended to append `?type=json`.
-```js
-import json from '../path/to/data.json?type=json';
-```
+A couple notes:
+- For SSR and `prerender` use cases, [follow these steps](/docs/server-rendering/#custom-imports-experimental)
+- For client side / browser code specifically, it is recommended to append `?type=json`, e.g.
+    ```js
+    import json from '../path/to/data.json?type=json';
+    ```
 
 > _The plan is to coalesce around [import assertions](https://github.com/ProjectEvergreen/greenwood/issues/923) in time for the v1.0 release so the same standard syntax can be used on the client and the server._
