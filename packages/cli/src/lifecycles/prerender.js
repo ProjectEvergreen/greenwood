@@ -59,6 +59,7 @@ async function optimizePage(compilation, contents, route, outputPath, outputDir)
 async function preRenderCompilationWorker(compilation, workerPrerender) {
   const pages = compilation.graph.filter(page => !page.isSSR || (page.isSSR && page.data.static) || (page.isSSR && compilation.config.prerender));
   const outputDir = compilation.context.scratchDir;
+  const { pagesDir, userWorkspace } = compilation.context;
 
   console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
 
@@ -80,13 +81,14 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       style: true
     });
 
-    const headScripts = root.querySelectorAll('script')
+    const templateScripts = root.querySelectorAll('script')
       .filter(script => {
         return script.getAttribute('type') === 'module'
           && script.getAttribute('src') && script.getAttribute('src').indexOf('http') < 0;
       }).map(script => {
-        return pathToFileURL(path.join(compilation.context.userWorkspace, script.getAttribute('src').replace(/\.\.\//g, '').replace('./', '')));
+        return pathToFileURL(path.join(userWorkspace, script.getAttribute('src').replace(/\.\.\//g, '').replace('./', '')));
       });
+    const pageScript = page.isSSR ? [pathToFileURL(path.join(pagesDir, page.filename))] : [];
 
     await new Promise((resolve, reject) => {
       const worker = new Worker(workerPrerender.workerUrl, {
@@ -96,7 +98,10 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
           route,
           prerender: true,
           htmlContents: html,
-          scripts: JSON.stringify(headScripts)
+          scripts: JSON.stringify([
+            ...pageScript,
+            ...templateScripts
+          ])
         }
       });
       worker.on('message', (result) => {
