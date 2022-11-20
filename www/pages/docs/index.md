@@ -72,4 +72,4 @@ To continue learning more about Greenwood, please feel free to browse the other 
 - [Markdown](/docs/markdown/): Using markdown and related authoring capabilities supported by Greenwood.
 - [Styles and Assets](/docs/css-and-images/): How to style and theme your project with CSS.
 - [Templates](/docs/layouts/): Controlling the layout of your pages.
-- [Tech Stack](/docs/tech-stack/): What's under the hood.
+- [Tech Stack](/about/tech-stack/): What's under the hood.

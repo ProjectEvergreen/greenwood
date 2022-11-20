@@ -7,3 +7,7 @@
 
 [build.environment]
   NODE_VERSION = "14.16.0"
+
+[[redirects]]
+  from = "/docs/tech-stack/"
+  to = "/about/tech-stack/"
