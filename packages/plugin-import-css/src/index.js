@@ -1,4 +1,3 @@
-
 /*
  * 
  * Enables using JavaScript to import CSS files, using ESM syntax.
