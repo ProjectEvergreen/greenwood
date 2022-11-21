@@ -119,7 +119,7 @@ const generateGraph = async (compilation) => {
               }
               /* ---------End Menu Query-------------------- */
             } else if (isDynamic) {
-              const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
+              const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation).workerUrl;
               let ssrFrontmatter;
 
               filePath = route;

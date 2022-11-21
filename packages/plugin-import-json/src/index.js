@@ -4,6 +4,7 @@
  * This is a Greenwood default plugin.
  *
  */
+import fs from 'fs';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class ImportJsonResource extends ResourceInterface {
@@ -26,12 +27,17 @@ class ImportJsonResource extends ResourceInterface {
     return Promise.resolve(originalUrl && originalUrl.indexOf(`?type=${type}`) >= 0);
   }
 
-  async intercept(url, body) {
+  async intercept(url, body = '') {
     return new Promise(async (resolve, reject) => {
       try {
+        // TODO better way to handle this?
+        // https://github.com/ProjectEvergreen/greenwood/issues/948
+        const raw = body === ''
+          ? await fs.promises.readFile(url, 'utf-8')
+          : body;
 
         resolve({
-          body: `export default ${JSON.stringify(body)}`,
+          body: `export default ${JSON.stringify(raw)}`,
           contentType: this.contentType
         });
       } catch (e) {
