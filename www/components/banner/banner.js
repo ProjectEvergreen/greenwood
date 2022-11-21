@@ -63,7 +63,7 @@ class Banner extends LitElement {
                       ../../assets/greenwood-logo-1000w.png 4x,
                       ../../assets/greenwood-logo-1500w.png 5x"/>
 
-            <h3>Ready to help you build your next. . . <br /><span class="${this.animateState}">${currentProjectType}.</span></h3>
+            <h3>Your full stack workbench for the web, ready to help you build your next. . . <span class="${this.animateState}">${currentProjectType}.</span></h3>
 
             <eve-button size="md" href="/getting-started/" style="${buttonCss}">Get Started</eve-button>
           </div>
