@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-typescript",
-  "version": "0.27.0-alpha.6",
+  "version": "0.27.0-alpha.7",
   "description": "A Greenwood plugin for writing TypeScript.",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-typescript",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -26,6 +26,6 @@
     "typescript": "^4.3.5"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.27.0-alpha.6"
+    "@greenwood/cli": "^0.27.0-alpha.7"
   }
 }
