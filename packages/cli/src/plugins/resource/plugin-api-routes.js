@@ -7,7 +7,7 @@ import path from 'path';
 import { pathToFileURL } from 'url';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
-class DevProxyResource extends ResourceInterface {
+class ApiRoutesResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
   }
@@ -31,7 +31,7 @@ class DevProxyResource extends ResourceInterface {
 const greenwoodApiRoutesPlugin = {
   type: 'resource',
   name: 'plugin-api-routes',
-  provider: (compilation, options) => new DevProxyResource(compilation, options)
+  provider: (compilation, options) => new ApiRoutesResource(compilation, options)
 };
 
 export { greenwoodApiRoutesPlugin };
