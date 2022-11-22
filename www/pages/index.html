@@ -13,8 +13,8 @@
 
     <script type="module">
       const params = new URLSearchParams(document.location.search);
-      const qs = params.has('name') ? `name=${params.get('name')}` : '';
-      const data = await fetch(`/api/greeting?${qs}`).then(resp => resp.json());
+      const qs = params.has('name') ? `?name=${params.get('name')}` : '';
+      const data = await fetch(`/api/greeting${qs}`).then(resp => resp.json());
 
       console.debug({ data });
       document.getElementById('greeting').textContent = data.message;
