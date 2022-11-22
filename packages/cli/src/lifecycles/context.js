@@ -11,6 +11,7 @@ const initContext = async({ config }) => {
     try {
       const projectDirectory = process.cwd();
       const userWorkspace = path.join(config.workspace);
+      const apisDir = path.join(userWorkspace, 'api/');
       const pagesDir = path.join(userWorkspace, `${config.pagesDirectory}/`);
       const userTemplatesDir = path.join(userWorkspace, `${config.templatesDirectory}/`);
 
@@ -18,6 +19,7 @@ const initContext = async({ config }) => {
         dataDir,
         outputDir,
         userWorkspace,
+        apisDir,
         pagesDir,
         userTemplatesDir,
         scratchDir,

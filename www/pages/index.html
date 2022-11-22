@@ -10,10 +10,18 @@
 
     <link rel="stylesheet" href="/node_modules/prismjs/themes/prism-tomorrow.css"/>
     <link rel="stylesheet" href="../styles/home.css"/>
+
+    <script type="module">
+      const data = await fetch('/api/greeting').then(resp => resp.json());
+
+      console.debug({ data });
+      document.getElementById('greeting').textContent = `Hello ${data.message}!!!`;
+    </script>
   </head>
   <body>
 
     <div class="gwd-content-outlet">
+      <h1 id="greeting" style="text-align:center"></h1>
       <app-banner></app-banner>
 
       <div class='gwd-content-wrapper'>
