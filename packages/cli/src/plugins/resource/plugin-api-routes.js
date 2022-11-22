@@ -20,10 +20,11 @@ class ApiRoutesResource extends ResourceInterface {
 
     // https://github.com/nodejs/modules/issues/307#issuecomment-1165387383
     if (process.env.__GWD_COMMAND__) { // eslint-disable-line no-underscore-dangle
-      href = `${resolvedUrl}?t=${Date.now()}`;
+      href = `${href}?t=${Date.now()}`;
     }
 
     const { handler } = await import(href);
+
     // TODO can we assume localhost?
     // TODO get port
     const req = new Request(new URL(`https://localhost:1984${url}`));
