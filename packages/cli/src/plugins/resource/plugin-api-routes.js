@@ -19,11 +19,12 @@ class ApiRoutesResource extends ResourceInterface {
 
   async serve(url) {
     console.debug('SERVING API => ', { url });
-    // TODO stop using path!
-    const { handler } = await import(pathToFileURL(`${path.join(this.compilation.context.apisDir, url.replace('/api', ''))}.js`));
+    // TODO stop using path / url helpers!
+    const { handler } = await import(pathToFileURL(`${path.join(this.compilation.context.apisDir, this.getBareUrlPath(url).replace('/api', ''))}.js`));
+    const req = new Request(new URL(`https://localhost:1984${url}`));
 
     return {
-      body: await handler()
+      body: await handler(req)
     };
   }
 }
