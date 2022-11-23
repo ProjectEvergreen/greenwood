@@ -203,7 +203,9 @@ async function getTemplate(compilation, route) {
 }
 ```
 
-### Custom Imports (Experimental)
+### Custom Imports
+
+> ⚠️ _This feature is experimental._
 
 Through the support of the following plugins, Greenwood also supports loading custom file formats on the server side using ESM
 - [CSS](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/plugin-import-css/README.md#usage)
