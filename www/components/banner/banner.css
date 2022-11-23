@@ -44,7 +44,9 @@
       }
 
       & h3 {
-        padding-top: 10px;
+        padding: 10px 0;
+        max-width: 50%;
+        margin: 0 auto;
         color: #201e2e;
       }
 
@@ -104,6 +106,10 @@
 
       & .content {
         margin-top: 0;
+
+        & h3 {
+          width: 100%;
+        }
       }
     }
   }
