@@ -218,7 +218,7 @@ console.log(json); // { status: 200, message: 'some data' }
 ```
 
 **Steps**
-1. Make sure you are using Node `v16.17.0`
+1. Make sure you are using Node `v18.12.1`
 1. Run the Greenwood CLI using the `--experimental-loaders` flag and pass Greenwood's custom loader
     ```shell
     $ node --experimental-loader ./node_modules/@greenwood/cli/src/loader.js ./node_modules/.bin/greenwood <command>
