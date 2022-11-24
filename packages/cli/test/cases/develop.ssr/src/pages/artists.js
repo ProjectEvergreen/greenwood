@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 async function getTemplate(compilation, route) {
   return `
     <html>

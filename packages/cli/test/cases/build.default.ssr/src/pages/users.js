@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import '../components/card.js';
 
 export default class UsersPage extends HTMLElement {
