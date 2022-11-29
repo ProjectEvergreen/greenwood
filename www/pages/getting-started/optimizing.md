@@ -22,17 +22,20 @@ By adding a _greenwood.config.js_ file at the root of your project and setting t
 ```js
 export default {
   prerender: true
-}
+};
 ```
 
 Then, for each component, you will to export the `class` definition as a default export.
+<!-- eslint-disable no-unused-vars -->
 ```js
-# before
+// before
 class FooterComponent extends HTMLElement {
   /* ... */
 }
+```
 
-# after
+```js
+// after
 export default class FooterComponent extends HTMLElement {
   /* ... */
 }

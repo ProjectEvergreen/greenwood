@@ -29,7 +29,7 @@ export default {
   optimization: 'default',
   plugins: [],
   workspace: 'src', // assumes process.cwd()
-  pagesDirectory: 'pages' // e.g. src/pages
+  pagesDirectory: 'pages', // e.g. src/pages
   templatesDirectory: 'templates' // e.g. src/templates
 };
 ```
@@ -52,7 +52,7 @@ export default {
       '/api/foo': 'https://foo.otherdomain.net'
     }
   }
-}
+};
 ```
 
 ### Interpolate Frontmatter
@@ -115,7 +115,7 @@ export default {
       'rehype-autolink-headings'
     ]
   }
-}
+};
 ```
 
 ### Optimization
@@ -135,7 +135,7 @@ Greenwood provides a number of different ways to send hints to Greenwood as to h
 ```js
 export default {
   optimization: 'inline'
-}
+};
 ```
 
 #### Overrides
@@ -160,7 +160,7 @@ By default the directory Greenwood will use to look for your local content is _p
 ```js
 export default {
   pagesDirectory: 'docs' // Greenwood will look for pages at src/docs/
-}
+};
 ```
 
 ### Port
@@ -170,7 +170,7 @@ Unlike the port option for `devServer` configuration, this option allows you to 
 ```js
 export default {
   port: 8181
-}
+};
 ```
 
 ### Prerender
@@ -183,7 +183,7 @@ You can combine this with ["static" components](/docs/configuration/#optimizatio
 ```js
 export default {
   prerender: true
-}
+};
 ```
 
 ### Static Router
@@ -198,7 +198,7 @@ Setting the `staticRouter` option to `true` will add a small router runtime in p
 ```js
 export default {
   staticRouter: true
-}
+};
 ```
 
 ### Templates Directory
@@ -209,7 +209,7 @@ By default the directory Greenwood will use to look for your templates is _templ
 ```js
 export default {
   templatesDirectory: 'layouts' // Greenwood will look for templates at src/layouts/
-}
+};
 ```
 
 ### Workspace
@@ -224,5 +224,5 @@ import { fileURLToPath, URL } from 'url';
 
 export default {
   workspace: fileURLToPath(new URL('./www', import.meta.url))
-}
+};
 ```

@@ -15,7 +15,7 @@ This plugin supports providing an array of "location" objects that can either be
 ```js
 import path from 'path';
 
-export function myCopyPlugin(options = {}) {
+export function myCopyPlugin() {
   return {
     type: 'copy',
     name: 'plugin-copy-some-files',
@@ -32,8 +32,8 @@ export function myCopyPlugin(options = {}) {
         to: path.join(context.outputDir, 'pdfs')
       }];
     }
-  }
-};
+  };
+}
 ```
 
 

@@ -166,7 +166,7 @@ And enabling the feature in _greenwood.config.js_
 ```js
 export default {
   interpolateFrontmatter: true
-}
+};
 ```
 
 You access the frontmatter data in the markdown or HTML on a _per page instance_ following the convention of JavaScript [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals), and Greenwood will interpolate those values at build time.

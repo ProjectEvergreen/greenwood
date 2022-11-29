@@ -33,20 +33,21 @@ In your _[page].js_ file, Greenwood supports the following functions you can `ex
 - `getBody`: Effectively anything that you could put into a [`<content-outlet></content-outlet>`](/docs/layouts/#page-templates).
 - `getTemplate`: Effectively the same as a [page template](/docs/layouts/#page-templates).
 
+<!-- eslint-disable no-unused-vars -->
 ```js
 async function getFrontmatter(compilation, route, label, id) {
   return { /* ... */ };
 }
 
 async function getBody(compilation, route) {
-  return `/* some HTML here */`;
+  return '/* some HTML here */';
 }
 
 async function getTemplate(compilation, route) {
-  return `/* some HTML here */`;
+  return '/* some HTML here */';
 }
 
-export default MyComponent extends HTMLElement {
+export default class MyComponent extends HTMLElement {
   constructor() { }
   connectedCallback() { }
 }
@@ -55,7 +56,7 @@ export {
   getFrontmatter,
   getBody,
   getTemplate
-}
+};
 ```
 
 #### Custom Element (default)
@@ -64,7 +65,7 @@ When using `export default`, Greenwood supports providing a custom element as th
 
 ```js
 import fetch from 'node-fetch';
-import '../components/card/card.js';  // <wc-card></wc-card>
+import '../components/card/card.js'; // <wc-card></wc-card>
 
 export default class UsersPage extends HTMLElement {
   async connectedCallback() {
@@ -109,6 +110,8 @@ async function getFrontmatter(compilation, route) {
     }
   };
 }
+
+export { getFrontmatter };
 ```
 
 > _For defining custom dynamic based metadata, like for `<meta>` tags, use `getTemplate` and define those tags right in your HTML._
@@ -118,8 +121,7 @@ async function getFrontmatter(compilation, route) {
 To export server routes as just static HTML, you can set the `static` property within the `data` object of your frontmatter.
 
 ```js
-// example
-async function getFrontmatter(compilation, route) {
+async function getFrontmatter() {
   return {
     /* ... */
 
@@ -128,6 +130,8 @@ async function getFrontmatter(compilation, route) {
     }
   };
 }
+
+export { getFrontmatter };
 ```
 
 So for example, `/pages/artist.js` would render out as `/artists/index.html` and would not require the serve task.  So if you need more flexibility in how you create your pages, but still want to just serve it statically, you can!
@@ -139,7 +143,7 @@ For just returning content, you can use `getBody`.  For example, return a list o
 ```js
 import fetch from 'node-fetch'; // this needs to be installed from npm
 
-async function getBody(compilation) {
+async function getBody() {
   const users = await fetch('http://www.example.com/api/users').then(resp => resp.json());
   const timestamp = new Date().getTime();
   const usersListItems = users
@@ -168,6 +172,8 @@ async function getBody(compilation) {
     </body>
   `;
 }
+
+export { getBody };
 ```
 
 #### Templates
@@ -201,6 +207,8 @@ async function getTemplate(compilation, route) {
     </html>
   `;
 }
+
+export { getTemplate };
 ```
 
 ### Custom Imports
@@ -215,7 +223,7 @@ For example, you can now import JSON in your SSR pages and components.
 ```js
 import json from '../path/to/data.json';
 
-console.log(json) // { status: 200, message: 'some data' }
+console.log(json); // { status: 200, message: 'some data' }
 ```
 
 **Steps**

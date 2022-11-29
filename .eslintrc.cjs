@@ -8,6 +8,7 @@ module.exports = {
     '@typescript-eslint',
     'no-only-tests'
   ],
+  extends: 'plugin:markdown/recommended',
   env: {
     browser: true,
     node: false

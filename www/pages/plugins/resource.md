@@ -95,6 +95,7 @@ export function myResourcePlugin(options = {}) {
 ## Example
 Below is an example of turning files that have a _.foo_ extension into JavaScript.
 
+<!-- eslint-disable no-unused-vars -->
 ```js
 // file.foo
 interface User {
@@ -144,22 +145,22 @@ export function myFooPlugin(options = {}) {
   return {
     type: 'resource',
     name: 'plugin-foo',
-    provider: (compilation) => new StandardJsonResource(compilation, options)
-  }
-};
+    provider: (compilation) => new FooResource(compilation, options)
+  };
+}
+```
 
+```js
 // greenwood.config.js
 import { myFooPlugin } from './plugin-foo.js';
 
 export default {
 
-  ...
-
   plugins: [
-    myFooPlugin()
+    myFooPlugin({ /* custom options */ })
   ]
 
-}
+};
 ```
 
 > _You can see [more in-depth examples of resource plugin](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/plugins/resource/) by reviewing the default plugins maintained in Greenwood's CLI package._

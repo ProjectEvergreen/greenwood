@@ -122,6 +122,7 @@ The main consideration needed for development is that your files won't be in _no
 1. If the flag _is not_ installed (like we want for local development) then you can use use whatever location you have defined in your repository.  Most common would just be to use `process.cwd`
 
 So using our current example, our final _my-theme-pack.js_ would look like this:
+<!-- eslint-disable no-underscore-dangle -->
 ```js
 import path from 'path';
 import { fileURLToPath, URL } from 'url';
@@ -129,7 +130,7 @@ import { fileURLToPath, URL } from 'url';
 const myThemePackPlugin = (options = {}) => [{
   type: 'context',
   name: 'my-theme-pack:context',
-  provider: compilation) => {
+  provider: (compilation) => {
     // you can use other directory names besides templates/ this way!
     const templateLocation = options.__isDevelopment
       ? path.join(compilation.context.userWorkspace, 'layouts')

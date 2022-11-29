@@ -16,36 +16,38 @@ This plugin supports providing an array of "page" objects that will be added as 
 
 ```js
 // my-source-plugin.js
-export const customExternalSourcesPlugin = (options = {}) => {
-  type: 'source',
-  name: 'source-plugin-myapi',
-  provider: () => {
-    return async function () {
-      // this could just as easily come from an API, DB, Headless CMS, etc
-      const artists = await fetch('http://www.myapi.com/...').then(resp => resp.json());
+export const customExternalSourcesPlugin = () => {
+  return {
+    type: 'source',
+    name: 'source-plugin-myapi',
+    provider: () => {
+      return async function () {
+        // this could just as easily come from an API, DB, Headless CMS, etc
+        const artists = await fetch('http://www.myapi.com/...').then(resp => resp.json());
 
-      return artists.map((artist) => {
-        const { bio, id, imageUrl, name } = artist;
-        const route = `/artists/${name.toLowerCase().replace(/ /g, '-')}/`;
+        return artists.map((artist) => {
+          const { bio, id, imageUrl, name } = artist;
+          const route = `/artists/${name.toLowerCase().replace(/ /g, '-')}/`;
 
-        return {
-          title: name,
-          body: `
-            <h1>${name}</h1>
-            <p>${bio}</p>
-            <img src='${imageUrl}'/>
-          `,
-          route,
-          id,
-          label: name
-        };
-      });
-    };
-  }
+          return {
+            title: name,
+            body: `
+              <h1>${name}</h1>
+              <p>${bio}</p>
+              <img src='${imageUrl}'/>
+            `,
+            route,
+            id,
+            label: name
+          };
+        });
+      };
+    }
+  };
 };
 ```
 
-In the above example, you would have the following three data statically generated in the output directory
+In the above example, you would have the following statically generated in the output directory (assuming three items in the `artists` array.)
 
 ```bash
 .
