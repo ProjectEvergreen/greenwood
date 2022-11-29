@@ -28,12 +28,12 @@ Add this plugin to your _greenwood.config.js_.
 import { greenwoodPluginTypeScript } from '@greenwood/plugin-typescript';
 
 export default {
-  ...
+  // ...
 
   plugins: [
     greenwoodPluginTypeScript()
   ]
-}
+};
 ```
 
 Then, you can write some TypeScript
@@ -87,14 +87,14 @@ If you would like to extend / override these options:
     import { greenwoodPluginTypeScript } from '@greenwood/plugin-typescript';
 
     export default {
-      ...
+      // ...
 
       plugins: [
         greenwoodPluginTypeScript({
           extendConfig: true
         })
       ]
-    }
+    };
     ```
 
 This will then process your JavaScript with TypeScript with the additional configuration settings you provide.  This also allows you to configure the rest of _tsconfig.json_ to support your IDE and local development environment settings.

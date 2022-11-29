@@ -65,14 +65,14 @@ If you would like to use it with your own custom _postcss.config.js_, you will n
 import { greenwoodPluginPostcss } from '@greenwood/plugin-postcss';
 
 export default {
-  ...
+  // ...
 
   plugins: [
     greenwoodPluginPostcss({
       extendConfig: true
     })
   ]
-}
+};
 ```
 
 By default, the configuration provided by this plugin is:

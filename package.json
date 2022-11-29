@@ -24,7 +24,7 @@
     "test:exp": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --experimental-loader $(pwd)/test/test-loader.js ./node_modules/mocha/bin/mocha \"./packages/**/**/*.spec.js\"",
     "test:exp:win": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --experimental-loader file:\\\\%cd%\\test\\test-loader.js ./node_modules/mocha/bin/mocha --exclude \"./packages/init/test/cases/**\" \"./packages/**/**/*.spec.js\"",
     "test:tdd": "yarn test --watch",
-    "lint:js": "eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.{js,md}\"",
+    "lint:js": "eslint \"*.js\" \"./packages/**/**/*.{js,md}\" \"./test/*.js\" \"./www/**/**/*.{js,md}\"",
     "lint:ts": "eslint \"./packages/**/**/*.ts\"",
     "lint:css": "stylelint \"./www/**/*.js\", \"./www/**/*.css\"",
     "lint": "ls-lint && yarn lint:js && yarn lint:ts && yarn lint:css"

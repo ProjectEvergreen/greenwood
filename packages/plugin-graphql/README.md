@@ -39,7 +39,7 @@ import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
 import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
 
 export default {
-  ...
+  // ...
 
   plugins: [
     greenwoodPluginGraphQL(),
@@ -95,6 +95,8 @@ class HeaderComponent extends HTMLElement {
     `;
   }
 }
+
+customElements.define('app-header', HeaderComponent);
 ```
 
 > _For more general purpose information on integrating GraphQL with Greenwood, [please review our docs](https://www.greenwoodjs.io/docs/data)._
@@ -157,7 +159,7 @@ export {
 };
 ```
 
-```js
+```graphql
 // gallery.gql
 query($name: String!) {
   gallery(name: $name)  {
@@ -185,6 +187,6 @@ client.query({
 
   logos.forEach((logo) => {
     console.log(logo.path); // /assets/logo1.png, /assets/logo2.png, /assets/logo3.png
-  })
+  });
 });
 ```
