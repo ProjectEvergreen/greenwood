@@ -106,7 +106,7 @@ describe('Build Greenwood With: ', function() {
 
           expect(scriptTag.type).to.be.equal('module');
           // eslint-disable-next-line max-len
-          expect(scriptTag.textContent).to.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex(e=>new RegExp(`^${t}$`).test(e.route))}}export{t as Foobar};');
+          expect(scriptTag.textContent).to.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex((e=>new RegExp(`^${t}$`).test(e.route)))}}export{t as Foobar};');
         });
       });
 
@@ -118,7 +118,7 @@ describe('Build Greenwood With: ', function() {
 
           expect(scriptTag.type).to.be.equal('module');
           // eslint-disable-next-line max-len
-          expect(scriptTag.textContent).to.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex(e=>new RegExp(`^${t}$`).test(e.route))}}export{t as Baz};');
+          expect(scriptTag.textContent).to.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex((e=>new RegExp(`^${t}$`).test(e.route)))}}export{t as Baz};');
         });
       });
 

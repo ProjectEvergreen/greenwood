@@ -6,7 +6,7 @@
  */
 import fs from 'fs';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 
 class StandardJavaScriptResource extends ResourceInterface {
   constructor(compilation, options) {
