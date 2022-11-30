@@ -95,8 +95,7 @@ Any Greenwood supported frontmatter can be returned here.  _This is only run onc
 You can even define a `template` and reuse all your existing [templates](/docs/layouts/), even for server routes!
 
 ```js
-// example
-async function getFrontmatter(compilation, route) {
+export async function getFrontmatter(compilation, route) {
   return {
     template: 'user',
     menu: 'header',
@@ -110,8 +109,6 @@ async function getFrontmatter(compilation, route) {
     }
   };
 }
-
-export { getFrontmatter };
 ```
 
 > _For defining custom dynamic based metadata, like for `<meta>` tags, use `getTemplate` and define those tags right in your HTML._
@@ -121,7 +118,7 @@ export { getFrontmatter };
 To export server routes as just static HTML, you can set the `static` property within the `data` object of your frontmatter.
 
 ```js
-async function getFrontmatter() {
+export async function getFrontmatter() {
   return {
     /* ... */
 
@@ -130,8 +127,6 @@ async function getFrontmatter() {
     }
   };
 }
-
-export { getFrontmatter };
 ```
 
 So for example, `/pages/artist.js` would render out as `/artists/index.html` and would not require the serve task.  So if you need more flexibility in how you create your pages, but still want to just serve it statically, you can!
@@ -143,7 +138,7 @@ For just returning content, you can use `getBody`.  For example, return a list o
 ```js
 import fetch from 'node-fetch'; // this needs to be installed from npm
 
-async function getBody() {
+export async function getBody() {
   const users = await fetch('http://www.example.com/api/users').then(resp => resp.json());
   const timestamp = new Date().getTime();
   const usersListItems = users
@@ -172,8 +167,6 @@ async function getBody() {
     </body>
   `;
 }
-
-export { getBody };
 ```
 
 #### Templates
@@ -181,7 +174,7 @@ export { getBody };
 For creating a template dynamically, you can use `getTemplate` and return the HTML you need.
 
 ```js
-async function getTemplate(compilation, route) {
+export async function getTemplate(compilation, route) {
   return `
     <html>
       <head>
@@ -207,8 +200,6 @@ async function getTemplate(compilation, route) {
     </html>
   `;
 }
-
-export { getTemplate };
 ```
 
 ### Custom Imports
