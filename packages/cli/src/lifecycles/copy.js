@@ -3,13 +3,13 @@ import path from 'path';
 
 async function rreaddir (dir, allFiles = []) {
   const files = (await fs.promises.readdir(dir)).map(f => path.join(dir, f));
-  
+
   allFiles.push(...files);
-  
+
   await Promise.all(files.map(async f => (
     await fs.promises.stat(f)).isDirectory() && rreaddir(f, allFiles
   )));
-  
+
   return allFiles;
 }
 
@@ -41,7 +41,9 @@ async function copyDirectory(from, to) {
 
       if (files.length > 0) {
         if (!fs.existsSync(to)) {
-          fs.mkdirSync(to);
+          fs.mkdirSync(to, {
+            recursive: true
+          });
         }
         await Promise.all(files.filter((asset) => {
           const target = asset.replace(from, to);
