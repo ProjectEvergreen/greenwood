@@ -9,7 +9,7 @@ import { parse, walk } from 'css-tree';
 import path from 'path';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
-function bundleCss(body, url) {
+function bundleCss(body, url, projectDirectory) {
   const ast = parse(body, {
     onParseError(error) {
       console.log(error.formattedMessage);
@@ -24,10 +24,13 @@ function bundleCss(body, url) {
       if ((type === 'String' || type === 'Url') && this.atrulePrelude && this.atrule.name === 'import') {
         const { value } = node;
 
-        if (value.indexOf('.') === 0) {
-          const importContents = fs.readFileSync(path.resolve(path.dirname(url), value), 'utf-8');
+        if (value.indexOf('.') === 0 || value.indexOf('/node_modules') === 0) {
+          const location = value.indexOf('/node_modules') === 0
+            ? path.join(projectDirectory, value)
+            : path.resolve(path.dirname(url), value);
+          const importContents = fs.readFileSync(location, 'utf-8');
 
-          optimizedCss += bundleCss(importContents, url);
+          optimizedCss += bundleCss(importContents, url, projectDirectory);
         } else {
           optimizedCss += `@import url('${value}');`;
         }
@@ -225,9 +228,10 @@ class StandardCssResource extends ResourceInterface {
   }
 
   async optimize(url, body) {
+    console.debug('optimize @@@@@@@', {url});
     return new Promise(async (resolve, reject) => {
       try {
-        resolve(bundleCss(body, url));
+        resolve(bundleCss(body, url, this.compilation.context.projectDirectory));
       } catch (e) {
         reject(e);
       }
