@@ -24,12 +24,11 @@ class ApiRoutesResource extends ResourceInterface {
     }
 
     const { handler } = await import(href);
-
     // TODO can we assume localhost?
     // TODO get port
     const req = new Request(new URL(`https://localhost:1984${url}`));
     const resp = await handler(req);
-    const body = await resp.json(); // TODO assumes JSON, pass Raesponse all the way up?
+    const body = await resp.json(); // TODO assumes JSON, pass Response all the way up?
 
     return {
       body
