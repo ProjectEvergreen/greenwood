@@ -19,52 +19,35 @@ document.addEventListener('click', async function(e) {
   if (canClientSideRoute) {
     e.preventDefault();
 
-    console.debug({ currentUrl });
-
     const targetUrl = new URL(href, currentUrl.origin);
     const routerOutlet = Array.from(document.getElementsByTagName('greenwood-route')).filter(outlet => {
       return outlet.getAttribute('data-route') === targetUrl.pathname;
     })[0];
 
+    console.debug({ currentUrl });
     console.debug({ targetUrl });
+
     // maintain the app shell if we are navigating between pages that are built from the same page template
     // also, some routes may be SSR, so we may not always match on a static route
     if (routerOutlet && routerOutlet.getAttribute('data-template') === window.__greenwood.currentTemplate) {
-      // only update the hash if it just the hash changing
-      // else, request and load the partial for the page, and push page to the browser history stack
-      // if (targetUrl.hash !== '' && window.location) {
-      //   console.debug('111 HASH', targetUrl.hash);
-      //   location = targetUrl.hash;
-      // } else {
-      //   console.debug('222 PUSH STATE', targetUrl.pathname);
-      //   routerOutlet.loadRoute();
-      //   history.pushState({}, '', targetUrl.pathname);
-      // }
-      console.debug('TARGET PATHNAME', targetUrl.pathname);
-      console.debug('TARGET HASH', targetUrl.hash);
+      const { hash, pathname } = targetUrl;
+      console.debug('TARGET PATHNAME', { pathname });
+      console.debug('TARGET HASH', { hash });
 
-      if (currentUrl.pathname !== targetUrl.pathname) {
+      if (currentUrl.pathname !== pathname) {
         console.debug('111 PUSH STATE TO NEW PATHNAME');
         await routerOutlet.loadRoute();
         // history.pushState({}, '', `${targetUrl.pathname}${targetUrl.hash}`);
-        history.pushState({}, '', targetUrl.pathname);
+        history.pushState({}, '', pathname);
       }
 
-      if (targetUrl.hash !== '') {
+      if (hash !== '') {
         console.debug('222 HASH');
-        currentUrl.hash = targetUrl.hash;
-        // history.pushState({}, '', targetUrl.hash);
-        // setTimeout(() => {
-        //   console.debug('222bbb', targetUrl.hash);
-        //   currentUrl.hash = targetUrl.hash;
-        //   history.pushState({}, '', targetUrl.hash);
-        //   // currentUrl.hash = targetUrl.hash;
-        // }, 500);
+        currentUrl.hash = hash;
       }
     } else {
       // this page uses is a completely different page template from the current page
       // so just load the new page
-      console.debug('ooopsy doopsy???', { href });
       window.location.href = href;
     }
   }
@@ -73,7 +56,6 @@ document.addEventListener('click', async function(e) {
 window.addEventListener('popstate', (event) => {
   try {
     console.debug('popstate', { event });
-
     const targetRoute = window.location;
     const routerOutlet = Array.from(document.getElementsByTagName('greenwood-route')).filter(outlet => {
       return outlet.getAttribute('data-route') === targetRoute.pathname;
