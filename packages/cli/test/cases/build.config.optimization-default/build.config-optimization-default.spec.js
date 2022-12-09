@@ -122,8 +122,7 @@ describe('Build Greenwood With: ', function() {
 
       describe('<style> tags on the page', function() {
         it('should have the expected inline content for prism.css @import in the <style> tag in the <head>', function() {
-          const headStyleTags = Array
-            .from(dom.window.document.querySelectorAll('head style'))
+          const headStyleTags = Array.from(dom.window.document.querySelectorAll('head style'));
 
           expect(headStyleTags.length).to.be.equal(1);
           expect(headStyleTags[0].textContent.indexOf('code[class*=\'language-\']')).to.equal(0);
