@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Manages web standard resource related operations for CSS.
  * This is a Greenwood default plugin.
  *
@@ -60,6 +60,10 @@ function bundleCss(body, url, projectDirectory) {
 
         }
       } else if (type === 'Function') {
+        /* ex: border-left: 3px solid var(--color-secondary); */
+        if (this.declaration && item.prev && item.prev.data.type === 'Identifier') {
+          optimizedCss += ' ';
+        }
         optimizedCss += `${name}(`;
       } else if (type === 'MediaFeature') {
         optimizedCss += ` (${name}:`;
@@ -175,7 +179,7 @@ function bundleCss(body, url, projectDirectory) {
           break;
         case 'Selector':
           if (item.next) {
-            optimizedCss += ',';  
+            optimizedCss += ',';
           }
           break;
         case 'AttributeSelector':
@@ -208,7 +212,7 @@ class StandardCssResource extends ResourceInterface {
 
   async serve(url) {
     return new Promise(async (resolve, reject) => {
-      try {  
+      try {
         const css = await fs.promises.readFile(url, 'utf-8');
 
         resolve({
@@ -223,7 +227,7 @@ class StandardCssResource extends ResourceInterface {
 
   async shouldOptimize(url) {
     const isValidCss = path.extname(url) === this.extensions[0] && this.compilation.config.optimization !== 'none';
-    
+
     return Promise.resolve(isValidCss);
   }
 

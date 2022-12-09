@@ -13,6 +13,8 @@ body {
 h1, h2 {
   color: var(--primary-color);
   border: 0.5px solid #dddde1;
+  border-left: 3px solid var(--color-secondary);
+  border-top: 3px solid var(--color-secondary);
 }
 
 #foo, .bar {
