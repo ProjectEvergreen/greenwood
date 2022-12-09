@@ -228,7 +228,6 @@ class StandardCssResource extends ResourceInterface {
   }
 
   async optimize(url, body) {
-    console.debug('optimize @@@@@@@', {url});
     return new Promise(async (resolve, reject) => {
       try {
         resolve(bundleCss(body, url, this.compilation.context.projectDirectory));
