@@ -48,7 +48,7 @@ function trackResourcesForRoute(html, compilation, route) {
       }
     });
 
-  const styles = root.querySelectorAll('head style')
+  const styles = root.querySelectorAll('style')
     .filter(style => !(/\$/).test(style.rawText) && !(/<!-- Shady DOM styles for -->/).test(style.rawText)) // filter out Shady DOM <style> tags that happen when using puppeteer
     .map(style => modelResource(context, 'style', null, style.rawText, null, style.getAttribute('data-gwd-opt')));
 
