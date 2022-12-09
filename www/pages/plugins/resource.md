@@ -26,7 +26,7 @@ import fs from 'fs';
 import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
-class ResourceInterface {
+class ExampleResource extends ResourceInterface {
   constructor(compilation, options = {}) {
     this.compilation = compilation;
     this.options = options;
