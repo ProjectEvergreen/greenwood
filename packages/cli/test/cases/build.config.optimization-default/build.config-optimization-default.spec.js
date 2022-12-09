@@ -24,7 +24,7 @@ import fs from 'fs';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getDependencyFiles, getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -47,7 +47,15 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      await runner.setup(outputPath, getSetupFiles(outputPath));
+      const prismCss = await getDependencyFiles(
+        `${process.cwd()}/node_modules/prismjs/themes/*.css`,
+        `${outputPath}/node_modules/prismjs/themes/`
+      );
+
+      await runner.setup(outputPath, [
+        ...getSetupFiles(outputPath),
+        ...prismCss
+      ]);
       await runner.runCommand(cliPath, 'build');
     });
   
@@ -112,8 +120,15 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
-      describe('<style> tag in the `<body>` of the page', function() {
-        it('should have the expected contents of the <style> tag', async function() {
+      describe('<style> tags on the page', function() {
+        it('should have the expected inline content for prism.css @import in the <style> tag in the <head>', function() {
+          const headStyleTags = Array.from(dom.window.document.querySelectorAll('head style'));
+
+          expect(headStyleTags.length).to.be.equal(1);
+          expect(headStyleTags[0].textContent.indexOf('code[class*=\'language-\']')).to.equal(0);
+        });
+
+        it('should have the expected contents of the <style> tag in the <body>', async function() {
           const styleTags = Array.from(dom.window.document.querySelectorAll('body style'));
 
           expect(styleTags.length).to.equal(1);
