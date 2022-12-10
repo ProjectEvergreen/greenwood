@@ -24,25 +24,18 @@ document.addEventListener('click', async function(e) {
       return outlet.getAttribute('data-route') === targetUrl.pathname;
     })[0];
 
-    console.debug({ currentUrl });
-    console.debug({ targetUrl });
-
     // maintain the app shell if we are navigating between pages that are built from the same page template
     // also, some routes may be SSR, so we may not always match on a static route
     if (routerOutlet && routerOutlet.getAttribute('data-template') === window.__greenwood.currentTemplate) {
       const { hash, pathname } = targetUrl;
-      console.debug('TARGET PATHNAME', { pathname });
-      console.debug('TARGET HASH', { hash });
 
       if (currentUrl.pathname !== pathname) {
-        console.debug('111 PUSH STATE TO NEW PATHNAME');
         await routerOutlet.loadRoute();
-        // history.pushState({}, '', `${targetUrl.pathname}${targetUrl.hash}`);
+
         history.pushState({}, '', pathname);
       }
 
       if (hash !== '') {
-        console.debug('222 HASH');
         currentUrl.hash = hash;
       }
     } else {
@@ -53,17 +46,14 @@ document.addEventListener('click', async function(e) {
   }
 });
 
-window.addEventListener('popstate', (event) => {
+window.addEventListener('popstate', () => {
   try {
-    console.debug('popstate', { event });
     const targetRoute = window.location;
     const routerOutlet = Array.from(document.getElementsByTagName('greenwood-route')).filter(outlet => {
       return outlet.getAttribute('data-route') === targetRoute.pathname;
     })[0];
 
     if (routerOutlet) {
-      console.debug('popstate loadRoute');
-      // TODO do we need to handle hash here too?
       routerOutlet.loadRoute();
     }
   } catch (err) {
@@ -78,7 +68,6 @@ class RouteComponent extends HTMLElement {
     await fetch(key)
       .then(res => res.text())
       .then((response) => {
-        console.debug('HTML LOADED!!!');
         document.getElementsByTagName('router-outlet')[0].innerHTML = response;
       });
   }
