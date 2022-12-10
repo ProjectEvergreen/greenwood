@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import { terser } from 'rollup-plugin-terser';
 
 function greenwoodResourceLoader (compilation) {
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
@@ -133,8 +132,7 @@ const getRollupConfig = async (compilation) => {
     plugins: [
       greenwoodResourceLoader(compilation),
       greenwoodSyncPageResourceBundlesPlugin(compilation),
-      ...customRollupPlugins,
-      terser()
+      ...customRollupPlugins
     ],
     context: 'window',
     onwarn: (errorObj) => {
