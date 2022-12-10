@@ -59,7 +59,7 @@ export function myCopyPlugin() {
         ]
       };
     }
-  }
+  };
 }
 ```
 

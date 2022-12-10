@@ -33,20 +33,21 @@ In your _[page].js_ file, Greenwood supports the following functions you can `ex
 - `getBody`: Effectively anything that you could put into a [`<content-outlet></content-outlet>`](/docs/layouts/#page-templates).
 - `getTemplate`: Effectively the same as a [page template](/docs/layouts/#page-templates).
 
+<!-- eslint-disable no-unused-vars -->
 ```js
 async function getFrontmatter(compilation, route, label, id) {
   return { /* ... */ };
 }
 
 async function getBody(compilation, route) {
-  return `/* some HTML here */`;
+  return '/* some HTML here */';
 }
 
 async function getTemplate(compilation, route) {
-  return `/* some HTML here */`;
+  return '/* some HTML here */';
 }
 
-export default MyComponent extends HTMLElement {
+export default class MyComponent extends HTMLElement {
   constructor() { }
   connectedCallback() { }
 }
@@ -55,7 +56,7 @@ export {
   getFrontmatter,
   getBody,
   getTemplate
-}
+};
 ```
 
 #### Custom Element (default)
@@ -64,7 +65,7 @@ When using `export default`, Greenwood supports providing a custom element as th
 
 ```js
 import fetch from 'node-fetch';
-import '../components/card/card.js';  // <wc-card></wc-card>
+import '../components/card/card.js'; // <wc-card></wc-card>
 
 export default class UsersPage extends HTMLElement {
   async connectedCallback() {
@@ -94,8 +95,7 @@ Any Greenwood supported frontmatter can be returned here.  _This is only run onc
 You can even define a `template` and reuse all your existing [templates](/docs/layouts/), even for server routes!
 
 ```js
-// example
-async function getFrontmatter(compilation, route) {
+export async function getFrontmatter(compilation, route) {
   return {
     template: 'user',
     menu: 'header',
@@ -118,8 +118,7 @@ async function getFrontmatter(compilation, route) {
 To export server routes as just static HTML, you can set the `static` property within the `data` object of your frontmatter.
 
 ```js
-// example
-async function getFrontmatter(compilation, route) {
+export async function getFrontmatter() {
   return {
     /* ... */
 
@@ -139,7 +138,7 @@ For just returning content, you can use `getBody`.  For example, return a list o
 ```js
 import fetch from 'node-fetch'; // this needs to be installed from npm
 
-async function getBody(compilation) {
+export async function getBody() {
   const users = await fetch('http://www.example.com/api/users').then(resp => resp.json());
   const timestamp = new Date().getTime();
   const usersListItems = users
@@ -175,7 +174,7 @@ async function getBody(compilation) {
 For creating a template dynamically, you can use `getTemplate` and return the HTML you need.
 
 ```js
-async function getTemplate(compilation, route) {
+export async function getTemplate(compilation, route) {
   return `
     <html>
       <head>
@@ -215,7 +214,7 @@ For example, you can now import JSON in your SSR pages and components.
 ```js
 import json from '../path/to/data.json';
 
-console.log(json) // { status: 200, message: 'some data' }
+console.log(json); // { status: 200, message: 'some data' }
 ```
 
 **Steps**

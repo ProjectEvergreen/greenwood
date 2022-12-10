@@ -63,13 +63,20 @@ One important note to consider is that ESM by spec definition, expects a couple 
 1. It must be a relative path
 1. It must have an extension
 
+<!-- eslint-disable no-unused-vars -->
 ```js
-import { Foo } from './foo.js'; // happy panda
+// happy panda
+import { Foo } from './foo.js';
+```
 
-import { Foo } from './foo'; // sad panda
+<!-- eslint-disable no-unused-vars -->
+```js
+// sad panda
+import { Foo } from './foo';
 ```
 
 However, Greenwood also supports [bare module specifiers](https://lit.dev/docs/v1/tools/build/#bare-module-specifiers) for packages you install with a package manager from **npm**.
+<!-- eslint-disable no-unused-vars -->
 ```js
 import { html, LitElement } from 'lit';
 ```

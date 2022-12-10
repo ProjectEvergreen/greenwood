@@ -35,8 +35,7 @@ For example, to add support for [**Prism**](https://prismjs.com/) for syntax hig
 
 ```js
 export default {
-  
-  ...
+  // ...
 
   markdown: {
     settings: { /* whatever you need */ },
@@ -60,11 +59,11 @@ Here is an example of how to include a Prism theme from a CSS file into your pro
 @import url('../../node_modules/prismjs/themes/prism-tomorrow.css');
 ```
 
-Then if you add the language after the fencing **prismjs** will add syntax highlighting to your code fences.
+Then if you add [one of the supported language](https://lucidar.me/en/web-dev/list-of-supported-languages-by-prism/) after the fencing **prismjs** will add syntax highlighting to your code fences.
 
 Write the following in your markdown
 
-````js
+````md
 ```js
 const hello = 'world';
 
@@ -72,9 +71,8 @@ const hello = 'world';
 ```
 ````
 
-To get the result:
-
-```js
+To get this result:
+```jsx
 const hello = 'world';
 
 <p>${hello}</p>

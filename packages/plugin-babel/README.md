@@ -65,14 +65,14 @@ If you would like to use it, either standalone or with your own custom _babel.co
     import { greenwoodPluginBabel } from '@greenwood/plugin-babel';
 
     export default {
-      ...
+      // ...
 
       plugins: [
         greenwoodPluginBabel({
           extendConfig: true
         })
       ]
-    }
+    };
     ```
 
 If you have a custom _babel.config.js_, this option will merge its own `presets` and `plugins` in the array ahead of your own (if you have them).

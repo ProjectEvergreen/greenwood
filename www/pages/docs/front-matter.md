@@ -100,7 +100,7 @@ date: '04/07/2020'
 ```
 
 You would then need to create a `graph` GraphQL query and use that with Greenwood's built in client to get access to that `data`, plus whatever other fields you might want.
-```js
+```graphql
 query {
   graph {
     data {

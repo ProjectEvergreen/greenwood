@@ -24,7 +24,7 @@ Add this plugin to your _greenwood.config.js_ and spread the `export`.
 import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
 
 export default {
-  ...
+  // ...
 
   plugins: [
     greenwoodPluginImportCss()
@@ -35,17 +35,18 @@ export default {
 
 This will then allow you to use `import` to include CSS in your JavaScript files.
 ```js
-import css from '../path/to/styles.css';  // must be a relative path per ESM spec
+import css from '../path/to/styles.css'; // must be a relative path per ESM spec
 
-console.log(css) // h1 { color: red }
+console.log(css); // h1 { color: red }
 ```
 
 A couple notes:
 - For SSR and `prerender` use cases, [follow these steps](/docs/server-rendering/#custom-imports-experimental)
-- For client side / browser code specifically, it is recommended to append `?type=css`, e.g.
-    ```js
-    import css from '../path/to/styles.css?type=css';
-    ```
+- For client side / browser code specifically, it is recommended to append `?type=css`, e.g. 
+  <!-- eslint-disable -->
+  ```js
+  import css from '../path/to/styles.css?type=css';
+  ```
 
 For libraries like Material Web Components, this plugin will [resolve references to _some-file.css_ if the equivalent exists that ends in _.js_ (e.g. _styles.css.js_)](https://github.com/ProjectEvergreen/greenwood/issues/700).
 
@@ -60,7 +61,7 @@ import { greenwoodPluginPostcss } from '@greenwood/plugin-postcss';
 import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
 
 export default {
-  ...
+  // ...
 
   plugins: [
     greenwoodPluginPostcss(),

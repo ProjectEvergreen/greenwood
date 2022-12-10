@@ -76,10 +76,9 @@ linkheadings: 3
 ### Retrieve Menu
 
 Now in order to use our navigation menu within a component we need to query it via GraphQL.
-
-`navigation.js`
-
+<!-- eslint-disable indent -->
 ```js
+// navigation.js
 import { LitElement, html } from 'lit';
 import client from '@greenwood/plugin-graphql/core/client';
 import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
@@ -126,28 +125,28 @@ customElements.define('app-header', HeaderComponent);
 ### Query Result
 
 The query will result in the object(default sort by filename):
-```js
-menu: {
-  children:[
+```json
+"menu": {
+  "children": [
     {
-      children: [
-        { item: {label: "Online", route: "#online"}},
-        { item: {label: "Offline", route: "#offline"}},
-        { item: {label: "Locations", route: "#locations"}},
+      "children": [
+        { "item": {"label": "Online", "route": "#online"}},
+        { "item": {"label": "Offline", "route": "#offline"}},
+        { "item": {"label": "Locations", "route": "#locations"}},
       ],
-      item: {label: "Contact", route: "/mydirectory/contact"}
+      "item": {"label": "Contact", "route": "/mydirectory/contact"}
     },
     {
-      children: []
-      item: {label: "Docs", route: "/mydirectory/docs"}
+      "children": [],
+      "item": {"label": "Docs", "route": "/mydirectory/docs"}
     },
     {
-      children: []
-      item: {label: "About", route: "/mydirectory/"}
+      "children": [],
+      "item": {"label": "About", "route": "/mydirectory/"}
     }
   ],
-  item: {label: "navigation", route: "na"}
-]
+  "item": {"label": "navigation", "route": "na"}
+}
 ```
 
 
@@ -163,6 +162,8 @@ const response = await client.query({
     order: 'index_asc'
   }
 });
+
+console.debug(response);
 ```
 
 
@@ -189,6 +190,8 @@ const response = await client.query({
     route: window.location.pathname
   }
 });
+
+console.debug(response);
 ```
 
 #### Filter By Path Example.
@@ -251,13 +254,15 @@ const response = await client.query({
     route: window.location.pathname
   }
 });
+
+console.debug(response);
 ```
 
 Despite having the same menu declared in all 4 pages, by including `route:` variable we're filtering our menus based on the basePath(subdirectory).
 
 The object result for `/docs` is:
 
-```js
+```json
 "menu":{
   "item": {"label": "shelf", "link": "na"},
   "children":[{
@@ -274,7 +279,7 @@ The object result for `/docs` is:
 
 The object result for `/about` is:
 
-```js
+```json
 "menu":{
   "item": {"label": "shelf", "link": "na"},
   "children":[{

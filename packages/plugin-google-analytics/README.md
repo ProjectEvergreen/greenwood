@@ -2,6 +2,7 @@
 
 ## Overview
 A Greenwood plugin adding support for [Google Analytics](https://developers.google.com/analytics/) JavaScript tracker. It assumes you already have your own Tracking ID(s) and [can either filter out tracking for everything but your production environment](https://stackoverflow.com/a/1251931/417806) so that local testing doesn't interfere with production data, or use a conditional based `analyticsId` using an environment variable, ex.
+<!-- eslint-disable no-unused-vars -->
 ```js
 const analyticsId = process.env.NODE_ENV === 'xxx' ? 'UA-123...' : 'UA-345...';
 ```
