@@ -12,7 +12,7 @@
     "Web Components"
   ],
   "engines": {
-    "node": ">=14"
+    "node": ">=18.12.1"
   },
   "bin": {
     "greenwood": "./src/index.js"
@@ -36,7 +36,6 @@
     "koa": "^2.13.0",
     "livereload": "^0.9.1",
     "markdown-toc": "^1.2.0",
-    "node-fetch": "^2.6.1",
     "node-html-parser": "^1.2.21",
     "rehype-raw": "^5.0.0",
     "rehype-stringify": "^8.0.0",

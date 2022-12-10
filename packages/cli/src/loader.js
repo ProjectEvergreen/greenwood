@@ -1,4 +1,3 @@
-// Node ^16.17.0
 import path from 'path';
 import { readAndMergeConfig as initConfig } from './lifecycles/config.js';
 import { URL, fileURLToPath } from 'url';
@@ -10,12 +9,11 @@ const plugins = config.plugins.filter(plugin => plugin.type === 'resource' && !p
   }
 }));
 
-// TODO need to polyfill original URL header instead of extensions?
 function getCustomLoaderPlugins(url, body, headers) {
   return plugins.filter(plugin => plugin.extensions.includes(path.extname(url)) && (plugin.shouldServe(url, body, headers) || plugin.shouldIntercept(url, body, headers)));
 }
 
-// https://nodejs.org/docs/latest-v16.x/api/esm.html#resolvespecifier-context-nextresolve
+// https://nodejs.org/docs/latest-v18.x/api/esm.html#resolvespecifier-context-nextresolve
 export function resolve(specifier, context, defaultResolve) {
   const { parentURL } = context;
 
@@ -29,7 +27,7 @@ export function resolve(specifier, context, defaultResolve) {
   return defaultResolve(specifier, context, defaultResolve);
 }
 
-// https://nodejs.org/docs/latest-v16.x/api/esm.html#loadurl-context-nextload
+// https://nodejs.org/docs/latest-v18.x/api/esm.html#loadurl-context-nextload
 export async function load(source, context, defaultLoad) {
   const resourcePlugins = getCustomLoaderPlugins(source);
   const extension = path.extname(source).replace('.', '');

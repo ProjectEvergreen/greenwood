@@ -16,7 +16,6 @@ import chalk from 'chalk';
 import simpleGit from 'simple-git';
 import commander from 'commander';
 import { copyFolder } from './copy-folder.js';
-import fetch from 'node-fetch';
 import fs from 'fs';
 import inquirer from 'inquirer';
 import os from 'os';

@@ -1,5 +1,4 @@
 import ApolloCore from '@apollo/client/core/core.cjs.js';
-import fetch from 'node-fetch';
 import fs from 'fs';
 import { gql } from 'apollo-server';
 import { getQueryHash } from './common.js';

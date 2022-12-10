@@ -36,10 +36,10 @@ $ npm -v
 
 # for example
 $ node -v
-v14.16.0
+v18.12.1
 
 $ npm -v
-6.4.1
+8.19.2
 ```
 
 Along with this, familiarity of the command line / terminal is also assumed as Greenwood is a command line tool, and so all examples will assume a bash / shell like environment.  Example commands used in this guide are:
