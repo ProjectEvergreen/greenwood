@@ -53,9 +53,8 @@ class Shelf extends LitElement {
   }
 
   toggleSelectedItem() {
-    let selectedShelfListIndex = this.shelfList.findIndex((list, index) => {
-      return index === this.selectedIndex;
-    });
+    let selectedShelfListIndex = this.shelfList.findIndex((list, index) => index === this.selectedIndex);
+
     if (selectedShelfListIndex > -1) {
       this.shelfList[selectedShelfListIndex].selected = !this.shelfList[selectedShelfListIndex].selected;
     }

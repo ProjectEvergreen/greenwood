@@ -2,7 +2,9 @@
 
 // ** THIS DOES NOT WORK ON SAFARI **
 // It will just load pages as if staticRouter was not enabled
-document.addEventListener('click', function(e) {
+// https://github.com/ProjectEvergreen/greenwood/issues/559
+document.addEventListener('click', async function(e) {
+  const currentUrl = window.location;
   const href = (e.path && e.path[0]
     ? e.path[0].href // chrome + edge
     : e.originalTarget && e.originalTarget.href
@@ -11,13 +13,13 @@ document.addEventListener('click', function(e) {
   // best case "guess" is that if the link originates on the current site when resolved by the browser
   // treat it as a client side route, ex:  /about/, /docs/ and trigger the client side router
   // https://github.com/ProjectEvergreen/greenwood/issues/562
-  const isOnCurrentDomain = href.indexOf(window.location.hostname) >= 0 || href.indexOf('localhost') >= 0;
+  const isOnCurrentDomain = href.indexOf(currentUrl.hostname) >= 0 || href.indexOf('localhost') >= 0;
   const canClientSideRoute = href !== '' && isOnCurrentDomain;
 
   if (canClientSideRoute) {
     e.preventDefault();
 
-    const targetUrl = new URL(href, window.location.origin);
+    const targetUrl = new URL(href, currentUrl.origin);
     const routerOutlet = Array.from(document.getElementsByTagName('greenwood-route')).filter(outlet => {
       return outlet.getAttribute('data-route') === targetUrl.pathname;
     })[0];
@@ -25,14 +27,16 @@ document.addEventListener('click', function(e) {
     // maintain the app shell if we are navigating between pages that are built from the same page template
     // also, some routes may be SSR, so we may not always match on a static route
     if (routerOutlet && routerOutlet.getAttribute('data-template') === window.__greenwood.currentTemplate) {
-      
-      // only update the hash if it just the hash changing
-      // else, request and load the partial for the page, and push page to the browser history stack
-      if (targetUrl.hash !== '') {
-        location = targetUrl.hash;
-      } else {
-        routerOutlet.loadRoute();
-        history.pushState({}, '', targetUrl.pathname);
+      const { hash, pathname } = targetUrl;
+
+      if (currentUrl.pathname !== pathname) {
+        await routerOutlet.loadRoute();
+
+        history.pushState({}, '', pathname);
+      }
+
+      if (hash !== '') {
+        currentUrl.hash = hash;
       }
     } else {
       // this page uses is a completely different page template from the current page
@@ -58,10 +62,10 @@ window.addEventListener('popstate', () => {
 });
 
 class RouteComponent extends HTMLElement {
-  loadRoute() {
+  async loadRoute() {
     const key = this.getAttribute('data-key');
 
-    fetch(key)
+    await fetch(key)
       .then(res => res.text())
       .then((response) => {
         document.getElementsByTagName('router-outlet')[0].innerHTML = response;
