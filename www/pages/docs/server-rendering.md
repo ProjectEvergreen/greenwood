@@ -64,7 +64,6 @@ export {
 When using `export default`, Greenwood supports providing a custom element as the export for your page content.  It uses [**WCC**](https://github.com/ProjectEvergreen/wcc) by default which also includes support for rendering [Declarative Shadow DOM](https://web.dev/declarative-shadow-dom/).
 
 ```js
-import fetch from 'node-fetch';
 import '../components/card/card.js'; // <wc-card></wc-card>
 
 export default class UsersPage extends HTMLElement {
@@ -218,7 +217,7 @@ console.log(json); // { status: 200, message: 'some data' }
 ```
 
 **Steps**
-1. Make sure you are using Node `v16.17.0`
+1. Make sure you are using Node `v18.12.1`
 1. Run the Greenwood CLI using the `--experimental-loaders` flag and pass Greenwood's custom loader
     ```shell
     $ node --experimental-loader ./node_modules/@greenwood/cli/src/loader.js ./node_modules/.bin/greenwood <command>

@@ -3,7 +3,6 @@
  * Manages routing devServer.proxy entries to their destination.
  *
  */
-import fetch from 'node-fetch';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class DevProxyResource extends ResourceInterface {
