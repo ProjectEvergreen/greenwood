@@ -1,9 +1,5 @@
 ## Type of Change
-- [ ] New Feature Request
-- [ ] Documentation / Website
-- [ ] Improvement / Suggestion
-- [ ] Bug
-- [ ] Other (please clarify below)
+<!-- New Feature / Enhancement / Bug / Other -->
 
 ## Summary
 <!-- Brief summary of the issue like steps to reproduce for a bug, or motivation and API design if proposing a new feature. -->
