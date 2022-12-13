@@ -1210,36 +1210,26 @@ describe('Develop Greenwood With: ', function() {
     describe('Develop command with API specific behaviors', function() {
       const name = 'Greenwood';
       let response = {};
+      let data = {};
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/api/greeting?name=${name}`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve(response);
-          });
-        });
+        response = await fetch(`${hostname}:${port}/api/greeting?name=${name}`);
+        data = await response.json();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.ok).to.equal(true);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
+        expect(response.headers.get('content-type')).to.equal('application/json; charset=utf-8');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        const json = JSON.parse(response.body);
-
-        expect(json.message).to.contain(`Hello ${name}!!!`);
+        expect(data.message).to.equal(`Hello ${name}!!!`);
         done();
       });
     });
