@@ -19,7 +19,7 @@ class ApiRoutesResource extends ResourceInterface {
     let href = new URL(`${this.getBareUrlPath(url).replace('/api/', '')}.js`, `file://${this.compilation.context.apisDir}`).href;
 
     // https://github.com/nodejs/modules/issues/307#issuecomment-1165387383
-    if (process.env.__GWD_COMMAND__) { // eslint-disable-line no-underscore-dangle
+    if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
       href = `${href}?t=${Date.now()}`;
     }
 
@@ -29,10 +29,12 @@ class ApiRoutesResource extends ResourceInterface {
     // TODO get port
     const req = new Request(new URL(`https://localhost:1984${url}`));
     const resp = await handler(req);
-    const body = await resp.json(); // TODO assumes JSON, pass Response all the way up?
+    const contents = resp.headers.get('content-type').indexOf('application/json') >= 0
+      ? await resp.json()
+      : await resp.text();
 
     return {
-      body
+      body: contents
     };
   }
 }

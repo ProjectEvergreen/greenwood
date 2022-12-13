@@ -253,6 +253,13 @@ async function getStaticServer(compilation, composable) {
 
 async function getHybridServer(compilation) {
   const app = await getStaticServer(compilation, true);
+  const apiResource = compilation.config.plugins.filter((plugin) => {
+    return plugin.isGreenwoodDefaultPlugin
+      && plugin.type === 'resource'
+      && plugin.name.indexOf('plugin-api-routes') === 0;
+  }).map((plugin) => {
+    return plugin.provider(compilation);
+  })[0];
 
   app.use(async (ctx) => {
     const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
@@ -261,6 +268,7 @@ async function getHybridServer(compilation) {
     })[0] || { data: {} };
 
     if (matchingRoute.isSSR && !matchingRoute.data.static) {
+      // TODO would be nice to pull these plugins once instead of one every request
       const headers = {
         request: { 'accept': 'text/html', 'content-type': 'text/html' },
         response: { 'content-type': 'text/html' }
@@ -312,6 +320,9 @@ async function getHybridServer(compilation) {
       ctx.status = 200;
       ctx.set('content-type', 'text/html');
       ctx.body = body;
+    } else if (await apiResource.shouldServe(url)) {
+      ctx.status = 200;
+      ctx.body = (await apiResource.serve(ctx.request.url)).body;
     }
   });
 
