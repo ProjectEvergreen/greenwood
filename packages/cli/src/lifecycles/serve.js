@@ -321,11 +321,11 @@ async function getHybridServer(compilation) {
       ctx.set('content-type', 'text/html');
       ctx.body = body;
     } else if (await apiResource.shouldServe(url)) {
-      const resp = (await apiResource.serve(ctx.request.url)).resp;
+      const { body, resp } = await apiResource.serve(ctx.request.url);
 
       ctx.status = 200;
       ctx.set('content-type', resp.headers.get('content-type'));
-      ctx.body = resp.body;
+      ctx.body = body;
     }
   });
 
