@@ -33,8 +33,10 @@ class ApiRoutesResource extends ResourceInterface {
       ? await resp.json()
       : await resp.text();
 
+    // TODO need to bubble resp all the way up
     return {
-      body: contents
+      body: contents,
+      resp
     };
   }
 }
