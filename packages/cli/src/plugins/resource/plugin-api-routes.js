@@ -29,11 +29,13 @@ class ApiRoutesResource extends ResourceInterface {
     // TODO get port
     const req = new Request(new URL(`https://localhost:1984${url}`));
     const resp = await handler(req);
+    // TODO do we need to .json or .text?  or can we just pass through the response body plain
     const contents = resp.headers.get('content-type').indexOf('application/json') >= 0
       ? await resp.json()
       : await resp.text();
 
     // TODO need to bubble resp all the way up
+    // https://github.com/ProjectEvergreen/greenwood/issues/948
     return {
       body: contents,
       resp
