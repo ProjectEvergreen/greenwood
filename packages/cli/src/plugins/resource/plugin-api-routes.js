@@ -11,11 +11,14 @@ class ApiRoutesResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    // TODO check it exists first
+    // TODO check it exists first.  Could this come from the graph?
     return url.startsWith('/api');
   }
 
   async serve(url) {
+    // TODO we assume host here, but eventually we will be getting a Request
+    // https://github.com/ProjectEvergreen/greenwood/issues/948
+    const host = `https://localhost:${this.compilation.config.port}`;
     let href = new URL(`${this.getBareUrlPath(url).replace('/api/', '')}.js`, `file://${this.compilation.context.apisDir}`).href;
 
     // https://github.com/nodejs/modules/issues/307#issuecomment-1165387383
@@ -24,18 +27,14 @@ class ApiRoutesResource extends ResourceInterface {
     }
 
     const { handler } = await import(href);
-
-    // TODO can we assume localhost?
-    // TODO get port
-    const req = new Request(new URL(`https://localhost:1984${url}`));
+    // TODO we need to pass in headers here
+    // https://github.com/ProjectEvergreen/greenwood/issues/948
+    const req = new Request(new URL(`${host}${url}`));
     const resp = await handler(req);
-    // TODO do we need to .json or .text?  or can we just pass through the response body plain
     const contents = resp.headers.get('content-type').indexOf('application/json') >= 0
       ? await resp.json()
       : await resp.text();
 
-    // TODO need to bubble resp all the way up
-    // https://github.com/ProjectEvergreen/greenwood/issues/948
     return {
       body: contents,
       resp
