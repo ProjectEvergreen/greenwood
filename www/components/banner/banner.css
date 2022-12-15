@@ -45,12 +45,13 @@
 
       & h3 {
         padding: 10px 0;
-        max-width: 65%;
-        margin: 0 auto;
+        max-width: 70%;
+        margin: 0 auto 10px;
         color: #201e2e;
 
         @media (min-width: 768px) {
           max-width: 50%;
+          margin: 0 auto;
         }
       }
 
