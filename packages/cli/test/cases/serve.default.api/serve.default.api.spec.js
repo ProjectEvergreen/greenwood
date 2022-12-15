@@ -19,13 +19,15 @@
 import chai from 'chai';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import request from 'request';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
 // TODO why does this test keep stalling out and not closing the command?
-xdescribe('Serve Greenwood With: ', function() {
+describe('Serve Greenwood With: ', function() {
   const LABEL = 'API Routes';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -53,30 +55,40 @@ xdescribe('Serve Greenwood With: ', function() {
       });
     });
 
+    runSmokeTest(['serve'], LABEL);
+
     describe('Serve command with API specific behaviors for a JSON API', function() {
       const name = 'Greenwood';
       let response = {};
-      let data = {};
 
       before(async function() {
-        response = await fetch(`${hostname}/api/greeting?name=${name}`);
-        data = await response.json();
-        console.debug({ data });
+        // TODO not sure why native `fetch` doesn't seem to work here, just hangs the test runner
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/api/greeting?name=${name}`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = JSON.parse(body);
+
+            resolve();
+          });
+        });
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.ok).to.equal(true);
-        expect(response.status).to.equal(200);
+        expect(response.statusCode).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers.get('content-type')).to.equal('application/json; charset=utf-8');
+        expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(data.message).to.equal(`Hello ${name}!!!`);
+        expect(response.body.message).to.equal(`Hello ${name}!!!`);
         done();
       });
     });
@@ -84,26 +96,35 @@ xdescribe('Serve Greenwood With: ', function() {
     describe('Serve command with API specific behaviors for an HTML ("fragment") API', function() {
       const name = 'Greenwood';
       let response = {};
-      let data = {};
 
       before(async function() {
-        response = await fetch(`${hostname}/api/fragment?name=${name}`);
-        data = await response.text();
-      });
+        // TODO not sure why native `fetch` doesn't seem to work here, just hangs the test runner
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/api/fragment?name=${name}`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
 
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+      
       it('should return a 200 status', function(done) {
-        expect(response.ok).to.equal(true);
-        expect(response.status).to.equal(200);
+        expect(response.statusCode).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers.get('content-type')).to.equal('text/html');
+        expect(response.headers['content-type']).to.equal('text/html');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(data).to.contain(`<h1>Hello ${name}!!!</h1>`);
+        expect(response.body).to.contain(`<h1>Hello ${name}!!!</h1>`);
         done();
       });
     });
@@ -112,6 +133,5 @@ xdescribe('Serve Greenwood With: ', function() {
   after(function() {
     runner.stopCommand();
     runner.teardown(getOutputTeardownFiles(outputPath));
-    console.debug('after 333????');
   });
 });
