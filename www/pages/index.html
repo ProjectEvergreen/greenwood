@@ -10,20 +10,10 @@
 
     <link rel="stylesheet" href="/node_modules/prismjs/themes/prism-tomorrow.css"/>
     <link rel="stylesheet" href="../styles/home.css"/>
-
-    <script type="module">
-      const params = new URLSearchParams(document.location.search);
-      const qs = params.has('name') ? `?name=${params.get('name')}` : '';
-      const data = await fetch(`/api/greeting${qs}`).then(resp => resp.json());
-
-      console.debug({ data });
-      document.getElementById('greeting').textContent = data.message;
-    </script>
   </head>
   <body>
 
     <div class="gwd-content-outlet">
-      <h1 id="greeting" style="text-align:center"></h1>
       <app-banner></app-banner>
 
       <div class='gwd-content-wrapper'>
