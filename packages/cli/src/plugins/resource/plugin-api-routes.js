@@ -3,6 +3,7 @@
  * Manages routing to API routes.
  *
  */
+import fs from 'fs';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class ApiRoutesResource extends ResourceInterface {
@@ -11,8 +12,9 @@ class ApiRoutesResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    // TODO check it exists first.  Could this come from the graph?
-    return url.startsWith('/api');
+    // TODO Could this existance check be derived from the graph instead?
+    // https://github.com/ProjectEvergreen/greenwood/issues/946
+    return url.startsWith('/api') && fs.existsSync(this.compilation.context.apisDir, url);
   }
 
   async serve(url) {
