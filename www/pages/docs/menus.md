@@ -2,7 +2,7 @@
 label: 'menus'
 menu: side
 title: 'Menus'
-index: 9
+index: 10
 linkheadings: 3
 ---
 
