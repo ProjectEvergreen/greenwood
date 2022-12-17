@@ -17,6 +17,8 @@
  *
  * User Workspace
  * src/
+ *   api/
+ *     greeting.js
  *   assets/
  *     data.json
  *     favicon.ico
@@ -1201,6 +1203,33 @@ describe('Develop Greenwood With: ', function() {
 
       it('should return the correct response body', function(done) {
         expect(response.body).to.have.lengthOf(1);
+        done();
+      });
+    });
+
+    describe('Develop command with API specific behaviors', function() {
+      const name = 'Greenwood';
+      let response = {};
+      let data = {};
+
+      before(async function() {
+        response = await fetch(`${hostname}:${port}/api/greeting?name=${name}`);
+        data = await response.json();
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.ok).to.equal(true);
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers.get('content-type')).to.equal('application/json; charset=utf-8');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(data.message).to.equal(`Hello ${name}!!!`);
         done();
       });
     });
