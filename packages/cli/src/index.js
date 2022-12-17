@@ -69,22 +69,22 @@ const run = async() => {
     switch (command) {
 
       case 'build':
-        await (await import('./commands/build.js')).runProductionBuild(compilation);
+        // await (await import('./commands/build.js')).runProductionBuild(compilation);
 
         break;
       case 'develop':
-        await (await import('./commands/develop.js')).runDevServer(compilation);
+        // await (await import('./commands/develop.js')).runDevServer(compilation);
 
         break;
       case 'serve':
         process.env.__GWD_COMMAND__ = 'build';
 
-        await (await import('./commands/build.js')).runProductionBuild(compilation);
-        await (await import('./commands/serve.js')).runProdServer(compilation);
+        // await (await import('./commands/build.js')).runProductionBuild(compilation);
+        // await (await import('./commands/serve.js')).runProdServer(compilation);
 
         break;
       case 'eject':
-        await (await import('./commands/eject.js')).ejectConfiguration(compilation);
+        // await (await import('./commands/eject.js')).ejectConfiguration(compilation);
 
         break;
       default: 
