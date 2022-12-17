@@ -1,19 +1,19 @@
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath, URL } from 'url';
 
 const initContext = async({ config }) => {
-  const scratchDir = path.join(process.cwd(), './.greenwood');
-  const outputDir = path.join(process.cwd(), './public');
-  const dataDir = fileURLToPath(new URL('../data', import.meta.url));
 
   return new Promise(async (resolve, reject) => {
     try {
-      const projectDirectory = process.cwd();
-      const userWorkspace = path.join(config.workspace);
-      const apisDir = path.join(userWorkspace, 'api/');
-      const pagesDir = path.join(userWorkspace, `${config.pagesDirectory}/`);
-      const userTemplatesDir = path.join(userWorkspace, `${config.templatesDirectory}/`);
+      const { workspace, pagesDirectory, templatesDirectory } = config;
+
+      const projectDirectory = new URL(`file://${process.cwd()}/`);
+      const scratchDir = new URL('./.greenwood/', projectDirectory);
+      const outputDir = new URL('./public/', projectDirectory);
+      const dataDir = new URL('../data/', import.meta.url);
+      const userWorkspace = workspace;
+      const apisDir = new URL('./apis/', userWorkspace);
+      const pagesDir = new URL(`./${pagesDirectory}/`, userWorkspace);
+      const userTemplatesDir = new URL(`./${templatesDirectory}/`, userWorkspace);
 
       const context = {
         dataDir,
@@ -26,8 +26,8 @@ const initContext = async({ config }) => {
         projectDirectory
       };
 
-      if (!fs.existsSync(scratchDir)) {
-        fs.mkdirSync(scratchDir, {
+      if (!fs.existsSync(scratchDir.pathname)) {
+        fs.mkdirSync(scratchDir.pathname, {
           recursive: true
         });
       }
