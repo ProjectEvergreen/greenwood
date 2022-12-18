@@ -22,7 +22,7 @@ const generateCompilation = () => {
       
       // generate a graph of all pages / components to build
       console.info('Generating graph of workspace files...');
-      // compilation = await generateGraph(compilation);
+      compilation = await generateGraph(compilation);
 
       resolve(compilation);
     } catch (err) {

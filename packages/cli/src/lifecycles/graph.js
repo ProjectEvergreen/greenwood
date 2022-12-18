@@ -214,16 +214,16 @@ const generateGraph = async (compilation) => {
       };
 
       console.debug('building from local sources...');
-      if (fs.existsSync(path.join(userWorkspace, 'index.html'))) { // SPA
+      if (fs.existsSync(path.join(userWorkspace.pathname, 'index.html'))) { // SPA
         graph = [{
           ...graph[0],
-          path: `${userWorkspace}${path.sep}index.html`,
+          path: `${userWorkspace.pathname}index.html`,
           isSPA: true
         }];
       } else {
         const oldGraph = graph[0];
         
-        graph = fs.existsSync(pagesDir) ? await walkDirectoryForPages(pagesDir) : graph;
+        graph = fs.existsSync(pagesDir.pathname) ? await walkDirectoryForPages(pagesDir.pathname) : graph;
 
         const has404Page = graph.filter(page => page.route === '/404/').length === 1;
 
@@ -279,11 +279,11 @@ const generateGraph = async (compilation) => {
 
       compilation.graph = graph;
 
-      if (!fs.existsSync(context.scratchDir)) {
-        await fs.promises.mkdir(context.scratchDir);
+      if (!fs.existsSync(context.scratchDir.pathname)) {
+        await fs.promises.mkdir(context.scratchDir.pathname);
       }
 
-      await fs.promises.writeFile(`${context.scratchDir}/graph.json`, JSON.stringify(compilation.graph));
+      await fs.promises.writeFile(`${context.scratchDir.pathname}graph.json`, JSON.stringify(compilation.graph));
 
       resolve(compilation);
     } catch (err) {
