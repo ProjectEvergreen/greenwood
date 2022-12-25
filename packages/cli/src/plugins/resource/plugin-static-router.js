@@ -8,7 +8,6 @@
 import fs from 'fs';
 import path from 'path';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import { fileURLToPath, URL } from 'url';
 
 class StaticRouterResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -18,20 +17,16 @@ class StaticRouterResource extends ResourceInterface {
     this.libPath = '@greenwood/router/router.js';
   }
 
-  async shouldResolve(url) {
-    return Promise.resolve(url.indexOf(this.libPath) >= 0);
+  async shouldResolve(request) {
+    const url = new URL(request.url);
+
+    return url.pathname.indexOf(this.libPath) >= 0;
   }
 
   async resolve() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const routerUrl = fileURLToPath(new URL('../../lib/router.js', import.meta.url));
-
-        resolve(routerUrl);
-      } catch (e) {
-        reject(e);
-      }
-    });
+    const routerUrl = new URL('../../lib/router.js', import.meta.url);
+    
+    return new Request(`file://${routerUrl.pathname}`);
   }
 
   async shouldIntercept(url, body, headers = { request: {} }) {

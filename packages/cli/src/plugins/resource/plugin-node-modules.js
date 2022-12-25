@@ -19,16 +19,20 @@ class NodeModulesResource extends ResourceInterface {
     this.extensions = ['*'];
   }
 
-  async shouldResolve(url) {
-    return Promise.resolve(url.indexOf('node_modules/') >= 0);
+  async shouldResolve(request) {
+    const url = new URL(request.url);
+
+    return url.pathname.indexOf('node_modules/') >= 0;
   }
 
-  async resolve(url) {
-    const bareUrl = this.getBareUrlPath(url);
+  // TODO convert node modules util to URL
+  async resolve(request) {
     const { projectDirectory } = this.compilation.context;
-    const packageName = getPackageNameFromUrl(bareUrl);
+    const url = new URL(request.url);
+    const barePath = url.pathname;
+    const packageName = getPackageNameFromUrl(barePath);
     const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(packageName);
-    const packagePathPieces = bareUrl.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
+    const packagePathPieces = barePath.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
     let absoluteNodeModulesUrl;
 
     if (absoluteNodeModulesLocation) {
@@ -37,13 +41,13 @@ class NodeModulesResource extends ResourceInterface {
       const isAbsoluteNodeModulesFile = fs.existsSync(path.join(projectDirectory, bareUrl));
       
       absoluteNodeModulesUrl = isAbsoluteNodeModulesFile
-        ? path.join(projectDirectory, bareUrl)
-        : this.resolveRelativeUrl(projectDirectory, bareUrl)
-          ? path.join(projectDirectory, this.resolveRelativeUrl(projectDirectory, bareUrl))
-          : bareUrl;
+        ? new URL(`.${barePath}`, userWorkspace)
+        : this.resolveRelativeUrl(projectDirectory, barePath)
+          ? new URL(this.resolveRelativeUrl(projectDirectory, barePath), userWorkspace)
+          : barePath;
     }
 
-    return Promise.resolve(absoluteNodeModulesUrl);
+    return new Request(`file://${absoluteNodeModulesUrl}`);
   }
 
   async shouldServe(url) {
