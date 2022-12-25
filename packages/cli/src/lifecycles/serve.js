@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { hashString } from '../lib/hashing-utils.js';
+// import { hashString } from '../lib/hashing-utils.js';
 import path from 'path';
 import Koa from 'koa';
 import { ResourceInterface } from '../lib/resource-interface.js';
@@ -7,7 +7,7 @@ import { ResourceInterface } from '../lib/resource-interface.js';
 async function getDevServer(compilation) {
   const app = new Koa();
   const compilationCopy = Object.assign({}, compilation);
-  const resources = [
+  const resourcePlugins = [
     // Greenwood default standard resource and import plugins
     ...compilation.config.plugins.filter((plugin) => {
       return plugin.type === 'resource' && plugin.isGreenwoodDefaultPlugin;
@@ -29,128 +29,148 @@ async function getDevServer(compilation) {
     })
   ];
 
-  // resolve urls to paths first
+  // resolve urls to `file://` paths if possible, otherwise default is `http://`
   app.use(async (ctx, next) => {
-    ctx.url = await resources.reduce(async (responsePromise, resource) => {
-      const response = await responsePromise;
-      const resourceShouldResolveUrl = await resource.shouldResolve(response);
+    try {
+      let request = new Request(`http://localhost:${compilation.config.port}${ctx.url}`, {
+        method: ctx.request.method,
+        headers: ctx.request.header,
+        body: ctx.body || null
+      });
       
-      return resourceShouldResolveUrl
-        ? resource.resolve(response)
-        : Promise.resolve(response);
-    }, Promise.resolve(ctx.url));
+      for (const plugin of resourcePlugins) {
+        if (plugin.shouldResolve && await plugin.shouldResolve(request)) {
+          request = await plugin.resolve(request);
+        }
+      }
 
-    // bit of a hack to get these two bugs to play well together
-    // https://github.com/ProjectEvergreen/greenwood/issues/598
-    // https://github.com/ProjectEvergreen/greenwood/issues/604
-    ctx.request.headers.originalUrl = ctx.originalUrl;
+      ctx.url = request.url;
+    } catch (e) {
+      console.error(e);
+    }
 
     await next();
   });
 
   // then handle serving urls
   app.use(async (ctx, next) => {
-    const responseAccumulator = {
-      body: ctx.body,
-      contentType: ctx.response.contentType
-    };
-    
-    const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
-      const response = await responsePromise;
-      const { url } = ctx;
-      const { headers } = ctx.response;
-      const shouldServe = await resource.shouldServe(url, {
-        request: ctx.headers,
-        response: headers
-      });
+    console.debug('CTX 2', { ctx });
+    try {
+      // const responseAccumulator = {
+      //   body: ctx.body,
+      //   contentType: ctx.response.contentType
+      // };
+      // let request = new Request(`http://localhost:${config.port}${request.url}`, {
+      //   method: request.method,
+      //   headers: request.header,
+      //   body: ctx.body || null
+      // });
 
-      if (shouldServe) {
-        const resolvedResource = await resource.serve(url, {
-          request: ctx.headers,
-          response: headers
-        });
-        
-        return Promise.resolve({
-          ...response,
-          ...resolvedResource
-        });
-      } else {
-        return Promise.resolve(response);
-      }
-    }, Promise.resolve(responseAccumulator));
+      // for (const plugin of resourcePlugins) {
+      //   if (plugin.shouldResolve && await plugin.shouldResolve(request)) {
+      //     request = await plugin.resolve(request);
+      //   }
+      // }
 
-    ctx.set('Content-Type', reducedResponse.contentType);
-    ctx.body = reducedResponse.body;
+      // const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
+      //   const response = await responsePromise;
+      //   const { url } = ctx;
+      //   const { headers } = ctx.response;
+      //   const shouldServe = await resource.shouldServe(url, {
+      //     request: ctx.headers,
+      //     response: headers
+      //   });
+
+      //   if (shouldServe) {
+      //     const resolvedResource = await resource.serve(url, {
+      //       request: ctx.headers,
+      //       response: headers
+      //     });
+
+      //     return Promise.resolve({
+      //       ...response,
+      //       ...resolvedResource
+      //     });
+      //   } else {
+      //     return Promise.resolve(response);
+      //   }
+      // }, Promise.resolve(responseAccumulator));
+
+      // ctx.set('Content-Type', reducedResponse.contentType);
+      // ctx.body = reducedResponse.body;
+    } catch (e) {
+      console.error(e);
+    }
 
     await next();
   });
 
   // allow intercepting of urls (response)
-  app.use(async (ctx, next) => {
-    const responseAccumulator = {
-      body: ctx.body,
-      contentType: ctx.response.headers['content-type']
-    };
+  // app.use(async (ctx, next) => {
+  //   const responseAccumulator = {
+  //     body: ctx.body,
+  //     contentType: ctx.response.headers['content-type']
+  //   };
 
-    const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
-      const response = await responsePromise;
-      const { url } = ctx;
-      const { headers } = ctx.response;
-      const shouldIntercept = await resource.shouldIntercept(url, response.body, {
-        request: ctx.headers,
-        response: headers
-      });
+  //   const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
+  //     const response = await responsePromise;
+  //     const { url } = ctx;
+  //     const { headers } = ctx.response;
+  //     const shouldIntercept = await resource.shouldIntercept(url, response.body, {
+  //       request: ctx.headers,
+  //       response: headers
+  //     });
 
-      if (shouldIntercept) {
-        const interceptedResponse = await resource.intercept(url, response.body, {
-          request: ctx.headers,
-          response: headers
-        });
+  //     if (shouldIntercept) {
+  //       const interceptedResponse = await resource.intercept(url, response.body, {
+  //         request: ctx.headers,
+  //         response: headers
+  //       });
         
-        return Promise.resolve({
-          ...response,
-          ...interceptedResponse
-        });
-      } else {
-        return Promise.resolve(response);
-      }
-    }, Promise.resolve(responseAccumulator));
+  //       return Promise.resolve({
+  //         ...response,
+  //         ...interceptedResponse
+  //       });
+  //     } else {
+  //       return Promise.resolve(response);
+  //     }
+  //   }, Promise.resolve(responseAccumulator));
 
-    ctx.set('Content-Type', reducedResponse.contentType);
-    ctx.body = reducedResponse.body;
+  //   ctx.set('Content-Type', reducedResponse.contentType);
+  //   ctx.body = reducedResponse.body;
 
-    await next();
-  });
+  //   await next();
+  // });
 
   // ETag Support - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
   // https://stackoverflow.com/questions/43659756/chrome-ignores-the-etag-header-and-just-uses-the-in-memory-cache-disk-cache
-  app.use(async (ctx) => {
-    const body = ctx.response.body;
-    const { url } = ctx;
+  // app.use(async (ctx) => {
+  //   const body = ctx.response.body;
+  //   const { url } = ctx;
 
-    // don't interfere with external requests or API calls, binary files, or JSON
-    // and only run in development
-    if (process.env.__GWD_COMMAND__ === 'develop' && path.extname(url) !== '' && url.indexOf('http') !== 0) { // eslint-disable-line no-underscore-dangle
-      if (!body || Buffer.isBuffer(body)) {
-        // console.warn(`no body for => ${ctx.url}`);
-      } else {
-        const inm = ctx.headers['if-none-match'];
-        const etagHash = path.extname(ctx.request.headers.originalUrl) === '.json'
-          ? hashString(JSON.stringify(body))
-          : hashString(body);
+  //   // don't interfere with external requests or API calls, binary files, or JSON
+  //   // and only run in development
+  //   if (process.env.__GWD_COMMAND__ === 'develop' && path.extname(url) !== '' && url.indexOf('http') !== 0) { // eslint-disable-line no-underscore-dangle
+  //     if (!body || Buffer.isBuffer(body)) {
+  //       // console.warn(`no body for => ${ctx.url}`);
+  //     } else {
+  //       const inm = ctx.headers['if-none-match'];
+  //       const etagHash = path.extname(ctx.request.headers.originalUrl) === '.json'
+  //         ? hashString(JSON.stringify(body))
+  //         : hashString(body);
 
-        if (inm && inm === etagHash) {
-          ctx.status = 304;
-          ctx.body = null;
-          ctx.set('Etag', etagHash);
-          ctx.set('Cache-Control', 'no-cache');
-        } else if (!inm || inm !== etagHash) {
-          ctx.set('Etag', etagHash);
-        }
-      }
-    }
+  //       if (inm && inm === etagHash) {
+  //         ctx.status = 304;
+  //         ctx.body = null;
+  //         ctx.set('Etag', etagHash);
+  //         ctx.set('Cache-Control', 'no-cache');
+  //       } else if (!inm || inm !== etagHash) {
+  //         ctx.set('Etag', etagHash);
+  //       }
+  //     }
+  //   }
 
-  });
+  // });
 
   return Promise.resolve(app);
 }

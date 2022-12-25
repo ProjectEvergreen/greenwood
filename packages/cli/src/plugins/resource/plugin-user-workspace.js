@@ -5,7 +5,6 @@
  *
  */
 import fs from 'fs';
-import path from 'path';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class UserWorkspaceResource extends ResourceInterface {
@@ -14,32 +13,24 @@ class UserWorkspaceResource extends ResourceInterface {
     this.extensions = ['*'];
   }
 
-  async shouldResolve(url = '/') {
+  async shouldResolve(request) {
+    const url = new URL(request.url);
     const { userWorkspace } = this.compilation.context;
-    const bareUrl = this.getBareUrlPath(url);
-    const isAbsoluteWorkspaceFile = fs.existsSync(path.join(userWorkspace, bareUrl));
-    const workspaceUrl = isAbsoluteWorkspaceFile
-      ? isAbsoluteWorkspaceFile || bareUrl === '/'
-      : url.indexOf('node_modules') < 0 && this.resolveRelativeUrl(userWorkspace, bareUrl);
+    const barePath = url.pathname;
+    const isWorkspaceFile = barePath !== '/'
+      && barePath.split('.').pop() !== ''
+      && fs.existsSync(new URL(`.${barePath}`, userWorkspace).pathname);
 
-    return Promise.resolve(workspaceUrl);
+    return barePath.indexOf('node_modules') < 0 && isWorkspaceFile;
   }
 
-  async resolve(url = '/') {
+  async resolve(request) {
     const { userWorkspace } = this.compilation.context;
+    const url = new URL(request.url);
+    const barePath = url.pathname;
+    const workspaceUrl = new URL(`.${barePath}`, userWorkspace);
 
-    return new Promise(async (resolve, reject) => {
-      try {
-        const bareUrl = this.getBareUrlPath(url);
-        const workspaceUrl = fs.existsSync(path.join(userWorkspace, bareUrl))
-          ? path.join(userWorkspace, bareUrl)
-          : path.join(userWorkspace, this.resolveRelativeUrl(userWorkspace, bareUrl));
-        
-        resolve(workspaceUrl);
-      } catch (e) {
-        reject(e);
-      }
-    });
+    return new Request(`file://${workspaceUrl.pathname}`);
   }
 }
 
