@@ -27,27 +27,26 @@ class StaticRouterResource extends ResourceInterface {
     return new Request(`file://${routerUrl.pathname}`);
   }
 
-  async shouldIntercept(url, body, headers = { request: {} }) {
-    const contentType = headers.request['content-type'];
+  async shouldIntercept(url, request, response) {
+    const { pathname } = url;
+    const contentType = response.headers.get['content-type'];
 
-    return Promise.resolve(process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
+    // TODO should this also happen during development too?
+    return process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
       && this.compilation.config.staticRouter
-      && url !== '404.html'
-      && (path.extname(url) === '.html' || (contentType && contentType.indexOf('text/html') >= 0)));
+      && pathname.startsWith('/404')
+      && pathname.split('.').pop() === 'html' || (contentType && contentType.indexOf('text/html') >= 0);
   }
 
-  async intercept(url, body) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        body = body.replace('</head>', `
-          <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
-          </head>
-        `);
+  async intercept(url, request, response) {
+    const body = response.body.replace('</head>', `
+      <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
+      </head>
+    `);
 
-        resolve({ body });
-      } catch (e) {
-        reject(e);
-      }
+    // TODO avoid having to rebuild response each time?
+    return new Response(body, {
+      headers: response.headers
     });
   }
 

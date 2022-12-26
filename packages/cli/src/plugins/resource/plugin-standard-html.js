@@ -207,8 +207,6 @@ class StandardHtmlResource extends ResourceInterface {
     const pathname = url.pathname;
     // const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows
     const isClientSideRoute = this.compilation.graph[0].isSPA && pathname.split('.').pop() === '' && (request.headers?.accept || '').indexOf(this.contentType) >= 0;
-    console.debug('StandardHtmlResource.shouldServe', url.pathname);
-    console.debug('HEADERS', request.headers);
     const hasMatchingRoute = this.compilation.graph.filter((node) => {
       return node.route === pathname;
     }).length === 1;
@@ -216,9 +214,7 @@ class StandardHtmlResource extends ResourceInterface {
     return hasMatchingRoute || isClientSideRoute;
   }
 
-  async serve(url, request) {
-    console.debug('StandardHtmlResource.serve', url.pathname);
-    console.debug('HEADERS', request.headers);
+  async serve(url) {
     const { config } = this.compilation;
     const { pagesDir, userTemplatesDir } = this.compilation.context;
     const { interpolateFrontmatter } = config;
@@ -392,7 +388,7 @@ class StandardHtmlResource extends ResourceInterface {
       `);
     }
 
-    console.debug({ body });
+    // TODO avoid having to rebuild response each time?
     return new Response(body, {
       headers: {
         'Content-Type': this.contentType

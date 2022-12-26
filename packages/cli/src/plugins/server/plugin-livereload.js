@@ -51,24 +51,23 @@ class LiveReloadServer extends ServerInterface {
 
 class LiveReloadResource extends ResourceInterface {
   
-  async shouldIntercept(url, body, headers) {
-    const { accept } = headers.request;
+  async shouldIntercept(url, request, response) {
+    const contentType = response.headers.get('content-type');
 
-    return Promise.resolve(accept && accept.indexOf('text/html') >= 0 && process.env.__GWD_COMMAND__ === 'develop'); // eslint-disable-line no-underscore-dangle
+    return contentType.indexOf('text/html') >= 0 && process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line no-underscore-dangle
   }
 
-  async intercept(url, body) {
-    return new Promise((resolve, reject) => {
-      try {
-        const contents = body.replace('</head>', `
-            <script src="http://localhost:35729/livereload.js?snipver=1"></script>
-          </head>
-        `);
+  async intercept(url, request, response) {
+    let body = await response.text();
+    
+    body = body.replace('</head>', `
+        <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+      </head>
+    `);
 
-        resolve({ body: contents });
-      } catch (e) {
-        reject(e);
-      }
+    // TODO avoid having to rebuild response each time?
+    return new Response(body, {
+      headers: response.headers
     });
   }
 }

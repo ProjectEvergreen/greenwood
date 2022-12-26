@@ -29,20 +29,6 @@ class StandardFontResource extends ResourceInterface {
         'Content-Type': contentType
       }
     });
-    // return new Promise(async (resolve, reject) => {
-    //   try {
-    //     const ext = path.extname(url).replace('.', '');
-    //     const contentType = ext === 'eot' ? 'application/vnd.ms-fontobject' : ext;
-    //     const body = await fs.promises.readFile(url);
-
-    //     resolve({
-    //       body,
-    //       contentType
-    //     });
-    //   } catch (e) {
-    //     reject(e);
-    //   }
-    // });
   }
 }
 
