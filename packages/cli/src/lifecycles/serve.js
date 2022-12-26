@@ -32,15 +32,15 @@ async function getDevServer(compilation) {
   // resolve urls to `file://` paths if possible, otherwise default is `http://`
   app.use(async (ctx, next) => {
     try {
-      let request = new Request(`http://localhost:${compilation.config.port}${ctx.url}`, {
+      const url = new URL(`http://localhost:${compilation.config.port}${ctx.url}`);
+      let request = new Request(url, {
         method: ctx.request.method,
-        headers: ctx.request.header,
-        body: ctx.body || null
+        headers: ctx.request.header
       });
       
       for (const plugin of resourcePlugins) {
-        if (plugin.shouldResolve && await plugin.shouldResolve(request)) {
-          request = await plugin.resolve(request);
+        if (plugin.shouldResolve && await plugin.shouldResolve(url, request)) {
+          request = await plugin.resolve(url, request);
         }
       }
 
@@ -56,48 +56,36 @@ async function getDevServer(compilation) {
   app.use(async (ctx, next) => {
     console.debug('CTX 2', { ctx });
     try {
-      // const responseAccumulator = {
-      //   body: ctx.body,
-      //   contentType: ctx.response.contentType
-      // };
-      // let request = new Request(`http://localhost:${config.port}${request.url}`, {
-      //   method: request.method,
-      //   headers: request.header,
-      //   body: ctx.body || null
-      // });
+      const url = new URL(ctx.url);
+      const request = new Request(url, {
+        method: ctx.request.method,
+        headers: ctx.request.header
+      });
+      let response = new Response(ctx.message, {
+        status: ctx.response.status,
+        headers: ctx.response.header
+      });
 
-      // for (const plugin of resourcePlugins) {
-      //   if (plugin.shouldResolve && await plugin.shouldResolve(request)) {
-      //     request = await plugin.resolve(request);
-      //   }
-      // }
+      for (const plugin of resourcePlugins) {
+        if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
+          response = await plugin.serve(url, request);
+        }
+      }
 
-      // const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
-      //   const response = await responsePromise;
-      //   const { url } = ctx;
-      //   const { headers } = ctx.response;
-      //   const shouldServe = await resource.shouldServe(url, {
-      //     request: ctx.headers,
-      //     response: headers
-      //   });
+      // TODO would be nice if Koa (or other framework) could just a Response object directly
+      const contentType = response.headers.has('content-type')
+        ? response.headers.get('content-type')
+        : ctx.response.headers.contentType;
+      const isJson = contentType.indexOf('application/json') >= 0;
+      const body = isJson ? await response.json() : await response.text();
 
-      //   if (shouldServe) {
-      //     const resolvedResource = await resource.serve(url, {
-      //       request: ctx.headers,
-      //       response: headers
-      //     });
+      console.debug('@@@@@@@@@@@@@@@@@@@@@@', { response });
+      console.debug("alll eyses => ", { isJson });
+      console.debug("alll eyses => ", { body });
 
-      //     return Promise.resolve({
-      //       ...response,
-      //       ...resolvedResource
-      //     });
-      //   } else {
-      //     return Promise.resolve(response);
-      //   }
-      // }, Promise.resolve(responseAccumulator));
-
-      // ctx.set('Content-Type', reducedResponse.contentType);
-      // ctx.body = reducedResponse.body;
+      console.debug(response.headers);
+      ctx.set('Content-Type', contentType);
+      ctx.body = body;
     } catch (e) {
       console.error(e);
     }

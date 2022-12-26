@@ -5,7 +5,6 @@
  *
  */
 import fs from 'fs';
-import path from 'path';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardFontResource extends ResourceInterface {
@@ -13,24 +12,37 @@ class StandardFontResource extends ResourceInterface {
     super(compilation, options);
 
     // https://developer.mozilla.org/en-US/docs/Learn/CSS/Styling_text/Web_fonts
-    this.extensions = ['.woff2', '.woff', '.ttf', '.eot'];
+    this.extensions = ['woff2', 'woff', 'ttf', 'eot'];
+  }
+
+  async shouldServe(url) {
+    return this.extensions.indexOf(url.pathname.split('.').pop()) >= 0;
   }
 
   async serve(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const ext = path.extname(url).replace('.', '');
-        const contentType = ext === 'eot' ? 'application/vnd.ms-fontobject' : ext;
-        const body = await fs.promises.readFile(url);
+    const extension = url.pathname.split('.').pop();
+    const contentType = extension === 'eot' ? 'application/vnd.ms-fontobject' : extension;
+    const body = await fs.promises.readFile(url);
 
-        resolve({
-          body,
-          contentType
-        });
-      } catch (e) {
-        reject(e);
+    return new Response(body, {
+      headers: {
+        'Content-Type': contentType
       }
     });
+    // return new Promise(async (resolve, reject) => {
+    //   try {
+    //     const ext = path.extname(url).replace('.', '');
+    //     const contentType = ext === 'eot' ? 'application/vnd.ms-fontobject' : ext;
+    //     const body = await fs.promises.readFile(url);
+
+    //     resolve({
+    //       body,
+    //       contentType
+    //     });
+    //   } catch (e) {
+    //     reject(e);
+    //   }
+    // });
   }
 }
 

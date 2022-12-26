@@ -206,21 +206,20 @@ function bundleCss(body, url, projectDirectory) {
 class StandardCssResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.css'];
+    this.extensions = ['css'];
     this.contentType = 'text/css';
   }
 
-  async serve(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const css = await fs.promises.readFile(url, 'utf-8');
+  async shouldServe(url) {
+    return url.protocol === 'file:' && this.extensions.indexOf(url.pathname.split('.').pop()) >= 0;
+  }
 
-        resolve({
-          body: css,
-          contentType: this.contentType
-        });
-      } catch (e) {
-        reject(e);
+  async serve(url) {
+    const body = await fs.promises.readFile(url, 'utf-8');
+
+    return new Response(body, {
+      headers: {
+        'Content-Type': this.contentType
       }
     });
   }

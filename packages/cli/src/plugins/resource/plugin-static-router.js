@@ -17,9 +17,7 @@ class StaticRouterResource extends ResourceInterface {
     this.libPath = '@greenwood/router/router.js';
   }
 
-  async shouldResolve(request) {
-    const url = new URL(request.url);
-
+  async shouldResolve(url) {
     return url.pathname.indexOf(this.libPath) >= 0;
   }
 

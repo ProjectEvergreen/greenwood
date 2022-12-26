@@ -203,199 +203,199 @@ class StandardHtmlResource extends ResourceInterface {
     return path.normalize(url.replace(this.compilation.context.userWorkspace, ''));
   }
 
-  async shouldServe(url, headers) {
-    const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows
-    const isClientSideRoute = this.compilation.graph[0].isSPA && path.extname(url) === '' && (headers.request.accept || '').indexOf(this.contentType) >= 0;
+  async shouldServe(url, request) {
+    const pathname = url.pathname;
+    // const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows
+    const isClientSideRoute = this.compilation.graph[0].isSPA && pathname.split('.').pop() === '' && (request.headers?.accept || '').indexOf(this.contentType) >= 0;
+    console.debug('StandardHtmlResource.shouldServe', url.pathname);
+    console.debug('HEADERS', request.headers);
     const hasMatchingRoute = this.compilation.graph.filter((node) => {
-      return node.route === relativeUrl;
+      return node.route === pathname;
     }).length === 1;
 
-    return Promise.resolve(hasMatchingRoute || isClientSideRoute);
+    return hasMatchingRoute || isClientSideRoute;
   }
 
-  async serve(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const config = Object.assign({}, this.compilation.config);
-        const { pagesDir, userTemplatesDir } = this.compilation.context;
-        const { interpolateFrontmatter } = this.compilation.config;
-        const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows;
-        const isClientSideRoute = this.compilation.graph[0].isSPA;
-        const matchingRoute = isClientSideRoute
-          ? this.compilation.graph[0]
-          : this.compilation.graph.filter((node) => {
-            return node.route === relativeUrl;
-          })[0];
-        const fullPath = !matchingRoute.external ? matchingRoute.path : '';
-        const isMarkdownContent = path.extname(fullPath) === '.md';
+  async serve(url, request) {
+    console.debug('StandardHtmlResource.serve', url.pathname);
+    console.debug('HEADERS', request.headers);
+    const { config } = this.compilation;
+    const { pagesDir, userTemplatesDir } = this.compilation.context;
+    const { interpolateFrontmatter } = config;
+    const pathname = url.pathname;
+    // const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows;
+    const isClientSideRoute = this.compilation.graph[0].isSPA;
+    const matchingRoute = isClientSideRoute
+      ? this.compilation.graph[0]
+      : this.compilation.graph.filter((node) => node.route === pathname)[0];
+    const fullPath = !matchingRoute.external ? matchingRoute.path : '';
+    const isMarkdownContent = pathname.split('.').pop() === 'md';
 
-        let customImports = [];
-        let body = '';
-        let title = null;
-        let template = null;
-        let frontMatter = {};
-        let ssrBody;
-        let ssrTemplate;
-        let ssrFrontmatter;
-        let processedMarkdown = null;
+    let customImports = [];
+    let body = '';
+    let title = null;
+    let template = null;
+    let frontMatter = {};
+    let ssrBody;
+    let ssrTemplate;
+    let ssrFrontmatter;
+    let processedMarkdown = null;
 
-        if (matchingRoute.external) {
-          template = matchingRoute.template || template;
+    if (matchingRoute.external) {
+      template = matchingRoute.template || template;
+    }
+
+    if (isMarkdownContent) {
+      const markdownContents = await fs.promises.readFile(fullPath, 'utf-8');
+      const rehypePlugins = [];
+      const remarkPlugins = [];
+
+      for (const plugin of config.markdown.plugins) {
+        if (plugin.indexOf('rehype-') >= 0) {
+          rehypePlugins.push((await import(plugin)).default);
         }
 
-        if (isMarkdownContent) {
-          const markdownContents = await fs.promises.readFile(fullPath, 'utf-8');
-          const rehypePlugins = [];
-          const remarkPlugins = [];
+        if (plugin.indexOf('remark-') >= 0) {
+          remarkPlugins.push((await import(plugin)).default);
+        }
+      }
 
-          for (const plugin of config.markdown.plugins) {
-            if (plugin.indexOf('rehype-') >= 0) {
-              rehypePlugins.push((await import(plugin)).default);
+      const settings = config.markdown.settings || {};
+      const fm = frontmatter(markdownContents);
+
+      processedMarkdown = await unified()
+        .use(remarkParse, settings) // parse markdown into AST
+        .use(remarkFrontmatter) // extract frontmatter from AST
+        .use(remarkPlugins) // apply userland remark plugins
+        .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
+        .use(rehypeRaw) // support mixed HTML in markdown
+        .use(rehypePlugins) // apply userland rehype plugins
+        .use(rehypeStringify) // convert AST to HTML string
+        .process(markdownContents);
+
+      // configure via frontmatter
+      if (fm.attributes) {
+        frontMatter = fm.attributes;
+
+        if (frontMatter.title) {
+          title = frontMatter.title;
+        }
+
+        if (frontMatter.template) {
+          template = frontMatter.template;
+        }
+
+        if (frontMatter.imports) {
+          customImports = frontMatter.imports;
+        }
+      }
+    }
+
+    if (matchingRoute.isSSR) {
+      const routeModuleLocation = path.join(pagesDir, matchingRoute.filename);
+      const routeWorkerUrl = this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
+
+      await new Promise((resolve, reject) => {
+        const worker = new Worker(routeWorkerUrl);
+
+        worker.on('message', (result) => {
+          if (result.template) {
+            ssrTemplate = result.template;
+          }
+          if (result.body) {
+            ssrBody = result.body;
+          }
+          if (result.frontmatter) {
+            ssrFrontmatter = result.frontmatter;
+
+            if (ssrFrontmatter.title) {
+              title = ssrFrontmatter.title;
+              frontMatter.title = ssrFrontmatter.title;
             }
 
-            if (plugin.indexOf('remark-') >= 0) {
-              remarkPlugins.push((await import(plugin)).default);
+            if (ssrFrontmatter.template) {
+              template = ssrFrontmatter.template;
+            }
+
+            if (ssrFrontmatter.imports) {
+              customImports = customImports.concat(ssrFrontmatter.imports);
             }
           }
-
-          const settings = config.markdown.settings || {};
-          const fm = frontmatter(markdownContents);
-
-          processedMarkdown = await unified()
-            .use(remarkParse, settings) // parse markdown into AST
-            .use(remarkFrontmatter) // extract frontmatter from AST
-            .use(remarkPlugins) // apply userland remark plugins
-            .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
-            .use(rehypeRaw) // support mixed HTML in markdown
-            .use(rehypePlugins) // apply userland rehype plugins
-            .use(rehypeStringify) // convert AST to HTML string
-            .process(markdownContents);
-
-          // configure via frontmatter
-          if (fm.attributes) {
-            frontMatter = fm.attributes;
-
-            if (frontMatter.title) {
-              title = frontMatter.title;
-            }
-
-            if (frontMatter.template) {
-              template = frontMatter.template;
-            }
-
-            if (frontMatter.imports) {
-              customImports = frontMatter.imports;
-            }
+          resolve();
+        });
+        worker.on('error', reject);
+        worker.on('exit', (code) => {
+          if (code !== 0) {
+            reject(new Error(`Worker stopped with exit code ${code}`));
           }
-        }
-
-        if (matchingRoute.isSSR) {
-          const routeModuleLocation = path.join(pagesDir, matchingRoute.filename);
-          const routeWorkerUrl = this.compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider().workerUrl;
-
-          await new Promise((resolve, reject) => {
-            const worker = new Worker(routeWorkerUrl);
-
-            worker.on('message', (result) => {
-              if (result.template) {
-                ssrTemplate = result.template;
-              }
-              if (result.body) {
-                ssrBody = result.body;
-              }
-              if (result.frontmatter) {
-                ssrFrontmatter = result.frontmatter;
-
-                if (ssrFrontmatter.title) {
-                  title = ssrFrontmatter.title;
-                  frontMatter.title = ssrFrontmatter.title;
-                }
-
-                if (ssrFrontmatter.template) {
-                  template = ssrFrontmatter.template;
-                }
-
-                if (ssrFrontmatter.imports) {
-                  customImports = customImports.concat(ssrFrontmatter.imports);
-                }
-              }
-              resolve();
-            });
-            worker.on('error', reject);
-            worker.on('exit', (code) => {
-              if (code !== 0) {
-                reject(new Error(`Worker stopped with exit code ${code}`));
-              }
-            });
-
-            worker.postMessage({
-              modulePath: routeModuleLocation,
-              compilation: JSON.stringify(this.compilation),
-              route: fullPath
-            });
-          });
-        }
-
-        // get context plugins
-        const contextPlugins = this.compilation.config.plugins.filter((plugin) => {
-          return plugin.type === 'context';
-        }).map((plugin) => {
-          return plugin.provider(this.compilation);
         });
 
-        if (isClientSideRoute) {
-          body = fs.readFileSync(fullPath, 'utf-8');
-        } else {
-          body = ssrTemplate ? ssrTemplate : getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir);
-        }
-
-        body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud, title);
-        body = getUserScripts(body, this.compilation.context);
-
-        if (processedMarkdown) {
-          const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
-          const ceTest = wrappedCustomElementRegex.test(processedMarkdown.contents);
-
-          if (ceTest) {
-            const ceMatches = processedMarkdown.contents.match(wrappedCustomElementRegex);
-
-            ceMatches.forEach((match) => {
-              const stripWrappingTags = match
-                .replace('<p>', '')
-                .replace('</p>', '');
-
-              processedMarkdown.contents = processedMarkdown.contents.replace(match, stripWrappingTags);
-            });
-          }
-
-          body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
-        } else if (matchingRoute.external) {
-          body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
-        } else if (ssrBody) {
-          body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, ssrBody);
-        }
-
-        if (interpolateFrontmatter) {
-          for (const fm in frontMatter) {
-            const interpolatedFrontmatter = '\\$\\{globalThis.page.' + fm + '\\}';
-
-            body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), frontMatter[fm]);
-          }
-        }
-
-        // give the user something to see so they know it works, if they have no content
-        if (body.indexOf('<content-outlet></content-outlet>') > 0) {
-          body = body.replace('<content-outlet></content-outlet>', `
-            <h1>Welcome to Greenwood!</h1>
-          `);
-        }
-
-        resolve({
-          body,
-          contentType: this.contentType
+        worker.postMessage({
+          modulePath: routeModuleLocation,
+          compilation: JSON.stringify(this.compilation),
+          route: fullPath
         });
-      } catch (e) {
-        reject(e);
+      });
+    }
+
+    // get context plugins
+    const contextPlugins = this.compilation.config.plugins.filter((plugin) => {
+      return plugin.type === 'context';
+    }).map((plugin) => {
+      return plugin.provider(this.compilation);
+    });
+
+    if (isClientSideRoute) {
+      body = fs.readFileSync(fullPath, 'utf-8');
+    } else {
+      body = ssrTemplate ? ssrTemplate : getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir);
+    }
+
+    body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud, title);
+    body = getUserScripts(body, this.compilation.context);
+
+    if (processedMarkdown) {
+      const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
+      const ceTest = wrappedCustomElementRegex.test(processedMarkdown.contents);
+
+      if (ceTest) {
+        const ceMatches = processedMarkdown.contents.match(wrappedCustomElementRegex);
+
+        ceMatches.forEach((match) => {
+          const stripWrappingTags = match
+            .replace('<p>', '')
+            .replace('</p>', '');
+
+          processedMarkdown.contents = processedMarkdown.contents.replace(match, stripWrappingTags);
+        });
+      }
+
+      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
+    } else if (matchingRoute.external) {
+      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
+    } else if (ssrBody) {
+      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, ssrBody);
+    }
+
+    if (interpolateFrontmatter) {
+      for (const fm in frontMatter) {
+        const interpolatedFrontmatter = '\\$\\{globalThis.page.' + fm + '\\}';
+
+        body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), frontMatter[fm]);
+      }
+    }
+
+    // give the user something to see so they know it works, if they have no content
+    if (body.indexOf('<content-outlet></content-outlet>') > 0) {
+      body = body.replace('<content-outlet></content-outlet>', `
+        <h1>Welcome to Greenwood!</h1>
+      `);
+    }
+
+    console.debug({ body });
+    return new Response(body, {
+      headers: {
+        'Content-Type': this.contentType
       }
     });
   }

@@ -16,62 +16,69 @@ let importMap;
 class NodeModulesResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['*'];
+    this.extensions = ['js', 'mjs'];
+    this.contentType = 'text/javascript';
   }
 
-  async shouldResolve(request) {
-    const url = new URL(request.url);
-
-    return url.pathname.indexOf('node_modules/') >= 0;
+  async shouldResolve(url) {
+    return url.pathname.indexOf('/node_modules/') === 0;
   }
 
   // TODO convert node modules util to URL
-  async resolve(request) {
+  async resolve(url) {
     const { projectDirectory } = this.compilation.context;
-    const url = new URL(request.url);
-    const barePath = url.pathname;
-    const packageName = getPackageNameFromUrl(barePath);
+    const pathname = url.pathname;
+    const packageName = getPackageNameFromUrl(pathname);
     const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(packageName);
-    const packagePathPieces = barePath.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
+    const packagePathPieces = pathname.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
     let absoluteNodeModulesUrl;
 
     if (absoluteNodeModulesLocation) {
       absoluteNodeModulesUrl = `${absoluteNodeModulesLocation}${packagePathPieces.join('/').replace(packageName, '')}`;
     } else {
-      const isAbsoluteNodeModulesFile = fs.existsSync(path.join(projectDirectory, bareUrl));
+      const isAbsoluteNodeModulesFile = fs.existsSync(path.join(projectDirectory, pathname));
       
       absoluteNodeModulesUrl = isAbsoluteNodeModulesFile
-        ? new URL(`.${barePath}`, userWorkspace)
+        ? new URL(`.${pathname}`, userWorkspace)
         : this.resolveRelativeUrl(projectDirectory, barePath)
-          ? new URL(this.resolveRelativeUrl(projectDirectory, barePath), userWorkspace)
-          : barePath;
+          ? new URL(this.resolveRelativeUrl(projectDirectory, pathname), userWorkspace)
+          : pathname;
     }
 
     return new Request(`file://${absoluteNodeModulesUrl}`);
   }
 
   async shouldServe(url) {
-    return Promise.resolve(path.extname(url) === '.mjs' 
-      || (path.extname(url) === '' && fs.existsSync(`${url}.js`))
-      || (path.extname(url) === '.js' && (/node_modules/).test(url)));
+    return url.protocol === 'file:' && url.pathname.startsWith('/node_modules/');
+    // return Promise.resolve(path.extname(url) === '.mjs' 
+    //   || (path.extname(url) === '' && fs.existsSync(`${url}.js`))
+    //   || (path.extname(url) === '.js' && (/node_modules/).test(url)));
   }
 
   async serve(url) {
-    return new Promise(async(resolve, reject) => {
-      try {
-        const fullUrl = path.extname(url) === ''
-          ? `${url}.js`
-          : url;
-        const body = await fs.promises.readFile(fullUrl, 'utf-8');
+    const pathname = url.pathname;
+    const pathnameExtended = pathname.split('.').pop() === ''
+      ? `${pathname}.js`
+      : pathname;
+    const body = await fs.promises.readFile(pathnameExtended, 'utf-8');
 
-        resolve({
-          body,
-          contentType: 'text/javascript'
-        });
-      } catch (e) {
-        reject(e);
+    return new Response(body, {
+      headers: {
+        'Content-Type': this.contentType
       }
     });
+    // const body = await fs.promises.readFile(fullUrl, 'utf-8');
+
+    //   return new Promise(async(resolve, reject) => {
+    //     try {
+    //       resolve({
+    //         body,
+    //         contentType: 'text/javascript'
+    //       });
+    //     } catch (e) {
+    //       reject(e);
+    //     }
+    //   });
   }
 
   async shouldIntercept(url, body, headers) {
