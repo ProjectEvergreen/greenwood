@@ -102,7 +102,6 @@ async function getDevServer(compilation) {
 
       ctx.set('Content-Type', response.headers.get('content-type'));
       ctx.body = await response.text();
-      ctx.body = t;
     } catch (e) {
       console.error(e);
     }
