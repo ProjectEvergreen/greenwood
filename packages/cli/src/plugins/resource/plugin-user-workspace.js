@@ -13,22 +13,19 @@ class UserWorkspaceResource extends ResourceInterface {
     this.extensions = ['*'];
   }
 
-  async shouldResolve(request) {
-    const url = new URL(request.url);
+  async shouldResolve(url) {
     const { userWorkspace } = this.compilation.context;
-    const barePath = url.pathname;
-    const isWorkspaceFile = barePath !== '/'
-      && barePath.split('.').pop() !== ''
-      && fs.existsSync(new URL(`.${barePath}`, userWorkspace).pathname);
+    const pathname = url.pathname;
+    const isWorkspaceFile = pathname !== '/'
+      && pathname.split('.').pop() !== ''
+      && fs.existsSync(new URL(`.${pathname}`, userWorkspace).pathname);
 
-    return barePath.indexOf('node_modules') < 0 && isWorkspaceFile;
+    return !pathname.startsWith('/node_modules/') && isWorkspaceFile;
   }
 
-  async resolve(request) {
+  async resolve(url) {
     const { userWorkspace } = this.compilation.context;
-    const url = new URL(request.url);
-    const barePath = url.pathname;
-    const workspaceUrl = new URL(`.${barePath}`, userWorkspace);
+    const workspaceUrl = new URL(`.${url.pathname}`, userWorkspace);
 
     return new Request(`file://${workspaceUrl.pathname}`);
   }

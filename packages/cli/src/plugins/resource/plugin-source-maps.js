@@ -4,7 +4,6 @@
  *
  */
 import fs from 'fs';
-import path from 'path';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class SourceMapsResource extends ResourceInterface {
@@ -14,20 +13,15 @@ class SourceMapsResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    return Promise.resolve(path.extname(url) === this.extensions[0] && fs.existsSync(url));
+    return `.${url.pathname.split('.').pop()}` === this.extensions[0] && fs.existsSync(url.pathname);
   }
 
   async serve(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const sourceMap = fs.readFileSync(url, 'utf-8');
-        
-        resolve({
-          body: sourceMap,
-          contentType: 'application/json'
-        });
-      } catch (e) {
-        reject(e);
+    const body = await fs.promises.readFile(url, 'utf-8');
+
+    return new Response(body, {
+      headers: {
+        'Content-Type': 'text/javascript'
       }
     });
   }

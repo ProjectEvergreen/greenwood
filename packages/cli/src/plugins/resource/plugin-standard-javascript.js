@@ -11,21 +11,20 @@ import terser from '@rollup/plugin-terser';
 class StandardJavaScriptResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.js'];
+    this.extensions = ['js'];
     this.contentType = 'text/javascript';
   }
 
+  async shouldServe(url) {
+    return url.protocol === 'file:' && this.extensions.indexOf(url.pathname.split('.').pop()) >= 0;
+  }
+
   async serve(url) {
-    return new Promise(async(resolve, reject) => {
-      try {
-        const body = await fs.promises.readFile(url, 'utf-8');
+    const body = await fs.promises.readFile(url, 'utf-8');
     
-        resolve({
-          body,
-          contentType: this.contentType
-        });
-      } catch (e) {
-        reject(e);
+    return new Response(body, {
+      headers: {
+        'Content-Type': this.contentType
       }
     });
   }
