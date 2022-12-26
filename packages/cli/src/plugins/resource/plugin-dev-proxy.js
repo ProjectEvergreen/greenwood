@@ -20,28 +20,9 @@ class DevProxyResource extends ResourceInterface {
   }
 
   async serve(url, request) {
-    // const baseUrl = request.url.pathname.replace(this.compilation.context.userWorkspace, '');
-    // const proxies = this.compilation.config.devServer.proxy;
-    // // const proxyBaseUrl = Object.entries(proxies).reduce((acc, entry) => {
-    // //   return url.indexOf(entry[0]) >= 0
-    // //     ? `${entry[1]}${baseUrl}`
-    // //     : acc;
-    // // }, baseUrl);
-
     return fetch(request, {
       ...request
     });
-    // return new Response(JSON.stringify(body), {
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   }
-    // });
-    // const response = await fetch(proxyBaseUrl)
-    //   .then(res => res.json());
-
-    // return Promise.resolve({
-    //   body: response
-    // });
   }
 }
 

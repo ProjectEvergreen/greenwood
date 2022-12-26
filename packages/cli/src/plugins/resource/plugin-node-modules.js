@@ -50,9 +50,6 @@ class NodeModulesResource extends ResourceInterface {
 
   async shouldServe(url) {
     return url.protocol === 'file:' && url.pathname.startsWith('/node_modules/');
-    // return Promise.resolve(path.extname(url) === '.mjs' 
-    //   || (path.extname(url) === '' && fs.existsSync(`${url}.js`))
-    //   || (path.extname(url) === '.js' && (/node_modules/).test(url)));
   }
 
   async serve(url) {
@@ -67,69 +64,53 @@ class NodeModulesResource extends ResourceInterface {
         'Content-Type': this.contentType
       }
     });
-    // const body = await fs.promises.readFile(fullUrl, 'utf-8');
-
-    //   return new Promise(async(resolve, reject) => {
-    //     try {
-    //       resolve({
-    //         body,
-    //         contentType: 'text/javascript'
-    //       });
-    //     } catch (e) {
-    //       reject(e);
-    //     }
-    //   });
   }
 
-  async shouldIntercept(url, body, headers) {
-    return Promise.resolve(headers.response['content-type'] === 'text/html');
+  async shouldIntercept(url, request, response) {
+    return response.headers.get('content-type').indexOf('text/html') >= 0;
   }
 
-  async intercept(url, body) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const { userWorkspace } = this.compilation.context;
-        let newContents = body;
-        const hasHead = body.match(/\<head>(.*)<\/head>/s);
+  async intercept(url, request, response) {
+    const { projectDirectory, userWorkspace } = this.compilation.context;
+    let body = await response.text();
+    const hasHead = body.match(/\<head>(.*)<\/head>/s);
 
-        if (hasHead && hasHead.length > 0) {
-          const contents = hasHead[0].replace(/type="module"/g, 'type="module-shim"');
+    if (hasHead && hasHead.length > 0) {
+      const contents = hasHead[0].replace(/type="module"/g, 'type="module-shim"');
 
-          newContents = newContents.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
-        }
+      body = body.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
+    }
 
-        const userPackageJson = fs.existsSync(`${userWorkspace}/package.json`)
-          ? JSON.parse(fs.readFileSync(path.join(userWorkspace, 'package.json'), 'utf-8')) // its a monorepo?
-          : fs.existsSync(`${process.cwd()}/package.json`)
-            ? JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8'))
-            : {};
-        
-        // if there are dependencies and we haven't generated the importMap already
-        // walk the project's package.json for all its direct dependencies
-        // for each entry found in dependencies, find its entry point
-        // then walk its entry point (e.g. index.js) for imports / exports to add to the importMap
-        // and then walk its package.json for transitive dependencies and all those import / exports
-        importMap = !importMap && Object.keys(userPackageJson.dependencies || []).length > 0
-          ? await walkPackageJson(userPackageJson)
-          : importMap || {};
+    // handle for monorepos too
+    const userPackageJson = fs.existsSync(new URL('./package.json', userWorkspace).pathname)
+      ? JSON.parse(await fs.promises.readFile(new URL('./package.json', userWorkspace), 'utf-8')) // its a monorepo?
+      : fs.existsSync(new URL('./package.json', projectDirectory).pathname)
+        ? JSON.parse(await fs.promises.readFile(new URL('./package.json', projectDirectory)))
+        : {};
+    
+    // if there are dependencies and we haven't generated the importMap already
+    // walk the project's package.json for all its direct dependencies
+    // for each entry found in dependencies, find its entry point
+    // then walk its entry point (e.g. index.js) for imports / exports to add to the importMap
+    // and then walk its package.json for transitive dependencies and all those import / exports
+    importMap = !importMap && Object.keys(userPackageJson.dependencies || []).length > 0
+      ? await walkPackageJson(userPackageJson)
+      : importMap || {};
 
-        // apply import map and shim for users
-        newContents = newContents.replace('<head>', `
-          <head>
-            <script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>
-            <script type="importmap-shim">
-              {
-                "imports": ${JSON.stringify(importMap, null, 1)}
-              }
-            </script>
-        `);
+    // apply import map and shim for users
+    body = body.replace('<head>', `
+      <head>
+        <script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>
+        <script type="importmap-shim">
+          {
+            "imports": ${JSON.stringify(importMap, null, 1)}
+          }
+        </script>
+    `);
 
-        resolve({
-          body: newContents
-        });
-      } catch (e) {
-        reject(e);
-      }
+    // TODO avoid having to rebuild response each time?
+    return new Response(body, {
+      headers: response.headers
     });
   }
 }

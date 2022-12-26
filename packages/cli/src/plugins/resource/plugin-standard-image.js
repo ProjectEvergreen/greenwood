@@ -21,7 +21,7 @@ class StandardFontResource extends ResourceInterface {
 
   async serve(url) {
     const extension = url.pathname.split('.').pop();
-    const type = extension === 'svg' ? `${ext}+xml` : extension;
+    const type = extension === 'svg' ? `${extension}+xml` : extension;
     const exts = [...this.extensions];
     const isIco = extension === 'ico';
     let body = '';
@@ -33,6 +33,7 @@ class StandardFontResource extends ResourceInterface {
       if (extension === 'svg') {
         body = await fs.promises.readFile(url, 'utf-8');
       } else {
+        // TODO this doesn't seem to work
         body = await fs.promises.readFile(url); 
       }
     } else if (isIco) {
@@ -40,9 +41,10 @@ class StandardFontResource extends ResourceInterface {
       body = await fs.promises.readFile(url);
     }
 
+    // TODO avoid having to rebuild response each time?
     return new Response(body, {
       headers: {
-        'Content-Type': contentType
+        'content-type': contentType
       }
     });
   }

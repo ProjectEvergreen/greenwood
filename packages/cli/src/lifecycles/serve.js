@@ -29,7 +29,7 @@ async function getDevServer(compilation) {
     })
   ];
 
-  // resolve urls to `file://` paths if possible, otherwise default is `http://`
+  // resolve urls to `file://` paths if applicable, otherwise default is `http://`
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`http://localhost:${compilation.config.port}${ctx.url}`);
@@ -52,9 +52,8 @@ async function getDevServer(compilation) {
     await next();
   });
 
-  // then handle serving urls
+  // handle creating responses from urls
   app.use(async (ctx, next) => {
-    console.debug('CTX 2', { ctx });
     try {
       const url = new URL(ctx.url);
       const request = new Request(url, {
@@ -73,19 +72,8 @@ async function getDevServer(compilation) {
       }
 
       // TODO would be nice if Koa (or other framework) could just a Response object directly
-      const contentType = response.headers.has('content-type')
-        ? response.headers.get('content-type')
-        : ctx.response.headers.contentType;
-      const isJson = contentType.indexOf('application/json') >= 0;
-      const body = isJson ? await response.json() : await response.text();
-
-      console.debug('@@@@@@@@@@@@@@@@@@@@@@', { response });
-      console.debug("alll eyses => ", { isJson });
-      console.debug("alll eyses => ", { body });
-
-      console.debug(response.headers);
-      ctx.set('Content-Type', contentType);
-      ctx.body = body;
+      ctx.set('Content-Type', response.headers.get('content-type'));
+      ctx.body = await response.text();
     } catch (e) {
       console.error(e);
     }
@@ -93,42 +81,34 @@ async function getDevServer(compilation) {
     await next();
   });
 
-  // allow intercepting of urls (response)
-  // app.use(async (ctx, next) => {
-  //   const responseAccumulator = {
-  //     body: ctx.body,
-  //     contentType: ctx.response.headers['content-type']
-  //   };
+  // allow intercepting of responses for URLs
+  app.use(async (ctx, next) => {
+    try {
+      const url = new URL(ctx.url);
+      const request = new Request(url, {
+        method: ctx.request.method,
+        headers: ctx.request.header
+      });
+      let response = new Response(ctx.body, {
+        status: ctx.response.status,
+        headers: ctx.response.header
+      });
 
-  //   const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
-  //     const response = await responsePromise;
-  //     const { url } = ctx;
-  //     const { headers } = ctx.response;
-  //     const shouldIntercept = await resource.shouldIntercept(url, response.body, {
-  //       request: ctx.headers,
-  //       response: headers
-  //     });
+      for (const plugin of resourcePlugins) {
+        if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
+          response = await plugin.intercept(url, request, response);
+        }
+      }
 
-  //     if (shouldIntercept) {
-  //       const interceptedResponse = await resource.intercept(url, response.body, {
-  //         request: ctx.headers,
-  //         response: headers
-  //       });
-        
-  //       return Promise.resolve({
-  //         ...response,
-  //         ...interceptedResponse
-  //       });
-  //     } else {
-  //       return Promise.resolve(response);
-  //     }
-  //   }, Promise.resolve(responseAccumulator));
-
-  //   ctx.set('Content-Type', reducedResponse.contentType);
-  //   ctx.body = reducedResponse.body;
-
-  //   await next();
-  // });
+      ctx.set('Content-Type', response.headers.get('content-type'));
+      ctx.body = await response.text();
+      ctx.body = t;
+    } catch (e) {
+      console.error(e);
+    }
+  
+    await next();
+  });
 
   // ETag Support - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
   // https://stackoverflow.com/questions/43659756/chrome-ignores-the-etag-header-and-just-uses-the-in-memory-cache-disk-cache
