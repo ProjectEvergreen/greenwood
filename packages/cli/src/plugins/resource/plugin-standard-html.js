@@ -32,6 +32,7 @@ const getPageTemplate = async (filePath, templatesDir, template, contextPlugins 
   const customPluginDefaultPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
   const customPluginPageTemplates = getCustomPageTemplates(contextPlugins, template);
   const extension = filePath.split('.').pop();
+  console.debug({ filePath, extension, template });
   const is404Page = path.basename(filePath).indexOf('404') === 0 && extension === 'html';
   let contents;
 
@@ -43,12 +44,12 @@ const getPageTemplate = async (filePath, templatesDir, template, contextPlugins 
   } else if (extension === 'html' && fs.existsSync(filePath)) {
     // if the page is already HTML, use that as the template, NOT accounting for 404 pages
     contents = await fs.promises.readFile(filePath, 'utf-8');
-  } else if (customPluginDefaultPageTemplates.length > 0 || (!is404Page && fs.existsSync(`${templatesDir}/page.html`))) {
+  } else if (customPluginDefaultPageTemplates.length > 0 || (!is404Page && fs.existsSync(new URL('./page.html', templatesDir).pathname))) {
     // else look for default page template from the user
     // and 404 pages should be their own "top level" template
     contents = customPluginDefaultPageTemplates.length > 0
       ? await fs.promises.readFile(`${customPluginDefaultPageTemplates[0]}/page.html`, 'utf-8')
-      : await fs.promises.readFile(new URL('./page.html', templatesDir).pathname);
+      : await fs.promises.readFile(new URL('./page.html', templatesDir), 'utf-8');
   } else if (is404Page && !fs.existsSync(new URL('./404.html', pagesDir).pathname)) {
     contents = await fs.promises.readFile(new URL('../../templates/404.html', import.meta.url).pathname, 'utf-8');
   } else {

@@ -28,14 +28,14 @@ const createCache = async (req, context) => {
         const cache = JSON.stringify(data);
         const queryHash = getQueryHash(query, variables);
         const hashFilename = `${queryHash}-cache.json`;
-        const cachePath = `${outputDir}/${hashFilename}`;
+        const cachePath = new URL(`./${hashFilename}`, outputDir);
 
-        if (!fs.existsSync(outputDir)) {
-          fs.mkdirSync(outputDir);
+        if (!fs.existsSync(outputDir.pathname)) {
+          fs.mkdirSync(outputDir.pathname);
         }
 
-        if (!fs.existsSync(cachePath)) {
-          fs.writeFileSync(cachePath, cache, 'utf8');
+        if (!fs.existsSync(cachePath.pathname)) {
+          fs.writeFileSync(cachePath.pathname, cache, 'utf8');
         }
       }
       

@@ -19,41 +19,39 @@ const importMap = {
 class GraphQLResource extends ResourceInterface {
   constructor(compilation, options = {}) {
     super(compilation, options);
-    this.extensions = ['.gql'];
+    this.extensions = ['gql'];
     this.contentType = ['text/javascript', 'text/html'];
   }
 
-  async serve(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const js = await fs.promises.readFile(url, 'utf-8');
-        const body = `
-          export default \`${js}\`;
-        `;
+  async shouldServe(url) {
+    return url.protocol === 'file:' && this.extensions.indexOf(url.pathname.split('.').pop()) >= 0;
+  }
 
-        resolve({
-          body,
-          contentType: this.contentType[0]
-        });
-      } catch (e) {
-        reject(e);
+  async serve(url) {
+    const js = await fs.promises.readFile(url, 'utf-8');
+    const body = `
+      export default \`${js}\`;
+    `;
+
+    // TODO avoid having to rebuild response each time?
+    return new Response(body, {
+      headers: {
+        'Content-Type': this.contentType[0]
       }
     });
   }
   
-  async shouldIntercept(url, body, headers) {
-    return Promise.resolve(headers.request.accept && headers.request.accept.indexOf(this.contentType[1]) >= 0);
+  async shouldIntercept(url, request, response) {
+    return response.headers.get('content-type').indexOf('text/html') >= 0;
   }
 
-  async intercept(url, body) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const newBody = mergeImportMap(body, importMap);
+  async intercept(url, request, response) {
+    const body = await response.text();
+    const newBody = mergeImportMap(body, importMap);
 
-        resolve({ body: newBody });
-      } catch (e) {
-        reject(e);
-      }
+    // TODO avoid having to rebuild response each time?
+    return new Response(newBody, {
+      headers: response.headers
     });
   }
 

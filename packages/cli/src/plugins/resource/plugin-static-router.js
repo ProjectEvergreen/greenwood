@@ -34,7 +34,7 @@ class StaticRouterResource extends ResourceInterface {
     // TODO should this also happen during development too?
     return process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
       && this.compilation.config.staticRouter
-      && pathname.startsWith('/404')
+      && !pathname.startsWith('/404')
       && pathname.split('.').pop() === 'html' || (contentType && contentType.indexOf('text/html') >= 0);
   }
 
