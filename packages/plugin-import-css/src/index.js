@@ -4,59 +4,46 @@
  *
  */
 import fs from 'fs';
-import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
-import { pathToFileURL } from 'url';
 
 class ImportCssResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.css'];
+    this.extensions = ['css'];
     this.contentType = 'text/javascript';
-  }
-
-  // TODO resolve as part of https://github.com/ProjectEvergreen/greenwood/issues/952
-  async shouldServe() {
-    return false;
   }
 
   // https://github.com/ProjectEvergreen/greenwood/issues/700
   async shouldResolve(url) {
-    const isCssInDisguise = url.endsWith(this.extensions[0]) && fs.existsSync(`${url}.js`);
-
-    return Promise.resolve(isCssInDisguise);
+    return url.pathname.endsWith(`.${this.extensions[0]}`) && fs.existsSync(`${url.pathname}.js`);
   }
 
   async resolve(url) {
-    return Promise.resolve(`${url}.js`);
+    return new Request(`file://${url.pathname}.js`);
   }
 
-  async shouldIntercept(url, body, headers = { request: {} }) {
-    const { originalUrl = '' } = headers.request;
-    const accept = headers.request.accept || '';
-    const isCssFile = path.extname(url) === this.extensions[0];
-    const notFromBrowser = accept.indexOf('text/css') < 0 && accept.indexOf('application/signed-exchange') < 0;
+  async shouldIntercept(url, request) {
+    const { pathname } = url;
+    const accepts = request.headers.get('accept') || '';
+    const isCssFile = pathname.split('.').pop() === this.extensions[0];
+    const notFromBrowser = accepts.indexOf('text/css') < 0 && accepts.indexOf('application/signed-exchange') < 0;
 
     // https://github.com/ProjectEvergreen/greenwood/issues/492
-    const isCssInJs = originalUrl.indexOf('?type=css') >= 0
+    const isCssInJs = url.searchParams.has('type') && url.searchParams.get('type') === this.extensions[0]
       || isCssFile && notFromBrowser
-      || isCssFile && notFromBrowser && url.indexOf('/node_modules/') >= 0;
+      || isCssFile && notFromBrowser && pathname.startsWith('/node_modules/');
 
-    return Promise.resolve(isCssInJs);
+    return isCssInJs;
   }
 
-  async intercept(url, body) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const finalBody = body || await fs.promises.readFile(pathToFileURL(url), 'utf-8');
-        const cssInJsBody = `const css = \`${finalBody.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\')}\`;\nexport default css;`;
-        
-        resolve({
-          body: cssInJsBody,
-          contentType: this.contentType
-        });
-      } catch (e) {
-        reject(e);
+  async intercept(url, request, response) {
+    // TODO why do we need to check for body first?
+    const body = await response.text(); // => body || await fs.promises.readFile(pathToFileURL(url), 'utf-8');
+    const cssInJsBody = `const css = \`${body.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\')}\`;\nexport default css;`;
+    
+    return new Response(cssInJsBody, {
+      headers: {
+        'content-type': this.contentType
       }
     });
   }
