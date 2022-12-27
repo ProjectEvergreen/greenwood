@@ -16,7 +16,6 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import unified from 'unified';
-import { fileURLToPath } from 'url';
 import { Worker } from 'worker_threads';
 
 function getCustomPageTemplates(contextPlugins, templateName) {
@@ -24,49 +23,51 @@ function getCustomPageTemplates(contextPlugins, templateName) {
     .map(plugin => plugin.templates)
     .flat()
     .filter((templateDir) => {
-      return templateName && fs.existsSync(path.join(templateDir, `${templateName}.html`));
+      return templateName && fs.existsSync(new URL(`./${templateName}.html`, templateDir).pathname);
     });
 }
 
-const getPageTemplate = (fullPath, templatesDir, template, contextPlugins = [], pagesDir) => {
+// TODO use URL more here
+const getPageTemplate = async (filePath, templatesDir, template, contextPlugins = [], pagesDir) => {
   const customPluginDefaultPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
   const customPluginPageTemplates = getCustomPageTemplates(contextPlugins, template);
-  const is404Page = path.basename(fullPath).indexOf('404') === 0 && path.extname(fullPath) === '.html';
+  const extension = filePath.split('.').pop();
+  const is404Page = path.basename(filePath).indexOf('404') === 0 && extension === 'html';
   let contents;
 
-  if (template && customPluginPageTemplates.length > 0 || fs.existsSync(`${templatesDir}/${template}.html`)) {
+  if (template && customPluginPageTemplates.length > 0 || fs.existsSync(new URL(`./${template}.html`, templatesDir).pathname)) {
     // use a custom template, usually from markdown frontmatter
     contents = customPluginPageTemplates.length > 0
-      ? fs.readFileSync(`${customPluginPageTemplates[0]}/${template}.html`, 'utf-8')
-      : fs.readFileSync(`${templatesDir}/${template}.html`, 'utf-8');
-  } else if (path.extname(fullPath) === '.html' && fs.existsSync(fullPath)) {
+      ? await fs.promises.readFile(`${customPluginPageTemplates[0]}/${template}.html`, 'utf-8')
+      : await fs.promises.readFile(new URL(`./${template}.html`, templatesDir), 'utf-8');
+  } else if (extension === 'html' && fs.existsSync(filePath)) {
     // if the page is already HTML, use that as the template, NOT accounting for 404 pages
-    contents = fs.readFileSync(fullPath, 'utf-8');
+    contents = await fs.promises.readFile(filePath, 'utf-8');
   } else if (customPluginDefaultPageTemplates.length > 0 || (!is404Page && fs.existsSync(`${templatesDir}/page.html`))) {
     // else look for default page template from the user
     // and 404 pages should be their own "top level" template
     contents = customPluginDefaultPageTemplates.length > 0
-      ? fs.readFileSync(`${customPluginDefaultPageTemplates[0]}/page.html`, 'utf-8')
-      : fs.readFileSync(`${templatesDir}/page.html`, 'utf-8');
-  } else if (is404Page && !fs.existsSync(path.join(pagesDir, '404.html'))) {
-    contents = fs.readFileSync(fileURLToPath(new URL('../../templates/404.html', import.meta.url)), 'utf-8');
+      ? await fs.promises.readFile(`${customPluginDefaultPageTemplates[0]}/page.html`, 'utf-8')
+      : await fs.promises.readFile(new URL('./page.html', templatesDir).pathname);
+  } else if (is404Page && !fs.existsSync(new URL('./404.html', pagesDir).pathname)) {
+    contents = await fs.promises.readFile(new URL('../../templates/404.html', import.meta.url).pathname, 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
-    contents = fs.readFileSync(fileURLToPath(new URL('../../templates/page.html', import.meta.url)), 'utf-8');
+    contents = await fs.promises.readFile(new URL('../../templates/page.html', import.meta.url).pathname, 'utf-8');
   }
 
   return contents;
 };
 
-const getAppTemplate = (pageTemplateContents, templatesDir, customImports = [], contextPlugins, enableHud, frontmatterTitle) => {
-  const userAppTemplatePath = `${templatesDir}app.html`;
+const getAppTemplate = async (pageTemplateContents, templatesDir, customImports = [], contextPlugins, enableHud, frontmatterTitle) => {
+  const userAppTemplatePath = new URL('./app.html', templatesDir);
   const customAppTemplates = getCustomPageTemplates(contextPlugins, 'app');
   let mergedTemplateContents = '';
   let appTemplateContents = customAppTemplates.length > 0
-    ? fs.readFileSync(`${customAppTemplates[0]}/app.html`, 'utf-8')
-    : fs.existsSync(userAppTemplatePath)
-      ? fs.readFileSync(userAppTemplatePath, 'utf-8')
-      : fs.readFileSync(fileURLToPath(new URL('../../templates/app.html', import.meta.url)), 'utf-8');
+    ? await fs.promises.readFile(`${customAppTemplates[0]}/app.html`)
+    : fs.existsSync(userAppTemplatePath.pathname)
+      ? await fs.promises.readFile(userAppTemplatePath, 'utf-8')
+      : await fs.promises.readFile(new URL('../../templates/app.html', import.meta.url), 'utf-8');
 
   const pageRoot = htmlparser.parse(pageTemplateContents, {
     script: true,
@@ -169,14 +170,14 @@ const getAppTemplate = (pageTemplateContents, templatesDir, customImports = [], 
   return mergedTemplateContents;
 };
 
-const getUserScripts = (contents, context) => {
+const getUserScripts = async (contents, context) => {
   // https://lit.dev/docs/tools/requirements/#polyfills
   if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
     const { projectDirectory, userWorkspace } = context;
-    const dependencies = fs.existsSync(path.join(userWorkspace, 'package.json')) // handle monorepos first
-      ? JSON.parse(fs.readFileSync(path.join(userWorkspace, 'package.json'), 'utf-8')).dependencies
-      : fs.existsSync(path.join(projectDirectory, 'package.json'))
-        ? JSON.parse(fs.readFileSync(path.join(projectDirectory, 'package.json'), 'utf-8')).dependencies
+    const dependencies = fs.existsSync(new URL('./package.json', userWorkspace).pathname) // handle monorepos first
+      ? JSON.parse(await fs.promises.readFile(new URL('./package.json', userWorkspace), 'utf-8')).dependencies
+      : fs.existsSync(new URL('./package.json', projectDirectory).pathname)
+        ? JSON.parse(await fs.promises.readFile(new URL('./package.json', projectDirectory), 'utf-8')).dependencies
         : {};
 
     const litPolyfill = dependencies && dependencies.lit
@@ -224,8 +225,8 @@ class StandardHtmlResource extends ResourceInterface {
     const matchingRoute = isClientSideRoute
       ? this.compilation.graph[0]
       : this.compilation.graph.filter((node) => node.route === pathname)[0];
-    const fullPath = !matchingRoute.external ? matchingRoute.path : '';
-    const isMarkdownContent = pathname.split('.').pop() === 'md';
+    const filePath = !matchingRoute.external ? matchingRoute.path : '';
+    const isMarkdownContent = matchingRoute.filename.split('.').pop() === 'md';
 
     let customImports = [];
     let body = '';
@@ -242,7 +243,7 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     if (isMarkdownContent) {
-      const markdownContents = await fs.promises.readFile(fullPath, 'utf-8');
+      const markdownContents = await fs.promises.readFile(filePath, 'utf-8');
       const rehypePlugins = [];
       const remarkPlugins = [];
 
@@ -342,13 +343,13 @@ class StandardHtmlResource extends ResourceInterface {
     });
 
     if (isClientSideRoute) {
-      body = fs.readFileSync(fullPath, 'utf-8');
+      body = fs.readFileSync(filePath, 'utf-8');
     } else {
-      body = ssrTemplate ? ssrTemplate : getPageTemplate(fullPath, userTemplatesDir, template, contextPlugins, pagesDir);
+      body = ssrTemplate ? ssrTemplate : await getPageTemplate(filePath, userTemplatesDir, template, contextPlugins, pagesDir);
     }
 
-    body = getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud, title);
-    body = getUserScripts(body, this.compilation.context);
+    body = await getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud, title);
+    body = await getUserScripts(body, this.compilation.context);
 
     if (processedMarkdown) {
       const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
