@@ -32,7 +32,6 @@ const getPageTemplate = async (filePath, templatesDir, template, contextPlugins 
   const customPluginDefaultPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
   const customPluginPageTemplates = getCustomPageTemplates(contextPlugins, template);
   const extension = filePath.split('.').pop();
-  console.debug({ filePath, extension, template });
   const is404Page = path.basename(filePath).indexOf('404') === 0 && extension === 'html';
   let contents;
 

@@ -2,6 +2,7 @@ import fs from 'fs';
 // import { hashString } from '../lib/hashing-utils.js';
 import path from 'path';
 import Koa from 'koa';
+import { Readable } from 'stream';
 import { ResourceInterface } from '../lib/resource-interface.js';
 
 async function getDevServer(compilation) {
@@ -46,6 +47,7 @@ async function getDevServer(compilation) {
 
       ctx.url = request.url;
     } catch (e) {
+      ctx.status = 500;
       console.error(e);
     }
 
@@ -56,13 +58,13 @@ async function getDevServer(compilation) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(ctx.url);
-      const request = new Request(url, {
+      const request = new Request(url.href, {
         method: ctx.request.method,
         headers: ctx.request.header
       });
-      let response = new Response(ctx.message, {
+      let response = new Response(null, {
         status: ctx.response.status,
-        headers: ctx.response.header
+        headers: new Headers()
       });
 
       for (const plugin of resourcePlugins) {
@@ -72,9 +74,12 @@ async function getDevServer(compilation) {
       }
 
       // TODO would be nice if Koa (or other framework) could just a Response object directly
-      ctx.set('Content-Type', response.headers.get('content-type'));
-      ctx.body = await response.text();
+      // not sure why we have to use `Readable.from`, does this couple us to NodeJS?
+      ctx.body = response.body ? Readable.from(response.body) : '';
+      ctx.type = response.headers.get('content-type');
+      ctx.status = response.status;
     } catch (e) {
+      ctx.status = 500;
       console.error(e);
     }
 
@@ -100,9 +105,10 @@ async function getDevServer(compilation) {
         }
       }
 
+      ctx.body = response.body ? Readable.from(response.body) : '';
       ctx.set('Content-Type', response.headers.get('content-type'));
-      ctx.body = await response.text();
     } catch (e) {
+      ctx.status = 500;
       console.error(e);
     }
   
