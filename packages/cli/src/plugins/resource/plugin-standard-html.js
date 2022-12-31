@@ -200,31 +200,20 @@ class StandardHtmlResource extends ResourceInterface {
     this.contentType = 'text/html';
   }
 
-  getRelativeUserworkspaceUrl(url) {
-    return path.normalize(url.replace(this.compilation.context.userWorkspace, ''));
-  }
+  async shouldServe(url) {
+    const { protocol, pathname } = url;
+    const hasMatchingPageRoute = this.compilation.graph.find(node => node.route === pathname);
 
-  async shouldServe(url, request) {
-    const pathname = url.pathname;
-    // const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows
-    const isClientSideRoute = this.compilation.graph[0].isSPA && pathname.split('.').pop() === '' && (request.headers?.accept || '').indexOf(this.contentType) >= 0;
-    const hasMatchingRoute = this.compilation.graph.filter((node) => {
-      return node.route === pathname;
-    }).length === 1;
-
-    return hasMatchingRoute || isClientSideRoute;
+    return protocol.startsWith('http') && hasMatchingPageRoute;
   }
 
   async serve(url) {
     const { config } = this.compilation;
     const { pagesDir, userTemplatesDir } = this.compilation.context;
     const { interpolateFrontmatter } = config;
-    const pathname = url.pathname;
-    // const relativeUrl = this.getRelativeUserworkspaceUrl(url).replace(/\\/g, '/'); // and handle for windows;
-    const isClientSideRoute = this.compilation.graph[0].isSPA;
-    const matchingRoute = isClientSideRoute
-      ? this.compilation.graph[0]
-      : this.compilation.graph.filter((node) => node.route === pathname)[0];
+    const { pathname } = url;
+    const isSpaRoute = this.compilation.graph[0].isSPA;
+    const matchingRoute = this.compilation.graph.find((node) => node.route === pathname);
     const filePath = !matchingRoute.external ? matchingRoute.path : '';
     const isMarkdownContent = matchingRoute.filename.split('.').pop() === 'md';
 
@@ -342,7 +331,7 @@ class StandardHtmlResource extends ResourceInterface {
       return plugin.provider(this.compilation);
     });
 
-    if (isClientSideRoute) {
+    if (isSpaRoute) {
       body = fs.readFileSync(filePath, 'utf-8');
     } else {
       body = ssrTemplate ? ssrTemplate : await getPageTemplate(filePath, userTemplatesDir, template, contextPlugins, pagesDir);

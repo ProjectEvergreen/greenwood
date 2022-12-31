@@ -4,7 +4,6 @@
  *
  */
 import fs from 'fs';
-import path from 'path';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import { getNodeModulesLocationForPackage, getPackageNameFromUrl } from '../../lib/node-modules-utils.js';
@@ -27,29 +26,20 @@ class NodeModulesResource extends ResourceInterface {
   // TODO convert node modules util to URL
   async resolve(url) {
     const { projectDirectory } = this.compilation.context;
-    const pathname = url.pathname;
+    const { pathname } = url;
     const packageName = getPackageNameFromUrl(pathname);
     const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(packageName);
     const packagePathPieces = pathname.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
-    let absoluteNodeModulesUrl;
+    // use node modules resolution logic first, else hope for the best from the root of the project
+    const absoluteNodeModulesPathname = absoluteNodeModulesLocation
+      ? `${absoluteNodeModulesLocation}${packagePathPieces.join('/').replace(packageName, '')}`
+      : this.resolveForRelativeUrl(url, projectDirectory).pathname;
 
-    if (absoluteNodeModulesLocation) {
-      absoluteNodeModulesUrl = `${absoluteNodeModulesLocation}${packagePathPieces.join('/').replace(packageName, '')}`;
-    } else {
-      const isAbsoluteNodeModulesFile = fs.existsSync(path.join(projectDirectory, pathname));
-      
-      absoluteNodeModulesUrl = isAbsoluteNodeModulesFile
-        ? new URL(`.${pathname}`, userWorkspace)
-        : this.resolveRelativeUrl(projectDirectory, barePath)
-          ? new URL(this.resolveRelativeUrl(projectDirectory, pathname), userWorkspace)
-          : pathname;
-    }
-
-    return new Request(`file://${absoluteNodeModulesUrl}`);
+    return new Request(`file://${absoluteNodeModulesPathname}`);
   }
 
   async shouldServe(url) {
-    return url.protocol === 'file:' && url.pathname.startsWith('/node_modules/');
+    return this.hasExtension(url) && url.pathname.startsWith('/node_modules/');
   }
 
   async serve(url) {
