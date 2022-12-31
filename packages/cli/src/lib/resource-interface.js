@@ -1,4 +1,4 @@
-// import fs from 'fs';
+import fs from 'fs';
 
 class ResourceInterface {
   constructor(compilation, options = {}) {
@@ -8,41 +8,36 @@ class ResourceInterface {
     this.contentType = ''; // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
   }
 
-  // get rid of things like query string parameters
-  // that will break when trying to use with fs
-  // TODO URLs will not contain query strings by default, right?
-  // getBareUrlPath(url) {
-  //   console.debug('getBareUrlPath', { url });
-  //   return url.replace(/\?(.*)/, '');
-  // }
+  hasExtension(url) {
+    const extension = url.pathname.split('.').pop();
+
+    return extension !== '' && !extension.startsWith('/');
+  }
 
   // turn relative paths into relatively absolute based on a known root directory
-  // e.g. "../styles/theme.css" -> `${userWorkspace}/styles/theme.css`
-  // resolveRelativeUrl(root, pathname) {
-  //   // console.debug('getBareUrlPath', { root, pathname });
-  //   if (fs.existsSync(new URL(pathname, root).pathname)) {
-  //     return url;
-  //   }
+  // * deep link route - /blog/releases/some-post
+  // * and a nested path in the template - ../../styles/theme.css
+  // so will get resolved as `${rootUrl}/styles/theme.css`
+  resolveForRelativeUrl(url, rootUrl) {
+    let reducedUrl;
 
-  //   let reducedPathname;
+    if (fs.existsSync(new URL(`.${url.pathname}`, rootUrl).pathname)) {
+      return new URL(`.${url.pathname}`, rootUrl);
+    }
 
-  //   pathname.split('/')
-  //     .filter((segment) => segment !== '')
-  //     .reduce((acc, segment) => {
-  //       // console.debug({ acc, segment });
-  //       const reducedPath = pathname.replace(`${acc}/${segment}`, '');
+    url.pathname.split('/')
+      .filter((segment) => segment !== '')
+      .reduce((acc, segment) => {
+        const reducedPath = url.pathname.replace(`${acc}/${segment}`, '');
 
-  //       // console.debug({ reducedPath });
-  //       // console.debug(new URL(`.${reducedPath}`, root).pathname);
-  //       if (reducedPath.split('.').pop() !== '' && fs.existsSync(new URL(`.${reducedPath}`, root).pathname)) {
-  //         reducedPathname = reducedPath;
-  //       }
-  //       return `${acc}/${segment}`;
-  //     }, '');
+        if (reducedPath !== '' && fs.existsSync(new URL(`.${reducedPath}`, rootUrl).pathname)) {
+          reducedUrl = new URL(`.${reducedPath}`, rootUrl);
+        }
+        return `${acc}/${segment}`;
+      }, '');
 
-  //   // console.debug({ reducedPathname });
-  //   return reducedPathname;
-  // }
+    return reducedUrl;
+  }
 
   // test if this plugin should change a relative URL from the browser to an absolute path on disk 
   // like for node_modules/ resolution. not commonly needed by most resource plugins

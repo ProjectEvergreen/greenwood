@@ -34,6 +34,7 @@ async function getDevServer(compilation) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`http://localhost:${compilation.config.port}${ctx.url}`);
+
       let request = new Request(url, {
         method: ctx.request.method,
         headers: ctx.request.header
@@ -105,6 +106,8 @@ async function getDevServer(compilation) {
         }
       }
 
+      // TODO would be nice if Koa (or other framework) could just a Response object directly
+      // not sure why we have to use `Readable.from`, does this couple us to NodeJS?
       ctx.body = response.body ? Readable.from(response.body) : '';
       ctx.set('Content-Type', response.headers.get('content-type'));
     } catch (e) {
