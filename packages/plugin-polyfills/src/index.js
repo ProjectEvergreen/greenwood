@@ -14,55 +14,57 @@ class PolyfillsResource extends ResourceInterface {
     };
   }
 
-  async shouldIntercept(url, body, headers = { request: {} }) {
-    return Promise.resolve(headers.request['content-type'] && headers.request['content-type'].indexOf('text/html') >= 0);
+  async shouldIntercept(url) {
+    const { protocol, pathname } = url;
+    const { wc, lit, dsd } = this.options;
+    const hasMatchingPageRoute = this.compilation.graph.find(node => node.route === pathname);
+    const isEnabled = wc || lit || dsd;
+
+    return isEnabled && protocol.startsWith('http') && hasMatchingPageRoute;
   }
 
-  async intercept(url, body) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let newHtml = body;
+  async intercept(url, request, response) {
+    const { wc, lit, dsd } = this.options;
+    let body = await response.text();
 
-        // standard WC polyfill
-        if (this.options.wc) {
-          newHtml = newHtml.replace('<head>', `
-            <head>
-              <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-          `);
-        }
+    // standard WC polyfill
+    if (wc) {
+      body = body.replace('<head>', `
+        <head>
+          <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+      `);
+    }
 
-        // append Lit polyfill next to make sure it comes before WC polyfill
-        if (this.options.lit) {
-          newHtml = newHtml.replace('<head>', `
-            <head>
-              <script src="/node_modules/lit/polyfill-support.js"></script>
-          `);
-        }
+    // append Lit polyfill next to make sure it comes before WC polyfill
+    if (lit) {
+      body = body.replace('<head>', `
+        <head>
+          <script src="/node_modules/lit/polyfill-support.js"></script>
+      `);
+    }
 
-        // lastly, Declarative Shadow DOM polyfill
-        if (this.options.dsd) {
-          newHtml = newHtml.replace('</body>', `
-              <script>
-                if (!HTMLTemplateElement.prototype.hasOwnProperty('shadowRoot')) {
-                  (function attachShadowRoots(root) {
-                    root.querySelectorAll("template[shadowroot]").forEach(template => {
-                      const mode = template.getAttribute("shadowroot");
-                      const shadowRoot = template.parentNode.attachShadow({ mode });
-                      shadowRoot.appendChild(template.content);
-                      template.remove();
-                      attachShadowRoots(shadowRoot);
-                    });
-                  })(document);
-                }
-              </script>
-            </body>
-          `);
-        }
+    // lastly, Declarative Shadow DOM polyfill
+    if (dsd) {
+      body = body.replace('</body>', `
+          <script>
+            if (!HTMLTemplateElement.prototype.hasOwnProperty('shadowRoot')) {
+              (function attachShadowRoots(root) {
+                root.querySelectorAll("template[shadowroot]").forEach(template => {
+                  const mode = template.getAttribute("shadowroot");
+                  const shadowRoot = template.parentNode.attachShadow({ mode });
+                  shadowRoot.appendChild(template.content);
+                  template.remove();
+                  attachShadowRoots(shadowRoot);
+                });
+              })(document);
+            }
+          </script>
+        </body>
+      `);
+    }
 
-        resolve({ body: newHtml });
-      } catch (e) {
-        reject(e);
-      }
+    return new Response(body, {
+      headers: response.headers
     });
   }
 }

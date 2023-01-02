@@ -1,4 +1,3 @@
-import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class PuppeteerResource extends ResourceInterface {
@@ -9,19 +8,24 @@ class PuppeteerResource extends ResourceInterface {
     this.contentType = 'text/html';
   }
 
-  async shouldIntercept(url, body, headers = {}) {
-    const shouldIntercept = url.endsWith(path.sep) && headers.request && headers.request.accept.indexOf(this.contentType) >= 0;
-  
-    return process.env.__GWD_COMMAND__ === 'build' && shouldIntercept;// eslint-disable-line no-underscore-dangle
+  async shouldIntercept(url) {
+    const { protocol, pathname } = url;
+    const hasMatchingPageRoute = this.compilation.graph.find(node => node.route === pathname);
+    
+    return process.env.__GWD_COMMAND__ === 'build' && protocol.startsWith('http') && hasMatchingPageRoute; // eslint-disable-line no-underscore-dangle
   }
 
-  async intercept(url, body) {
+  async intercept(url, request, response) {
+    let body = await response.text();
+
     body = body.replace('<head>', `
       <head>
         <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     `);
 
-    return Promise.resolve({ body });
+    return new Response(body, {
+      headers: response.headers
+    });
   }
 }
 
