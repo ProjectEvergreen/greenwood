@@ -6,6 +6,7 @@ class PolyfillsResource extends ResourceInterface {
   constructor(compilation, options = {}) {
     super(compilation, options);
 
+    this.contentType = 'text/html';
     this.options = {
       wc: true,
       dsd: false,
@@ -14,13 +15,14 @@ class PolyfillsResource extends ResourceInterface {
     };
   }
 
-  async shouldIntercept(url) {
-    const { protocol, pathname } = url;
+  async shouldIntercept(url, request, response) {
+    const { protocol } = url;
     const { wc, lit, dsd } = this.options;
-    const hasMatchingPageRoute = this.compilation.graph.find(node => node.route === pathname);
     const isEnabled = wc || lit || dsd;
 
-    return isEnabled && protocol.startsWith('http') && hasMatchingPageRoute;
+    return isEnabled
+      && protocol.startsWith('http')
+      && response.headers.get('content-type').indexOf(this.contentType) >= 0;
   }
 
   async intercept(url, request, response) {
@@ -78,20 +80,21 @@ const greenwoodPluginPolyfills = (options = {}) => {
     type: 'copy',
     name: 'plugin-copy-polyfills',
     provider: async (compilation) => {
+      // TODO convert this and node utils to use URL
       const { outputDir } = compilation.context;
       const polyfillPackageName = '@webcomponents/webcomponentsjs';
       const polyfillNodeModulesLocation = await getNodeModulesLocationForPackage(polyfillPackageName);
       const litNodeModulesLocation = await getNodeModulesLocationForPackage('lit');
       const standardPolyfills = [{
         from: path.join(polyfillNodeModulesLocation, 'webcomponents-loader.js'),
-        to: path.join(outputDir, 'webcomponents-loader.js')
+        to: path.join(outputDir.pathname, 'webcomponents-loader.js')
       }, {
         from: path.join(polyfillNodeModulesLocation, 'bundles'),
-        to: path.join(outputDir, 'bundles')
+        to: path.join(outputDir.pathname, 'bundles')
       }];
       const litPolyfills = [{
         from: path.join(litNodeModulesLocation, 'polyfill-support.js'),
-        to: path.join(outputDir, 'polyfill-support.js')
+        to: path.join(outputDir.pathname, 'polyfill-support.js')
       }];
 
       return [

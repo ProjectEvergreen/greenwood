@@ -35,7 +35,7 @@ class StaticRouterResource extends ResourceInterface {
     return process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
       && this.compilation.config.staticRouter
       && !pathname.startsWith('/404')
-      && pathname.split('.').pop() === 'html' || (contentType && contentType.indexOf('text/html') >= 0);
+      && pathname.split('.').pop() === 'html' || (contentType && contentType.indexOf(this.contentType) >= 0);
   }
 
   async intercept(url, request, response) {

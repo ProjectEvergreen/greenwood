@@ -8,11 +8,12 @@ class PuppeteerResource extends ResourceInterface {
     this.contentType = 'text/html';
   }
 
-  async shouldIntercept(url) {
-    const { protocol, pathname } = url;
-    const hasMatchingPageRoute = this.compilation.graph.find(node => node.route === pathname);
-    
-    return process.env.__GWD_COMMAND__ === 'build' && protocol.startsWith('http') && hasMatchingPageRoute; // eslint-disable-line no-underscore-dangle
+  async shouldIntercept(url, request, response) {
+    const { protocol } = url;
+
+    return process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
+      && protocol.startsWith('http')
+      && response.headers.get('content-type').indexOf(this.contentType) >= 0;
   }
 
   async intercept(url, request, response) {

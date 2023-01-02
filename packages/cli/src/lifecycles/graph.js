@@ -6,6 +6,8 @@ import path from 'path';
 import toc from 'markdown-toc';
 import { Worker } from 'worker_threads';
 
+// TODO convert graph to use URLs
+// https://github.com/ProjectEvergreen/greenwood/issues/952
 const generateGraph = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
@@ -35,7 +37,7 @@ const generateGraph = async (compilation) => {
             const extension = path.extname(filename);
             const isStatic = extension === '.md' || extension === '.html';
             const isDynamic = extension === '.js';
-            const relativePagePath = fullPath.substring(pagesDir.length - 1, fullPath.length);
+            const relativePagePath = fullPath.substring(pagesDir.pathname.length - 1, fullPath.length);
             const relativeWorkspacePath = directory.replace(process.cwd(), '').replace(path.sep, '');
             let route = relativePagePath
               .replace(extension, '')

@@ -2,16 +2,15 @@ import fs from 'fs';
 import htmlparser from 'node-html-parser';
 import { modelResource } from '../lib/resource-utils.js';
 import os from 'os';
-import path from 'path';
 import { WorkerPool } from '../lib/threadpool.js';
 
 function isLocalLink(url = '') {
   return url !== '' && (url.indexOf('http') !== 0 && url.indexOf('//') !== 0);
 }
 
-function createOutputDirectory(route, outputPathDir) {
-  if (route !== '/404/' && !fs.existsSync(outputPathDir)) {
-    fs.mkdirSync(outputPathDir, {
+function createOutputDirectory(route, { pathname }) {
+  if (route !== '/404/' && !fs.existsSync(pathname)) {
+    fs.mkdirSync(pathname, {
       recursive: true
     });
   }
@@ -72,66 +71,73 @@ function trackResourcesForRoute(html, compilation, route) {
   return resources;
 }
 
-async function interceptPage(compilation, contents, route) {
-  const headers = {
-    request: { 'accept': 'text/html', 'content-type': 'text/html' },
-    response: { 'content-type': 'text/html' }
-  };
-  const interceptResources = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'resource' && plugin.name !== 'plugin-node-modules:resource';
-  }).map((plugin) => {
-    return plugin.provider(compilation);
-  }).filter((provider) => {
-    return provider.shouldIntercept && provider.intercept;
-  });
+async function servePage(url, request, plugins) {
+  let response = new Response('');
 
-  const htmlIntercepted = await interceptResources.reduce(async (htmlPromise, resource) => {
-    const html = (await htmlPromise).body;
-    const shouldIntercept = await resource.shouldIntercept(route, html, headers);
+  for (const plugin of plugins) {
+    if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
+      response = await plugin.serve(url, request);
+    }
+  }
 
-    return shouldIntercept
-      ? resource.intercept(route, html, headers)
-      : htmlPromise;
-  }, Promise.resolve({ body: contents }));
+  return response;
+}
 
-  return htmlIntercepted;
+async function interceptPage(url, request, plugins, body) {
+  const headers = new Headers();
+  headers.append('content-type', 'text/html');
+
+  let response = new Response(body, { headers });
+
+  for (const plugin of plugins) {
+    if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
+      response = await plugin.intercept(url, request, response);
+    }
+  }
+
+  return response;
+}
+
+function getPluginInstances (compilation) {
+  return [...compilation.config.plugins]
+    .map((plugin) => {
+      return plugin.provider(compilation);
+    });
 }
 
 async function preRenderCompilationWorker(compilation, workerPrerender) {
   const pages = compilation.graph.filter(page => !page.isSSR || (page.isSSR && page.data.static) || (page.isSSR && compilation.config.prerender));
   const { scratchDir } = compilation.context;
+  const plugins = getPluginInstances(compilation);
 
   console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
 
   const pool = new WorkerPool(os.cpus().length, workerPrerender.workerUrl);
 
   for (const page of pages) {
-    const { outputPath, route } = page;
-    const outputPathDir = path.join(scratchDir, route);
-    const htmlResource = compilation.config.plugins.filter((plugin) => {
-      return plugin.name === 'plugin-standard-html';
-    }).map((plugin) => {
-      return plugin.provider(compilation);
-    })[0];
-    let html;
+    const { route, outputPath } = page;
+    const outputDirUrl = new URL(`./${route}`, scratchDir);
+    const outputPathUrl = new URL(`./${outputPath}`, scratchDir);
+    const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+    const request = new Request(url);
 
-    html = (await htmlResource.serve(route)).body;
-    html = (await interceptPage(compilation, html, route)).body;
+    let body = await (await servePage(url, request, plugins)).text();
+    body = await (await interceptPage(url, request, plugins, html)).text();
 
-    createOutputDirectory(route, outputPathDir);
+    createOutputDirectory(route, outputDirUrl);
 
-    const resources = trackResourcesForRoute(html, compilation, route);
+    const resources = trackResourcesForRoute(body, compilation, route);
     const scripts = resources
       .filter(resource => resource.type === 'script')
       .map(resource => resource.sourcePathURL.href);
 
-    html = await new Promise((resolve, reject) => {
+    body = await new Promise((resolve, reject) => {
       pool.runTask({
         modulePath: null,
         compilation: JSON.stringify(compilation),
         route,
         prerender: true,
-        htmlContents: html,
+        htmlContents: body,
         scripts: JSON.stringify(scripts)
       }, (err, result) => {
         if (err) {
@@ -142,7 +148,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       });
     });
 
-    await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
+    await fs.promises.writeFile(outputPathUrl, body);
 
     console.info('generated page...', route);
   }
@@ -151,28 +157,32 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
 async function preRenderCompilationCustom(compilation, customPrerender) {
   const { scratchDir } = compilation.context;
   const renderer = (await import(customPrerender.customUrl)).default;
+  const plugins = getPluginInstances(compilation);
 
   console.info('pages to generate', `\n ${compilation.graph.map(page => page.route).join('\n ')}`);
 
-  await renderer(compilation, async (page, contents) => {
-    const { outputPath, route } = page;
-    const outputPathDir = path.join(scratchDir, route);
+  await renderer(compilation, async (page, body) => {
+    const { route, outputPath } = page;
+    const outputDirUrl = new URL(`./${route}`, scratchDir);
+    const outputPathUrl = new URL(`./${outputPath}`, scratchDir);
+    const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+    const request = new Request(url);
 
     // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
-    contents = contents.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
-    contents = contents.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
-    contents = contents.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
-    contents = contents.replace(/type="module-shim"/g, 'type="module"');
+    body = body.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
+    body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
+    body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
+    body = body.replace(/type="module-shim"/g, 'type="module"');
 
-    contents = (await interceptPage(compilation, contents, route)).body;
+    body = await (await interceptPage(url, request, plugins, body)).text();
 
     // clean this up here to avoid sending webcomponents-bundle to rollup
-    contents = contents.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
+    body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
 
-    trackResourcesForRoute(contents, compilation, route);
-    createOutputDirectory(route, outputPathDir);
+    trackResourcesForRoute(body, compilation, route);
+    createOutputDirectory(route, outputDirUrl);
 
-    await fs.promises.writeFile(path.join(scratchDir, outputPath), contents);
+    await fs.promises.writeFile(outputPathUrl, body);
 
     console.info('generated page...', route);
   });
@@ -181,24 +191,24 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
 async function staticRenderCompilation(compilation) {
   const { scratchDir } = compilation.context;
   const pages = compilation.graph.filter(page => !page.isSSR || page.isSSR && page.data.static);
-  const htmlResource = compilation.config.plugins.filter((plugin) => {
-    return plugin.name === 'plugin-standard-html';
-  }).map((plugin) => {
-    return plugin.provider(compilation);
-  })[0];
+  const plugins = getPluginInstances(compilation);
 
   console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
   
   await Promise.all(pages.map(async (page) => {
     const { route, outputPath } = page;
-    const outputPathDir = path.join(scratchDir, route);
-    let html = (await htmlResource.serve(route)).body;
-    html = (await interceptPage(compilation, html, route)).body;
+    const outputDirUrl = new URL(`./${route}`, scratchDir);
+    const outputPathUrl = new URL(`./${outputPath}`, scratchDir);
+    const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+    const request = new Request(url);
 
-    trackResourcesForRoute(html, compilation, route);
-    createOutputDirectory(route, outputPathDir);
+    let body = await (await servePage(url, request, plugins)).text();
+    body = await (await interceptPage(url, request, plugins, html)).text();
 
-    await fs.promises.writeFile(path.join(scratchDir, outputPath), html);
+    trackResourcesForRoute(body, compilation, route);
+    createOutputDirectory(route, outputDirUrl);
+
+    await fs.promises.writeFile(outputPathUrl, body);
 
     console.info('generated page...', route);
 

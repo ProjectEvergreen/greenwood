@@ -194,7 +194,7 @@ const readAndMergeConfig = async() => {
         }
 
         // SPA should _not_ prerender unless if user has specified prerender should be true
-        if (prerender === undefined && fs.existsSync(path.join(customConfig.workspace, 'index.html'))) {
+        if (prerender === undefined && fs.existsSync(new URL('./index.html', customConfig.workspace))) {
           customConfig.prerender = false;
         }
 

@@ -16,10 +16,6 @@ class ImportJsonResource extends ResourceInterface {
 
   // TODO handle it from node_modules too, when without `?type=json`
   async shouldIntercept(url) {
-    // const { originalUrl } = headers.request;
-    // const type = this.extensions[0].replace('.', '');
-
-    // return Promise.resolve(originalUrl && originalUrl.indexOf(`?type=${type}`) >= 0);
     return url.searchParams.has('type') && url.searchParams.get('type') === this.extensions[0];
   }
 
@@ -35,26 +31,6 @@ class ImportJsonResource extends ResourceInterface {
         'content-type': this.contentType
       }
     });
-    // resolve({
-    //   body: `export default ${JSON.stringify(raw)}`,
-    //   contentType: this.contentType
-    // });
-    // return new Promise(async (resolve, reject) => {
-    //   try {
-    //     // TODO better way to handle this?
-    //     // https://github.com/ProjectEvergreen/greenwood/issues/948
-    //     const raw = body === ''
-    //       ? await fs.promises.readFile(url, 'utf-8')
-    //       : body;
-
-    //     resolve({
-    //       body: `export default ${JSON.stringify(raw)}`,
-    //       contentType: this.contentType
-    //     });
-    //   } catch (e) {
-    //     reject(e);
-    //   }
-    // });
   }
 }
 
