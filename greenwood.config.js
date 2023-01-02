@@ -19,6 +19,8 @@ export default {
     greenwoodPluginPostCss(),
     greenwoodPluginImportJson(),
     greenwoodPluginImportCss(),
+    greenwoodPluginIncludeHTML(),
+    greenwoodPluginRendererPuppeteer(),
     {
       type: 'rollup',
       name: 'rollup-plugin-analyzer',
@@ -32,9 +34,7 @@ export default {
           })
         ];
       }
-    },
-    greenwoodPluginIncludeHTML(),
-    greenwoodPluginRendererPuppeteer()
+    }
   ],
   markdown: {
     plugins: [
