@@ -1,8 +1,7 @@
 import fs from 'fs';
 import { hashString } from '../lib/hashing-utils.js';
-import path from 'path';
-import { pathToFileURL } from 'url';
 
+// TODO could make async?
 function modelResource(context, type, src = undefined, contents = undefined, optimizationAttr = undefined, rawAttributes = undefined) {
   const { projectDirectory, scratchDir, userWorkspace } = context;
   const extension = type === 'script' ? 'js' : 'css';
@@ -10,15 +9,15 @@ function modelResource(context, type, src = undefined, contents = undefined, opt
   let sourcePathURL;
 
   if (src) {
-    sourcePathURL = src.indexOf('/node_modules') === 0
-      ? pathToFileURL(path.join(projectDirectory, src)) // TODO (good first issue) get "real" location of node modules
-      : pathToFileURL(path.join(userWorkspace, src.replace(/\.\.\//g, '').replace('./', '')));
+    sourcePathURL = src.startsWith('/node_modules')
+      ? new URL(`./${src}`, projectDirectory) // pathToFileURL(path.join(projectDirectory, src)) // TODO (good first issue) get "real" location of node modules
+      : new URL(`./${src.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace); // pathToFileURL(path.join(userWorkspace, src.replace(/\.\.\//g, '').replace('./', '')));
 
     contents = fs.readFileSync(sourcePathURL, 'utf-8');
   } else {
     const scratchFileName = hashString(contents);
 
-    sourcePathURL = pathToFileURL(path.join(scratchDir, `${scratchFileName}.${extension}`));
+    sourcePathURL = new URL(`./${scratchFileName}.${extension}`, scratchDir);
     fs.writeFileSync(sourcePathURL, contents);
   }
 

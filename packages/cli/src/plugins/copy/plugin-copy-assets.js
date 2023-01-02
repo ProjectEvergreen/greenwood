@@ -1,18 +1,17 @@
 import fs from 'fs';
-import path from 'path';
 
 const greenwoodPluginCopyAssets = [{
   type: 'copy',
   name: 'plugin-copy-assets',
   provider: (compilation) => {
-    const { context } = compilation;
-    const fromAssetsDir = path.join(context.userWorkspace, 'assets');
+    const { outputDir, userWorkspace } = compilation.context;
+    const fromAssetsDirUrl = new URL('./assets/', userWorkspace);
     const assets = [];
 
-    if (fs.existsSync(fromAssetsDir)) {
+    if (fs.existsSync(fromAssetsDirUrl.pathname)) {
       assets.push({
-        from: fromAssetsDir,
-        to: path.join(context.outputDir, 'assets')
+        from: fromAssetsDirUrl,
+        to: new URL('./assets/', outputDir)
       });
     }
 
