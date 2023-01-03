@@ -14,7 +14,7 @@ async function cleanUpResources(compilation) {
     const optAttr = ['inline', 'static'].indexOf(optimizationAttr) >= 0;
 
     if (optimizedFileName && (!src || (optAttr || optConfig))) {
-      fs.unlinkSync(path.join(outputDir, optimizedFileName));
+      fs.unlinkSync(new URL(`./${optimizedFileName}`, outputDir).pathname);
     }
   }
 }
@@ -67,6 +67,7 @@ async function bundleStyleResources(compilation, plugins) {
       let optimizedFileContents;
 
       if (src) {
+        // TODO remove path. usage
         const basename = path.basename(srcPath);
         const basenamePieces = path.basename(srcPath).split('.');
         const fileNamePieces = srcPath.split('/').filter(piece => piece !== ''); // normalize by removing any leading /'s  
