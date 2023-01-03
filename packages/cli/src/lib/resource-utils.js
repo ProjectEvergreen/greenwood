@@ -10,8 +10,8 @@ function modelResource(context, type, src = undefined, contents = undefined, opt
 
   if (src) {
     sourcePathURL = src.startsWith('/node_modules')
-      ? new URL(`./${src}`, projectDirectory) // pathToFileURL(path.join(projectDirectory, src)) // TODO (good first issue) get "real" location of node modules
-      : new URL(`./${src.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace); // pathToFileURL(path.join(userWorkspace, src.replace(/\.\.\//g, '').replace('./', '')));
+      ? new URL(`.${src}`, projectDirectory)
+      : new URL(`${src.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace);
 
     contents = fs.readFileSync(sourcePathURL, 'utf-8');
   } else {

@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 
 function greenwoodResourceLoader (compilation) {
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
@@ -13,40 +12,33 @@ function greenwoodResourceLoader (compilation) {
     resolveId(id) {
       const { userWorkspace } = compilation.context;
 
-      if ((id.indexOf('./') === 0 || id.indexOf('/') === 0) && fs.existsSync(path.join(userWorkspace, id))) {
-        return path.join(userWorkspace, id.replace(/\?type=(.*)/, ''));
+      if ((id.indexOf('./') === 0 || id.indexOf('/') === 0) && fs.existsSync(new URL(`./${id}`, userWorkspace).pathname)) {
+        return new URL(`./${id.replace(/\?type=(.*)/, '')}`, userWorkspace);
       }
 
       return null;
     },
     async load(id) {
-      const importAsIdAsUrl = id.replace(/\?type=(.*)/, '');
-      const extension = path.extname(importAsIdAsUrl);
+      const url = new URL(`file://${id}`);
+      const extension = url.pathname.split('.').pop();
 
-      if (extension !== '.js') {
-        const originalUrl = `${id}?type=${extension.replace('.', '')}`;
-        let contents;
+      if (extension !== 'js') {
+        const request = new Request(url.href);
+        let response = new Response('');
 
         for (const plugin of resourcePlugins) {
-          const headers = {
-            request: {
-              originalUrl
-            },
-            response: {
-              'content-type': plugin.contentType
-            }
-          };
-
-          contents = await plugin.shouldServe(importAsIdAsUrl)
-            ? (await plugin.serve(importAsIdAsUrl)).body
-            : contents;
-
-          if (await plugin.shouldIntercept(importAsIdAsUrl, contents, headers)) {
-            contents = (await plugin.intercept(importAsIdAsUrl, contents, headers)).body;
+          if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
+            response = await plugin.serve(url, request);
           }
         }
 
-        return contents;
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
+            response = await plugin.intercept(url, request, response);
+          }
+        }
+
+        return await response.text();
       }
     }
   };
@@ -90,7 +82,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
             const { fileName } = bundles[bundle];
             const { rawAttributes, contents } = resource;
             const noop = rawAttributes && rawAttributes.indexOf('data-gwd-opt="none"') >= 0 || compilation.config.optimization === 'none';
-            const outputPath = path.join(outputDir, fileName);
+            const outputPath = new URL(`./${fileName}`, outputDir);
 
             compilation.resources.set(resourceKey, {
               ...compilation.resources.get(resourceKey),
@@ -100,7 +92,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
             });
 
             if (noop) {
-              fs.writeFileSync(outputPath, contents);
+              fs.writeFileSync(outputPath.pathname, contents);
             }
           }
         }
@@ -124,7 +116,7 @@ const getRollupConfig = async (compilation) => {
     preserveEntrySignatures: 'strict', // https://github.com/ProjectEvergreen/greenwood/pull/990
     input,
     output: { 
-      dir: outputDir,
+      dir: outputDir.pathname,
       entryFileNames: '[name].[hash].js',
       chunkFileNames: '[name].[hash].js',
       sourcemap: true

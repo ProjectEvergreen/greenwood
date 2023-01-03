@@ -6,7 +6,6 @@
  */
 import fs from 'fs';
 import { parse, walk } from 'css-tree';
-import path from 'path';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 function bundleCss(body, url, projectDirectory) {
@@ -25,10 +24,10 @@ function bundleCss(body, url, projectDirectory) {
         const { value } = node;
 
         if (value.indexOf('.') === 0 || value.indexOf('/node_modules') === 0) {
-          const location = value.indexOf('/node_modules') === 0
-            ? path.join(projectDirectory, value)
-            : path.resolve(path.dirname(url), value);
-          const importContents = fs.readFileSync(location, 'utf-8');
+          const resolvedUrl = value.startsWith('/node_modules')
+            ? new URL(`.${value}`, projectDirectory)
+            : new URL(value, url);
+          const importContents = fs.readFileSync(resolvedUrl.pathname, 'utf-8');
 
           optimizedCss += bundleCss(importContents, url, projectDirectory);
         } else {
@@ -219,24 +218,26 @@ class StandardCssResource extends ResourceInterface {
 
     return new Response(body, {
       headers: {
-        'Content-Type': this.contentType
+        'content-type': this.contentType
       }
     });
   }
 
-  async shouldOptimize(url) {
-    const isValidCss = path.extname(url) === this.extensions[0] && this.compilation.config.optimization !== 'none';
+  async shouldOptimize(url, response) {
+    const { protocol, pathname } = url;
+    const isValidCss = pathname.split('.').pop() === this.extensions[0]
+      && protocol === 'file:'
+      && response.headers.get('content-type').indexOf(this.contentType) >= 0;
 
-    return Promise.resolve(isValidCss);
+    return this.compilation.config.optimization !== 'none' && isValidCss;
   }
 
-  async optimize(url, body) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        resolve(bundleCss(body, url, this.compilation.context.projectDirectory));
-      } catch (e) {
-        reject(e);
-      }
+  async optimize(url, response) {
+    const body = await response.text();
+    const optimizedBody = bundleCss(body, url, this.compilation.context.projectDirectory);
+
+    return new Response(optimizedBody, {
+      headers: response.headers
     });
   }
 }

@@ -1,7 +1,6 @@
 import fs from 'fs';
 import { graphqlServer } from './core/server.js';
 import { mergeImportMap } from '@greenwood/cli/src/lib/walker-package-ranger.js';
-import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 import { ServerInterface } from '@greenwood/cli/src/lib/server-interface.js';
 import rollupPluginAlias from '@rollup/plugin-alias';
@@ -36,7 +35,7 @@ class GraphQLResource extends ResourceInterface {
     // TODO avoid having to rebuild response each time?
     return new Response(body, {
       headers: {
-        'Content-Type': this.contentType[0]
+        'content-type': this.contentType[0]
       }
     });
   }
@@ -55,24 +54,23 @@ class GraphQLResource extends ResourceInterface {
     });
   }
 
-  async shouldOptimize(url = '', body, headers = {}) {
-    return Promise.resolve(path.extname(url) === '.html' || (headers.request && headers.request['content-type'].indexOf('text/html') >= 0));
+  async shouldOptimize(url, response) {
+    return response.headers.get('content-type').indexOf(this.contentType[1]) >= 0;
   }
 
-  async optimize(url, body) {
-    return new Promise((resolve, reject) => {
-      try {
-        body = body.replace('<head>', `
-          <script data-state="apollo" data-gwd-opt="none">
-            window.__APOLLO_STATE__ = true;
-          </script>
-          <head>
-        `);
-    
-        resolve(body);
-      } catch (e) {
-        reject(e);
-      }
+  async optimize(url, response) {
+    let body = await response.text();
+
+    body = body.replace('<head>', `
+      <script data-state="apollo" data-gwd-opt="none">
+        window.__APOLLO_STATE__ = true;
+      </script>
+      <head>
+    `);
+
+    // TODO avoid having to rebuild response each time?
+    return new Response(body, {
+      headers: response.headers
     });
   }
 }
