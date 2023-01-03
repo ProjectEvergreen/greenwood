@@ -14,11 +14,11 @@ async function rreaddir (dir, allFiles = []) {
 }
 
 // https://stackoverflow.com/a/30405105/417806
-async function copyFile(source, target) {
+async function copyFile(source, target, projectDirectory) {
   try {
-    console.info(`copying file... ${source.replace(`${process.cwd()}/`, '')}`);
-    const rd = fs.createReadStream(source);
-    const wr = fs.createWriteStream(target);
+    console.info(`copying file... ${source.pathname.replace(projectDirectory.pathname, '')}`);
+    const rd = fs.createReadStream(source.pathname);
+    const wr = fs.createWriteStream(target.pathname);
 
     return await new Promise((resolve, reject) => {
       rd.on('error', reject);
@@ -33,67 +33,55 @@ async function copyFile(source, target) {
   }
 }
 
-async function copyDirectory(from, to) {
-  return new Promise(async(resolve, reject) => {
-    try {
-      console.info(`copying directory... ${from.replace(`${process.cwd()}/`, '')}`);
-      const files = await rreaddir(from);
+async function copyDirectory(fromUrl, toUrl, projectDirectory) {
+  try {
+    console.info(`copying directory... ${fromUrl.pathname.replace(projectDirectory.pathname, '')}`);
+    const files = await rreaddir(fromUrl.pathname);
 
-      if (files.length > 0) {
-        if (!fs.existsSync(to)) {
-          fs.mkdirSync(to, {
-            recursive: true
-          });
-        }
-        await Promise.all(files.filter((asset) => {
-          const target = asset.replace(from, to);
-          const isDirectory = path.extname(target) === '';
-
-          if (isDirectory && !fs.existsSync(target)) {
-            fs.mkdirSync(target);
-          } else if (!isDirectory) {
-            return asset;
-          }
-        }).map((asset) => {
-          const target = asset.replace(from, to);
-
-          return copyFile(asset, target);
-        }));
+    if (files.length > 0) {
+      if (!fs.existsSync(toUrl.pathname)) {
+        fs.mkdirSync(toUrl.pathname, {
+          recursive: true
+        });
       }
-      resolve();
-    } catch (e) {
-      reject(e);
+      await Promise.all(files.filter((filePath) => {
+        const target = filePath.replace(fromUrl.pathname, toUrl.pathname);
+        const isDirectory = fs.lstatSync(filePath).isDirectory();
+
+        if (isDirectory && !fs.existsSync(target)) {
+          fs.mkdirSync(target);
+        } else if (!isDirectory) {
+          return filePath;
+        }
+      }).map((filePath) => {
+        const sourceUrl = new URL(`file://${filePath}`);
+        const targetUrl = new URL(`file://${filePath.replace(fromUrl.pathname, toUrl.pathname)}`);
+
+        return copyFile(sourceUrl, targetUrl, projectDirectory);
+      }));
     }
-  });
+  } catch (e) {
+    console.error('ERROR', e);
+  }
 }
 
-const copyAssets = (compilation) => {
+const copyAssets = async (compilation) => {
+  const copyPlugins = compilation.config.plugins.filter(plugin => plugin.type === 'copy');
+  const { projectDirectory } = compilation.context;
 
-  return new Promise(async (resolve, reject) => {
-    try {
-      const copyPlugins = compilation.config.plugins.filter(plugin => plugin.type === 'copy');
+  for (const plugin of copyPlugins) {
+    const locations = await plugin.provider(compilation);
 
-      for (const plugin of copyPlugins) {
-        const locations = await plugin.provider(compilation);
+    for (const location of locations) {
+      const { from, to } = location;
 
-        for (const location of locations) {
-          const { from, to } = location;
-
-          if (path.extname(from) === '') {
-            // copy directory
-            await copyDirectory(from, to);
-          } else {
-            // copy file
-            await copyFile(from, to);
-          }
-        }
+      if (from.pathname.endsWith('/')) {
+        await copyDirectory(from, to, projectDirectory);
+      } else {
+        await copyFile(from, to, projectDirectory);
       }
-
-      resolve();
-    } catch (err) {
-      reject(err);
     }
-  });
+  }
 };
 
 export { copyAssets };

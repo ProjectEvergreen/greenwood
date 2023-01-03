@@ -1,5 +1,4 @@
 import { getNodeModulesLocationForPackage } from '@greenwood/cli/src/lib/node-modules-utils.js';
-import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class PolyfillsResource extends ResourceInterface {
@@ -80,21 +79,21 @@ const greenwoodPluginPolyfills = (options = {}) => {
     type: 'copy',
     name: 'plugin-copy-polyfills',
     provider: async (compilation) => {
-      // TODO convert this and node utils to use URL
       const { outputDir } = compilation.context;
       const polyfillPackageName = '@webcomponents/webcomponentsjs';
       const polyfillNodeModulesLocation = await getNodeModulesLocationForPackage(polyfillPackageName);
       const litNodeModulesLocation = await getNodeModulesLocationForPackage('lit');
+
       const standardPolyfills = [{
-        from: path.join(polyfillNodeModulesLocation, 'webcomponents-loader.js'),
-        to: path.join(outputDir.pathname, 'webcomponents-loader.js')
+        from: new URL('./webcomponents-loader.js', new URL(`file://${polyfillNodeModulesLocation}/`)),
+        to: new URL('./webcomponents-loader.js', outputDir)
       }, {
-        from: path.join(polyfillNodeModulesLocation, 'bundles'),
-        to: path.join(outputDir.pathname, 'bundles')
+        from: new URL('./bundles/', new URL(`file://${polyfillNodeModulesLocation}/`)),
+        to: new URL('./bundles/', outputDir)
       }];
       const litPolyfills = [{
-        from: path.join(litNodeModulesLocation, 'polyfill-support.js'),
-        to: path.join(outputDir.pathname, 'polyfill-support.js')
+        from: new URL('./polyfill-support.js', new URL(`file://${litNodeModulesLocation}/`)),
+        to: new URL('./polyfill-support.js', outputDir)
       }];
 
       return [
