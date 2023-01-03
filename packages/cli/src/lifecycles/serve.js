@@ -1,6 +1,5 @@
 import fs from 'fs';
 // import { hashString } from '../lib/hashing-utils.js';
-import path from 'path';
 import Koa from 'koa';
 import { Readable } from 'stream';
 import { ResourceInterface } from '../lib/resource-interface.js';
@@ -153,52 +152,38 @@ async function getDevServer(compilation) {
 
 async function getStaticServer(compilation, composable) {
   const app = new Koa();
-  const standardResources = compilation.config.plugins.filter((plugin) => {
-    // html is intentionally omitted
-    return plugin.isGreenwoodDefaultPlugin
-      && plugin.type === 'resource'
-      && ((plugin.name.indexOf('plugin-standard') >= 0 // allow standard web resources
-      && plugin.name.indexOf('plugin-standard-html') < 0) // but _not_ our markdown / HTML plugin
-      || plugin.name.indexOf('plugin-source-maps') >= 0); // and source maps
-  }).map((plugin) => {
-    return plugin.provider(compilation);
+  const { outputDir } = compilation.context;
+  const standardResourcePlugins = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'resource'
+      && plugin.isGreenwoodDefaultPlugin
+      && plugin.name !== 'plugin-standard-html';
   });
 
   app.use(async (ctx, next) => {
-    const { outputDir, userWorkspace } = compilation.context;
-    const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
+    const url = new URL(`http://localhost:8080${ctx.url}`);
+    const matchingRoute = compilation.graph.find(page => page.route === url.pathname);
 
-    // only handle static output routes, eg. public/about.html
-    if (url.endsWith('/') || url.endsWith('.html')) {
-      const barePath = fs.existsSync(path.join(userWorkspace, 'index.html')) // SPA
-        ? 'index.html'
-        : url.endsWith('/')
-          ? path.join(url, 'index.html')
-          : url;
+    if (matchingRoute || url.pathname.split('.').pop() === 'html') {
+      const pathname = matchingRoute ? matchingRoute.outputPath : url.pathname;
+      const body = await fs.promises.readFile(new URL(`./${pathname}`, outputDir), 'utf-8');
 
-      if (fs.existsSync(path.join(outputDir, barePath))) {
-        const contents = await fs.promises.readFile(path.join(outputDir, barePath), 'utf-8');
-
-        ctx.set('content-type', 'text/html');
-        ctx.body = contents;
-      }
+      ctx.set('content-type', 'text/html');
+      ctx.body = body;
     }
 
     await next();
   });
 
   app.use(async (ctx, next) => {
-    const url = ctx.request.url;
+    const url = new URL(`http://localhost:8080${ctx.url}`);
 
     if (compilation.config.devServer.proxy) {
-      const proxyPlugin = compilation.config.plugins.filter((plugin) => {
-        return plugin.name === 'plugin-dev-proxy';
-      }).map((plugin) => {
-        return plugin.provider(compilation);
-      })[0];
+      const proxyPlugin = standardResourcePlugins
+        .find((plugin) => plugin.name === 'plugin-dev-proxy')
+        .provider(compilation);
 
-      if (url !== '/' && await proxyPlugin.shouldServe(url)) {
-        ctx.body = (await proxyPlugin.serve(url)).body;
+      if (await proxyPlugin.shouldServe(url)) {
+        ctx.body = (await proxyPlugin.serve(url)).text();
       }
     }
 
@@ -206,38 +191,24 @@ async function getStaticServer(compilation, composable) {
   });
 
   app.use(async (ctx, next) => {
-    const responseAccumulator = {
-      body: ctx.body,
-      contentType: ctx.response.header['content-type']
-    };
+    const url = new URL(`.${ctx.url}`, outputDir.href);
+    const resourcePlugins = standardResourcePlugins.map((plugin) => {
+      return plugin.provider(compilation);
+    });
+    const request = new Request(url.href);
+    let response = null;
 
-    const reducedResponse = await standardResources.reduce(async (responsePromise, resource) => {
-      const response = await responsePromise;
-      const url = ctx.url.replace(/\?(.*)/, '');
-      const { headers } = ctx.response;
-      const outputPathUrl = path.join(compilation.context.outputDir, url);
-      const shouldServe = await resource.shouldServe(outputPathUrl, {
-        request: ctx.headers,
-        response: headers
-      });
-
-      if (shouldServe) {
-        const resolvedResource = await resource.serve(outputPathUrl, {
-          request: ctx.headers,
-          response: headers
-        });
-
-        return Promise.resolve({
-          ...response,
-          ...resolvedResource
-        });
-      } else {
-        return Promise.resolve(response);
+    for (const plugin of resourcePlugins) {
+      if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
+        response = await plugin.serve(url, request);
       }
-    }, Promise.resolve(responseAccumulator));
+    }
 
-    ctx.set('content-type', reducedResponse.contentType);
-    ctx.body = reducedResponse.body;
+    if (response) {
+      ctx.body = Readable.from(response.body);
+      ctx.type = response.headers.get('content-type');
+      ctx.status = response.status;
+    }
 
     if (composable) {
       await next();
@@ -249,81 +220,48 @@ async function getStaticServer(compilation, composable) {
 
 async function getHybridServer(compilation) {
   const app = await getStaticServer(compilation, true);
-  const apiResource = compilation.config.plugins.filter((plugin) => {
-    return plugin.isGreenwoodDefaultPlugin
-      && plugin.type === 'resource'
-      && plugin.name.indexOf('plugin-api-routes') === 0;
-  }).map((plugin) => {
-    return plugin.provider(compilation);
-  })[0];
+  const resourcePlugins = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'resource';
+  });
 
   app.use(async (ctx) => {
-    const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
-    const isApiRoute = await apiResource.shouldServe(url);
-    const matchingRoute = compilation.graph.filter((node) => {
-      return node.route === url;
-    })[0] || { data: {} };
+    const url = new URL(`http://localhost:8080${ctx.url}`);
+    const isApiRoute = url.pathname.startsWith('/api');
+    const matchingRoute = compilation.graph.find((node) => node.route === url) || { data: {} };
 
     if (matchingRoute.isSSR && !matchingRoute.data.static) {
-      // TODO would be nice to pull these plugins once instead of one every request
-      const headers = {
-        request: { 'accept': 'text/html', 'content-type': 'text/html' },
-        response: { 'content-type': 'text/html' }
-      };
-      const standardHtmlResource = compilation.config.plugins.filter((plugin) => {
+      const standardHtmlResource = [resourcePlugins.find((plugin) => {
         return plugin.isGreenwoodDefaultPlugin
-          && plugin.type === 'resource'
           && plugin.name.indexOf('plugin-standard-html') === 0;
-      }).map((plugin) => {
-        return plugin.provider(compilation);
-      })[0];
-      let body;
+      })].provider(compilation);
+      let response = await standardHtmlResource.serve(url, request);
 
-      const interceptResources = compilation.config.plugins.filter((plugin) => {
-        return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
-      }).map((plugin) => {
-        return plugin.provider(compilation);
-      }).filter((provider) => {
-        return provider.shouldIntercept && provider.intercept;
-      });
+      for (const plugin of resourcePlugins) {
+        if (plugin.shouldIntercept && await plugin.shouldIntercept(url, response)) {
+          response = await plugin.intercept(url, response);
+        }
+      }
 
-      body = (await standardHtmlResource.serve(url)).body;
-      body = (await interceptResources.reduce(async (htmlPromise, resource) => {
-        const html = (await htmlPromise).body;
-        const shouldIntercept = await resource.shouldIntercept(url, html, headers);
+      for (const plugin of resourcePlugins) {
+        if (plugin.shouldOptimize && await plugin.shouldOptimize(url, response)) {
+          response = await plugin.optimize(url, response);
+        }
+      }
 
-        return shouldIntercept
-          ? resource.intercept(url, html, headers)
-          : htmlPromise;
-      }, Promise.resolve({ url, body }))).body;
-
-      const optimizeResources = compilation.config.plugins.filter((plugin) => {
-        return plugin.type === 'resource';
-      }).map((plugin) => {
-        return plugin.provider(compilation);
-      }).filter((provider) => {
-        return provider.shouldOptimize && provider.optimize;
-      });
-
-      body = await optimizeResources.reduce(async (htmlPromise, resource) => {
-        const html = await htmlPromise;
-        const shouldOptimize = await resource.shouldOptimize(url, html, headers);
-
-        return shouldOptimize
-          ? resource.optimize(url, html, headers)
-          : Promise.resolve(html);
-      }, Promise.resolve(body));
-
-      ctx.status = 200;
+      ctx.body = response.body;
       ctx.set('content-type', 'text/html');
-      ctx.body = body;
+      ctx.status = 200;
     } else if (isApiRoute) {
       // TODO just use response
-      const { body, resp } = await apiResource.serve(ctx.request.url);
+      const apiResource = standardResourcePlugins.find((plugin) => {
+        return plugin.isGreenwoodDefaultPlugin
+          && plugin.name === 'plugin-api-routes';
+      }).provider(compilation);
+      const response = await apiResource.serve(ctx.request.url);
 
       ctx.status = 200;
-      ctx.set('content-type', resp.headers.get('content-type'));
-      ctx.body = body;
+      ctx.set('content-type', response.headers.get('content-type'));
+      ctx.body = response.body;
     }
   });
 
