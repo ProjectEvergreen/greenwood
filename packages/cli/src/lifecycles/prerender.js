@@ -203,7 +203,7 @@ async function staticRenderCompilation(compilation) {
     const request = new Request(url);
 
     let body = await (await servePage(url, request, plugins)).text();
-    body = await (await interceptPage(url, request, plugins, html)).text();
+    body = await (await interceptPage(url, request, plugins, body)).text();
 
     trackResourcesForRoute(body, compilation, route);
     createOutputDirectory(route, outputDirUrl);
