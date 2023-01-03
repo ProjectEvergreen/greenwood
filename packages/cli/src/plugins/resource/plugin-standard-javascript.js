@@ -16,7 +16,7 @@ class StandardJavaScriptResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    return url.protocol === 'file:' && this.extensions.indexOf(url.pathname.split('.').pop()) >= 0;
+    return url.protocol === 'file:' && this.extensions.includes(url.pathname.split('.').pop());
   }
 
   async serve(url) {
