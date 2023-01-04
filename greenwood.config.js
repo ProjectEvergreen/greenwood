@@ -10,7 +10,7 @@ import { fileURLToPath, URL } from 'url';
 
 export default {
   workspace: fileURLToPath(new URL('./www', import.meta.url)),
-  prerender: true,
+  // prerender: true,
   optimization: 'inline',
   staticRouter: true,
   interpolateFrontmatter: true,
