@@ -9,11 +9,12 @@ import { ResourceInterface } from '../../lib/resource-interface.js';
 class SourceMapsResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.map'];
+    this.extensions = ['map'];
+    this.contentType = 'application/json';
   }
 
   async shouldServe(url) {
-    return `.${url.pathname.split('.').pop()}` === this.extensions[0] && fs.existsSync(url.pathname);
+    return url.pathname.split('.').pop() === this.extensions[0] && fs.existsSync(url.pathname);
   }
 
   async serve(url) {
@@ -21,7 +22,7 @@ class SourceMapsResource extends ResourceInterface {
 
     return new Response(body, {
       headers: {
-        'Content-Type': 'text/javascript'
+        'content-type': this.contentType
       }
     });
   }

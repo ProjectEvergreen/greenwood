@@ -231,7 +231,7 @@ function serve(label) {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers['content-type']).to.contain('text/html');
         done();
       });
 

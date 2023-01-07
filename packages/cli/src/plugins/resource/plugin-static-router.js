@@ -27,18 +27,20 @@ class StaticRouterResource extends ResourceInterface {
   }
 
   async shouldIntercept(url, request, response) {
-    const { pathname } = url;
-    const contentType = response.headers.get['content-type'];
+    const { pathname, protocol } = url;
+    const contentType = response.headers.get['content-type'] || '';
 
     // TODO should this also happen during development too?
     return process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
       && this.compilation.config.staticRouter
       && !pathname.startsWith('/404')
-      && pathname.split('.').pop() === 'html' || (contentType && contentType.indexOf(this.contentType) >= 0);
+      && protocol === 'http:' || contentType.indexOf(this.contentType) >= 0;
   }
 
   async intercept(url, request, response) {
-    const body = response.body.replace('</head>', `
+    let body = await response.text();
+
+    body = body.replace('</head>', `
       <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
       </head>
     `);
@@ -56,8 +58,8 @@ class StaticRouterResource extends ResourceInterface {
   }
 
   async optimize(url, response) {
-    const { pathname } = url;
     let body = await response.text();
+    const { pathname } = url;
     const isStaticRoute = this.compilation.graph.find(page => page.route === pathname && !page.isSSR);
     const { outputDir } = this.compilation.context;
     const partial = body.match(/<body>(.*)<\/body>/s)[0].replace('<body>', '').replace('</body>', '');
@@ -76,7 +78,7 @@ class StaticRouterResource extends ResourceInterface {
           ? ''
           : page.route.slice(0, page.route.lastIndexOf('/'));
 
-        if (url === page.outputPath) {
+        if (pathname === page.route) {
           currentTemplate = template;
         }
         return `
