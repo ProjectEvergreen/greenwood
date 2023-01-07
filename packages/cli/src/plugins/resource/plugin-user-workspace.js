@@ -15,7 +15,9 @@ class UserWorkspaceResource extends ResourceInterface {
   async shouldResolve(url) {
     const { userWorkspace } = this.compilation.context;
 
-    return this.hasExtension(url) && this.resolveForRelativeUrl(url, userWorkspace);
+    return this.hasExtension(url)
+      && !url.pathname.startsWith('/node_modules')
+      && this.resolveForRelativeUrl(url, userWorkspace);
   }
 
   async resolve(url) {

@@ -215,7 +215,7 @@ class StandardHtmlResource extends ResourceInterface {
     const isSpaRoute = this.compilation.graph[0].isSPA;
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname);
     const filePath = !matchingRoute.external ? matchingRoute.path : '';
-    const isMarkdownContent = matchingRoute.filename.split('.').pop() === 'md';
+    const isMarkdownContent = (matchingRoute?.filename || '').split('.').pop() === 'md';
 
     let customImports = [];
     let body = '';

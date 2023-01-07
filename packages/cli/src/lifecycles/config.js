@@ -64,7 +64,7 @@ const readAndMergeConfig = async() => {
 
         // workspace validation
         if (workspace) {
-          if (!workspace instanceof URL) {
+          if (!(workspace instanceof URL)) {
             reject('Error: greenwood.config.js workspace must be an instance of URL');
           }
 
@@ -207,7 +207,7 @@ const readAndMergeConfig = async() => {
         }
       } else {
         // SPA should _not_ prerender unless if user has specified prerender should be true
-        if (fs.existsSync(path.join(customConfig.workspace, 'index.html'))) {
+        if (fs.existsSync(new URL('./index.html', customConfig.workspace).pathname)) {
           customConfig.prerender = false;
         }
       }

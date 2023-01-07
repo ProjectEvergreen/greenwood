@@ -12,15 +12,17 @@ class ApiRoutesResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
+    const apiPathUrl = new URL(`.${url.pathname.replace('/api', '')}.js`, this.compilation.context.apisDir);
+
     // TODO Could this existence check be derived from the graph instead, like pages are?
     // https://github.com/ProjectEvergreen/greenwood/issues/946
     return url.protocol.indexOf('http') === 0
       && url.pathname.startsWith('/api')
-      && fs.existsSync(this.compilation.context.apisDir, url.pathname.replace('/api/', ''));
+      && fs.existsSync(apiPathUrl.pathname);
   }
 
   async serve(url, request) {
-    let href = new URL(`./${url.pathname.replace('/api/', '')}.js`, `file://${this.compilation.context.apisDir}`).href;
+    let href = new URL(`./${url.pathname.replace('/api/', '')}.js`, `file://${this.compilation.context.apisDir.pathname}`).href;
 
     // https://github.com/nodejs/modules/issues/307#issuecomment-1165387383
     if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
@@ -31,9 +33,8 @@ class ApiRoutesResource extends ResourceInterface {
     const req = new Request(new URL(`${request.url.origin}${url}`), {
       ...request
     });
-    const resp = await handler(req);
 
-    return resp;
+    return await handler(req);
   }
 }
 

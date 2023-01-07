@@ -9,9 +9,12 @@ function modelResource(context, type, src = undefined, contents = undefined, opt
   let sourcePathURL;
 
   if (src) {
+    // TODO more elegant way to normalize paths with ../, ./, /, etc?
     sourcePathURL = src.startsWith('/node_modules')
       ? new URL(`.${src}`, projectDirectory)
-      : new URL(`${src.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace);
+      : src.startsWith('/')
+        ? new URL(`.${src}`, userWorkspace)
+        : new URL(`./${src.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace);
 
     contents = fs.readFileSync(sourcePathURL, 'utf-8');
   } else {

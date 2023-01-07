@@ -11,7 +11,7 @@ const initContext = async({ config }) => {
       const outputDir = new URL('./public/', projectDirectory);
       const dataDir = new URL('../data/', import.meta.url);
       const userWorkspace = workspace;
-      const apisDir = new URL('./apis/', userWorkspace);
+      const apisDir = new URL('./api/', userWorkspace);
       const pagesDir = new URL(`./${pagesDirectory}/`, userWorkspace);
       const userTemplatesDir = new URL(`./${templatesDirectory}/`, userWorkspace);
 
