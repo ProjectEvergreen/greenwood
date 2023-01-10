@@ -161,7 +161,7 @@ const bundleCompilation = async (compilation) => {
 
       await Promise.all([
         await bundleScriptResources(compilation),
-        await bundleStyleResources(compilation, optimizeResourcePlugins.filter(plugin => plugin.contentType.includes('text/css')))
+        await bundleStyleResources(compilation, optimizeResourcePlugins)
       ]);
 
       console.info('optimizing static pages....');

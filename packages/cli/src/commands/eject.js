@@ -1,18 +1,16 @@
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath, URL } from 'url';
 
 const ejectConfiguration = async (compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const configFilePath = fileURLToPath(new URL('../config', import.meta.url));
-      const configFiles = fs.readdirSync(configFilePath);
+      const configFileDirUrl = new URL('../config/', import.meta.url);
+      const configFiles = await fs.promises.readdir(configFileDirUrl);
       
       configFiles.forEach((configFile) => {
-        const from = path.join(configFilePath, configFile);
-        const to = `${compilation.context.projectDirectory}/${configFile}`;
+        const from = new URL(`./${configFile}`, configFileDirUrl);
+        const to = new URL(`./${configFile}`, compilation.context.projectDirectory);
 
-        fs.copyFileSync(from, to);
+        fs.copyFileSync(from.pathname, to.pathname);
         
         console.log(`Ejected ${configFile} successfully.`);
       });

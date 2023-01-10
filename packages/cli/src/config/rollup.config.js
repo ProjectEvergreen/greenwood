@@ -12,8 +12,8 @@ function greenwoodResourceLoader (compilation) {
     resolveId(id) {
       const { userWorkspace } = compilation.context;
 
-      if ((id.indexOf('./') === 0 || id.indexOf('/') === 0) && fs.existsSync(new URL(`./${id}`, userWorkspace).pathname)) {
-        return new URL(`./${id.replace(/\?type=(.*)/, '')}`, userWorkspace);
+      if ((id.indexOf('./') === 0 || id.indexOf('/') === 0) && fs.existsSync(new URL(`./${id.replace(/\?type=(.*)/, '')}`, userWorkspace).pathname)) {
+        return new URL(`./${id.replace(/\?type=(.*)/, '')}`, userWorkspace).pathname;
       }
 
       return null;

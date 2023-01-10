@@ -226,7 +226,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal(ext);
+        expect(response.headers['content-type']).to.equal(`font/${ext}`);
         done();
       });
 

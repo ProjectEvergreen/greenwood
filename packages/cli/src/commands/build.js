@@ -11,8 +11,8 @@ const runProductionBuild = async (compilation) => {
     try {
       const { prerender } = compilation.config;
       const outputDir = compilation.context.outputDir;
-      const prerenderPlugin = (compilation.config.plugins.filter(plugin => plugin.type === 'renderer') || []).length === 1
-        ? compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation)
+      const prerenderPlugin = compilation.config.plugins.find(plugin => plugin.type === 'renderer')
+        ? compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider(compilation)
         : {};
 
       if (!fs.existsSync(outputDir.pathname)) {
