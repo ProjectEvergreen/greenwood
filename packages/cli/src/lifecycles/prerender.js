@@ -100,6 +100,7 @@ async function interceptPage(url, request, plugins, body) {
 
 function getPluginInstances (compilation) {
   return [...compilation.config.plugins]
+    .filter(plugin => plugin.type === 'resource' && plugin.name !== 'plugin-node-modules:resource')
     .map((plugin) => {
       return plugin.provider(compilation);
     });
@@ -116,13 +117,13 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
 
   for (const page of pages) {
     const { route, outputPath } = page;
-    const outputDirUrl = new URL(`./${route}`, scratchDir);
+    const outputDirUrl = new URL(`./${route}/`, scratchDir);
     const outputPathUrl = new URL(`./${outputPath}`, scratchDir);
     const url = new URL(`http://localhost:${compilation.config.port}${route}`);
     const request = new Request(url);
 
     let body = await (await servePage(url, request, plugins)).text();
-    body = await (await interceptPage(url, request, plugins, html)).text();
+    body = await (await interceptPage(url, request, plugins, body)).text();
 
     createOutputDirectory(route, outputDirUrl);
 
@@ -157,7 +158,6 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
 async function preRenderCompilationCustom(compilation, customPrerender) {
   const { scratchDir } = compilation.context;
   const renderer = (await import(customPrerender.customUrl)).default;
-  const plugins = getPluginInstances(compilation);
 
   console.info('pages to generate', `\n ${compilation.graph.map(page => page.route).join('\n ')}`);
 
@@ -165,16 +165,12 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     const { route, outputPath } = page;
     const outputDirUrl = new URL(`./${route}`, scratchDir);
     const outputPathUrl = new URL(`./${outputPath}`, scratchDir);
-    const url = new URL(`http://localhost:${compilation.config.port}${route}`);
-    const request = new Request(url);
 
     // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
     body = body.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
     body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
     body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
     body = body.replace(/type="module-shim"/g, 'type="module"');
-
-    body = await (await interceptPage(url, request, plugins, body)).text();
 
     // clean this up here to avoid sending webcomponents-bundle to rollup
     body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
@@ -197,7 +193,7 @@ async function staticRenderCompilation(compilation) {
   
   await Promise.all(pages.map(async (page) => {
     const { route, outputPath } = page;
-    const outputDirUrl = new URL(`./${route}`, scratchDir);
+    const outputDirUrl = new URL(`.${route}`, scratchDir);
     const outputPathUrl = new URL(`./${outputPath}`, scratchDir);
     const url = new URL(`http://localhost:${compilation.config.port}${route}`);
     const request = new Request(url);

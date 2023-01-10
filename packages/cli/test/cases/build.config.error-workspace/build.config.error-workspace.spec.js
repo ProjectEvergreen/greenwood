@@ -36,12 +36,12 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe('Custom Configuration with a bad value for Workspace', function() {
-    it('should throw an error that workspace path must be a string', async function() {
+    it('should throw an error that workspace path must be a URL', async function() {
       try {
         await runner.setup(outputPath);
         await runner.runCommand(cliPath, 'build');
       } catch (err) {
-        expect(err).to.contain('greenwood.config.js workspace path must be a string');
+        expect(err).to.contain('Error: greenwood.config.js workspace must be an instance of URL');
       }
     });
   });

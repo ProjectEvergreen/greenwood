@@ -163,7 +163,7 @@ async function getStaticServer(compilation, composable) {
     const url = new URL(`http://localhost:8080${ctx.url}`);
     const matchingRoute = compilation.graph.find(page => page.route === url.pathname);
 
-    if (matchingRoute || url.pathname.split('.').pop() === 'html') {
+    if ((matchingRoute && !matchingRoute.isSSR) || url.pathname.split('.').pop() === 'html') {
       const pathname = matchingRoute ? matchingRoute.outputPath : url.pathname;
       const body = await fs.promises.readFile(new URL(`./${pathname}`, outputDir), 'utf-8');
 
@@ -176,14 +176,21 @@ async function getStaticServer(compilation, composable) {
 
   app.use(async (ctx, next) => {
     const url = new URL(`http://localhost:8080${ctx.url}`);
+    const request = new Request(url, {
+      method: ctx.request.method,
+      headers: ctx.request.header
+    });
 
     if (compilation.config.devServer.proxy) {
       const proxyPlugin = standardResourcePlugins
         .find((plugin) => plugin.name === 'plugin-dev-proxy')
         .provider(compilation);
 
-      if (await proxyPlugin.shouldServe(url)) {
-        ctx.body = (await proxyPlugin.serve(url)).text();
+      if (await proxyPlugin.shouldServe(url, request)) {
+        const response = await proxyPlugin.serve(url, request);
+
+        ctx.body = Readable.from(response.body);
+        ctx.set('content-type', response.headers.get('content-type'));
       }
     }
 
@@ -227,41 +234,47 @@ async function getHybridServer(compilation) {
   app.use(async (ctx) => {
     const url = new URL(`http://localhost:8080${ctx.url}`);
     const isApiRoute = url.pathname.startsWith('/api');
-    const matchingRoute = compilation.graph.find((node) => node.route === url) || { data: {} };
+    const matchingRoute = compilation.graph.find((node) => node.route === url.pathname) || { data: {} };
+    const request = new Request(url.href, {
+      method: ctx.request.method,
+      headers: ctx.request.header
+    });
 
+    console.debug('0000', { matchingRoute, isApiRoute });
     if (matchingRoute.isSSR && !matchingRoute.data.static) {
-      const standardHtmlResource = [resourcePlugins.find((plugin) => {
+      const standardHtmlResource = resourcePlugins.find((plugin) => {
         return plugin.isGreenwoodDefaultPlugin
           && plugin.name.indexOf('plugin-standard-html') === 0;
-      })].provider(compilation);
+      }).provider(compilation);
       let response = await standardHtmlResource.serve(url, request);
 
       for (const plugin of resourcePlugins) {
-        if (plugin.shouldIntercept && await plugin.shouldIntercept(url, response)) {
-          response = await plugin.intercept(url, response);
+        if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
+          response = await plugin.intercept(url, request, response);
         }
       }
+
+      response = await standardHtmlResource.optimize(url, response);
 
       for (const plugin of resourcePlugins) {
-        if (plugin.shouldOptimize && await plugin.shouldOptimize(url, response)) {
-          response = await plugin.optimize(url, response);
+        if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
+          response = await plugin.intercept(url, request, response);
         }
       }
 
-      ctx.body = response.body;
+      ctx.body = Readable.from(response.body);
       ctx.set('content-type', 'text/html');
       ctx.status = 200;
     } else if (isApiRoute) {
-      // TODO just use response
-      const apiResource = standardResourcePlugins.find((plugin) => {
+      const apiResource = resourcePlugins.find((plugin) => {
         return plugin.isGreenwoodDefaultPlugin
           && plugin.name === 'plugin-api-routes';
       }).provider(compilation);
-      const response = await apiResource.serve(ctx.request.url);
+      const response = await apiResource.serve(url, request);
 
       ctx.status = 200;
       ctx.set('content-type', response.headers.get('content-type'));
-      ctx.body = response.body;
+      ctx.body = Readable.from(response.body);
     }
   });
 

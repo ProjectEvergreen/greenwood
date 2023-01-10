@@ -640,7 +640,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
+        expect(response.headers['content-type']).to.contain('text/javascript');
         done();
       });
 
@@ -674,7 +674,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/css');
+        expect(response.headers['content-type']).to.contain('text/css');
         done();
       });
 
@@ -710,7 +710,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal(`image/${ext}`);
+        expect(response.headers['content-type']).to.contain(`image/${ext}`);
         done();
       });
 
@@ -744,7 +744,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('image/x-icon');
+        expect(response.headers['content-type']).to.contain('image/x-icon');
         done();
       });
 
@@ -778,7 +778,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('image/webp');
+        expect(response.headers['content-type']).to.contain('image/webp');
         done();
       });
 
@@ -812,7 +812,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('image/avif');
+        expect(response.headers['content-type']).to.contain('image/avif');
         done();
       });
 
@@ -847,7 +847,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal(`image/${ext}+xml`);
+        expect(response.headers['content-type']).to.contain(`image/${ext}+xml`);
         done();
       });
 
@@ -882,7 +882,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal(ext);
+        expect(response.headers['content-type']).to.contain(ext);
         done();
       });
 
@@ -984,7 +984,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
+        expect(response.headers['content-type']).to.contain('text/javascript');
         done();
       });
 
@@ -1020,7 +1020,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/css');
+        expect(response.headers['content-type']).to.contain('text/css');
         done();
       });
 
@@ -1032,7 +1032,7 @@ describe('Develop Greenwood With: ', function() {
 
     // if things work correctly, this workspace file should never resolve to the equivalent node_modules file
     // https://github.com/ProjectEvergreen/greenwood/pull/687
-    describe('Develop command specific workspace resolution when matching node_modules', function() {
+    describe('Develop command specific workspace resolution when local file matches a file also in node_modules', function() {
       let response = {};
 
       before(async function() {
@@ -1056,7 +1056,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
+        expect(response.headers['content-type']).to.contain('text/javascript');
         done();
       });
 
@@ -1091,7 +1091,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
+        expect(response.headers['content-type']).to.contain('text/javascript');
         done();
       });
 
@@ -1127,7 +1127,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
+        expect(response.headers['content-type']).to.contain('text/javascript');
         done();
       });
 
@@ -1167,7 +1167,12 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('Not Found');
+        expect(response.body).to.contain('');
+        done();
+      });
+
+      it('should return the correct status message body', function(done) {
+        expect(response.statusMessage).to.contain('Not Found');
         done();
       });
     });
@@ -1214,6 +1219,7 @@ describe('Develop Greenwood With: ', function() {
 
       before(async function() {
         response = await fetch(`${hostname}:${port}/api/greeting?name=${name}`);
+
         data = await response.json();
       });
 

@@ -216,7 +216,7 @@ const generateGraph = async (compilation) => {
       };
 
       console.debug('building from local sources...');
-      if (fs.existsSync(path.join(userWorkspace.pathname, 'index.html'))) { // SPA
+      if (fs.existsSync(new URL('./index.html', userWorkspace).pathname)) { // SPA
         graph = [{
           ...graph[0],
           path: `${userWorkspace.pathname}index.html`,

@@ -1,27 +1,26 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import { ResourceInterface } from '../../../src/lib/resource-interface.js';
 
 class FooResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
     
-    this.extensions = ['.foo'];
+    this.extensions = ['foo'];
     this.contentType = 'text/javascript';
   }
 
-  async serve(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let body = await fs.promises.readFile(url, 'utf-8');
-        
-        body = body.replace(/interface (.*){(.*)}/s, '');
+  async shouldServe(url) {
+    return url.pathname.split('.').pop() === this.extensions[0];
+  }
 
-        resolve({
-          body,
-          contentType: this.contentType
-        });
-      } catch (e) {
-        reject(e);
+  async serve(url) {
+    let body = await fs.readFile(url, 'utf-8');
+
+    body = body.replace(/interface (.*){(.*)}/s, '');
+
+    return new Response(body, {
+      headers: {
+        'content-type': this.contentType
       }
     });
   }
