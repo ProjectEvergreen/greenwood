@@ -4,7 +4,6 @@
  *
  */
 import fs from 'fs';
-import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 import tsc from 'typescript';
 
@@ -17,7 +16,7 @@ const defaultCompilerOptions = {
 
 function getCompilerOptions (projectDirectory, extendConfig) {
   const customOptions = extendConfig
-    ? JSON.parse(fs.readFileSync(path.join(projectDirectory, 'tsconfig.json'), 'utf-8'))
+    ? JSON.parse(fs.readFileSync(new URL('./tsconfig.json', projectDirectory).pathname, 'utf-8'))
     : { compilerOptions: {} };
 
   return {
@@ -29,27 +28,28 @@ function getCompilerOptions (projectDirectory, extendConfig) {
 class TypeScriptResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.ts'];
+    this.extensions = ['ts'];
     this.contentType = 'text/javascript';
   }
 
+  async shouldServe(url) {
+    const { pathname, protocol } = url;
+    const isTsFile = protocol === 'file:' && pathname.split('.').pop() === this.extensions[0];
+
+    return isTsFile || isTsFile && url.searchParams.has('type') && url.searchParams.get('type') === this.extensions[0];
+  }
+
   async serve(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const { projectDirectory } = this.compilation.context;
-        const source = await fs.promises.readFile(url, 'utf-8');
-        const compilerOptions = getCompilerOptions(projectDirectory, this.options.extendConfig);
+    const { projectDirectory } = this.compilation.context;
+    const source = await fs.promises.readFile(url, 'utf-8');
+    const compilerOptions = getCompilerOptions(projectDirectory, this.options.extendConfig);
+    // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
+    const body = tsc.transpileModule(source, { compilerOptions }).outputText;
 
-        // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
-        const result = tsc.transpileModule(source, { compilerOptions });
-
-        resolve({
-          body: result.outputText,
-          contentType: this.contentType
-        });
-      } catch (e) {
-        reject(e);
-      }
+    return new Response(body, {
+      headers: new Headers({
+        'Content-Type': this.contentType
+      })
     });
   }
 }

@@ -81,7 +81,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['Content-Type']).to.contain('text/html');
+        expect(response.headers['content-type']).to.contain('text/html');
         done();
       });
     });
@@ -125,12 +125,12 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['Content-Type']).to.contain('application/json');
+        expect(response.headers['content-type']).to.contain('application/json');
         done();
       });
 
       it('should return the expected query response', function(done) {
-        expect(response.body.data.config.workspace).to.equal(path.join(outputPath, 'src'));
+        expect(response.body.data.config.workspace).to.equal(new URL('./src/', import.meta.url).href);
         done();
       });
     });

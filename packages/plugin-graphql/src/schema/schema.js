@@ -3,13 +3,11 @@ import { configTypeDefs, configResolvers } from './config.js';
 import { graphTypeDefs, graphResolvers } from './graph.js';
 import fs from 'fs';
 import gql from 'graphql-tag';
-import path from 'path';
-import { pathToFileURL } from 'url';
 
 const createSchema = async (compilation) => {
   const { graph } = compilation;
   const uniqueCustomDataDefKeys = {};
-  const customSchemasPath = `${compilation.context.userWorkspace}/data/schema`;
+  const customSchemasUrl = new URL('./data/schema/', compilation.context.userWorkspace);
   const customUserResolvers = [];
   const customUserDefs = [];
   let customDataDefsString = '';
@@ -36,13 +34,13 @@ const createSchema = async (compilation) => {
       }
     `;
 
-    if (fs.existsSync(customSchemasPath)) {
+    if (fs.existsSync(customSchemasUrl.pathname)) {
       console.log('custom schemas directory detected, scanning...');
-      const schemaPaths = (await fs.promises.readdir(customSchemasPath))
-        .filter(file => path.extname(file) === '.js');
+      const schemaPaths = (await fs.promises.readdir(customSchemasUrl))
+        .filter(file => file.split('.').pop() === 'js');
 
       for (const schemaPath of schemaPaths) {
-        const { customTypeDefs, customResolvers } = await import(pathToFileURL(`${customSchemasPath}/${schemaPath}`));
+        const { customTypeDefs, customResolvers } = await import(new URL(`./${schemaPath}`, customSchemasUrl));
         
         customUserDefs.push(customTypeDefs);
         customUserResolvers.push(customResolvers);
