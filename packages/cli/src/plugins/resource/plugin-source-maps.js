@@ -21,9 +21,9 @@ class SourceMapsResource extends ResourceInterface {
     const body = await fs.promises.readFile(url, 'utf-8');
 
     return new Response(body, {
-      headers: {
-        'content-type': this.contentType
-      }
+      headers: new Headers({
+        'Content-Type': this.contentType
+      })
     });
   }
 }

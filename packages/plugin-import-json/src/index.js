@@ -27,9 +27,9 @@ class ImportJsonResource extends ResourceInterface {
       : await response.text();
 
     return new Response(`export default ${JSON.stringify(body)}`, {
-      headers: {
-        'content-type': this.contentType
-      }
+      headers: new Headers({
+        'Content-Type': this.contentType
+      })
     });
   }
 }

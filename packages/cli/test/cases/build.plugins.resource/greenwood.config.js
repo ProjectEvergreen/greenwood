@@ -19,9 +19,9 @@ class FooResource extends ResourceInterface {
     body = body.replace(/interface (.*){(.*)}/s, '');
 
     return new Response(body, {
-      headers: {
-        'content-type': this.contentType
-      }
+      headers: new Headers({
+        'Content-Type': this.contentType
+      })
     });
   }
 }

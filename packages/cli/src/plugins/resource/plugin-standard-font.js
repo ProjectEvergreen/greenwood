@@ -25,9 +25,9 @@ class StandardFontResource extends ResourceInterface {
     const body = await fs.promises.readFile(url);
 
     return new Response(body, {
-      headers: {
+      headers: new Headers({
         'Content-Type': contentType
-      }
+      })
     });
   }
 }

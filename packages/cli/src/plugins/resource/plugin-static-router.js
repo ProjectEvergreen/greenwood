@@ -28,7 +28,7 @@ class StaticRouterResource extends ResourceInterface {
 
   async shouldIntercept(url, request, response) {
     const { pathname, protocol } = url;
-    const contentType = response.headers.get['content-type'] || '';
+    const contentType = response.headers.get['Content-Type'] || '';
 
     // TODO should this also happen during development too?
     return process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
@@ -54,7 +54,7 @@ class StaticRouterResource extends ResourceInterface {
   async shouldOptimize(url, response) {
     return this.compilation.config.staticRouter
       && !url.pathname.startsWith('/404')
-      && response.headers.get('content-type').indexOf(this.contentType) >= 0;
+      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
   }
 
   async optimize(url, response) {

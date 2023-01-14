@@ -29,9 +29,9 @@ class StandardFontResource extends ResourceInterface {
 
     // TODO avoid having to rebuild response each time?
     return new Response(body, {
-      headers: {
-        'content-type': `image/${contentType}`
-      }
+      headers: new Headers({
+        'Content-Type': `image/${contentType}`
+      })
     });
   }
 }

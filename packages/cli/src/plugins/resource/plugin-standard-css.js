@@ -218,7 +218,7 @@ class StandardCssResource extends ResourceInterface {
 
     return new Response(body, {
       headers: {
-        'content-type': this.contentType
+        'Content-Type': this.contentType
       }
     });
   }
@@ -227,7 +227,7 @@ class StandardCssResource extends ResourceInterface {
     const { protocol, pathname } = url;
     const isValidCss = pathname.split('.').pop() === this.extensions[0]
       && protocol === 'file:'
-      && response.headers.get('content-type').indexOf(this.contentType) >= 0;
+      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
 
     return this.compilation.config.optimization !== 'none' && isValidCss;
   }

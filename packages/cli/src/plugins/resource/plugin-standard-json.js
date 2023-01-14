@@ -32,9 +32,9 @@ class StandardJsonResource extends ResourceInterface {
     const contents = await fs.promises.readFile(finalUrl, 'utf-8');
 
     return new Response(contents, {
-      headers: {
+      headers: new Headers({
         'Content-Type': this.contentType
-      }
+      })
     });
   }
 }
