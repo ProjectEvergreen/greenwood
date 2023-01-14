@@ -15,7 +15,7 @@
  *   plugins: [{
  *     greenwoodPluginGoogleAnalytics({
  *       analyticsId: 'UA-123456-1',
- *       anonymouse: false
+ *       anonymous: false
  *     })
  *  }]
  *
@@ -81,7 +81,7 @@ describe('Build Greenwood With: ', function() {
             gtag('config', '${mockAnalyticsId}', { 'anonymize_ip': false });
         `;
 
-        expect(inlineScript[0].textContent).to.contain(expectedContent);
+        expect(inlineScript[0].textContent.trim().replace(/\n/g, '').replace(/ /g, '')).to.contain(expectedContent.trim().replace(/\n/g, '').replace(/ /g, ''));
       });
     });
 

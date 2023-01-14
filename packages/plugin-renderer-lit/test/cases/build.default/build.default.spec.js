@@ -182,7 +182,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['Content-Type']).to.contain('text/html');
+        expect(response.headers['content-type']).to.contain('text/html');
         done();
       });
 
