@@ -33,17 +33,16 @@ async function getDevServer(compilation) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`http://localhost:${compilation.config.port}${ctx.url}`);
-
-      let request = new Request(url, {
+      const initRequest = new Request(url, {
         method: ctx.request.method,
         headers: ctx.request.header
       });
-      
-      for (const plugin of resourcePlugins) {
-        if (plugin.shouldResolve && await plugin.shouldResolve(url, request)) {
-          request = await plugin.resolve(url, request);
-        }
-      }
+      const request = await resourcePlugins.reduce(async (requestPromise, plugin) => {
+        const intermediateRequest = await requestPromise;
+        return plugin.shouldResolve && await plugin.shouldResolve(url, intermediateRequest.clone())
+          ? Promise.resolve(await plugin.resolve(url, intermediateRequest.clone()))
+          : Promise.resolve(await requestPromise);
+      }, Promise.resolve(initRequest));
 
       ctx.url = request.url;
     } catch (e) {
@@ -58,25 +57,20 @@ async function getDevServer(compilation) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(ctx.url);
-      const request = new Request(url.href, {
-        method: ctx.request.method,
-        headers: ctx.request.header
-      });
-      let response = new Response(null, {
-        status: ctx.response.status,
-        headers: new Headers()
-      });
-
-      for (const plugin of resourcePlugins) {
-        if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
-          response = await plugin.serve(url, request);
-        }
-      }
+      const { method, header } = ctx.request;
+      const { status } = ctx.response;
+      const initResponse = new Response(null, { status });
+      const request = new Request(url.href, { method, headers: header });
+      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        return plugin.shouldServe && await plugin.shouldServe(url, request.clone())
+          ? Promise.resolve(await plugin.serve(url, request.clone()))
+          : Promise.resolve(await responsePromise);
+      }, Promise.resolve(initResponse.clone()));
 
       // TODO would be nice if Koa (or other framework) could just a Response object directly
       // not sure why we have to use `Readable.from`, does this couple us to NodeJS?
       ctx.body = response.body ? Readable.from(response.body) : '';
-      ctx.type = response.headers.get('content-type');
+      ctx.type = response.headers.get('Content-Type');
       ctx.status = response.status;
     } catch (e) {
       ctx.status = 500;
@@ -94,21 +88,21 @@ async function getDevServer(compilation) {
         method: ctx.request.method,
         headers: ctx.request.header
       });
-      let response = new Response(ctx.body, {
+      const initResponse = new Response(ctx.body, {
         status: ctx.response.status,
-        headers: ctx.response.header
+        headers: new Headers(ctx.response.header)
       });
-
-      for (const plugin of resourcePlugins) {
-        if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
-          response = await plugin.intercept(url, request, response);
-        }
-      }
+      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        const intermediateResponse = await responsePromise;
+        return plugin.shouldIntercept && await plugin.shouldIntercept(url, request.clone(), intermediateResponse.clone())
+          ? Promise.resolve(await plugin.intercept(url, request.clone(), await intermediateResponse.clone()))
+          : Promise.resolve(responsePromise);
+      }, Promise.resolve(initResponse.clone()));
 
       // TODO would be nice if Koa (or other framework) could just a Response object directly
       // not sure why we have to use `Readable.from`, does this couple us to NodeJS?
       ctx.body = response.body ? Readable.from(response.body) : '';
-      ctx.set('Content-Type', response.headers.get('content-type'));
+      ctx.set('Content-Type', response.headers.get('Content-Type'));
     } catch (e) {
       ctx.status = 500;
       console.error(e);
@@ -167,7 +161,7 @@ async function getStaticServer(compilation, composable) {
       const pathname = matchingRoute ? matchingRoute.outputPath : url.pathname;
       const body = await fs.promises.readFile(new URL(`./${pathname}`, outputDir), 'utf-8');
 
-      ctx.set('content-type', 'text/html');
+      ctx.set('Content-Type', 'text/html');
       ctx.body = body;
     }
 
@@ -186,11 +180,11 @@ async function getStaticServer(compilation, composable) {
         .find((plugin) => plugin.name === 'plugin-dev-proxy')
         .provider(compilation);
 
-      if (await proxyPlugin.shouldServe(url, request)) {
-        const response = await proxyPlugin.serve(url, request);
+      if (await proxyPlugin.shouldServe(url, request.clone())) {
+        const response = await proxyPlugin.serve(url, request.clone());
 
         ctx.body = Readable.from(response.body);
-        ctx.set('content-type', response.headers.get('content-type'));
+        ctx.set('Content-Type', response.headers.get('Content-Type'));
       }
     }
 
@@ -203,17 +197,19 @@ async function getStaticServer(compilation, composable) {
       return plugin.provider(compilation);
     });
     const request = new Request(url.href);
-    let response = null;
+    const initResponse = new Response(ctx.body, {
+      status: ctx.response.status,
+      headers: new Headers(ctx.response.header)
+    });
+    const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+      return plugin.shouldServe && await plugin.shouldServe(url, request.clone())
+        ? Promise.resolve(await plugin.serve(url, request.clone()))
+        : responsePromise;
+    }, Promise.resolve(initResponse));
 
-    for (const plugin of resourcePlugins) {
-      if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
-        response = await plugin.serve(url, request);
-      }
-    }
-
-    if (response) {
+    if (response.ok) {
       ctx.body = Readable.from(response.body);
-      ctx.type = response.headers.get('content-type');
+      ctx.type = response.headers.get('Content-Type');
       ctx.status = response.status;
     }
 
@@ -240,7 +236,6 @@ async function getHybridServer(compilation) {
       headers: ctx.request.header
     });
 
-    console.debug('0000', { matchingRoute, isApiRoute });
     if (matchingRoute.isSSR && !matchingRoute.data.static) {
       const standardHtmlResource = resourcePlugins.find((plugin) => {
         return plugin.isGreenwoodDefaultPlugin
@@ -248,22 +243,11 @@ async function getHybridServer(compilation) {
       }).provider(compilation);
       let response = await standardHtmlResource.serve(url, request);
 
-      for (const plugin of resourcePlugins) {
-        if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
-          response = await plugin.intercept(url, request, response);
-        }
-      }
-
+      // TODO no intercept???
       response = await standardHtmlResource.optimize(url, response);
 
-      for (const plugin of resourcePlugins) {
-        if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
-          response = await plugin.intercept(url, request, response);
-        }
-      }
-
       ctx.body = Readable.from(response.body);
-      ctx.set('content-type', 'text/html');
+      ctx.set('Content-Type', 'text/html');
       ctx.status = 200;
     } else if (isApiRoute) {
       const apiResource = resourcePlugins.find((plugin) => {
@@ -273,7 +257,7 @@ async function getHybridServer(compilation) {
       const response = await apiResource.serve(url, request);
 
       ctx.status = 200;
-      ctx.set('content-type', response.headers.get('content-type'));
+      ctx.set('Content-Type', response.headers.get('Content-Type'));
       ctx.body = Readable.from(response.body);
     }
   });

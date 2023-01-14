@@ -30,7 +30,7 @@ async function optimizeStaticPages(compilation, plugins) {
       const contents = await fs.promises.readFile(new URL(`./${outputPath}`, scratchDir), 'utf-8');
       const headers = new Headers();
 
-      headers.append('content-type', 'text/html');
+      headers.append('Content-Type', 'text/html');
 
       if (route !== '/404/' && !fs.existsSync(new URL(`.${route}`, outputDir).pathname)) {
         fs.mkdirSync(new URL(`.${route}`, outputDir).pathname, {
@@ -54,7 +54,7 @@ async function optimizeStaticPages(compilation, plugins) {
   );
 }
 
-async function bundleStyleResources(compilation, plugins) {
+async function bundleStyleResources(compilation, resourcePlugins) {
   const { outputDir } = compilation.context;
 
   for (const resource of compilation.resources.values()) {
@@ -94,25 +94,34 @@ async function bundleStyleResources(compilation, plugins) {
         optimizedFileContents = contents;
       } else {
         const url = resource.sourcePathURL;
-        const body = await fs.promises.readFile(url, 'utf-8');
-        const headers = new Headers();
-        const request = new Request(url);
+        const contentType = 'text/css';
+        const headers = new Headers({ 'Content-Type': contentType });
+        const request = new Request(url, { headers });
+        const initResponse = new Response(contents, { headers });
 
-        headers.append('content-type', 'text/css');
+        let response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+          const intermediateResponse = await responsePromise;
+          const shouldIntercept = plugin.shouldIntercept && await plugin.shouldIntercept(url, request, intermediateResponse.clone());
 
-        let response = new Response(body, { headers });
+          if (shouldIntercept) {
+            const thisResponse = await plugin.intercept(url, request.clone(), intermediateResponse.clone());
 
-        for (const plugin of plugins) {
-          if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
-            response = await plugin.intercept(url, request, response);
+            if (thisResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
+              return Promise.resolve(intermediateResponse.clone());
+            }
           }
-        }
 
-        for (const plugin of plugins) {
-          if (plugin.shouldOptimize && await plugin.shouldOptimize(url, response)) {
-            response = await plugin.optimize(url, response);
-          }
-        }
+          return Promise.resolve(responsePromise);
+        }, Promise.resolve(initResponse));
+
+        response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+          const intermediateResponse = await responsePromise;
+          const shouldOptimize = plugin.shouldOptimize && await plugin.shouldOptimize(url, intermediateResponse.clone());
+
+          return shouldOptimize
+            ? Promise.resolve(await plugin.optimize(url, intermediateResponse.clone()))
+            : Promise.resolve(responsePromise);
+        }, Promise.resolve(response.clone()));
 
         optimizedFileContents = await response.text();
       }

@@ -55,14 +55,14 @@ class NodeModulesResource extends ResourceInterface {
     const body = await fs.promises.readFile(pathnameExtended, 'utf-8');
 
     return new Response(body, {
-      headers: {
+      headers: new Headers({
         'Content-Type': this.contentType
-      }
+      })
     });
   }
 
   async shouldIntercept(url, request, response) {
-    return response.headers.get('content-type').indexOf('text/html') >= 0;
+    return response.headers.get('Content-Type').indexOf('text/html') >= 0;
   }
 
   async intercept(url, request, response) {

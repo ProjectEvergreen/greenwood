@@ -380,14 +380,14 @@ class StandardHtmlResource extends ResourceInterface {
 
     // TODO avoid having to rebuild response each time?
     return new Response(body, {
-      headers: {
-        'content-type': this.contentType
-      }
+      headers: new Headers({
+        'Content-Type': this.contentType
+      })
     });
   }
 
   async shouldOptimize(url, response) {
-    return response.headers.get('content-type').indexOf(this.contentType) >= 0;
+    return response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
   }
 
   async optimize(url, response) {

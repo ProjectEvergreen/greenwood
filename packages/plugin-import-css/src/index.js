@@ -42,9 +42,9 @@ class ImportCssResource extends ResourceInterface {
     const cssInJsBody = `const css = \`${body.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\')}\`;\nexport default css;`;
     
     return new Response(cssInJsBody, {
-      headers: {
-        'content-type': this.contentType
-      }
+      headers: new Headers({
+        'Content-Type': this.contentType
+      })
     });
   }
 }

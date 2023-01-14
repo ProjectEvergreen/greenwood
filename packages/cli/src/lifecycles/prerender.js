@@ -85,7 +85,7 @@ async function servePage(url, request, plugins) {
 
 async function interceptPage(url, request, plugins, body) {
   const headers = new Headers();
-  headers.append('content-type', 'text/html');
+  headers.append('Content-Type', 'text/html');
 
   let response = new Response(body, { headers });
 
@@ -158,6 +158,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
 async function preRenderCompilationCustom(compilation, customPrerender) {
   const { scratchDir } = compilation.context;
   const renderer = (await import(customPrerender.customUrl)).default;
+  // const plugins = getPluginInstances(compilation);
 
   console.info('pages to generate', `\n ${compilation.graph.map(page => page.route).join('\n ')}`);
 
@@ -165,12 +166,17 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     const { route, outputPath } = page;
     const outputDirUrl = new URL(`./${route}`, scratchDir);
     const outputPathUrl = new URL(`./${outputPath}`, scratchDir);
+    // const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+    // const request = new Request(url);
 
     // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
     body = body.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
     body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
     body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
     body = body.replace(/type="module-shim"/g, 'type="module"');
+
+    // TODO no intercept needed?
+    // body = await (await interceptPage(url, request, plugins, body)).text();
 
     // clean this up here to avoid sending webcomponents-bundle to rollup
     body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
