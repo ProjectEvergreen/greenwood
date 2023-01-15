@@ -17,11 +17,11 @@ function getCustomLoaderPlugins(url, body, headers) {
 
 // https://nodejs.org/docs/latest-v16.x/api/esm.html#resolvespecifier-context-nextresolve
 export function resolve(specifier, context, defaultResolve) {
-  const { baseURL } = context;
+  const { parentURL } = context;
 
   if (getCustomLoaderPlugins(specifier).length > 0) {
     return {
-      url: new URL(specifier, baseURL).href,
+      url: new URL(specifier, parentURL).href,
       shortCircuit: true
     };
   }
