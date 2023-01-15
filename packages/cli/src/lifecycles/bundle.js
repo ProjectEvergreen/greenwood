@@ -107,7 +107,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
             const thisResponse = await plugin.intercept(url, request.clone(), intermediateResponse.clone());
 
             if (thisResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
-              return Promise.resolve(intermediateResponse.clone());
+              return Promise.resolve(thisResponse.clone());
             }
           }
 
