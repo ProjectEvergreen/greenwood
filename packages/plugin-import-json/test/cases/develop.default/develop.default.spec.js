@@ -13,8 +13,8 @@
  *
  * {
  *   plugins: [{
- *      ...greenwoodPluginImportJson()
- *  }]
+ *     greenwoodPluginImportJson()
+ *   }]
  * }
  *
  *
@@ -89,7 +89,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['Content-Type']).to.equal('text/javascript');
+        expect(response.headers['content-type']).to.equal('text/javascript');
         done();
       });
 

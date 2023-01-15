@@ -10,13 +10,13 @@ import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js'
 async function getConfig (compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = 'postcss.config';
-  const defaultConfig = (await import(new URL(`${configFile}.js`, import.meta.url))).default;
+  const defaultConfig = (await import(new URL(`./${configFile}.js`, import.meta.url))).default;
   const userConfig = fs.existsSync(new URL(`./${configFile}.mjs`, projectDirectory).pathname)
     ? (await import(new URL(`./${configFile}.mjs`, projectDirectory))).default
     : {};
   let finalConfig = Object.assign({}, userConfig);
 
-  if (userConfig && extendConfig) {    
+  if (userConfig && extendConfig) {
     finalConfig.plugins = Array.isArray(userConfig.plugins)
       ? [...defaultConfig.plugins, ...userConfig.plugins]
       : [...defaultConfig.plugins];
@@ -43,7 +43,7 @@ class PostCssResource extends ResourceInterface {
     const css = plugins.length > 0
       ? (await postcss(plugins).process(body, { from: url.pathname })).css
       : body;
-    
+
     // TODO avoid having to rebuild response each time?
     return new Response(css, {
       headers: response.headers
