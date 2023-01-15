@@ -22,7 +22,8 @@ class IncludeHtmlResource extends ResourceInterface {
 
       for (const link of htmlIncludeLinks) {
         const href = link.match(/href="(.*)"/)[1];
-        const includeContents = await fs.readFile(new URL(href, this.compilation.context.userWorkspace), 'utf-8');
+        const prefix = href.startsWith('/') ? '.' : '';
+        const includeContents = await fs.promises.readFile(new URL(`${prefix}${href}`, this.compilation.context.userWorkspace), 'utf-8');
 
         body = body.replace(link, includeContents);
       }
