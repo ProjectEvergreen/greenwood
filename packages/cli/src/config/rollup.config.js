@@ -10,22 +10,25 @@ function greenwoodResourceLoader (compilation) {
   return {
     name: 'greenwood-resource-loader',
     resolveId(id) {
+      const normalizedId = id.replace(/\?type=(.*)/, '');
       const { userWorkspace } = compilation.context;
 
-      if ((id.indexOf('./') === 0 || id.indexOf('/') === 0) && fs.existsSync(new URL(`./${id.replace(/\?type=(.*)/, '')}`, userWorkspace).pathname)) {
-        return new URL(`./${id.replace(/\?type=(.*)/, '')}`, userWorkspace).pathname;
+      if ((id.indexOf('./') === 0 || id.indexOf('/') === 0) && fs.existsSync(new URL(`./${normalizedId}`, userWorkspace).pathname)) {
+        return new URL(`./${normalizedId}`, userWorkspace).pathname;
       }
 
       return null;
     },
     async load(id) {
-      const url = new URL(`file://${id}`);
-      const extension = url.pathname.split('.').pop();
+      const pathname = id.indexOf('?') >= 0 ? id.slice(0, id.indexOf('?')) : id;
+      const extension = pathname.split('.').pop();
 
-      if (extension !== 'js') {
+      if (extension !== '' && extension !== 'js') {
+        const url = new URL(`file://${pathname}`);
         const request = new Request(url.href);
         let response = new Response('');
 
+        // TODO should this use the reduce pattern too?
         for (const plugin of resourcePlugins) {
           if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
             response = await plugin.serve(url, request);
