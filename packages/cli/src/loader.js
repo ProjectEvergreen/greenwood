@@ -9,7 +9,6 @@ const resourcePlugins = config.plugins.filter(plugin => plugin.type === 'resourc
 }));
 
 async function getCustomLoaderResponse(url, body = '', checkOnly = false) {
-  console.debug('getCustomLoaderResponse', { url, body, checkOnly });
   const headers = new Headers({
     'Content-Type': 'text/javascript'
   });
@@ -66,19 +65,13 @@ export async function resolve(specifier, context, defaultResolve) {
 
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#loadurl-context-nextload
 export async function load(source, context, defaultLoad) {
-  console.debug('my load', { source, context });
   const extension = source.split('.').pop();
   const url = new URL('', `${source}?type=${extension}`);
   const { shouldHandle } = await getCustomLoaderResponse(url, null, true);
 
-  console.debug({ url, shouldHandle, extension });
-
   if (shouldHandle) {
-    console.log('we have a hit for !!!!!', { source });
     const contents = await fs.readFile(new URL(source), 'utf-8');
-    console.debug('what goes in???????', { contents });
     const { response } = await getCustomLoaderResponse(url, contents);
-    console.debug('$$$$$', { response });
     const body = await response.text();
 
     // TODO better way to handle remove export default?
