@@ -2,7 +2,7 @@
 // https://github.com/nodejs/node/discussions/41711
 import fs from 'fs';
 import path from 'path';
-import { load as experimentalLoad } from '../packages/cli/src/loader.js';
+import { load as experimentalLoad, resolve as experimentalResolve } from '../packages/cli/src/loader.js';
 
 export async function load(url, context, defaultLoad) {
   const ext = path.extname(url);
@@ -11,6 +11,16 @@ export async function load(url, context, defaultLoad) {
     return loadBin(url, context, defaultLoad);
   } else {
     return experimentalLoad(url, context, defaultLoad);
+  }
+}
+
+export function resolve(specifier, context, defaultResolve) {
+  const ext = path.extname(specifier);
+
+  if (ext === '') {
+    return experimentalResolve(specifier, context, defaultResolve);
+  } else {
+    return defaultResolve(specifier, context, defaultResolve);
   }
 }
 
