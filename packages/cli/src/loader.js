@@ -1,23 +1,72 @@
-import path from 'path';
+import fs from 'fs/promises';
 import { readAndMergeConfig as initConfig } from './lifecycles/config.js';
-import { URL, fileURLToPath } from 'url';
 
 const config = await initConfig();
-const plugins = config.plugins.filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin).map(plugin => plugin.provider({
+const resourcePlugins = config.plugins.filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin).map(plugin => plugin.provider({
   context: {
-    projectDirectory: process.cwd()
+    projectDirectory: new URL(`file://${process.cwd()}`)
   }
 }));
 
-function getCustomLoaderPlugins(url, body, headers) {
-  return plugins.filter(plugin => plugin.extensions.includes(path.extname(url)) && (plugin.shouldServe(url, body, headers) || plugin.shouldIntercept(url, body, headers)));
+async function getCustomLoaderResponse(url, body = '', checkOnly = false) {
+  console.debug('getCustomLoaderResponse', { url, body, checkOnly });
+  const headers = new Headers({
+    'Content-Type': 'text/javascript'
+  });
+  const request = new Request(url.href, { headers });
+  const initResponse = new Response(body, { headers });
+  let response = initResponse; // new Response(body);
+  let shouldHandle = false;
+
+  // TODO should this use the reduce pattern too?
+  for (const plugin of resourcePlugins) {
+    if (plugin.shouldServe && await plugin.shouldServe(url, request.clone())) {
+      shouldHandle = true;
+  
+      if (!checkOnly) {
+        response = await plugin.serve(url, request.clone());
+      }
+    }
+  }
+
+  for (const plugin of resourcePlugins) {
+    if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request.clone(), response.clone())) {
+      shouldHandle = true;
+
+      if (!checkOnly) {
+        response = await plugin.intercept(url, request.clone(), response.clone());
+      }
+    }
+  }
+  // let response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+  //   return plugin.shouldServe && await plugin.shouldServe(url, request.clone())
+  //     ? Promise.resolve(await plugin.serve(url, request.clone()))
+  //     : Promise.resolve(await responsePromise);
+  // }, Promise.resolve(initResponse.clone()));
+
+  // response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+  //   const intermediateResponse = await responsePromise;
+  //   return plugin.shouldIntercept && await plugin.shouldIntercept(url, request.clone(), intermediateResponse.clone())
+  //     ? Promise.resolve(await plugin.intercept(url, request.clone(), await intermediateResponse.clone()))
+  //     : Promise.resolve(responsePromise);
+  // }, Promise.resolve(initResponse.clone()));
+
+  return {
+    shouldHandle,
+    response
+  };
 }
 
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#resolvespecifier-context-nextresolve
-export function resolve(specifier, context, defaultResolve) {
+export async function resolve(specifier, context, defaultResolve) {
+  console.log('my resolve', { specifier });
   const { baseURL } = context;
 
-  if (getCustomLoaderPlugins(specifier).length > 0) {
+  const { shouldHandle } = await getCustomLoaderResponse(new URL(specifier), null, true);
+
+  console.debug('resolve shouldHandle????', { specifier, shouldHandle });
+  if (shouldHandle) {
+    console.log('handlign!!!!!!!@@@@@', { specifier });
     return {
       url: new URL(specifier, baseURL).href,
       shortCircuit: true
@@ -29,35 +78,48 @@ export function resolve(specifier, context, defaultResolve) {
 
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#loadurl-context-nextload
 export async function load(source, context, defaultLoad) {
-  const resourcePlugins = getCustomLoaderPlugins(source);
-  const extension = path.extname(source).replace('.', '');
+  console.debug('my load', { source, context });
+  const extension = source.split('.').pop();
+  const { shouldHandle } = await getCustomLoaderResponse(new URL('', `${source}?type=${extension}`), null, true);
 
-  if (resourcePlugins.length) {
-    const headers = {
-      request: {
-        originalUrl: `${source}?type=${extension}`,
-        accept: ''
-      }
-    };
-    let contents = '';
+  console.debug({ shouldHandle });
 
-    for (const plugin of resourcePlugins) {
-      if (await plugin.shouldServe(source, headers)) {
-        contents = (await plugin.serve(source, headers)).body || contents;
-      }
-    }
+  if (shouldHandle) {
+    console.log('we have a hit for !!!!!', { source });
+    const contents = await fs.readFile(new URL(source), 'utf-8');
+    console.debug('what goes in???????', { contents });
+    const { response } = await getCustomLoaderResponse(new URL('', `${source}?type=${extension}`), contents);
+    console.debug({ response });
+    const body = await response.text();
 
-    for (const plugin of resourcePlugins) {
-      if (await plugin.shouldIntercept(fileURLToPath(source), contents, headers)) {
-        contents = (await plugin.intercept(fileURLToPath(source), contents, headers)).body || contents;
-      }
-    }
+    console.debug('must come out!!!?????????', { body });
+
+    // const headers = {
+    //   request: {
+    //     originalUrl: `${source}?type=${extension}`,
+    //     accept: ''
+    //   }
+    // };
+    // let contents = '';
+
+    // // TODO should this use the reduce pattern too?
+    // for (const plugin of resourcePlugins) {
+    //   if (await plugin.shouldServe(source, headers)) {
+    //     contents = (await plugin.serve(source, headers)).body || contents;
+    //   }
+    // }
+
+    // for (const plugin of resourcePlugins) {
+    //   if (await plugin.shouldIntercept(fileURLToPath(source), contents, headers)) {
+    //     contents = (await plugin.intercept(fileURLToPath(source), contents, headers)).body || contents;
+    //   }
+    // }
 
     // TODO better way to handle remove export default?
     // https://github.com/ProjectEvergreen/greenwood/issues/948
     return {
       format: extension === 'json' ? 'json' : 'module',
-      source: extension === 'json' ? JSON.parse(contents.replace('export default ', '')) : contents,
+      source: extension === 'json' ? JSON.parse(body.replace('export default ', '')) : body,
       shortCircuit: true
     };
   }
