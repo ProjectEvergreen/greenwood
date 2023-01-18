@@ -62,8 +62,8 @@ async function getDevServer(compilation) {
       const initResponse = new Response(null, { status });
       const request = new Request(url.href, { method, headers: header });
       const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        return plugin.shouldServe && await plugin.shouldServe(url, request.clone())
-          ? Promise.resolve(await plugin.serve(url, request.clone()))
+        return plugin.shouldServe && await plugin.shouldServe(url, request)
+          ? Promise.resolve(await plugin.serve(url, request))
           : Promise.resolve(await responsePromise);
       }, Promise.resolve(initResponse.clone()));
 
@@ -94,8 +94,8 @@ async function getDevServer(compilation) {
       });
       const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
         const intermediateResponse = await responsePromise;
-        return plugin.shouldIntercept && await plugin.shouldIntercept(url, request.clone(), intermediateResponse.clone())
-          ? Promise.resolve(await plugin.intercept(url, request.clone(), await intermediateResponse.clone()))
+        return plugin.shouldIntercept && await plugin.shouldIntercept(url, request, intermediateResponse.clone())
+          ? Promise.resolve(await plugin.intercept(url, request, await intermediateResponse.clone()))
           : Promise.resolve(responsePromise);
       }, Promise.resolve(initResponse.clone()));
 
@@ -180,8 +180,8 @@ async function getStaticServer(compilation, composable) {
         .find((plugin) => plugin.name === 'plugin-dev-proxy')
         .provider(compilation);
 
-      if (await proxyPlugin.shouldServe(url, request.clone())) {
-        const response = await proxyPlugin.serve(url, request.clone());
+      if (await proxyPlugin.shouldServe(url, request)) {
+        const response = await proxyPlugin.serve(url, request);
 
         ctx.body = Readable.from(response.body);
         ctx.set('Content-Type', response.headers.get('Content-Type'));
@@ -202,8 +202,8 @@ async function getStaticServer(compilation, composable) {
       headers: new Headers(ctx.response.header)
     });
     const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-      return plugin.shouldServe && await plugin.shouldServe(url, request.clone())
-        ? Promise.resolve(await plugin.serve(url, request.clone()))
+      return plugin.shouldServe && await plugin.shouldServe(url, request)
+        ? Promise.resolve(await plugin.serve(url, request))
         : responsePromise;
     }, Promise.resolve(initResponse));
 

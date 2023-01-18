@@ -19,21 +19,21 @@ async function getCustomLoaderResponse(url, body = '', checkOnly = false) {
 
   // TODO should this use the reduce pattern too?
   for (const plugin of resourcePlugins) {
-    if (plugin.shouldServe && await plugin.shouldServe(url, request.clone())) {
+    if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
       shouldHandle = true;
   
       if (!checkOnly) {
-        response = await plugin.serve(url, request.clone());
+        response = await plugin.serve(url, request);
       }
     }
   }
 
   for (const plugin of resourcePlugins) {
-    if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request.clone(), response.clone())) {
+    if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
       shouldHandle = true;
 
       if (!checkOnly) {
-        response = await plugin.intercept(url, request.clone(), response.clone());
+        response = await plugin.intercept(url, request, response.clone());
       }
     }
   }
