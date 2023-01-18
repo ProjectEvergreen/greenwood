@@ -22,15 +22,18 @@ class ImportJsonResource extends ResourceInterface {
   }
 
   async intercept(url, request, response) {
+    console.log('JSON intercept!?!?!?!', { url });
     // TODO better way to handle this?
     // https://github.com/ProjectEvergreen/greenwood/issues/948
-    const body = await response.text();
+    const json = await response.json();
+    const body = `export default ${JSON.stringify(json)}`;
     // TODO need to support an empty body to read from disc?
     // const json = body === ''
     //   ? await fs.promises.readFile(url, 'utf-8')
     //   : body;
+    console.log('JSON return', { body });
 
-    return new Response(`export default ${body}`, {
+    return new Response(body, {
       headers: new Headers({
         'Content-Type': this.contentType
       })

@@ -38,18 +38,6 @@ async function getCustomLoaderResponse(url, body = '', checkOnly = false) {
       }
     }
   }
-  // let response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-  //   return plugin.shouldServe && await plugin.shouldServe(url, request.clone())
-  //     ? Promise.resolve(await plugin.serve(url, request.clone()))
-  //     : Promise.resolve(await responsePromise);
-  // }, Promise.resolve(initResponse.clone()));
-
-  // response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-  //   const intermediateResponse = await responsePromise;
-  //   return plugin.shouldIntercept && await plugin.shouldIntercept(url, request.clone(), intermediateResponse.clone())
-  //     ? Promise.resolve(await plugin.intercept(url, request.clone(), await intermediateResponse.clone()))
-  //     : Promise.resolve(responsePromise);
-  // }, Promise.resolve(initResponse.clone()));
 
   return {
     shouldHandle,
@@ -80,46 +68,24 @@ export async function resolve(specifier, context, defaultResolve) {
 export async function load(source, context, defaultLoad) {
   console.debug('my load', { source, context });
   const extension = source.split('.').pop();
-  const { shouldHandle } = await getCustomLoaderResponse(new URL('', `${source}?type=${extension}`), null, true);
+  const url = new URL('', `${source}?type=${extension}`);
+  const { shouldHandle } = await getCustomLoaderResponse(url, null, true);
 
-  console.debug({ shouldHandle });
+  console.debug({ url, shouldHandle, extension });
 
   if (shouldHandle) {
     console.log('we have a hit for !!!!!', { source });
     const contents = await fs.readFile(new URL(source), 'utf-8');
     console.debug('what goes in???????', { contents });
-    const { response } = await getCustomLoaderResponse(new URL('', `${source}?type=${extension}`), contents);
-    console.debug({ response });
+    const { response } = await getCustomLoaderResponse(url, contents);
+    console.debug('$$$$$', { response });
     const body = await response.text();
-
-    console.debug('must come out!!!?????????', { body });
-
-    // const headers = {
-    //   request: {
-    //     originalUrl: `${source}?type=${extension}`,
-    //     accept: ''
-    //   }
-    // };
-    // let contents = '';
-
-    // // TODO should this use the reduce pattern too?
-    // for (const plugin of resourcePlugins) {
-    //   if (await plugin.shouldServe(source, headers)) {
-    //     contents = (await plugin.serve(source, headers)).body || contents;
-    //   }
-    // }
-
-    // for (const plugin of resourcePlugins) {
-    //   if (await plugin.shouldIntercept(fileURLToPath(source), contents, headers)) {
-    //     contents = (await plugin.intercept(fileURLToPath(source), contents, headers)).body || contents;
-    //   }
-    // }
 
     // TODO better way to handle remove export default?
     // https://github.com/ProjectEvergreen/greenwood/issues/948
     return {
       format: extension === 'json' ? 'json' : 'module',
-      source: extension === 'json' ? JSON.parse(body.replace('export default ', '')) : body,
+      source: extension === 'json' ? JSON.stringify(JSON.parse(contents.replace('export default ', ''))) : body,
       shortCircuit: true
     };
   }
