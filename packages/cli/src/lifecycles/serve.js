@@ -1,5 +1,5 @@
 import fs from 'fs';
-// import { hashString } from '../lib/hashing-utils.js';
+import { hashString } from '../lib/hashing-utils.js';
 import Koa from 'koa';
 import { Readable } from 'stream';
 import { ResourceInterface } from '../lib/resource-interface.js';
@@ -113,35 +113,34 @@ async function getDevServer(compilation) {
 
   // ETag Support - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
   // https://stackoverflow.com/questions/43659756/chrome-ignores-the-etag-header-and-just-uses-the-in-memory-cache-disk-cache
-  // app.use(async (ctx) => {
-  //   const body = ctx.response.body;
-  //   const { url } = ctx;
+  app.use(async (ctx) => {
+    const body = ctx.response.body;
+    const url = new URL(ctx.url);
 
-  //   // don't interfere with external requests or API calls, binary files, or JSON
-  //   // and only run in development
-  //   if (process.env.__GWD_COMMAND__ === 'develop' && path.extname(url) !== '' && url.indexOf('http') !== 0) { // eslint-disable-line no-underscore-dangle
-  //     if (!body || Buffer.isBuffer(body)) {
-  //       // console.warn(`no body for => ${ctx.url}`);
-  //     } else {
-  //       const inm = ctx.headers['if-none-match'];
-  //       const etagHash = path.extname(ctx.request.headers.originalUrl) === '.json'
-  //         ? hashString(JSON.stringify(body))
-  //         : hashString(body);
+    // don't interfere with external requests or API calls, binary files, or JSON
+    // and only run in development
+    if (process.env.__GWD_COMMAND__ === 'develop' && url.protocol === 'file:') { // eslint-disable-line no-underscore-dangle
+      if (!body || Buffer.isBuffer(body)) {
+        // console.warn(`no body for => ${ctx.url}`);
+      } else {
+        const inm = ctx.headers['if-none-match'];
+        const etagHash = url.pathname.split('.').pop() === 'json'
+          ? hashString(JSON.stringify(body))
+          : hashString(body);
 
-  //       if (inm && inm === etagHash) {
-  //         ctx.status = 304;
-  //         ctx.body = null;
-  //         ctx.set('Etag', etagHash);
-  //         ctx.set('Cache-Control', 'no-cache');
-  //       } else if (!inm || inm !== etagHash) {
-  //         ctx.set('Etag', etagHash);
-  //       }
-  //     }
-  //   }
+        if (inm && inm === etagHash) {
+          ctx.status = 304;
+          ctx.body = null;
+          ctx.set('Etag', etagHash);
+          ctx.set('Cache-Control', 'no-cache');
+        } else if (!inm || inm !== etagHash) {
+          ctx.set('Etag', etagHash);
+        }
+      }
+    }
+  });
 
-  // });
-
-  return Promise.resolve(app);
+  return app;
 }
 
 async function getStaticServer(compilation, composable) {
