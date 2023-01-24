@@ -103,10 +103,7 @@ class NodeModulesResource extends ResourceInterface {
         </script>
     `);
 
-    // TODO avoid having to rebuild response each time?
-    return new Response(body, {
-      headers: response.headers
-    });
+    return new Response(body);
   }
 }
 

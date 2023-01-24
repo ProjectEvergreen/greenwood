@@ -24,9 +24,7 @@ class PuppeteerResource extends ResourceInterface {
         <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     `);
 
-    return new Response(body, {
-      headers: response.headers
-    });
+    return new Response(body);
   }
 }
 

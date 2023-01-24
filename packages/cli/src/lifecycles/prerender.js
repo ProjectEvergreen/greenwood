@@ -77,6 +77,7 @@ async function servePage(url, request, plugins) {
   for (const plugin of plugins) {
     if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
       response = await plugin.serve(url, request);
+      break;
     }
   }
 
@@ -84,10 +85,9 @@ async function servePage(url, request, plugins) {
 }
 
 async function interceptPage(url, request, plugins, body) {
-  const headers = new Headers();
-  headers.append('Content-Type', 'text/html');
-
-  let response = new Response(body, { headers });
+  let response = new Response(body, {
+    headers: new Headers({ 'Content-Type': 'text/html' })
+  });
 
   for (const plugin of plugins) {
     if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {

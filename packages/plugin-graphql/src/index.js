@@ -32,11 +32,10 @@ class GraphQLResource extends ResourceInterface {
       export default \`${js}\`;
     `;
 
-    // TODO avoid having to rebuild response each time?
     return new Response(body, {
-      headers: {
+      headers: new Headers({
         'Content-Type': this.contentType[0]
-      }
+      })
     });
   }
   
@@ -48,14 +47,11 @@ class GraphQLResource extends ResourceInterface {
     const body = await response.text();
     const newBody = mergeImportMap(body, importMap);
 
-    // TODO avoid having to rebuild response each time?
-    return new Response(newBody, {
-      headers: response.headers
-    });
+    return new Response(newBody);
   }
 
   async shouldOptimize(url, response) {
-    return response.headers.get('Content-Type').indexOf(this.contentType[1]) >= 0;
+    return (response.headers.get('Content-Type') || response.headers.get('content-type')).indexOf(this.contentType[1]) >= 0;
   }
 
   async optimize(url, response) {
@@ -68,10 +64,7 @@ class GraphQLResource extends ResourceInterface {
       <head>
     `);
 
-    // TODO avoid having to rebuild response each time?
-    return new Response(body, {
-      headers: response.headers
-    });
+    return new Response(body);
   }
 }
 

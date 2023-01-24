@@ -2,6 +2,7 @@
 import fs from 'fs';
 import { getRollupConfig } from '../config/rollup.config.js';
 import { hashString } from '../lib/hashing-utils.js';
+import { mergeResponse } from '../lib/resource-utils.js';
 import path from 'path';
 import { rollup } from 'rollup';
 
@@ -67,7 +68,6 @@ async function bundleStyleResources(compilation, resourcePlugins) {
       let optimizedFileContents;
 
       if (src) {
-        // TODO remove path. usage
         const basename = path.basename(srcPath);
         const basenamePieces = path.basename(srcPath).split('.');
         const fileNamePieces = srcPath.split('/').filter(piece => piece !== ''); // normalize by removing any leading /'s  
@@ -104,10 +104,12 @@ async function bundleStyleResources(compilation, resourcePlugins) {
           const shouldIntercept = plugin.shouldIntercept && await plugin.shouldIntercept(url, request, intermediateResponse.clone());
 
           if (shouldIntercept) {
-            const thisResponse = await plugin.intercept(url, request, intermediateResponse.clone());
+            const currentResponse = await plugin.intercept(url, request, intermediateResponse.clone());
+            const mergedResponse = mergeResponse(intermediateResponse.clone(), currentResponse.clone());
 
-            if (thisResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
-              return Promise.resolve(thisResponse.clone());
+            // TODO better way to handle Response automatically setting content-type
+            if ((mergedResponse.headers.get('Content-Type') || mergedResponse.headers.get('content-type')).indexOf(contentType) >= 0) {
+              return Promise.resolve(mergedResponse.clone());
             }
           }
 
