@@ -44,10 +44,7 @@ class PostCssResource extends ResourceInterface {
       ? (await postcss(plugins).process(body, { from: url.pathname })).css
       : body;
 
-    // TODO avoid having to rebuild response each time?
-    return new Response(css, {
-      headers: response.headers
-    });
+    return new Response(css);
   }
 }
 

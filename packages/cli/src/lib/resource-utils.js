@@ -1,7 +1,6 @@
 import fs from 'fs';
 import { hashString } from '../lib/hashing-utils.js';
 
-// TODO could make async?
 function modelResource(context, type, src = undefined, contents = undefined, optimizationAttr = undefined, rawAttributes = undefined) {
   const { projectDirectory, scratchDir, userWorkspace } = context;
   const extension = type === 'script' ? 'js' : 'css';
@@ -49,4 +48,25 @@ function modelResource(context, type, src = undefined, contents = undefined, opt
   };
 }
 
-export { modelResource };
+function mergeResponse(destination, source) {
+  const headers = destination.headers || new Headers();
+
+  source.headers.forEach((value, key) => {
+    // TODO better way to handle Response automatically setting content-type
+    const isDefaultHeader = key.toLowerCase() === 'content-type' && value === 'text/plain;charset=UTF-8';
+
+    if (!isDefaultHeader) {
+      headers.set(key, value);
+    }
+  });
+
+  // TODO handle merging in state (aborted, type, status, etc)
+  return new Response(source.body, {
+    headers
+  });
+}
+
+export {
+  mergeResponse,
+  modelResource
+};

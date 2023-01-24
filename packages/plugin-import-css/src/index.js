@@ -37,8 +37,7 @@ class ImportCssResource extends ResourceInterface {
   }
 
   async intercept(url, request, response) {
-    // TODO why do we need to check for body first?
-    const body = await response.text(); // => body || await fs.promises.readFile(pathToFileURL(url), 'utf-8');
+    const body = await response.text();
     const cssInJsBody = `const css = \`${body.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\')}\`;\nexport default css;`;
     
     return new Response(cssInJsBody, {

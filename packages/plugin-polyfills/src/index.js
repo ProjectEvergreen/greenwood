@@ -64,9 +64,7 @@ class PolyfillsResource extends ResourceInterface {
       `);
     }
 
-    return new Response(body, {
-      headers: response.headers
-    });
+    return new Response(body);
   }
 }
 

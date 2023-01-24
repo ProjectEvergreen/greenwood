@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { hashString } from '../lib/hashing-utils.js';
 import Koa from 'koa';
+import { mergeResponse } from '../lib/resource-utils.js';
 import { Readable } from 'stream';
 import { ResourceInterface } from '../lib/resource-interface.js';
 
@@ -35,7 +36,7 @@ async function getDevServer(compilation) {
       const url = new URL(`http://localhost:${compilation.config.port}${ctx.url}`);
       const initRequest = new Request(url, {
         method: ctx.request.method,
-        headers: ctx.request.header
+        headers: new Headers(ctx.request.header)
       });
       const request = await resourcePlugins.reduce(async (requestPromise, plugin) => {
         const intermediateRequest = await requestPromise;
@@ -59,13 +60,15 @@ async function getDevServer(compilation) {
       const url = new URL(ctx.url);
       const { method, header } = ctx.request;
       const { status } = ctx.response;
-      const initResponse = new Response(null, { status });
-      const request = new Request(url.href, { method, headers: header });
-      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        return plugin.shouldServe && await plugin.shouldServe(url, request)
-          ? Promise.resolve(await plugin.serve(url, request))
-          : Promise.resolve(await responsePromise);
-      }, Promise.resolve(initResponse.clone()));
+      const request = new Request(url.href, { method, headers: new Headers(header) });
+      let response = new Response(null, { status });
+
+      for (const plugin of resourcePlugins) {
+        if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
+          response = await plugin.serve(url, request);
+          break;
+        }
+      }
 
       // TODO would be nice if Koa (or other framework) could just a Response object directly
       // not sure why we have to use `Readable.from`, does this couple us to NodeJS?
@@ -86,7 +89,7 @@ async function getDevServer(compilation) {
       const url = new URL(ctx.url);
       const request = new Request(url, {
         method: ctx.request.method,
-        headers: ctx.request.header
+        headers: new Headers(ctx.request.header)
       });
       const initResponse = new Response(ctx.body, {
         status: ctx.response.status,
@@ -94,9 +97,14 @@ async function getDevServer(compilation) {
       });
       const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
         const intermediateResponse = await responsePromise;
-        return plugin.shouldIntercept && await plugin.shouldIntercept(url, request, intermediateResponse.clone())
-          ? Promise.resolve(await plugin.intercept(url, request, await intermediateResponse.clone()))
-          : Promise.resolve(responsePromise);
+        if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, intermediateResponse.clone())) {
+          const current = await plugin.intercept(url, request, await intermediateResponse.clone());
+          const merged = mergeResponse(intermediateResponse.clone(), current);
+
+          return Promise.resolve(merged);
+        } else {
+          return Promise.resolve(await responsePromise);
+        }
       }, Promise.resolve(initResponse.clone()));
 
       // TODO would be nice if Koa (or other framework) could just a Response object directly

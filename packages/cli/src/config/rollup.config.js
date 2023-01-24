@@ -36,8 +36,8 @@ function greenwoodResourceLoader (compilation) {
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
-            response = await plugin.intercept(url, request, response);
+          if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
+            response = await plugin.intercept(url, request, response.clone());
           }
         }
 

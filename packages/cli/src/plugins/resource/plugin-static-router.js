@@ -28,7 +28,7 @@ class StaticRouterResource extends ResourceInterface {
 
   async shouldIntercept(url, request, response) {
     const { pathname, protocol } = url;
-    const contentType = response.headers.get['Content-Type'] || '';
+    const contentType = response.headers.get('Content-Type') || '';
 
     // TODO should this also happen during development too?
     return process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
@@ -45,16 +45,13 @@ class StaticRouterResource extends ResourceInterface {
       </head>
     `);
 
-    // TODO avoid having to rebuild response each time?
-    return new Response(body, {
-      headers: response.headers
-    });
+    return new Response(body);
   }
 
   async shouldOptimize(url, response) {
     return this.compilation.config.staticRouter
       && !url.pathname.startsWith('/404')
-      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
+      && (response.headers.get('Content-Type') || response.headers.get('content-type')).indexOf(this.contentType) >= 0;
   }
 
   async optimize(url, response) {
@@ -114,10 +111,7 @@ class StaticRouterResource extends ResourceInterface {
         </body>
       `);
 
-    // TODO avoid having to rebuild response each time?
-    return new Response(body, {
-      headers: response.headers
-    });
+    return new Response(body);
   }
 }
 

@@ -378,7 +378,6 @@ class StandardHtmlResource extends ResourceInterface {
       `);
     }
 
-    // TODO avoid having to rebuild response each time?
     return new Response(body, {
       headers: new Headers({
         'Content-Type': this.contentType
