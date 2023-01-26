@@ -7,160 +7,177 @@ index: 3
 
 ## Resource
 
-Resource plugins allow the manipulation of files loaded through ESM.  Depending on if you need to support a file with a custom extension, or to manipulate standard file extensions, Resource plugins provide the lifecycle hooks into Greenwood to do things like:
-- Integrating Site Analytics (Google, Snowplow) or third snippets into generated _index.html_ pages
-- Processing TypeScript into JavaScript
+Resource plugins allow for the manipulation and transformation of files served and bundled by Greenwood.  Whether you need to support a file with a custom extension or transform the contents of a file from one type to the other, resource plugins provide the lifecycle hooks into Greenwood to enable these customizations.  Examples from Greenwood's own plugin system include:
+* Minifying and bundling CSS
+* Compiling TypeScript into JavaScript
+* Converting vanilla CSS into ESM
+* Injecting site analytics or other third party snippets into your HTML
 
-This API is also used as part of our bundling process to "teach" Rollup how to process any non JavaScript files!
+It uses standard Web APIs for facilitating these transformations such as [`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL), [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request), and [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response).
 
-### API (Resource Interface)
+### API
 
-> _**Note**: This API is [planning to change soon](https://github.com/ProjectEvergreen/greenwood/issues/948) as part of a general alignment within Greenwood to align the signatures of these lifecycle method to be more consistent with web standards in support of Greenwood adopting compatibility with [serverless and edge runtimes](https://github.com/ProjectEvergreen/greenwood/issues/953)_.
-
-Although JavaScript is loosely typed, a [resource "interface"](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/lib/resource-interface.js) has been provided by Greenwood that you can use to start building your own resource plugins.  Effectively you have to define two things:
-- `extensions`: The file types your plugin will operate on
-- `contentType`: A browser compatible contentType to ensure browsers correctly interpret you transformations
+A [resource "interface"](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/lib/resource-interface.js) has been provided by Greenwood that you can use to start building your own resource plugins with.
 
 ```javascript
-import fs from 'fs';
-import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class ExampleResource extends ResourceInterface {
   constructor(compilation, options = {}) {
-    this.compilation = compilation;
-    this.options = options;
-    this.extensions = [];
-    this.contentType = '';
+    this.compilation = compilation; // Greenwood's compilation object
+    this.options = options; // any optional configuration provided by the user of your plugin
+    this.extensions = ['foo', 'bar']; // add custom extensions for file watching + live reload here, ex. ts for TypeScript
   }
 
-  // test if this plugin should change a relative URL from the browser to an absolute path on disk
-  // like for node_modules/ resolution. not commonly needed by most resource plugins
-  // return true | false
-  async shouldResolve(url) {
-    return Promise.resolve(false);
-  }
-
-  // return an absolute path
-  async resolve(url) {
-    return Promise.resolve(url);
-  }
-
-  // test if this plugin should be used to process a given url / header for the browser
-  // ex: `<script type="module" src="index.ts">`
-  // return true | false
-  async shouldServe(url, headers) {
-    return Promise.resolve(this.extensions.indexOf(path.extname(url)) >= 0);
-  }
-
-  // return the new body and / or contentType, e.g. convert file.foo -> file.js
-  async serve(url, headers) {
-    return Promise.resolve({});
-  }
-
-  // test if this plugin should return a new body for an already resolved resource
-  // useful for modifying code on the fly without needing to read the file from disk
-  // return true | false
-  async shouldIntercept(url, body, headers) {
-    return Promise.resolve(false);
-  }
-
-  // return the new body
-  async intercept(url, body, headers) {
-    return Promise.resolve({ body, contentType: 'text/...' });
-  }
-
-  // test if this plugin should manipulate the body and return a new body prior to any final optimizations happening
-  // ex: add a "banner" to all .js files with a timestamp of the build, or minifying files
-  // return true | false
-  async shouldOptimize(url, body) {
-    return Promise.resolve(false);
-  }
-
-  // return the new body
-  async optimize (url, body) {
-    return Promise.resolve(body);
-  }
+  // lifecycles go here
 }
 
 export function myResourcePlugin(options = {}) {
   return {
     type: 'resource',
-    name: 'plugin-example',
+    name: 'my-resource-plugin',
     provider: (compilation) => new ExampleResource(compilation, options)
   }
 };
 ```
 
-## Example
-Below is an example of turning files that have a _.foo_ extension into JavaScript.
+### Lifecycles
+A resource in Greenwood has access to four lifecycles, in this order:
+1. `resolve`
+1. `serve`
+1. `intercept`
+1. `optimize` (only runs at build time)
+
+Each lifecycle also supports a predicate like function, e.g. `shouldResolve` that returns a boolean of `true|false` if this plugin's lifecycle should be invoked for this resource.  You can think of these lifecycles effectively as middleware.
+
+#### Resolve
+
+When requesting a file, such as `/main.js`, Greenwood needs to know _where_ this resource is located.  This is the first lifecycle that is run and takes in a `URL` and `Request` as parameters, and should return an of a `Request` object.  Below is an example from [Greenwood's codebase](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/src/plugins/resource/plugin-user-workspace.js).
 
 <!-- eslint-disable no-unused-vars -->
 ```js
-// file.foo
-interface User {
-  id: number
-  firstName: string
-  lastName: string
-  role: string
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
+
+class UserWorkspaceResource extends ResourceInterface {
+  async shouldResolve(url) {
+    const { userWorkspace } = this.compilation.context;
+
+    return this.hasExtension(url)
+      && !url.pathname.startsWith('/node_modules')
+      && this.resolveForRelativeUrl(url, userWorkspace);
+  }
+
+  async resolve(url) {
+    const { userWorkspace } = this.compilation.context;
+    const workspaceUrl = this.resolveForRelativeUrl(url, userWorkspace);
+
+    return new Request(workspaceUrl);
+  }
 }
-
-console.log('hello from file.foo with non standard JavaScript in it.');
 ```
+<!-- eslint-enable no-unused-vars -->
 
+> For most cases, you will not need to use this lifecycle as by default Greenwood will first check if it can resolve a request to a file either in the current workspace or _/node_modules/_.  If it finds a match, it will transform the request into a `file://` protocol with the full local path, otherwise the request will remain as the default of `http://`.
+
+#### Serve
+
+When requesting a file, such as `/main.js`, Greenwood needs to return a response so that the contents can be served or bundled appropriately.  This is done by passing an instance of `URL` and returning an instance of a `Response`.  For example, Greenwood uses this lifecycle extensively to serve all the standard web content types like HTML, JS, CSS, images, fonts, etc and also providing the appropriate `Content-Type` header.  If you are supporting custom extensions, this is where you would transform the contents into something a browser would understand; like compiling from TypeScript to JavaScript.
+
+Below is an example from [Greenwood's codebase](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/src/plugins/resource/plugin-standard-javascript.js) for serving JavaScript files.
+
+<!-- eslint-disable no-unused-vars -->
 ```js
-// plugin-foo.js
 import fs from 'fs';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
-class FooResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class StandardJavaScriptResource extends ResourceInterface {
 
-    this.extensions = ['.foo'];
-    this.contentType = 'text/javascript';
+  async shouldServe(url) {
+    return url.protocol === 'file:' && url.pathname.split('.').pop() === 'js';
   }
 
   async serve(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let body = await fs.promises.readFile(url, 'utf-8');
-
-        // remove non standard JavaScript usage so browser is happy
-        body = body.replace(/interface (.*){(.*)}/s, '');
-
-        // and we can return .foo as .js!
-        resolve({
-          body,
-          contentType: this.contentType
-        });
-      } catch (e) {
-        reject(e);
+    const body = await fs.promises.readFile(url, 'utf-8');
+    
+    return new Response(body, {
+      headers: {
+        'Content-Type': 'text/javascript'
       }
     });
   }
 }
+```
+<!-- eslint-enable no-unused-vars -->
 
-export function myFooPlugin(options = {}) {
-  return {
-    type: 'resource',
-    name: 'plugin-foo',
-    provider: (compilation) => new FooResource(compilation, options)
-  };
+> If this was for a TypeScript file (_.ts_) for example, this would be the lifecycle where you would run `tsc`.
+
+#### Intercept
+
+After the `serve` lifecycle comes the `intercept` lifecycle.  This lifecycle is useful for transforming an already handled resource, or to in anyway augment an already handled response before it is served or bundle.  This can be done by returning an instance of a `Response`.  It takes in as parameters an instance of `URL`, `Request`, and `Response`.
+
+Below is an example from [Greenwood's codebase](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/plugin-import-css/src/index.js) for converting a standard CSS file response into ESM so that you can `import` _.css_ files.  You'll see in this example we're return a module instead of just a CSS string, and changing the `Content-Type` of the response to `text/javascript`.
+
+<!-- eslint-disable no-unused-vars -->
+```js
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
+
+class ImportCssResource extends ResourceInterface {
+  constructor(compilation, options) {
+    super(compilation, options);
+  }
+
+  // ...
+
+  async shouldIntercept(url, request) {
+    const { pathname } = url;
+    const accepts = request.headers.get('accept') || '';
+    const notFromBrowser = accepts.indexOf('text/css') < 0 && accepts.indexOf('application/signed-exchange') < 0;
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/492
+    return pathname.split('.').pop() === 'css' && 
+      (notFromBrowser || url.searchParams.has('type') && url.searchParams.get('type') === 'css');
+  }
+
+  async intercept(url, request, response) {
+    const body = await response.text();
+    const cssInJsBody = `const css = \`${body.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\')}\`;\nexport default css;`;
+    
+    return new Response(cssInJsBody, {
+      headers: new Headers({
+        'Content-Type': 'text/javascript'
+      })
+    });
+  }
 }
 ```
+<!-- eslint-enable no-unused-vars -->
 
+#### Optimize
+
+This lifecycle is only run during a build and after the `intercept` lifecycle, and as the name implies is a way to do any final production ready optimizations or transformations. It takes as parameters an instance of `URL` and `Response` and should return an instance of `Response`.
+
+Below is an example from [Greenwood's codebase](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/plugin-import-css/src/index.js) for minifying CSS.  (The actual function for minifying has been ommitted for brevity)
+
+<!-- eslint-disable no-unused-vars -->
 ```js
-// greenwood.config.js
-import { myFooPlugin } from './plugin-foo.js';
+class StandardCssResource extends ResourceInterface {
+  async shouldOptimize(url, response) {
+    const { protocol, pathname } = url;
 
-export default {
+    return this.compilation.config.optimization !== 'none'
+      && protocol === 'file:'
+      && pathname.split('.').pop() === 'css'
+      && response.headers.get('Content-Type').indexOf('text/css') >= 0;
+  }
 
-  plugins: [
-    myFooPlugin({ /* custom options */ })
-  ]
+  async optimize(url, response) {
+    const body = await response.text();
+    const optimizedBody = bundleCss(body /* ... */);
 
-};
+    return new Response(optimizedBody);
+  }
+}
 ```
+<!-- eslint-enable no-unused-vars -->
 
 > _You can see [more in-depth examples of resource plugin](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/plugins/resource/) by reviewing the default plugins maintained in Greenwood's CLI package._

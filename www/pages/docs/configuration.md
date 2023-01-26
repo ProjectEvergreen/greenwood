@@ -220,9 +220,7 @@ Path to where all your project files will be located.  Using an absolute path is
 Setting the workspace path to be the _www/_ folder in the current directory from where Greenwood is being run.
 
 ```js
-import { fileURLToPath, URL } from 'url';
-
 export default {
-  workspace: fileURLToPath(new URL('./www', import.meta.url))
+  workspace: new URL('./www', import.meta.url)
 };
 ```

@@ -13,7 +13,7 @@ Though rare, there may be cases and opportunities for tapping into the bundling 
 Install your favorite rollup plugin(s), then create a simple object to provide those plugins to Greenwood.
 
 ```javascript
-import bannerRollup = from 'rollup-plugin-banner';
+import bannerRollup from 'rollup-plugin-banner';
 import fs from 'fs';
 
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));
