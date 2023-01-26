@@ -51,7 +51,7 @@ class GraphQLResource extends ResourceInterface {
   }
 
   async shouldOptimize(url, response) {
-    return (response.headers.get('Content-Type') || response.headers.get('content-type')).indexOf(this.contentType[1]) >= 0;
+    return response.headers.get('Content-Type').indexOf(this.contentType[1]) >= 0;
   }
 
   async optimize(url, response) {
