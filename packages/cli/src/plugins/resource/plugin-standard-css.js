@@ -236,9 +236,7 @@ class StandardCssResource extends ResourceInterface {
     const body = await response.text();
     const optimizedBody = bundleCss(body, url, this.compilation.context.projectDirectory);
 
-    return new Response(optimizedBody, {
-      headers: response.headers
-    });
+    return new Response(optimizedBody);
   }
 }
 

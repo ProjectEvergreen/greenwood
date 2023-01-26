@@ -45,9 +45,7 @@ Your plugin might look like this:
  *     acme-theme-pack.js
  *     package.json
  */
-import { fileURLToPath } from 'url';
-
-export function myCopyPlugin() {
+export function myContextPlugin() {
   return {
     type: 'context',
     name: 'acme-theme-pack:context',
@@ -55,7 +53,7 @@ export function myCopyPlugin() {
       return {
         templates: [
           // when the plugin is installed import.meta.url will be /path/to/node_modules/<your-package>/
-          fileURLToPath(new URL('./dist/layouts', import.meta.url))
+          new URL('./dist/layouts/', import.meta.url)
         ]
       };
     }

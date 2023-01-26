@@ -43,7 +43,7 @@ export default {
         }
       }
     }
-  }]
+  ]
 
 }
 ```
@@ -72,7 +72,7 @@ export default {
 #### Context
 This provides access to all the input / output directories and file paths Greenwood uses to build the site and output all the generated files.  Context is especially useful for copying files or writing to the build directory.
 
-Here are paths you can get from `context`, all of which are absolute URLs:
+Here are paths you can get from `context`, all of which are instances of [`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL) and use the `file://` protocol:
 
 - `outputDir`: Where Greenwood outputs the final static site
 - `pagesDir`: Path to the _pages/_ directory in the user's workspace
@@ -81,26 +81,7 @@ Here are paths you can get from `context`, all of which are absolute URLs:
 - `userTemplatesDir`: Path to the _templates/_ directory in the user's workspace
 - `userWorkspace`: Path to the workspace directory (_src/_ by default)
 
-
-Example using `context` to write to `publicDir` from _greenwood.config.js_
-```javascript
-import fs from 'fs';
-import path from 'path';
-
-export default {
-
-  plugins: [{
-    name: 'my-plugin'
-    type: 'resource',
-    provider: (compilation) => {
-      const { outputDir } = compilation.context;
-
-      fs.writeFileSync(path.join(outputDir, 'robots.txt'), 'Hello World!');
-    }
-  }]
-
-}
-```
+> You can see a good example of this in use in our [context plugin docs](/plugins/copy/)
 
 ### Plugin Types
 While each API has its own documentation section on the left sidebar of this page, here is a quick overview of the current set of Plugin APIs Greenwood supports.
