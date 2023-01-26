@@ -29,9 +29,8 @@ async function optimizeStaticPages(compilation, plugins) {
       const { route, outputPath } = page;
       const url = new URL(`http://localhost:${compilation.config.port}${route}`);
       const contents = await fs.promises.readFile(new URL(`./${outputPath}`, scratchDir), 'utf-8');
-      const headers = new Headers();
-
-      headers.append('Content-Type', 'text/html');
+      const headers = new Headers({ 'Content-Type': 'text/html' });
+      let response = new Response(contents, { headers });
 
       if (route !== '/404/' && !fs.existsSync(new URL(`.${route}`, outputDir).pathname)) {
         fs.mkdirSync(new URL(`.${route}`, outputDir).pathname, {
@@ -39,11 +38,11 @@ async function optimizeStaticPages(compilation, plugins) {
         });
       }
 
-      let response = new Response(contents, { headers });
-
       for (const plugin of plugins) {
-        if (plugin.shouldOptimize && await plugin.shouldOptimize(url, response)) {
-          response = await plugin.optimize(url, response);
+        if (plugin.shouldOptimize && await plugin.shouldOptimize(url, response.clone())) {
+          const currentResponse = await plugin.optimize(url, response.clone());
+
+          response = mergeResponse(response.clone(), currentResponse.clone());
         }
       }
 
