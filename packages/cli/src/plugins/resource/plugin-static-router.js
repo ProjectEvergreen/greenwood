@@ -30,11 +30,10 @@ class StaticRouterResource extends ResourceInterface {
     const { pathname, protocol } = url;
     const contentType = response.headers.get('Content-Type') || '';
 
-    // TODO should this also happen during development too?
     return process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
       && this.compilation.config.staticRouter
       && !pathname.startsWith('/404')
-      && protocol === 'http:' || contentType.indexOf(this.contentType) >= 0;
+      && (protocol === 'http:' && contentType.indexOf(this.contentType) >= 0);
   }
 
   async intercept(url, request, response) {
