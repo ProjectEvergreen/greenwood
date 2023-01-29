@@ -28,8 +28,16 @@ const generateGraph = async (compilation) => {
         for (const filename of files) {
           const filenameUrl = new URL(`./${filename}`, directory);
           const filenameUrlAsDir = new URL(`./${filename}/`, directory);
+          let isDirectory = false;
 
-          if ((await fs.stat(filenameUrlAsDir)).isDirectory()) {
+          try {
+            await fs.access(filenameUrlAsDir);
+            isDirectory = (await fs.stat(filenameUrlAsDir)).isDirectory();
+          } catch (e) {
+            // console.debug(' directory check e ', { e });
+          }
+
+          if (isDirectory) {
             pages = await walkDirectoryForPages(filenameUrlAsDir, pages);
           } else {
             const extension = `.${filenameUrl.pathname.split('.').pop()}`; 
@@ -143,7 +151,7 @@ const generateGraph = async (compilation) => {
                 });
 
                 worker.postMessage({
-                  modulePath: fullPath,
+                  moduleUrl: filenameUrl,
                   compilation: JSON.stringify(compilation),
                   route
                 });
@@ -217,7 +225,7 @@ const generateGraph = async (compilation) => {
           path: `${userWorkspace.pathname}index.html`,
           isSPA: true
         }];
-      } catch(e) {
+      } catch (e) {
         const oldGraph = graph[0];
 
         try {
@@ -226,8 +234,8 @@ const generateGraph = async (compilation) => {
           if ((await fs.stat(pagesDir)).isDirectory()) {
             graph = await walkDirectoryForPages(pagesDir);
           }
-        } catch(e) {
-          console.debug('eeeeee????', { e })
+        } catch (error) {
+          // console.debug('eeeeee on pages dir ????', { error });
           graph = graph;
         }
 
@@ -285,9 +293,9 @@ const generateGraph = async (compilation) => {
 
       compilation.graph = graph;
 
-      try{
+      try {
         await fs.access(scratchDir);
-      } catch(e) {
+      } catch (e) {
         await fs.mkdir(scratchDir);
       }
 

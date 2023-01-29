@@ -24,7 +24,6 @@ class UserWorkspaceResource extends ResourceInterface {
     const { userWorkspace } = this.compilation.context;
     const workspaceUrl = await this.resolveForRelativeUrl(url, userWorkspace);
 
-    console.debug({ workspaceUrl });
     return new Request(workspaceUrl);
   }
 }
