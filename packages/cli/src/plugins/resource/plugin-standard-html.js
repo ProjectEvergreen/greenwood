@@ -27,10 +27,7 @@ function getCustomPageTemplatesFromPlugins(contextPlugins, templateName) {
         if (templateName) {
           fs.access(new URL(`./${templateName}.html`, templateDirUrl)).then(() => true);
         }
-        // await fs.access(new URL(`./${templateName}.html`, templateDirUrl));
-
-        // return true;
-      } catch(e) {
+      } catch (e) {
         return false;
       }
     });
@@ -51,19 +48,19 @@ const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDi
   try {
     await fs.access(new URL(`./${template}.html`, userTemplatesDir));
     hasCustomTemplate = true;
-  } catch(e) {
-    console.debug('111', { e })
+  } catch (e) {
+    console.debug('111', { e });
   }
 
   // check page is already HTML
   try {
     await fs.access(new URL(`./${filePath}`, projectDirectory));
 
-    if(extension === 'html') {
+    if (extension === 'html') {
       isHtmlPage = true;
     }
-  } catch(e) {
-    console.debug('222', { e })
+  } catch (e) {
+    console.debug('222', { e });
   }
 
   // check for default page template
@@ -71,8 +68,8 @@ const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDi
     // fs.existsSync(new URL('./page.html', templatesDir).pathname))
     await fs.access(new URL('./page.html', userTemplatesDir));
     hasPageTemplate = true;
-  } catch(e) {
-    console.debug('333', { e })
+  } catch (e) {
+    console.debug('333', { e });
   }
 
   // check for custom 404 page
@@ -80,7 +77,7 @@ const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDi
     // fs.existsSync(new URL('./404.html', pagesDir).pathname)
     await fs.access(new URL('./404.html', pagesDir));
     hasCustom404Page = true;
-  } catch(e) {
+  } catch (e) {
     console.debug('444', { e })
   }
 
@@ -120,7 +117,7 @@ const getAppTemplate = async (pageTemplateContents, templatesDir, customImports 
   try {
     await fs.access(userAppTemplateUrl);
     hasCustomUserAppTemplate = true;
-  } catch(e) {
+  } catch (e) {
     console.debug('userAPpTemplatePAtj', { e });
   }
 
@@ -245,7 +242,7 @@ const getUserScripts = async (contents, context) => {
       // fs.existsSync(new URL('./package.json', userWorkspace).pathname
       await fs.access(monorepoPackageJsonUrl);
       hasMonorepoPackageJson = true;
-    } catch(e) {
+    } catch (e) {
 
     }
 
@@ -254,7 +251,7 @@ const getUserScripts = async (contents, context) => {
       // fs.existsSync(new URL('./package.json', projectDirectory).pathname)
       await fs.access(topLevelPackageJsonUrl);
       hasTopLevelPackageJson = true;
-    } catch(e) {
+    } catch (e) {
 
     }
 

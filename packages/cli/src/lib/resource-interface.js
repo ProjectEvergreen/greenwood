@@ -24,30 +24,27 @@ class ResourceInterface {
     try {
       await fs.access(new URL(`.${url.pathname}`, rootUrl));
       atRoot = true;
-    } catch(e) {
-      console.debug('reesolveFoRRelative', { e })
+    } catch (e) {
+      // console.debug('reesolveFoRRelative', { e });
     }
 
     if (atRoot) {
       return new URL(`.${url.pathname}`, rootUrl);
     }
 
-    url.pathname.split('/')
-      .filter((segment) => segment !== '')
-      .reduce(async (acc, segment) => {
-        const reducedPath = url.pathname.replace(`${acc}/${segment}`, '');
+    const segments = url.pathname.split('/').filter(segment => segment !== '');
+    segments.shift();
 
-        try {
-          if(reducedPath !== '') {
-            await fs.access(new URL(`.${reducedPath}`, rootUrl));
-            reducedUrl = new URL(`.${reducedPath}`, rootUrl);
-          }
-        } catch(e) {
-          console.debug('reesolveFoRRelative reducing', { e })
-        }
-
-        return `${acc}/${segment}`;
-      }, '');
+    for (let i = 0, l = segments.length - 1; i < l; i += 1) {
+      try {
+        const nextSegments = segments.slice(i);
+        const urlToCheck = new URL(`./${nextSegments.join('/')}`, rootUrl);
+        await fs.access(urlToCheck);
+        reducedUrl = urlToCheck;
+      } catch (e) {
+        // console.debug('resolveForRelativeUrl trying again....');
+      }
+    }
 
     return reducedUrl;
   }
