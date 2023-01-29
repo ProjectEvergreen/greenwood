@@ -4,7 +4,7 @@
  *
  */
 import babel from '@babel/core';
-import fs from 'fs';
+import fs from 'fs/promises';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 import rollupBabelPlugin from '@rollup/plugin-babel';
 
@@ -12,9 +12,16 @@ async function getConfig(compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = 'babel.config.mjs';
   const defaultConfig = (await import(new URL(`./${configFile}`, import.meta.url))).default;
-  const userConfig = fs.existsSync(new URL(`./${configFile}`, projectDirectory).pathname)
-    ? (await import(`${projectDirectory}/${configFile}`)).default
-    : {};
+  let userConfig = {};
+  try {
+    fs.access(new URL(`./${configFile}`, projectDirectory))
+    userConfig = (await import(`${projectDirectory}/${configFile}`)).default;
+  } catch (error) {
+
+  }
+  // const userConfig = fs.existsSync(new URL(`./${configFile}`, projectDirectory).pathname)
+  //   ? (await import(`${projectDirectory}/${configFile}`)).default
+  //   : {};
   let finalConfig = Object.assign({}, userConfig);
 
   if (extendConfig) {    

@@ -1,6 +1,6 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 
-const packageJson = JSON.parse(await fs.promises.readFile(new URL('./package.json', import.meta.url), 'utf-8'));
+const packageJson = JSON.parse(await fs.readFile(new URL('./package.json', import.meta.url), 'utf-8'));
 const myThemePack = (options = {}) => [{
   type: 'context',
   name: `${packageJson.name}:context`,

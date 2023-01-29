@@ -4,7 +4,6 @@
  * This is a Greenwood default plugin.
  *
  */
-// import fs from 'fs';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class ImportJsonResource extends ResourceInterface {

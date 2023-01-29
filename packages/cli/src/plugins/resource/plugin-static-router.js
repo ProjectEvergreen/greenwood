@@ -5,7 +5,7 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from 'fs';
+import fs from 'fs/promises';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StaticRouterResource extends ResourceInterface {
@@ -60,7 +60,7 @@ class StaticRouterResource extends ResourceInterface {
     const { outputDir } = this.compilation.context;
     const partial = body.match(/<body>(.*)<\/body>/s)[0].replace('<body>', '').replace('</body>', '');
     const outputPartialDirUrl = new URL(`./_routes${url.pathname}`, outputDir);
-    const outputPartialDirPath = outputPartialDirUrl.pathname.split('/').slice(0, -1).join('/');
+    const outputPartialDirPathUrl = new URL(`file://${outputPartialDirUrl.pathname.split('/').slice(0, -1).join('/')}`);
     let currentTemplate;
 
     const routeTags = this.compilation.graph
@@ -83,13 +83,21 @@ class StaticRouterResource extends ResourceInterface {
       });
 
     if (isStaticRoute) {
-      if (!fs.existsSync(outputPartialDirPath)) {
-        fs.mkdirSync(outputPartialDirPath, {
+      try {
+        await fs.access(outputPartialDirPathUrl);
+      } catch (e) {
+        await fs.mkdir(outputPartialDirPathUrl, {
           recursive: true
         });
       }
+      
+      // if (!fs.existsSync(outputPartialDirPath)) {
+      //   fs.mkdirSync(outputPartialDirPath, {
+      //     recursive: true
+      //   });
+      // }
 
-      await fs.promises.writeFile(new URL('./index.html', outputPartialDirUrl), partial);
+      await fs.writeFile(new URL('./index.html', outputPartialDirUrl), partial);
     }
 
     body = body.replace('</head>', `

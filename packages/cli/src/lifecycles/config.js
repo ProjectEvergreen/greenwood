@@ -64,7 +64,7 @@ const readAndMergeConfig = async() => {
       try {
         await fs.access(configUrl);
         hasConfigFile = true;
-      } catch(e) {
+      } catch (e) {
 
       }
 
@@ -72,7 +72,7 @@ const readAndMergeConfig = async() => {
       try {
         await fs.access(new URL('./index.html', customConfig.workspace));
         isSPA = true;
-      } catch(e) {
+      } catch (e) {
 
       }
 

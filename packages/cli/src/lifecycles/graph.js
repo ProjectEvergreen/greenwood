@@ -132,10 +132,10 @@ const generateGraph = async (compilation) => {
 
                 worker.on('message', (result) => {
                   if (result.frontmatter) {
-                    const resources = (result.frontmatter.imports || []).map((resource) => {
+                    const resources = (result.frontmatter.imports || []).map(async (resource) => {
                       const type = resource.split('.').pop() === 'js' ? 'script' : 'link';
 
-                      return modelResource(compilation.context, type, resource);
+                      return await modelResource(compilation.context, type, resource);
                     });
 
                     result.frontmatter.imports = resources;

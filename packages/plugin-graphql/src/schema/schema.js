@@ -1,7 +1,7 @@
 import { makeExecutableSchema } from 'apollo-server-express';
 import { configTypeDefs, configResolvers } from './config.js';
 import { graphTypeDefs, graphResolvers } from './graph.js';
-import fs from 'fs';
+import fs from 'fs/promises';
 import gql from 'graphql-tag';
 
 const createSchema = async (compilation) => {
@@ -34,9 +34,11 @@ const createSchema = async (compilation) => {
       }
     `;
 
-    if (fs.existsSync(customSchemasUrl.pathname)) {
+    try {
+      await fs.access(customSchemasUrl);
+
       console.log('custom schemas directory detected, scanning...');
-      const schemaPaths = (await fs.promises.readdir(customSchemasUrl))
+      const schemaPaths = (await fs.readdir(customSchemasUrl))
         .filter(file => file.split('.').pop() === 'js');
 
       for (const schemaPath of schemaPaths) {
@@ -45,7 +47,21 @@ const createSchema = async (compilation) => {
         customUserDefs.push(customTypeDefs);
         customUserResolvers.push(customResolvers);
       }
+    } catch (error) {
+      
     }
+    // if (fs.existsSync(customSchemasUrl.pathname)) {
+    //   console.log('custom schemas directory detected, scanning...');
+    //   const schemaPaths = (await fs.readdir(customSchemasUrl))
+    //     .filter(file => file.split('.').pop() === 'js');
+
+    //   for (const schemaPath of schemaPaths) {
+    //     const { customTypeDefs, customResolvers } = await import(new URL(`./${schemaPath}`, customSchemasUrl));
+        
+    //     customUserDefs.push(customTypeDefs);
+    //     customUserResolvers.push(customResolvers);
+    //   }
+    // }
   
     const mergedResolvers = Object.assign({}, {
       Query: {

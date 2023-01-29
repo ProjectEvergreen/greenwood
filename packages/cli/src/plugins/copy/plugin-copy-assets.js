@@ -1,18 +1,22 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 
 const greenwoodPluginCopyAssets = [{
   type: 'copy',
   name: 'plugin-copy-assets',
-  provider: (compilation) => {
+  provider: async (compilation) => {
     const { outputDir, userWorkspace } = compilation.context;
     const fromAssetsDirUrl = new URL('./assets/', userWorkspace);
     const assets = [];
 
-    if (fs.existsSync(fromAssetsDirUrl.pathname)) {
+    try {
+      await fs.access(fromAssetsDirUrl);
+
       assets.push({
         from: fromAssetsDirUrl,
         to: new URL('./assets/', outputDir)
       });
+    } catch (e) {
+
     }
 
     return assets;

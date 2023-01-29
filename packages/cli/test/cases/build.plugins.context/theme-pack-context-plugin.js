@@ -2,7 +2,7 @@ import fs from 'fs';
 import os from 'os';
 import { spawnSync } from 'child_process';
 
-const packageJson = JSON.parse(await fs.promises.readFile(new URL('./package.json', import.meta.url), 'utf-8'));
+const packageJson = JSON.parse(await fs.readFile(new URL('./package.json', import.meta.url), 'utf-8'));
 const myThemePackPlugin = () => [{
   type: 'context',
   name: 'my-theme-pack:context',

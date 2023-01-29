@@ -36,22 +36,29 @@ async function copyFile(source, target, projectDirectory) {
 async function copyDirectory(fromUrl, toUrl, projectDirectory) {
   try {
     console.info(`copying directory... ${fromUrl.pathname.replace(projectDirectory.pathname, '')}`);
-    const files = await rreaddir(fromUrl.pathname);
+    const files = await rreaddir(fromUrl);
 
     if (files.length > 0) {
-      if (!fs.existsSync(toUrl.pathname)) {
-        fs.mkdirSync(toUrl.pathname, {
+      try {
+        await fs.promises.access(toUrl);
+      } catch (e) {
+        await fs.promises.mkdir(toUrl, {
           recursive: true
         });
       }
-      await Promise.all(files.filter((filePath) => {
-        const target = filePath.replace(fromUrl.pathname, toUrl.pathname);
-        const isDirectory = fs.lstatSync(filePath).isDirectory();
 
-        if (isDirectory && !fs.existsSync(target)) {
-          fs.mkdirSync(target);
-        } else if (!isDirectory) {
-          return filePath;
+      await Promise.all(files.filter((filePath) => {
+        const targetUrl = `file://${filePath.replace(fromUrl.pathname, toUrl.pathname)}`;
+        const isDirectory = (await fs.promises.lstat(targetUrl)).isDirectory();
+
+        try {
+          if (isDirectory) {
+            await fs.promises.access(targetUrl);
+          } else if (!isDirectory) {
+            return filePath;
+          }
+        } catch (e) {
+          await fs.promises.mkdir(targetUrl);
         }
       }).map((filePath) => {
         const sourceUrl = new URL(`file://${filePath}`);

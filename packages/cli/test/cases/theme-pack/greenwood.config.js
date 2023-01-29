@@ -1,9 +1,8 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import { myThemePack } from './my-theme-pack.js';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
-import { URL } from 'url';
 
-const packageName = JSON.parse(await fs.promises.readFile(new URL('./package.json', import.meta.url), 'utf-8')).name;
+const packageName = JSON.parse(await fs.readFile(new URL('./package.json', import.meta.url), 'utf-8')).name;
 
 class MyThemePackDevelopmentResource extends ResourceInterface {
   constructor(compilation, options) {

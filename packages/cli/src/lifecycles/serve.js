@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import { hashString } from '../lib/hashing-utils.js';
 import Koa from 'koa';
 import { mergeResponse } from '../lib/resource-utils.js';
@@ -166,7 +166,7 @@ async function getStaticServer(compilation, composable) {
 
     if ((matchingRoute && !matchingRoute.isSSR) || url.pathname.split('.').pop() === 'html') {
       const pathname = matchingRoute ? matchingRoute.outputPath : url.pathname;
-      const body = await fs.promises.readFile(new URL(`./${pathname}`, outputDir), 'utf-8');
+      const body = await fs.readFile(new URL(`./${pathname}`, outputDir), 'utf-8');
 
       ctx.set('Content-Type', 'text/html');
       ctx.body = body;
