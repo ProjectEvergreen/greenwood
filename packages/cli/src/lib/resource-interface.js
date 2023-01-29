@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 
 class ResourceInterface {
   constructor(compilation, options = {}) {
@@ -17,21 +17,35 @@ class ResourceInterface {
   // * deep link route - /blog/releases/some-post
   // * and a nested path in the template - ../../styles/theme.css
   // so will get resolved as `${rootUrl}/styles/theme.css`
-  resolveForRelativeUrl(url, rootUrl) {
+  async resolveForRelativeUrl(url, rootUrl) {
     let reducedUrl;
+    let atRoot;
 
-    if (fs.existsSync(new URL(`.${url.pathname}`, rootUrl).pathname)) {
+    try {
+      await fs.access(new URL(`.${url.pathname}`, rootUrl));
+      atRoot = true;
+    } catch(e) {
+      console.debug('reesolveFoRRelative', { e })
+    }
+
+    if (atRoot) {
       return new URL(`.${url.pathname}`, rootUrl);
     }
 
     url.pathname.split('/')
       .filter((segment) => segment !== '')
-      .reduce((acc, segment) => {
+      .reduce(async (acc, segment) => {
         const reducedPath = url.pathname.replace(`${acc}/${segment}`, '');
 
-        if (reducedPath !== '' && fs.existsSync(new URL(`.${reducedPath}`, rootUrl).pathname)) {
-          reducedUrl = new URL(`.${reducedPath}`, rootUrl);
+        try {
+          if(reducedPath !== '') {
+            await fs.access(new URL(`.${reducedPath}`, rootUrl));
+            reducedUrl = new URL(`.${reducedPath}`, rootUrl);
+          }
+        } catch(e) {
+          console.debug('reesolveFoRRelative reducing', { e })
         }
+
         return `${acc}/${segment}`;
       }, '');
 

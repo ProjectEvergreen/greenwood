@@ -1,6 +1,6 @@
 import { bundleCompilation } from '../lifecycles/bundle.js';
 import { copyAssets } from '../lifecycles/copy.js';
-import fs from 'fs';
+import fs from 'fs/promises';
 import { preRenderCompilationWorker, preRenderCompilationCustom, staticRenderCompilation } from '../lifecycles/prerender.js';
 import { ServerInterface } from '../lib/server-interface.js';
 
@@ -15,8 +15,12 @@ const runProductionBuild = async (compilation) => {
         ? compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider(compilation)
         : {};
 
-      if (!fs.existsSync(outputDir.pathname)) {
-        fs.mkdirSync(outputDir.pathname);
+      try {
+        await fs.access(outputDir);
+      } catch(e) {
+        await fs.mkdir(outputDir, {
+          recursive: true
+        })
       }
 
       if (prerender || prerenderPlugin.prerender) {

@@ -4,7 +4,7 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from 'fs';
+import fs from 'fs/promises';
 import { parse, walk } from 'css-tree';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
@@ -27,7 +27,7 @@ function bundleCss(body, url, projectDirectory) {
           const resolvedUrl = value.startsWith('/node_modules')
             ? new URL(`.${value}`, projectDirectory)
             : new URL(value, url);
-          const importContents = fs.readFileSync(resolvedUrl.pathname, 'utf-8');
+          const importContents = fs.readFile(resolvedUrl, 'utf-8');
 
           optimizedCss += bundleCss(importContents, url, projectDirectory);
         } else {
@@ -214,7 +214,7 @@ class StandardCssResource extends ResourceInterface {
   }
 
   async serve(url) {
-    const body = await fs.promises.readFile(url, 'utf-8');
+    const body = await fs.readFile(url, 'utf-8');
 
     return new Response(body, {
       headers: {

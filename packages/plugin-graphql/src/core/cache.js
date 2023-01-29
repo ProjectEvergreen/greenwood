@@ -1,5 +1,5 @@
 import ApolloCore from '@apollo/client/core/core.cjs.js';
-import fs from 'fs';
+import fs from 'fs/promises';
 import { gql } from 'apollo-server';
 import { getQueryHash } from './common.js';
 
@@ -30,12 +30,16 @@ const createCache = async (req, context) => {
         const hashFilename = `${queryHash}-cache.json`;
         const cachePath = new URL(`./${hashFilename}`, outputDir);
 
-        if (!fs.existsSync(outputDir.pathname)) {
-          fs.mkdirSync(outputDir.pathname);
+        try {
+          await fs.access(outputDir);
+        } catch(e) {
+          fs.mkdir(outputDir);
         }
 
-        if (!fs.existsSync(cachePath.pathname)) {
-          fs.writeFileSync(cachePath.pathname, cache, 'utf8');
+        try {
+          await fs.access(cachePath);
+        } catch(e) {
+          fs.writeFile(cachePath, cache, 'utf-8');
         }
       }
       
