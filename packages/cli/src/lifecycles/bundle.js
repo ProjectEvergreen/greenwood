@@ -106,8 +106,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
             const currentResponse = await plugin.intercept(url, request, intermediateResponse.clone());
             const mergedResponse = mergeResponse(intermediateResponse.clone(), currentResponse.clone());
 
-            // TODO better way to handle Response automatically setting content-type
-            if ((mergedResponse.headers.get('Content-Type') || mergedResponse.headers.get('content-type')).indexOf(contentType) >= 0) {
+            if (mergedResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
               return Promise.resolve(mergedResponse.clone());
             }
           }

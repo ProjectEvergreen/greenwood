@@ -28,7 +28,6 @@ function greenwoodResourceLoader (compilation) {
         const request = new Request(url.href);
         let response = new Response('');
 
-        // TODO should this use the reduce pattern too?
         for (const plugin of resourcePlugins) {
           if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
             response = await plugin.serve(url, request);

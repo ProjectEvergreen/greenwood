@@ -14,10 +14,9 @@ async function getCustomLoaderResponse(url, body = '', checkOnly = false) {
   });
   const request = new Request(url.href, { headers });
   const initResponse = new Response(body, { headers });
-  let response = initResponse; // new Response(body);
+  let response = initResponse.clone();
   let shouldHandle = false;
 
-  // TODO should this use the reduce pattern too?
   for (const plugin of resourcePlugins) {
     if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
       shouldHandle = true;
@@ -46,14 +45,10 @@ async function getCustomLoaderResponse(url, body = '', checkOnly = false) {
 
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#resolvespecifier-context-nextresolve
 export async function resolve(specifier, context, defaultResolve) {
-  console.log('my resolve', { specifier });
   const { baseURL } = context;
-
   const { shouldHandle } = await getCustomLoaderResponse(new URL(specifier), null, true);
 
-  console.debug('resolve shouldHandle????', { specifier, shouldHandle });
   if (shouldHandle) {
-    console.log('handlign!!!!!!!@@@@@', { specifier });
     return {
       url: new URL(specifier, baseURL).href,
       shortCircuit: true
@@ -74,8 +69,8 @@ export async function load(source, context, defaultLoad) {
     const { response } = await getCustomLoaderResponse(url, contents);
     const body = await response.text();
 
-    // TODO better way to handle remove export default?
-    // https://github.com/ProjectEvergreen/greenwood/issues/948
+    // TODO better way to handle remove export default?  leverage import assertions instead
+    // https://github.com/ProjectEvergreen/greenwood/issues/923
     return {
       format: extension === 'json' ? 'json' : 'module',
       source: extension === 'json' ? JSON.stringify(JSON.parse(contents.replace('export default ', ''))) : body,

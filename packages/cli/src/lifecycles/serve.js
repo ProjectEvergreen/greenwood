@@ -250,7 +250,6 @@ async function getHybridServer(compilation) {
       }).provider(compilation);
       let response = await standardHtmlResource.serve(url, request);
 
-      // TODO no intercept???
       response = await standardHtmlResource.optimize(url, response);
 
       ctx.body = Readable.from(response.body);
