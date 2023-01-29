@@ -6,7 +6,7 @@
  *
  */
 import frontmatter from 'front-matter';
-import fs from 'fs';
+import fs from 'fs/promises';
 import htmlparser from 'node-html-parser';
 import path from 'path';
 import rehypeStringify from 'rehype-stringify';
@@ -18,56 +18,117 @@ import { ResourceInterface } from '../../lib/resource-interface.js';
 import unified from 'unified';
 import { Worker } from 'worker_threads';
 
-function getCustomPageTemplates(contextPlugins, templateName) {
+function getCustomPageTemplatesFromPlugins(contextPlugins, templateName) {
   return contextPlugins
     .map(plugin => plugin.templates)
     .flat()
     .filter((templateDirUrl) => {
-      return templateName && fs.existsSync(new URL(`./${templateName}.html`, templateDirUrl).pathname);
+      try {
+        if (templateName) {
+          fs.access(new URL(`./${templateName}.html`, templateDirUrl)).then(() => true);
+        }
+        // await fs.access(new URL(`./${templateName}.html`, templateDirUrl));
+
+        // return true;
+      } catch(e) {
+        return false;
+      }
     });
 }
 
-// TODO use URL more here
-const getPageTemplate = async (filePath, templatesDir, template, contextPlugins = [], pagesDir) => {
-  const customPluginDefaultPageTemplates = getCustomPageTemplates(contextPlugins, 'page');
-  const customPluginPageTemplates = getCustomPageTemplates(contextPlugins, template);
+const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDirectory }, template, contextPlugins = []) => {
+  const customPluginDefaultPageTemplates = getCustomPageTemplatesFromPlugins(contextPlugins, 'page');
+  const customPluginPageTemplates = getCustomPageTemplatesFromPlugins(contextPlugins, template);
   const extension = filePath.split('.').pop();
   const is404Page = path.basename(filePath).indexOf('404') === 0 && extension === 'html';
+  let hasCustomTemplate;
+  let hasPageTemplate;
+  let hasCustom404Page;
+  let isHtmlPage;
   let contents;
 
-  if (template && customPluginPageTemplates.length > 0 || fs.existsSync(new URL(`./${template}.html`, templatesDir).pathname)) {
+  // check for custom template
+  try {
+    await fs.access(new URL(`./${template}.html`, userTemplatesDir));
+    hasCustomTemplate = true;
+  } catch(e) {
+    console.debug('111', { e })
+  }
+
+  // check page is already HTML
+  try {
+    await fs.access(new URL(`./${filePath}`, projectDirectory));
+
+    if(extension === 'html') {
+      isHtmlPage = true;
+    }
+  } catch(e) {
+    console.debug('222', { e })
+  }
+
+  // check for default page template
+  try {
+    // fs.existsSync(new URL('./page.html', templatesDir).pathname))
+    await fs.access(new URL('./page.html', userTemplatesDir));
+    hasPageTemplate = true;
+  } catch(e) {
+    console.debug('333', { e })
+  }
+
+  // check for custom 404 page
+  try {
+    // fs.existsSync(new URL('./404.html', pagesDir).pathname)
+    await fs.access(new URL('./404.html', pagesDir));
+    hasCustom404Page = true;
+  } catch(e) {
+    console.debug('444', { e })
+  }
+
+  // console.debug({ extension, filePath, hasCustomTemplate, hasPageTemplate, hasCustom404Page, isHtmlPage});
+
+  if (template && customPluginPageTemplates.length > 0 || hasCustomTemplate) {
     // use a custom template, usually from markdown frontmatter
     contents = customPluginPageTemplates.length > 0
-      ? await fs.promises.readFile(`${customPluginPageTemplates[0].pathname}${template}.html`, 'utf-8')
-      : await fs.promises.readFile(new URL(`./${template}.html`, templatesDir), 'utf-8');
-  } else if (extension === 'html' && fs.existsSync(filePath)) {
+      ? await fs.readFile(new URL(`./${template}.html`, customPluginPageTemplates[0]), 'utf-8')
+      : await fs.readFile(new URL(`./${template}.html`, userTemplatesDir), 'utf-8');
+  } else if (isHtmlPage) {
     // if the page is already HTML, use that as the template, NOT accounting for 404 pages
-    contents = await fs.promises.readFile(filePath, 'utf-8');
-  } else if (customPluginDefaultPageTemplates.length > 0 || (!is404Page && fs.existsSync(new URL('./page.html', templatesDir).pathname))) {
+    contents = await fs.readFile(new URL(`./${filePath}`, projectDirectory), 'utf-8');
+  } else if (customPluginDefaultPageTemplates.length > 0 || (!is404Page && hasPageTemplate)) {
     // else look for default page template from the user
     // and 404 pages should be their own "top level" template
     contents = customPluginDefaultPageTemplates.length > 0
-      ? await fs.promises.readFile(`${customPluginDefaultPageTemplates[0].pathname}page.html`, 'utf-8')
-      : await fs.promises.readFile(new URL('./page.html', templatesDir), 'utf-8');
-  } else if (is404Page && !fs.existsSync(new URL('./404.html', pagesDir).pathname)) {
-    contents = await fs.promises.readFile(new URL('../../templates/404.html', import.meta.url).pathname, 'utf-8');
+      ? await fs.readFile(new URL('./page.html', customPluginDefaultPageTemplates[0]), 'utf-8')
+      : await fs.readFile(new URL('./page.html', userTemplatesDir), 'utf-8');
+  } else if (is404Page && !hasCustom404Page) {
+    contents = await fs.readFile(new URL('../../templates/404.html', import.meta.url).pathname, 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
-    contents = await fs.promises.readFile(new URL('../../templates/page.html', import.meta.url).pathname, 'utf-8');
+    contents = await fs.readFile(new URL('../../templates/page.html', import.meta.url).pathname, 'utf-8');
   }
 
   return contents;
 };
 
 const getAppTemplate = async (pageTemplateContents, templatesDir, customImports = [], contextPlugins, enableHud, frontmatterTitle) => {
-  const userAppTemplatePath = new URL('./app.html', templatesDir);
-  const customAppTemplates = getCustomPageTemplates(contextPlugins, 'app');
+  const userAppTemplateUrl = new URL('./app.html', templatesDir);
+  const customAppTemplatesFromPlugins = getCustomPageTemplatesFromPlugins(contextPlugins, 'app');
+  let hasCustomUserAppTemplate;
   let mergedTemplateContents = '';
-  let appTemplateContents = customAppTemplates.length > 0
-    ? await fs.promises.readFile(`${customAppTemplates[0].pathname}app.html`)
-    : fs.existsSync(userAppTemplatePath.pathname)
-      ? await fs.promises.readFile(userAppTemplatePath, 'utf-8')
-      : await fs.promises.readFile(new URL('../../templates/app.html', import.meta.url), 'utf-8');
+
+  // check for custom app template page
+  try {
+    await fs.access(userAppTemplateUrl);
+    hasCustomUserAppTemplate = true;
+  } catch(e) {
+    console.debug('userAPpTemplatePAtj', { e });
+  }
+
+  let appTemplateContents = customAppTemplatesFromPlugins.length > 0
+    ? await fs.readFile(new URL('./app.html', customAppTemplatesFromPlugins[0]))
+    : hasCustomUserAppTemplate
+      ? await fs.readFile(userAppTemplateUrl, 'utf-8')
+      : await fs.readFile(new URL('../../templates/app.html', import.meta.url), 'utf-8');
 
   const pageRoot = htmlparser.parse(pageTemplateContents, {
     script: true,
@@ -174,10 +235,33 @@ const getUserScripts = async (contents, context) => {
   // https://lit.dev/docs/tools/requirements/#polyfills
   if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
     const { projectDirectory, userWorkspace } = context;
-    const dependencies = fs.existsSync(new URL('./package.json', userWorkspace).pathname) // handle monorepos first
-      ? JSON.parse(await fs.promises.readFile(new URL('./package.json', userWorkspace), 'utf-8')).dependencies
-      : fs.existsSync(new URL('./package.json', projectDirectory).pathname)
-        ? JSON.parse(await fs.promises.readFile(new URL('./package.json', projectDirectory), 'utf-8')).dependencies
+    const monorepoPackageJsonUrl = new URL('./package.json', userWorkspace);
+    const topLevelPackageJsonUrl = new URL('./package.json', projectDirectory);
+    let hasMonorepoPackageJson;
+    let hasTopLevelPackageJson;
+
+    // check for monorepo package.json
+    try {
+      // fs.existsSync(new URL('./package.json', userWorkspace).pathname
+      await fs.access(monorepoPackageJsonUrl);
+      hasMonorepoPackageJson = true;
+    } catch(e) {
+
+    }
+
+    // check for top level package.json
+    try {
+      // fs.existsSync(new URL('./package.json', projectDirectory).pathname)
+      await fs.access(topLevelPackageJsonUrl);
+      hasTopLevelPackageJson = true;
+    } catch(e) {
+
+    }
+
+    const dependencies = hasMonorepoPackageJson // handle monorepos first
+      ? JSON.parse(await fs.readFile(monorepoPackageJsonUrl, 'utf-8')).dependencies
+      : hasTopLevelPackageJson
+        ? JSON.parse(await fs.readFile(topLevelPackageJsonUrl, 'utf-8')).dependencies
         : {};
 
     const litPolyfill = dependencies && dependencies.lit
@@ -209,7 +293,7 @@ class StandardHtmlResource extends ResourceInterface {
 
   async serve(url) {
     const { config } = this.compilation;
-    const { pagesDir, userTemplatesDir } = this.compilation.context;
+    const { pagesDir, userTemplatesDir, userWorkspace } = this.compilation.context;
     const { interpolateFrontmatter } = config;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph[0].isSPA;
@@ -232,7 +316,7 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     if (isMarkdownContent) {
-      const markdownContents = await fs.promises.readFile(filePath, 'utf-8');
+      const markdownContents = await fs.readFile(filePath, 'utf-8');
       const rehypePlugins = [];
       const remarkPlugins = [];
 
@@ -332,9 +416,9 @@ class StandardHtmlResource extends ResourceInterface {
     });
 
     if (isSpaRoute) {
-      body = fs.readFileSync(this.compilation.graph[0].path, 'utf-8');
+      body = await fs.readFile(new URL(`${filePath}`, userWorkspace), 'utf-8');
     } else {
-      body = ssrTemplate ? ssrTemplate : await getPageTemplate(filePath, userTemplatesDir, template, contextPlugins, pagesDir);
+      body = ssrTemplate ? ssrTemplate : await getPageTemplate(filePath, this.compilation.context, template, contextPlugins);
     }
 
     body = await getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud, title);

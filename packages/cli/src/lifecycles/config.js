@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 
 const cwd = new URL(`file://${process.cwd()}/`);
 const greenwoodPluginsDirectoryUrl = new URL('../plugins/', import.meta.url);
@@ -13,7 +13,7 @@ const greenwoodPlugins = (await Promise.all([
   new URL('./resource/', greenwoodPluginsDirectoryUrl),
   new URL('./server/', greenwoodPluginsDirectoryUrl)
 ].map(async (pluginDirectoryUrl) => {
-  const files = await fs.promises.readdir(pluginDirectoryUrl);
+  const files = await fs.readdir(pluginDirectoryUrl);
 
   return await Promise.all(files.map(async(file) => {
     const importUrl = new URL(`./${file}`, pluginDirectoryUrl);
@@ -57,8 +57,26 @@ const readAndMergeConfig = async() => {
       // deep clone of default config
       const configUrl = new URL('./greenwood.config.js', cwd);
       let customConfig = Object.assign({}, defaultConfig);
+      let hasConfigFile;
+      let isSPA;
 
-      if (fs.existsSync(configUrl.pathname)) {
+      // check for greenwood.config.js
+      try {
+        await fs.access(configUrl);
+        hasConfigFile = true;
+      } catch(e) {
+
+      }
+
+      // check for SPA
+      try {
+        await fs.access(new URL('./index.html', customConfig.workspace));
+        isSPA = true;
+      } catch(e) {
+
+      }
+
+      if (hasConfigFile) {
         const userCfgFile = (await import(configUrl)).default;
         const { workspace, devServer, markdown, optimization, plugins, port, prerender, staticRouter, pagesDirectory, templatesDirectory, interpolateFrontmatter } = userCfgFile;
 
@@ -68,11 +86,12 @@ const readAndMergeConfig = async() => {
             reject('Error: greenwood.config.js workspace must be an instance of URL');
           }
 
-          if (!fs.existsSync(workspace.pathname)) {
+          try {
+            await fs.access(workspace);
+            customConfig.workspace = workspace;
+          } catch(e) {
             reject('Error: greenwood.config.js workspace doesn\'t exist! Please double check your configuration.');
           }
-
-          customConfig.workspace = workspace;
         }
 
         if (typeof optimization === 'string' && optimizations.indexOf(optimization.toLowerCase()) >= 0) {
@@ -194,7 +213,7 @@ const readAndMergeConfig = async() => {
         }
 
         // SPA should _not_ prerender unless if user has specified prerender should be true
-        if (prerender === undefined && fs.existsSync(new URL('./index.html', customConfig.workspace))) {
+        if (prerender === undefined && isSPA) {
           customConfig.prerender = false;
         }
 
@@ -207,7 +226,7 @@ const readAndMergeConfig = async() => {
         }
       } else {
         // SPA should _not_ prerender unless if user has specified prerender should be true
-        if (fs.existsSync(new URL('./index.html', customConfig.workspace).pathname)) {
+        if (isSPA) {
           customConfig.prerender = false;
         }
       }

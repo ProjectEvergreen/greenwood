@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 
 const initContext = async({ config }) => {
 
@@ -14,7 +14,6 @@ const initContext = async({ config }) => {
       const apisDir = new URL('./api/', userWorkspace);
       const pagesDir = new URL(`./${pagesDirectory}/`, userWorkspace);
       const userTemplatesDir = new URL(`./${templatesDirectory}/`, userWorkspace);
-
       const context = {
         dataDir,
         outputDir,
@@ -26,10 +25,12 @@ const initContext = async({ config }) => {
         projectDirectory
       };
 
-      if (!fs.existsSync(scratchDir.pathname)) {
-        fs.mkdirSync(scratchDir.pathname, {
+      try {
+        await fs.access(scratchDir);
+      } catch(e) {
+        await fs.mkdir(scratchDir, {
           recursive: true
-        });
+        })
       }
       
       resolve(context);

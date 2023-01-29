@@ -17,13 +17,14 @@ class UserWorkspaceResource extends ResourceInterface {
 
     return this.hasExtension(url)
       && !url.pathname.startsWith('/node_modules')
-      && this.resolveForRelativeUrl(url, userWorkspace);
+      && await this.resolveForRelativeUrl(url, userWorkspace);
   }
 
   async resolve(url) {
     const { userWorkspace } = this.compilation.context;
-    const workspaceUrl = this.resolveForRelativeUrl(url, userWorkspace);
+    const workspaceUrl = await this.resolveForRelativeUrl(url, userWorkspace);
 
+    console.debug({ workspaceUrl });
     return new Request(workspaceUrl);
   }
 }

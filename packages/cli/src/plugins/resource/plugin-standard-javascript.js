@@ -4,7 +4,7 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from 'fs';
+import fs from 'fs/promises';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import terser from '@rollup/plugin-terser';
 
@@ -20,8 +20,8 @@ class StandardJavaScriptResource extends ResourceInterface {
   }
 
   async serve(url) {
-    const body = await fs.promises.readFile(url, 'utf-8');
-    
+    const body = await fs.readFile(url, 'utf-8');
+
     return new Response(body, {
       headers: {
         'Content-Type': this.contentType

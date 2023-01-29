@@ -3,7 +3,7 @@
  * Detects and fully resolves requests to node_modules and handles creating an importMap.
  *
  */
-import fs from 'fs';
+import fs from 'fs/promises';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import { getNodeModulesLocationForPackage, getPackageNameFromUrl } from '../../lib/node-modules-utils.js';
@@ -33,25 +33,37 @@ class NodeModulesResource extends ResourceInterface {
     // use node modules resolution logic first, else hope for the best from the root of the project
     const absoluteNodeModulesPathname = absoluteNodeModulesLocation
       ? `${absoluteNodeModulesLocation}${packagePathPieces.join('/').replace(packageName, '')}`
-      : this.resolveForRelativeUrl(url, projectDirectory).pathname;
+      : (await this.resolveForRelativeUrl(url, projectDirectory)).pathname;
 
     return new Request(`file://${absoluteNodeModulesPathname}`);
   }
 
   async shouldServe(url) {
-    const extension = url.pathname.split('.').pop();
+    const { href, pathname, protocol } = url;
+    const extension = pathname.split('.').pop();
+    let existsAsJs;
+
+    try {
+      if(protocol === 'file:'){
+        await fs.access(new URL(`${href}.js`));
+        existsAsJs = true;
+      }
+    } catch(e) {
+      // console.debug('shouldSeRvE hiding', { e })
+      // console.debug({ url });
+    }
 
     return extension === 'mjs'
-      || extension === '' && fs.existsSync(`${url}.js`)
+      || extension === '' && existsAsJs
       || extension === 'js' && url.pathname.startsWith('/node_modules/');
   }
 
   async serve(url) {
     const pathname = url.pathname;
-    const pathnameExtended = pathname.split('.').pop() === ''
-      ? `${pathname}.js`
-      : pathname;
-    const body = await fs.promises.readFile(pathnameExtended, 'utf-8');
+    const urlExtended = pathname.split('.').pop() === ''
+      ? new URL(`file://${pathname}.js`)
+      : url;
+    const body = await fs.readFile(urlExtended, 'utf-8');
 
     return new Response(body, {
       headers: new Headers({
@@ -68,6 +80,27 @@ class NodeModulesResource extends ResourceInterface {
     const { projectDirectory, userWorkspace } = this.compilation.context;
     let body = await response.text();
     const hasHead = body.match(/\<head>(.*)<\/head>/s);
+    const monorepoPackageJsonUrl = new URL('./package.json', userWorkspace);
+    const topLevelPackageJsonUrl = new URL('./package.json', projectDirectory);
+    let hasMonorepoPackageJson;
+    let hasTopLevelPackageJson;
+
+    // check for monorepo package.json
+    try {
+      await fs.access(monorepoPackageJsonUrl);
+      hasMonorepoPackageJson = true;
+    } catch(e) {
+      // console.debug('aaa', { e })
+    }
+
+    // check for top level package.json
+    try {
+      // fs.existsSync(new URL('./package.json', projectDirectory).pathname)
+      await fs.access(topLevelPackageJsonUrl);
+      hasTopLevelPackageJson = true;
+    } catch(e) {
+      // console.debug('bbb', { e })
+    }
 
     if (hasHead && hasHead.length > 0) {
       const contents = hasHead[0].replace(/type="module"/g, 'type="module-shim"');
@@ -75,11 +108,10 @@ class NodeModulesResource extends ResourceInterface {
       body = body.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
     }
 
-    // handle for monorepos too
-    const userPackageJson = fs.existsSync(new URL('./package.json', userWorkspace).pathname)
-      ? JSON.parse(await fs.promises.readFile(new URL('./package.json', userWorkspace), 'utf-8')) // its a monorepo?
-      : fs.existsSync(new URL('./package.json', projectDirectory).pathname)
-        ? JSON.parse(await fs.promises.readFile(new URL('./package.json', projectDirectory)))
+    const userPackageJson = hasMonorepoPackageJson // handle monorepos first
+      ? JSON.parse(await fs.readFile(monorepoPackageJsonUrl, 'utf-8'))
+      : hasTopLevelPackageJson
+        ? JSON.parse(await fs.readFile(topLevelPackageJsonUrl, 'utf-8'))
         : {};
     
     // if there are dependencies and we haven't generated the importMap already
