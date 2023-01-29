@@ -3,7 +3,7 @@
  * Detects and fully resolve requests to source map (.map) files.
  *
  */
-import fs from 'fs';
+import fs from 'fs/promises';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class SourceMapsResource extends ResourceInterface {
@@ -14,11 +14,18 @@ class SourceMapsResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    return url.pathname.split('.').pop() === this.extensions[0] && fs.existsSync(url.pathname);
+    try {
+      if (url.pathname.split('.').pop() === this.extensions[0]) {
+        fs.access(url);
+        return true;
+      }
+    } catch (error) {
+      
+    }
   }
 
   async serve(url) {
-    const body = await fs.promises.readFile(url, 'utf-8');
+    const body = await fs.readFile(url, 'utf-8');
 
     return new Response(body, {
       headers: new Headers({

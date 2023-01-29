@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class IncludeHtmlResource extends ResourceInterface {
@@ -23,7 +23,7 @@ class IncludeHtmlResource extends ResourceInterface {
       for (const link of htmlIncludeLinks) {
         const href = link.match(/href="(.*)"/)[1];
         const prefix = href.startsWith('/') ? '.' : '';
-        const includeContents = await fs.promises.readFile(new URL(`${prefix}${href}`, this.compilation.context.userWorkspace), 'utf-8');
+        const includeContents = await fs.readFile(new URL(`${prefix}${href}`, this.compilation.context.userWorkspace), 'utf-8');
 
         body = body.replace(link, includeContents);
       }

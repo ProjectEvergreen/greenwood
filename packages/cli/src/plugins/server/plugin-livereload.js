@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import livereload from 'livereload';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { ServerInterface } from '../../lib/server-interface.js';
@@ -11,7 +11,7 @@ class LiveReloadServer extends ServerInterface {
   async start() {
     const { userWorkspace } = this.compilation.context;
     const standardPluginsDirectoryPath = new URL('../resource/', import.meta.url);
-    const standardPluginsNames = fs.readdirSync(standardPluginsDirectoryPath)
+    const standardPluginsNames = (await fs.readdir(standardPluginsDirectoryPath))
       .filter(filename => filename.indexOf('plugin-standard') === 0);
     const standardPluginsExtensions = (await Promise.all(standardPluginsNames.map(async (filename) => {
       const pluginImport = await import(new URL(`./${filename}`, standardPluginsDirectoryPath));

@@ -1,5 +1,5 @@
 /* eslint-disable max-depth */
-import fs from 'fs';
+import fs from 'fs/promises';
 import { getRollupConfig } from '../config/rollup.config.js';
 import { hashString } from '../lib/hashing-utils.js';
 import { mergeResponse } from '../lib/resource-utils.js';
@@ -15,7 +15,7 @@ async function cleanUpResources(compilation) {
     const optAttr = ['inline', 'static'].indexOf(optimizationAttr) >= 0;
 
     if (optimizedFileName && (!src || (optAttr || optConfig))) {
-      fs.unlinkSync(new URL(`./${optimizedFileName}`, outputDir).pathname);
+      await fs.unlink(new URL(`./${optimizedFileName}`, outputDir).pathname);
     }
   }
 }
@@ -28,12 +28,14 @@ async function optimizeStaticPages(compilation, plugins) {
     .map(async (page) => {
       const { route, outputPath } = page;
       const url = new URL(`http://localhost:${compilation.config.port}${route}`);
-      const contents = await fs.promises.readFile(new URL(`./${outputPath}`, scratchDir), 'utf-8');
+      const contents = await fs.readFile(new URL(`./${outputPath}`, scratchDir), 'utf-8');
       const headers = new Headers({ 'Content-Type': 'text/html' });
       let response = new Response(contents, { headers });
 
-      if (route !== '/404/' && !fs.existsSync(new URL(`.${route}`, outputDir).pathname)) {
-        fs.mkdirSync(new URL(`.${route}`, outputDir).pathname, {
+      try {
+        await fs.access(new URL(`.${route}`, outputDir))
+      } catch (error) {
+        await fs.mkdir(new URL(`.${route}`, outputDir), {
           recursive: true
         });
       }
@@ -49,7 +51,7 @@ async function optimizeStaticPages(compilation, plugins) {
       // clean up optimization markers
       const body = (await response.text()).replace(/data-gwd-opt=".*[a-z]"/g, '');
 
-      await fs.promises.writeFile(new URL(`./${outputPath}`, outputDir), body);
+      await fs.writeFile(new URL(`./${outputPath}`, outputDir), body);
     })
   );
 }
@@ -83,8 +85,11 @@ async function bundleStyleResources(compilation, resourcePlugins) {
         .slice(0, -1)
         .join('/');
 
-      if (!fs.existsSync(outputPathRoot)) {
-        fs.mkdirSync(outputPathRoot, {
+      console.debug('???', new URL(`file://${outputPathRoot}`))
+      try {
+        fs.access(new URL(`file://${outputPathRoot}`));
+      } catch (error) {
+        fs.mkdir(new URL(`file://${outputPathRoot}`), {
           recursive: true
         });
       }
@@ -132,7 +137,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
         optimizedFileContents
       });
 
-      await fs.promises.writeFile(new URL(`./${optimizedFileName}`, outputDir), optimizedFileContents);
+      await fs.writeFile(new URL(`./${optimizedFileName}`, outputDir), optimizedFileContents);
     }
   }
 }

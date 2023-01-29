@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 
 function greenwoodResourceLoader (compilation) {
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
@@ -13,11 +13,22 @@ function greenwoodResourceLoader (compilation) {
       const normalizedId = id.replace(/\?type=(.*)/, '');
       const { userWorkspace } = compilation.context;
 
-      if ((id.indexOf('./') === 0 || id.indexOf('/') === 0) && fs.existsSync(new URL(`./${normalizedId}`, userWorkspace).pathname)) {
-        return new URL(`./${normalizedId}`, userWorkspace).pathname;
-      }
+      try {
+        if (id.indexOf('./') === 0 || id.indexOf('/') === 0) {
+          await fs.access(new URL(`./${normalizedId}`, userWorkspace));
 
-      return null;
+          return new URL(`./${normalizedId}`, userWorkspace).pathname;
+        } else {
+          return null;
+        }
+      } catch (e) {
+        return null;
+      }
+      // if ((id.indexOf('./') === 0 || id.indexOf('/') === 0) && fs.existsSync(new URL(`./${normalizedId}`, userWorkspace).pathname)) {
+      //   return new URL(`./${normalizedId}`, userWorkspace).pathname;
+      // }
+
+      // return null;
     },
     async load(id) {
       const pathname = id.indexOf('?') >= 0 ? id.slice(0, id.indexOf('?')) : id;
@@ -76,9 +87,21 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
            * pathToMatch (before): /node_modules/@greenwood/cli/src/lib/router.js
            * pathToMatch (after): /cli/src/lib/router.js
            */
-          if (facadeModuleId && resourceKey.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId.indexOf('/packages/cli') > 0 && fs.existsSync(facadeModuleId)) {
-            facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');
+          try {
+            if (facadeModuleId && resourceKey.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId.indexOf('/packages/cli') > 0) {
+              console.debug({ facadeModuleId });
+              await fs.access(facadeModuleId);
+
+              facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');
+            }
+          } catch (e) {
+            console.debug('facademodule id', e);
+            // return null;
           }
+
+          // if (facadeModuleId && resourceKey.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId.indexOf('/packages/cli') > 0 && fs.existsSync(facadeModuleId)) {
+          //   facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');
+          // }
 
           if (resourceKey === facadeModuleId) {
             const { fileName } = bundles[bundle];
@@ -89,12 +112,12 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
             compilation.resources.set(resourceKey, {
               ...compilation.resources.get(resourceKey),
               optimizedFileName: fileName,
-              optimizedFileContents: fs.readFileSync(outputPath, 'utf-8'),
+              optimizedFileContents: await fs.readFile(outputPath, 'utf-8'),
               contents: contents.replace(/\.\//g, '/')
             });
 
             if (noop) {
-              fs.writeFileSync(outputPath.pathname, contents);
+              await fs.writeFile(outputPath, contents);
             }
           }
         }

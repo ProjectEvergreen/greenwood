@@ -6,11 +6,11 @@
 process.setMaxListeners(0);
 
 import { generateCompilation } from './lifecycles/compile.js';
-import fs from 'fs';
+import fs from 'fs/promises';
 import program from 'commander';
 import { URL } from 'url';
 
-const greenwoodPackageJson = JSON.parse(await fs.promises.readFile(new URL('../package.json', import.meta.url), 'utf-8'));
+const greenwoodPackageJson = JSON.parse(await fs.readFile(new URL('../package.json', import.meta.url), 'utf-8'));
 let cmdOption = {};
 let command = '';
 

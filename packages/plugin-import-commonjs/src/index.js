@@ -4,7 +4,7 @@
  *
  */
 import commonjs from '@rollup/plugin-commonjs';
-import fs from 'fs';
+import fs from 'fs/promises';
 import { parse, init } from 'cjs-module-lexer';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 import rollupStream from '@rollup/stream';
@@ -18,7 +18,7 @@ const testForCjsModule = async(url) => {
   if (pathname.split('.').pop() === '.js' && pathname.startsWith('/node_modules/') && pathname.indexOf('es-module-shims.js') < 0) {
     try {
       await init();
-      const body = await fs.promises.readFile(url, 'utf-8');
+      const body = await fs.readFile(url, 'utf-8');
       await parse(body);
 
       isCommonJs = true;

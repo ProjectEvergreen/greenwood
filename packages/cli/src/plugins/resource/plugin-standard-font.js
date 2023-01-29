@@ -4,7 +4,7 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from 'fs';
+import fs from 'fs/promises';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardFontResource extends ResourceInterface {
@@ -22,7 +22,7 @@ class StandardFontResource extends ResourceInterface {
   async serve(url) {
     const extension = url.pathname.split('.').pop();
     const contentType = extension === 'eot' ? 'application/vnd.ms-fontobject' : extension;
-    const body = await fs.promises.readFile(url);
+    const body = await fs.readFile(url);
 
     return new Response(body, {
       headers: new Headers({

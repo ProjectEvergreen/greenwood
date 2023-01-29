@@ -17,10 +17,10 @@ const runProductionBuild = async (compilation) => {
 
       try {
         await fs.access(outputDir);
-      } catch(e) {
+      } catch (e) {
         await fs.mkdir(outputDir, {
           recursive: true
-        })
+        });
       }
 
       if (prerender || prerenderPlugin.prerender) {

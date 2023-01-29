@@ -3,7 +3,7 @@
  * Manages routing to API routes.
  *
  */
-import fs from 'fs';
+import fs from 'fs/promises';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class ApiRoutesResource extends ResourceInterface {
@@ -12,13 +12,20 @@ class ApiRoutesResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    const apiPathUrl = new URL(`.${url.pathname.replace('/api', '')}.js`, this.compilation.context.apisDir);
+    const { protocol, pathname } = url;
+    const apiPathUrl = new URL(`.${pathname.replace('/api', '')}.js`, this.compilation.context.apisDir);
 
-    // TODO Could this existence check be derived from the graph instead, like pages are?
-    // https://github.com/ProjectEvergreen/greenwood/issues/946
-    return url.protocol.indexOf('http') === 0
-      && url.pathname.startsWith('/api')
-      && fs.existsSync(apiPathUrl.pathname);
+    try {
+      // TODO Could this existence check be derived from the graph instead, like pages are?
+      // https://github.com/ProjectEvergreen/greenwood/issues/946
+      if (protocol.startsWith('http') === 0 && pathname.startsWith('/api')) {
+        await fs.access(apiPathUrl);
+
+        return true;
+      }
+    } catch (error) {
+      
+    }
   }
 
   async serve(url, request) {

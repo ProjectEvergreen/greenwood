@@ -3,7 +3,7 @@
  * Enables using JavaScript to import CSS files, using ESM syntax.
  *
  */
-import fs from 'fs';
+import fs from 'fs/promises';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class ImportCssResource extends ResourceInterface {
@@ -15,7 +15,14 @@ class ImportCssResource extends ResourceInterface {
 
   // https://github.com/ProjectEvergreen/greenwood/issues/700
   async shouldResolve(url) {
-    return url.pathname.endsWith(`.${this.extensions[0]}`) && fs.existsSync(`${url.pathname}.js`);
+    try {
+      if (url.pathname.endsWith(`.${this.extensions[0]}`)) {
+        await fs.access(url);
+        return true;
+      }      
+    } catch (error) {
+      
+    }
   }
 
   async resolve(url) {

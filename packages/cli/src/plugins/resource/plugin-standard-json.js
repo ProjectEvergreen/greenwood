@@ -4,7 +4,7 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from 'fs';
+import fs from 'fs/promises';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardJsonResource extends ResourceInterface {
@@ -18,7 +18,16 @@ class StandardJsonResource extends ResourceInterface {
     const { protocol, pathname } = url;
     const isJson = pathname.split('.').pop() === this.extensions[0];
     const isGraphJson = pathname === '/graph.json';
-    const isWorkspaceFile = protocol === 'file:' && fs.existsSync(url);
+    const isWorkspaceFile = false;
+    
+    try {
+      if (protocol === 'file:') {
+        await fs.access(url);
+        isWorkspaceFile = true;
+      }
+    } catch (error) {
+      
+    }
 
     return isJson && (isWorkspaceFile || isGraphJson);
   }
@@ -29,7 +38,7 @@ class StandardJsonResource extends ResourceInterface {
     const finalUrl = pathname.startsWith('/graph.json')
       ? new URL('./graph.json', scratchDir)
       : url;
-    const contents = await fs.promises.readFile(finalUrl, 'utf-8');
+    const contents = await fs.readFile(finalUrl, 'utf-8');
 
     return new Response(contents, {
       headers: new Headers({

@@ -1,10 +1,10 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 
 const ejectConfiguration = async (compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
       const configFileDirUrl = new URL('../config/', import.meta.url);
-      const configFiles = await fs.promises.readdir(configFileDirUrl);
+      const configFiles = await fs.readdir(configFileDirUrl);
       
       configFiles.forEach((configFile) => {
         const from = new URL(`./${configFile}`, configFileDirUrl);

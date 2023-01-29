@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import htmlparser from 'node-html-parser';
 import { modelResource } from '../lib/resource-utils.js';
 import os from 'os';
@@ -8,9 +8,13 @@ function isLocalLink(url = '') {
   return url !== '' && (url.indexOf('http') !== 0 && url.indexOf('//') !== 0);
 }
 
-function createOutputDirectory(route, { pathname }) {
-  if (route !== '/404/' && !fs.existsSync(pathname)) {
-    fs.mkdirSync(pathname, {
+async function createOutputDirectory(route, outputDir) {
+  try {
+    if (route !== '/404/') {
+      await fs.access(outputDir);
+    }
+  } catch (e) {
+    await fs.mkdir(outputDir, {
       recursive: true
     });
   }
@@ -40,16 +44,16 @@ function trackResourcesForRoute(html, compilation, route) {
 
       if (src) {
         // <script src="...."></script>
-        return modelResource(context, 'script', src, null, optimizationAttr, rawAttrs);
+        return await modelResource(context, 'script', src, null, optimizationAttr, rawAttrs);
       } else if (script.rawText) {
         // <script>...</script>
-        return modelResource(context, 'script', null, script.rawText, optimizationAttr, rawAttrs);
+        return await modelResource(context, 'script', null, script.rawText, optimizationAttr, rawAttrs);
       }
     });
 
   const styles = root.querySelectorAll('style')
     .filter(style => !(/\$/).test(style.rawText) && !(/<!-- Shady DOM styles for -->/).test(style.rawText)) // filter out Shady DOM <style> tags that happen when using puppeteer
-    .map(style => modelResource(context, 'style', null, style.rawText, null, style.getAttribute('data-gwd-opt')));
+    .map(style => await modelResource(context, 'style', null, style.rawText, null, style.getAttribute('data-gwd-opt')));
 
   const links = root.querySelectorAll('head link')
     .filter(link => {
@@ -57,7 +61,7 @@ function trackResourcesForRoute(html, compilation, route) {
       return link.getAttribute('rel') === 'stylesheet'
         && link.getAttribute('href') && isLocalLink(link.getAttribute('href'));
     }).map(link => {
-      return modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'), link.rawAttrs);
+      return await modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'), link.rawAttrs);
     });
 
   const resources = [
@@ -125,9 +129,9 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     let body = await (await servePage(url, request, plugins)).text();
     body = await (await interceptPage(url, request, plugins, body)).text();
 
-    createOutputDirectory(route, outputDirUrl);
+    await createOutputDirectory(route, outputDirUrl);
 
-    const resources = trackResourcesForRoute(body, compilation, route);
+    const resources = await trackResourcesForRoute(body, compilation, route);
     const scripts = resources
       .filter(resource => resource.type === 'script')
       .map(resource => resource.sourcePathURL.href);
@@ -149,7 +153,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       });
     });
 
-    await fs.promises.writeFile(outputPathUrl, body);
+    await fs.writeFile(outputPathUrl, body);
 
     console.info('generated page...', route);
   }
@@ -175,10 +179,9 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     // clean this up here to avoid sending webcomponents-bundle to rollup
     body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
 
-    trackResourcesForRoute(body, compilation, route);
-    createOutputDirectory(route, outputDirUrl);
-
-    await fs.promises.writeFile(outputPathUrl, body);
+    await trackResourcesForRoute(body, compilation, route);
+    await createOutputDirectory(route, outputDirUrl);
+    await fs.writeFile(outputPathUrl, body);
 
     console.info('generated page...', route);
   });
@@ -201,10 +204,9 @@ async function staticRenderCompilation(compilation) {
     let body = await (await servePage(url, request, plugins)).text();
     body = await (await interceptPage(url, request, plugins, body)).text();
 
-    trackResourcesForRoute(body, compilation, route);
-    createOutputDirectory(route, outputDirUrl);
-
-    await fs.promises.writeFile(outputPathUrl, body);
+    await trackResourcesForRoute(body, compilation, route);
+    await createOutputDirectory(route, outputDirUrl);
+    await fs.writeFile(outputPathUrl, body);
 
     console.info('generated page...', route);
 

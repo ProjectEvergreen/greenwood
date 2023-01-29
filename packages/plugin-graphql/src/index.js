@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import { graphqlServer } from './core/server.js';
 import { mergeImportMap } from '@greenwood/cli/src/lib/walker-package-ranger.js';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
@@ -27,7 +27,7 @@ class GraphQLResource extends ResourceInterface {
   }
 
   async serve(url) {
-    const js = await fs.promises.readFile(url, 'utf-8');
+    const js = await fs.readFile(url, 'utf-8');
     const body = `
       export default \`${js}\`;
     `;
