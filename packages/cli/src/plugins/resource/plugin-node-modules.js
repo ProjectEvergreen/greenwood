@@ -41,7 +41,6 @@ class NodeModulesResource extends ResourceInterface {
   async shouldServe(url) {
     const extension = url.pathname.split('.').pop();
 
-    // TODO return this.hasExtension(url) && url.pathname.startsWith('/node_modules/');
     return extension === 'mjs'
       || extension === '' && fs.existsSync(`${url}.js`)
       || extension === 'js' && url.pathname.startsWith('/node_modules/');

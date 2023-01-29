@@ -14,7 +14,6 @@ class ImportJsonResource extends ResourceInterface {
     this.contentType = 'text/javascript';
   }
 
-  // TODO handle it from node_modules too, when without `?type=json`
   async shouldIntercept(url) {
     const { pathname } = url;
 
