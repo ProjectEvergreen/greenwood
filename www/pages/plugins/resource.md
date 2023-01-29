@@ -56,20 +56,24 @@ When requesting a file, such as `/main.js`, Greenwood needs to know _where_ this
 
 <!-- eslint-disable no-unused-vars -->
 ```js
+import fs from 'fs';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class UserWorkspaceResource extends ResourceInterface {
-  async shouldResolve(url) {
+  async shouldResolve(url, request) {
+    const { pathname } = url;
     const { userWorkspace } = this.compilation.context;
+    const hasExtension = !['', '/'].includes(pathname.split('.').pop());
 
-    return this.hasExtension(url)
-      && !url.pathname.startsWith('/node_modules')
-      && this.resolveForRelativeUrl(url, userWorkspace);
+    return hasExtension
+      && !pathname.startsWith('/node_modules')
+      && fs.existsSync(new URL(`.${pathname}`, userWorkspace).pathname);
   }
 
-  async resolve(url) {
+  async resolve(url, request) {
+    const { pathname } = url;
     const { userWorkspace } = this.compilation.context;
-    const workspaceUrl = this.resolveForRelativeUrl(url, userWorkspace);
+    const workspaceUrl = new URL(`.${pathname}`, userWorkspace);
 
     return new Request(workspaceUrl);
   }
@@ -81,7 +85,7 @@ class UserWorkspaceResource extends ResourceInterface {
 
 #### Serve
 
-When requesting a file, such as `/main.js`, Greenwood needs to return a response so that the contents can be served or bundled appropriately.  This is done by passing an instance of `URL` and returning an instance of a `Response`.  For example, Greenwood uses this lifecycle extensively to serve all the standard web content types like HTML, JS, CSS, images, fonts, etc and also providing the appropriate `Content-Type` header.  If you are supporting custom extensions, this is where you would transform the contents into something a browser would understand; like compiling from TypeScript to JavaScript.
+When requesting a file, such as `/main.js`, Greenwood needs to return a response so that the contents can be served or bundled appropriately.  This is done by passing an instance of `URL` and `Request` and returning an instance of `Response`.  For example, Greenwood uses this lifecycle extensively to serve all the standard web content types like HTML, JS, CSS, images, fonts, etc and also providing the appropriate `Content-Type` header.  If you are supporting custom extensions, this is where you would transform the contents into something a browser would understand; like compiling from TypeScript to JavaScript.
 
 Below is an example from [Greenwood's codebase](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/src/plugins/resource/plugin-standard-javascript.js) for serving JavaScript files.
 
@@ -92,11 +96,11 @@ import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js'
 
 class StandardJavaScriptResource extends ResourceInterface {
 
-  async shouldServe(url) {
+  async shouldServe(url, request) {
     return url.protocol === 'file:' && url.pathname.split('.').pop() === 'js';
   }
 
-  async serve(url) {
+  async serve(url, request) {
     const body = await fs.promises.readFile(url, 'utf-8');
     
     return new Response(body, {
@@ -128,7 +132,7 @@ class ImportCssResource extends ResourceInterface {
 
   // ...
 
-  async shouldIntercept(url, request) {
+  async shouldIntercept(url, request, response) {
     const { pathname } = url;
     const accepts = request.headers.get('accept') || '';
     const notFromBrowser = accepts.indexOf('text/css') < 0 && accepts.indexOf('application/signed-exchange') < 0;
