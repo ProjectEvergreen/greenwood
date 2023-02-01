@@ -47,6 +47,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
+// TODO good first issue, to abstract along with copy plugin
 async function rreaddir (dir, allFiles = []) {
   const files = (await fs.promises.readdir(dir)).map(f => path.join(dir, f));
 
@@ -90,7 +91,7 @@ describe('Develop Greenwood With: ', function() {
     this.context = {
       hostname: `${hostname}:${port}`
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function() {
