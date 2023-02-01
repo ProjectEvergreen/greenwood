@@ -22,10 +22,10 @@ function getCustomPageTemplatesFromPlugins(contextPlugins, templateName) {
   return contextPlugins
     .map(plugin => plugin.templates)
     .flat()
-    .filter((templateDirUrl) => {
+    .filter(async(templateDirUrl) => {
       try {
         if (templateName) {
-          fs.access(new URL(`./${templateName}.html`, templateDirUrl)).then(() => true);
+          await fs.access(new URL(`./${templateName}.html`, templateDirUrl)).then(() => true);
         }
       } catch (e) {
         return false;

@@ -161,63 +161,79 @@ async function getStaticServer(compilation, composable) {
   });
 
   app.use(async (ctx, next) => {
-    const url = new URL(`http://localhost:8080${ctx.url}`);
-    const matchingRoute = compilation.graph.find(page => page.route === url.pathname);
+    try {
+      const url = new URL(`http://localhost:8080${ctx.url}`);
+      const matchingRoute = compilation.graph.find(page => page.route === url.pathname);
 
-    if ((matchingRoute && !matchingRoute.isSSR) || url.pathname.split('.').pop() === 'html') {
-      const pathname = matchingRoute ? matchingRoute.outputPath : url.pathname;
-      const body = await fs.readFile(new URL(`./${pathname}`, outputDir), 'utf-8');
+      if ((matchingRoute && !matchingRoute.isSSR) || url.pathname.split('.').pop() === 'html') {
+        const pathname = matchingRoute ? matchingRoute.outputPath : url.pathname;
+        const body = await fs.readFile(new URL(`./${pathname}`, outputDir), 'utf-8');
 
-      ctx.set('Content-Type', 'text/html');
-      ctx.body = body;
-    }
-
-    await next();
-  });
-
-  app.use(async (ctx, next) => {
-    const url = new URL(`http://localhost:8080${ctx.url}`);
-    const request = new Request(url, {
-      method: ctx.request.method,
-      headers: ctx.request.header
-    });
-
-    if (compilation.config.devServer.proxy) {
-      const proxyPlugin = standardResourcePlugins
-        .find((plugin) => plugin.name === 'plugin-dev-proxy')
-        .provider(compilation);
-
-      if (await proxyPlugin.shouldServe(url, request)) {
-        const response = await proxyPlugin.serve(url, request);
-
-        ctx.body = Readable.from(response.body);
-        ctx.set('Content-Type', response.headers.get('Content-Type'));
+        ctx.set('Content-Type', 'text/html');
+        ctx.body = body;
       }
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
     }
 
     await next();
   });
 
   app.use(async (ctx, next) => {
-    const url = new URL(`.${ctx.url}`, outputDir.href);
-    const resourcePlugins = standardResourcePlugins.map((plugin) => {
-      return plugin.provider(compilation);
-    });
-    const request = new Request(url.href);
-    const initResponse = new Response(ctx.body, {
-      status: ctx.response.status,
-      headers: new Headers(ctx.response.header)
-    });
-    const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-      return plugin.shouldServe && await plugin.shouldServe(url, request)
-        ? Promise.resolve(await plugin.serve(url, request))
-        : responsePromise;
-    }, Promise.resolve(initResponse));
+    try {
+      const url = new URL(`http://localhost:8080${ctx.url}`);
+      const request = new Request(url, {
+        method: ctx.request.method,
+        headers: ctx.request.header
+      });
 
-    if (response.ok) {
-      ctx.body = Readable.from(response.body);
-      ctx.type = response.headers.get('Content-Type');
-      ctx.status = response.status;
+      if (compilation.config.devServer.proxy) {
+        const proxyPlugin = standardResourcePlugins
+          .find((plugin) => plugin.name === 'plugin-dev-proxy')
+          .provider(compilation);
+
+        if (await proxyPlugin.shouldServe(url, request)) {
+          const response = await proxyPlugin.serve(url, request);
+
+          ctx.body = Readable.from(response.body);
+          ctx.set('Content-Type', response.headers.get('Content-Type'));
+        }
+      }
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
+    }
+
+    await next();
+  });
+
+  app.use(async (ctx, next) => {
+    try {
+      const url = new URL(`.${ctx.url}`, outputDir.href);
+      const resourcePlugins = standardResourcePlugins.map((plugin) => {
+        return plugin.provider(compilation);
+      });
+
+      const request = new Request(url.href);
+      const initResponse = new Response(ctx.body, {
+        status: ctx.response.status,
+        headers: new Headers(ctx.response.header)
+      });
+      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        return plugin.shouldServe && await plugin.shouldServe(url, request)
+          ? Promise.resolve(await plugin.serve(url, request))
+          : responsePromise;
+      }, Promise.resolve(initResponse));
+
+      if (response.ok) {
+        ctx.body = Readable.from(response.body);
+        ctx.type = response.headers.get('Content-Type');
+        ctx.status = response.status;
+      }
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
     }
 
     if (composable) {
@@ -235,36 +251,41 @@ async function getHybridServer(compilation) {
   });
 
   app.use(async (ctx) => {
-    const url = new URL(`http://localhost:8080${ctx.url}`);
-    const isApiRoute = url.pathname.startsWith('/api');
-    const matchingRoute = compilation.graph.find((node) => node.route === url.pathname) || { data: {} };
-    const request = new Request(url.href, {
-      method: ctx.request.method,
-      headers: ctx.request.header
-    });
+    try {
+      const url = new URL(`http://localhost:8080${ctx.url}`);
+      const isApiRoute = url.pathname.startsWith('/api');
+      const matchingRoute = compilation.graph.find((node) => node.route === url.pathname) || { data: {} };
+      const request = new Request(url.href, {
+        method: ctx.request.method,
+        headers: ctx.request.header
+      });
 
-    if (matchingRoute.isSSR && !matchingRoute.data.static) {
-      const standardHtmlResource = resourcePlugins.find((plugin) => {
-        return plugin.isGreenwoodDefaultPlugin
-          && plugin.name.indexOf('plugin-standard-html') === 0;
-      }).provider(compilation);
-      let response = await standardHtmlResource.serve(url, request);
+      if (matchingRoute.isSSR && !matchingRoute.data.static) {
+        const standardHtmlResource = resourcePlugins.find((plugin) => {
+          return plugin.isGreenwoodDefaultPlugin
+            && plugin.name.indexOf('plugin-standard-html') === 0;
+        }).provider(compilation);
+        let response = await standardHtmlResource.serve(url, request);
 
-      response = await standardHtmlResource.optimize(url, response);
+        response = await standardHtmlResource.optimize(url, response);
 
-      ctx.body = Readable.from(response.body);
-      ctx.set('Content-Type', 'text/html');
-      ctx.status = 200;
-    } else if (isApiRoute) {
-      const apiResource = resourcePlugins.find((plugin) => {
-        return plugin.isGreenwoodDefaultPlugin
-          && plugin.name === 'plugin-api-routes';
-      }).provider(compilation);
-      const response = await apiResource.serve(url, request);
+        ctx.body = Readable.from(response.body);
+        ctx.set('Content-Type', 'text/html');
+        ctx.status = 200;
+      } else if (isApiRoute) {
+        const apiResource = resourcePlugins.find((plugin) => {
+          return plugin.isGreenwoodDefaultPlugin
+            && plugin.name === 'plugin-api-routes';
+        }).provider(compilation);
+        const response = await apiResource.serve(url, request);
 
-      ctx.status = 200;
-      ctx.set('Content-Type', response.headers.get('Content-Type'));
-      ctx.body = Readable.from(response.body);
+        ctx.status = 200;
+        ctx.set('Content-Type', response.headers.get('Content-Type'));
+        ctx.body = Readable.from(response.body);
+      }
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
     }
   });
 

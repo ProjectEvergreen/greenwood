@@ -18,7 +18,7 @@ class StandardJsonResource extends ResourceInterface {
     const { protocol, pathname } = url;
     const isJson = pathname.split('.').pop() === this.extensions[0];
     const isGraphJson = pathname === '/graph.json';
-    const isWorkspaceFile = false;
+    let isWorkspaceFile = false;
     
     try {
       if (protocol === 'file:') {
@@ -26,7 +26,7 @@ class StandardJsonResource extends ResourceInterface {
         isWorkspaceFile = true;
       }
     } catch (error) {
-      
+
     }
 
     return isJson && (isWorkspaceFile || isGraphJson);

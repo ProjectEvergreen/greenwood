@@ -16,11 +16,11 @@ class SourceMapsResource extends ResourceInterface {
   async shouldServe(url) {
     try {
       if (url.pathname.split('.').pop() === this.extensions[0]) {
-        fs.access(url);
+        await fs.access(url);
         return true;
       }
-    } catch (error) {
-      
+    } catch (e) {
+
     }
   }
 

@@ -89,7 +89,7 @@ const readAndMergeConfig = async() => {
           try {
             await fs.access(workspace);
             customConfig.workspace = workspace;
-          } catch(e) {
+          } catch (e) {
             reject('Error: greenwood.config.js workspace doesn\'t exist! Please double check your configuration.');
           }
         }

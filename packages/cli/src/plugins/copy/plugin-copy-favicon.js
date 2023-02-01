@@ -17,7 +17,7 @@ const greenwoodPluginCopyFavicon = [{
         to: new URL(`./${fileName}`, outputDir)
       });
     } catch (error) {
-      console.log('copy favion', { error });
+
     }
 
     return assets;

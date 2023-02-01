@@ -9,7 +9,7 @@ function greenwoodResourceLoader (compilation) {
 
   return {
     name: 'greenwood-resource-loader',
-    resolveId(id) {
+    async resolveId(id) {
       const normalizedId = id.replace(/\?type=(.*)/, '');
       const { userWorkspace } = compilation.context;
 
@@ -24,11 +24,6 @@ function greenwoodResourceLoader (compilation) {
       } catch (e) {
         return null;
       }
-      // if ((id.indexOf('./') === 0 || id.indexOf('/') === 0) && fs.existsSync(new URL(`./${normalizedId}`, userWorkspace).pathname)) {
-      //   return new URL(`./${normalizedId}`, userWorkspace).pathname;
-      // }
-
-      // return null;
     },
     async load(id) {
       const pathname = id.indexOf('?') >= 0 ? id.slice(0, id.indexOf('?')) : id;
@@ -60,7 +55,7 @@ function greenwoodResourceLoader (compilation) {
 function greenwoodSyncPageResourceBundlesPlugin(compilation) {
   return {
     name: 'greenwood-sync-page-resource-bundles-plugin',
-    writeBundle(outputOptions, bundles) {
+    async writeBundle(outputOptions, bundles) {
       const { outputDir } = compilation.context;
 
       for (const resource of compilation.resources.values()) {
@@ -89,19 +84,13 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
            */
           try {
             if (facadeModuleId && resourceKey.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId.indexOf('/packages/cli') > 0) {
-              console.debug({ facadeModuleId });
               await fs.access(facadeModuleId);
 
               facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');
             }
           } catch (e) {
-            console.debug('facademodule id', e);
-            // return null;
-          }
 
-          // if (facadeModuleId && resourceKey.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId.indexOf('/packages/cli') > 0 && fs.existsSync(facadeModuleId)) {
-          //   facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');
-          // }
+          }
 
           if (resourceKey === facadeModuleId) {
             const { fileName } = bundles[bundle];

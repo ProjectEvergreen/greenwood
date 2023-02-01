@@ -25,7 +25,7 @@ async function createOutputDirectory(route, outputDir) {
 // or could this be done sooner (like in appTemplate building in html resource plugin)?
 // Or do we need to ensure userland code / plugins have gone first
 // before we can curate the final list of <script> / <style> / <link> tags to bundle
-function trackResourcesForRoute(html, compilation, route) {
+async function trackResourcesForRoute(html, compilation, route) {
   const { context } = compilation;
   const root = htmlparser.parse(html, {
     script: true,
@@ -33,11 +33,11 @@ function trackResourcesForRoute(html, compilation, route) {
   });
 
   // intentionally support <script> tags from the <head> or <body>
-  const scripts = root.querySelectorAll('script')
+  const scripts = await Promise.all(root.querySelectorAll('script')
     .filter(script => (
       isLocalLink(script.getAttribute('src')) || script.rawText)
       && script.rawAttrs.indexOf('importmap') < 0)
-    .map(script => {
+    .map(async(script) => {
       const src = script.getAttribute('src');
       const optimizationAttr = script.getAttribute('data-gwd-opt');
       const { rawAttrs } = script;
@@ -49,20 +49,20 @@ function trackResourcesForRoute(html, compilation, route) {
         // <script>...</script>
         return await modelResource(context, 'script', null, script.rawText, optimizationAttr, rawAttrs);
       }
-    });
+    }));
 
-  const styles = root.querySelectorAll('style')
+  const styles = await Promise.all(root.querySelectorAll('style')
     .filter(style => !(/\$/).test(style.rawText) && !(/<!-- Shady DOM styles for -->/).test(style.rawText)) // filter out Shady DOM <style> tags that happen when using puppeteer
-    .map(style => await modelResource(context, 'style', null, style.rawText, null, style.getAttribute('data-gwd-opt')));
+    .map(async(style) => await modelResource(context, 'style', null, style.rawText, null, style.getAttribute('data-gwd-opt'))));
 
-  const links = root.querySelectorAll('head link')
+  const links = await Promise.all(root.querySelectorAll('head link')
     .filter(link => {
       // <link rel="stylesheet" href="..."></link>
       return link.getAttribute('rel') === 'stylesheet'
         && link.getAttribute('href') && isLocalLink(link.getAttribute('href'));
-    }).map(link => {
-      return await modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'), link.rawAttrs);
-    });
+    }).map(async(link) => {
+      return modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'), link.rawAttrs);
+    }));
 
   const resources = [
     ...scripts,

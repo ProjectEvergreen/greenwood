@@ -83,13 +83,13 @@ async function bundleStyleResources(compilation, resourcePlugins) {
       const outputPathRoot = new URL(`./${optimizedFileName}`, outputDir).pathname
         .split('/')
         .slice(0, -1)
-        .join('/');
+        .join('/')
+        .concat('/');
 
-      console.debug('???', new URL(`file://${outputPathRoot}`))
       try {
-        fs.access(new URL(`file://${outputPathRoot}`));
+        await fs.access(new URL(`file://${outputPathRoot}`));
       } catch (error) {
-        fs.mkdir(new URL(`file://${outputPathRoot}`), {
+        await fs.mkdir(new URL(`file://${outputPathRoot}`), {
           recursive: true
         });
       }
