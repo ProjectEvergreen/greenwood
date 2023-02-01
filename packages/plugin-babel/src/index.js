@@ -14,7 +14,7 @@ async function getConfig(compilation, extendConfig = false) {
   const defaultConfig = (await import(new URL(`./${configFile}`, import.meta.url))).default;
   let userConfig = {};
   try {
-    fs.access(new URL(`./${configFile}`, projectDirectory))
+    await fs.access(new URL(`./${configFile}`, projectDirectory))
     userConfig = (await import(`${projectDirectory}/${configFile}`)).default;
   } catch (error) {
 

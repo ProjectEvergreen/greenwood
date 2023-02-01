@@ -1,13 +1,12 @@
 import fs from 'fs';
-import path from 'path';
 
 async function rreaddir (dir, allFiles = []) {
-  const files = (await fs.promises.readdir(dir)).map(f => path.join(dir, f));
+  const files = (await fs.promises.readdir(dir)).map(f => new URL(`./${f}`, dir));
 
   allFiles.push(...files);
 
   await Promise.all(files.map(async f => (
-    await fs.promises.stat(f)).isDirectory() && rreaddir(f, allFiles
+    await fs.promises.stat(f)).isDirectory() && await rreaddir(new URL(`file://${f.pathname}/`), allFiles
   )));
 
   return allFiles;
@@ -47,25 +46,16 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
         });
       }
 
-      await Promise.all(files.filter((filePath) => {
-        const targetUrl = `file://${filePath.replace(fromUrl.pathname, toUrl.pathname)}`;
-        const isDirectory = (await fs.promises.lstat(targetUrl)).isDirectory();
+      for (const fileUrl of files) {
+        const targetUrl = new URL(`file://${fileUrl.pathname.replace(fromUrl.pathname, toUrl.pathname)}`);
+        const isDirectory = (await fs.promises.stat(fileUrl)).isDirectory();
 
-        try {
-          if (isDirectory) {
-            await fs.promises.access(targetUrl);
-          } else if (!isDirectory) {
-            return filePath;
-          }
-        } catch (e) {
+        if (isDirectory) {
           await fs.promises.mkdir(targetUrl);
+        } else if (!isDirectory) {
+          await copyFile(fileUrl, targetUrl, projectDirectory);
         }
-      }).map((filePath) => {
-        const sourceUrl = new URL(`file://${filePath}`);
-        const targetUrl = new URL(`file://${filePath.replace(fromUrl.pathname, toUrl.pathname)}`);
-
-        return copyFile(sourceUrl, targetUrl, projectDirectory);
-      }));
+      }
     }
   } catch (e) {
     console.error('ERROR', e);

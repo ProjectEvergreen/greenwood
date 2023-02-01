@@ -16,7 +16,7 @@ class ImportJsonResource extends ResourceInterface {
   async shouldIntercept(url) {
     const { pathname } = url;
 
-    return pathname.split('.').pop() === this.extensions[0] || (url.searchParams.has('type') && url.searchParams.get('type') === this.extensions[0]);
+    return pathname.split('.').pop() === this.extensions[0] && (url.searchParams.has('type') && url.searchParams.get('type') === this.extensions[0]);
   }
 
   async intercept(url, request, response) {
