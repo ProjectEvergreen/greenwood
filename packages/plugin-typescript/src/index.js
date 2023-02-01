@@ -14,7 +14,7 @@ const defaultCompilerOptions = {
   sourceMap: true
 };
 
-function getCompilerOptions (projectDirectory, extendConfig) {
+async function getCompilerOptions (projectDirectory, extendConfig) {
   const customOptions = extendConfig
     ? JSON.parse(await fs.readFile(new URL('./tsconfig.json', projectDirectory), 'utf-8'))
     : { compilerOptions: {} };
@@ -42,7 +42,7 @@ class TypeScriptResource extends ResourceInterface {
   async serve(url) {
     const { projectDirectory } = this.compilation.context;
     const source = await fs.readFile(url, 'utf-8');
-    const compilerOptions = getCompilerOptions(projectDirectory, this.options.extendConfig);
+    const compilerOptions = await getCompilerOptions(projectDirectory, this.options.extendConfig);
     // https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
     const body = tsc.transpileModule(source, { compilerOptions }).outputText;
 

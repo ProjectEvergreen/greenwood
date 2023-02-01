@@ -30,7 +30,7 @@ function greenwoodResourceLoader (compilation) {
       const extension = pathname.split('.').pop();
 
       if (extension !== '' && extension !== 'js') {
-        const url = new URL(`file://${pathname}`);
+        const url = new URL(`file://${pathname}?type=${extension}`);
         const request = new Request(url.href);
         let response = new Response('');
 

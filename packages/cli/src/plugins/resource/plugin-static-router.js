@@ -60,7 +60,7 @@ class StaticRouterResource extends ResourceInterface {
     const { outputDir } = this.compilation.context;
     const partial = body.match(/<body>(.*)<\/body>/s)[0].replace('<body>', '').replace('</body>', '');
     const outputPartialDirUrl = new URL(`./_routes${url.pathname}`, outputDir);
-    const outputPartialDirPathUrl = new URL(`file://${outputPartialDirUrl.pathname.split('/').slice(0, -1).join('/')}`);
+    const outputPartialDirPathUrl = new URL(`file://${outputPartialDirUrl.pathname.split('/').slice(0, -1).join('/').concat('/')}`);
     let currentTemplate;
 
     const routeTags = this.compilation.graph
@@ -90,12 +90,6 @@ class StaticRouterResource extends ResourceInterface {
           recursive: true
         });
       }
-      
-      // if (!fs.existsSync(outputPartialDirPath)) {
-      //   fs.mkdirSync(outputPartialDirPath, {
-      //     recursive: true
-      //   });
-      // }
 
       await fs.writeFile(new URL('./index.html', outputPartialDirUrl), partial);
     }

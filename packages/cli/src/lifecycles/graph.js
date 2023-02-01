@@ -34,7 +34,7 @@ const generateGraph = async (compilation) => {
             await fs.access(filenameUrlAsDir);
             isDirectory = (await fs.stat(filenameUrlAsDir)).isDirectory();
           } catch (e) {
-            // console.debug(' directory check e ', { e });
+
           }
 
           if (isDirectory) {
@@ -130,13 +130,13 @@ const generateGraph = async (compilation) => {
               await new Promise((resolve, reject) => {
                 const worker = new Worker(routeWorkerUrl);
 
-                worker.on('message', (result) => {
+                worker.on('message', async (result) => {
                   if (result.frontmatter) {
-                    const resources = (result.frontmatter.imports || []).map(async (resource) => {
+                    const resources = await Promise.all((result.frontmatter.imports || []).map(async (resource) => {
                       const type = resource.split('.').pop() === 'js' ? 'script' : 'link';
 
                       return await modelResource(compilation.context, type, resource);
-                    });
+                    }));
 
                     result.frontmatter.imports = resources;
                     ssrFrontmatter = result.frontmatter;
@@ -151,7 +151,7 @@ const generateGraph = async (compilation) => {
                 });
 
                 worker.postMessage({
-                  moduleUrl: filenameUrl,
+                  moduleUrl: filenameUrl.href,
                   compilation: JSON.stringify(compilation),
                   route
                 });
@@ -235,8 +235,7 @@ const generateGraph = async (compilation) => {
             graph = await walkDirectoryForPages(pagesDir);
           }
         } catch (error) {
-          // console.debug('eeeeee on pages dir ????', { error });
-          graph = graph;
+
         }
 
         const has404Page = graph.filter(page => page.route === '/404/').length === 1;
