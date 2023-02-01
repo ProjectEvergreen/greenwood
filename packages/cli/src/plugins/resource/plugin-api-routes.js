@@ -18,13 +18,13 @@ class ApiRoutesResource extends ResourceInterface {
     try {
       // TODO Could this existence check be derived from the graph instead, like pages are?
       // https://github.com/ProjectEvergreen/greenwood/issues/946
-      if (protocol.startsWith('http') === 0 && pathname.startsWith('/api')) {
+      if (protocol.startsWith('http') && pathname.startsWith('/api')) {
         await fs.access(apiPathUrl);
 
         return true;
       }
     } catch (error) {
-      
+
     }
   }
 

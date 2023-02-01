@@ -4,7 +4,6 @@ import { hashString } from '../lib/hashing-utils.js';
 async function modelResource(context, type, src = undefined, contents = undefined, optimizationAttr = undefined, rawAttributes = undefined) {
   const { projectDirectory, scratchDir, userWorkspace } = context;
   const extension = type === 'script' ? 'js' : 'css';
-  // const windowsDriveRegex = /\/[a-zA-Z]{1}:\//;
   let sourcePathURL;
 
   if (src) {
@@ -21,19 +20,6 @@ async function modelResource(context, type, src = undefined, contents = undefine
     sourcePathURL = new URL(`./${scratchFileName}.${extension}`, scratchDir);
     await fs.writeFile(sourcePathURL, contents);
   }
-
-  // TODO (good first issue) handle for Windows adding extra / in front of drive letter for whatever reason :(
-  // e.g. turn /C:/... -> C:/...
-  // and also URL is readonly in NodeJS??
-  // if (windowsDriveRegex.test(sourcePathURL.pathname)) {
-  //   const driveMatch = sourcePathURL.pathname.match(windowsDriveRegex)[0];
-
-  //   sourcePathURL = {
-  //     ...sourcePathURL,
-  //     pathname: sourcePathURL.pathname.replace(driveMatch, driveMatch.replace('/', '')),
-  //     href: sourcePathURL.href.replace(driveMatch, driveMatch.replace('/', ''))
-  //   };
-  // }
 
   return {
     src, // if <script src="..."></script> or <link href="..."></link>
