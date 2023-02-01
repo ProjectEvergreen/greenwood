@@ -30,6 +30,7 @@ async function executeRouteModule({ moduleUrl, compilation, route, label, id, pr
     html: null
   };
 
+  console.debug({ moduleUrl });
   // prerender static content
   if (prerender) {
     for (const script of parsedScripts) {

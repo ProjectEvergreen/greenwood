@@ -6,14 +6,14 @@ const ejectConfiguration = async (compilation) => {
       const configFileDirUrl = new URL('../config/', import.meta.url);
       const configFiles = await fs.readdir(configFileDirUrl);
       
-      configFiles.forEach((configFile) => {
-        const from = new URL(`./${configFile}`, configFileDirUrl);
-        const to = new URL(`./${configFile}`, compilation.context.projectDirectory);
+      for (const file of configFiles) {
+        const from = new URL(`./${file}`, configFileDirUrl);
+        const to = new URL(`./${file}`, compilation.context.projectDirectory);
 
-        fs.copyFileSync(from.pathname, to.pathname);
+        await fs.copyFile(from.pathname, to.pathname);
         
-        console.log(`Ejected ${configFile} successfully.`);
-      });
+        console.log(`Ejected ${file} successfully.`);
+      }
 
       console.debug('all configuration files ejected.');
 

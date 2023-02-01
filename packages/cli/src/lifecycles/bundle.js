@@ -33,7 +33,7 @@ async function optimizeStaticPages(compilation, plugins) {
       let response = new Response(contents, { headers });
 
       try {
-        await fs.access(new URL(`.${route}`, outputDir))
+        await fs.access(new URL(`.${route}`, outputDir));
       } catch (error) {
         await fs.mkdir(new URL(`.${route}`, outputDir), {
           recursive: true

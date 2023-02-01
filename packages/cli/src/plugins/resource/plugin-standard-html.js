@@ -18,26 +18,32 @@ import { ResourceInterface } from '../../lib/resource-interface.js';
 import unified from 'unified';
 import { Worker } from 'worker_threads';
 
-function getCustomPageTemplatesFromPlugins(contextPlugins, templateName) {
-  return contextPlugins
+async function getCustomPageTemplatesFromPlugins(contextPlugins, templateName) {
+  const customTemplateLocations = [];
+  const templateDir = contextPlugins
     .map(plugin => plugin.templates)
-    .flat()
-    .filter(async(templateDirUrl) => {
-      try {
-        if (templateName) {
-          await fs.access(new URL(`./${templateName}.html`, templateDirUrl)).then(() => true);
-        }
-      } catch (e) {
-        return false;
+    .flat();
+
+  for (const templateDirUrl of templateDir) {
+    try {
+      if (templateName) {
+        const templateUrl = new URL(`./${templateName}.html`, templateDirUrl);
+        await fs.access(templateUrl);
+        customTemplateLocations.push(templateUrl);
       }
-    });
+    } catch (e) {
+
+    }
+  }
+
+  return customTemplateLocations;
 }
 
 const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDirectory }, template, contextPlugins = []) => {
-  const customPluginDefaultPageTemplates = getCustomPageTemplatesFromPlugins(contextPlugins, 'page');
-  const customPluginPageTemplates = getCustomPageTemplatesFromPlugins(contextPlugins, template);
+  const customPluginDefaultPageTemplates = await getCustomPageTemplatesFromPlugins(contextPlugins, 'page');
+  const customPluginPageTemplates = await getCustomPageTemplatesFromPlugins(contextPlugins, template);
   const extension = filePath.split('.').pop();
-  const is404Page = path.basename(filePath).indexOf('404') === 0 && extension === 'html';
+  const is404Page = filePath.startsWith('404') && extension === 'html';
   let hasCustomTemplate;
   let hasPageTemplate;
   let hasCustom404Page;
@@ -49,7 +55,7 @@ const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDi
     await fs.access(new URL(`./${template}.html`, userTemplatesDir));
     hasCustomTemplate = true;
   } catch (e) {
-    console.debug('111', { e });
+    // console.debug('111', { e });
   }
 
   // check page is already HTML
@@ -60,7 +66,7 @@ const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDi
       isHtmlPage = true;
     }
   } catch (e) {
-    console.debug('222', { e });
+    // console.debug('222', { e });
   }
 
   // check for default page template
@@ -69,7 +75,7 @@ const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDi
     await fs.access(new URL('./page.html', userTemplatesDir));
     hasPageTemplate = true;
   } catch (e) {
-    console.debug('333', { e });
+    // console.debug('333', { e });
   }
 
   // check for custom 404 page
@@ -78,12 +84,11 @@ const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDi
     await fs.access(new URL('./404.html', pagesDir));
     hasCustom404Page = true;
   } catch (e) {
-    console.debug('444', { e })
+    // console.debug('444', { e })
   }
 
-  // console.debug({ extension, filePath, hasCustomTemplate, hasPageTemplate, hasCustom404Page, isHtmlPage});
 
-  if (template && customPluginPageTemplates.length > 0 || hasCustomTemplate) {
+  if (template && (customPluginPageTemplates.length > 0 || hasCustomTemplate)) {
     // use a custom template, usually from markdown frontmatter
     contents = customPluginPageTemplates.length > 0
       ? await fs.readFile(new URL(`./${template}.html`, customPluginPageTemplates[0]), 'utf-8')
@@ -109,7 +114,7 @@ const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDi
 
 const getAppTemplate = async (pageTemplateContents, templatesDir, customImports = [], contextPlugins, enableHud, frontmatterTitle) => {
   const userAppTemplateUrl = new URL('./app.html', templatesDir);
-  const customAppTemplatesFromPlugins = getCustomPageTemplatesFromPlugins(contextPlugins, 'app');
+  const customAppTemplatesFromPlugins = await getCustomPageTemplatesFromPlugins(contextPlugins, 'app');
   let hasCustomUserAppTemplate;
   let mergedTemplateContents = '';
 
@@ -118,7 +123,7 @@ const getAppTemplate = async (pageTemplateContents, templatesDir, customImports 
     await fs.access(userAppTemplateUrl);
     hasCustomUserAppTemplate = true;
   } catch (e) {
-    console.debug('userAPpTemplatePAtj', { e });
+
   }
 
   let appTemplateContents = customAppTemplatesFromPlugins.length > 0
@@ -239,7 +244,6 @@ const getUserScripts = async (contents, context) => {
 
     // check for monorepo package.json
     try {
-      // fs.existsSync(new URL('./package.json', userWorkspace).pathname
       await fs.access(monorepoPackageJsonUrl);
       hasMonorepoPackageJson = true;
     } catch (e) {
@@ -248,7 +252,6 @@ const getUserScripts = async (contents, context) => {
 
     // check for top level package.json
     try {
-      // fs.existsSync(new URL('./package.json', projectDirectory).pathname)
       await fs.access(topLevelPackageJsonUrl);
       hasTopLevelPackageJson = true;
     } catch (e) {
@@ -293,7 +296,7 @@ class StandardHtmlResource extends ResourceInterface {
     const { pagesDir, userTemplatesDir, userWorkspace } = this.compilation.context;
     const { interpolateFrontmatter } = config;
     const { pathname } = url;
-    const isSpaRoute = this.compilation.graph[0].isSPA;
+    const isSpaRoute = this.compilation.graph.find(node => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
     const filePath = !matchingRoute.external ? matchingRoute.path : '';
     const isMarkdownContent = (matchingRoute?.filename || '').split('.').pop() === 'md';
@@ -398,7 +401,7 @@ class StandardHtmlResource extends ResourceInterface {
         });
 
         worker.postMessage({
-          modulePath: routeModuleLocationUrl.pathname,
+          moduleUrl: routeModuleLocationUrl.href,
           compilation: JSON.stringify(this.compilation),
           route: matchingRoute.path
         });
@@ -413,7 +416,7 @@ class StandardHtmlResource extends ResourceInterface {
     });
 
     if (isSpaRoute) {
-      body = await fs.readFile(new URL(`${filePath}`, userWorkspace), 'utf-8');
+      body = await fs.readFile(new URL(`./${isSpaRoute.filename}`, userWorkspace), 'utf-8');
     } else {
       body = ssrTemplate ? ssrTemplate : await getPageTemplate(filePath, this.compilation.context, template, contextPlugins);
     }
