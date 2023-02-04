@@ -3,7 +3,7 @@
  * Manages routing to API routes.
  *
  */
-import fs from 'fs/promises';
+import { checkResourceExists } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class ApiRoutesResource extends ResourceInterface {
@@ -15,16 +15,8 @@ class ApiRoutesResource extends ResourceInterface {
     const { protocol, pathname } = url;
     const apiPathUrl = new URL(`.${pathname.replace('/api', '')}.js`, this.compilation.context.apisDir);
 
-    try {
-      // TODO Could this existence check be derived from the graph instead, like pages are?
-      // https://github.com/ProjectEvergreen/greenwood/issues/946
-      if (protocol.startsWith('http') && pathname.startsWith('/api')) {
-        await fs.access(apiPathUrl);
-
-        return true;
-      }
-    } catch (error) {
-
+    if (protocol.startsWith('http') && pathname.startsWith('/api') && await checkResourceExists(apiPathUrl)) {
+      return true;
     }
   }
 

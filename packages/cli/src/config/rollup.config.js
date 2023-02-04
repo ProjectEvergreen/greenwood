@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-import { normalizePathnameForWindows } from '../lib/resource-utils.js';
+import { checkResourceExists, normalizePathnameForWindows } from '../lib/resource-utils.js';
 
 function greenwoodResourceLoader (compilation) {
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
@@ -14,16 +14,13 @@ function greenwoodResourceLoader (compilation) {
       const normalizedId = id.replace(/\?type=(.*)/, '');
       const { userWorkspace } = compilation.context;
 
-      try {
-        if (id.startsWith('./') || id.startsWith('/')) {
-          const prefix = id.startsWith('/') ? '.' : '';
-          const userWorkspaceUrl = new URL(`${prefix}${normalizedId}`, userWorkspace)
-          await fs.access(userWorkspaceUrl);
+      if (id.startsWith('./') || id.startsWith('/')) {
+        const prefix = id.startsWith('/') ? '.' : '';
+        const userWorkspaceUrl = new URL(`${prefix}${normalizedId}`, userWorkspace);
 
+        if (await checkResourceExists(userWorkspaceUrl)) {
           return normalizePathnameForWindows(userWorkspaceUrl);
         }
-      } catch (e) {
-
       }
     },
     async load(id) {
@@ -82,14 +79,11 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
            * pathToMatch (before): /node_modules/@greenwood/cli/src/lib/router.js
            * pathToMatch (after): /cli/src/lib/router.js
            */
-          try {
-            if (resourceKey?.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId?.indexOf('/packages/cli') > 0) {
-              await fs.access(facadeModuleId);
 
+          if (resourceKey?.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId?.indexOf('/packages/cli') > 0) {
+            if (await checkResourceExists(new URL(`file://${facadeModuleId}`))) {
               facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');
             }
-          } catch (e) {
-
           }
 
           if (resourceKey === facadeModuleId) {

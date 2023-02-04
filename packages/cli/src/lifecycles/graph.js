@@ -1,7 +1,7 @@
 /* eslint-disable complexity, max-depth */
 import fs from 'fs/promises';
 import fm from 'front-matter';
-import { modelResource } from '../lib/resource-utils.js';
+import { checkResourceExists, modelResource } from '../lib/resource-utils.js';
 import toc from 'markdown-toc';
 import { Worker } from 'worker_threads';
 
@@ -28,14 +28,7 @@ const generateGraph = async (compilation) => {
         for (const filename of files) {
           const filenameUrl = new URL(`./${filename}`, directory);
           const filenameUrlAsDir = new URL(`./${filename}/`, directory);
-          let isDirectory = false;
-
-          try {
-            await fs.access(filenameUrlAsDir);
-            isDirectory = (await fs.stat(filenameUrlAsDir)).isDirectory();
-          } catch (e) {
-
-          }
+          const isDirectory = await checkResourceExists(filenameUrlAsDir) && (await fs.stat(filenameUrlAsDir)).isDirectory();
 
           if (isDirectory) {
             pages = await walkDirectoryForPages(filenameUrlAsDir, pages);
@@ -217,26 +210,17 @@ const generateGraph = async (compilation) => {
       };
 
       console.debug('building from local sources...');
-      try {
-        await fs.access(new URL('./index.html', userWorkspace)); // test for SPA
-
+      // test for SPA
+      if (await checkResourceExists(new URL('./index.html', userWorkspace))) {
         graph = [{
           ...graph[0],
           path: `${userWorkspace.pathname}index.html`,
           isSPA: true
         }];
-      } catch (e) {
+      } else {
         const oldGraph = graph[0];
 
-        try {
-          await fs.access(pagesDir);
-
-          if ((await fs.stat(pagesDir)).isDirectory()) {
-            graph = await walkDirectoryForPages(pagesDir);
-          }
-        } catch (error) {
-
-        }
+        graph = await checkResourceExists(pagesDir) ? await walkDirectoryForPages(pagesDir) : graph;
 
         const has404Page = graph.filter(page => page.route === '/404/').length === 1;
 
@@ -292,9 +276,7 @@ const generateGraph = async (compilation) => {
 
       compilation.graph = graph;
 
-      try {
-        await fs.access(scratchDir);
-      } catch (e) {
+      if (!await checkResourceExists(scratchDir)) {
         await fs.mkdir(scratchDir);
       }
 

@@ -3,8 +3,7 @@
  * Enable using PostCSS process for CSS files.
  *
  */
-import fs from 'fs/promises';
-import { normalizePathnameForWindows } from '@greenwood/cli/src/lib/resource-utils.js';
+import { checkResourceExists, normalizePathnameForWindows } from '@greenwood/cli/src/lib/resource-utils.js';
 import postcss from 'postcss';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
@@ -12,16 +11,11 @@ async function getConfig (compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = 'postcss.config';
   const defaultConfig = (await import(new URL(`./${configFile}.js`, import.meta.url))).default;
-  let userConfig = {};
-
-  try {
-    await fs.access(new URL(`./${configFile}.mjs`, projectDirectory));
-    userConfig = (await import(new URL(`./${configFile}.mjs`, projectDirectory))).default
-  } catch(e) {
-    console.debug('postcss getConfig', { e })
-  }
-
-  let finalConfig = Object.assign({}, userConfig);
+  const userConfigUrl = new URL(`./${configFile}.mjs`, projectDirectory);
+  const userConfig = await checkResourceExists(userConfigUrl)
+    ? (await import(userConfigUrl)).default
+    : {};
+  const finalConfig = Object.assign({}, userConfig);
 
   if (userConfig && extendConfig) {
     finalConfig.plugins = Array.isArray(userConfig.plugins)

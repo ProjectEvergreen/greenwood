@@ -53,21 +53,32 @@ function mergeResponse(destination, source) {
 
 // On Windows, a URL with a drive letter like C:/ thinks it is a protocol and so prepends a /, e.g. /C:/
 // This is fine with never fs methods that Greenwood uses, but tools like Rollupand PostCSS will need this handled manually
+// https://github.com/rollup/rollup/issues/3779
 function normalizePathnameForWindows(url) {
   const windowsDriveRegex = /\/[a-zA-Z]{1}:\//;
   const { pathname = '' } = url;
 
   if (windowsDriveRegex.test(pathname)) {
-   const driveMatch = pathname.match(windowsDriveRegex)[0];
+    const driveMatch = pathname.match(windowsDriveRegex)[0];
 
-   return pathname.replace(driveMatch, driveMatch.replace('/', ''))
+    return pathname.replace(driveMatch, driveMatch.replace('/', ''));
   }
 
   return pathname;
 }
 
+async function checkResourceExists(url) {
+  try {
+    await fs.access(url);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 export {
   mergeResponse,
   modelResource,
-  normalizePathnameForWindows
+  normalizePathnameForWindows,
+  checkResourceExists
 };

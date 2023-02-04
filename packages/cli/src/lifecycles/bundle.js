@@ -2,7 +2,7 @@
 import fs from 'fs/promises';
 import { getRollupConfig } from '../config/rollup.config.js';
 import { hashString } from '../lib/hashing-utils.js';
-import { mergeResponse } from '../lib/resource-utils.js';
+import { checkResourceExists, mergeResponse } from '../lib/resource-utils.js';
 import path from 'path';
 import { rollup } from 'rollup';
 
@@ -27,15 +27,14 @@ async function optimizeStaticPages(compilation, plugins) {
     .filter(page => !page.isSSR || (page.isSSR && page.data.static) || (page.isSSR && compilation.config.prerender))
     .map(async (page) => {
       const { route, outputPath } = page;
+      const outputDirUrl = new URL(`.${route}`, outputDir);
       const url = new URL(`http://localhost:${compilation.config.port}${route}`);
       const contents = await fs.readFile(new URL(`./${outputPath}`, scratchDir), 'utf-8');
       const headers = new Headers({ 'Content-Type': 'text/html' });
       let response = new Response(contents, { headers });
 
-      try {
-        await fs.access(new URL(`.${route}`, outputDir));
-      } catch (error) {
-        await fs.mkdir(new URL(`.${route}`, outputDir), {
+      if (!await checkResourceExists(outputDirUrl)) {
+        await fs.mkdir(outputDirUrl, {
           recursive: true
         });
       }
@@ -80,15 +79,15 @@ async function bundleStyleResources(compilation, resourcePlugins) {
         optimizedFileName = `${hashString(contents)}.css`;
       }
 
-      const outputPathRoot = new URL(`./${optimizedFileName}`, outputDir).pathname
+      const outputPathRoot = new URL(`./${optimizedFileName}`, outputDir)
+        .pathname
         .split('/')
         .slice(0, -1)
         .join('/')
         .concat('/');
+      const outputPathRootUrl = new URL(`file://${outputPathRoot}`);
 
-      try {
-        await fs.access(new URL(`file://${outputPathRoot}`));
-      } catch (error) {
+      if (!await checkResourceExists(outputPathRootUrl)) {
         await fs.mkdir(new URL(`file://${outputPathRoot}`), {
           recursive: true
         });

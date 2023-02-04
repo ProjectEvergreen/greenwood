@@ -3,6 +3,7 @@
  * Detects and fully resolve requests to source map (.map) files.
  *
  */
+import { checkResourceExists } from '../../lib/resource-utils.js';
 import fs from 'fs/promises';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
@@ -14,14 +15,7 @@ class SourceMapsResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    try {
-      if (url.pathname.split('.').pop() === this.extensions[0]) {
-        await fs.access(url);
-        return true;
-      }
-    } catch (e) {
-
-    }
+    return url.pathname.split('.').pop() === this.extensions[0] && await checkResourceExists(url);
   }
 
   async serve(url) {

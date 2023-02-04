@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import htmlparser from 'node-html-parser';
-import { modelResource } from '../lib/resource-utils.js';
+import { checkResourceExists, modelResource } from '../lib/resource-utils.js';
 import os from 'os';
 import { WorkerPool } from '../lib/threadpool.js';
 
@@ -9,11 +9,7 @@ function isLocalLink(url = '') {
 }
 
 async function createOutputDirectory(route, outputDir) {
-  try {
-    if (route !== '/404/') {
-      await fs.access(outputDir);
-    }
-  } catch (e) {
+  if (route !== '/404/' && !await checkResourceExists(outputDir)) {
     await fs.mkdir(outputDir, {
       recursive: true
     });
