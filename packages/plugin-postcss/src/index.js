@@ -4,6 +4,7 @@
  *
  */
 import fs from 'fs/promises';
+import { normalizePathnameForWindows } from '@greenwood/cli/src/lib/resource-utils.js';
 import postcss from 'postcss';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
@@ -47,7 +48,7 @@ class PostCssResource extends ResourceInterface {
     const plugins = config.plugins || [];
     const body = await response.text();
     const css = plugins.length > 0
-      ? (await postcss(plugins).process(body, { from: url.pathname })).css
+      ? (await postcss(plugins).process(body, { from: normalizePathnameForWindows(url) })).css
       : body;
 
     return new Response(css);

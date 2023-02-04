@@ -51,7 +51,23 @@ function mergeResponse(destination, source) {
   });
 }
 
+// On Windows, a URL with a drive letter like C:/ thinks it is a protocol and so prepends a /, e.g. /C:/
+// This is fine with never fs methods that Greenwood uses, but tools like Rollupand PostCSS will need this handled manually
+function normalizePathnameForWindows(url) {
+  const windowsDriveRegex = /\/[a-zA-Z]{1}:\//;
+  const { pathname = '' } = url;
+
+  if (windowsDriveRegex.test(pathname)) {
+   const driveMatch = pathname.match(windowsDriveRegex)[0];
+
+   return pathname.replace(driveMatch, driveMatch.replace('/', ''))
+  }
+
+  return pathname;
+}
+
 export {
   mergeResponse,
-  modelResource
+  modelResource,
+  normalizePathnameForWindows
 };

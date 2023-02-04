@@ -103,10 +103,10 @@ const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDi
       ? await fs.readFile(new URL('./page.html', customPluginDefaultPageTemplates[0]), 'utf-8')
       : await fs.readFile(new URL('./page.html', userTemplatesDir), 'utf-8');
   } else if (is404Page && !hasCustom404Page) {
-    contents = await fs.readFile(new URL('../../templates/404.html', import.meta.url).pathname, 'utf-8');
+    contents = await fs.readFile(new URL('../../templates/404.html', import.meta.url), 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
-    contents = await fs.readFile(new URL('../../templates/page.html', import.meta.url).pathname, 'utf-8');
+    contents = await fs.readFile(new URL('../../templates/page.html', import.meta.url), 'utf-8');
   }
 
   return contents;
