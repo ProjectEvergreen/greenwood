@@ -7,7 +7,8 @@ import { checkResourceExists } from '../../lib/resource-utils.js';
 import fs from 'fs/promises';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
-import { getNodeModulesLocationForPackage, getPackageNameFromUrl } from '../../lib/node-modules-utils.js';
+import { getNodeModulesLocationForPackage, getPackageJson, getPackageNameFromUrl } from '../../lib/node-modules-utils.js';
+import { resolveForRelativeUrl } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { walkPackageJson } from '../../lib/walker-package-ranger.js';
 
@@ -34,7 +35,7 @@ class NodeModulesResource extends ResourceInterface {
     // use node modules resolution logic first, else hope for the best from the root of the project
     const absoluteNodeModulesPathname = absoluteNodeModulesLocation
       ? `${absoluteNodeModulesLocation}${packagePathPieces.join('/').replace(packageName, '')}`
-      : (await this.resolveForRelativeUrl(url, projectDirectory)).pathname;
+      : (await resolveForRelativeUrl(url, projectDirectory)).pathname;
 
     return new Request(`file://${absoluteNodeModulesPathname}`);
   }
@@ -68,13 +69,9 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   async intercept(url, request, response) {
-    const { projectDirectory, userWorkspace } = this.compilation.context;
+    const { context } = this.compilation;
     let body = await response.text();
     const hasHead = body.match(/\<head>(.*)<\/head>/s);
-    const monorepoPackageJsonUrl = new URL('./package.json', userWorkspace);
-    const topLevelPackageJsonUrl = new URL('./package.json', projectDirectory);
-    const hasMonorepoPackageJson = await checkResourceExists(monorepoPackageJsonUrl);
-    const hasTopLevelPackageJson = await checkResourceExists(topLevelPackageJsonUrl);
 
     if (hasHead && hasHead.length > 0) {
       const contents = hasHead[0].replace(/type="module"/g, 'type="module-shim"');
@@ -82,11 +79,7 @@ class NodeModulesResource extends ResourceInterface {
       body = body.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
     }
 
-    const userPackageJson = hasMonorepoPackageJson // handle monorepos first
-      ? JSON.parse(await fs.readFile(monorepoPackageJsonUrl, 'utf-8'))
-      : hasTopLevelPackageJson
-        ? JSON.parse(await fs.readFile(topLevelPackageJsonUrl, 'utf-8'))
-        : {};
+    const userPackageJson = await getPackageJson(context);
     
     // if there are dependencies and we haven't generated the importMap already
     // walk the project's package.json for all its direct dependencies

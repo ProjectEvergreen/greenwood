@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-import { checkResourceExists, normalizePathnameForWindows } from '../lib/resource-utils.js';
+import { checkResourceExists, normalizePathnameForWindows, resolveForRelativeUrl } from '../lib/resource-utils.js';
 
 function greenwoodResourceLoader (compilation) {
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
@@ -12,11 +12,12 @@ function greenwoodResourceLoader (compilation) {
     name: 'greenwood-resource-loader',
     async resolveId(id) {
       const normalizedId = id.replace(/\?type=(.*)/, '');
-      const { userWorkspace } = compilation.context;
+      const { projectDirectory, userWorkspace } = compilation.context;
 
-      if (id.startsWith('./') || id.startsWith('/')) {
+      if (id.startsWith('.') || id.startsWith('/')) {
         const prefix = id.startsWith('/') ? '.' : '';
-        const userWorkspaceUrl = new URL(`${prefix}${normalizedId}`, userWorkspace);
+        const contextUrl = id.indexOf('/node_modules/') >= 0 ? projectDirectory : userWorkspace;
+        const userWorkspaceUrl = await resolveForRelativeUrl(new URL(`${prefix}${normalizedId}`, contextUrl), contextUrl);
 
         if (await checkResourceExists(userWorkspaceUrl)) {
           return normalizePathnameForWindows(userWorkspaceUrl);
@@ -79,7 +80,6 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
            * pathToMatch (before): /node_modules/@greenwood/cli/src/lib/router.js
            * pathToMatch (after): /cli/src/lib/router.js
            */
-
           if (resourceKey?.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId?.indexOf('/packages/cli') > 0) {
             if (await checkResourceExists(new URL(`file://${facadeModuleId}`))) {
               facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');

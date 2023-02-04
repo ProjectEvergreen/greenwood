@@ -51,7 +51,7 @@ class StaticRouterResource extends ResourceInterface {
   async shouldOptimize(url, response) {
     return this.compilation.config.staticRouter
       && !url.pathname.startsWith('/404')
-      && (response.headers.get('Content-Type') || response.headers.get('content-type')).indexOf(this.contentType) >= 0;
+      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
   }
 
   async optimize(url, response) {

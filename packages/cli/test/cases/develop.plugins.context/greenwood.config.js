@@ -8,7 +8,6 @@ const packageName = JSON.parse(await fs.readFile(new URL('./package.json', impor
 class MyThemePackDevelopmentResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['*'];
   }
 
   async shouldResolve(url) {

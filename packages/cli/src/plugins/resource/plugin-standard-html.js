@@ -8,6 +8,7 @@
 import { checkResourceExists } from '../../lib/resource-utils.js';
 import frontmatter from 'front-matter';
 import fs from 'fs/promises';
+import { getPackageJson } from '../../lib/node-modules-utils.js';
 import htmlparser from 'node-html-parser';
 import path from 'path';
 import rehypeStringify from 'rehype-stringify';
@@ -188,18 +189,8 @@ const getAppTemplate = async (pageTemplateContents, templatesDir, customImports 
 const getUserScripts = async (contents, context) => {
   // https://lit.dev/docs/tools/requirements/#polyfills
   if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
-    const { projectDirectory, userWorkspace } = context;
-    const monorepoPackageJsonUrl = new URL('./package.json', userWorkspace);
-    const topLevelPackageJsonUrl = new URL('./package.json', projectDirectory);
-    const hasMonorepoPackageJson = await checkResourceExists(monorepoPackageJsonUrl);
-    const hasTopLevelPackageJson = await checkResourceExists(topLevelPackageJsonUrl);
-
-    const dependencies = hasMonorepoPackageJson // handle monorepos first
-      ? JSON.parse(await fs.readFile(monorepoPackageJsonUrl, 'utf-8')).dependencies
-      : hasTopLevelPackageJson
-        ? JSON.parse(await fs.readFile(topLevelPackageJsonUrl, 'utf-8')).dependencies
-        : {};
-
+    const userPackageJson = await getPackageJson(context);
+    const dependencies = userPackageJson?.dependencies || {};
     const litPolyfill = dependencies && dependencies.lit
       ? '<script src="/node_modules/lit/polyfill-support.js"></script>\n'
       : '';
