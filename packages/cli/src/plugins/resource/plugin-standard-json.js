@@ -4,6 +4,7 @@
  * This is a Greenwood default plugin.
  *
  */
+import { checkResourceExists } from '../../lib/resource-utils.js';
 import fs from 'fs/promises';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
@@ -18,16 +19,7 @@ class StandardJsonResource extends ResourceInterface {
     const { protocol, pathname } = url;
     const isJson = pathname.split('.').pop() === this.extensions[0];
     const isGraphJson = pathname === '/graph.json';
-    let isWorkspaceFile = false;
-    
-    try {
-      if (protocol === 'file:') {
-        await fs.access(url);
-        isWorkspaceFile = true;
-      }
-    } catch (error) {
-
-    }
+    const isWorkspaceFile = protocol === 'file:' && await checkResourceExists(url);
 
     return isJson && (isWorkspaceFile || isGraphJson);
   }

@@ -5,6 +5,7 @@
  * This is a Greenwood default plugin.
  *
  */
+import { checkResourceExists } from '../../lib/resource-utils.js';
 import frontmatter from 'front-matter';
 import fs from 'fs/promises';
 import htmlparser from 'node-html-parser';
@@ -25,14 +26,12 @@ async function getCustomPageTemplatesFromPlugins(contextPlugins, templateName) {
     .flat();
 
   for (const templateDirUrl of templateDir) {
-    try {
-      if (templateName) {
-        const templateUrl = new URL(`./${templateName}.html`, templateDirUrl);
-        await fs.access(templateUrl);
+    if (templateName) {
+      const templateUrl = new URL(`./${templateName}.html`, templateDirUrl);
+
+      if (await checkResourceExists(templateUrl)) {
         customTemplateLocations.push(templateUrl);
       }
-    } catch (e) {
-
     }
   }
 
@@ -44,49 +43,11 @@ const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDi
   const customPluginPageTemplates = await getCustomPageTemplatesFromPlugins(contextPlugins, template);
   const extension = filePath.split('.').pop();
   const is404Page = filePath.startsWith('404') && extension === 'html';
-  let hasCustomTemplate;
-  let hasPageTemplate;
-  let hasCustom404Page;
-  let isHtmlPage;
+  const hasCustomTemplate = await checkResourceExists(new URL(`./${template}.html`, userTemplatesDir));
+  const hasPageTemplate = await checkResourceExists(new URL('./page.html', userTemplatesDir));
+  const hasCustom404Page = await checkResourceExists(new URL('./404.html', pagesDir));
+  const isHtmlPage = extension === 'html' && await checkResourceExists(new URL(`./${filePath}`, projectDirectory));
   let contents;
-
-  // check for custom template
-  try {
-    await fs.access(new URL(`./${template}.html`, userTemplatesDir));
-    hasCustomTemplate = true;
-  } catch (e) {
-    // console.debug('111', { e });
-  }
-
-  // check page is already HTML
-  try {
-    await fs.access(new URL(`./${filePath}`, projectDirectory));
-
-    if (extension === 'html') {
-      isHtmlPage = true;
-    }
-  } catch (e) {
-    // console.debug('222', { e });
-  }
-
-  // check for default page template
-  try {
-    // fs.existsSync(new URL('./page.html', templatesDir).pathname))
-    await fs.access(new URL('./page.html', userTemplatesDir));
-    hasPageTemplate = true;
-  } catch (e) {
-    // console.debug('333', { e });
-  }
-
-  // check for custom 404 page
-  try {
-    // fs.existsSync(new URL('./404.html', pagesDir).pathname)
-    await fs.access(new URL('./404.html', pagesDir));
-    hasCustom404Page = true;
-  } catch (e) {
-    // console.debug('444', { e })
-  }
-
 
   if (template && (customPluginPageTemplates.length > 0 || hasCustomTemplate)) {
     // use a custom template, usually from markdown frontmatter
@@ -115,22 +76,13 @@ const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDi
 const getAppTemplate = async (pageTemplateContents, templatesDir, customImports = [], contextPlugins, enableHud, frontmatterTitle) => {
   const userAppTemplateUrl = new URL('./app.html', templatesDir);
   const customAppTemplatesFromPlugins = await getCustomPageTemplatesFromPlugins(contextPlugins, 'app');
-  let hasCustomUserAppTemplate;
-  let mergedTemplateContents = '';
-
-  // check for custom app template page
-  try {
-    await fs.access(userAppTemplateUrl);
-    hasCustomUserAppTemplate = true;
-  } catch (e) {
-
-  }
-
+  const hasCustomUserAppTemplate = await checkResourceExists(userAppTemplateUrl);
   let appTemplateContents = customAppTemplatesFromPlugins.length > 0
     ? await fs.readFile(new URL('./app.html', customAppTemplatesFromPlugins[0]))
     : hasCustomUserAppTemplate
       ? await fs.readFile(userAppTemplateUrl, 'utf-8')
       : await fs.readFile(new URL('../../templates/app.html', import.meta.url), 'utf-8');
+  let mergedTemplateContents = '';
 
   const pageRoot = htmlparser.parse(pageTemplateContents, {
     script: true,
@@ -239,24 +191,8 @@ const getUserScripts = async (contents, context) => {
     const { projectDirectory, userWorkspace } = context;
     const monorepoPackageJsonUrl = new URL('./package.json', userWorkspace);
     const topLevelPackageJsonUrl = new URL('./package.json', projectDirectory);
-    let hasMonorepoPackageJson;
-    let hasTopLevelPackageJson;
-
-    // check for monorepo package.json
-    try {
-      await fs.access(monorepoPackageJsonUrl);
-      hasMonorepoPackageJson = true;
-    } catch (e) {
-
-    }
-
-    // check for top level package.json
-    try {
-      await fs.access(topLevelPackageJsonUrl);
-      hasTopLevelPackageJson = true;
-    } catch (e) {
-
-    }
+    const hasMonorepoPackageJson = await checkResourceExists(monorepoPackageJsonUrl);
+    const hasTopLevelPackageJson = await checkResourceExists(topLevelPackageJsonUrl);
 
     const dependencies = hasMonorepoPackageJson // handle monorepos first
       ? JSON.parse(await fs.readFile(monorepoPackageJsonUrl, 'utf-8')).dependencies

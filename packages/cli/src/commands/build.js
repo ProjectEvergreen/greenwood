@@ -1,4 +1,5 @@
 import { bundleCompilation } from '../lifecycles/bundle.js';
+import { checkResourceExists } from '../lib/resource-utils.js';
 import { copyAssets } from '../lifecycles/copy.js';
 import fs from 'fs/promises';
 import { preRenderCompilationWorker, preRenderCompilationCustom, staticRenderCompilation } from '../lifecycles/prerender.js';
@@ -15,9 +16,7 @@ const runProductionBuild = async (compilation) => {
         ? compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider(compilation)
         : {};
 
-      try {
-        await fs.access(outputDir);
-      } catch (e) {
+      if (!await checkResourceExists(outputDir)) {
         await fs.mkdir(outputDir, {
           recursive: true
         });

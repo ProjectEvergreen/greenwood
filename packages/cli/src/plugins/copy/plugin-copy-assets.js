@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import { checkResourceExists } from '../../lib/resource-utils.js';
 
 const greenwoodPluginCopyAssets = [{
   type: 'copy',
@@ -8,15 +8,11 @@ const greenwoodPluginCopyAssets = [{
     const fromAssetsDirUrl = new URL('./assets/', userWorkspace);
     const assets = [];
 
-    try {
-      await fs.access(fromAssetsDirUrl);
-
+    if (await checkResourceExists(fromAssetsDirUrl)) {
       assets.push({
         from: fromAssetsDirUrl,
         to: new URL('./assets/', outputDir)
       });
-    } catch (e) {
-
     }
 
     return assets;

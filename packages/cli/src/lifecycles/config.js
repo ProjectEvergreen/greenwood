@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { checkResourceExists } from '../lib/resource-utils.js';
 
 const cwd = new URL(`file://${process.cwd()}/`);
 const greenwoodPluginsDirectoryUrl = new URL('../plugins/', import.meta.url);
@@ -61,19 +62,13 @@ const readAndMergeConfig = async() => {
       let isSPA;
 
       // check for greenwood.config.js
-      try {
-        await fs.access(configUrl);
+      if (await checkResourceExists(configUrl)) {
         hasConfigFile = true;
-      } catch (e) {
-
       }
 
       // check for SPA
-      try {
-        await fs.access(new URL('./index.html', customConfig.workspace));
+      if (await checkResourceExists(new URL('./index.html', customConfig.workspace))) {
         isSPA = true;
-      } catch (e) {
-
       }
 
       if (hasConfigFile) {
@@ -86,10 +81,9 @@ const readAndMergeConfig = async() => {
             reject('Error: greenwood.config.js workspace must be an instance of URL');
           }
 
-          try {
-            await fs.access(workspace);
+          if (await checkResourceExists(workspace)) {
             customConfig.workspace = workspace;
-          } catch (e) {
+          } else {
             reject('Error: greenwood.config.js workspace doesn\'t exist! Please double check your configuration.');
           }
         }

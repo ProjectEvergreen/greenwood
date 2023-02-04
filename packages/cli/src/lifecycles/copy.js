@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { checkResourceExists } from '../lib/resource-utils.js';
 
 async function rreaddir (dir, allFiles = []) {
   const files = (await fs.promises.readdir(dir)).map(f => new URL(`./${f}`, dir));
@@ -38,9 +39,7 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
     const files = await rreaddir(fromUrl);
 
     if (files.length > 0) {
-      try {
-        await fs.promises.access(toUrl);
-      } catch (e) {
+      if (!await checkResourceExists(toUrl)) {
         await fs.promises.mkdir(toUrl, {
           recursive: true
         });
@@ -50,14 +49,10 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
         const targetUrl = new URL(`file://${fileUrl.pathname.replace(fromUrl.pathname, toUrl.pathname)}`);
         const isDirectory = (await fs.promises.stat(fileUrl)).isDirectory();
 
-        if (isDirectory) {
-          try {
-            await fs.promises.access(targetUrl);
-          } catch (e) {
-            await fs.promises.mkdir(targetUrl, {
-              recursive: true
-            });
-          }
+        if (isDirectory && !await checkResourceExists(targetUrl)) {
+          await fs.promises.mkdir(targetUrl, {
+            recursive: true
+          });
         } else if (!isDirectory) {
           await copyFile(fileUrl, targetUrl, projectDirectory);
         }

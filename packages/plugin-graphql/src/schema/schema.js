@@ -1,3 +1,4 @@
+import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 import { makeExecutableSchema } from 'apollo-server-express';
 import { configTypeDefs, configResolvers } from './config.js';
 import { graphTypeDefs, graphResolvers } from './graph.js';
@@ -34,9 +35,7 @@ const createSchema = async (compilation) => {
       }
     `;
 
-    try {
-      await fs.access(customSchemasUrl);
-
+    if (await checkResourceExists(customSchemasUrl)) {
       console.log('custom schemas directory detected, scanning...');
       const schemaPaths = (await fs.readdir(customSchemasUrl))
         .filter(file => file.split('.').pop() === 'js');
@@ -47,21 +46,7 @@ const createSchema = async (compilation) => {
         customUserDefs.push(customTypeDefs);
         customUserResolvers.push(customResolvers);
       }
-    } catch (error) {
-      
     }
-    // if (fs.existsSync(customSchemasUrl.pathname)) {
-    //   console.log('custom schemas directory detected, scanning...');
-    //   const schemaPaths = (await fs.readdir(customSchemasUrl))
-    //     .filter(file => file.split('.').pop() === 'js');
-
-    //   for (const schemaPath of schemaPaths) {
-    //     const { customTypeDefs, customResolvers } = await import(new URL(`./${schemaPath}`, customSchemasUrl));
-        
-    //     customUserDefs.push(customTypeDefs);
-    //     customUserResolvers.push(customResolvers);
-    //   }
-    // }
   
     const mergedResolvers = Object.assign({}, {
       Query: {

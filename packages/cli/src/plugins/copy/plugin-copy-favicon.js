@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import { checkResourceExists } from '../../lib/resource-utils.js';
 
 const greenwoodPluginCopyFavicon = [{
   type: 'copy',
@@ -6,18 +6,14 @@ const greenwoodPluginCopyFavicon = [{
   provider: async (compilation) => {
     const fileName = 'favicon.ico';
     const { outputDir, userWorkspace } = compilation.context;
-    const robotsPathUrl = new URL(`./${fileName}`, userWorkspace);
+    const faviconPathUrl = new URL(`./${fileName}`, userWorkspace);
     const assets = [];
 
-    try {
-      await fs.access(robotsPathUrl);
-
+    if (await checkResourceExists(faviconPathUrl)) {
       assets.push({
-        from: robotsPathUrl,
+        from: faviconPathUrl,
         to: new URL(`./${fileName}`, outputDir)
       });
-    } catch (error) {
-
     }
 
     return assets;

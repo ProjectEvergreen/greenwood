@@ -1,6 +1,6 @@
 // TODO convert this to use / return URLs
 import { createRequire } from 'module'; // https://stackoverflow.com/a/62499498/417806
-import fs from 'fs/promises';
+import { checkResourceExists } from '../lib/resource-utils.js';
 
 // defer to NodeJS to find where on disk a package is located using import.meta.resolve
 // and return the root absolute location
@@ -35,11 +35,8 @@ async function getNodeModulesLocationForPackage(packageName) {
       const nodeModulesPackageRoot = `${locations[location]}/${packageName}`;
       const packageJsonLocation = `${nodeModulesPackageRoot}/package.json`;
 
-      try {
-        await fs.access(new URL(`file://${packageJsonLocation}`));
+      if (await checkResourceExists(new URL(`file://${packageJsonLocation}`))) {
         nodeModulesUrl = nodeModulesPackageRoot;
-      } catch(e) {
-        // console.debug('shouldSeRvE hiding', { e })
       }
     }
 

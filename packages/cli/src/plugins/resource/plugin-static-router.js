@@ -5,6 +5,7 @@
  * This is a Greenwood default plugin.
  *
  */
+import { checkResourceExists } from '../../lib/resource-utils.js';
 import fs from 'fs/promises';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
@@ -83,9 +84,7 @@ class StaticRouterResource extends ResourceInterface {
       });
 
     if (isStaticRoute) {
-      try {
-        await fs.access(outputPartialDirPathUrl);
-      } catch (e) {
+      if (!await checkResourceExists(outputPartialDirPathUrl)) {
         await fs.mkdir(outputPartialDirPathUrl, {
           recursive: true
         });

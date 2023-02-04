@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import { checkResourceExists } from './resource-utils.js';
 
 class ResourceInterface {
   constructor(compilation, options = {}) {
@@ -20,16 +20,8 @@ class ResourceInterface {
   async resolveForRelativeUrl(url, rootUrl) {
     const search = url.search || '';
     let reducedUrl;
-    let atRoot;
 
-    try {
-      await fs.access(new URL(`.${url.pathname}`, rootUrl));
-      atRoot = true;
-    } catch (e) {
-
-    }
-
-    if (atRoot) {
+    if (await checkResourceExists(new URL(`.${url.pathname}`, rootUrl))) {
       return new URL(`.${url.pathname}${search}`, rootUrl);
     }
 
@@ -37,15 +29,11 @@ class ResourceInterface {
     segments.shift();
 
     for (let i = 0, l = segments.length - 1; i < l; i += 1) {
-      try {
-        const nextSegments = segments.slice(i);
-        const urlToCheck = new URL(`./${nextSegments.join('/')}`, rootUrl);
+      const nextSegments = segments.slice(i);
+      const urlToCheck = new URL(`./${nextSegments.join('/')}`, rootUrl);
 
-        await fs.access(urlToCheck);
-
+      if (await checkResourceExists(urlToCheck)) {
         reducedUrl = new URL(`${urlToCheck}${search}`);
-      } catch (e) {
-
       }
     }
 

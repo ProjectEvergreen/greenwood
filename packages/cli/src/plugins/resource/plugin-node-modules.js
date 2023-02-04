@@ -3,6 +3,7 @@
  * Detects and fully resolves requests to node_modules and handles creating an importMap.
  *
  */
+import { checkResourceExists } from '../../lib/resource-utils.js';
 import fs from 'fs/promises';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
@@ -41,17 +42,7 @@ class NodeModulesResource extends ResourceInterface {
   async shouldServe(url) {
     const { href, pathname, protocol } = url;
     const extension = pathname.split('.').pop();
-    let existsAsJs;
-
-    try {
-      if(protocol === 'file:'){
-        await fs.access(new URL(`${href}.js`));
-        existsAsJs = true;
-      }
-    } catch(e) {
-      // console.debug('shouldSeRvE hiding', { e })
-      // console.debug({ url });
-    }
+    const existsAsJs = protocol === 'file:' && await checkResourceExists(new URL(`${href}.js`));
 
     return extension === 'mjs'
       || extension === '' && existsAsJs
@@ -82,25 +73,8 @@ class NodeModulesResource extends ResourceInterface {
     const hasHead = body.match(/\<head>(.*)<\/head>/s);
     const monorepoPackageJsonUrl = new URL('./package.json', userWorkspace);
     const topLevelPackageJsonUrl = new URL('./package.json', projectDirectory);
-    let hasMonorepoPackageJson;
-    let hasTopLevelPackageJson;
-
-    // check for monorepo package.json
-    try {
-      await fs.access(monorepoPackageJsonUrl);
-      hasMonorepoPackageJson = true;
-    } catch(e) {
-      // console.debug('aaa', { e })
-    }
-
-    // check for top level package.json
-    try {
-      // fs.existsSync(new URL('./package.json', projectDirectory).pathname)
-      await fs.access(topLevelPackageJsonUrl);
-      hasTopLevelPackageJson = true;
-    } catch(e) {
-      // console.debug('bbb', { e })
-    }
+    const hasMonorepoPackageJson = await checkResourceExists(monorepoPackageJsonUrl);
+    const hasTopLevelPackageJson = await checkResourceExists(topLevelPackageJsonUrl);
 
     if (hasHead && hasHead.length > 0) {
       const contents = hasHead[0].replace(/type="module"/g, 'type="module-shim"');

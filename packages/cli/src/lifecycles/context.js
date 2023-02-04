@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { checkResourceExists } from '../lib/resource-utils.js';
 
 const initContext = async({ config }) => {
 
@@ -25,12 +26,10 @@ const initContext = async({ config }) => {
         projectDirectory
       };
 
-      try {
-        await fs.access(scratchDir);
-      } catch(e) {
+      if (!await checkResourceExists(scratchDir)) {
         await fs.mkdir(scratchDir, {
           recursive: true
-        })
+        });
       }
       
       resolve(context);
