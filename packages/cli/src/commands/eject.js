@@ -10,7 +10,7 @@ const ejectConfiguration = async (compilation) => {
         const from = new URL(`./${file}`, configFileDirUrl);
         const to = new URL(`./${file}`, compilation.context.projectDirectory);
 
-        await fs.copyFile(from.pathname, to.pathname);
+        await fs.copyFile(from, to);
         
         console.log(`Ejected ${file} successfully.`);
       }

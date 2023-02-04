@@ -15,7 +15,7 @@ async function cleanUpResources(compilation) {
     const optAttr = ['inline', 'static'].indexOf(optimizationAttr) >= 0;
 
     if (optimizedFileName && (!src || (optAttr || optConfig))) {
-      await fs.unlink(new URL(`./${optimizedFileName}`, outputDir).pathname);
+      await fs.unlink(new URL(`./${optimizedFileName}`, outputDir));
     }
   }
 }

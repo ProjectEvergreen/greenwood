@@ -16,8 +16,8 @@ async function rreaddir (dir, allFiles = []) {
 async function copyFile(source, target, projectDirectory) {
   try {
     console.info(`copying file... ${source.pathname.replace(projectDirectory.pathname, '')}`);
-    const rd = fs.createReadStream(source.pathname);
-    const wr = fs.createWriteStream(target.pathname);
+    const rd = fs.createReadStream(source);
+    const wr = fs.createWriteStream(target);
 
     return await new Promise((resolve, reject) => {
       rd.on('error', reject);
@@ -51,7 +51,13 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
         const isDirectory = (await fs.promises.stat(fileUrl)).isDirectory();
 
         if (isDirectory) {
-          await fs.promises.mkdir(targetUrl);
+          try {
+            await fs.promises.access(targetUrl);
+          } catch (e) {
+            await fs.promises.mkdir(targetUrl, {
+              recursive: true
+            });
+          }
         } else if (!isDirectory) {
           await copyFile(fileUrl, targetUrl, projectDirectory);
         }
