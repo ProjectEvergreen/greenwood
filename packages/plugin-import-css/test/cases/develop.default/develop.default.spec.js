@@ -89,7 +89,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
+        expect(response.headers['content-type']).to.contain('text/javascript');
         done();
       });
 
@@ -132,7 +132,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
+        expect(response.headers['content-type']).to.contain('text/javascript');
         done();
       });
 

@@ -4,40 +4,38 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from 'fs';
-import path from 'path';
+import { checkResourceExists } from '../../lib/resource-utils.js';
+import fs from 'fs/promises';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardJsonResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.json'];
+    this.extensions = ['json'];
     this.contentType = 'application/json';
   }
 
   async shouldServe(url) {
-    return Promise.resolve(
-      url.indexOf('graph.json') >= 0 ||
-      path.extname(url) === '.json' && fs.existsSync(url)
-    );
+    const { protocol, pathname } = url;
+    const isJson = pathname.split('.').pop() === this.extensions[0];
+    const isGraphJson = pathname === '/graph.json';
+    const isWorkspaceFile = protocol === 'file:' && await checkResourceExists(url);
+
+    return isJson && (isWorkspaceFile || isGraphJson);
   }
 
   async serve(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const { scratchDir } = this.compilation.context;
-        const filePath = url.indexOf('graph.json') >= 0
-          ? `${scratchDir}/graph.json`
-          : url;
-        const contents = await fs.promises.readFile(filePath, 'utf-8');
+    const { pathname } = url;
+    const { scratchDir } = this.compilation.context;
+    const finalUrl = pathname.startsWith('/graph.json')
+      ? new URL('./graph.json', scratchDir)
+      : url;
+    const contents = await fs.readFile(finalUrl, 'utf-8');
 
-        resolve({
-          body: JSON.parse(contents),
-          contentType: this.contentType
-        });
-      } catch (e) {
-        reject(e);
-      }
+    return new Response(contents, {
+      headers: new Headers({
+        'Content-Type': this.contentType
+      })
     });
   }
 }

@@ -1,23 +1,23 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath, pathToFileURL, URL } from 'url';
+import fs from 'fs/promises';
+import { checkResourceExists } from '../lib/resource-utils.js';
+
+const cwd = new URL(`file://${process.cwd()}/`);
+const greenwoodPluginsDirectoryUrl = new URL('../plugins/', import.meta.url);
+const PLUGINS_FLATTENED_DEPTH = 2;
 
 // get and "tag" all plugins provided / maintained by the @greenwood/cli
 // and include as the default set, with all user plugins getting appended
-const greenwoodPluginsBasePath = fileURLToPath(new URL('../plugins', import.meta.url));
-const PLUGINS_FLATTENED_DEPTH = 2;
-
 const greenwoodPlugins = (await Promise.all([
-  path.join(greenwoodPluginsBasePath, 'copy'),
-  path.join(greenwoodPluginsBasePath, 'renderer'),
-  path.join(greenwoodPluginsBasePath, 'resource'),
-  path.join(greenwoodPluginsBasePath, 'server')
-].map(async (pluginDirectory) => {
-  const files = await fs.promises.readdir(pluginDirectory);
+  new URL('./copy/', greenwoodPluginsDirectoryUrl),
+  new URL('./renderer/', greenwoodPluginsDirectoryUrl),
+  new URL('./resource/', greenwoodPluginsDirectoryUrl),
+  new URL('./server/', greenwoodPluginsDirectoryUrl)
+].map(async (pluginDirectoryUrl) => {
+  const files = await fs.readdir(pluginDirectoryUrl);
 
   return await Promise.all(files.map(async(file) => {
-    const importPaTh = pathToFileURL(`${pluginDirectory}${path.sep}${file}`);
-    const pluginImport = await import(importPaTh);
+    const importUrl = new URL(`./${file}`, pluginDirectoryUrl);
+    const pluginImport = await import(importUrl);
     const plugin = pluginImport[Object.keys(pluginImport)[0]];
 
     return Array.isArray(plugin)
@@ -34,7 +34,7 @@ const greenwoodPlugins = (await Promise.all([
 const optimizations = ['default', 'none', 'static', 'inline'];
 const pluginTypes = ['copy', 'context', 'resource', 'rollup', 'server', 'source', 'renderer'];
 const defaultConfig = {
-  workspace: path.join(process.cwd(), 'src'),
+  workspace: new URL('./src/', cwd),
   devServer: {
     hud: true,
     port: 1984,
@@ -55,34 +55,35 @@ const readAndMergeConfig = async() => {
   return new Promise(async (resolve, reject) => {
     try {
       // deep clone of default config
+      const configUrl = new URL('./greenwood.config.js', cwd);
       let customConfig = Object.assign({}, defaultConfig);
+      let hasConfigFile;
+      let isSPA;
 
-      if (fs.existsSync(path.join(process.cwd(), 'greenwood.config.js'))) {
-        const userCfgFile = (await import(pathToFileURL(path.join(process.cwd(), 'greenwood.config.js')))).default;
+      // check for greenwood.config.js
+      if (await checkResourceExists(configUrl)) {
+        hasConfigFile = true;
+      }
+
+      // check for SPA
+      if (await checkResourceExists(new URL('./index.html', customConfig.workspace))) {
+        isSPA = true;
+      }
+
+      if (hasConfigFile) {
+        const userCfgFile = (await import(configUrl)).default;
         const { workspace, devServer, markdown, optimization, plugins, port, prerender, staticRouter, pagesDirectory, templatesDirectory, interpolateFrontmatter } = userCfgFile;
 
         // workspace validation
         if (workspace) {
-          if (typeof workspace !== 'string') {
-            reject('Error: greenwood.config.js workspace path must be a string');
+          if (!(workspace instanceof URL)) {
+            reject('Error: greenwood.config.js workspace must be an instance of URL');
           }
 
-          if (!path.isAbsolute(workspace)) {
-            // prepend relative path with current directory
-            customConfig.workspace = path.join(process.cwd(), workspace);
-          }
-
-          if (path.isAbsolute(workspace)) {
-            // use the users provided path
+          if (await checkResourceExists(workspace)) {
             customConfig.workspace = workspace;
-          }
-
-          if (!fs.existsSync(customConfig.workspace)) {
-            reject('Error: greenwood.config.js workspace doesn\'t exist! \n' +
-              'common issues to check might be: \n' +
-              '- typo in your workspace directory name, or in greenwood.config.js \n' +
-              '- if using relative paths, make sure your workspace is in the same cwd as _greenwood.config.js_ \n' +
-              '- consider using an absolute path, e.g. new URL(\'/your/relative/path/\', import.meta.url)');
+          } else {
+            reject('Error: greenwood.config.js workspace doesn\'t exist! Please double check your configuration.');
           }
         }
 
@@ -205,7 +206,7 @@ const readAndMergeConfig = async() => {
         }
 
         // SPA should _not_ prerender unless if user has specified prerender should be true
-        if (prerender === undefined && fs.existsSync(path.join(customConfig.workspace, 'index.html'))) {
+        if (prerender === undefined && isSPA) {
           customConfig.prerender = false;
         }
 
@@ -218,7 +219,7 @@ const readAndMergeConfig = async() => {
         }
       } else {
         // SPA should _not_ prerender unless if user has specified prerender should be true
-        if (fs.existsSync(path.join(customConfig.workspace, 'index.html'))) {
+        if (isSPA) {
           customConfig.prerender = false;
         }
       }

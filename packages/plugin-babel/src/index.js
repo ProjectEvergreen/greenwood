@@ -4,25 +4,24 @@
  *
  */
 import babel from '@babel/core';
-import fs from 'fs';
-import path from 'path';
+import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 import rollupBabelPlugin from '@rollup/plugin-babel';
 
-async function getConfig (compilation, extendConfig = false) {
+async function getConfig(compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = 'babel.config.mjs';
-  const defaultConfig = (await import(new URL(configFile, import.meta.url).pathname)).default;
-  const userConfig = fs.existsSync(path.join(projectDirectory, configFile))
+  const defaultConfig = (await import(new URL(`./${configFile}`, import.meta.url))).default;
+  const userConfig = await checkResourceExists(new URL(`./${configFile}`, projectDirectory))
     ? (await import(`${projectDirectory}/${configFile}`)).default
     : {};
-  let finalConfig = Object.assign({}, userConfig);
-  
+  const finalConfig = Object.assign({}, userConfig);
+
   if (extendConfig) {    
     finalConfig.presets = Array.isArray(userConfig.presets)
       ? [...defaultConfig.presets, ...userConfig.presets]
       : [...defaultConfig.presets];
-    
+
     finalConfig.plugins = Array.isArray(userConfig.plugins)
       ? [...defaultConfig.plugins, ...userConfig.plugins]
       : [...defaultConfig.plugins];
@@ -34,26 +33,21 @@ async function getConfig (compilation, extendConfig = false) {
 class BabelResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.js'];
+    this.extensions = ['js'];
     this.contentType = ['text/javascript'];
   }
 
   async shouldIntercept(url) {
-    return Promise.resolve(path.extname(url) === this.extensions[0] && url.indexOf('node_modules/') < 0);
+    return url.pathname.split('.').pop() === this.extensions[0] && !url.pathname.startsWith('/node_modules/');
   }
 
-  async intercept(url, body) {
-    return new Promise(async(resolve, reject) => {
-      try {
-        const config = await getConfig(this.compilation, this.options.extendConfig);
-        const result = await babel.transform(body, config);
-        
-        resolve({
-          body: result.code
-        });
-      } catch (e) {
-        reject(e);
-      }
+  async intercept(url, request, response) {
+    const config = await getConfig(this.compilation, this.options.extendConfig);
+    const body = await response.text();
+    const result = await babel.transform(body, config);
+    
+    return new Response(result.code, {
+      headers: response.headers
     });
   }
 }

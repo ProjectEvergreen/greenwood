@@ -1,19 +1,18 @@
-import fs from 'fs';
-import path from 'path';
+import { checkResourceExists } from '../../lib/resource-utils.js';
 
 const greenwoodPluginCopyRobots = [{
   type: 'copy',
   name: 'plugin-copy-robots',
-  provider: (compilation) => {
+  provider: async (compilation) => {
     const fileName = 'robots.txt';
-    const { context } = compilation;
-    const robotsPath = path.join(context.userWorkspace, fileName);
+    const { outputDir, userWorkspace } = compilation.context;
+    const robotsPathUrl = new URL(`./${fileName}`, userWorkspace);
     const assets = [];
 
-    if (fs.existsSync(robotsPath)) {
+    if (await checkResourceExists(robotsPathUrl)) {
       assets.push({
-        from: robotsPath,
-        to: path.join(context.outputDir, fileName)
+        from: robotsPathUrl,
+        to: new URL(`./${fileName}`, outputDir)
       });
     }
 

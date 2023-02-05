@@ -4,42 +4,29 @@
  * This sets the default value for requests in Greenwood.
  *
  */
-import fs from 'fs';
-import path from 'path';
+import { resolveForRelativeUrl } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class UserWorkspaceResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['*'];
   }
 
-  async shouldResolve(url = '/') {
+  async shouldResolve(url) {
     const { userWorkspace } = this.compilation.context;
-    const bareUrl = this.getBareUrlPath(url);
-    const isAbsoluteWorkspaceFile = fs.existsSync(path.join(userWorkspace, bareUrl));
-    const workspaceUrl = isAbsoluteWorkspaceFile
-      ? isAbsoluteWorkspaceFile || bareUrl === '/'
-      : url.indexOf('node_modules') < 0 && this.resolveRelativeUrl(userWorkspace, bareUrl);
+    const extension = url.pathname.split('.').pop();
+    const hasExtension = extension !== '' && !extension.startsWith('/');
 
-    return Promise.resolve(workspaceUrl);
+    return hasExtension
+      && !url.pathname.startsWith('/node_modules')
+      && await resolveForRelativeUrl(url, userWorkspace);
   }
 
-  async resolve(url = '/') {
+  async resolve(url) {
     const { userWorkspace } = this.compilation.context;
+    const workspaceUrl = await resolveForRelativeUrl(url, userWorkspace);
 
-    return new Promise(async (resolve, reject) => {
-      try {
-        const bareUrl = this.getBareUrlPath(url);
-        const workspaceUrl = fs.existsSync(path.join(userWorkspace, bareUrl))
-          ? path.join(userWorkspace, bareUrl)
-          : path.join(userWorkspace, this.resolveRelativeUrl(userWorkspace, bareUrl));
-        
-        resolve(workspaceUrl);
-      } catch (e) {
-        reject(e);
-      }
-    });
+    return new Request(workspaceUrl);
   }
 }
 

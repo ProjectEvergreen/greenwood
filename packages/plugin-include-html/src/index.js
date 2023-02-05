@@ -1,7 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'fs/promises';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
-import { pathToFileURL } from 'url';
 
 class IncludeHtmlResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -10,44 +8,42 @@ class IncludeHtmlResource extends ResourceInterface {
     this.contentType = 'text/html';
   }
 
-  async shouldIntercept(url, body, headers) {
-    return Promise.resolve(headers.response['content-type'] === this.contentType);
+  async shouldIntercept(url, request, response) {
+    return response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
   }
 
-  async intercept(url, body) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const includeLinksRegexMatches = body.match(/<link (.*)>/g);
-        const includeCustomElementssRegexMatches = body.match(/<[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)>/g);
+  async intercept(url, request, response) {
+    let body = await response.text();
+    const includeLinksRegexMatches = body.match(/<link (.*)>/g);
+    const includeCustomElementsRegexMatches = body.match(/<[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)>/g);
 
-        if (includeLinksRegexMatches) {
-          includeLinksRegexMatches
-            .filter(link => link.indexOf('rel="html"') > 0)
-            .forEach((link) => {
-              const href = link.match(/href="(.*)"/)[1];
-              const includeContents = fs.readFileSync(path.join(this.compilation.context.userWorkspace, href), 'utf-8');
+    if (includeLinksRegexMatches) {
+      const htmlIncludeLinks = includeLinksRegexMatches.filter(link => link.indexOf('rel="html"') > 0);
 
-              body = body.replace(link, includeContents);
-            });
-        }
+      for (const link of htmlIncludeLinks) {
+        const href = link.match(/href="(.*)"/)[1];
+        const prefix = href.startsWith('/') ? '.' : '';
+        const includeContents = await fs.readFile(new URL(`${prefix}${href}`, this.compilation.context.userWorkspace), 'utf-8');
 
-        if (includeCustomElementssRegexMatches) {
-          const customElementTags = includeCustomElementssRegexMatches.filter(customElementTag => customElementTag.indexOf('src=') > 0);
-
-          for (const tag of customElementTags) {
-            const src = tag.match(/src="(.*)"/)[1];
-            const filepath = path.join(this.compilation.context.userWorkspace, this.getBareUrlPath(src.replace(/\.\.\//g, '')));
-            const { getData, getTemplate } = await import(pathToFileURL(filepath));
-            const includeContents = await getTemplate(await getData());
-
-            body = body.replace(tag, includeContents);
-          }
-        }
-
-        resolve({ body });
-      } catch (e) {
-        reject(e);
+        body = body.replace(link, includeContents);
       }
+    }
+
+    if (includeCustomElementsRegexMatches) {
+      const customElementTags = includeCustomElementsRegexMatches.filter(customElementTag => customElementTag.indexOf('src=') > 0);
+
+      for (const tag of customElementTags) {
+        const src = tag.match(/src="(.*)"/)[1];
+        const srcUrl = new URL(`./${src.replace(/\.\.\//g, '')}`, this.compilation.context.userWorkspace);
+        const { getData, getTemplate } = await import(srcUrl);
+        const includeContents = await getTemplate(await getData());
+
+        body = body.replace(tag, includeContents);
+      }
+    }
+
+    return new Response(body, {
+      headers: response.headers
     });
   }
 }

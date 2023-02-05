@@ -6,10 +6,9 @@ import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
-import { fileURLToPath, URL } from 'url';
 
 export default {
-  workspace: fileURLToPath(new URL('./www', import.meta.url)),
+  workspace: new URL('./www/', import.meta.url),
   prerender: true,
   optimization: 'inline',
   staticRouter: true,
@@ -20,6 +19,8 @@ export default {
     greenwoodPluginPostCss(),
     greenwoodPluginImportJson(),
     greenwoodPluginImportCss(),
+    greenwoodPluginIncludeHTML(),
+    greenwoodPluginRendererPuppeteer(),
     {
       type: 'rollup',
       name: 'rollup-plugin-analyzer',
@@ -33,9 +34,7 @@ export default {
           })
         ];
       }
-    },
-    greenwoodPluginIncludeHTML(),
-    greenwoodPluginRendererPuppeteer()
+    }
   ],
   markdown: {
     plugins: [

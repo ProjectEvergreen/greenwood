@@ -1,6 +1,8 @@
-import fs from 'fs';
+/* eslint-disable max-depth */
+import fs from 'fs/promises';
 import { getRollupConfig } from '../config/rollup.config.js';
 import { hashString } from '../lib/hashing-utils.js';
+import { checkResourceExists, mergeResponse } from '../lib/resource-utils.js';
 import path from 'path';
 import { rollup } from 'rollup';
 
@@ -13,44 +15,47 @@ async function cleanUpResources(compilation) {
     const optAttr = ['inline', 'static'].indexOf(optimizationAttr) >= 0;
 
     if (optimizedFileName && (!src || (optAttr || optConfig))) {
-      fs.unlinkSync(path.join(outputDir, optimizedFileName));
+      await fs.unlink(new URL(`./${optimizedFileName}`, outputDir));
     }
   }
 }
 
-async function optimizeStaticPages(compilation, optimizeResources) {
+async function optimizeStaticPages(compilation, plugins) {
   const { scratchDir, outputDir } = compilation.context;
 
   return Promise.all(compilation.graph
     .filter(page => !page.isSSR || (page.isSSR && page.data.static) || (page.isSSR && compilation.config.prerender))
     .map(async (page) => {
       const { route, outputPath } = page;
-      const html = await fs.promises.readFile(path.join(scratchDir, outputPath), 'utf-8');
+      const outputDirUrl = new URL(`.${route}`, outputDir);
+      const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+      const contents = await fs.readFile(new URL(`./${outputPath}`, scratchDir), 'utf-8');
+      const headers = new Headers({ 'Content-Type': 'text/html' });
+      let response = new Response(contents, { headers });
 
-      if (route !== '/404/' && !fs.existsSync(path.join(outputDir, route))) {
-        fs.mkdirSync(path.join(outputDir, route), {
+      if (!await checkResourceExists(outputDirUrl)) {
+        await fs.mkdir(outputDirUrl, {
           recursive: true
         });
       }
 
-      let htmlOptimized = await optimizeResources.reduce(async (htmlPromise, resource) => {
-        const contents = await htmlPromise;
-        const shouldOptimize = await resource.shouldOptimize(outputPath, contents);
+      for (const plugin of plugins) {
+        if (plugin.shouldOptimize && await plugin.shouldOptimize(url, response.clone())) {
+          const currentResponse = await plugin.optimize(url, response.clone());
 
-        return shouldOptimize
-          ? resource.optimize(outputPath, contents)
-          : Promise.resolve(contents);
-      }, Promise.resolve(html));
+          response = mergeResponse(response.clone(), currentResponse.clone());
+        }
+      }
 
       // clean up optimization markers
-      htmlOptimized = htmlOptimized.replace(/data-gwd-opt=".*[a-z]"/g, '');
+      const body = (await response.text()).replace(/data-gwd-opt=".*[a-z]"/g, '');
 
-      await fs.promises.writeFile(path.join(outputDir, outputPath), htmlOptimized);
+      await fs.writeFile(new URL(`./${outputPath}`, outputDir), body);
     })
   );
 }
 
-async function bundleStyleResources(compilation, optimizationPlugins) {
+async function bundleStyleResources(compilation, resourcePlugins) {
   const { outputDir } = compilation.context;
 
   for (const resource of compilation.resources.values()) {
@@ -74,10 +79,16 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
         optimizedFileName = `${hashString(contents)}.css`;
       }
 
-      const outputPathRoot = path.join(outputDir, path.dirname(optimizedFileName));
+      const outputPathRoot = new URL(`./${optimizedFileName}`, outputDir)
+        .pathname
+        .split('/')
+        .slice(0, -1)
+        .join('/')
+        .concat('/');
+      const outputPathRootUrl = new URL(`file://${outputPathRoot}`);
 
-      if (!fs.existsSync(outputPathRoot)) {
-        fs.mkdirSync(outputPathRoot, {
+      if (!await checkResourceExists(outputPathRootUrl)) {
+        await fs.mkdir(new URL(`file://${outputPathRoot}`), {
           recursive: true
         });
       }
@@ -85,22 +96,38 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
       if (compilation.config.optimization === 'none' || optimizationAttr === 'none') {
         optimizedFileContents = contents;
       } else {
-        const url = resource.sourcePathURL.pathname;
-        let optimizedStyles = await fs.promises.readFile(url, 'utf-8');
+        const url = resource.sourcePathURL;
+        const contentType = 'text/css';
+        const headers = new Headers({ 'Content-Type': contentType });
+        const request = new Request(url, { headers });
+        const initResponse = new Response(contents, { headers });
 
-        for (const plugin of optimizationPlugins) {
-          optimizedStyles = await plugin.shouldIntercept(url, optimizedStyles)
-            ? (await plugin.intercept(url, optimizedStyles)).body
-            : optimizedStyles;
-        }
+        let response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+          const intermediateResponse = await responsePromise;
+          const shouldIntercept = plugin.shouldIntercept && await plugin.shouldIntercept(url, request, intermediateResponse.clone());
 
-        for (const plugin of optimizationPlugins) {
-          optimizedStyles = await plugin.shouldOptimize(url, optimizedStyles)
-            ? await plugin.optimize(url, optimizedStyles)
-            : optimizedStyles;
-        }
+          if (shouldIntercept) {
+            const currentResponse = await plugin.intercept(url, request, intermediateResponse.clone());
+            const mergedResponse = mergeResponse(intermediateResponse.clone(), currentResponse.clone());
 
-        optimizedFileContents = optimizedStyles;
+            if (mergedResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
+              return Promise.resolve(mergedResponse.clone());
+            }
+          }
+
+          return Promise.resolve(responsePromise);
+        }, Promise.resolve(initResponse));
+
+        response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+          const intermediateResponse = await responsePromise;
+          const shouldOptimize = plugin.shouldOptimize && await plugin.shouldOptimize(url, intermediateResponse.clone());
+
+          return shouldOptimize
+            ? Promise.resolve(await plugin.optimize(url, intermediateResponse.clone()))
+            : Promise.resolve(responsePromise);
+        }, Promise.resolve(response.clone()));
+
+        optimizedFileContents = await response.text();
       }
 
       compilation.resources.set(resourceKey, {
@@ -109,7 +136,7 @@ async function bundleStyleResources(compilation, optimizationPlugins) {
         optimizedFileContents
       });
 
-      await fs.promises.writeFile(path.join(outputDir, optimizedFileName), optimizedFileContents);
+      await fs.writeFile(new URL(`./${optimizedFileName}`, outputDir), optimizedFileContents);
     }
   }
 }
@@ -147,12 +174,12 @@ const bundleCompilation = async (compilation) => {
 
       await Promise.all([
         await bundleScriptResources(compilation),
-        await bundleStyleResources(compilation, optimizeResourcePlugins.filter(plugin => plugin.contentType.includes('text/css')))
+        await bundleStyleResources(compilation, optimizeResourcePlugins)
       ]);
 
       console.info('optimizing static pages....');
 
-      await optimizeStaticPages(compilation, optimizeResourcePlugins.filter(plugin => plugin.contentType.includes('text/html')));
+      await optimizeStaticPages(compilation, optimizeResourcePlugins);
       await cleanUpResources(compilation);
 
       resolve();

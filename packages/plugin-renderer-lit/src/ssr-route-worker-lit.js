@@ -3,7 +3,6 @@ import { render } from '@lit-labs/ssr/lib/render-with-global-dom-shim.js';
 import { Buffer } from 'buffer';
 import { html } from 'lit';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
-import { pathToFileURL } from 'url';
 import { Readable } from 'stream';
 import { parentPort } from 'worker_threads';
 
@@ -21,7 +20,7 @@ async function getTemplateResultString(template) {
   return await streamToString(Readable.from(render(template)));
 }
 
-async function executeRouteModule({ modulePath, compilation, route, label, id, prerender, htmlContents, scripts }) {
+async function executeRouteModule({ moduleUrl, compilation, route, label, id, prerender, htmlContents, scripts }) {
   const parsedCompilation = JSON.parse(compilation);
   const parsedScripts = scripts ? JSON.parse(scripts) : [];
   const data = {
@@ -31,6 +30,7 @@ async function executeRouteModule({ modulePath, compilation, route, label, id, p
     html: null
   };
 
+  console.debug({ moduleUrl });
   // prerender static content
   if (prerender) {
     for (const script of parsedScripts) {
@@ -41,7 +41,7 @@ async function executeRouteModule({ modulePath, compilation, route, label, id, p
 
     data.html = await getTemplateResultString(templateResult);
   } else {
-    const module = await import(pathToFileURL(modulePath)).then(module => module);
+    const module = await import(moduleUrl).then(module => module);
     const { getTemplate = null, getBody = null, getFrontmatter = null } = module;
 
     if (module.default && module.tagName) {

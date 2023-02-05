@@ -1,13 +1,14 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import { hashString } from '../lib/hashing-utils.js';
-import path from 'path';
 import Koa from 'koa';
+import { mergeResponse } from '../lib/resource-utils.js';
+import { Readable } from 'stream';
 import { ResourceInterface } from '../lib/resource-interface.js';
 
 async function getDevServer(compilation) {
   const app = new Koa();
   const compilationCopy = Object.assign({}, compilation);
-  const resources = [
+  const resourcePlugins = [
     // Greenwood default standard resource and import plugins
     ...compilation.config.plugins.filter((plugin) => {
       return plugin.type === 'resource' && plugin.isGreenwoodDefaultPlugin;
@@ -29,96 +30,88 @@ async function getDevServer(compilation) {
     })
   ];
 
-  // resolve urls to paths first
+  // resolve urls to `file://` paths if applicable, otherwise default is `http://`
   app.use(async (ctx, next) => {
-    ctx.url = await resources.reduce(async (responsePromise, resource) => {
-      const response = await responsePromise;
-      const resourceShouldResolveUrl = await resource.shouldResolve(response);
-      
-      return resourceShouldResolveUrl
-        ? resource.resolve(response)
-        : Promise.resolve(response);
-    }, Promise.resolve(ctx.url));
+    try {
+      const url = new URL(`http://localhost:${compilation.config.port}${ctx.url}`);
+      const initRequest = new Request(url, {
+        method: ctx.request.method,
+        headers: new Headers(ctx.request.header)
+      });
+      const request = await resourcePlugins.reduce(async (requestPromise, plugin) => {
+        const intermediateRequest = await requestPromise;
+        return plugin.shouldResolve && await plugin.shouldResolve(url, intermediateRequest.clone())
+          ? Promise.resolve(await plugin.resolve(url, intermediateRequest.clone()))
+          : Promise.resolve(await requestPromise);
+      }, Promise.resolve(initRequest));
 
-    // bit of a hack to get these two bugs to play well together
-    // https://github.com/ProjectEvergreen/greenwood/issues/598
-    // https://github.com/ProjectEvergreen/greenwood/issues/604
-    ctx.request.headers.originalUrl = ctx.originalUrl;
+      ctx.url = request.url;
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
+    }
 
     await next();
   });
 
-  // then handle serving urls
+  // handle creating responses from urls
   app.use(async (ctx, next) => {
-    const responseAccumulator = {
-      body: ctx.body,
-      contentType: ctx.response.contentType
-    };
-    
-    const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
-      const response = await responsePromise;
-      const { url } = ctx;
-      const { headers } = ctx.response;
-      const shouldServe = await resource.shouldServe(url, {
-        request: ctx.headers,
-        response: headers
-      });
+    try {
+      const url = new URL(ctx.url);
+      const { method, header } = ctx.request;
+      const { status } = ctx.response;
+      const request = new Request(url.href, { method, headers: new Headers(header) });
+      let response = new Response(null, { status });
 
-      if (shouldServe) {
-        const resolvedResource = await resource.serve(url, {
-          request: ctx.headers,
-          response: headers
-        });
-        
-        return Promise.resolve({
-          ...response,
-          ...resolvedResource
-        });
-      } else {
-        return Promise.resolve(response);
+      for (const plugin of resourcePlugins) {
+        if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
+          response = await plugin.serve(url, request);
+          break;
+        }
       }
-    }, Promise.resolve(responseAccumulator));
 
-    ctx.set('Content-Type', reducedResponse.contentType);
-    ctx.body = reducedResponse.body;
+      ctx.body = response.body ? Readable.from(response.body) : '';
+      ctx.type = response.headers.get('Content-Type');
+      ctx.status = response.status;
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
+    }
 
     await next();
   });
 
-  // allow intercepting of urls (response)
+  // allow intercepting of responses for URLs
   app.use(async (ctx, next) => {
-    const responseAccumulator = {
-      body: ctx.body,
-      contentType: ctx.response.headers['content-type']
-    };
-
-    const reducedResponse = await resources.reduce(async (responsePromise, resource) => {
-      const response = await responsePromise;
-      const { url } = ctx;
-      const { headers } = ctx.response;
-      const shouldIntercept = await resource.shouldIntercept(url, response.body, {
-        request: ctx.headers,
-        response: headers
+    try {
+      const url = new URL(ctx.url);
+      const request = new Request(url, {
+        method: ctx.request.method,
+        headers: new Headers(ctx.request.header)
       });
+      const initResponse = new Response(ctx.body, {
+        status: ctx.response.status,
+        headers: new Headers(ctx.response.header)
+      });
+      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        const intermediateResponse = await responsePromise;
+        if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, intermediateResponse.clone())) {
+          const current = await plugin.intercept(url, request, await intermediateResponse.clone());
+          const merged = mergeResponse(intermediateResponse.clone(), current);
 
-      if (shouldIntercept) {
-        const interceptedResponse = await resource.intercept(url, response.body, {
-          request: ctx.headers,
-          response: headers
-        });
-        
-        return Promise.resolve({
-          ...response,
-          ...interceptedResponse
-        });
-      } else {
-        return Promise.resolve(response);
-      }
-    }, Promise.resolve(responseAccumulator));
+          return Promise.resolve(merged);
+        } else {
+          return Promise.resolve(await responsePromise);
+        }
+      }, Promise.resolve(initResponse.clone()));
 
-    ctx.set('Content-Type', reducedResponse.contentType);
-    ctx.body = reducedResponse.body;
-
+      ctx.body = response.body ? Readable.from(response.body) : '';
+      ctx.set('Content-Type', response.headers.get('Content-Type'));
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
+    }
+  
     await next();
   });
 
@@ -126,16 +119,16 @@ async function getDevServer(compilation) {
   // https://stackoverflow.com/questions/43659756/chrome-ignores-the-etag-header-and-just-uses-the-in-memory-cache-disk-cache
   app.use(async (ctx) => {
     const body = ctx.response.body;
-    const { url } = ctx;
+    const url = new URL(ctx.url);
 
     // don't interfere with external requests or API calls, binary files, or JSON
     // and only run in development
-    if (process.env.__GWD_COMMAND__ === 'develop' && path.extname(url) !== '' && url.indexOf('http') !== 0) { // eslint-disable-line no-underscore-dangle
+    if (process.env.__GWD_COMMAND__ === 'develop' && url.protocol === 'file:') { // eslint-disable-line no-underscore-dangle
       if (!body || Buffer.isBuffer(body)) {
         // console.warn(`no body for => ${ctx.url}`);
       } else {
         const inm = ctx.headers['if-none-match'];
-        const etagHash = path.extname(ctx.request.headers.originalUrl) === '.json'
+        const etagHash = url.pathname.split('.').pop() === 'json'
           ? hashString(JSON.stringify(body))
           : hashString(body);
 
@@ -149,99 +142,95 @@ async function getDevServer(compilation) {
         }
       }
     }
-
   });
 
-  return Promise.resolve(app);
+  return app;
 }
 
 async function getStaticServer(compilation, composable) {
   const app = new Koa();
-  const standardResources = compilation.config.plugins.filter((plugin) => {
-    // html is intentionally omitted
-    return plugin.isGreenwoodDefaultPlugin
-      && plugin.type === 'resource'
-      && ((plugin.name.indexOf('plugin-standard') >= 0 // allow standard web resources
-      && plugin.name.indexOf('plugin-standard-html') < 0) // but _not_ our markdown / HTML plugin
-      || plugin.name.indexOf('plugin-source-maps') >= 0); // and source maps
-  }).map((plugin) => {
-    return plugin.provider(compilation);
+  const { outputDir } = compilation.context;
+  const standardResourcePlugins = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'resource'
+      && plugin.isGreenwoodDefaultPlugin
+      && plugin.name !== 'plugin-standard-html';
   });
 
   app.use(async (ctx, next) => {
-    const { outputDir, userWorkspace } = compilation.context;
-    const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
+    try {
+      const url = new URL(`http://localhost:8080${ctx.url}`);
+      const matchingRoute = compilation.graph.find(page => page.route === url.pathname);
 
-    // only handle static output routes, eg. public/about.html
-    if (url.endsWith('/') || url.endsWith('.html')) {
-      const barePath = fs.existsSync(path.join(userWorkspace, 'index.html')) // SPA
-        ? 'index.html'
-        : url.endsWith('/')
-          ? path.join(url, 'index.html')
-          : url;
+      if ((matchingRoute && !matchingRoute.isSSR) || url.pathname.split('.').pop() === 'html') {
+        const pathname = matchingRoute ? matchingRoute.outputPath : url.pathname;
+        const body = await fs.readFile(new URL(`./${pathname}`, outputDir), 'utf-8');
 
-      if (fs.existsSync(path.join(outputDir, barePath))) {
-        const contents = await fs.promises.readFile(path.join(outputDir, barePath), 'utf-8');
-
-        ctx.set('content-type', 'text/html');
-        ctx.body = contents;
+        ctx.set('Content-Type', 'text/html');
+        ctx.body = body;
       }
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
     }
 
     await next();
   });
 
   app.use(async (ctx, next) => {
-    const url = ctx.request.url;
-
-    if (compilation.config.devServer.proxy) {
-      const proxyPlugin = compilation.config.plugins.filter((plugin) => {
-        return plugin.name === 'plugin-dev-proxy';
-      }).map((plugin) => {
-        return plugin.provider(compilation);
-      })[0];
-
-      if (url !== '/' && await proxyPlugin.shouldServe(url)) {
-        ctx.body = (await proxyPlugin.serve(url)).body;
-      }
-    }
-
-    await next();
-  });
-
-  app.use(async (ctx, next) => {
-    const responseAccumulator = {
-      body: ctx.body,
-      contentType: ctx.response.header['content-type']
-    };
-
-    const reducedResponse = await standardResources.reduce(async (responsePromise, resource) => {
-      const response = await responsePromise;
-      const url = ctx.url.replace(/\?(.*)/, '');
-      const { headers } = ctx.response;
-      const outputPathUrl = path.join(compilation.context.outputDir, url);
-      const shouldServe = await resource.shouldServe(outputPathUrl, {
-        request: ctx.headers,
-        response: headers
+    try {
+      const url = new URL(`http://localhost:8080${ctx.url}`);
+      const request = new Request(url, {
+        method: ctx.request.method,
+        headers: ctx.request.header
       });
 
-      if (shouldServe) {
-        const resolvedResource = await resource.serve(outputPathUrl, {
-          request: ctx.headers,
-          response: headers
-        });
+      if (compilation.config.devServer.proxy) {
+        const proxyPlugin = standardResourcePlugins
+          .find((plugin) => plugin.name === 'plugin-dev-proxy')
+          .provider(compilation);
 
-        return Promise.resolve({
-          ...response,
-          ...resolvedResource
-        });
-      } else {
-        return Promise.resolve(response);
+        if (await proxyPlugin.shouldServe(url, request)) {
+          const response = await proxyPlugin.serve(url, request);
+
+          ctx.body = Readable.from(response.body);
+          ctx.set('Content-Type', response.headers.get('Content-Type'));
+        }
       }
-    }, Promise.resolve(responseAccumulator));
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
+    }
 
-    ctx.set('content-type', reducedResponse.contentType);
-    ctx.body = reducedResponse.body;
+    await next();
+  });
+
+  app.use(async (ctx, next) => {
+    try {
+      const url = new URL(`.${ctx.url}`, outputDir.href);
+      const resourcePlugins = standardResourcePlugins.map((plugin) => {
+        return plugin.provider(compilation);
+      });
+
+      const request = new Request(url.href);
+      const initResponse = new Response(ctx.body, {
+        status: ctx.response.status,
+        headers: new Headers(ctx.response.header)
+      });
+      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        return plugin.shouldServe && await plugin.shouldServe(url, request)
+          ? Promise.resolve(await plugin.serve(url, request))
+          : responsePromise;
+      }, Promise.resolve(initResponse));
+
+      if (response.ok) {
+        ctx.body = Readable.from(response.body);
+        ctx.type = response.headers.get('Content-Type');
+        ctx.status = response.status;
+      }
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
+    }
 
     if (composable) {
       await next();
@@ -253,81 +242,46 @@ async function getStaticServer(compilation, composable) {
 
 async function getHybridServer(compilation) {
   const app = await getStaticServer(compilation, true);
-  const apiResource = compilation.config.plugins.filter((plugin) => {
-    return plugin.isGreenwoodDefaultPlugin
-      && plugin.type === 'resource'
-      && plugin.name.indexOf('plugin-api-routes') === 0;
-  }).map((plugin) => {
-    return plugin.provider(compilation);
-  })[0];
+  const resourcePlugins = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'resource';
+  });
 
   app.use(async (ctx) => {
-    const url = ctx.request.url.replace(/\?(.*)/, ''); // get rid of things like query string parameters
-    const isApiRoute = await apiResource.shouldServe(url);
-    const matchingRoute = compilation.graph.filter((node) => {
-      return node.route === url;
-    })[0] || { data: {} };
-
-    if (matchingRoute.isSSR && !matchingRoute.data.static) {
-      // TODO would be nice to pull these plugins once instead of one every request
-      const headers = {
-        request: { 'accept': 'text/html', 'content-type': 'text/html' },
-        response: { 'content-type': 'text/html' }
-      };
-      const standardHtmlResource = compilation.config.plugins.filter((plugin) => {
-        return plugin.isGreenwoodDefaultPlugin
-          && plugin.type === 'resource'
-          && plugin.name.indexOf('plugin-standard-html') === 0;
-      }).map((plugin) => {
-        return plugin.provider(compilation);
-      })[0];
-      let body;
-
-      const interceptResources = compilation.config.plugins.filter((plugin) => {
-        return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
-      }).map((plugin) => {
-        return plugin.provider(compilation);
-      }).filter((provider) => {
-        return provider.shouldIntercept && provider.intercept;
+    try {
+      const url = new URL(`http://localhost:8080${ctx.url}`);
+      const isApiRoute = url.pathname.startsWith('/api');
+      const matchingRoute = compilation.graph.find((node) => node.route === url.pathname) || { data: {} };
+      const request = new Request(url.href, {
+        method: ctx.request.method,
+        headers: ctx.request.header
       });
 
-      body = (await standardHtmlResource.serve(url)).body;
-      body = (await interceptResources.reduce(async (htmlPromise, resource) => {
-        const html = (await htmlPromise).body;
-        const shouldIntercept = await resource.shouldIntercept(url, html, headers);
+      if (matchingRoute.isSSR && !matchingRoute.data.static) {
+        const standardHtmlResource = resourcePlugins.find((plugin) => {
+          return plugin.isGreenwoodDefaultPlugin
+            && plugin.name.indexOf('plugin-standard-html') === 0;
+        }).provider(compilation);
+        let response = await standardHtmlResource.serve(url, request);
 
-        return shouldIntercept
-          ? resource.intercept(url, html, headers)
-          : htmlPromise;
-      }, Promise.resolve({ url, body }))).body;
+        response = await standardHtmlResource.optimize(url, response);
 
-      const optimizeResources = compilation.config.plugins.filter((plugin) => {
-        return plugin.type === 'resource';
-      }).map((plugin) => {
-        return plugin.provider(compilation);
-      }).filter((provider) => {
-        return provider.shouldOptimize && provider.optimize;
-      });
+        ctx.body = Readable.from(response.body);
+        ctx.set('Content-Type', 'text/html');
+        ctx.status = 200;
+      } else if (isApiRoute) {
+        const apiResource = resourcePlugins.find((plugin) => {
+          return plugin.isGreenwoodDefaultPlugin
+            && plugin.name === 'plugin-api-routes';
+        }).provider(compilation);
+        const response = await apiResource.serve(url, request);
 
-      body = await optimizeResources.reduce(async (htmlPromise, resource) => {
-        const html = await htmlPromise;
-        const shouldOptimize = await resource.shouldOptimize(url, html, headers);
-
-        return shouldOptimize
-          ? resource.optimize(url, html, headers)
-          : Promise.resolve(html);
-      }, Promise.resolve(body));
-
-      ctx.status = 200;
-      ctx.set('content-type', 'text/html');
-      ctx.body = body;
-    } else if (isApiRoute) {
-      // TODO just use response
-      const { body, resp } = await apiResource.serve(ctx.request.url);
-
-      ctx.status = 200;
-      ctx.set('content-type', resp.headers.get('content-type'));
-      ctx.body = body;
+        ctx.status = 200;
+        ctx.set('Content-Type', response.headers.get('Content-Type'));
+        ctx.body = Readable.from(response.body);
+      }
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
     }
   });
 

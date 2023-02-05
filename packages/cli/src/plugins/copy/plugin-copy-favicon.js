@@ -1,19 +1,18 @@
-import fs from 'fs';
-import path from 'path';
+import { checkResourceExists } from '../../lib/resource-utils.js';
 
 const greenwoodPluginCopyFavicon = [{
   type: 'copy',
   name: 'plugin-copy-favicon',
-  provider: (compilation) => {
+  provider: async (compilation) => {
     const fileName = 'favicon.ico';
-    const { context } = compilation;
-    const robotsPath = path.join(context.userWorkspace, fileName);
+    const { outputDir, userWorkspace } = compilation.context;
+    const faviconPathUrl = new URL(`./${fileName}`, userWorkspace);
     const assets = [];
 
-    if (fs.existsSync(robotsPath)) {
+    if (await checkResourceExists(faviconPathUrl)) {
       assets.push({
-        from: robotsPath,
-        to: path.join(context.outputDir, fileName)
+        from: faviconPathUrl,
+        to: new URL(`./${fileName}`, outputDir)
       });
     }
 

@@ -1,19 +1,14 @@
-import path from 'path';
-
 export default {
   plugins: [{
     type: 'copy',
     name: 'plugin-copy-prismjs',
     provider: (compilation) => {
       const { projectDirectory, outputDir } = compilation.context;
-      const prismThemeDir = 'node_modules/prismjs/themes';
-      const from = path.join(projectDirectory, prismThemeDir);
-      const to = path.join(outputDir, prismThemeDir);
+      const prismThemeDir = '/node_modules/prismjs/themes/';
+      const from = new URL(`.${prismThemeDir}`, projectDirectory);
+      const to = new URL(`.${prismThemeDir}`, outputDir);
 
-      return [{
-        from,
-        to
-      }];
+      return [{ from, to }];
     }
   }]
 };
