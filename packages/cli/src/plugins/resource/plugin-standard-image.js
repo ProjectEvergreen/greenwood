@@ -7,7 +7,7 @@
 import fs from 'fs/promises';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
-class StandardFontResource extends ResourceInterface {
+class StandardImageResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
 
@@ -38,7 +38,7 @@ class StandardFontResource extends ResourceInterface {
 const greenwoodPluginStandardImage = {
   type: 'resource',
   name: 'plugin-standard-image',
-  provider: (compilation, options) => new StandardFontResource(compilation, options)
+  provider: (compilation, options) => new StandardImageResource(compilation, options)
 };
 
 export { greenwoodPluginStandardImage };
