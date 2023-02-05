@@ -1,6 +1,6 @@
 /*
  * 
- * Manages web standard resource related operations for JavaScript.
+ * Manages web standard resource related operations for image formats.
  * This is a Greenwood default plugin.
  *
  */
@@ -37,7 +37,7 @@ class StandardFontResource extends ResourceInterface {
 
 const greenwoodPluginStandardImage = {
   type: 'resource',
-  name: 'plugin-standard-font',
+  name: 'plugin-standard-image',
   provider: (compilation, options) => new StandardFontResource(compilation, options)
 };
 
