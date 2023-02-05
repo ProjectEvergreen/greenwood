@@ -874,6 +874,41 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
+    describe('Develop command with video specific (.mp4) behavior', function() {
+      const ext = 'mp4';
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}:${port}/assets/splash-clip.mp4`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain(ext);
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(response.body).to.contain(ext);
+        done();
+      });
+    });
+
     describe('Develop command with JSON specific behavior', function() {
       let response = {};
 

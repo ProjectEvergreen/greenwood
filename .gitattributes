@@ -14,3 +14,10 @@
 *.woff2   binary
 *.ttf     binary
 *.eot     binary
+*.flv     binary
+*.mp4     binary
+*.ts      binary
+*.3gp     binary
+*.mov     binary
+*.avi     binary
+*.wmv     binary
