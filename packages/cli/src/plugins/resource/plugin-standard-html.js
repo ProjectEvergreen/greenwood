@@ -471,7 +471,8 @@ class StandardHtmlResource extends ResourceInterface {
       }
     }
 
-    // TODO clean up lit-polyfill as part of https://github.com/ProjectEvergreen/greenwood/issues/728
+    // TODO clean up lit-polyfill
+    // https://github.com/ProjectEvergreen/greenwood/issues/728
     body = body.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
 
     return new Response(body);

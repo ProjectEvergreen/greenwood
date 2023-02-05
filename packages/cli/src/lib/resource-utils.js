@@ -38,6 +38,7 @@ function mergeResponse(destination, source) {
 
   source.headers.forEach((value, key) => {
     // TODO better way to handle Response automatically setting content-type
+    // https://github.com/ProjectEvergreen/greenwood/issues/1049
     const isDefaultHeader = key.toLowerCase() === 'content-type' && value === 'text/plain;charset=UTF-8';
 
     if (!isDefaultHeader) {

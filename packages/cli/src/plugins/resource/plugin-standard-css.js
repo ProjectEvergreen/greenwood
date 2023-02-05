@@ -27,7 +27,6 @@ function bundleCss(body, url, projectDirectory) {
           const resolvedUrl = value.startsWith('/node_modules')
             ? new URL(`.${value}`, projectDirectory)
             : new URL(value, url);
-          // TODO intentionally using sync, unless csstree can support an async walk?
           const importContents = fs.readFileSync(resolvedUrl, 'utf-8');
 
           optimizedCss += bundleCss(importContents, url, projectDirectory);

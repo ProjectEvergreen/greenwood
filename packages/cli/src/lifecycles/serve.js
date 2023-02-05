@@ -70,8 +70,6 @@ async function getDevServer(compilation) {
         }
       }
 
-      // TODO would be nice if Koa (or other framework) could just a Response object directly
-      // not sure why we have to use `Readable.from`, does this couple us to NodeJS?
       ctx.body = response.body ? Readable.from(response.body) : '';
       ctx.type = response.headers.get('Content-Type');
       ctx.status = response.status;
@@ -107,8 +105,6 @@ async function getDevServer(compilation) {
         }
       }, Promise.resolve(initResponse.clone()));
 
-      // TODO would be nice if Koa (or other framework) could just a Response object directly
-      // not sure why we have to use `Readable.from`, does this couple us to NodeJS?
       ctx.body = response.body ? Readable.from(response.body) : '';
       ctx.set('Content-Type', response.headers.get('Content-Type'));
     } catch (e) {

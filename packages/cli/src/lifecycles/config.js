@@ -7,7 +7,6 @@ const PLUGINS_FLATTENED_DEPTH = 2;
 
 // get and "tag" all plugins provided / maintained by the @greenwood/cli
 // and include as the default set, with all user plugins getting appended
-// TODO could probably refactored to use a for loop
 const greenwoodPlugins = (await Promise.all([
   new URL('./copy/', greenwoodPluginsDirectoryUrl),
   new URL('./renderer/', greenwoodPluginsDirectoryUrl),

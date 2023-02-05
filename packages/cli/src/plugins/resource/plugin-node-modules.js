@@ -26,6 +26,7 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   // TODO convert node modules util to URL
+  // https://github.com/ProjectEvergreen/greenwood/issues/953v
   async resolve(url) {
     const { projectDirectory } = this.compilation.context;
     const { pathname } = url;
