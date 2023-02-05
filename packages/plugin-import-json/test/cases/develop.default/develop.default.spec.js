@@ -13,8 +13,8 @@
  *
  * {
  *   plugins: [{
- *      ...greenwoodPluginImportJson()
- *  }]
+ *     greenwoodPluginImportJson()
+ *   }]
  * }
  *
  *

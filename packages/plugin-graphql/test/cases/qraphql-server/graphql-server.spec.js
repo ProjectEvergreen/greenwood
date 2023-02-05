@@ -130,7 +130,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the expected query response', function(done) {
-        expect(response.body.data.config.workspace).to.equal(path.join(outputPath, 'src'));
+        expect(response.body.data.config.workspace).to.equal(new URL('./src/', import.meta.url).href);
         done();
       });
     });

@@ -1,9 +1,8 @@
 // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
-import { pathToFileURL } from 'url';
 import { parentPort } from 'worker_threads';
 import { renderToString, renderFromHTML } from 'wc-compiler';
 
-async function executeRouteModule({ modulePath, compilation, route, label, id, prerender, htmlContents, scripts }) {
+async function executeRouteModule({ moduleUrl, compilation, route, label, id, prerender, htmlContents, scripts }) {
   const parsedCompilation = JSON.parse(compilation);
   const data = {
     template: null,
@@ -18,11 +17,11 @@ async function executeRouteModule({ modulePath, compilation, route, label, id, p
 
     data.html = html;
   } else {
-    const module = await import(pathToFileURL(modulePath)).then(module => module);
+    const module = await import(moduleUrl).then(module => module);
     const { getTemplate = null, getBody = null, getFrontmatter = null } = module;
 
     if (module.default) {
-      const { html } = await renderToString(pathToFileURL(modulePath));
+      const { html } = await renderToString(new URL(moduleUrl));
 
       data.body = html;
     } else {

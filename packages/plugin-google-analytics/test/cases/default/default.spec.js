@@ -79,20 +79,20 @@ describe('Build Greenwood With: ', function() {
 
       it('should have the expected code with users analyticsId', function() {
         const expectedContent = `
-            var getOutboundLink = function(url) {
-              gtag('event', 'click', {
-                'event_category': 'outbound',
-                'event_label': url,
-                'transport_type': 'beacon'
-              });
-            }
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${mockAnalyticsId}', { 'anonymize_ip': true });
+          var getOutboundLink = function(url) {
+            gtag('event', 'click', {
+              'event_category': 'outbound',
+              'event_label': url,
+              'transport_type': 'beacon'
+            });
+          }
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${mockAnalyticsId}', { 'anonymize_ip': true });
         `;
 
-        expect(inlineScript[0].textContent).to.contain(expectedContent);
+        expect(inlineScript[0].textContent.trim().replace(/\n/g, '').replace(/ /g, '')).to.contain(expectedContent.trim().replace(/\n/g, '').replace(/ /g, ''));
       });
 
       it('should only have one external Google script tag', function() {

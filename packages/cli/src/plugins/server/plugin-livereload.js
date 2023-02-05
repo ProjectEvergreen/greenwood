@@ -1,8 +1,7 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import livereload from 'livereload';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { ServerInterface } from '../../lib/server-interface.js';
-import { fileURLToPath, pathToFileURL } from 'url';
 
 class LiveReloadServer extends ServerInterface {
   constructor(compilation, options = {}) {
@@ -11,23 +10,17 @@ class LiveReloadServer extends ServerInterface {
 
   async start() {
     const { userWorkspace } = this.compilation.context;
-    const standardPluginsPath = fileURLToPath(new URL('../resource', import.meta.url));
-    const standardPluginsNames = fs.readdirSync(standardPluginsPath)
+    const standardPluginsDirectoryPath = new URL('../resource/', import.meta.url);
+    const standardPluginsNames = (await fs.readdir(standardPluginsDirectoryPath))
       .filter(filename => filename.indexOf('plugin-standard') === 0);
     const standardPluginsExtensions = (await Promise.all(standardPluginsNames.map(async (filename) => {
-      const pluginImport = await import(pathToFileURL(`${standardPluginsPath}/${filename}`));
+      const pluginImport = await import(new URL(`./${filename}`, standardPluginsDirectoryPath));
       const plugin = pluginImport[Object.keys(pluginImport)[0]];
       
       return plugin;
     })))
-      .map((plugin) => {
-        // assume that if it is an array, the second item is a rollup plugin
-        const instance = plugin.length
-          ? plugin[0].provider(this.compilation)
-          : plugin.provider(this.compilation);
-
-        return instance.extensions.flat();
-      })
+      .filter(plugin => plugin.type === 'resource')
+      .map((plugin) => plugin.provider(this.compilation).extensions.flat())
       .flat();
     const customPluginsExtensions = this.compilation.config.plugins
       .filter((plugin) => plugin.type === 'resource')
@@ -49,7 +42,7 @@ class LiveReloadServer extends ServerInterface {
       applyCSSLive: false // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
     });
 
-    liveReloadServer.watch(userWorkspace, () => {
+    liveReloadServer.watch(userWorkspace.pathname, () => {
       console.info(`Now watching directory "${userWorkspace}" for changes.`);
       return Promise.resolve(true);
     });
@@ -58,25 +51,21 @@ class LiveReloadServer extends ServerInterface {
 
 class LiveReloadResource extends ResourceInterface {
   
-  async shouldIntercept(url, body, headers) {
-    const { accept } = headers.request;
+  async shouldIntercept(url, request, response) {
+    const contentType = response.headers.get('Content-Type');
 
-    return Promise.resolve(accept && accept.indexOf('text/html') >= 0 && process.env.__GWD_COMMAND__ === 'develop'); // eslint-disable-line no-underscore-dangle
+    return contentType.indexOf('text/html') >= 0 && process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line no-underscore-dangle
   }
 
-  async intercept(url, body) {
-    return new Promise((resolve, reject) => {
-      try {
-        const contents = body.replace('</head>', `
-            <script src="http://localhost:35729/livereload.js?snipver=1"></script>
-          </head>
-        `);
+  async intercept(url, request, response) {
+    let body = await response.text();
+    
+    body = body.replace('</head>', `
+        <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+      </head>
+    `);
 
-        resolve({ body: contents });
-      } catch (e) {
-        reject(e);
-      }
-    });
+    return new Response(body);
   }
 }
 

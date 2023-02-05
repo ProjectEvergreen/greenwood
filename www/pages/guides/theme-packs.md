@@ -55,8 +55,6 @@ _package.json_
 
 _my-theme-pack.js_
 ```js
-import { fileURLToPath } from 'url';
-
 const myThemePack = () => [{
   type: 'context',
   name: 'my-theme-pack:context',
@@ -65,7 +63,7 @@ const myThemePack = () => [{
       templates: [
         // import.meta.url will be located at _node_modules/your-package/_
         // when your plugin is run in a user's project
-        fileURLToPath(new URL('./dist/layouts', import.meta.url))
+        new URL('./dist/layouts', import.meta.url)
       ]
     };
   }
@@ -124,17 +122,14 @@ The main consideration needed for development is that your files won't be in _no
 So using our current example, our final _my-theme-pack.js_ would look like this:
 <!-- eslint-disable no-underscore-dangle -->
 ```js
-import path from 'path';
-import { fileURLToPath, URL } from 'url';
-
 const myThemePackPlugin = (options = {}) => [{
   type: 'context',
   name: 'my-theme-pack:context',
   provider: (compilation) => {
     // you can use other directory names besides templates/ this way!
     const templateLocation = options.__isDevelopment
-      ? path.join(compilation.context.userWorkspace, 'layouts')
-      : fileURLToPath(new URL('dist/layouts', import.meta.url));
+      ? new URL('./layouts/', compilation.context.userWorkspace)
+      : new URL('dist/layouts', import.meta.url);
 
     return {
       templates: [
@@ -156,7 +151,6 @@ Additionally, we make sure to pass the flag from above for `__isDevelopment` to 
 // shared from another test
 import { myThemePackPlugin } from './my-theme-pack.js';
 import fs from 'fs';
-import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 const packageName = JSON.parse(fs.readFileSync('./package.json', 'utf-8')).name;
@@ -168,15 +162,16 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
   }
 
   async shouldResolve(url) {
+    const { pathname } = url;
     // eslint-disable-next-line no-underscore-dangle
-    return Promise.resolve((process.env.__GWD_COMMAND__ === 'develop') && url.indexOf(`/node_modules/${packageName}/`) >= 0);
+    return process.env.__GWD_COMMAND__ === 'develop' && pathname.indexOf(`/node_modules/${packageName}/`) >= 0;
   }
 
   async resolve(url) {
     const { userWorkspace } = this.compilation.context;
     const filePath = this.getBareUrlPath(url).split(`/node_modules/${packageName}/dist/`)[1];
 
-    return Promise.resolve(path.join(userWorkspace, filePath));
+    return new URL(`./${filePath}`, userWorkspace, filePath);
   }
 }
 

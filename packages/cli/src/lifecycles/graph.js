@@ -1,8 +1,7 @@
 /* eslint-disable complexity, max-depth */
-import fs from 'fs';
+import fs from 'fs/promises';
 import fm from 'front-matter';
-import { modelResource } from '../lib/resource-utils.js';
-import path from 'path';
+import { checkResourceExists, modelResource } from '../lib/resource-utils.js';
 import toc from 'markdown-toc';
 import { Worker } from 'worker_threads';
 
@@ -11,7 +10,7 @@ const generateGraph = async (compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { context } = compilation;
-      const { pagesDir, userWorkspace } = context;
+      const { pagesDir, projectDirectory, userWorkspace, scratchDir } = context;
       let graph = [{
         outputPath: 'index.html',
         filename: 'index.html',
@@ -24,23 +23,23 @@ const generateGraph = async (compilation) => {
       }];
 
       const walkDirectoryForPages = async function(directory, pages = []) {
-        const files = fs.readdirSync(directory);
+        const files = await fs.readdir(directory);
 
         for (const filename of files) {
-          const fullPath = path.normalize(`${directory}${path.sep}${filename}`);
-          
-          if (fs.statSync(fullPath).isDirectory()) {
-            pages = await walkDirectoryForPages(fullPath, pages);
+          const filenameUrl = new URL(`./${filename}`, directory);
+          const filenameUrlAsDir = new URL(`./${filename}/`, directory);
+          const isDirectory = await checkResourceExists(filenameUrlAsDir) && (await fs.stat(filenameUrlAsDir)).isDirectory();
+
+          if (isDirectory) {
+            pages = await walkDirectoryForPages(filenameUrlAsDir, pages);
           } else {
-            const extension = path.extname(filename);
+            const extension = `.${filenameUrl.pathname.split('.').pop()}`; 
             const isStatic = extension === '.md' || extension === '.html';
             const isDynamic = extension === '.js';
-            const relativePagePath = fullPath.substring(pagesDir.length - 1, fullPath.length);
-            const relativeWorkspacePath = directory.replace(process.cwd(), '').replace(path.sep, '');
-            let route = relativePagePath
-              .replace(extension, '')
-              .replace(/\\/g, '/');
-            let id = filename.split(path.sep)[filename.split(path.sep).length - 1].replace(extension, '');
+            const relativePagePath = filenameUrl.pathname.replace(pagesDir.pathname, '/');
+            const relativeWorkspacePath = directory.pathname.replace(projectDirectory.pathname, '');
+            let route = relativePagePath.replace(extension, '');
+            let id = filename.split('/')[filename.split('/').length - 1].replace(extension, '');
             let template = 'page';
             let title = null;
             let imports = [];
@@ -55,7 +54,7 @@ const generateGraph = async (compilation) => {
              * - pages/blog/index.{html,md,js} -> /blog/
              * - pages/blog/some-post.{html,md,js} -> /blog/some-post/
              */
-            if (relativePagePath.lastIndexOf(path.sep) > 0) {
+            if (relativePagePath.lastIndexOf('/') > 0) {
               // https://github.com/ProjectEvergreen/greenwood/issues/455
               route = id === 'index' || route.replace('/index', '') === `/${id}`
                 ? route.replace('index', '')
@@ -67,17 +66,14 @@ const generateGraph = async (compilation) => {
             }
 
             if (isStatic) {
-              const fileContents = fs.readFileSync(fullPath, 'utf8');
+              const fileContents = await fs.readFile(filenameUrl, 'utf8');
               const { attributes } = fm(fileContents);
               
               template = attributes.template || 'page';
               title = attributes.title || title;
               id = attributes.label || id;
               imports = attributes.imports || [];
-              
-              filePath = route === '/' || relativePagePath.lastIndexOf(path.sep) === 0
-                ? `${relativeWorkspacePath}${filename}`
-                : `${relativeWorkspacePath}${path.sep}${filename}`,
+              filePath = `${relativeWorkspacePath}${filename}`;
 
               // prune "reserved" attributes that are supported by Greenwood
               // https://www.greenwoodjs.io/docs/front-matter
@@ -127,13 +123,13 @@ const generateGraph = async (compilation) => {
               await new Promise((resolve, reject) => {
                 const worker = new Worker(routeWorkerUrl);
 
-                worker.on('message', (result) => {
+                worker.on('message', async (result) => {
                   if (result.frontmatter) {
-                    const resources = (result.frontmatter.imports || []).map((resource) => {
-                      const type = path.extname(resource) === '.js' ? 'script' : 'link';
+                    const resources = await Promise.all((result.frontmatter.imports || []).map(async (resource) => {
+                      const type = resource.split('.').pop() === 'js' ? 'script' : 'link';
 
-                      return modelResource(compilation.context, type, resource);
-                    });
+                      return await modelResource(compilation.context, type, resource);
+                    }));
 
                     result.frontmatter.imports = resources;
                     ssrFrontmatter = result.frontmatter;
@@ -148,7 +144,7 @@ const generateGraph = async (compilation) => {
                 });
 
                 worker.postMessage({
-                  modulePath: fullPath,
+                  moduleUrl: filenameUrl.href,
                   compilation: JSON.stringify(compilation),
                   route
                 });
@@ -214,16 +210,17 @@ const generateGraph = async (compilation) => {
       };
 
       console.debug('building from local sources...');
-      if (fs.existsSync(path.join(userWorkspace, 'index.html'))) { // SPA
+      // test for SPA
+      if (await checkResourceExists(new URL('./index.html', userWorkspace))) {
         graph = [{
           ...graph[0],
-          path: `${userWorkspace}${path.sep}index.html`,
+          path: `${userWorkspace.pathname}index.html`,
           isSPA: true
         }];
       } else {
         const oldGraph = graph[0];
-        
-        graph = fs.existsSync(pagesDir) ? await walkDirectoryForPages(pagesDir) : graph;
+
+        graph = await checkResourceExists(pagesDir) ? await walkDirectoryForPages(pagesDir) : graph;
 
         const has404Page = graph.filter(page => page.route === '/404/').length === 1;
 
@@ -269,7 +266,7 @@ const generateGraph = async (compilation) => {
               path: null,
               data: {},
               imports: [],
-              outputPath: path.join(node.route, 'index.html'),
+              outputPath: `${node.route}index.html`,
               ...node,
               external: true
             });
@@ -279,11 +276,11 @@ const generateGraph = async (compilation) => {
 
       compilation.graph = graph;
 
-      if (!fs.existsSync(context.scratchDir)) {
-        await fs.promises.mkdir(context.scratchDir);
+      if (!await checkResourceExists(scratchDir)) {
+        await fs.mkdir(scratchDir);
       }
 
-      await fs.promises.writeFile(`${context.scratchDir}/graph.json`, JSON.stringify(compilation.graph));
+      await fs.writeFile(new URL('./graph.json', scratchDir), JSON.stringify(compilation.graph));
 
       resolve(compilation);
     } catch (err) {

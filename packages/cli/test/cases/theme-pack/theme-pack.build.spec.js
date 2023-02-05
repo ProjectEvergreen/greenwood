@@ -131,13 +131,13 @@ describe('Build Greenwood With: ', function() {
         expect(await glob.promise(path.join(this.context.publicDir, '**/header.*.js'))).to.have.lengthOf(1);
       });
 
-      it('should have expected link tag in the head', function() {
-        const scriptTag = Array.from(dom.window.document.querySelectorAll('head script'))
-          .filter((linkTag) => {
-            return linkTag.getAttribute('src').indexOf('/header.') === 0;
+      it('should have expected script tag in the head', function() {
+        const scriptTags = Array.from(dom.window.document.querySelectorAll('head script'))
+          .filter((scriptTag) => {
+            return scriptTag.getAttribute('src').indexOf('/header.') === 0;
           });
 
-        expect(scriptTag.length).to.equal(1);
+        expect(scriptTags.length).to.equal(1);
       });
 
       it('should have expected <x-header> component', function() {
