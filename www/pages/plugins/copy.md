@@ -10,11 +10,8 @@ index: 2
 The copy plugin allows users to copy files around as part of the [build](/docs/#cli) command.  For example, Greenwood uses this feature to copy all files in the user's _/assets/_ directory to final output directory automatically.  You can use this plugin to copy single files, or entire directories.
 
 ## API
-This plugin supports providing an array of "location" objects that can either be files or directories.
-
+This plugin supports providing an array of "paired" URL objects that can either be files or directories, by providing a `from` and `to` location.
 ```js
-import path from 'path';
-
 export function myCopyPlugin() {
   return {
     type: 'copy',
@@ -23,13 +20,13 @@ export function myCopyPlugin() {
       const { context } = compilation;
 
       return [{
-        // can only copy a file to a file
-        from: path.join(context.userWorkspace, 'robots.txt'),
-        to: path.join(context.outputDir, 'robots.txt')
+        // copy a file
+        from: new URL('./robots.txt', context.userWorkspace),
+        to: new URL('./robots.txt', context.outputDir)
       }, {
-        // can only copy a directory to a directory
-        from: path.join(context.userWorkspace, 'pdfs'),
-        to: path.join(context.outputDir, 'pdfs')
+        // copy a directory (notice the trailing /)
+        from: new URL('./pdfs/', context.userWorkspace),
+        to: new URL('./pdfs/', context.outputDir)
       }];
     }
   };

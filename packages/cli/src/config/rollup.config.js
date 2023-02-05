@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'fs/promises';
+import { checkResourceExists, normalizePathnameForWindows, resolveForRelativeUrl } from '../lib/resource-utils.js';
 
 function greenwoodResourceLoader (compilation) {
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
@@ -10,43 +10,42 @@ function greenwoodResourceLoader (compilation) {
 
   return {
     name: 'greenwood-resource-loader',
-    resolveId(id) {
-      const { userWorkspace } = compilation.context;
+    async resolveId(id) {
+      const normalizedId = id.replace(/\?type=(.*)/, '');
+      const { projectDirectory, userWorkspace } = compilation.context;
 
-      if ((id.indexOf('./') === 0 || id.indexOf('/') === 0) && fs.existsSync(path.join(userWorkspace, id))) {
-        return path.join(userWorkspace, id.replace(/\?type=(.*)/, ''));
+      if (id.startsWith('.') || id.startsWith('/')) {
+        const prefix = id.startsWith('/') ? '.' : '';
+        const contextUrl = id.indexOf('/node_modules/') >= 0 ? projectDirectory : userWorkspace;
+        const userWorkspaceUrl = await resolveForRelativeUrl(new URL(`${prefix}${normalizedId}`, contextUrl), contextUrl);
+
+        if (await checkResourceExists(userWorkspaceUrl)) {
+          return normalizePathnameForWindows(userWorkspaceUrl);
+        }
       }
-
-      return null;
     },
     async load(id) {
-      const importAsIdAsUrl = id.replace(/\?type=(.*)/, '');
-      const extension = path.extname(importAsIdAsUrl);
+      const pathname = id.indexOf('?') >= 0 ? id.slice(0, id.indexOf('?')) : id;
+      const extension = pathname.split('.').pop();
 
-      if (extension !== '.js') {
-        const originalUrl = `${id}?type=${extension.replace('.', '')}`;
-        let contents;
+      if (extension !== '' && extension !== 'js') {
+        const url = new URL(`file://${pathname}?type=${extension}`);
+        const request = new Request(url.href);
+        let response = new Response('');
 
         for (const plugin of resourcePlugins) {
-          const headers = {
-            request: {
-              originalUrl
-            },
-            response: {
-              'content-type': plugin.contentType
-            }
-          };
-
-          contents = await plugin.shouldServe(importAsIdAsUrl)
-            ? (await plugin.serve(importAsIdAsUrl)).body
-            : contents;
-
-          if (await plugin.shouldIntercept(importAsIdAsUrl, contents, headers)) {
-            contents = (await plugin.intercept(importAsIdAsUrl, contents, headers)).body;
+          if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
+            response = await plugin.serve(url, request);
           }
         }
 
-        return contents;
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
+            response = await plugin.intercept(url, request, response.clone());
+          }
+        }
+
+        return await response.text();
       }
     }
   };
@@ -55,15 +54,14 @@ function greenwoodResourceLoader (compilation) {
 function greenwoodSyncPageResourceBundlesPlugin(compilation) {
   return {
     name: 'greenwood-sync-page-resource-bundles-plugin',
-    writeBundle(outputOptions, bundles) {
+    async writeBundle(outputOptions, bundles) {
       const { outputDir } = compilation.context;
 
       for (const resource of compilation.resources.values()) {
-        const resourceKey = resource.sourcePathURL.pathname;
+        const resourceKey = normalizePathnameForWindows(resource.sourcePathURL);
 
         for (const bundle in bundles) {
           let facadeModuleId = (bundles[bundle].facadeModuleId || '').replace(/\\/g, '/');
-
           /*
            * this is an odd issue related to symlinking in our Greenwood monorepo when building the website
            * and managing packages that we create as "virtual" modules, like for the mpa router
@@ -82,25 +80,27 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
            * pathToMatch (before): /node_modules/@greenwood/cli/src/lib/router.js
            * pathToMatch (after): /cli/src/lib/router.js
            */
-          if (facadeModuleId && resourceKey.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId.indexOf('/packages/cli') > 0 && fs.existsSync(facadeModuleId)) {
-            facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');
+          if (resourceKey?.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId?.indexOf('/packages/cli') > 0) {
+            if (await checkResourceExists(new URL(`file://${facadeModuleId}`))) {
+              facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');
+            }
           }
 
           if (resourceKey === facadeModuleId) {
             const { fileName } = bundles[bundle];
             const { rawAttributes, contents } = resource;
             const noop = rawAttributes && rawAttributes.indexOf('data-gwd-opt="none"') >= 0 || compilation.config.optimization === 'none';
-            const outputPath = path.join(outputDir, fileName);
+            const outputPath = new URL(`./${fileName}`, outputDir);
 
-            compilation.resources.set(resourceKey, {
-              ...compilation.resources.get(resourceKey),
+            compilation.resources.set(resource.sourcePathURL.pathname, {
+              ...compilation.resources.get(resource.sourcePathURL.pathname),
               optimizedFileName: fileName,
-              optimizedFileContents: fs.readFileSync(outputPath, 'utf-8'),
+              optimizedFileContents: await fs.readFile(outputPath, 'utf-8'),
               contents: contents.replace(/\.\//g, '/')
             });
 
             if (noop) {
-              fs.writeFileSync(outputPath, contents);
+              await fs.writeFile(outputPath, contents);
             }
           }
         }
@@ -113,7 +113,7 @@ const getRollupConfig = async (compilation) => {
   const { outputDir } = compilation.context;
   const input = [...compilation.resources.values()]
     .filter(resource => resource.type === 'script')
-    .map(resource => resource.sourcePathURL.pathname);
+    .map(resource => normalizePathnameForWindows(resource.sourcePathURL));
   const customRollupPlugins = compilation.config.plugins.filter(plugin => {
     return plugin.type === 'rollup';
   }).map(plugin => {
@@ -124,7 +124,7 @@ const getRollupConfig = async (compilation) => {
     preserveEntrySignatures: 'strict', // https://github.com/ProjectEvergreen/greenwood/pull/990
     input,
     output: { 
-      dir: outputDir,
+      dir: normalizePathnameForWindows(outputDir),
       entryFileNames: '[name].[hash].js',
       chunkFileNames: '[name].[hash].js',
       sourcemap: true

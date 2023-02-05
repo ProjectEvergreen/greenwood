@@ -1,7 +1,6 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import { graphqlServer } from './core/server.js';
 import { mergeImportMap } from '@greenwood/cli/src/lib/walker-package-ranger.js';
-import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 import { ServerInterface } from '@greenwood/cli/src/lib/server-interface.js';
 import rollupPluginAlias from '@rollup/plugin-alias';
@@ -19,63 +18,53 @@ const importMap = {
 class GraphQLResource extends ResourceInterface {
   constructor(compilation, options = {}) {
     super(compilation, options);
-    this.extensions = ['.gql'];
+    this.extensions = ['gql'];
     this.contentType = ['text/javascript', 'text/html'];
   }
 
-  async serve(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const js = await fs.promises.readFile(url, 'utf-8');
-        const body = `
-          export default \`${js}\`;
-        `;
+  async shouldServe(url) {
+    return url.protocol === 'file:' && this.extensions.indexOf(url.pathname.split('.').pop()) >= 0;
+  }
 
-        resolve({
-          body,
-          contentType: this.contentType[0]
-        });
-      } catch (e) {
-        reject(e);
-      }
+  async serve(url) {
+    const js = await fs.readFile(url, 'utf-8');
+    const body = `
+      export default \`${js}\`;
+    `;
+
+    return new Response(body, {
+      headers: new Headers({
+        'Content-Type': this.contentType[0]
+      })
     });
   }
   
-  async shouldIntercept(url, body, headers) {
-    return Promise.resolve(headers.request.accept && headers.request.accept.indexOf(this.contentType[1]) >= 0);
+  async shouldIntercept(url, request, response) {
+    return response.headers.get('Content-Type').indexOf(this.contentType[1]) >= 0;
   }
 
-  async intercept(url, body) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const newBody = mergeImportMap(body, importMap);
+  async intercept(url, request, response) {
+    const body = await response.text();
+    const newBody = mergeImportMap(body, importMap);
 
-        resolve({ body: newBody });
-      } catch (e) {
-        reject(e);
-      }
-    });
+    return new Response(newBody);
   }
 
-  async shouldOptimize(url = '', body, headers = {}) {
-    return Promise.resolve(path.extname(url) === '.html' || (headers.request && headers.request['content-type'].indexOf('text/html') >= 0));
+  async shouldOptimize(url, response) {
+    return response.headers.get('Content-Type').indexOf(this.contentType[1]) >= 0;
   }
 
-  async optimize(url, body) {
-    return new Promise((resolve, reject) => {
-      try {
-        body = body.replace('<head>', `
-        <head>
-          <script data-state="apollo" data-gwd-opt="none">
-            window.__APOLLO_STATE__ = true;
-          </script>
-        `);
-    
-        resolve(body);
-      } catch (e) {
-        reject(e);
-      }
-    });
+  async optimize(url, response) {
+    let body = await response.text();
+
+    body = body.replace('<head>', `
+      <head>
+        <script data-state="apollo" data-gwd-opt="none">
+          window.__APOLLO_STATE__ = true;
+        </script>
+    `);
+
+    return new Response(body);
   }
 }
 

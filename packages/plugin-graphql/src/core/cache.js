@@ -1,5 +1,6 @@
 import ApolloCore from '@apollo/client/core/core.cjs.js';
-import fs from 'fs';
+import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
+import fs from 'fs/promises';
 import { gql } from 'apollo-server';
 import { getQueryHash } from './common.js';
 
@@ -28,14 +29,14 @@ const createCache = async (req, context) => {
         const cache = JSON.stringify(data);
         const queryHash = getQueryHash(query, variables);
         const hashFilename = `${queryHash}-cache.json`;
-        const cachePath = `${outputDir}/${hashFilename}`;
+        const cachePath = new URL(`./${hashFilename}`, outputDir);
 
-        if (!fs.existsSync(outputDir)) {
-          fs.mkdirSync(outputDir);
+        if (!await checkResourceExists(outputDir)) {
+          await fs.mkdir(outputDir);
         }
 
-        if (!fs.existsSync(cachePath)) {
-          fs.writeFileSync(cachePath, cache, 'utf8');
+        if (!await checkResourceExists(cachePath)) {
+          await fs.writeFile(cachePath, cache, 'utf-8');
         }
       }
       

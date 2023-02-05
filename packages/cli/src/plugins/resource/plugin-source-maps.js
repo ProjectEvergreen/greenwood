@@ -3,32 +3,28 @@
  * Detects and fully resolve requests to source map (.map) files.
  *
  */
-import fs from 'fs';
-import path from 'path';
+import { checkResourceExists } from '../../lib/resource-utils.js';
+import fs from 'fs/promises';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class SourceMapsResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.map'];
+    this.extensions = ['map'];
+    this.contentType = 'application/json';
   }
 
   async shouldServe(url) {
-    return Promise.resolve(path.extname(url) === this.extensions[0] && fs.existsSync(url));
+    return url.pathname.split('.').pop() === this.extensions[0] && await checkResourceExists(url);
   }
 
   async serve(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const sourceMap = fs.readFileSync(url, 'utf-8');
-        
-        resolve({
-          body: sourceMap,
-          contentType: 'application/json'
-        });
-      } catch (e) {
-        reject(e);
-      }
+    const body = await fs.readFile(url, 'utf-8');
+
+    return new Response(body, {
+      headers: new Headers({
+        'Content-Type': this.contentType
+      })
     });
   }
 }

@@ -1,11 +1,11 @@
 import { getNodeModulesLocationForPackage } from '@greenwood/cli/src/lib/node-modules-utils.js';
-import path from 'path';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class PolyfillsResource extends ResourceInterface {
   constructor(compilation, options = {}) {
     super(compilation, options);
 
+    this.contentType = 'text/html';
     this.options = {
       wc: true,
       dsd: false,
@@ -14,56 +14,57 @@ class PolyfillsResource extends ResourceInterface {
     };
   }
 
-  async shouldIntercept(url, body, headers = { request: {} }) {
-    return Promise.resolve(headers.request['content-type'] && headers.request['content-type'].indexOf('text/html') >= 0);
+  async shouldIntercept(url, request, response) {
+    const { protocol } = url;
+    const { wc, lit, dsd } = this.options;
+    const isEnabled = wc || lit || dsd;
+
+    return isEnabled
+      && protocol.startsWith('http')
+      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
   }
 
-  async intercept(url, body) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let newHtml = body;
+  async intercept(url, request, response) {
+    const { wc, lit, dsd } = this.options;
+    let body = await response.text();
 
-        // standard WC polyfill
-        if (this.options.wc) {
-          newHtml = newHtml.replace('<head>', `
-            <head>
-              <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-          `);
-        }
+    // standard WC polyfill
+    if (wc) {
+      body = body.replace('<head>', `
+        <head>
+          <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+      `);
+    }
 
-        // append Lit polyfill next to make sure it comes before WC polyfill
-        if (this.options.lit) {
-          newHtml = newHtml.replace('<head>', `
-            <head>
-              <script src="/node_modules/lit/polyfill-support.js"></script>
-          `);
-        }
+    // append Lit polyfill next to make sure it comes before WC polyfill
+    if (lit) {
+      body = body.replace('<head>', `
+        <head>
+          <script src="/node_modules/lit/polyfill-support.js"></script>
+      `);
+    }
 
-        // lastly, Declarative Shadow DOM polyfill
-        if (this.options.dsd) {
-          newHtml = newHtml.replace('</body>', `
-              <script>
-                if (!HTMLTemplateElement.prototype.hasOwnProperty('shadowRoot')) {
-                  (function attachShadowRoots(root) {
-                    root.querySelectorAll("template[shadowroot]").forEach(template => {
-                      const mode = template.getAttribute("shadowroot");
-                      const shadowRoot = template.parentNode.attachShadow({ mode });
-                      shadowRoot.appendChild(template.content);
-                      template.remove();
-                      attachShadowRoots(shadowRoot);
-                    });
-                  })(document);
-                }
-              </script>
-            </body>
-          `);
-        }
+    // lastly, Declarative Shadow DOM polyfill
+    if (dsd) {
+      body = body.replace('</body>', `
+          <script>
+            if (!HTMLTemplateElement.prototype.hasOwnProperty('shadowRoot')) {
+              (function attachShadowRoots(root) {
+                root.querySelectorAll("template[shadowroot]").forEach(template => {
+                  const mode = template.getAttribute("shadowroot");
+                  const shadowRoot = template.parentNode.attachShadow({ mode });
+                  shadowRoot.appendChild(template.content);
+                  template.remove();
+                  attachShadowRoots(shadowRoot);
+                });
+              })(document);
+            }
+          </script>
+        </body>
+      `);
+    }
 
-        resolve({ body: newHtml });
-      } catch (e) {
-        reject(e);
-      }
-    });
+    return new Response(body);
   }
 }
 
@@ -80,16 +81,17 @@ const greenwoodPluginPolyfills = (options = {}) => {
       const polyfillPackageName = '@webcomponents/webcomponentsjs';
       const polyfillNodeModulesLocation = await getNodeModulesLocationForPackage(polyfillPackageName);
       const litNodeModulesLocation = await getNodeModulesLocationForPackage('lit');
+
       const standardPolyfills = [{
-        from: path.join(polyfillNodeModulesLocation, 'webcomponents-loader.js'),
-        to: path.join(outputDir, 'webcomponents-loader.js')
+        from: new URL('./webcomponents-loader.js', new URL(`file://${polyfillNodeModulesLocation}/`)),
+        to: new URL('./webcomponents-loader.js', outputDir)
       }, {
-        from: path.join(polyfillNodeModulesLocation, 'bundles'),
-        to: path.join(outputDir, 'bundles')
+        from: new URL('./bundles/', new URL(`file://${polyfillNodeModulesLocation}/`)),
+        to: new URL('./bundles/', outputDir)
       }];
       const litPolyfills = [{
-        from: path.join(litNodeModulesLocation, 'polyfill-support.js'),
-        to: path.join(outputDir, 'polyfill-support.js')
+        from: new URL('./polyfill-support.js', new URL(`file://${litNodeModulesLocation}/`)),
+        to: new URL('./polyfill-support.js', outputDir)
       }];
 
       return [

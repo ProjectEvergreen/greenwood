@@ -30,9 +30,9 @@ export async function handler(request) {
   const body = { message: `Hello ${name}!!!` };
 
   return new Response(JSON.stringify(body), {
-    headers: {
+    headers: new Headers({
       'Content-Type': 'application/json'
-    }
+    })
   });
 }
 ```

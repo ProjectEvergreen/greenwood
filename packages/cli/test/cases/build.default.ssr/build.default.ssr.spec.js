@@ -86,7 +86,7 @@ describe('Build Greenwood With: ', function() {
     before(async function() {
       const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
       
-      artistsPageGraphData = graph.filter(page => page.route === '/artists/')[0];
+      artistsPageGraphData = graph.find(page => page.route === '/artists/');
 
       return new Promise((resolve, reject) => {
         request.get(`${hostname}/artists/`, (err, res, body) => {

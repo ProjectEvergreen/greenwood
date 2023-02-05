@@ -36,7 +36,7 @@ export default {
 
 ### Dev Server
 Configuration for Greenwood's development server is available using the `devServer` option.
-- `extensions`: Provide an array of to watch for changes and reload the live server with.  By default, Greenwood will already watch all "standard" web assets (HTML, CSS, JS, etc) it supports by default, as well as any extensions set by [resource plugins](/plugins/resource) you are using in your _greenwood.config.json_.
+- `extensions`: Provide an array of extensions to watch for changes and reload the live server with.  By default, Greenwood will already watch all "standard" web assets (HTML, CSS, JS, etc) it supports by default, as well as any extensions set by [resource plugins](/plugins/resource) you are using in your _greenwood.config.json_.
 - `hud`: The HUD option ([_head-up display_](https://en.wikipedia.org/wiki/Head-up_display)) is some additional HTML added to your site's page when Greenwood wants to help provide information to you in the browser.  For example, if your HTML is detected as malformed, which could break the parser.  Set this to `false` if you would like to turn it off.
 - `port`: Pick a different port when starting the dev server
 - `proxy`: A set of paths to match and re-route to other hosts.  Highest specificity should go at the end.
@@ -45,7 +45,7 @@ Configuration for Greenwood's development server is available using the `devServ
 ```js
 export default {
   devServer: {
-    extensions: ['.txt', '.rtf'],
+    extensions: ['txt', 'rtf'],
     port: 3000,
     proxy: {
       '/api': 'https://stage.myapp.com',
@@ -220,9 +220,7 @@ Path to where all your project files will be located.  Using an absolute path is
 Setting the workspace path to be the _www/_ folder in the current directory from where Greenwood is being run.
 
 ```js
-import { fileURLToPath, URL } from 'url';
-
 export default {
-  workspace: fileURLToPath(new URL('./www', import.meta.url))
+  workspace: new URL('./www', import.meta.url)
 };
 ```

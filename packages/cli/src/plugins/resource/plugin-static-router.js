@@ -5,128 +5,113 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from 'fs';
-import path from 'path';
+import { checkResourceExists } from '../../lib/resource-utils.js';
+import fs from 'fs/promises';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import { fileURLToPath, URL } from 'url';
 
 class StaticRouterResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.html'];
+    this.extensions = ['html'];
     this.contentType = 'text/html';
     this.libPath = '@greenwood/router/router.js';
   }
 
   async shouldResolve(url) {
-    return Promise.resolve(url.indexOf(this.libPath) >= 0);
+    return url.pathname.indexOf(this.libPath) >= 0;
   }
 
   async resolve() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const routerUrl = fileURLToPath(new URL('../../lib/router.js', import.meta.url));
-
-        resolve(routerUrl);
-      } catch (e) {
-        reject(e);
-      }
-    });
+    const routerUrl = new URL('../../lib/router.js', import.meta.url);
+    
+    return new Request(`file://${routerUrl.pathname}`);
   }
 
-  async shouldIntercept(url, body, headers = { request: {} }) {
-    const contentType = headers.request['content-type'];
+  async shouldIntercept(url, request, response) {
+    const { pathname, protocol } = url;
+    const contentType = response.headers.get('Content-Type') || '';
 
-    return Promise.resolve(process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
+    return process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
       && this.compilation.config.staticRouter
-      && url !== '404.html'
-      && (path.extname(url) === '.html' || (contentType && contentType.indexOf('text/html') >= 0)));
+      && !pathname.startsWith('/404')
+      && (protocol === 'http:' && contentType.indexOf(this.contentType) >= 0);
   }
 
-  async intercept(url, body) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        body = body.replace('</head>', `
-          <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
-          </head>
-        `);
+  async intercept(url, request, response) {
+    let body = await response.text();
 
-        resolve({ body });
-      } catch (e) {
-        reject(e);
-      }
-    });
+    body = body.replace('</head>', `
+      <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
+      </head>
+    `);
+
+    return new Response(body);
   }
 
-  async shouldOptimize(url, body, headers = { request: {} }) {
-    const contentType = headers.request['content-type'];
-
-    return Promise.resolve(this.compilation.config.staticRouter
-      && url !== '404.html'
-      && (path.extname(url) === '.html' || (contentType && contentType.indexOf('text/html') >= 0)));
+  async shouldOptimize(url, response) {
+    return this.compilation.config.staticRouter
+      && !url.pathname.startsWith('/404')
+      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
   }
 
-  async optimize(url, body) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let currentTemplate;
-        const isStaticRoute = this.compilation.graph.filter(page => page.outputPath === url && url !== '/404/' && !page.isSSR).length === 1;
-        const { outputDir } = this.compilation.context;
-        const bodyContents = body.match(/<body>(.*)<\/body>/s)[0].replace('<body>', '').replace('</body>', '');
-        const outputBundlePath = path.join(`${outputDir}/_routes${url}`);
+  async optimize(url, response) {
+    let body = await response.text();
+    const { pathname } = url;
+    const isStaticRoute = this.compilation.graph.find(page => page.route === pathname && !page.isSSR);
+    const { outputDir } = this.compilation.context;
+    const partial = body.match(/<body>(.*)<\/body>/s)[0].replace('<body>', '').replace('</body>', '');
+    const outputPartialDirUrl = new URL(`./_routes${url.pathname}`, outputDir);
+    const outputPartialDirPathUrl = new URL(`file://${outputPartialDirUrl.pathname.split('/').slice(0, -1).join('/').concat('/')}`);
+    let currentTemplate;
 
-        const routeTags = this.compilation.graph
-          .filter(page => !page.isSSR)
-          .filter(page => page.route !== '/404/')
-          .map((page) => {
-            const template = page.filename && path.extname(page.filename) === '.html'
-              ? page.route
-              : page.template;
-            const key = page.route === '/'
-              ? ''
-              : page.route.slice(0, page.route.lastIndexOf('/'));
+    const routeTags = this.compilation.graph
+      .filter(page => !page.isSSR)
+      .filter(page => page.route !== '/404/')
+      .map((page) => {
+        const template = page.filename && page.filename.split('.').pop() === this.extensions[0]
+          ? page.route
+          : page.template;
+        const key = page.route === '/'
+          ? ''
+          : page.route.slice(0, page.route.lastIndexOf('/'));
 
-            if (url === page.outputPath) {
-              currentTemplate = template;
-            }
-            return `
-              <greenwood-route data-route="${page.route}" data-template="${template}" data-key="/_routes${key}/index.html"></greenwood-route>
-            `;
-          });
-
-        if (isStaticRoute) {
-          if (!fs.existsSync(path.dirname(outputBundlePath))) {
-            fs.mkdirSync(path.dirname(outputBundlePath), {
-              recursive: true
-            });
-          }
-
-          await fs.promises.writeFile(outputBundlePath, bodyContents);
+        if (pathname === page.route) {
+          currentTemplate = template;
         }
+        return `
+          <greenwood-route data-route="${page.route}" data-template="${template}" data-key="/_routes${key}/index.html"></greenwood-route>
+        `;
+      });
 
-        body = body.replace('</head>', `
-          <script>
-            window.__greenwood = window.__greenwood || {};
-            window.__greenwood.currentTemplate = "${currentTemplate}";
-          </script>
-          </head>
-        `.replace(/\n/g, '').replace(/ /g, ''))
-          .replace(/<body>(.*)<\/body>/s, `
-            <body>\n
-
-              <router-outlet>
-                ${bodyContents.replace(/\$/g, '$$$')}\n
-              </router-outlet>
-
-              ${routeTags.join('\n')}
-            </body>
-          `);
-
-        resolve(body);
-      } catch (e) {
-        reject(e);
+    if (isStaticRoute) {
+      if (!await checkResourceExists(outputPartialDirPathUrl)) {
+        await fs.mkdir(outputPartialDirPathUrl, {
+          recursive: true
+        });
       }
-    });
+
+      await fs.writeFile(new URL('./index.html', outputPartialDirUrl), partial);
+    }
+
+    body = body.replace('</head>', `
+      <script>
+        window.__greenwood = window.__greenwood || {};
+        window.__greenwood.currentTemplate = "${currentTemplate}";
+      </script>
+      </head>
+    `.replace(/\n/g, '').replace(/ /g, ''))
+      .replace(/<body>(.*)<\/body>/s, `
+        <body>\n
+
+          <router-outlet>
+            ${partial.replace(/\$/g, '$$$')}\n
+          </router-outlet>
+
+          ${routeTags.join('\n')}
+        </body>
+      `);
+
+    return new Response(body);
   }
 }
 

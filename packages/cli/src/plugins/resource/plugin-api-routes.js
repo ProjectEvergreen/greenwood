@@ -3,7 +3,7 @@
  * Manages routing to API routes.
  *
  */
-import fs from 'fs';
+import { checkResourceExists } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class ApiRoutesResource extends ResourceInterface {
@@ -12,16 +12,16 @@ class ApiRoutesResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    // TODO Could this existance check be derived from the graph instead?
-    // https://github.com/ProjectEvergreen/greenwood/issues/946
-    return url.startsWith('/api') && fs.existsSync(this.compilation.context.apisDir, url);
+    const { protocol, pathname } = url;
+    const apiPathUrl = new URL(`.${pathname.replace('/api', '')}.js`, this.compilation.context.apisDir);
+
+    if (protocol.startsWith('http') && pathname.startsWith('/api') && await checkResourceExists(apiPathUrl)) {
+      return true;
+    }
   }
 
-  async serve(url) {
-    // TODO we assume host here, but eventually we will be getting a Request
-    // https://github.com/ProjectEvergreen/greenwood/issues/948
-    const host = `https://localhost:${this.compilation.config.port}`;
-    let href = new URL(`${this.getBareUrlPath(url).replace('/api/', '')}.js`, `file://${this.compilation.context.apisDir}`).href;
+  async serve(url, request) {
+    let href = new URL(`./${url.pathname.replace('/api/', '')}.js`, `file://${this.compilation.context.apisDir.pathname}`).href;
 
     // https://github.com/nodejs/modules/issues/307#issuecomment-1165387383
     if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
@@ -29,18 +29,11 @@ class ApiRoutesResource extends ResourceInterface {
     }
 
     const { handler } = await import(href);
-    // TODO we need to pass in headers here
-    // https://github.com/ProjectEvergreen/greenwood/issues/948
-    const req = new Request(new URL(`${host}${url}`));
-    const resp = await handler(req);
-    const contents = resp.headers.get('content-type').indexOf('application/json') >= 0
-      ? await resp.json()
-      : await resp.text();
+    const req = new Request(new URL(`${request.url.origin}${url}`), {
+      ...request
+    });
 
-    return {
-      body: contents,
-      resp
-    };
+    return await handler(req);
   }
 }
 

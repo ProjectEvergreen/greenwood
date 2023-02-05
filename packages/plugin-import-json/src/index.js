@@ -4,45 +4,29 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from 'fs';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class ImportJsonResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['.json'];
+    this.extensions = ['json'];
     this.contentType = 'text/javascript';
   }
 
-  // TODO resolve as part of https://github.com/ProjectEvergreen/greenwood/issues/952
-  async shouldServe() {
-    return false;
+  async shouldIntercept(url) {
+    const { pathname } = url;
+
+    return pathname.split('.').pop() === this.extensions[0] && (url.searchParams.has('type') && url.searchParams.get('type') === this.extensions[0]);
   }
 
-  // TODO handle it from node_modules too, when without `?type=json`
-  async shouldIntercept(url, body, headers) {
-    const { originalUrl } = headers.request;
-    const type = this.extensions[0].replace('.', '');
+  async intercept(url, request, response) {
+    const json = await response.json();
+    const body = `export default ${JSON.stringify(json)}`;
 
-    return Promise.resolve(originalUrl && originalUrl.indexOf(`?type=${type}`) >= 0);
-  }
-
-  async intercept(url, body = '') {
-    return new Promise(async (resolve, reject) => {
-      try {
-        // TODO better way to handle this?
-        // https://github.com/ProjectEvergreen/greenwood/issues/948
-        const raw = body === ''
-          ? await fs.promises.readFile(url, 'utf-8')
-          : body;
-
-        resolve({
-          body: `export default ${JSON.stringify(raw)}`,
-          contentType: this.contentType
-        });
-      } catch (e) {
-        reject(e);
-      }
+    return new Response(body, {
+      headers: new Headers({
+        'Content-Type': this.contentType
+      })
     });
   }
 }
