@@ -15,9 +15,7 @@ export async function load(url, context, defaultLoad) {
 }
 
 export function resolve(specifier, context, defaultResolve) {
-  const ext = path.extname(specifier);
-
-  if (ext === '') {
+  if (specifier.startsWith('file:')) {
     return experimentalResolve(specifier, context, defaultResolve);
   } else {
     return defaultResolve(specifier, context, defaultResolve);
