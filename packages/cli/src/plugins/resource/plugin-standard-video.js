@@ -56,7 +56,7 @@ class StandardVideoResource extends ResourceInterface {
 
     return new Response(body, {
       headers: new Headers({
-        'Content-Type': `image/${contentType}`
+        'Content-Type': contentType
       })
     });
   }
