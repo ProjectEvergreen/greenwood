@@ -64,13 +64,13 @@ class GraphQLResource extends ResourceInterface {
   async optimize(url, body) {
     return new Promise((resolve, reject) => {
       try {
-        body = body.replace( `
+        body = body.replace('<head>', `
         
+        <head>
           <script data-state="apollo" data-gwd-opt="none">
             window.__APOLLO_STATE__ = true;
           </script>
-          </head>
-        `,'<head>');
+        `);
     
         resolve(body);
       } catch (e) {
