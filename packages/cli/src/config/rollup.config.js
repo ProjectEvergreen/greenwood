@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-import { checkResourceExists, normalizePathnameForWindows, resolveForRelativeUrl } from '../lib/resource-utils.js';
+import { checkResourceExists, normalizePathnameForWindows } from '../lib/resource-utils.js';
 
 function greenwoodResourceLoader (compilation) {
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
@@ -14,10 +14,9 @@ function greenwoodResourceLoader (compilation) {
       const normalizedId = id.replace(/\?type=(.*)/, '');
       const { projectDirectory, userWorkspace } = compilation.context;
 
-      if (id.startsWith('.') || id.startsWith('/')) {
+      if ((id.startsWith('.') || id.startsWith('/')) && !id.startsWith(projectDirectory.pathname)) {
         const prefix = id.startsWith('/') ? '.' : '';
-        const contextUrl = id.indexOf('/node_modules/') >= 0 ? projectDirectory : userWorkspace;
-        const userWorkspaceUrl = await resolveForRelativeUrl(new URL(`${prefix}${normalizedId}`, contextUrl), contextUrl);
+        const userWorkspaceUrl = new URL(`${prefix}${normalizedId}`, userWorkspace);
 
         if (await checkResourceExists(userWorkspaceUrl)) {
           return normalizePathnameForWindows(userWorkspaceUrl);
