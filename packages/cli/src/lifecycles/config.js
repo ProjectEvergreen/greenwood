@@ -25,8 +25,11 @@ const greenwoodPlugins = (await Promise.all([
       : [plugin];
   }));
 }))).flat(PLUGINS_FLATTENED_DEPTH).map((plugin) => {
+  const isStandardStaticResource = (plugin.name.startsWith('plugin-standard') && plugin.name !== 'plugin-standard-html') || plugin.name === 'plugin-source-maps';
+
   return {
     isGreenwoodDefaultPlugin: true,
+    isStandardStaticResource,
     ...plugin
   };
 });

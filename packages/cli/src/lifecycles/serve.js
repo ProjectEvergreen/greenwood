@@ -165,9 +165,7 @@ async function getStaticServer(compilation, composable) {
   const app = new Koa();
   const { outputDir } = compilation.context;
   const standardResourcePlugins = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'resource'
-      && plugin.isGreenwoodDefaultPlugin
-      && plugin.name !== 'plugin-standard-html';
+    return plugin.type === 'resource' && plugin.isGreenwoodDefaultPlugin;
   });
 
   app.use(async (ctx, next) => {
@@ -228,9 +226,11 @@ async function getStaticServer(compilation, composable) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`.${ctx.url}`, outputDir.href);
-      const resourcePlugins = standardResourcePlugins.map((plugin) => {
-        return plugin.provider(compilation);
-      });
+      const resourcePlugins = standardResourcePlugins
+        .filter((plugin) => plugin.isStandardStaticResource)
+        .map((plugin) => {
+          return plugin.provider(compilation);
+        });
 
       const request = new Request(url.href, {
         headers: new Headers(ctx.request.header)

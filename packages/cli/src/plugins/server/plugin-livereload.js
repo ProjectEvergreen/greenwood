@@ -20,12 +20,12 @@ class LiveReloadServer extends ServerInterface {
       return plugin;
     })))
       .filter(plugin => plugin.type === 'resource')
-      .map((plugin) => plugin.provider(this.compilation).extensions.flat())
+      .map((plugin) => plugin.provider(this.compilation).extensions || [].flat())
       .flat();
     const customPluginsExtensions = this.compilation.config.plugins
       .filter((plugin) => plugin.type === 'resource')
       .map((plugin) => {
-        return plugin.provider(this.compilation).extensions.flat();
+        return plugin.provider(this.compilation).extensions || [].flat();
       }).flat();
 
     // filter out wildcards or otherwise undesired values and remove any . since livereload likes them that way
