@@ -7,6 +7,7 @@ document.addEventListener('click', async function(e) {
   console.log('COMPOSED PATH', e.composedPath());
   console.log('originalTarget', e.originalTarget);
   // https://stackoverflow.com/questions/51493918/vanilla-javascript-event-delegation-when-dealing-with-web-components
+  // https://developer.mozilla.org/en-US/docs/Web/API/Event/composedPath
   const href = e.composedPath && e.composedPath()[0].tagName === 'A'
     ? e.composedPath()[0].href
     : '';
