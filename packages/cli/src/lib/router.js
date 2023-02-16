@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 
-document.addEventListener('click', function(e) {
+document.addEventListener('click', async function(e) {
   const currentUrl = window.location;
   console.log(e);
   console.log('PATH', e.path);
@@ -35,7 +35,7 @@ document.addEventListener('click', function(e) {
       const { hash, pathname } = targetUrl;
 
       if (currentUrl.pathname !== pathname) {
-        routerOutlet.loadRoute();
+        await routerOutlet.loadRoute();
 
         history.pushState({}, '', pathname);
       }
