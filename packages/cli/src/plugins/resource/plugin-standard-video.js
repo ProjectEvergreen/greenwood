@@ -56,7 +56,8 @@ class StandardVideoResource extends ResourceInterface {
 
     return new Response(body, {
       headers: new Headers({
-        'Content-Type': contentType
+        'Content-Type': contentType,
+        'Content-Length': String(body.toString().length)
       })
     });
   }

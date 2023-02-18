@@ -65,13 +65,23 @@ async function getDevServer(compilation) {
 
       for (const plugin of resourcePlugins) {
         if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
-          response = await plugin.serve(url, request);
+          const current = await plugin.serve(url, request);
+          const merged = mergeResponse(response.clone(), current.clone());
+
+          response = merged;
           break;
         }
       }
 
+      // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
+      // https://github.com/ProjectEvergreen/greenwood/issues/1048
+      if (response.headers.has('Content-Length')) {
+        ctx.set('Content-Length', response.headers.get('Content-Length'));
+      }
+
       ctx.body = response.body ? Readable.from(response.body) : '';
       ctx.type = response.headers.get('Content-Type');
+
       ctx.status = response.status;
     } catch (e) {
       ctx.status = 500;
@@ -104,6 +114,12 @@ async function getDevServer(compilation) {
           return Promise.resolve(await responsePromise);
         }
       }, Promise.resolve(initResponse.clone()));
+
+      // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
+      // https://github.com/ProjectEvergreen/greenwood/issues/1048
+      if (response.headers.has('Content-Length')) {
+        ctx.set('Content-Length', response.headers.get('Content-Length'));
+      }
 
       ctx.body = response.body ? Readable.from(response.body) : '';
       ctx.set('Content-Type', response.headers.get('Content-Type'));
@@ -230,6 +246,12 @@ async function getStaticServer(compilation, composable) {
       }, Promise.resolve(initResponse));
 
       if (response.ok) {
+        // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
+        // https://github.com/ProjectEvergreen/greenwood/issues/1048
+        if (response.headers.has('Content-Length')) {
+          ctx.set('Content-Length', response.headers.get('Content-Length'));
+        }
+      
         ctx.body = Readable.from(response.body);
         ctx.type = response.headers.get('Content-Type');
         ctx.status = response.status;
