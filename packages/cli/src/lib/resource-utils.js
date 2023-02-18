@@ -93,7 +93,7 @@ async function resolveForRelativeUrl(url, rootUrl) {
   const segments = url.pathname.split('/').filter(segment => segment !== '');
   segments.shift();
 
-  for (let i = 0, l = segments.length - 1; i < l; i += 1) {
+  for (let i = 0, l = segments.length; i < l; i += 1) {
     const nextSegments = segments.slice(i);
     const urlToCheck = new URL(`./${nextSegments.join('/')}`, rootUrl);
 
