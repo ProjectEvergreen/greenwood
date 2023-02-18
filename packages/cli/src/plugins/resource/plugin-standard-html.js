@@ -214,8 +214,9 @@ class StandardHtmlResource extends ResourceInterface {
   async shouldServe(url) {
     const { protocol, pathname } = url;
     const hasMatchingPageRoute = this.compilation.graph.find(node => node.route === pathname);
+    const isSPA = this.compilation.graph.find(node => node.isSPA) && pathname.indexOf('.') < 0;
 
-    return protocol.startsWith('http') && (hasMatchingPageRoute || this.compilation.graph[0].isSPA);
+    return protocol.startsWith('http') && (hasMatchingPageRoute || isSPA);
   }
 
   async serve(url) {

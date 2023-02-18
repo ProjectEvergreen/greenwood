@@ -160,9 +160,14 @@ async function getStaticServer(compilation, composable) {
     try {
       const url = new URL(`http://localhost:8080${ctx.url}`);
       const matchingRoute = compilation.graph.find(page => page.route === url.pathname);
+      const isSPA = compilation.graph.find(page => page.isSPA);
 
-      if ((matchingRoute && !matchingRoute.isSSR) || url.pathname.split('.').pop() === 'html') {
-        const pathname = matchingRoute ? matchingRoute.outputPath : url.pathname;
+      if (isSPA || (matchingRoute && !matchingRoute.isSSR) || url.pathname.split('.').pop() === 'html') {
+        const pathname = isSPA
+          ? 'index.html'
+          : matchingRoute
+            ? matchingRoute.outputPath
+            : url.pathname;
         const body = await fs.readFile(new URL(`./${pathname}`, outputDir), 'utf-8');
 
         ctx.set('Content-Type', 'text/html');
