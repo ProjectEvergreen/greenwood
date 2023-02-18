@@ -14,9 +14,9 @@ function greenwoodResourceLoader (compilation) {
       const normalizedId = id.replace(/\?type=(.*)/, '');
       const { projectDirectory, userWorkspace } = compilation.context;
 
-      if ((id.startsWith('.') || id.startsWith('/')) && !id.startsWith(projectDirectory.pathname)) {
-        const prefix = id.startsWith('/') ? '.' : '';
-        const userWorkspaceUrl = new URL(`${prefix}${normalizedId}`, userWorkspace);
+      if (id.startsWith('.') && !id.startsWith(projectDirectory.pathname)) {
+        const prefix = id.startsWith('..') ? './' : '';
+        const userWorkspaceUrl = new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
 
         if (await checkResourceExists(userWorkspaceUrl)) {
           return normalizePathnameForWindows(userWorkspaceUrl);
