@@ -42,7 +42,7 @@ describe('Serve Greenwood With: ', function() {
     this.context = {
       hostname
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
