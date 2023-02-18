@@ -254,12 +254,16 @@ async function getHybridServer(compilation) {
   app.use(async (ctx) => {
     try {
       const url = new URL(`http://localhost:8080${ctx.url}`);
-      const isApiRoute = url.pathname.startsWith('/api');
       const matchingRoute = compilation.graph.find((node) => node.route === url.pathname) || { data: {} };
       const request = new Request(url.href, {
         method: ctx.request.method,
         headers: ctx.request.header
       });
+      const apiResource = resourcePlugins.find((plugin) => {
+        return plugin.isGreenwoodDefaultPlugin
+          && plugin.name === 'plugin-api-routes';
+      }).provider(compilation);
+      const isApiRoute = await apiResource.shouldServe(url, request);
 
       if (matchingRoute.isSSR && !matchingRoute.data.static) {
         const standardHtmlResource = resourcePlugins.find((plugin) => {
@@ -274,10 +278,6 @@ async function getHybridServer(compilation) {
         ctx.set('Content-Type', 'text/html');
         ctx.status = 200;
       } else if (isApiRoute) {
-        const apiResource = resourcePlugins.find((plugin) => {
-          return plugin.isGreenwoodDefaultPlugin
-            && plugin.name === 'plugin-api-routes';
-        }).provider(compilation);
         const response = await apiResource.serve(url, request);
 
         ctx.status = 200;

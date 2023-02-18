@@ -96,6 +96,41 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
+    // https://github.com/ProjectEvergreen/greenwood/issues/1059
+    describe('Serve command with dev proxy with an /api prefix', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/api/posts?id=7`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = JSON.parse(body);
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('application/json');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(JSON.stringify(response.body)).to.equal('{}');
+        done();
+      });
+    });
+
     describe('Serve command with image (png) specific behavior', function() {
       const ext = 'png';
       let response = {};
