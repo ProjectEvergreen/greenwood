@@ -236,7 +236,7 @@ function serve(label) {
       });
 
       it('should do all the common checks for an HTML page', function(done) {
-        commonIndexSpecs(dom, response.body);
+        commonIndexSpecs(dom, response.body, label);
         done();
       });
     });
