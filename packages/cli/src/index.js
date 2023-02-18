@@ -1,10 +1,6 @@
 #!/usr/bin/env node
 
 /* eslint-disable no-underscore-dangle */
-
-// https://github.com/ProjectEvergreen/greenwood/issues/141
-process.setMaxListeners(0);
-
 import { generateCompilation } from './lifecycles/compile.js';
 import fs from 'fs/promises';
 import program from 'commander';
