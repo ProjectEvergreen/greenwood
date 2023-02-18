@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood develop command for SPA based project.
+ * Run Greenwood serve command for SPA based project.
  *
  * User Result
  * Should start the development server for a SPA with client side routing support.
@@ -19,8 +19,8 @@
  */
 import chai from 'chai';
 import fs from 'fs';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import path from 'path';
-import { getDependencyFiles } from '../../../../../test/utils.js';
 import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
@@ -34,7 +34,7 @@ function removeWhiteSpace(string = '') {
     .replace(/ /g, '');
 }
 
-describe('Develop Greenwood With: ', function() {
+describe('Serve Greenwood With: ', function() {
   const LABEL = 'A Single Page Application (SPA)';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -42,7 +42,7 @@ describe('Develop Greenwood With: ', function() {
   const BODY_REGEX = /<body>(.*)<\/body>/s;
   const expected = removeWhiteSpace(fs.readFileSync(path.join(outputPath, `src${path.sep}index.html`), 'utf-8').match(BODY_REGEX)[0]);
 
-  const port = 1984;
+  const port = 8080;
   let runner;
 
   before(function() {
@@ -55,25 +55,20 @@ describe('Develop Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      const simpleCss = await getDependencyFiles(
-        `${process.cwd()}/node_modules/simpledotcss/simple.css`,
-        `${outputPath}/node_modules/simpledotcss/`
-      );
-
-      await runner.setup(outputPath, [...simpleCss]);
+      await runner.setup(outputPath);
 
       return new Promise(async (resolve) => {
         setTimeout(() => {
           resolve();
         }, 5000);
 
-        await runner.runCommand(cliPath, 'develop');
+        await runner.runCommand(cliPath, 'serve');
       });
     });
 
     runSmokeTest(['serve'], LABEL);
 
-    describe('Develop command specific HTML behaviors for client side routing at root - /', function() {
+    describe('Serve command specific HTML behaviors for client side routing at root - /', function() {
       let response = {};
 
       before(async function() {
@@ -112,7 +107,7 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command specific HTML behaviors for client side routing at 1 level route - /<resource>', function() {
+    describe('Serve command specific HTML behaviors for client side routing at 1 level route - /<resource>', function() {
       let response = {};
 
       before(async function() {
@@ -127,8 +122,7 @@ describe('Develop Greenwood With: ', function() {
               reject();
             }
 
-            response = res;
-            
+            response = res;      
             resolve();
           });
         });
@@ -151,7 +145,7 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command specific HTML behaviors for client side routing at 1 level route - /<resource>/:id', function() {
+    describe('Serve command specific HTML behaviors for client side routing at 1 level route - /<resource>/:id', function() {
       let response = {};
 
       before(async function() {
@@ -189,90 +183,10 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
     });
-
-    // https://github.com/ProjectEvergreen/greenwood/issues/1064
-    describe('Develop command specific workspace resolution behavior that does not think its a client side route', function() {
-      let response = {};
-
-      before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/events/main.css`
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            resolve();
-          });
-        });
-      });
-
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/css');
-        done();
-      });
-
-      it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
-
-        done();
-      });
-
-      it('should return the expected body contents', function(done) {
-        expect(response.body.replace(/\n/g, '').indexOf('* {  color: red;}')).to.equal(0);
-        done();
-      });
-    });
-
-    // https://github.com/ProjectEvergreen/greenwood/issues/803
-    describe('Develop command specific node modules resolution behavior that does not think its a client side route', function() {
-      let response = {};
-
-      before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/node_modules/simpledotcss/simple.css`,
-            headers: {
-              accept: 'ext/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
-            }
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            resolve();
-          });
-        });
-      });
-
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/css');
-        done();
-      });
-
-      it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
-
-        done();
-      });
-
-      it('should return the expected body contents', function(done) {
-        expect(response.body.indexOf('/* Set the global variables for everything. Change these to use your own fonts/colours. */')).to.equal(0);
-        done();
-      });
-    });
   });
 
   after(function() {
     runner.stopCommand();
-    runner.teardown([
-      path.join(outputPath, '.greenwood'),
-      path.join(outputPath, 'node_modules')
-    ]);
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
