@@ -1,6 +1,6 @@
 /*
  * 
- * Manages web standard resource related operations for JavaScript.
+ * Manages web standard resource related operations for JSON.
  * This is a Greenwood default plugin.
  *
  */
