@@ -5,19 +5,25 @@
  *
  */
 import fs from 'fs/promises';
+import { isGenericMediaContainer } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardVideoResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
 
+    // https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Video_codecs
     // https://help.encoding.com/knowledge-base/article/correct-mime-types-for-serving-video-files/
     // TODO add support for .ts
-    this.extensions = ['flv', 'mp4', 'm3u8', '3gp', 'mov', 'avi', 'wmv'];
+    this.extensions = ['3gp', 'avi', 'flv', 'm3u8', 'mp4', 'mov', 'ogg', 'ogv', 'wmv'];
   }
 
-  async shouldServe(url) {
-    return url.protocol === 'file:' && this.extensions.includes(url.pathname.split('.').pop());
+  async shouldServe(url, request) {
+    const extension = url.pathname.split('.').pop();
+    const isVideoFile = request.headers.get('Sec-Fetch-Dest') === 'video';
+    const isGenericVideoResource = isGenericMediaContainer(extension) && isVideoFile;
+
+    return url.protocol === 'file:' && (isGenericVideoResource || !isGenericMediaContainer(extension) && this.extensions.includes(extension));
   }
 
   async serve(url) {
@@ -27,23 +33,27 @@ class StandardVideoResource extends ResourceInterface {
 
     switch (extension) {
 
+      case '3gp':
+        contentType = 'video/3gpp';
+        break;
+      case 'avi':
+        contentType = 'video/x-msvideo';
+        break;  
       case 'flv':
         contentType = 'video/x-flv';
-        break;
-      case 'mp4':
-        contentType = 'video/mp4';
         break;
       case 'm3u8':
         contentType = 'application/x-mpegURL';
         break;
-      case '3gp':
-        contentType = 'video/3gpp';
+      case 'mp4':
+        contentType = 'video/mp4';
         break;
       case 'mov':
         contentType = 'video/quicktime';
         break;
-      case 'avi':
-        contentType = 'video/x-msvideo';
+      case 'ogg':
+      case 'ogv':
+        contentType = `video/${extension}`;
         break;
       case 'wmv':
         contentType = 'video/x-ms-wmv';

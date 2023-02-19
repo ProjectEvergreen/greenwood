@@ -105,8 +105,13 @@ async function resolveForRelativeUrl(url, rootUrl) {
   return reducedUrl;
 }
 
+function isGenericMediaContainer(extension) {
+  return extension === 'ogg' || extension === 'mp4' || extension === '3gp';
+}
+
 export {
   checkResourceExists,
+  isGenericMediaContainer,
   mergeResponse,
   modelResource,
   normalizePathnameForWindows,

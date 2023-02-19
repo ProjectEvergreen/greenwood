@@ -19,7 +19,18 @@
  * }
  *
  * User Workspace
- * Greenwood default (src/)
+ * src/
+ *   api/
+ *     greeting.js
+ *   assets/
+ *     data.json
+ *     favicon.ico
+ *     logo.png
+ *     router.js.map
+ *     song-sample.mp3
+ *     source-sans-pro.woff
+ *     splash-clip.mp4
+ *     webcomponents.svg
  */
 import chai from 'chai';
 import path from 'path';
@@ -271,13 +282,18 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command with video specific (.mp4) behavior', function() {
+    describe('Serve command with generic video container format (.mp4) behavior', function() {
       const ext = 'mp4';
       let response = {};
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          request.get(`${hostname}/assets/splash-clip.mp4`, (err, res, body) => {
+          request.get({
+            url: `${hostname}/assets/splash-clip.mp4`,
+            headers: {
+              'Sec-Fetch-Dest': 'video'
+            }
+          }, (err, res, body) => {
             if (err) {
               reject();
             }
@@ -300,8 +316,52 @@ describe('Serve Greenwood With: ', function() {
         done();
       });
 
+      it('should return the correct content length', function(done) {
+        expect(response.headers['content-length']).to.equal('2498461');
+        done();
+      });
+
       it('should return the correct response body', function(done) {
         expect(response.body).to.contain(ext);
+        done();
+      });
+    });
+
+    describe('Serve command with audio format (.mp3) behavior', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/assets/song-sample.mp3`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('audio/mpeg');
+        done();
+      });
+
+      it('should return the correct content length', function(done) {
+        expect(response.headers['content-length']).to.equal('5425061');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(response.body).to.contain('ID3');
         done();
       });
     });

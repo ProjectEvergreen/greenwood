@@ -20,3 +20,8 @@
 *.mov     binary
 *.avi     binary
 *.wmv     binary
+*.ogg     binary
+*.oga     binary
+*.ogg     binary
+*.mp3     binary
+*.wav     binary
