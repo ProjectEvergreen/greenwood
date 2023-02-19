@@ -12,7 +12,8 @@ class StandardVideoResource extends ResourceInterface {
     super(compilation, options);
 
     // https://help.encoding.com/knowledge-base/article/correct-mime-types-for-serving-video-files/
-    this.extensions = ['flv', 'mp4', 'm3u8', 'ts', '3gp', 'mov', 'avi', 'wmv'];
+    // TODO add support for .ts
+    this.extensions = ['flv', 'mp4', 'm3u8', '3gp', 'mov', 'avi', 'wmv'];
   }
 
   async shouldServe(url) {
@@ -34,9 +35,6 @@ class StandardVideoResource extends ResourceInterface {
         break;
       case 'm3u8':
         contentType = 'application/x-mpegURL';
-        break;
-      case 'ts':
-        contentType = 'video/MP2T';
         break;
       case '3gp':
         contentType = 'video/3gpp';
