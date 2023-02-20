@@ -106,7 +106,7 @@ async function resolveForRelativeUrl(url, rootUrl) {
 }
 
 function isGenericMediaContainer(extension) {
-  return extension === 'ogg' || extension === 'mp4' || extension === '3gp';
+  return ['ogg', 'mp4', '3gp'].includes(extension);
 }
 
 export {
