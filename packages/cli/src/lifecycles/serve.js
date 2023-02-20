@@ -148,6 +148,7 @@ async function getDevServer(compilation) {
 }
 
 async function getStaticServer(compilation, composable) {
+  console.log('GET STATIC SERVER');
   const app = new Koa();
   const { outputDir } = compilation.context;
   const standardResourcePlugins = compilation.config.plugins.filter((plugin) => {
@@ -161,11 +162,13 @@ async function getStaticServer(compilation, composable) {
       const url = new URL(`http://localhost:8080${ctx.url}`);
       const matchingRoute = compilation.graph.find(page => page.route === url.pathname);
       const isSPA = compilation.graph.find(page => page.isSPA);
+      const { isSSR } = matchingRoute || {};
+      const isStatic = matchingRoute && !isSSR || isSSR && compilation.config.prerender || isSSR && matchingRoute.data.static;
 
-      if (isSPA || (matchingRoute && !matchingRoute.isSSR) || url.pathname.split('.').pop() === 'html') {
+      if (isSPA || (matchingRoute && isStatic) || url.pathname.split('.').pop() === 'html') {
         const pathname = isSPA
           ? 'index.html'
-          : matchingRoute
+          : isStatic
             ? matchingRoute.outputPath
             : url.pathname;
         const body = await fs.readFile(new URL(`./${pathname}`, outputDir), 'utf-8');
