@@ -129,18 +129,17 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    let dom;
-    let artistsPageGraphData;
-
-    before(async function() {
-      const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
-      const artistsHtml = await fs.promises.readFile(path.join(outputPath, 'public/artists/index.html'), 'utf-8');
-      
-      artistsPageGraphData = graph.filter(page => page.route === '/artists/')[0];
-      dom = new JSDOM(artistsHtml);
-    });
-
     describe('Build command that tests for static HTML export from SSR route', function() {
+      let dom;
+      let artistsPageGraphData;
+
+      before(async function() {
+        const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
+        const artistsHtml = await fs.promises.readFile(path.join(outputPath, 'public/artists/index.html'), 'utf-8');
+
+        artistsPageGraphData = graph.filter(page => page.route === '/artists/')[0];
+        dom = new JSDOM(artistsHtml);
+      });
 
       it('should have one style tags', function() {
         const styles = dom.window.document.querySelectorAll('head > style');
