@@ -148,7 +148,6 @@ async function getDevServer(compilation) {
 }
 
 async function getStaticServer(compilation, composable) {
-  console.log('GET STATIC SERVER');
   const app = new Koa();
   const { outputDir } = compilation.context;
   const standardResourcePlugins = compilation.config.plugins.filter((plugin) => {
