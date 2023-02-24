@@ -1,15 +1,12 @@
 /* eslint-disable no-underscore-dangle */
 
-// ** THIS DOES NOT WORK ON SAFARI **
-// It will just load pages as if staticRouter was not enabled
-// https://github.com/ProjectEvergreen/greenwood/issues/559
 document.addEventListener('click', async function(e) {
   const currentUrl = window.location;
-  const href = (e.path && e.path[0]
-    ? e.path[0].href // chrome + edge
-    : e.originalTarget && e.originalTarget.href
-      ? e.originalTarget.href // firefox
-      : '') || '';
+  // https://developer.mozilla.org/en-US/docs/Web/API/Event/composedPath
+  const href = e.composedPath && e.composedPath()[0].tagName === 'A'
+    ? e.composedPath()[0].href
+    : '';
+
   // best case "guess" is that if the link originates on the current site when resolved by the browser
   // treat it as a client side route, ex:  /about/, /docs/ and trigger the client side router
   // https://github.com/ProjectEvergreen/greenwood/issues/562
