@@ -30,12 +30,13 @@ import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import request from 'request';
+import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
+describe('Serve Greenwood With: ', function() {
   const LABEL = 'A Server Rendered Application (SSR)';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -44,7 +45,8 @@ describe('Build Greenwood With: ', function() {
 
   before(async function() {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, 'public'),
+      hostname
     };
     runner = new Runner();
   });
@@ -62,6 +64,8 @@ describe('Build Greenwood With: ', function() {
         await runner.runCommand(cliPath, 'serve');
       });
     });
+
+    runSmokeTest(['serve'], LABEL);
 
     let response = {};
     let artistsPageDom;

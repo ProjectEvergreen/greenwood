@@ -9,7 +9,9 @@
  * greenwood build
  *
  * User Config
- * None
+ * {
+ *   prerender: true
+ * }
  *
  * User Workspace
  *  src/
