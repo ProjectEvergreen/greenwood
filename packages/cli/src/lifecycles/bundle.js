@@ -23,7 +23,7 @@ async function cleanUpResources(compilation) {
 async function optimizeStaticPages(compilation, plugins) {
   const { scratchDir, outputDir } = compilation.context;
 
-  return Promise.all(compilation.graph
+  return await Promise.all(compilation.graph
     .filter(page => !page.isSSR || (page.isSSR && page.data.static) || (page.isSSR && compilation.config.prerender))
     .map(async (page) => {
       const { route, outputPath } = page;
