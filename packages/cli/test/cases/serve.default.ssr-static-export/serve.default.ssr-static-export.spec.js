@@ -22,25 +22,27 @@
  *     app.html
  */
 import chai from 'chai';
-import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
+describe('Serve Greenwood With: ', function() {
   const LABEL = 'A Server Rendered Application (SSR) that is statically exported';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
+  const hostname = 'http://127.0.0.1:8080';
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
   before(async function() {
     this.context = { 
-      publicDir: path.join(outputPath, 'public') 
+      publicDir: path.join(outputPath, 'public'),
+      hostname
     };
     runner = new Runner();
   });
@@ -127,18 +129,53 @@ describe('Build Greenwood With: ', function() {
       await runner.runCommand(cliPath, 'build');
     });
 
-    runSmokeTest(['public', 'index'], LABEL);
+    before(async function() {
+      await runner.setup(outputPath, getSetupFiles(outputPath));
 
-    describe('Build command that tests for static HTML export from SSR route', function() {
+      return new Promise(async (resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 10000);
+
+        await runner.runCommand(cliPath, 'serve');
+      });
+    });
+
+    runSmokeTest(['public', 'index', 'serve'], LABEL);
+
+    describe('Serve command that tests for static HTML export from SSR route', function() {
       let dom;
-      let artistsPageGraphData;
+      let response;
   
       before(async function() {
-        const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
-        const artistsHtml = await fs.promises.readFile(path.join(outputPath, 'public/artists/index.html'), 'utf-8');
-        
-        artistsPageGraphData = graph.filter(page => page.route === '/artists/')[0];
-        dom = new JSDOM(artistsHtml);
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/artists/`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+  
+            response = res;
+            response.body = body;
+            dom = new JSDOM(body);
+  
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('text/html');
+        done();
+      });
+
+      it('should return a response body', function(done) {
+        expect(response.body).to.not.be.undefined;
+        done();
       });
 
       it('should have one style tags', function() {
@@ -191,26 +228,11 @@ describe('Build Greenwood With: ', function() {
         expect(metaDescription[0].getAttribute('content')).to.equal('/artists/ (this was generated server side!!!)');
       });
 
-      it('should be a part of graph.json', function() {
-        expect(artistsPageGraphData).to.not.be.undefined;
-      });
-
-      it('should have the expected menu and index values in the graph', function() {
-        expect(artistsPageGraphData.data.menu).to.equal('navigation');
-        expect(artistsPageGraphData.data.index).to.equal(7);
-      });
-
-      it('should have expected custom data values in its graph data', function() {
-        expect(artistsPageGraphData.data.author).to.equal('Project Evergreen');
-        expect(artistsPageGraphData.data.date).to.equal('01-01-2021');
-      });
-
       it('should append the expected <script> tag for a frontmatter import <x-counter> component', function() {
         const componentName = 'counter';
         const counterScript = Array.from(dom.window.document.querySelectorAll('head > script[src]'))
           .filter((tag) => tag.getAttribute('src').indexOf(`/${componentName}.`) === 0);
 
-        expect(artistsPageGraphData.imports[0].src).to.equal(`/components/${componentName}.js`);
         expect(counterScript.length).to.equal(1);
       });
     });
@@ -218,6 +240,7 @@ describe('Build Greenwood With: ', function() {
 
   after(function() {
     runner.teardown(getOutputTeardownFiles(outputPath));
+    runner.stopCommand();
   });
 
 });
