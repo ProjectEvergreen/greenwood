@@ -44,7 +44,7 @@ import path from 'path';
 import { getDependencyFiles, getSetupFiles } from '../../../../../test/utils.js';
 import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { Runner } from 'gallinago';
+import { Runner } from '../../../../../runner.js';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;

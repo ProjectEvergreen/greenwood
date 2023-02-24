@@ -26,7 +26,7 @@
 import chai from 'chai';
 import path from 'path';
 import request from 'request';
-import { Runner } from 'gallinago';
+import { Runner } from '../../../../../runner.js';
 import { fileURLToPath, URL } from 'url';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 

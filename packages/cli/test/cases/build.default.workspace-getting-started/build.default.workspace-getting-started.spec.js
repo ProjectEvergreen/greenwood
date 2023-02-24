@@ -36,7 +36,7 @@ import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { getSetupFiles, getOutputTeardownFiles, tagsMatch } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
+import { Runner } from '../../../../../runner.js';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;

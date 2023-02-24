@@ -17,7 +17,7 @@ import fs from 'fs';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
+import { Runner } from '../../../../../runner.js';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;

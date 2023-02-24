@@ -38,7 +38,7 @@ import glob from 'glob-promise';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { Runner } from 'gallinago';
+import { Runner } from '../../../../../runner.js';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;

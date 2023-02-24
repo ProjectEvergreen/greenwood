@@ -24,7 +24,7 @@
 
 import chai from 'chai';
 import path from 'path';
-import { Runner } from 'gallinago';
+import { Runner } from '../../../../../runner.js';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;

@@ -30,7 +30,7 @@ import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import request from 'request';
-import { Runner } from 'gallinago';
+import { Runner } from '../../../../../runner.js';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { fileURLToPath, URL } from 'url';
 
