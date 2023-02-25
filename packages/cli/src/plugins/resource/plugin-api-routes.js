@@ -10,6 +10,7 @@ class ApiRoutesResource extends ResourceInterface {
     super(compilation, options);
   }
 
+  // only used for development
   async shouldServe(url) {
     const { protocol, pathname } = url;
 
