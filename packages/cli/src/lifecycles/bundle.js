@@ -1,6 +1,6 @@
 /* eslint-disable max-depth */
 import fs from 'fs/promises';
-import { getRollupConfig } from '../config/rollup.config.js';
+import { getRollupConfigForApis, getRollupConfigForScriptResources } from '../config/rollup.config.js';
 import { hashString } from '../lib/hashing-utils.js';
 import { checkResourceExists, mergeResponse } from '../lib/resource-utils.js';
 import path from 'path';
@@ -141,9 +141,19 @@ async function bundleStyleResources(compilation, resourcePlugins) {
   }
 }
 
+async function bundleApis(compilation) {
+  // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
+  const [rollupConfig] = await getRollupConfigForApis(compilation);
+
+  if (rollupConfig.input.length !== 0) {
+    const bundle = await rollup(rollupConfig);
+    await bundle.write(rollupConfig.output);
+  }
+}
+
 async function bundleScriptResources(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const [rollupConfig] = await getRollupConfig(compilation);
+  const [rollupConfig] = await getRollupConfigForScriptResources(compilation);
 
   if (rollupConfig.input.length !== 0) {
     const bundle = await rollup(rollupConfig);
@@ -173,6 +183,7 @@ const bundleCompilation = async (compilation) => {
       console.info('bundling static assets...');
 
       await Promise.all([
+        await bundleApis(compilation),
         await bundleScriptResources(compilation),
         await bundleStyleResources(compilation, optimizeResourcePlugins)
       ]);

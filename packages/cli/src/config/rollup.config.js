@@ -108,7 +108,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
   };
 }
 
-const getRollupConfig = async (compilation) => {
+const getRollupConfigForScriptResources = async (compilation) => {
   const { outputDir } = compilation.context;
   const input = [...compilation.resources.values()]
     .filter(resource => resource.type === 'script')
@@ -165,4 +165,22 @@ const getRollupConfig = async (compilation) => {
   }];
 };
 
-export { getRollupConfig };
+const getRollupConfigForApis = async (compilation) => {
+  const { outputDir } = compilation.context;
+  const input = [...compilation.manifest.apis.values()]
+    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, compilation.context.userWorkspace)));
+
+  return [{
+    input,
+    output: {
+      dir: `${normalizePathnameForWindows(outputDir)}/api`,
+      entryFileNames: '[name].js',
+      chunkFileNames: '[name].[hash].js'
+    }
+  }];
+};
+
+export {
+  getRollupConfigForApis,
+  getRollupConfigForScriptResources
+};
