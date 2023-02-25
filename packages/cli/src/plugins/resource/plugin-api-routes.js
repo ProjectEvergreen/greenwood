@@ -3,7 +3,6 @@
  * Manages routing to API routes.
  *
  */
-import { checkResourceExists } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class ApiRoutesResource extends ResourceInterface {
@@ -13,15 +12,13 @@ class ApiRoutesResource extends ResourceInterface {
 
   async shouldServe(url) {
     const { protocol, pathname } = url;
-    const apiPathUrl = new URL(`.${pathname.replace('/api', '')}.js`, this.compilation.context.apisDir);
 
-    if (protocol.startsWith('http') && pathname.startsWith('/api') && await checkResourceExists(apiPathUrl)) {
-      return true;
-    }
+    return protocol.startsWith('http') && this.compilation.manifest.apis.has(pathname);
   }
 
   async serve(url, request) {
-    let href = new URL(`./${url.pathname.replace('/api/', '')}.js`, `file://${this.compilation.context.apisDir.pathname}`).href;
+    const api = this.compilation.manifest.apis.get(url.pathname);
+    let href = new URL(`.${api.path}`, `file://${this.compilation.context.userWorkspace.pathname}`).href;
 
     // https://github.com/nodejs/modules/issues/307#issuecomment-1165387383
     if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
