@@ -1,5 +1,9 @@
 import fs from 'fs/promises';
-import { checkResourceExists, normalizePathnameForWindows } from '../lib/resource-utils.js';
+import { checkResourceExists, normalizePathnameForWindows, resolveForRelativeUrl } from '../lib/resource-utils.js';
+import json from '@rollup/plugin-json';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
 
 function greenwoodResourceLoader (compilation) {
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
@@ -176,7 +180,13 @@ const getRollupConfigForApis = async (compilation) => {
       dir: `${normalizePathnameForWindows(outputDir)}/api`,
       entryFileNames: '[name].js',
       chunkFileNames: '[name].[hash].js'
-    }
+    },
+    plugins: [
+      json(),
+      nodeResolve(),
+      commonjs(),
+      importMetaAssets()
+    ]
   }];
 };
 
