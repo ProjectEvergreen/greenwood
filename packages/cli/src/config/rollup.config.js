@@ -166,9 +166,9 @@ const getRollupConfigForScriptResources = async (compilation) => {
 };
 
 const getRollupConfigForApis = async (compilation) => {
-  const { outputDir } = compilation.context;
+  const { outputDir, userWorkspace } = compilation.context;
   const input = [...compilation.manifest.apis.values()]
-    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, compilation.context.userWorkspace)));
+    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)));
 
   return [{
     input,
@@ -180,7 +180,24 @@ const getRollupConfigForApis = async (compilation) => {
   }];
 };
 
+const getRollupConfigForSsr = async (compilation) => {
+  const { outputDir, pagesDir } = compilation.context;
+  const input = compilation.graph
+    .filter(page => page.isSSR && !page.data.static)
+    .map(page => normalizePathnameForWindows(new URL(`./${page.filename}`, pagesDir)));
+
+  return [{
+    input,
+    output: {
+      dir: normalizePathnameForWindows(outputDir),
+      entryFileNames: '[name].js',
+      chunkFileNames: '[name].[hash].js'
+    }
+  }];
+};
+
 export {
   getRollupConfigForApis,
-  getRollupConfigForScriptResources
+  getRollupConfigForScriptResources,
+  getRollupConfigForSsr
 };
