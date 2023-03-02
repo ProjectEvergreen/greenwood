@@ -883,10 +883,7 @@ describe('Develop Greenwood With: ', function() {
       before(async function() {
         return new Promise((resolve, reject) => {
           request.get({
-            url: `${hostname}:${port}/assets/splash-clip.mp4`,
-            headers: {
-              'Sec-Fetch-Dest': 'video'
-            }
+            url: `${hostname}:${port}/assets/splash-clip.mp4`
           }, (err, res, body) => {
             if (err) {
               reject();

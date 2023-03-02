@@ -5,7 +5,6 @@
  *
  */
 import fs from 'fs/promises';
-import { isGenericMediaContainer } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardAudioResource extends ResourceInterface {
@@ -14,16 +13,13 @@ class StandardAudioResource extends ResourceInterface {
 
     // https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Audio_codecs
     // https://www.thoughtco.com/audio-file-mime-types-3469485
-    // TODO add support for .ts
-    this.extensions = ['3gp', 'mid', 'mp3', 'mp4', 'm3u', 'oga', 'ogg', 'ra', 'wav'];
+    this.extensions = ['mid', 'mp3', 'm3u', 'oga', 'ra', 'wav'];
   }
 
-  async shouldServe(url, request) {
+  async shouldServe(url) {
     const extension = url.pathname.split('.').pop();
-    const isAudioFile = request.headers.get('Sec-Fetch-Dest') === 'audio';
-    const isGenericAudioResource = isGenericMediaContainer(extension) && isAudioFile;
 
-    return url.protocol === 'file:' && (isGenericAudioResource || (!isGenericMediaContainer(extension) && this.extensions.includes(extension)));
+    return url.protocol === 'file:' && this.extensions.includes(extension);
   }
 
   async serve(url) {

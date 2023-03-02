@@ -5,7 +5,6 @@
  *
  */
 import fs from 'fs/promises';
-import { isGenericMediaContainer } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 class StandardVideoResource extends ResourceInterface {
@@ -18,12 +17,10 @@ class StandardVideoResource extends ResourceInterface {
     this.extensions = ['3gp', 'avi', 'flv', 'm3u8', 'mp4', 'mov', 'ogg', 'ogv', 'wmv'];
   }
 
-  async shouldServe(url, request) {
+  async shouldServe(url) {
     const extension = url.pathname.split('.').pop();
-    const isVideoFile = request.headers.get('Sec-Fetch-Dest') === 'video';
-    const isGenericVideoResource = isGenericMediaContainer(extension) && isVideoFile;
 
-    return url.protocol === 'file:' && (isGenericVideoResource || !isGenericMediaContainer(extension) && this.extensions.includes(extension));
+    return url.protocol === 'file:' && this.extensions.includes(extension);
   }
 
   async serve(url) {
@@ -52,6 +49,8 @@ class StandardVideoResource extends ResourceInterface {
         contentType = 'video/quicktime';
         break;
       case 'ogg':
+        contentType = `application/${extension}`;
+        break;
       case 'ogv':
         contentType = `video/${extension}`;
         break;
