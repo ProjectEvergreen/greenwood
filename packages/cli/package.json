@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/cli",
-  "version": "0.27.4",
+  "version": "0.27.5",
   "description": "Greenwood CLI.",
   "type": "module",
   "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli",
