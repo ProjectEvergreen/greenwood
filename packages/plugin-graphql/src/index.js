@@ -65,10 +65,10 @@ class GraphQLResource extends ResourceInterface {
     return new Promise((resolve, reject) => {
       try {
         body = body.replace('<head>', `
+        <head>
           <script data-state="apollo" data-gwd-opt="none">
             window.__APOLLO_STATE__ = true;
           </script>
-          <head>
         `);
     
         resolve(body);

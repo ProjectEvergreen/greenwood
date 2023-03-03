@@ -152,7 +152,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', function() {
-        const scriptTags = dom.window.document.querySelectorAll('script');
+        const scriptTags = dom.window.document.querySelectorAll('head script');
         const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.getAttribute('data-state') === 'apollo';
         });
