@@ -13,7 +13,6 @@ class StandardVideoResource extends ResourceInterface {
 
     // https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Video_codecs
     // https://help.encoding.com/knowledge-base/article/correct-mime-types-for-serving-video-files/
-    // TODO add support for .ts
     this.extensions = ['3gp', 'avi', 'flv', 'm3u8', 'mp4', 'mov', 'ogg', 'ogv', 'wmv'];
   }
 
