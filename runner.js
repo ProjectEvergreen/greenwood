@@ -54,6 +54,14 @@ class Runner {
         detached: true
       });
 
+      this.childProcess.on('close', code => {
+        if (err !== '' && code && code !== 0) {
+          reject(err);
+          return;
+        }
+        resolve();
+      });
+
       this.childProcess.on('exit', code => {
         if (err !== '' && code && code !== 0) {
           reject(err);
