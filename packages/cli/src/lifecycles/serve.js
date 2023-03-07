@@ -269,36 +269,40 @@ async function getStaticServer(compilation, composable) {
 }
 
 async function getHybridServer(compilation) {
+  const { outputDir } = compilation.context;
   const app = await getStaticServer(compilation, true);
-  const resourcePlugins = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'resource';
+  const graph = JSON.parse(await fs.readFile(new URL('./graph.json', outputDir)));
+  // https://stackoverflow.com/a/56150320/417806
+  // TODO put into a util?
+  const manifest = JSON.parse(await fs.readFile(new URL('./manifest.json', outputDir)), function reviver(key, value) {
+    if (typeof value === 'object' && value !== null) {
+      if (value.dataType === 'Map') {
+        return new Map(value.value);
+      }
+    }
+    return value;
   });
 
   app.use(async (ctx) => {
     try {
       const url = new URL(`http://localhost:8080${ctx.url}`);
-      const matchingRoute = compilation.graph.find((node) => node.route === url.pathname) || { data: {} };
-      const isApiRoute = compilation.manifest.apis.has(url.pathname);
+      const matchingRoute = graph.find((node) => node.route === url.pathname) || { data: {} };
+      const isApiRoute = manifest.apis.has(url.pathname);
       const request = new Request(url.href, {
         method: ctx.request.method,
         headers: ctx.request.header
       });
 
       if (matchingRoute.isSSR && !matchingRoute.data.static) {
-        const standardHtmlResource = resourcePlugins.find((plugin) => {
-          return plugin.isGreenwoodDefaultPlugin
-            && plugin.name.indexOf('plugin-standard-html') === 0;
-        }).provider(compilation);
-        let response = await standardHtmlResource.serve(url, request);
-
-        response = await standardHtmlResource.optimize(url, response);
+        const { handler } = await import(`${outputDir}${matchingRoute.filename}`);
+        const response = await handler(request);
 
         ctx.body = Readable.from(response.body);
         ctx.set('Content-Type', 'text/html');
         ctx.status = 200;
       } else if (isApiRoute) {
-        const apiRoute = compilation.manifest.apis.get(url.pathname);
-        const { handler } = await import(`${compilation.context.outputDir}${apiRoute.path.replace('/', '')}`);
+        const apiRoute = manifest.apis.get(url.pathname);
+        const { handler } = await import(`${outputDir}${apiRoute.path.replace('/', '')}`);
         const response = await handler(request);
 
         ctx.status = 200;

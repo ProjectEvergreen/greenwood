@@ -179,7 +179,7 @@ const getRollupConfigForApis = async (compilation) => {
     output: {
       dir: `${normalizePathnameForWindows(outputDir)}/api`,
       entryFileNames: '[name].js',
-      chunkFileNames: '[name].[hash].js'
+      chunkFileNames: '[name].[hash].js' // TODO should routes and APIs have chunks?
     },
     plugins: [
       json(),
@@ -190,19 +190,22 @@ const getRollupConfigForApis = async (compilation) => {
   }];
 };
 
-const getRollupConfigForSsr = async (compilation) => {
-  const { outputDir, pagesDir } = compilation.context;
-  const input = compilation.graph
-    .filter(page => page.isSSR && !page.data.static)
-    .map(page => normalizePathnameForWindows(new URL(`./${page.filename}`, pagesDir)));
+const getRollupConfigForSsr = async (compilation, input) => {
+  const { outputDir } = compilation.context;
 
   return [{
     input,
     output: {
       dir: normalizePathnameForWindows(outputDir),
-      entryFileNames: '[name].js',
-      chunkFileNames: '[name].[hash].js'
-    }
+      entryFileNames: '_[name].js',
+      chunkFileNames: '[name].[hash].js' // TODO should routes and APIs have chunks?
+    },
+    plugins: [
+      json(),
+      nodeResolve(),
+      commonjs(),
+      importMetaAssets()
+    ]
   }];
 };
 

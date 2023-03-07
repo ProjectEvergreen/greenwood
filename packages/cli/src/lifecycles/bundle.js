@@ -2,7 +2,7 @@
 import fs from 'fs/promises';
 import { getRollupConfigForApis, getRollupConfigForScriptResources, getRollupConfigForSsr } from '../config/rollup.config.js';
 import { hashString } from '../lib/hashing-utils.js';
-import { checkResourceExists, mergeResponse } from '../lib/resource-utils.js';
+import { checkResourceExists, mergeResponse, normalizePathnameForWindows } from '../lib/resource-utils.js';
 import path from 'path';
 import { rollup } from 'rollup';
 
@@ -153,7 +153,56 @@ async function bundleApiRoutes(compilation) {
 
 async function bundleSsrPages(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const [rollupConfig] = await getRollupConfigForSsr(compilation);
+  const { outputDir, pagesDir } = compilation.context;
+  const input = [];
+
+  for (const page of compilation.graph) {
+    if (page.isSSR && !page.data.static) {
+      const { filename, path: pagePath } = page;
+      const scratchUrl = new URL(`./${filename}`, outputDir);
+
+      // TODO better way to write out inline code like this?
+      await fs.writeFile(scratchUrl, `
+        import { Worker } from 'worker_threads';
+
+        export async function handler(request) {
+          let body = 'Hello from the ${page.id} page!';
+          const routeModuleLocationUrl = new URL('./_${filename}', '${outputDir}');
+          const routeWorkerUrl = '${compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().workerUrl}';
+
+          await new Promise((resolve, reject) => {
+            const worker = new Worker(new URL(routeWorkerUrl));
+
+            worker.on('message', (result) => {
+              if (result.body) {
+                body = result.body;
+              }
+              resolve();
+            });
+
+            worker.on('error', reject);
+            worker.on('exit', (code) => {
+              if (code !== 0) {
+                reject(new Error(\`Worker stopped with exit code \${code}\`));
+              }
+            });
+
+            worker.postMessage({
+              moduleUrl: routeModuleLocationUrl.href,
+              compilation: \`${JSON.stringify({})}\`,
+              route: '${pagePath}'
+            });
+          });
+
+          return new Response(body);
+        }
+      `);
+      
+      input.push(normalizePathnameForWindows(new URL(`./${filename}`, pagesDir)));
+    }
+  }
+
+  const [rollupConfig] = await getRollupConfigForSsr(compilation, input);
 
   if (rollupConfig.input.length !== 0) {
     const bundle = await rollup(rollupConfig);

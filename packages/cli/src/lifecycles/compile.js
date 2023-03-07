@@ -37,6 +37,7 @@ const generateCompilation = () => {
 
       if (checkResourceExists(apisDir)) {
         // https://stackoverflow.com/a/56150320/417806
+        // TODO put into a util?
         await fs.writeFile(new URL('./manifest.json', scratchDir), JSON.stringify(compilation.manifest, (key, value) => {
           if (value instanceof Map) {
             return {
