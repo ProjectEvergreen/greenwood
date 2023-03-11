@@ -1,35 +1,25 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import { checkResourceExists } from '../lib/resource-utils.js';
 
 async function rreaddir (dir, allFiles = []) {
-  const files = (await fs.promises.readdir(dir)).map(f => new URL(`./${f}`, dir));
+  const files = (await fs.readdir(dir)).map(f => new URL(`./${f}`, dir));
 
   allFiles.push(...files);
 
   await Promise.all(files.map(async f => (
-    await fs.promises.stat(f)).isDirectory() && await rreaddir(new URL(`file://${f.pathname}/`), allFiles
+    await fs.stat(f)).isDirectory() && await rreaddir(new URL(`file://${f.pathname}/`), allFiles
   )));
 
   return allFiles;
 }
 
-// https://stackoverflow.com/a/30405105/417806
 async function copyFile(source, target, projectDirectory) {
   try {
     console.info(`copying file... ${source.pathname.replace(projectDirectory.pathname, '')}`);
-    const rd = fs.createReadStream(source);
-    const wr = fs.createWriteStream(target);
 
-    return await new Promise((resolve, reject) => {
-      rd.on('error', reject);
-      wr.on('error', reject);
-      wr.on('finish', resolve);
-      rd.pipe(wr);
-    });
+    await fs.copyFile(source, target);
   } catch (error) {
     console.error('ERROR', error);
-    rd.destroy();
-    wr.end();
   }
 }
 
@@ -40,17 +30,17 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
 
     if (files.length > 0) {
       if (!await checkResourceExists(toUrl)) {
-        await fs.promises.mkdir(toUrl, {
+        await fs.mkdir(toUrl, {
           recursive: true
         });
       }
 
       for (const fileUrl of files) {
         const targetUrl = new URL(`file://${fileUrl.pathname.replace(fromUrl.pathname, toUrl.pathname)}`);
-        const isDirectory = (await fs.promises.stat(fileUrl)).isDirectory();
+        const isDirectory = (await fs.stat(fileUrl)).isDirectory();
 
         if (isDirectory && !await checkResourceExists(targetUrl)) {
-          await fs.promises.mkdir(targetUrl, {
+          await fs.mkdir(targetUrl, {
             recursive: true
           });
         } else if (!isDirectory) {
