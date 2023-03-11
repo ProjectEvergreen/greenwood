@@ -65,14 +65,22 @@ async function getDevServer(compilation) {
 
       for (const plugin of resourcePlugins) {
         if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
-          response = await plugin.serve(url, request);
-          break;
+          const current = await plugin.serve(url, request);
+          const merged = mergeResponse(response.clone(), current.clone());
+
+          response = merged;
         }
       }
 
       ctx.body = response.body ? Readable.from(response.body) : '';
       ctx.type = response.headers.get('Content-Type');
       ctx.status = response.status;
+
+      // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
+      // https://github.com/ProjectEvergreen/greenwood/issues/1048
+      if (response.headers.has('Content-Length')) {
+        ctx.set('Content-Length', response.headers.get('Content-Length'));
+      }
     } catch (e) {
       ctx.status = 500;
       console.error(e);
@@ -107,6 +115,11 @@ async function getDevServer(compilation) {
 
       ctx.body = response.body ? Readable.from(response.body) : '';
       ctx.set('Content-Type', response.headers.get('Content-Type'));
+      // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
+      // https://github.com/ProjectEvergreen/greenwood/issues/1048
+      if (response.headers.has('Content-Length')) {
+        ctx.set('Content-Length', response.headers.get('Content-Length'));
+      }
     } catch (e) {
       ctx.status = 500;
       console.error(e);
@@ -218,7 +231,9 @@ async function getStaticServer(compilation, composable) {
         return plugin.provider(compilation);
       });
 
-      const request = new Request(url.href);
+      const request = new Request(url.href, {
+        headers: new Headers(ctx.request.header)
+      });
       const initResponse = new Response(ctx.body, {
         status: ctx.response.status,
         headers: new Headers(ctx.response.header)
@@ -233,6 +248,12 @@ async function getStaticServer(compilation, composable) {
         ctx.body = Readable.from(response.body);
         ctx.type = response.headers.get('Content-Type');
         ctx.status = response.status;
+
+        // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
+        // https://github.com/ProjectEvergreen/greenwood/issues/1048
+        if (response.headers.has('Content-Length')) {
+          ctx.set('Content-Length', response.headers.get('Content-Length'));
+        }
       }
     } catch (e) {
       ctx.status = 500;
