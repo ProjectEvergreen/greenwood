@@ -2,7 +2,8 @@
   "name": "@greenwood/plugin-graphql",
   "version": "0.28.0-alpha.3",
   "description": "A plugin for using GraphQL for querying your content.",
-  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql",
+  "repository": "https://github.com/ProjectEvergreen/greenwood",
+  "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "keywords": [

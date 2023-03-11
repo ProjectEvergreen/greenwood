@@ -2,7 +2,8 @@
   "name": "@greenwood/plugin-import-css",
   "version": "0.28.0-alpha.3",
   "description": "A Greenwood plugin to allow you to use ESM (import) syntax to load your CSS.",
-  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-css",
+  "repository": "https://github.com/ProjectEvergreen/greenwood",
+  "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-css",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "keywords": [
