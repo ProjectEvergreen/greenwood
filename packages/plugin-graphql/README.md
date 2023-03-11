@@ -175,7 +175,7 @@ query($name: String!) {
 And then you can use it in your code as such:
 ```js
 import client from '@greenwood/plugin-graphql/core/client';
-import GalleryQuery from '/data/queries/gallery.gql';
+import GalleryQuery from '../relative/path/to/data/queries/gallery.gql';
 
 client.query({
   query: GalleryQuery,
