@@ -53,7 +53,7 @@ With the above in place, let's set everything up!
       build-and-deploy:
         steps:
         - uses: actions/checkout@v2
-        - uses: actions/setup-node@v2
+        - uses: actions/setup-node@v3
           with:
             node-version: 14.x
 
