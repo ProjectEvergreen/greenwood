@@ -60,25 +60,6 @@ async function rreaddir (dir, allFiles = []) {
   return allFiles;
 }
 
-// https://stackoverflow.com/a/30405105/417806
-async function copyFile(source, target) {
-  const rd = fs.createReadStream(source);
-  const wr = fs.createWriteStream(target);
-
-  try {
-    return await new Promise((resolve, reject) => {
-      rd.on('error', reject);
-      wr.on('error', reject);
-      wr.on('finish', resolve);
-      rd.pipe(wr);
-    });
-  } catch (error) {
-    console.error('ERROR', error);
-    rd.destroy();
-    wr.end();
-  }
-}
-
 describe('Develop Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
@@ -372,10 +353,10 @@ describe('Develop Greenwood With: ', function() {
         } else if (!isDirectory) {
           return asset;
         }
-      }).map((asset) => {
+      }).map(async (asset) => {
         const target = asset.replace(process.cwd(), fileURLToPath(new URL('.', import.meta.url)));
 
-        return copyFile(asset, target);
+        return await fs.promises.copyFile(asset, target);
       }));
 
       const regeneratorRuntimeLibs = await getDependencyFiles(
