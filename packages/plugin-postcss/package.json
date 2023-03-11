@@ -2,7 +2,8 @@
   "name": "@greenwood/plugin-postcss",
   "version": "0.28.0-alpha.3",
   "description": "A Greenwood plugin for loading PostCSS configuration and applying it to your CSS.",
-  "repository": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss",
+  "repository": "https://github.com/ProjectEvergreen/greenwood",
+  "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "keywords": [
