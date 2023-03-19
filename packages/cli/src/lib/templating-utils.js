@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import htmlparser from 'node-html-parser';
 import { checkResourceExists } from '../lib/resource-utils.js';
+import { getPackageJson } from './node-modules-utils.js';
 
 // async function getCustomPageTemplatesFromPlugins(contextPlugins, templateName) {
 //   const customTemplateLocations = [];
@@ -23,6 +24,7 @@ import { checkResourceExists } from '../lib/resource-utils.js';
 
 // TODO path to default Greenwood ../../templates directory should be added to `compilation.context`
 async function getPageTemplate(filePath, { userTemplatesDir, pagesDir, projectDirectory }, template, contextPlugins = []) {
+  console.log({ pagesDir, contextPlugins });
   const customPluginDefaultPageTemplates = []; // TODO await getCustomPageTemplatesFromPlugins(contextPlugins, 'page');
   const customPluginPageTemplates = []; // TODO await getCustomPageTemplatesFromPlugins(contextPlugins, template);
   const extension = filePath.split('.').pop();
@@ -197,6 +199,7 @@ async function getUserScripts (contents, context) {
         ${litPolyfill}
     `);
   }
+
   return contents;
 }
 

@@ -178,7 +178,7 @@ async function bundleSsrPages(compilation) {
       // TODO better way to write out inline code like this?
       await fs.writeFile(scratchUrl, `
         import { Worker } from 'worker_threads';
-        import { getAppTemplate, getPageTemplate } from '@greenwood/cli/src/lib/templating-utils.js';
+        import { getAppTemplate, getPageTemplate, getUserScripts } from '@greenwood/cli/src/lib/templating-utils.js';
 
         export async function handler(request, compilation) {
           const routeModuleLocationUrl = new URL('./_${filename}', '${outputDir}');
@@ -239,6 +239,7 @@ async function bundleSsrPages(compilation) {
 
           html = template ? template : await getPageTemplate('', JSON.parse(\`${ JSON.stringify({ userTemplatesDir: new URL('./_templates/', outputDir).href, pagesDir: pagesDir.href, projectDirectory: projectDirectory.href })}\`), templateType, []);
           html = await getAppTemplate(html, '${new URL('./_templates/', outputDir).href}', imports, [], false, title);
+          html = await getUserScripts(html, compilation.context);
           html = html.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, body);
           html = await (await htmlOptimizer.optimize(new URL(request.url), new Response(html))).text();
 
