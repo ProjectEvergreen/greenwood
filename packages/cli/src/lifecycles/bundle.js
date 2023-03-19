@@ -238,7 +238,7 @@ async function bundleSsrPages(compilation) {
           });
 
           html = template ? template : await getPageTemplate('', JSON.parse(\`${ JSON.stringify({ userTemplatesDir: new URL('./_templates/', outputDir).href, pagesDir: pagesDir.href, projectDirectory: projectDirectory.href })}\`), templateType, []);
-          html = await getAppTemplate(html, '${new URL('./_templates/', outputDir).href}', imports, false, title);
+          html = await getAppTemplate(html, '${new URL('./_templates/', outputDir).href}', imports, [], false, title);
           html = html.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, body);
           html = await (await htmlOptimizer.optimize(new URL(request.url), new Response(html))).text();
 
