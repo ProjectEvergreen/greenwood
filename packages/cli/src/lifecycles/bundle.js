@@ -1,4 +1,4 @@
-/* eslint-disable max-depth */
+/* eslint-disable max-depth, max-len */
 import fs from 'fs/promises';
 import { getRollupConfigForApis, getRollupConfigForScriptResources, getRollupConfigForSsr } from '../config/rollup.config.js';
 import { hashString } from '../lib/hashing-utils.js';
@@ -153,8 +153,22 @@ async function bundleApiRoutes(compilation) {
 
 async function bundleSsrPages(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const { outputDir, pagesDir } = compilation.context;
+  const { outputDir, pagesDir, userTemplatesDir, projectDirectory } = compilation.context;
+  // const contextPlugins = compilation.config.plugins.filter((plugin) => {
+  //   return plugin.type === 'context';
+  // }).map((plugin) => {
+  //   return plugin.provider(compilation);
+  // });
+
   const input = [];
+  // TODO ideally be able to serialize entire graph (or only an explicit subset?)
+  // right now page.imports is breaking JSON.stringify
+  const intermediateGraph = compilation.graph.map(page => {
+    const p = { ...page };
+    delete p.imports;
+
+    return p;
+  });
 
   for (const page of compilation.graph) {
     if (page.isSSR && !page.data.static) {
@@ -164,11 +178,18 @@ async function bundleSsrPages(compilation) {
       // TODO better way to write out inline code like this?
       await fs.writeFile(scratchUrl, `
         import { Worker } from 'worker_threads';
+        import { getAppTemplate, getPageTemplate } from '@greenwood/cli/src/lib/templating-utils.js';
 
         export async function handler(request) {
-          let body = 'Hello from the ${page.id} page!';
           const routeModuleLocationUrl = new URL('./_${filename}', '${outputDir}');
           const routeWorkerUrl = '${compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().workerUrl}';
+          let body = 'Hello from the ${page.id} page!';
+          let html = '';
+          let frontmatter;
+          let template;
+          let templateType = 'page';
+          let title = '';
+          let imports = [];
 
           await new Promise((resolve, reject) => {
             const worker = new Worker(new URL(routeWorkerUrl));
@@ -177,6 +198,27 @@ async function bundleSsrPages(compilation) {
               if (result.body) {
                 body = result.body;
               }
+
+              if (result.template) {
+                template = result.template;
+              }
+
+              if (result.frontmatter) {
+                frontmatter = result.frontmatter;
+
+                if (frontmatter.title) {
+                  title = frontmatter.title;
+                }
+
+                if (frontmatter.template) {
+                  templateType = frontmatter.template;
+                }
+
+                if (frontmatter.imports) {
+                  imports = imports.concat(frontmatter.imports);
+                }
+              }
+
               resolve();
             });
 
@@ -189,16 +231,23 @@ async function bundleSsrPages(compilation) {
 
             worker.postMessage({
               moduleUrl: routeModuleLocationUrl.href,
-              compilation: \`${JSON.stringify({})}\`,
+              compilation: \`${JSON.stringify({ graph: intermediateGraph })}\`,
               route: '${pagePath}'
             });
           });
 
-          return new Response(body);
+          html = template ? template : await getPageTemplate('', JSON.parse(\`${ JSON.stringify({ userTemplatesDir: new URL('./_templates/', outputDir).href, pagesDir: pagesDir.href, projectDirectory: projectDirectory.href })}\`), templateType, []);
+          html = await getAppTemplate(html, '${new URL('./_templates/', outputDir).href}', imports, false, title);
+          html = html.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, body);
+
+          console.log('FINAL', { html });
+          return new Response(html);
         }
       `);
       
+      // TODO need to bundle page and wrapper?
       input.push(normalizePathnameForWindows(new URL(`./${filename}`, pagesDir)));
+      // input.push(normalizePathnameForWindows(scratchUrl));
     }
   }
 
