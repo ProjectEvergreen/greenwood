@@ -153,7 +153,7 @@ async function bundleApiRoutes(compilation) {
 
 async function bundleSsrPages(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const { outputDir, pagesDir, userTemplatesDir, projectDirectory } = compilation.context;
+  const { outputDir, pagesDir, projectDirectory } = compilation.context;
   // const contextPlugins = compilation.config.plugins.filter((plugin) => {
   //   return plugin.type === 'context';
   // }).map((plugin) => {
@@ -180,9 +180,10 @@ async function bundleSsrPages(compilation) {
         import { Worker } from 'worker_threads';
         import { getAppTemplate, getPageTemplate } from '@greenwood/cli/src/lib/templating-utils.js';
 
-        export async function handler(request) {
+        export async function handler(request, compilation) {
           const routeModuleLocationUrl = new URL('./_${filename}', '${outputDir}');
           const routeWorkerUrl = '${compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().workerUrl}';
+          const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
           let body = 'Hello from the ${page.id} page!';
           let html = '';
           let frontmatter;
@@ -239,8 +240,8 @@ async function bundleSsrPages(compilation) {
           html = template ? template : await getPageTemplate('', JSON.parse(\`${ JSON.stringify({ userTemplatesDir: new URL('./_templates/', outputDir).href, pagesDir: pagesDir.href, projectDirectory: projectDirectory.href })}\`), templateType, []);
           html = await getAppTemplate(html, '${new URL('./_templates/', outputDir).href}', imports, false, title);
           html = html.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, body);
+          html = await (await htmlOptimizer.optimize(new URL(request.url), new Response(html))).text();
 
-          console.log('FINAL', { html });
           return new Response(html);
         }
       `);
