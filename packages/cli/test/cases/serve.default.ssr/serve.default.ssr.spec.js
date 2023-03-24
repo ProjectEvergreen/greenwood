@@ -36,7 +36,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe.only('Serve Greenwood With: ', function() {
+describe('Serve Greenwood With: ', function() {
   const LABEL = 'A Server Rendered Application (SSR)';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
