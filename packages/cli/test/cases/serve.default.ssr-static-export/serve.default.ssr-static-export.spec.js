@@ -238,8 +238,8 @@ describe('Serve Greenwood With: ', function() {
   });
 
   after(function() {
-    runner.stopCommand();
     runner.teardown(getOutputTeardownFiles(outputPath));
+    runner.stopCommand();
   });
 
 });
