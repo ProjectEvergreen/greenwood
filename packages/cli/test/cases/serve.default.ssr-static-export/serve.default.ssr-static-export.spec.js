@@ -126,7 +126,6 @@ describe('Serve Greenwood With: ', function() {
         ...litReactiveElementDecorators,
         ...litReactiveElementPackageJson
       ]);
-      await runner.runCommand(cliPath, 'build');
     });
 
     before(async function() {
@@ -239,8 +238,8 @@ describe('Serve Greenwood With: ', function() {
   });
 
   after(function() {
-    runner.teardown(getOutputTeardownFiles(outputPath));
     runner.stopCommand();
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 
 });
