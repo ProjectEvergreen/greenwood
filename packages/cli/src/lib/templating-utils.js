@@ -3,81 +3,74 @@ import htmlparser from 'node-html-parser';
 import { checkResourceExists } from '../lib/resource-utils.js';
 import { getPackageJson } from './node-modules-utils.js';
 
-// async function getCustomPageTemplatesFromPlugins(contextPlugins, templateName) {
-//   const customTemplateLocations = [];
-//   const templateDir = contextPlugins
-//     .map(plugin => plugin.templates)
-//     .flat();
+async function getCustomPageTemplatesFromPlugins(contextPlugins, templateName) {
+  const customTemplateLocations = [];
+  const templateDir = contextPlugins
+    .map(plugin => plugin.templates)
+    .flat();
 
-//   for (const templateDirUrl of templateDir) {
-//     if (templateName) {
-//       const templateUrl = new URL(`./${templateName}.html`, templateDirUrl);
+  for (const templateDirUrl of templateDir) {
+    if (templateName) {
+      const templateUrl = new URL(`./${templateName}.html`, templateDirUrl);
 
-//       if (await checkResourceExists(templateUrl)) {
-//         customTemplateLocations.push(templateUrl);
-//       }
-//     }
-//   }
+      if (await checkResourceExists(templateUrl)) {
+        customTemplateLocations.push(templateUrl);
+      }
+    }
+  }
 
-//   return customTemplateLocations;
-// }
+  return customTemplateLocations;
+}
 
-// TODO path to default Greenwood ../../templates directory should be added to `compilation.context`
-async function getPageTemplate(filePath, { userTemplatesDir, pagesDir, projectDirectory }, template, contextPlugins = []) {
-  console.log({ pagesDir, contextPlugins });
-  const customPluginDefaultPageTemplates = []; // TODO await getCustomPageTemplatesFromPlugins(contextPlugins, 'page');
-  const customPluginPageTemplates = []; // TODO await getCustomPageTemplatesFromPlugins(contextPlugins, template);
+async function getPageTemplate(filePath, context, template, contextPlugins = []) {
+  const isServing = process.env.__GWD_COMMAND__ === 'serve'; // eslint-disable-line no-underscore-dangle
+  const { templatesDir, userTemplatesDir, pagesDir, projectDirectory } = context;
+  const customPluginDefaultPageTemplates = isServing ? [] : await getCustomPageTemplatesFromPlugins(contextPlugins, 'page');
+  const customPluginPageTemplates = isServing ? [] : await getCustomPageTemplatesFromPlugins(contextPlugins, template);
   const extension = filePath.split('.').pop();
   const is404Page = filePath.startsWith('404') && extension === 'html';
   const hasCustomTemplate = await checkResourceExists(new URL(`./${template}.html`, userTemplatesDir));
   const hasPageTemplate = await checkResourceExists(new URL('./page.html', userTemplatesDir));
-  const hasCustom404Page = false; // await checkResourceExists(new URL('./404.html', pagesDir));
+  const hasCustom404Page = await checkResourceExists(new URL('./404.html', pagesDir));
   const isHtmlPage = extension === 'html' && await checkResourceExists(new URL(`./${filePath}`, projectDirectory));
   let contents;
 
   if (template && (customPluginPageTemplates.length > 0 || hasCustomTemplate)) {
-    console.log('1');
     // use a custom template, usually from markdown frontmatter
     contents = customPluginPageTemplates.length > 0
       ? await fs.readFile(new URL(`./${template}.html`, customPluginPageTemplates[0]), 'utf-8')
       : await fs.readFile(new URL(`./${template}.html`, userTemplatesDir), 'utf-8');
   } else if (isHtmlPage) {
-    console.log('2');
     // if the page is already HTML, use that as the template, NOT accounting for 404 pages
     contents = await fs.readFile(new URL(`./${filePath}`, projectDirectory), 'utf-8');
   } else if (customPluginDefaultPageTemplates.length > 0 || (!is404Page && hasPageTemplate)) {
-    console.log('3');
     // else look for default page template from the user
     // and 404 pages should be their own "top level" template
     contents = customPluginDefaultPageTemplates.length > 0
       ? await fs.readFile(new URL('./page.html', customPluginDefaultPageTemplates[0]), 'utf-8')
       : await fs.readFile(new URL('./page.html', userTemplatesDir), 'utf-8');
   } else if (is404Page && !hasCustom404Page) {
-    console.log('4');
-    contents = await fs.readFile(new URL('../templates/404.html', import.meta.url), 'utf-8');
+    contents = await fs.readFile(new URL('./404.html', templatesDir), 'utf-8');
   } else {
     // fallback to using Greenwood's stock page template
-    console.log('5');
-
-    // TODO import.meta.url is different, e.g. ../../
-    contents = await fs.readFile(new URL('../templates/page.html', import.meta.url), 'utf-8');
+    contents = await fs.readFile(new URL('./page.html', templatesDir), 'utf-8');
   }
 
   return contents;
 }
 
-// TODO don't need pageRoot checks anymore?
 /* eslint-disable-next-line complexity */
-async function getAppTemplate(pageTemplateContents, templatesDir, customImports = [], contextPlugins, enableHud, frontmatterTitle) {
-  console.log({ pageTemplateContents });
-  const userAppTemplateUrl = new URL('./app.html', templatesDir);
-  const customAppTemplatesFromPlugins = []; // TODO await getCustomPageTemplatesFromPlugins(contextPlugins, 'app');
+async function getAppTemplate(pageTemplateContents, context, customImports = [], contextPlugins, enableHud, frontmatterTitle) {
+  const isServing = process.env.__GWD_COMMAND__ === 'serve'; // eslint-disable-line no-underscore-dangle
+  const { templatesDir, userTemplatesDir } = context;
+  const userAppTemplateUrl = new URL('./app.html', userTemplatesDir);
+  const customAppTemplatesFromPlugins = isServing ? [] : await getCustomPageTemplatesFromPlugins(contextPlugins, 'app');
   const hasCustomUserAppTemplate = await checkResourceExists(userAppTemplateUrl);
   let appTemplateContents = customAppTemplatesFromPlugins.length > 0
     ? await fs.readFile(new URL('./app.html', customAppTemplatesFromPlugins[0]))
     : hasCustomUserAppTemplate
       ? await fs.readFile(userAppTemplateUrl, 'utf-8')
-      : await fs.readFile(new URL('../templates/app.html', import.meta.url), 'utf-8');
+      : await fs.readFile(new URL('./app.html', templatesDir), 'utf-8');
   let mergedTemplateContents = '';
 
   const pageRoot = pageTemplateContents && htmlparser.parse(pageTemplateContents, {
@@ -140,24 +133,24 @@ async function getAppTemplate(pageTemplateContents, templatesDir, customImports 
 
     const mergedMeta = [
       ...appRoot.querySelectorAll('head meta'),
-      ...[pageRoot && pageRoot.querySelectorAll('head meta') || []]
+      ...[...(pageRoot && pageRoot.querySelectorAll('head meta')) || []]
     ].join('\n');
 
     const mergedLinks = [
       ...appRoot.querySelectorAll('head link'),
-      ...[pageRoot && pageRoot.querySelectorAll('head link') || []]
+      ...[...(pageRoot && pageRoot.querySelectorAll('head link')) || []]
     ].join('\n');
 
     const mergedStyles = [
       ...appRoot.querySelectorAll('head style'),
-      ...[pageRoot && pageRoot.querySelectorAll('head style') || []],
+      ...[...(pageRoot && pageRoot.querySelectorAll('head style')) || []],
       ...customImports.filter(resource => resource.split('.').pop() === 'css')
         .map(resource => `<link rel="stylesheet" href="${resource}"></link>`)
     ].join('\n');
 
     const mergedScripts = [
       ...appRoot.querySelectorAll('head script'),
-      ...[pageRoot && pageRoot.querySelectorAll('head script') || []],
+      ...[...(pageRoot && pageRoot.querySelectorAll('head script')) || []],
       ...customImports.filter(resource => resource.split('.').pop() === 'js')
         .map(resource => `<script src="${resource}" type="module"></script>`)
     ].join('\n');

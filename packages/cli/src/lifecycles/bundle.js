@@ -172,6 +172,7 @@ async function bundleApiRoutes(compilation) {
 async function bundleSsrPages(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
   const { outputDir, pagesDir } = compilation.context;
+  // TODO context plugins for SSR?
   // const contextPlugins = compilation.config.plugins.filter((plugin) => {
   //   return plugin.type === 'context';
   // }).map((plugin) => {
@@ -256,7 +257,7 @@ async function bundleSsrPages(compilation) {
           });
 
           html = template ? template : await getPageTemplate('', compilation.context, templateType, []);
-          html = await getAppTemplate(html, '${new URL('./_templates/', outputDir).href}', imports, [], false, title);
+          html = await getAppTemplate(html, compilation.context, imports, [], false, title);
           html = await getUserScripts(html, compilation.context);
           html = html.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, body);
           html = await (await htmlOptimizer.optimize(new URL(request.url), new Response(html))).text();
@@ -264,10 +265,8 @@ async function bundleSsrPages(compilation) {
           return new Response(html);
         }
       `);
-      
-      // TODO need to bundle page and wrapper?
+
       input.push(normalizePathnameForWindows(new URL(`./${filename}`, pagesDir)));
-      // input.push(normalizePathnameForWindows(scratchUrl));
     }
   }
 
