@@ -171,7 +171,7 @@ async function bundleApiRoutes(compilation) {
 
 async function bundleSsrPages(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const { outputDir, pagesDir, projectDirectory } = compilation.context;
+  const { outputDir, pagesDir } = compilation.context;
   // const contextPlugins = compilation.config.plugins.filter((plugin) => {
   //   return plugin.type === 'context';
   // }).map((plugin) => {
@@ -255,7 +255,7 @@ async function bundleSsrPages(compilation) {
             });
           });
 
-          html = template ? template : await getPageTemplate('', JSON.parse(\`${ JSON.stringify({ userTemplatesDir: new URL('./_templates/', outputDir).href, pagesDir: pagesDir.href, projectDirectory: projectDirectory.href })}\`), templateType, []);
+          html = template ? template : await getPageTemplate('', compilation.context, templateType, []);
           html = await getAppTemplate(html, '${new URL('./_templates/', outputDir).href}', imports, [], false, title);
           html = await getUserScripts(html, compilation.context);
           html = html.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, body);
