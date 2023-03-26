@@ -32,7 +32,7 @@ import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils
 import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import { fileURLToPath } from 'url';
 
 const expect = chai.expect;
 

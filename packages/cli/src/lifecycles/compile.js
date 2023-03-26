@@ -34,6 +34,11 @@ const generateCompilation = () => {
 
       if (process.env.__GWD_COMMAND__ === 'serve') { // eslint-disable-line no-underscore-dangle
         console.info('Loading graph from build output...');
+
+        if (!await checkResourceExists(new URL('./graph.json', outputDir))) {
+          reject(new Error('No build output detected.  Make sure you have run greenwood build'));
+        }
+
         compilation.graph = JSON.parse(await fs.readFile(new URL('./graph.json', outputDir), 'utf-8'));
 
         // hydrate URLs
