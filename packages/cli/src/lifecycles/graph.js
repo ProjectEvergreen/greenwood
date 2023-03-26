@@ -249,6 +249,7 @@ const generateGraph = async (compilation) => {
       };
 
       console.debug('building from local sources...');
+
       // test for SPA
       if (await checkResourceExists(new URL('./index.html', userWorkspace))) {
         graph = [{
@@ -315,7 +316,7 @@ const generateGraph = async (compilation) => {
 
       compilation.graph = graph;
 
-      if (await checkResourceExists(new URL(apisDir))) {
+      if (await checkResourceExists(apisDir)) {
         const apis = await walkDirectoryForApis(apisDir);
 
         compilation.manifest = { apis };

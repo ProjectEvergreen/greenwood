@@ -269,19 +269,9 @@ async function getStaticServer(compilation, composable) {
 }
 
 async function getHybridServer(compilation) {
-  const { outputDir } = compilation.context;
+  const { graph, manifest, context } = compilation;
+  const { outputDir } = context;
   const app = await getStaticServer(compilation, true);
-  const graph = JSON.parse(await fs.readFile(new URL('./graph.json', outputDir)));
-  // https://stackoverflow.com/a/56150320/417806
-  // TODO put into a util?
-  const manifest = JSON.parse(await fs.readFile(new URL('./manifest.json', outputDir)), function reviver(key, value) {
-    if (typeof value === 'object' && value !== null) {
-      if (value.dataType === 'Map') {
-        return new Map(value.value);
-      }
-    }
-    return value;
-  });
 
   app.use(async (ctx) => {
     try {

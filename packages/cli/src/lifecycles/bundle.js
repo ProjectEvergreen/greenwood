@@ -6,6 +6,24 @@ import { checkResourceExists, mergeResponse, normalizePathnameForWindows } from 
 import path from 'path';
 import { rollup } from 'rollup';
 
+async function emitResources(compilation) {
+  const { outputDir } = compilation.context;
+  const { resources } = compilation;
+
+  // https://stackoverflow.com/a/56150320/417806
+  // TODO put into a util?
+  await fs.writeFile(new URL('./resources.json', outputDir), JSON.stringify(resources, (key, value) => {
+    if (value instanceof Map) {
+      return {
+        dataType: 'Map',
+        value: [...value]
+      };
+    } else {
+      return value;
+    }
+  }));
+}
+
 async function cleanUpResources(compilation) {
   const { outputDir } = compilation.context;
 
@@ -303,6 +321,7 @@ const bundleCompilation = async (compilation) => {
 
       await optimizeStaticPages(compilation, optimizeResourcePlugins);
       await cleanUpResources(compilation);
+      await emitResources(compilation);
 
       resolve();
     } catch (err) {

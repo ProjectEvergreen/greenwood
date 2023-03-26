@@ -105,6 +105,8 @@ describe('Serve Greenwood With: ', function() {
 
         await fs.writeFile(pathname.replace('.js', '.mjs'), contents);
       }
+
+      await runner.runCommand(cliPath, 'build');
       
       return new Promise(async (resolve) => {
         setTimeout(async () => {

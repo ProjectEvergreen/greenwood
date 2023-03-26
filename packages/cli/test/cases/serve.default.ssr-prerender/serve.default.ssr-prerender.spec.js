@@ -52,6 +52,7 @@ describe('Serve Greenwood With: ', function() {
 
     before(async function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
+      await runner.runCommand(cliPath, 'build');
 
       return new Promise(async (resolve) => {
         setTimeout(() => {

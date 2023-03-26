@@ -4,7 +4,6 @@
 import { generateCompilation } from './lifecycles/compile.js';
 import fs from 'fs/promises';
 import program from 'commander';
-import { URL } from 'url';
 
 const greenwoodPackageJson = JSON.parse(await fs.readFile(new URL('../package.json', import.meta.url), 'utf-8'));
 let cmdOption = {};
@@ -56,11 +55,11 @@ if (program.parse.length === 0) {
 }
 
 const run = async() => {
+  process.env.__GWD_COMMAND__ = command;
   const compilation = await generateCompilation();
 
   try {
     console.info(`Running Greenwood with the ${command} command.`);
-    process.env.__GWD_COMMAND__ = command;
 
     switch (command) {
 
@@ -73,9 +72,6 @@ const run = async() => {
 
         break;
       case 'serve':
-        process.env.__GWD_COMMAND__ = 'build';
-
-        await (await import('./commands/build.js')).runProductionBuild(compilation);
         await (await import('./commands/serve.js')).runProdServer(compilation);
 
         break;

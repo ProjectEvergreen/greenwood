@@ -26,7 +26,6 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-// TODO why does this test keep stalling out and not closing the command?
 describe('Serve Greenwood With: ', function() {
   const LABEL = 'API Routes';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
@@ -45,6 +44,7 @@ describe('Serve Greenwood With: ', function() {
 
     before(async function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
+      await runner.runCommand(cliPath, 'build');
       
       return new Promise(async (resolve) => {
         setTimeout(() => {
