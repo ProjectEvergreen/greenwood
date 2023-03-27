@@ -63,7 +63,7 @@ $ npm run serve
 $ yarn serve
 ```
 
-> _Note: You must have run `greenwood build` before running `greenwood serve`.  Plugins are not available with `greenwood serve`, your application is built ahead of time atomically._
+> _Note: You must have run `greenwood build` before running `greenwood serve`.  Except for Context plugins, plugins are generally not available with `greenwood serve` as your application is built ahead of time._
 
 ### Sections
 

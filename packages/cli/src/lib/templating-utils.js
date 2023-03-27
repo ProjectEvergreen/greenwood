@@ -23,10 +23,9 @@ async function getCustomPageTemplatesFromPlugins(contextPlugins, templateName) {
 }
 
 async function getPageTemplate(filePath, context, template, contextPlugins = []) {
-  const isServing = process.env.__GWD_COMMAND__ === 'serve'; // eslint-disable-line no-underscore-dangle
   const { templatesDir, userTemplatesDir, pagesDir, projectDirectory } = context;
-  const customPluginDefaultPageTemplates = isServing ? [] : await getCustomPageTemplatesFromPlugins(contextPlugins, 'page');
-  const customPluginPageTemplates = isServing ? [] : await getCustomPageTemplatesFromPlugins(contextPlugins, template);
+  const customPluginDefaultPageTemplates = await getCustomPageTemplatesFromPlugins(contextPlugins, 'page');
+  const customPluginPageTemplates = await getCustomPageTemplatesFromPlugins(contextPlugins, template);
   const extension = filePath.split('.').pop();
   const is404Page = filePath.startsWith('404') && extension === 'html';
   const hasCustomTemplate = await checkResourceExists(new URL(`./${template}.html`, userTemplatesDir));
@@ -61,10 +60,9 @@ async function getPageTemplate(filePath, context, template, contextPlugins = [])
 
 /* eslint-disable-next-line complexity */
 async function getAppTemplate(pageTemplateContents, context, customImports = [], contextPlugins, enableHud, frontmatterTitle) {
-  const isServing = process.env.__GWD_COMMAND__ === 'serve'; // eslint-disable-line no-underscore-dangle
   const { templatesDir, userTemplatesDir } = context;
   const userAppTemplateUrl = new URL('./app.html', userTemplatesDir);
-  const customAppTemplatesFromPlugins = isServing ? [] : await getCustomPageTemplatesFromPlugins(contextPlugins, 'app');
+  const customAppTemplatesFromPlugins = await getCustomPageTemplatesFromPlugins(contextPlugins, 'app');
   const hasCustomUserAppTemplate = await checkResourceExists(userAppTemplateUrl);
   let appTemplateContents = customAppTemplatesFromPlugins.length > 0
     ? await fs.readFile(new URL('./app.html', customAppTemplatesFromPlugins[0]))
