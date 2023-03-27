@@ -1,9 +1,25 @@
 import fs from 'fs/promises';
 import { checkResourceExists, normalizePathnameForWindows, resolveForRelativeUrl } from '../lib/resource-utils.js';
-import json from '@rollup/plugin-json';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
+
+function greenwoodJsonLoader() {
+  return {
+    name: 'greenwood-json-loader',
+    async load(id) {
+      const extension = id.split('.').pop();
+
+      if (extension === 'json') {
+        const url = new URL(`file://${id}`);
+        const json = JSON.parse(await fs.readFile(url, 'utf-8'));
+        const contents = `export default ${JSON.stringify(json)}`;
+
+        return contents;
+      }
+    }
+  };
+}
 
 function greenwoodResourceLoader (compilation) {
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
@@ -182,7 +198,7 @@ const getRollupConfigForApis = async (compilation) => {
       chunkFileNames: '[name].[hash].js' // TODO should routes and APIs have chunks?
     },
     plugins: [
-      json(),
+      greenwoodJsonLoader(),
       nodeResolve(),
       commonjs(),
       importMetaAssets()
@@ -201,7 +217,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
       chunkFileNames: '[name].[hash].js' // TODO should routes and APIs have chunks?
     },
     plugins: [
-      json(),
+      greenwoodJsonLoader(),
       nodeResolve(),
       commonjs(),
       importMetaAssets()
