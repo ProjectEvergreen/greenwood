@@ -4,6 +4,8 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
 
+// specifically to handle escodegen using require for package.json
+// https://github.com/estools/escodegen/issues/455
 function greenwoodJsonLoader() {
   return {
     name: 'greenwood-json-loader',
