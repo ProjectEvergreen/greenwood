@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood with greenwoodPluginImportJsx plugin with prerendering of JSX on the server side using wc-compiler.
+ * Run Greenwood with greenwoodPluginImportJsx plugin with bundling of JSX for the client side using wc-compiler.
  * 
  * User Result
- * Should generate a static Greenwood build with JSX properly prerendered.
+ * Should generate a static Greenwood build with JSX properly bundled.
  *
  * User Command
  * greenwood build
@@ -39,7 +39,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('(Experimental) Build Greenwood With: ', function() {
-  const LABEL = 'Import JSX Plugin with static pre-rendering';
+  const LABEL = 'Import JSX Plugin for client side bundling';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -59,7 +59,7 @@ describe('(Experimental) Build Greenwood With: ', function() {
 
     runSmokeTest(['public'], LABEL);
 
-    describe('importing JSX using ESM (import)', function() {
+    describe('bundling JSX using ESM (import)', function() {
       let dom;
       let scripts;
 
@@ -69,14 +69,13 @@ describe('(Experimental) Build Greenwood With: ', function() {
       });
 
       it('should contain one bundled output file in the output directory', function() {
-        expect(scripts.length).to.be.equal(0);
+        expect(scripts.length).to.be.equal(1);
       });
 
-      it('should have the expected content from importing values from package.json in index.html', function() {
-        const headings = dom.window.document.querySelectorAll('app-footer footer h4');
+      it('should have the expected <script> tag in the <head> for the <app-footer> component', function() {
+        const scripts = dom.window.document.querySelectorAll('head > script');
 
-        expect(headings.length).to.equal(1);
-        expect(headings[0].textContent.trim()).to.equal('My Blog');
+        expect(scripts.length).to.equal(1);
       });
     });
   });
