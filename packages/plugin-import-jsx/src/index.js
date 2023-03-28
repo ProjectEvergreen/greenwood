@@ -21,11 +21,9 @@ class ImportJsxResource extends ResourceInterface {
   }
 
   async serve(url) {
-    console.log('SERVE!!!!');
     const tree = parseJsx(url);
     const result = escodegen.generate(tree);
 
-    console.log({ result });
     return new Response(result, {
       headers: new Headers({
         'Content-Type': this.contentType
