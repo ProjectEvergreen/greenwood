@@ -21,13 +21,13 @@ yarn add @greenwood/plugin-import-jsx --dev
 Add this plugin to your _greenwood.config.js_.
 
 ```javascript
-import { greenwoodPluginImportJson } from '@greenwood/plugin-import-jsx';
+import { greenwoodPluginImportJsx } from '@greenwood/plugin-import-jsx';
 
 export default {
   ...
 
   plugins: [
-    greenwoodPluginImportJson()
+    greenwoodPluginImportJsx()
   ]
 }
 ```
