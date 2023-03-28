@@ -11679,10 +11679,10 @@ w3c-xmlserializer@^2.0.0:
   dependencies:
     xml-name-validator "^3.0.0"
 
-wc-compiler@~0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.6.1.tgz#acae127206c4fb028dccd530efa948c91efa7c20"
-  integrity sha512-riK9RNwus8U1O9VFjZ3Zph8nFGj6ivzWGQbWHZxkHkKbhS1/W/mwIw4e+20V9Uy8CsLy3u0j2HLDOxzAro5pJg==
+wc-compiler@~0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.7.0.tgz#0ceac8af462502ff69a80eb3861f75eaa39c37f1"
+  integrity sha512-jWORep0UIvnZi8+4ek2ZfX1TJik3B5QW/38MZ6UZN/st3TORt13vk50Arr2Rc3zlpam5AGE3Oxi7no8WmEBBXQ==
   dependencies:
     acorn "^8.7.0"
     acorn-jsx "^5.3.2"
