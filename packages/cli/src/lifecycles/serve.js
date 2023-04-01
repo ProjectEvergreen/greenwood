@@ -69,6 +69,7 @@ async function getDevServer(compilation) {
           const merged = mergeResponse(response.clone(), current.clone());
 
           response = merged;
+          break;
         }
       }
 
