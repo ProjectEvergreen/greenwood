@@ -18,6 +18,7 @@ The available plugins built and maintained by Greenwood team and contributors ha
 | [Import CommonJs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-commonjs) | Enables usage of `import` syntax for loading CommonJS modules from _node_modules_. |
 | [Import CSS](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-css) | Enables usage of `import` syntax for loading CSS files. |
 | [Import JSON](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-json) | Enables usage of `import` syntax for loading JSON files. |
+| [Import JSX](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-jsx) | Enables usage of `import` syntax for loading JSX rendering Web Components compatible with [**WCC**](https://github.com/ProjectEvergreen/wcc). |
 | [Polyfills](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-polyfills) | Although most modern browsers now support the APIs that make up Web Component, for older browsers use this plugin to Let Greenwood automatically take care of progressively loading polyfills for you. |
 | [PostCSS](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss) | Allows usage of [**PostCSS**](https://postcss.org/) plugins and configuration in your project. |
 | [Renderer Lit](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-lit) | A server-side rendering plugin for Lit based Greenwood projects. |
