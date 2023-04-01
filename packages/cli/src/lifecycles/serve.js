@@ -285,7 +285,7 @@ async function getHybridServer(compilation) {
       });
 
       if (matchingRoute.isSSR && !matchingRoute.data.static) {
-        const { handler } = await import(`${outputDir}${matchingRoute.filename}`);
+        const { handler } = await import(new URL(`./${matchingRoute.filename}`, outputDir));
         // TODO passing compilation this way too hacky?
         // https://github.com/ProjectEvergreen/greenwood/issues/1008
         const response = await handler(request, compilation);
@@ -295,7 +295,7 @@ async function getHybridServer(compilation) {
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
-        const { handler } = await import(`${outputDir}${apiRoute.path.replace('/', '')}`);
+        const { handler } = await import(new URL(`.${apiRoute.path}`, outputDir));
         const response = await handler(request);
 
         ctx.status = 200;
