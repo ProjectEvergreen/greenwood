@@ -1,9 +1,10 @@
 import fs from 'fs/promises';
-import { ResourceInterface } from '../../../src/lib/resource-interface.js';
 
-class FooResource extends ResourceInterface {
+// intentionally omitting `extends ResourceInterface` since it should still work the same
+class FooResource {
   constructor(compilation, options) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
     
     this.extensions = ['foo'];
     this.contentType = 'text/javascript';

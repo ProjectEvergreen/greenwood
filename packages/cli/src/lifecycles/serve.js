@@ -165,9 +165,7 @@ async function getStaticServer(compilation, composable) {
   const app = new Koa();
   const { outputDir } = compilation.context;
   const standardResourcePlugins = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'resource'
-      && plugin.isGreenwoodDefaultPlugin
-      && plugin.name !== 'plugin-standard-html';
+    return plugin.type === 'resource' && plugin.isGreenwoodDefaultPlugin;
   });
 
   app.use(async (ctx, next) => {
@@ -228,9 +226,11 @@ async function getStaticServer(compilation, composable) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`.${ctx.url}`, outputDir.href);
-      const resourcePlugins = standardResourcePlugins.map((plugin) => {
-        return plugin.provider(compilation);
-      });
+      const resourcePlugins = standardResourcePlugins
+        .filter((plugin) => plugin.isStandardStaticResource)
+        .map((plugin) => {
+          return plugin.provider(compilation);
+        });
 
       const request = new Request(url.href, {
         headers: new Headers(ctx.request.header)
@@ -285,7 +285,7 @@ async function getHybridServer(compilation) {
       });
 
       if (matchingRoute.isSSR && !matchingRoute.data.static) {
-        const { handler } = await import(`${outputDir}${matchingRoute.filename}`);
+        const { handler } = await import(new URL(`./${matchingRoute.filename}`, outputDir));
         // TODO passing compilation this way too hacky?
         // https://github.com/ProjectEvergreen/greenwood/issues/1008
         const response = await handler(request, compilation);
@@ -295,7 +295,7 @@ async function getHybridServer(compilation) {
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
-        const { handler } = await import(`${outputDir}${apiRoute.path.replace('/', '')}`);
+        const { handler } = await import(new URL(`.${apiRoute.path}`, outputDir));
         const response = await handler(request);
 
         ctx.status = 200;
