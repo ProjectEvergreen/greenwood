@@ -234,8 +234,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should have the expected <h1> text in the <body>', function() {
-        // TODO fix extra entry component wrapping in WCC to restore original selector body > h1
-        const heading = usersPageDom.window.document.querySelectorAll('body h1');
+        const heading = usersPageDom.window.document.querySelectorAll('body > h1');
         const userLength = parseInt(heading[0].querySelector('span').textContent, 10);
 
         expect(heading.length).to.be.equal(1);
