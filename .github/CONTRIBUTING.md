@@ -255,15 +255,25 @@ Note: If you have issues running tests due to timeouts, you can increase the set
 
 ## Release Management
 
-Lerna is used to manage the publishing of packages within the workspace under a single unified version.  Assuming you are logged into **npm** locally and have 2FA access to publish, the command to run is
+Lerna is used to manage the publishing of packages within the workspace under a single unified version.  Assuming you are logged into **npm** locally and have 2FA access to publish, the following workflows should be used
+
+After running these commands, Lerna should then prompt you through the steps to pick the version and all packages that will get updated.
+
+### Alpha Release
+
+Greenwood typically works on new minor versions in a dedicated branch and release line called "alpha".  This leverages NPM's concept of dist tags.  While on a release branch, run the following to publish a new _alpha_ release.
+
 ```sh
 # from the root of the repo
-$ yarn lerna publish
-
-# if Lerna is not displaying all packages as needing publishing, cancel and use
-$ yarn lerna publish --force-publish
+$ yarn lerna publish --force-publish --dist-tag alpha
 ```
 
-Lerna should then prompt you through the steps to pick the version and all packages that will get updated.
+> Typically you will want to select the _Custom Preminor_ option from the list, which Lerna should appropriately yield the expected version.
 
-> _Sometimes when doing pre-minor releases, it will be required to manually bump the `version` in www/package.json_
+### Standard Release
+
+For a normal release (e.g. "latest") the following command can be run from the mainline branch of the repo.
+```sh
+# from the root of the repo
+$ yarn lerna publish --force-publish
+```
