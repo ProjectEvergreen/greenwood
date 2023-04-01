@@ -45,7 +45,7 @@
     "remark-rehype": "^7.0.0",
     "rollup": "^2.58.0",
     "unified": "^9.2.0",
-    "wc-compiler": "~0.6.1"
+    "wc-compiler": "~0.7.0"
   },
   "devDependencies": {
     "@babel/runtime": "^7.10.4",
