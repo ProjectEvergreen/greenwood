@@ -112,7 +112,7 @@ describe('Serve Greenwood With: ', function() {
       return new Promise(async (resolve) => {
         setTimeout(async () => {
           // template out artists.js to use .mjs too
-          const pathname = normalizePathnameForWindows(new URL('./public/artists.js', import.meta.url).pathname);
+          const pathname = normalizePathnameForWindows(new URL('./public/artists.js', import.meta.url));
           let ssrPageContents = await fs.readFile(pathname, 'utf-8');
 
           for (const f of workaroundFiles) {
