@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-import { checkResourceExists, normalizePathnameForWindows, resolveForRelativeUrl } from '../lib/resource-utils.js';
+import { checkResourceExists, normalizePathnameForWindows } from '../lib/resource-utils.js';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
