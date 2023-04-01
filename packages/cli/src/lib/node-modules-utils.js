@@ -1,7 +1,7 @@
 // TODO convert this to use / return URLs
 // https://github.com/ProjectEvergreen/greenwood/issues/953
 import { createRequire } from 'module'; // https://stackoverflow.com/a/62499498/417806
-import { checkResourceExists } from '../lib/resource-utils.js';
+import { checkResourceExists } from './resource-utils.js';
 import fs from 'fs/promises';
 
 // defer to NodeJS to find where on disk a package is located using import.meta.resolve

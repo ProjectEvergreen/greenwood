@@ -1,5 +1,27 @@
 import fs from 'fs/promises';
 import { checkResourceExists, normalizePathnameForWindows } from '../lib/resource-utils.js';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
+
+// specifically to handle escodegen using require for package.json
+// https://github.com/estools/escodegen/issues/455
+function greenwoodJsonLoader() {
+  return {
+    name: 'greenwood-json-loader',
+    async load(id) {
+      const extension = id.split('.').pop();
+
+      if (extension === 'json') {
+        const url = new URL(`file://${id}`);
+        const json = JSON.parse(await fs.readFile(url, 'utf-8'));
+        const contents = `export default ${JSON.stringify(json)}`;
+
+        return contents;
+      }
+    }
+  };
+}
 
 function greenwoodResourceLoader (compilation) {
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
@@ -108,7 +130,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
   };
 }
 
-const getRollupConfig = async (compilation) => {
+const getRollupConfigForScriptResources = async (compilation) => {
   const { outputDir } = compilation.context;
   const input = [...compilation.resources.values()]
     .filter(resource => resource.type === 'script')
@@ -165,4 +187,52 @@ const getRollupConfig = async (compilation) => {
   }];
 };
 
-export { getRollupConfig };
+const getRollupConfigForApis = async (compilation) => {
+  const { outputDir, userWorkspace } = compilation.context;
+  const input = [...compilation.manifest.apis.values()]
+    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)));
+
+  // TODO should routes and APIs have chunks?
+  // https://github.com/ProjectEvergreen/greenwood/issues/1008
+  return [{
+    input,
+    output: {
+      dir: `${normalizePathnameForWindows(outputDir)}/api`,
+      entryFileNames: '[name].js',
+      chunkFileNames: '[name].[hash].js'
+    },
+    plugins: [
+      greenwoodJsonLoader(),
+      nodeResolve(),
+      commonjs(),
+      importMetaAssets()
+    ]
+  }];
+};
+
+const getRollupConfigForSsr = async (compilation, input) => {
+  const { outputDir } = compilation.context;
+
+  // TODO should routes and APIs have chunks?
+  // https://github.com/ProjectEvergreen/greenwood/issues/1008
+  return [{
+    input,
+    output: {
+      dir: normalizePathnameForWindows(outputDir),
+      entryFileNames: '_[name].js',
+      chunkFileNames: '[name].[hash].js'
+    },
+    plugins: [
+      greenwoodJsonLoader(),
+      nodeResolve(),
+      commonjs(),
+      importMetaAssets()
+    ]
+  }];
+};
+
+export {
+  getRollupConfigForApis,
+  getRollupConfigForScriptResources,
+  getRollupConfigForSsr
+};

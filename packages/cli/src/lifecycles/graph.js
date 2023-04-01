@@ -10,7 +10,7 @@ const generateGraph = async (compilation) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { context } = compilation;
-      const { pagesDir, projectDirectory, userWorkspace, scratchDir } = context;
+      const { apisDir, pagesDir, projectDirectory, userWorkspace } = context;
       let graph = [{
         outputPath: 'index.html',
         filename: 'index.html',
@@ -209,7 +209,47 @@ const generateGraph = async (compilation) => {
         return pages;
       };
 
+      const walkDirectoryForApis = async function(directory, apis = new Map()) {
+        const files = await fs.readdir(directory);
+
+        for (const filename of files) {
+          const filenameUrl = new URL(`./${filename}`, directory);
+          const filenameUrlAsDir = new URL(`./${filename}/`, directory);
+          const isDirectory = await checkResourceExists(filenameUrlAsDir) && (await fs.stat(filenameUrlAsDir)).isDirectory();
+
+          if (isDirectory) {
+            apis = await walkDirectoryForApis(filenameUrlAsDir, apis);
+          } else {
+            const extension = filenameUrl.pathname.split('.').pop();
+            const relativeApiPath = filenameUrl.pathname.replace(userWorkspace.pathname, '/');
+            const route = relativeApiPath.replace(`.${extension}`, '');
+
+            if (extension !== 'js') {
+              console.warn(`${filenameUrl} is not a JavaScript file, skipping...`);
+            } else {
+              /*
+              * API Properties (per route)
+              *----------------------
+              * filename: base filename of the page
+              * outputPath: the filename to write to when generating a build
+              * path: path to the file relative to the workspace
+              * route: URL route for a given page on outputFilePath
+              */
+              apis.set(route, {
+                filename: filename,
+                outputPath: `/api/${filename}`,
+                path: relativeApiPath,
+                route
+              });
+            }
+          }
+        }
+
+        return apis;
+      };
+
       console.debug('building from local sources...');
+
       // test for SPA
       if (await checkResourceExists(new URL('./index.html', userWorkspace))) {
         graph = [{
@@ -276,11 +316,11 @@ const generateGraph = async (compilation) => {
 
       compilation.graph = graph;
 
-      if (!await checkResourceExists(scratchDir)) {
-        await fs.mkdir(scratchDir);
-      }
+      if (await checkResourceExists(apisDir)) {
+        const apis = await walkDirectoryForApis(apisDir);
 
-      await fs.writeFile(new URL('./graph.json', scratchDir), JSON.stringify(compilation.graph));
+        compilation.manifest = { apis };
+      }
 
       resolve(compilation);
     } catch (err) {

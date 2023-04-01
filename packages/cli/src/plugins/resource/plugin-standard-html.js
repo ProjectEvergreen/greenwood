@@ -5,203 +5,17 @@
  * This is a Greenwood default plugin.
  *
  */
-import { checkResourceExists } from '../../lib/resource-utils.js';
 import frontmatter from 'front-matter';
 import fs from 'fs/promises';
-import { getPackageJson } from '../../lib/node-modules-utils.js';
-import htmlparser from 'node-html-parser';
-import path from 'path';
 import rehypeStringify from 'rehype-stringify';
 import rehypeRaw from 'rehype-raw';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
+import { getUserScripts, getPageTemplate, getAppTemplate } from '../../lib/templating-utils.js';
 import unified from 'unified';
 import { Worker } from 'worker_threads';
-
-async function getCustomPageTemplatesFromPlugins(contextPlugins, templateName) {
-  const customTemplateLocations = [];
-  const templateDir = contextPlugins
-    .map(plugin => plugin.templates)
-    .flat();
-
-  for (const templateDirUrl of templateDir) {
-    if (templateName) {
-      const templateUrl = new URL(`./${templateName}.html`, templateDirUrl);
-
-      if (await checkResourceExists(templateUrl)) {
-        customTemplateLocations.push(templateUrl);
-      }
-    }
-  }
-
-  return customTemplateLocations;
-}
-
-const getPageTemplate = async (filePath, { userTemplatesDir, pagesDir, projectDirectory }, template, contextPlugins = []) => {
-  const customPluginDefaultPageTemplates = await getCustomPageTemplatesFromPlugins(contextPlugins, 'page');
-  const customPluginPageTemplates = await getCustomPageTemplatesFromPlugins(contextPlugins, template);
-  const extension = filePath.split('.').pop();
-  const is404Page = filePath.startsWith('404') && extension === 'html';
-  const hasCustomTemplate = await checkResourceExists(new URL(`./${template}.html`, userTemplatesDir));
-  const hasPageTemplate = await checkResourceExists(new URL('./page.html', userTemplatesDir));
-  const hasCustom404Page = await checkResourceExists(new URL('./404.html', pagesDir));
-  const isHtmlPage = extension === 'html' && await checkResourceExists(new URL(`./${filePath}`, projectDirectory));
-  let contents;
-
-  if (template && (customPluginPageTemplates.length > 0 || hasCustomTemplate)) {
-    // use a custom template, usually from markdown frontmatter
-    contents = customPluginPageTemplates.length > 0
-      ? await fs.readFile(new URL(`./${template}.html`, customPluginPageTemplates[0]), 'utf-8')
-      : await fs.readFile(new URL(`./${template}.html`, userTemplatesDir), 'utf-8');
-  } else if (isHtmlPage) {
-    // if the page is already HTML, use that as the template, NOT accounting for 404 pages
-    contents = await fs.readFile(new URL(`./${filePath}`, projectDirectory), 'utf-8');
-  } else if (customPluginDefaultPageTemplates.length > 0 || (!is404Page && hasPageTemplate)) {
-    // else look for default page template from the user
-    // and 404 pages should be their own "top level" template
-    contents = customPluginDefaultPageTemplates.length > 0
-      ? await fs.readFile(new URL('./page.html', customPluginDefaultPageTemplates[0]), 'utf-8')
-      : await fs.readFile(new URL('./page.html', userTemplatesDir), 'utf-8');
-  } else if (is404Page && !hasCustom404Page) {
-    contents = await fs.readFile(new URL('../../templates/404.html', import.meta.url), 'utf-8');
-  } else {
-    // fallback to using Greenwood's stock page template
-    contents = await fs.readFile(new URL('../../templates/page.html', import.meta.url), 'utf-8');
-  }
-
-  return contents;
-};
-
-const getAppTemplate = async (pageTemplateContents, templatesDir, customImports = [], contextPlugins, enableHud, frontmatterTitle) => {
-  const userAppTemplateUrl = new URL('./app.html', templatesDir);
-  const customAppTemplatesFromPlugins = await getCustomPageTemplatesFromPlugins(contextPlugins, 'app');
-  const hasCustomUserAppTemplate = await checkResourceExists(userAppTemplateUrl);
-  let appTemplateContents = customAppTemplatesFromPlugins.length > 0
-    ? await fs.readFile(new URL('./app.html', customAppTemplatesFromPlugins[0]))
-    : hasCustomUserAppTemplate
-      ? await fs.readFile(userAppTemplateUrl, 'utf-8')
-      : await fs.readFile(new URL('../../templates/app.html', import.meta.url), 'utf-8');
-  let mergedTemplateContents = '';
-
-  const pageRoot = htmlparser.parse(pageTemplateContents, {
-    script: true,
-    style: true,
-    noscript: true,
-    pre: true
-  });
-  const appRoot = htmlparser.parse(appTemplateContents, {
-    script: true,
-    style: true
-  });
-
-  if (!pageRoot.valid || !appRoot.valid) {
-    console.debug('ERROR: Invalid HTML detected');
-    const invalidContents = !pageRoot.valid
-      ? pageTemplateContents
-      : appTemplateContents;
-
-    if (enableHud) {
-      appTemplateContents = appTemplateContents.replace('<body>', `
-        <body>
-          <div style="position: absolute; width: auto; border: dotted 3px red; background-color: white; opacity: 0.75; padding: 1% 1% 0">
-            <p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="noreferrer">HTML formatter</a>.</p>
-            <details>
-              <pre>
-                ${invalidContents.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}
-              </pre>
-            </details>
-          </div>
-      `);
-    }
-
-    mergedTemplateContents = appTemplateContents.replace(/<page-outlet><\/page-outlet>/, '');
-  } else {
-    const appTitle = appRoot ? appRoot.querySelector('head title') : null;
-    const appBody = appRoot.querySelector('body') ? appRoot.querySelector('body').innerHTML : '';
-    const pageBody = pageRoot.querySelector('body') ? pageRoot.querySelector('body').innerHTML : '';
-    const pageTitle = pageRoot.querySelector('head title');
-    const hasInterpolatedFrontmatter = pageTitle && pageTitle.rawText.indexOf('${globalThis.page.title}') >= 0
-     || appTitle && appTitle.rawText.indexOf('${globalThis.page.title}') >= 0;
-
-    const title = hasInterpolatedFrontmatter // favor frontmatter interpolation first
-      ? pageTitle && pageTitle.rawText
-        ? pageTitle.rawText
-        : appTitle.rawText
-      : frontmatterTitle // otherwise, work in order of specificity from page -> page template -> app template
-        ? frontmatterTitle
-        : pageTitle && pageTitle.rawText
-          ? pageTitle.rawText
-          : appTitle && appTitle.rawText
-            ? appTitle.rawText
-            : 'My App';
-
-    const mergedHtml = pageRoot.querySelector('html').rawAttrs !== ''
-      ? `<html ${pageRoot.querySelector('html').rawAttrs}>`
-      : appRoot.querySelector('html').rawAttrs !== ''
-        ? `<html ${appRoot.querySelector('html').rawAttrs}>`
-        : '<html>';
-
-    const mergedMeta = [
-      ...appRoot.querySelectorAll('head meta'),
-      ...pageRoot.querySelectorAll('head meta')
-    ].join('\n');
-
-    const mergedLinks = [
-      ...appRoot.querySelectorAll('head link'),
-      ...pageRoot.querySelectorAll('head link')
-    ].join('\n');
-
-    const mergedStyles = [
-      ...appRoot.querySelectorAll('head style'),
-      ...pageRoot.querySelectorAll('head style'),
-      ...customImports.filter(resource => path.extname(resource) === '.css')
-        .map(resource => `<link rel="stylesheet" href="${resource}"></link>`)
-    ].join('\n');
-
-    const mergedScripts = [
-      ...appRoot.querySelectorAll('head script'),
-      ...pageRoot.querySelectorAll('head script'),
-      ...customImports.filter(resource => path.extname(resource) === '.js')
-        .map(resource => `<script src="${resource}" type="module"></script>`)
-    ].join('\n');
-
-    mergedTemplateContents = `<!DOCTYPE html>
-      ${mergedHtml}
-        <head>
-          <title>${title}</title>
-          ${mergedMeta}
-          ${mergedLinks}
-          ${mergedStyles}
-          ${mergedScripts}
-        </head>
-        <body>
-          ${appBody.replace(/<page-outlet><\/page-outlet>/, pageBody)}
-        </body>
-      </html>
-    `;
-  }
-
-  return mergedTemplateContents;
-};
-
-const getUserScripts = async (contents, context) => {
-  // https://lit.dev/docs/tools/requirements/#polyfills
-  if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
-    const userPackageJson = await getPackageJson(context);
-    const dependencies = userPackageJson?.dependencies || {};
-    const litPolyfill = dependencies && dependencies.lit
-      ? '<script src="/node_modules/lit/polyfill-support.js"></script>\n'
-      : '';
-
-    contents = contents.replace('<head>', `
-      <head>
-        ${litPolyfill}
-    `);
-  }
-  return contents;
-};
 
 class StandardHtmlResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -220,8 +34,8 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async serve(url) {
-    const { config } = this.compilation;
-    const { pagesDir, userTemplatesDir, userWorkspace } = this.compilation.context;
+    const { config, context } = this.compilation;
+    const { pagesDir, userWorkspace } = context;
     const { interpolateFrontmatter } = config;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find(node => node.isSPA);
@@ -346,11 +160,11 @@ class StandardHtmlResource extends ResourceInterface {
     if (isSpaRoute) {
       body = await fs.readFile(new URL(`./${isSpaRoute.filename}`, userWorkspace), 'utf-8');
     } else {
-      body = ssrTemplate ? ssrTemplate : await getPageTemplate(filePath, this.compilation.context, template, contextPlugins);
+      body = ssrTemplate ? ssrTemplate : await getPageTemplate(filePath, context, template, contextPlugins);
     }
 
-    body = await getAppTemplate(body, userTemplatesDir, customImports, contextPlugins, config.devServer.hud, title);
-    body = await getUserScripts(body, this.compilation.context);
+    body = await getAppTemplate(body, context, customImports, contextPlugins, config.devServer.hud, title);
+    body = await getUserScripts(body, context);
 
     if (processedMarkdown) {
       const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;

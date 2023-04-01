@@ -269,39 +269,33 @@ async function getStaticServer(compilation, composable) {
 }
 
 async function getHybridServer(compilation) {
+  const { graph, manifest, context } = compilation;
+  const { outputDir } = context;
   const app = await getStaticServer(compilation, true);
-  const resourcePlugins = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'resource';
-  });
 
   app.use(async (ctx) => {
     try {
       const url = new URL(`http://localhost:8080${ctx.url}`);
-      const matchingRoute = compilation.graph.find((node) => node.route === url.pathname) || { data: {} };
+      const matchingRoute = graph.find((node) => node.route === url.pathname) || { data: {} };
+      const isApiRoute = manifest.apis.has(url.pathname);
       const request = new Request(url.href, {
         method: ctx.request.method,
         headers: ctx.request.header
       });
-      const apiResource = resourcePlugins.find((plugin) => {
-        return plugin.isGreenwoodDefaultPlugin
-          && plugin.name === 'plugin-api-routes';
-      }).provider(compilation);
-      const isApiRoute = await apiResource.shouldServe(url, request);
 
       if (matchingRoute.isSSR && !matchingRoute.data.static) {
-        const standardHtmlResource = resourcePlugins.find((plugin) => {
-          return plugin.isGreenwoodDefaultPlugin
-            && plugin.name.indexOf('plugin-standard-html') === 0;
-        }).provider(compilation);
-        let response = await standardHtmlResource.serve(url, request);
-
-        response = await standardHtmlResource.optimize(url, response);
+        const { handler } = await import(`${outputDir}${matchingRoute.filename}`);
+        // TODO passing compilation this way too hacky?
+        // https://github.com/ProjectEvergreen/greenwood/issues/1008
+        const response = await handler(request, compilation);
 
         ctx.body = Readable.from(response.body);
         ctx.set('Content-Type', 'text/html');
         ctx.status = 200;
       } else if (isApiRoute) {
-        const response = await apiResource.serve(url, request);
+        const apiRoute = manifest.apis.get(url.pathname);
+        const { handler } = await import(`${outputDir}${apiRoute.path.replace('/', '')}`);
+        const response = await handler(request);
 
         ctx.status = 200;
         ctx.set('Content-Type', response.headers.get('Content-Type'));
