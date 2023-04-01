@@ -25,7 +25,7 @@
     "@greenwood/cli": "^0.28.0-alpha.4"
   },
   "dependencies": {
-    "wc-compiler": "~0.7.0"
+    "wc-compiler": "~0.8.0"
   },
   "devDependencies": {
     "@greenwood/cli": "^0.28.0-alpha.4"

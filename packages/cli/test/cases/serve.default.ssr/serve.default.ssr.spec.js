@@ -32,7 +32,7 @@ import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils
 import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import { fileURLToPath } from 'url';
 
 const expect = chai.expect;
 
@@ -55,6 +55,7 @@ describe('Serve Greenwood With: ', function() {
 
     before(async function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
+      await runner.runCommand(cliPath, 'build');
 
       return new Promise(async (resolve) => {
         setTimeout(() => {
