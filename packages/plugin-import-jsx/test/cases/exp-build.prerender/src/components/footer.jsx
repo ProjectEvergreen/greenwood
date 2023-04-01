@@ -4,9 +4,11 @@ export default class FooterComponent extends HTMLElement {
   }
 
   render() {
+    const year = new Date().getFullYear();
+
     return (
       <footer>
-        <h4>My Blog</h4>
+        <h4>My Blog - {year}</h4>
       </footer>
     );
   }

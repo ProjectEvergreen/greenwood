@@ -74,9 +74,10 @@ describe('(Experimental) Build Greenwood With: ', function() {
 
       it('should have the expected content from importing values from package.json in index.html', function() {
         const headings = dom.window.document.querySelectorAll('app-footer footer h4');
+        const year = new Date().getFullYear();
 
         expect(headings.length).to.equal(1);
-        expect(headings[0].textContent.trim()).to.equal('My Blog');
+        expect(headings[0].textContent.trim()).to.equal(`My Blog - ${year}`);
       });
     });
   });

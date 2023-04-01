@@ -21,6 +21,8 @@ class ImportJsxResource extends ResourceInterface {
   }
 
   async serve(url) {
+    // TODO refactor when WCC refactors
+    // https://github.com/ProjectEvergreen/wcc/issues/116
     const tree = parseJsx(url);
     const result = escodegen.generate(tree);
 
