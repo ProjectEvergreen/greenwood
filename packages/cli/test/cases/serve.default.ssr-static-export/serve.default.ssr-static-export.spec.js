@@ -126,11 +126,11 @@ describe('Serve Greenwood With: ', function() {
         ...litReactiveElementDecorators,
         ...litReactiveElementPackageJson
       ]);
-      await runner.runCommand(cliPath, 'build');
     });
 
     before(async function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
+      await runner.runCommand(cliPath, 'build');
 
       return new Promise(async (resolve) => {
         setTimeout(() => {

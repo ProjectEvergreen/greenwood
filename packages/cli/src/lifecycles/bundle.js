@@ -1,10 +1,29 @@
-/* eslint-disable max-depth */
+/* eslint-disable max-depth, max-len */
 import fs from 'fs/promises';
-import { getRollupConfig } from '../config/rollup.config.js';
+import { getRollupConfigForApis, getRollupConfigForScriptResources, getRollupConfigForSsr } from '../config/rollup.config.js';
 import { hashString } from '../lib/hashing-utils.js';
-import { checkResourceExists, mergeResponse } from '../lib/resource-utils.js';
+import { checkResourceExists, mergeResponse, normalizePathnameForWindows } from '../lib/resource-utils.js';
 import path from 'path';
 import { rollup } from 'rollup';
+
+async function emitResources(compilation) {
+  const { outputDir } = compilation.context;
+  const { resources } = compilation;
+
+  // https://stackoverflow.com/a/56150320/417806
+  // TODO put into a util
+  // https://github.com/ProjectEvergreen/greenwood/issues/1008
+  await fs.writeFile(new URL('./resources.json', outputDir), JSON.stringify(resources, (key, value) => {
+    if (value instanceof Map) {
+      return {
+        dataType: 'Map',
+        value: [...value]
+      };
+    } else {
+      return value;
+    }
+  }));
+}
 
 async function cleanUpResources(compilation) {
   const { outputDir } = compilation.context;
@@ -141,9 +160,130 @@ async function bundleStyleResources(compilation, resourcePlugins) {
   }
 }
 
+async function bundleApiRoutes(compilation) {
+  // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
+  const [rollupConfig] = await getRollupConfigForApis(compilation);
+
+  if (rollupConfig.input.length !== 0) {
+    const bundle = await rollup(rollupConfig);
+    await bundle.write(rollupConfig.output);
+  }
+}
+
+async function bundleSsrPages(compilation) {
+  // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
+  const { outputDir, pagesDir } = compilation.context;
+  // TODO context plugins for SSR ?
+  // https://github.com/ProjectEvergreen/greenwood/issues/1008
+  // const contextPlugins = compilation.config.plugins.filter((plugin) => {
+  //   return plugin.type === 'context';
+  // }).map((plugin) => {
+  //   return plugin.provider(compilation);
+  // });
+
+  const input = [];
+  // TODO ideally be able to serialize entire graph (or only an explicit subset?)
+  // right now page.imports is breaking JSON.stringify
+  // https://github.com/ProjectEvergreen/greenwood/issues/1008
+  const intermediateGraph = compilation.graph.map(page => {
+    const p = { ...page };
+    delete p.imports;
+
+    return p;
+  });
+
+  for (const page of compilation.graph) {
+    if (page.isSSR && !page.data.static) {
+      const { filename, path: pagePath } = page;
+      const scratchUrl = new URL(`./${filename}`, outputDir);
+
+      // better way to write out inline code like this?
+      await fs.writeFile(scratchUrl, `
+        import { Worker } from 'worker_threads';
+        import { getAppTemplate, getPageTemplate, getUserScripts } from '@greenwood/cli/src/lib/templating-utils.js';
+
+        export async function handler(request, compilation) {
+          const routeModuleLocationUrl = new URL('./_${filename}', '${outputDir}');
+          const routeWorkerUrl = '${compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().workerUrl}';
+          const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
+          let body = 'Hello from the ${page.id} page!';
+          let html = '';
+          let frontmatter;
+          let template;
+          let templateType = 'page';
+          let title = '';
+          let imports = [];
+
+          await new Promise((resolve, reject) => {
+            const worker = new Worker(new URL(routeWorkerUrl));
+
+            worker.on('message', (result) => {
+              if (result.body) {
+                body = result.body;
+              }
+
+              if (result.template) {
+                template = result.template;
+              }
+
+              if (result.frontmatter) {
+                frontmatter = result.frontmatter;
+
+                if (frontmatter.title) {
+                  title = frontmatter.title;
+                }
+
+                if (frontmatter.template) {
+                  templateType = frontmatter.template;
+                }
+
+                if (frontmatter.imports) {
+                  imports = imports.concat(frontmatter.imports);
+                }
+              }
+
+              resolve();
+            });
+
+            worker.on('error', reject);
+            worker.on('exit', (code) => {
+              if (code !== 0) {
+                reject(new Error(\`Worker stopped with exit code \${code}\`));
+              }
+            });
+
+            worker.postMessage({
+              moduleUrl: routeModuleLocationUrl.href,
+              compilation: \`${JSON.stringify({ graph: intermediateGraph })}\`,
+              route: '${pagePath}'
+            });
+          });
+
+          html = template ? template : await getPageTemplate('', compilation.context, templateType, []);
+          html = await getAppTemplate(html, compilation.context, imports, [], false, title);
+          html = await getUserScripts(html, compilation.context);
+          html = html.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, body);
+          html = await (await htmlOptimizer.optimize(new URL(request.url), new Response(html))).text();
+
+          return new Response(html);
+        }
+      `);
+
+      input.push(normalizePathnameForWindows(new URL(`./${filename}`, pagesDir)));
+    }
+  }
+
+  const [rollupConfig] = await getRollupConfigForSsr(compilation, input);
+
+  if (rollupConfig.input.length !== 0) {
+    const bundle = await rollup(rollupConfig);
+    await bundle.write(rollupConfig.output);
+  }
+}
+
 async function bundleScriptResources(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const [rollupConfig] = await getRollupConfig(compilation);
+  const [rollupConfig] = await getRollupConfigForScriptResources(compilation);
 
   if (rollupConfig.input.length !== 0) {
     const bundle = await rollup(rollupConfig);
@@ -173,6 +313,8 @@ const bundleCompilation = async (compilation) => {
       console.info('bundling static assets...');
 
       await Promise.all([
+        await bundleApiRoutes(compilation),
+        await bundleSsrPages(compilation),
         await bundleScriptResources(compilation),
         await bundleStyleResources(compilation, optimizeResourcePlugins)
       ]);
@@ -181,6 +323,7 @@ const bundleCompilation = async (compilation) => {
 
       await optimizeStaticPages(compilation, optimizeResourcePlugins);
       await cleanUpResources(compilation);
+      await emitResources(compilation);
 
       resolve();
     } catch (err) {

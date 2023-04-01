@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with an SSR route.
+ * Run Greenwood server with an SSR route built using Lit SSR.
  *
  * User Result
  * Should generate a Greenwood build for hosting a server rendered application.
@@ -34,7 +34,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
+describe('Serve Greenwood With: ', function() {
   const LABEL = 'Custom Lit Renderer for SSR';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -127,6 +127,7 @@ describe('Build Greenwood With: ', function() {
         ...litReactiveElementDecorators,
         ...litReactiveElementPackageJson
       ]);
+      await runner.runCommand(cliPath, 'build');
 
       return new Promise(async (resolve) => {
         setTimeout(() => {
