@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import htmlparser from 'node-html-parser';
-import { checkResourceExists } from '../lib/resource-utils.js';
+import { checkResourceExists } from './resource-utils.js';
 import { getPackageJson } from './node-modules-utils.js';
 
 async function getCustomPageTemplatesFromPlugins(contextPlugins, templateName) {
