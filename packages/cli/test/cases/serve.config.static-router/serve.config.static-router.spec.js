@@ -25,6 +25,7 @@ import chai from 'chai';
 import fs from 'fs/promises';
 import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { normalizePathnameForWindows } from '../../../src/lib/resource-utils.js';
 import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
@@ -96,10 +97,10 @@ describe('Serve Greenwood With: ', function() {
       ]);
 
       for (const f of workaroundFiles) {
-        const { pathname } = new URL(`./node_modules/@greenwood/cli/src/lib/${f}.js`, import.meta.url);
+        const pathname = normalizePathnameForWindows(new URL(`./node_modules/@greenwood/cli/src/lib/${f}.js`, import.meta.url));
         let contents = await fs.readFile(pathname, 'utf-8');
 
-        workaroundFiles.forEach(wf => {
+        workaroundFiles.forEach((wf) => {
           contents = contents.replace(`${wf}.js`, `${wf}.mjs`);
         });
 
@@ -111,14 +112,14 @@ describe('Serve Greenwood With: ', function() {
       return new Promise(async (resolve) => {
         setTimeout(async () => {
           // template out artists.js to use .mjs too
-          const ssrPagePath = new URL('./public/artists.js', import.meta.url).pathname;
-          let ssrPageContents = await fs.readFile(ssrPagePath, 'utf-8');
+          const pathname = normalizePathnameForWindows(new URL('./public/artists.js', import.meta.url).pathname);
+          let ssrPageContents = await fs.readFile(pathname, 'utf-8');
 
           for (const f of workaroundFiles) {
             ssrPageContents = ssrPageContents.replace(`${f}.js`, `${f}.mjs`);
           }
 
-          await fs.writeFile(ssrPagePath, ssrPageContents);
+          await fs.writeFile(pathname, ssrPageContents);
 
           resolve();
         }, 10000);
