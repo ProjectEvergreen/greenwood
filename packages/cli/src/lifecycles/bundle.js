@@ -11,7 +11,8 @@ async function emitResources(compilation) {
   const { resources } = compilation;
 
   // https://stackoverflow.com/a/56150320/417806
-  // TODO put into a util?
+  // TODO put into a util
+  // https://github.com/ProjectEvergreen/greenwood/issues/1008
   await fs.writeFile(new URL('./resources.json', outputDir), JSON.stringify(resources, (key, value) => {
     if (value instanceof Map) {
       return {
@@ -172,7 +173,8 @@ async function bundleApiRoutes(compilation) {
 async function bundleSsrPages(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
   const { outputDir, pagesDir } = compilation.context;
-  // TODO context plugins for SSR?
+  // TODO context plugins for SSR ?
+  // https://github.com/ProjectEvergreen/greenwood/issues/1008
   // const contextPlugins = compilation.config.plugins.filter((plugin) => {
   //   return plugin.type === 'context';
   // }).map((plugin) => {
@@ -182,6 +184,7 @@ async function bundleSsrPages(compilation) {
   const input = [];
   // TODO ideally be able to serialize entire graph (or only an explicit subset?)
   // right now page.imports is breaking JSON.stringify
+  // https://github.com/ProjectEvergreen/greenwood/issues/1008
   const intermediateGraph = compilation.graph.map(page => {
     const p = { ...page };
     delete p.imports;
@@ -194,7 +197,7 @@ async function bundleSsrPages(compilation) {
       const { filename, path: pagePath } = page;
       const scratchUrl = new URL(`./${filename}`, outputDir);
 
-      // TODO better way to write out inline code like this?
+      // better way to write out inline code like this?
       await fs.writeFile(scratchUrl, `
         import { Worker } from 'worker_threads';
         import { getAppTemplate, getPageTemplate, getUserScripts } from '@greenwood/cli/src/lib/templating-utils.js';

@@ -192,12 +192,14 @@ const getRollupConfigForApis = async (compilation) => {
   const input = [...compilation.manifest.apis.values()]
     .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)));
 
+  // TODO should routes and APIs have chunks?
+  // https://github.com/ProjectEvergreen/greenwood/issues/1008
   return [{
     input,
     output: {
       dir: `${normalizePathnameForWindows(outputDir)}/api`,
       entryFileNames: '[name].js',
-      chunkFileNames: '[name].[hash].js' // TODO should routes and APIs have chunks?
+      chunkFileNames: '[name].[hash].js'
     },
     plugins: [
       greenwoodJsonLoader(),
@@ -211,12 +213,14 @@ const getRollupConfigForApis = async (compilation) => {
 const getRollupConfigForSsr = async (compilation, input) => {
   const { outputDir } = compilation.context;
 
+  // TODO should routes and APIs have chunks?
+  // https://github.com/ProjectEvergreen/greenwood/issues/1008
   return [{
     input,
     output: {
       dir: normalizePathnameForWindows(outputDir),
       entryFileNames: '_[name].js',
-      chunkFileNames: '[name].[hash].js' // TODO should routes and APIs have chunks?
+      chunkFileNames: '[name].[hash].js'
     },
     plugins: [
       greenwoodJsonLoader(),

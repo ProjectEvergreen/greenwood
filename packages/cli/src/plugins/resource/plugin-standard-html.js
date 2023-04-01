@@ -163,7 +163,6 @@ class StandardHtmlResource extends ResourceInterface {
       body = ssrTemplate ? ssrTemplate : await getPageTemplate(filePath, context, template, contextPlugins);
     }
 
-    console.log('body?>>>', { body });
     body = await getAppTemplate(body, context, customImports, contextPlugins, config.devServer.hud, title);
     body = await getUserScripts(body, context);
 
