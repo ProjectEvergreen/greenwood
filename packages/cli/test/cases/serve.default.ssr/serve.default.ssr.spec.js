@@ -43,7 +43,7 @@ describe('Serve Greenwood With: ', function() {
   const hostname = 'http://127.0.0.1:8080';
   let runner;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public'),
       hostname
