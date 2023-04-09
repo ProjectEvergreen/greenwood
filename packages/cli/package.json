@@ -10,7 +10,12 @@
   "keywords": [
     "Greenwood",
     "Static Site Generator",
-    "Web Components"
+    "Full Stack Web Development",
+    "Web Components",
+    "HTML",
+    "CSS",
+    "JavaScript",
+    "NodeJS"
   ],
   "engines": {
     "node": ">=18.12.1"

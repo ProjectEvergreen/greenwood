@@ -8,9 +8,11 @@
   "license": "MIT",
   "keywords": [
     "Greenwood",
-    "JSX",
-    "Full Stack framework",
+    "Static Site Generator",
+    "Full Stack Web Development",
+    "Web Components",
     "NodeJS",
+    "JSX",
     "WCC"
   ],
   "main": "src/index.js",
