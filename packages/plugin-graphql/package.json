@@ -8,9 +8,11 @@
   "license": "MIT",
   "keywords": [
     "Greenwood",
-    "GraphQL",
     "Static Site Generator",
+    "Full Stack Web Development",
+    "Web Components",
     "NodeJS",
+    "GraphQL",
     "Apollo"
   ],
   "main": "src/index.js",

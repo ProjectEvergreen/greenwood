@@ -8,8 +8,9 @@
   "license": "MIT",
   "keywords": [
     "Greenwood",
-    "CommonJS",
     "Static Site Generator",
+    "Full Stack Web Development",
+    "Web Components",
     "NodeJS",
     "Babel"
   ],
@@ -22,7 +23,6 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@babel/core": "^7.10.4",
     "@greenwood/cli": "^0.4.0"
   },
   "dependencies": {
