@@ -9,7 +9,9 @@
  * greenwood build
  *
  * User Config
- * None
+ * {
+ *   port: 8181
+ * }
  *
  * User Workspace
  *  src/
@@ -40,7 +42,7 @@ describe('Serve Greenwood With: ', function() {
   const LABEL = 'A Server Rendered Application (SSR)';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const hostname = 'http://127.0.0.1:8080';
+  const hostname = 'http://127.0.0.1:8181';
   let runner;
 
   before(async function() {

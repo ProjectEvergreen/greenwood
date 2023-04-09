@@ -1,5 +1,5 @@
 import { getStaticServer, getHybridServer } from '../lifecycles/serve.js';
-import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
+import { checkResourceExists } from '../lib/resource-utils.js';
 
 const runProdServer = async (compilation) => {
 
