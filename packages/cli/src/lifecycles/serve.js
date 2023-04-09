@@ -270,13 +270,13 @@ async function getStaticServer(compilation, composable) {
 }
 
 async function getHybridServer(compilation) {
-  const { graph, manifest, context } = compilation;
+  const { graph, manifest, context, config } = compilation;
   const { outputDir } = context;
   const app = await getStaticServer(compilation, true);
 
   app.use(async (ctx) => {
     try {
-      const url = new URL(`http://localhost:8080${ctx.url}`);
+      const url = new URL(`http://localhost:${config.port}${ctx.url}`);
       const matchingRoute = graph.find((node) => node.route === url.pathname) || { data: {} };
       const isApiRoute = manifest.apis.has(url.pathname);
       const request = new Request(url.href, {

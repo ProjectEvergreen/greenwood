@@ -1,3 +1,3 @@
 export default {
-  interpolateFrontmatter: true
+  port: 8181
 };
