@@ -117,7 +117,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
               ...compilation.resources.get(resource.sourcePathURL.pathname),
               optimizedFileName: fileName,
               optimizedFileContents: await fs.readFile(outputPath, 'utf-8'),
-              contents: contents.replace(/\.\//g, '/')
+              contents
             });
 
             if (noop) {
