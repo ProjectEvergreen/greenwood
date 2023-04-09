@@ -8,10 +8,12 @@
   "license": "MIT",
   "keywords": [
     "Greenwood",
-    "CommonJS",
     "Static Site Generator",
+    "Full Stack Web Development",
+    "Web Components",
     "NodeJS",
-    "Css-in-Js"
+    "ESM",
+    "CSS-in-JS"
   ],
   "main": "src/index.js",
   "type": "module",

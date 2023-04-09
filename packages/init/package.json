@@ -11,8 +11,10 @@
   "keywords": [
     "Greenwood",
     "Static Site Generator",
+    "Full Stack Web Development",
+    "Web Components",
     "NodeJS",
-    "Scaffold"
+    "Scaffolding"
   ],
   "bin": {
     "init": "./src/index.js"
