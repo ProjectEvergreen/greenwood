@@ -8,21 +8,25 @@ template: blog
 
 **Published: April 12, 2023**
 
-About a year has passed since our [first _State of Greenwood_ blog post](/blog/state-of-greenwood-2023/) and wow, what a year of progress it has been!  In our continued effort to make web development easier and more intuitive, we have introduced a significant amount of new features and capabilities into Greenwood, and even the server side we've been able to keep the spirit of the web alive.
+![Greenwood logo](https://raw.githubusercontent.com/ProjectEvergreen/greenwood/9d43f5ef87f0ee3487db77ad8945c0d8ece30e1c/www/assets/greenwood-logo.png)
 
-I think more than ever we continue to be proud of our effort to embrace not only HTML as the baseline for developing websites, but [actual _.html_ files](/getting-started/) even more so.  We feel that being able to start a project this easily in a manner that can be as accessible as being able to copy / pasting from MDN is critical to the core of our approach.  Greenwood will always [stay true to web standards](/about/how-it-works/) and refrain from introducing any "magic" as much as possible.
+## The Full Stack Web
 
-Let's take a look back at some key features we added over the past year and in particular putting a spotlight on how web standards factor in, even on the server side! 🔦
+About a year has passed since our [first _State of Greenwood_ blog post](/blog/state-of-greenwood-2023/) and wow, what a year of progress it has been!  In our continued effort to make web development easier to get started with, we have made great strides in our journey of promoting the best of web standards not only for the frontend, but also on the backend as well; the web is _full stack_! And we even picked up a new logo along the way!
+
+I think more than ever we continue to be proud of our efforts to embrace not only HTML as the baseline for developing websites, but [actual _.html_ files](/getting-started/).  We feel that being able to start a project this intuitively makes Greenwood the perfect on-ramp for any web development project but also carries that spirit of web standards all the way through into the backend as well.  It would not be incorrect to say that we are happy to offload some of our docs to MDN if we can!  Why create a new API if a good one already exists?  In this way Greenwood will always [stay true to web standards](/about/how-it-works/) and refrain from introducing any "magic" as much as possible.
+
+So, let's take a look back at some key features we added over the past year that we felt helps us achieve our goals. 🔦
 
 ## The Year In Review
 
 ### Custom Elements as Pages (WCC)
 
-Project Evergreen released a new project last year called [WCC (Web Components Compiler)]() that was designed specifically to make it easy to render native Web Components to HTML on the backend.  Its focus on making SSR (Server Side Rendering) easier for Web Components was designed to manifest features in Greenwood like _Custom Elements as Pages_.
+Project Evergreen released a new project last year called [**WCC (Web Components Compiler)**](https://github.com/ProjectEvergreen/wcc) that was designed specifically to make it easy to render native Web Components to HTML on the server.  Its focus on making SSR (Server Side Rendering) easier for Web Components was designed to manifest features in Greenwood like _Custom Elements as Pages_ and to run in serverless and edge runtimes.
 
-Now, instead of having to spin up a (headless) browser with Puppeteer, WCC now provides the ability to deliver on what we think is a really nice and familiar developer experience for authoring server rendered content.  We think custom elements fit right at home in providing a consistent and standards based solution for authoring pages, just as easily as they do for components.
+Instead of having to spin up a (headless) browser with Puppeteer, WCC now provides the ability to deliver on what we think is a really nice and familiar developer experience for authoring server rendered content.  We think custom elements fit right at home in providing a consistent and standards based solution for authoring page entry points, just as easily as they do for components.
 
-Here is an example of what authoring an SSR page in Greenwood looks like now
+Here is an example of what authoring an SSR page in Greenwood looks like with WCC
 ```js
 // src/pages/artists.js
 import '../components/card.js';
@@ -97,13 +101,13 @@ export default class Card extends HTMLElement {
 customElements.define('wc-card', Card);
 ```
 
-> **Note**: In this example, Greenwood will _not_ ship any JS for this page.  All the HTML is extracted at build / request time from the custom element. 💯
+> **Note**: In this example, Greenwood will _not_ ship any JS for this page by default.  All the HTML is extracted at build / request time from the custom element. 💯
 
 ### Web APIs Standardization
 
-In the [v0.28.0 release](/blog/release-0.28.0/), Greenwood made Node 18 the minimum version in particular to make use of the native Fetch API and its many companion APIs like [`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL), [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request), and [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response), just to name a few.  Greenwood has fully embraced this movement to adopting Web APIs on the server side not only throughout its code base, but basing entire user facing APIs around these standards as well.  Why invent an API when we get everything we need from the web, in Node, and all documented by MDN!
+In the [v0.28.0 release](/blog/release-0.28.0/), Greenwood made Node 18 the minimum version, in particular to make use of the native Fetch API and its many companion APIs like [`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL), [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request), and [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response) just to name a few.  Greenwood has fully embraced this movement to adopting Web APIs on the server side not only throughout its code base, but basing user facing APIs around these standards as well.  Why invent an API when we get everything we need from the web, in Node, and all documented by MDN!
 
-This was especially beneficial to our [Resource Plugin API](/plugins/resource/) as it was already modeling this request / response behavior anyway, and so it was a natural fit to adopt these APIs. To give an idea of this transformation, here is a before snippet of Greenwood's internal plugin for handling CSS.
+This was especially beneficial to our [Resource Plugin API](/plugins/resource/) as it was already modeling this request / response behavior anyway albeit in an ad-hoc manner, and so it was a natural fit to adopt these APIs. To give an idea of this transformation, here is a before snippet of Greenwood's internal plugin for handling CSS.
 <!-- eslint-disable-next-line no-unused-vars -->
 ```js
 class StandardCssResource extends ResourceInterface {
@@ -191,7 +195,7 @@ What's really neat is that there is no bundling going on, just a real time trans
 
 This is just a sampling of the work that we wanted to shout-out over the course of 2022.  You can read about all our releases over in the [blog section](/blog/) of our website.   Some honorable mentions include:
 - [Node 18 support](/blog/release/v0-28-0/#node-18) - Upgrading to Node 18 really helped us drive forward on making Web APIs a consistent experience from the front to the back of the stack.
-- [API Routes](/blog/release/v0-28-0/#api-routes) -  File based routing convention to make APIs in your projects, based on a standards based `Request` / `Response` model.
+- [API Routes](/blog/release/v0-28-0/#api-routes) -  File based routing convention to make API endpoints in your projects, based on a standard `Request` / `Response` model.
 - [Build Capacity](/blog/release/v0-27-0/#build-capacity) - Introduction of thread pooling for static builds that rely on SSR based page generation.
 
 ## The Year In Front of Us
@@ -200,22 +204,18 @@ While we managed to check off a lot of items from last years list, we are carryi
 
 So what's in store next?  Here are a few:
 - [Serverless and Edge runtime support](https://github.com/ProjectEvergreen/greenwood/issues/1008)
+- [Agnostic Runtime](https://github.com/w3c/webcomponents-cg/discussions/39#discussioncomment-3452237)
 - [Data Loading Strategies](https://github.com/ProjectEvergreen/greenwood/issues/952)
 - [Hydration Strategies](https://github.com/ProjectEvergreen/greenwood/issues/880)
 
 We still plan to keep contributing to great community efforts and conversations around the web platform like the [Web Components Community Group](https://github.com/w3c/webcomponents-cg) and supporting their initiatives towards pushing web standards forward.  Here were a couple of our contributions to the conversation:
-- [Web Components in 5 Years]()
+- [Web Components in 5 Years](https://github.com/w3c/webcomponents-cg/discussions/39#discussioncomment-3452237)
 - [Self hydrating custom elements](https://github.com/webcomponents-cg/community-protocols/issues/33)
 - [Web Components Interop Specification](https://github.com/webcomponents-cg/community-protocols/issues/35)
 
 
 ## In Closing
 
-TODO
-Our hope is by reviewing some of the key features the team was able to accomplish in 2021, and in sharing our outlook for 2022, that we have given a good overview of what Greenwood hopes to accomplish for itself and what we hope it can contribute to the web dev community.  We love the web and we love open source, and our vision for removing the friction and tools between your code and the browser is even more entrenched in us now.
+We're really encouraged to see the progress of web development these days, especially in seeing the growing adoption of web standards on the backend and the creation of groups like the [WinterCG](https://wintercg.org/) to help steward it.  With the proliferation of many great JavaScript runtimes, competing against a standard will ultimately benefit the users, allowing us to mix and match as needed to find the right runtime for our projects.
 
-For us, it's great to see support for Web Components rising and we hope to be a champion and companion for all those building for the web, new or seasoned, user or spec author.  Naturally, the decisions we've made come with tradeoffs, as do any of the other options out there in the community, and that is important for us to highlight.  It's not necessarily about right or wrong; it's just emphasizing differing opinions and values.  But this is what is great about open source!  
-
-> _We all think different, and so for us the more we thought about our approach and the implications this could have on long term maintainability, knowledge sharing, and just general practicality, has only cemented our motivations even further to optimize for a web first world._
-
-We want to not only be _your workbench for the web_, but a way to build for the web that looks past the **#hypegeist** and instead emphasizes usage of web APIs in an effort to shy away, where possible, from the complexity and magic often found in today's modern (meta) frameworks.  Owning your code and owning your content is important to us, and developing for the web isn't the burden it once was.  We feel an honest discussion around the efforts to build around and on top of it are worth having.  Looking inside your _node_modules_ or network tab should be encouraging of you to ask yourself; _**what can the web do for me now**_? <img style="width: 15px; display: inline-block" src="/assets/evergreen.svg" alt="Project Evergreen logo"/>
+Greenwood wants to be there every step of the way to get your project from SPA to SSG to SSR to everything in between.  Can't wait to see what you build next!  <img style="width: 15px; display: inline-block" src="/assets/evergreen.svg" alt="Project Evergreen logo"/>
