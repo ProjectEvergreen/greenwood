@@ -7,8 +7,8 @@ import path from 'path';
 import { rollup } from 'rollup';
 
 async function emitResources(compilation) {
-  const { outputDir } = compilation.context;
-  const { resources } = compilation;
+  const { outputDir, scratchDir } = compilation.context;
+  const { resources, graph } = compilation;
 
   // https://stackoverflow.com/a/56150320/417806
   // TODO put into a util
@@ -23,6 +23,11 @@ async function emitResources(compilation) {
       return value;
     }
   }));
+
+  // TODO this adds a log of overhead to graph.json output
+  // because now it will include all page resources (modelResource)
+  // (maybe a way on serve command startup to map resources to imports?)
+  await fs.writeFile(new URL('./graph.json', scratchDir), JSON.stringify(graph));
 }
 
 async function cleanUpResources(compilation) {
