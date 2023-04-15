@@ -7,7 +7,7 @@ import path from 'path';
 import { rollup } from 'rollup';
 
 async function emitResources(compilation) {
-  const { outputDir, scratchDir } = compilation.context;
+  const { outputDir } = compilation.context;
   const { resources, graph } = compilation;
 
   // https://stackoverflow.com/a/56150320/417806
@@ -24,10 +24,7 @@ async function emitResources(compilation) {
     }
   }));
 
-  // TODO this adds a log of overhead to graph.json output
-  // because now it will include all page resources (modelResource)
-  // (maybe a way on serve command startup to map resources to imports?)
-  await fs.writeFile(new URL('./graph.json', scratchDir), JSON.stringify(graph));
+  await fs.writeFile(new URL('./graph.json', outputDir), JSON.stringify(graph));
 }
 
 async function cleanUpResources(compilation) {
@@ -187,15 +184,6 @@ async function bundleSsrPages(compilation) {
   // });
 
   const input = [];
-  // TODO ideally be able to serialize entire graph (or only an explicit subset?)
-  // right now page.imports is breaking JSON.stringify
-  // https://github.com/ProjectEvergreen/greenwood/issues/1008
-  const intermediateGraph = compilation.graph.map(page => {
-    const p = { ...page };
-    delete p.imports;
-
-    return p;
-  });
 
   if (!compilation.config.prerender) {
     for (const page of compilation.graph) {
@@ -212,7 +200,7 @@ async function bundleSsrPages(compilation) {
             const routeModuleLocationUrl = new URL('./_${filename}', '${outputDir}');
             const routeWorkerUrl = '${compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().workerUrl}';
             const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
-            let body = 'Hello from the ${page.id} page!';
+            let body = '';
             let html = '';
             let frontmatter;
             let template;
@@ -260,7 +248,7 @@ async function bundleSsrPages(compilation) {
 
               worker.postMessage({
                 moduleUrl: routeModuleLocationUrl.href,
-                compilation: \`${JSON.stringify({ graph: intermediateGraph })}\`,
+                compilation: \`${JSON.stringify(compilation)}\`,
                 route: '${pagePath}'
               });
             });
@@ -315,12 +303,6 @@ const bundleCompilation = async (compilation) => {
       }).filter((provider) => {
         return provider.shouldIntercept && provider.intercept
           || provider.shouldOptimize && provider.optimize;
-      });
-      // centrally register all static resources
-      compilation.graph.map((page) => {
-        return page.imports;
-      }).flat().forEach(resource => {
-        compilation.resources.set(resource.sourcePathURL.pathname, resource);
       });
 
       console.info('bundling static assets...');
