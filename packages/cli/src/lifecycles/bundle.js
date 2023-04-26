@@ -276,7 +276,13 @@ async function bundleSsrPages(compilation) {
 
     const [rollupConfig] = await getRollupConfigForSsr(compilation, input);
 
-    if (rollupConfig.input.length !== 0) {
+    if (rollupConfig.input.length > 0) {
+      const { userTemplatesDir, outputDir } = compilation.context;
+
+      if (await checkResourceExists(userTemplatesDir)) {
+        await fs.cp(userTemplatesDir, new URL('./_templates/', outputDir), { recursive: true });
+      }
+
       const bundle = await rollup(rollupConfig);
       await bundle.write(rollupConfig.output);
     }

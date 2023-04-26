@@ -115,6 +115,12 @@ describe('Serve Greenwood With: ', function() {
 
           expect(scriptFiles.length).to.equal(0);
         });
+
+        it('should have no _templates/ output directory for the app', async function() {
+          const templateFiles = await glob.promise(path.join(this.context.publicDir, '_templates/*'));
+
+          expect(templateFiles.length).to.equal(0);
+        });
       });
     });
   });
