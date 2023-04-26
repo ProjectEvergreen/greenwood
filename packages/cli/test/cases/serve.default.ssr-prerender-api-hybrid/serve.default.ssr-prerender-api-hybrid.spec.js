@@ -25,6 +25,7 @@
  *     app.html
  */
 import chai from 'chai';
+import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
@@ -109,6 +110,13 @@ describe('Serve Greenwood With: ', function() {
 
           expect(headings.length).to.equal(1);
           expect(headings[0].textContent).to.equal('This is the home page.');
+        });
+
+        it('should have no bundled SSR output for the page', async function() {
+          const scriptFiles = (await glob.promise(path.join(this.context.publicDir, '*.js')))
+            .filter(file => file.indexOf('index.js') >= 0);
+
+          expect(scriptFiles.length).to.equal(0);
         });
       });
 

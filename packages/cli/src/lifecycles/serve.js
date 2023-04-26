@@ -177,7 +177,6 @@ async function getStaticServer(compilation, composable) {
       const isStatic = matchingRoute && !isSSR || isSSR && compilation.config.prerender || isSSR && matchingRoute.data.static;
 
       if (isSPA || (matchingRoute && isStatic) || url.pathname.split('.').pop() === 'html') {
-        console.log('getStaticServer', { url });
         const pathname = isSPA
           ? 'index.html'
           : isStatic
@@ -286,7 +285,6 @@ async function getHybridServer(compilation) {
       });
 
       if (!config.prerender && matchingRoute.isSSR && !matchingRoute.data.static) {
-        console.log('getHybridServer', { url });
         const { handler } = await import(new URL(`./${matchingRoute.filename}`, outputDir));
         // TODO passing compilation this way too hacky?
         // https://github.com/ProjectEvergreen/greenwood/issues/1008

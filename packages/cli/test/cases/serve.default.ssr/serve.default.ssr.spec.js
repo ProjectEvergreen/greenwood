@@ -27,6 +27,7 @@
  *     app.html
  */
 import chai from 'chai';
+import glob from 'glob-promise';
 import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
@@ -131,6 +132,13 @@ describe('Serve Greenwood With: ', function() {
         expect(headings.length).to.equal(1);
         expect(headings[0].textContent).to.equal('Hello from the server rendered home page!');
       });
+
+      it('should have the expected bundled SSR output for the page', async function() {
+        const scriptFiles = (await glob.promise(path.join(this.context.publicDir, '*.js')))
+          .filter(file => file.indexOf('index.js') >= 0);
+
+        expect(scriptFiles.length).to.equal(2);
+      });
     });
 
     describe('Serve command with HTML route response for artists page using "get" functions', function() {
@@ -227,6 +235,13 @@ describe('Serve Greenwood With: ', function() {
         expect(artistsPageGraphData.imports[0].src).to.equal(`/components/${componentName}.js`);
         expect(counterScript.length).to.equal(1);
       });
+
+      it('should have the expected bundled SSR output for the page', async function() {
+        const scriptFiles = (await glob.promise(path.join(this.context.publicDir, '*.js')))
+          .filter(file => file.indexOf('artists.js') >= 0);
+
+        expect(scriptFiles.length).to.equal(2);
+      });
     });
 
     describe('Prerender an HTML route response for users page exporting an HTMLElement as default export', function() {
@@ -256,6 +271,13 @@ describe('Serve Greenwood With: ', function() {
 
         expect(cardScript.length).to.be.equal(1);
         expect(cardScript[0].type).to.be.equal('module');
+      });
+
+      it('should have the expected bundled SSR output for the page', async function() {
+        const scriptFiles = (await glob.promise(path.join(this.context.publicDir, '*.js')))
+          .filter(file => file.indexOf('users.js') >= 0);
+
+        expect(scriptFiles.length).to.equal(2);
       });
     });
   });
