@@ -1,0 +1,16 @@
+const template = document.createElement('template');
+      
+template.innerHTML = '<footer>This is the footer component.</footer>';
+
+export default class FooterComponent extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
+  }
+}
+
+customElements.define('app-footer', FooterComponent);
