@@ -58,7 +58,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
   const pool = new WorkerPool(os.cpus().length, workerPrerender.workerUrl);
 
   for (const page of pages) {
-    const { route, outputPath } = page;
+    const { route, outputPath, resources } = page;
     const outputDirUrl = new URL(`./${route}/`, scratchDir);
     const outputPathUrl = new URL(`./${outputPath}`, scratchDir);
     const url = new URL(`http://localhost:${compilation.config.port}${route}`);
@@ -69,9 +69,8 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
 
     await createOutputDirectory(route, outputDirUrl);
 
-    // TODO could this come from page resources Map now instead
-    const resources = await trackResourcesForRoute(body, compilation, route);
     const scripts = resources
+      .map(resource => compilation.resources.get(resource))
       .filter(resource => resource.type === 'script')
       .map(resource => resource.sourcePathURL.href);
 
