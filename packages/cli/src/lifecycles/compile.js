@@ -42,15 +42,6 @@ const generateCompilation = () => {
 
         compilation.graph = JSON.parse(await fs.readFile(new URL('./graph.json', outputDir), 'utf-8'));
 
-        // hydrate URLs
-        compilation.graph.forEach((page, idx) => {
-          if (page.imports.length > 0) {
-            page.imports.forEach((imp, jdx) => {
-              compilation.graph[idx].imports[jdx].sourcePathURL = new URL(imp.sourcePathURL);
-            });
-          }
-        });
-
         if (await checkResourceExists(new URL('./manifest.json', outputDir))) {
           console.info('Loading manifest from build output...');
           // TODO put reviver into a utility?

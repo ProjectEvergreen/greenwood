@@ -1,7 +1,7 @@
 /* eslint-disable complexity, max-depth */
 import fs from 'fs/promises';
 import fm from 'front-matter';
-import { checkResourceExists, modelResource } from '../lib/resource-utils.js';
+import { checkResourceExists } from '../lib/resource-utils.js';
 import toc from 'markdown-toc';
 import { Worker } from 'worker_threads';
 
@@ -19,7 +19,8 @@ const generateGraph = async (compilation) => {
         id: 'index',
         label: 'Index',
         data: {},
-        imports: []
+        imports: [],
+        resources: []
       }];
 
       const walkDirectoryForPages = async function(directory, pages = []) {
@@ -125,13 +126,7 @@ const generateGraph = async (compilation) => {
 
                 worker.on('message', async (result) => {
                   if (result.frontmatter) {
-                    const resources = await Promise.all((result.frontmatter.imports || []).map(async (resource) => {
-                      const type = resource.split('.').pop() === 'js' ? 'script' : 'link';
-
-                      return await modelResource(compilation.context, type, resource);
-                    }));
-
-                    result.frontmatter.imports = resources;
+                    result.frontmatter.imports = result.frontmatter.imports || [];
                     ssrFrontmatter = result.frontmatter;
                   }
                   resolve();
@@ -178,7 +173,8 @@ const generateGraph = async (compilation) => {
              * filename: base filename of the page
              * id: filename without the extension
              * label: "pretty" text representation of the filename
-             * imports: per page JS or CSS file imports to be included in HTML output
+             * imports: per page JS or CSS file imports to be included in HTML output from frontmatter
+             * resources: sum of all resources for the entire page
              * outputPath: the filename to write to when generating static HTML
              * path: path to the file relative to the workspace
              * route: URL route for a given page on outputFilePath
@@ -194,6 +190,7 @@ const generateGraph = async (compilation) => {
                   return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
                 }).join(' '),
               imports,
+              resources: [],
               outputPath: route === '/404/'
                 ? '404.html'
                 : `${route}index.html`,
@@ -306,6 +303,7 @@ const generateGraph = async (compilation) => {
               path: null,
               data: {},
               imports: [],
+              resources: [],
               outputPath: `${node.route}index.html`,
               ...node,
               external: true

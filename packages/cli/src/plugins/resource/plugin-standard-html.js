@@ -218,11 +218,11 @@ class StandardHtmlResource extends ResourceInterface {
   async optimize(url, response) {
     const { optimization } = this.compilation.config;
     const { pathname } = url;
-    const pageResources = this.compilation.graph.find(page => page.outputPath === pathname || page.route === pathname).imports;
+    const pageResources = this.compilation.graph.find(page => page.outputPath === pathname || page.route === pathname).resources;
     let body = await response.text();
 
     for (const pageResource of pageResources) {
-      const keyedResource = this.compilation.resources.get(pageResource.sourcePathURL.pathname);
+      const keyedResource = this.compilation.resources.get(pageResource);
       const { contents, src, type, optimizationAttr, optimizedFileContents, optimizedFileName, rawAttributes } = keyedResource;
 
       if (src) {
