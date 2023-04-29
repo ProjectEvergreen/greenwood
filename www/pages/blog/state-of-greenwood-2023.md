@@ -222,6 +222,6 @@ We still plan to keep contributing to great community efforts and conversations 
 
 ## In Closing
 
-We're really encouraged to see the progress of web development these days, especially in seeing the growing adoption of web standards on the backend in tool like [Deno](https://deno.com/), and the creation of groups like the [WinterCG](https://wintercg.org/) to help steward it.  With the proliferation of many great JavaScript runtimes, competing against a standard will ultimately benefit users and maintainers, allowing us to mix and match as needed to find the right runtime for our projects.
+We're really encouraged to see the progress of web development these days, especially in seeing the growing adoption of web standards on the backend in tool like [Deno](https://deno.land/api@v1.33.1?unstable=), and the creation of groups like the [WinterCG](https://wintercg.org/) to help steward it.  With the proliferation of many great JavaScript runtimes, competing against a standard will ultimately benefit users and maintainers, allowing us to mix and match as needed to find the right runtime for our projects.
 
 Greenwood wants to be there every step of the way to get your project from SPA to SSG to SSR to everything in between.  Can't wait to see what you build next!  <img style="width: 15px; display: inline-block" src="/assets/evergreen.svg" alt="Project Evergreen logo"/>
