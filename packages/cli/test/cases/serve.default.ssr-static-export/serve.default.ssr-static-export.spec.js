@@ -22,6 +22,7 @@
  *     app.html
  */
 import chai from 'chai';
+import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
@@ -234,6 +235,13 @@ describe('Serve Greenwood With: ', function() {
           .filter((tag) => tag.getAttribute('src').indexOf(`/${componentName}.`) === 0);
 
         expect(counterScript.length).to.equal(1);
+      });
+
+      it('should have no bundled SSR output for the page', async function() {
+        const scriptFiles = (await glob.promise(path.join(this.context.publicDir, '*.js')))
+          .filter(file => file.indexOf('artists.js') >= 0);
+
+        expect(scriptFiles.length).to.equal(0);
       });
     });
   });

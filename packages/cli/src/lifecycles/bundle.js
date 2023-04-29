@@ -192,92 +192,100 @@ async function bundleSsrPages(compilation) {
     return p;
   });
 
-  for (const page of compilation.graph) {
-    if (page.isSSR && !page.data.static) {
-      const { filename, path: pagePath } = page;
-      const scratchUrl = new URL(`./${filename}`, outputDir);
+  if (!compilation.config.prerender) {
+    for (const page of compilation.graph) {
+      if (page.isSSR && !page.data.static) {
+        const { filename, path: pagePath } = page;
+        const scratchUrl = new URL(`./${filename}`, outputDir);
 
-      // better way to write out inline code like this?
-      await fs.writeFile(scratchUrl, `
-        import { Worker } from 'worker_threads';
-        import { getAppTemplate, getPageTemplate, getUserScripts } from '@greenwood/cli/src/lib/templating-utils.js';
+        // better way to write out inline code like this?
+        await fs.writeFile(scratchUrl, `
+          import { Worker } from 'worker_threads';
+          import { getAppTemplate, getPageTemplate, getUserScripts } from '@greenwood/cli/src/lib/templating-utils.js';
 
-        export async function handler(request, compilation) {
-          const routeModuleLocationUrl = new URL('./_${filename}', '${outputDir}');
-          const routeWorkerUrl = '${compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().workerUrl}';
-          const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
-          let body = 'Hello from the ${page.id} page!';
-          let html = '';
-          let frontmatter;
-          let template;
-          let templateType = 'page';
-          let title = '';
-          let imports = [];
+          export async function handler(request, compilation) {
+            const routeModuleLocationUrl = new URL('./_${filename}', '${outputDir}');
+            const routeWorkerUrl = '${compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().workerUrl}';
+            const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
+            let body = 'Hello from the ${page.id} page!';
+            let html = '';
+            let frontmatter;
+            let template;
+            let templateType = 'page';
+            let title = '';
+            let imports = [];
 
-          await new Promise((resolve, reject) => {
-            const worker = new Worker(new URL(routeWorkerUrl));
+            await new Promise((resolve, reject) => {
+              const worker = new Worker(new URL(routeWorkerUrl));
 
-            worker.on('message', (result) => {
-              if (result.body) {
-                body = result.body;
-              }
-
-              if (result.template) {
-                template = result.template;
-              }
-
-              if (result.frontmatter) {
-                frontmatter = result.frontmatter;
-
-                if (frontmatter.title) {
-                  title = frontmatter.title;
+              worker.on('message', (result) => {
+                if (result.body) {
+                  body = result.body;
                 }
 
-                if (frontmatter.template) {
-                  templateType = frontmatter.template;
+                if (result.template) {
+                  template = result.template;
                 }
 
-                if (frontmatter.imports) {
-                  imports = imports.concat(frontmatter.imports);
+                if (result.frontmatter) {
+                  frontmatter = result.frontmatter;
+
+                  if (frontmatter.title) {
+                    title = frontmatter.title;
+                  }
+
+                  if (frontmatter.template) {
+                    templateType = frontmatter.template;
+                  }
+
+                  if (frontmatter.imports) {
+                    imports = imports.concat(frontmatter.imports);
+                  }
                 }
-              }
 
-              resolve();
+                resolve();
+              });
+
+              worker.on('error', reject);
+              worker.on('exit', (code) => {
+                if (code !== 0) {
+                  reject(new Error(\`Worker stopped with exit code \${code}\`));
+                }
+              });
+
+              worker.postMessage({
+                moduleUrl: routeModuleLocationUrl.href,
+                compilation: \`${JSON.stringify({ graph: intermediateGraph })}\`,
+                route: '${pagePath}'
+              });
             });
 
-            worker.on('error', reject);
-            worker.on('exit', (code) => {
-              if (code !== 0) {
-                reject(new Error(\`Worker stopped with exit code \${code}\`));
-              }
-            });
+            html = template ? template : await getPageTemplate('', compilation.context, templateType, []);
+            html = await getAppTemplate(html, compilation.context, imports, [], false, title);
+            html = await getUserScripts(html, compilation.context);
+            html = html.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, body);
+            html = await (await htmlOptimizer.optimize(new URL(request.url), new Response(html))).text();
 
-            worker.postMessage({
-              moduleUrl: routeModuleLocationUrl.href,
-              compilation: \`${JSON.stringify({ graph: intermediateGraph })}\`,
-              route: '${pagePath}'
-            });
-          });
+            return new Response(html);
+          }
+        `);
 
-          html = template ? template : await getPageTemplate('', compilation.context, templateType, []);
-          html = await getAppTemplate(html, compilation.context, imports, [], false, title);
-          html = await getUserScripts(html, compilation.context);
-          html = html.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, body);
-          html = await (await htmlOptimizer.optimize(new URL(request.url), new Response(html))).text();
-
-          return new Response(html);
-        }
-      `);
-
-      input.push(normalizePathnameForWindows(new URL(`./${filename}`, pagesDir)));
+        input.push(normalizePathnameForWindows(new URL(`./${filename}`, pagesDir)));
+      }
     }
-  }
 
-  const [rollupConfig] = await getRollupConfigForSsr(compilation, input);
+    const [rollupConfig] = await getRollupConfigForSsr(compilation, input);
 
-  if (rollupConfig.input.length !== 0) {
-    const bundle = await rollup(rollupConfig);
-    await bundle.write(rollupConfig.output);
+    if (rollupConfig.input.length > 0) {
+      const { userTemplatesDir, outputDir } = compilation.context;
+
+      if (await checkResourceExists(userTemplatesDir)) {
+        await fs.cp(userTemplatesDir, new URL('./_templates/', outputDir), { recursive: true });
+      }
+
+      const bundle = await rollup(rollupConfig);
+      await bundle.write(rollupConfig.output);
+    }
   }
 }
 
