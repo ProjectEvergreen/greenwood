@@ -432,6 +432,30 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
+    describe('Serve command with 404 not found behavior', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/foo.png`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 404 status', function(done) {
+        expect(response.statusCode).to.equal(404);
+        done();
+      });
+    });
+
   });
 
   after(function() {
