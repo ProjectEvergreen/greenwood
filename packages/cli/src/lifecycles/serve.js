@@ -164,13 +164,14 @@ async function getDevServer(compilation) {
 async function getStaticServer(compilation, composable) {
   const app = new Koa();
   const { outputDir } = compilation.context;
+  const { port } = compilation.config;
   const standardResourcePlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource' && plugin.isGreenwoodDefaultPlugin;
   });
 
   app.use(async (ctx, next) => {
     try {
-      const url = new URL(`http://localhost:8080${ctx.url}`);
+      const url = new URL(`http://localhost:${port}${ctx.url}`);
       const matchingRoute = compilation.graph.find(page => page.route === url.pathname);
       const isSPA = compilation.graph.find(page => page.isSPA);
       const { isSSR } = matchingRoute || {};
@@ -197,7 +198,7 @@ async function getStaticServer(compilation, composable) {
 
   app.use(async (ctx, next) => {
     try {
-      const url = new URL(`http://localhost:8080${ctx.url}`);
+      const url = new URL(`http://localhost:${port}${ctx.url}`);
       const request = new Request(url, {
         method: ctx.request.method,
         headers: ctx.request.header
