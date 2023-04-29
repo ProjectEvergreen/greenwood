@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import { hashString } from '../lib/hashing-utils.js';
 import Koa from 'koa';
-import { mergeResponse } from '../lib/resource-utils.js';
+import { checkResourceExists, mergeResponse } from '../lib/resource-utils.js';
 import { Readable } from 'stream';
 import { ResourceInterface } from '../lib/resource-interface.js';
 
@@ -227,34 +227,37 @@ async function getStaticServer(compilation, composable) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`.${ctx.url}`, outputDir.href);
-      const resourcePlugins = standardResourcePlugins
-        .filter((plugin) => plugin.isStandardStaticResource)
-        .map((plugin) => {
-          return plugin.provider(compilation);
+
+      if (await checkResourceExists(url)) {
+        const resourcePlugins = standardResourcePlugins
+          .filter((plugin) => plugin.isStandardStaticResource)
+          .map((plugin) => {
+            return plugin.provider(compilation);
+          });
+
+        const request = new Request(url.href, {
+          headers: new Headers(ctx.request.header)
         });
+        const initResponse = new Response(ctx.body, {
+          status: ctx.response.status,
+          headers: new Headers(ctx.response.header)
+        });
+        const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+          return plugin.shouldServe && await plugin.shouldServe(url, request)
+            ? Promise.resolve(await plugin.serve(url, request))
+            : responsePromise;
+        }, Promise.resolve(initResponse));
 
-      const request = new Request(url.href, {
-        headers: new Headers(ctx.request.header)
-      });
-      const initResponse = new Response(ctx.body, {
-        status: ctx.response.status,
-        headers: new Headers(ctx.response.header)
-      });
-      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        return plugin.shouldServe && await plugin.shouldServe(url, request)
-          ? Promise.resolve(await plugin.serve(url, request))
-          : responsePromise;
-      }, Promise.resolve(initResponse));
+        if (response.ok) {
+          ctx.body = Readable.from(response.body);
+          ctx.type = response.headers.get('Content-Type');
+          ctx.status = response.status;
 
-      if (response.ok) {
-        ctx.body = Readable.from(response.body);
-        ctx.type = response.headers.get('Content-Type');
-        ctx.status = response.status;
-
-        // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
-        // https://github.com/ProjectEvergreen/greenwood/issues/1048
-        if (response.headers.has('Content-Length')) {
-          ctx.set('Content-Length', response.headers.get('Content-Length'));
+          // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
+          // https://github.com/ProjectEvergreen/greenwood/issues/1048
+          if (response.headers.has('Content-Length')) {
+            ctx.set('Content-Length', response.headers.get('Content-Length'));
+          }
         }
       }
     } catch (e) {
