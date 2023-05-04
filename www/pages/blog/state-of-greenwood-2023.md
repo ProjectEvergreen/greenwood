@@ -8,13 +8,20 @@ template: blog
 
 **Published: May 3, 2023**
 
-![Greenwood logo](https://raw.githubusercontent.com/ProjectEvergreen/greenwood/9d43f5ef87f0ee3487db77ad8945c0d8ece30e1c/www/assets/greenwood-logo.png)
+<img
+  src="/assets/greenwood-logo-300w.webp"
+  alt="Greenwood Logo"
+  srcset="/assets/greenwood-logo-300w.webp 350w,
+          /assets/greenwood-logo-500w.webp 500w,
+          /assets/greenwood-logo-750w.webp 750w,
+          /assets/greenwood-logo-1000w.webp 1000w,
+          /assets/greenwood-logo-1500w.webp 1500w"/>
 
 ## The Full Stack Web
 
 About a year has passed since our [first _State of Greenwood_ blog post](/blog/state-of-greenwood-2022/) and wow, what a year of progress it has been!  In our continued effort to make web development easier to get started with, we have made great strides in our journey of promoting the best of web standards not only for the frontend, but also on the backend as well.  The web is _full stack_, even Web Components! (and we even picked up a new logo along the way!)
 
-I think more than ever we continue to be proud of our efforts to embrace not only HTML as the baseline for shipping websites, but being able to write [actual _.html_ files](/getting-started/).  We feel that being able to start a project this intuitively from any skill level makes Greenwood the perfect on-ramp for any web development project, and it would not be incorrect to say that we are happy to offload some of our docs to MDN if we can!  Why create a new API if a good one already exists?  In this way Greenwood will always [stay true to web standards](/about/how-it-works/) and refrain from introducing any "magic" as much as possible.
+I think more than ever we continue to be proud of our efforts to embrace not only HTML as the baseline for shipping websites, but also being able to write [actual _.html_ files](/getting-started/).  We feel that being able to start a project this intuitively from any skill level makes Greenwood the perfect on-ramp for any web development project, and it would not be incorrect to say that we are happy to offload some of our docs to MDN if we can!  Why create a new API if a good one already exists?  In this way Greenwood will always [stay true to web standards](/about/how-it-works/) and refrain from introducing any "magic" as much as possible.
 
 So let's take a look back at some key features we added over the past year that we feel best exhibits what makes us excited not only for how we can help developers achieve their goals today, but also what it means for the next year of Greenwood development. 🔍
 
@@ -134,7 +141,7 @@ class StandardCssResource extends ResourceInterface {
 ```
 <!-- eslint-enable no-unused-vars -->
 
-And here is what it looks like now, exclusively based on Web APIs and standards. ✨
+And here is what it looks like now, now based on Web APIs and standards. ✨
 <!-- eslint-disable-next-line no-unused-vars -->
 ```js
 class StandardCssResource extends ResourceInterface {
@@ -206,7 +213,7 @@ This is just a sampling of the work that we wanted to share over the course of t
 
 ## The Year In Front of Us
 
-While we managed to check off a lot of items from last years list, we are already have our sites set on the next horizon for Greenwood; running on serverless and at the edge!  A lot of the work to make this possible was completed in the last year as part of the features listed above, and so Greenwood is poised to cross that bridge very soon now.  It's this last stretch of development that will allow Greenwood to consider being ready for its [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3)!
+While we managed to check off a lot of items from last years list, we already have our sites set on the next horizon for Greenwood; running on serverless and at the edge!  A lot of the work to make this possible was completed in the last year as part of the features listed above, and so Greenwood is poised to cross that bridge very soon now.  It's this last stretch of development that will allow Greenwood to consider being ready for its [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3)!
 
 So what's in store next?  Here are a few key items we're tracking:
 - [Serverless and Edge runtime support](https://github.com/ProjectEvergreen/greenwood/issues/1008)
