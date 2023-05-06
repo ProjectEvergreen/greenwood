@@ -55,3 +55,5 @@ a[href*='greenwood'],a[href$='.pdf']{color:orange}
 @page {size:8.5in 9in;margin-top:4in;}
 
 @font-feature-values Font One{@styleset {nice-style:12}}
+
+h1:has(+h2){margin:0 0 0.25rem 0}
