@@ -26,6 +26,8 @@ function requestAsObject (request) {
     return filtered;
   }
 
+  // TODO handle full response
+  // https://github.com/ProjectEvergreen/greenwood/issues/1048
   return {
     ...stringifiableObject(request),
     headers: Object.fromEntries(request.headers),
@@ -53,8 +55,6 @@ class ApiRoutesResource extends ResourceInterface {
       ...request
     });
 
-    // console.log({ req });
-
     // TODO does this ever run in anything but development mode?
     if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
       const workerUrl = new URL('../../lib/api-route-worker.js', import.meta.url);
@@ -64,7 +64,6 @@ class ApiRoutesResource extends ResourceInterface {
         const req = requestAsObject(request);
 
         worker.on('message', (result) => {
-          // console.log('RESULT =====>', { result });
           resolve(result);
         });
         worker.on('error', reject);
@@ -74,12 +73,9 @@ class ApiRoutesResource extends ResourceInterface {
           }
         });
 
-        // console.log('OUT', { reqUnrevied });
-
         worker.postMessage({ href, request: req });
       });
 
-      // console.log('SUCCESS', {response})
       return new Response(response.body, {
         ...response
       });

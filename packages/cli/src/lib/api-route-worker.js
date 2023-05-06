@@ -21,6 +21,8 @@ async function responseAsObject (response) {
     return filtered;
   }
 
+  // TODO handle full response
+  // https://github.com/ProjectEvergreen/greenwood/issues/1048
   return {
     ...stringifiableObject(response),
     headers: Object.fromEntries(response.headers),
@@ -30,11 +32,9 @@ async function responseAsObject (response) {
 }
 
 async function executeRouteModule({ href, request }) {
-  // console.log('WORKER', { href, message, request })
   const { handler } = await import(href);
   const response = await handler(request);
 
-  // console.log('WORKER', { response })
   parentPort.postMessage(await responseAsObject(response));
 }
 
