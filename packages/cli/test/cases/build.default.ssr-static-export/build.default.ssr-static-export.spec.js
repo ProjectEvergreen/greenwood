@@ -209,8 +209,11 @@ describe('Build Greenwood With: ', function() {
         const componentName = 'counter';
         const counterScript = Array.from(dom.window.document.querySelectorAll('head > script[src]'))
           .filter((tag) => tag.getAttribute('src').indexOf(`/${componentName}.`) === 0);
+        const counterImport = artistsPageGraphData.imports
+          .filter(script => script.indexOf(`${componentName}.`) >= 0);
 
-        expect(artistsPageGraphData.imports[0].src).to.equal(`/components/${componentName}.js`);
+        expect(artistsPageGraphData.imports.length).to.equal(1);
+        expect(counterImport.length).to.equal(1);
         expect(counterScript.length).to.equal(1);
       });
     });

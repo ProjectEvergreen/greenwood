@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import { hashString } from './hashing-utils.js';
+import htmlparser from 'node-html-parser';
 
 async function modelResource(context, type, src = undefined, contents = undefined, optimizationAttr = undefined, rawAttributes = undefined) {
   const { projectDirectory, scratchDir, userWorkspace } = context;
@@ -105,10 +106,74 @@ async function resolveForRelativeUrl(url, rootUrl) {
   return reducedUrl;
 }
 
+// TODO does this make more sense in bundle lifecycle?
+// https://github.com/ProjectEvergreen/greenwood/issues/970
+// or could this be done sooner (like in appTemplate building in html resource plugin)?
+// Or do we need to ensure userland code / plugins have gone first
+// before we can curate the final list of <script> / <style> / <link> tags to bundle
+async function trackResourcesForRoute(html, compilation, route) {
+  const { context } = compilation;
+  const root = htmlparser.parse(html, {
+    script: true,
+    style: true
+  });
+
+  // intentionally support <script> tags from the <head> or <body>
+  const scripts = await Promise.all(root.querySelectorAll('script')
+    .filter(script => (
+      isLocalLink(script.getAttribute('src')) || script.rawText)
+      && script.rawAttrs.indexOf('importmap') < 0)
+    .map(async(script) => {
+      const src = script.getAttribute('src');
+      const optimizationAttr = script.getAttribute('data-gwd-opt');
+      const { rawAttrs } = script;
+
+      if (src) {
+        // <script src="...."></script>
+        return await modelResource(context, 'script', src, null, optimizationAttr, rawAttrs);
+      } else if (script.rawText) {
+        // <script>...</script>
+        return await modelResource(context, 'script', null, script.rawText, optimizationAttr, rawAttrs);
+      }
+    }));
+
+  const styles = await Promise.all(root.querySelectorAll('style')
+    .filter(style => !(/\$/).test(style.rawText) && !(/<!-- Shady DOM styles for -->/).test(style.rawText)) // filter out Shady DOM <style> tags that happen when using puppeteer
+    .map(async(style) => await modelResource(context, 'style', null, style.rawText, null, style.getAttribute('data-gwd-opt'))));
+
+  const links = await Promise.all(root.querySelectorAll('head link')
+    .filter(link => {
+      // <link rel="stylesheet" href="..."></link>
+      return link.getAttribute('rel') === 'stylesheet'
+        && link.getAttribute('href') && isLocalLink(link.getAttribute('href'));
+    }).map(async(link) => {
+      return modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'), link.rawAttrs);
+    }));
+
+  const resources = [
+    ...scripts,
+    ...styles,
+    ...links
+  ];
+
+  resources.forEach(resource => {
+    compilation.resources.set(resource.sourcePathURL.pathname, resource);
+  });
+
+  compilation.graph.find(page => page.route === route).resources = resources.map(resource => resource.sourcePathURL.pathname);
+
+  return resources;
+}
+
+function isLocalLink(url = '') {
+  return url !== '' && (url.indexOf('http') !== 0 && url.indexOf('//') !== 0);
+}
+
 export {
   checkResourceExists,
   mergeResponse,
   modelResource,
   normalizePathnameForWindows,
-  resolveForRelativeUrl
+  resolveForRelativeUrl,
+  trackResourcesForRoute
 };

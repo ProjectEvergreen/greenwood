@@ -186,7 +186,14 @@ describe('Serve Greenwood With: ', function() {
       it('should have the expected number of <script> tags in the <head>', function() {
         const scripts = artistsPageDom.window.document.querySelectorAll('head > script');
 
-        expect(scripts.length).to.equal(2);
+        expect(scripts.length).to.equal(3);
+      });
+
+      it('should have the expected <app-header> tag from the app template in the <head>', function() {
+        const scripts = Array.from(artistsPageDom.window.document.querySelectorAll('head > script'))
+          .filter(script => script.src && script.src.startsWith('/header.'));
+
+        expect(scripts.length).to.equal(1);
       });
 
       it('should have expected SSR content from the non module script tag', function() {
@@ -234,12 +241,24 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should append the expected <script> tag for a frontmatter import <x-counter> component', function() {
-        const componentName = 'counter';
         const counterScript = Array.from(artistsPageDom.window.document.querySelectorAll('head > script[src]'))
-          .filter((tag) => tag.getAttribute('src').indexOf(`/${componentName}.`) === 0);
+          .filter((tag) => tag.getAttribute('src').startsWith('/counter.'));
 
-        expect(artistsPageGraphData.imports[0].src).to.equal(`/components/${componentName}.js`);
         expect(counterScript.length).to.equal(1);
+      });
+
+      it('should append the expected graph import scripts for the page', function() {
+        const { imports } = artistsPageGraphData;
+
+        expect(imports.length).to.equal(1);
+        expect(imports[0]).to.equal('/components/counter.js');
+      });
+
+      it('should append the expected graph resource scripts for the page from a template', function() {
+        const { resources } = artistsPageGraphData;
+
+        expect(resources.length).to.equal(4);
+        expect(resources.find(resource => resource.endsWith('/header.js'))).to.not.be.undefined;
       });
 
       it('should have the expected bundled SSR output for the page', async function() {

@@ -1,74 +1,16 @@
 import fs from 'fs/promises';
-import htmlparser from 'node-html-parser';
-import { checkResourceExists, modelResource } from '../lib/resource-utils.js';
+import { checkResourceExists, trackResourcesForRoute } from '../lib/resource-utils.js';
 import os from 'os';
 import { WorkerPool } from '../lib/threadpool.js';
 
-function isLocalLink(url = '') {
-  return url !== '' && (url.indexOf('http') !== 0 && url.indexOf('//') !== 0);
-}
-
+// TODO a lot of these are duplicated in the build lifecycle too
+// would be good to refactor
 async function createOutputDirectory(route, outputDir) {
   if (route !== '/404/' && !await checkResourceExists(outputDir)) {
     await fs.mkdir(outputDir, {
       recursive: true
     });
   }
-}
-
-// TODO does this make more sense in bundle lifecycle?
-// https://github.com/ProjectEvergreen/greenwood/issues/970
-// or could this be done sooner (like in appTemplate building in html resource plugin)?
-// Or do we need to ensure userland code / plugins have gone first
-// before we can curate the final list of <script> / <style> / <link> tags to bundle
-async function trackResourcesForRoute(html, compilation, route) {
-  const { context } = compilation;
-  const root = htmlparser.parse(html, {
-    script: true,
-    style: true
-  });
-
-  // intentionally support <script> tags from the <head> or <body>
-  const scripts = await Promise.all(root.querySelectorAll('script')
-    .filter(script => (
-      isLocalLink(script.getAttribute('src')) || script.rawText)
-      && script.rawAttrs.indexOf('importmap') < 0)
-    .map(async(script) => {
-      const src = script.getAttribute('src');
-      const optimizationAttr = script.getAttribute('data-gwd-opt');
-      const { rawAttrs } = script;
-
-      if (src) {
-        // <script src="...."></script>
-        return await modelResource(context, 'script', src, null, optimizationAttr, rawAttrs);
-      } else if (script.rawText) {
-        // <script>...</script>
-        return await modelResource(context, 'script', null, script.rawText, optimizationAttr, rawAttrs);
-      }
-    }));
-
-  const styles = await Promise.all(root.querySelectorAll('style')
-    .filter(style => !(/\$/).test(style.rawText) && !(/<!-- Shady DOM styles for -->/).test(style.rawText)) // filter out Shady DOM <style> tags that happen when using puppeteer
-    .map(async(style) => await modelResource(context, 'style', null, style.rawText, null, style.getAttribute('data-gwd-opt'))));
-
-  const links = await Promise.all(root.querySelectorAll('head link')
-    .filter(link => {
-      // <link rel="stylesheet" href="..."></link>
-      return link.getAttribute('rel') === 'stylesheet'
-        && link.getAttribute('href') && isLocalLink(link.getAttribute('href'));
-    }).map(async(link) => {
-      return modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'), link.rawAttrs);
-    }));
-
-  const resources = [
-    ...scripts,
-    ...styles,
-    ...links
-  ];
-
-  compilation.graph.find(page => page.route === route).imports = resources;
-
-  return resources;
 }
 
 async function servePage(url, request, plugins) {
@@ -116,7 +58,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
   const pool = new WorkerPool(os.cpus().length, workerPrerender.workerUrl);
 
   for (const page of pages) {
-    const { route, outputPath } = page;
+    const { route, outputPath, resources } = page;
     const outputDirUrl = new URL(`./${route}/`, scratchDir);
     const outputPathUrl = new URL(`./${outputPath}`, scratchDir);
     const url = new URL(`http://localhost:${compilation.config.port}${route}`);
@@ -127,8 +69,8 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
 
     await createOutputDirectory(route, outputDirUrl);
 
-    const resources = await trackResourcesForRoute(body, compilation, route);
     const scripts = resources
+      .map(resource => compilation.resources.get(resource))
       .filter(resource => resource.type === 'script')
       .map(resource => resource.sourcePathURL.href);
 
@@ -200,7 +142,6 @@ async function staticRenderCompilation(compilation) {
     let body = await (await servePage(url, request, plugins)).text();
     body = await (await interceptPage(url, request, plugins, body)).text();
 
-    await trackResourcesForRoute(body, compilation, route);
     await createOutputDirectory(route, outputDirUrl);
     await fs.writeFile(outputPathUrl, body);
 
