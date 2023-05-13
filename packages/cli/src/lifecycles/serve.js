@@ -136,9 +136,8 @@ async function getDevServer(compilation) {
     console.log(url.pathname);
     // console.log('ctx.body', ctx.body);
 
-    // don't interfere with external requests or API calls, binary files, or JSON
+    // don't interfere with external requests or API calls, only files
     // and only run in development
-    // TODO better buffer / binary data detection
     if (process.env.__GWD_COMMAND__ === 'develop' && url.protocol === 'file:') { // eslint-disable-line no-underscore-dangle
       // const response = new Response(ctx.body._readableState);
       // const teedOff = new ReadableStream(ctx.body).tee();
