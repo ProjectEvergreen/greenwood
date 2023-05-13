@@ -1,6 +1,7 @@
 /* eslint-disable max-depth, max-len */
 import fs from 'fs/promises';
 import { getRollupConfigForApis, getRollupConfigForScriptResources, getRollupConfigForSsr } from '../config/rollup.config.js';
+import { getAppTemplate, getPageTemplate, getUserScripts } from '../lib/templating-utils.js';
 import { hashString } from '../lib/hashing-utils.js';
 import { checkResourceExists, mergeResponse, normalizePathnameForWindows } from '../lib/resource-utils.js';
 import path from 'path';
@@ -173,6 +174,8 @@ async function bundleApiRoutes(compilation) {
 }
 
 async function bundleSsrPages(compilation) {
+  // TODO better way to do this?
+  await import('wc-compiler');
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
   const { outputDir, pagesDir } = compilation.context;
   // TODO context plugins for SSR ?
@@ -188,80 +191,119 @@ async function bundleSsrPages(compilation) {
   if (!compilation.config.prerender) {
     for (const page of compilation.graph) {
       if (page.isSSR && !page.data.static) {
-        const { filename, path: pagePath } = page;
-        const scratchUrl = new URL(`./${filename}`, outputDir);
+        console.log({ page });
+        const { filename, imports, route, template, title } = page;
+        const outputUrl = new URL(`./${filename}`, outputDir);
+        const { getTemplate = null, getBody = null } = await import(new URL(`./${filename}`, pagesDir));
+        
+        let body = getBody ? await getBody(compilation, route) : null;
+        let html = '';
 
-        // better way to write out inline code like this?
-        await fs.writeFile(scratchUrl, `
-          import { Worker } from 'worker_threads';
-          import { getAppTemplate, getPageTemplate, getUserScripts } from '@greenwood/cli/src/lib/templating-utils.js';
+        html = getTemplate ? await getTemplate(compilation, route) : await getPageTemplate('', compilation.context, template, []);
+        html = await getAppTemplate(html, compilation.context, imports, [], false, title);
+        html = await getUserScripts(html, compilation.context);
+        // html = html.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, body);
+        // html = await (await htmlOptimizer.optimize(new URL(request.url), new Response(html))).text();
 
-          export async function handler(request, compilation) {
-            const routeModuleLocationUrl = new URL('./_${filename}', '${outputDir}');
-            const routeWorkerUrl = '${compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().workerUrl}';
-            const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
-            let body = '';
-            let html = '';
-            let frontmatter;
-            let template;
-            let templateType = 'page';
-            let title = '';
-            let imports = [];
+        // return new Response(html);
+        // const staticHtml = '';
 
-            await new Promise((resolve, reject) => {
-              const worker = new Worker(new URL(routeWorkerUrl));
+        // TODO need to handle body as a string
+        // TODO have to do this "manually" until import.meta.url is supported?
+        await fs.writeFile(outputUrl, `
+          // import { renderToString } from 'wc-compiler';
+          import 'wc-compiler/src/dom-shim.js';
+          import Page from './_${filename}';
 
-              worker.on('message', (result) => {
-                if (result.body) {
-                  body = result.body;
-                }
+          export async function handler(request) {
+            console.log('${JSON.stringify(page)}');          
 
-                if (result.template) {
-                  template = result.template;
-                }
+            let initBody = ${body};
+            let initHtml = \`${html}\`;
 
-                if (result.frontmatter) {
-                  frontmatter = result.frontmatter;
+            if (!initBody) {
+              const page = new Page();
+              await page.connectedCallback();
+              // const { html } = await renderToString(new URL(request.url), false);
 
-                  if (frontmatter.title) {
-                    title = frontmatter.title;
-                  }
+              initHtml = initHtml.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, page.innerHTML);
+            }
 
-                  if (frontmatter.template) {
-                    templateType = frontmatter.template;
-                  }
-
-                  if (frontmatter.imports) {
-                    imports = imports.concat(frontmatter.imports);
-                  }
-                }
-
-                resolve();
-              });
-
-              worker.on('error', reject);
-              worker.on('exit', (code) => {
-                if (code !== 0) {
-                  reject(new Error(\`Worker stopped with exit code \${code}\`));
-                }
-              });
-
-              worker.postMessage({
-                moduleUrl: routeModuleLocationUrl.href,
-                compilation: \`${JSON.stringify(compilation)}\`,
-                route: '${pagePath}'
-              });
-            });
-
-            html = template ? template : await getPageTemplate('', compilation.context, templateType, []);
-            html = await getAppTemplate(html, compilation.context, imports, [], false, title);
-            html = await getUserScripts(html, compilation.context);
-            html = html.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, body);
-            html = await (await htmlOptimizer.optimize(new URL(request.url), new Response(html))).text();
-
-            return new Response(html);
+            return new Response(initHtml);
           }
         `);
+
+        // better way to write out inline code like this?
+        // await fs.writeFile(scratchUrl, `
+        //   import { Worker } from 'worker_threads';
+        //   import { getAppTemplate, getPageTemplate, getUserScripts } from '@greenwood/cli/src/lib/templating-utils.js';
+
+        //   export async function handler(request, compilation) {
+        //     const routeModuleLocationUrl = new URL('./_${filename}', '${outputDir}');
+        //     const routeWorkerUrl = '${compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().workerUrl}';
+        //     const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
+        //     let body = '';
+        //     let html = '';
+        //     let frontmatter;
+        //     let template;
+        //     let templateType = 'page';
+        //     let title = '';
+        //     let imports = [];
+
+        //     await new Promise((resolve, reject) => {
+        //       const worker = new Worker(new URL(routeWorkerUrl));
+
+        //       worker.on('message', (result) => {
+        //         if (result.body) {
+        //           body = result.body;
+        //         }
+
+        //         if (result.template) {
+        //           template = result.template;
+        //         }
+
+        //         if (result.frontmatter) {
+        //           frontmatter = result.frontmatter;
+
+        //           if (frontmatter.title) {
+        //             title = frontmatter.title;
+        //           }
+
+        //           if (frontmatter.template) {
+        //             templateType = frontmatter.template;
+        //           }
+
+        //           if (frontmatter.imports) {
+        //             imports = imports.concat(frontmatter.imports);
+        //           }
+        //         }
+
+        //         resolve();
+        //       });
+
+        //       worker.on('error', reject);
+        //       worker.on('exit', (code) => {
+        //         if (code !== 0) {
+        //           reject(new Error(\`Worker stopped with exit code \${code}\`));
+        //         }
+        //       });
+
+        //       worker.postMessage({
+        //         moduleUrl: routeModuleLocationUrl.href,
+        //         compilation: \`${JSON.stringify(compilation)}\`,
+        //         route: '${pagePath}'
+        //       });
+        //     });
+
+        //     html = template ? template : await getPageTemplate('', compilation.context, templateType, []);
+        //     html = await getAppTemplate(html, compilation.context, imports, [], false, title);
+        //     html = await getUserScripts(html, compilation.context);
+        //     html = html.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, body);
+        //     html = await (await htmlOptimizer.optimize(new URL(request.url), new Response(html))).text();
+
+        //     return new Response(html);
+        //   }
+        // `);
 
         input.push(normalizePathnameForWindows(new URL(`./${filename}`, pagesDir)));
       }
@@ -269,6 +311,7 @@ async function bundleSsrPages(compilation) {
 
     const [rollupConfig] = await getRollupConfigForSsr(compilation, input);
 
+    // TODO do we need templates anymore?
     if (rollupConfig.input.length > 0) {
       const { userTemplatesDir, outputDir } = compilation.context;
 
