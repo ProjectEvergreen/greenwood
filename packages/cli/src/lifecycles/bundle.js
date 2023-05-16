@@ -210,23 +210,44 @@ async function bundleSsrPages(compilation) {
 
         // TODO need to handle body as a string
         // TODO have to do this "manually" until import.meta.url is supported?
+        // await fs.writeFile(outputUrl, `
+        //   // import { renderToString } from 'wc-compiler';
+        //   import 'wc-compiler/src/dom-shim.js';
+        //   import Page from './_${filename}';
+
+        //   export async function handler(request) {
+        //     console.log('${JSON.stringify(page)}');          
+
+        //     let initBody = ${body};
+        //     let initHtml = \`${html}\`;
+
+        //     if (!initBody) {
+        //       const page = new Page();
+        //       await page.connectedCallback();
+        //       // const { html } = await renderToString(new URL(request.url), false);
+
+        //       initHtml = initHtml.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, page.innerHTML);
+        //     }
+
+        //     return new Response(initHtml);
+        //   }
+        // `);
+
         await fs.writeFile(outputUrl, `
-          // import { renderToString } from 'wc-compiler';
-          import 'wc-compiler/src/dom-shim.js';
-          import Page from './_${filename}';
+          import { renderToString } from 'wc-compiler';
 
           export async function handler(request) {
-            console.log('${JSON.stringify(page)}');          
+            console.log('${JSON.stringify(page)}');
+            console.log({ request });      
 
             let initBody = ${body};
             let initHtml = \`${html}\`;
 
             if (!initBody) {
-              const page = new Page();
-              await page.connectedCallback();
-              // const { html } = await renderToString(new URL(request.url), false);
+              console.log('serve', new URL(\`./${filename}\`, import.meta.url));
+              const { html } = await renderToString(new URL(\`./_${filename}\`, import.meta.url), false);
 
-              initHtml = initHtml.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, page.innerHTML);
+              initHtml = initHtml.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, html);
             }
 
             return new Response(initHtml);
