@@ -28,7 +28,7 @@ export default {
   staticRouter: false,
   optimization: 'default',
   plugins: [],
-  workspace: 'src', // assumes process.cwd()
+  workspace: new URL('./src/', import.meta.url),
   pagesDirectory: 'pages', // e.g. src/pages
   templatesDirectory: 'templates' // e.g. src/templates
 };
@@ -221,6 +221,8 @@ Setting the workspace path to be the _www/_ folder in the current directory from
 
 ```js
 export default {
-  workspace: new URL('./www', import.meta.url)
+  workspace: new URL('./www/', import.meta.url)
 };
 ```
+
+> Please note the trailing `/` here as for ESM, a path must end in a `/` for directories.

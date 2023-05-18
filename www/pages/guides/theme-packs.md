@@ -63,7 +63,7 @@ const myThemePack = () => [{
       templates: [
         // import.meta.url will be located at _node_modules/your-package/_
         // when your plugin is run in a user's project
-        new URL('./dist/layouts', import.meta.url)
+        new URL('./dist/layouts/', import.meta.url)
       ]
     };
   }
@@ -129,7 +129,7 @@ const myThemePackPlugin = (options = {}) => [{
     // you can use other directory names besides templates/ this way!
     const templateLocation = options.__isDevelopment
       ? new URL('./layouts/', compilation.context.userWorkspace)
-      : new URL('dist/layouts', import.meta.url);
+      : new URL('dist/layouts/', import.meta.url);
 
     return {
       templates: [
