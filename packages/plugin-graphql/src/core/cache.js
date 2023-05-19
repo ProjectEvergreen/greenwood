@@ -1,4 +1,4 @@
-import ApolloCore from '@apollo/client/core/core.cjs.js';
+import ApolloCore from '@apollo/client/core/core.cjs';
 import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 import fs from 'fs/promises';
 import { gql } from 'apollo-server';
