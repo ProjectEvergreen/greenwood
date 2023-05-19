@@ -216,7 +216,7 @@ async function walkPackageJson(packageJson = {}) {
 }
 
 function mergeImportMap(html = '', map = {}) {
-  // es-modules-shims breaks on dangling commas in an importMap :/
+  // just like with JSON, importmaps break on dangling commas
   const danglingComma = html.indexOf('"imports": {}') > 0 ? '' : ',';
   const importMap = JSON.stringify(map).replace('}', '').replace('{', '');
 

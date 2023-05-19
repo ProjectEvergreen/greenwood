@@ -72,13 +72,6 @@ class NodeModulesResource extends ResourceInterface {
   async intercept(url, request, response) {
     const { context } = this.compilation;
     let body = await response.text();
-    const hasHead = body.match(/\<head>(.*)<\/head>/s);
-
-    if (hasHead && hasHead.length > 0) {
-      const contents = hasHead[0].replace(/type="module"/g, 'type="module-shim"');
-
-      body = body.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
-    }
 
     const userPackageJson = await getPackageJson(context);
     
@@ -94,8 +87,7 @@ class NodeModulesResource extends ResourceInterface {
     // apply import map and shim for users
     body = body.replace('<head>', `
       <head>
-        <script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>
-        <script type="importmap-shim">
+        <script type="importmap">
           {
             "imports": ${JSON.stringify(importMap, null, 1)}
           }

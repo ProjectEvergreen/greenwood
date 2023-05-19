@@ -110,9 +110,9 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
 
     // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
     body = body.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
-    body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
-    body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
-    body = body.replace(/type="module-shim"/g, 'type="module"');
+    // body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
+    // body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
+    // body = body.replace(/type="module-shim"/g, 'type="module"');
 
     // clean this up here to avoid sending webcomponents-bundle to rollup
     body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
