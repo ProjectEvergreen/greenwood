@@ -1,4 +1,4 @@
-import ApolloCore from '@apollo/client/core/core.cjs';
+import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client/core/index.js';
 import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 import fs from 'fs/promises';
 import { gql } from 'apollo-server';
@@ -9,12 +9,12 @@ const createCache = async (req, context) => {
 
   return new Promise(async(resolve, reject) => {
     try {
-      const client = await new ApolloCore.ApolloClient({
-        link: new ApolloCore.HttpLink({
+      const client = await new ApolloClient({
+        link: new HttpLink({
           uri: 'http://localhost:4000?q=internal', /* internal flag to prevent looping cache on request */
           fetch
         }),
-        cache: new ApolloCore.InMemoryCache()
+        cache: new InMemoryCache()
       });
 
       /* Take the same query from request, and repeat the query for our server side cache */
