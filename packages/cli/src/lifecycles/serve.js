@@ -133,72 +133,28 @@ async function getDevServer(compilation) {
   // https://stackoverflow.com/questions/43659756/chrome-ignores-the-etag-header-and-just-uses-the-in-memory-cache-disk-cache
   app.use(async (ctx) => {
     const url = new URL(ctx.url);
-    console.log(url.pathname);
-    // console.log('ctx.body', ctx.body);
 
     // don't interfere with external requests or API calls, only files
     // and only run in development
     if (process.env.__GWD_COMMAND__ === 'develop' && url.protocol === 'file:') { // eslint-disable-line no-underscore-dangle
-      // const response = new Response(ctx.body._readableState);
-      // const teedOff = new ReadableStream(ctx.body).tee();
-      // console.log({ teedOff });
-      // const readStream1 = ctx.body.clone();
-      // const response = new Response(teedOff[0]);
-      // const contents = await response.text();
-      // const contents = await ctx.body.read();
-      console.log('headers', ctx.response.header);
       // TODO there's probably a better way to do this with tee-ing streams but this works for now
       const response = new Response(ctx.body, {
         status: ctx.response.status,
         headers: new Headers(ctx.response.header)
       }).clone();
-      const r2 = response.clone();
-      const contents = await r2.text();
-
-      // const chunks = [];
-      // for await (const chunk of teedOff[0]) {
-      //     chunks.push(Buffer.from(chunk));
-      // }
-
-      // const contents = Buffer.concat(chunks).toString("utf-8");
-      // console.log(ctx.body.read());
-      // console.log(ctx.body._readableState)
-      // console.log({ contents });
-      // console.log({ teedOff });
-      // console.log('is Buffer contents', Buffer.isBuffer(contents))
-      // console.log('is Buffer cdx.body', Buffer.isBuffer(ctx.body))
-
-      // TODO does this still work?
-      // if (url.pathname.endsWith('.webp') || !contents || Buffer.isBuffer(contents)) {
-      //   console.warn(`no body for => ${ctx.url}`);
-      //   // ctx.body = Readable.from(ctx.body);
-      //   ctx.status = 200;
-      //   // ctx.response.body = Readable.from(contents);
-      //   ctx.body = contents;
-      // } else {
+      const splitResponse = response.clone();
+      const contents = await splitResponse.text();
       const inm = ctx.headers['if-none-match'];
-      // const stream1 = contents.pipe(new stream.PassThrough())
-      // const contents = await streamToString(body);
-      // const contents = await (new Response(body)).text();
       const etagHash = url.pathname.split('.').pop() === 'json'
         ? hashString(JSON.stringify(contents))
         : hashString(contents);
 
-      // console.log({ contents });
-      console.log({ inm, etagHash });
-
       if (inm && inm === etagHash) {
-        console.log('cache hit!');
         ctx.status = 304;
         ctx.body = null;
         ctx.set('Etag', etagHash);
         ctx.set('Cache-Control', 'no-cache');
-        // teedOff[0];
       } else if (!inm || inm !== etagHash) {
-        // await next();
-        console.log('cache miss!');
-        console.log('content type', ctx.response.header['content-type']);
-
         ctx.body = Readable.from(response.body);
         ctx.status = ctx.status;
         ctx.set('Content-Type', ctx.response.header['content-type']);
@@ -209,21 +165,7 @@ async function getDevServer(compilation) {
         if (response.headers.has('Content-Length')) {
           ctx.set('Content-Length', response.headers.get('Content-Length'));
         }
-        // console.log({ contents });
-        // ctx.status = 200;
-        // ctx.body = Readable.from(response.body); // Readable.from(contents);
-        // ctx.body.resume();
-      } else {
-        console.log('??????????');
-        // ctx.body = teedOff[1];
-        // ctx.body.resume();
-        // ctx.body = Readable.from(ctx.body);
       }
-
-      // ctx.body.resume();
-      // }
-
-      console.log('======================');
     }
   });
 
