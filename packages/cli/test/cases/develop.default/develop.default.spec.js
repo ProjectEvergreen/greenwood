@@ -923,6 +923,45 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
+    describe('Develop command with generic video container format (.mp4) behavior that should return an etag hit', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get({
+            url: `${hostname}:${port}/assets/splash-clip.mp4`,
+            headers: {
+              'if-none-match': '2130309740'
+            }
+          }, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 304 status', function(done) {
+        expect(response.statusCode).to.equal(304);
+        done();
+      });
+
+      it('should return an empty body', function(done) {
+        expect(response.body).to.contain('');
+        done();
+      });
+
+      it('should return the correct cache-control header', function(done) {
+        expect(response.headers['cache-control']).to.equal('no-cache');
+        done();
+      });
+    });
+
     describe('Develop command with audio format (.mp3) behavior', function() {
       let response = {};
 
