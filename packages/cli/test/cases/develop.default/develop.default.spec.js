@@ -902,13 +902,18 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
 
-      it('should return the correct content type', function(done) {
+      it('should return the correct content type header', function(done) {
         expect(response.headers['content-type']).to.contain(ext);
         done();
       });
 
-      it('should return the correct content length', function(done) {
+      it('should return the correct content length header', function(done) {
         expect(response.headers['content-length']).to.equal('2498461');
+        done();
+      });
+
+      it('should return the correct etag header', function(done) {
+        expect(response.headers.etag).to.equal('2130309740');
         done();
       });
 
