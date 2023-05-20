@@ -146,12 +146,16 @@ async function getDevServer(compilation) {
       // const response = new Response(teedOff[0]);
       // const contents = await response.text();
       // const contents = await ctx.body.read();
-      const response = new Response(ctx.body).clone();
+      console.log('headers', ctx.response.header);
+      // TODO there's probably a better way to do this with tee-ing streams but this works for now
+      const response = new Response(ctx.body, {
+        status: ctx.response.status,
+        headers: new Headers(ctx.response.header)
+      }).clone();
       const r2 = response.clone();
       const contents = await r2.text();
-      
-      // const chunks = [];
 
+      // const chunks = [];
       // for await (const chunk of teedOff[0]) {
       //     chunks.push(Buffer.from(chunk));
       // }
@@ -193,10 +197,20 @@ async function getDevServer(compilation) {
       } else if (!inm || inm !== etagHash) {
         // await next();
         console.log('cache miss!');
+
+        ctx.body = Readable.from(response.body);
+        ctx.type = response.headers.get('Content-Type');
+        ctx.status = response.status;
         ctx.set('Etag', etagHash);
+  
+        // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
+        // https://github.com/ProjectEvergreen/greenwood/issues/1048
+        if (response.headers.has('Content-Length')) {
+          ctx.set('Content-Length', response.headers.get('Content-Length'));
+        }
         // console.log({ contents });
         // ctx.status = 200;
-        ctx.body = Readable.from(response.body); // Readable.from(contents);
+        // ctx.body = Readable.from(response.body); // Readable.from(contents);
         // ctx.body.resume();
       } else {
         console.log('??????????');
