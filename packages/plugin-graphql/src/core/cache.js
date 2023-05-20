@@ -1,3 +1,5 @@
+// we "deep" link into the Apollo package to avoid pulling in React
+// https://www.apollographql.com/docs/react/migrating/apollo-client-3-migration/#using-apollo-client-without-react
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client/core/index.js';
 import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 import fs from 'fs/promises';
