@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-import-jsx",
-  "version": "0.28.2",
+  "version": "0.28.3",
   "description": "A Greenwood plugin to write JSX rendering Web Components compatible with WCC.",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-jsx",
@@ -30,6 +30,6 @@
     "wc-compiler": "~0.8.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.28.2"
+    "@greenwood/cli": "^0.28.3"
   }
 }
