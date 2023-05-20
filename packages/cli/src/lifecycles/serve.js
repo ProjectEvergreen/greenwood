@@ -197,10 +197,11 @@ async function getDevServer(compilation) {
       } else if (!inm || inm !== etagHash) {
         // await next();
         console.log('cache miss!');
+        console.log('content type', ctx.response.header['content-type']);
 
         ctx.body = Readable.from(response.body);
-        ctx.type = response.headers.get('Content-Type');
-        ctx.status = response.status;
+        ctx.status = ctx.status;
+        ctx.set('Content-Type', ctx.response.header['content-type']);
         ctx.set('Etag', etagHash);
   
         // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
