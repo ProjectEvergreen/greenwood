@@ -132,27 +132,38 @@ async function getDevServer(compilation) {
   // ETag Support - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
   // https://stackoverflow.com/questions/43659756/chrome-ignores-the-etag-header-and-just-uses-the-in-memory-cache-disk-cache
   app.use(async (ctx) => {
-    const body = ctx.response.body;
     const url = new URL(ctx.url);
 
-    // don't interfere with external requests or API calls, binary files, or JSON
+    // don't interfere with external requests or API calls, only files
     // and only run in development
     if (process.env.__GWD_COMMAND__ === 'develop' && url.protocol === 'file:') { // eslint-disable-line no-underscore-dangle
-      if (!body || Buffer.isBuffer(body)) {
-        // console.warn(`no body for => ${ctx.url}`);
-      } else {
-        const inm = ctx.headers['if-none-match'];
-        const etagHash = url.pathname.split('.').pop() === 'json'
-          ? hashString(JSON.stringify(body))
-          : hashString(body);
+      // TODO there's probably a better way to do this with tee-ing streams but this works for now
+      const response = new Response(ctx.body, {
+        status: ctx.response.status,
+        headers: new Headers(ctx.response.header)
+      }).clone();
+      const splitResponse = response.clone();
+      const contents = await splitResponse.text();
+      const inm = ctx.headers['if-none-match'];
+      const etagHash = url.pathname.split('.').pop() === 'json'
+        ? hashString(JSON.stringify(contents))
+        : hashString(contents);
 
-        if (inm && inm === etagHash) {
-          ctx.status = 304;
-          ctx.body = null;
-          ctx.set('Etag', etagHash);
-          ctx.set('Cache-Control', 'no-cache');
-        } else if (!inm || inm !== etagHash) {
-          ctx.set('Etag', etagHash);
+      if (inm && inm === etagHash) {
+        ctx.status = 304;
+        ctx.body = null;
+        ctx.set('Etag', etagHash);
+        ctx.set('Cache-Control', 'no-cache');
+      } else if (!inm || inm !== etagHash) {
+        ctx.body = Readable.from(response.body);
+        ctx.status = ctx.status;
+        ctx.set('Content-Type', ctx.response.header['content-type']);
+        ctx.set('Etag', etagHash);
+  
+        // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
+        // https://github.com/ProjectEvergreen/greenwood/issues/1048
+        if (response.headers.has('Content-Length')) {
+          ctx.set('Content-Length', response.headers.get('Content-Length'));
         }
       }
     }

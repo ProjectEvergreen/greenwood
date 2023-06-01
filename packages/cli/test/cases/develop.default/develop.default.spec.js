@@ -902,18 +902,62 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
 
-      it('should return the correct content type', function(done) {
+      it('should return the correct content type header', function(done) {
         expect(response.headers['content-type']).to.contain(ext);
         done();
       });
 
-      it('should return the correct content length', function(done) {
+      it('should return the correct content length header', function(done) {
         expect(response.headers['content-length']).to.equal('2498461');
+        done();
+      });
+
+      it('should return the correct etag header', function(done) {
+        expect(response.headers.etag).to.equal('2130309740');
         done();
       });
 
       it('should return the correct response body', function(done) {
         expect(response.body).to.contain(ext);
+        done();
+      });
+    });
+
+    describe('Develop command with generic video container format (.mp4) behavior that should return an etag hit', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get({
+            url: `${hostname}:${port}/assets/splash-clip.mp4`,
+            headers: {
+              'if-none-match': '2130309740'
+            }
+          }, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 304 status', function(done) {
+        expect(response.statusCode).to.equal(304);
+        done();
+      });
+
+      it('should return an empty body', function(done) {
+        expect(response.body).to.contain('');
+        done();
+      });
+
+      it('should return the correct cache-control header', function(done) {
+        expect(response.headers['cache-control']).to.equal('no-cache');
         done();
       });
     });
