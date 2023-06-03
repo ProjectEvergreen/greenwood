@@ -34,7 +34,9 @@ class Shelf extends LitElement {
   }
 
   expandRoute(path) {
+    console.log({ path })
     let routeShelfListIndex = this.shelfList.findIndex(item => {
+      console.log({ item });
       let expRoute = new RegExp(`^${path}$`);
       return expRoute.test(item.route);
     });
@@ -65,6 +67,7 @@ class Shelf extends LitElement {
 
     this.selectedIndex = parseInt(evt.target.id.substring(6, evt.target.id.length), 10);
 
+    console.log('selected', this.selectedIndex);
     if (this.selectedIndex === previousSelected) {
       this.selectedIndex = '';
     }
@@ -82,6 +85,7 @@ class Shelf extends LitElement {
   }
 
   async fetchShelfData() {
+    console.log('page', this.page);
     return await client.query({
       query: MenuQuery,
       variables: {
@@ -95,6 +99,7 @@ class Shelf extends LitElement {
   async updated(changedProperties) {
     if (changedProperties.has('page') && this.page !== '' && this.page !== '/') {
       const response = await this.fetchShelfData();
+      console.log({ response });
 
       this.shelfList = response.data.menu.children.map((item) => {
         return {
@@ -130,6 +135,7 @@ class Shelf extends LitElement {
     };
 
     /* eslint-enable */
+    console.log('shelf liust', this.shelfList);
     return this.shelfList.map((item, index) => {
       let id = `index_${index}`;
       let chevron = item.children && item.children.length > 0

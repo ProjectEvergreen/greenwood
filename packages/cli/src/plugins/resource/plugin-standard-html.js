@@ -27,8 +27,9 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
+    const { basePath } = this.compilation.config;
     const { protocol, pathname } = url;
-    const hasMatchingPageRoute = this.compilation.graph.find(node => node.route === pathname);
+    const hasMatchingPageRoute = this.compilation.graph.find(node => `${basePath}${node.route}` === pathname);
     const isSPA = this.compilation.graph.find(node => node.isSPA) && pathname.indexOf('.') < 0;
 
     return protocol.startsWith('http') && (hasMatchingPageRoute || isSPA);
@@ -37,10 +38,11 @@ class StandardHtmlResource extends ResourceInterface {
   async serve(url, request) {
     const { config, context } = this.compilation;
     const { pagesDir, userWorkspace } = context;
-    const { interpolateFrontmatter } = config;
+    const { interpolateFrontmatter, basePath } = config;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find(node => node.isSPA);
-    const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
+    const matchingRoute = this.compilation.graph.find((node) => `${basePath}${node.route}` === pathname) || {};
+    console.log({ matchingRoute });
     const filePath = !matchingRoute.external ? matchingRoute.path : '';
     const isMarkdownContent = (matchingRoute?.filename || '').split('.').pop() === 'md';
 
@@ -166,7 +168,7 @@ class StandardHtmlResource extends ResourceInterface {
       body = ssrTemplate ? ssrTemplate : await getPageTemplate(filePath, context, template, contextPlugins);
     }
 
-    body = await getAppTemplate(body, context, customImports, contextPlugins, config.devServer.hud, title);
+    body = await getAppTemplate(body, context, customImports, contextPlugins, config.devServer.hud, title, basePath);
     body = await getUserScripts(body, context);
 
     if (processedMarkdown) {
