@@ -52,7 +52,7 @@ describe('Serve Greenwood With: ', function() {
       'hashing-utils',
       'node-modules-utils',
       'resource-utils',
-      'templating-utils'
+      'execute-route-module'
     ];
 
     before(async function() {
@@ -61,19 +61,19 @@ describe('Serve Greenwood With: ', function() {
         `${outputPath}/node_modules/@greenwood/cli/src/lib`
       );
       /*
-       * there is an odd issue seemingly due to needed lib/router.js tha causes tests to think files are CommonJS
+       * there is an odd issue seemingly due to needing lib/router.js that causes tests to think files are CommonJS
        * ```
        * file:///Users/owenbuckley/Workspace/project-evergreen/repos/greenwood/packages/cli/test/cases/serve.config.static-router/public/artists.js:3
-       * import { getAppTemplate, getPageTemplate, getUserScripts } from '@greenwood/cli/src/lib/templating-utils.js';
+       * import { executeRouteModule } from '@greenwood/cli/src/lib/execute-route-module.js';
        *         ^^^^^^^^^^^^^^
-       * SyntaxError: Named export 'getAppTemplate' not found. The requested module '@greenwood/cli/src/lib/templating-utils.js'
+       * SyntaxError: Named export 'executeRouteModule' not found. The requested module '@greenwood/cli/src/lib/templating-utils.js'
        * is a CommonJS module, which may not support all module.exports as named exports.
        * CommonJS modules can always be imported via the default export, for example using:
-       * import pkg from '@greenwood/cli/src/lib/templating-utils.js';
-       * const { getAppTemplate, getPageTemplate, getUserScripts } = pkg;
+       * import pkg from '@greenwood/cli/src/lib/execute-route-module.js';
+       * const { executeRouteModule } = pkg;
        * ```
        *
-       * however no other tests have this issue.  so as terrible hack we need to
+       * however no other tests have this issue.  so as a terrible hack we need to
        * - copy all lib files
        * - rename them to end in .mjs
        * - update references to these files in other imports
