@@ -105,10 +105,10 @@ class StandardHtmlResource extends ResourceInterface {
 
     if (matchingRoute.isSSR) {
       const routeModuleLocationUrl = new URL(`./${matchingRoute.filename}`, pagesDir);
-      const routeWorkerUrl = this.compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().workerUrl;
+      const routeWorkerUrl = this.compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeRouteModuleUrl;
 
       await new Promise((resolve, reject) => {
-        const worker = new Worker(routeWorkerUrl);
+        const worker = new Worker(new URL('../../lib/ssr-route-worker.js', import.meta.url));
 
         worker.on('message', (result) => {
           if (result.template) {
@@ -143,6 +143,7 @@ class StandardHtmlResource extends ResourceInterface {
         });
 
         worker.postMessage({
+          executeRouteModuleUrl: routeWorkerUrl.href,
           moduleUrl: routeModuleLocationUrl.href,
           compilation: JSON.stringify(this.compilation),
           route: matchingRoute.path
@@ -212,6 +213,7 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async shouldOptimize(url, response) {
+    // TOOD should be .indexOf(this.contentType) === 0
     return response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
   }
 

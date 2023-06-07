@@ -3,7 +3,7 @@ const greenwoodPluginRendererDefault = {
   name: 'plugin-renderer-default',
   provider: () => {
     return {
-      workerUrl: new URL('../../lib/ssr-route-worker.js', import.meta.url)
+      executeRouteModuleUrl: new URL('../../lib/execute-route-module.js', import.meta.url)
     };
   }
 };

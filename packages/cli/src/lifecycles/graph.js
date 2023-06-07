@@ -116,13 +116,13 @@ const generateGraph = async (compilation) => {
               }
               /* ---------End Menu Query-------------------- */
             } else if (isDynamic) {
-              const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation).workerUrl;
+              const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation).executeRouteModuleUrl;
               let ssrFrontmatter;
 
               filePath = route;
 
               await new Promise((resolve, reject) => {
-                const worker = new Worker(routeWorkerUrl);
+                const worker = new Worker(new URL('../lib/ssr-route-worker.js', import.meta.url));
 
                 worker.on('message', async (result) => {
                   if (result.frontmatter) {
@@ -139,6 +139,7 @@ const generateGraph = async (compilation) => {
                 });
 
                 worker.postMessage({
+                  executeRouteModuleUrl: routeWorkerUrl.href,
                   moduleUrl: filenameUrl.href,
                   compilation: JSON.stringify(compilation),
                   route

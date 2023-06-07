@@ -2,7 +2,6 @@
 import fs from 'fs/promises';
 import { getRollupConfigForApis, getRollupConfigForScriptResources, getRollupConfigForSsr } from '../config/rollup.config.js';
 import { getAppTemplate, getPageTemplate, getUserScripts } from '../lib/templating-utils.js';
-import { executeRouteModule } from '../lib/execute-route-module.js';
 import { hashString } from '../lib/hashing-utils.js';
 import { checkResourceExists, mergeResponse, normalizePathnameForWindows } from '../lib/resource-utils.js';
 import path from 'path';
@@ -188,6 +187,8 @@ async function bundleSsrPages(compilation) {
 
   if (!compilation.config.prerender) {
     const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
+    const routeWorkerUrl = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeRouteModuleUrl;
+    const { executeRouteModule } = await import(routeWorkerUrl);
     const { outputDir, pagesDir } = compilation.context;
 
     for (const page of compilation.graph) {
@@ -209,15 +210,17 @@ async function bundleSsrPages(compilation) {
         staticHtml = await getUserScripts(staticHtml, compilation.context);
         // console.log('+ user scripts', { staticHtml });
 
+        // TODO do we want to use http:// here for optimizer?
         staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
         // console.log('+ optimizer', { staticHtml });
 
         // better way to write out this inline code?
-        // TODO need to get executeRouteModule value from config
+        // TODO does executeRouteModule need to get bundled?
         await fs.writeFile(outputUrl, `
-          import { executeRouteModule } from '@greenwood/cli/src/lib/execute-route-module.js';
+          // const { executeRouteModule } from '@greenwood/cli/src/lib/execute-route-module.js';
 
           export async function handler(request) {
+            const { executeRouteModule } = await import('${routeWorkerUrl.href}');
             const compilation = JSON.parse('${JSON.stringify(compilation)}');
             const page = JSON.parse('${JSON.stringify(page)}');
             const { route, label, id } = page;
@@ -239,6 +242,7 @@ async function bundleSsrPages(compilation) {
 
         // console.log('=========================');
 
+        // TODO should we bundle entry points?
         input.push(normalizePathnameForWindows(new URL(`./${filename}`, pagesDir)));
       }
     }
@@ -249,6 +253,7 @@ async function bundleSsrPages(compilation) {
     if (rollupConfig.input.length > 0) {
       const { userTemplatesDir, outputDir } = compilation.context;
 
+      // TODO can this be removed
       if (await checkResourceExists(userTemplatesDir)) {
         await fs.cp(userTemplatesDir, new URL('./_templates/', outputDir), { recursive: true });
       }
