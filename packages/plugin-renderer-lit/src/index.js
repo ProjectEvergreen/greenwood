@@ -4,7 +4,7 @@ const greenwoodPluginRendererLit = (options = {}) => {
     name: 'plugin-renderer-lit',
     provider: () => {
       return {
-        workerUrl: new URL('./ssr-route-worker-lit.js', import.meta.url),
+        executeModuleUrl: new URL('./execute-route-module.js', import.meta.url),
         prerender: options.prerender
       };
     }
