@@ -3,7 +3,7 @@ import { html } from 'lit';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import '../components/greeting.js';
 
-async function getTemplate(compilation, route) {
+async function getTemplate(compilation, { route }) {
   return html`
     <html>
       <head>
@@ -65,7 +65,7 @@ async function getBody() {
   `;
 }
 
-async function getFrontmatter(compilation, route) {
+async function getFrontmatter(compilation, { route }) {
   return {
     menu: 'navigation',
     index: 7,

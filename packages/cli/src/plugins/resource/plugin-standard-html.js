@@ -105,7 +105,7 @@ class StandardHtmlResource extends ResourceInterface {
 
     if (matchingRoute.isSSR) {
       const routeModuleLocationUrl = new URL(`./${matchingRoute.filename}`, pagesDir);
-      const routeWorkerUrl = this.compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeRouteModuleUrl;
+      const routeWorkerUrl = this.compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeModuleUrl;
 
       await new Promise((resolve, reject) => {
         const worker = new Worker(new URL('../../lib/ssr-route-worker.js', import.meta.url));
@@ -143,10 +143,10 @@ class StandardHtmlResource extends ResourceInterface {
         });
 
         worker.postMessage({
-          executeRouteModuleUrl: routeWorkerUrl.href,
+          executeModuleUrl: routeWorkerUrl.href,
           moduleUrl: routeModuleLocationUrl.href,
           compilation: JSON.stringify(this.compilation),
-          route: matchingRoute.path
+          page: JSON.stringify(matchingRoute)
         });
       });
     }

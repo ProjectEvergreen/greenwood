@@ -3,7 +3,7 @@ const greenwoodPluginRendererDefault = {
   name: 'plugin-renderer-default',
   provider: () => {
     return {
-      executeRouteModuleUrl: new URL('../../lib/execute-route-module.js', import.meta.url)
+      executeModuleUrl: new URL('../../lib/execute-route-module.js', import.meta.url)
     };
   }
 };

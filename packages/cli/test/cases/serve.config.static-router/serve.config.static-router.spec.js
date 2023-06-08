@@ -22,10 +22,8 @@
  *     index.md
  */
 import chai from 'chai';
-import fs from 'fs/promises';
 import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { normalizePathnameForWindows } from '../../../src/lib/resource-utils.js';
 import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
@@ -48,79 +46,22 @@ describe('Serve Greenwood With: ', function() {
   });
 
   describe(LABEL, function() {
-    const workaroundFiles = [
-      'hashing-utils',
-      'node-modules-utils',
-      'resource-utils',
-      'execute-route-module'
-    ];
 
     before(async function() {
       const greenwoodRouterLibs = await getDependencyFiles(
         `${process.cwd()}/packages/cli/src/lib/router.js`,
         `${outputPath}/node_modules/@greenwood/cli/src/lib`
       );
-      /*
-       * there is an odd issue seemingly due to needing lib/router.js that causes tests to think files are CommonJS
-       * ```
-       * file:///Users/owenbuckley/Workspace/project-evergreen/repos/greenwood/packages/cli/test/cases/serve.config.static-router/public/artists.js:3
-       * import { executeRouteModule } from '@greenwood/cli/src/lib/execute-route-module.js';
-       *         ^^^^^^^^^^^^^^
-       * SyntaxError: Named export 'executeRouteModule' not found. The requested module '@greenwood/cli/src/lib/templating-utils.js'
-       * is a CommonJS module, which may not support all module.exports as named exports.
-       * CommonJS modules can always be imported via the default export, for example using:
-       * import pkg from '@greenwood/cli/src/lib/execute-route-module.js';
-       * const { executeRouteModule } = pkg;
-       * ```
-       *
-       * however no other tests have this issue.  so as a terrible hack we need to
-       * - copy all lib files
-       * - rename them to end in .mjs
-       * - update references to these files in other imports
-       *
-       *  (unfortunately, trying to just add a package.json with type="module" did not seem to work :/)
-       */
-      const greenwoodTemplatingLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/cli/src/lib/*`,
-        `${outputPath}/node_modules/@greenwood/cli/src/lib`
-      );
-      const greenwoodTemplates = await getDependencyFiles(
-        `${process.cwd()}/packages/cli/src/templates/*`,
-        `${outputPath}/node_modules/@greenwood/cli/src/templates`
-      );
 
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
-        ...greenwoodRouterLibs,
-        ...greenwoodTemplatingLibs,
-        ...greenwoodTemplates
+        ...greenwoodRouterLibs
       ]);
-
-      for (const f of workaroundFiles) {
-        const pathname = normalizePathnameForWindows(new URL(`./node_modules/@greenwood/cli/src/lib/${f}.js`, import.meta.url));
-        let contents = await fs.readFile(pathname, 'utf-8');
-
-        workaroundFiles.forEach((wf) => {
-          contents = contents.replace(`${wf}.js`, `${wf}.mjs`);
-        });
-
-        await fs.writeFile(pathname.replace('.js', '.mjs'), contents);
-      }
 
       await runner.runCommand(cliPath, 'build');
 
       return new Promise(async (resolve) => {
         setTimeout(async () => {
-          // template out artists.js to use .mjs too
-          const pathname = normalizePathnameForWindows(new URL('./public/artists.js', import.meta.url));
-          let ssrPageContents = await fs.readFile(pathname, 'utf-8');
-
-          for (const f of workaroundFiles) {
-            ssrPageContents = ssrPageContents.replace(`${f}.js`, `${f}.mjs`);
-          }
-
-          await fs.writeFile(pathname, ssrPageContents);
-
           resolve();
         }, 10000);
 

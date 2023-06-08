@@ -182,23 +182,23 @@ async function bundleSsrPages(compilation) {
   // }).map((plugin) => {
   //   return plugin.provider(compilation);
   // });
-
+  const hasSSRPages = compilation.graph.filter(page => page.isSSR).length > 0;
   const input = [];
 
-  if (!compilation.config.prerender) {
+  if (!compilation.config.prerender && hasSSRPages) {
     const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
-    const routeWorkerUrl = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeRouteModuleUrl;
-    const { executeRouteModule } = await import(routeWorkerUrl);
+    const { executeModuleUrl } = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider();
+    const { executeRouteModule } = await import(executeModuleUrl);
     const { outputDir, pagesDir } = compilation.context;
 
     for (const page of compilation.graph) {
       if (page.isSSR && !page.data.static) {
-        const { filename, imports, route, id, label, template, title } = page;
+        const { filename, imports, route, template, title } = page;
         const outputUrl = new URL(`./${filename}`, outputDir);
         const moduleUrl = new URL(`./${filename}`, pagesDir);
         // TODO getTemplate has to be static (for now?)
         // const { getTemplate = null } = await import(new URL(`./${filename}`, pagesDir));
-        const data = await executeRouteModule({ moduleUrl, compilation, route, label, id, prerender: false, htmlContents: null, scripts: [] });
+        const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [] });
         let staticHtml = '';
 
         staticHtml = data.template ? data.template : await getPageTemplate(staticHtml, compilation.context, template, []);
@@ -216,17 +216,15 @@ async function bundleSsrPages(compilation) {
 
         // better way to write out this inline code?
         // TODO does executeRouteModule need to get bundled?
+        // TODO do we need to bundle this too since we reference executeModuleUrl.href directly?
         await fs.writeFile(outputUrl, `
-          // const { executeRouteModule } from '@greenwood/cli/src/lib/execute-route-module.js';
-
           export async function handler(request) {
-            const { executeRouteModule } = await import('${routeWorkerUrl.href}');
+            const { executeRouteModule } = await import('${executeModuleUrl.href}');
             const compilation = JSON.parse('${JSON.stringify(compilation)}');
             const page = JSON.parse('${JSON.stringify(page)}');
-            const { route, label, id } = page;
-            let staticHtml = \`${staticHtml}\`;
             const moduleUrl = new URL('./_${filename}', '${outputDir.href}');
-            const data = await executeRouteModule({ moduleUrl, compilation, route, label, id, prerender: false, htmlContents: null, scripts: [] });
+            const data = await executeRouteModule({ moduleUrl, compilation, page });
+            let staticHtml = \`${staticHtml}\`;
 
             // console.log({ page })
             // console.log({ staticHtml })

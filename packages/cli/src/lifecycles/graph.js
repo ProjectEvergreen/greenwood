@@ -116,7 +116,7 @@ const generateGraph = async (compilation) => {
               }
               /* ---------End Menu Query-------------------- */
             } else if (isDynamic) {
-              const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation).executeRouteModuleUrl;
+              const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation).executeModuleUrl;
               let ssrFrontmatter;
 
               filePath = route;
@@ -139,10 +139,19 @@ const generateGraph = async (compilation) => {
                 });
 
                 worker.postMessage({
-                  executeRouteModuleUrl: routeWorkerUrl.href,
+                  executeModuleUrl: routeWorkerUrl.href,
                   moduleUrl: filenameUrl.href,
                   compilation: JSON.stringify(compilation),
-                  route
+                  // TODO need to get as many of these params as possible
+                  // or ignore completely?
+                  page: JSON.stringify({
+                    route,
+                    id,
+                    label: id.split('-')
+                      .map((idPart) => {
+                        return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
+                      }).join(' ')
+                  })
                 });
               });
 
