@@ -189,7 +189,7 @@ async function bundleSsrPages(compilation) {
     const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
     const { executeModuleUrl } = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider();
     const { executeRouteModule } = await import(executeModuleUrl);
-    const { outputDir, pagesDir, scratchDir } = compilation.context;
+    const { pagesDir, scratchDir } = compilation.context;
 
     for (const page of compilation.graph) {
       if (page.isSSR && !page.data.static) {
@@ -220,10 +220,15 @@ async function bundleSsrPages(compilation) {
         await fs.writeFile(entryFileUrl, `
           import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
 
+          // use a function to explicitly resolve import.meta.url at _runtime_, not build time
+          function getEntryPointUrl(filename) {
+            return new URL(\`./_\${filename}\`, import.meta.url);
+          }
+
           export async function handler(request) {
             const compilation = JSON.parse('${JSON.stringify(compilation)}');
             const page = JSON.parse('${JSON.stringify(page)}');
-            const moduleUrl = new URL('./_${filename}', '${outputDir.href}');
+            const moduleUrl = getEntryPointUrl('${filename}');
             const data = await executeRouteModule({ moduleUrl, compilation, page });
             let staticHtml = \`${staticHtml}\`;
 
