@@ -189,12 +189,12 @@ async function bundleSsrPages(compilation) {
     const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
     const { executeModuleUrl } = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider();
     const { executeRouteModule } = await import(executeModuleUrl);
-    const { outputDir, pagesDir } = compilation.context;
+    const { outputDir, pagesDir, scratchDir } = compilation.context;
 
     for (const page of compilation.graph) {
       if (page.isSSR && !page.data.static) {
         const { filename, imports, route, template, title } = page;
-        const outputUrl = new URL(`./${filename}`, outputDir);
+        const entryFileUrl = new URL(`./_${filename}`, scratchDir);
         const moduleUrl = new URL(`./${filename}`, pagesDir);
         // TODO getTemplate has to be static (for now?)
         // const { getTemplate = null } = await import(new URL(`./${filename}`, pagesDir));
@@ -217,9 +217,10 @@ async function bundleSsrPages(compilation) {
         // better way to write out this inline code?
         // TODO does executeRouteModule need to get bundled?
         // TODO do we need to bundle this too since we reference executeModuleUrl.href directly?
-        await fs.writeFile(outputUrl, `
+        await fs.writeFile(entryFileUrl, `
+          import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
+
           export async function handler(request) {
-            const { executeRouteModule } = await import('${executeModuleUrl.href}');
             const compilation = JSON.parse('${JSON.stringify(compilation)}');
             const page = JSON.parse('${JSON.stringify(page)}');
             const moduleUrl = new URL('./_${filename}', '${outputDir.href}');
@@ -238,10 +239,8 @@ async function bundleSsrPages(compilation) {
           }
         `);
 
-        // console.log('=========================');
-
-        // TODO should we bundle entry points?
-        input.push(normalizePathnameForWindows(new URL(`./${filename}`, pagesDir)));
+        input.push(normalizePathnameForWindows(moduleUrl));
+        input.push(normalizePathnameForWindows(entryFileUrl));
       }
     }
 
@@ -249,13 +248,6 @@ async function bundleSsrPages(compilation) {
 
     // TODO do we need templates anymore?
     if (rollupConfig.input.length > 0) {
-      const { userTemplatesDir, outputDir } = compilation.context;
-
-      // TODO can this be removed
-      if (await checkResourceExists(userTemplatesDir)) {
-        await fs.cp(userTemplatesDir, new URL('./_templates/', outputDir), { recursive: true });
-      }
-
       const bundle = await rollup(rollupConfig);
       await bundle.write(rollupConfig.output);
     }

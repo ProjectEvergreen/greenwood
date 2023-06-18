@@ -224,10 +224,28 @@ const getRollupConfigForSsr = async (compilation, input) => {
     },
     plugins: [
       greenwoodJsonLoader(),
-      nodeResolve(),
+      // TODO should this be used in all configs?
+      nodeResolve({
+        preferBuiltins: true
+      }),
       commonjs(),
       importMetaAssets()
-    ]
+    ],
+    onwarn: (errorObj) => {
+      const { code, message } = errorObj;
+
+      switch (code) {
+
+        case 'CIRCULAR_DEPENDENCY':
+          // let this through for lit to enable nodeResolve({ preferBuiltins: true })
+          // https://github.com/lit/lit/issues/449
+          break;
+        default:
+          // otherwise, log all warnings from rollup
+          console.debug(message);
+
+      }
+    }
   }];
 };
 
