@@ -263,7 +263,9 @@ const getRollupConfigForSsr = async (compilation, input) => {
       switch (code) {
 
         case 'CIRCULAR_DEPENDENCY':
-          // TODO let this through for lit to enable nodeResolve({ preferBuiltins: true })
+          // TODO let this through for lit by suppressing it
+          // Error: the string "Circular dependency: ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js ->
+          // ../../../../../node_modules/@lit-labs/ssr/lib/lit-element-renderer.js -> ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js\n" was thrown, throw an Error :)
           // https://github.com/lit/lit/issues/449
           break;
         default:
