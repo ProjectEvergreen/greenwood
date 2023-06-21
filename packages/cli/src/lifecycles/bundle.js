@@ -220,15 +220,10 @@ async function bundleSsrPages(compilation) {
         await fs.writeFile(entryFileUrl, `
           import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
 
-          // use a function to explicitly resolve import.meta.url at _runtime_, not build time
-          function getEntryPointUrl(filename) {
-            return new URL(\`./_\${filename}\`, import.meta.url);
-          }
-
           export async function handler(request) {
             const compilation = JSON.parse('${JSON.stringify(compilation)}');
             const page = JSON.parse('${JSON.stringify(page)}');
-            const moduleUrl = getEntryPointUrl('${filename}');
+            const moduleUrl = '___GWD_ENTRY_FILE_URL=${filename}___';
             const data = await executeRouteModule({ moduleUrl, compilation, page });
             let staticHtml = \`${staticHtml}\`;
 

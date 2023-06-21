@@ -130,6 +130,30 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
   };
 }
 
+// TODO could we use this instead?
+// https://github.com/rollup/rollup/blob/v2.79.1/docs/05-plugin-development.md#resolveimportmeta
+function greenwoodPatchSsrPagesEntryPointRuntimeImport() {
+  return {
+    name: 'greenwood-patch-ssr-pages-entry-point-runtime-import',
+    generateBundle(options, bundle) {
+      Object.keys(bundle).forEach((key) => {
+        if (key.startsWith('__')) {
+          console.log('this is a generated entry point', bundle[key]);
+          // ___GWD_ENTRY_FILE_URL=${filename}___
+          const needle = bundle[key].code.match(/___GWD_ENTRY_FILE_URL=(.*.)___/);
+          if (needle) {
+            const entryPathMatch = needle[1];
+
+            bundle[key].code = bundle[key].code.replace(/'___GWD_ENTRY_FILE_URL=(.*.)___'/, `new URL('./_${entryPathMatch}', import.meta.url)`);
+          } else {
+            console.warn(`Could not find entry path match for bundle => ${ley}`);
+          }
+        }
+      });
+    }
+  };
+}
+
 const getRollupConfigForScriptResources = async (compilation) => {
   const { outputDir } = compilation.context;
   const input = [...compilation.resources.values()]
@@ -224,12 +248,14 @@ const getRollupConfigForSsr = async (compilation, input) => {
     },
     plugins: [
       greenwoodJsonLoader(),
-      // TODO should this be used in all configs?
+      // TODO let this through for lit to enable nodeResolve({ preferBuiltins: true })
+      // https://github.com/lit/lit/issues/449
       nodeResolve({
         preferBuiltins: true
       }),
       commonjs(),
-      importMetaAssets()
+      importMetaAssets(),
+      greenwoodPatchSsrPagesEntryPointRuntimeImport() // TODO a little hacky but works for now
     ],
     onwarn: (errorObj) => {
       const { code, message } = errorObj;
@@ -237,7 +263,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
       switch (code) {
 
         case 'CIRCULAR_DEPENDENCY':
-          // let this through for lit to enable nodeResolve({ preferBuiltins: true })
+          // TODO let this through for lit to enable nodeResolve({ preferBuiltins: true })
           // https://github.com/lit/lit/issues/449
           break;
         default:
