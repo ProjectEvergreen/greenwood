@@ -213,7 +213,6 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async shouldOptimize(url, response) {
-    // TOOD should be .indexOf(this.contentType) === 0
     return response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
   }
 

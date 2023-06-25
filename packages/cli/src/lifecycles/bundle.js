@@ -197,26 +197,16 @@ async function bundleSsrPages(compilation) {
         const entryFileUrl = new URL(`./_${filename}`, scratchDir);
         const moduleUrl = new URL(`./${filename}`, pagesDir);
         // TODO getTemplate has to be static (for now?)
-        // const { getTemplate = null } = await import(new URL(`./${filename}`, pagesDir));
+        // https://github.com/ProjectEvergreen/greenwood/issues/955
         const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [] });
         let staticHtml = '';
 
         staticHtml = data.template ? data.template : await getPageTemplate(staticHtml, compilation.context, template, []);
-        // console.log('+ page template', { staticHtml });
-
         staticHtml = await getAppTemplate(staticHtml, compilation.context, imports, [], false, title);
-        // console.log('+ app template', { staticHtml });
-
         staticHtml = await getUserScripts(staticHtml, compilation.context);
-        // console.log('+ user scripts', { staticHtml });
-
-        // TODO do we want to use http:// here for optimizer?
         staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
-        // console.log('+ optimizer', { staticHtml });
 
         // better way to write out this inline code?
-        // TODO does executeRouteModule need to get bundled?
-        // TODO do we need to bundle this too since we reference executeModuleUrl.href directly?
         await fs.writeFile(entryFileUrl, `
           import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
 
@@ -246,7 +236,6 @@ async function bundleSsrPages(compilation) {
 
     const [rollupConfig] = await getRollupConfigForSsr(compilation, input);
 
-    // TODO do we need templates anymore?
     if (rollupConfig.input.length > 0) {
       const bundle = await rollup(rollupConfig);
       await bundle.write(rollupConfig.output);

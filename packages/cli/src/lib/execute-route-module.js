@@ -1,8 +1,5 @@
 import { renderToString, renderFromHTML } from 'wc-compiler';
 
-// TODO simplify this API signature (lot of things could be combined)
-// - route, label and id could just be the current page
-// - scripts is already part of the compilation
 async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender = false, htmlContents = null, scripts = [] }) {
   const data = {
     template: null,

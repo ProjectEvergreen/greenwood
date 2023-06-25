@@ -132,6 +132,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
 
 // TODO could we use this instead?
 // https://github.com/rollup/rollup/blob/v2.79.1/docs/05-plugin-development.md#resolveimportmeta
+// https://github.com/ProjectEvergreen/greenwood/issues/1087
 function greenwoodPatchSsrPagesEntryPointRuntimeImport() {
   return {
     name: 'greenwood-patch-ssr-pages-entry-point-runtime-import',
@@ -217,7 +218,7 @@ const getRollupConfigForApis = async (compilation) => {
     .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)));
 
   // TODO should routes and APIs have chunks?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1008
+  // https://github.com/ProjectEvergreen/greenwood/issues/1118
   return [{
     input,
     output: {
@@ -238,7 +239,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
   const { outputDir } = compilation.context;
 
   // TODO should routes and APIs have chunks?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1008
+  // https://github.com/ProjectEvergreen/greenwood/issues/1118
   return [{
     input,
     output: {
@@ -250,6 +251,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
       greenwoodJsonLoader(),
       // TODO let this through for lit to enable nodeResolve({ preferBuiltins: true })
       // https://github.com/lit/lit/issues/449
+      // https://github.com/ProjectEvergreen/greenwood/issues/1118
       nodeResolve({
         preferBuiltins: true
       }),
@@ -267,6 +269,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
           // Error: the string "Circular dependency: ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js ->
           // ../../../../../node_modules/@lit-labs/ssr/lib/lit-element-renderer.js -> ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js\n" was thrown, throw an Error :)
           // https://github.com/lit/lit/issues/449
+          // https://github.com/ProjectEvergreen/greenwood/issues/1118
           break;
         default:
           // otherwise, log all warnings from rollup

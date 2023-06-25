@@ -55,7 +55,6 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
 
   console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
 
-  console.log({ workerPrerender });
   const pool = new WorkerPool(os.cpus().length, new URL('../lib/ssr-route-worker.js', import.meta.url));
 
   for (const page of pages) {
