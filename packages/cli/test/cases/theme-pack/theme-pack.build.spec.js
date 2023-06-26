@@ -2,12 +2,12 @@
  * Use Case
  * A theme pack _author_ creating a theme pack and using Greenwood for development and testing
  * following the guide published on the Greenwood website. (https://www.greenwoodjs.io/guides/theme-packs/)
- * 
+ *
  * User Result
- * Should correctly validate the develop and build / serve commands work correctly using tge expected templates 
+ * Should correctly validate the develop and build / serve commands work correctly using tge expected templates
  * being resolved correctly per the known work around needs as documented in the FAQ and tracked in a discussion.
  * https://github.com/ProjectEvergreen/greenwood/discussions/682
- * 
+ *
  * User Command
  * greenwood develop
  *
@@ -153,4 +153,3 @@ describe('Build Greenwood With: ', function() {
   });
 
 });
-

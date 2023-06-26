@@ -72,19 +72,19 @@ describe('Build Greenwood With: ', function() {
 
       it('should output a counter.css file from frontmatter import', async function() {
         const cssFiles = await glob.promise(`${this.context.publicDir}**/**/counter.*.css`);
-          
+
         expect(cssFiles).to.have.lengthOf(1);
       });
 
       it('should output a counter.js file from frontmatter import', async function() {
         const jsFiles = await glob.promise(`${this.context.publicDir}**/**/counter.*.js`);
-          
+
         expect(jsFiles).to.have.lengthOf(1);
       });
 
       it('should output a multi-hyphen.js file from frontmatter import', async function() {
         const jsFiles = await glob.promise(`${this.context.publicDir}**/**/multi-hyphen.*.js`);
-          
+
         expect(jsFiles).to.have.lengthOf(1);
       });
 
@@ -98,15 +98,15 @@ describe('Build Greenwood With: ', function() {
       describe('Counter <x-counter> component from front matter that is prerendered', () => {
         it('should output a custom <x-counter> tag that', function() {
           const counter = dom.window.document.querySelectorAll('body x-counter');
-  
+
           expect(counter.length).to.be.equal(1);
         });
-  
+
         it('should output a custom <x-counter> tag that is _not_ wrapped in a <p> tag', function() {
           expect((/<p><x-counter>/).test(html)).to.be.false;
           expect((/<\/x-counter><\/p>/).test(html)).to.be.false;
         });
-  
+
         it('should output a heading tag from the custom element', function() {
           expect(html).to.contain('<h3>My Counter</h3>');
         });
@@ -115,10 +115,10 @@ describe('Build Greenwood With: ', function() {
       describe('Custom Multihyphen component', () => {
         it('should output a custom <multihyphen-custom-element> tag', function() {
           const hyphen = dom.window.document.querySelectorAll('body multihyphen-custom-element');
-  
+
           expect(hyphen.length).to.be.equal(1);
         });
-  
+
         it('should output a <multihyphen-custom-element> tag that is _not_ wrapped in a <p> tag', function() {
           expect((/<p><multihyphen-custom-element>/).test(html)).to.be.false;
           expect((/<\/multihyphen-custom-element><\/p>/).test(html)).to.be.false;

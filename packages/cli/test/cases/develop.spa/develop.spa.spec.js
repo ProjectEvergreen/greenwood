@@ -15,7 +15,7 @@
  * src/
  *   index.html
  *   main.css
- * 
+ *
  */
 import chai from 'chai';
 import fs from 'fs';
@@ -89,7 +89,7 @@ describe('Develop Greenwood With: ', function() {
             }
 
             response = res;
-            
+
             resolve();
           });
         });
@@ -128,7 +128,7 @@ describe('Develop Greenwood With: ', function() {
             }
 
             response = res;
-            
+
             resolve();
           });
         });
@@ -167,7 +167,7 @@ describe('Develop Greenwood With: ', function() {
             }
 
             response = res;
-            
+
             resolve();
           });
         });

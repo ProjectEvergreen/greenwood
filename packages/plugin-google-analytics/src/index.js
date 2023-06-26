@@ -13,7 +13,7 @@ class GoogleAnalyticsResource extends ResourceInterface {
     this.contentType = 'text/html';
   }
 
-  async shouldIntercept(url, request, response) {    
+  async shouldIntercept(url, request, response) {
     return response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
   }
 

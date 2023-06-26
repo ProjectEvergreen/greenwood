@@ -79,7 +79,7 @@ const run = async() => {
         await (await import('./commands/eject.js')).ejectConfiguration(compilation);
 
         break;
-      default: 
+      default:
         console.warn(`
           Error: not able to detect command. try using the --help flag if 
           you're encountering issues running Greenwood.  Visit our docs for more 

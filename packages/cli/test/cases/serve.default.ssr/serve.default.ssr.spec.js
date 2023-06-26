@@ -93,7 +93,7 @@ describe('Serve Greenwood With: ', function() {
 
     before(async function() {
       const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
-      
+
       artistsPageGraphData = graph.find(page => page.route === '/artists/');
 
       return new Promise((resolve, reject) => {

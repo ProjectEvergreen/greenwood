@@ -55,7 +55,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe(LABEL, function() {
-    
+
     before(async function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
@@ -69,7 +69,7 @@ describe('Build Greenwood With: ', function() {
 
       before(async function() {
         const htmlPath = path.resolve(this.context.publicDir, 'index.html');
-        
+
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
         html = await fs.promises.readFile(htmlPath, 'utf-8');
       });
@@ -81,7 +81,7 @@ describe('Build Greenwood With: ', function() {
 
         it('should have a <head> tag with the lang attribute on it', function() {
           const htmlTag = dom.window.document.querySelectorAll('html');
-    
+
           expect(htmlTag.length).to.equal(1);
           expect(htmlTag[0].getAttribute('lang')).to.be.equal('en');
           expect(htmlTag[0].getAttribute('prefix')).to.be.equal('og:http://ogp.me/ns#');
@@ -101,7 +101,7 @@ describe('Build Greenwood With: ', function() {
 
         it('should have a <title> tag in the <head>', function() {
           const title = dom.window.document.querySelector('head title').textContent;
-    
+
           expect(title).to.be.equal('My App');
         });
 
@@ -135,72 +135,72 @@ describe('Build Greenwood With: ', function() {
         it('should create a new assets directory', function() {
           expect(fs.existsSync(path.join(this.context.publicDir, 'assets'))).to.be.true;
         });
-  
+
         it('should contain files from the asset directory', async function() {
           expect(fs.existsSync(path.join(this.context.publicDir, 'assets', './greenwood-logo.png'))).to.be.true;
         });
-  
+
         it('should output two JS bundle files', async function() {
           expect(await glob.promise(path.join(this.context.publicDir, './*.js'))).to.have.lengthOf(2);
         });
-  
+
         it('should have two <script> tags in the <head>', async function() {
           const scriptTags = dom.window.document.querySelectorAll('head script');
-  
+
           expect(scriptTags.length).to.be.equal(2);
         });
-  
+
         it('should output one CSS file', async function() {
           expect(await glob.promise(`${path.join(this.context.publicDir, 'styles')}/theme.*.css`)).to.have.lengthOf(1);
         });
-  
+
         it('should output one <style> tag in the <head>', async function() {
           const styleTags = dom.window.document.querySelectorAll('head style');
-  
+
           expect(styleTags.length).to.be.equal(1);
         });
-  
+
         it('should output one <link> tag in the <head>', async function() {
           const linkTags = dom.window.document.querySelectorAll('head link[rel="stylesheet"]');
-  
+
           expect(linkTags.length).to.be.equal(1);
         });
-  
+
         it('should have content in the <body>', function() {
           const h2 = dom.window.document.querySelector('body h2');
           const p = dom.window.document.querySelector('body p');
           const h3 = dom.window.document.querySelector('body h3');
-  
+
           expect(h2.textContent).to.be.equal('Home Page');
           expect(p.textContent).to.be.equal('This is the Getting Started home page!');
           expect(h3.textContent).to.be.equal('My Posts');
         });
-  
+
         it('should have an unordered list of blog posts in the <body>', function() {
           const ul = dom.window.document.querySelectorAll('body ul');
           const li = dom.window.document.querySelectorAll('body ul li');
           const links = dom.window.document.querySelectorAll('body ul a');
-  
+
           expect(ul.length).to.be.equal(1);
           expect(li.length).to.be.equal(2);
           expect(links.length).to.be.equal(2);
-  
+
           expect(links[0].href.replace('file://', '').replace(/\/[A-Z]:/, '')).to.be.equal('/blog/second-post/');
           expect(links[0].textContent).to.be.equal('my-second-post');
-  
+
           expect(links[1].href.replace('file://', '').replace(/\/[A-Z]:/, '')).to.be.equal('/blog/first-post/');
           expect(links[1].textContent).to.be.equal('my-first-post');
         });
-  
+
         it('should have a <app-header> tag in the <body>', function() {
           const header = dom.window.document.querySelectorAll('body app-header');
-  
+
           expect(header.length).to.be.equal(1);
         });
-  
+
         it('should have a <app-footer> tag in the <body>', function() {
           const footer = dom.window.document.querySelectorAll('body app-footer');
-  
+
           expect(footer.length).to.be.equal(1);
         });
       });
@@ -208,7 +208,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('First Blog Post', function() {
       let dom;
-      
+
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'blog/first-post/index.html'));
       });
@@ -220,7 +220,7 @@ describe('Build Greenwood With: ', function() {
       it('should output an index.html file for first-post page', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'blog', 'first-post', './index.html'))).to.be.true;
       });
-      
+
       it('should have two <script> tags in the <head>', async function() {
         const scriptTags = dom.window.document.querySelectorAll('head script');
 
@@ -252,7 +252,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(h1.textContent).to.be.equal('A Blog Post Page');
         expect(h2.textContent).to.be.equal('My First Blog Post');
-        
+
         expect(p[0].textContent).to.be.equal('Lorem Ipsum');
         expect(p[1].textContent).to.be.equal('back');
       });
@@ -266,7 +266,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('Second Blog Post', function() {
       let dom;
-      
+
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'blog/second-post/index.html'));
       });
@@ -278,7 +278,7 @@ describe('Build Greenwood With: ', function() {
       it('should output an index.html file for first-post page', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'blog', 'second-post', './index.html'))).to.be.true;
       });
-      
+
       it('should have two <script> tags in the <head>', async function() {
         const scriptTags = dom.window.document.querySelectorAll('head script');
 
@@ -310,7 +310,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(h1.textContent).to.be.equal('A Blog Post Page');
         expect(h2.textContent).to.be.equal('My Second Blog Post');
-        
+
         expect(p[0].textContent).to.be.equal('Lorem Ipsum');
         expect(p[1].textContent).to.be.equal('back');
       });

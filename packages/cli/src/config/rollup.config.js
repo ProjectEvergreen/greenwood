@@ -144,7 +144,7 @@ const getRollupConfigForScriptResources = async (compilation) => {
   return [{
     preserveEntrySignatures: 'strict', // https://github.com/ProjectEvergreen/greenwood/pull/990
     input,
-    output: { 
+    output: {
       dir: normalizePathnameForWindows(outputDir),
       entryFileNames: '[name].[hash].js',
       chunkFileNames: '[name].[hash].js',

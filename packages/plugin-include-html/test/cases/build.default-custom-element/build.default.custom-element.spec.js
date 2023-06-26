@@ -54,7 +54,7 @@ describe('Build Greenwood With HTML Include Plugin: ', function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });
-    
+
     runSmokeTest(['public', 'index'], LABEL);
 
     describe('Default custom element include and page content for index.html', function() {
@@ -70,14 +70,14 @@ describe('Build Greenwood With HTML Include Plugin: ', function() {
 
       it('should have expected footer <h4> tag content in the <body>', function() {
         const text = footerHeadingTags[0].textContent;
-        
+
         expect(footerHeadingTags.length).to.be.equal(1);
         expect(text.trim()).to.be.equal('Greenwood v1.0.0');
       });
 
       it('should have existing <h1> content in the <body>', function() {
         const text = headingTags[0].textContent;
-        
+
         expect(headingTags.length).to.be.equal(1);
         expect(text).to.be.equal('Hello!');
       });

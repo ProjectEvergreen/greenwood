@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Detects and fully resolve requests to source map (.map) files.
  *
  */

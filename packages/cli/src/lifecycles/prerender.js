@@ -131,7 +131,7 @@ async function staticRenderCompilation(compilation) {
   const plugins = getPluginInstances(compilation);
 
   console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
-  
+
   await Promise.all(pages.map(async (page) => {
     const { route, outputPath } = page;
     const outputDirUrl = new URL(`.${route}`, scratchDir);

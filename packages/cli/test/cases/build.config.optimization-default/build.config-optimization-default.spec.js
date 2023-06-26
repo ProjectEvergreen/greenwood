@@ -58,7 +58,7 @@ describe('Build Greenwood With: ', function() {
       ]);
       await runner.runCommand(cliPath, 'build');
     });
-  
+
     describe('Output for JavaScript / CSS tags and files', function() {
       let dom;
 
@@ -114,7 +114,7 @@ describe('Build Greenwood With: ', function() {
         it('should have the expect preload CSS content in the file', async function() {
           const cssFiles = await glob.promise(path.join(this.context.publicDir, 'styles/*.css'));
           const customCss = await fs.promises.readFile(cssFiles[0], 'utf-8');
-          
+
           expect(cssFiles.length).to.be.equal(1);
           expect(customCss).to.be.equal(expectedCss);
         });

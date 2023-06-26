@@ -20,7 +20,7 @@ async function getCustomLoaderResponse(url, body = '', checkOnly = false) {
   for (const plugin of resourcePlugins) {
     if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
       shouldHandle = true;
-  
+
       if (!checkOnly) {
         response = await plugin.serve(url, request);
       }

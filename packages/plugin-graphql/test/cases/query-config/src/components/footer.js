@@ -4,7 +4,7 @@ import ConfigQuery from '@greenwood/plugin-graphql/queries/config';
 class FooterComponent extends HTMLElement {
   constructor() {
     super();
-    
+
     this.root = this.attachShadow({ mode: 'open' });
   }
 

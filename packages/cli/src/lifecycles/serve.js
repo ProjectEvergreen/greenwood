@@ -125,7 +125,7 @@ async function getDevServer(compilation) {
       ctx.status = 500;
       console.error(e);
     }
-  
+
     await next();
   });
 
@@ -159,7 +159,7 @@ async function getDevServer(compilation) {
         ctx.status = ctx.status;
         ctx.set('Content-Type', ctx.response.header['content-type']);
         ctx.set('Etag', etagHash);
-  
+
         // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
         // https://github.com/ProjectEvergreen/greenwood/issues/1048
         if (response.headers.has('Content-Length')) {
@@ -280,7 +280,7 @@ async function getStaticServer(compilation, composable) {
       await next();
     }
   });
-    
+
   return app;
 }
 
@@ -326,7 +326,7 @@ async function getHybridServer(compilation) {
   return app;
 }
 
-export { 
+export {
   getDevServer,
   getStaticServer,
   getHybridServer

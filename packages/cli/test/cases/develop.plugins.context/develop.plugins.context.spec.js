@@ -78,7 +78,7 @@ describe('Develop Greenwood With: ', function() {
             }
 
             response = res;
-            
+
             dom = new JSDOM(body);
             resolve();
           });

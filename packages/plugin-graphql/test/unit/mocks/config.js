@@ -7,6 +7,6 @@ const MOCK_CONFIG = {
   }
 };
 
-export { 
+export {
   MOCK_CONFIG
 };

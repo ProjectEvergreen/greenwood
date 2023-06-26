@@ -40,7 +40,7 @@ describe('Scaffold Greenwood With Default Template: ', function() {
     });
 
     describe('should scaffold project files and folders', () => {
-      
+
       it('should create a src/pages directory', function() {
         expect(fs.existsSync(path.join(outputPath, 'src', 'pages'))).to.be.true;
       });
@@ -48,7 +48,7 @@ describe('Scaffold Greenwood With Default Template: ', function() {
       it('should generate a .gitignore file', function() {
         expect(fs.existsSync(path.join(outputPath, '.gitignore'))).to.be.true;
       });
-  
+
       it('should generate a package.json file', function() {
         expect(fs.existsSync(path.join(outputPath, 'package.json'))).to.be.true;
       });
@@ -75,7 +75,7 @@ describe('Scaffold Greenwood With Default Template: ', function() {
 
       it('the should have the correct Greenwood scripts', function() {
         const scripts = pkgJson.scripts;
-        
+
         expect(scripts.start).to.equal('greenwood develop');
         expect(scripts.build).to.equal('greenwood build');
         expect(scripts.serve).to.equal('greenwood serve');

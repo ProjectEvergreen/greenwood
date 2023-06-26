@@ -1,6 +1,6 @@
 /*
- * 
- * Detects and fully resolve requests to the user's workspace.  
+ *
+ * Detects and fully resolve requests to the user's workspace.
  * This sets the default value for requests in Greenwood.
  *
  */

@@ -16,7 +16,7 @@ class LiveReloadServer extends ServerInterface {
     const standardPluginsExtensions = (await Promise.all(standardPluginsNames.map(async (filename) => {
       const pluginImport = await import(new URL(`./${filename}`, standardPluginsDirectoryPath));
       const plugin = pluginImport[Object.keys(pluginImport)[0]];
-      
+
       return plugin;
     })))
       .filter(plugin => plugin.type === 'resource')
@@ -50,7 +50,7 @@ class LiveReloadServer extends ServerInterface {
 }
 
 class LiveReloadResource extends ResourceInterface {
-  
+
   async shouldIntercept(url, request, response) {
     const contentType = response.headers.get('Content-Type');
 
@@ -59,7 +59,7 @@ class LiveReloadResource extends ResourceInterface {
 
   async intercept(url, request, response) {
     let body = await response.text();
-    
+
     body = body.replace('</head>', `
         <script src="http://localhost:35729/livereload.js?snipver=1"></script>
       </head>

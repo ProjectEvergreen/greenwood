@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Enables using JavaScript to import CSS files, using ESM syntax.
  *
  */
@@ -39,7 +39,7 @@ class ImportCssResource extends ResourceInterface {
   async intercept(url, request, response) {
     const body = await response.text();
     const cssInJsBody = `const css = \`${body.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\')}\`;\nexport default css;`;
-    
+
     return new Response(cssInJsBody, {
       headers: new Headers({
         'Content-Type': this.contentType

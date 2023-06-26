@@ -86,7 +86,7 @@ describe('Build Greenwood With: ', function() {
           // hyphen is used to make sure no other bundles get loaded by accident (#9)
           return script.src.indexOf('/webcomponents-') >= 0;
         });
-        
+
         expect(polyfillScriptTags.length).to.be.equal(1);
       });
 

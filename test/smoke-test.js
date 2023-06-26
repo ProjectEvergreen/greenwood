@@ -201,7 +201,7 @@ function defaultIndex(label) {
 
 function serve(label) {
   describe(`Running Smoke Tests: ${label}`, function() {
-    
+
     describe('Serving Index (Home) page', function() {
       let dom;
       let response = {
@@ -215,7 +215,7 @@ function serve(label) {
             res.setEncoding('utf8');
             response.status = res.statusCode;
             response.headers = res.headers;
-            
+
             res.on('data', chunk => response.body += chunk);
             res.on('end', () => {
               dom = new JSDOM(response.body);

@@ -27,8 +27,8 @@ describe('Build Greenwood With: ', function() {
   let runner;
 
   before(function() {
-    this.context = { 
-      publicDir: path.join(outputPath, 'public') 
+    this.context = {
+      publicDir: path.join(outputPath, 'public')
     };
     runner = new Runner();
   });

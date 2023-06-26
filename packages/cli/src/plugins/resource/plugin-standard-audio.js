@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Manages web standard resource related operations for audio formats.
  * This is a Greenwood default plugin.
  *

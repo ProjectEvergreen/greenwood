@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Manages routing devServer.proxy entries to their destination.
  *
  */

@@ -1,7 +1,7 @@
 /*
  * Use Case
  * Run Greenwood with various usages of JavaScript (<script>) and CSS (<style> / <link>) tags.
- * 
+ *
  * User Result
  * Should generate a bare bones Greenwood build without erroring.
  *
@@ -60,7 +60,7 @@ describe('Build Greenwood With: ', function() {
         const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return (/other.*[a-z0-9].js/).test(script.src);
         });
-        
+
         expect(mainScriptTags.length).to.be.equal(1);
       });
 
@@ -77,7 +77,7 @@ describe('Build Greenwood With: ', function() {
     describe('<script ...>...</script> tag in the <head> with mixed attribute ordering', function() {
       it('should have two <script> tag with inline script in the <head>', function() {
         const scriptTagInline = dom.window.document.querySelectorAll('head > script:not([src])');
-        
+
         expect(scriptTagInline.length).to.be.equal(4);
       });
 
@@ -109,7 +109,7 @@ describe('Build Greenwood With: ', function() {
 
           return (/non-module.*[a-z0-9].js/).test(src) && src.indexOf('//') < 0;
         });
-        
+
         expect(mainScriptTags.length).to.be.equal(1);
       });
 
@@ -179,7 +179,7 @@ describe('Build Greenwood With: ', function() {
     describe('<link rel="stylesheet" href="..."/> tag in the <head> with mixed attribute ordering', function() {
       it('should have two <link> tag in the <head>', function() {
         const linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"]');
-        
+
         expect(linkTags.length).to.be.equal(2);
 
         linkTags.forEach(link => {

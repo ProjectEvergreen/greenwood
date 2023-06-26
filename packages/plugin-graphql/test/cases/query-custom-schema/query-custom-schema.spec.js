@@ -2,10 +2,10 @@
  * Use Case
  * Run Greenwood build command with GraphQL calls to get data about the projects graph using its own custom schema and query.
  * Needs prerender to be true to get SSR and client side GQL fetching.
- * 
+ *
  * User Result
  * Should generate a Greenwood build that tests basic output from the custom query.
- * 
+ *
  * User Command
  * greenwood build
  *
@@ -51,7 +51,7 @@ describe('Build Greenwood With: ', function() {
 
     before(async function() {
       const greenwoodGraphqlCoreLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/plugin-graphql/src/core/*.js`, 
+        `${process.cwd()}/packages/plugin-graphql/src/core/*.js`,
         `${outputPath}/node_modules/@greenwood/plugin-graphql/src/core/`
       );
 
@@ -107,7 +107,7 @@ describe('Build Greenwood With: ', function() {
         it('should have three <img> tags in the <body>', function() {
           expect(images.length).to.be.equal(3);
         });
-        
+
         it('should have a expected src attribute value for all three <img> tags', function() {
           images.forEach((image, i) => {
             const count = i += 1;

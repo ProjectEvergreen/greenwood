@@ -44,7 +44,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe(LABEL, function() {
-    
+
     before(async function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
@@ -73,7 +73,7 @@ describe('Build Greenwood With: ', function() {
         it('should have custom <meta> tag in the <head>', function() {
           const customMeta = Array.from(dom.window.document.querySelectorAll('head > meta'))
             .filter(meta => meta.getAttribute('property') === 'og:description');
-  
+
           expect(customMeta.length).to.be.equal(1);
           expect(customMeta[0].getAttribute('content')).to.be.equal('My custom meta content.');
         });
@@ -104,31 +104,31 @@ describe('Build Greenwood With: ', function() {
           expect(styleTags[0].textContent).to.contain('.owen-test');
         });
       });
-  
+
       describe('custom inline <style> tag in the <head> of a page template', function() {
         let dom;
-  
+
         before(async function() {
           dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
         });
 
         it('should have the specific element we added as part of our custom page template', function() {
           const customElement = dom.window.document.querySelectorAll('div.owen-test');
-  
+
           expect(customElement.length).to.equal(1);
         });
-  
+
         it('should have the color style for the .owen-test element in the page template that we added as part of our custom style', function() {
           const customElement = dom.window.document.querySelector('.owen-test');
           const computedStyle = dom.window.getComputedStyle(customElement);
-  
+
           expect(computedStyle.color).to.equal('blue');
         });
-  
+
         it('should have the color styles for the h3 element that we defined as part of our custom style', function() {
           const customHeader = dom.window.document.querySelector('h3');
           const computedStyle = dom.window.getComputedStyle(customHeader);
-  
+
           expect(computedStyle.color).to.equal('green');
         });
       });

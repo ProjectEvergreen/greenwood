@@ -15,7 +15,7 @@ const graphqlServer = async (compilation) => {
     },
     context: async (integrationContext) => {
       const { req } = integrationContext;
-      
+
       if (req.query.q !== 'internal') {
         await createCache(req, context);
       }

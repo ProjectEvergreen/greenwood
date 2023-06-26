@@ -12,7 +12,7 @@
  * {
  *   optimization: 'inline'
  * }
- * 
+ *
  * Custom Workspace
  * src/
  *   components/
@@ -53,14 +53,14 @@ describe('Build Greenwood With: ', function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });
-  
+
     describe('Output for JavaScript / CSS tags and files', function() {
       let dom;
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
-      
+
       it('should contain no link <tags> in the <head> tag', function() {
         const linkTags = dom.window.document.querySelectorAll('head link');
 
@@ -79,10 +79,10 @@ describe('Build Greenwood With: ', function() {
 
           expect(allSrcScriptTags.length).to.be.equal(0);
         });
-      
+
         it('should contain no Javascript files in the output directory', async function() {
           const jsFiles = await glob.promise(`${this.context.publicDir}**/**/*.js`);
-          
+
           expect(jsFiles).to.have.lengthOf(0);
         });
       });
@@ -91,7 +91,7 @@ describe('Build Greenwood With: ', function() {
       describe('Header', function() {
         it('should contain one <script> tag with the expected JS content inlined of type="module" for the header', function() {
           const scriptTag = dom.window.document.querySelectorAll('head script')[0];
-          
+
           expect(scriptTag.type).to.be.equal('module');
           // eslint-disable-next-line max-len
           expect(scriptTag.textContent).to.contain('class e extends HTMLElement{constructor(){super(),this.root=this.attachShadow({mode:"open"}),this.root.innerHTML="\\n      <header>This is the header component.</header>\\n    "}}customElements.define("app-header",e);');
@@ -125,7 +125,7 @@ describe('Build Greenwood With: ', function() {
       describe('<link> tags as <style> tags and file output', function() {
         it('should contain no CSS files in the output directory', async function() {
           const cssFiles = await glob.promise(`${this.context.publicDir}**/**/*.css`);
-          
+
           expect(cssFiles).to.have.lengthOf(0);
         });
 

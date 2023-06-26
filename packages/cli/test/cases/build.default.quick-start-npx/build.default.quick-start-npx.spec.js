@@ -3,7 +3,7 @@
  * Run Greenwood build command with no config and emulating being run with npx
  *
  * User Result
- * Should generate a bare bones Greenwood build with no errors for missing files 
+ * Should generate a bare bones Greenwood build with no errors for missing files
  * by specifically not scaffolding node_modules/ needed for es-modules-shims and webcomponents-bundle.
  * https://github.com/ProjectEvergreen/greenwood/issues/505
  *
@@ -45,9 +45,9 @@ describe('Build Greenwood With: ', function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });
-    
+
     runSmokeTest(['public', 'index'], LABEL);
-  
+
     describe('Default output for index.html', function() {
       let dom;
 
@@ -64,7 +64,7 @@ describe('Build Greenwood With: ', function() {
 
         it('should have a <title> tag in the <head>', function() {
           const title = dom.window.document.querySelector('head title').textContent;
-    
+
           expect(title).to.be.equal('My App');
         });
 
@@ -78,7 +78,7 @@ describe('Build Greenwood With: ', function() {
 
         it('should have default viewport <meta> tag', function() {
           const viewportMeta = metaTags[1];
-          
+
           expect(viewportMeta.getAttribute('name')).to.be.equal('viewport');
           expect(viewportMeta.getAttribute('content')).to.be.equal('width=device-width, initial-scale=1');
         });

@@ -8,7 +8,7 @@ describe('Unit Test: Data', function() {
   describe('Common', function() {
 
     describe('getQueryHash', function() {
-      
+
       it('should return the expected hash for a standard graph query', function () {
         // __typename is added by server.js
         const query = `

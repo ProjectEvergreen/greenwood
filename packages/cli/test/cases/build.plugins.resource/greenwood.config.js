@@ -5,7 +5,7 @@ class FooResource {
   constructor(compilation, options) {
     this.compilation = compilation;
     this.options = options;
-    
+
     this.extensions = ['foo'];
     this.contentType = 'text/javascript';
   }

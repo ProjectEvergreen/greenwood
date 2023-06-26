@@ -1,5 +1,5 @@
 const template = document.createElement('template');
-      
+
 template.innerHTML = `
   <p>Hello from the greeting component!</p>
 `;

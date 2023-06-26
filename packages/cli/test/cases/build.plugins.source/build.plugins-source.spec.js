@@ -16,7 +16,7 @@
  *     // see complete implementation in the greenwood.config.js file used for this spec
  *   }
  * }
- * 
+ *
  * {
  *   plugins: [
  *     customExternalSourcesPlugin
@@ -70,7 +70,7 @@ describe('Build Greenwood With: ', function() {
       let dom;
 
       before(async function() {
-        pages = await glob(`${publicDir}/about/index.html`);  
+        pages = await glob(`${publicDir}/about/index.html`);
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'about/index.html'));
       });
 
@@ -79,20 +79,20 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have expected heading content on the about page', function() {
-        const heading = dom.window.document.querySelectorAll('body h1'); 
-        
+        const heading = dom.window.document.querySelectorAll('body h1');
+
         expect(heading.length).to.equal(1);
         expect(heading[0].textContent).to.equal('About Us');
       });
 
       it('should have expected paragraph content on the about page', function() {
-        const paragraph = dom.window.document.querySelectorAll('body p'); 
-        
+        const paragraph = dom.window.document.querySelectorAll('body p');
+
         expect(paragraph.length).to.equal(1);
         expect(paragraph[0].textContent).to.equal('Lorem ipsum.');
       });
     });
-    
+
     describe('Artists Pages', function() {
       let fixtureData = {};
       let pages = [];
@@ -100,7 +100,7 @@ describe('Build Greenwood With: ', function() {
 
       before(async function() {
         fixtureData = JSON.parse(await fs.readFile(new URL('./data.json', import.meta.url), 'utf-8'));
-        pages = await glob(`${publicDir}/artists/**/index.html`);  
+        pages = await glob(`${publicDir}/artists/**/index.html`);
         doms = await Promise.all(pages.map(async (path) => {
           return JSDOM.fromFile(path);
         }));
@@ -111,10 +111,10 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have expected heading content for each artist page template', function() {
-  
+
         doms.forEach((dom) => {
           const headings = dom.window.document.querySelectorAll('body h1');
-          
+
           expect(headings.length).to.equal(1);
           expect(headings[0].textContent).to.equal('Welcome to the artist page.');
         });
@@ -123,7 +123,7 @@ describe('Build Greenwood With: ', function() {
       it('should have expected artist paragraph content for each artist page', function() {
         doms.forEach((dom, idx) => {
           const paragraphs = dom.window.document.querySelectorAll('body p');
-          
+
           expect(paragraphs.length).to.equal(1);
           expect(paragraphs[0].textContent).to.equal(fixtureData[idx].bio);
         });
@@ -132,7 +132,7 @@ describe('Build Greenwood With: ', function() {
       it('should have expected artist image content for each artist page', function() {
         doms.forEach((dom, idx) => {
           const images = dom.window.document.querySelectorAll('body img');
-          
+
           expect(images.length).to.equal(1);
           expect(images[0].getAttribute('src')).to.equal(fixtureData[idx].imageUrl);
         });

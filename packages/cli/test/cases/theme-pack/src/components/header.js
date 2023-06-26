@@ -1,5 +1,5 @@
 const template = document.createElement('template');
-      
+
 template.innerHTML = `
   <header>Welcome to my blog!</header>
 `;

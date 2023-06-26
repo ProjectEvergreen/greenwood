@@ -79,7 +79,7 @@ xdescribe('Scaffold Greenwood and Run Develop command: ', function() {
         it('should generate a package-lock.json file', function() {
           expect(fs.existsSync(path.join(outputPath, 'package-lock.json'))).to.be.true;
         });
-  
+
         it('should not generate a yarn.lock file', function() {
           expect(fs.existsSync(path.join(outputPath, 'yarn.lock'))).to.be.false;
         });
@@ -105,7 +105,7 @@ xdescribe('Scaffold Greenwood and Run Develop command: ', function() {
                 }
 
                 response = res;
-                
+
                 dom = new JSDOM(body);
                 resolve();
               });
@@ -125,7 +125,7 @@ xdescribe('Scaffold Greenwood and Run Develop command: ', function() {
 
           it('should display My Project heading', function(done) {
             const heading = dom.window.document.querySelector('body > h2');
-            
+
             expect(heading.textContent).to.equal('My Project');
 
             done();
@@ -133,7 +133,7 @@ xdescribe('Scaffold Greenwood and Run Develop command: ', function() {
 
           it('should display My Project title', function(done) {
             const title = dom.window.document.querySelector('head > title');
-            
+
             expect(title.textContent).to.equal('My App');
 
             done();

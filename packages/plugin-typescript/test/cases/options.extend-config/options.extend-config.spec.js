@@ -18,14 +18,14 @@
  *     })
  *   ]
  * }
- * 
+ *
  * User Workspace
  *  src/
  *   pages/
  *     index.html
  *   scripts/
  *     main.ts
- * 
+ *
  * User tsconfig.json (example)
  * {
  *   "compilerOptions": {
@@ -69,7 +69,7 @@ describe('Build Greenwood With: ', function() {
       jsFiles = glob.sync(path.join(this.context.publicDir, '*.js'));
     });
 
-    runSmokeTest(['public', 'index'], LABEL);    
+    runSmokeTest(['public', 'index'], LABEL);
 
     it('should output one JavaScript file', function() {
       expect(jsFiles.length).to.equal(1);

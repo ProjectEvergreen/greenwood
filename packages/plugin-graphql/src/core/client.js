@@ -26,7 +26,7 @@ client.query = (params) => {
     // __APOLLO_STATE__ defined, in production mode
     const queryHash = getQueryHash(params.query, params.variables);
     const cachePath = `/${queryHash}-cache.json`;
-    
+
     return fetch(cachePath)
       .then(response => response.json())
       .then((response) => {

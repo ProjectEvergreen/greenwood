@@ -12,7 +12,7 @@
  * class FooResource extends ResourceInterface {
  *   // see complete implementation in the greenwood.config.js file used for this spec
  * }
- * 
+ *
  * {
  *   plugins: [{
  *     type: 'resource',

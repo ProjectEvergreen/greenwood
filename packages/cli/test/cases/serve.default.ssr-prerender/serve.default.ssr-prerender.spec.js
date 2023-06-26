@@ -76,11 +76,11 @@ describe('Serve Greenwood With: ', function() {
             if (err) {
               reject();
             }
-  
+
             response = res;
             response.body = body;
             dom = new JSDOM(body);
-  
+
             resolve();
           });
         });

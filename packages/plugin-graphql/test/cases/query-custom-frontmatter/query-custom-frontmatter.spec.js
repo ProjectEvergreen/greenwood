@@ -1,12 +1,12 @@
 /*
  * Use Case
- * Run Greenwood build command with GraphQL calls to get data about the projects graph using ChildrenQuery, simulating 
+ * Run Greenwood build command with GraphQL calls to get data about the projects graph using ChildrenQuery, simulating
  * a link of blog posts derivered from a pages/blog directory with custom frontmatter.  Also uses LitElement.
  *
  * Needs prerender to be true to get SSR and client side GQL fetching.
- * 
+ *
  * User Result
- * Should generate a Greenwood build that dynamically serializes data from the graph in the body 
+ * Should generate a Greenwood build that dynamically serializes data from the graph in the body
  * of the home page as a list of blog post links.
  *
  * User Command
@@ -56,51 +56,51 @@ describe('Build Greenwood With: ', function() {
 
     before(async function() {
       const greenwoodGraphqlCoreLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/plugin-graphql/src/core/*.js`, 
+        `${process.cwd()}/packages/plugin-graphql/src/core/*.js`,
         `${outputPath}/node_modules/@greenwood/plugin-graphql/src/core/`
       );
       const greenwoodGraphqlQueryLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`, 
+        `${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`,
         `${outputPath}/node_modules/@greenwood/plugin-graphql/src/queries/`
       );
       const lit = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/*.js`, 
+        `${process.cwd()}/node_modules/lit/*.js`,
         `${outputPath}/node_modules/lit/`
       );
       const litDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/decorators/*.js`, 
+        `${process.cwd()}/node_modules/lit/decorators/*.js`,
         `${outputPath}/node_modules/lit/decorators/`
       );
       const litDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/directives/*.js`, 
+        `${process.cwd()}/node_modules/lit/directives/*.js`,
         `${outputPath}/node_modules/lit/directives/`
       );
       const litPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/package.json`, 
+        `${process.cwd()}/node_modules/lit/package.json`,
         `${outputPath}/node_modules/lit/`
       );
       const litElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/*.js`, 
+        `${process.cwd()}/node_modules/lit-element/*.js`,
         `${outputPath}/node_modules/lit-element/`
       );
       const litElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/package.json`, 
+        `${process.cwd()}/node_modules/lit-element/package.json`,
         `${outputPath}/node_modules/lit-element/`
       );
       const litElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/decorators/*.js`, 
+        `${process.cwd()}/node_modules/lit-element/decorators/*.js`,
         `${outputPath}/node_modules/lit-element/decorators/`
       );
       const litHtml = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/*.js`, 
+        `${process.cwd()}/node_modules/lit-html/*.js`,
         `${outputPath}/node_modules/lit-html/`
       );
       const litHtmlPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/package.json`, 
+        `${process.cwd()}/node_modules/lit-html/package.json`,
         `${outputPath}/node_modules/lit-html/`
       );
       const litHtmlDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/directives/*.js`, 
+        `${process.cwd()}/node_modules/lit-html/directives/*.js`,
         `${outputPath}/node_modules/lit-html/directives/`
       );
       // lit-html has a dependency on this
@@ -110,15 +110,15 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/@types/trusted-types/`
       );
       const litReactiveElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`, 
+        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
       const litReactiveElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`, 
+        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
         `${outputPath}/node_modules/@lit/reactive-element/decorators/`
       );
       const litReactiveElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`, 
+        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
 
@@ -185,14 +185,14 @@ describe('Build Greenwood With: ', function() {
 
         expect(lists.length).to.be.equal(1);
       });
-      
+
       it('should have a expected Query output in the <body> tag for posts list links', function() {
         const listItems = dom.window.document.querySelectorAll('body ul li');
         const link1 = listItems[0].querySelector('a');
         const link2 = listItems[1].querySelector('a');
 
         expect(listItems.length).to.be.equal(2);
-        
+
         expect(link1.href.replace('file://', '').replace(/\/[A-Z]:/, '')).to.be.equal('/blog/first-post/');
         expect(link1.title).to.be.equal('Click to read my First blog post');
         expect(link1.innerHTML).to.contain('First');
@@ -208,7 +208,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(authors.length).to.be.equal(2);
         expect(dates.length).to.be.equal(2);
-        
+
         // account for dynamic hydration markers added by lit
         expect(authors[0].innerHTML).to.match(/Written By:(.*.)someone@blog.com/);
         expect(dates[0].innerHTML).to.match(/On:(.*.)07.08.2020/);

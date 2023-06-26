@@ -8,7 +8,7 @@ async function getBody() {
       </wc-card>
     `;
   }).join('');
-  
+
   return html;
 }
 

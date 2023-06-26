@@ -16,14 +16,14 @@
  *     ...pluginBabel()
  *  ]
  * }
- * 
+ *
  * User Workspace
  *  src/
  *   pages/
  *     index.html
  *   scripts/
  *     main.js
- * 
+ *
  */
 import chai from 'chai';
 import fs from 'fs';
@@ -56,7 +56,7 @@ describe('Build Greenwood With: ', function() {
       await runner.runCommand(cliPath, 'build');
     });
 
-    runSmokeTest(['public', 'index'], LABEL);    
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('Babel should process JavaScript that reference private class members / methods', function() {
       it('should output correctly processed JavaScript without private members', function() {

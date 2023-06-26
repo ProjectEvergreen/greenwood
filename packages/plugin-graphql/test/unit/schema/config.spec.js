@@ -42,7 +42,7 @@ describe('Unit Test: Data', function() {
       describe('Workspace', function() {
         const { workspace } = MOCK_CONFIG.config;
 
-        it('should have the expected title', function() {  
+        it('should have the expected title', function() {
           expect(workspace).to.equal(config.workspace);
         });
       });

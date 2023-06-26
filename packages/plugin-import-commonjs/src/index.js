@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Detects and fully resolves import requests for CommonJS files in node_modules.
  *
  */
@@ -24,7 +24,7 @@ const testForCjsModule = async(url) => {
       isCommonJs = true;
     } catch (e) {
       const { message } = e;
-      const isProbablyLexarErrorSoIgnore = message.indexOf('Unexpected import statement in CJS module.') >= 0 
+      const isProbablyLexarErrorSoIgnore = message.indexOf('Unexpected import statement in CJS module.') >= 0
         || message.indexOf('Unexpected export statement in CJS module.') >= 0;
 
       if (!isProbablyLexarErrorSoIgnore) {
@@ -48,7 +48,7 @@ class ImportCommonJsResource extends ResourceInterface {
 
   async intercept(url) {
     const { pathname } = url;
-    
+
     return new Promise(async(resolve, reject) => {
       try {
         const options = {

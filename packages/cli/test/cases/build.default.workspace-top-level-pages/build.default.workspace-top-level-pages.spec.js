@@ -113,7 +113,7 @@ describe('Build Greenwood With: ', function() {
       it('should create a top level contact page with a directory and index.html', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'contact', 'index.html'))).to.be.true;
       });
-  
+
       it('should have the correct content for the contact page', function() {
         const h3Tags = dom.window.document.querySelectorAll('h3');
         const pTags = dom.window.document.querySelectorAll('p');

@@ -12,7 +12,7 @@
  * {
  *   optimization: 'none'
  * }
- * 
+ *
  * Custom Workspace
  * src/
  *   components/
@@ -52,7 +52,7 @@ describe('Build Greenwood With: ', function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });
-  
+
     describe('Output for JavaScript / CSS tags and files', function() {
       let dom;
       let cssFiles;
@@ -69,7 +69,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(preloadTags.length).to.be.equal(0);
       });
-      
+
       describe('<script> tag and preloading', function() {
         it('should contain one un-minified javascript file in the output directory', async function() {
           expect(jsFiles).to.have.lengthOf(1);
@@ -102,7 +102,7 @@ describe('Build Greenwood With: ', function() {
 
         it('should output the contents of the one CSS file', function() {
           const css = fs.readFileSync(cssFiles[0], 'utf-8');
-          
+
           expect(css).to.contain('{\n  margin: 0;\n  padding: 0;\n  font-family: \'Comic Sans\', sans-serif;\n}');
         });
 

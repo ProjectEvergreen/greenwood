@@ -1,7 +1,7 @@
 /*
  * Use Case
  * Run Greenwood with greenwoodPluginImportJson plugin with prerendering of JSON on the server side.
- * 
+ *
  * User Result
  * Should generate a static Greenwood build with CSS properly prerendered.
  *
