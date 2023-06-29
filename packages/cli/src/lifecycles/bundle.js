@@ -1,6 +1,7 @@
 /* eslint-disable max-depth, max-len */
 import fs from 'fs/promises';
 import { getRollupConfigForApis, getRollupConfigForScriptResources, getRollupConfigForSsr } from '../config/rollup.config.js';
+import { getAppTemplate, getPageTemplate, getUserScripts } from '../lib/templating-utils.js';
 import { hashString } from '../lib/hashing-utils.js';
 import { checkResourceExists, mergeResponse, normalizePathnameForWindows } from '../lib/resource-utils.js';
 import path from 'path';
@@ -174,7 +175,6 @@ async function bundleApiRoutes(compilation) {
 
 async function bundleSsrPages(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const { outputDir, pagesDir } = compilation.context;
   // TODO context plugins for SSR ?
   // https://github.com/ProjectEvergreen/greenwood/issues/1008
   // const contextPlugins = compilation.config.plugins.filter((plugin) => {
@@ -182,100 +182,61 @@ async function bundleSsrPages(compilation) {
   // }).map((plugin) => {
   //   return plugin.provider(compilation);
   // });
-
+  const hasSSRPages = compilation.graph.filter(page => page.isSSR).length > 0;
   const input = [];
 
-  if (!compilation.config.prerender) {
+  if (!compilation.config.prerender && hasSSRPages) {
+    const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
+    const { executeModuleUrl } = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider();
+    const { executeRouteModule } = await import(executeModuleUrl);
+    const { pagesDir, scratchDir } = compilation.context;
+
     for (const page of compilation.graph) {
       if (page.isSSR && !page.data.static) {
-        const { filename, path: pagePath } = page;
-        const scratchUrl = new URL(`./${filename}`, outputDir);
+        const { filename, imports, route, template, title } = page;
+        const entryFileUrl = new URL(`./_${filename}`, scratchDir);
+        const moduleUrl = new URL(`./${filename}`, pagesDir);
+        // TODO getTemplate has to be static (for now?)
+        // https://github.com/ProjectEvergreen/greenwood/issues/955
+        const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [] });
+        let staticHtml = '';
 
-        // better way to write out inline code like this?
-        await fs.writeFile(scratchUrl, `
-          import { Worker } from 'worker_threads';
-          import { getAppTemplate, getPageTemplate, getUserScripts } from '@greenwood/cli/src/lib/templating-utils.js';
+        staticHtml = data.template ? data.template : await getPageTemplate(staticHtml, compilation.context, template, []);
+        staticHtml = await getAppTemplate(staticHtml, compilation.context, imports, [], false, title);
+        staticHtml = await getUserScripts(staticHtml, compilation.context);
+        staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
 
-          export async function handler(request, compilation) {
-            const routeModuleLocationUrl = new URL('./_${filename}', '${outputDir}');
-            const routeWorkerUrl = '${compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().workerUrl}';
-            const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
-            let body = '';
-            let html = '';
-            let frontmatter;
-            let template;
-            let templateType = 'page';
-            let title = '';
-            let imports = [];
+        // better way to write out this inline code?
+        await fs.writeFile(entryFileUrl, `
+          import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
 
-            await new Promise((resolve, reject) => {
-              const worker = new Worker(new URL(routeWorkerUrl));
+          export async function handler(request) {
+            const compilation = JSON.parse('${JSON.stringify(compilation)}');
+            const page = JSON.parse('${JSON.stringify(page)}');
+            const moduleUrl = '___GWD_ENTRY_FILE_URL=${filename}___';
+            const data = await executeRouteModule({ moduleUrl, compilation, page });
+            let staticHtml = \`${staticHtml}\`;
 
-              worker.on('message', (result) => {
-                if (result.body) {
-                  body = result.body;
-                }
+            // console.log({ page })
+            // console.log({ staticHtml })
+            // console.log({ data });
 
-                if (result.template) {
-                  template = result.template;
-                }
+            if (data.body) {
+              staticHtml = staticHtml.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, data.body);
+            }
 
-                if (result.frontmatter) {
-                  frontmatter = result.frontmatter;
-
-                  if (frontmatter.title) {
-                    title = frontmatter.title;
-                  }
-
-                  if (frontmatter.template) {
-                    templateType = frontmatter.template;
-                  }
-
-                  if (frontmatter.imports) {
-                    imports = imports.concat(frontmatter.imports);
-                  }
-                }
-
-                resolve();
-              });
-
-              worker.on('error', reject);
-              worker.on('exit', (code) => {
-                if (code !== 0) {
-                  reject(new Error(\`Worker stopped with exit code \${code}\`));
-                }
-              });
-
-              worker.postMessage({
-                moduleUrl: routeModuleLocationUrl.href,
-                compilation: \`${JSON.stringify(compilation)}\`,
-                route: '${pagePath}'
-              });
-            });
-
-            html = template ? template : await getPageTemplate('', compilation.context, templateType, []);
-            html = await getAppTemplate(html, compilation.context, imports, [], false, title);
-            html = await getUserScripts(html, compilation.context);
-            html = html.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, body);
-            html = await (await htmlOptimizer.optimize(new URL(request.url), new Response(html))).text();
-
-            return new Response(html);
+            return new Response(staticHtml);
           }
         `);
 
-        input.push(normalizePathnameForWindows(new URL(`./${filename}`, pagesDir)));
+        input.push(normalizePathnameForWindows(moduleUrl));
+        input.push(normalizePathnameForWindows(entryFileUrl));
       }
     }
 
     const [rollupConfig] = await getRollupConfigForSsr(compilation, input);
 
     if (rollupConfig.input.length > 0) {
-      const { userTemplatesDir, outputDir } = compilation.context;
-
-      if (await checkResourceExists(userTemplatesDir)) {
-        await fs.cp(userTemplatesDir, new URL('./_templates/', outputDir), { recursive: true });
-      }
-
       const bundle = await rollup(rollupConfig);
       await bundle.write(rollupConfig.output);
     }
@@ -309,13 +270,14 @@ const bundleCompilation = async (compilation) => {
 
       await Promise.all([
         await bundleApiRoutes(compilation),
-        await bundleSsrPages(compilation),
         await bundleScriptResources(compilation),
         await bundleStyleResources(compilation, optimizeResourcePlugins)
       ]);
 
-      console.info('optimizing static pages....');
+      // bundleSsrPages depends on bundleScriptResources having run first
+      await bundleSsrPages(compilation);
 
+      console.info('optimizing static pages....');
       await optimizeStaticPages(compilation, optimizeResourcePlugins);
       await cleanUpResources(compilation);
       await emitResources(compilation);

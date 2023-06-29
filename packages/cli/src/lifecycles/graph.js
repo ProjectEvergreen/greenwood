@@ -116,13 +116,13 @@ const generateGraph = async (compilation) => {
               }
               /* ---------End Menu Query-------------------- */
             } else if (isDynamic) {
-              const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation).workerUrl;
+              const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation).executeModuleUrl;
               let ssrFrontmatter;
 
               filePath = route;
 
               await new Promise((resolve, reject) => {
-                const worker = new Worker(routeWorkerUrl);
+                const worker = new Worker(new URL('../lib/ssr-route-worker.js', import.meta.url));
 
                 worker.on('message', async (result) => {
                   if (result.frontmatter) {
@@ -139,9 +139,19 @@ const generateGraph = async (compilation) => {
                 });
 
                 worker.postMessage({
+                  executeModuleUrl: routeWorkerUrl.href,
                   moduleUrl: filenameUrl.href,
                   compilation: JSON.stringify(compilation),
-                  route
+                  // TODO need to get as many of these params as possible
+                  // or ignore completely?
+                  page: JSON.stringify({
+                    route,
+                    id,
+                    label: id.split('-')
+                      .map((idPart) => {
+                        return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
+                      }).join(' ')
+                  })
                 });
               });
 

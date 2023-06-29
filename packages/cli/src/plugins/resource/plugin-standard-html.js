@@ -105,10 +105,10 @@ class StandardHtmlResource extends ResourceInterface {
 
     if (matchingRoute.isSSR) {
       const routeModuleLocationUrl = new URL(`./${matchingRoute.filename}`, pagesDir);
-      const routeWorkerUrl = this.compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().workerUrl;
+      const routeWorkerUrl = this.compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeModuleUrl;
 
       await new Promise((resolve, reject) => {
-        const worker = new Worker(routeWorkerUrl);
+        const worker = new Worker(new URL('../../lib/ssr-route-worker.js', import.meta.url));
 
         worker.on('message', (result) => {
           if (result.template) {
@@ -143,9 +143,10 @@ class StandardHtmlResource extends ResourceInterface {
         });
 
         worker.postMessage({
+          executeModuleUrl: routeWorkerUrl.href,
           moduleUrl: routeModuleLocationUrl.href,
           compilation: JSON.stringify(this.compilation),
-          route: matchingRoute.path
+          page: JSON.stringify(matchingRoute)
         });
       });
     }

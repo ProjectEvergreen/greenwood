@@ -130,6 +130,31 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
   };
 }
 
+// TODO could we use this instead?
+// https://github.com/rollup/rollup/blob/v2.79.1/docs/05-plugin-development.md#resolveimportmeta
+// https://github.com/ProjectEvergreen/greenwood/issues/1087
+function greenwoodPatchSsrPagesEntryPointRuntimeImport() {
+  return {
+    name: 'greenwood-patch-ssr-pages-entry-point-runtime-import',
+    generateBundle(options, bundle) {
+      Object.keys(bundle).forEach((key) => {
+        if (key.startsWith('__')) {
+          console.log('this is a generated entry point', bundle[key]);
+          // ___GWD_ENTRY_FILE_URL=${filename}___
+          const needle = bundle[key].code.match(/___GWD_ENTRY_FILE_URL=(.*.)___/);
+          if (needle) {
+            const entryPathMatch = needle[1];
+
+            bundle[key].code = bundle[key].code.replace(/'___GWD_ENTRY_FILE_URL=(.*.)___'/, `new URL('./_${entryPathMatch}', import.meta.url)`);
+          } else {
+            console.warn(`Could not find entry path match for bundle => ${ley}`);
+          }
+        }
+      });
+    }
+  };
+}
+
 const getRollupConfigForScriptResources = async (compilation) => {
   const { outputDir } = compilation.context;
   const input = [...compilation.resources.values()]
@@ -193,7 +218,7 @@ const getRollupConfigForApis = async (compilation) => {
     .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)));
 
   // TODO should routes and APIs have chunks?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1008
+  // https://github.com/ProjectEvergreen/greenwood/issues/1118
   return [{
     input,
     output: {
@@ -214,7 +239,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
   const { outputDir } = compilation.context;
 
   // TODO should routes and APIs have chunks?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1008
+  // https://github.com/ProjectEvergreen/greenwood/issues/1118
   return [{
     input,
     output: {
@@ -224,10 +249,34 @@ const getRollupConfigForSsr = async (compilation, input) => {
     },
     plugins: [
       greenwoodJsonLoader(),
-      nodeResolve(),
+      // TODO let this through for lit to enable nodeResolve({ preferBuiltins: true })
+      // https://github.com/lit/lit/issues/449
+      // https://github.com/ProjectEvergreen/greenwood/issues/1118
+      nodeResolve({
+        preferBuiltins: true
+      }),
       commonjs(),
-      importMetaAssets()
-    ]
+      importMetaAssets(),
+      greenwoodPatchSsrPagesEntryPointRuntimeImport() // TODO a little hacky but works for now
+    ],
+    onwarn: (errorObj) => {
+      const { code, message } = errorObj;
+
+      switch (code) {
+
+        case 'CIRCULAR_DEPENDENCY':
+          // TODO let this through for lit by suppressing it
+          // Error: the string "Circular dependency: ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js ->
+          // ../../../../../node_modules/@lit-labs/ssr/lib/lit-element-renderer.js -> ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js\n" was thrown, throw an Error :)
+          // https://github.com/lit/lit/issues/449
+          // https://github.com/ProjectEvergreen/greenwood/issues/1118
+          break;
+        default:
+          // otherwise, log all warnings from rollup
+          console.debug(message);
+
+      }
+    }
   }];
 };
 

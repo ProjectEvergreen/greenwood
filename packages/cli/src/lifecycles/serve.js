@@ -300,7 +300,7 @@ async function getHybridServer(compilation) {
       });
 
       if (!config.prerender && matchingRoute.isSSR && !matchingRoute.data.static) {
-        const { handler } = await import(new URL(`./${matchingRoute.filename}`, outputDir));
+        const { handler } = await import(new URL(`./__${matchingRoute.filename}`, outputDir));
         // TODO passing compilation this way too hacky?
         // https://github.com/ProjectEvergreen/greenwood/issues/1008
         const response = await handler(request, compilation);

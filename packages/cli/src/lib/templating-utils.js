@@ -177,6 +177,8 @@ async function getAppTemplate(pageTemplateContents, context, customImports = [],
 }
 
 async function getUserScripts (contents, context) {
+  // TODO get rid of lit polyfills in core
+  // https://github.com/ProjectEvergreen/greenwood/issues/728
   // https://lit.dev/docs/tools/requirements/#polyfills
   if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
     const userPackageJson = await getPackageJson(context);
