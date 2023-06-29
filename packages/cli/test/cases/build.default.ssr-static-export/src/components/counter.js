@@ -1,5 +1,5 @@
 const template = document.createElement('template');
-      
+
 template.innerHTML = `
   <style>
     :host {
@@ -19,7 +19,7 @@ class MyCounter extends HTMLElement {
     this.attachShadow({ mode: 'open' });
   }
 
-  async connectedCallback() {    
+  async connectedCallback() {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.shadowRoot.getElementById('inc').onclick = () => this.inc();
     this.shadowRoot.getElementById('dec').onclick = () => this.dec();

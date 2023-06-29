@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Manages web standard resource related operations for video formats.
  * This is a Greenwood default plugin.
  *
@@ -34,7 +34,7 @@ class StandardVideoResource extends ResourceInterface {
         break;
       case 'avi':
         contentType = 'video/x-msvideo';
-        break;  
+        break;
       case 'flv':
         contentType = 'video/x-flv';
         break;

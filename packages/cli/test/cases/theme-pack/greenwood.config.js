@@ -17,7 +17,7 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
   async resolve(url) {
     const themePackUrl = url.pathname.replace(`/node_modules/${packageName}/dist`, 'src');
 
-    return new Request(`${this.compilation.context.projectDirectory}${themePackUrl}`); 
+    return new Request(`${this.compilation.context.projectDirectory}${themePackUrl}`);
   }
 }
 

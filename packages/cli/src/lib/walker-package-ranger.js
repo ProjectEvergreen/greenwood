@@ -60,7 +60,7 @@ async function walkModule(modulePath, dependency) {
         if (!importMap[sourceValue]) {
           updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
         }
-        
+
         await walkPackageJson(path.join(absoluteNodeModulesLocation, 'package.json'));
       } else if (isBarePath) {
         updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
@@ -128,18 +128,18 @@ async function walkPackageJson(packageJson = {}) {
       if (Array.isArray(entry)) {
         // we have an exportMap
         const exportMap = entry;
-  
+
         for (const entry of exportMap) {
           const exportMapEntry = dependencyPackageJson.exports[entry];
           let packageExport;
-  
+
           if (Array.isArray(exportMapEntry)) {
             let fallbackPath;
             let esmPath;
-  
+
             exportMapEntry.forEach((mapItem) => {
               switch (typeof mapItem) {
-  
+
                 case 'string':
                   fallbackPath = mapItem;
                   break;
@@ -159,10 +159,10 @@ async function walkPackageJson(packageJson = {}) {
                 default:
                   console.warn(`Sorry, we were unable to detect the module type for ${mapItem} :(.  please consider opening an issue to let us know about your use case.`);
                   break;
-  
+
               }
             });
-  
+
             packageExport = esmPath
               ? esmPath
               : fallbackPath;
@@ -170,7 +170,7 @@ async function walkPackageJson(packageJson = {}) {
             packageExport = exportMapEntry.import
               ? exportMapEntry.import
               : exportMapEntry.default;
-            
+
             // use the dependency itself as an entry in the importMap
             if (entry === '.') {
               updateImportMap(dependency, `/node_modules/${path.join(dependency, packageExport)}`);

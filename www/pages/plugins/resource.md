@@ -102,7 +102,7 @@ class StandardJavaScriptResource extends ResourceInterface {
 
   async serve(url, request) {
     const body = await fs.promises.readFile(url, 'utf-8');
-    
+
     return new Response(body, {
       headers: {
         'Content-Type': 'text/javascript'
@@ -138,14 +138,14 @@ class ImportCssResource extends ResourceInterface {
     const notFromBrowser = accepts.indexOf('text/css') < 0 && accepts.indexOf('application/signed-exchange') < 0;
 
     // https://github.com/ProjectEvergreen/greenwood/issues/492
-    return pathname.split('.').pop() === 'css' && 
+    return pathname.split('.').pop() === 'css' &&
       (notFromBrowser || url.searchParams.has('type') && url.searchParams.get('type') === 'css');
   }
 
   async intercept(url, request, response) {
     const body = await response.text();
     const cssInJsBody = `const css = \`${body.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\')}\`;\nexport default css;`;
-    
+
     return new Response(cssInJsBody, {
       headers: new Headers({
         'Content-Type': 'text/javascript'

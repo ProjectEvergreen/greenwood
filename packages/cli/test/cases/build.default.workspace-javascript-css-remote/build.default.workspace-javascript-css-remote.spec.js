@@ -1,7 +1,7 @@
 /*
  * Use Case
  * Run Greenwood with various usages of JavaScript (<script>) and CSS (<style> / <link>) tags with remove links.
- * 
+ *
  * User Result
  * Should generate a bare bones Greenwood build without erroring.
  *
@@ -15,7 +15,7 @@
  * src/
  *   pages/
  *     index.html
- *     
+ *
  */
 import chai from 'chai';
 import glob from 'glob-promise';
@@ -66,7 +66,7 @@ describe('Build Greenwood With: ', function() {
         const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return (/http/).test(script.src);
         });
-        
+
         expect(mainScriptTags.length).to.be.equal(2);
       });
 
@@ -75,7 +75,7 @@ describe('Build Greenwood With: ', function() {
         const jqueryScriptTag = Array.prototype.slice.call(scriptTags).filter(script => {
           return (/http:\/\/code.jquery.com\//).test(script.src);
         });
-        
+
         expect(jqueryScriptTag.length).to.be.equal(1);
       });
 
@@ -84,7 +84,7 @@ describe('Build Greenwood With: ', function() {
         const unpkgScriptTag = Array.prototype.slice.call(scriptTags).filter(script => {
           return (/https:\/\/unpkg.com\//).test(script.src);
         });
-        
+
         expect(unpkgScriptTag.length).to.be.equal(1);
       });
     });
@@ -92,7 +92,7 @@ describe('Build Greenwood With: ', function() {
     describe('<link rel="stylesheet" href="..."/> tag in the <head>', function() {
       it('should have one <link> tag in the <head> with no protocol specified', function() {
         const linkTags = dom.window.document.querySelectorAll('head > link');
-        
+
         expect(linkTags.length).to.be.equal(1);
       });
 
@@ -101,7 +101,7 @@ describe('Build Greenwood With: ', function() {
         const fontsLinkTag = Array.prototype.slice.call(linkTags).filter(link => {
           return (/\/\/fonts.googleapis.com\//).test(link.href);
         });
-        
+
         expect(fontsLinkTag.length).to.be.equal(1);
       });
     });

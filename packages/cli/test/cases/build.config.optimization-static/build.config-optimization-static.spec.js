@@ -59,7 +59,7 @@ describe('Build Greenwood With: ', function() {
 
       it('should emit no javascript files to the output directory', async function() {
         const jsFiles = await glob.promise(path.join(this.context.publicDir, '*.js'));
-        
+
         expect(jsFiles).to.have.lengthOf(0);
       });
 
@@ -68,7 +68,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(linkTags.length).to.be.equal(0);
       });
-      
+
       it('should have no <script> tags in the <head>', function() {
         const scriptTags = dom.window.document.querySelectorAll('head script');
 

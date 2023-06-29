@@ -16,14 +16,14 @@
  *     ...pluginTypeScript()
  *  ]
  * }
- * 
+ *
  * User Workspace
  *  src/
  *   pages/
  *     index.html
  *   scripts/
  *     main.ts
- * 
+ *
  * Default Config
  * {
  *   "compilerOptions": {
@@ -33,7 +33,7 @@
  *      "sourceMap": true
  *   }
  * }
- * 
+ *
  */
 import chai from 'chai';
 import fs from 'fs';
@@ -66,7 +66,7 @@ describe('Build Greenwood With: ', function() {
       await runner.runCommand(cliPath, 'build');
     });
 
-    runSmokeTest(['public', 'index'], LABEL);    
+    runSmokeTest(['public', 'index'], LABEL);
 
     describe('TypeScript should process JavaScript that uses an interface', function() {
       it('should output correctly processed JavaScript without the interface', function() {

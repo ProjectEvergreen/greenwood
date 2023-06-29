@@ -47,9 +47,9 @@ xdescribe('Scaffold Greenwood With Yarn: ', function() {
       before(async function() {
         await runner.runCommand(cliPath, 'build');
       });
-      
+
       runSmokeTest(['public', 'index'], LABEL);
-    
+
       it('should generate a yarn.lock file', function() {
         expect(fs.existsSync(path.join(outputPath, 'yarn.lock'))).to.be.true;
       });

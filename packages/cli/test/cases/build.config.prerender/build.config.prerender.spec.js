@@ -49,9 +49,9 @@ describe('Build Greenwood With: ', function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });
-    
+
     runSmokeTest(['public', 'index'], LABEL);
-  
+
     describe('Default output for index.html', function() {
       let dom;
 
@@ -68,7 +68,7 @@ describe('Build Greenwood With: ', function() {
 
         it('should have a <title> tag in the <head>', function() {
           const title = dom.window.document.querySelector('head title').textContent;
-    
+
           expect(title).to.be.equal('My App');
         });
 

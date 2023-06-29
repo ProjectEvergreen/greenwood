@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with no config and custom page templates to ensure Greenwood 
+ * Run Greenwood build command with no config and custom page templates to ensure Greenwood
  * can build various  "states" of in development HTML files.
  * https://github.com/ProjectEvergreen/greenwood/issues/627
  *
@@ -19,7 +19,7 @@
  *     index.html
  *     no-body.html
  *     no-head.html
- *     shell.html 
+ *     shell.html
  *   scripts/
  *     main.js
  *   styles/

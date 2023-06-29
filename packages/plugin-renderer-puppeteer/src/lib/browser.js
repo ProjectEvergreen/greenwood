@@ -31,7 +31,7 @@ class BrowserRunner {
     page.evaluateOnNewDocument('customElements.forcePolyfill = true');
     page.evaluateOnNewDocument('ShadyDOM = {force: true}');
     page.evaluateOnNewDocument('ShadyCSS = {shimcssproperties: true}');
-    
+
     await page.setCacheEnabled(false); // https://github.com/ProjectEvergreen/greenwood/pull/699
     await page.setRequestInterception(true);
 

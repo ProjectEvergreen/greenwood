@@ -1,5 +1,5 @@
 const template = document.createElement('template');
-      
+
 template.innerHTML = '<footer>This is the footer component.</footer>';
 
 export default class FooterComponent extends HTMLElement {

@@ -3,7 +3,7 @@
  * Run Greenwood with default config and nested directories in workspace with lots of nested pages.
  *
  * Result
- * Test for correctly ordered graph.json and pages output, which by default should mimic 
+ * Test for correctly ordered graph.json and pages output, which by default should mimic
  * the filesystem order by default.
  *
  * Command
@@ -113,7 +113,7 @@ describe('Build Greenwood With: ', function() {
       it('should create a top level blog pages directory', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './blog'))).to.be.true;
       });
-  
+
       it('should create a directory for each year of blog pages', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, 'blog/2017'))).to.be.true;
         expect(fs.existsSync(path.join(this.context.publicDir, 'blog/2018'))).to.be.true;
@@ -162,7 +162,7 @@ describe('Build Greenwood With: ', function() {
           return page.route.indexOf(/\/blog\/[0-9]{4}/) > 0;
         }).forEach((page) => {
           const contents = fs.readFileSync(path.join(this.context.publicDir, page.route, 'index.html'), 'utf-8');
-          
+
           expect(contents).to.contain(`<p>This is the post for page ${page.data.date}.</p>`);
         });
       });

@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Compile Web Components rendering with JSX using wc-compiler.
  *
  */

@@ -10,7 +10,7 @@
  *
  * User Config
  * N / A
- * 
+ *
  * User Workspace
  * src/
  *   api/
@@ -45,7 +45,7 @@ describe('Serve Greenwood With: ', function() {
     before(async function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
-      
+
       return new Promise(async (resolve) => {
         setTimeout(() => {
           resolve();
@@ -112,7 +112,7 @@ describe('Serve Greenwood With: ', function() {
           });
         });
       });
-      
+
       it('should return a 200 status', function(done) {
         expect(response.statusCode).to.equal(200);
         done();

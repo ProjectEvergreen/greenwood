@@ -3,7 +3,7 @@
  * Run Greenwood with Babel processing merging user and default babel.config.js files.
  *
  * User Result
- * Should generate a bare bones Greenwood build with the user's JavaScript files processed 
+ * Should generate a bare bones Greenwood build with the user's JavaScript files processed
  * based on their own babel.config.js file merged with plugin default babel.config.js file.
  *
  * User Command
@@ -19,14 +19,14 @@
  *     })
  *   ]
  * }
- * 
+ *
  * User Workspace
  *  src/
  *   pages/
  *     index.html
  *   scripts/
  *     main.js
- * 
+ *
  * User babel.config.js
  * module.exports = {
  *   plugins: [
@@ -69,7 +69,7 @@ describe('Build Greenwood With: ', function() {
       jsFiles = glob.sync(path.join(this.context.publicDir, '*.js'));
     });
 
-    runSmokeTest(['public', 'index'], LABEL);    
+    runSmokeTest(['public', 'index'], LABEL);
 
     it('should output one JavaScript file', function() {
       expect(jsFiles.length).to.equal(1);

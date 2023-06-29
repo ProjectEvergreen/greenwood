@@ -38,7 +38,7 @@ class GraphQLResource extends ResourceInterface {
       })
     });
   }
-  
+
   async shouldIntercept(url, request, response) {
     return response.headers.get('Content-Type').indexOf(this.contentType[1]) >= 0;
   }
@@ -99,7 +99,7 @@ const greenwoodPluginGraphQL = (options = {}) => {
           replacement: importMap[key].replace('/node_modules/', '')
         };
       });
-    
+
       return [
         rollupPluginAlias({ entries: aliasEntries })
       ];

@@ -60,13 +60,13 @@ describe('Build Greenwood With: ', function() {
 
       it('should emit no Javascript files to the output directory', async function() {
         const jsFiles = await glob.promise(path.join(this.context.publicDir, '**/*.js'));
-        
+
         expect(jsFiles).to.have.lengthOf(0);
       });
 
       it('should emit no CSS files to the output directory', async function() {
         const cssFiles = await glob.promise(path.join(this.context.publicDir, '**/*.css'));
-        
+
         expect(cssFiles).to.have.lengthOf(0);
       });
 
@@ -102,7 +102,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(headerLinkTags.length).to.be.equal(0);
       });
-      
+
       it('should have no <script> tags in the <head>', function() {
         const headerScriptTags = Array.from(dom.window.document.querySelectorAll('head script'))
           .filter(script => script.getAttribute('src') && script.getAttribute('src').indexOf('header') >= 0);
@@ -124,12 +124,12 @@ describe('Build Greenwood With: ', function() {
 
         expect(footerLinkTags.length).to.be.equal(0);
       });
-      
+
       it('should have an inline <script> tag in the <head>', function() {
         const footerScriptTags = Array.from(dom.window.document.querySelectorAll('head script'))
           .filter((script) => {
             // eslint-disable-next-line max-len
-            return script.textContent.indexOf('const e=document.createElement("template");e.innerHTML="<footer>This is the footer component.</footer>";class t extends HTMLElement{constructor(){super(),this.attachShadow({mode:"open"})}connectedCallback(){this.shadowRoot.appendChild(e.content.cloneNode(!0))}}customElements.define("app-footer",t);') >= 0 
+            return script.textContent.indexOf('const e=document.createElement("template");e.innerHTML="<footer>This is the footer component.</footer>";class t extends HTMLElement{constructor(){super(),this.attachShadow({mode:"open"})}connectedCallback(){this.shadowRoot.appendChild(e.content.cloneNode(!0))}}customElements.define("app-footer",t);') >= 0
               && !script.getAttribute('src');
           });
 
@@ -150,7 +150,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(themeLinkTags.length).to.be.equal(0);
       });
-      
+
       it('should have an inline <style> tag in the <head>', function() {
         const themeStyleTags = Array.from(dom.window.document.querySelectorAll('head style'))
           .filter(style => style.textContent.trim() === '*{color:blue}');

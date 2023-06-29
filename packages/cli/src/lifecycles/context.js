@@ -34,7 +34,7 @@ const initContext = async({ config }) => {
           recursive: true
         });
       }
-      
+
       resolve(context);
     } catch (err) {
       console.log(err);

@@ -99,7 +99,7 @@ module.exports = {
     'no-unused-expressions': 0,
     'no-useless-call': 0,
     'no-void': 0,
-    'no-warning-comments': [1, { 
+    'no-warning-comments': [1, {
       'terms': [
         'todo',
         ' fixme',
@@ -142,7 +142,7 @@ module.exports = {
     'comma-style': [2, 'last'],
     'computed-property-spacing': 0,
     'consistent-this': [0, 'self', 'that'],
-    'eol-last': 0,
+    'eol-last': [2, 'never'],
     'func-names': 0,
     'func-style': 0,
     'id-length': 0,
@@ -172,7 +172,7 @@ module.exports = {
     'no-new-object': 2,
     'no-spaced-func': 2,
     'no-ternary': 0,
-    'no-trailing-spaces': 0,
+    'no-trailing-spaces': 2,
     'no-underscore-dangle': [2, { 'allowAfterThis': true }],
     'no-unneeded-ternary': 2,
     'object-curly-spacing': [2, 'always', {}],

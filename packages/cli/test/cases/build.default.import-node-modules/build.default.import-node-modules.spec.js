@@ -2,7 +2,7 @@
  * Use Case
  * Run Greenwood with and loading different references to node_module types to ensure proper support.
  * Sets prerender: true to validate the functionality.
- * 
+ *
  * User Result
  * Should generate a bare bones Greenwood build without erroring.
  *
@@ -47,43 +47,43 @@ describe('Build Greenwood With: ', function() {
 
     before(async function() {
       const lit = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/*.js`, 
+        `${process.cwd()}/node_modules/lit/*.js`,
         `${outputPath}/node_modules/lit/`
       );
       const litDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/decorators/*.js`, 
+        `${process.cwd()}/node_modules/lit/decorators/*.js`,
         `${outputPath}/node_modules/lit/decorators/`
       );
       const litDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/directives/*.js`, 
+        `${process.cwd()}/node_modules/lit/directives/*.js`,
         `${outputPath}/node_modules/lit/directives/`
       );
       const litPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/package.json`, 
+        `${process.cwd()}/node_modules/lit/package.json`,
         `${outputPath}/node_modules/lit/`
       );
       const litElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/*.js`, 
+        `${process.cwd()}/node_modules/lit-element/*.js`,
         `${outputPath}/node_modules/lit-element/`
       );
       const litElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/package.json`, 
+        `${process.cwd()}/node_modules/lit-element/package.json`,
         `${outputPath}/node_modules/lit-element/`
       );
       const litElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/decorators/*.js`, 
+        `${process.cwd()}/node_modules/lit-element/decorators/*.js`,
         `${outputPath}/node_modules/lit-element/decorators/`
       );
       const litHtml = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/*.js`, 
+        `${process.cwd()}/node_modules/lit-html/*.js`,
         `${outputPath}/node_modules/lit-html/`
       );
       const litHtmlPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/package.json`, 
+        `${process.cwd()}/node_modules/lit-html/package.json`,
         `${outputPath}/node_modules/lit-html/`
       );
       const litHtmlDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/directives/*.js`, 
+        `${process.cwd()}/node_modules/lit-html/directives/*.js`,
         `${outputPath}/node_modules/lit-html/directives/`
       );
       // lit-html has a dependency on this
@@ -93,71 +93,71 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/@types/trusted-types/`
       );
       const litReactiveElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`, 
+        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
       const litReactiveElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`, 
+        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
         `${outputPath}/node_modules/@lit/reactive-element/decorators/`
       );
       const litReactiveElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`, 
+        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
       const reduxLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/redux/es/redux.mjs`, 
+        `${process.cwd()}/node_modules/redux/es/redux.mjs`,
         `${outputPath}/node_modules/redux/es`
       );
       const reduxPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/redux/package.json`, 
+        `${process.cwd()}/node_modules/redux/package.json`,
         `${outputPath}/node_modules/redux/`
       );
       const looseLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/loose-envify/index.js`, 
+        `${process.cwd()}/node_modules/loose-envify/index.js`,
         `${outputPath}/node_modules/loose-envify`
       );
       const looseLibsPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/loose-envify/package.json`, 
+        `${process.cwd()}/node_modules/loose-envify/package.json`,
         `${outputPath}/node_modules/loose-envify/`
       );
       const tokensLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/js-tokens/index.js`, 
+        `${process.cwd()}/node_modules/js-tokens/index.js`,
         `${outputPath}/node_modules/js-tokens`
       );
       const tokensLibsPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/js-tokens/package.json`, 
+        `${process.cwd()}/node_modules/js-tokens/package.json`,
         `${outputPath}/node_modules/js-tokens/`
       );
       const symbolLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/symbol-observable/es/*.js`, 
+        `${process.cwd()}/node_modules/symbol-observable/es/*.js`,
         `${outputPath}/node_modules/symbol-observable/es`
       );
       const symbolLibsPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/symbol-observable/package.json`, 
+        `${process.cwd()}/node_modules/symbol-observable/package.json`,
         `${outputPath}/node_modules/symbol-observable/`
       );
       const lodashEsLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lodash-es/*.js`, 
+        `${process.cwd()}/node_modules/lodash-es/*.js`,
         `${outputPath}/node_modules/lodash-es/`
       );
       const lodashEsLibsPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lodash-es/package.json`, 
+        `${process.cwd()}/node_modules/lodash-es/package.json`,
         `${outputPath}/node_modules/lodash-es/`
       );
       const pwaHelpersLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/pwa-helpers/*.js`, 
+        `${process.cwd()}/node_modules/pwa-helpers/*.js`,
         `${outputPath}/node_modules/pwa-helpers/`
       );
       const pwaHelpersPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/pwa-helpers/package.json`, 
+        `${process.cwd()}/node_modules/pwa-helpers/package.json`,
         `${outputPath}/node_modules/pwa-helpers/`
       );
       const simpleCss = await getDependencyFiles(
-        `${process.cwd()}/node_modules/simpledotcss/simple.css`, 
+        `${process.cwd()}/node_modules/simpledotcss/simple.css`,
         `${outputPath}/node_modules/simpledotcss/`
       );
       const simpleCssPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/simpledotcss/package.json`, 
+        `${process.cwd()}/node_modules/simpledotcss/package.json`,
         `${outputPath}/node_modules/simpledotcss/`
       );
       const prismCss = await getDependencyFiles(
@@ -165,7 +165,7 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/prismjs/themes/`
       );
       const prismPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/prismjs/package.json`, 
+        `${process.cwd()}/node_modules/prismjs/package.json`,
         `${outputPath}/node_modules/prismjs/`
       );
 
@@ -195,7 +195,7 @@ describe('Build Greenwood With: ', function() {
         ...litReactiveElementPackageJson,
         ...lodashEsLibs,
         ...lodashEsLibsPackageJson,
-        ...pwaHelpersPackageJson,    
+        ...pwaHelpersPackageJson,
         ...pwaHelpersLibs,
         ...prismCss,
         ...prismPackageJson,
@@ -213,7 +213,7 @@ describe('Build Greenwood With: ', function() {
         const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return (/main.*.js/).test(script.src);
         });
-        
+
         expect(mainScriptTags.length).to.be.equal(1);
       });
 
@@ -230,7 +230,7 @@ describe('Build Greenwood With: ', function() {
     describe('<script> tag with inline code in the <head> tag', function() {
       it('should have one <script> tag with inline code loaded in the <head> tag', function() {
         const scriptTagsInline = dom.window.document.querySelectorAll('head > script:not([src])');
-        
+
         expect(scriptTagsInline.length).to.be.equal(1);
       });
 
@@ -240,7 +240,7 @@ describe('Build Greenwood With: ', function() {
 
       it('should have the expected inline node_modules content in the first inline script', async function() {
         const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[0];
-        
+
         expect(inlineScriptTag.textContent.replace(/\n/g, '')).to
           .equal('import"/lit-element.ae169679.js";import"/lit-html.7f7a9139.js";//# sourceMappingURL=116321042.6c5eb91c.js.map');
       });

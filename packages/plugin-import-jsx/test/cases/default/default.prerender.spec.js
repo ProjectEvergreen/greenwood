@@ -1,7 +1,7 @@
 /*
  * Use Case
  * Run Greenwood with greenwoodPluginImportJsx plugin with bundling of JSX for the client side using wc-compiler.
- * 
+ *
  * User Result
  * Should generate a static Greenwood build with JSX properly bundled.
  *

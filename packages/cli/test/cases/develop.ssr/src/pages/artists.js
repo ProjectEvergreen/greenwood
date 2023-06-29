@@ -86,4 +86,4 @@ export {
   getTemplate,
   getBody,
   getFrontmatter
-}; 
+};

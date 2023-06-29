@@ -45,7 +45,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe(LABEL, function() {
-    
+
     before(async function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');

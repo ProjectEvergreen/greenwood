@@ -8,7 +8,7 @@ import fs from 'fs/promises';
 // and return the root absolute location
 async function getNodeModulesLocationForPackage(packageName) {
   let nodeModulesUrl;
-  
+
   try {
     const packageEntryLocation = (await import.meta.resolve(packageName)).replace(/\\/g, '/'); // force / for consistency and path matching
 

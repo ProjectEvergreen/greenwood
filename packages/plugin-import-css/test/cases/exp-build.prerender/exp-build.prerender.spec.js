@@ -1,7 +1,7 @@
 /*
  * Use Case
  * Run Greenwood with pluginImportCss plugin with prerendering of CSS on the server side.
- * 
+ *
  * User Result
  * Should generate a static Greenwood build with CSS properly prerendered.
  *

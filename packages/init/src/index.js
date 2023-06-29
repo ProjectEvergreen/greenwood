@@ -54,7 +54,7 @@ const npmInit = async () => {
 
   // use installation path's folder name for packages
   appPkg.name = path.basename(process.cwd());
-  
+
   // make sure users get latest and greatest version of Greenwood
   // https://github.com/ProjectEvergreen/greenwood/issues/781
   // https://github.com/ProjectEvergreen/greenwood/issues/809
@@ -79,7 +79,7 @@ const srcInit = async () => {
   await Promise.all(
     templateFiles.map(async file => {
       const resolvedPath = path.join(templateDir, file);
-      
+
       if (fs.lstatSync(resolvedPath).isDirectory()) {
         return await copyFolder(resolvedPath, TARGET_DIR);
       } else if (await fs.existsSync(resolvedPath)) {
@@ -138,18 +138,18 @@ const install = async () => {
 };
 
 const listAndSelectTemplate = async () => {
-  
+
   const getTemplates = async () => {
     try {
 
-      // create error response 
+      // create error response
       class HTTPResponseError extends Error {
         constructor(response, ...args) {
           super(`HTTP Error Response: ${response.status} ${response.statusText}`, ...args);
           this.response = response;
         }
       }
-      
+
       // check response from repo list fetch
       const checkStatus = response => {
         if (response.ok) {
@@ -172,7 +172,7 @@ const listAndSelectTemplate = async () => {
       const templateRepos = repos.filter(repo => {
         return repo.name.includes(templateStandardName);
       });
-      
+
       return templateRepos.map(({ clone_url, name }) => { // eslint-disable-line camelcase
         const templateName = name.substring(templateStandardName.length, name.length);
         return { clone_url, name: templateName }; // eslint-disable-line camelcase
@@ -200,7 +200,7 @@ const listAndSelectTemplate = async () => {
   if (typeof program.template !== 'boolean') {
     const userSelection = program.template;
     const matchedTemplate = templates.find((template) => template.name === userSelection);
-    
+
     if (matchedTemplate) {
       console.debug(`using user provided template => ${userSelection}...`);
       selectedTemplate = matchedTemplate;
@@ -231,7 +231,7 @@ const cloneTemplate = async () => {
     fs.rmSync(clonedTemplateDir, { recursive: true, force: true });
   }
 
-  // clone to .template directory 
+  // clone to .template directory
   console.log('clone template', selectedTemplate.name, 'to directory', clonedTemplateDir);
   try {
     await git.clone(selectedTemplate.clone_url, clonedTemplateDir);
@@ -259,7 +259,7 @@ const run = async () => {
     // map all the template files and copy them to the current working directory
     console.log('Initialzing project with files...');
     await srcInit();
-    
+
     console.log('Creating manifest (package.json)...');
     await npmInit();
 

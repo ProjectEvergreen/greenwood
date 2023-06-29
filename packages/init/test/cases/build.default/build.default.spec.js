@@ -48,9 +48,9 @@ xdescribe('Scaffold Greenwood and Run Build command: ', function() {
         await runner.setup(outputPath);
         await runner.runCommand(cliPath, 'build');
       });
-      
+
       runSmokeTest(['public', 'index'], LABEL);
-    
+
       it('should generate a package-lock.json file', function() {
         expect(fs.existsSync(path.join(outputPath, 'package-lock.json'))).to.be.true;
       });

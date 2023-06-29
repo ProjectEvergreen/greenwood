@@ -76,7 +76,7 @@ describe('Develop Greenwood With: ', function() {
             }
 
             response = res;
-            
+
             dom = new JSDOM(body);
             sourceHtml = fs.readFileSync(fileURLToPath(new URL('./src/pages/index.html', import.meta.url)), 'utf-8');
 

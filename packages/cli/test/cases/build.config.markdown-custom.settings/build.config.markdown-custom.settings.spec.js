@@ -56,7 +56,7 @@ describe('Build Greenwood With: ', function() {
 
       // gfm: false disables things like fenced code blocks https://www.npmjs.com/package/remark-parse#optionsgfm
       it('should intentionally fail to compile code fencing using our custom markdown preset settings', async function() {
-        let pre = dom.window.document.querySelector('pre > code'); 
+        let pre = dom.window.document.querySelector('pre > code');
 
         expect(pre).to.equal(null);
       });

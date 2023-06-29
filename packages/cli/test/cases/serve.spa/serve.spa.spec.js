@@ -15,7 +15,7 @@
  * src/
  *   index.html
  *   main.css
- * 
+ *
  */
 import chai from 'chai';
 import fs from 'fs';
@@ -85,7 +85,7 @@ describe('Serve Greenwood With: ', function() {
             }
 
             response = res;
-            
+
             resolve();
           });
         });
@@ -123,7 +123,7 @@ describe('Serve Greenwood With: ', function() {
               reject();
             }
 
-            response = res;      
+            response = res;
             resolve();
           });
         });
@@ -162,7 +162,7 @@ describe('Serve Greenwood With: ', function() {
             }
 
             response = res;
-            
+
             resolve();
           });
         });

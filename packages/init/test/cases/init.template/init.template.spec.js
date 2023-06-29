@@ -47,12 +47,12 @@ describe('Scaffold Greenwood From a (Blog) Template: ', function() {
       it('should generate a .gitignore file', function() {
         expect(fs.existsSync(path.join(outputPath, '.gitignore'))).to.be.true;
       });
-  
+
       it('should generate a package.json file', function() {
         expect(fs.existsSync(path.join(outputPath, 'package.json'))).to.be.true;
       });
     });
-    
+
   });
 
   after(function() {

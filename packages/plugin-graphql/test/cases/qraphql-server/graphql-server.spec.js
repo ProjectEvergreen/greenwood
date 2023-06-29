@@ -38,7 +38,7 @@ describe('Develop Greenwood With: ', function() {
 
     before(async function() {
       await runner.setup(outputPath);
-      
+
       return new Promise(async (resolve) => {
         setTimeout(() => {
           resolve();

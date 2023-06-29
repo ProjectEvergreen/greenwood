@@ -1,10 +1,10 @@
 /*
  * Use Case
- * Run Greenwood build command with GraphQL calls to get data about the projects graph using MenuQuery, simluting 
+ * Run Greenwood build command with GraphQL calls to get data about the projects graph using MenuQuery, simulating
  * a site navigation based on top level page routes.  Also uses LitElement.
- * 
+ *
  * Needs prerender to be true to get SSR and client side GQL fetching.
- * 
+ *
  * User Result
  * Should generate a Greenwood build that dynamically serializes data from the graph from the header.
  *
@@ -54,51 +54,51 @@ describe('Build Greenwood With: ', async function() {
 
     before(async function() {
       const greenwoodGraphqlCoreLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/plugin-graphql/src/core/*.js`, 
+        `${process.cwd()}/packages/plugin-graphql/src/core/*.js`,
         `${outputPath}/node_modules/@greenwood/plugin-graphql/src/core/`
       );
       const greenwoodGraphqlQueryLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`, 
+        `${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`,
         `${outputPath}/node_modules/@greenwood/plugin-graphql/src/queries/`
       );
       const lit = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/*.js`, 
+        `${process.cwd()}/node_modules/lit/*.js`,
         `${outputPath}/node_modules/lit/`
       );
       const litDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/decorators/*.js`, 
+        `${process.cwd()}/node_modules/lit/decorators/*.js`,
         `${outputPath}/node_modules/lit/decorators/`
       );
       const litDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/directives/*.js`, 
+        `${process.cwd()}/node_modules/lit/directives/*.js`,
         `${outputPath}/node_modules/lit/directives/`
       );
       const litPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/package.json`, 
+        `${process.cwd()}/node_modules/lit/package.json`,
         `${outputPath}/node_modules/lit/`
       );
       const litElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/*.js`, 
+        `${process.cwd()}/node_modules/lit-element/*.js`,
         `${outputPath}/node_modules/lit-element/`
       );
       const litElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/package.json`, 
+        `${process.cwd()}/node_modules/lit-element/package.json`,
         `${outputPath}/node_modules/lit-element/`
       );
       const litElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/decorators/*.js`, 
+        `${process.cwd()}/node_modules/lit-element/decorators/*.js`,
         `${outputPath}/node_modules/lit-element/decorators/`
       );
       const litHtml = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/*.js`, 
+        `${process.cwd()}/node_modules/lit-html/*.js`,
         `${outputPath}/node_modules/lit-html/`
       );
       const litHtmlPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/package.json`, 
+        `${process.cwd()}/node_modules/lit-html/package.json`,
         `${outputPath}/node_modules/lit-html/`
       );
       const litHtmlDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/directives/*.js`, 
+        `${process.cwd()}/node_modules/lit-html/directives/*.js`,
         `${outputPath}/node_modules/lit-html/directives/`
       );
       // lit-html has a dependency on this
@@ -108,22 +108,22 @@ describe('Build Greenwood With: ', async function() {
         `${outputPath}/node_modules/@types/trusted-types/`
       );
       const litReactiveElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`, 
+        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
       const litReactiveElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`, 
+        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
         `${outputPath}/node_modules/@lit/reactive-element/decorators/`
       );
       const litReactiveElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`, 
+        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
 
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...greenwoodGraphqlCoreLibs,
-        ...greenwoodGraphqlQueryLibs, 
+        ...greenwoodGraphqlQueryLibs,
         ...lit,
         ...litPackageJson,
         ...litDirectives,
@@ -181,14 +181,14 @@ describe('Build Greenwood With: ', async function() {
 
         expect(headers.length).to.be.equal(1);
       });
-      
+
       it('should have a expected navigation output in the <header> based on pages with menu: navigation frontmatter', function() {
         const listItems = dom.window.document.querySelectorAll('body header ul li');
         const link1 = listItems[0].querySelector('a');
         const link2 = listItems[1].querySelector('a');
 
         expect(listItems.length).to.be.equal(2);
-        
+
         expect(link1.href.replace('file://', '').replace(/\/[A-Z]:/, '')).to.be.equal('/about/');
         expect(link1.title).to.be.equal('Click to visit the About page');
         expect(link1.innerHTML).to.contain('About');

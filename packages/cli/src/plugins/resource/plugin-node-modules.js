@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Detects and fully resolves requests to node_modules and handles creating an importMap.
  *
  */
@@ -81,7 +81,7 @@ class NodeModulesResource extends ResourceInterface {
     }
 
     const userPackageJson = await getPackageJson(context);
-    
+
     // if there are dependencies and we haven't generated the importMap already
     // walk the project's package.json for all its direct dependencies
     // for each entry found in dependencies, find its entry point
@@ -118,7 +118,7 @@ const greenwoodPluginNodeModules = [{
       replace({
         // https://github.com/ProjectEvergreen/greenwood/issues/582
         'preventAssignment': true,
-        
+
         // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
         'process.env.NODE_ENV': JSON.stringify('production')
       }),

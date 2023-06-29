@@ -1,5 +1,5 @@
 const template = document.createElement('template');
-      
+
 template.innerHTML = `
   <p>I have multiple hyphens in my tag name!</p>
 `;

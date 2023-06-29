@@ -35,7 +35,7 @@ class FooterComponent extends LitElement {
 
   render() {
     const { version } = this;
-    
+
     return html`
       <footer class="footer">
         <h4>

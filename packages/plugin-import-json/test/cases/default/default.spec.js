@@ -1,7 +1,7 @@
 /*
  * Use Case
  * Run Greenwood with pluginImportCss plugin with default options.
- * 
+ *
  * User Result
  * Should generate a bare bones Greenwood build without erroring when using ESM (import) with CSS.
  *
@@ -64,7 +64,7 @@ describe('Build Greenwood With: ', function() {
       before(async function() {
         scripts = await glob.promise(path.join(this.context.publicDir, '*.js'));
       });
-    
+
       it('should contain one javascript file in the output directory', function() {
         expect(scripts.length).to.be.equal(1);
       });

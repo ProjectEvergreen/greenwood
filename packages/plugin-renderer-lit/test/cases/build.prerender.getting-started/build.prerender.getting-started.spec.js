@@ -1,8 +1,8 @@
 /*
  * Use Case
- * Run Greenwood build command with a static site and only prerendering the content (no JS!).  Modeled after the 
+ * Run Greenwood build command with a static site and only prerendering the content (no JS!).  Modeled after the
  * Greenwood Getting Started repo.
- * 
+ *
  * User Result
  * Should generate a bare bones Greenwood build with correctly templated out HTML from a LitElement.
  *
@@ -157,7 +157,7 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
 
       it('should have expected footer <h4> tag content in the <body>', function() {
         const scripTags = dom.window.document.querySelectorAll('body script');
-        
+
         expect(scripTags.length).to.be.equal(0);
       });
     });
@@ -173,7 +173,7 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
 
       it('should have expected footer <h4> tag content in the <body>', function() {
         const html = body.innerHTML.trim();
-        
+
         expect(html).to.contain('<header>');
         expect(html).to.contain('This is the header component.');
       });
@@ -190,7 +190,7 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
 
       it('should have expected footer <h4> tag content in the <body>', function() {
         const html = body.innerHTML.trim();
-        
+
         expect(html).to.contain('<footer>');
         expect(html).to.contain('My Blog');
         expect(html).to.contain('2022');

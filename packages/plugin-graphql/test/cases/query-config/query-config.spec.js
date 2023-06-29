@@ -3,7 +3,7 @@
  * Run Greenwood build command with GraphQL calls to get data from the project configuration.
  *
  * Needs prerender to be true to get SSR and client side GQL fetching.
- * 
+ *
  * User Result
  * Should generate a Greenwood build that dynamically serializes data from the config in the footer.
  *
@@ -50,15 +50,15 @@ describe('Build Greenwood With: ', function() {
 
     before(async function() {
       const greenwoodGraphqlCoreLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/plugin-graphql/src/core/*.js`, 
+        `${process.cwd()}/packages/plugin-graphql/src/core/*.js`,
         `${outputPath}/node_modules/@greenwood/plugin-graphql/src/core/`
       );
       const greenwoodGraphqlQueryLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`, 
+        `${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`,
         `${outputPath}/node_modules/@greenwood/plugin-graphql/src/queries/`
       );
 
-      await runner.setup(outputPath, [ 
+      await runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...greenwoodGraphqlCoreLibs,
         ...greenwoodGraphqlQueryLibs

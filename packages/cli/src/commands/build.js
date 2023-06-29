@@ -84,17 +84,17 @@ const runProductionBuild = async (compilation) => {
           return plugin.type === 'server';
         }).map((plugin) => {
           const provider = plugin.provider(compilation);
-  
+
           if (!(provider instanceof ServerInterface)) {
             console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`);
           }
-  
+
           return provider;
         })];
-  
+
         await Promise.all(servers.map(async (server) => {
           await server.start();
-  
+
           return Promise.resolve(server);
         }));
 
@@ -119,7 +119,7 @@ const runProductionBuild = async (compilation) => {
       reject(err);
     }
   });
-  
+
 };
 
 export { runProductionBuild };

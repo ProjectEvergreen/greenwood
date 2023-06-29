@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Manages web standard resource related operations for image formats.
  * This is a Greenwood default plugin.
  *

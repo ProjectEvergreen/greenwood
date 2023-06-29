@@ -1,7 +1,7 @@
 /*
  * Use Case
  * Run Greenwood with greenwoodPluginImportJsx plugin with prerendering of JSX on the server side using wc-compiler.
- * 
+ *
  * User Result
  * Should generate a static Greenwood build with JSX properly prerendered.
  *

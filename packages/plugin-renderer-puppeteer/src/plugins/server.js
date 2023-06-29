@@ -10,7 +10,7 @@ class PuppeteerServer extends ServerInterface {
   async start() {
     if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
       const { port } = this.compilation.config.devServer;
-  
+
       (await getDevServer(this.compilation)).listen(port, async () => {
         console.info(`Started puppeteer prerender server at localhost:${port}`);
       });

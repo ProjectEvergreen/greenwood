@@ -10,7 +10,7 @@ const myThemePackPlugin = () => [{
     const { name } = packageJson;
     const command = os.platform() === 'win32' ? 'npm.cmd' : 'npm';
     const ls = spawnSync(command, ['ls', name]);
-    
+
     const isInstalled = ls.stdout.toString().indexOf('(empty)') < 0;
     const templateLocation = isInstalled
       ? new URL(`./node_modules/${name}/dist/layouts/`, import.meta.url)

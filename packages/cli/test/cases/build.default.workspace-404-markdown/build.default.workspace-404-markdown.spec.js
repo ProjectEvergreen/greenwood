@@ -97,25 +97,25 @@ describe('Build Greenwood With: ', function() {
 
         it('should have 1 app template specific <script> tag in the <head>', function() {
           const scriptTagsTemplate = Array.from(scriptTags).filter(script => script.getAttribute('src').indexOf('404') < 0);
-          
+
           expect(scriptTagsTemplate.length).to.equal(1);
         });
 
         it('should have 1 app template specific <link> tag in the <head>', function() {
           const linkTagsTemplate = Array.from(linkTags).filter(link => link.getAttribute('href').indexOf('404') < 0);
-          
+
           expect(linkTagsTemplate.length).to.equal(1);
         });
 
         it('should have 1 404 page specific <script> tags in the <head>', function() {
           const scriptTags404 = Array.from(scriptTags).filter(script => script.getAttribute('src').indexOf('404') >= 0);
-          
+
           expect(scriptTags404.length).to.equal(1);
         });
 
         it('should have 1 404 page specific <link> tags in the <head>', function() {
           const linkTags404 = Array.from(linkTags).filter(link => link.getAttribute('href').indexOf('404') >= 0);
-          
+
           expect(linkTags404.length).to.equal(1);
         });
       });
@@ -123,17 +123,17 @@ describe('Build Greenwood With: ', function() {
       describe('404 page <body>', function() {
         it('should have <app-header> component in the <body>', function() {
           const header = dom.window.document.querySelectorAll('body app-header');
-          
+
           expect(header.length).to.equal(1);
         });
 
         it('should have 404 page specific content in the <body>', function() {
           const heading = dom.window.document.querySelectorAll('body h1');
-          
+
           expect(heading.length).to.equal(1);
           expect(heading[0].textContent).to.equal('This is not the page you are looking for.');
         });
-        
+
         it('should not have any sourcemap inlining for Rollup HTML entry points', function() {
           const html = fs.readFileSync(path.resolve(this.context.publicDir, '404.html'), 'utf-8');
 

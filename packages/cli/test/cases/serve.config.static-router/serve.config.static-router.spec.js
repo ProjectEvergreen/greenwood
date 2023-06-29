@@ -57,7 +57,7 @@ describe('Serve Greenwood With: ', function() {
 
     before(async function() {
       const greenwoodRouterLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/cli/src/lib/router.js`, 
+        `${process.cwd()}/packages/cli/src/lib/router.js`,
         `${outputPath}/node_modules/@greenwood/cli/src/lib`
       );
       /*
@@ -66,13 +66,13 @@ describe('Serve Greenwood With: ', function() {
        * file:///Users/owenbuckley/Workspace/project-evergreen/repos/greenwood/packages/cli/test/cases/serve.config.static-router/public/artists.js:3
        * import { getAppTemplate, getPageTemplate, getUserScripts } from '@greenwood/cli/src/lib/templating-utils.js';
        *         ^^^^^^^^^^^^^^
-       * SyntaxError: Named export 'getAppTemplate' not found. The requested module '@greenwood/cli/src/lib/templating-utils.js' 
+       * SyntaxError: Named export 'getAppTemplate' not found. The requested module '@greenwood/cli/src/lib/templating-utils.js'
        * is a CommonJS module, which may not support all module.exports as named exports.
        * CommonJS modules can always be imported via the default export, for example using:
        * import pkg from '@greenwood/cli/src/lib/templating-utils.js';
        * const { getAppTemplate, getPageTemplate, getUserScripts } = pkg;
        * ```
-       * 
+       *
        * however no other tests have this issue.  so as terrible hack we need to
        * - copy all lib files
        * - rename them to end in .mjs
@@ -81,11 +81,11 @@ describe('Serve Greenwood With: ', function() {
        *  (unfortunately, trying to just add a package.json with type="module" did not seem to work :/)
        */
       const greenwoodTemplatingLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/cli/src/lib/*`, 
+        `${process.cwd()}/packages/cli/src/lib/*`,
         `${outputPath}/node_modules/@greenwood/cli/src/lib`
       );
       const greenwoodTemplates = await getDependencyFiles(
-        `${process.cwd()}/packages/cli/src/templates/*`, 
+        `${process.cwd()}/packages/cli/src/templates/*`,
         `${outputPath}/node_modules/@greenwood/cli/src/templates`
       );
 
@@ -108,7 +108,7 @@ describe('Serve Greenwood With: ', function() {
       }
 
       await runner.runCommand(cliPath, 'build');
-      
+
       return new Promise(async (resolve) => {
         setTimeout(async () => {
           // template out artists.js to use .mjs too

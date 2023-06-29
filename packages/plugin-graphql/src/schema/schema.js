@@ -21,7 +21,7 @@ const createSchema = async (compilation) => {
         uniqueCustomDataDefKeys[key] = 'String';
       });
     });
-  
+
     Object.keys(uniqueCustomDataDefKeys).forEach((key) => {
       customDataDefsString += `
         ${key}: ${uniqueCustomDataDefKeys[key]}
@@ -42,12 +42,12 @@ const createSchema = async (compilation) => {
 
       for (const schemaPath of schemaPaths) {
         const { customTypeDefs, customResolvers } = await import(new URL(`./${schemaPath}`, customSchemasUrl));
-        
+
         customUserDefs.push(customTypeDefs);
         customUserResolvers.push(customResolvers);
       }
     }
-  
+
     const mergedResolvers = Object.assign({}, {
       Query: {
         ...graphResolvers.Query,
@@ -60,7 +60,7 @@ const createSchema = async (compilation) => {
         }, {})
       }
     });
-  
+
     const schema = makeExecutableSchema({
       typeDefs: [
         graphTypeDefs,
@@ -72,7 +72,7 @@ const createSchema = async (compilation) => {
         mergedResolvers
       ]
     });
-  
+
     return schema;
   } catch (e) {
     console.error(e);

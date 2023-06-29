@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Enable using Babel for processing JavaScript files.
  *
  */
@@ -17,7 +17,7 @@ async function getConfig(compilation, extendConfig = false) {
     : {};
   const finalConfig = Object.assign({}, userConfig);
 
-  if (extendConfig) {    
+  if (extendConfig) {
     finalConfig.presets = Array.isArray(userConfig.presets)
       ? [...defaultConfig.presets, ...userConfig.presets]
       : [...defaultConfig.presets];
@@ -45,13 +45,13 @@ class BabelResource extends ResourceInterface {
     const config = await getConfig(this.compilation, this.options.extendConfig);
     const body = await response.text();
     const result = await babel.transform(body, config);
-    
+
     return new Response(result.code, {
       headers: response.headers
     });
   }
 }
- 
+
 const greenwoodPluginBabel = (options = {}) => {
   return [{
     type: 'resource',
@@ -64,7 +64,7 @@ const greenwoodPluginBabel = (options = {}) => {
       rollupBabelPlugin.default({
         // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
         babelHelpers: 'bundled',
-        
+
         ...getConfig(compilation, options.extendConfig)
       })
     ]

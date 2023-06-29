@@ -1,6 +1,6 @@
 /*
  *
- * 
+ *
  * Manages SPA like client side routing for static pages.
  * This is a Greenwood default plugin.
  *
@@ -23,7 +23,7 @@ class StaticRouterResource extends ResourceInterface {
 
   async resolve() {
     const routerUrl = new URL('../../lib/router.js', import.meta.url);
-    
+
     return new Request(`file://${routerUrl.pathname}`);
   }
 

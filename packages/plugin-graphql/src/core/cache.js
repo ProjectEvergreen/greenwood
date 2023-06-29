@@ -41,7 +41,7 @@ const createCache = async (req, context) => {
           await fs.writeFile(cachePath, cache, 'utf-8');
         }
       }
-      
+
       resolve();
     } catch (err) {
       console.error('create cache error', err);

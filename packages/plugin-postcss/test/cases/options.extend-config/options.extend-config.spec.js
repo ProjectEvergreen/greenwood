@@ -16,14 +16,14 @@
  *     pluginPostCss()
  *  ]
  * }
- * 
+ *
  * User Workspace
  *  src/
  *   pages/
  *     index.html
  *   styles/
  *     main.css
- * 
+ *
  * User postcss.config.js
  * module.exports = {
  *   plugins: [

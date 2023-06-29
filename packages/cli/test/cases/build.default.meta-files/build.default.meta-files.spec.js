@@ -45,9 +45,9 @@ describe('Build Greenwood With: ', function() {
       await runner.setup(outputPath, getSetupFiles(outputPath));
       await runner.runCommand(cliPath, 'build');
     });
-    
+
     runSmokeTest(['public', 'index'], LABEL);
-  
+
     describe('Default output for project level favicon.ico', function() {
       let favicons;
 

@@ -34,7 +34,7 @@ const generateGraph = async (compilation) => {
           if (isDirectory) {
             pages = await walkDirectoryForPages(filenameUrlAsDir, pages);
           } else {
-            const extension = `.${filenameUrl.pathname.split('.').pop()}`; 
+            const extension = `.${filenameUrl.pathname.split('.').pop()}`;
             const isStatic = extension === '.md' || extension === '.html';
             const isDynamic = extension === '.js';
             const relativePagePath = filenameUrl.pathname.replace(pagesDir.pathname, '/');
@@ -69,7 +69,7 @@ const generateGraph = async (compilation) => {
             if (isStatic) {
               const fileContents = await fs.readFile(filenameUrl, 'utf8');
               const { attributes } = fm(fileContents);
-              
+
               template = attributes.template || 'page';
               title = attributes.title || title;
               id = attributes.label || id;
@@ -120,7 +120,7 @@ const generateGraph = async (compilation) => {
               let ssrFrontmatter;
 
               filePath = route;
-  
+
               await new Promise((resolve, reject) => {
                 const worker = new Worker(routeWorkerUrl);
 
@@ -144,13 +144,13 @@ const generateGraph = async (compilation) => {
                   route
                 });
               });
-  
+
               if (ssrFrontmatter) {
                 template = ssrFrontmatter.template || template;
                 title = ssrFrontmatter.title || title;
                 imports = ssrFrontmatter.imports || imports;
                 customData = ssrFrontmatter.data || customData;
-  
+
                 /* Menu Query
                  * Custom front matter - Variable Definitions
                  * --------------------------------------------------
@@ -161,7 +161,7 @@ const generateGraph = async (compilation) => {
                  */
                 customData.menu = ssrFrontmatter.menu || '';
                 customData.index = ssrFrontmatter.index || '';
-              }  
+              }
             } else {
               console.debug(`Unhandled extension (.${extension}) for route => ${route}`);
             }

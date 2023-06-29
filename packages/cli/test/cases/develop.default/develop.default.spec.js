@@ -470,10 +470,10 @@ describe('Develop Greenwood With: ', function() {
             }
 
             response = res;
-            
+
             dom = new JSDOM(body);
             expectedImportMap = JSON.parse(fs.readFileSync(new URL('./import-map.snapshot.json', import.meta.url), 'utf-8'));
-            
+
             resolve();
           });
         });
@@ -545,7 +545,7 @@ describe('Develop Greenwood With: ', function() {
         expect(livereloadScript.length).to.equal(1);
 
         done();
-      });   
+      });
     });
 
     describe('Develop command specific 404 Not Found page HTML behaviors', function() {
@@ -565,7 +565,7 @@ describe('Develop Greenwood With: ', function() {
             }
 
             response = res;
-            
+
             dom = new JSDOM(body);
             resolve();
           });

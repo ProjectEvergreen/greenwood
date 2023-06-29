@@ -7,7 +7,7 @@ export default async function(compilation, callback) {
       return Promise.all(pages.map(async(page) => {
         const { route } = page;
         console.info('prerendering page...', route);
-        
+
         return await browserRunner
           .serialize(`${serverUrl}${route}`)
           .then(async (html) => {

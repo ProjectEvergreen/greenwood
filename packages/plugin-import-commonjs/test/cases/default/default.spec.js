@@ -2,7 +2,7 @@
  * Use Case
  * Run Greenwood with pluginImportCommonjs plugin with default options.
  * Sets prerender: true to validate the functionality.
- * 
+ *
  * User Result
  * Should generate a bare bones Greenwood build without erroring on a CommonJS module.
  *
@@ -53,11 +53,11 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
     before(async function() {
       const lodashLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lodash/lodash.js`, 
+        `${process.cwd()}/node_modules/lodash/lodash.js`,
         `${outputPath}/node_modules/lodash/`
       );
       const lodashLibsPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lodash/package.json`, 
+        `${process.cwd()}/node_modules/lodash/package.json`,
         `${outputPath}/node_modules/lodash/`
       );
 
@@ -85,7 +85,7 @@ describe('Build Greenwood With: ', function() {
         const mainScriptTag = Array.prototype.slice.call(scriptTags).filter(script => {
           return (/main.*.js/).test(script.src);
         });
-        
+
         expect(mainScriptTag.length).to.be.equal(1);
       });
 

@@ -20,7 +20,7 @@ function copyFolderRecursiveSync(source, target) {
 
   // check if folder needs to be created or integrated
   const targetFolder = path.join(target, path.basename(source));
-  
+
   if (!fs.existsSync(targetFolder)) {
     fs.mkdirSync(targetFolder);
   }
