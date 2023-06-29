@@ -98,7 +98,7 @@ const runProductionBuild = async (compilation) => {
           return Promise.resolve(server);
         }));
 
-        if (prerenderPlugin.workerUrl) {
+        if (prerenderPlugin.executeModuleUrl) {
           await trackResourcesForRoutes(compilation);
           await preRenderCompilationWorker(compilation, prerenderPlugin);
         } else {

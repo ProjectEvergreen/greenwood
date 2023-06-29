@@ -1,4 +1,4 @@
-async function getTemplate(compilation, route) {
+async function getTemplate(compilation, { route }) {
   return `
     <html>
       <head>
@@ -68,7 +68,7 @@ async function getBody(compilation) {
   `;
 }
 
-async function getFrontmatter(compilation, route) {
+async function getFrontmatter(compilation, { route }) {
   return {
     menu: 'navigation',
     title: route,
