@@ -139,12 +139,6 @@ describe('Serve Greenwood With: ', function() {
 
         expect(scriptFiles.length).to.equal(2);
       });
-
-      it('should have the expected _templates/ output directory for the app', async function() {
-        const templateFiles = await glob.promise(path.join(this.context.publicDir, '_templates/*'));
-
-        expect(templateFiles.length).to.equal(1);
-      });
     });
 
     describe('Serve command with HTML route response for artists page using "get" functions', function() {

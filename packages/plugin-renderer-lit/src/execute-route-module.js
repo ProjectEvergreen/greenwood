@@ -4,7 +4,6 @@ import { Buffer } from 'buffer';
 import { html } from 'lit';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import { Readable } from 'stream';
-import { parentPort } from 'worker_threads';
 
 async function streamToString (stream) {
   const chunks = [];
@@ -20,9 +19,7 @@ async function getTemplateResultString(template) {
   return await streamToString(Readable.from(render(template)));
 }
 
-async function executeRouteModule({ moduleUrl, compilation, route, label, id, prerender, htmlContents, scripts }) {
-  const parsedCompilation = JSON.parse(compilation);
-  const parsedScripts = scripts ? JSON.parse(scripts) : [];
+async function executeRouteModule({ moduleUrl, compilation, page, prerender, htmlContents, scripts }) {
   const data = {
     template: null,
     body: null,
@@ -30,10 +27,9 @@ async function executeRouteModule({ moduleUrl, compilation, route, label, id, pr
     html: null
   };
 
-  console.debug({ moduleUrl });
   // prerender static content
   if (prerender) {
-    for (const script of parsedScripts) {
+    for (const script of scripts) {
       await import(script);
     }
 
@@ -52,25 +48,23 @@ async function executeRouteModule({ moduleUrl, compilation, route, label, id, pr
 
       data.body = await getTemplateResultString(templateResult);
     } else if (getBody) {
-      const templateResult = await getBody(parsedCompilation, route);
+      const templateResult = await getBody(compilation, page);
 
       data.body = await getTemplateResultString(templateResult);
     }
 
     if (getTemplate) {
-      const templateResult = await getTemplate(parsedCompilation, route);
+      const templateResult = await getTemplate(compilation, page);
 
       data.template = await getTemplateResultString(templateResult);
     }
 
     if (getFrontmatter) {
-      data.frontmatter = await getFrontmatter(parsedCompilation, route, label, id);
+      data.frontmatter = await getFrontmatter(compilation, page);
     }
   }
 
-  parentPort.postMessage(data);
+  return data;
 }
 
-parentPort.on('message', async (task) => {
-  await executeRouteModule(task);
-});
+export { executeRouteModule };

@@ -1,4 +1,4 @@
-async function getTemplate(compilation, route) {
+async function getTemplate(compilation, { route }) {
   return `
     <html>
       <head>

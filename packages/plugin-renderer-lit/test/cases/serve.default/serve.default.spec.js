@@ -203,10 +203,13 @@ describe('Serve Greenwood With: ', function() {
         expect(styles.length).to.equal(1);
       });
 
-      it('should have no <script> tags in the <head>', function() {
+      // TODO this should be managed via a plugin, not in core
+      // https://github.com/ProjectEvergreen/greenwood/issues/728
+      it('should have one <script> tag in the <head> for lit polyfills', function() {
         const scripts = dom.window.document.querySelectorAll('head > script');
 
-        expect(scripts.length).to.equal(0);
+        expect(scripts.length).to.equal(1);
+        expect(scripts[0].getAttribute('src').startsWith('/polyfill-support')).to.equal(true);
       });
 
       it('should have the expected number of <tr> tags of content', function() {
