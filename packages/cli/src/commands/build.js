@@ -71,6 +71,9 @@ const runProductionBuild = async (compilation) => {
       const prerenderPlugin = compilation.config.plugins.find(plugin => plugin.type === 'renderer')
         ? compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider(compilation)
         : {};
+      const adapterPlugin = compilation.config.plugins.find(plugin => plugin.type === 'adapter')
+        ? compilation.config.plugins.find(plugin => plugin.type === 'adapter').provider(compilation)
+        : null;
 
       if (!await checkResourceExists(outputDir)) {
         await fs.mkdir(outputDir, {
@@ -113,6 +116,10 @@ const runProductionBuild = async (compilation) => {
 
       await bundleCompilation(compilation);
       await copyAssets(compilation);
+
+      if (adapterPlugin) {
+        await adapterPlugin();
+      }
 
       resolve();
     } catch (err) {
