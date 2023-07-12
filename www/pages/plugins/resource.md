@@ -2,7 +2,7 @@
 label: 'Resource'
 menu: side
 title: 'Resource'
-index: 3
+index: 4
 ---
 
 ## Resource
