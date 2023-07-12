@@ -217,10 +217,6 @@ async function bundleSsrPages(compilation) {
             const data = await executeRouteModule({ moduleUrl, compilation, page });
             let staticHtml = \`${staticHtml}\`;
 
-            // console.log({ page })
-            // console.log({ staticHtml })
-            // console.log({ data });
-
             if (data.body) {
               staticHtml = staticHtml.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, data.body);
             }

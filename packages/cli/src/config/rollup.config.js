@@ -139,7 +139,6 @@ function greenwoodPatchSsrPagesEntryPointRuntimeImport() {
     generateBundle(options, bundle) {
       Object.keys(bundle).forEach((key) => {
         if (key.startsWith('__')) {
-          console.log('this is a generated entry point', bundle[key]);
           // ___GWD_ENTRY_FILE_URL=${filename}___
           const needle = bundle[key].code.match(/___GWD_ENTRY_FILE_URL=(.*.)___/);
           if (needle) {
