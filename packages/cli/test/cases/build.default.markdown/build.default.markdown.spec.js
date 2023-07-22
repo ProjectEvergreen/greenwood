@@ -52,7 +52,15 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
-      it('should correctly rendering an <h3> tag', function() {
+      // https://github.com/ProjectEvergreen/greenwood/issues/1126
+      it('should correctly render an <h2> tag with a $1 in the text content', function() {
+        const heading = dom.window.document.querySelectorAll('body h2');
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal('Posters $10');
+      });
+
+      it('should correctly render an <h3> tag', function() {
         const heading = dom.window.document.querySelectorAll('body h3');
 
         expect(heading.length).to.equal(1);
