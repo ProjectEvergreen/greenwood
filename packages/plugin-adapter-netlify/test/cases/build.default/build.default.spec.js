@@ -30,7 +30,7 @@
  */
 import chai from 'chai';
 import glob from 'glob-promise';
-// import { JSDOM } from 'jsdom';
+import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
@@ -39,7 +39,7 @@ import extract from 'extract-zip';
 
 const expect = chai.expect;
 
-describe.only('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Netlify Adapter plugin output';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -50,7 +50,7 @@ describe.only('Build Greenwood With: ', function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
@@ -82,7 +82,7 @@ describe.only('Build Greenwood With: ', function() {
         expect(apiFunctions.length).to.be.equal(1);
       });
 
-      it('should return the expected response the serverless adapter entry point handler is invoked', async function() {
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
         const param = 'Greenwood';
         const name = path.basename(apiFunctions[0]).replace('.zip', '');
 
@@ -101,23 +101,37 @@ describe.only('Build Greenwood With: ', function() {
     });
 
     describe('Artists SSR Page adapter', function() {
-      // let dom;
-      // let scripts;
+      let pageFunctions;
 
-      // before(async function() {
-      //   scripts = await glob.promise(path.join(this.context.publicDir, '*.js'));
-      //   dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
-      // });
+      before(async function() {
+        pageFunctions = (await glob.promise(path.join(netlifyFunctionsOutputUrl.pathname, '*.zip')))
+          .filter(zipFile => !path.basename(zipFile).startsWith('api-'));
+      });
 
-      // it('should contain one bundled output file in the output directory', function() {
-      //   expect(scripts.length).to.be.equal(1);
-      // });
+      it('should output one API route as a serverless function zip file', function() {
+        expect(pageFunctions.length).to.be.equal(1);
+      });
 
-      // it('should have the expected <script> tag in the <head> for the <app-footer> component', function() {
-      //   const scripts = dom.window.document.querySelectorAll('head > script');
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const name = path.basename(pageFunctions[0]).replace('.zip', '');
 
-      //   expect(scripts.length).to.equal(1);
-      // });
+        await extract(pageFunctions[0], {
+          dir: path.join(netlifyFunctionsOutputUrl.pathname, name)
+        });
+        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
+        const response = await handler({
+          rawUrl: `http://localhost:8080/${name}/`
+        }, {});
+        const { statusCode, body } = response;
+        const dom = new JSDOM(body);
+        const cardTags = dom.window.document.querySelectorAll('body > app-card');
+        const headings = dom.window.document.querySelectorAll('body > h1');
+
+        expect(statusCode).to.be.equal(200);
+        expect(cardTags.length).to.be.equal(2);
+        expect(headings.length).to.be.equal(1);
+        expect(headings[0].textContent).to.be.equal('List of Artists: 2');
+      });
     });
   });
 
