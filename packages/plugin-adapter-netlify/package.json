@@ -9,6 +9,7 @@
   "keywords": [
     "Greenwood",
     "Static Site Generator",
+    "SSR",
     "Full Stack Web Development",
     "Netlify",
     "Serverless",
@@ -29,6 +30,7 @@
     "zip-a-folder": "^2.0.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.29.0-alpha.1"
+    "@greenwood/cli": "^0.29.0-alpha.1",
+    "extract-zip": "^2.0.1"
   }
 }
