@@ -1,0 +1,34 @@
+{
+  "name": "@greenwood/plugin-adapter-netlify",
+  "version": "0.29.0-alpha.1",
+  "description": "A Greenwood plugin for supporting Netlify serverless and edge runtimes.",
+  "repository": "https://github.com/ProjectEvergreen/greenwood",
+  "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-adapter-netlify",
+  "author": "Owen Buckley <owen@thegreenhouse.io>",
+  "license": "MIT",
+  "keywords": [
+    "Greenwood",
+    "Static Site Generator",
+    "Full Stack Web Development",
+    "Netlify",
+    "Serverless",
+    "Edge"
+  ],
+  "main": "src/index.js",
+  "type": "module",
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@greenwood/cli": "^0.28.0"
+  },
+  "dependencies": {
+    "zip-a-folder": "^2.0.0"
+  },
+  "devDependencies": {
+    "@greenwood/cli": "^0.29.0-alpha.1"
+  }
+}
