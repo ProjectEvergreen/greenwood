@@ -2,7 +2,7 @@
 label: 'copy'
 menu: side
 title: 'Copy'
-index: 2
+index: 3
 ---
 
 ## Copy

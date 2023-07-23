@@ -2,7 +2,7 @@
 label: 'context'
 menu: side
 title: 'Context'
-index: 1
+index: 2
 ---
 
 ## Context

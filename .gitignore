@@ -8,3 +8,4 @@ node_modules/
 packages/**/test/**/yarn.lock
 packages/**/test/**/package-lock.json
 public/
+adapter-outlet/
