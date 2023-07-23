@@ -2,7 +2,7 @@
 label: 'Server'
 menu: side
 title: 'Server'
-index: 6
+index: 7
 ---
 
 ## Server
