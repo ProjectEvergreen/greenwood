@@ -35,7 +35,7 @@ const greenwoodPlugins = (await Promise.all([
 });
 
 const optimizations = ['default', 'none', 'static', 'inline'];
-const pluginTypes = ['copy', 'context', 'resource', 'rollup', 'server', 'source', 'renderer'];
+const pluginTypes = ['copy', 'context', 'resource', 'rollup', 'server', 'source', 'renderer', 'adapter'];
 const defaultConfig = {
   workspace: new URL('./src/', cwd),
   devServer: {

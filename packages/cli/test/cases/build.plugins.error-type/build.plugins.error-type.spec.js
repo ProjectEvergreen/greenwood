@@ -43,7 +43,7 @@ describe('Build Greenwood With: ', function() {
 
   describe('Custom Configuration with a bad value for plugin type', function() {
     it('should throw an error that plugin.type is not a valid value', async function() {
-      const pluginTypes = ['copy', 'context', 'resource', 'rollup', 'server', 'source', 'renderer'];
+      const pluginTypes = ['copy', 'context', 'resource', 'rollup', 'server', 'source', 'renderer', 'adapter'];
 
       try {
         await runner.setup(outputPath);
