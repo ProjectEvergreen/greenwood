@@ -34,21 +34,23 @@ import glob from 'glob-promise';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import { fileURLToPath } from 'url';
+import extract from 'extract-zip';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
+describe.only('Build Greenwood With: ', function() {
   const LABEL = 'Netlify Adapter plugin output';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
+  const netlifyFunctionsOutputUrl = new URL('./netlify/functions/', import.meta.url);
   let runner;
 
   before(async function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function() {
@@ -57,12 +59,11 @@ describe('Build Greenwood With: ', function() {
       await runner.runCommand(cliPath, 'build');
     });
 
-    describe('Default Output files', function() {
+    describe('Default Output', function() {
       let zipFiles;
 
       before(async function() {
-        zipFiles = await glob.promise(path.join(outputPath, 'netlify/functions/*.zip'));
-        // dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+        zipFiles = await glob.promise(path.join(netlifyFunctionsOutputUrl.pathname, '*.zip'));
       });
 
       it('should output two serverless function zip files', function() {
@@ -70,27 +71,36 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('API Route adapter', function() {
-      // let dom;
-      // let scripts;
+    describe('Greeting API Route adapter', function() {
+      let apiFunctions;
 
-      // before(async function() {
-      //   scripts = await glob.promise(path.join(this.context.publicDir, '*.js'));
-      //   dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
-      // });
+      before(async function() {
+        apiFunctions = await glob.promise(path.join(netlifyFunctionsOutputUrl.pathname, 'api-*.zip'));
+      });
 
-      // it('should contain one bundled output file in the output directory', function() {
-      //   expect(scripts.length).to.be.equal(1);
-      // });
+      it('should output one API route as a serverless function zip file', function() {
+        expect(apiFunctions.length).to.be.equal(1);
+      });
 
-      // it('should have the expected <script> tag in the <head> for the <app-footer> component', function() {
-      //   const scripts = dom.window.document.querySelectorAll('head > script');
+      it('should return the expected response the serverless adapter entry point handler is invoked', async function() {
+        const param = 'Greenwood';
+        const name = path.basename(apiFunctions[0]).replace('.zip', '');
 
-      //   expect(scripts.length).to.equal(1);
-      // });
+        await extract(apiFunctions[0], {
+          dir: path.join(netlifyFunctionsOutputUrl.pathname, name)
+        });
+        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
+        const response = await handler({
+          rawUrl: `http://localhost:8080/api/${name}?name=${param}`
+        }, {});
+        const { statusCode, body } = response;
+
+        expect(statusCode).to.be.equal(200);
+        expect(JSON.parse(body).message).to.be.equal(`Hello ${param}!`);
+      });
     });
 
-    describe('SSR Page adapter', function() {
+    describe('Artists SSR Page adapter', function() {
       // let dom;
       // let scripts;
 
