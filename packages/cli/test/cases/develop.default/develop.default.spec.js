@@ -19,6 +19,7 @@
  * src/
  *   api/
  *     greeting.js
+ *     nothing.js
  *   assets/
  *     data.json
  *     favicon.ico
@@ -1345,6 +1346,29 @@ describe('Develop Greenwood With: ', function() {
 
       it('should return the correct response body', function(done) {
         expect(data.message).to.equal(`Hello ${name}!!!`);
+        done();
+      });
+    });
+
+    describe('Develop command with API specific behaviors with a minimal response', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}:${port}/api/nothing`, (err, res) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        console.log('???', response.body);
         done();
       });
     });

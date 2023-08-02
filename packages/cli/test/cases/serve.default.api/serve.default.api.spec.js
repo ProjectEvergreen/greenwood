@@ -37,7 +37,7 @@ describe('Serve Greenwood With: ', function() {
     this.context = {
       hostname
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function() {
@@ -125,6 +125,28 @@ describe('Serve Greenwood With: ', function() {
 
       it('should return the correct response body', function(done) {
         expect(response.body).to.contain(`<h1>Hello ${name}!!!</h1>`);
+        done();
+      });
+    });
+
+    describe('Serve command with API specific behaviors with a minimal response', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/api/nothing`, (err, res) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
         done();
       });
     });

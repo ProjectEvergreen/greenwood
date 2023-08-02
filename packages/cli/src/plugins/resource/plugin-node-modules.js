@@ -66,7 +66,7 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   async shouldIntercept(url, request, response) {
-    return response.headers.get('Content-Type').indexOf('text/html') >= 0;
+    return response.headers.get('Content-Type')?.indexOf('text/html') >= 0;
   }
 
   async intercept(url, request, response) {

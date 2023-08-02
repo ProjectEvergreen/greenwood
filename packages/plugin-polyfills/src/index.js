@@ -21,7 +21,7 @@ class PolyfillsResource extends ResourceInterface {
 
     return isEnabled
       && protocol.startsWith('http')
-      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
+      && response.headers.get('Content-Type')?.indexOf(this.contentType) >= 0;
   }
 
   async intercept(url, request, response) {
