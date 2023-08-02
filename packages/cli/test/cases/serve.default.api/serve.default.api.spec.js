@@ -14,7 +14,11 @@
  * User Workspace
  * src/
  *   api/
+ *     fragment.js
  *     greeting.js
+ *     missing.js
+ *   components/
+ *     card.js
  */
 import chai from 'chai';
 import path from 'path';
@@ -171,6 +175,35 @@ describe('Serve Greenwood With: ', function() {
 
       it('should return a 404 status', function(done) {
         expect(response.statusCode).to.equal(404);
+        done();
+      });
+    });
+
+    describe('Serve command with API specific behaviors with a custom response', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/api/missing`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 404 status', function(done) {
+        expect(response.statusCode).to.equal(404);
+        done();
+      });
+
+      it('should return a body of not found', function(done) {
+        expect(response.body).to.equal('Not Found');
         done();
       });
     });

@@ -19,6 +19,7 @@
  * src/
  *   api/
  *     greeting.js
+ *     missing.js
  *     nothing.js
  *   assets/
  *     data.json
@@ -75,7 +76,7 @@ describe('Develop Greenwood With: ', function() {
     this.context = {
       hostname: `${hostname}:${port}`
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function() {
@@ -1346,6 +1347,33 @@ describe('Develop Greenwood With: ', function() {
 
       it('should return the correct response body', function(done) {
         expect(data.message).to.equal(`Hello ${name}!!!`);
+        done();
+      });
+    });
+
+    describe('Develop command with API specific behaviors with a custom response', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}:${port}/api/missing`, (err, res) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 404 status', function(done) {
+        expect(response.statusCode).to.equal(404);
+        done();
+      });
+
+      it('should return a body of not found', function(done) {
+        expect(response.body).to.equal('Not Found');
         done();
       });
     });

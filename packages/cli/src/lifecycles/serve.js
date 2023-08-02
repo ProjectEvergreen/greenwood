@@ -316,10 +316,8 @@ async function getHybridServer(compilation) {
         const response = await handler(request);
         const { body } = response;
 
-        // TODO should use status from response
-        // https://github.com/ProjectEvergreen/greenwood/issues/1048
         ctx.body = body ? Readable.from(body) : null;
-        ctx.status = 200;
+        ctx.status = response.status;
         ctx.set('Content-Type', response.headers.get('Content-Type'));
       }
     } catch (e) {
