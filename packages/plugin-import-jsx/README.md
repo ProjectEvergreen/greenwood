@@ -32,7 +32,7 @@ export default {
 }
 ```
 
-This will then allow you to use `import` to include [WCC]() compatible JSX rendering Web Components.
+This will then allow you to use `import` to include [WCC](https://merry-caramel-524e61.netlify.app/docs/#jsx) compatible JSX rendering Web Components.
 ```js
 export default class FooterComponent extends HTMLElement {
   connectedCallback() {
