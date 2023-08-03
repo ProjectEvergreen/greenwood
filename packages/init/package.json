@@ -29,6 +29,6 @@
     "chalk": "^4.1.2",
     "commander": "^8.2.0",
     "inquirer": "^8.2.0",
-    "simple-git": "^2.48.0"
+    "simple-git": "^3.5.0"
   }
 }
