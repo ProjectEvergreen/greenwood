@@ -13,7 +13,7 @@ class PuppeteerResource extends ResourceInterface {
 
     return process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
       && protocol.startsWith('http')
-      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
+      && response.headers.get('Content-Type')?.indexOf(this.contentType) >= 0;
   }
 
   async intercept(url, request, response) {

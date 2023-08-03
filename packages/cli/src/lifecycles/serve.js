@@ -307,15 +307,20 @@ async function getHybridServer(compilation) {
 
         ctx.body = Readable.from(response.body);
         ctx.set('Content-Type', 'text/html');
+        // TODO should use status from response
+        // https://github.com/ProjectEvergreen/greenwood/issues/1048
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
         const { handler } = await import(new URL(`.${apiRoute.path}`, outputDir));
         const response = await handler(request);
+        const { body } = response;
 
+        // TODO should use status from response
+        // https://github.com/ProjectEvergreen/greenwood/issues/1048
+        ctx.body = body ? Readable.from(body) : null;
         ctx.status = 200;
         ctx.set('Content-Type', response.headers.get('Content-Type'));
-        ctx.body = Readable.from(response.body);
       }
     } catch (e) {
       ctx.status = 500;
