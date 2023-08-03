@@ -182,7 +182,8 @@ class StandardHtmlResource extends ResourceInterface {
         });
       }
 
-      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents);
+      // https://github.com/ProjectEvergreen/greenwood/issues/1126
+      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents.replace(/\$/g, '$$$'));
     } else if (matchingRoute.external) {
       body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
     } else if (ssrBody) {
