@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-postcss",
-  "version": "0.28.4",
+  "version": "0.28.5",
   "description": "A Greenwood plugin for loading PostCSS configuration and applying it to your CSS.",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss",
@@ -31,6 +31,6 @@
     "postcss-preset-env": "^7.0.1"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.28.4"
+    "@greenwood/cli": "^0.28.5"
   }
 }
