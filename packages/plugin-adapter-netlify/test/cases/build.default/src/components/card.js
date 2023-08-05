@@ -12,7 +12,7 @@ export default class Card extends HTMLElement {
 
       template.innerHTML = `
         <div>
-          <h2>${title}</h2>
+          <h1>${title}</h1>
           <button onclick="this.parentNode.parentNode.host.selectArtist()">View Artist Details</button>
           <img src="${thumbnail}" loading="lazy" width="25%">
           <hr/>
