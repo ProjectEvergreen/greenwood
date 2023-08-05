@@ -30,6 +30,7 @@
  *     greeting.js
  */
 import chai from 'chai';
+import fs from 'fs/promises';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
@@ -62,9 +63,11 @@ describe('Build Greenwood With: ', function() {
 
     describe('Default Output', function() {
       let zipFiles;
+      let redirectsFile;
 
       before(async function() {
         zipFiles = await glob.promise(path.join(netlifyFunctionsOutputUrl.pathname, '*.zip'));
+        redirectsFile = await glob.promise(path.join(outputPath, 'public/_redirects'));
       });
 
       it('should output the expected number of serverless function zip files', function() {
@@ -77,6 +80,10 @@ describe('Build Greenwood With: ', function() {
 
       it('should output the expected number of serverless function SSR page zip files', function() {
         expect(zipFiles.filter(file => !path.basename(file).startsWith('api-')).length).to.be.equal(2);
+      });
+
+      it('should output a _redirects file', function() {
+        expect(redirectsFile.length).to.be.equal(1);
       });
     });
 
@@ -209,6 +216,22 @@ describe('Build Greenwood With: ', function() {
         expect(cardTags.length).to.be.equal(count);
         expect(headings.length).to.be.equal(1);
         expect(headings[0].textContent).to.be.equal(`List of Users: ${count}`);
+      });
+    });
+
+    describe('_redirects file contents', function() {
+      let redirectsFileContents;
+
+      before(async function() {
+        redirectsFileContents = await fs.readFile(path.join(outputPath, 'public/_redirects'), 'utf-8');
+      });
+
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        expect(redirectsFileContents).to.be.equal(
+`/artists/ /.netlify/functions/artists
+/users/ /.netlify/functions/users
+/api/* /.netlify/functions/api-:splat`
+        );
       });
     });
   });
