@@ -25,6 +25,32 @@ function generateOutputFormat(id) {
   `;
 }
 
+async function setupOutputDirectory(id, outputRoot, outputType) {
+  const outputFormat = generateOutputFormat(id, outputType);
+  const filename = outputType === 'api'
+    ? `api-${id}`
+    : `${id}`;
+
+  await fs.mkdir(outputRoot, { recursive: true });
+  await fs.writeFile(new URL(`./${filename}.js`, outputRoot), outputFormat);
+  await fs.writeFile(new URL('./package.json', outputRoot), JSON.stringify({
+    type: 'module'
+  }));
+}
+
+// TODO manifest options, like node version?
+// https://github.com/netlify/zip-it-and-ship-it#options
+async function createOutputZip(id, outputType, outputRootUrl, projectDirectory) {
+  const filename = outputType === 'api'
+    ? `api-${id}`
+    : `${id}`;
+
+  await zip(
+    outputRootUrl.pathname,
+    new URL(`./netlify/functions/${filename}.zip`, projectDirectory).pathname
+  );
+}
+
 async function netlifyAdapter(compilation) {
   const { outputDir, projectDirectory, scratchDir } = compilation.context;
   const adapterOutputUrl = new URL('./netlify/functions/', scratchDir);
@@ -41,21 +67,16 @@ async function netlifyAdapter(compilation) {
 
   for (const page of ssrPages) {
     const { id } = page;
-    const outputFormat = generateOutputFormat(id, 'page');
+    const outputType = 'page';
     const outputRoot = new URL(`./${id}/`, adapterOutputUrl);
 
-    await fs.mkdir(outputRoot, { recursive: true });
-    await fs.writeFile(new URL(`./${id}.js`, outputRoot), outputFormat);
-    await fs.writeFile(new URL('./package.json', outputRoot), JSON.stringify({
-      type: 'module'
-    }));
+    await setupOutputDirectory(id, outputRoot, outputType);
 
     await fs.cp(
       new URL(`./_${id}.js`, outputDir),
       new URL(`./_${id}.js`, outputRoot),
       { recursive: true }
     );
-
     await fs.cp(
       new URL(`./__${id}.js`, outputDir),
       new URL(`./__${id}.js`, outputRoot),
@@ -75,7 +96,10 @@ async function netlifyAdapter(compilation) {
     // TODO how to track SSR resources that get dumped out in the public directory?
     // https://github.com/ProjectEvergreen/greenwood/issues/1118
     const ssrPageAssets = (await fs.readdir(outputDir))
-      .filter(file => !path.basename(file).startsWith('_') && !path.basename(file).startsWith('execute') && path.basename(file).endsWith('.js'));
+      .filter(file => !path.basename(file).startsWith('_')
+        && !path.basename(file).startsWith('execute')
+        && path.basename(file).endsWith('.js')
+      );
 
     for (const asset of ssrPageAssets) {
       await fs.cp(
@@ -85,25 +109,15 @@ async function netlifyAdapter(compilation) {
       );
     }
 
-    // TODO manifest options, like node version?
-    // https://github.com/netlify/zip-it-and-ship-it#options
-    await zip(
-      new URL(`./${id}/`, adapterOutputUrl).pathname,
-      new URL(`./netlify/functions/${id}.zip`, projectDirectory).pathname
-    );
+    await createOutputZip(id, outputType, new URL(`./${id}/`, adapterOutputUrl), projectDirectory);
   }
 
-  // public/api/
   for (const [key] of apiRoutes) {
+    const outputType = 'api';
     const id = key.replace('/api/', '');
-    const outputFormat = generateOutputFormat(id, 'api');
     const outputRoot = new URL(`./api/${id}/`, adapterOutputUrl);
 
-    await fs.mkdir(outputRoot, { recursive: true });
-    await fs.writeFile(new URL(`./api-${id}.js`, outputRoot), outputFormat);
-    await fs.writeFile(new URL('./package.json', outputRoot), JSON.stringify({
-      type: 'module'
-    }));
+    await setupOutputDirectory(id, outputRoot, outputType);
 
     // TODO ideally all functions would be self contained
     // https://github.com/ProjectEvergreen/greenwood/issues/1118
@@ -122,11 +136,8 @@ async function netlifyAdapter(compilation) {
     }
 
     // NOTE: All functions must live at the top level
-    // # https://github.com/netlify/netlify-lambda/issues/90#issuecomment-486047201
-    await zip(
-      outputRoot.pathname,
-      new URL(`./netlify/functions/api-${id}.zip`, projectDirectory).pathname
-    );
+    // https://github.com/netlify/netlify-lambda/issues/90#issuecomment-486047201
+    await createOutputZip(id, outputType, outputRoot, projectDirectory);
   }
 }
 
