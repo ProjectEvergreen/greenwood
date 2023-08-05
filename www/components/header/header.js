@@ -55,7 +55,7 @@ class HeaderComponent extends LitElement {
                 <img src="/assets/evergreen.svg" alt="Greenwood logo"/>
               </a>
               <div class="project-name">
-                <a href="/">Greenwood</a>
+                <a href="/my-subpath/">Greenwood</a>
               </div>
             </div>
 
@@ -67,7 +67,7 @@ class HeaderComponent extends LitElement {
 
                   return html`
                     <li>
-                      <a href="${item.route}" title="Click to visit the ${item.label} page" class="${activeClassName}">${item.label}</a>
+                      <a href="/my-subpath${item.route}" title="Click to visit the ${item.label} page" class="${activeClassName}">${item.label}</a>
                     </li>
                   `;
                 })}

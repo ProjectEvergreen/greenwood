@@ -11,6 +11,9 @@ class Shelf extends LitElement {
     return {
       page: {
         type: String
+      },
+      basePath: {
+        type: String
       }
     };
   }
@@ -24,6 +27,7 @@ class Shelf extends LitElement {
   constructor() {
     super();
     this.page = '';
+    this.basePath = '';
     this.selectedIndex = '';
     this.shelfList = [];
   }
@@ -34,9 +38,7 @@ class Shelf extends LitElement {
   }
 
   expandRoute(path) {
-    console.log({ path })
     let routeShelfListIndex = this.shelfList.findIndex(item => {
-      console.log({ item });
       let expRoute = new RegExp(`^${path}$`);
       return expRoute.test(item.route);
     });
@@ -67,7 +69,6 @@ class Shelf extends LitElement {
 
     this.selectedIndex = parseInt(evt.target.id.substring(6, evt.target.id.length), 10);
 
-    console.log('selected', this.selectedIndex);
     if (this.selectedIndex === previousSelected) {
       this.selectedIndex = '';
     }
@@ -85,7 +86,6 @@ class Shelf extends LitElement {
   }
 
   async fetchShelfData() {
-    console.log('page', this.page);
     return await client.query({
       query: MenuQuery,
       variables: {
@@ -99,7 +99,6 @@ class Shelf extends LitElement {
   async updated(changedProperties) {
     if (changedProperties.has('page') && this.page !== '' && this.page !== '/') {
       const response = await this.fetchShelfData();
-      console.log({ response });
 
       this.shelfList = response.data.menu.children.map((item) => {
         return {
@@ -123,7 +122,7 @@ class Shelf extends LitElement {
             ${children.map((child) => {
               return html`
                 <li class="${selected ? '' : 'hidden'}">
-                  <a href="${mainRoute}${child.item.route}">${child.item.label}</a>
+                  <a href="${this.basePath}${mainRoute}${child.item.route}">${child.item.label}</a>
                 </li>
               `;
             })}
@@ -135,7 +134,6 @@ class Shelf extends LitElement {
     };
 
     /* eslint-enable */
-    console.log('shelf liust', this.shelfList);
     return this.shelfList.map((item, index) => {
       let id = `index_${index}`;
       let chevron = item.children && item.children.length > 0
@@ -145,7 +143,7 @@ class Shelf extends LitElement {
       return html`
         <li class="list-wrap">
           <div>
-            <a href="${item.route}">${item.label}</a>
+            <a href="${this.basePath}${item.route}">${item.label}</a>
             <a id="${id}" @click="${this.handleShelfClick}"><span class="pointer">${chevron}</span></a>
           </div>
 

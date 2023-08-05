@@ -14,9 +14,11 @@
         const path = window.location.pathname;
         const params = path.split('/').filter(param => param !== "");
         const filePath = params.length <= 1 ? `${params[0]}/index.md` : `${params.join("/")}.md`
+        const shelf = document.getElementsByTagName('app-shelf')[0];
 
-        console.log({ path, params });
-        document.getElementsByTagName('app-shelf')[0].setAttribute('page', params[0]);
+        shelf.setAttribute('page', params[1]);
+        shelf.setAttribute('basePath', `/${params[0]}`);
+
         editButton.href = `https://github.com/ProjectEvergreen/greenwood/tree/master/www/pages/${filePath}`
       }
     </script>
