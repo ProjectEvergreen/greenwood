@@ -1,7 +1,7 @@
 # @greenwood/plugin-adapter-netlify
 
 ## Overview
-Enables usage of Netlify Serverless runtimes for API routes and SSR pages .
+Enables usage of Netlify Serverless runtimes for API routes and SSR pages.  You can see a working demonstration repo [here](https://github.com/ProjectEvergreen/greenwood-demo-adapter-netlify).
 
 > This package assumes you already have `@greenwood/cli` installed.
 
