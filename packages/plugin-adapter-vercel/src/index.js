@@ -7,22 +7,40 @@ function generateOutputFormat(id, type) {
     ? `__${id}`
     : id;
 
-  // TODO need to handle all Response properties like headers
-  // https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/node-js#node.js-request-and-response-objects
   return `
     import { handler as ${id} } from './${path}.js';
 
     export default async function handler (request, response) {
-      const { url, headers } = request;
+      const { url, headers, method } = request;
       const req = new Request(new URL(url, \`http://\${headers.host}\`), {
-        headers: new Headers(headers)
+        headers: new Headers(headers),
+        method
       });
       const res = await ${id}(req);
 
+      res.headers.forEach((value, key) => {
+        response.setHeader(key, value);
+      });
       response.status(res.status);
       response.send(await res.text());
     }
   `;
+}
+
+async function setupFunctionBuildFolder(id, outputType, outputRoot) {
+  const outputFormat = generateOutputFormat(id, outputType);
+
+  await fs.mkdir(outputRoot, { recursive: true });
+  await fs.writeFile(new URL('./index.js', outputRoot), outputFormat);
+  await fs.writeFile(new URL('./package.json', outputRoot), JSON.stringify({
+    type: 'module'
+  }));
+  await fs.writeFile(new URL('./.vc-config.json', outputRoot), JSON.stringify({
+    runtime: 'nodejs18.x',
+    handler: 'index.js',
+    launcherType: 'Nodejs',
+    shouldAddHelpers: true
+  }));
 }
 
 async function vercelAdapter(compilation) {
@@ -43,21 +61,11 @@ async function vercelAdapter(compilation) {
   const isExecuteRouteModule = files.find(file => file.startsWith('execute-route-module'));
 
   for (const page of ssrPages) {
+    const outputType = 'page';
     const { id } = page;
-    const outputFormat = generateOutputFormat(id, 'page');
     const outputRoot = new URL(`./${id}.func/`, adapterOutputUrl);
 
-    await fs.mkdir(outputRoot, { recursive: true });
-    await fs.writeFile(new URL('./index.js', outputRoot), outputFormat);
-    await fs.writeFile(new URL('./package.json', outputRoot), JSON.stringify({
-      type: 'module'
-    }));
-    await fs.writeFile(new URL('./.vc-config.json', outputRoot), JSON.stringify({
-      runtime: 'nodejs18.x',
-      handler: 'index.js',
-      launcherType: 'Nodejs',
-      shouldAddHelpers: true
-    }));
+    await setupFunctionBuildFolder(id, outputType, outputRoot);
 
     await fs.cp(
       new URL(`./_${id}.js`, outputDir),
@@ -99,22 +107,11 @@ async function vercelAdapter(compilation) {
   }
 
   for (const [key] of apiRoutes) {
+    const outputType = 'api';
     const id = key.replace('/api/', '');
-    const outputFormat = generateOutputFormat(id, 'api');
     const outputRoot = new URL(`./api/${id}.func/`, adapterOutputUrl);
 
-    await fs.mkdir(outputRoot, { recursive: true });
-    await fs.writeFile(new URL('./index.js', outputRoot), outputFormat);
-    await fs.writeFile(new URL('./package.json', outputRoot), JSON.stringify({
-      type: 'module'
-    }));
-    // https://vercel.com/docs/build-output-api/v3/primitives#config-example
-    await fs.writeFile(new URL('./.vc-config.json', outputRoot), JSON.stringify({
-      runtime: 'nodejs18.x',
-      handler: 'index.js',
-      launcherType: 'Nodejs',
-      shouldAddHelpers: true
-    }));
+    await setupFunctionBuildFolder(id, outputType, outputRoot);
 
     // TODO ideally all functions would be self contained
     // https://github.com/ProjectEvergreen/greenwood/issues/1118

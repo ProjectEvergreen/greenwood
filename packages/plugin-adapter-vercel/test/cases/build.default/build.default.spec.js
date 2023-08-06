@@ -116,7 +116,9 @@ describe('Build Greenwood With: ', function() {
       it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
         const handler = (await import(new URL('./api/greeting.func/index.js', vercelFunctionsOutputUrl))).default;
         const param = 'Greenwood';
-        const response = {};
+        const response = {
+          headers: new Headers()
+        };
 
         await handler({
           url: `http://localhost:8080/api/greeting?name=${param}`,
@@ -130,15 +132,14 @@ describe('Build Greenwood With: ', function() {
           send: function(body) {
             response.body = body;
           },
-          // TODO
           setHeader: function(key, value) {
-            response.headers[key] = value;
+            response.headers.set(key, value);
           }
         });
-        const { status, body } = response;
+        const { status, body, headers } = response;
 
         expect(status).to.be.equal(200);
-        // TODO expect(headers.get('content-type')).to.be.equal('application/json');
+        expect(headers.get('content-type')).to.be.equal('application/json');
         expect(JSON.parse(body).message).to.be.equal(`Hello ${param}!`);
       });
     });
@@ -146,7 +147,9 @@ describe('Build Greenwood With: ', function() {
     describe('Fragments API Route adapter', function() {
       it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
         const handler = (await import(new URL('./api/fragment.func/index.js', vercelFunctionsOutputUrl))).default;
-        const response = {};
+        const response = {
+          headers: new Headers()
+        };
 
         await handler({
           url: 'http://localhost:8080/api/fragment',
@@ -160,25 +163,26 @@ describe('Build Greenwood With: ', function() {
           send: function(body) {
             response.body = body;
           },
-          // TODO
           setHeader: function(key, value) {
-            response.headers[key] = value;
+            response.headers.set(key, value);
           }
         });
-        const { status, body } = response;
+        const { status, body, headers } = response;
         const dom = new JSDOM(body);
         const cardTags = dom.window.document.querySelectorAll('app-card');
 
         expect(status).to.be.equal(200);
         expect(cardTags.length).to.be.equal(2);
-        // TODO expect(headers.get('content-type')).to.be.equal('text/html');
+        expect(headers.get('content-type')).to.be.equal('text/html');
       });
     });
 
     describe('Artists SSR Page adapter', function() {
       it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
         const handler = (await import(new URL('./artists.func/index.js', vercelFunctionsOutputUrl))).default;
-        const response = {};
+        const response = {
+          headers: new Headers()
+        };
         const count = 2;
 
         await handler({
@@ -194,11 +198,11 @@ describe('Build Greenwood With: ', function() {
             response.body = body;
           },
           setHeader: function(key, value) {
-            response.headers[key] = value;
+            response.headers.set(key, value);
           }
         });
 
-        const { status, body } = response;
+        const { status, body, headers } = response;
         const dom = new JSDOM(body);
         const cardTags = dom.window.document.querySelectorAll('body > app-card');
         const headings = dom.window.document.querySelectorAll('body > h1');
@@ -207,13 +211,16 @@ describe('Build Greenwood With: ', function() {
         expect(cardTags.length).to.be.equal(count);
         expect(headings.length).to.be.equal(1);
         expect(headings[0].textContent).to.be.equal(`List of Artists: ${count}`);
+        expect(headers.get('content-type')).to.be.equal('text/html');
       });
     });
 
     describe('Users SSR Page adapter', function() {
       it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
         const handler = (await import(new URL('./users.func/index.js', vercelFunctionsOutputUrl))).default;
-        const response = {};
+        const response = {
+          headers: new Headers()
+        };
         const count = 1;
 
         await handler({
@@ -229,11 +236,11 @@ describe('Build Greenwood With: ', function() {
             response.body = body;
           },
           setHeader: function(key, value) {
-            response.headers[key] = value;
+            response.headers.set(key, value);
           }
         });
 
-        const { status, body } = response;
+        const { status, body, headers } = response;
         const dom = new JSDOM(body);
         const cardTags = dom.window.document.querySelectorAll('body > app-card');
         const headings = dom.window.document.querySelectorAll('body > h1');
@@ -242,6 +249,7 @@ describe('Build Greenwood With: ', function() {
         expect(cardTags.length).to.be.equal(count);
         expect(headings.length).to.be.equal(1);
         expect(headings[0].textContent).to.be.equal(`List of Users: ${count}`);
+        expect(headers.get('content-type')).to.be.equal('text/html');
       });
     });
   });
