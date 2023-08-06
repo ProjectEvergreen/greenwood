@@ -27,7 +27,8 @@
     "@greenwood/cli": "^0.28.0"
   },
   "dependencies": {
-    "zip-a-folder": "^2.0.0"
+    "zip-a-folder": "^2.0.0",
+    "netlify-cli": "^15.10.0"
   },
   "devDependencies": {
     "@greenwood/cli": "^0.29.0-alpha.1",
