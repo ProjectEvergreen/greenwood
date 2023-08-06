@@ -54,4 +54,5 @@ This plugin Transforms Greenwood [API routes](https://www.greenwoodjs.io/docs/ap
 > _**Note:** You can see a working example of this plugin [here](https://github.com/ProjectEvergreen/greenwood-demo-adapter-netlify)_.
 
 ## Caveats
-1. Edge runtime not supported yet
+1. [Edge runtime](https://docs.netlify.com/edge-functions/overview/) not supported yet.
+1. Local dev integration testing with the Netlify CLI / [`context` object](https://docs.netlify.com/functions/create/?fn-language=js#code-your-function-2).
