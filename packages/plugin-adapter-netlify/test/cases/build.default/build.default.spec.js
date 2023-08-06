@@ -228,9 +228,9 @@ describe('Build Greenwood With: ', function() {
 
       it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
         expect(redirectsFileContents).to.be.equal(
-`/artists/ /.netlify/functions/artists
-/users/ /.netlify/functions/users
-/api/* /.netlify/functions/api-:splat`
+`/artists/ /.netlify/functions/artists 200
+/users/ /.netlify/functions/users 200
+/api/* /.netlify/functions/api-:splat 200`
         );
       });
     });
