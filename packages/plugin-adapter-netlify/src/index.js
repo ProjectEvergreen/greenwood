@@ -56,6 +56,9 @@ async function netlifyAdapter(compilation) {
   const adapterOutputUrl = new URL('./netlify/functions/', scratchDir);
   const ssrPages = compilation.graph.filter(page => page.isSSR);
   const apiRoutes = compilation.manifest.apis;
+  // https://docs.netlify.com/routing/redirects/
+  // https://docs.netlify.com/routing/redirects/rewrites-proxies/
+  // When you assign an HTTP status code of 200 to a redirect rule, it becomes a rewrite.
   let redirects = '';
 
   if (!await checkResourceExists(adapterOutputUrl)) {
@@ -113,12 +116,12 @@ async function netlifyAdapter(compilation) {
 
     await createOutputZip(id, outputType, new URL(`./${id}/`, adapterOutputUrl), projectDirectory);
 
-    redirects += `/${id}/ /.netlify/functions/${id}
+    redirects += `/${id}/ /.netlify/functions/${id} 200
 `;
   }
 
   if (apiRoutes.size > 0) {
-    redirects += '/api/* /.netlify/functions/api-:splat';
+    redirects += '/api/* /.netlify/functions/api-:splat 200';
   }
 
   for (const [key] of apiRoutes) {
@@ -149,7 +152,6 @@ async function netlifyAdapter(compilation) {
     await createOutputZip(id, outputType, outputRoot, projectDirectory);
   }
 
-  // https://docs.netlify.com/routing/redirects/
   if (redirects !== '') {
     await fs.writeFile(new URL('./_redirects', outputDir), redirects);
   }
