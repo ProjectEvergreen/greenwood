@@ -8,13 +8,13 @@ function generateOutputFormat(id) {
   return `
     import { handler as ${id} } from './__${id}.js';
 
-    export async function handler (event, context) {
+    export async function handler (event, context = {}) {
       const { rawUrl, headers, httpMethod } = event;
       const request = new Request(rawUrl, {
         method: httpMethod,
         headers: new Headers(headers)
       });
-      const response = await ${id}(request);
+      const response = await ${id}(request, context);
 
       return {
         statusCode: response.status,
