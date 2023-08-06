@@ -1,6 +1,5 @@
-// https://vercel.com/docs/build-output-api/v3/
-// https://github.com/vercel/examples/tree/main/build-output-api/serverless-functions
 import fs from 'fs/promises';
+import path from 'path';
 import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 
 function generateOutputFormat(id, type) {
@@ -79,6 +78,22 @@ async function vercelAdapter(compilation) {
       await fs.cp(
         new URL(`./${isExecuteRouteModule}`, outputDir),
         new URL(`./${isExecuteRouteModule}`, outputRoot)
+      );
+    }
+
+    // TODO how to track SSR resources that get dumped out in the public directory?
+    // https://github.com/ProjectEvergreen/greenwood/issues/1118
+    const ssrPageAssets = (await fs.readdir(outputDir))
+      .filter(file => !path.basename(file).startsWith('_')
+        && !path.basename(file).startsWith('execute')
+        && path.basename(file).endsWith('.js')
+      );
+
+    for (const asset of ssrPageAssets) {
+      await fs.cp(
+        new URL(`./${asset}`, outputDir),
+        new URL(`./${asset}`, outputRoot),
+        { recursive: true }
       );
     }
   }

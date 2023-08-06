@@ -20,6 +20,9 @@
  * User Workspace
  * package.json
  * src/
+ *   api/
+ *     fragment.js
+ *     greeting.js
  *   components/
  *     card.js
  *   pages/
@@ -34,10 +37,10 @@ import fs from 'fs/promises';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
+import { checkResourceExists } from '../../../../cli/src/lib/resource-utils.js';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath } from 'url';
-import extract from 'extract-zip';
 
 const expect = chai.expect;
 
@@ -82,6 +85,7 @@ describe('Build Greenwood With: ', function() {
       it('should output the expected package.json for each serverless function', function() {
         functionFolders.forEach(async (folder) => {
           const packageJson = await fs.readFile(new URL('./package.json', `file://${folder}/`), 'utf-8');
+
           expect(packageJson).to.be.equal('{"type":"module"}');
         });
       });
@@ -89,8 +93,22 @@ describe('Build Greenwood With: ', function() {
       it('should output the expected .vc-config.json for each serverless function', function() {
         functionFolders.forEach(async (folder) => {
           const packageJson = await fs.readFile(new URL('./vc-config.json', `file://${folder}/`), 'utf-8');
+
           expect(packageJson).to.be.equal('{"runtime":"nodejs18.x","handler":"index.js","launcherType":"Nodejs","shouldAddHelpers":true}');
         });
+      });
+    });
+
+    describe('Static directory output', function() {
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const publicFiles = await glob.promise(path.join(outputPath, 'public/**/**'));
+
+        for (const file of publicFiles) {
+          const buildOutputDestination = file.replace(path.join(outputPath, 'public'), path.join(vercelOutputFolder.pathname, 'static'));
+          const itExists = await checkResourceExists(new URL(`file://${buildOutputDestination}`));
+
+          expect(itExists).to.be.equal(true);
+        }
       });
     });
 
@@ -157,70 +175,70 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    xdescribe('Artists SSR Page adapter', function() {
-      const count = 2;
-      let pageFunctions;
-
-      before(async function() {
-        pageFunctions = (await glob.promise(path.join(netlifyFunctionsOutputUrl.pathname, '*.zip')))
-          .filter(zipFile => path.basename(zipFile).startsWith('artists'));
-      });
-
-      it('should output one SSR page as a serverless function zip file', function() {
-        expect(pageFunctions.length).to.be.equal(1);
-      });
-
+    describe('Artists SSR Page adapter', function() {
       it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const name = path.basename(pageFunctions[0]).replace('.zip', '');
+        const handler = (await import(new URL('./artists.func/index.js', vercelFunctionsOutputUrl))).default;
+        const response = {};
+        const count = 2;
 
-        await extract(pageFunctions[0], {
-          dir: path.join(netlifyFunctionsOutputUrl.pathname, name)
+        await handler({
+          url: 'http://localhost:8080/artists',
+          headers: {
+            host: 'http://localhost:8080'
+          }
+        }, {
+          status: function(code) {
+            response.status = code;
+          },
+          send: function(body) {
+            response.body = body;
+          },
+          setHeader: function(key, value) {
+            response.headers[key] = value;
+          }
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `http://localhost:8080/${name}/`
-        }, {});
-        const { statusCode, body } = response;
+
+        const { status, body } = response;
         const dom = new JSDOM(body);
         const cardTags = dom.window.document.querySelectorAll('body > app-card');
         const headings = dom.window.document.querySelectorAll('body > h1');
 
-        expect(statusCode).to.be.equal(200);
+        expect(status).to.be.equal(200);
         expect(cardTags.length).to.be.equal(count);
         expect(headings.length).to.be.equal(1);
         expect(headings[0].textContent).to.be.equal(`List of Artists: ${count}`);
       });
     });
 
-    xdescribe('Users SSR Page adapter', function() {
-      let pageFunctions;
-
-      before(async function() {
-        pageFunctions = (await glob.promise(path.join(netlifyFunctionsOutputUrl.pathname, '*.zip')))
-          .filter(zipFile => path.basename(zipFile).startsWith('users'));
-      });
-
-      it('should output one SSR page as a serverless function zip file', function() {
-        expect(pageFunctions.length).to.be.equal(1);
-      });
-
+    describe('Users SSR Page adapter', function() {
       it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const name = path.basename(pageFunctions[0]).replace('.zip', '');
+        const handler = (await import(new URL('./users.func/index.js', vercelFunctionsOutputUrl))).default;
+        const response = {};
         const count = 1;
 
-        await extract(pageFunctions[0], {
-          dir: path.join(netlifyFunctionsOutputUrl.pathname, name)
+        await handler({
+          url: 'http://localhost:8080/users',
+          headers: {
+            host: 'http://localhost:8080'
+          }
+        }, {
+          status: function(code) {
+            response.status = code;
+          },
+          send: function(body) {
+            response.body = body;
+          },
+          setHeader: function(key, value) {
+            response.headers[key] = value;
+          }
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `http://localhost:8080/${name}/`
-        }, {});
-        const { statusCode, body } = response;
+
+        const { status, body } = response;
         const dom = new JSDOM(body);
         const cardTags = dom.window.document.querySelectorAll('body > app-card');
         const headings = dom.window.document.querySelectorAll('body > h1');
 
-        expect(statusCode).to.be.equal(200);
+        expect(status).to.be.equal(200);
         expect(cardTags.length).to.be.equal(count);
         expect(headings.length).to.be.equal(1);
         expect(headings[0].textContent).to.be.equal(`List of Users: ${count}`);
