@@ -24,6 +24,21 @@ npm install @greenwood/plugin-adapter-vercel --save-dev
 yarn add @greenwood/plugin-adapter-vercel --dev
 ```
 
+You will then want to create a _vercel.json_ file, customized to match your project.  Assuming you have an npm script called `build`
+```json
+{
+  "scripts": {
+    "build": "greenwood build"
+  }
+}
+```
+
+This would be the minimum _vercel.json_ configuration you would need
+```json
+{
+  "buildCommand": "npm run build"
+}
+```
 
 ## Usage
 Add this plugin to your _greenwood.config.js_.
@@ -40,9 +55,10 @@ export default {
 }
 ```
 
-## Vercel CLI / Local Development
-
-TODO
 
 ## Caveats
-TODO
+1. [Edge runtime](https://vercel.com/docs/concepts/functions/edge-functions) is not supported (yet).
+1. The Vercel CLI (`vercel dev`) is not compatible with Build Output v3.
+    ```sh
+    Error: Detected Build Output v3 from "npm run build", but it is not supported for `vercel dev`. Please set the Development Command in your Project Settings.
+    ```
