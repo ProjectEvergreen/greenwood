@@ -9,6 +9,8 @@ Enables usage of Netlify Serverless runtimes for API routes and SSR pages.
 
 This plugin adapts Greenwood [API routes](https://www.greenwoodjs.io/docs/api-routes/) and [SSR pages](https://www.greenwoodjs.io/docs/server-rendering/) into Netlify [Serverless functions](https://docs.netlify.com/functions/overview/) using their [custom build](https://docs.netlify.com/functions/deploy/?fn-language=js#custom-build-2) approach
 
+In addition to generating the correct build output format for Netlify hosting, this plugin will automatically generate a __redirects_ file to correctly map your SSR page and API route URLs to the corresponding Netlify function (as a rewrite).  You can continue to customize your Netlify project using your _netlify.toml_ file as needed.
+
 > _**Note:** You can see a working example of this plugin [here](https://github.com/ProjectEvergreen/greenwood-demo-adapter-netlify)_.
 
 
@@ -60,8 +62,6 @@ export async function handler(request, context = {}) {
   console.log({ request, context });
 }
 ```
-
-> **This plugin will then generate the appropriate __redirects_ file to correctly route SSR pages and API routes in Netlify as rewrites automatically.  You can continue to customize your Netlify project using your _netlify.toml_ file as needed.**
 
 ## Netlify CLI / Local Development
 
