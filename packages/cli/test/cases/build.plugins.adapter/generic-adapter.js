@@ -29,8 +29,6 @@ async function genericAdapter(compilation) {
     await fs.mkdir(adapterOutputUrl);
   }
 
-  console.log({ ssrPages, apiRoutes });
-
   for (const page of ssrPages) {
     const { id } = page;
     const outputFormat = generateOutputFormat(id, 'page');
