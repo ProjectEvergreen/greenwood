@@ -56,17 +56,20 @@ describe('Build Greenwood With: ', function() {
       await runner.runCommand(cliPath, 'build');
     });
 
-    // test SSR page
     describe('Adapting an SSR Page', function() {
       let dom;
+      let response;
 
       before(async function() {
         const req = new Request(new URL('http://localhost:8080/index'));
         const { handler } = await import(new URL('./adapter-output/index.js', pathToFileURL(outputPath)));
-        const response = await handler(req);
-        const html = await response.text();
 
-        dom = new JSDOM(html);
+        response = await handler(req);
+        dom = new JSDOM(await response.text());
+      });
+
+      it('should have the expected content-type for the response', function() {
+        expect(response.headers.get('content-type')).to.be.equal('text/html');
       });
 
       it('should have the expected number of <app-card> components on the page', function() {
@@ -92,13 +95,18 @@ describe('Build Greenwood With: ', function() {
 
     describe('Adapting an API Route', function() {
       let data;
+      let response;
 
       before(async function() {
         const handler = (await import(new URL('./adapter-output/greeting.js', pathToFileURL(outputPath)))).handler;
         const req = new Request(new URL('http://localhost:8080/api/greeting?name=Greenwood'));
-        const res = await handler(req);
 
-        data = await res.json();
+        response = await handler(req);
+        data = await response.json();
+      });
+
+      it('should have the expected content-type for the response', function() {
+        expect(response.headers.get('content-type')).to.be.equal('application/json');
       });
 
       it('should have the expected message from the API when a query is passed', function() {
