@@ -221,7 +221,11 @@ async function bundleSsrPages(compilation) {
               staticHtml = staticHtml.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, data.body);
             }
 
-            return new Response(staticHtml);
+            return new Response(staticHtml, {
+              headers: {
+                'Content-Type': 'text/html'
+              }
+            });
           }
         `);
 
