@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { html, css, LitElement, customElement, property } from 'lit-element';
 
 @customElement('app-greeting')
