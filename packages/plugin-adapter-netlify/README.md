@@ -1,15 +1,15 @@
 # @greenwood/plugin-adapter-netlify
 
 ## Overview
-Enables usage of Netlify Serverless runtimes for API routes and SSR pages.
+This plugin enables usage of the [Netlify](https://www.netlify.com/) platform for hosting a Greenwood application.
 
 > This package assumes you already have `@greenwood/cli` installed.
 
 ## Features
 
-This plugin adapts Greenwood [API routes](https://www.greenwoodjs.io/docs/api-routes/) and [SSR pages](https://www.greenwoodjs.io/docs/server-rendering/) into Netlify [Serverless functions](https://docs.netlify.com/functions/overview/) using their [custom build](https://docs.netlify.com/functions/deploy/?fn-language=js#custom-build-2) approach
+In addition to publishing a project's static assets to the Netlify CDN, this plugin adapts Greenwood [API routes](https://www.greenwoodjs.io/docs/api-routes/) and [SSR pages](https://www.greenwoodjs.io/docs/server-rendering/) into Netlify [Serverless functions](https://docs.netlify.com/functions/overview/) using their [custom build](https://docs.netlify.com/functions/deploy/?fn-language=js#custom-build-2) approach
 
-In addition to generating the correct build output format for Netlify hosting, this plugin will automatically generate a __redirects_ file to correctly map your SSR page and API route URLs to the corresponding Netlify function (as a rewrite).  You can continue to customize your Netlify project using your _netlify.toml_ file as needed.
+This plugin will automatically generate a custom [__redirects_](https://docs.netlify.com/routing/redirects/) file to correctly map your SSR page and API route URLs to the corresponding Netlify function endpoint (as a rewrite).  You can continue to customize your Netlify project using your _netlify.toml_ file as needed.
 
 > _**Note:** You can see a working example of this plugin [here](https://github.com/ProjectEvergreen/greenwood-demo-adapter-netlify)_.
 
@@ -63,6 +63,8 @@ export async function handler(request, context = {}) {
 }
 ```
 
+> _Please see caveats section for more information on this feature. 👇_
+
 ## Netlify CLI / Local Development
 
 This plugin comes with the Netlify CLI as a dependency to support some local development testing for previewing a Netlify build locally.  Simply add a script like this to your _package.json_
@@ -80,4 +82,4 @@ Then when you run it, you will be able to run and test a production build of you
 1. [Edge runtime](https://docs.netlify.com/edge-functions/overview/) is not supported yet.
 1. Netlify CLI / Local Dev
     - [`context` object](https://docs.netlify.com/functions/create/?fn-language=js#code-your-function-2) not supported when running `greenwood develop` command
-    - [`import.meta.url` is not supported in the Netlify CLI](https://github.com/netlify/cli/issues/4601) and in particular causes [WCC to break]().
+    - [`import.meta.url` is not supported in the Netlify CLI](https://github.com/netlify/cli/issues/4601) and in particular causes [WCC to break](https://github.com/ProjectEvergreen/greenwood-demo-adapter-netlify#-importmetaurl).
