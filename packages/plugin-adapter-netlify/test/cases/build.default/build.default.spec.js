@@ -37,6 +37,7 @@ import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath } from 'url';
+import { normalizePathnameForWindows } from '../../../../cli/src/lib/resource-utils.js';
 import extract from 'extract-zip';
 
 const expect = chai.expect;
@@ -66,7 +67,7 @@ describe('Build Greenwood With: ', function() {
       let redirectsFile;
 
       before(async function() {
-        zipFiles = await glob.promise(path.join(netlifyFunctionsOutputUrl.pathname, '*.zip'));
+        zipFiles = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip'));
         redirectsFile = await glob.promise(path.join(outputPath, 'public/_redirects'));
       });
 
@@ -91,7 +92,7 @@ describe('Build Greenwood With: ', function() {
       let apiFunctions;
 
       before(async function() {
-        apiFunctions = await glob.promise(path.join(netlifyFunctionsOutputUrl.pathname, 'api-greeting.zip'));
+        apiFunctions = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), 'api-greeting.zip'));
       });
 
       it('should output one API route as a serverless function zip file', function() {
@@ -103,7 +104,7 @@ describe('Build Greenwood With: ', function() {
         const name = path.basename(apiFunctions[0]).replace('.zip', '');
 
         await extract(apiFunctions[0], {
-          dir: path.join(netlifyFunctionsOutputUrl.pathname, name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
@@ -121,7 +122,7 @@ describe('Build Greenwood With: ', function() {
       let apiFunctions;
 
       before(async function() {
-        apiFunctions = await glob.promise(path.join(netlifyFunctionsOutputUrl.pathname, 'api-fragment.zip'));
+        apiFunctions = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), 'api-fragment.zip'));
       });
 
       it('should output one API route as a serverless function zip file', function() {
@@ -133,7 +134,7 @@ describe('Build Greenwood With: ', function() {
         const name = path.basename(apiFunctions[0]).replace('.zip', '');
 
         await extract(apiFunctions[0], {
-          dir: path.join(netlifyFunctionsOutputUrl.pathname, name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
@@ -154,7 +155,7 @@ describe('Build Greenwood With: ', function() {
       let pageFunctions;
 
       before(async function() {
-        pageFunctions = (await glob.promise(path.join(netlifyFunctionsOutputUrl.pathname, '*.zip')))
+        pageFunctions = (await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip')))
           .filter(zipFile => path.basename(zipFile).startsWith('artists'));
       });
 
@@ -166,7 +167,7 @@ describe('Build Greenwood With: ', function() {
         const name = path.basename(pageFunctions[0]).replace('.zip', '');
 
         await extract(pageFunctions[0], {
-          dir: path.join(netlifyFunctionsOutputUrl.pathname, name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
@@ -188,7 +189,7 @@ describe('Build Greenwood With: ', function() {
       let pageFunctions;
 
       before(async function() {
-        pageFunctions = (await glob.promise(path.join(netlifyFunctionsOutputUrl.pathname, '*.zip')))
+        pageFunctions = (await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip')))
           .filter(zipFile => path.basename(zipFile).startsWith('users'));
       });
 
@@ -201,7 +202,7 @@ describe('Build Greenwood With: ', function() {
         const count = 1;
 
         await extract(pageFunctions[0], {
-          dir: path.join(netlifyFunctionsOutputUrl.pathname, name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({

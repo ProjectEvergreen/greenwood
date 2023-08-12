@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
+import { checkResourceExists, normalizePathnameForWindows } from '@greenwood/cli/src/lib/resource-utils.js';
 import { zip } from 'zip-a-folder';
 
 // https://docs.netlify.com/functions/create/?fn-language=js
@@ -46,8 +46,8 @@ async function createOutputZip(id, outputType, outputRootUrl, projectDirectory) 
     : `${id}`;
 
   await zip(
-    outputRootUrl.pathname,
-    new URL(`./netlify/functions/${filename}.zip`, projectDirectory).pathname
+    normalizePathnameForWindows(outputRootUrl),
+    normalizePathnameForWindows(new URL(`./netlify/functions/${filename}.zip`, projectDirectory))
   );
 }
 
