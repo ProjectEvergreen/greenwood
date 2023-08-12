@@ -79,7 +79,7 @@ Then when you run it, you will be able to run and test a production build of you
 > _Please see caveats section for more information on this feature. 👇_
 
 ## Caveats
-1. [Edge runtime](https://docs.netlify.com/edge-functions/overview/) is not supported yet.
+1. [Edge runtime](https://docs.netlify.com/edge-functions/overview/) is not supported ([yet](https://github.com/ProjectEvergreen/greenwood/issues/1141)).
 1. Netlify CLI / Local Dev
     - [`context` object](https://docs.netlify.com/functions/create/?fn-language=js#code-your-function-2) not supported when running `greenwood develop` command
     - [`import.meta.url` is not supported in the Netlify CLI](https://github.com/netlify/cli/issues/4601) and in particular causes [WCC to break](https://github.com/ProjectEvergreen/greenwood-demo-adapter-netlify#-importmetaurl).
