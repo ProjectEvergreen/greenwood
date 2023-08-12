@@ -7,7 +7,7 @@ Enables usage of Vercel Serverless runtimes for API routes and SSR pages.
 
 ## Features
 
-This plugin adapts Greenwood [API routes](https://www.greenwoodjs.io/docs/api-routes/) and [SSR pages](https://www.greenwoodjs.io/docs/server-rendering/) into Vercel [Serverless functions](https://vercel.com/docs/concepts/functions/serverless-functions) using their [Build Output API](https://vercel.com/docs/build-output-api/v3).
+In addition to publishing a project's static assets to the Vercel's CDN, this plugin adapts Greenwood [API routes](https://www.greenwoodjs.io/docs/api-routes/) and [SSR pages](https://www.greenwoodjs.io/docs/server-rendering/) into Vercel [Serverless functions](https://vercel.com/docs/concepts/functions/serverless-functions) using their [Build Output API](https://vercel.com/docs/build-output-api/v3).
 
 > _**Note:** You can see a working example of this plugin [here](https://github.com/ProjectEvergreen/greenwood-demo-adapter-vercel)_.
 
@@ -57,7 +57,7 @@ export default {
 
 
 ## Caveats
-1. [Edge runtime](https://vercel.com/docs/concepts/functions/edge-functions) is not supported (yet).
+1. [Edge runtime](https://vercel.com/docs/concepts/functions/edge-functions) is not supported ([yet](https://github.com/ProjectEvergreen/greenwood/issues/1141)).
 1. The Vercel CLI (`vercel dev`) is not compatible with Build Output v3.
     ```sh
     Error: Detected Build Output v3 from "npm run build", but it is not supported for `vercel dev`. Please set the Development Command in your Project Settings.
