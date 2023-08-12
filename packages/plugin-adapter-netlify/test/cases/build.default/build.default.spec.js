@@ -41,7 +41,7 @@ import extract from 'extract-zip';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
+describe.only('Build Greenwood With: ', function() {
   const LABEL = 'Netlify Adapter plugin output';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -52,7 +52,7 @@ describe('Build Greenwood With: ', function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function() {
