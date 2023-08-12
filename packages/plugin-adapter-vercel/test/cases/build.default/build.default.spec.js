@@ -39,6 +39,7 @@ import { JSDOM } from 'jsdom';
 import path from 'path';
 import { checkResourceExists } from '../../../../cli/src/lib/resource-utils.js';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { normalizePathnameForWindows } from '../../../../cli/src/lib/resource-utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath } from 'url';
 
@@ -71,7 +72,7 @@ describe('Build Greenwood With: ', function() {
 
       before(async function() {
         configFile = await fs.readFile(new URL('./config.json', vercelOutputFolder), 'utf-8');
-        functionFolders = await glob.promise(path.join(vercelFunctionsOutputUrl.pathname, '**/*.func'));
+        functionFolders = await glob.promise(path.join(normalizePathnameForWindows(vercelFunctionsOutputUrl), '**/*.func'));
       });
 
       it('should output the expected number of serverless function output folders', function() {
