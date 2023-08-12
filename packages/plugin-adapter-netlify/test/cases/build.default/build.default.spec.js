@@ -173,12 +173,13 @@ describe('Build Greenwood With: ', function() {
         const response = await handler({
           rawUrl: `http://localhost:8080/${name}/`
         }, {});
-        const { statusCode, body } = response;
+        const { statusCode, body, headers } = response;
         const dom = new JSDOM(body);
         const cardTags = dom.window.document.querySelectorAll('body > app-card');
         const headings = dom.window.document.querySelectorAll('body > h1');
 
         expect(statusCode).to.be.equal(200);
+        expect(headers.get('content-type')).to.be.equal('text/html');
         expect(cardTags.length).to.be.equal(count);
         expect(headings.length).to.be.equal(1);
         expect(headings[0].textContent).to.be.equal(`List of Artists: ${count}`);
@@ -208,12 +209,13 @@ describe('Build Greenwood With: ', function() {
         const response = await handler({
           rawUrl: `http://localhost:8080/${name}/`
         }, {});
-        const { statusCode, body } = response;
+        const { statusCode, body, headers } = response;
         const dom = new JSDOM(body);
         const cardTags = dom.window.document.querySelectorAll('body > app-card');
         const headings = dom.window.document.querySelectorAll('body > h1');
 
         expect(statusCode).to.be.equal(200);
+        expect(headers.get('content-type')).to.be.equal('text/html');
         expect(cardTags.length).to.be.equal(count);
         expect(headings.length).to.be.equal(1);
         expect(headings[0].textContent).to.be.equal(`List of Users: ${count}`);
