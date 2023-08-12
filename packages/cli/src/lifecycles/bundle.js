@@ -207,6 +207,8 @@ async function bundleSsrPages(compilation) {
         staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
 
         // better way to write out this inline code?
+        // TODO flesh out response properties
+        // https://github.com/ProjectEvergreen/greenwood/issues/1048
         await fs.writeFile(entryFileUrl, `
           import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
 
