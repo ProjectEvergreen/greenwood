@@ -73,14 +73,10 @@ async function getDevServer(compilation) {
       }
 
       ctx.body = response.body ? Readable.from(response.body) : '';
-      ctx.type = response.headers.get('Content-Type');
       ctx.status = response.status;
-
-      // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
-      // https://github.com/ProjectEvergreen/greenwood/issues/1048
-      if (response.headers.has('Content-Length')) {
-        ctx.set('Content-Length', response.headers.get('Content-Length'));
-      }
+      response.headers.forEach((value, key) => {
+        ctx.set(key, value);
+      });
     } catch (e) {
       ctx.status = 500;
       console.error(e);
@@ -111,12 +107,9 @@ async function getDevServer(compilation) {
       }, Promise.resolve(initResponse.clone()));
 
       ctx.body = response.body ? Readable.from(response.body) : '';
-      ctx.set('Content-Type', response.headers.get('Content-Type'));
-      // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
-      // https://github.com/ProjectEvergreen/greenwood/issues/1048
-      if (response.headers.has('Content-Length')) {
-        ctx.set('Content-Length', response.headers.get('Content-Length'));
-      }
+      response.headers.forEach((value, key) => {
+        ctx.set(key, value);
+      });
     } catch (e) {
       ctx.status = 500;
       console.error(e);
@@ -153,14 +146,10 @@ async function getDevServer(compilation) {
       } else if (!inm || inm !== etagHash) {
         ctx.body = Readable.from(response.body);
         ctx.status = ctx.status;
-        ctx.set('Content-Type', ctx.response.header['content-type']);
         ctx.set('Etag', etagHash);
-
-        // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
-        // https://github.com/ProjectEvergreen/greenwood/issues/1048
-        if (response.headers.has('Content-Length')) {
-          ctx.set('Content-Length', response.headers.get('Content-Length'));
-        }
+        response.headers.forEach((value, key) => {
+          ctx.set(key, value);
+        });
       }
     }
   });
@@ -220,7 +209,9 @@ async function getStaticServer(compilation, composable) {
           const response = await proxyPlugin.serve(url, request);
 
           ctx.body = Readable.from(response.body);
-          ctx.set('Content-Type', response.headers.get('Content-Type'));
+          response.headers.forEach((value, key) => {
+            ctx.set(key, value);
+          });
         }
       }
     } catch (e) {
@@ -257,14 +248,11 @@ async function getStaticServer(compilation, composable) {
 
         if (response.ok) {
           ctx.body = Readable.from(response.body);
-          ctx.type = response.headers.get('Content-Type');
           ctx.status = response.status;
 
-          // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
-          // https://github.com/ProjectEvergreen/greenwood/issues/1048
-          if (response.headers.has('Content-Length')) {
-            ctx.set('Content-Length', response.headers.get('Content-Length'));
-          }
+          response.headers.forEach((value, key) => {
+            ctx.set(key, value);
+          });
         }
       }
     } catch (e) {
@@ -302,18 +290,19 @@ async function getHybridServer(compilation) {
 
         ctx.body = Readable.from(response.body);
         ctx.set('Content-Type', 'text/html');
-        // TODO should use status from response
-        // https://github.com/ProjectEvergreen/greenwood/issues/1048
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
         const { handler } = await import(new URL(`.${apiRoute.path}`, outputDir));
         const response = await handler(request);
-        const { body } = response;
+        const { body, status, headers } = response;
 
         ctx.body = body ? Readable.from(body) : null;
-        ctx.status = response.status;
-        ctx.set('Content-Type', response.headers.get('Content-Type'));
+        ctx.status = status;
+
+        headers.forEach((value, key) => {
+          ctx.set(key, value);
+        });
       }
     } catch (e) {
       ctx.status = 500;

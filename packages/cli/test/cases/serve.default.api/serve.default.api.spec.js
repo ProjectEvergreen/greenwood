@@ -89,7 +89,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers['content-type']).to.equal('application/json');
         done();
       });
 
@@ -244,13 +244,12 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the expected content type header', function(done) {
-        expect(response.headers['content-type']).to.contain('text/html');
+        expect(response.headers['content-type']).to.equal('text/html');
         done();
       });
 
-      // TODO custom response headers are not supported
-      xit('should return the secret header in the response', function(done) {
-        expect(response.headers['x-secret']).to.equal(1234);
+      it('should return the secret header in the response', function(done) {
+        expect(response.headers['x-secret']).to.equal('1234');
         done();
       });
     });

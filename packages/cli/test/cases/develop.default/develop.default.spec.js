@@ -79,7 +79,7 @@ describe('Develop Greenwood With: ', function() {
     this.context = {
       hostname: `${hostname}:${port}`
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
@@ -485,7 +485,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/html');
+        expect(response.headers['content-type']).to.equal('text/html');
         done();
       });
 
@@ -578,7 +578,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/html');
+        expect(response.headers['content-type']).to.equal('text/html');
         done();
       });
 
@@ -629,7 +629,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/javascript');
+        expect(response.headers['content-type']).to.equal('text/javascript');
         done();
       });
 
@@ -663,7 +663,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/css');
+        expect(response.headers['content-type']).to.equal('text/css');
         done();
       });
 
@@ -699,7 +699,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain(`image/${ext}`);
+        expect(response.headers['content-type']).to.equal(`image/${ext}`);
         done();
       });
 
@@ -733,7 +733,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('image/x-icon');
+        expect(response.headers['content-type']).to.equal('image/x-icon');
         done();
       });
 
@@ -767,7 +767,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('image/webp');
+        expect(response.headers['content-type']).to.equal('image/webp');
         done();
       });
 
@@ -801,7 +801,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('image/avif');
+        expect(response.headers['content-type']).to.equal('image/avif');
         done();
       });
 
@@ -836,7 +836,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain(`image/${ext}+xml`);
+        expect(response.headers['content-type']).to.equal(`image/${ext}+xml`);
         done();
       });
 
@@ -871,7 +871,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain(ext);
+        expect(response.headers['content-type']).to.equal(`font/${ext}`);
         done();
       });
 
@@ -908,7 +908,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type header', function(done) {
-        expect(response.headers['content-type']).to.contain(ext);
+        expect(response.headers['content-type']).to.equal(`video/${ext}`);
         done();
       });
 
@@ -991,7 +991,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('audio/mpeg');
+        expect(response.headers['content-type']).to.equal('audio/mpeg');
         done();
       });
 
@@ -1030,7 +1030,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers['content-type']).to.equal('application/json');
         done();
       });
 
@@ -1064,7 +1064,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers['content-type']).to.equal('application/json');
         done();
       });
 
@@ -1098,7 +1098,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/javascript');
+        expect(response.headers['content-type']).to.equal('text/javascript');
         done();
       });
 
@@ -1134,7 +1134,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/css');
+        expect(response.headers['content-type']).to.equal('text/css');
         done();
       });
 
@@ -1170,7 +1170,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/javascript');
+        expect(response.headers['content-type']).to.equal('text/javascript');
         done();
       });
 
@@ -1205,7 +1205,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/javascript');
+        expect(response.headers['content-type']).to.equal('text/javascript');
         done();
       });
 
@@ -1241,7 +1241,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/javascript');
+        expect(response.headers['content-type']).to.equal('text/javascript');
         done();
       });
 
@@ -1276,7 +1276,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/plain');
+        expect(response.headers['content-type']).to.equal('text/plain; charset=utf-8');
         done();
       });
 
@@ -1316,7 +1316,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
         done();
       });
 
@@ -1344,7 +1344,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers.get('content-type')).to.equal('application/json; charset=utf-8');
+        expect(response.headers.get('content-type')).to.equal('application/json');
         done();
       });
 
@@ -1380,7 +1380,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/html');
+        expect(response.headers['content-type']).to.equal('text/html');
         done();
       });
 
@@ -1473,13 +1473,12 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the expected content type header', function(done) {
-        expect(response.headers['content-type']).to.contain('text/html');
+        expect(response.headers['content-type']).to.equal('text/html');
         done();
       });
 
-      // TODO custom response headers are not supported
-      xit('should return the secret header in the response', function(done) {
-        expect(response.headers['x-secret']).to.equal(1234);
+      it('should return the secret header in the response', function(done) {
+        expect(response.headers['x-secret']).to.equal('1234');
         done();
       });
     });

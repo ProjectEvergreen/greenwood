@@ -4,7 +4,6 @@ export async function handler(request) {
   const { name } = formData;
   const body = `Thank you ${name} for your submission!`;
 
-  // TODO get custom header working
   return new Response(body, {
     headers: new Headers({
       'Content-Type': 'text/html',
