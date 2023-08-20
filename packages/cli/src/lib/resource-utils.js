@@ -174,6 +174,7 @@ function isLocalLink(url = '') {
 function transformKoaRequestIntoStandardRequest(url, request) {
   const { body, method, header } = request;
 
+  // https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#parameters
   return new Request(url, {
     body: ['GET', 'HEAD'].includes(method.toUpperCase())
       ? null

@@ -96,7 +96,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/html');
+        expect(response.headers['content-type']).to.equal('text/html');
         done();
       });
 
@@ -135,7 +135,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/html');
+        expect(response.headers['content-type']).to.equal('text/html');
         done();
       });
 
@@ -174,7 +174,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/html');
+        expect(response.headers['content-type']).to.equal('text/html');
         done();
       });
 
@@ -211,7 +211,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/css');
+        expect(response.headers['content-type']).to.equal('text/css');
         done();
       });
 
@@ -251,7 +251,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/css');
+        expect(response.headers['content-type']).to.equal('text/css');
         done();
       });
 
