@@ -12,6 +12,7 @@ export async function handler(request) {
   return new Response(html, {
     headers: new Headers({
       'Content-Type': 'text/html'
-    })
+    }),
+    statusText: 'SUCCESS!!!'
   });
 }

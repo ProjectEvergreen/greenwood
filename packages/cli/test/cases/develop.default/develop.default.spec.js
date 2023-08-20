@@ -1343,6 +1343,12 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
 
+      it('should return a default status message', function(done) {
+        // OK appears to be a Koa default when statusText is an empty string
+        expect(response.statusText).to.equal('OK');
+        done();
+      });
+
       it('should return the correct content type', function(done) {
         expect(response.headers.get('content-type')).to.equal('application/json');
         done();
@@ -1376,6 +1382,11 @@ describe('Develop Greenwood With: ', function() {
 
       it('should return a 200 status', function(done) {
         expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return a custom status message', function(done) {
+        expect(response.statusMessage).to.equal('SUCCESS!!!');
         done();
       });
 

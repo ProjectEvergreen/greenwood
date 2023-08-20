@@ -37,6 +37,7 @@ async function modelResource(context, type, src = undefined, contents = undefine
 function mergeResponse(destination, source) {
   const headers = destination.headers || new Headers();
   const status = source.status || destination.status;
+  const statusText = source.statusText || destination.statusText;
 
   source.headers.forEach((value, key) => {
     // TODO better way to handle Response automatically setting content-type
@@ -48,11 +49,10 @@ function mergeResponse(destination, source) {
     }
   });
 
-  // TODO handle merging in state (aborted, type, status, etc)
-  // https://github.com/ProjectEvergreen/greenwood/issues/1048
   return new Response(source.body, {
     headers,
-    status
+    status,
+    statusText
   });
 }
 

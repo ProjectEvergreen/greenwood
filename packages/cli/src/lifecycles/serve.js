@@ -60,6 +60,7 @@ async function getDevServer(compilation) {
       const url = new URL(ctx.url);
       const { status } = ctx.response;
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
+      // intentionally ignore initial statusText to avoid false positives from 404s
       let response = new Response(null, { status });
 
       for (const plugin of resourcePlugins) {
@@ -74,6 +75,7 @@ async function getDevServer(compilation) {
 
       ctx.body = response.body ? Readable.from(response.body) : '';
       ctx.status = response.status;
+      ctx.message = response.statusText;
       response.headers.forEach((value, key) => {
         ctx.set(key, value);
       });
@@ -89,10 +91,12 @@ async function getDevServer(compilation) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(ctx.url);
+      const { header, status, message } = ctx.response;
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
       const initResponse = new Response(ctx.body, {
-        status: ctx.response.status,
-        headers: new Headers(ctx.response.header)
+        statusText: message,
+        status,
+        headers: new Headers(header)
       });
       const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
         const intermediateResponse = await responsePromise;
@@ -107,6 +111,7 @@ async function getDevServer(compilation) {
       }, Promise.resolve(initResponse.clone()));
 
       ctx.body = response.body ? Readable.from(response.body) : '';
+      ctx.message = response.statusText;
       response.headers.forEach((value, key) => {
         ctx.set(key, value);
       });
@@ -127,9 +132,11 @@ async function getDevServer(compilation) {
     // and only run in development
     if (process.env.__GWD_COMMAND__ === 'develop' && url.protocol === 'file:') { // eslint-disable-line no-underscore-dangle
       // TODO there's probably a better way to do this with tee-ing streams but this works for now
+      const { header, status, message } = ctx.response;
       const response = new Response(ctx.body, {
-        status: ctx.response.status,
-        headers: new Headers(ctx.response.header)
+        statusText: message,
+        status,
+        headers: new Headers(header)
       }).clone();
       const splitResponse = response.clone();
       const contents = await splitResponse.text();
@@ -147,6 +154,7 @@ async function getDevServer(compilation) {
         ctx.body = Readable.from(response.body);
         ctx.status = ctx.status;
         ctx.set('Etag', etagHash);
+        ctx.message = response.statusText;
         response.headers.forEach((value, key) => {
           ctx.set(key, value);
         });
@@ -212,6 +220,7 @@ async function getStaticServer(compilation, composable) {
           response.headers.forEach((value, key) => {
             ctx.set(key, value);
           });
+          ctx.message = response.statusText;
         }
       }
     } catch (e) {
@@ -249,7 +258,7 @@ async function getStaticServer(compilation, composable) {
         if (response.ok) {
           ctx.body = Readable.from(response.body);
           ctx.status = response.status;
-
+          ctx.message = response.statusText;
           response.headers.forEach((value, key) => {
             ctx.set(key, value);
           });
@@ -295,10 +304,11 @@ async function getHybridServer(compilation) {
         const apiRoute = manifest.apis.get(url.pathname);
         const { handler } = await import(new URL(`.${apiRoute.path}`, outputDir));
         const response = await handler(request);
-        const { body, status, headers } = response;
+        const { body, status, headers, statusText } = response;
 
         ctx.body = body ? Readable.from(body) : null;
         ctx.status = status;
+        ctx.message = statusText;
 
         headers.forEach((value, key) => {
           ctx.set(key, value);
