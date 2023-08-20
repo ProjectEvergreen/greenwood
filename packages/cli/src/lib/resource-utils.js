@@ -171,11 +171,24 @@ function isLocalLink(url = '') {
   return url !== '' && (url.indexOf('http') !== 0 && url.indexOf('//') !== 0);
 }
 
+function transformKoaRequestIntoStandardRequest(url, request) {
+  const { body, method, header } = request;
+
+  return new Request(url, {
+    body: ['GET', 'HEAD'].includes(method.toUpperCase())
+      ? null
+      : JSON.stringify(body),
+    method,
+    headers: new Headers(header)
+  });
+}
+
 export {
   checkResourceExists,
   mergeResponse,
   modelResource,
   normalizePathnameForWindows,
   resolveForRelativeUrl,
-  trackResourcesForRoute
+  trackResourcesForRoute,
+  transformKoaRequestIntoStandardRequest
 };

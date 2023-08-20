@@ -1,7 +1,8 @@
 import fs from 'fs/promises';
 import { hashString } from '../lib/hashing-utils.js';
 import Koa from 'koa';
-import { checkResourceExists, mergeResponse } from '../lib/resource-utils.js';
+import { koaBody } from 'koa-body';
+import { checkResourceExists, mergeResponse, transformKoaRequestIntoStandardRequest } from '../lib/resource-utils.js';
 import { Readable } from 'stream';
 import { ResourceInterface } from '../lib/resource-interface.js';
 
@@ -30,14 +31,13 @@ async function getDevServer(compilation) {
     })
   ];
 
+  app.use(koaBody());
+
   // resolve urls to `file://` paths if applicable, otherwise default is `http://`
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`http://localhost:${compilation.config.port}${ctx.url}`);
-      const initRequest = new Request(url, {
-        method: ctx.request.method,
-        headers: new Headers(ctx.request.header)
-      });
+      const initRequest = transformKoaRequestIntoStandardRequest(url, ctx.request);
       const request = await resourcePlugins.reduce(async (requestPromise, plugin) => {
         const intermediateRequest = await requestPromise;
         return plugin.shouldResolve && await plugin.shouldResolve(url, intermediateRequest.clone())
@@ -58,9 +58,8 @@ async function getDevServer(compilation) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(ctx.url);
-      const { method, header } = ctx.request;
       const { status } = ctx.response;
-      const request = new Request(url.href, { method, headers: new Headers(header) });
+      const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
       let response = new Response(null, { status });
 
       for (const plugin of resourcePlugins) {
@@ -94,10 +93,7 @@ async function getDevServer(compilation) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(ctx.url);
-      const request = new Request(url, {
-        method: ctx.request.method,
-        headers: new Headers(ctx.request.header)
-      });
+      const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
       const initResponse = new Response(ctx.body, {
         status: ctx.response.status,
         headers: new Headers(ctx.response.header)
@@ -289,15 +285,14 @@ async function getHybridServer(compilation) {
   const { outputDir } = context;
   const app = await getStaticServer(compilation, true);
 
+  app.use(koaBody());
+
   app.use(async (ctx) => {
     try {
       const url = new URL(`http://localhost:${config.port}${ctx.url}`);
       const matchingRoute = graph.find((node) => node.route === url.pathname) || { data: {} };
       const isApiRoute = manifest.apis.has(url.pathname);
-      const request = new Request(url.href, {
-        method: ctx.request.method,
-        headers: ctx.request.header
-      });
+      const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
 
       if (!config.prerender && matchingRoute.isSSR && !matchingRoute.data.static) {
         const { handler } = await import(new URL(`./__${matchingRoute.filename}`, outputDir));

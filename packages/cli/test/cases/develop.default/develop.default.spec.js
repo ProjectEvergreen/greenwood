@@ -18,9 +18,11 @@
  * User Workspace
  * src/
  *   api/
+ *     fragment.js
  *     greeting.js
  *     missing.js
  *     nothing.js
+ *     submit.js
  *   assets/
  *     data.json
  *     favicon.ico
@@ -32,6 +34,7 @@
  *     splash-clip.mp4
  *     webcomponents.svg
  *   components/
+ *     card.js
  *     header.js
  *   pages/
  *     index.html
@@ -1351,6 +1354,42 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
+    describe('Serve command with API specific behaviors for an HTML ("fragment") API', function() {
+      const name = 'Greenwood';
+      let response = {};
+
+      before(async function() {
+        // TODO not sure why native `fetch` doesn't seem to work here, just hangs the test runner
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}:${port}/api/fragment?name=${name}`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('text/html');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(response.body).to.contain(`<h1>Hello ${name}!!!</h1>`);
+        done();
+      });
+    });
+
     describe('Develop command with API specific behaviors with a custom response', function() {
       let response = {};
 
@@ -1396,6 +1435,51 @@ describe('Develop Greenwood With: ', function() {
 
       it('should return a 200 status', function(done) {
         expect(response.statusCode).to.equal(200);
+        done();
+      });
+    });
+
+    describe('Develop command with POST API specific behaviors', function() {
+      const name = 'Greenwood';
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.post({
+            url: `${hostname}:${port}/api/submit`,
+            json: true,
+            body: { name }
+          }, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve(response);
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the expected response message', function(done) {
+        expect(response.body).to.equal(`Thank you ${name} for your submission!`);
+        done();
+      });
+
+      it('should return the expected content type header', function(done) {
+        expect(response.headers['content-type']).to.contain('text/html');
+        done();
+      });
+
+      // TODO custom response headers are not supported
+      xit('should return the secret header in the response', function(done) {
+        expect(response.headers['x-secret']).to.equal(1234);
         done();
       });
     });

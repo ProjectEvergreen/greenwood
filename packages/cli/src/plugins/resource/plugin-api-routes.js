@@ -7,14 +7,14 @@ import { ResourceInterface } from '../../lib/resource-interface.js';
 import { Worker } from 'worker_threads';
 
 // https://stackoverflow.com/questions/57447685/how-can-i-convert-a-request-object-into-a-stringifiable-object-in-javascript
-function requestAsObject (request) {
-  if (!request instanceof Request) {
+async function requestAsObject (_request) {
+  if (!_request instanceof Request) {
     throw Object.assign(
       new Error(),
       { name: 'TypeError', message: 'Argument must be a Request object' }
     );
   }
-  request = request.clone();
+  const request = _request.clone();
 
   function stringifiableObject (obj) {
     const filtered = {};
@@ -29,6 +29,7 @@ function requestAsObject (request) {
   // TODO handle full response
   // https://github.com/ProjectEvergreen/greenwood/issues/1048
   return {
+    body: await request.text(),
     ...stringifiableObject(request),
     headers: Object.fromEntries(request.headers),
     signal: stringifiableObject(request.signal)
@@ -51,17 +52,21 @@ class ApiRoutesResource extends ResourceInterface {
     const api = this.compilation.manifest.apis.get(url.pathname);
     const apiUrl = new URL(`.${api.path}`, this.compilation.context.userWorkspace);
     const href = apiUrl.href;
-    const req = new Request(new URL(url), {
-      ...request
-    });
 
     // TODO does this ever run in anything but development mode?
     if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
       const workerUrl = new URL('../../lib/api-route-worker.js', import.meta.url);
+      const { headers, method } = request;
+      const req = await requestAsObject(new Request(url, {
+        body: ['GET', 'HEAD'].includes(method.toUpperCase())
+          ? null
+          : await request.text(),
+        method,
+        headers
+      }));
 
-      const response = await new Promise((resolve, reject) => {
+      const response = await new Promise(async (resolve, reject) => {
         const worker = new Worker(workerUrl);
-        const req = requestAsObject(request);
 
         worker.on('message', (result) => {
           resolve(result);
@@ -82,7 +87,7 @@ class ApiRoutesResource extends ResourceInterface {
     } else {
       const { handler } = await import(href);
 
-      return await handler(req);
+      return await handler(request);
     }
   }
 }

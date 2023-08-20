@@ -17,6 +17,8 @@
  *     fragment.js
  *     greeting.js
  *     missing.js
+ *     nothing.js
+ *     submit.js
  *   components/
  *     card.js
  */
@@ -41,7 +43,7 @@ describe('Serve Greenwood With: ', function() {
     this.context = {
       hostname
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
@@ -204,6 +206,51 @@ describe('Serve Greenwood With: ', function() {
 
       it('should return a body of not found', function(done) {
         expect(response.body).to.equal('Not Found');
+        done();
+      });
+    });
+
+    describe('Serve command with POST API specific behaviors', function() {
+      const name = 'Greenwood';
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.post({
+            url: `${hostname}/api/submit`,
+            json: true,
+            body: { name }
+          }, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve(response);
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the expected response message', function(done) {
+        expect(response.body).to.equal(`Thank you ${name} for your submission!`);
+        done();
+      });
+
+      it('should return the expected content type header', function(done) {
+        expect(response.headers['content-type']).to.contain('text/html');
+        done();
+      });
+
+      // TODO custom response headers are not supported
+      xit('should return the secret header in the response', function(done) {
+        expect(response.headers['x-secret']).to.equal(1234);
         done();
       });
     });
