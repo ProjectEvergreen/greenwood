@@ -1,3 +1,5 @@
 export async function handler() {
-  return new Response(undefined);
+  return new Response(null, {
+    status: 204
+  });
 }

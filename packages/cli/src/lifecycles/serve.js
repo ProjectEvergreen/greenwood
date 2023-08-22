@@ -93,7 +93,7 @@ async function getDevServer(compilation) {
       const url = new URL(ctx.url);
       const { header, status, message } = ctx.response;
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
-      const initResponse = new Response(ctx.body, {
+      const initResponse = new Response(status === 204 ? null : ctx.body, {
         statusText: message,
         status,
         headers: new Headers(header)
@@ -294,7 +294,6 @@ async function getHybridServer(compilation) {
       if (!config.prerender && matchingRoute.isSSR && !matchingRoute.data.static) {
         const { handler } = await import(new URL(`./__${matchingRoute.filename}`, outputDir));
         // TODO passing compilation this way too hacky?
-        // https://github.com/ProjectEvergreen/greenwood/issues/1008
         const response = await handler(request, compilation);
 
         ctx.body = Readable.from(response.body);

@@ -1360,12 +1360,11 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
-    describe('Serve command with API specific behaviors for an HTML ("fragment") API', function() {
+    describe('Develop command with API specific behaviors for an HTML ("fragment") API', function() {
       const name = 'Greenwood';
       let response = {};
 
       before(async function() {
-        // TODO not sure why native `fetch` doesn't seem to work here, just hangs the test runner
         return new Promise((resolve, reject) => {
           request.get(`${hostname}:${port}/api/fragment?name=${name}`, (err, res, body) => {
             if (err) {
@@ -1444,8 +1443,8 @@ describe('Develop Greenwood With: ', function() {
         });
       });
 
-      it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+      it('should return a custom status code', function(done) {
+        expect(response.statusCode).to.equal(204);
         done();
       });
     });

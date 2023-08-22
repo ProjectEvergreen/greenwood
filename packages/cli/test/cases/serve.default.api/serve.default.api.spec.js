@@ -162,8 +162,8 @@ describe('Serve Greenwood With: ', function() {
         });
       });
 
-      it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+      it('should return a custom status code', function(done) {
+        expect(response.statusCode).to.equal(204);
         done();
       });
     });

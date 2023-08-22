@@ -26,14 +26,11 @@ async function requestAsObject (_request) {
     return filtered;
   }
 
-  // TODO handle full response
-  // https://github.com/ProjectEvergreen/greenwood/issues/1048
+  // TODO handle full request
   return {
-    body: await request.text(),
     ...stringifiableObject(request),
-    headers: Object.fromEntries(request.headers),
-    signal: stringifiableObject(request.signal)
-    // bodyText: await request.text(), // requires function to be async
+    body: await request.text(),
+    headers: Object.fromEntries(request.headers)
   };
 }
 
@@ -80,9 +77,12 @@ class ApiRoutesResource extends ResourceInterface {
 
         worker.postMessage({ href, request: req });
       });
+      const { body, status, statusText } = response;
 
-      return new Response(response.body, {
-        ...response
+      return new Response(status === 204 ? null : body, {
+        headers: response.headers,
+        status,
+        statusText
       });
     } else {
       const { handler } = await import(href);

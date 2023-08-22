@@ -22,12 +22,9 @@ async function responseAsObject (response) {
     return filtered;
   }
 
-  // TODO handle full response, use resource-util?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1048
   return {
     ...stringifiableObject(response),
     headers: Object.fromEntries(response.headers),
-    // signal: stringifiableObject(request.signal),
     body: await response.text()
   };
 }
