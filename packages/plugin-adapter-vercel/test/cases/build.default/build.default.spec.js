@@ -23,6 +23,7 @@
  *   api/
  *     fragment.js
  *     greeting.js
+ *     submit.js
  *   components/
  *     card.js
  *   pages/
@@ -76,7 +77,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output the expected number of serverless function output folders', function() {
-        expect(functionFolders.length).to.be.equal(4);
+        expect(functionFolders.length).to.be.equal(5);
       });
 
       it('should output the expected configuration file for the build output', function() {
@@ -125,7 +126,8 @@ describe('Build Greenwood With: ', function() {
           url: `http://localhost:8080/api/greeting?name=${param}`,
           headers: {
             host: 'http://localhost:8080'
-          }
+          },
+          method: 'GET'
         }, {
           status: function(code) {
             response.status = code;
@@ -156,7 +158,8 @@ describe('Build Greenwood With: ', function() {
           url: 'http://localhost:8080/api/fragment',
           headers: {
             host: 'http://localhost:8080'
-          }
+          },
+          method: 'GET'
         }, {
           status: function(code) {
             response.status = code;
@@ -178,6 +181,42 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
+    describe('Submit API Route adapter', function() {
+      const name = 'Greenwood';
+
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const handler = (await import(new URL('./api/submit.func/index.js', vercelFunctionsOutputUrl))).default;
+        const response = {
+          headers: new Headers()
+        };
+
+        await handler({
+          url: 'http://localhost:8080/api/submit',
+          headers: {
+            host: 'http://localhost:8080'
+          },
+          body: { name },
+          method: 'POST'
+        }, {
+          status: function(code) {
+            response.status = code;
+          },
+          send: function(body) {
+            response.body = body;
+          },
+          setHeader: function(key, value) {
+            response.headers.set(key, value);
+          }
+        });
+        const { status, body, headers } = response;
+
+        expect(status).to.be.equal(200);
+        expect(JSON.parse(body).message).to.be.equal(`Thank you ${name} for your submission!`);
+        expect(headers.get('Content-Type')).to.be.equal('application/json');
+        expect(headers.get('x-secret')).to.be.equal('1234');
+      });
+    });
+
     describe('Artists SSR Page adapter', function() {
       it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
         const handler = (await import(new URL('./artists.func/index.js', vercelFunctionsOutputUrl))).default;
@@ -190,7 +229,8 @@ describe('Build Greenwood With: ', function() {
           url: 'http://localhost:8080/artists',
           headers: {
             host: 'http://localhost:8080'
-          }
+          },
+          method: 'GET'
         }, {
           status: function(code) {
             response.status = code;
@@ -228,7 +268,8 @@ describe('Build Greenwood With: ', function() {
           url: 'http://localhost:8080/users',
           headers: {
             host: 'http://localhost:8080'
-          }
+          },
+          method: 'GET'
         }, {
           status: function(code) {
             response.status = code;

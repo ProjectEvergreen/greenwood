@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 
+// https://vercel.com/docs/functions/serverless-functions/runtimes/node-js#node.js-helpers
 function generateOutputFormat(id, type) {
   const path = type === 'page'
     ? `__${id}`
@@ -11,8 +12,11 @@ function generateOutputFormat(id, type) {
     import { handler as ${id} } from './${path}.js';
 
     export default async function handler (request, response) {
-      const { url, headers, method } = request;
+      const { body, url, headers, method } = request;
       const req = new Request(new URL(url, \`http://\${headers.host}\`), {
+        body: ['GET', 'HEAD'].includes(method.toUpperCase())
+          ? null
+          : JSON.stringify(body),
         headers: new Headers(headers),
         method
       });
