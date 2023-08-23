@@ -9,8 +9,11 @@ function generateOutputFormat(id) {
     import { handler as ${id} } from './__${id}.js';
 
     export async function handler (event, context = {}) {
-      const { rawUrl, headers, httpMethod } = event;
+      const { rawUrl, body, headers, httpMethod } = event;
       const request = new Request(rawUrl, {
+        body: ['GET', 'HEAD'].includes(httpMethod.toUpperCase())
+          ? null
+          : JSON.stringify(body),
         method: httpMethod,
         headers: new Headers(headers)
       });
