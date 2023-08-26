@@ -5,19 +5,40 @@ import { zip } from 'zip-a-folder';
 
 // https://docs.netlify.com/functions/create/?fn-language=js
 function generateOutputFormat(id) {
+  const variableNameSafeId = id.replace(/-/g, '');
+
   return `
-    import { handler as ${id} } from './__${id}.js';
+    import { handler as ${variableNameSafeId} } from './__${id}.js';
 
     export async function handler (event, context = {}) {
-      const { rawUrl, body, headers, httpMethod } = event;
+      const { rawUrl, body, headers = {}, httpMethod } = event;
+      const contentType = headers['content-type'] || '';
+      let format = body;
+
+      if (['GET', 'HEAD'].includes(httpMethod.toUpperCase())) {
+        format = null
+      } else if (contentType.includes('application/x-www-form-urlencoded')) {
+        const formData = new FormData();
+
+        for (const key of Object.keys(body)) {
+          formData.append(key, body[key]);
+        }
+
+        // when using FormData, let Request set the correct headers
+        // or else it will come out as multipart/form-data
+        // https://stackoverflow.com/a/43521052/417806
+        format = formData;
+        delete headers['content-type'];
+      } else if(contentType.includes('application/json')) {
+        format = JSON.stringify(body);
+      }
+
       const request = new Request(rawUrl, {
-        body: ['GET', 'HEAD'].includes(httpMethod.toUpperCase())
-          ? null
-          : JSON.stringify(body),
+        body: format,
         method: httpMethod,
         headers: new Headers(headers)
       });
-      const response = await ${id}(request, context);
+      const response = await ${variableNameSafeId}(request, context);
 
       return {
         statusCode: response.status,

@@ -76,11 +76,11 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output the expected number of serverless function zip files', function() {
-        expect(zipFiles.length).to.be.equal(5);
+        expect(zipFiles.length).to.be.equal(6);
       });
 
       it('should output the expected number of serverless function API zip files', function() {
-        expect(zipFiles.filter(file => path.basename(file).startsWith('api-')).length).to.be.equal(3);
+        expect(zipFiles.filter(file => path.basename(file).startsWith('api-')).length).to.be.equal(4);
       });
 
       it('should output the expected number of serverless function SSR page zip files', function() {
@@ -156,11 +156,11 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('Submit API Route adapter', function() {
+    describe('Submit JSON API Route adapter', function() {
       let apiFunctions;
 
       before(async function() {
-        apiFunctions = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), 'api-submit.zip'));
+        apiFunctions = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), 'api-submit-json.zip'));
       });
 
       it('should output one API route as a serverless function zip file', function() {
@@ -176,7 +176,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: 'http://localhost:8080/api/submit',
+          rawUrl: 'http://localhost:8080/api/submit-json',
           body: { name: param },
           httpMethod: 'POST',
           headers: {
@@ -189,6 +189,41 @@ describe('Build Greenwood With: ', function() {
         expect(JSON.parse(body).message).to.be.equal(`Thank you ${param} for your submission!`);
         expect(headers.get('Content-Type')).to.be.equal('application/json');
         expect(headers.get('x-secret')).to.be.equal('1234');
+      });
+    });
+
+    describe('Submit FormData API Route adapter', function() {
+      let apiFunctions;
+
+      before(async function() {
+        apiFunctions = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), 'api-submit-form-data.zip'));
+      });
+
+      it('should output one API route as a serverless function zip file', function() {
+        expect(apiFunctions.length).to.be.equal(1);
+      });
+
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const param = 'Greenwood';
+        const name = path.basename(apiFunctions[0]).replace('.zip', '');
+
+        await extract(apiFunctions[0], {
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+        });
+        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
+        const response = await handler({
+          rawUrl: 'http://localhost:8080/api/submit-form-data',
+          body: { name: param },
+          httpMethod: 'POST',
+          headers: {
+            'content-type': 'application/x-www-form-urlencoded'
+          }
+        }, {});
+        const { statusCode, body, headers } = response;
+
+        expect(statusCode).to.be.equal(200);
+        expect(body).to.be.equal(`Thank you ${param} for your submission!`);
+        expect(headers.get('Content-Type')).to.be.equal('text/html');
       });
     });
 

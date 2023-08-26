@@ -4,23 +4,43 @@ import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 
 // https://vercel.com/docs/functions/serverless-functions/runtimes/node-js#node.js-helpers
 function generateOutputFormat(id, type) {
+  const variableNameSafeId = id.replace(/-/g, '');
   const path = type === 'page'
     ? `__${id}`
     : id;
 
   return `
-    import { handler as ${id} } from './${path}.js';
+    import { handler as ${variableNameSafeId} } from './${path}.js';
 
     export default async function handler (request, response) {
-      const { body, url, headers, method } = request;
+      const { body, url, headers = {}, method } = request;
+      const contentType = headers['content-type'] || '';
+      let format = body;
+
+      if (['GET', 'HEAD'].includes(method.toUpperCase())) {
+        format = null
+      } else if (contentType.includes('application/x-www-form-urlencoded')) {
+        const formData = new FormData();
+
+        for (const key of Object.keys(body)) {
+          formData.append(key, body[key]);
+        }
+
+        // when using FormData, let Request set the correct headers
+        // or else it will come out as multipart/form-data
+        // https://stackoverflow.com/a/43521052/417806
+        format = formData;
+        delete headers['content-type'];
+      } else if(contentType.includes('application/json')) {
+        format = JSON.stringify(body);
+      }
+
       const req = new Request(new URL(url, \`http://\${headers.host}\`), {
-        body: ['GET', 'HEAD'].includes(method.toUpperCase())
-          ? null
-          : JSON.stringify(body),
+        body: format,
         headers: new Headers(headers),
         method
       });
-      const res = await ${id}(req);
+      const res = await ${variableNameSafeId}(req);
 
       res.headers.forEach((value, key) => {
         response.setHeader(key, value);
