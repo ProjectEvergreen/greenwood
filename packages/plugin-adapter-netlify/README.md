@@ -41,6 +41,9 @@ You will then want to create a _netlify.toml_ file at the root of your project (
   NODE_VERSION = "18.x" # or pin to a specific version, like 18.15.0
 ```
 
+Set the `AWS_LAMBDA_JS_RUNTIME` environment variable [in your Netlify UI](https://answers.netlify.com/t/aws-lambda-js-runtime-nodejs14-x/32161/2) to the value of  `nodejs18.x`.
+
+
 ## Usage
 Add this plugin to your _greenwood.config.js_.
 
