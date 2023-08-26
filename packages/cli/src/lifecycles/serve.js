@@ -1,7 +1,8 @@
 import fs from 'fs/promises';
 import { hashString } from '../lib/hashing-utils.js';
 import Koa from 'koa';
-import { checkResourceExists, mergeResponse } from '../lib/resource-utils.js';
+import { koaBody } from 'koa-body';
+import { checkResourceExists, mergeResponse, transformKoaRequestIntoStandardRequest } from '../lib/resource-utils.js';
 import { Readable } from 'stream';
 import { ResourceInterface } from '../lib/resource-interface.js';
 
@@ -30,14 +31,13 @@ async function getDevServer(compilation) {
     })
   ];
 
+  app.use(koaBody());
+
   // resolve urls to `file://` paths if applicable, otherwise default is `http://`
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`http://localhost:${compilation.config.port}${ctx.url}`);
-      const initRequest = new Request(url, {
-        method: ctx.request.method,
-        headers: new Headers(ctx.request.header)
-      });
+      const initRequest = transformKoaRequestIntoStandardRequest(url, ctx.request);
       const request = await resourcePlugins.reduce(async (requestPromise, plugin) => {
         const intermediateRequest = await requestPromise;
         return plugin.shouldResolve && await plugin.shouldResolve(url, intermediateRequest.clone())
@@ -58,9 +58,9 @@ async function getDevServer(compilation) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(ctx.url);
-      const { method, header } = ctx.request;
       const { status } = ctx.response;
-      const request = new Request(url.href, { method, headers: new Headers(header) });
+      const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
+      // intentionally ignore initial statusText to avoid false positives from 404s
       let response = new Response(null, { status });
 
       for (const plugin of resourcePlugins) {
@@ -74,14 +74,11 @@ async function getDevServer(compilation) {
       }
 
       ctx.body = response.body ? Readable.from(response.body) : '';
-      ctx.type = response.headers.get('Content-Type');
       ctx.status = response.status;
-
-      // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
-      // https://github.com/ProjectEvergreen/greenwood/issues/1048
-      if (response.headers.has('Content-Length')) {
-        ctx.set('Content-Length', response.headers.get('Content-Length'));
-      }
+      ctx.message = response.statusText;
+      response.headers.forEach((value, key) => {
+        ctx.set(key, value);
+      });
     } catch (e) {
       ctx.status = 500;
       console.error(e);
@@ -94,13 +91,12 @@ async function getDevServer(compilation) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(ctx.url);
-      const request = new Request(url, {
-        method: ctx.request.method,
-        headers: new Headers(ctx.request.header)
-      });
-      const initResponse = new Response(ctx.body, {
-        status: ctx.response.status,
-        headers: new Headers(ctx.response.header)
+      const { header, status, message } = ctx.response;
+      const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
+      const initResponse = new Response(status === 204 ? null : ctx.body, {
+        statusText: message,
+        status,
+        headers: new Headers(header)
       });
       const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
         const intermediateResponse = await responsePromise;
@@ -115,12 +111,10 @@ async function getDevServer(compilation) {
       }, Promise.resolve(initResponse.clone()));
 
       ctx.body = response.body ? Readable.from(response.body) : '';
-      ctx.set('Content-Type', response.headers.get('Content-Type'));
-      // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
-      // https://github.com/ProjectEvergreen/greenwood/issues/1048
-      if (response.headers.has('Content-Length')) {
-        ctx.set('Content-Length', response.headers.get('Content-Length'));
-      }
+      ctx.message = response.statusText;
+      response.headers.forEach((value, key) => {
+        ctx.set(key, value);
+      });
     } catch (e) {
       ctx.status = 500;
       console.error(e);
@@ -138,9 +132,11 @@ async function getDevServer(compilation) {
     // and only run in development
     if (process.env.__GWD_COMMAND__ === 'develop' && url.protocol === 'file:') { // eslint-disable-line no-underscore-dangle
       // TODO there's probably a better way to do this with tee-ing streams but this works for now
+      const { header, status, message } = ctx.response;
       const response = new Response(ctx.body, {
-        status: ctx.response.status,
-        headers: new Headers(ctx.response.header)
+        statusText: message,
+        status,
+        headers: new Headers(header)
       }).clone();
       const splitResponse = response.clone();
       const contents = await splitResponse.text();
@@ -157,14 +153,11 @@ async function getDevServer(compilation) {
       } else if (!inm || inm !== etagHash) {
         ctx.body = Readable.from(response.body);
         ctx.status = ctx.status;
-        ctx.set('Content-Type', ctx.response.header['content-type']);
         ctx.set('Etag', etagHash);
-
-        // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
-        // https://github.com/ProjectEvergreen/greenwood/issues/1048
-        if (response.headers.has('Content-Length')) {
-          ctx.set('Content-Length', response.headers.get('Content-Length'));
-        }
+        ctx.message = response.statusText;
+        response.headers.forEach((value, key) => {
+          ctx.set(key, value);
+        });
       }
     }
   });
@@ -224,7 +217,10 @@ async function getStaticServer(compilation, composable) {
           const response = await proxyPlugin.serve(url, request);
 
           ctx.body = Readable.from(response.body);
-          ctx.set('Content-Type', response.headers.get('Content-Type'));
+          response.headers.forEach((value, key) => {
+            ctx.set(key, value);
+          });
+          ctx.message = response.statusText;
         }
       }
     } catch (e) {
@@ -261,14 +257,11 @@ async function getStaticServer(compilation, composable) {
 
         if (response.ok) {
           ctx.body = Readable.from(response.body);
-          ctx.type = response.headers.get('Content-Type');
           ctx.status = response.status;
-
-          // TODO automatically loop and apply all custom headers to Koa response, include Content-Type below
-          // https://github.com/ProjectEvergreen/greenwood/issues/1048
-          if (response.headers.has('Content-Length')) {
-            ctx.set('Content-Length', response.headers.get('Content-Length'));
-          }
+          ctx.message = response.statusText;
+          response.headers.forEach((value, key) => {
+            ctx.set(key, value);
+          });
         }
       }
     } catch (e) {
@@ -289,38 +282,36 @@ async function getHybridServer(compilation) {
   const { outputDir } = context;
   const app = await getStaticServer(compilation, true);
 
+  app.use(koaBody());
+
   app.use(async (ctx) => {
     try {
       const url = new URL(`http://localhost:${config.port}${ctx.url}`);
       const matchingRoute = graph.find((node) => node.route === url.pathname) || { data: {} };
       const isApiRoute = manifest.apis.has(url.pathname);
-      const request = new Request(url.href, {
-        method: ctx.request.method,
-        headers: ctx.request.header
-      });
+      const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
 
       if (!config.prerender && matchingRoute.isSSR && !matchingRoute.data.static) {
         const { handler } = await import(new URL(`./__${matchingRoute.filename}`, outputDir));
         // TODO passing compilation this way too hacky?
-        // https://github.com/ProjectEvergreen/greenwood/issues/1008
         const response = await handler(request, compilation);
 
         ctx.body = Readable.from(response.body);
         ctx.set('Content-Type', 'text/html');
-        // TODO should use status from response
-        // https://github.com/ProjectEvergreen/greenwood/issues/1048
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
         const { handler } = await import(new URL(`.${apiRoute.path}`, outputDir));
         const response = await handler(request);
-        const { body } = response;
+        const { body, status, headers, statusText } = response;
 
-        // TODO should use status from response
-        // https://github.com/ProjectEvergreen/greenwood/issues/1048
         ctx.body = body ? Readable.from(body) : null;
-        ctx.status = 200;
-        ctx.set('Content-Type', response.headers.get('Content-Type'));
+        ctx.status = status;
+        ctx.message = statusText;
+
+        headers.forEach((value, key) => {
+          ctx.set(key, value);
+        });
       }
     } catch (e) {
       ctx.status = 500;

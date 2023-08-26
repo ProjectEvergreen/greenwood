@@ -1,5 +1,6 @@
 // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
 import { parentPort } from 'worker_threads';
+import { transformKoaRequestIntoStandardRequest } from './resource-utils.js';
 
 // based on https://stackoverflow.com/questions/57447685/how-can-i-convert-a-request-object-into-a-stringifiable-object-in-javascript
 async function responseAsObject (response) {
@@ -21,19 +22,31 @@ async function responseAsObject (response) {
     return filtered;
   }
 
-  // TODO handle full response
-  // https://github.com/ProjectEvergreen/greenwood/issues/1048
   return {
     ...stringifiableObject(response),
     headers: Object.fromEntries(response.headers),
-    // signal: stringifiableObject(request.signal),
     body: await response.text()
   };
 }
 
 async function executeRouteModule({ href, request }) {
-  const { handler } = await import(href);
-  const response = await handler(request);
+  const { body, headers = {}, method, url } = request;
+  const contentType = headers['content-type'] || '';
+  const { handler } = await import(new URL(href));
+  const format = contentType.startsWith('application/json')
+    ? JSON.parse(body)
+    : body;
+
+  // handling of serialized FormData across Worker threads
+  if (contentType.startsWith('x-greenwood/www-form-urlencoded')) {
+    headers['content-type'] = 'application/x-www-form-urlencoded';
+  }
+
+  const response = await handler(transformKoaRequestIntoStandardRequest(new URL(url), {
+    method,
+    header: headers,
+    body: format
+  }));
 
   parentPort.postMessage(await responseAsObject(response));
 }

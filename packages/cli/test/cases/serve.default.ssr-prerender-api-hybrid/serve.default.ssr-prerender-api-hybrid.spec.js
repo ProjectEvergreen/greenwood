@@ -96,7 +96,7 @@ describe('Serve Greenwood With: ', function() {
         });
 
         it('should return the correct content type', function(done) {
-          expect(response.headers['content-type']).to.contain('text/html');
+          expect(response.headers['content-type']).to.equal('text/html');
           done();
         });
 
@@ -162,7 +162,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers['content-type']).to.equal('application/json');
         done();
       });
 

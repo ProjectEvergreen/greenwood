@@ -13,7 +13,6 @@ const generateCompilation = () => {
         context: {},
         config: {},
         // TODO put resources into manifest
-        // https://github.com/ProjectEvergreen/greenwood/issues/1008
         resources: new Map(),
         manifest: {
           apis: new Map()
@@ -45,7 +44,6 @@ const generateCompilation = () => {
         if (await checkResourceExists(new URL('./manifest.json', outputDir))) {
           console.info('Loading manifest from build output...');
           // TODO put reviver into a utility?
-          // https://github.com/ProjectEvergreen/greenwood/issues/1008
           const manifest = JSON.parse(await fs.readFile(new URL('./manifest.json', outputDir)), function reviver(key, value) {
             if (typeof value === 'object' && value !== null) {
               if (value.dataType === 'Map') {
@@ -61,7 +59,6 @@ const generateCompilation = () => {
         if (await checkResourceExists(new URL('./resources.json', outputDir))) {
           console.info('Loading resources from build output...');
           // TODO put reviver into a utility?
-          // https://github.com/ProjectEvergreen/greenwood/issues/1008
           const resources = JSON.parse(await fs.readFile(new URL('./resources.json', outputDir)), function reviver(key, value) {
             if (typeof value === 'object' && value !== null) {
               if (value.dataType === 'Map') {
@@ -85,7 +82,6 @@ const generateCompilation = () => {
 
         // https://stackoverflow.com/a/56150320/417806
         // TODO put reviver into a util?
-        // https://github.com/ProjectEvergreen/greenwood/issues/1008
         await fs.writeFile(new URL('./manifest.json', scratchDir), JSON.stringify(compilation.manifest, (key, value) => {
           if (value instanceof Map) {
             return {

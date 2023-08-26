@@ -12,8 +12,6 @@ async function emitResources(compilation) {
   const { resources, graph } = compilation;
 
   // https://stackoverflow.com/a/56150320/417806
-  // TODO put into a util
-  // https://github.com/ProjectEvergreen/greenwood/issues/1008
   await fs.writeFile(new URL('./resources.json', outputDir), JSON.stringify(resources, (key, value) => {
     if (value instanceof Map) {
       return {
@@ -176,7 +174,6 @@ async function bundleApiRoutes(compilation) {
 async function bundleSsrPages(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
   // TODO context plugins for SSR ?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1008
   // const contextPlugins = compilation.config.plugins.filter((plugin) => {
   //   return plugin.type === 'context';
   // }).map((plugin) => {
@@ -207,8 +204,6 @@ async function bundleSsrPages(compilation) {
         staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
 
         // better way to write out this inline code?
-        // TODO flesh out response properties
-        // https://github.com/ProjectEvergreen/greenwood/issues/1048
         await fs.writeFile(entryFileUrl, `
           import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
 

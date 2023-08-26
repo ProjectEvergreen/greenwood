@@ -42,6 +42,7 @@
     "es-module-shims": "^1.2.0",
     "front-matter": "^4.0.2",
     "koa": "^2.13.0",
+    "koa-body": "^6.0.1",
     "livereload": "^0.9.1",
     "markdown-toc": "^1.2.0",
     "node-html-parser": "^1.2.21",

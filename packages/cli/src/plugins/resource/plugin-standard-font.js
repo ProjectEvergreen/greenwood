@@ -21,7 +21,7 @@ class StandardFontResource extends ResourceInterface {
 
   async serve(url) {
     const extension = url.pathname.split('.').pop();
-    const contentType = extension === 'eot' ? 'application/vnd.ms-fontobject' : extension;
+    const contentType = extension === 'eot' ? 'application/vnd.ms-fontobject' : `font/${extension}`;
     const body = await fs.readFile(url);
 
     return new Response(body, {

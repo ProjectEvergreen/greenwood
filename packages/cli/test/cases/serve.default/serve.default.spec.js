@@ -98,7 +98,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
         done();
       });
 
@@ -133,7 +133,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
         done();
       });
 
@@ -310,7 +310,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain(ext);
+        expect(response.headers['content-type']).to.equal(`video/${ext}`);
         done();
       });
 
@@ -349,7 +349,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('audio/mpeg');
+        expect(response.headers['content-type']).to.equal('audio/mpeg');
         done();
       });
 
@@ -388,7 +388,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers['content-type']).to.equal('application/json');
         done();
       });
 
@@ -422,7 +422,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers['content-type']).to.equal('application/json');
         done();
       });
 
