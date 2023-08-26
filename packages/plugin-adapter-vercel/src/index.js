@@ -4,13 +4,13 @@ import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 
 // https://vercel.com/docs/functions/serverless-functions/runtimes/node-js#node.js-helpers
 function generateOutputFormat(id, type) {
-  const variableNameSafeId = id.replace(/-/g, '');
+  const handlerAlias = '$handler';
   const path = type === 'page'
     ? `__${id}`
     : id;
 
   return `
-    import { handler as ${variableNameSafeId} } from './${path}.js';
+    import { handler as ${handlerAlias} } from './${path}.js';
 
     export default async function handler (request, response) {
       const { body, url, headers = {}, method } = request;
@@ -40,7 +40,7 @@ function generateOutputFormat(id, type) {
         headers: new Headers(headers),
         method
       });
-      const res = await ${variableNameSafeId}(req);
+      const res = await ${handlerAlias}(req);
 
       res.headers.forEach((value, key) => {
         response.setHeader(key, value);

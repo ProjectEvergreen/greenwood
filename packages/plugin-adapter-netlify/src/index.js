@@ -5,10 +5,10 @@ import { zip } from 'zip-a-folder';
 
 // https://docs.netlify.com/functions/create/?fn-language=js
 function generateOutputFormat(id) {
-  const variableNameSafeId = id.replace(/-/g, '');
+  const handlerAlias = '$handler';
 
   return `
-    import { handler as ${variableNameSafeId} } from './__${id}.js';
+    import { handler as ${handlerAlias} } from './__${id}.js';
 
     export async function handler (event, context = {}) {
       const { rawUrl, body, headers = {}, httpMethod } = event;
@@ -38,7 +38,7 @@ function generateOutputFormat(id) {
         method: httpMethod,
         headers: new Headers(headers)
       });
-      const response = await ${variableNameSafeId}(request, context);
+      const response = await ${handlerAlias}(request, context);
 
       return {
         statusCode: response.status,
