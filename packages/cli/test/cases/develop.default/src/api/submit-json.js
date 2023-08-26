@@ -1,12 +1,11 @@
 export async function handler(request) {
-  // TODO const formData = await request.formData()
   const formData = await request.json();
   const { name } = formData;
-  const body = `Thank you ${name} for your submission!`;
+  const body = { message: `Thank you ${name} for your submission!` };
 
-  return new Response(body, {
+  return new Response(JSON.stringify(body), {
     headers: new Headers({
-      'Content-Type': 'text/html',
+      'Content-Type': 'application/json',
       'x-secret': 1234
     })
   });

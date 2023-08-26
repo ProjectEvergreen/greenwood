@@ -30,14 +30,22 @@ async function responseAsObject (response) {
 }
 
 async function executeRouteModule({ href, request }) {
-  const { body, headers, method, url } = request;
+  const { body, headers = {}, method, url } = request;
+  const contentType = headers['content-type'] || '';
   const { handler } = await import(new URL(href));
+  const format = contentType.startsWith('application/json')
+    ? JSON.parse(body)
+    : body;
+
+  // handling of serialized FormData across Worker threads
+  if (contentType.startsWith('x-greenwood/www-form-urlencoded')) {
+    headers['content-type'] = 'application/x-www-form-urlencoded';
+  }
+
   const response = await handler(transformKoaRequestIntoStandardRequest(new URL(url), {
     method,
-    headers,
-    body: ['GET', 'HEAD'].includes(method)
-      ? body
-      : JSON.parse(body)
+    header: headers,
+    body: format
   }));
 
   parentPort.postMessage(await responseAsObject(response));

@@ -18,7 +18,8 @@
  *     greeting.js
  *     missing.js
  *     nothing.js
- *     submit.js
+ *     submit-form-data.js
+ *     submit-json.js
  *   components/
  *     card.js
  */
@@ -68,7 +69,6 @@ describe('Serve Greenwood With: ', function() {
       let response = {};
 
       before(async function() {
-        // TODO not sure why native `fetch` doesn't seem to work here, just hangs the test runner
         return new Promise((resolve, reject) => {
           request.get(`${hostname}/api/greeting?name=${name}`, (err, res, body) => {
             if (err) {
@@ -110,7 +110,6 @@ describe('Serve Greenwood With: ', function() {
       let response = {};
 
       before(async function() {
-        // TODO not sure why native `fetch` doesn't seem to work here, just hangs the test runner
         return new Promise((resolve, reject) => {
           request.get(`${hostname}/api/fragment?name=${name}`, (err, res, body) => {
             if (err) {
@@ -221,16 +220,18 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe('Serve command with POST API specific behaviors', function() {
-      const name = 'Greenwood';
+    describe('Serve command with POST API specific behaviors for JSON', function() {
+      const param = 'Greenwood';
       let response = {};
 
       before(async function() {
         return new Promise((resolve, reject) => {
           request.post({
-            url: `${hostname}/api/submit`,
-            json: true,
-            body: { name }
+            url: `${hostname}/api/submit-json`,
+            body: {
+              name: param
+            },
+            json: true
           }, (err, res, body) => {
             if (err) {
               reject();
@@ -250,17 +251,59 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the expected response message', function(done) {
-        expect(response.body).to.equal(`Thank you ${name} for your submission!`);
+        const { message } = response.body;
+
+        expect(message).to.equal(`Thank you ${param} for your submission!`);
         done();
       });
 
       it('should return the expected content type header', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers['content-type']).to.equal('application/json');
         done();
       });
 
       it('should return the secret header in the response', function(done) {
         expect(response.headers['x-secret']).to.equal('1234');
+        done();
+      });
+    });
+
+    describe('Serve command with POST API specific behaviors for FormData', function() {
+      const param = 'Greenwood';
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.post({
+            url: `${hostname}/api/submit-form-data`,
+            form: {
+              name: param
+            }
+          }, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve(response);
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the expected response message', function(done) {
+        expect(response.body).to.equal(`Thank you ${param} for your submission!`);
+        done();
+      });
+
+      it('should return the expected content type header', function(done) {
+        expect(response.headers['content-type']).to.equal('text/html');
         done();
       });
     });

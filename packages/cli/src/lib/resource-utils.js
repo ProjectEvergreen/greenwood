@@ -171,16 +171,40 @@ function isLocalLink(url = '') {
   return url !== '' && (url.indexOf('http') !== 0 && url.indexOf('//') !== 0);
 }
 
+// TODO handle full request
+// https://github.com/ProjectEvergreen/greenwood/discussions/1146
 function transformKoaRequestIntoStandardRequest(url, request) {
   const { body, method, header } = request;
+  const headers = new Headers(header);
+  const contentType = headers.get('content-type') || '';
+  let format;
+
+  if (contentType.includes('application/x-www-form-urlencoded')) {
+    const formData = new FormData();
+
+    for (const key of Object.keys(body)) {
+      formData.append(key, body[key]);
+    }
+
+    // when using FormData, let Request set the correct headers
+    // or else it will come out as multipart/form-data
+    // https://stackoverflow.com/a/43521052/417806
+    headers.delete('content-type');
+
+    format = formData;
+  } else if (contentType.includes('application/json')) {
+    format = JSON.stringify(body);
+  } else {
+    format = body;
+  }
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#parameters
   return new Request(url, {
     body: ['GET', 'HEAD'].includes(method.toUpperCase())
       ? null
-      : JSON.stringify(body),
+      : format,
     method,
-    headers: new Headers(header)
+    headers
   });
 }
 
