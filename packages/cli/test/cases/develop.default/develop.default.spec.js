@@ -18,8 +18,12 @@
  * User Workspace
  * src/
  *   api/
+ *     fragment.js
  *     greeting.js
+ *     missing.js
  *     nothing.js
+ *     submit-form-data.js
+ *     submit-json.js
  *   assets/
  *     data.json
  *     favicon.ico
@@ -31,6 +35,7 @@
  *     splash-clip.mp4
  *     webcomponents.svg
  *   components/
+ *     card.js
  *     header.js
  *   pages/
  *     index.html
@@ -481,7 +486,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/html');
+        expect(response.headers['content-type']).to.equal('text/html');
         done();
       });
 
@@ -574,7 +579,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/html');
+        expect(response.headers['content-type']).to.equal('text/html');
         done();
       });
 
@@ -625,7 +630,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/javascript');
+        expect(response.headers['content-type']).to.equal('text/javascript');
         done();
       });
 
@@ -659,7 +664,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/css');
+        expect(response.headers['content-type']).to.equal('text/css');
         done();
       });
 
@@ -695,7 +700,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain(`image/${ext}`);
+        expect(response.headers['content-type']).to.equal(`image/${ext}`);
         done();
       });
 
@@ -729,7 +734,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('image/x-icon');
+        expect(response.headers['content-type']).to.equal('image/x-icon');
         done();
       });
 
@@ -763,7 +768,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('image/webp');
+        expect(response.headers['content-type']).to.equal('image/webp');
         done();
       });
 
@@ -797,7 +802,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('image/avif');
+        expect(response.headers['content-type']).to.equal('image/avif');
         done();
       });
 
@@ -832,7 +837,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain(`image/${ext}+xml`);
+        expect(response.headers['content-type']).to.equal(`image/${ext}+xml`);
         done();
       });
 
@@ -867,7 +872,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain(ext);
+        expect(response.headers['content-type']).to.equal(`font/${ext}`);
         done();
       });
 
@@ -904,7 +909,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type header', function(done) {
-        expect(response.headers['content-type']).to.contain(ext);
+        expect(response.headers['content-type']).to.equal(`video/${ext}`);
         done();
       });
 
@@ -987,7 +992,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('audio/mpeg');
+        expect(response.headers['content-type']).to.equal('audio/mpeg');
         done();
       });
 
@@ -1026,7 +1031,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers['content-type']).to.equal('application/json');
         done();
       });
 
@@ -1060,7 +1065,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers['content-type']).to.equal('application/json');
         done();
       });
 
@@ -1094,7 +1099,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/javascript');
+        expect(response.headers['content-type']).to.equal('text/javascript');
         done();
       });
 
@@ -1130,7 +1135,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/css');
+        expect(response.headers['content-type']).to.equal('text/css');
         done();
       });
 
@@ -1166,7 +1171,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/javascript');
+        expect(response.headers['content-type']).to.equal('text/javascript');
         done();
       });
 
@@ -1201,7 +1206,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/javascript');
+        expect(response.headers['content-type']).to.equal('text/javascript');
         done();
       });
 
@@ -1237,7 +1242,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/javascript');
+        expect(response.headers['content-type']).to.equal('text/javascript');
         done();
       });
 
@@ -1272,7 +1277,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/plain');
+        expect(response.headers['content-type']).to.equal('text/plain; charset=utf-8');
         done();
       });
 
@@ -1312,7 +1317,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
         done();
       });
 
@@ -1339,13 +1344,86 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
 
+      it('should return a default status message', function(done) {
+        // OK appears to be a Koa default when statusText is an empty string
+        expect(response.statusText).to.equal('OK');
+        done();
+      });
+
       it('should return the correct content type', function(done) {
-        expect(response.headers.get('content-type')).to.equal('application/json; charset=utf-8');
+        expect(response.headers.get('content-type')).to.equal('application/json');
         done();
       });
 
       it('should return the correct response body', function(done) {
         expect(data.message).to.equal(`Hello ${name}!!!`);
+        done();
+      });
+    });
+
+    describe('Develop command with API specific behaviors for an HTML ("fragment") API', function() {
+      const name = 'Greenwood';
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}:${port}/api/fragment?name=${name}`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return a custom status message', function(done) {
+        expect(response.statusMessage).to.equal('SUCCESS!!!');
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal('text/html');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(response.body).to.contain(`<h1>Hello ${name}!!!</h1>`);
+        done();
+      });
+    });
+
+    describe('Develop command with API specific behaviors with a custom response', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}:${port}/api/missing`, (err, res) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 404 status', function(done) {
+        expect(response.statusCode).to.equal(404);
+        done();
+      });
+
+      it('should return a body of not found', function(done) {
+        expect(response.body).to.equal('Not Found');
         done();
       });
     });
@@ -1366,8 +1444,94 @@ describe('Develop Greenwood With: ', function() {
         });
       });
 
+      it('should return a custom status code', function(done) {
+        expect(response.statusCode).to.equal(204);
+        done();
+      });
+    });
+
+    describe('Develop command with POST API specific behaviors for JSON', function() {
+      const param = 'Greenwood';
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.post({
+            url: `${hostname}:${port}/api/submit-json`,
+            json: true,
+            body: { name: param }
+          }, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve(response);
+          });
+        });
+      });
+
       it('should return a 200 status', function(done) {
         expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the expected response message', function(done) {
+        const { message } = response.body;
+
+        expect(message).to.equal(`Thank you ${param} for your submission!`);
+        done();
+      });
+
+      it('should return the expected content type header', function(done) {
+        expect(response.headers['content-type']).to.equal('application/json');
+        done();
+      });
+
+      it('should return the secret header in the response', function(done) {
+        expect(response.headers['x-secret']).to.equal('1234');
+        done();
+      });
+    });
+
+    describe('Develop command with POST API specific behaviors for FormData', function() {
+      const param = 'Greenwood';
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.post({
+            url: `${hostname}:${port}/api/submit-form-data`,
+            form: {
+              name: param
+            }
+          }, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+
+            resolve(response);
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the expected response message', function(done) {
+        expect(response.body).to.equal(`Thank you ${param} for your submission!`);
+        done();
+      });
+
+      it('should return the expected content type header', function(done) {
+        expect(response.headers['content-type']).to.equal('text/html');
         done();
       });
     });
