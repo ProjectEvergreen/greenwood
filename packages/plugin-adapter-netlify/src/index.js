@@ -171,6 +171,17 @@ async function netlifyAdapter(compilation) {
       );
     }
 
+    const ssrApiAssets = (await fs.readdir(new URL('./api/', outputDir)))
+      .filter(file => new RegExp(/^[\w][\w-]*\.[a-zA-Z0-9]{4,20}\.[\w]{2,4}$/).test(path.basename(file)));
+
+    for (const asset of ssrApiAssets) {
+      await fs.cp(
+        new URL(`./${asset}`, new URL('./api/', outputDir)),
+        new URL(`./${asset}`, outputRoot),
+        { recursive: true }
+      );
+    }
+
     // NOTE: All functions must live at the top level
     // https://github.com/netlify/netlify-lambda/issues/90#issuecomment-486047201
     await createOutputZip(id, outputType, outputRoot, projectDirectory);
