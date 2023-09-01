@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-typescript",
-  "version": "0.29.0-alpha.3",
+  "version": "0.29.0-alpha.4",
   "description": "A Greenwood plugin for writing TypeScript.",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-typescript",
@@ -29,6 +29,6 @@
     "typescript": "^4.3.5"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.29.0-alpha.3"
+    "@greenwood/cli": "^0.29.0-alpha.4"
   }
 }
