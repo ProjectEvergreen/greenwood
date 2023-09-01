@@ -23,7 +23,9 @@
  *   api/
  *     fragment.js
  *     greeting.js
- *     submit.js
+ *     search.js
+ *     submit-form-data.js
+ *     submit-json.js
  *   components/
  *     card.js
  *   pages/
@@ -77,7 +79,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output the expected number of serverless function output folders', function() {
-        expect(functionFolders.length).to.be.equal(6);
+        expect(functionFolders.length).to.be.equal(7);
       });
 
       it('should output the expected configuration file for the build output', function() {

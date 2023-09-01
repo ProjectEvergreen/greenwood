@@ -149,6 +149,17 @@ async function vercelAdapter(compilation) {
       new URL('./assets/', outputRoot),
       { recursive: true }
     );
+
+    const ssrApiAssets = (await fs.readdir(new URL('./api/', outputDir)))
+      .filter(file => new RegExp(/^[\w][\w-]*\.[a-zA-Z0-9]{4,20}\.[\w]{2,4}$/).test(path.basename(file)));
+
+    for (const asset of ssrApiAssets) {
+      await fs.cp(
+        new URL(`./${asset}`, new URL('./api/', outputDir)),
+        new URL(`./${asset}`, outputRoot),
+        { recursive: true }
+      );
+    }
   }
 
   // static assets / build
