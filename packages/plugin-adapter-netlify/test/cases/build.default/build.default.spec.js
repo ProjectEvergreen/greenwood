@@ -23,7 +23,9 @@
  *   api/
  *     fragment.js
  *     greeting.js
- *     submit.js
+ *     search.js
+ *     submit-form-data.js
+ *     submit-json.js
  *   components/
  *     card.js
  *   pages/
@@ -76,11 +78,11 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output the expected number of serverless function zip files', function() {
-        expect(zipFiles.length).to.be.equal(6);
+        expect(zipFiles.length).to.be.equal(7);
       });
 
       it('should output the expected number of serverless function API zip files', function() {
-        expect(zipFiles.filter(file => path.basename(file).startsWith('api-')).length).to.be.equal(4);
+        expect(zipFiles.filter(file => path.basename(file).startsWith('api-')).length).to.be.equal(5);
       });
 
       it('should output the expected number of serverless function SSR page zip files', function() {
