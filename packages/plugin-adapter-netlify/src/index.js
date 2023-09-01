@@ -18,10 +18,12 @@ function generateOutputFormat(id) {
       if (['GET', 'HEAD'].includes(httpMethod.toUpperCase())) {
         format = null
       } else if (contentType.includes('application/x-www-form-urlencoded')) {
+        const searchParams = new URLSearchParams(body);
         const formData = new FormData();
 
-        for (const key of Object.keys(body)) {
-          formData.append(key, body[key]);
+        for (const key of searchParams.keys()) {
+          const value = searchParams.get(key);
+          formData.append(key, value);
         }
 
         // when using FormData, let Request set the correct headers
