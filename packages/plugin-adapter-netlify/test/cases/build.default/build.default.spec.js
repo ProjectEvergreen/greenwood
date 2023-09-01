@@ -215,7 +215,7 @@ describe('Build Greenwood With: ', function() {
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
           rawUrl: 'http://localhost:8080/api/submit-form-data',
-          body: { name: param },
+          body: `name=${param}`,
           httpMethod: 'POST',
           headers: {
             'content-type': 'application/x-www-form-urlencoded'
