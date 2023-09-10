@@ -1,0 +1,4 @@
+{
+  "name": "test-plugin-import-json-serve-ssr",
+  "type": "module"
+}

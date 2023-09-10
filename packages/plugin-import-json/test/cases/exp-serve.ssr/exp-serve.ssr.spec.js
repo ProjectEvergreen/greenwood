@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with an API and SSR routes that import CSS.
+ * Run Greenwood with an API and SSR routes that import JSON.
  *
  * User Result
  * Should generate a Greenwood build that correctly builds and bundles all assets.
@@ -21,13 +21,10 @@
  *     fragment.js
  *   components/
  *     card.js
- *     card.css
+ *   data/
+ *     products.json
  *   pages/
  *     products.js
- *   services/
- *     products.js
- *   styles/
- *     some.css
  */
 import chai from 'chai';
 import { JSDOM } from 'jsdom';
@@ -40,7 +37,7 @@ import { fileURLToPath } from 'url';
 const expect = chai.expect;
 
 describe('Serve Greenwood With: ', function() {
-  const LABEL = 'A Server Rendered Application (SSR) with API Routes importing CSS';
+  const LABEL = 'A Server Rendered Application (SSR) with API Routes importing JSON';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://127.0.0.1:8080';
@@ -104,21 +101,10 @@ describe('Serve Greenwood With: ', function() {
         done();
       });
 
-      it('should have the expected import CSS in the page in the response body', function(done) {
-        const styleTag = productsPageDom.window.document.querySelectorAll('body > style');
-
-        expect(styleTag.length).to.equal(1);
-        expect(styleTag[0].textContent.replace(/ /g, '').replace(/\n/, '')).contain('h1{color:red;}');
-        done();
-      });
-
-      it('should make sure to have the expected CSS inlined into the page for each <app-card>', function(done) {
+      it('should make sure to have the expected number of <app-card> components on the page', function(done) {
         const cardComponents = productsPageDom.window.document.querySelectorAll('body app-card');
 
         expect(cardComponents.length).to.equal(2);
-        Array.from(cardComponents).forEach((card) => {
-          expect(card.innerHTML).contain('display: flex;');
-        });
         done();
       });
     });
@@ -158,13 +144,10 @@ describe('Serve Greenwood With: ', function() {
         done();
       });
 
-      it('should make sure to have the expected CSS inlined into the page for each <app-card>', function(done) {
+      it('should make sure to have the expected number of <app-card> components in the fragment', function(done) {
         const cardComponents = fragmentsApiDom.window.document.querySelectorAll('body > app-card');
 
         expect(cardComponents.length).to.equal(2);
-        Array.from(cardComponents).forEach((card) => {
-          expect(card.innerHTML).contain('display: flex;');
-        });
         done();
       });
     });
