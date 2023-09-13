@@ -11,25 +11,23 @@ import path from 'path';
 import { asyncWalk } from 'estree-walker';
 import MagicString from 'magic-string';
 
-// specifically to handle escodegen using require for package.json
+// https://github.com/rollup/rollup/issues/2121
+function cleanRollupId(id) {
+  return id.replace('\x00', '');
+}
+
+// specifically to handle escodegen and other node modules
+// using require for package.json or other json files
 // https://github.com/estools/escodegen/issues/455
 function greenwoodJsonLoader() {
   return {
     name: 'greenwood-json-loader',
     async load(id) {
-      console.log('greenwood-json-loader', { id });
-      // const extension = id.split('.').pop();
-      const extension = id.split('.').pop().replace('?commonjs-proxy', '');
-      console.log({ extension });
+      const idUrl = new URL(`file://${cleanRollupId(id)}`);
+      const extension = idUrl.pathname.split('.').pop();
 
       if (extension === 'json') {
-      // if (extension === 'json' && id.indexOf('/node_modules/') > 0) {
-        console.log('GO!  ---> ', id.replace('?commonjs-proxy', ''));
-        // https://github.com/rollup/rollup/issues/2121
-        const url = new URL(`file://${id.replace('?commonjs-proxy', '').replace('\x00', '')}`);
-        // const url = new URL(`file://${id}`);
-        console.log({ url });
-        const json = JSON.parse(await fs.readFile(url, 'utf-8'));
+        const json = JSON.parse(await fs.readFile(idUrl, 'utf-8'));
         const contents = `export default ${JSON.stringify(json)}`;
 
         return contents;
@@ -48,11 +46,11 @@ function greenwoodResourceLoader (compilation) {
   return {
     name: 'greenwood-resource-loader',
     async resolveId(id) {
-      const normalizedId = id.replace('\x00', '').replace(/\?type=(.*)/, '');
+      const normalizedId = cleanRollupId(id); // idUrl.pathname;
       const { projectDirectory, userWorkspace } = compilation.context;
 
-      if (id.startsWith('.') && !id.startsWith(projectDirectory.pathname)) {
-        const prefix = id.startsWith('..') ? './' : '';
+      if (normalizedId.startsWith('.') && !normalizedId.startsWith(projectDirectory.pathname)) {
+        const prefix = normalizedId.startsWith('..') ? './' : '';
         const userWorkspaceUrl = new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
 
         if (await checkResourceExists(userWorkspaceUrl)) {
@@ -61,12 +59,13 @@ function greenwoodResourceLoader (compilation) {
       }
     },
     async load(id) {
-      const pathname = (id.indexOf('?') >= 0 ? id.slice(0, id.indexOf('?')) : id).replace('\x00', '');
+      const idUrl = new URL(`file://${cleanRollupId(id)}`);
+      const { pathname } = idUrl;
       const extension = pathname.split('.').pop();
 
-      if (pathname.startsWith('/') && extension !== '' && extension !== 'js') {
-        // https://github.com/rollup/rollup/issues/2121
-        const url = new URL(`file://${pathname.replace('\x00', '')}?type=${extension}`);
+      // filter first for any bare specifiers
+      if (await checkResourceExists(idUrl) && extension !== '' && extension !== 'js') {
+        const url = new URL(`${idUrl.href}?type=${extension}`);
         const request = new Request(url.href);
         let response = new Response('');
 
@@ -326,21 +325,15 @@ const getRollupConfigForScriptResources = async (compilation) => {
 };
 
 const getRollupConfigForApis = async (compilation) => {
-  console.log('##### getRollupConfigForApis');
   const { outputDir, userWorkspace } = compilation.context;
   const input = [...compilation.manifest.apis.values()]
     .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)));
-  // TODO is this needed?
-  // const customRollupPlugins = compilation.config.plugins.filter(plugin => {
-  //     return plugin.type === 'rollup';
-  //   }).map(plugin => {
-  //     return plugin.provider(compilation);
-  //   }).flat();
 
-  // TODO why is this needed?
+  // why is this needed?
   await fs.mkdir(new URL('./api/assets/', outputDir), {
     recursive: true
   });
+
   // TODO should routes and APIs have chunks?
   // https://github.com/ProjectEvergreen/greenwood/issues/1118
   return [{
@@ -350,27 +343,18 @@ const getRollupConfigForApis = async (compilation) => {
       entryFileNames: '[name].js',
       chunkFileNames: '[name].[hash].js'
     },
-    // TODO should these plugins match across all configurations?
-    // TODO sync with SSR config
     plugins: [
       greenwoodJsonLoader(),
       greenwoodResourceLoader(compilation),
       nodeResolve(),
       commonjs(),
       importMetaAssets()
-      // TODO ??? ...customRollupPlugins,
     ]
   }];
 };
 
 const getRollupConfigForSsr = async (compilation, input) => {
-  console.log('##### getRollupConfigForSsr');
   const { outputDir } = compilation.context;
-  // const customRollupPlugins = compilation.config.plugins.filter(plugin => {
-  //   return plugin.type === 'rollup';
-  // }).map(plugin => {
-  //   return plugin.provider(compilation);
-  // }).flat();
 
   // TODO should routes and APIs have chunks?
   // https://github.com/ProjectEvergreen/greenwood/issues/1118
