@@ -7,7 +7,7 @@ import commonjs from '@rollup/plugin-commonjs';
 // import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
 // const fs = require('fs');
 import path from 'path';
-import { createFilter } from '@rollup/pluginutils';
+// import { createFilter } from '@rollup/pluginutils';
 import { asyncWalk } from 'estree-walker';
 import MagicString from 'magic-string';
 
@@ -17,12 +17,13 @@ function greenwoodJsonLoader() {
   return {
     name: 'greenwood-json-loader',
     async load(id) {
-      console.log({ id });
+      console.log('greenwood-json-loader', { id });
       // const extension = id.split('.').pop();
       const extension = id.split('.').pop().replace('?commonjs-proxy', '');
       console.log({ extension });
 
       if (extension === 'json') {
+      // if (extension === 'json' && id.indexOf('/node_modules/') > 0) {
         console.log('GO!  ---> ', id.replace('?commonjs-proxy', ''));
         // https://github.com/rollup/rollup/issues/2121
         const url = new URL(`file://${id.replace('?commonjs-proxy', '').replace('\x00', '')}`);
@@ -47,7 +48,7 @@ function greenwoodResourceLoader (compilation) {
   return {
     name: 'greenwood-resource-loader',
     async resolveId(id) {
-      const normalizedId = id.replace(/\?type=(.*)/, '');
+      const normalizedId = id.replace('\x00', '').replace(/\?type=(.*)/, '');
       const { projectDirectory, userWorkspace } = compilation.context;
 
       if (id.startsWith('.') && !id.startsWith(projectDirectory.pathname)) {
@@ -60,11 +61,10 @@ function greenwoodResourceLoader (compilation) {
       }
     },
     async load(id) {
-      const pathname = id.indexOf('?') >= 0 ? id.slice(0, id.indexOf('?')) : id;
+      const pathname = (id.indexOf('?') >= 0 ? id.slice(0, id.indexOf('?')) : id).replace('\x00', '');
       const extension = pathname.split('.').pop();
 
-      if (extension !== '' && extension !== 'js') {
-        console.log({ extension, pathname })
+      if (pathname.startsWith('/') && extension !== '' && extension !== 'js') {
         // https://github.com/rollup/rollup/issues/2121
         const url = new URL(`file://${pathname.replace('\x00', '')}?type=${extension}`);
         const request = new Request(url.href);
@@ -166,22 +166,18 @@ function isNewUrlImportMetaUrl(node) {
   );
 }
 
-
 // adapted from, and with credit to @web/rollup-plugin-import-meta-assets
 // https://modern-web.dev/docs/building/rollup-plugin-import-meta-assets/
-function importMetaAssets({ include, exclude, warnOnError, transform } = {}) {
-  const filter = createFilter(include, exclude);
+function importMetaAssets({ warnOnError, transform } = {}) {
 
   return {
     name: 'greenwood-import-meta-assets',
 
     async transform(code, id) {
-      console.log({ id });
-      if (!filter(id)) {
+      // TODO allow other import types?
+      if (!id.endsWith('.js')) {
         return null;
       }
-
-      console.log('here!?!!?!?!', { id });
 
       const ast = this.parse(code);
       const magicString = new MagicString(code);
@@ -205,26 +201,29 @@ function importMetaAssets({ include, exclude, warnOnError, transform } = {}) {
               if (transformedAssetContents === null) {
                 return;
               }
-              // https://github.com/rollup/rollup/blob/v2.79.1/docs/05-plugin-development.md#thisemitfile
-              // TODO chunk (.js) vs asset (not .js)?
-              const ref = this.emitFile({
-                type: 'chunk',
-                id: absoluteAssetPath,
-                // preserveSignature: 'strict'
-                name: assetName.replace('.js', ''),
-                // source: transformedAssetContents,
-              });
-              // const ref = this.emitFile({
-              //   type: 'asset',
-              //   name: assetName,
-              //   source: transformedAssetContents,
-              // });
-              console.log({ ref });
+
+              let ref;
+
+              if (absoluteAssetPath.endsWith('.js')) {
+                ref = this.emitFile({
+                  type: 'chunk',
+                  id: absoluteAssetPath,
+                  name: assetName.replace('.js', '')
+                });
+              } else {
+                ref = this.emitFile({
+                  type: 'asset',
+                  name: assetName,
+                  source: transformedAssetContents
+                });
+              }
+
               magicString.overwrite(
                 node.arguments[0].start,
                 node.arguments[0].end,
-                `import.meta.ROLLUP_FILE_URL_${ref}`,
+                `import.meta.ROLLUP_FILE_URL_${ref}`
               );
+
               modifiedCode = true;
             } catch (error) {
               if (warnOnError) {
@@ -234,16 +233,14 @@ function importMetaAssets({ include, exclude, warnOnError, transform } = {}) {
               }
             }
           }
-        },
+        }
       });
-
-      console.log('(((((((((((((((((');
 
       return {
         code: magicString.toString(),
-        map: modifiedCode ? magicString.generateMap({ hires: true }) : null,
+        map: modifiedCode ? magicString.generateMap({ hires: true }) : null
       };
-    },
+    }
   };
 }
 
@@ -360,7 +357,7 @@ const getRollupConfigForApis = async (compilation) => {
       greenwoodResourceLoader(compilation),
       nodeResolve(),
       commonjs(),
-      importMetaAssets(),
+      importMetaAssets()
       // TODO ??? ...customRollupPlugins,
     ]
   }];
@@ -369,11 +366,11 @@ const getRollupConfigForApis = async (compilation) => {
 const getRollupConfigForSsr = async (compilation, input) => {
   console.log('##### getRollupConfigForSsr');
   const { outputDir } = compilation.context;
-  const customRollupPlugins = compilation.config.plugins.filter(plugin => {
-    return plugin.type === 'rollup';
-  }).map(plugin => {
-    return plugin.provider(compilation);
-  }).flat();
+  // const customRollupPlugins = compilation.config.plugins.filter(plugin => {
+  //   return plugin.type === 'rollup';
+  // }).map(plugin => {
+  //   return plugin.provider(compilation);
+  // }).flat();
 
   // TODO should routes and APIs have chunks?
   // https://github.com/ProjectEvergreen/greenwood/issues/1118
