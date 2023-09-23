@@ -201,11 +201,13 @@ function greenwoodImportMetaUrl() {
                 });
               }
 
+              // handle Windows style paths
+              const normalizedRelativeAssetPath = relativeAssetPath.replace(/\\/g, '/');
               const importRef = `import.meta.ROLLUP_FILE_URL_${ref}`;
 
               modifiedCode = code
-                .replace(`'${relativeAssetPath}'`, importRef)
-                .replace(`"${relativeAssetPath}"`, importRef);
+                .replace(`'${normalizedRelativeAssetPath}'`, importRef)
+                .replace(`"${normalizedRelativeAssetPath}"`, importRef);
             } catch (error) {
               that.error(error, node.arguments[0].start);
             }
