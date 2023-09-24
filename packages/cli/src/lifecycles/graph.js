@@ -1,7 +1,7 @@
 /* eslint-disable complexity, max-depth */
 import fs from 'fs/promises';
 import fm from 'front-matter';
-import { checkResourceExists } from '../lib/resource-utils.js';
+import { checkResourceExists, requestAsObject } from '../lib/resource-utils.js';
 import toc from 'markdown-toc';
 import { Worker } from 'worker_threads';
 
@@ -121,8 +121,10 @@ const generateGraph = async (compilation) => {
 
               filePath = route;
 
-              await new Promise((resolve, reject) => {
+              await new Promise(async (resolve, reject) => {
                 const worker = new Worker(new URL('../lib/ssr-route-worker.js', import.meta.url));
+                // TOOD "faux" new Request here, a better way?
+                const request = await requestAsObject(new Request(filenameUrl));
 
                 worker.on('message', async (result) => {
                   if (result.frontmatter) {
@@ -151,7 +153,8 @@ const generateGraph = async (compilation) => {
                       .map((idPart) => {
                         return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
                       }).join(' ')
-                  })
+                  }),
+                  request
                 });
               });
 

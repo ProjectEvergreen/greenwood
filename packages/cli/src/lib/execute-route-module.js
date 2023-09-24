@@ -1,6 +1,6 @@
 import { renderToString, renderFromHTML } from 'wc-compiler';
 
-async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender = false, htmlContents = null, scripts = [] }) {
+async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender = false, htmlContents = null, scripts = [], request }) {
   const data = {
     template: null,
     body: null,
@@ -18,7 +18,8 @@ async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender
     const { getTemplate = null, getBody = null, getFrontmatter = null } = module;
 
     if (module.default) {
-      const { html } = await renderToString(new URL(moduleUrl), false);
+      const props = module.loader ? await module.loader(request, compilation) : {};
+      const { html } = await renderToString(new URL(moduleUrl), false, props);
 
       data.body = html;
     } else {

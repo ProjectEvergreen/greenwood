@@ -193,9 +193,10 @@ async function bundleSsrPages(compilation) {
         const { filename, imports, route, template, title } = page;
         const entryFileUrl = new URL(`./_${filename}`, scratchDir);
         const moduleUrl = new URL(`./${filename}`, pagesDir);
+        const request = new Request(moduleUrl); // TODO not really sure how to best no-op this?
         // TODO getTemplate has to be static (for now?)
         // https://github.com/ProjectEvergreen/greenwood/issues/955
-        const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [] });
+        const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [], request });
         let staticHtml = '';
 
         staticHtml = data.template ? data.template : await getPageTemplate(staticHtml, compilation.context, template, []);
@@ -212,7 +213,7 @@ async function bundleSsrPages(compilation) {
             const compilation = JSON.parse('${JSON.stringify(compilation)}');
             const page = JSON.parse('${JSON.stringify(page)}');
             const moduleUrl = '___GWD_ENTRY_FILE_URL=${filename}___';
-            const data = await executeRouteModule({ moduleUrl, compilation, page });
+            const data = await executeRouteModule({ moduleUrl, compilation, page, request });
             let staticHtml = \`${staticHtml}\`;
 
             if (data.body) {

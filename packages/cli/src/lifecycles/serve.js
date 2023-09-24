@@ -294,8 +294,8 @@ async function getHybridServer(compilation) {
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
 
       if (!config.prerender && matchingRoute.isSSR && !matchingRoute.data.static) {
+        console.log('MATCHING ROUTE -> ', matchingRoute.filename);
         const { handler } = await import(new URL(`./__${matchingRoute.filename}`, outputDir));
-        // TODO passing compilation this way too hacky?
         const response = await handler(request, compilation);
 
         ctx.body = Readable.from(response.body);
