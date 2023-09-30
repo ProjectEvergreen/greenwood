@@ -160,38 +160,82 @@ function isNewUrlImportMetaUrl(node) {
 
 // adapted from, and with credit to @web/rollup-plugin-import-meta-assets
 // https://modern-web.dev/docs/building/rollup-plugin-import-meta-assets/
-function greenwoodImportMetaUrl() {
+function greenwoodImportMetaUrl(compilation) {
 
   return {
     name: 'greenwood-import-meta-url',
 
     async transform(code, id) {
       // TODO allow other import types?
-      if (!id.endsWith('.js')) {
+      console.log('transform @@@@@', { id });
+      const resourcePlugins = compilation.config.plugins.filter((plugin) => {
+        return plugin.type === 'resource';
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      });
+      let canTransform = false;
+
+      const idUrl = new URL(`file://${cleanRollupId(id)}`);
+      const { pathname } = idUrl;
+      const extension = pathname.split('.').pop();
+      let response = new Response(code);
+
+      // filter first for any bare specifiers
+      // TOOD can we remove .json?
+      if (await checkResourceExists(idUrl) && extension !== '' && extension !== 'json') {
+        const url = new URL(`${idUrl.href}?type=${extension}`);
+        const request = new Request(url.href);
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
+            console.log('we got a serve match!', { id });
+            response = await plugin.serve(url, request);
+            canTransform = true;
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
+            console.log('we got a intercept match!', { id });
+            response = await plugin.intercept(url, request, response.clone());
+            canTransform = true;
+          }
+        }
+      }
+
+      // 1) need to find all supported JS handlers (to parse the code as standard AST)
+      // 2) make sure to modify the original code
+      if (!canTransform) {
         return null;
       }
 
-      const ast = this.parse(code);
+      const r = await response.text();
+
+      const ast = this.parse(r);
       const that = this;
       let modifiedCode = false;
 
       walk.simple(ast, {
         NewExpression(node) {
           if (isNewUrlImportMetaUrl(node)) {
+            console.log('333');
             const absoluteScriptDir = path.dirname(id);
             const relativeAssetPath = getMetaImportPath(node);
             const absoluteAssetPath = path.resolve(absoluteScriptDir, relativeAssetPath);
             const assetName = path.basename(absoluteAssetPath);
+            const extension = assetName.split('.').pop();
 
             try {
               const assetContents = fs.readFileSync(absoluteAssetPath, 'utf-8');
               let ref;
+              console.log('here?', { id });
 
-              if (absoluteAssetPath.endsWith('.js')) {
+              // TOOD better way to zero in on this
+              if (absoluteAssetPath.endsWith('.js') || absoluteAssetPath.endsWith('.ts')) {
                 ref = that.emitFile({
                   type: 'chunk',
                   id: absoluteAssetPath,
-                  name: assetName.replace('.js', '')
+                  name: assetName.replace(`.${extension}`, '')
                 });
               } else {
                 ref = that.emitFile({
@@ -216,7 +260,8 @@ function greenwoodImportMetaUrl() {
       });
 
       return {
-        code: modifiedCode ? modifiedCode : code
+        code: modifiedCode ? modifiedCode : code,
+        map: null
       };
     }
   };
@@ -269,6 +314,7 @@ const getRollupConfigForScriptResources = async (compilation) => {
     plugins: [
       greenwoodResourceLoader(compilation),
       greenwoodSyncPageResourceBundlesPlugin(compilation),
+      greenwoodImportMetaUrl(compilation),
       ...customRollupPlugins
     ],
     context: 'window',
@@ -327,7 +373,7 @@ const getRollupConfigForApis = async (compilation) => {
       greenwoodResourceLoader(compilation),
       nodeResolve(),
       commonjs(),
-      greenwoodImportMetaUrl()
+      greenwoodImportMetaUrl(compilation)
     ]
   }];
 };
@@ -354,7 +400,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
         preferBuiltins: true
       }),
       commonjs(),
-      greenwoodImportMetaUrl(),
+      greenwoodImportMetaUrl(compilation),
       greenwoodPatchSsrPagesEntryPointRuntimeImport() // TODO a little hacky but works for now
     ],
     onwarn: (errorObj) => {

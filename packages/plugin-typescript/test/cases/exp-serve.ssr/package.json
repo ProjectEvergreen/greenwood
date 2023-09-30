@@ -1,0 +1,4 @@
+{
+  "name": "test-plugin-import-ts-serve-ssr",
+  "type": "module"
+}
