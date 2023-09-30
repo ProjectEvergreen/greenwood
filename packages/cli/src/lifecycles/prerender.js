@@ -49,7 +49,7 @@ function getPluginInstances (compilation) {
 }
 
 async function preRenderCompilationWorker(compilation, workerPrerender) {
-  const pages = compilation.graph.filter(page => !page.isSSR || (page.isSSR && page.data.static) || (page.isSSR && compilation.config.prerender));
+  const pages = compilation.graph.filter(page => !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender));
   const { scratchDir } = compilation.context;
   const plugins = getPluginInstances(compilation);
 
@@ -128,7 +128,7 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
 
 async function staticRenderCompilation(compilation) {
   const { scratchDir } = compilation.context;
-  const pages = compilation.graph.filter(page => !page.isSSR || page.isSSR && page.data.static);
+  const pages = compilation.graph.filter(page => !page.isSSR || page.isSSR && page.prerender);
   const plugins = getPluginInstances(compilation);
 
   console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);

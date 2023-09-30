@@ -15,7 +15,7 @@ async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender
     data.html = html;
   } else {
     const module = await import(moduleUrl).then(module => module);
-    const { getTemplate = null, getBody = null, getFrontmatter = null } = module;
+    const { prerender = false, getTemplate = null, getBody = null, getFrontmatter = null } = module;
 
     if (module.default) {
       const props = module.loader ? await module.loader(request, compilation) : {};
@@ -35,6 +35,8 @@ async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender
     if (getFrontmatter) {
       data.frontmatter = await getFrontmatter(compilation, page);
     }
+
+    data.prerender = prerender;
   }
 
   return data;

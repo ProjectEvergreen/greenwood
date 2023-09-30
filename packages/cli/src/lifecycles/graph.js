@@ -20,7 +20,8 @@ const generateGraph = async (compilation) => {
         label: 'Index',
         data: {},
         imports: [],
-        resources: []
+        resources: [],
+        prerender: true
       }];
 
       const walkDirectoryForPages = async function(directory, pages = []) {
@@ -46,6 +47,7 @@ const generateGraph = async (compilation) => {
             let imports = [];
             let customData = {};
             let filePath;
+            let prerender = true;
 
             /*
              * check if additional nested directories exist to correctly determine route (minus filename)
@@ -123,14 +125,17 @@ const generateGraph = async (compilation) => {
 
               await new Promise(async (resolve, reject) => {
                 const worker = new Worker(new URL('../lib/ssr-route-worker.js', import.meta.url));
-                // TOOD "faux" new Request here, a better way?
+                // TODO "faux" new Request here, a better way?
                 const request = await requestAsObject(new Request(filenameUrl));
 
                 worker.on('message', async (result) => {
+                  prerender = result.prerender;
+
                   if (result.frontmatter) {
                     result.frontmatter.imports = result.frontmatter.imports || [];
                     ssrFrontmatter = result.frontmatter;
                   }
+
                   resolve();
                 });
                 worker.on('error', reject);
@@ -193,6 +198,8 @@ const generateGraph = async (compilation) => {
              * route: URL route for a given page on outputFilePath
              * template: page template to use as a base for a generated component
              * title: a default value that can be used for <title></title>
+             * isSSR: if this is a server side route
+             * prerednder: if this should be statically exported
              */
             pages.push({
               data: customData || {},
@@ -211,7 +218,8 @@ const generateGraph = async (compilation) => {
               route,
               template,
               title,
-              isSSR: !isStatic
+              isSSR: !isStatic,
+              prerender
             });
           }
         }

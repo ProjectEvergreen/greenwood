@@ -44,7 +44,7 @@ async function optimizeStaticPages(compilation, plugins) {
   const { scratchDir, outputDir } = compilation.context;
 
   return Promise.all(compilation.graph
-    .filter(page => !page.isSSR || (page.isSSR && page.data.static) || (page.isSSR && compilation.config.prerender))
+    .filter(page => !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender))
     .map(async (page) => {
       const { route, outputPath } = page;
       const outputDirUrl = new URL(`.${route}`, outputDir);
@@ -189,7 +189,7 @@ async function bundleSsrPages(compilation) {
     const { pagesDir, scratchDir } = compilation.context;
 
     for (const page of compilation.graph) {
-      if (page.isSSR && !page.data.static) {
+      if (page.isSSR && !page.prerender) {
         const { filename, imports, route, template, title } = page;
         const entryFileUrl = new URL(`./_${filename}`, scratchDir);
         const moduleUrl = new URL(`./${filename}`, pagesDir);

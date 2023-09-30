@@ -179,7 +179,7 @@ async function getStaticServer(compilation, composable) {
       const matchingRoute = compilation.graph.find(page => page.route === url.pathname);
       const isSPA = compilation.graph.find(page => page.isSPA);
       const { isSSR } = matchingRoute || {};
-      const isStatic = matchingRoute && !isSSR || isSSR && compilation.config.prerender || isSSR && matchingRoute.data.static;
+      const isStatic = matchingRoute && !isSSR || isSSR && compilation.config.prerender || isSSR && matchingRoute.prerender;
 
       if (isSPA || (matchingRoute && isStatic) || url.pathname.split('.').pop() === 'html') {
         const pathname = isSPA
@@ -293,7 +293,7 @@ async function getHybridServer(compilation) {
       const isApiRoute = manifest.apis.has(url.pathname);
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
 
-      if (!config.prerender && matchingRoute.isSSR && !matchingRoute.data.static) {
+      if (!config.prerender && matchingRoute.isSSR && !matchingRoute.prerender) {
         console.log('MATCHING ROUTE -> ', matchingRoute.filename);
         const { handler } = await import(new URL(`./__${matchingRoute.filename}`, outputDir));
         const response = await handler(request, compilation);

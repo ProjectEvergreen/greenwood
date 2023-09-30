@@ -77,11 +77,12 @@ async function getFrontmatter() {
     ],
     data: {
       author: 'Project Evergreen',
-      date: '01-01-2021',
-      static: true
+      date: '01-01-2021'
     }
   };
 }
+
+export const prerender = true;
 
 export {
   getTemplate,
