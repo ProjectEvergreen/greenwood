@@ -112,32 +112,14 @@ export async function getFrontmatter(compilation, route) {
 
 > _For defining custom dynamic based metadata, like for `<meta>` tags, use `getTemplate` and define those tags right in your HTML._
 
-##### Static Export
-
-To export server routes as just static HTML, you can set the `static` property within the `data` object of your frontmatter.
-
-```js
-export async function getFrontmatter() {
-  return {
-    /* ... */
-
-    data: {
-      static: true
-    }
-  };
-}
-```
-
 So for example, `/pages/artist.js` would render out as `/artists/index.html` and would not require the serve task.  So if you need more flexibility in how you create your pages, but still want to just serve it statically, you can!
 
 #### Body
 
 For just returning content, you can use `getBody`.  For example, return a list of users from an API as the HTML you need.
-
+<!-- eslint-disable no-unused-vars -->
 ```js
-import fetch from 'node-fetch'; // this needs to be installed from npm
-
-export async function getBody() {
+export async function getBody(compilation, page, request) {
   const users = await fetch('http://www.example.com/api/users').then(resp => resp.json());
   const timestamp = new Date().getTime();
   const usersListItems = users
@@ -167,6 +149,7 @@ export async function getBody() {
   `;
 }
 ```
+<!-- eslint-enable no-unused-vars -->
 
 #### Templates
 
@@ -200,6 +183,48 @@ export async function getTemplate(compilation, route) {
   `;
 }
 ```
+
+### Data Loading
+
+To get dynamic request data into your page's custom element, you can export an `async loader` function and return an object of props into your page.
+
+```js
+export async function loader(request) {
+  const params = new URLSearchParams(request.url.slice(request.url.indexOf('?')));
+  const postId = params.get('id');
+  const post = await fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`)
+    .then(resp => resp.json());
+
+  return { post };
+}
+
+export default class PostPage extends HTMLElement {
+  constructor({ post = {} }) {
+    super();
+    this.post = post;
+  }
+
+  async connectedCallback() {
+    const { id, title, body } = this.post;
+
+    this.innerHTML = `
+      <h1>Fetched Post ID: ${id}</h1>
+      <h2>${title}</h2>
+      <p>${body}</p>
+    `;
+  }
+}
+```
+
+### Prerender
+
+To export server routes as just static HTML, you can export a `prerender` option from your page set to `true`.
+
+```js
+export const prerender = true;
+```
+
+> You can enable this for all pages using the [prerender configuration](/docs/configuration/#prerender) option.
 
 ### Custom Imports
 

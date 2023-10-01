@@ -24,7 +24,7 @@ async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender
       data.body = html;
     } else {
       if (getBody) {
-        data.body = await getBody(compilation, page);
+        data.body = await getBody(compilation, page, request);
       }
     }
 
