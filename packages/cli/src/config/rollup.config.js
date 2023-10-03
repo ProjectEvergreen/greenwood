@@ -166,7 +166,6 @@ function greenwoodImportMetaUrl(compilation) {
     name: 'greenwood-import-meta-url',
 
     async transform(code, id) {
-      // TODO filter only on custom imports?  Better to detect canTransform vs is "chunk"
       const resourcePlugins = compilation.config.plugins.filter((plugin) => {
         return plugin.type === 'resource';
       }).map((plugin) => {
@@ -175,24 +174,23 @@ function greenwoodImportMetaUrl(compilation) {
       const idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
       const extension = pathname.split('.').pop();
+      const urlWithType = new URL(`${idUrl.href}?type=${extension}`);
+      const request = new Request(urlWithType.href);
       let canTransform = false;
       let response = new Response(code);
 
-      // handle any custom imports
+      // handle any custom imports or pre-processing needed before passing to Rollup this.parse
       if (await checkResourceExists(idUrl) && extension !== '' && extension !== 'json') {
-        const url = new URL(`${idUrl.href}?type=${extension}`);
-        const request = new Request(url.href);
-
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
-            response = await plugin.serve(url, request);
+          if (plugin.shouldServe && await plugin.shouldServe(urlWithType, request)) {
+            response = await plugin.serve(urlWithType, request);
             canTransform = true;
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
-            response = await plugin.intercept(url, request, response.clone());
+          if (plugin.shouldIntercept && await plugin.shouldIntercept(urlWithType, request, response.clone())) {
+            response = await plugin.intercept(urlWithType, request, response.clone());
             canTransform = true;
           }
         }
@@ -213,22 +211,42 @@ function greenwoodImportMetaUrl(compilation) {
             const relativeAssetPath = getMetaImportPath(node);
             const absoluteAssetPath = path.resolve(absoluteScriptDir, relativeAssetPath);
             const assetName = path.basename(absoluteAssetPath);
-            const extension = assetName.split('.').pop();
+            const assetExtension = assetName.split('.').pop();
+            const name = assetName.replace(`.${assetExtension}`, '');
 
             try {
+              const assetUrl = new URL(`file://${absoluteAssetPath}?type=${assetExtension}`);
               const assetContents = fs.readFileSync(absoluteAssetPath, 'utf-8');
+              const customResourcePlugins = compilation.config.plugins.filter((plugin) => {
+                return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
+              }).map((plugin) => {
+                return plugin.provider(compilation);
+              });
+              let bundleExtensions = ['js'];
+
+              // check if we can serve this as javascript
+              // so we can send it off to Rollup for further bundling as an entry point
+              for (const plugin of customResourcePlugins) {
+                // kind of cheating here since plugins are async, but it works? :|
+                if (plugin.contentType.indexOf('text/javascript') >= 0 && plugin.shouldServe && plugin.shouldServe(assetUrl)) {
+                  bundleExtensions = [...bundleExtensions, ...plugin.extensions];
+                }
+              }
+
+              const type = bundleExtensions.indexOf(assetExtension) >= 0
+                ? 'chunk'
+                : 'asset';
               let ref;
 
-              // TOOD better way to filter these
-              if (absoluteAssetPath.endsWith('.js') || absoluteAssetPath.endsWith('.ts')) {
+              if (type === 'chunk') {
                 ref = that.emitFile({
-                  type: 'chunk',
+                  type,
                   id: absoluteAssetPath,
-                  name: assetName.replace(`.${extension}`, '')
+                  name
                 });
               } else {
                 ref = that.emitFile({
-                  type: 'asset',
+                  type,
                   name: assetName,
                   source: assetContents
                 });
