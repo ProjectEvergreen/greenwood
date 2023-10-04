@@ -61,25 +61,44 @@ You can do the same in your HTML
 </header>
 ```
 
+Or in your JavaScript use a combination of `new URL` and `import.meta.url`!
 
-> If you like an all-the-things-in-JS approach, Greenwood can be extended with [plugins](/plugins/) to support "webpack" like behavior as seen in the below example:
+```js
+const logo = new URL('../images/logo.svg', import.meta.url);
+
+class HeaderComponent extends HTMLElement {
+  connectedCallback() {
+    this.innerHTML = `
+      <header>
+        <h1>Welcome to My Site!</h1>
+        <img alt="logo" src="${logo.pathname}" />
+      </header>
+    `;
+  }
+}
+
+customElements.define('x-header', HeaderComponent);
+```
+
+> If you like an all-the-things-in-JS approach, Greenwood can be extended with [plugins](/plugins/) to support "webpack" like behavior as seen in the below example for CSS:
 >
 > ```javascript
-> import { html, LitElement } from 'lit';
 > import headerCss from './header.css';
+> 
+> const logo = new URL('../images/logo.svg', import.meta.url);
 >
-> class HeaderComponent extends LitElement {
->  render() {
->    return html`
->      <style>
->        ${headerCss}
->      <style>
->      <header>
->        <h1>Welcome to My Site!</h1>
->        <img alt="brand logo" src="${logo}" />
->      </header>
+> class HeaderComponent extends HTMLElement {
+>   connectedCallback() {
+>     this.innerHTML = `
+>       <style>
+>         ${headerCss}
+>       <style>
+>       <header>
+>         <h1>Welcome to My Site!</h1>
+>         <img alt="logo" src="${logo.pathname}" />
+>       </header>
 >    `;
->  }
+>   }
 > }
 >
 > customElements.define('x-header', HeaderComponent);
