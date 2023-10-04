@@ -171,6 +171,11 @@ function greenwoodImportMetaUrl(compilation) {
       }).map((plugin) => {
         return plugin.provider(compilation);
       });
+      const customResourcePlugins = compilation.config.plugins.filter((plugin) => {
+        return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      });
       const idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
       const extension = pathname.split('.').pop();
@@ -201,9 +206,10 @@ function greenwoodImportMetaUrl(compilation) {
       }
 
       const ast = this.parse(await response.text());
-      const that = this;
+      const assetUrls = [];
       let modifiedCode = false;
 
+      // aggregate all references of new URL + import.meta.url
       walk.simple(ast, {
         NewExpression(node) {
           if (isNewUrlImportMetaUrl(node)) {
@@ -212,59 +218,50 @@ function greenwoodImportMetaUrl(compilation) {
             const absoluteAssetPath = path.resolve(absoluteScriptDir, relativeAssetPath);
             const assetName = path.basename(absoluteAssetPath);
             const assetExtension = assetName.split('.').pop();
-            const name = assetName.replace(`.${assetExtension}`, '');
 
-            try {
-              const assetUrl = new URL(`file://${absoluteAssetPath}?type=${assetExtension}`);
-              const assetContents = fs.readFileSync(absoluteAssetPath, 'utf-8');
-              const customResourcePlugins = compilation.config.plugins.filter((plugin) => {
-                return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
-              }).map((plugin) => {
-                return plugin.provider(compilation);
-              });
-              let bundleExtensions = ['js'];
-
-              // check if we can serve this as javascript
-              // so we can send it off to Rollup for further bundling as an entry point
-              for (const plugin of customResourcePlugins) {
-                // kind of cheating here since plugins are async, but it works? :|
-                if (plugin.contentType.indexOf('text/javascript') >= 0 && plugin.shouldServe && plugin.shouldServe(assetUrl)) {
-                  bundleExtensions = [...bundleExtensions, ...plugin.extensions];
-                }
-              }
-
-              const type = bundleExtensions.indexOf(assetExtension) >= 0
-                ? 'chunk'
-                : 'asset';
-              let ref;
-
-              if (type === 'chunk') {
-                ref = that.emitFile({
-                  type,
-                  id: absoluteAssetPath,
-                  name
-                });
-              } else {
-                ref = that.emitFile({
-                  type,
-                  name: assetName,
-                  source: assetContents
-                });
-              }
-
-              // handle Windows style paths
-              const normalizedRelativeAssetPath = relativeAssetPath.replace(/\\/g, '/');
-              const importRef = `import.meta.ROLLUP_FILE_URL_${ref}`;
-
-              modifiedCode = code
-                .replace(`'${normalizedRelativeAssetPath}'`, importRef)
-                .replace(`"${normalizedRelativeAssetPath}"`, importRef);
-            } catch (error) {
-              that.error(error, node.arguments[0].start);
-            }
+            assetUrls.push({
+              url: new URL(`file://${absoluteAssetPath}?type=${assetExtension}`),
+              relativeAssetPath
+            });
           }
         }
       });
+
+      for (const assetUrl of assetUrls) {
+        const { url } = assetUrl;
+        const { pathname } = url;
+        const { relativeAssetPath } = assetUrl;
+        const assetName = path.basename(pathname);
+        const assetExtension = assetName.split('.').pop();
+        const assetContents = await fs.promises.readFile(url, 'utf-8');
+        const name = assetName.replace(`.${assetExtension}`, '');
+        let bundleExtensions = ['js'];
+
+        for (const plugin of customResourcePlugins) {
+          if (plugin.shouldServe && await plugin.shouldServe(url)) {
+            const response = await plugin.serve(url);
+
+            if (response?.headers?.get('content-type') || ''.indexOf('text/javascript') >= 0) {
+              bundleExtensions = [...bundleExtensions, ...plugin.extensions];
+            }
+          }
+        }
+
+        const type = bundleExtensions.indexOf(assetExtension) >= 0
+          ? 'chunk'
+          : 'asset';
+        const emitConfig = type === 'chunk'
+          ? { type, id: pathname, name }
+          : { type, name: assetName, source: assetContents };
+        const ref = this.emitFile(emitConfig);
+        // handle Windows style paths
+        const normalizedRelativeAssetPath = relativeAssetPath.replace(/\\/g, '/');
+        const importRef = `import.meta.ROLLUP_FILE_URL_${ref}`;
+
+        modifiedCode = code
+          .replace(`'${normalizedRelativeAssetPath}'`, importRef)
+          .replace(`"${normalizedRelativeAssetPath}"`, importRef);
+      }
 
       return {
         code: modifiedCode ? modifiedCode : code,
