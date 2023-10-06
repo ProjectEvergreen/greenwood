@@ -41,7 +41,7 @@ Styles can be done in any standards compliant way that will work in a browser.  
 
 ### Assets
 
-For convenience, **Greenwood** does support an "assets" directory wherein anything copied into that will be present in the build output directory.  This is the recommended location for all your local images, fonts, etc.  Effectively anything that is not part of an `import`, `@import`, `<script>`, `<style>` or `<link>` will not be handled by **Greenwood**.
+For convenience, **Greenwood** does support an "assets" directory wherein anything included in that directory will automatically be copied into the build output directory.  This is the recommended location for all your local images, fonts, etc.  At this time, anything that is not referenced through an `import`, `@import`, `<script>`, `<style>` or `<link>` will not be handled by **Greenwood**.
 
 #### Example
 To use an image in a markdown file, you would reference it as so using standard markdown syntax:
@@ -61,7 +61,7 @@ You can do the same in your HTML
 </header>
 ```
 
-Or in your JavaScript use a combination of `new URL` and `import.meta.url`!
+In your JavaScript use a combination of `new URL` and `import.meta.url` which means you can put the file anywhere in your project, not just the _assets/_ directory and it will be resolved automatically!  For production builds, Greenwood will generate a unique filename for the asset as well, e.g. _logo-83bc009f.svg_.
 
 ```js
 const logo = new URL('../images/logo.svg', import.meta.url);
@@ -71,7 +71,8 @@ class HeaderComponent extends HTMLElement {
     this.innerHTML = `
       <header>
         <h1>Welcome to My Site!</h1>
-        <img alt="logo" src="${logo.pathname}" />
+        <!-- handles nested routes / deeplinking, e.g. https://www.mysite.com/some/page/ -->
+        <img src="${logo.pathname.replace(window.location.pathname, '/')}" alt="Greenwood logo"/>
       </header>
     `;
   }
@@ -95,7 +96,7 @@ customElements.define('x-header', HeaderComponent);
 >       <style>
 >       <header>
 >         <h1>Welcome to My Site!</h1>
->         <img alt="logo" src="${logo.pathname}" />
+>         <img src="${logo.pathname.replace(window.location.pathname, '/')}" alt="Greenwood logo"/>
 >       </header>
 >    `;
 >   }
