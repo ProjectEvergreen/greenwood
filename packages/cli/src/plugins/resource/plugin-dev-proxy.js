@@ -31,8 +31,18 @@ class DevProxyResource extends ResourceInterface {
       method: request.method,
       headers: request.header
     });
+    const response = await fetch(requestProxied);
+    const filteredResponseHeaders = new Headers();
 
-    return await fetch(requestProxied);
+    // filter out content-encoding to make sure browsers do not try and decode responses
+    // https://github.com/ProjectEvergreen/greenwood/issues/1159
+    response.headers.forEach((value, key) => {
+      if (key !== 'content-encoding') {
+        filteredResponseHeaders.set(key, value);
+      }
+    });
+
+    return new Response(response.body, { headers: filteredResponseHeaders });
   }
 }
 
