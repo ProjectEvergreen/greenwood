@@ -251,7 +251,7 @@ function greenwoodImportMetaUrl(compilation) {
           ? 'chunk'
           : 'asset';
         const emitConfig = type === 'chunk'
-          ? { type, id: pathname, name }
+          ? { type, id: normalizePathnameForWindows(url), name }
           : { type, name: assetName, source: assetContents };
         const ref = this.emitFile(emitConfig);
         // handle Windows style paths
