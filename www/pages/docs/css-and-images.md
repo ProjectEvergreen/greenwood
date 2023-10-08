@@ -61,7 +61,9 @@ You can do the same in your HTML
 </header>
 ```
 
-In your JavaScript use a combination of `new URL` and `import.meta.url` which means you can put the file anywhere in your project, not just the _assets/_ directory and it will be resolved automatically!  For production builds, Greenwood will generate a unique filename for the asset as well, e.g. _logo-83bc009f.svg_.
+In your JavaScript, you can also use a combination of `new URL` and `import.meta.url` which means you can put the file anywhere in your project, not just the _assets/_ directory and it will be resolved automatically!  For production builds, Greenwood will generate a unique filename for the asset as well, e.g. _logo-83bc009f.svg_.
+
+> _We are looking to improve the developer experience around using `new URL` + `import.meta.url` as part of an overall isomorphic asset bundling strategy.  You can visit this [GitHub issue](https://github.com/ProjectEvergreen/greenwood/issues/1163) to follow along._
 
 ```js
 const logo = new URL('../images/logo.svg', import.meta.url);
@@ -84,7 +86,7 @@ customElements.define('x-header', HeaderComponent);
 > If you like an all-the-things-in-JS approach, Greenwood can be extended with [plugins](/plugins/) to support "webpack" like behavior as seen in the below example for CSS:
 >
 > ```javascript
-> import headerCss from './header.css';
+> import styles from './header.css';
 > 
 > const logo = new URL('../images/logo.svg', import.meta.url);
 >
@@ -92,7 +94,7 @@ customElements.define('x-header', HeaderComponent);
 >   connectedCallback() {
 >     this.innerHTML = `
 >       <style>
->         ${headerCss}
+>         ${styles}
 >       <style>
 >       <header>
 >         <h1>Welcome to My Site!</h1>
