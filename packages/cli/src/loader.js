@@ -48,14 +48,19 @@ export async function resolve(specifier, context, defaultResolve) {
   const { parentURL } = context;
   const url = specifier.startsWith('file://')
     ? new URL(specifier)
-    : new URL(specifier, parentURL);
-  const { shouldHandle } = await getCustomLoaderResponse(url, null, true);
+    : specifier.startsWith('.')
+      ? new URL(specifier, parentURL)
+      : undefined;
 
-  if (shouldHandle) {
-    return {
-      url: url.href,
-      shortCircuit: true
-    };
+  if (url) {
+    const { shouldHandle } = await getCustomLoaderResponse(url, null, true);
+
+    if (shouldHandle) {
+      return {
+        url: url.href,
+        shortCircuit: true
+      };
+    }
   }
 
   return defaultResolve(specifier, context, defaultResolve);
