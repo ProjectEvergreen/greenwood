@@ -46,13 +46,21 @@ async function getCustomLoaderResponse(url, body = '', checkOnly = false) {
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#resolvespecifier-context-nextresolve
 export async function resolve(specifier, context, defaultResolve) {
   const { parentURL } = context;
-  const { shouldHandle } = await getCustomLoaderResponse(new URL(specifier), null, true);
+  const url = specifier.startsWith('file://')
+    ? new URL(specifier)
+    : specifier.startsWith('.')
+      ? new URL(specifier, parentURL)
+      : undefined;
 
-  if (shouldHandle) {
-    return {
-      url: new URL(specifier, parentURL).href,
-      shortCircuit: true
-    };
+  if (url) {
+    const { shouldHandle } = await getCustomLoaderResponse(url, null, true);
+
+    if (shouldHandle) {
+      return {
+        url: url.href,
+        shortCircuit: true
+      };
+    }
   }
 
   return defaultResolve(specifier, context, defaultResolve);
@@ -61,11 +69,11 @@ export async function resolve(specifier, context, defaultResolve) {
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#loadurl-context-nextload
 export async function load(source, context, defaultLoad) {
   const extension = source.split('.').pop();
-  const url = new URL('', `${source}?type=${extension}`);
+  const url = new URL(`${source}?type=${extension}`);
   const { shouldHandle } = await getCustomLoaderResponse(url, null, true);
 
   if (shouldHandle) {
-    const contents = await fs.readFile(new URL(source), 'utf-8');
+    const contents = await fs.readFile(url, 'utf-8');
     const { response } = await getCustomLoaderResponse(url, contents);
     const body = await response.text();
 
