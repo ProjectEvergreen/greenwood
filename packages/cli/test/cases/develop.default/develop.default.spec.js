@@ -1321,6 +1321,12 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
 
+      // https://github.com/ProjectEvergreen/greenwood/issues/1159
+      it('should not return a content-encoding header', function(done) {
+        expect(response.headers['content-encoding']).to.equal(undefined);
+        done();
+      });
+
       it('should return the correct response body', function(done) {
         expect(response.body).to.have.lengthOf(1);
         done();
