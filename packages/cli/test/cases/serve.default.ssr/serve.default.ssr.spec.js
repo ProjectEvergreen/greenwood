@@ -18,6 +18,8 @@
  *   components/
  *     card.js
  *     counter.js
+ *   images/
+ *     logo.svg
  *   pages/
  *     about.md
  *     artists.js
@@ -297,6 +299,60 @@ describe('Serve Greenwood With: ', function() {
           .filter(file => file.indexOf('users.js') >= 0);
 
         expect(scriptFiles.length).to.equal(2);
+      });
+    });
+
+    describe('Bundled image using new URL and import.meta.url', function() {
+      const bundledName = 'assets/logo-abb2e884.svg';
+      let bundledImageResponse = {};
+      let usersResponse = {};
+
+      before(async function() {
+        await new Promise((resolve, reject) => {
+          request.get(`${hostname}/${bundledName}`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            bundledImageResponse = res;
+            bundledImageResponse.body = body;
+
+            resolve();
+          });
+        });
+
+        await new Promise((resolve, reject) => {
+          request.get(`${hostname}/_users.js`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            usersResponse = res;
+            usersResponse.body = body;
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status for the image', function(done) {
+        expect(bundledImageResponse.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the expected content-type for the image', function(done) {
+        expect(bundledImageResponse.headers['content-type']).to.equal('image/svg+xml');
+        done();
+      });
+
+      it('should return the expected body for the image', function(done) {
+        expect(bundledImageResponse.body.startsWith('<svg')).to.equal(true);
+        done();
+      });
+
+      it('should return the expected bundled image name inside the bundled page route', function(done) {
+        expect(usersResponse.body.indexOf(bundledName) >= 0).to.equal(true);
+        done();
       });
     });
 

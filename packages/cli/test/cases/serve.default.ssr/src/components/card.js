@@ -1,3 +1,4 @@
+const logo = new URL('../images/logo.svg', import.meta.url);
 const template = document.createElement('template');
 
 template.innerHTML = `
@@ -23,6 +24,7 @@ template.innerHTML = `
   </style>
 
   <div class="card">
+    <img alt="logo" href="${logo.pathname}">
     <slot name="title">My default title</slot>
     <slot name="image"></slot>
   </div>
