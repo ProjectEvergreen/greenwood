@@ -1,18 +1,16 @@
-/* eslint-disable no-unused-vars */
 import { html, css, LitElement, customElement, property } from 'lit-element';
+import { TemplateResult } from 'lit-html';
 
 @customElement('app-greeting')
 export class GreetingComponent extends LitElement {
   static styles = css`p { color: blue }`;
 
   @property()
-  name = 'Somebody';
+    name = 'Somebody';
 
-  render() {
-    const greeting: Greeting = {
-      message: html`<p>Hello, ${this.name}!</p>`
-    };
+  render(): TemplateResult {
+    const greeting: TemplateResult = html`<p>Hello, ${this.name}!</p>`;
 
-    return greeting.message;
+    return greeting;
   }
 }

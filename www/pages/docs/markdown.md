@@ -67,7 +67,7 @@ Write the following in your markdown
 ```js
 const hello = 'world';
 
-<p>${hello}</p>
+console.log(hello);
 ```
 ````
 
@@ -75,5 +75,5 @@ To get this result:
 ```jsx
 const hello = 'world';
 
-<p>${hello}</p>
+console.log(hello);
 ```
