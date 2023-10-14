@@ -41,7 +41,7 @@ Styles can be done in any standards compliant way that will work in a browser.  
 
 ### Assets
 
-For convenience, **Greenwood** does support an "assets" directory wherein anything copied into that will be present in the build output directory.  This is the recommended location for all your local images, fonts, etc.  Effectively anything that is not part of an `import`, `@import`, `<script>`, `<style>` or `<link>` will not be handled by **Greenwood**.
+For convenience, **Greenwood** does support an "assets" directory wherein anything included in that directory will automatically be copied into the build output directory.  This is the recommended location for all your local images, fonts, etc.  At this time, anything that is not referenced through an `import`, `@import`, `<script>`, `<style>` or `<link>` will not be handled by **Greenwood**.
 
 #### Example
 To use an image in a markdown file, you would reference it as so using standard markdown syntax:
@@ -61,25 +61,47 @@ You can do the same in your HTML
 </header>
 ```
 
+In your JavaScript, you can also use a combination of `new URL` and `import.meta.url` which means you can put the file anywhere in your project, not just the _assets/_ directory and it will be resolved automatically!  For production builds, Greenwood will generate a unique filename for the asset as well, e.g. _logo-83bc009f.svg_.
 
-> If you like an all-the-things-in-JS approach, Greenwood can be extended with [plugins](/plugins/) to support "webpack" like behavior as seen in the below example:
+> _We are looking to improve the developer experience around using `new URL` + `import.meta.url` as part of an overall isomorphic asset bundling strategy.  You can visit this [GitHub issue](https://github.com/ProjectEvergreen/greenwood/issues/1163) to follow along._
+
+```js
+const logo = new URL('../images/logo.svg', import.meta.url);
+
+class HeaderComponent extends HTMLElement {
+  connectedCallback() {
+    this.innerHTML = `
+      <header>
+        <h1>Welcome to My Site!</h1>
+        <!-- handles nested routes / deeplinking, e.g. https://www.mysite.com/some/page/ -->
+        <img src="${logo.pathname.replace(window.location.pathname, '/')}" alt="Greenwood logo"/>
+      </header>
+    `;
+  }
+}
+
+customElements.define('x-header', HeaderComponent);
+```
+
+> If you like an all-the-things-in-JS approach, Greenwood can be extended with [plugins](/plugins/) to support "webpack" like behavior as seen in the below example for CSS:
 >
 > ```javascript
-> import { html, LitElement } from 'lit';
-> import headerCss from './header.css';
+> import styles from './header.css';
+> 
+> const logo = new URL('../images/logo.svg', import.meta.url);
 >
-> class HeaderComponent extends LitElement {
->  render() {
->    return html`
->      <style>
->        ${headerCss}
->      <style>
->      <header>
->        <h1>Welcome to My Site!</h1>
->        <img alt="brand logo" src="${logo}" />
->      </header>
+> class HeaderComponent extends HTMLElement {
+>   connectedCallback() {
+>     this.innerHTML = `
+>       <style>
+>         ${styles}
+>       <style>
+>       <header>
+>         <h1>Welcome to My Site!</h1>
+>         <img src="${logo.pathname.replace(window.location.pathname, '/')}" alt="Greenwood logo"/>
+>       </header>
 >    `;
->  }
+>   }
 > }
 >
 > customElements.define('x-header', HeaderComponent);

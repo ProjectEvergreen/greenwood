@@ -1,20 +1,27 @@
-import fs from 'fs/promises';
+import fs from 'fs';
+import path from 'path';
 import { checkResourceExists, normalizePathnameForWindows } from '../lib/resource-utils.js';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
+import * as walk from 'acorn-walk';
 
-// specifically to handle escodegen using require for package.json
+// https://github.com/rollup/rollup/issues/2121
+function cleanRollupId(id) {
+  return id.replace('\x00', '');
+}
+
+// specifically to handle escodegen and other node modules
+// using require for package.json or other json files
 // https://github.com/estools/escodegen/issues/455
 function greenwoodJsonLoader() {
   return {
     name: 'greenwood-json-loader',
     async load(id) {
-      const extension = id.split('.').pop();
+      const idUrl = new URL(`file://${cleanRollupId(id)}`);
+      const extension = idUrl.pathname.split('.').pop();
 
       if (extension === 'json') {
-        const url = new URL(`file://${id}`);
-        const json = JSON.parse(await fs.readFile(url, 'utf-8'));
+        const json = JSON.parse(await fs.promises.readFile(idUrl, 'utf-8'));
         const contents = `export default ${JSON.stringify(json)}`;
 
         return contents;
@@ -33,11 +40,11 @@ function greenwoodResourceLoader (compilation) {
   return {
     name: 'greenwood-resource-loader',
     async resolveId(id) {
-      const normalizedId = id.replace(/\?type=(.*)/, '');
+      const normalizedId = cleanRollupId(id); // idUrl.pathname;
       const { projectDirectory, userWorkspace } = compilation.context;
 
-      if (id.startsWith('.') && !id.startsWith(projectDirectory.pathname)) {
-        const prefix = id.startsWith('..') ? './' : '';
+      if (normalizedId.startsWith('.') && !normalizedId.startsWith(projectDirectory.pathname)) {
+        const prefix = normalizedId.startsWith('..') ? './' : '';
         const userWorkspaceUrl = new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
 
         if (await checkResourceExists(userWorkspaceUrl)) {
@@ -46,11 +53,13 @@ function greenwoodResourceLoader (compilation) {
       }
     },
     async load(id) {
-      const pathname = id.indexOf('?') >= 0 ? id.slice(0, id.indexOf('?')) : id;
+      const idUrl = new URL(`file://${cleanRollupId(id)}`);
+      const { pathname } = idUrl;
       const extension = pathname.split('.').pop();
 
-      if (extension !== '' && extension !== 'js') {
-        const url = new URL(`file://${pathname}?type=${extension}`);
+      // filter first for any bare specifiers
+      if (await checkResourceExists(idUrl) && extension !== '' && extension !== 'js') {
+        const url = new URL(`${idUrl.href}?type=${extension}`);
         const request = new Request(url.href);
         let response = new Response('');
 
@@ -116,16 +125,148 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
             compilation.resources.set(resource.sourcePathURL.pathname, {
               ...compilation.resources.get(resource.sourcePathURL.pathname),
               optimizedFileName: fileName,
-              optimizedFileContents: await fs.readFile(outputPath, 'utf-8'),
+              optimizedFileContents: await fs.promises.readFile(outputPath, 'utf-8'),
               contents
             });
 
             if (noop) {
-              await fs.writeFile(outputPath, contents);
+              await fs.promises.writeFile(outputPath, contents);
             }
           }
         }
       }
+    }
+  };
+}
+
+function getMetaImportPath(node) {
+  return node.arguments[0].value.split('/').join(path.sep);
+}
+
+function isNewUrlImportMetaUrl(node) {
+  return (
+    node.type === 'NewExpression' &&
+    node.callee.type === 'Identifier' &&
+    node.callee.name === 'URL' &&
+    node.arguments.length === 2 &&
+    node.arguments[0].type === 'Literal' &&
+    typeof getMetaImportPath(node) === 'string' &&
+    node.arguments[1].type === 'MemberExpression' &&
+    node.arguments[1].object.type === 'MetaProperty' &&
+    node.arguments[1].property.type === 'Identifier' &&
+    node.arguments[1].property.name === 'url'
+  );
+}
+
+// adapted from, and with credit to @web/rollup-plugin-import-meta-assets
+// https://modern-web.dev/docs/building/rollup-plugin-import-meta-assets/
+function greenwoodImportMetaUrl(compilation) {
+
+  return {
+    name: 'greenwood-import-meta-url',
+
+    async transform(code, id) {
+      const resourcePlugins = compilation.config.plugins.filter((plugin) => {
+        return plugin.type === 'resource';
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      });
+      const customResourcePlugins = compilation.config.plugins.filter((plugin) => {
+        return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      });
+      const idUrl = new URL(`file://${cleanRollupId(id)}`);
+      const { pathname } = idUrl;
+      const extension = pathname.split('.').pop();
+      const urlWithType = new URL(`${idUrl.href}?type=${extension}`);
+      const request = new Request(urlWithType.href);
+      let canTransform = false;
+      let response = new Response(code);
+
+      // handle any custom imports or pre-processing needed before passing to Rollup this.parse
+      if (await checkResourceExists(idUrl) && extension !== '' && extension !== 'json') {
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldServe && await plugin.shouldServe(urlWithType, request)) {
+            response = await plugin.serve(urlWithType, request);
+            canTransform = true;
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldIntercept && await plugin.shouldIntercept(urlWithType, request, response.clone())) {
+            response = await plugin.intercept(urlWithType, request, response.clone());
+            canTransform = true;
+          }
+        }
+      }
+
+      if (!canTransform) {
+        return null;
+      }
+
+      const ast = this.parse(await response.text());
+      const assetUrls = [];
+      let modifiedCode = false;
+
+      // aggregate all references of new URL + import.meta.url
+      walk.simple(ast, {
+        NewExpression(node) {
+          if (isNewUrlImportMetaUrl(node)) {
+            const absoluteScriptDir = path.dirname(id);
+            const relativeAssetPath = getMetaImportPath(node);
+            const absoluteAssetPath = path.resolve(absoluteScriptDir, relativeAssetPath);
+            const assetName = path.basename(absoluteAssetPath);
+            const assetExtension = assetName.split('.').pop();
+
+            assetUrls.push({
+              url: new URL(`file://${absoluteAssetPath}?type=${assetExtension}`),
+              relativeAssetPath
+            });
+          }
+        }
+      });
+
+      for (const assetUrl of assetUrls) {
+        const { url } = assetUrl;
+        const { pathname } = url;
+        const { relativeAssetPath } = assetUrl;
+        const assetName = path.basename(pathname);
+        const assetExtension = assetName.split('.').pop();
+        const assetContents = await fs.promises.readFile(url, 'utf-8');
+        const name = assetName.replace(`.${assetExtension}`, '');
+        let bundleExtensions = ['js'];
+
+        for (const plugin of customResourcePlugins) {
+          if (plugin.shouldServe && await plugin.shouldServe(url)) {
+            const response = await plugin.serve(url);
+
+            if (response?.headers?.get('content-type') || ''.indexOf('text/javascript') >= 0) {
+              bundleExtensions = [...bundleExtensions, ...plugin.extensions];
+            }
+          }
+        }
+
+        const type = bundleExtensions.indexOf(assetExtension) >= 0
+          ? 'chunk'
+          : 'asset';
+        const emitConfig = type === 'chunk'
+          ? { type, id: normalizePathnameForWindows(url), name }
+          : { type, name: assetName, source: assetContents };
+        const ref = this.emitFile(emitConfig);
+        // handle Windows style paths
+        const normalizedRelativeAssetPath = relativeAssetPath.replace(/\\/g, '/');
+        const importRef = `import.meta.ROLLUP_FILE_URL_${ref}`;
+
+        modifiedCode = code
+          .replace(`'${normalizedRelativeAssetPath}'`, importRef)
+          .replace(`"${normalizedRelativeAssetPath}"`, importRef);
+      }
+
+      return {
+        code: modifiedCode ? modifiedCode : code,
+        map: null
+      };
     }
   };
 }
@@ -177,6 +318,7 @@ const getRollupConfigForScriptResources = async (compilation) => {
     plugins: [
       greenwoodResourceLoader(compilation),
       greenwoodSyncPageResourceBundlesPlugin(compilation),
+      greenwoodImportMetaUrl(compilation),
       ...customRollupPlugins
     ],
     context: 'window',
@@ -216,6 +358,11 @@ const getRollupConfigForApis = async (compilation) => {
   const input = [...compilation.manifest.apis.values()]
     .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)));
 
+  // why is this needed?
+  await fs.promises.mkdir(new URL('./api/assets/', outputDir), {
+    recursive: true
+  });
+
   // TODO should routes and APIs have chunks?
   // https://github.com/ProjectEvergreen/greenwood/issues/1118
   return [{
@@ -227,9 +374,10 @@ const getRollupConfigForApis = async (compilation) => {
     },
     plugins: [
       greenwoodJsonLoader(),
+      greenwoodResourceLoader(compilation),
       nodeResolve(),
       commonjs(),
-      importMetaAssets()
+      greenwoodImportMetaUrl(compilation)
     ]
   }];
 };
@@ -248,6 +396,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
     },
     plugins: [
       greenwoodJsonLoader(),
+      greenwoodResourceLoader(compilation),
       // TODO let this through for lit to enable nodeResolve({ preferBuiltins: true })
       // https://github.com/lit/lit/issues/449
       // https://github.com/ProjectEvergreen/greenwood/issues/1118
@@ -255,7 +404,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
         preferBuiltins: true
       }),
       commonjs(),
-      importMetaAssets(),
+      greenwoodImportMetaUrl(compilation),
       greenwoodPatchSsrPagesEntryPointRuntimeImport() // TODO a little hacky but works for now
     ],
     onwarn: (errorObj) => {
