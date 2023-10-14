@@ -18,8 +18,7 @@ async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender
     const { prerender = false, getTemplate = null, getBody = null, getFrontmatter = null } = module;
 
     if (module.default) {
-      const props = module.loader ? await module.loader(request, compilation) : {};
-      const { html } = await renderToString(new URL(moduleUrl), false, props);
+      const { html } = await renderToString(new URL(moduleUrl), false, request);
 
       data.body = html;
     } else {

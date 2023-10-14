@@ -24,6 +24,7 @@
  *     about.md
  *     artists.js
  *     index.js
+ *     post.js
  *     users.js
  *   templates/
  *     app.html
@@ -348,7 +349,7 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe('Prerender an HTML route response for post page exporting an HTMLElement as default export and loader function', function() {
+    describe('Prerender an HTML route response for post page exporting an HTMLElement as default export and data loading', function() {
       const postId = 1;
       let dom;
 
