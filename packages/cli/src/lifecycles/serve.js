@@ -200,6 +200,8 @@ async function getStaticServer(compilation, composable) {
     await next();
   });
 
+  // TODO devServer.proxy is not really just for dev
+  // should it be renamed?  should this be a middleware?
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`http://localhost:${port}${ctx.url}`);
