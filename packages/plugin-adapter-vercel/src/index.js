@@ -144,11 +144,14 @@ async function vercelAdapter(compilation) {
       new URL(`./${id}.js`, outputRoot),
       { recursive: true }
     );
-    await fs.cp(
-      new URL('./api/assets/', outputDir),
-      new URL('./assets/', outputRoot),
-      { recursive: true }
-    );
+
+    if (await checkResourceExists(new URL('./api/assets/', outputDir))) {
+      await fs.cp(
+        new URL('./api/assets/', outputDir),
+        new URL('./assets/', outputRoot),
+        { recursive: true }
+      );
+    }
 
     const ssrApiAssets = (await fs.readdir(new URL('./api/', outputDir)))
       .filter(file => new RegExp(/^[\w][\w-]*\.[a-zA-Z0-9]{4,20}\.[\w]{2,4}$/).test(path.basename(file)));

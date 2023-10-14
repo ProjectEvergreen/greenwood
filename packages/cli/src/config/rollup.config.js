@@ -287,7 +287,7 @@ function greenwoodPatchSsrPagesEntryPointRuntimeImport() {
 
             bundle[key].code = bundle[key].code.replace(/'___GWD_ENTRY_FILE_URL=(.*.)___'/, `new URL('./_${entryPathMatch}', import.meta.url)`);
           } else {
-            console.warn(`Could not find entry path match for bundle => ${ley}`);
+            console.warn(`Could not find entry path match for bundle => ${key}`);
           }
         }
       });
