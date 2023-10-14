@@ -202,6 +202,7 @@ async function bundleSsrPages(compilation) {
         staticHtml = await getAppTemplate(staticHtml, compilation.context, imports, [], false, title);
         staticHtml = await getUserScripts(staticHtml, compilation.context);
         staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
+        staticHtml = staticHtml.replace(/[`\\$]/g, '\\$&'); // https://stackoverflow.com/a/75688937/417806
 
         // better way to write out this inline code?
         await fs.writeFile(entryFileUrl, `

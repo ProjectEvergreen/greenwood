@@ -180,7 +180,7 @@ describe('Serve Greenwood With: ', function() {
       it('should have the expected number of <script> tags in the <head>', function() {
         const scripts = artistsPageDom.window.document.querySelectorAll('head > script');
 
-        expect(scripts.length).to.equal(3);
+        expect(scripts.length).to.equal(4);
       });
 
       it('should have the expected <app-header> tag from the app template in the <head>', function() {
@@ -194,8 +194,8 @@ describe('Serve Greenwood With: ', function() {
         const scripts = Array.from(artistsPageDom.window.document.querySelectorAll('head > script'))
           .filter(tag => !tag.getAttribute('type'));
 
-        expect(scripts.length).to.equal(1);
-        expect(scripts[0].textContent).to.contain('console.log');
+        expect(scripts.length).to.equal(2);
+        expect(scripts[1].textContent).to.contain('console.log');
       });
 
       it('should have the expected number of table rows of content', function() {
@@ -251,7 +251,7 @@ describe('Serve Greenwood With: ', function() {
       it('should append the expected graph resource scripts for the page from a template', function() {
         const { resources } = artistsPageGraphData;
 
-        expect(resources.length).to.equal(4);
+        expect(resources.length).to.equal(5);
         expect(resources.find(resource => resource.endsWith('/header.js'))).to.not.be.undefined;
       });
 
