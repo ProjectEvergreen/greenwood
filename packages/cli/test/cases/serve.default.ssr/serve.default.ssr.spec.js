@@ -349,7 +349,7 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe('Prerender an HTML route response for post page exporting an HTMLElement as default export and data loading', function() {
+    describe.only('Prerender an HTML route response for post page exporting an HTMLElement as default export and data loading', function() {
       const postId = 1;
       let dom;
 

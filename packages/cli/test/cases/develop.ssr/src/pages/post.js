@@ -1,11 +1,15 @@
 export default class PostPage extends HTMLElement {
-  constructor({ post = {} }) {
+  constructor(request) {
     super();
-    this.post = post;
+
+    const params = new URLSearchParams(request.url.slice(request.url.indexOf('?')));
+    this.postId = params.get('id');
   }
 
   async connectedCallback() {
-    const { id, title, body } = this.post;
+    const { postId } = this;
+    const post = await fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`).then(resp => resp.json());
+    const { id, title, body } = post;
 
     this.innerHTML = `
       <h1>Fetched Post ID: ${id}</h1>
@@ -13,14 +17,4 @@ export default class PostPage extends HTMLElement {
       <p>${body}</p>
     `;
   }
-}
-
-export async function loader(request) {
-  const params = new URLSearchParams(request.url.slice(request.url.indexOf('?')));
-  const postId = params.get('id');
-  const post = await fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`).then(resp => resp.json());
-
-  return {
-    post
-  };
 }
