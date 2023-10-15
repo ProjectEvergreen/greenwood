@@ -18,7 +18,7 @@ const client = {
   }
 };
 
-const APOLLO_STATE = window.__APOLLO_STATE__; // eslint-disable-line no-underscore-dangle
+const APOLLO_STATE = globalThis.__APOLLO_STATE__; // eslint-disable-line no-underscore-dangle
 const backupQuery = client.query;
 
 client.query = (params) => {
