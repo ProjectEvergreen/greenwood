@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit';
-import client from '@greenwood/plugin-graphql/core/client';
-import ChildrenQuery from '@greenwood/plugin-graphql/queries/children';
+import client from '@greenwood/plugin-graphql/src/core/client.js';
+import ChildrenQuery from '@greenwood/plugin-graphql/src/queries/children.gql';
 
 class PostsListTemplate extends LitElement {
 

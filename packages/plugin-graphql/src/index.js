@@ -3,16 +3,15 @@ import { graphqlServer } from './core/server.js';
 import { mergeImportMap } from '@greenwood/cli/src/lib/walker-package-ranger.js';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 import { ServerInterface } from '@greenwood/cli/src/lib/server-interface.js';
-import rollupPluginAlias from '@rollup/plugin-alias';
 
 const importMap = {
   '@greenwood/cli/src/lib/hashing-utils.js': '/node_modules/@greenwood/cli/src/lib/hashing-utils.js',
-  '@greenwood/plugin-graphql/core/client': '/node_modules/@greenwood/plugin-graphql/src/core/client.js',
-  '@greenwood/plugin-graphql/core/common': '/node_modules/@greenwood/plugin-graphql/src/core/common.js',
-  '@greenwood/plugin-graphql/queries/children': '/node_modules/@greenwood/plugin-graphql/src/queries/children.gql',
-  '@greenwood/plugin-graphql/queries/config': '/node_modules/@greenwood/plugin-graphql/src/queries/config.gql',
-  '@greenwood/plugin-graphql/queries/graph': '/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql',
-  '@greenwood/plugin-graphql/queries/menu': '/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql'
+  '@greenwood/plugin-graphql/src/core/client.js': '/node_modules/@greenwood/plugin-graphql/src/core/client.js',
+  '@greenwood/plugin-graphql/src/core/common.js': '/node_modules/@greenwood/plugin-graphql/src/core/common.js',
+  '@greenwood/plugin-graphql/src/queries/children.gql': '/node_modules/@greenwood/plugin-graphql/src/queries/children.gql',
+  '@greenwood/plugin-graphql/src/queries/config.gql': '/node_modules/@greenwood/plugin-graphql/src/queries/config.gql',
+  '@greenwood/plugin-graphql/src/queries/graph.gql': '/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql',
+  '@greenwood/plugin-graphql/src/queries/menu.gql': '/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql'
 };
 
 class GraphQLResource extends ResourceInterface {
@@ -89,21 +88,6 @@ const greenwoodPluginGraphQL = (options = {}) => {
     type: 'resource',
     name: 'plugin-graphql:resource',
     provider: (compilation) => new GraphQLResource(compilation, options)
-  }, {
-    type: 'rollup',
-    name: 'plugin-graphql:rollup',
-    provider: () => {
-      const aliasEntries = Object.keys(importMap).map(key => {
-        return {
-          find: key,
-          replacement: importMap[key].replace('/node_modules/', '')
-        };
-      });
-
-      return [
-        rollupPluginAlias({ entries: aliasEntries })
-      ];
-    }
   }];
 };
 

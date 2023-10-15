@@ -1,4 +1,4 @@
-import { getQueryHash } from '@greenwood/plugin-graphql/core/common';
+import { getQueryHash } from './common.js';
 
 const client = {
   query: (params) => {
