@@ -1,6 +1,6 @@
 import { css, html, LitElement, unsafeCSS } from 'lit';
-import client from '@greenwood/plugin-graphql/core/client';
-import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
+import client from '@greenwood/plugin-graphql/src/core/client.js';
+import MenuQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
 import shelfCss from './shelf.css?type=css';
 import chevronRt from '../icons/chevron-right.js';
 import chevronDwn from '../icons/chevron-down.js';
