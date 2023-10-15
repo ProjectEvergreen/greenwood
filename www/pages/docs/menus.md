@@ -80,8 +80,8 @@ Now in order to use our navigation menu within a component we need to query it v
 ```js
 // navigation.js
 import { LitElement, html } from 'lit';
-import client from '@greenwood/plugin-graphql/core/client';
-import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
+import client from '@greenwood/plugin-graphql/src/core/client.js';
+import MenuQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
 
 class HeaderComponent extends LitElement {
 

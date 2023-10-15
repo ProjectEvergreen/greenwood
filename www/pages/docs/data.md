@@ -101,8 +101,8 @@ query {
 ###### Usage
 `import` the query in your component
 ```javascript
-import client from '@greenwood/plugin-graphql/core/client';
-import GraphQuery from '@greenwood/plugin-graphql/queries/menu';
+import client from '@greenwood/plugin-graphql/src/core/client.js';
+import GraphQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
 
 .
 .
@@ -180,8 +180,8 @@ query {
 ###### Usage
 `import` the query in your component
 ```javascript
-import client from '@greenwood/plugin-graphql/core/client';
-import ChildrenQuery from '@greenwood/plugin-graphql/queries/menu';
+import client from '@greenwood/plugin-graphql/src/core/client.js';
+import ChildrenQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
 
 .
 .
@@ -257,8 +257,8 @@ query {
 ###### Usage
 `import` the query in your component
 ```javascript
-import client from '@greenwood/plugin-graphql/core/client';
-import ConfigQuery from '@greenwood/plugin-graphql/queries/menu';
+import client from '@greenwood/plugin-graphql/src/core/client.js';
+import ConfigQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
 .
 .
 .
@@ -323,8 +323,8 @@ Now of course comes the fun part, actually seeing it all come together.  Here is
 
 ```javascript
 import { LitElement, html } from 'lit';
-import client from '@greenwood/plugin-graphql/core/client';
-import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
+import client from '@greenwood/plugin-graphql/src/core/client.js';
+import MenuQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
 
 class HeaderComponent extends LitElement {
 
