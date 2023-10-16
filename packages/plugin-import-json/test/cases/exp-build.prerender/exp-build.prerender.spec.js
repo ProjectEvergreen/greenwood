@@ -12,6 +12,7 @@
  * import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
  *
  * {
+ *   prerender: true,
  *   plugins: [{
  *     greenwoodPluginImportJson()
  *   }]

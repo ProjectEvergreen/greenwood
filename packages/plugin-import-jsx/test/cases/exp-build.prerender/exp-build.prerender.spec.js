@@ -12,6 +12,7 @@
  * import { greenwoodPluginImportJsx } from '@greenwood/plugin-import-jsx';
  *
  * {
+ *   prerender: true,
  *   plugins: [{
  *     greenwoodPluginImportJsx()
  *   }]
