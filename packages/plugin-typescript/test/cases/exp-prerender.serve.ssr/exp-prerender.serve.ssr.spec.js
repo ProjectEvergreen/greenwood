@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with an API and SSR routes that import TypeScript.
+ * Run Greenwood with a prerender HTML page that imports TypeScript.
  *
  * User Result
  * Should generate a Greenwood build that correctly builds and bundles all assets.
