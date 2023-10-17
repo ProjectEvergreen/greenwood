@@ -30,6 +30,7 @@
  *     card.js
  *   pages/
  *     artists.js
+ *     post.js
  *     users.js
  *   services/
  *     artists.js
@@ -77,8 +78,8 @@ describe('Build Greenwood With: ', function() {
         redirectsFile = await glob.promise(path.join(outputPath, 'public/_redirects'));
       });
 
-      it('should output the expected number of serverless function zip files', function() {
-        expect(zipFiles.length).to.be.equal(7);
+      it('', function() {
+        expect(zipFiles.length).to.be.equal(8);
       });
 
       it('should output the expected number of serverless function API zip files', function() {
@@ -86,7 +87,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output the expected number of serverless function SSR page zip files', function() {
-        expect(zipFiles.filter(file => !path.basename(file).startsWith('api-')).length).to.be.equal(2);
+        expect(zipFiles.filter(file => !path.basename(file).startsWith('api-')).length).to.be.equal(3);
       });
 
       it('should output a _redirects file', function() {
@@ -303,6 +304,50 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
+    describe('Post SSR Page adapter', function() {
+      let pageFunctions;
+
+      before(async function() {
+        pageFunctions = (await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip')))
+          .filter(zipFile => path.basename(zipFile).startsWith('post'));
+      });
+
+      it('should output one SSR page as a serverless function zip file', function() {
+        expect(pageFunctions.length).to.be.equal(1);
+      });
+
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const name = path.basename(pageFunctions[0]).replace('.zip', '');
+        const postId = 1;
+
+        await extract(pageFunctions[0], {
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+        });
+        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
+        const response = await handler({
+          rawUrl: `http://localhost:8080/post/?id=${postId}`,
+          httpMethod: 'GET'
+        }, {});
+
+        const { statusCode, body, headers } = response;
+        const dom = new JSDOM(body);
+        const headingOne = dom.window.document.querySelectorAll('body > h1');
+        const headingTwo = dom.window.document.querySelectorAll('body > h2');
+        const paragraph = dom.window.document.querySelectorAll('body > p');
+
+        expect(statusCode).to.be.equal(200);
+        expect(headers.get('content-type')).to.be.equal('text/html');
+
+        expect(headingOne.length).to.be.equal(1);
+        expect(headingTwo.length).to.be.equal(1);
+        expect(paragraph.length).to.be.equal(1);
+
+        expect(headingOne[0].textContent).to.be.equal(`Fetched Post ID: ${postId}`);
+        expect(headingTwo[0].textContent).to.not.be.undefined;
+        expect(paragraph[0].textContent).to.not.be.undefined;
+      });
+    });
+
     describe('_redirects file contents', function() {
       let redirectsFileContents;
 
@@ -313,6 +358,7 @@ describe('Build Greenwood With: ', function() {
       it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
         expect(redirectsFileContents).to.be.equal(
 `/artists/ /.netlify/functions/artists 200
+/post/ /.netlify/functions/post 200
 /users/ /.netlify/functions/users 200
 /api/* /.netlify/functions/api-:splat 200`
         );
