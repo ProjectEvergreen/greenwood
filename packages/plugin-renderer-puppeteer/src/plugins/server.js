@@ -12,7 +12,7 @@ class PuppeteerServer extends ServerInterface {
       const { port } = this.compilation.config.devServer;
 
       (await getDevServer(this.compilation)).listen(port, async () => {
-        console.info(`Started puppeteer prerender server at localhost:${port}`);
+        console.info(`Started puppeteer prerender server at http://localhost:${port}`);
       });
     } else {
       await Promise.resolve();
