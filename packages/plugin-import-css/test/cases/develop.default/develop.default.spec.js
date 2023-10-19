@@ -66,7 +66,7 @@ describe('Develop Greenwood With: ', function() {
       let data;
 
       before(async function() {
-        response = await fetch(`http://localhost:${port}/main.css?type=css`);
+        response = await fetch(`${hostname}:${port}/main.css?type=css`);
         data = await response.text();
       });
 
@@ -94,7 +94,7 @@ describe('Develop Greenwood With: ', function() {
       let data;
 
       before(async function() {
-        response = await fetch(`http://localhost:${port}/styles.css.js`);
+        response = await fetch(`${hostname}:${port}/styles.css.js`);
         data = await response.text();
       });
 

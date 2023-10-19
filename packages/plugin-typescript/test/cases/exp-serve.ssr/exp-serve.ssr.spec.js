@@ -61,7 +61,7 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe.only('Serve command with API specific behaviors for an HTML ("fragment") API', function() {
+    describe('Serve command with API specific behaviors for an HTML ("fragment") API', function() {
       let response = {};
       let fragmentsApiDom;
 

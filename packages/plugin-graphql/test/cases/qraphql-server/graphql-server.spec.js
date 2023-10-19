@@ -72,7 +72,7 @@ describe('Develop Greenwood With: ', function() {
     });
 
     // test a query call
-    describe.only('Develop command with GraphQL server and running a query', function() {
+    describe('Develop command with GraphQL server and running a query', function() {
       let response = {
         body: '',
         code: 0
