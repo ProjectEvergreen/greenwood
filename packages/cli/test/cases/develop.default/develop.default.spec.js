@@ -1470,46 +1470,30 @@ describe('Develop Greenwood With: ', function() {
     describe('Develop command with POST API specific behaviors for JSON', function() {
       const param = 'Greenwood';
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.post({
-            url: `${hostname}:${port}/api/submit-json`,
-            json: true,
-            body: { name: param }
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve(response);
-          });
+        response = await fetch(`${hostname}:${port}/api/submit-json`, {
+          method: 'POST',
+          body: JSON.stringify({ name: param })
         });
+        data = await response.json();
       });
 
-      it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
-        done();
+      it('should return a 200 status', function() {
+        expect(response.status).to.equal(200);
       });
 
-      it('should return the expected response message', function(done) {
-        const { message } = response.body;
-
-        expect(message).to.equal(`Thank you ${param} for your submission!`);
-        done();
+      it('should return the expected response message', function() {
+        expect(data.message).to.equal(`Thank you ${param} for your submission!`);
       });
 
-      it('should return the expected content type header', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json');
-        done();
+      it('should return the expected content type header', function() {
+        expect(response.headers.get('content-type')).to.equal('application/json');
       });
 
-      it('should return the secret header in the response', function(done) {
-        expect(response.headers['x-secret']).to.equal('1234');
-        done();
+      it('should return the secret header in the response', function() {
+        expect(response.headers.get('x-secret')).to.equal('1234');
       });
     });
 
