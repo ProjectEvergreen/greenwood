@@ -24,7 +24,6 @@
  */
 import chai from 'chai';
 import path from 'path';
-import request from 'request';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
@@ -64,42 +63,27 @@ describe('Develop Greenwood With: ', function() {
 
     describe('Develop command specific ESM .css behaviors', function() {
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/main.css?type=css`
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`http://localhost:${port}/main.css?type=css`);
+        data = await response.text();
       });
 
-      it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
-
-        done();
+      it('should return a 200', function() {
+        expect(response.status).to.equal(200);
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
-        done();
+      it('should return the correct content type', function() {
+        expect(response.headers.get('content-type')).to.equal('text/javascript');
       });
 
       // https://github.com/ProjectEvergreen/greenwood/issues/766
       // https://unpkg.com/browse/bootstrap@4.6.1/dist/css/bootstrap.css
       // https://unpkg.com/browse/font-awesome@4.7.0/css/font-awesome.css
-      it('should return an ECMASCript module', function(done) {
-        expect(response.body.replace('\n', '').replace(/ /g, '').trim())
+      it('should return an ECMASCript module', function() {
+        expect(data.replace('\n', '').replace(/ /g, '').trim())
           .to.equal('constcss=`*{background-image:url("/assets/background.jpg");font-family:\'Arial\'}.blockquote-footer::before{content:"\\\\2014\\\\00A0";}.fa-chevron-right:before{content:"\\\\f054";}`;exportdefaultcss;'); // eslint-disable-line max-len
-        done();
       });
     });
 
@@ -107,38 +91,23 @@ describe('Develop Greenwood With: ', function() {
     // https://unpkg.com/browse/@material/mwc-button@0.22.1/styles.css.js
     describe('Develop command specific ESM .css.js files behaviors (CSS in disguise)', function() {
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/styles.css.js`
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`http://localhost:${port}/styles.css.js`);
+        data = await response.text();
       });
 
-      it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
-
-        done();
+      it('should return a 200', function() {
+        expect(response.status).to.equal(200);
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
-        done();
+      it('should return the correct content type', function() {
+        expect(response.headers.get('content-type')).to.equal('text/javascript');
       });
 
-      it('should return an ECMASCript module', function(done) {
-        expect(response.body).to.equal('export const styles = css `.mdc-touch-target-wrapper{display:inline}`;');
-        done();
+      it('should return an ECMASCript module', function() {
+        expect(data).to.equal('export const styles = css `.mdc-touch-target-wrapper{display:inline}`;');
       });
     });
   });
