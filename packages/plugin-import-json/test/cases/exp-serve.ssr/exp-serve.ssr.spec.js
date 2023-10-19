@@ -30,7 +30,6 @@ import chai from 'chai';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { Runner } from 'gallinago';
 import { fileURLToPath } from 'url';
 
@@ -40,7 +39,7 @@ describe('Serve Greenwood With: ', function() {
   const LABEL = 'A Server Rendered Application (SSR) with API Routes importing JSON';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const hostname = 'http://127.0.0.1:8080';
+  const hostname = 'http://localhost:8080';
   let runner;
 
   before(async function() {
@@ -68,37 +67,25 @@ describe('Serve Greenwood With: ', function() {
 
     describe('Serve command with HTML route response for products page', function() {
       let response = {};
+      let data;
       let productsPageDom;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/products/`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-            productsPageDom = new JSDOM(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/products/`);
+        data = response.json();
+        productsPageDom = new JSDOM(data);
       });
 
-      it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
-        done();
+      it('should return a 200 status', function() {
+        expect(response.status).to.equal(200);
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
-        done();
+      it('should return the correct content type', function() {
+        expect(response.headers.get('content-type')).to.equal('text/html');
       });
 
-      it('should return a response body', function(done) {
-        expect(response.body).to.not.be.undefined;
-        done();
+      it('should return a response body', function() {
+        expect(data).to.not.be.undefined;
       });
 
       it('should make sure to have the expected number of <app-card> components on the page', function(done) {
@@ -114,34 +101,19 @@ describe('Serve Greenwood With: ', function() {
       let fragmentsApiDom;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/api/fragment`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-            fragmentsApiDom = new JSDOM(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/api/fragment`);
       });
 
-      it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
-        done();
+      it('should return a 200 status', function() {
+        expect(response.status).to.equal(200);
       });
 
-      it('should return a custom status message', function(done) {
+      it('should return a custom status message', function() {
         expect(response.statusMessage).to.equal('OK');
-        done();
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
-        done();
+      it('should return the correct content type', function() {
+        expect(response.headers.get('content-type')).to.equal('text/html');
       });
 
       it('should make sure to have the expected number of <app-card> components in the fragment', function(done) {

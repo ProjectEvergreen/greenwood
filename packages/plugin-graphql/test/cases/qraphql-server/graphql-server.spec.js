@@ -30,7 +30,7 @@ describe('Develop Greenwood With: ', function() {
   let runner;
 
   before(function() {
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
@@ -93,7 +93,7 @@ describe('Develop Greenwood With: ', function() {
             'content-type': 'application/json'
           }
         });
-        data = await response.text();
+        data = await response.json();
       });
 
       it('should return a 200 status', function() {
@@ -105,7 +105,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the expected query response', function() {
-        expect(data.config.workspace).to.equal(new URL('./src/', import.meta.url).href);
+        expect(data.data.config.workspace).to.equal(new URL('./src/', import.meta.url).href);
       });
     });
   });

@@ -60,7 +60,7 @@ describe('Develop Greenwood With: ', function() {
       let data;
 
       before(async function() {
-        response = await fetch(`http://127.0.0.1:${port}/main.ts`);
+        response = await fetch(`${hostname}:${port}/main.ts`);
         data = await response.text();
       });
 

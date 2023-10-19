@@ -67,7 +67,7 @@ describe('Develop Greenwood With: ', function() {
       let data;
 
       before(async function() {
-        response = await fetch(`http://localhost:${port}/main.json?type=json`);
+        response = await fetch(`${hostname}:${port}/main.json?type=json`);
         data = await response.text();
       });
 
