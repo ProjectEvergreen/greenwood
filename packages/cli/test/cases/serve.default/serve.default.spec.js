@@ -46,7 +46,7 @@ describe('Serve Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const hostname = 'http://127.0.0.1:8181';
+  const hostname = 'http://localhost:8181';
   let runner;
 
   before(function() {
@@ -76,35 +76,23 @@ describe('Serve Greenwood With: ', function() {
     // proxies to https://jsonplaceholder.typicode.com/posts via greenwood.config.js
     describe('Serve command with dev proxy', function() {
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/posts?id=7`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = JSON.parse(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/posts?id=7`);
+        data = await response.json();
       });
 
-      it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
-        done();
+      it('should return a 200 status', function() {
+        expect(response.status).to.equal(200);
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
-        done();
+      it('should return the correct content type', function() {
+        expect(response.headers.get('content-type')).to.equal('application/json; charset=utf-8');
       });
 
-      it('should return the correct response body', function(done) {
-        expect(response.body).to.have.lengthOf(1);
-        done();
+      it('should return the correct response body', function() {
+        expect(data).to.have.lengthOf(1);
       });
     });
 
