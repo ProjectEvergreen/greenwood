@@ -70,7 +70,11 @@ async function optimizeStaticPages(compilation, plugins) {
       // clean up optimization markers
       const body = (await response.text()).replace(/data-gwd-opt=".*[a-z]"/g, '');
 
+<<<<<<< HEAD
       await fs.writeFile(new URL(`.${outputPath}`, outputDir), body);
+=======
+      await fs.writeFile(new URL('./index.html', outputDirUrl), body);
+>>>>>>> 4dec045b (refactor base configuraton within the graph)
     })
   );
 }

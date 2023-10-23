@@ -67,7 +67,7 @@ class HeaderComponent extends LitElement {
 
                   return html`
                     <li>
-                      <a href="/my-subpath${item.route}" title="Click to visit the ${item.label} page" class="${activeClassName}">${item.label}</a>
+                      <a href="${item.route}" title="Click to visit the ${item.label} page" class="${activeClassName}">${item.label}</a>
                     </li>
                   `;
                 })}

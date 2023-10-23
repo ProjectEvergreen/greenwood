@@ -27,9 +27,8 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    const { basePath } = this.compilation.config;
     const { protocol, pathname } = url;
-    const hasMatchingPageRoute = this.compilation.graph.find(node => `${basePath}${node.route}` === pathname);
+    const hasMatchingPageRoute = this.compilation.graph.find(node => node.route === pathname);
     const isSPA = this.compilation.graph.find(node => node.isSPA) && pathname.indexOf('.') < 0;
 
     return protocol.startsWith('http') && (hasMatchingPageRoute || isSPA);
@@ -41,8 +40,7 @@ class StandardHtmlResource extends ResourceInterface {
     const { interpolateFrontmatter, basePath } = config;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find(node => node.isSPA);
-    const matchingRoute = this.compilation.graph.find((node) => `${basePath}${node.route}` === pathname) || {};
-    console.log({ matchingRoute });
+    const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
     const filePath = !matchingRoute.external ? matchingRoute.path : '';
     const isMarkdownContent = (matchingRoute?.filename || '').split('.').pop() === 'md';
 

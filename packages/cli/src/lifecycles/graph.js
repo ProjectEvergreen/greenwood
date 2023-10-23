@@ -9,10 +9,11 @@ const generateGraph = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const { context } = compilation;
+      const { context, config } = compilation;
+      const { basePath } = config;
       const { apisDir, pagesDir, projectDirectory, userWorkspace } = context;
       let graph = [{
-        outputPath: 'index.html',
+        outputPath: '/index.html',
         filename: 'index.html',
         path: '/',
         route: '/',
@@ -212,10 +213,10 @@ const generateGraph = async (compilation) => {
               imports,
               resources: [],
               outputPath: route === '/404/'
-                ? '404.html'
+                ? '/404.html'
                 : `${route}index.html`,
               path: filePath,
-              route,
+              route: `${basePath}${route}`,
               template,
               title,
               isSSR: !isStatic,
@@ -293,7 +294,7 @@ const generateGraph = async (compilation) => {
             ...graph,
             {
               ...oldGraph,
-              outputPath: '404.html',
+              outputPath: '/404.html',
               filename: '404.html',
               route: '/404/',
               path: '404.html',
