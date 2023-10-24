@@ -67,7 +67,7 @@ class StaticRouterResource extends ResourceInterface {
 
     const routeTags = this.compilation.graph
       .filter(page => !page.isSSR)
-      .filter(page => page.route !== '/404/')
+      .filter(page => !page.route.endsWith('/404/'))
       .map((page) => {
         const template = page.filename && page.filename.split('.').pop() === this.extensions[0]
           ? page.route

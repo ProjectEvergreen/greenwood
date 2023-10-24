@@ -16,7 +16,7 @@ const generateGraph = async (compilation) => {
         outputPath: '/index.html',
         filename: 'index.html',
         path: '/',
-        route: '/',
+        route: `${basePath}/`,
         id: 'index',
         label: 'Index',
         data: {},
@@ -281,7 +281,7 @@ const generateGraph = async (compilation) => {
 
         graph = await checkResourceExists(pagesDir) ? await walkDirectoryForPages(pagesDir) : graph;
 
-        const has404Page = graph.filter(page => page.route === '/404/').length === 1;
+        const has404Page = graph.find(page => page.route.endsWith('/404/'));
 
         // if the _only_ page is a 404 page, still provide a default index.html
         if (has404Page && graph.length === 1) {
@@ -296,7 +296,7 @@ const generateGraph = async (compilation) => {
               ...oldGraph,
               outputPath: '/404.html',
               filename: '404.html',
-              route: '/404/',
+              route: `${basePath}/404/`,
               path: '404.html',
               id: '404',
               label: 'Not Found'
