@@ -54,12 +54,14 @@ class GraphQLResource extends ResourceInterface {
   }
 
   async optimize(url, response) {
+    const { basePath } = this.compilation.config;
     let body = await response.text();
 
     body = body.replace('<head>', `
       <head>
         <script data-state="apollo" data-gwd-opt="none">
           window.__APOLLO_STATE__ = true;
+          window.__GWD_BASE_PATH__ = '${basePath}';
         </script>
     `);
 

@@ -18,14 +18,15 @@ const client = {
   }
 };
 
-const APOLLO_STATE = globalThis.__APOLLO_STATE__; // eslint-disable-line no-underscore-dangle
+const APOLLO_STATE = window.__APOLLO_STATE__; // eslint-disable-line no-underscore-dangle
+const BASE_PATH = window.__GWD_BASE_PATH__; // eslint-disable-line no-underscore-dangle
 const backupQuery = client.query;
 
 client.query = (params) => {
   if (APOLLO_STATE) {
     // __APOLLO_STATE__ defined, in production mode
     const queryHash = getQueryHash(params.query, params.variables);
-    const cachePath = `/${queryHash}-cache.json`;
+    const cachePath = `${BASE_PATH}/${queryHash}-cache.json`;
 
     return fetch(cachePath)
       .then(response => response.json())
