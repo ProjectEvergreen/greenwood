@@ -8,7 +8,7 @@ import { WorkerPool } from '../lib/threadpool.js';
 async function createOutputDirectory(route, outputDir) {
   if (!route.endsWith('/404/') && !await checkResourceExists(outputDir)) {
     await fs.mkdir(outputDir, {
-      recursive: true,
+      recursive: true
     });
   }
 }

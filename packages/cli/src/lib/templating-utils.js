@@ -160,12 +160,12 @@ async function getAppTemplate(pageTemplateContents, context, customImports = [],
     const basePathTag = basePath === ''
       ? ''
       : `<base href="http://localhost:1984${basePath}/" target="_top"/>`;
+    console.log({ basePathTag });
 
     mergedTemplateContents = `<!DOCTYPE html>
       ${mergedHtml}
         <head>
           <title>${title}</title>
-          ${basePathTag}
           ${mergedMeta}
           ${mergedLinks}
           ${mergedStyles}
