@@ -186,7 +186,7 @@ async function getStaticServer(compilation, composable) {
           ? 'index.html'
           : isStatic
             ? matchingRoute.outputPath
-            : url.pathname;
+            : url.pathname.replace(basePath, '');
         const body = await fs.readFile(new URL(`./${pathname}`, outputDir), 'utf-8');
 
         ctx.set('Content-Type', 'text/html');
