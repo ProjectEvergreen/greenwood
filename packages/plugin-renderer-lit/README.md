@@ -88,13 +88,20 @@ customElements.define('artists-page', ArtistsPage);
 export const tagName = 'artists-page';
 ```
 
-> **Note**: _Lit SSR [**only** renders into declarative shadow roots](https://github.com/lit/lit/issues/3080#issuecomment-1165158794) so you will have to keep browser support and polyfill usage in mind depending on your use case_.
+## Caveats
+
+There are a few considerations to take into account when using a `LitElement` as your page component:
+- Lit SSR [**only** renders into declarative shadow roots](https://github.com/lit/lit/issues/3080#issuecomment-1165158794), so you will have to keep browser support and polyfill usage in mind.
+- Depending on your use case, SSR bundling may break due to bundle chunking and code splitting by Rollup, which we are [hoping to correct ASAP](https://github.com/ProjectEvergreen/greenwood/issues/1118).
+- At this time, `LitElement` does [not support `async` work](https://lit.dev/docs/ssr/overview/#library-status) which makes data fetching in pages a bit of challenge.  You can follow along with this issue [in the Lit repo](https://github.com/lit/lit/issues/2469).
+
+> _You can see a work (in progress) demo of using Lit SSR (with Serverless!) [here](https://github.com/thescientist13/greenwood-demo-adapter-vercel-lit/)._
 
 ## Options
 
 ### Prerender (experimental)
 
-The plugin provides a setting that can be used to override Greenwood's [default _prerender_](/docs/configuration/#prerender) which is Puppeteer, and to instead use Lit.
+The plugin provides a setting that can be used to override Greenwood's [default _prerender_](/docs/configuration/#prerender) implementation which uses [WCC](https://github.com/ProjectEvergreen/wcc), to use Lit instead.
 
 ```javascript
 import { greenwoodPluginRendererLit } from '@greenwood/plugin-renderer-lit';
