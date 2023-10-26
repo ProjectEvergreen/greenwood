@@ -6,11 +6,13 @@ const runDevServer = async (compilation) => {
   return new Promise(async (resolve, reject) => {
 
     try {
-      const { port } = compilation.config.devServer;
-
+      const { basePath, devServer } = compilation.config;
+      const { port } = devServer;
+      const postfixSlash = basePath === '' ? '' : '/';
+      
       (await getDevServer(compilation)).listen(port, () => {
-
-        console.info(`Started local development server at http://localhost:${port}`);
+        
+        console.info(`Started local development server at http://localhost:${port}${basePath}${postfixSlash}`);
 
         const servers = [...compilation.config.plugins.filter((plugin) => {
           return plugin.type === 'server';
