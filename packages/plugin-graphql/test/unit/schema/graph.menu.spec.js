@@ -17,9 +17,13 @@ describe('Unit Test: Data', function() {
 
           before(async function() {
             navigation = await graphResolvers.Query.menu(undefined, {
-              pathname: '/',
               name: 'navigation'
-            }, MOCK_GRAPH);
+            }, {
+              graph: MOCK_GRAPH.graph,
+              config: {
+                basePath: ''
+              }
+            });
           });
 
           it('should have 4 children', function() {
@@ -57,14 +61,19 @@ describe('Unit Test: Data', function() {
       });
 
       describe('getMenuFromGraph filtering by side menu from path /getting-started', function() {
-        describe('with no sorting(default)', function() {
+        describe('with no sorting (default)', function() {
           let shelf = [];
 
           before(async function() {
             shelf = await graphResolvers.Query.menu(undefined, {
               pathname: '/getting-started/',
               name: 'side'
-            }, MOCK_GRAPH);
+            }, {
+              graph: MOCK_GRAPH.graph,
+              config: {
+                basePath: '/my-app'
+              }
+            });
           });
 
           it('should have 7 children', function() {
@@ -125,7 +134,12 @@ describe('Unit Test: Data', function() {
               pathname: '/getting-started/',
               name: 'side',
               orderBy: 'index_asc'
-            }, MOCK_GRAPH);
+            }, {
+              graph: MOCK_GRAPH.graph,
+              config: {
+                basePath: ''
+              }
+            });
           });
 
           it('should have 7 children', function() {
@@ -190,7 +204,12 @@ describe('Unit Test: Data', function() {
               pathname: '/getting-started/',
               name: 'side',
               orderBy: 'index_desc'
-            }, MOCK_GRAPH);
+            }, {
+              graph: MOCK_GRAPH.graph,
+              config: {
+                basePath: ''
+              }
+            });
           });
 
           it('should have 7 children', function() {
@@ -242,7 +261,12 @@ describe('Unit Test: Data', function() {
               pathname: '/getting-started/',
               name: 'side',
               orderBy: 'title_asc'
-            }, MOCK_GRAPH);
+            }, {
+              graph: MOCK_GRAPH.graph,
+              config: {
+                basePath: ''
+              }
+            });
           });
 
           it('should have 7 children', function() {
@@ -305,7 +329,12 @@ describe('Unit Test: Data', function() {
               pathname: '/getting-started/',
               name: 'side',
               orderBy: 'title_desc'
-            }, MOCK_GRAPH);
+            }, {
+              graph: MOCK_GRAPH.graph,
+              config: {
+                basePath: ''
+              }
+            });
           });
 
           it('should have 7 children', function() {
