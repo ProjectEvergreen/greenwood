@@ -18,6 +18,7 @@ export default {
     port: 1984,
     host: 'localhost'
   },
+  basePath: '',
   port: 8080,
   interpolateFrontmatter: false,
   markdown: {
@@ -33,6 +34,25 @@ export default {
   templatesDirectory: 'templates' // e.g. src/templates
 };
 ```
+
+### Base Path
+
+There are cases where an application might be deployed and hosted from a "sub" pathname that acts as the relative "web root".  (GitHub Pages is an example of this)
+
+So with a URL of `http://www.example.com/app-a`, the `basePath` could be set as such:
+```js
+export default {
+  basePath: '/app-a'
+};
+```
+
+This would then configure Greenwood's routing and `<script>` and `<link>` tags to reference this segment automatically.  For example:
+```html
+<script type="module" src="/app-a/some-script.a243dccss.js"></script>
+```
+
+> _User content, like `<a>` tags will require manually prefixing the basePath in your code._
+
 
 ### Dev Server
 Configuration for Greenwood's development server is available using the `devServer` option.
