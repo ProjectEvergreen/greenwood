@@ -85,13 +85,17 @@ const getChildrenFromParentRoute = async (root, query, context) => {
   const pages = [];
   const { parent } = query;
   const { graph } = context;
+  const { basePath } = context.config;
 
   graph
     .forEach((page) => {
       const { route, path } = page;
-      const root = route.split('/')[1]; // TODO https://github.com/ProjectEvergreen/greenwood/issues/273
+      const normalizedRoute = basePath === ''
+        ? route
+        : route.replace(basePath, '/');
+      const root = normalizedRoute.split('/')[1];
 
-      if (root === parent && path.indexOf(`${parent}/index.md`) < 0) {
+      if (`/${root}` === parent && path.indexOf(`${parent}/index.md`) < 0) {
         pages.push(page);
       }
     });

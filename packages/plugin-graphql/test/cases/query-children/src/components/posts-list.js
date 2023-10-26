@@ -22,7 +22,7 @@ class PostsListTemplate extends LitElement {
     const response = await client.query({
       query: ChildrenQuery,
       variables: {
-        parent: 'blog'
+        parent: '/blog'
       }
     });
 
