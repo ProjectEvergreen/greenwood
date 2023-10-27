@@ -1,3 +1,4 @@
 export default {
-  basePath: '/my-path'
+  basePath: '/my-path',
+  staticRouter: true
 };

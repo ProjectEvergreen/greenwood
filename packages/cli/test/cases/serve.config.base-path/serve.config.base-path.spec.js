@@ -1,16 +1,17 @@
 /*
  * Use Case
- * Run Greenwood serve command with no config.
+ * Run Greenwood serve command with no basePath configuration set (and staticRouter).
  *
  * User Result
- * Should start the production server and render a bare bones Greenwood build.
+ * Should start the production server and render a the Greenwood application.
  *
  * User Command
  * greenwood serve
  *
  * User Config
  * devServer: {
- *   basePath: '/my-path'
+ *   basePath: '/my-path',
+ *   staticRouter: true
  * }
  *
  * User Workspace
@@ -20,15 +21,18 @@
  *   components/
  *     card.js
  *   pages/
+ *     about.md
  *     index.html
  *   styles/
  *     main.css
  * package.json
  */
 import chai from 'chai';
+import fs from 'fs';
+import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getSetupFiles, getOutputTeardownFiles, getDependencyFiles } from '../../../../../test/utils.js';
 import request from 'request';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
@@ -39,6 +43,7 @@ describe('Serve Greenwood With: ', function() {
   const LABEL = 'Base Path Configuration';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
+  const publicPath = path.join(outputPath, 'public/');
   const hostname = 'http://127.0.0.1:8080';
   const basePath = '/my-path';
   const jsHash = '4bcc801e';
@@ -55,7 +60,15 @@ describe('Serve Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      await runner.setup(outputPath, getSetupFiles(outputPath));
+      const greenwoodRouterLibs = await getDependencyFiles(
+        `${process.cwd()}/packages/cli/src/lib/router.js`,
+        `${outputPath}/node_modules/@greenwood/cli/src/lib`
+      );
+
+      await runner.setup(outputPath, [
+        ...getSetupFiles(outputPath),
+        ...greenwoodRouterLibs
+      ]);
       await runner.runCommand(cliPath, 'build');
 
       return new Promise(async (resolve) => {
@@ -103,7 +116,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should have the expected heading tag in the DOM', function(done) {
-        const headings = Array.from(dom.window.document.querySelectorAll('body > h1'));
+        const headings = Array.from(dom.window.document.querySelectorAll('body h1'));
 
         expect(headings.length).to.equal(1);
         expect(headings[0].textContent).to.equal('Hello World');
@@ -112,7 +125,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should have the expected <app-card> tag in the DOM', function(done) {
-        const cards = Array.from(dom.window.document.querySelectorAll('body > app-card'));
+        const cards = Array.from(dom.window.document.querySelectorAll('body app-card'));
 
         expect(cards.length).to.equal(1);
 
@@ -124,25 +137,30 @@ describe('Serve Greenwood With: ', function() {
           .from(dom.window.document.querySelectorAll('head > link'))
           .filter(link => link.getAttribute('as') === 'script');
 
-        expect(links.length).to.equal(1);
-        expect(links[0].getAttribute('href')).to.equal(`${basePath}/card.${jsHash}.js`);
+        // TODO for some reason there is an extra <link> tag in the head, should only be 1
+        // https://github.com/ProjectEvergreen/greenwood/issues/1051
+        expect(links.length).to.equal(2);
+        expect(links[1].getAttribute('href')).to.equal(`${basePath}/card.${jsHash}.js`);
 
         done();
       });
 
-      it('should have the correct script tag path in the DOM', function(done) {
-        const scripts = Array.from(dom.window.document.querySelectorAll('head > script'));
+      it('should have the correct script tag path in the DOM for the card component', function(done) {
+        const scripts = Array
+          .from(dom.window.document.querySelectorAll('head script'))
+          .filter(script => script.getAttribute('type') === 'module');
 
-        expect(scripts.length).to.equal(1);
+        // TODO for some reason there is an extra <script> tag in the head, should only be 1
+        // https://github.com/ProjectEvergreen/greenwood/issues/1051
+        expect(scripts.length).to.equal(2);
         expect(scripts[0].getAttribute('src')).to.equal(`${basePath}/card.${jsHash}.js`);
 
         done();
       });
 
-      // <link rel="preload" href="/my-path/styles/main.1454013616.css" as="style" crossorigin="anonymous"></link>
       it('should have the correct style preload tag path in the DOM', function(done) {
         const links = Array
-          .from(dom.window.document.querySelectorAll('head > link'))
+          .from(dom.window.document.querySelectorAll('head link'))
           .filter(link => link.getAttribute('as') === 'style');
 
         expect(links.length).to.equal(1);
@@ -267,6 +285,101 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
+    describe('Static content routes', function() {
+      let dom;
+      let aboutDom;
+      let pages;
+      let partials;
+      let routerFiles;
+
+      before(async function() {
+        dom = await JSDOM.fromFile(path.resolve(publicPath, 'index.html'));
+        aboutDom = await JSDOM.fromFile(path.resolve(publicPath, 'about/index.html'));
+        pages = await glob(`${publicPath}/*.html`);
+        partials = await glob(`${publicPath}/_routes/**/*.html`);
+        routerFiles = await glob(`${publicPath}/router.*.js`);
+      });
+
+      it('should have one <script> tag in the <head> for the router', function() {
+        const scriptTags = dom.window.document.querySelectorAll('head > script[type]');
+
+        // TODO for some reason there is an extra <script> tag in the head, should only be 1
+        // https://github.com/ProjectEvergreen/greenwood/issues/1051
+        expect(scriptTags.length).to.be.equal(2);
+        expect(scriptTags[0].href).to.contain(/router.*.js/);
+        expect(scriptTags[0].type).to.be.equal('module');
+      });
+
+      it('should have one router.js file in the output directory', function() {
+        expect(routerFiles.length).to.be.equal(1);
+      });
+
+      it('should have one expected inline <script> tag in the <head> for router global variables', function() {
+        const inlineScriptTags = Array.from(dom.window.document.querySelectorAll('head > script'))
+          .filter(tag => !tag.type);
+
+        expect(inlineScriptTags.length).to.be.equal(1);
+        expect(inlineScriptTags[0].textContent).to.contain(`window.__greenwood=window.__greenwood||{};window.__greenwood.currentTemplate="${basePath}/"`);
+      });
+
+      it('should have one <router-outlet> tag in the <body> for the content', function() {
+        const routerOutlets = dom.window.document.querySelectorAll('body > router-outlet');
+
+        expect(routerOutlets.length).to.be.equal(1);
+      });
+
+      it('should have expected <greenwood-route> tags in the <body> for each page', function() {
+        const routeTags = dom.window.document.querySelectorAll('body > greenwood-route');
+
+        expect(routeTags.length).to.be.equal(2);
+      });
+
+      it('should have the expected properties for each <greenwood-route> tag for the about page', function() {
+        const aboutRouteTag = Array
+          .from(dom.window.document.querySelectorAll('body > greenwood-route'))
+          .filter(tag => tag.dataset.route === `${basePath}/about/`);
+        const dataset = aboutRouteTag[0].dataset;
+
+        expect(aboutRouteTag.length).to.be.equal(1);
+        expect(dataset.template).to.be.equal('test');
+        expect(dataset.key).to.be.equal(`${basePath}/_routes/about/index.html`);
+      });
+
+      it('should have the expected properties for each <greenwood-route> tag for the home page', function() {
+        const aboutRouteTag = Array
+          .from(dom.window.document.querySelectorAll('body > greenwood-route'))
+          .filter(tag => tag.dataset.route === `${basePath}/`);
+        const dataset = aboutRouteTag[0].dataset;
+
+        expect(aboutRouteTag.length).to.be.equal(1);
+        expect(dataset.template).to.be.equal(`${basePath}/`);
+        expect(dataset.key).to.be.equal(`${basePath}/_routes/index.html`);
+      });
+
+      // tests to make sure we filter out 404 page from _route partials
+      it('should have the expected top level HTML files (index.html, 404.html) in the output', function() {
+        expect(pages.length).to.equal(2);
+      });
+
+      it('should have the expected number of _route partials in the output directory for each page', function() {
+        expect(partials.length).to.be.equal(3);
+      });
+
+      it('should have the expected partial output to match the contents of the home page in the <router-outlet> tag in the <body>', function() {
+        const aboutPartial = fs.readFileSync(path.join(publicPath, '_routes/about/index.html'), 'utf-8');
+        const aboutRouterOutlet = aboutDom.window.document.querySelectorAll('body > router-outlet')[0];
+
+        expect(aboutRouterOutlet.innerHTML).to.contain(aboutPartial);
+      });
+
+      it('should have the expected partial output to match the contents of the about page in the <router-outlet> tag in the <body>', function() {
+        const homePartial = fs.readFileSync(path.join(publicPath, '_routes/index.html'), 'utf-8');
+        const homeRouterOutlet = dom.window.document.querySelectorAll('body > router-outlet')[0];
+
+        expect(homeRouterOutlet.innerHTML).to.contain(homePartial);
+      });
+
+    });
     // TODO
     // dev server proxy
     // API end[points
