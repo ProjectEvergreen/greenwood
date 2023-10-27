@@ -54,7 +54,7 @@ describe('Develop Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      
+
       await runner.setup(outputPath, [
         ...getSetupFiles(outputPath)
       ]);
@@ -86,7 +86,7 @@ describe('Develop Greenwood With: ', function() {
 
             response = res;
             dom = new JSDOM(body);
-            
+
             resolve();
           });
         });

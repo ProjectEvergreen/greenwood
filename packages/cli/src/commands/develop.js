@@ -9,9 +9,9 @@ const runDevServer = async (compilation) => {
       const { basePath, devServer } = compilation.config;
       const { port } = devServer;
       const postfixSlash = basePath === '' ? '' : '/';
-      
+
       (await getDevServer(compilation)).listen(port, () => {
-        
+
         console.info(`Started local development server at http://localhost:${port}${basePath}${postfixSlash}`);
 
         const servers = [...compilation.config.plugins.filter((plugin) => {
