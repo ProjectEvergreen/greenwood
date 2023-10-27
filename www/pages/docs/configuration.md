@@ -51,7 +51,7 @@ This would then configure Greenwood's routing and `<script>` and `<link>` tags t
 <script type="module" src="/app-a/some-script.a243dccss.js"></script>
 ```
 
-> _User content, like `<a>` tags will require manually prefixing the basePath in your code._
+> _User content, like `<a>` and `<img>` tags will require manually prefixing the basePath in your code._
 
 
 ### Dev Server
