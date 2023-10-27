@@ -12,6 +12,7 @@
  * import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
  *
  * {
+ *   prerender: true,
  *   plugins: [{
  *     greenwoodPluginImportCss()
  *   }]

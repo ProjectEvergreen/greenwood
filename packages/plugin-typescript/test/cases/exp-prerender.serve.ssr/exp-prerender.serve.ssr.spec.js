@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with an API and SSR routes that import TypeScript.
+ * Run Greenwood with a prerender HTML page that imports TypeScript.
  *
  * User Result
  * Should generate a Greenwood build that correctly builds and bundles all assets.
@@ -10,6 +10,7 @@
  *
  * User Config
  * {
+ *   prerender: true,
  *   plugins: [
  *      greenwoodPluginTypeScript()
  *   ]
@@ -17,10 +18,10 @@
  *
  * User Workspace
  *  src/
- *   api/
- *     fragment.js
  *   components/
  *     card.ts
+ *   pages/
+ *     index.html
  */
 import chai from 'chai';
 import { JSDOM } from 'jsdom';
@@ -32,8 +33,10 @@ import { fileURLToPath } from 'url';
 
 const expect = chai.expect;
 
-describe('Serve Greenwood With: ', function() {
-  const LABEL = 'A Server Rendered Application (SSR) with API Routes importing TypeScript';
+// TODO - this should work after this issue is resolved
+// https://github.com/ProjectEvergreen/wcc/issues/122
+xdescribe('Serve Greenwood With: ', function() {
+  const LABEL = 'A Prerendered Application (SSR) with an HTML page importing a TypeScript component';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://127.0.0.1:8080';
@@ -62,13 +65,12 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe('Serve command with API specific behaviors for an HTML ("fragment") API', function() {
+    describe('Serve command with SSR prerender specific behaviors for an HTML page', function() {
       let response = {};
-      let fragmentsApiDom;
 
       before(async function() {
         return new Promise((resolve, reject) => {
-          request.get(`${hostname}/api/fragment`, (err, res, body) => {
+          request.get(`${hostname}/`, (err, res, body) => {
             if (err) {
               reject();
             }
@@ -92,20 +94,8 @@ describe('Serve Greenwood With: ', function() {
         done();
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
-        done();
-      });
-
-      it('should make sure to have the expected CSS inlined into the page for each <app-card>', function(done) {
-        const cardComponents = fragmentsApiDom.window.document.querySelectorAll('body > app-card');
-
-        expect(cardComponents.length).to.equal(2);
-        Array.from(cardComponents).forEach((card) => {
-          expect(card.innerHTML).contain('font-size: 1.85rem');
-        });
-        done();
-      });
+      // it should return the correct h1 contents
+      // it should return the correct app-card contents
     });
   });
 
