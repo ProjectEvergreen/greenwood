@@ -204,10 +204,10 @@ export async function getTemplate(compilation, route) {
 ### Custom Imports
 
 > ⚠️ _This feature is experimental._
+> 
+> _**Note**: At this time, [WCC can't handle non-standard javaScript formats](https://github.com/ProjectEvergreen/greenwood/issues/1004), though we hope to enable this by the 1.0 release._
 
-Through the support of the following plugins, Greenwood also supports loading custom file formats on the server side using ESM
-- [CSS](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/plugin-import-css/README.md#usage)
-- [JSON](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/plugin-import-json/README.md#usage)
+Combined with Greenwood's [custom import resource plugins](https://www.greenwoodjs.io/plugins/custom-plugins/) (or your own!), Greenwood can handle loading custom file extensions on the server side using ESM, like CSS and JSON!
 
 For example, you can now import JSON in your SSR pages and components.
 ```js
@@ -217,7 +217,7 @@ console.log(json); // { status: 200, message: 'some data' }
 ```
 
 **Steps**
-1. Make sure you are using Node `v18.12.1`
+1. Make sure you are using Node `v18.15.0`
 1. Run the Greenwood CLI using the `--experimental-loaders` flag and pass Greenwood's custom loader
     ```shell
     $ node --experimental-loader ./node_modules/@greenwood/cli/src/loader.js ./node_modules/.bin/greenwood <command>
