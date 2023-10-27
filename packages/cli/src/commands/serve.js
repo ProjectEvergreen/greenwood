@@ -12,7 +12,7 @@ const runProdServer = async (compilation) => {
       const server = (hasDynamicRoutes && !compilation.config.prerender) || hasApisDir ? getHybridServer : getStaticServer;
 
       (await server(compilation)).listen(port, () => {
-        console.info(`Started server at localhost:${port}`);
+        console.info(`Started server at http://localhost:${port}`);
       });
     } catch (err) {
       reject(err);

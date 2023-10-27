@@ -10,7 +10,7 @@ const runDevServer = async (compilation) => {
 
       (await getDevServer(compilation)).listen(port, () => {
 
-        console.info(`Started local development server at localhost:${port}`);
+        console.info(`Started local development server at http://localhost:${port}`);
 
         const servers = [...compilation.config.plugins.filter((plugin) => {
           return plugin.type === 'server';
