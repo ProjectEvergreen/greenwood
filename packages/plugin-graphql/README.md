@@ -1,7 +1,7 @@
 # @greenwood/plugin-graphql
 
 ## Overview
-A plugin for Greenwood to support using [GraphQL](https://graphql.org/) to query Greenwood's [content graph](https://www.greenwoodjs.io/docs/data/) with our optoinal [pre-made queries](https://www.greenwoodjs.io/docs/menus/).  It runs [**apollo-server**](https://www.apollographql.com/docs/apollo-server/) on the backend at build time and provides a **"read-only"** [**@apollo/client** _"like"_](https://www.apollographql.com/docs/react/api/core/ApolloClient/#ApolloClient.readQuery) interface for the frontend that you can use.
+A plugin for Greenwood to support using [GraphQL](https://graphql.org/) to query Greenwood's [content graph](https://www.greenwoodjs.io/docs/data/) with our optional [pre-made queries](https://www.greenwoodjs.io/docs/menus/).  It runs [**apollo-server**](https://www.apollographql.com/docs/apollo-server/) on the backend at build time and provides a **"read-only"** [**@apollo/client** _"like"_](https://www.apollographql.com/docs/react/api/core/ApolloClient/#ApolloClient.readQuery) interface for the frontend that you can use.
 
 > This package assumes you already have `@greenwood/cli` installed.
 

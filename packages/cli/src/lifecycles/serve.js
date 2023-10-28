@@ -294,7 +294,6 @@ async function getHybridServer(compilation) {
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
 
       if (!config.prerender && matchingRoute.isSSR && !matchingRoute.prerender) {
-        console.log('MATCHING ROUTE -> ', matchingRoute.filename);
         const { handler } = await import(new URL(`./__${matchingRoute.filename}`, outputDir));
         const response = await handler(request, compilation);
 
