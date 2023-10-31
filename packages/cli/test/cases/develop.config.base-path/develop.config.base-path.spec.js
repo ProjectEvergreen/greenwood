@@ -37,7 +37,6 @@ import chai from 'chai';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -198,34 +197,25 @@ describe('Develop Greenwood With: ', function() {
     // proxies to https://jsonplaceholder.typicode.com/posts via greenwood.config.js
     describe('Develop command with dev proxy', function() {
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}${basePath}/posts?id=7`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = JSON.parse(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}${basePath}/posts?id=7`);
+        data = await response.clone().json();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers.get('content-type')).to.contain('application/json');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.have.lengthOf(1);
+        expect(data).to.have.lengthOf(1);
         done();
       });
     });
@@ -262,17 +252,8 @@ describe('Develop Greenwood With: ', function() {
       let usersPageDom;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}${basePath}/users/`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            usersPageDom = new JSDOM(body);
-
-            resolve();
-          });
-        });
+        const response = await fetch(`${hostname}:${port}${basePath}/users/`);
+        usersPageDom = new JSDOM(await response.text());
       });
 
       it('the response body should be valid HTML from JSDOM', function(done) {

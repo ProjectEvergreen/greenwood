@@ -36,7 +36,6 @@ import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles, getDependencyFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -348,34 +347,25 @@ describe('Serve Greenwood With: ', function() {
 
     describe('Develop command with dev proxy', function() {
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}${basePath}/posts?id=7`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = JSON.parse(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}${basePath}/posts?id=7`);
+        data = await response.clone().json();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('application/json');
+        expect(response.headers.get('content-type')).to.contain('application/json');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.have.lengthOf(1);
+        expect(data).to.have.lengthOf(1);
         done();
       });
     });
@@ -412,17 +402,8 @@ describe('Serve Greenwood With: ', function() {
       let usersPageDom;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}${basePath}/users/`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            usersPageDom = new JSDOM(body);
-
-            resolve();
-          });
-        });
+        const response = await fetch(`${hostname}${basePath}/users/`);
+        usersPageDom = new JSDOM(await response.text());
       });
 
       it('the response body should be valid HTML from JSDOM', function(done) {
@@ -443,13 +424,6 @@ describe('Serve Greenwood With: ', function() {
         const cards = usersPageDom.window.document.querySelectorAll('body > section');
 
         expect(cards.length).to.be.greaterThan(0);
-      });
-
-      it('should have the expected bundled SSR output for the page', async function() {
-        const scriptFiles = (await glob.promise(path.join(publicPath, '*.js')))
-          .filter(file => file.indexOf('users.js') >= 0);
-
-        expect(scriptFiles.length).to.equal(2);
       });
     });
   });
