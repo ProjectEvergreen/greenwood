@@ -16,6 +16,8 @@
  *
  * User Workspace
  * src/
+ *   api/
+ *     greeting.js
  *   assets/
  *     logo.png
  *   components/
@@ -23,6 +25,7 @@
  *   pages/
  *     about.md
  *     index.html
+ *     users.js
  *   styles/
  *     main.css
  * package.json
@@ -33,6 +36,7 @@ import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles, getDependencyFiles } from '../../../../../test/utils.js';
+import request from 'request';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -341,9 +345,113 @@ describe('Serve Greenwood With: ', function() {
       });
 
     });
-    // TODO
-    // dev server proxy
-    // API end[points
+
+    describe('Develop command with dev proxy', function() {
+      let response = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}${basePath}/posts?id=7`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = JSON.parse(body);
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.contain('application/json');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(response.body).to.have.lengthOf(1);
+        done();
+      });
+    });
+
+    describe('Develop command with API specific behaviors', function() {
+      const name = 'Greenwood';
+      let response = {};
+      let data = {};
+
+      before(async function() {
+        response = await fetch(`${hostname}${basePath}/api/greeting?name=${name}`);
+
+        data = await response.json();
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.ok).to.equal(true);
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers.get('content-type')).to.equal('application/json');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(data.message).to.equal(`Hello ${name}!!!`);
+        done();
+      });
+    });
+
+    describe('Prerender an HTML route response for users page exporting an HTMLElement as default export', function() {
+      let usersPageDom;
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}${basePath}/users/`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            usersPageDom = new JSDOM(body);
+
+            resolve();
+          });
+        });
+      });
+
+      it('the response body should be valid HTML from JSDOM', function(done) {
+        expect(usersPageDom).to.not.be.undefined;
+        done();
+      });
+
+      it('should have the expected <h1> text in the <body>', function() {
+        const heading = usersPageDom.window.document.querySelectorAll('body > h1');
+        const userLength = parseInt(heading[0].querySelector('span').textContent, 10);
+
+        expect(heading.length).to.be.equal(1);
+        expect(heading[0].textContent).to.contain('List of Users:');
+        expect(userLength).to.greaterThan(0);
+      });
+
+      it('should have the expected number of <section> tags in the <body>', function() {
+        const cards = usersPageDom.window.document.querySelectorAll('body > section');
+
+        expect(cards.length).to.be.greaterThan(0);
+      });
+
+      it('should have the expected bundled SSR output for the page', async function() {
+        const scriptFiles = (await glob.promise(path.join(publicPath, '*.js')))
+          .filter(file => file.indexOf('users.js') >= 0);
+
+        expect(scriptFiles.length).to.equal(2);
+      });
+    });
   });
 
   after(function() {

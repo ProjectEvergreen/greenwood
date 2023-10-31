@@ -241,7 +241,7 @@ const generateGraph = async (compilation) => {
           } else {
             const extension = filenameUrl.pathname.split('.').pop();
             const relativeApiPath = filenameUrl.pathname.replace(userWorkspace.pathname, '/');
-            const route = relativeApiPath.replace(`.${extension}`, '');
+            const route = `${basePath}${relativeApiPath.replace(`.${extension}`, '')}`;
 
             if (extension !== 'js') {
               console.warn(`${filenameUrl} is not a JavaScript file, skipping...`);
