@@ -24,6 +24,7 @@
  *     about.md
  *     artists.js
  *     index.js
+ *     post.js
  *     users.js
  *   templates/
  *     app.html
@@ -286,14 +287,6 @@ describe('Serve Greenwood With: ', function() {
         expect(cards.length).to.be.greaterThan(0);
       });
 
-      xit('should have a bundled <script> for the card component', function() {
-        const cardScript = Array.from(usersPageDom.window.document.querySelectorAll('head > script[type]'))
-          .filter(script => (/card.*[a-z0-9].js/).test(script.src));
-
-        expect(cardScript.length).to.be.equal(1);
-        expect(cardScript[0].type).to.be.equal('module');
-      });
-
       it('should have the expected bundled SSR output for the page', async function() {
         const scriptFiles = (await glob.promise(path.join(this.context.publicDir, '*.js')))
           .filter(file => file.indexOf('users.js') >= 0);
@@ -353,6 +346,51 @@ describe('Serve Greenwood With: ', function() {
       it('should return the expected bundled image name inside the bundled page route', function(done) {
         expect(usersResponse.body.indexOf(bundledName) >= 0).to.equal(true);
         done();
+      });
+    });
+
+    describe('Prerender an HTML route response for post page exporting an HTMLElement as default export and data loading', function() {
+      const postId = 1;
+      let dom;
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/post/?id=${postId}`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            dom = new JSDOM(body);
+
+            resolve();
+          });
+        });
+      });
+
+      it('the response body should be valid HTML from JSDOM', function(done) {
+        expect(dom).to.not.be.undefined;
+        done();
+      });
+
+      it('should have the expected postId as an <h1> tag in the body', function() {
+        const heading = dom.window.document.querySelectorAll('body > h1');
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal(`Fetched Post ID: ${postId}`);
+      });
+
+      it('should have the expected title as an <h2> tag in the body', function() {
+        const heading = dom.window.document.querySelectorAll('body > h2');
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.not.be.undefined;
+      });
+
+      it('should have the expected body as a <p> tag in the body', function() {
+        const paragraph = dom.window.document.querySelectorAll('body > p');
+
+        expect(paragraph.length).to.equal(1);
+        expect(paragraph[0].textContent).to.not.be.undefined;
       });
     });
 

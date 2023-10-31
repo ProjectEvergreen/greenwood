@@ -12,7 +12,7 @@ In addition to supporting [static and Single Page application project types](/do
 
 > 👉 _To run a Greenwood project with SSR routes for production, just use the [`serve` command](/docs/#cli)._
 
-### Routes
+### Routing
 
 File based routing also applies to server routes.  Just create JavaScript file in the _pages/_ directory and that's it!
 
@@ -25,9 +25,9 @@ greenwood.config.js
 
 The above would serve content in a browser at `/users/`.
 
-### API
+### Usage
 
-In your _[page].js_ file, Greenwood supports the following functions you can `export` for providing server rendered configuration and content:
+In your page _.js_ file, Greenwood supports the following functions you can `export` for providing server rendered configuration and content:
 - `default`: Use a custom element to render your page content.  Will take precedence over `getBody`.  Will also automatically track your custom element dependencies, in place of having to define [frontmatter imports](/docs/front-matter/#imports) in `getFrontmatter`.
 - `getFrontmatter`: Static [frontmatter](/docs/front-matter/), useful in conjunction with [menus](/docs/menus/) or otherwise static configuration / meta data.
 - `getBody`: Effectively anything that you could put into a [`<content-outlet></content-outlet>`](/docs/layouts/#page-templates).
@@ -40,16 +40,18 @@ async function getFrontmatter(compilation, route, label, id) {
 }
 
 async function getBody(compilation, route) {
-  return '/* some HTML here */';
+  return '<!-- some HTML here -->';
 }
 
 async function getTemplate(compilation, route) {
-  return '/* some HTML here */';
+  return '<!-- some HTML here -->';
 }
 
-export default class MyComponent extends HTMLElement {
+export default class MyPage extends HTMLElement {
   constructor() { }
-  connectedCallback() { }
+  async connectedCallback() {
+    this.innerHTML = '<!-- some HTML here -->';
+  }
 }
 
 export {
@@ -59,9 +61,9 @@ export {
 };
 ```
 
-#### Custom Element (default)
+#### Web Server Components (default)
 
-When using `export default`, Greenwood supports providing a custom element as the export for your page content.  It uses [**WCC**](https://github.com/ProjectEvergreen/wcc) by default which also includes support for rendering [Declarative Shadow DOM](https://web.dev/declarative-shadow-dom/).
+When using `export default`, Greenwood supports providing a custom element as the export for your page content, which Greenwood refers to as **Web Server Components (WSCs)**.  It uses [**WCC**](https://github.com/ProjectEvergreen/wcc) by default which also includes support for rendering [Declarative Shadow DOM](https://web.dev/declarative-shadow-dom/).
 
 ```js
 import '../components/card/card.js'; // <wc-card></wc-card>
@@ -69,11 +71,12 @@ import '../components/card/card.js'; // <wc-card></wc-card>
 export default class UsersPage extends HTMLElement {
   async connectedCallback() {
     const users = await fetch('https://www.example.com/api/users').then(resp => resp.json());
-    const html = users.map(user => {
+    const html = users.map((user) => {
+      const { name, imageUrl } = user;
       return `
         <wc-card>
-          <h2 slot="title">${user.name}</h2>
-          <img slot="image" src="${user.imageUrl}" alt="${user.name}"/>
+          <h2 slot="title">${name}</h2>
+          <img slot="image" src="${imageUrl}" alt="${name}"/>
         </wc-card>
       `;
     }).join('');
@@ -83,9 +86,10 @@ export default class UsersPage extends HTMLElement {
 }
 ```
 
-In the above example, _card.js_ will automatically be bundled for you on the client side!  🙌
-
-> _**Note**: Keep in mind that for these "page" components, you will likely want to _avoid_ Declarative Shadow for rendering the top level (to avoid wrapping static content in `<template>` tags), but definitely use Declarative Shadow DOM within any dependent custom elements of your page._
+A couple of notes:
+- WSCs run only on the server, thus you have full access to any APIs of the runtime, with the ability to perform one time `async` operations for [data loading](/docs/server-rendering/#data-loading) in `connectedCallback`.
+- In the above example, card.js will automatically be bundled for you on the client side!
+-  Keep in mind that for these "page" components, you will likely want to _avoid_ rendering into a shadow root in your SSR pages so as to avoid wrapping static content in a Declarative Shadow DOM wrapping `<template>` tag.  However, for any interactive elements within your page, Definitely use Declarative Shadow DOM!
 
 #### Frontmatter
 
@@ -112,32 +116,14 @@ export async function getFrontmatter(compilation, route) {
 
 > _For defining custom dynamic based metadata, like for `<meta>` tags, use `getTemplate` and define those tags right in your HTML._
 
-##### Static Export
-
-To export server routes as just static HTML, you can set the `static` property within the `data` object of your frontmatter.
-
-```js
-export async function getFrontmatter() {
-  return {
-    /* ... */
-
-    data: {
-      static: true
-    }
-  };
-}
-```
-
 So for example, `/pages/artist.js` would render out as `/artists/index.html` and would not require the serve task.  So if you need more flexibility in how you create your pages, but still want to just serve it statically, you can!
 
 #### Body
 
 For just returning content, you can use `getBody`.  For example, return a list of users from an API as the HTML you need.
-
+<!-- eslint-disable no-unused-vars -->
 ```js
-import fetch from 'node-fetch'; // this needs to be installed from npm
-
-export async function getBody() {
+export async function getBody(compilation, page, request) {
   const users = await fetch('http://www.example.com/api/users').then(resp => resp.json());
   const timestamp = new Date().getTime();
   const usersListItems = users
@@ -167,6 +153,7 @@ export async function getBody() {
   `;
 }
 ```
+<!-- eslint-enable no-unused-vars -->
 
 #### Templates
 
@@ -200,6 +187,43 @@ export async function getTemplate(compilation, route) {
   `;
 }
 ```
+
+### Data Loading
+
+For request time data fetching, Greenwood will pass a native `Request` object and a Greenwood compilation params as "constructor props" to your Web Server Component's `constructor`.  For `async` work, use an `async connectedCallback`.
+
+```js
+export default class PostPage extends HTMLElement {
+  constructor(request) {
+    super();
+
+    const params = new URLSearchParams(request.url.slice(request.url.indexOf('?')));
+    this.postId = params.get('id');
+  }
+
+  async connectedCallback() {
+    const { postId } = this;
+    const post = await fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`).then(resp => resp.json());
+    const { id, title, body } = post;
+
+    this.innerHTML = `
+      <h1>Fetched Post ID: ${id}</h1>
+      <h2>${title}</h2>
+      <p>${body}</p>
+    `;
+  }
+}
+```
+
+### Prerender
+
+To export server routes as just static HTML, you can export a `prerender` option from your page set to `true`.
+
+```js
+export const prerender = true;
+```
+
+> You can enable this for all pages using the [prerender configuration](/docs/configuration/#prerender) option.
 
 ### Custom Imports
 

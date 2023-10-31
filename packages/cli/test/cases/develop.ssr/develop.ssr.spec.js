@@ -17,6 +17,7 @@
  *     footer.js
  *   pages/
  *     artists.js
+ *     post.js
  *   templates/
  *     app.html
  */
@@ -134,31 +135,30 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
-    let response = {};
-    let dom;
-    let artistsPageGraphData;
+    describe('Develop command with HTML route response using getTemplate, getBody, getFrontmatter', function() {
+      let response = {};
+      let dom;
+      let artistsPageGraphData;
 
-    before(async function() {
-      const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, '.greenwood/graph.json'), 'utf-8'));
+      before(async function() {
+        const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, '.greenwood/graph.json'), 'utf-8'));
 
-      artistsPageGraphData = graph.filter(page => page.route === '/artists/')[0];
+        artistsPageGraphData = graph.filter(page => page.route === '/artists/')[0];
 
-      return new Promise((resolve, reject) => {
-        request.get(`${hostname}/artists/`, (err, res, body) => {
-          if (err) {
-            reject();
-          }
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/artists/`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
 
-          response = res;
-          response.body = body;
-          dom = new JSDOM(body);
+            response = res;
+            response.body = body;
+            dom = new JSDOM(body);
 
-          resolve();
+            resolve();
+          });
         });
       });
-    });
-
-    describe('Serve command with HTML route response', function() {
 
       it('should return a 200 status', function(done) {
         expect(response.statusCode).to.equal(200);
@@ -234,6 +234,74 @@ describe('Develop Greenwood With: ', function() {
 
         expect(artistsPageGraphData.imports[0]).to.equal(`/components/${componentName}.js`);
         expect(counterScript.length).to.equal(1);
+      });
+    });
+
+    describe('Develop command with HTML route response using default export and request time data', function() {
+      const postId = 1;
+      let response = {};
+      let dom = {};
+
+      before(async function() {
+        return new Promise((resolve, reject) => {
+          request.get(`${hostname}/post/?id=${postId}`, (err, res, body) => {
+            if (err) {
+              reject();
+            }
+
+            response = res;
+            response.body = body;
+            dom = new JSDOM(body);
+
+            resolve();
+          });
+        });
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.statusCode).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers['content-type']).to.equal('text/html');
+        done();
+      });
+
+      it('should return a response body', function(done) {
+        expect(response.body).to.not.be.undefined;
+        done();
+      });
+
+      it('should be valid HTML from JSDOM', function(done) {
+        expect(dom).to.not.be.undefined;
+        done();
+      });
+
+      it('should be valid HTML from JSDOM', function(done) {
+        expect(dom).to.not.be.undefined;
+        done();
+      });
+
+      it('should have the expected postId as an <h1> tag in the body', function() {
+        const heading = dom.window.document.querySelectorAll('body > h1');
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal(`Fetched Post ID: ${postId}`);
+      });
+
+      it('should have the expected title as an <h2> tag in the body', function() {
+        const heading = dom.window.document.querySelectorAll('body > h2');
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.not.be.undefined;
+      });
+
+      it('should have the expected body as a <p> tag in the body', function() {
+        const paragraph = dom.window.document.querySelectorAll('body > p');
+
+        expect(paragraph.length).to.equal(1);
+        expect(paragraph[0].textContent).to.not.be.undefined;
       });
     });
   });

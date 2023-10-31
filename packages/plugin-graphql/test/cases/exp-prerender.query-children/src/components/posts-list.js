@@ -1,55 +1,34 @@
-import { html, LitElement } from 'lit';
 import client from '@greenwood/plugin-graphql/src/core/client.js';
 import ChildrenQuery from '@greenwood/plugin-graphql/src/queries/children.gql';
 
-class PostsListTemplate extends LitElement {
-
-  static get properties() {
-    return {
-      posts: {
-        type: Array
-      }
-    };
-  }
-
-  constructor() {
-    super();
-    this.posts = [];
-  }
-
+export default class PostsList extends HTMLElement {
   async connectedCallback() {
-    super.connectedCallback();
     const response = await client.query({
       query: ChildrenQuery,
       variables: {
         parent: 'blog'
       }
     });
+    const posts = response.data.children;
 
-    this.posts = response.data.children;
-  }
-
-  /* eslint-disable indent */
-  render() {
-    const { posts } = this;
-
-    return html`
+    /* eslint-disable indent */
+    this.innerHTML = `
       <h1>My Posts</h1>
 
       <div class="posts">          
         <ul>
           ${posts.map((post) => {
-            return html`
+            return `
               <li>
                 <a href="${post.route}" title="Click to read my ${post.title} blog post">${post.title} Post</a>
               </li>
             `;
-          })}
+          }).join('')}
         </ul>
       </div>
     `;
+    /* eslint-enable indent */
   }
-  /* eslint-enable */
 }
 
-customElements.define('posts-list', PostsListTemplate);
+customElements.define('posts-list', PostsList);

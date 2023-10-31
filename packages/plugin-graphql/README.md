@@ -1,23 +1,15 @@
 # @greenwood/plugin-graphql
 
 ## Overview
-A plugin for Greenwood to support using [GraphQL](https://graphql.org/) to query Greenwood's content graph.  It runs [**apollo-server**](https://www.apollographql.com/docs/apollo-server/) on the backend and provides an [**@apollo/client** _"like"_](https://www.apollographql.com/docs/react/api/core/ApolloClient/#ApolloClient.readQuery) interface for the frontend that you can use.
+A plugin for Greenwood to support using [GraphQL](https://graphql.org/) to query Greenwood's [content graph](https://www.greenwoodjs.io/docs/data/) with our optional [pre-made queries](https://www.greenwoodjs.io/docs/menus/).  It runs [**apollo-server**](https://www.apollographql.com/docs/apollo-server/) on the backend at build time and provides a **"read-only"** [**@apollo/client** _"like"_](https://www.apollographql.com/docs/react/api/core/ApolloClient/#ApolloClient.readQuery) interface for the frontend that you can use.
 
 > This package assumes you already have `@greenwood/cli` installed.
 
 ## Caveats
 
-As of now, this plugin can only be used in conjunction with our [Puppeteer rendering plugin](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-puppeteer).  Please make sure you have it installed first to get the benefits of this plugin.
-
-```bash
-# npm
-npm install @greenwood/plugin-renderer-puppeteer --save-dev
-
-# yarn
-yarn add  @greenwood/plugin-renderer-puppeteer --dev
-```
-
-> _We are working on re-evaluating and improving our [data loading](https://github.com/ProjectEvergreen/greenwood/issues/952) and [rendering strategies](https://github.com/ProjectEvergreen/greenwood/issues/951) as part of our [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3)._
+As of now, this plugin requires some form of [prerendering](https://www.greenwoodjs.io/docs/server-rendering/#render-vs-prerender) either through:
+1. Enabling [custom imports](https://www.greenwoodjs.io/docs/server-rendering/#custom-imports)
+1. Installing the [Puppeteer renderer plugin](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-puppeteer).
 
 
 ## Installation
@@ -32,15 +24,15 @@ yarn add @greenwood/plugin-graphql --dev
 ```
 
 ## Usage
-Add this plugin and the Puppeteer plugins to your _greenwood.config.js_.
+Add this plugin to your _greenwood.config.js_ and configure with either `prerender: true` _or_ by adding the `greenwoodPluginRendererPuppeteer` plugin.
 
 ```javascript
 import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
-import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
+import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer'; // if using puppeteer
 
 export default {
   // ...
-
+  prerender: true, // if using custom imports
   plugins: [
     greenwoodPluginGraphQL(),
     greenwoodPluginRendererPuppeteer()
@@ -52,8 +44,8 @@ export default {
 This will then allow you to use GraphQL to query your content from your client side.  At build time, it will generate JSON files so that the data is still accessible statically.
 
 ```js
-import client from '@greenwood/plugin-graphql/core/client';
-import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
+import client from '@greenwood/plugin-graphql/src/core/client.js';
+import MenuQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
 
 class HeaderComponent extends HTMLElement {
   constructor() {
@@ -82,7 +74,7 @@ class HeaderComponent extends HTMLElement {
           <a href="${menuItem.route}" title="Click to visit the ${menuItem.label} page">${menuItem.label}</a>
         </li>
       `;
-    }).join();
+    }).join('');
 
     return `
       <header>
@@ -174,7 +166,7 @@ query($name: String!) {
 
 And then you can use it in your code as such:
 ```js
-import client from '@greenwood/plugin-graphql/core/client';
+import client from '@greenwood/plugin-graphql/src/core/client.js';
 import GalleryQuery from '../relative/path/to/data/queries/gallery.gql';
 
 client.query({

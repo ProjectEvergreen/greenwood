@@ -30,6 +30,7 @@
  *     card.js
  *   pages/
  *     artists.js
+ *     post.js
  *     users.js
  *   services/
  *     artists.js
@@ -79,7 +80,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output the expected number of serverless function output folders', function() {
-        expect(functionFolders.length).to.be.equal(7);
+        expect(functionFolders.length).to.be.equal(8);
       });
 
       it('should output the expected configuration file for the build output', function() {
@@ -331,6 +332,52 @@ describe('Build Greenwood With: ', function() {
         expect(headings.length).to.be.equal(1);
         expect(headings[0].textContent).to.be.equal(`List of Users: ${count}`);
         expect(headers.get('content-type')).to.be.equal('text/html');
+      });
+    });
+
+    describe('Post SSR Page adapter', function() {
+      const postId = 1;
+
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const handler = (await import(new URL('./post.func/index.js', vercelFunctionsOutputUrl))).default;
+        const response = {
+          headers: new Headers()
+        };
+
+        await handler({
+          url: `http://localhost:8080/post/?id=${postId}`,
+          headers: {
+            host: 'http://localhost:8080'
+          },
+          method: 'GET'
+        }, {
+          status: function(code) {
+            response.status = code;
+          },
+          send: function(body) {
+            response.body = body;
+          },
+          setHeader: function(key, value) {
+            response.headers.set(key, value);
+          }
+        });
+
+        const { status, body, headers } = response;
+        const dom = new JSDOM(body);
+        const headingOne = dom.window.document.querySelectorAll('body > h1');
+        const headingTwo = dom.window.document.querySelectorAll('body > h2');
+        const paragraph = dom.window.document.querySelectorAll('body > p');
+
+        expect(status).to.be.equal(200);
+        expect(headers.get('content-type')).to.be.equal('text/html');
+
+        expect(headingOne.length).to.be.equal(1);
+        expect(headingTwo.length).to.be.equal(1);
+        expect(paragraph.length).to.be.equal(1);
+
+        expect(headingOne[0].textContent).to.be.equal(`Fetched Post ID: ${postId}`);
+        expect(headingTwo[0].textContent).to.not.be.undefined;
+        expect(paragraph[0].textContent).to.not.be.undefined;
       });
     });
   });

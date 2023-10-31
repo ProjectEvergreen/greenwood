@@ -1,5 +1,5 @@
-import client from '@greenwood/plugin-graphql/core/client';
-import ConfigQuery from '@greenwood/plugin-graphql/queries/config';
+import client from '@greenwood/plugin-graphql/src/core/client.js';
+import ConfigQuery from '@greenwood/plugin-graphql/src/queries/config.gql';
 
 class FooterComponent extends HTMLElement {
   constructor() {

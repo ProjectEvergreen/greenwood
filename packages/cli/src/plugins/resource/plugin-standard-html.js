@@ -14,6 +14,7 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { getUserScripts, getPageTemplate, getAppTemplate } from '../../lib/templating-utils.js';
+import { requestAsObject } from '../../lib/resource-utils.js';
 import unified from 'unified';
 import { Worker } from 'worker_threads';
 
@@ -33,7 +34,7 @@ class StandardHtmlResource extends ResourceInterface {
     return protocol.startsWith('http') && (hasMatchingPageRoute || isSPA);
   }
 
-  async serve(url) {
+  async serve(url, request) {
     const { config, context } = this.compilation;
     const { pagesDir, userWorkspace } = context;
     const { interpolateFrontmatter } = config;
@@ -107,7 +108,7 @@ class StandardHtmlResource extends ResourceInterface {
       const routeModuleLocationUrl = new URL(`./${matchingRoute.filename}`, pagesDir);
       const routeWorkerUrl = this.compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeModuleUrl;
 
-      await new Promise((resolve, reject) => {
+      await new Promise(async (resolve, reject) => {
         const worker = new Worker(new URL('../../lib/ssr-route-worker.js', import.meta.url));
 
         worker.on('message', (result) => {
@@ -146,7 +147,8 @@ class StandardHtmlResource extends ResourceInterface {
           executeModuleUrl: routeWorkerUrl.href,
           moduleUrl: routeModuleLocationUrl.href,
           compilation: JSON.stringify(this.compilation),
-          page: JSON.stringify(matchingRoute)
+          page: JSON.stringify(matchingRoute),
+          request: await requestAsObject(request)
         });
       });
     }
