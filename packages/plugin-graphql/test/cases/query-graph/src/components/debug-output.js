@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit';
-import client from '@greenwood/plugin-graphql/core/client';
-import GraphQuery from '@greenwood/plugin-graphql/queries/graph';
+import client from '@greenwood/plugin-graphql/src/core/client.js';
+import GraphQuery from '@greenwood/plugin-graphql/src/queries/graph.gql';
 
 class DebugOutputComponent extends LitElement {
 

@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.14",
-    "@rollup/plugin-alias": "^3.1.2",
     "apollo-server": "^2.21.0",
     "graphql": "^15.5.0",
     "graphql-tag": "^2.10.1"

@@ -97,12 +97,12 @@ describe('Develop Greenwood With: ', function() {
         const importMapTag = dom.window.document.querySelectorAll('head > script[type="importmap-shim"]')[0];
         const importMap = JSON.parse(importMapTag.textContent).imports;
 
-        expect(importMap['@greenwood/plugin-graphql/core/client']).to.equal('/node_modules/@greenwood/plugin-graphql/src/core/client.js');
-        expect(importMap['@greenwood/plugin-graphql/core/common']).to.equal('/node_modules/@greenwood/plugin-graphql/src/core/common.js');
-        expect(importMap['@greenwood/plugin-graphql/queries/children']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/children.gql');
-        expect(importMap['@greenwood/plugin-graphql/queries/config']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/config.gql');
-        expect(importMap['@greenwood/plugin-graphql/queries/graph']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql');
-        expect(importMap['@greenwood/plugin-graphql/queries/menu']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql');
+        expect(importMap['@greenwood/plugin-graphql/src/core/client.js']).to.equal('/node_modules/@greenwood/plugin-graphql/src/core/client.js');
+        expect(importMap['@greenwood/plugin-graphql/src/core/common.js']).to.equal('/node_modules/@greenwood/plugin-graphql/src/core/common.js');
+        expect(importMap['@greenwood/plugin-graphql/src/queries/children.gql']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/children.gql');
+        expect(importMap['@greenwood/plugin-graphql/src/queries/config.gql']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/config.gql');
+        expect(importMap['@greenwood/plugin-graphql/src/queries/graph.gql']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql');
+        expect(importMap['@greenwood/plugin-graphql/src/queries/menu.gql']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql');
 
         done();
       });

@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
-import client from '@greenwood/plugin-graphql/core/client';
-import MenuQuery from '@greenwood/plugin-graphql/queries/menu';
+import client from '@greenwood/plugin-graphql/src/core/client.js';
+import MenuQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
 
 class HeaderComponent extends LitElement {
 

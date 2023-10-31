@@ -8,7 +8,7 @@ const runProdServer = async (compilation) => {
     try {
       const port = compilation.config.port;
       const hasApisDir = await checkResourceExists(compilation.context.apisDir);
-      const hasDynamicRoutes = compilation.graph.find(page => page.isSSR && !page.data.static);
+      const hasDynamicRoutes = compilation.graph.find(page => page.isSSR && !page.prerender);
       const server = (hasDynamicRoutes && !compilation.config.prerender) || hasApisDir ? getHybridServer : getStaticServer;
 
       (await server(compilation)).listen(port, () => {
