@@ -79,6 +79,7 @@ async function createOutputZip(id, outputType, outputRootUrl, projectDirectory) 
 
 async function netlifyAdapter(compilation) {
   const { outputDir, projectDirectory, scratchDir } = compilation.context;
+  const { basePath } = compilation.config;
   const adapterOutputUrl = new URL('./netlify/functions/', scratchDir);
   const ssrPages = compilation.graph.filter(page => page.isSSR);
   const apiRoutes = compilation.manifest.apis;
@@ -142,17 +143,17 @@ async function netlifyAdapter(compilation) {
 
     await createOutputZip(id, outputType, new URL(`./${id}/`, adapterOutputUrl), projectDirectory);
 
-    redirects += `/${id}/ /.netlify/functions/${id} 200
+    redirects += `${basePath}/${id}/ /.netlify/functions/${id} 200
 `;
   }
 
   if (apiRoutes.size > 0) {
-    redirects += '/api/* /.netlify/functions/api-:splat 200';
+    redirects += `${basePath}/api/* /.netlify/functions/api-:splat 200`;
   }
 
   for (const [key] of apiRoutes) {
     const outputType = 'api';
-    const id = key.replace('/api/', '');
+    const id = key.replace(`${basePath}/api/`, '');
     const outputRoot = new URL(`./api/${id}/`, adapterOutputUrl);
 
     await setupOutputDirectory(id, outputRoot, outputType);
