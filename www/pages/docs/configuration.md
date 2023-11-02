@@ -39,7 +39,7 @@ export default {
 
 There are cases where an application might be deployed and hosted from a "sub" pathname that acts as the relative "web root".  (GitHub Pages is an example of this)
 
-So with a URL of `http://www.example.com/app-a`, the `basePath` could be set as such:
+So with a URL of `http://www.example.com/app-a/`, the `basePath` could be set as such:
 ```js
 export default {
   basePath: '/app-a'
@@ -51,8 +51,14 @@ This would then configure Greenwood's routing and `<script>` and `<link>` tags t
 <script type="module" src="/app-a/some-script.a243dccss.js"></script>
 ```
 
-> _User content, like `<a>` and `<img>` tags will require manually prefixing the basePath in your code._
+For convenience, the value of `basePath` will also be made available as a global variable in the `<head>` of your pages.  For example:
+```html
+<script data-gwd="base-path">
+  globalThis.__GWD_BASE_PATH__ = '/app-a';
+</script>
+```
 
+> _User content, like `<a>` and `<img>` tags will require manually prefixing the basePath in your code._
 
 ### Dev Server
 Configuration for Greenwood's development server is available using the `devServer` option.
