@@ -73,7 +73,7 @@ describe('(Experimental) Build Greenwood With: ', function() {
       });
 
       it('should have the expected <script> tag in the <head> for the <app-footer> component', function() {
-        const scripts = dom.window.document.querySelectorAll('head > script');
+        const scripts = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
 
         expect(scripts.length).to.equal(1);
       });

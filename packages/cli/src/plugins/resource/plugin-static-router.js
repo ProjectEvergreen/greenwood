@@ -95,13 +95,14 @@ class StaticRouterResource extends ResourceInterface {
     }
 
     body = body.replace('</head>', `
-      <script>
-        window.__greenwood = window.__greenwood || {};
-        window.__greenwood.currentTemplate = "${currentTemplate}";
-      </script>
+        <script data-gwd="static-router">
+          window.__greenwood = window.__greenwood || {};
+          window.__greenwood.currentTemplate = "${currentTemplate}";
+        </script>
       </head>
-    `.replace(/\n/g, '').replace(/ /g, ''))
-      .replace(/<body>(.*)<\/body>/s, `
+    `)
+      // TODO needed? .replace(/\n/g, '').replace(/ /g, ''))
+      .replace(/<body>(.*)<\/body>/s, ` //
         <body>\n
 
           <router-outlet>

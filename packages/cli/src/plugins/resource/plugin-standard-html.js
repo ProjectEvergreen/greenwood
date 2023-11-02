@@ -167,7 +167,7 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     body = await getAppTemplate(body, context, customImports, contextPlugins, config.devServer.hud, title, basePath);
-    body = await getUserScripts(body, context);
+    body = await getUserScripts(body, this.compilation);
 
     if (processedMarkdown) {
       const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;

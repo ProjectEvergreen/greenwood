@@ -107,6 +107,17 @@ describe('Serve Greenwood With: ', function() {
         done();
       });
 
+      it('should add a <script> tag for tracking basePath configuration', function(done) {
+        const scriptTags = Array.from(dom.window.document.querySelectorAll('head > script'));
+        const basePathScript = scriptTags.filter((tag) => {
+          return tag.getAttribute('data-gwd') === 'base-path';
+        });
+
+        expect(basePathScript.length).to.equal(1);
+        expect(basePathScript[0].textContent).to.contain(`globalThis.__GWD_BASE_PATH__="${basePath}"`);
+        done();
+      });
+
       it('should have the expected heading tag in the DOM', function(done) {
         const headings = Array.from(dom.window.document.querySelectorAll('body h1'));
 
@@ -279,11 +290,11 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should have one expected inline <script> tag in the <head> for router global variables', function() {
-        const inlineScriptTags = Array.from(dom.window.document.querySelectorAll('head > script'))
-          .filter(tag => !tag.type);
+        const routerScriptTags = Array.from(dom.window.document.querySelectorAll('head > script'))
+          .filter(tag => tag.getAttribute('data-gwd') === 'static-router');
 
-        expect(inlineScriptTags.length).to.be.equal(1);
-        expect(inlineScriptTags[0].textContent).to.contain(`window.__greenwood=window.__greenwood||{};window.__greenwood.currentTemplate="${basePath}/"`);
+        expect(routerScriptTags.length).to.be.equal(1);
+        expect(routerScriptTags[0].textContent.replace(/ /g, '').replace(/\n/g, '')).to.contain(`window.__greenwood=window.__greenwood||{};window.__greenwood.currentTemplate="${basePath}/"`);
       });
 
       it('should have one <router-outlet> tag in the <body> for the content', function() {

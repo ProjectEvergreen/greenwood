@@ -69,7 +69,7 @@ describe('Build Greenwood With: ', function() {
         });
 
         before(function() {
-          scriptTags = dom.window.document.querySelectorAll('head > script');
+          scriptTags = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
           linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"');
           headingTags = dom.window.document.querySelectorAll('body > h1');
         });
@@ -102,7 +102,7 @@ describe('Build Greenwood With: ', function() {
         });
 
         before(function() {
-          scriptTags = dom.window.document.querySelectorAll('head > script');
+          scriptTags = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
           linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"');
           bodyTags = dom.window.document.querySelectorAll('body');
         });
@@ -131,7 +131,7 @@ describe('Build Greenwood With: ', function() {
         });
 
         before(function() {
-          scriptTags = dom.window.document.querySelectorAll('head > script');
+          scriptTags = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
           linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"');
           bodyTags = dom.window.document.querySelectorAll('body');
         });
@@ -160,7 +160,7 @@ describe('Build Greenwood With: ', function() {
         });
 
         before(async function() {
-          scriptTags = dom.window.document.querySelectorAll('head > script');
+          scriptTags = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
           linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"');
           bodyTags = dom.window.document.querySelectorAll('body');
         });

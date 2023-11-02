@@ -90,11 +90,12 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have one expected inline <script> tag in the <head> for router global variables', function() {
-        const inlineScriptTags = Array.from(dom.window.document.querySelectorAll('head > script'))
-          .filter(tag => !tag.type);
+        const inlineRouterTags = Array.from(dom.window.document.querySelectorAll('head > script'))
+          .filter(tag => tag.getAttribute('data-gwd') === 'static-router');
 
-        expect(inlineScriptTags.length).to.be.equal(1);
-        expect(inlineScriptTags[0].textContent).to.contain('window.__greenwood=window.__greenwood||{};window.__greenwood.currentTemplate="page"');
+        expect(inlineRouterTags.length).to.be.equal(1);
+        expect(inlineRouterTags[0].textContent).to.contain('window.__greenwood = window.__greenwood || {};');
+        expect(inlineRouterTags[0].textContent).to.contain('window.__greenwood.currentTemplate = "page"');
       });
 
       it('should have one <router-outlet> tag in the <body> for the content', function() {

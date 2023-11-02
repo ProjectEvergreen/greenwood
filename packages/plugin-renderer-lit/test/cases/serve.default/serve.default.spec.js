@@ -206,7 +206,7 @@ describe('Serve Greenwood With: ', function() {
       // TODO this should be managed via a plugin, not in core
       // https://github.com/ProjectEvergreen/greenwood/issues/728
       it('should have one <script> tag in the <head> for lit polyfills', function() {
-        const scripts = dom.window.document.querySelectorAll('head > script');
+        const scripts = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
 
         expect(scripts.length).to.equal(1);
         expect(scripts[0].getAttribute('src').startsWith('/polyfill-support')).to.equal(true);

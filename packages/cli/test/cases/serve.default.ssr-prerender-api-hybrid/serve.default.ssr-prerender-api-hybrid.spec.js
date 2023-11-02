@@ -123,13 +123,13 @@ describe('Serve Greenwood With: ', function() {
       // TODO no page.js output
       describe('Serve command for static HTML response with bundled home page <script> tag', function() {
         it('should have the expected <script> tags in <head>', function(done) {
-          const scripts = dom.window.document.querySelectorAll('head > script');
+          const scripts = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
           expect(scripts.length).to.equal(1);
           done();
         });
 
         it('should have the expected bundled filename', function(done) {
-          const script = dom.window.document.querySelectorAll('head > script')[0];
+          const script = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'))[0];
 
           expect(script.getAttribute('src')).to.match(/^\/footer.*.js/);
           done();

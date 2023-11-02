@@ -76,25 +76,25 @@ describe('Build Greenwood With: ', function() {
 
     describe('<script ...>...</script> tag in the <head> with mixed attribute ordering', function() {
       it('should have two <script> tag with inline script in the <head>', function() {
-        const scriptTagInline = dom.window.document.querySelectorAll('head > script:not([src])');
+        const scriptTagInline = Array.from(dom.window.document.querySelectorAll('head > script:not([src])')).filter(tag => !tag.getAttribute('data-gwd'));
 
         expect(scriptTagInline.length).to.be.equal(4);
       });
 
       it('should have the expected inline content from inline <script> tag one in index.html', async function() {
-        const scriptTagSrcOne = dom.window.document.querySelectorAll('head > script:not([src])')[0];
+        const scriptTagSrcOne = Array.from(dom.window.document.querySelectorAll('head > script:not([src])')).filter(tag => !tag.getAttribute('data-gwd'))[0];
 
         expect(scriptTagSrcOne.textContent).to.contain('document.getElementsByClassName("output-script-inline-one")[0].innerHTML="script tag module inline one"');
       });
 
       it('should have the expected inline content from inline <script> tag two in index.html', async function() {
-        const scriptTagSrcTwo = dom.window.document.querySelectorAll('head > script:not([src])')[1];
+        const scriptTagSrcTwo = Array.from(dom.window.document.querySelectorAll('head > script:not([src])')).filter(tag => !tag.getAttribute('data-gwd'))[1];
 
         expect(scriptTagSrcTwo.textContent).to.contain('document.getElementsByClassName("output-script-inline-two")[0].innerHTML="script tag module inline two"');
       });
 
       it('should have the expected inline content from inline <script> tag three in index.html', async function() {
-        const scriptTagSrcTwo = dom.window.document.querySelectorAll('head > script:not([src])')[2];
+        const scriptTagSrcTwo = Array.from(dom.window.document.querySelectorAll('head > script:not([src])')).filter(tag => !tag.getAttribute('data-gwd'))[2];
 
         expect(scriptTagSrcTwo.textContent).to.contain('document.getElementsByClassName("output-script-inline-three")[0].innerHTML="script tag module inline three"');
       });

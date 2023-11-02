@@ -60,7 +60,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have one <script> tag for DSD polyfill loaded in the <body> tag', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
+        const scriptTags = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
 
         expect(scriptTags.length).to.be.equal(0);
       });

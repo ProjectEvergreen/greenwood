@@ -145,7 +145,7 @@ describe('Build Greenwood With: ', function() {
         });
 
         it('should have two <script> tags in the <head>', async function() {
-          const scriptTags = dom.window.document.querySelectorAll('head script');
+          const scriptTags = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
 
           expect(scriptTags.length).to.be.equal(2);
         });
@@ -222,7 +222,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have two <script> tags in the <head>', async function() {
-        const scriptTags = dom.window.document.querySelectorAll('head script');
+        const scriptTags = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
 
         expect(scriptTags.length).to.be.equal(2);
       });
@@ -280,7 +280,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have two <script> tags in the <head>', async function() {
-        const scriptTags = dom.window.document.querySelectorAll('head script');
+        const scriptTags = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
 
         expect(scriptTags.length).to.be.equal(2);
       });

@@ -133,9 +133,8 @@ describe('Build Greenwood With: ', function() {
 
       it('should have expected script tag in the head', function() {
         const scriptTags = Array.from(dom.window.document.querySelectorAll('head script'))
-          .filter((scriptTag) => {
-            return scriptTag.getAttribute('src').indexOf('/header.') === 0;
-          });
+          .filter((tag) => !tag.getAttribute('data-gwd'))
+          .filter((tag) => tag.getAttribute('src').indexOf('/header.') === 0);
 
         expect(scriptTags.length).to.equal(1);
       });

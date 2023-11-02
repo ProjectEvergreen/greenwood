@@ -90,6 +90,17 @@ describe('Build Greenwood With: ', function() {
           expect(amwasbsMeta.getAttribute('name')).to.be.equal('apple-mobile-web-app-status-bar-style');
           expect(amwasbsMeta.getAttribute('content')).to.be.equal('black');
         });
+
+        it('should add a <script> tag for tracking basePath configuration', function(done) {
+          const scriptTags = Array.from(dom.window.document.querySelectorAll('head > script'));
+          const basePathScript = scriptTags.filter((tag) => {
+            return tag.getAttribute('data-gwd') === 'base-path';
+          });
+
+          expect(basePathScript.length).to.equal(1);
+          expect(basePathScript[0].textContent).to.contain('globalThis.__GWD_BASE_PATH__=""');
+          done();
+        });
       });
 
       describe('default <body> content', function() {
