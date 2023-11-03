@@ -94,15 +94,15 @@ class StaticRouterResource extends ResourceInterface {
       await fs.writeFile(new URL('./index.html', outputPartialDirUrl), partial);
     }
 
-    body = body.replace('</head>', `
-        <script data-gwd="static-router">
-          window.__greenwood = window.__greenwood || {};
-          window.__greenwood.currentTemplate = "${currentTemplate}";
-        </script>
-      </head>
-    `)
-      // TODO needed? .replace(/\n/g, '').replace(/ /g, ''))
-      .replace(/<body>(.*)<\/body>/s, ` //
+    body = body
+      .replace('</head>', `
+          <script data-gwd="static-router">
+            window.__greenwood = window.__greenwood || {};
+            window.__greenwood.currentTemplate = "${currentTemplate}";
+          </script>
+        </head>
+      `)
+      .replace(/<body>(.*)<\/body>/s, `
         <body>\n
 
           <router-outlet>

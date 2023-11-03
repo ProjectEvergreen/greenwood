@@ -10,7 +10,6 @@ import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 export default {
   workspace: new URL('./www/', import.meta.url),
   optimization: 'inline',
-  basePath: '/my-subpath',
   staticRouter: true,
   interpolateFrontmatter: true,
   plugins: [

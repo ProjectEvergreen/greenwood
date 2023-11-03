@@ -59,7 +59,7 @@ async function getPageTemplate(filePath, context, template, contextPlugins = [])
 }
 
 /* eslint-disable-next-line complexity */
-async function getAppTemplate(pageTemplateContents, context, customImports = [], contextPlugins, enableHud, frontmatterTitle, basePath) {
+async function getAppTemplate(pageTemplateContents, context, customImports = [], contextPlugins, enableHud, frontmatterTitle) {
   const { templatesDir, userTemplatesDir } = context;
   const userAppTemplateUrl = new URL('./app.html', userTemplatesDir);
   const customAppTemplatesFromPlugins = await getCustomPageTemplatesFromPlugins(contextPlugins, 'app');
@@ -156,11 +156,6 @@ async function getAppTemplate(pageTemplateContents, context, customImports = [],
     const finalBody = pageTemplateContents
       ? appBody.replace(/<page-outlet><\/page-outlet>/, pageBody)
       : appBody;
-
-    const basePathTag = basePath === ''
-      ? ''
-      : `<base href="http://localhost:1984${basePath}/" target="_top"/>`;
-    console.log({ basePathTag });
 
     mergedTemplateContents = `<!DOCTYPE html>
       ${mergedHtml}

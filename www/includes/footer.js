@@ -32,7 +32,7 @@ const getTemplate = async (data) => {
       </style>
       <footer class="footer">
         <h4>
-          <a href="/my-subpath/">Greenwood v${data.version}</a> <span class="separator">&#9672</span> <a href="https://www.netlify.com/">This site is powered by Netlify</a>
+          <a href="/">Greenwood v${data.version}</a> <span class="separator">&#9672</span> <a href="https://www.netlify.com/">This site is powered by Netlify</a>
         </h4>
       </footer>
     </app-footer>`;

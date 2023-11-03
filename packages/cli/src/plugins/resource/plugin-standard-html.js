@@ -37,7 +37,7 @@ class StandardHtmlResource extends ResourceInterface {
   async serve(url, request) {
     const { config, context } = this.compilation;
     const { pagesDir, userWorkspace } = context;
-    const { interpolateFrontmatter, basePath } = config;
+    const { interpolateFrontmatter } = config;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find(node => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
@@ -166,7 +166,7 @@ class StandardHtmlResource extends ResourceInterface {
       body = ssrTemplate ? ssrTemplate : await getPageTemplate(filePath, context, template, contextPlugins);
     }
 
-    body = await getAppTemplate(body, context, customImports, contextPlugins, config.devServer.hud, title, basePath);
+    body = await getAppTemplate(body, context, customImports, contextPlugins, config.devServer.hud, title);
     body = await getUserScripts(body, this.compilation);
 
     if (processedMarkdown) {

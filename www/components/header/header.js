@@ -55,7 +55,7 @@ class HeaderComponent extends LitElement {
                 <img src="/assets/evergreen.svg" alt="Greenwood logo"/>
               </a>
               <div class="project-name">
-                <a href="/my-subpath/">Greenwood</a>
+                <a href="/">Greenwood</a>
               </div>
             </div>
 
