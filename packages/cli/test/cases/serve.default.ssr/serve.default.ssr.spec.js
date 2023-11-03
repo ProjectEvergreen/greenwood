@@ -181,7 +181,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should have the expected number of <script> tags in the <head>', function() {
-        const scripts = artistsPageDom.window.document.querySelectorAll('head > script');
+        const scripts = Array.from(artistsPageDom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
 
         expect(scripts.length).to.equal(4);
       });
@@ -195,6 +195,7 @@ describe('Serve Greenwood With: ', function() {
 
       it('should have expected SSR content from the non module script tag', function() {
         const scripts = Array.from(artistsPageDom.window.document.querySelectorAll('head > script'))
+          .filter(tag => !tag.getAttribute('data-gwd'))
           .filter(tag => !tag.getAttribute('type'));
 
         expect(scripts.length).to.equal(2);
@@ -254,7 +255,7 @@ describe('Serve Greenwood With: ', function() {
       it('should append the expected graph resource scripts for the page from a template', function() {
         const { resources } = artistsPageGraphData;
 
-        expect(resources.length).to.equal(5);
+        expect(resources.length).to.equal(6);
         expect(resources.find(resource => resource.endsWith('/header.js'))).to.not.be.undefined;
       });
 

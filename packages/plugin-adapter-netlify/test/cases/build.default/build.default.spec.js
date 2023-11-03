@@ -115,7 +115,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: `http://localhost:8080/api/greeting?name=${param}`,
+          rawUrl: `http://www.example.com/api/greeting?name=${param}`,
           httpMethod: 'GET'
         }, {});
         const { statusCode, body, headers } = response;
@@ -146,7 +146,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: `http://localhost:8080/api/greeting?name=${param}`,
+          rawUrl: `http://www.example.com/api/greeting?name=${param}`,
           httpMethod: 'GET'
         }, {});
         const { statusCode, body, headers } = response;
@@ -179,7 +179,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: 'http://localhost:8080/api/submit-json',
+          rawUrl: 'http://www.example.com/api/submit-json',
           body: { name: param },
           httpMethod: 'POST',
           headers: {
@@ -215,7 +215,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: 'http://localhost:8080/api/submit-form-data',
+          rawUrl: 'http://www.example.com/api/submit-form-data',
           body: `name=${param}`,
           httpMethod: 'POST',
           headers: {
@@ -251,7 +251,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: 'http://localhost:8080/artists/',
+          rawUrl: 'http://www.example.com/artists/',
           httpMethod: 'GET'
         }, {});
         const { statusCode, body, headers } = response;
@@ -288,7 +288,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: 'http://localhost:8080/users/',
+          rawUrl: 'http://www.example.com/users/',
           httpMethod: 'GET'
         }, {});
         const { statusCode, body, headers } = response;

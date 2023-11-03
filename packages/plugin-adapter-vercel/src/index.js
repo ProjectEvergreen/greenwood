@@ -69,6 +69,7 @@ async function setupFunctionBuildFolder(id, outputType, outputRoot) {
 
 async function vercelAdapter(compilation) {
   const { outputDir, projectDirectory } = compilation.context;
+  const { basePath } = compilation.config;
   const adapterOutputUrl = new URL('./.vercel/output/functions/', projectDirectory);
   const ssrPages = compilation.graph.filter(page => page.isSSR);
   const apiRoutes = compilation.manifest.apis;
@@ -87,7 +88,7 @@ async function vercelAdapter(compilation) {
   for (const page of ssrPages) {
     const outputType = 'page';
     const { id } = page;
-    const outputRoot = new URL(`./${id}.func/`, adapterOutputUrl);
+    const outputRoot = new URL(`./${basePath}/${id}.func/`, adapterOutputUrl);
 
     await setupFunctionBuildFolder(id, outputType, outputRoot);
 
@@ -132,8 +133,8 @@ async function vercelAdapter(compilation) {
 
   for (const [key] of apiRoutes) {
     const outputType = 'api';
-    const id = key.replace('/api/', '');
-    const outputRoot = new URL(`./api/${id}.func/`, adapterOutputUrl);
+    const id = key.replace(`${basePath}/api/`, '');
+    const outputRoot = new URL(`./${basePath}/api/${id}.func/`, adapterOutputUrl);
 
     await setupFunctionBuildFolder(id, outputType, outputRoot);
 

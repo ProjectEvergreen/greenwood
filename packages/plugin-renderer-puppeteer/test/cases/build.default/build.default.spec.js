@@ -294,7 +294,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have the expected inline node_modules content in the first inline script tag which should include extra code from rollup', async function() {
-        const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[0];
+        const inlineScriptTag = Array.from(dom.window.document.querySelectorAll('head > script:not([src])')).filter(tag => !tag.getAttribute('data-gwd'))[0];
 
         expect(inlineScriptTag.textContent.replace('\n', '')).to
           // eslint-disable-next-line max-len

@@ -6,7 +6,7 @@ import { WorkerPool } from '../lib/threadpool.js';
 // TODO a lot of these are duplicated in the build lifecycle too
 // would be good to refactor
 async function createOutputDirectory(route, outputDir) {
-  if (route !== '/404/' && !await checkResourceExists(outputDir)) {
+  if (!route.endsWith('/404/') && !await checkResourceExists(outputDir)) {
     await fs.mkdir(outputDir, {
       recursive: true
     });
@@ -59,15 +59,14 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
 
   for (const page of pages) {
     const { route, outputPath, resources } = page;
-    const outputDirUrl = new URL(`./${route}/`, scratchDir);
-    const outputPathUrl = new URL(`./${outputPath}`, scratchDir);
+    const outputPathUrl = new URL(`.${outputPath}`, scratchDir);
     const url = new URL(`http://localhost:${compilation.config.port}${route}`);
     const request = new Request(url);
 
     let body = await (await servePage(url, request, plugins)).text();
     body = await (await interceptPage(url, request, plugins, body)).text();
 
-    await createOutputDirectory(route, outputDirUrl);
+    await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
 
     const scripts = resources
       .map(resource => compilation.resources.get(resource))
@@ -106,8 +105,7 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
 
   await renderer(compilation, async (page, body) => {
     const { route, outputPath } = page;
-    const outputDirUrl = new URL(`./${route}`, scratchDir);
-    const outputPathUrl = new URL(`./${outputPath}`, scratchDir);
+    const outputPathUrl = new URL(`.${outputPath}`, scratchDir);
 
     // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
     body = body.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
@@ -119,7 +117,7 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
 
     await trackResourcesForRoute(body, compilation, route);
-    await createOutputDirectory(route, outputDirUrl);
+    await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
     await fs.writeFile(outputPathUrl, body);
 
     console.info('generated page...', route);
@@ -135,15 +133,14 @@ async function staticRenderCompilation(compilation) {
 
   await Promise.all(pages.map(async (page) => {
     const { route, outputPath } = page;
-    const outputDirUrl = new URL(`.${route}`, scratchDir);
-    const outputPathUrl = new URL(`./${outputPath}`, scratchDir);
+    const outputPathUrl = new URL(`.${outputPath}`, scratchDir);
     const url = new URL(`http://localhost:${compilation.config.port}${route}`);
     const request = new Request(url);
 
     let body = await (await servePage(url, request, plugins)).text();
     body = await (await interceptPage(url, request, plugins, body)).text();
 
-    await createOutputDirectory(route, outputDirUrl);
+    await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
     await fs.writeFile(outputPathUrl, body);
 
     console.info('generated page...', route);

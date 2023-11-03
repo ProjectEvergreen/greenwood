@@ -2,6 +2,7 @@ import gql from 'graphql-tag';
 
 const getMenuFromGraph = async (root, { name, pathname, orderBy }, context) => {
   const { graph } = context;
+  const { basePath } = context.config;
   let items = [];
 
   graph
@@ -12,14 +13,11 @@ const getMenuFromGraph = async (root, { name, pathname, orderBy }, context) => {
 
       if (menu && menu.search(name) > -1) {
         if (pathname) {
-          // check we're querying only pages that contain base route
-          let baseRoute = pathname;
-          let baseRouteIndex = pathname.substring(1, pathname.length).indexOf('/');
-          if (baseRouteIndex > -1) {
-            baseRoute = pathname.substring(0, baseRouteIndex + 1);
-          }
+          const normalizedRoute = basePath === ''
+            ? route
+            : route.replace(basePath, '');
 
-          if (route.includes(baseRoute)) {
+          if (normalizedRoute.startsWith(pathname)) {
             items.push({ item: { route, label, index }, children });
           }
         } else {
@@ -87,13 +85,17 @@ const getChildrenFromParentRoute = async (root, query, context) => {
   const pages = [];
   const { parent } = query;
   const { graph } = context;
+  const { basePath } = context.config;
 
   graph
     .forEach((page) => {
       const { route, path } = page;
-      const root = route.split('/')[1];
+      const normalizedRoute = basePath === ''
+        ? route
+        : route.replace(basePath, '/');
+      const root = normalizedRoute.split('/')[1];
 
-      if (root === parent && path.indexOf(`${parent}/index.md`) < 0) {
+      if (`/${root}` === parent && path.indexOf(`${parent}/index.md`) < 0) {
         pages.push(page);
       }
     });

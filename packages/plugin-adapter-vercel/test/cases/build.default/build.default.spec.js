@@ -126,9 +126,9 @@ describe('Build Greenwood With: ', function() {
         };
 
         await handler({
-          url: `http://localhost:8080/api/greeting?name=${param}`,
+          url: `http://www.example.com/api/greeting?name=${param}`,
           headers: {
-            host: 'http://localhost:8080'
+            host: 'http://www.example.com'
           },
           method: 'GET'
         }, {
@@ -158,9 +158,9 @@ describe('Build Greenwood With: ', function() {
         };
 
         await handler({
-          url: 'http://localhost:8080/api/fragment',
+          url: 'http://www.example.com/api/fragment',
           headers: {
-            host: 'http://localhost:8080'
+            host: 'http://www.example.com'
           },
           method: 'GET'
         }, {
@@ -194,9 +194,9 @@ describe('Build Greenwood With: ', function() {
         };
 
         await handler({
-          url: 'http://localhost:8080/api/submit-json',
+          url: 'http://www.example.com/api/submit-json',
           headers: {
-            'host': 'http://localhost:8080',
+            'host': 'http://www.example.com',
             'content-type': 'application/json'
           },
           body: { name },
@@ -231,9 +231,9 @@ describe('Build Greenwood With: ', function() {
         };
 
         await handler({
-          url: 'http://localhost:8080/api/submit-form-data',
+          url: 'http://www.example.com/api/submit-form-data',
           headers: {
-            'host': 'http://localhost:8080',
+            'host': 'http://www.example.com',
             'content-type': 'application/x-www-form-urlencoded'
           },
           body: { name },
@@ -266,9 +266,9 @@ describe('Build Greenwood With: ', function() {
         const count = 2;
 
         await handler({
-          url: 'http://localhost:8080/artists',
+          url: 'http://www.example.com/artists',
           headers: {
-            host: 'http://localhost:8080'
+            host: 'http://www.example.com'
           },
           method: 'GET'
         }, {
@@ -305,9 +305,9 @@ describe('Build Greenwood With: ', function() {
         const count = 1;
 
         await handler({
-          url: 'http://localhost:8080/users',
+          url: 'http://www.example.com/users',
           headers: {
-            host: 'http://localhost:8080'
+            host: 'http://www.example.com'
           },
           method: 'GET'
         }, {

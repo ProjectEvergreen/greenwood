@@ -167,7 +167,7 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     body = await getAppTemplate(body, context, customImports, contextPlugins, config.devServer.hud, title);
-    body = await getUserScripts(body, context);
+    body = await getUserScripts(body, this.compilation);
 
     if (processedMarkdown) {
       const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
@@ -220,7 +220,7 @@ class StandardHtmlResource extends ResourceInterface {
   }
 
   async optimize(url, response) {
-    const { optimization } = this.compilation.config;
+    const { optimization, basePath } = this.compilation.config;
     const { pathname } = url;
     const pageResources = this.compilation.graph.find(page => page.outputPath === pathname || page.route === pathname).resources;
     let body = await response.text();
@@ -232,7 +232,7 @@ class StandardHtmlResource extends ResourceInterface {
       if (src) {
         if (type === 'script') {
           if (!optimizationAttr && optimization === 'default') {
-            const optimizedFilePath = `/${optimizedFileName}`;
+            const optimizedFilePath = `${basePath}/${optimizedFileName}`;
 
             body = body.replace(src, optimizedFilePath);
             body = body.replace('<head>', `
@@ -244,7 +244,7 @@ class StandardHtmlResource extends ResourceInterface {
 
             body = body.replace(`<script ${rawAttributes}></script>`, `
               <script ${isModule}>
-                ${optimizedFileContents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}
+                ${optimizedFileContents.replace(/\.\//g, `${basePath}/`).replace(/\$/g, '$$$')}
               </script>
             `);
           } else if (optimizationAttr === 'static' || optimization === 'static') {
@@ -252,7 +252,7 @@ class StandardHtmlResource extends ResourceInterface {
           }
         } else if (type === 'link') {
           if (!optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
-            const optimizedFilePath = `/${optimizedFileName}`;
+            const optimizedFilePath = `${basePath}/${optimizedFileName}`;
 
             body = body.replace(src, optimizedFilePath);
             body = body.replace('<head>', `
@@ -280,9 +280,9 @@ class StandardHtmlResource extends ResourceInterface {
           if (optimizationAttr === 'static' || optimization === 'static') {
             body = body.replace(`<script ${rawAttributes}>${contents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}</script>`, '');
           } else if (optimizationAttr === 'none') {
-            body = body.replace(contents, contents.replace(/\.\//g, '/').replace(/\$/g, '$$$'));
+            body = body.replace(contents, contents.replace(/\.\//g, `${basePath}/`).replace(/\$/g, '$$$'));
           } else {
-            body = body.replace(contents, optimizedFileContents.replace(/\.\//g, '/').replace(/\$/g, '$$$'));
+            body = body.replace(contents, optimizedFileContents.replace(/\.\//g, `${basePath}/`).replace(/\$/g, '$$$'));
           }
         } else if (type === 'style') {
           body = body.replace(contents, optimizedFileContents);

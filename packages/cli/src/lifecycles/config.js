@@ -44,6 +44,7 @@ const defaultConfig = {
     extensions: []
   },
   port: 8080,
+  basePath: '',
   optimization: optimizations[0],
   interpolateFrontmatter: false,
   plugins: greenwoodPlugins,
@@ -75,7 +76,7 @@ const readAndMergeConfig = async() => {
 
       if (hasConfigFile) {
         const userCfgFile = (await import(configUrl)).default;
-        const { workspace, devServer, markdown, optimization, plugins, port, prerender, staticRouter, pagesDirectory, templatesDirectory, interpolateFrontmatter } = userCfgFile;
+        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, templatesDirectory, interpolateFrontmatter } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -185,6 +186,15 @@ const readAndMergeConfig = async() => {
             reject(`Error: greenwood.config.js port must be an integer.  Passed value was: ${port}`);
           } else {
             customConfig.port = port;
+          }
+        }
+
+        if (basePath) {
+          // eslint-disable-next-line max-depth
+          if (typeof basePath !== 'string') {
+            reject(`Error: greenwood.config.js basePath must be a string.  Passed value was: ${basePath}`);
+          } else {
+            customConfig.basePath = basePath;
           }
         }
 

@@ -47,7 +47,7 @@ async function optimizeStaticPages(compilation, plugins) {
     .filter(page => !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender))
     .map(async (page) => {
       const { route, outputPath } = page;
-      const outputDirUrl = new URL(`.${route}`, outputDir);
+      const outputDirUrl = new URL(`.${outputPath.replace('index.html', '').replace('404.html', '')}`, outputDir);
       const url = new URL(`http://localhost:${compilation.config.port}${route}`);
       const contents = await fs.readFile(new URL(`./${outputPath}`, scratchDir), 'utf-8');
       const headers = new Headers({ 'Content-Type': 'text/html' });
@@ -70,7 +70,7 @@ async function optimizeStaticPages(compilation, plugins) {
       // clean up optimization markers
       const body = (await response.text()).replace(/data-gwd-opt=".*[a-z]"/g, '');
 
-      await fs.writeFile(new URL(`./${outputPath}`, outputDir), body);
+      await fs.writeFile(new URL(`.${outputPath}`, outputDir), body);
     })
   );
 }
@@ -201,7 +201,7 @@ async function bundleSsrPages(compilation) {
 
         staticHtml = data.template ? data.template : await getPageTemplate(staticHtml, compilation.context, template, []);
         staticHtml = await getAppTemplate(staticHtml, compilation.context, imports, [], false, title);
-        staticHtml = await getUserScripts(staticHtml, compilation.context);
+        staticHtml = await getUserScripts(staticHtml, compilation);
         staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
         staticHtml = staticHtml.replace(/[`\\$]/g, '\\$&'); // https://stackoverflow.com/a/75688937/417806
 
