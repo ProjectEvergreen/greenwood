@@ -61,7 +61,7 @@ describe('Build Greenwood With: ', function() {
 
       before(async function() {
         const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-        const scriptTags = dom.window.document.querySelectorAll('head script');
+        const scriptTags = Array.from(dom.window.document.querySelectorAll('head script')).filter(tag => !tag.getAttribute('data-gwd'));
 
         inlineScript = Array.prototype.slice.call(scriptTags).filter(script => {
           return !script.src && !script.getAttribute('data-state');

@@ -21,10 +21,12 @@ class DevProxyResource extends ResourceInterface {
 
   async serve(url, request) {
     const { pathname } = url;
-    const proxies = this.compilation.config.devServer.proxy;
+    const { config } = this.compilation;
+    const proxies = config.devServer.proxy;
+    const { basePath } = config;
     const proxyBaseUrl = Object.entries(proxies).reduce((acc, entry) => {
-      return pathname.indexOf(entry[0]) >= 0
-        ? `${entry[1]}${pathname}`
+      return pathname.indexOf(`${basePath}${entry[0]}`) >= 0
+        ? `${entry[1]}${pathname.replace(basePath, '')}`
         : acc;
     }, pathname);
     const requestProxied = new Request(`${proxyBaseUrl}${url.search}`, {

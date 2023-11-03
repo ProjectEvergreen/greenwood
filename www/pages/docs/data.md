@@ -192,7 +192,7 @@ async connectedCallback() {
   const response = await client.query({
     query: ChildrenQuery,
     variables: {
-      parent: 'blog'
+      parent: '/blog'
     }
   });
 

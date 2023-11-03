@@ -17,9 +17,13 @@ describe('Unit Test: Data', function() {
 
           before(async function() {
             navigation = await graphResolvers.Query.menu(undefined, {
-              pathname: '/',
               name: 'navigation'
-            }, MOCK_GRAPH);
+            }, {
+              graph: MOCK_GRAPH.graph,
+              config: {
+                basePath: ''
+              }
+            });
           });
 
           it('should have 4 children', function() {
@@ -57,14 +61,19 @@ describe('Unit Test: Data', function() {
       });
 
       describe('getMenuFromGraph filtering by side menu from path /getting-started', function() {
-        describe('with no sorting(default)', function() {
+        describe('with no sorting (default)', function() {
           let shelf = [];
 
           before(async function() {
             shelf = await graphResolvers.Query.menu(undefined, {
               pathname: '/getting-started/',
               name: 'side'
-            }, MOCK_GRAPH);
+            }, {
+              graph: MOCK_GRAPH.graph,
+              config: {
+                basePath: '/my-app'
+              }
+            });
           });
 
           it('should have 7 children', function() {
@@ -125,7 +134,12 @@ describe('Unit Test: Data', function() {
               pathname: '/getting-started/',
               name: 'side',
               orderBy: 'index_asc'
-            }, MOCK_GRAPH);
+            }, {
+              graph: MOCK_GRAPH.graph,
+              config: {
+                basePath: ''
+              }
+            });
           });
 
           it('should have 7 children', function() {
@@ -190,7 +204,12 @@ describe('Unit Test: Data', function() {
               pathname: '/getting-started/',
               name: 'side',
               orderBy: 'index_desc'
-            }, MOCK_GRAPH);
+            }, {
+              graph: MOCK_GRAPH.graph,
+              config: {
+                basePath: ''
+              }
+            });
           });
 
           it('should have 7 children', function() {
@@ -242,7 +261,12 @@ describe('Unit Test: Data', function() {
               pathname: '/getting-started/',
               name: 'side',
               orderBy: 'title_asc'
-            }, MOCK_GRAPH);
+            }, {
+              graph: MOCK_GRAPH.graph,
+              config: {
+                basePath: ''
+              }
+            });
           });
 
           it('should have 7 children', function() {
@@ -305,7 +329,12 @@ describe('Unit Test: Data', function() {
               pathname: '/getting-started/',
               name: 'side',
               orderBy: 'title_desc'
-            }, MOCK_GRAPH);
+            }, {
+              graph: MOCK_GRAPH.graph,
+              config: {
+                basePath: ''
+              }
+            });
           });
 
           it('should have 7 children', function() {
@@ -348,6 +377,77 @@ describe('Unit Test: Data', function() {
               expect(item.label).to.be.equal('Next Steps');
               expect(item.route).to.be.equal('/getting-started/next-steps');
             });
+          });
+        });
+      });
+
+      describe('getChildrenFromGraph', function() {
+
+        describe('with default sort', function() {
+          let data = [];
+
+          before(async function() {
+            data = await graphResolvers.Query.children(undefined, {
+              parent: '/getting-started'
+            }, {
+              graph: MOCK_GRAPH.graph,
+              config: {
+                basePath: '/my-app'
+              }
+            });
+          });
+
+          it('should have 7 children', function() {
+            expect(data.length).to.equal(7);
+          });
+
+          it('should have Branding as the first item', function() {
+            const item = data[0];
+
+            expect(item.label).to.be.equal('Branding');
+            expect(item.route).to.be.equal('/getting-started/branding');
+          });
+
+          it('should have Build and Deploy as the second item', function() {
+            const item = data[1];
+
+            expect(item.label).to.be.equal('Build And Deploy');
+            expect(item.route).to.be.equal('/getting-started/build-and-deploy');
+          });
+
+          it('should have Creating Content as the third item', function() {
+            const item = data[2];
+
+            expect(item.label).to.be.equal('Creating Content');
+            expect(item.route).to.be.equal('/getting-started/creating-content');
+          });
+
+          it('should have Key Concepts as the fourth item', function() {
+            const item = data[3];
+
+            expect(item.label).to.be.equal('Key Concepts');
+            expect(item.route).to.be.equal('/getting-started/key-concepts');
+          });
+
+          it('should have Next Steps as the fifth item', function() {
+            const item = data[4];
+
+            expect(item.label).to.be.equal('Next Steps');
+            expect(item.route).to.be.equal('/getting-started/next-steps');
+          });
+
+          it('should have Project Setup as the sixth item', function() {
+            const item = data[5];
+
+            expect(item.label).to.be.equal('Project Setup');
+            expect(item.route).to.be.equal('/getting-started/project-setup');
+          });
+
+          it('should have Quick Start as the seventh item', function() {
+            const item = data[6];
+
+            expect(item.label).to.be.equal('Quick Start');
+            expect(item.route).to.be.equal('/getting-started/quick-start');
           });
         });
       });

@@ -229,7 +229,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('<script> tag with inline code in the <head> tag', function() {
       it('should have one <script> tag with inline code loaded in the <head> tag', function() {
-        const scriptTagsInline = dom.window.document.querySelectorAll('head > script:not([src])');
+        const scriptTagsInline = Array.from(dom.window.document.querySelectorAll('head > script:not([src])')).filter(tag => !tag.getAttribute('data-gwd'));
 
         expect(scriptTagsInline.length).to.be.equal(1);
       });
@@ -239,7 +239,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have the expected inline node_modules content in the first inline script', async function() {
-        const inlineScriptTag = dom.window.document.querySelectorAll('head > script:not([src])')[0];
+        const inlineScriptTag = Array.from(dom.window.document.querySelectorAll('head > script:not([src])')).filter(tag => !tag.getAttribute('data-gwd'))[0];
 
         expect(inlineScriptTag.textContent.replace(/\n/g, '')).to
           .equal('import"/lit-element.ae169679.js";import"/lit-html.7f7a9139.js";//# sourceMappingURL=116321042.6c5eb91c.js.map');

@@ -69,7 +69,7 @@ describe('Build Greenwood With: ', function() {
 
       describe('<script> tags and files', function() {
         it('should contain three <script> tags in the <head>', function() {
-          const allScriptTags = dom.window.document.querySelectorAll('head script');
+          const allScriptTags = Array.from(dom.window.document.querySelectorAll('head script')).filter(tag => !tag.getAttribute('data-gwd'));
 
           expect(allScriptTags.length).to.be.equal(3);
         });
@@ -90,7 +90,7 @@ describe('Build Greenwood With: ', function() {
       // assume the first tag is for the header
       describe('Header', function() {
         it('should contain one <script> tag with the expected JS content inlined of type="module" for the header', function() {
-          const scriptTag = dom.window.document.querySelectorAll('head script')[0];
+          const scriptTag = Array.from(dom.window.document.querySelectorAll('head script')).filter(tag => !tag.getAttribute('data-gwd'))[0];
 
           expect(scriptTag.type).to.be.equal('module');
           // eslint-disable-next-line max-len
@@ -102,7 +102,7 @@ describe('Build Greenwood With: ', function() {
       // https://github.com/ProjectEvergreen/greenwood/issues/656
       describe('Foobar', function() {
         it('should contain one <script> tag with the expected JS content inlined of type="module" for FooBar', function() {
-          const scriptTag = dom.window.document.querySelectorAll('head script')[1];
+          const scriptTag = Array.from(dom.window.document.querySelectorAll('head script')).filter(tag => !tag.getAttribute('data-gwd'))[1];
 
           expect(scriptTag.type).to.be.equal('module');
           // eslint-disable-next-line max-len
@@ -114,7 +114,7 @@ describe('Build Greenwood With: ', function() {
       // https://github.com/ProjectEvergreen/greenwood/issues/656
       describe('Baz', function() {
         it('should contain one <script> tag with the expected JS content for the already inlined of type="module" for Baz', function() {
-          const scriptTag = dom.window.document.querySelectorAll('head script')[2];
+          const scriptTag = Array.from(dom.window.document.querySelectorAll('head script')).filter(tag => !tag.getAttribute('data-gwd'))[2];
 
           expect(scriptTag.type).to.be.equal('module');
           // eslint-disable-next-line max-len

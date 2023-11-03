@@ -14,7 +14,8 @@ In this guide we'll walk through the steps for setting up a [GitHub Pages](https
 ### Prerequisites
 
 Following the steps [outlined here](https://pages.github.com/), first make sure you have already:
-1. Created a repo in the format `<username>.github.io`
+1. Created a repo in the format `<username>.github.io` or `<username>.github.io/<repo-name>`
+    - If using `<username>.github.io/<repo-name>`, make sure to set Greenwood's [base path](/docs/configuration/#base-peth) configuration to `/<repo-name>`, as you can see in [this demo](https://github.com/ProjectEvergreen/greenwood-demo-github-pages).
 1. Greenwood [installed and setup](/getting-started/) in your repository, ex.
     ```shell
     src/
@@ -39,7 +40,7 @@ With the above in place, let's set everything up!
     }
     ```
 1. Create a file called _.github/workflows/gh-pages.yml_ in the repo
-1. Now add this GitHub Action, making sure to use the correct branch name for your project; _master_, _main_, etc.  (We're leveraging [this action](https://github.com/marketplace/actions/github-pages-action) at the end for the actual auto deploy.)
+1. Now add this GitHub Action, _making sure to use the correct branch name for your project_; **_master_, _main_**, etc.  (We're leveraging [this action](https://github.com/marketplace/actions/github-pages-action) at the end for the actual auto deploy.)
     ```yml
     name: Deploy GitHub Pages
 
@@ -51,15 +52,17 @@ With the above in place, let's set everything up!
     jobs:
 
       build-and-deploy:
+        runs-on: ubuntu-20.04
+
         steps:
         - uses: actions/checkout@v2
         - uses: actions/setup-node@v3
           with:
-            node-version: 14.x
+            node-version: 18.15.0
 
         - name: Install Dependencies
           run: |
-            npm ci # or yarn install if using Yarn
+            npm ci # or replace with yarn, pnpm, etc
 
         - name: Build
           run: |

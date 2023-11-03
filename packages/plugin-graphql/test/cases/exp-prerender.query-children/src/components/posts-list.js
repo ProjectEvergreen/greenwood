@@ -6,7 +6,7 @@ export default class PostsList extends HTMLElement {
     const response = await client.query({
       query: ChildrenQuery,
       variables: {
-        parent: 'blog'
+        parent: '/blog'
       }
     });
     const posts = response.data.children;

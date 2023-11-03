@@ -168,7 +168,7 @@ async function getDevServer(compilation) {
 async function getStaticServer(compilation, composable) {
   const app = new Koa();
   const { outputDir } = compilation.context;
-  const { port } = compilation.config;
+  const { port, basePath } = compilation.config;
   const standardResourcePlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource' && plugin.isGreenwoodDefaultPlugin;
   });
@@ -186,7 +186,7 @@ async function getStaticServer(compilation, composable) {
           ? 'index.html'
           : isStatic
             ? matchingRoute.outputPath
-            : url.pathname;
+            : url.pathname.replace(basePath, '');
         const body = await fs.readFile(new URL(`./${pathname}`, outputDir), 'utf-8');
 
         ctx.set('Content-Type', 'text/html');
@@ -235,7 +235,7 @@ async function getStaticServer(compilation, composable) {
 
   app.use(async (ctx, next) => {
     try {
-      const url = new URL(`.${ctx.url}`, outputDir.href);
+      const url = new URL(`.${ctx.url.replace(basePath, '')}`, outputDir.href);
 
       if (await checkResourceExists(url)) {
         const resourcePlugins = standardResourcePlugins

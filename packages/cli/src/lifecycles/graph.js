@@ -9,13 +9,14 @@ const generateGraph = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const { context } = compilation;
+      const { context, config } = compilation;
+      const { basePath } = config;
       const { apisDir, pagesDir, projectDirectory, userWorkspace } = context;
       let graph = [{
-        outputPath: 'index.html',
+        outputPath: '/index.html',
         filename: 'index.html',
         path: '/',
-        route: '/',
+        route: `${basePath}/`,
         id: 'index',
         label: 'Index',
         data: {},
@@ -212,10 +213,10 @@ const generateGraph = async (compilation) => {
               imports,
               resources: [],
               outputPath: route === '/404/'
-                ? '404.html'
+                ? '/404.html'
                 : `${route}index.html`,
               path: filePath,
-              route,
+              route: `${basePath}${route}`,
               template,
               title,
               isSSR: !isStatic,
@@ -240,7 +241,7 @@ const generateGraph = async (compilation) => {
           } else {
             const extension = filenameUrl.pathname.split('.').pop();
             const relativeApiPath = filenameUrl.pathname.replace(userWorkspace.pathname, '/');
-            const route = relativeApiPath.replace(`.${extension}`, '');
+            const route = `${basePath}${relativeApiPath.replace(`.${extension}`, '')}`;
 
             if (extension !== 'js') {
               console.warn(`${filenameUrl} is not a JavaScript file, skipping...`);
@@ -280,7 +281,7 @@ const generateGraph = async (compilation) => {
 
         graph = await checkResourceExists(pagesDir) ? await walkDirectoryForPages(pagesDir) : graph;
 
-        const has404Page = graph.filter(page => page.route === '/404/').length === 1;
+        const has404Page = graph.find(page => page.route.endsWith('/404/'));
 
         // if the _only_ page is a 404 page, still provide a default index.html
         if (has404Page && graph.length === 1) {
@@ -293,9 +294,9 @@ const generateGraph = async (compilation) => {
             ...graph,
             {
               ...oldGraph,
-              outputPath: '404.html',
+              outputPath: '/404.html',
               filename: '404.html',
-              route: '/404/',
+              route: `${basePath}/404/`,
               path: '404.html',
               id: '404',
               label: 'Not Found'

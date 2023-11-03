@@ -176,7 +176,16 @@ async function getAppTemplate(pageTemplateContents, context, customImports = [],
   return mergedTemplateContents;
 }
 
-async function getUserScripts (contents, context) {
+async function getUserScripts (contents, compilation) {
+  const { context, config } = compilation;
+
+  contents = contents.replace('<head>', `
+    <head>
+      <script data-gwd="base-path">
+        globalThis.__GWD_BASE_PATH__ = '${config.basePath}';
+      </script>
+  `);
+
   // TODO get rid of lit polyfills in core
   // https://github.com/ProjectEvergreen/greenwood/issues/728
   // https://lit.dev/docs/tools/requirements/#polyfills

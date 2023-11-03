@@ -38,10 +38,15 @@ describe('Unit Test: Data', function() {
         let children = [];
 
         before(async function() {
-          children = await graphResolvers.Query.children(undefined, { parent: 'getting-started' }, MOCK_GRAPH);
+          children = await graphResolvers.Query.children(undefined, { parent: '/getting-started' }, {
+            graph: MOCK_GRAPH.graph,
+            config: {
+              basePath: ''
+            }
+          });
         });
 
-        it('should have 8 children', function() {
+        it('should have 7 children', function() {
           expect(children.length).to.equal(7);
         });
 
