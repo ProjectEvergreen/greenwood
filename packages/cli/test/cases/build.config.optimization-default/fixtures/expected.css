@@ -57,3 +57,5 @@ a[href*='greenwood'],a[href$='.pdf']{color:orange}
 @font-feature-values Font One{@styleset {nice-style:12}}
 
 h1:has(+h2){margin:0 0 0.25rem 0}
+
+:is(ol,ul,menu:unsupported) :is(ol,ul){color:green}
