@@ -46,6 +46,8 @@ function bundleCss(body, url, projectDirectory) {
 
         switch (name) {
 
+          case 'is':
+          case 'has':
           case 'lang':
           case 'not':
           case 'nth-child':
@@ -153,6 +155,8 @@ function bundleCss(body, url, projectDirectory) {
         case 'PseudoClassSelector':
           switch (node.name) {
 
+            case 'is':
+            case 'has':
             case 'lang':
             case 'not':
             case 'nth-child':
