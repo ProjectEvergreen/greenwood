@@ -75,7 +75,7 @@ describe('Serve Greenwood With: ', function() {
 
       before(async function() {
         response = await fetch(`${hostname}/products/`);
-        data = await response.json();
+        data = await response.text();
         productsPageDom = new JSDOM(data);
       });
 
