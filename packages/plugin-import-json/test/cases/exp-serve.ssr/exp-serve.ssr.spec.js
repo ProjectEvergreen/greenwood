@@ -67,13 +67,12 @@ describe('Serve Greenwood With: ', function() {
 
     describe('Serve command with HTML route response for products page', function() {
       let response = {};
-      let data;
-      let productsPageDom;
+      let dom;
 
       before(async function() {
         response = await fetch(`${hostname}/products/`);
-        data = response.json();
-        productsPageDom = new JSDOM(data);
+        const body = await response.clone().text();
+        dom = new JSDOM(body);
       });
 
       it('should return a 200 status', function() {
@@ -84,12 +83,8 @@ describe('Serve Greenwood With: ', function() {
         expect(response.headers.get('content-type')).to.equal('text/html');
       });
 
-      it('should return a response body', function() {
-        expect(data).to.not.be.undefined;
-      });
-
       it('should make sure to have the expected number of <app-card> components on the page', function(done) {
-        const cardComponents = productsPageDom.window.document.querySelectorAll('body app-card');
+        const cardComponents = dom.window.document.querySelectorAll('body app-card');
 
         expect(cardComponents.length).to.equal(2);
         done();
@@ -98,10 +93,12 @@ describe('Serve Greenwood With: ', function() {
 
     describe('Serve command with API specific behaviors for an HTML ("fragment") API', function() {
       let response = {};
-      let fragmentsApiDom;
+      let dom;
 
       before(async function() {
         response = await fetch(`${hostname}/api/fragment`);
+        const body = await response.clone().text();
+        dom = new JSDOM(body);
       });
 
       it('should return a 200 status', function() {
@@ -109,7 +106,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return a custom status message', function() {
-        expect(response.statusMessage).to.equal('OK');
+        expect(response.statusText).to.equal('OK');
       });
 
       it('should return the correct content type', function() {
@@ -117,7 +114,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should make sure to have the expected number of <app-card> components in the fragment', function(done) {
-        const cardComponents = fragmentsApiDom.window.document.querySelectorAll('body > app-card');
+        const cardComponents = dom.window.document.querySelectorAll('body > app-card');
 
         expect(cardComponents.length).to.equal(2);
         done();

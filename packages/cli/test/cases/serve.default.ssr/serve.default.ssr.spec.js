@@ -35,7 +35,6 @@ import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath } from 'url';
@@ -74,63 +73,18 @@ describe('Serve Greenwood With: ', function() {
 
     runSmokeTest(['serve'], LABEL);
 
-    let response = {};
-    let artistsPageDom;
-    let homePageDom;
-    let usersPageDom;
-    let artistsPageGraphData;
-
-    before(async function() {
-      return new Promise((resolve, reject) => {
-        request.get(`${hostname}/`, (err, res, body) => {
-          if (err) {
-            reject();
-          }
-
-          homePageDom = new JSDOM(body);
-
-          resolve();
-        });
-      });
-    });
-
-    before(async function() {
-      const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
-
-      artistsPageGraphData = graph.find(page => page.route === '/artists/');
-
-      return new Promise((resolve, reject) => {
-        request.get(`${hostname}/artists/`, (err, res, body) => {
-          if (err) {
-            reject();
-          }
-
-          response = res;
-          response.body = body;
-
-          artistsPageDom = new JSDOM(body);
-
-          resolve();
-        });
-      });
-    });
-
-    before(async function() {
-      return new Promise((resolve, reject) => {
-        request.get(`${hostname}/users/`, (err, res, body) => {
-          if (err) {
-            reject();
-          }
-          usersPageDom = new JSDOM(body);
-
-          resolve();
-        });
-      });
-    });
-
     describe('Serve command with HTML route response for the home page using "get" functions', function() {
+      let response;
+      let dom;
+
+      before(async function() {
+        response = await fetch(`${hostname}/`);
+        const body = await response.clone().text();
+        dom = new JSDOM(body);
+      });
+
       it('should have the expected output for the page', function() {
-        const headings = homePageDom.window.document.querySelectorAll('body > h1');
+        const headings = dom.window.document.querySelectorAll('body > h1');
 
         expect(headings.length).to.equal(1);
         expect(headings[0].textContent).to.equal('Hello from the server rendered home page!');
@@ -145,19 +99,32 @@ describe('Serve Greenwood With: ', function() {
     });
 
     describe('Serve command with HTML route response for artists page using "get" functions', function() {
+      let response;
+      let dom;
+      let artistsPageGraphData;
+      let body;
+
+      before(async function() {
+        response = await fetch(`${hostname}/artists/`);
+        body = await response.clone().text();
+        const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
+
+        artistsPageGraphData = graph.find(page => page.route === '/artists/');
+        dom = new JSDOM(body);
+      });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return a response body', function(done) {
-        expect(response.body).to.not.be.undefined;
+        expect(body).to.not.be.undefined;
         done();
       });
 
@@ -170,31 +137,31 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('the response body should be valid HTML from JSDOM', function(done) {
-        expect(artistsPageDom).to.not.be.undefined;
+        expect(dom).to.not.be.undefined;
         done();
       });
 
       it('should have one style tags', function() {
-        const styles = artistsPageDom.window.document.querySelectorAll('head > style');
+        const styles = dom.window.document.querySelectorAll('head > style');
 
         expect(styles.length).to.equal(1);
       });
 
       it('should have the expected number of <script> tags in the <head>', function() {
-        const scripts = Array.from(artistsPageDom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
+        const scripts = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
 
         expect(scripts.length).to.equal(4);
       });
 
       it('should have the expected <app-header> tag from the app template in the <head>', function() {
-        const scripts = Array.from(artistsPageDom.window.document.querySelectorAll('head > script'))
+        const scripts = Array.from(dom.window.document.querySelectorAll('head > script'))
           .filter(script => script.src && script.src.startsWith('/header.'));
 
         expect(scripts.length).to.equal(1);
       });
 
       it('should have expected SSR content from the non module script tag', function() {
-        const scripts = Array.from(artistsPageDom.window.document.querySelectorAll('head > script'))
+        const scripts = Array.from(dom.window.document.querySelectorAll('head > script'))
           .filter(tag => !tag.getAttribute('data-gwd'))
           .filter(tag => !tag.getAttribute('type'));
 
@@ -203,20 +170,20 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should have the expected number of table rows of content', function() {
-        const rows = artistsPageDom.window.document.querySelectorAll('body > table tr');
+        const rows = dom.window.document.querySelectorAll('body > table tr');
 
         expect(rows.length).to.equal(11);
       });
 
       it('should have the expected <title> content in the <head>', function() {
-        const title = artistsPageDom.window.document.querySelectorAll('head > title');
+        const title = dom.window.document.querySelectorAll('head > title');
 
         expect(title.length).to.equal(1);
         expect(title[0].textContent).to.equal('/artists/');
       });
 
       it('should have custom metadata in the <head>', function() {
-        const metaDescription = Array.from(artistsPageDom.window.document.querySelectorAll('head > meta'))
+        const metaDescription = Array.from(dom.window.document.querySelectorAll('head > meta'))
           .filter((tag) => tag.getAttribute('name') === 'description');
 
         expect(metaDescription.length).to.equal(1);
@@ -239,7 +206,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should append the expected <script> tag for a frontmatter import <x-counter> component', function() {
-        const counterScript = Array.from(artistsPageDom.window.document.querySelectorAll('head > script[src]'))
+        const counterScript = Array.from(dom.window.document.querySelectorAll('head > script[src]'))
           .filter((tag) => tag.getAttribute('src').startsWith('/counter.'));
 
         expect(counterScript.length).to.equal(1);
@@ -268,13 +235,22 @@ describe('Serve Greenwood With: ', function() {
     });
 
     describe('Prerender an HTML route response for users page exporting an HTMLElement as default export', function() {
+      let response;
+      let dom;
+
+      before(async function() {
+        response = await fetch(`${hostname}/users/`);
+        const body = await response.clone().text();
+        dom = new JSDOM(body);
+      });
+
       it('the response body should be valid HTML from JSDOM', function(done) {
-        expect(usersPageDom).to.not.be.undefined;
+        expect(dom).to.not.be.undefined;
         done();
       });
 
       it('should have the expected <h1> text in the <body>', function() {
-        const heading = usersPageDom.window.document.querySelectorAll('body > h1');
+        const heading = dom.window.document.querySelectorAll('body > h1');
         const userLength = parseInt(heading[0].querySelector('span').textContent, 10);
 
         expect(heading.length).to.be.equal(1);
@@ -283,7 +259,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should have the expected number of <wc-card> tags in the <head>', function() {
-        const cards = usersPageDom.window.document.querySelectorAll('body > wc-card template[shadowroot="open"]');
+        const cards = dom.window.document.querySelectorAll('body > wc-card template[shadowroot="open"]');
 
         expect(cards.length).to.be.greaterThan(0);
       });
@@ -298,54 +274,36 @@ describe('Serve Greenwood With: ', function() {
 
     describe('Bundled image using new URL and import.meta.url', function() {
       const bundledName = 'assets/logo-abb2e884.svg';
-      let bundledImageResponse = {};
+      let response = {};
+      let body;
       let usersResponse = {};
+      let usersBody;
 
       before(async function() {
-        await new Promise((resolve, reject) => {
-          request.get(`${hostname}/${bundledName}`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
+        response = await fetch(`${hostname}/${bundledName}`);
+        body = await response.clone().text();
 
-            bundledImageResponse = res;
-            bundledImageResponse.body = body;
-
-            resolve();
-          });
-        });
-
-        await new Promise((resolve, reject) => {
-          request.get(`${hostname}/_users.js`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            usersResponse = res;
-            usersResponse.body = body;
-
-            resolve();
-          });
-        });
+        usersResponse = await fetch(`${hostname}/users/`);
+        usersBody = await usersResponse.clone().text();
       });
 
       it('should return a 200 status for the image', function(done) {
-        expect(bundledImageResponse.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the expected content-type for the image', function(done) {
-        expect(bundledImageResponse.headers['content-type']).to.equal('image/svg+xml');
+        expect(response.headers.get('content-type')).to.equal('image/svg+xml');
         done();
       });
 
       it('should return the expected body for the image', function(done) {
-        expect(bundledImageResponse.body.startsWith('<svg')).to.equal(true);
+        expect(body.startsWith('<svg')).to.equal(true);
         done();
       });
 
       it('should return the expected bundled image name inside the bundled page route', function(done) {
-        expect(usersResponse.body.indexOf(bundledName) >= 0).to.equal(true);
+        expect(usersBody.indexOf(bundledName) >= 0).to.equal(true);
         done();
       });
     });
@@ -353,19 +311,12 @@ describe('Serve Greenwood With: ', function() {
     describe('Prerender an HTML route response for post page exporting an HTMLElement as default export and data loading', function() {
       const postId = 1;
       let dom;
+      let response;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/post/?id=${postId}`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            dom = new JSDOM(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/post/?id=${postId}`);
+        const body = await response.clone().text();
+        dom = new JSDOM(body);
       });
 
       it('the response body should be valid HTML from JSDOM', function(done) {
@@ -399,22 +350,11 @@ describe('Serve Greenwood With: ', function() {
       let response = {};
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/foo`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/foo`);
       });
 
       it('should return a 404 status', function(done) {
-        expect(response.statusCode).to.equal(404);
+        expect(response.status).to.equal(404);
         done();
       });
     });

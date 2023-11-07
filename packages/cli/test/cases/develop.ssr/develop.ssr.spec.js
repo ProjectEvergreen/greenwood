@@ -230,35 +230,26 @@ describe('Develop Greenwood With: ', function() {
       const postId = 1;
       let response = {};
       let dom = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/post/?id=${postId}`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-            dom = new JSDOM(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/post/?id=${postId}`);
+        body = await response.clone().text();
+        dom = new JSDOM(body);
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return a response body', function(done) {
-        expect(response.body).to.not.be.undefined;
+        expect(body).to.not.be.undefined;
         done();
       });
 

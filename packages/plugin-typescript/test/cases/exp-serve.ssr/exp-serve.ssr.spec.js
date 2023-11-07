@@ -63,12 +63,12 @@ describe('Serve Greenwood With: ', function() {
 
     describe('Serve command with API specific behaviors for an HTML ("fragment") API', function() {
       let response = {};
-      let fragmentsApiDom;
+      let dom;
 
       before(async function() {
         response = await fetch(`${hostname}/api/fragment`);
         const body = await response.text();
-        fragmentsApiDom = new JSDOM(body);
+        dom = new JSDOM(body);
       });
 
       it('should return a 200 status', function() {
@@ -76,7 +76,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return a custom status message', function() {
-        expect(response.statusMessage).to.equal('OK');
+        expect(response.statusText).to.equal('OK');
       });
 
       it('should return the correct content type', function() {
@@ -84,7 +84,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should make sure to have the expected CSS inlined into the page for each <app-card>', function(done) {
-        const cardComponents = fragmentsApiDom.window.document.querySelectorAll('body > app-card');
+        const cardComponents = dom.window.document.querySelectorAll('body > app-card');
 
         expect(cardComponents.length).to.equal(2);
         Array.from(cardComponents).forEach((card) => {
