@@ -16,7 +16,6 @@ import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { Runner } from 'gallinago';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { fileURLToPath, URL } from 'url';
@@ -93,32 +92,18 @@ xdescribe('Scaffold Greenwood and Run Develop command: ', function() {
           let dom;
 
           before(async function() {
-            return new Promise((resolve, reject) => {
-              request.get({
-                url: `http://127.0.0.1:${port}`,
-                headers: {
-                  accept: 'text/html'
-                }
-              }, (err, res, body) => {
-                if (err) {
-                  reject();
-                }
-
-                response = res;
-
-                dom = new JSDOM(body);
-                resolve();
-              });
-            });
+            response = await fetch(`${hostname}:${port}`);
+            const data = await response.text();
+            dom = new JSDOM(data);
           });
 
           it('should return the correct content type', function(done) {
-            expect(response.headers['content-type']).to.equal('text/html');
+            expect(response.headers.get('content-type')).to.equal('text/html');
             done();
           });
 
           it('should return a 200', function(done) {
-            expect(response.statusCode).to.equal(200);
+            expect(response.status).to.equal(200);
 
             done();
           });
