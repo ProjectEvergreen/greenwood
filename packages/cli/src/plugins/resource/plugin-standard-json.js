@@ -17,8 +17,9 @@ class StandardJsonResource extends ResourceInterface {
 
   async shouldServe(url) {
     const { protocol, pathname } = url;
+    const { basePath } = this.compilation.config;
     const isJson = pathname.split('.').pop() === this.extensions[0];
-    const isGraphJson = pathname === '/graph.json';
+    const isGraphJson = pathname === `${basePath}/graph.json`;
     const isWorkspaceFile = protocol === 'file:' && await checkResourceExists(url);
 
     return isJson && (isWorkspaceFile || isGraphJson);
@@ -27,7 +28,8 @@ class StandardJsonResource extends ResourceInterface {
   async serve(url) {
     const { pathname } = url;
     const { scratchDir } = this.compilation.context;
-    const finalUrl = pathname.startsWith('/graph.json')
+    const { basePath } = this.compilation.config;
+    const finalUrl = pathname === `${basePath}/graph.json`
       ? new URL('./graph.json', scratchDir)
       : url;
     const contents = await fs.readFile(finalUrl, 'utf-8');
