@@ -26,7 +26,6 @@ import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -139,39 +138,29 @@ describe('Develop Greenwood With: ', function() {
       let response = {};
       let dom;
       let artistsPageGraphData;
+      let body;
 
       before(async function() {
         const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, '.greenwood/graph.json'), 'utf-8'));
 
+        response = await fetch(`${hostname}/artists/`);
+        body = await response.text();
+        dom = new JSDOM(body);
         artistsPageGraphData = graph.filter(page => page.route === '/artists/')[0];
-
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/artists/`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-            dom = new JSDOM(body);
-
-            resolve();
-          });
-        });
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return a response body', function(done) {
-        expect(response.body).to.not.be.undefined;
+        expect(body).to.not.be.undefined;
         done();
       });
 

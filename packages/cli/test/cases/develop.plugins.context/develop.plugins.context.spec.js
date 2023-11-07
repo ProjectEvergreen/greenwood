@@ -22,7 +22,6 @@ import chai from 'chai';
 import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
@@ -66,27 +65,13 @@ describe('Develop Greenwood With: ', function() {
       let dom;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}`,
-            headers: {
-              accept: 'text/html'
-            }
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            dom = new JSDOM(body);
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}`);
+        const body = await response.clone().text();
+        dom = new JSDOM(body);
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
@@ -116,37 +101,26 @@ describe('Develop Greenwood With: ', function() {
 
     describe('Custom Theme Pack internal logic for resolving theme.css for local development', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/node_modules/${packageJson.name}/dist/styles/theme.css`
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/node_modules/${packageJson.name}/dist/styles/theme.css`);
+        body = await response.clone().text();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
 
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/css');
+        expect(response.headers.get('content-type')).to.equal('text/css');
         done();
       });
 
       it('should correctly return CSS from the developers local files', function(done) {
-        expect(response.body).to.equal(':root {\n  --color-primary: #135;\n}');
+        expect(body).to.equal(':root {\n  --color-primary: #135;\n}');
 
         done();
       });
@@ -154,37 +128,26 @@ describe('Develop Greenwood With: ', function() {
 
     describe('Custom Theme Pack internal logic for resolving greeting.js for local development', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/node_modules/${packageJson.name}/dist/components/greeting.js`
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/node_modules/${packageJson.name}/dist/components/greeting.js`);
+        body = await response.clone().text();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
 
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
+        expect(response.headers.get('content-type')).to.equal('text/javascript');
         done();
       });
 
       it('should correctly return JavaScript from the developers local files', function(done) {
-        expect(response.body).to.contain('customElements.define(\'x-greeting\', GreetingComponent);');
+        expect(body).to.contain('customElements.define(\'x-greeting\', GreetingComponent);');
 
         done();
       });

@@ -112,13 +112,12 @@ describe('Serve Greenwood With: ', function() {
 
     describe('Serve command with API specific behaviors for an HTML ("fragment") API', function() {
       let response = {};
-      let data;
       let fragmentsApiDom;
 
       before(async function() {
         response = await fetch(`${hostname}/api/fragment`);
-        data = await response.json();
-        fragmentsApiDom = new JSDOM(data);
+        const body = await response.clone().text();
+        fragmentsApiDom = new JSDOM(body);
       });
 
       it('should return a 200 status', function() {
@@ -126,7 +125,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return a custom status message', function() {
-        expect(response.statusMessage).to.equal('OK');
+        expect(response.statusText).to.equal('OK');
       });
 
       it('should return the correct content type', function() {

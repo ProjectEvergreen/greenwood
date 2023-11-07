@@ -20,7 +20,6 @@ import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { Runner } from 'gallinago';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { fileURLToPath, URL } from 'url';
@@ -61,46 +60,31 @@ describe('Develop Greenwood With: ', function() {
     describe('Develop command specific HUD HTML behaviors when disabled', function() {
       let response = {};
       let sourceHtml = '';
-      let dom;
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}`,
-            headers: {
-              accept: 'text/html'
-            }
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            dom = new JSDOM(body);
-            sourceHtml = fs.readFileSync(fileURLToPath(new URL('./src/pages/index.html', import.meta.url)), 'utf-8');
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}`);
+        body = await response.clone().text();
+        sourceHtml = fs.readFileSync(fileURLToPath(new URL('./src/pages/index.html', import.meta.url)), 'utf-8');
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
 
         done();
       });
 
       it('should contain the appropriate HUD output in the response', function(done) {
-        const body = dom.window.document.querySelectorAll('body')[0];
+        const dom = new JSDOM(body);
+        const bodyTag = dom.window.document.querySelectorAll('body')[0];
 
-        expect(body.textContent).not.to.contain('Malformed HTML detected, please check your closing tags or an HTML formatter');
-        expect(body.textContent.replace(/\\n/g, '').trim()).not.to.contain(sourceHtml.replace(/\\n/g, '').trim());
+        expect(bodyTag.textContent).not.to.contain('Malformed HTML detected, please check your closing tags or an HTML formatter');
+        expect(bodyTag.textContent.replace(/\\n/g, '').trim()).not.to.contain(sourceHtml.replace(/\\n/g, '').trim());
 
         done();
       });

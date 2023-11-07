@@ -35,7 +35,6 @@
 import chai from 'chai';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
@@ -99,34 +98,25 @@ describe('Serve Greenwood With: ', function() {
     // https://github.com/ProjectEvergreen/greenwood/issues/1059
     describe('Serve command with dev proxy with an /api prefix', function() {
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/api/posts?id=7`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = JSON.parse(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/api/posts?id=7`);
+        data = await response.clone().json();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
+        expect(response.headers.get('content-type')).to.equal('application/json; charset=utf-8');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(JSON.stringify(response.body)).to.equal('{}');
+        expect(JSON.stringify(data)).to.equal('{}');
         done();
       });
     });
@@ -134,69 +124,50 @@ describe('Serve Greenwood With: ', function() {
     describe('Serve command with image (png) specific behavior', function() {
       const ext = 'png';
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-
-          request.get(`${hostname}/assets/logo.${ext}`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/assets/logo.${ext}`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal(`image/${ext}`);
+        expect(response.headers.get('content-type')).to.equal(`image/${ext}`);
         done();
       });
 
       it('should return binary data', function(done) {
-        expect(response.body).to.contain('PNG');
+        expect(body).to.contain('PNG');
         done();
       });
     });
 
     describe('Serve command with image (ico) specific behavior', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/assets/favicon.ico`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve(response);
-          });
-        });
+        response = await fetch(`${hostname}/assets/favicon.ico`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('image/x-icon');
+        expect(response.headers.get('content-type')).to.equal('image/x-icon');
         done();
       });
 
       it('should return binary data', function(done) {
-        expect(response.body).to.contain('\u0000');
+        expect(body).to.contain('\u0000');
         done();
       });
     });
@@ -204,34 +175,25 @@ describe('Serve Greenwood With: ', function() {
     describe('Serve command with SVG specific behavior', function() {
       const ext = 'svg';
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/assets/webcomponents.${ext}`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/assets/webcomponents.${ext}`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal(`image/${ext}+xml`);
+        expect(response.headers.get('content-type')).to.equal(`image/${ext}+xml`);
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body.indexOf('<svg')).to.equal(0);
+        expect(body.indexOf('<svg')).to.equal(0);
         done();
       });
     });
@@ -239,34 +201,25 @@ describe('Serve Greenwood With: ', function() {
     describe('Serve command with font specific (.woff) behavior', function() {
       const ext = 'woff';
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/assets/source-sans-pro.woff?v=1`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/assets/source-sans-pro.woff?v=1`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal(`font/${ext}`);
+        expect(response.headers.get('content-type')).to.equal(`font/${ext}`);
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('wOFF');
+        expect(body).to.contain('wOFF');
         done();
       });
     });
@@ -274,148 +227,110 @@ describe('Serve Greenwood With: ', function() {
     describe('Serve command with generic video container format (.mp4) behavior', function() {
       const ext = 'mp4';
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `${hostname}/assets/splash-clip.mp4`
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/assets/splash-clip.mp4`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal(`video/${ext}`);
+        expect(response.headers.get('content-type')).to.equal(`video/${ext}`);
         done();
       });
 
       it('should return the correct content length', function(done) {
-        expect(response.headers['content-length']).to.equal('2498461');
+        expect(response.headers.get('content-length')).to.equal('2498461');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain(ext);
+        expect(body).to.contain(ext);
         done();
       });
     });
 
     describe('Serve command with audio format (.mp3) behavior', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/assets/song-sample.mp3`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/assets/song-sample.mp3`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('audio/mpeg');
+        expect(response.headers.get('content-type')).to.equal('audio/mpeg');
         done();
       });
 
       it('should return the correct content length', function(done) {
-        expect(response.headers['content-length']).to.equal('5425061');
+        expect(response.headers.get('content-length')).to.equal('5425061');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('ID3');
+        expect(body).to.contain('ID3');
         done();
       });
     });
 
     describe('Serve command with JSON specific behavior', function() {
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/assets/data.json`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = JSON.parse(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/assets/data.json`);
+        data = await response.clone().json();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json');
+        expect(response.headers.get('content-type')).to.equal('application/json');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body.name).to.equal('Marvin');
+        expect(data.name).to.equal('Marvin');
         done();
       });
     });
 
     describe('Serve command with source map specific behavior', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/assets/router.js.map`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/assets/router.js.map`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json');
+        expect(response.headers.get('content-type')).to.equal('application/json');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('"sources":["../packages/cli/src/lib/router.js"]');
+        expect(body).to.contain('"sources":["../packages/cli/src/lib/router.js"]');
         done();
       });
     });
@@ -424,22 +339,11 @@ describe('Serve Greenwood With: ', function() {
       let response = {};
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/foo.png`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/foo.png`);
       });
 
       it('should return a 404 status', function(done) {
-        expect(response.statusCode).to.equal(404);
+        expect(response.status).to.equal(404);
         done();
       });
     });
