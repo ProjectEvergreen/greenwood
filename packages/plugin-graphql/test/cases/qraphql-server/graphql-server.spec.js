@@ -15,7 +15,6 @@
  * Greenwood default (src/)
  */
 import chai from 'chai';
-import request from 'request';
 import path from 'path';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
@@ -26,7 +25,7 @@ describe('Develop Greenwood With: ', function() {
   const LABEL = 'GraphQL Server';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const hostname = '127.0.0.1';
+  const hostname = 'localhost';
   const port = 4000;
   let runner;
 
@@ -56,33 +55,19 @@ describe('Develop Greenwood With: ', function() {
       };
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://${hostname}:${port}`,
-            headers: {
-              accept: 'text/html'
-            }
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response.status = res.statusCode;
-            response.headers = res.headers;
-
-            resolve(response);
-          });
+        response = await fetch(`http://${hostname}:${port}`, {
+          headers: {
+            accept: 'text/html'
+          }
         });
       });
 
-      it('should return a 200 status', function(done) {
+      it('should return a 200 status', function() {
         expect(response.status).to.equal(200);
-        done();
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
-        done();
+      it('should return the correct content type', function() {
+        expect(response.headers.get('content-type')).to.equal('text/html');
       });
     });
 
@@ -92,6 +77,7 @@ describe('Develop Greenwood With: ', function() {
         body: '',
         code: 0
       };
+      let data;
 
       const body = {
         'operationName': null,
@@ -100,38 +86,26 @@ describe('Develop Greenwood With: ', function() {
       };
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.post({
-            url: `http://${hostname}:${port}/graphql`,
-            json: true,
-            body
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response.status = res.statusCode;
-            response.headers = res.headers;
-            response.body = body;
-
-            resolve(response);
-          });
+        response = await fetch(`http://${hostname}:${port}/graphql`, {
+          method: 'POST',
+          body: JSON.stringify(body),
+          headers: {
+            'content-type': 'application/json'
+          }
         });
+        data = await response.json();
       });
 
-      it('should return a 200 status', function(done) {
+      it('should return a 200 status', function() {
         expect(response.status).to.equal(200);
-        done();
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
-        done();
+      it('should return the correct content type', function() {
+        expect(response.headers.get('content-type')).to.equal('application/json; charset=utf-8');
       });
 
-      it('should return the expected query response', function(done) {
-        expect(response.body.data.config.workspace).to.equal(new URL('./src/', import.meta.url).href);
-        done();
+      it('should return the expected query response', function() {
+        expect(data.data.config.workspace).to.equal(new URL('./src/', import.meta.url).href);
       });
     });
   });

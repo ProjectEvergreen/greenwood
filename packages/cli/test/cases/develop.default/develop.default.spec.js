@@ -48,7 +48,6 @@ import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getDependencyFiles, getSetupFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
@@ -464,34 +463,19 @@ describe('Develop Greenwood With: ', function() {
       let expectedImportMap;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}`,
-            headers: {
-              accept: 'text/html'
-            }
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            dom = new JSDOM(body);
-            expectedImportMap = JSON.parse(fs.readFileSync(new URL('./import-map.snapshot.json', import.meta.url), 'utf-8'));
-
-            resolve();
-          });
-        });
+        response = await fetch(`http://127.0.0.1:${port}`);
+        const data = await response.text();
+        dom = new JSDOM(data);
+        expectedImportMap = JSON.parse(fs.readFileSync(new URL('./import-map.snapshot.json', import.meta.url), 'utf-8'));
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
 
         done();
       });
@@ -570,32 +554,18 @@ describe('Develop Greenwood With: ', function() {
       let dom;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/404/`,
-            headers: {
-              accept: 'text/html'
-            }
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            dom = new JSDOM(body);
-            resolve();
-          });
-        });
+        response = await fetch(`http://127.0.0.1:${port}/404/`);
+        const data = await response.text();
+        dom = new JSDOM(data);
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
 
         done();
       });
@@ -619,68 +589,50 @@ describe('Develop Greenwood With: ', function() {
 
     describe('Develop command specific JavaScript behaviors for user authored custom element', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/components/header.js`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/components/header.js`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
+        expect(response.headers.get('content-type')).to.equal('text/javascript');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('class HeaderComponent extends HTMLElement');
+        expect(body).to.contain('class HeaderComponent extends HTMLElement');
         done();
       });
     });
 
     describe('Develop command specific CSS behaviors', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/styles/main.css`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/styles/main.css`);
+        body = await response.clone().text();
       });
 
-      it('should eturn a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+      it('should return a 200 status', function(done) {
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/css');
+        expect(response.headers.get('content-type')).to.equal('text/css');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('color: blue;');
+        expect(body).to.contain('color: blue;');
         done();
       });
     });
@@ -688,137 +640,100 @@ describe('Develop Greenwood With: ', function() {
     describe('Develop command with image (png) specific behavior', function() {
       const ext = 'png';
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-
-          request.get(`${hostname}:${port}/assets/logo.${ext}`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/assets/logo.${ext}`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal(`image/${ext}`);
+        expect(response.headers.get('content-type')).to.equal(`image/${ext}`);
         done();
       });
 
       it('should return binary data', function(done) {
-        expect(response.body).to.contain('PNG');
+        expect(body).to.contain('PNG');
         done();
       });
     });
 
     describe('Develop command with image (ico) specific behavior', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/assets/favicon.ico`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve(response);
-          });
-        });
+        response = await fetch(`${hostname}:${port}/assets/favicon.ico`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('image/x-icon');
+        expect(response.headers.get('content-type')).to.equal('image/x-icon');
         done();
       });
 
       it('should return binary data', function(done) {
-        expect(response.body).to.contain('\u0000');
+        expect(body).to.contain('\u0000');
         done();
       });
     });
 
     describe('Develop command with image (webp) specific behavior', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/assets/river-valley.webp`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve(response);
-          });
-        });
+        response = await fetch(`${hostname}:${port}/assets/river-valley.webp`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('image/webp');
+        expect(response.headers.get('content-type')).to.equal('image/webp');
         done();
       });
 
       it('should return binary data', function(done) {
-        expect(response.body).to.contain('\u0000');
+        expect(body).to.contain('\u0000');
         done();
       });
     });
 
     describe('Develop command with image (avif) specific behavior', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/assets/fox.avif`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve(response);
-          });
-        });
+        response = await fetch(`${hostname}:${port}/assets/fox.avif`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('image/avif');
+        expect(response.headers.get('content-type')).to.equal('image/avif');
         done();
       });
 
       it('should return binary data', function(done) {
-        expect(response.body).to.contain('\u0000');
+        expect(body).to.contain('\u0000');
         done();
       });
     });
@@ -826,34 +741,25 @@ describe('Develop Greenwood With: ', function() {
     describe('Develop command with image (svg) specific behavior', function() {
       const ext = 'svg';
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/assets/webcomponents.${ext}`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/assets/webcomponents.${ext}`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal(`image/${ext}+xml`);
+        expect(response.headers.get('content-type')).to.equal(`image/${ext}+xml`);
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body.indexOf('<svg')).to.equal(0);
+        expect(body.indexOf('<svg')).to.equal(0);
         done();
       });
     });
@@ -861,34 +767,25 @@ describe('Develop Greenwood With: ', function() {
     describe('Develop command with font specific (.woff) behavior', function() {
       const ext = 'woff';
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/assets/source-sans-pro.woff?v=1`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/assets/source-sans-pro.${ext}?v=1`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal(`font/${ext}`);
+        expect(response.headers.get('content-type')).to.equal(`font/${ext}`);
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('wOFF');
+        expect(body).to.contain('wOFF');
         done();
       });
     });
@@ -896,262 +793,190 @@ describe('Develop Greenwood With: ', function() {
     describe('Develop command with generic video container format (.mp4) behavior', function() {
       const ext = 'mp4';
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `${hostname}:${port}/assets/splash-clip.mp4`
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/assets/splash-clip.mp4`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type header', function(done) {
-        expect(response.headers['content-type']).to.equal(`video/${ext}`);
+        expect(response.headers.get('content-type')).to.equal(`video/${ext}`);
         done();
       });
 
       it('should return the correct content length header', function(done) {
-        expect(response.headers['content-length']).to.equal('2498461');
+        expect(response.headers.get('content-length')).to.equal('2498461');
         done();
       });
 
       it('should return the correct etag header', function(done) {
-        expect(response.headers.etag).to.equal('2130309740');
+        expect(response.headers.get('etag')).to.equal('2130309740');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain(ext);
+        expect(body).to.contain(ext);
         done();
       });
     });
 
     describe('Develop command with generic video container format (.mp4) behavior that should return an etag hit', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `${hostname}:${port}/assets/splash-clip.mp4`,
-            headers: {
-              'if-none-match': '2130309740'
-            }
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/assets/splash-clip.mp4`, { headers: new Headers({ 'if-none-match': '2130309740' }) });
+        body = await response.clone().text();
       });
 
       it('should return a 304 status', function(done) {
-        expect(response.statusCode).to.equal(304);
+        expect(response.status).to.equal(304);
         done();
       });
 
       it('should return an empty body', function(done) {
-        expect(response.body).to.contain('');
+        expect(body).to.contain('');
         done();
       });
 
       it('should return the correct cache-control header', function(done) {
-        expect(response.headers['cache-control']).to.equal('no-cache');
+        expect(response.headers.get('cache-control')).to.equal('no-cache');
         done();
       });
     });
 
     describe('Develop command with audio format (.mp3) behavior', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/assets/song-sample.mp3`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/assets/song-sample.mp3`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('audio/mpeg');
+        expect(response.headers.get('content-type')).to.equal('audio/mpeg');
         done();
       });
 
       it('should return the correct content length', function(done) {
-        expect(response.headers['content-length']).to.equal('5425061');
+        expect(response.headers.get('content-length')).to.equal('5425061');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('ID3');
+        expect(body).to.contain('ID3');
         done();
       });
     });
 
     describe('Develop command with JSON specific behavior', function() {
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/assets/data.json`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = JSON.parse(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/assets/data.json`);
+        data = await response.clone().json();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json');
+        expect(response.headers.get('content-type')).to.equal('application/json');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body.name).to.equal('Marvin');
+        expect(data.name).to.equal('Marvin');
         done();
       });
     });
 
     describe('Develop command with source map specific behavior', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/node_modules/lit-html/lit-html.js.map`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/node_modules/lit-html/lit-html.js.map`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json');
+        expect(response.headers.get('content-type')).to.equal('application/json');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('"sources":["src/lit-html.ts"]');
+        expect(body).to.contain('"sources":["src/lit-html.ts"]');
         done();
       });
     });
 
     describe('Develop command specific node modules resolution behavior for JS with query string', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/node_modules/lit-html/lit-html.js?type=xyz`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/node_modules/lit-html/lit-html.js?type=xyz`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
+        expect(response.headers.get('content-type')).to.equal('text/javascript');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('Copyright 2017 Google LLC');
+        expect(body).to.contain('Copyright 2017 Google LLC');
         done();
       });
     });
 
     describe('Develop command specific node modules resolution behavior for CSS with query string', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/node_modules/simpledotcss/simple.css?xyz=123`
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`http://127.0.0.1:${port}/node_modules/simpledotcss/simple.css?xyz=123`);
+        body = await response.clone().text();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/css');
+        expect(response.headers.get('content-type')).to.equal('text/css');
         done();
       });
 
       it('should correctly return CSS from the developers local files', function(done) {
-        expect(response.body).to.contain('/* Set the global variables for everything. Change these to use your own fonts/colours. */');
+        expect(body).to.contain('/* Set the global variables for everything. Change these to use your own fonts/colours. */');
         done();
       });
     });
@@ -1160,34 +985,25 @@ describe('Develop Greenwood With: ', function() {
     // https://github.com/ProjectEvergreen/greenwood/pull/687
     describe('Develop command specific workspace resolution when local file matches a file also in node_modules', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/lit-html.js`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/lit-html.js`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
+        expect(response.headers.get('content-type')).to.equal('text/javascript');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.equal('console.debug(\'its just a prank bro!\');');
+        expect(body).to.equal('console.debug(\'its just a prank bro!\');');
         done();
       });
     });
@@ -1195,34 +1011,25 @@ describe('Develop Greenwood With: ', function() {
     // https://github.com/ProjectEvergreen/greenwood/issues/715
     describe('Develop command node_modules resolution for a transient dependency\'s own imports', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/node_modules/@bundled-es-modules/message-format/MessageFormat.js`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/node_modules/@bundled-es-modules/message-format/MessageFormat.js`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
+        expect(response.headers.get('content-type')).to.equal('text/javascript');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('export default messageFormat;');
+        expect(body).to.contain('export default messageFormat;');
         done();
       });
     });
@@ -1231,34 +1038,25 @@ describe('Develop Greenwood With: ', function() {
     // @lion/calendar/define -> /node_modules/@lion/calendar/lion-calendar.js
     describe('Develop command node_modules resolution for a flat export map entry from a dependency (not import or default)', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/node_modules/@lion/calendar/lion-calendar.js`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/node_modules/@lion/calendar/lion-calendar.js`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
+        expect(response.headers.get('content-type')).to.equal('text/javascript');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('customElements.define(\'lion-calendar\', LionCalendar);');
+        expect(body).to.contain('customElements.define(\'lion-calendar\', LionCalendar);');
         done();
       });
     });
@@ -1266,39 +1064,30 @@ describe('Develop Greenwood With: ', function() {
     // need some better 404 handling here (promise reject handling for assets and routes)
     describe('Develop command with default 404 behavior', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/abc.js`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/abc.js`);
+        body = await response.clone().text();
       });
 
       it('should return a 404 status', function(done) {
-        expect(response.statusCode).to.equal(404);
+        expect(response.status).to.equal(404);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/plain; charset=utf-8');
+        expect(response.headers.get('content-type')).to.equal('text/plain; charset=utf-8');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain('');
+        expect(body).to.contain('');
         done();
       });
 
       it('should return the correct status message body', function(done) {
-        expect(response.statusMessage).to.contain('Not Found');
+        expect(response.statusText).to.contain('Not Found');
         done();
       });
     });
@@ -1306,29 +1095,20 @@ describe('Develop Greenwood With: ', function() {
     // proxies to https://jsonplaceholder.typicode.com/posts via greenwood.config.js
     describe('Develop command with dev proxy', function() {
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/posts?id=7`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = JSON.parse(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/posts?id=7`);
+        data = await response.clone().json();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
+        expect(response.headers.get('content-type')).to.equal('application/json; charset=utf-8');
         done();
       });
 
@@ -1339,7 +1119,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.have.lengthOf(1);
+        expect(data).to.have.lengthOf(1);
         done();
       });
     });
@@ -1351,7 +1131,6 @@ describe('Develop Greenwood With: ', function() {
 
       before(async function() {
         response = await fetch(`${hostname}:${port}/api/greeting?name=${name}`);
-
         data = await response.json();
       });
 
@@ -1381,66 +1160,50 @@ describe('Develop Greenwood With: ', function() {
     describe('Develop command with API specific behaviors for an HTML ("fragment") API', function() {
       const name = 'Greenwood';
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/api/fragment?name=${name}`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/api/fragment?name=${name}`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return a custom status message', function(done) {
-        expect(response.statusMessage).to.equal('SUCCESS!!!');
+        expect(response.statusText).to.equal('SUCCESS!!!');
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain(`<h1>Hello ${name}!!!</h1>`);
+        expect(body).to.contain(`<h1>Hello ${name}!!!</h1>`);
         done();
       });
     });
 
     describe('Develop command with API specific behaviors with a custom response', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/api/missing`, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/api/missing`);
+        body = await response.clone().text();
       });
 
       it('should return a 404 status', function(done) {
-        expect(response.statusCode).to.equal(404);
+        expect(response.status).to.equal(404);
         done();
       });
 
       it('should return a body of not found', function(done) {
-        expect(response.body).to.equal('Not Found');
+        expect(body).to.equal('Not Found');
         done();
       });
     });
@@ -1449,20 +1212,11 @@ describe('Develop Greenwood With: ', function() {
       let response = {};
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}:${port}/api/nothing`, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/api/nothing`);
       });
 
       it('should return a custom status code', function(done) {
-        expect(response.statusCode).to.equal(204);
+        expect(response.status).to.equal(204);
         done();
       });
     });
@@ -1470,85 +1224,61 @@ describe('Develop Greenwood With: ', function() {
     describe('Develop command with POST API specific behaviors for JSON', function() {
       const param = 'Greenwood';
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.post({
-            url: `${hostname}:${port}/api/submit-json`,
-            json: true,
-            body: { name: param }
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve(response);
-          });
+        response = await fetch(`${hostname}:${port}/api/submit-json`, {
+          method: 'POST',
+          body: JSON.stringify({ name: param })
         });
+        data = await response.json();
       });
 
-      it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
-        done();
+      it('should return a 200 status', function() {
+        expect(response.status).to.equal(200);
       });
 
-      it('should return the expected response message', function(done) {
-        const { message } = response.body;
-
-        expect(message).to.equal(`Thank you ${param} for your submission!`);
-        done();
+      it('should return the expected response message', function() {
+        expect(data.message).to.equal(`Thank you ${param} for your submission!`);
       });
 
-      it('should return the expected content type header', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json');
-        done();
+      it('should return the expected content type header', function() {
+        expect(response.headers.get('content-type')).to.equal('application/json');
       });
 
-      it('should return the secret header in the response', function(done) {
-        expect(response.headers['x-secret']).to.equal('1234');
-        done();
+      it('should return the secret header in the response', function() {
+        expect(response.headers.get('x-secret')).to.equal('1234');
       });
     });
 
     describe('Develop command with POST API specific behaviors for FormData', function() {
       const param = 'Greenwood';
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.post({
-            url: `${hostname}:${port}/api/submit-form-data`,
-            form: {
-              name: param
-            }
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve(response);
-          });
+        response = await fetch(`${hostname}:${port}/api/submit-form-data`, {
+          method: 'POST',
+          body: new URLSearchParams({ name: param }).toString(),
+          headers: new Headers({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
         });
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
-        done();
-      });
-
-      it('should return the expected response message', function(done) {
-        expect(response.body).to.equal(`Thank you ${param} for your submission!`);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the expected content type header', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
+        done();
+      });
+
+      it('should return the expected response message', function(done) {
+        expect(body).to.equal(`Thank you ${param} for your submission!`);
         done();
       });
     });

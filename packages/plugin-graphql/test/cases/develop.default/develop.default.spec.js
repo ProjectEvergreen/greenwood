@@ -20,7 +20,6 @@
 import chai from 'chai';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import request from 'request';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
@@ -60,37 +59,21 @@ describe('Develop Greenwood With: ', function() {
 
     describe('Develop command import map for GraphQL', function() {
       let response = {};
+      let data;
       let dom;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}`,
-            headers: {
-              accept: 'text/html'
-            }
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            dom = new JSDOM(body);
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}`);
+        data = await response.text();
+        dom = new JSDOM(data);
       });
 
-      it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
-
-        done();
+      it('should return a 200', function() {
+        expect(response.status).to.equal(200);
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
-        done();
+      it('should return the correct content type', function() {
+        expect(response.headers.get('content-type')).to.equal('text/html');
       });
 
       it('should return an import map shim <script> in the <head> of the document', function(done) {
@@ -110,73 +93,45 @@ describe('Develop Greenwood With: ', function() {
 
     describe('Develop command specific client node_modules resolution', function() {
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/node_modules/@greenwood/plugin-graphql/src/core/client.js`
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/node_modules/@greenwood/plugin-graphql/src/core/client.js`);
+        data = await response.text();
       });
 
-      it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
-
-        done();
+      it('should return a 200', function() {
+        expect(response.status).to.equal(200);
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
-        done();
+      it('should return the correct content type', function() {
+        expect(response.headers.get('content-type')).to.equal('text/javascript');
       });
 
-      it('should return an ECMASCript module', function(done) {
-        expect(response.body).to.contain('export default client;');
-        done();
+      it('should return an ECMASCript module', function() {
+        expect(data).to.contain('export default client;');
       });
     });
 
     describe('Develop command specific .gql behaviors', function() {
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/data/queries/gallery.gql`
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/data/queries/gallery.gql`);
+        data = await response.text();
       });
 
-      it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
-
-        done();
+      it('should return a 200', function() {
+        expect(response.status).to.equal(200);
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
-        done();
+      it('should return the correct content type', function() {
+        expect(response.headers.get('content-type')).to.equal('text/javascript');
       });
 
-      it('should return an ECMASCript module', function(done) {
-        expect(response.body.trim().indexOf('export default')).to.equal(0);
-        done();
+      it('should return an ECMASCript module', function() {
+        expect(data.trim().indexOf('export default')).to.equal(0);
       });
     });
   });

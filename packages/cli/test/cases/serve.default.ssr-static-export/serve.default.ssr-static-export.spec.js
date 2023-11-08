@@ -26,7 +26,6 @@ import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
@@ -147,35 +146,26 @@ describe('Serve Greenwood With: ', function() {
     describe('Serve command that tests for static HTML export from SSR route', function() {
       let dom;
       let response;
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/artists/`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-            dom = new JSDOM(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/artists/`);
+        body = await response.clone().text();
+        dom = new JSDOM(body);
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return a response body', function(done) {
-        expect(response.body).to.not.be.undefined;
+        expect(body).to.not.be.undefined;
         done();
       });
 

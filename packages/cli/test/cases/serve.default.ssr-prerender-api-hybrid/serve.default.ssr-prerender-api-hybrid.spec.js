@@ -29,7 +29,6 @@ import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
@@ -72,36 +71,27 @@ describe('Serve Greenwood With: ', function() {
     describe('Serve command that prerenders SSR pages', function() {
       let dom;
       let response;
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-            dom = new JSDOM(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/`);
+        body = await response.clone().text();
+        dom = new JSDOM(body);
       });
 
       describe('Serve command with HTML response for the home page', function() {
         it('should return a 200 status', function(done) {
-          expect(response.statusCode).to.equal(200);
+          expect(response.status).to.equal(200);
           done();
         });
 
         it('should return the correct content type', function(done) {
-          expect(response.headers['content-type']).to.equal('text/html');
+          expect(response.headers.get('content-type')).to.equal('text/html');
           done();
         });
 
         it('should return a response body', function(done) {
-          expect(response.body).to.not.be.undefined;
+          expect(body).to.not.be.undefined;
           done();
         });
 
@@ -140,34 +130,25 @@ describe('Serve Greenwood With: ', function() {
     describe('Serve command with API specific behaviors for a JSON API', function() {
       const name = 'Greenwood';
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/api/greeting?name=${name}`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = JSON.parse(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/api/greeting?name=${name}`);
+        data = await response.clone().json();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json');
+        expect(response.headers.get('content-type')).to.equal('application/json');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body.message).to.equal(`Hello ${name}!!!`);
+        expect(data.message).to.equal(`Hello ${name}!!!`);
         done();
       });
     });

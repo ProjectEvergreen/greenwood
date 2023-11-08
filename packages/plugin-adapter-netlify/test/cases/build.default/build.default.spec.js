@@ -54,6 +54,7 @@ describe('Build Greenwood With: ', function() {
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const netlifyFunctionsOutputUrl = new URL('./netlify/functions/', import.meta.url);
+  const hostname = 'http://www.example.com';
   let runner;
 
   before(async function() {
@@ -115,7 +116,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: `http://www.example.com/api/greeting?name=${param}`,
+          rawUrl: `${hostname}/api/greeting?name=${param}`,
           httpMethod: 'GET'
         }, {});
         const { statusCode, body, headers } = response;
@@ -146,7 +147,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: `http://www.example.com/api/greeting?name=${param}`,
+          rawUrl: `${hostname}/api/greeting?name=${param}`,
           httpMethod: 'GET'
         }, {});
         const { statusCode, body, headers } = response;
@@ -179,7 +180,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: 'http://www.example.com/api/submit-json',
+          rawUrl: `${hostname}/api/submit-json`,
           body: { name: param },
           httpMethod: 'POST',
           headers: {
@@ -215,7 +216,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: 'http://www.example.com/api/submit-form-data',
+          rawUrl: `${hostname}/api/submit-form-data`,
           body: `name=${param}`,
           httpMethod: 'POST',
           headers: {
@@ -251,7 +252,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: 'http://www.example.com/artists/',
+          rawUrl: `${hostname}/artists/`,
           httpMethod: 'GET'
         }, {});
         const { statusCode, body, headers } = response;
@@ -288,7 +289,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: 'http://www.example.com/users/',
+          rawUrl: `${hostname}/users/`,
           httpMethod: 'GET'
         }, {});
         const { statusCode, body, headers } = response;
@@ -325,7 +326,7 @@ describe('Build Greenwood With: ', function() {
         });
         const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
         const response = await handler({
-          rawUrl: `http://localhost:8080/post/?id=${postId}`,
+          rawUrl: `${hostname}/post/?id=${postId}`,
           httpMethod: 'GET'
         }, {});
 
