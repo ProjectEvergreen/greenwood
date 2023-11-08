@@ -55,6 +55,7 @@ describe('Build Greenwood With: ', function() {
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const vercelOutputFolder = new URL('./.vercel/output/', import.meta.url);
   const vercelFunctionsOutputUrl = new URL('./functions/', vercelOutputFolder);
+  const hostname = 'http://www.example.com';
   let runner;
 
   before(async function() {
@@ -126,9 +127,9 @@ describe('Build Greenwood With: ', function() {
         };
 
         await handler({
-          url: `http://www.example.com/api/greeting?name=${param}`,
+          url: `${hostname}/api/greeting?name=${param}`,
           headers: {
-            host: 'http://www.example.com'
+            host: hostname
           },
           method: 'GET'
         }, {
@@ -158,9 +159,9 @@ describe('Build Greenwood With: ', function() {
         };
 
         await handler({
-          url: 'http://www.example.com/api/fragment',
+          url: `${hostname}/api/fragment`,
           headers: {
-            host: 'http://www.example.com'
+            host: hostname
           },
           method: 'GET'
         }, {
@@ -194,9 +195,9 @@ describe('Build Greenwood With: ', function() {
         };
 
         await handler({
-          url: 'http://www.example.com/api/submit-json',
+          url: `${hostname}/api/submit-json`,
           headers: {
-            'host': 'http://www.example.com',
+            'host': hostname,
             'content-type': 'application/json'
           },
           body: { name },
@@ -231,9 +232,9 @@ describe('Build Greenwood With: ', function() {
         };
 
         await handler({
-          url: 'http://www.example.com/api/submit-form-data',
+          url: `${hostname}/api/submit-form-data`,
           headers: {
-            'host': 'http://www.example.com',
+            'host': hostname,
             'content-type': 'application/x-www-form-urlencoded'
           },
           body: { name },
@@ -266,9 +267,9 @@ describe('Build Greenwood With: ', function() {
         const count = 2;
 
         await handler({
-          url: 'http://www.example.com/artists',
+          url: `${hostname}/artists`,
           headers: {
-            host: 'http://www.example.com'
+            host: hostname
           },
           method: 'GET'
         }, {
@@ -305,9 +306,9 @@ describe('Build Greenwood With: ', function() {
         const count = 1;
 
         await handler({
-          url: 'http://www.example.com/users',
+          url: `${hostname}/users`,
           headers: {
-            host: 'http://www.example.com'
+            host: hostname
           },
           method: 'GET'
         }, {
@@ -345,9 +346,9 @@ describe('Build Greenwood With: ', function() {
         };
 
         await handler({
-          url: `http://localhost:8080/post/?id=${postId}`,
+          url: `${hostname}/post/?id=${postId}`,
           headers: {
-            host: 'http://localhost:8080'
+            host: hostname
           },
           method: 'GET'
         }, {

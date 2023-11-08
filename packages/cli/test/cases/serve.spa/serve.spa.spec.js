@@ -21,7 +21,6 @@ import chai from 'chai';
 import fs from 'fs';
 import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import path from 'path';
-import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
@@ -71,116 +70,78 @@ describe('Serve Greenwood With: ', function() {
 
     describe('Serve command specific HTML behaviors for client side routing at root - /', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/`,
-            headers: {
-              accept: 'text/html'
-            }
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/`);
+        body = await response.clone().text();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
 
         done();
       });
 
       it('should return the expected body contents', function(done) {
-        expect(removeWhiteSpace(response.body.match(BODY_REGEX)[0])).to.equal(expected);
+        expect(removeWhiteSpace(body.match(BODY_REGEX)[0])).to.equal(expected);
         done();
       });
     });
 
     describe('Serve command specific HTML behaviors for client side routing at 1 level route - /<resource>', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/artists/`,
-            headers: {
-              accept: 'text/html'
-            }
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/artists/`);
+        body = await response.clone().text();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
 
         done();
       });
 
       it('should return the expected body contents', function(done) {
-        expect(removeWhiteSpace(response.body.match(BODY_REGEX)[0])).to.equal(expected);
+        expect(removeWhiteSpace(body.match(BODY_REGEX)[0])).to.equal(expected);
         done();
       });
     });
 
     describe('Serve command specific HTML behaviors for client side routing at 1 level route - /<resource>/:id', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/artists/1`,
-            headers: {
-              accept: 'text/html'
-            }
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/artists/1`);
+        body = await response.clone().text();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
 
         done();
       });
 
       it('should return the expected body contents', function(done) {
-        expect(removeWhiteSpace(response.body.match(BODY_REGEX)[0])).to.equal(expected);
+        expect(removeWhiteSpace(body.match(BODY_REGEX)[0])).to.equal(expected);
         done();
       });
     });

@@ -28,7 +28,6 @@ import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -38,7 +37,7 @@ describe('Serve Greenwood With: ', function() {
   const LABEL = 'Custom Lit Renderer for SSR';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const hostname = 'http://127.0.0.1:8080';
+  const hostname = 'http://localhost:8080';
   let runner;
 
   before(async function() {
@@ -140,6 +139,7 @@ describe('Serve Greenwood With: ', function() {
 
     let response = {};
     let artists = [];
+    let data;
     let dom;
     let usersPageDom;
     let usersPageHtml;
@@ -151,50 +151,31 @@ describe('Serve Greenwood With: ', function() {
 
       aboutPageGraphData = graph.filter(page => page.route === '/artists/')[0];
 
-      return new Promise((resolve, reject) => {
-        request.get(`${hostname}/artists/`, (err, res, body) => {
-          if (err) {
-            reject();
-          }
+      response = await fetch(`${hostname}/artists/`);
+      data = await response.text();
+      dom = new JSDOM(data);
 
-          response = res;
-          response.body = body;
-          dom = new JSDOM(body);
-
-          request.get(`${hostname}/users/`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            usersPageHtml = body;
-            usersPageDom = new JSDOM(body);
-
-            resolve();
-          });
-        });
-      });
+      response = await fetch(`${hostname}/users/`);
+      usersPageHtml = await response.text();
+      usersPageDom = new JSDOM(usersPageHtml);
     });
 
     describe('Serve command with HTML route response using getBody, getTemplate and getFrontmatter', function() {
 
-      it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
-        done();
+      it('should return a 200 status', function() {
+        expect(response.status).to.equal(200);
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
-        done();
+      it('should return the correct content type', function() {
+        expect(response.headers.get('content-type')).to.equal('text/html');
       });
 
-      it('should return a response body', function(done) {
-        expect(response.body).to.not.be.undefined;
-        done();
+      it('should return a response body', function() {
+        expect(data).to.not.be.undefined;
       });
 
-      it('the response body should be valid HTML from JSDOM', function(done) {
+      it('the response body should be valid HTML from JSDOM', function() {
         expect(dom).to.not.be.undefined;
-        done();
       });
 
       it('should have one <style> tag in the <head>', function() {

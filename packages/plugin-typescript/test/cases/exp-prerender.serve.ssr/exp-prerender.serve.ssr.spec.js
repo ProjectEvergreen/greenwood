@@ -27,7 +27,6 @@ import chai from 'chai';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { Runner } from 'gallinago';
 import { fileURLToPath } from 'url';
 
@@ -67,30 +66,27 @@ xdescribe('Serve Greenwood With: ', function() {
 
     describe('Serve command with SSR prerender specific behaviors for an HTML page', function() {
       let response = {};
+      let body;
+      let fragmentsApiDom;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-            fragmentsApiDom = new JSDOM(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/artists/`);
+        body = await response.clone().text();
+        fragmentsApiDom = new JSDOM(body);
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return a custom status message', function(done) {
         expect(response.statusMessage).to.equal('OK');
+        done();
+      });
+
+      it('should ...', function(done) {
+        expect(fragmentsApiDom).to.not.be.undefined;
         done();
       });
 

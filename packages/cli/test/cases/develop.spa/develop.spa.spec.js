@@ -21,7 +21,6 @@ import chai from 'chai';
 import fs from 'fs';
 import path from 'path';
 import { getDependencyFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
@@ -75,117 +74,78 @@ describe('Develop Greenwood With: ', function() {
 
     describe('Develop command specific HTML behaviors for client side routing at root - /', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/`,
-            headers: {
-              accept: 'text/html'
-            }
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/`);
+        body = await response.clone().text();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
 
         done();
       });
 
       it('should return the expected body contents', function(done) {
-        expect(removeWhiteSpace(response.body.match(BODY_REGEX)[0])).to.equal(expected);
+        expect(removeWhiteSpace(body.match(BODY_REGEX)[0])).to.equal(expected);
         done();
       });
     });
 
     describe('Develop command specific HTML behaviors for client side routing at 1 level route - /<resource>', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/artists/`,
-            headers: {
-              accept: 'text/html'
-            }
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            resolve();
-          });
-        });
+        response = await fetch(`http://127.0.0.1:${port}/artists/`);
+        body = await response.clone().text();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
 
         done();
       });
 
       it('should return the expected body contents', function(done) {
-        expect(removeWhiteSpace(response.body.match(BODY_REGEX)[0])).to.equal(expected);
+        expect(removeWhiteSpace(body.match(BODY_REGEX)[0])).to.equal(expected);
         done();
       });
     });
 
     describe('Develop command specific HTML behaviors for client side routing at 1 level route - /<resource>/:id', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/artists/1`,
-            headers: {
-              accept: 'text/html'
-            }
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            resolve();
-          });
-        });
+        response = await fetch(`http://127.0.0.1:${port}/artists/1`);
+        body = await response.clone().text();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
 
         done();
       });
 
       it('should return the expected body contents', function(done) {
-        expect(removeWhiteSpace(response.body.match(BODY_REGEX)[0])).to.equal(expected);
+        expect(removeWhiteSpace(body.match(BODY_REGEX)[0])).to.equal(expected);
         done();
       });
     });
@@ -193,36 +153,26 @@ describe('Develop Greenwood With: ', function() {
     // https://github.com/ProjectEvergreen/greenwood/issues/1064
     describe('Develop command specific workspace resolution behavior that does not think its a client side route', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/events/main.css`
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            resolve();
-          });
-        });
+        response = await fetch(`http://127.0.0.1:${port}/events/main.css`);
+        body = await response.clone().text();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/css');
+        expect(response.headers.get('content-type')).to.equal('text/css');
         done();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
 
         done();
       });
 
       it('should return the expected body contents', function(done) {
-        expect(response.body.replace(/\n/g, '').indexOf('* {  color: red;}')).to.equal(0);
+        expect(body.replace(/\n/g, '').indexOf('* {  color: red;}')).to.equal(0);
         done();
       });
     });
@@ -230,39 +180,30 @@ describe('Develop Greenwood With: ', function() {
     // https://github.com/ProjectEvergreen/greenwood/issues/803
     describe('Develop command specific node modules resolution behavior that does not think its a client side route', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/node_modules/simpledotcss/simple.css`,
-            headers: {
-              accept: 'ext/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
-            }
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            resolve();
-          });
+        response = await fetch(`http://127.0.0.1:${port}/node_modules/simpledotcss/simple.css`, {
+          headers: new Headers({
+            accept: 'ext/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+          })
         });
+        body = await response.clone().text();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/css');
+        expect(response.headers.get('content-type')).to.equal('text/css');
         done();
       });
 
       it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
 
         done();
       });
 
       it('should return the expected body contents', function(done) {
-        expect(response.body.indexOf('/* Set the global variables for everything. Change these to use your own fonts/colours. */')).to.equal(0);
+        expect(body.indexOf('/* Set the global variables for everything. Change these to use your own fonts/colours. */')).to.equal(0);
         done();
       });
     });

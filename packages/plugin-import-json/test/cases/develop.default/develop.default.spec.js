@@ -25,7 +25,6 @@
  */
 import chai from 'chai';
 import path from 'path';
-import request from 'request';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
@@ -65,37 +64,23 @@ describe('Develop Greenwood With: ', function() {
 
     describe('Develop command specific ESM .json behaviors', function() {
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get({
-            url: `http://127.0.0.1:${port}/main.json?type=json`
-          }, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}:${port}/main.json?type=json`);
+        data = await response.text();
       });
 
-      it('should return a 200', function(done) {
-        expect(response.statusCode).to.equal(200);
-
-        done();
+      it('should return a 200', function() {
+        expect(response.status).to.equal(200);
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/javascript');
-        done();
+      it('should return the correct content type', function() {
+        expect(response.headers.get('content-type')).to.equal('text/javascript');
       });
 
-      it('should return an ECMAScript module', function(done) {
-        expect(response.body).to.equal('export default {"status":200,"message":"got json"}');
-        done();
+      it('should return an ECMAScript module', function() {
+        expect(data).to.equal('export default {"status":200,"message":"got json"}');
       });
     });
   });

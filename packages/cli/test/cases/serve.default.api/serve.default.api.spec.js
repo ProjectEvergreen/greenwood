@@ -26,7 +26,6 @@
 import chai from 'chai';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import request from 'request';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
@@ -67,40 +66,31 @@ describe('Serve Greenwood With: ', function() {
     describe('Serve command with API specific behaviors for a JSON API', function() {
       const name = 'Greenwood';
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/api/greeting?name=${name}`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = JSON.parse(body);
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/api/greeting?name=${name}`);
+        data = await response.clone().json();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return a default status message', function(done) {
         // OK appears to be a Koa default when statusText is an empty string
-        expect(response.statusMessage).to.equal('OK');
+        expect(response.statusText).to.equal('OK');
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json');
+        expect(response.headers.get('content-type')).to.equal('application/json');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body.message).to.equal(`Hello ${name}!!!`);
+        expect(data.message).to.equal(`Hello ${name}!!!`);
         done();
       });
     });
@@ -108,39 +98,30 @@ describe('Serve Greenwood With: ', function() {
     describe('Serve command with API specific behaviors for an HTML ("fragment") API', function() {
       const name = 'Greenwood';
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/api/fragment?name=${name}`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/api/fragment?name=${name}`);
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return a custom status message', function(done) {
-        expect(response.statusMessage).to.equal('SUCCESS!!!');
+        expect(response.statusText).to.equal('SUCCESS!!!');
         done();
       });
 
       it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
         done();
       });
 
       it('should return the correct response body', function(done) {
-        expect(response.body).to.contain(`<h1>Hello ${name}!!!</h1>`);
+        expect(body).to.contain(`<h1>Hello ${name}!!!</h1>`);
         done();
       });
     });
@@ -149,20 +130,11 @@ describe('Serve Greenwood With: ', function() {
       let response = {};
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/api/nothing`, (err, res) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/api/nothing`);
       });
 
       it('should return a custom status code', function(done) {
-        expect(response.statusCode).to.equal(204);
+        expect(response.status).to.equal(204);
         done();
       });
     });
@@ -171,51 +143,31 @@ describe('Serve Greenwood With: ', function() {
       let response = {};
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/api/foo`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/api/foo`);
       });
 
       it('should return a 404 status', function(done) {
-        expect(response.statusCode).to.equal(404);
+        expect(response.status).to.equal(404);
         done();
       });
     });
 
     describe('Serve command with API specific behaviors with a custom response', function() {
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.get(`${hostname}/api/missing`, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve();
-          });
-        });
+        response = await fetch(`${hostname}/api/missing`);
+        body = await response.clone().text();
       });
 
       it('should return a 404 status', function(done) {
-        expect(response.statusCode).to.equal(404);
+        expect(response.status).to.equal(404);
         done();
       });
 
       it('should return a body of not found', function(done) {
-        expect(response.body).to.equal('Not Found');
+        expect(body).to.equal('Not Found');
         done();
       });
     });
@@ -223,47 +175,35 @@ describe('Serve Greenwood With: ', function() {
     describe('Serve command with POST API specific behaviors for JSON', function() {
       const param = 'Greenwood';
       let response = {};
+      let data;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.post({
-            url: `${hostname}/api/submit-json`,
-            body: {
-              name: param
-            },
-            json: true
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve(response);
-          });
+        response = await fetch(`${hostname}/api/submit-json`, {
+          method: 'POST',
+          body: JSON.stringify({ name: param })
         });
+        data = await response.clone().json();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
-        done();
-      });
-
-      it('should return the expected response message', function(done) {
-        const { message } = response.body;
-
-        expect(message).to.equal(`Thank you ${param} for your submission!`);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the expected content type header', function(done) {
-        expect(response.headers['content-type']).to.equal('application/json');
+        expect(response.headers.get('content-type')).to.equal('application/json');
         done();
       });
 
       it('should return the secret header in the response', function(done) {
-        expect(response.headers['x-secret']).to.equal('1234');
+        expect(response.headers.get('x-secret')).to.equal('1234');
+        done();
+      });
+
+      it('should return the expected response message', function(done) {
+        const { message } = data;
+
+        expect(message).to.equal(`Thank you ${param} for your submission!`);
         done();
       });
     });
@@ -271,39 +211,31 @@ describe('Serve Greenwood With: ', function() {
     describe('Serve command with POST API specific behaviors for FormData', function() {
       const param = 'Greenwood';
       let response = {};
+      let body;
 
       before(async function() {
-        return new Promise((resolve, reject) => {
-          request.post({
-            url: `${hostname}/api/submit-form-data`,
-            form: {
-              name: param
-            }
-          }, (err, res, body) => {
-            if (err) {
-              reject();
-            }
-
-            response = res;
-            response.body = body;
-
-            resolve(response);
-          });
+        response = await fetch(`${hostname}/api/submit-form-data`, {
+          method: 'POST',
+          body: new URLSearchParams({ name: param }).toString(),
+          headers: new Headers({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
         });
+        body = await response.clone().text();
       });
 
       it('should return a 200 status', function(done) {
-        expect(response.statusCode).to.equal(200);
-        done();
-      });
-
-      it('should return the expected response message', function(done) {
-        expect(response.body).to.equal(`Thank you ${param} for your submission!`);
+        expect(response.status).to.equal(200);
         done();
       });
 
       it('should return the expected content type header', function(done) {
-        expect(response.headers['content-type']).to.equal('text/html');
+        expect(response.headers.get('content-type')).to.equal('text/html');
+        done();
+      });
+
+      it('should return the expected response message', function(done) {
+        expect(body).to.equal(`Thank you ${param} for your submission!`);
         done();
       });
     });
