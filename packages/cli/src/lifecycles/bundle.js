@@ -185,11 +185,13 @@ async function bundleStyleResources(compilation, resourcePlugins) {
 
 async function bundleApiRoutes(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const [rollupConfig] = await getRollupConfigForApis(compilation);
+  const apiConfigs = await getRollupConfigForApis(compilation);
 
-  if (rollupConfig.input.length !== 0) {
-    const bundle = await rollup(rollupConfig);
-    await bundle.write(rollupConfig.output);
+  if (apiConfigs.length > 0 && apiConfigs[0].input.length !== 0) {
+    apiConfigs.forEach(async rollupConfig => {
+      const bundle = await rollup(rollupConfig);
+      await bundle.write(rollupConfig.output);
+    });
   }
 }
 

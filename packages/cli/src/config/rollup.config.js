@@ -336,36 +336,31 @@ const getRollupConfigForScriptResources = async (compilation) => {
 
 const getRollupConfigForApis = async (compilation) => {
   const { outputDir, userWorkspace } = compilation.context;
-  const input = [...compilation.manifest.apis.values()]
-    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)));
 
   // why is this needed?
   await fs.promises.mkdir(new URL('./api/assets/', outputDir), {
     recursive: true
   });
 
-  // TODO should routes and APIs have chunks?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1118
-  return [{
-    input,
-    output: {
-      dir: `${normalizePathnameForWindows(outputDir)}/api`,
-      entryFileNames: '[name].js',
-      chunkFileNames: '[name].[hash].js'
-    },
-    plugins: [
-      greenwoodResourceLoader(compilation),
-      // support node export conditions for API routes
-      // https://github.com/ProjectEvergreen/greenwood/issues/1118
-      // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
-      nodeResolve({
-        exportConditions: ['node'],
-        preferBuiltins: true
-      }),
-      commonjs(),
-      greenwoodImportMetaUrl(compilation)
-    ]
-  }];
+  return [...compilation.manifest.apis.values()]
+    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)))
+    .map(filepath => ({
+      input: filepath,
+      output: {
+        dir: `${normalizePathnameForWindows(outputDir)}/api`,
+        entryFileNames: '[name].js',
+        chunkFileNames: '[name].[hash].js'
+      },
+      plugins: [
+        greenwoodResourceLoader(compilation),
+        nodeResolve({
+          exportConditions: ['node'],
+          preferBuiltins: true
+        }),
+        commonjs(),
+        greenwoodImportMetaUrl(compilation)
+      ]
+    }));
 };
 
 const getRollupConfigForSsr = async (compilation, input) => {
