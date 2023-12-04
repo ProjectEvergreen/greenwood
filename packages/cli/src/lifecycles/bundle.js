@@ -258,11 +258,13 @@ async function bundleSsrPages(compilation) {
       }
     }
 
-    const [rollupConfig] = await getRollupConfigForSsr(compilation, input);
+    const ssrConfigs = await getRollupConfigForSsr(compilation, input);
 
-    if (rollupConfig.input.length > 0) {
-      const bundle = await rollup(rollupConfig);
-      await bundle.write(rollupConfig.output);
+    if (ssrConfigs.length > 0 && ssrConfigs[0].input.length > 0) {
+      ssrConfigs.forEach(async rollupConfig => {
+        const bundle = await rollup(rollupConfig);
+        await bundle.write(rollupConfig.output);
+      });
     }
   }
 }

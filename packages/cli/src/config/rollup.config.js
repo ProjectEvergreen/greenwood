@@ -366,10 +366,8 @@ const getRollupConfigForApis = async (compilation) => {
 const getRollupConfigForSsr = async (compilation, input) => {
   const { outputDir } = compilation.context;
 
-  // TODO should routes and APIs have chunks?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1118
-  return [{
-    input,
+  return input.map(filepath => ({
+    input: filepath,
     output: {
       dir: normalizePathnameForWindows(outputDir),
       entryFileNames: '_[name].js',
@@ -406,7 +404,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
 
       }
     }
-  }];
+  }));
 };
 
 export {
