@@ -50,7 +50,7 @@
     "remark-frontmatter": "^2.0.0",
     "remark-parse": "^8.0.3",
     "remark-rehype": "^7.0.0",
-    "rollup": "^2.58.0",
+    "rollup": "^3.29.4",
     "unified": "^9.2.0",
     "wc-compiler": "~0.11.0"
   },
