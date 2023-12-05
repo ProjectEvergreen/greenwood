@@ -30,10 +30,10 @@ async function getTemplate(compilation, { route }) {
 }
 
 async function getBody(compilation) {
-  const artists = await fetch('http://www.analogstudios.net/api/artists').then(resp => resp.json());
+  const artists = await fetch('http://www.analogstudios.net/api/v2/artists').then(resp => resp.json());
   const timestamp = new Date().getTime();
   const artistsListItems = artists
-    .filter(artist => artist.isActive === '1')
+    .filter(artist => artist.isActive === 1)
     .map((artist) => {
       const { id, name, bio, imageUrl } = artist;
 
