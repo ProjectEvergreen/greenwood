@@ -40,7 +40,7 @@ import '../components/card.js';
 
 export default class ArtistsPage extends HTMLElement {
   async connectedCallback() {
-    const artists = await fetch('https://.../api/artists').then(resp => resp.json());
+    const artists = await fetch('https://.../api/v2/artists').then(resp => resp.json());
     const html = artists.map(artist => {
       const { name, imageUrl } = artist;
 
