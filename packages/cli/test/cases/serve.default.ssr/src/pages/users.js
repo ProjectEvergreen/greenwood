@@ -1,8 +1,9 @@
 import '../components/card.js';
+import ARTISTS_TEST_ENDPOINT from '../../../../test-constants';
 
 export default class UsersPage extends HTMLElement {
   async connectedCallback() {
-    const users = await fetch('https://www.analogstudios.net/api/artists').then(resp => resp.json());
+    const users = await fetch(ARTISTS_TEST_ENDPOINT).then(resp => resp.json());
     const html = users.map(user => {
       return `
         <wc-card>

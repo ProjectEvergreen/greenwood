@@ -1,3 +1,5 @@
+import ARTISTS_TEST_ENDPOINT from '../../../../test-constants';
+
 async function getTemplate(compilation, { route }) {
   return `
     <html>
@@ -31,7 +33,7 @@ async function getTemplate(compilation, { route }) {
 }
 
 async function getBody(compilation) {
-  const artists = await fetch('http://www.analogstudios.net/api/artists').then(resp => resp.json());
+  const artists = await fetch(ARTISTS_TEST_ENDPOINT).then(resp => resp.json());
   const timestamp = new Date().getTime();
   const artistsListItems = artists
     .filter(artist => artist.isActive === '1')
