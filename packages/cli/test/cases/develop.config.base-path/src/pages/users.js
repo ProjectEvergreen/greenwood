@@ -1,8 +1,8 @@
-import ARTISTS_TEST_ENDPOINT from '../../../../test-constants';
+import ARTISTS_TEST_HTTPS_ENDPOINT from '../../../../test-constants';
 
 export default class UsersPage extends HTMLElement {
   async connectedCallback() {
-    const users = await fetch(ARTISTS_TEST_ENDPOINT).then(resp => resp.json());
+    const users = await fetch(ARTISTS_TEST_HTTPS_ENDPOINT).then(resp => resp.json());
     const html = users.map(user => {
       return `
         <section>
