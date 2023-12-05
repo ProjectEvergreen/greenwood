@@ -1,6 +1,6 @@
 export default class UsersPage extends HTMLElement {
   async connectedCallback() {
-    const users = await fetch('https://www.analogstudios.net/api/artists').then(resp => resp.json());
+    const users = await fetch('https://www.analogstudios.net/api/v2/artists').then(resp => resp.json());
     const html = users.map(user => {
       return `
         <section>
