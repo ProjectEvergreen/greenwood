@@ -194,8 +194,6 @@ async function bundleApiRoutes(compilation) {
       await bundle.write(rollupConfig.output);
 
     }
-    // apiConfigs.forEach(async rollupConfig => {
-    // });
   }
 }
 
