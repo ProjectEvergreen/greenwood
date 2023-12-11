@@ -188,10 +188,14 @@ async function bundleApiRoutes(compilation) {
   const apiConfigs = await getRollupConfigForApis(compilation);
 
   if (apiConfigs.length > 0 && apiConfigs[0].input.length !== 0) {
-    apiConfigs.forEach(async rollupConfig => {
+    for (const configIndex in apiConfigs) {
+      const rollupConfig = apiConfigs[configIndex];
       const bundle = await rollup(rollupConfig);
       await bundle.write(rollupConfig.output);
-    });
+
+    }
+    // apiConfigs.forEach(async rollupConfig => {
+    // });
   }
 }
 
