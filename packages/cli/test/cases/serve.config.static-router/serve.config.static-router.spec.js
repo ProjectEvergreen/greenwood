@@ -52,19 +52,19 @@ describe('Serve Greenwood With: ', function() {
         `${outputPath}/node_modules/@greenwood/cli/src/lib`
       );
 
-      await runner.setup(outputPath, [
+      runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...greenwoodRouterLibs
       ]);
 
-      await runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, 'build');
 
-      return new Promise(async (resolve) => {
+      return new Promise((resolve) => {
         setTimeout(async () => {
           resolve();
         }, 10000);
 
-        await runner.runCommand(cliPath, 'serve');
+        runner.runCommand(cliPath, 'serve', { async: true });
       });
     });
 

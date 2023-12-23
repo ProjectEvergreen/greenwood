@@ -34,7 +34,7 @@ describe('Build Greenwood With: ', function() {
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
@@ -42,12 +42,12 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe('Custom Configuration with a bad value for plugin type', function() {
-    it('should throw an error that plugin.type is not a valid value', async function() {
+    it('should throw an error that plugin.type is not a valid value', function() {
       const pluginTypes = ['copy', 'context', 'resource', 'rollup', 'server', 'source', 'renderer', 'adapter'];
 
       try {
-        await runner.setup(outputPath);
-        await runner.runCommand(cliPath, 'build');
+        runner.setup(outputPath);
+        runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain(`Error: greenwood.config.js plugins must be one of type "${pluginTypes.join(', ')}". got "indexxx" instead.`);
       }

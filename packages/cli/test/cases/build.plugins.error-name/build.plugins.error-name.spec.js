@@ -33,7 +33,7 @@ describe('Build Greenwood With: ', function() {
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
@@ -41,10 +41,10 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe('Custom Configuration with a bad name value for a plugin', function() {
-    it('should throw an error that plugin.name is not a string', async function() {
+    it('should throw an error that plugin.name is not a string', function() {
       try {
-        await runner.setup(outputPath);
-        await runner.runCommand(cliPath, 'build');
+        runner.setup(outputPath);
+        runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain('Error: greenwood.config.js plugins must have a name. got undefined instead.');
       }

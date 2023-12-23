@@ -40,7 +40,7 @@ describe('Serve Greenwood With: ', function() {
   const hostname = 'http://localhost:8080';
   let runner;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
@@ -109,7 +109,7 @@ describe('Serve Greenwood With: ', function() {
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
 
-      await runner.setup(outputPath, [
+      runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...lit,
         ...litPackageJson,
@@ -126,14 +126,14 @@ describe('Serve Greenwood With: ', function() {
         ...litReactiveElementDecorators,
         ...litReactiveElementPackageJson
       ]);
-      await runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, 'build');
 
-      return new Promise(async (resolve) => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 10000);
 
-        await runner.runCommand(cliPath, 'serve');
+        runner.runCommand(cliPath, 'serve', { async: true });
       });
     });
 

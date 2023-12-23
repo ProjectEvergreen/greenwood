@@ -27,7 +27,7 @@ describe('Serve Greenwood With: ', function() {
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
@@ -35,10 +35,10 @@ describe('Serve Greenwood With: ', function() {
   });
 
   describe('Running the serve command without running the build command first', function() {
-    it('should throw an error that no build output was detected', async function() {
+    it('should throw an error that no build output was detected', function() {
       try {
-        await runner.setup(outputPath);
-        await runner.runCommand(cliPath, 'serve');
+        runner.setup(outputPath);
+        runner.runCommand(cliPath, 'serve', { async: true });
       } catch (err) {
         expect(err).to.contain('No build output detected.  Make sure you have run greenwood build');
       }

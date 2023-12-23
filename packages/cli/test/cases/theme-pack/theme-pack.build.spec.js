@@ -65,13 +65,13 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/my-theme-pack/dist/components`
       );
 
-      await runner.setup(outputPath, [
+      runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...themePacktemplates,
         ...themePackStyles,
         ...themePackComponents
       ]);
-      await runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, 'build');
     });
 
     runSmokeTest(['public', 'index'], LABEL);

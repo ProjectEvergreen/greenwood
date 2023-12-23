@@ -24,7 +24,7 @@ describe('Eject Greenwood', function() {
   let runner;
   let configFiles;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
@@ -33,9 +33,9 @@ describe('Eject Greenwood', function() {
 
   describe('Default Eject', function() {
 
-    before(async function() {
-      await runner.setup(outputPath, getSetupFiles(outputPath));
-      await runner.runCommand(cliPath, 'eject');
+    before(function() {
+      runner.setup(outputPath, getSetupFiles(outputPath));
+      runner.runCommand(cliPath, 'eject');
 
       configFiles = fs.readdirSync(fileURLToPath(new URL('.', import.meta.url)))
         .filter((file) => path.extname(file) === '.js' && file.indexOf('spec.js') < 0);
@@ -59,9 +59,9 @@ describe('Eject Greenwood', function() {
 
   describe('Eject and Build Ejected Config', function() {
 
-    before(async function() {
-      await runner.runCommand(cliPath, 'build');
-      await runner.runCommand(cliPath, 'eject');
+    before(function() {
+      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, 'eject');
     });
 
     runSmokeTest(['public', 'index'], 'Eject and Build Ejected Config');

@@ -33,9 +33,9 @@ describe('Scaffold Greenwood From a (Blog) Template: ', function() {
 
   describe('default blog template', function () {
 
-    before(async function() {
-      await runner.setup(outputPath);
-      await runner.runCommand(initPath, '--template=blog');
+    before(function() {
+      runner.setup(outputPath);
+      runner.runCommand(initPath, '--template=blog');
     });
 
     describe('expected file output', function () {

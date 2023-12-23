@@ -41,7 +41,7 @@ xdescribe('Serve Greenwood With: ', function() {
   const hostname = 'http://127.0.0.1:8080';
   let runner;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public'),
       hostname
@@ -52,15 +52,15 @@ xdescribe('Serve Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      await runner.setup(outputPath, getSetupFiles(outputPath));
-      await runner.runCommand(cliPath, 'build');
+      runner.setup(outputPath, getSetupFiles(outputPath));
+      runner.runCommand(cliPath, 'build');
 
-      return new Promise(async (resolve) => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 10000);
 
-        await runner.runCommand(cliPath, 'serve');
+        runner.runCommand(cliPath, 'serve', { async: true });
       });
     });
 

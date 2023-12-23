@@ -125,7 +125,7 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
         `${outputPath}/node_modules/@types/trusted-types/`
       );
 
-      await runner.setup(outputPath, [
+      runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...lit,
         ...litPackageJson,
@@ -143,7 +143,7 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
         ...litReactiveElementPackageJson,
         ...litHtmlSourceMap
       ]);
-      await runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, 'build');
     });
 
     runSmokeTest(['public', 'index'], LABEL);

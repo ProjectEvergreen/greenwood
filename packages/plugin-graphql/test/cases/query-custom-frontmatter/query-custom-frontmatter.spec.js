@@ -122,7 +122,7 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
 
-      await runner.setup(outputPath, [
+      runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...greenwoodGraphqlCoreLibs,
         ...greenwoodGraphqlQueryLibs,
@@ -141,7 +141,7 @@ describe('Build Greenwood With: ', function() {
         ...litReactiveElementDecorators,
         ...litReactiveElementPackageJson
       ]);
-      await runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, 'build');
     });
 
     runSmokeTest(['public', 'index'], LABEL);

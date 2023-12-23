@@ -44,8 +44,8 @@ describe('Build Greenwood With: ', function() {
     let dom;
 
     before(async function() {
-      await runner.setup(outputPath, getSetupFiles(outputPath));
-      await runner.runCommand(cliPath, 'build');
+      runner.setup(outputPath, getSetupFiles(outputPath));
+      runner.runCommand(cliPath, 'build');
 
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
     });

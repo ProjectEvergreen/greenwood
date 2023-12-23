@@ -28,7 +28,7 @@ describe('Build Greenwood With: ', function() {
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
@@ -36,10 +36,10 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe('Custom Configuration with a bad value for Workspace', function() {
-    it('should throw an error that workspace path must be a URL', async function() {
+    it('should throw an error that workspace path must be a URL', function() {
       try {
-        await runner.setup(outputPath);
-        await runner.runCommand(cliPath, 'build');
+        runner.setup(outputPath);
+        runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain('Error: greenwood.config.js workspace must be an instance of URL');
       }

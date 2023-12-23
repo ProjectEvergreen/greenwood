@@ -47,14 +47,14 @@ describe('Develop Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      await runner.setup(outputPath);
+      runner.setup(outputPath);
 
-      return new Promise(async (resolve) => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 5000);
 
-        await runner.runCommand(cliPath, 'develop');
+        runner.runCommand(cliPath, 'develop', { async: true });
       });
     });
 

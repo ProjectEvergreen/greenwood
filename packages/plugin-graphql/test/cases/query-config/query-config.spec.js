@@ -58,12 +58,12 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/@greenwood/plugin-graphql/src/queries/`
       );
 
-      await runner.setup(outputPath, [
+      runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...greenwoodGraphqlCoreLibs,
         ...greenwoodGraphqlQueryLibs
       ]);
-      await runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, 'build');
     });
 
     runSmokeTest(['public', 'index'], LABEL);

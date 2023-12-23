@@ -35,8 +35,8 @@ describe('Scaffold Greenwood With Default Template: ', function() {
 
     before(async function() {
       await fs.promises.mkdir(outputPath);
-      await runner.setup(outputPath);
-      await runner.runCommand(initPath);
+      runner.setup(outputPath);
+      runner.runCommand(initPath);
     });
 
     describe('should scaffold project files and folders', () => {

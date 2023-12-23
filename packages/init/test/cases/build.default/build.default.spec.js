@@ -36,17 +36,17 @@ xdescribe('Scaffold Greenwood and Run Build command: ', function() {
 
   describe('default minimal template', function () {
 
-    before(async function() {
-      await runner.setup(outputPath);
-      await runner.runCommand(initPath, '--install');
+    before(function() {
+      runner.setup(outputPath);
+      runner.runCommand(initPath, '--install');
     });
 
     describe(`should build ${LABEL}`, function () {
       const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
 
-      before(async function() {
-        await runner.setup(outputPath);
-        await runner.runCommand(cliPath, 'build');
+      before(function() {
+        runner.setup(outputPath);
+        runner.runCommand(cliPath, 'build');
       });
 
       runSmokeTest(['public', 'index'], LABEL);

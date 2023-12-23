@@ -35,7 +35,7 @@ describe('Build Greenwood With: ', function() {
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
@@ -169,7 +169,7 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/prismjs/`
       );
 
-      await runner.setup(outputPath, [
+      runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...reduxLibs,
         ...reduxPackageJson,
@@ -202,7 +202,7 @@ describe('Build Greenwood With: ', function() {
         ...simpleCss,
         ...simpleCssPackageJson
       ]);
-      await runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, 'build');
 
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
     });

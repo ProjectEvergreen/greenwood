@@ -28,7 +28,7 @@ describe('Build Greenwood With: ', function() {
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
@@ -36,10 +36,10 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe('Custom Configuration with a bad value for templatesDirectory', function() {
-    it('should throw an error that templatesDirectory must be a string', async function() {
+    it('should throw an error that templatesDirectory must be a string', function() {
       try {
-        await runner.setup(outputPath);
-        await runner.runCommand(cliPath, 'build');
+        runner.setup(outputPath);
+        runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain('Error: provided templatesDirectory "[object Object]" is not supported.  Please make sure to pass something like \'layouts/\'');
       }

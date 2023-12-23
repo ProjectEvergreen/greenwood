@@ -38,10 +38,10 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe('Custom Configuration with a bad value for devServer.hud', function() {
-    it('should throw an error that provided extensions is not valid', async function() {
+    it('should throw an error that provided extensions is not valid', function() {
       try {
-        await runner.setup(outputPath);
-        await runner.runCommand(cliPath, 'build');
+        runner.setup(outputPath);
+        runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain('Error: greenwood.config.js devServer hud options must be a boolean.  Passed value was: 1234');
       }
