@@ -1,5 +1,5 @@
 diff --git a/node_modules/gallinago/src/lib/runner.js b/node_modules/gallinago/src/lib/runner.js
-index 30a2963..0f0003a 100644
+index 30a2963..42e7b1c 100644
 --- a/node_modules/gallinago/src/lib/runner.js
 +++ b/node_modules/gallinago/src/lib/runner.js
 @@ -1,7 +1,7 @@
@@ -33,3 +33,22 @@ index 30a2963..0f0003a 100644
          cwd: this.rootDir,
          shell: false,
          detached: !isWindows
+@@ -80,13 +81,12 @@ class Runner {
+   }
+ 
+   stopCommand() {
+-    if (this.childProcess) {
+-      if (os.platform() === 'win32') {
+-        spawn('taskkill', ['/pid', this.childProcess.pid, '/t', '/f']);
+-      } else {
+-        process.kill(-this.childProcess.pid, 'SIGKILL');
++    return new Promise((resolve) => {
++      if (this.childProcess) {
++        this.childProcess.kill();
++        resolve();
+       }
+-    }
++    });
+   }
+ 
+   teardown(additionalFiles = []) {
