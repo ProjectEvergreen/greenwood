@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import { getRollupConfigForApis, getRollupConfigForScriptResources, getRollupConfigForSsr } from '../config/rollup.config.js';
 import { getAppTemplate, getPageTemplate, getUserScripts } from '../lib/templating-utils.js';
 import { hashString } from '../lib/hashing-utils.js';
-import { checkResourceExists, mergeResponse, normalizePathnameForWindows } from '../lib/resource-utils.js';
+import { checkResourceExists, mergeResponse, normalizePathnameForWindows, trackResourcesForRoute } from '../lib/resource-utils.js';
 import path from 'path';
 import { rollup } from 'rollup';
 
@@ -229,7 +229,6 @@ async function bundleSsrPages(compilation) {
   const input = [];
 
   if (!compilation.config.prerender && hasSSRPages) {
-    const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
     const { executeModuleUrl } = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider();
     const { executeRouteModule } = await import(executeModuleUrl);
     const { pagesDir, scratchDir } = compilation.context;
@@ -254,6 +253,16 @@ async function bundleSsrPages(compilation) {
         staticHtml = await getAppTemplate(staticHtml, compilation.context, imports, [], false, title);
         staticHtml = await getUserScripts(staticHtml, compilation);
         staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
+
+        // track resources first before optimizing, so compilation is correctly set
+        await trackResourcesForRoute(staticHtml, compilation, route);
+        // TODO is there a way to avoid running this twice?
+        // first time we call this, we haven't tracked the resources for SSR pages yet
+        // so we have to do it again before optimizing
+        await bundleScriptResources(compilation);
+
+        const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
+
         staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
         staticHtml = staticHtml.replace(/[`\\$]/g, '\\$&'); // https://stackoverflow.com/a/75688937/417806
 
@@ -295,6 +304,7 @@ async function bundleSsrPages(compilation) {
     const ssrConfigs = await getRollupConfigForSsr(compilation, input);
 
     if (ssrConfigs.length > 0 && ssrConfigs[0].input !== '') {
+      console.info('bundling dynamic pages...');
       for (const configIndex in ssrConfigs) {
         const rollupConfig = ssrConfigs[configIndex];
         const bundle = await rollup(rollupConfig);

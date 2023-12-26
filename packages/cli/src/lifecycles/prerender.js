@@ -3,8 +3,6 @@ import { checkResourceExists, trackResourcesForRoute } from '../lib/resource-uti
 import os from 'os';
 import { WorkerPool } from '../lib/threadpool.js';
 
-// TODO a lot of these are duplicated in the build lifecycle too
-// would be good to refactor
 async function createOutputDirectory(route, outputDir) {
   if (!route.endsWith('/404/') && !await checkResourceExists(outputDir)) {
     await fs.mkdir(outputDir, {
@@ -62,7 +60,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
   const pool = new WorkerPool(os.cpus().length, new URL('../lib/ssr-route-worker.js', import.meta.url));
 
   for (const page of pages) {
-    const { route, outputPath, resources } = page;
+    const { route, outputPath } = page;
     const outputPathUrl = new URL(`.${outputPath}`, scratchDir);
     const url = new URL(`http://localhost:${compilation.config.port}${route}`);
     const request = new Request(url);
@@ -70,10 +68,10 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     let body = await (await servePage(url, request, plugins)).text();
     body = await (await interceptPage(url, request, plugins, body)).text();
 
+    const resources = await trackResourcesForRoute(body, compilation, route);
     await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
 
     const scripts = resources
-      .map(resource => compilation.resources.get(resource))
       .filter(resource => resource.type === 'script')
       .map(resource => resource.sourcePathURL.href);
 
@@ -144,6 +142,7 @@ async function staticRenderCompilation(compilation) {
     let body = await (await servePage(url, request, plugins)).text();
     body = await (await interceptPage(url, request, plugins, body)).text();
 
+    await trackResourcesForRoute(body, compilation, route);
     await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
     await fs.writeFile(outputPathUrl, body);
 

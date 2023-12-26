@@ -175,7 +175,7 @@ describe('Serve Greenwood With: ', function() {
         expect(styles.length).to.equal(1);
       });
 
-      it('should have four script tags', function() {
+      it('should have the expected number of script tags', function() {
         const scripts = Array.from(dom.window.document.querySelectorAll('head script')).filter(tag => !tag.getAttribute('data-gwd'));
 
         expect(scripts.length).to.equal(3);
