@@ -44,7 +44,7 @@ const generateGraph = async (compilation) => {
             const relativeWorkspacePath = directory.pathname.replace(projectDirectory.pathname, '');
             let route = relativePagePath.replace(extension, '');
             let id = filename.split('/')[filename.split('/').length - 1].replace(extension, '');
-            let template = 'page';
+            let template = extension === '.html' ? null : 'page';
             let title = null;
             let imports = [];
             let customData = {};
@@ -76,7 +76,7 @@ const generateGraph = async (compilation) => {
               const fileContents = await fs.readFile(filenameUrl, 'utf8');
               const { attributes } = fm(fileContents);
 
-              template = attributes.template || 'page';
+              template = attributes.template || template;
               title = attributes.title || title;
               id = attributes.label || id;
               imports = attributes.imports || [];
