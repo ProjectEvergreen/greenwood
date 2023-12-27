@@ -64,9 +64,24 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     const outputPathUrl = new URL(`.${outputPath}`, scratchDir);
     const url = new URL(`http://localhost:${compilation.config.port}${route}`);
     const request = new Request(url);
+    let ssrContents;
 
     let body = await (await servePage(url, request, plugins)).text();
     body = await (await interceptPage(url, request, plugins, body)).text();
+
+    // hack to avoid over-rendering SSR content
+    // https://github.com/ProjectEvergreen/greenwood/issues/1044
+    // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
+    if (page.isSSR) {
+      const ssrContentsMatch = /<!-- greenwood-ssr-start -->(.*.)<!-- greenwood-ssr-end -->/s;
+
+      ssrContents = body.match(ssrContentsMatch)[0];
+      body = body.replace(ssrContents, '<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->');
+
+      ssrContents = ssrContents
+        .replace('<!-- greenwood-ssr-start -->', '')
+        .replace('<!-- greenwood-ssr-end -->', '');
+    }
 
     const resources = await trackResourcesForRoute(body, compilation, route);
     await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
@@ -93,6 +108,10 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       });
     });
 
+    if (page.isSSR) {
+      body = body.replace('<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->', ssrContents);
+    }
+
     await fs.writeFile(outputPathUrl, body);
 
     console.info('generated page...', route);
@@ -115,7 +134,7 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
     body = body.replace(/type="module-shim"/g, 'type="module"');
 
-    // clean this up here to avoid sending webcomponents-bundle to rollup
+    // clean this up to avoid sending webcomponents-bundle to rollup
     body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
 
     await trackResourcesForRoute(body, compilation, route);

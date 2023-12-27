@@ -254,11 +254,11 @@ async function bundleSsrPages(compilation) {
         staticHtml = await getUserScripts(staticHtml, compilation);
         staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
 
-        // track resources first before optimizing, so compilation is correctly set
+        // track resources first before optimizing, so compilation.resources is correctly set
         await trackResourcesForRoute(staticHtml, compilation, route);
         // TODO is there a way to avoid running this twice?
-        // first time we call this, we haven't tracked the resources for SSR pages yet
-        // so we have to do it again before optimizing
+        // first time we call this at the start of this lifecycle, we haven't tracked the resources for SSR pages yet
+        // so we have to do it again before optimizing, but after tracking
         await bundleScriptResources(compilation);
 
         const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
