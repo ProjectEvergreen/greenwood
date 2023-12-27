@@ -44,14 +44,13 @@ class StandardHtmlResource extends ResourceInterface {
     const filePath = !matchingRoute.external ? matchingRoute.path : '';
     const isMarkdownContent = (matchingRoute?.filename || '').split('.').pop() === 'md';
 
-    let customImports = [];
     let body = '';
-    let title = null;
-    let template = null;
-    let frontMatter = {};
+    let title = matchingRoute.title || null;
+    let template = matchingRoute.template || null;
+    let frontMatter = matchingRoute.data || {};
+    let customImports = matchingRoute.imports || [];
     let ssrBody;
     let ssrTemplate;
-    let ssrFrontmatter;
     let processedMarkdown = null;
 
     if (matchingRoute.external) {
@@ -118,22 +117,6 @@ class StandardHtmlResource extends ResourceInterface {
 
           if (result.body) {
             ssrBody = result.body;
-          }
-          if (result.frontmatter) {
-            ssrFrontmatter = result.frontmatter;
-
-            if (ssrFrontmatter.title) {
-              title = ssrFrontmatter.title;
-              frontMatter.title = ssrFrontmatter.title;
-            }
-
-            if (ssrFrontmatter.template) {
-              template = ssrFrontmatter.template;
-            }
-
-            if (ssrFrontmatter.imports) {
-              customImports = customImports.concat(ssrFrontmatter.imports);
-            }
           }
           resolve();
         });
