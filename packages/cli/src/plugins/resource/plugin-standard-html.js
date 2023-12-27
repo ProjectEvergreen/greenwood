@@ -191,7 +191,7 @@ class StandardHtmlResource extends ResourceInterface {
     } else if (matchingRoute.external) {
       body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
     } else if (ssrBody) {
-      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, ssrBody);
+      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, '$$$')}<!-- greenwood-ssr-end -->`);
     }
 
     if (interpolateFrontmatter) {
