@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood build command with no config and custom page template.
+ * Run Greenwood build command with no config and custom page layout.
  *
  * User Result
- * Should generate a bare bones Greenwood build with custom page template.
+ * Should generate a bare bones Greenwood build with custom page layout.
  *
  * User Command
  * greenwood build
@@ -17,7 +17,7 @@
  *     main.js
  *   styles/
  *     theme.css
- *   templates/
+ *   layouts/
  *     page.html
  */
 import chai from 'chai';
@@ -31,7 +31,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom Page Template';
+  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom Page Layout';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -52,14 +52,14 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('Custom Page Template', function() {
+    describe('Custom Page Layout', function() {
       let dom;
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
-      describe('correct merge order for default app and custom page template <head> tags', function() {
+      describe('correct merge order for default app and custom page layout <head> tags', function() {
         let scriptTags;
         let linkTags;
         let styleTags;
@@ -90,35 +90,35 @@ describe('Build Greenwood With: ', function() {
           expect(styleTags.length).to.equal(1);
         });
 
-        it('should add one page template <script> tag', function() {
+        it('should add one page layout <script> tag', function() {
           expect(scriptTags[0].type).to.equal('module');
           expect(scriptTags[0].src).to.match(/main.*.js/);
         });
 
-        it('should add one page template <link> tag', function() {
+        it('should add one page layout <link> tag', function() {
           expect(linkTags[0].rel).to.equal('stylesheet');
           expect(linkTags[0].href).to.match(/styles\/theme.[a-z0-9]{10}.css/);
         });
 
-        it('should add one page template <style> tag', function() {
+        it('should add one page layout <style> tag', function() {
           expect(styleTags[0].textContent).to.contain('.owen-test');
         });
       });
 
-      describe('custom inline <style> tag in the <head> of a page template', function() {
+      describe('custom inline <style> tag in the <head> of a page layout', function() {
         let dom;
 
         before(async function() {
           dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
         });
 
-        it('should have the specific element we added as part of our custom page template', function() {
+        it('should have the specific element we added as part of our custom page layout', function() {
           const customElement = dom.window.document.querySelectorAll('div.owen-test');
 
           expect(customElement.length).to.equal(1);
         });
 
-        it('should have the color style for the .owen-test element in the page template that we added as part of our custom style', function() {
+        it('should have the color style for the .owen-test element in the page layout that we added as part of our custom style', function() {
           const customElement = dom.window.document.querySelector('.owen-test');
           const computedStyle = dom.window.getComputedStyle(customElement);
 

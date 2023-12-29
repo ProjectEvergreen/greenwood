@@ -3,7 +3,7 @@
  * Run Greenwood and get external  custom resource plugin and default workspace.
  *
  * User Result
- * Should generate a bare bones Greenwood build with expected artists data as static files using a custom template.
+ * Should generate a bare bones Greenwood build with expected artists data as static files using a custom layout.
  *
  * User Command
  * greenwood build
@@ -28,7 +28,7 @@
  *   pages/
  *     about.md
  *     index.md
- *   templates/
+ *   layouts/
  *     artist.html
  */
 import chai from 'chai';
@@ -44,7 +44,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom Sources Plugin and Custom Template';
+  const LABEL = 'Custom Sources Plugin and Custom Layout';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const publicDir = path.join(outputPath, 'public');
@@ -110,7 +110,7 @@ describe('Build Greenwood With: ', function() {
         expect(pages.length).to.equal(3);
       });
 
-      it('should have expected heading content for each artist page template', function() {
+      it('should have expected heading content for each artist page layout', function() {
 
         doms.forEach((dom) => {
           const headings = dom.window.document.querySelectorAll('body h1');

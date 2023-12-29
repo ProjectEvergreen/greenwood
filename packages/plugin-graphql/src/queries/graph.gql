@@ -6,7 +6,7 @@ query {
     outputPath,
     path,
     route,
-    template,
+    layout,
     title
   }
 }

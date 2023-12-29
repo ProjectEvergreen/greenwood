@@ -5,17 +5,17 @@ const initContext = async({ config }) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const { workspace, pagesDirectory, templatesDirectory } = config;
+      const { workspace, pagesDirectory, layoutsDirectory } = config;
 
       const projectDirectory = new URL(`file://${process.cwd()}/`);
       const scratchDir = new URL('./.greenwood/', projectDirectory);
       const outputDir = new URL('./public/', projectDirectory);
       const dataDir = new URL('../data/', import.meta.url);
-      const templatesDir = new URL('../templates/', import.meta.url);
+      const layoutsDir = new URL('../layouts/', import.meta.url);
       const userWorkspace = workspace;
       const apisDir = new URL('./api/', userWorkspace);
       const pagesDir = new URL(`./${pagesDirectory}/`, userWorkspace);
-      const userTemplatesDir = new URL(`./${templatesDirectory}/`, userWorkspace);
+      const userLayoutsDir = new URL(`./${layoutsDirectory}/`, userWorkspace);
 
       const context = {
         dataDir,
@@ -23,10 +23,10 @@ const initContext = async({ config }) => {
         userWorkspace,
         apisDir,
         pagesDir,
-        userTemplatesDir,
+        userLayoutsDir,
         scratchDir,
         projectDirectory,
-        templatesDir
+        layoutsDir
       };
 
       if (!await checkResourceExists(scratchDir)) {

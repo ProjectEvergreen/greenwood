@@ -71,7 +71,7 @@ Inside the `public/admin/` directory create another file called `index.html` thi
 
 #### Identity Widget
 
-Along with the admin UI, we also need to read the identity widget script element within our app template so that it will be accessible from any page.  Within our `src/templates/app.html` you need to add the following script element within the function:
+Along with the admin UI, we also need to read the identity widget script element within our app layout so that it will be accessible from any page.  Within our `src/layouts/app.html` you need to add the following script element within the function:
 
 ```html
 <head>
@@ -82,8 +82,8 @@ Along with the admin UI, we also need to read the identity widget script element
 ```
 
 > Later, when you're doing this with a your own projects, make sure you either:
->* a) add this line to all of your custom page templates or
->* b) add this line to your app template
+>* a) add this line to all of your custom page layouts or
+>* b) add this line to your app layout
 
 With that completed, save and recommit all your changes to your repository. If you haven't already pushed your code to a repository on github, you must do so in order to mirror it on netlify.
 
