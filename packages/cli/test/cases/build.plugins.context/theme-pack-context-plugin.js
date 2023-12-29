@@ -7,13 +7,13 @@ const myThemePackPlugin = (options = {}) => [{
   provider: () => {
     const { name } = packageJson;
 
-    const templateLocation = options.__isDevelopment // eslint-disable-line no-underscore-dangle
-      ? new URL('./fixtures/layouts/', import.meta.url)
-      : new URL(`./node_modules/${name}/dist/layouts/`, import.meta.url);
+    const layoutLocation = options.__isDevelopment // eslint-disable-line no-underscore-dangle
+      ? new URL(`./node_modules/${name}/dist/my-layouts/`, import.meta.url)
+      : new URL('./fixtures/my-layouts/', import.meta.url);
 
     return {
-      templates: [
-        templateLocation
+      layouts: [
+        layoutLocation
       ]
     };
   }

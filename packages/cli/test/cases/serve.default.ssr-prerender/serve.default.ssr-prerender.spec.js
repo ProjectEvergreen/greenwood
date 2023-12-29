@@ -19,7 +19,7 @@
  *     footer.js
  *   pages/
  *     index.js
- *   templates/
+ *   layouts/
  *     app.html
  */
 import chai from 'chai';
@@ -106,10 +106,10 @@ describe('Serve Greenwood With: ', function() {
           expect(scriptFiles.length).to.equal(0);
         });
 
-        it('should have no _templates/ output directory for the app', async function() {
-          const templateFiles = await glob.promise(path.join(this.context.publicDir, '_templates/*'));
+        it('should have no _layouts/ output directory for the app', async function() {
+          const layoutFiles = await glob.promise(path.join(this.context.publicDir, '_layouts/*'));
 
-          expect(templateFiles.length).to.equal(0);
+          expect(layoutFiles.length).to.equal(0);
         });
       });
     });

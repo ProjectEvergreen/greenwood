@@ -14,13 +14,13 @@ Although Greenwood works without any configuration or setup, (go ahead, run `npm
 For this reason, the minimum requirements for a site that you will want to be familiar with are:
 
 1. Workspace
-1. Templates
+1. Layouts
 1. Pages
 
 In this section, we hope you'll get a better understanding of key concepts and how they can be used to create as many layouts and pages as you need to build out your own site however you need.
 
 ### Workspace
-In the project setup section, we created a _src/_ directory at the root of the directory of the project.  To Greenwood, this is called your workspace and where are the files for your project need to reside, including the next two key concepts: templates and pages.
+In the project setup section, we created a _src/_ directory at the root of the directory of the project.  To Greenwood, this is called your workspace and where are the files for your project need to reside, including the next two key concepts: layouts and pages.
 
 This gives our project the following structure:
 ```bash
@@ -30,11 +30,11 @@ This gives our project the following structure:
 └── src/
 ```
 
-> Aside from these templates and pages directories, you can use any name you want for your other directories since your templates will be able to use JavaScript module with `import` to pull in anything you need.  This will be demonstrated more fully in the next section.
+> Aside from these layouts and pages directories, you can use any name you want for your other directories since your layouts will be able to use JavaScript module with `import` to pull in anything you need.  This will be demonstrated more fully in the next section.
 
 
-### Templates
-Templates are used to define the various layouts you will need for your site and should be put into a _templates/_ directory in your workspace directory.  You will need to define at least one page template for your project in order to get control over the output of your site, called _page-template.js_.
+### Layouts
+Layouts are used to define the various layouts you will need for your site and should be put into a _layouts/_ directory in your workspace directory.  You will need to define at least one page layout for your project in order to get control over the output of your site, called _page-layout.js_.
 
 
 So using the project structure we setup previously, adding your own custom page layout would leave you with a directory layout like this:
@@ -43,7 +43,7 @@ So using the project structure we setup previously, adding your own custom page 
 ├── package-lock.json
 ├── package.json
 └── src
-    └── templates
+    └── layouts
         └── page.html
 ```
 
@@ -79,7 +79,7 @@ Any regular HTML will do.  You will just need to include a `<content-outlet></co
 Don't worry too much about the `<content-outlet></content-outlet>`, this is discussed in more detail in our [docs](/docs/layouts/).
 
 ### Pages
-Pages are how you will create the content for your site by (generally) creating markdown files.  Simply make a _pages/_ directory in your workspace and Greenwood will start building them automatically.  By default, pages will build using the default page template: _page.html_.
+Pages are how you will create the content for your site by (generally) creating markdown files.  Simply make a _pages/_ directory in your workspace and Greenwood will start building them automatically.  By default, pages will build using the default page layout: _page.html_.
 
 By adding a home page (_index.md_), your directory structure for a basic Greenwood application would now look like this:
 ```bash
@@ -89,7 +89,7 @@ By adding a home page (_index.md_), your directory structure for a basic Greenwo
 └── src
     ├── pages
     │   └── index.md
-    └── templates
+    └── layouts
         └── page.html
 ```
 
@@ -101,4 +101,4 @@ This is the home page built by Greenwood.
 ```
 
 
-Ok, so with the key concepts of workspaces, templates and pages covered, you're now ready to start [creating content](/getting-started/creating-content/) and developing your first Greenwood site!
+Ok, so with the key concepts of workspaces, layouts and pages covered, you're now ready to start [creating content](/getting-started/creating-content/) and developing your first Greenwood site!

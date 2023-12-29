@@ -1,7 +1,7 @@
 ---
 label: 'blog'
 title: State of Greenwood (2022)
-template: blog
+layout: blog
 ---
 
 # State of Greenwood (2022)

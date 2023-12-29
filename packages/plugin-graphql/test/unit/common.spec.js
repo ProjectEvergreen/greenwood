@@ -19,14 +19,14 @@ describe('Unit Test: Data', function() {
               route,
               path,
               filename,
-              template,
+              layout,
               __typename
             }
           }
         `;
         const hash = getQueryHash(query);
 
-        expect(hash).to.be.equal('380713565');
+        expect(hash).to.be.equal('1291879437');
       });
 
       it('should return the expected hash for a custom graph query with custom data', function () {
@@ -56,7 +56,7 @@ describe('Unit Test: Data', function() {
               route,
               path,
               filename,
-              template
+              layout
             }
           }
         `;
@@ -64,7 +64,7 @@ describe('Unit Test: Data', function() {
           parent: '/docs/'
         });
 
-        expect(hash).to.be.equal('1696894039');
+        expect(hash).to.be.equal('2106154137');
       });
     });
 

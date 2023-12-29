@@ -30,7 +30,7 @@
  *   pages/
  *     artists.js
  *     users.js (isolation = false)
- *   templates/
+ *   layouts/
  *     app.html
  */
 import chai from 'chai';
@@ -195,8 +195,7 @@ describe('Serve Greenwood With: ', function() {
       usersPageDom = new JSDOM(usersPageHtml);
     });
 
-    describe('Serve command with HTML route response using getBody, getTemplate and getFrontmatter for the artists page', function() {
-
+    describe('Serve command with HTML route response using getBody, getLayout and getFrontmatter for the artists page', function() {
       it('should return a 200 status', function() {
         expect(response.status).to.equal(200);
       });

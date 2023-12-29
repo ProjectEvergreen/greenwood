@@ -95,7 +95,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(inlineRouterTags.length).to.be.equal(1);
         expect(inlineRouterTags[0].textContent).to.contain('window.__greenwood = window.__greenwood || {};');
-        expect(inlineRouterTags[0].textContent).to.contain('window.__greenwood.currentTemplate = "page"');
+        expect(inlineRouterTags[0].textContent).to.contain('window.__greenwood.currentLayout = "page"');
       });
 
       it('should have one <router-outlet> tag in the <body> for the content', function() {
@@ -117,7 +117,7 @@ describe('Build Greenwood With: ', function() {
         const dataset = aboutRouteTag[0].dataset;
 
         expect(aboutRouteTag.length).to.be.equal(1);
-        expect(dataset.template).to.be.equal('test');
+        expect(dataset.layout).to.be.equal('test');
         expect(dataset.key).to.be.equal('/_routes/about/index.html');
       });
 
@@ -128,7 +128,7 @@ describe('Build Greenwood With: ', function() {
         const dataset = aboutRouteTag[0].dataset;
 
         expect(aboutRouteTag.length).to.be.equal(1);
-        expect(dataset.template).to.be.equal('page');
+        expect(dataset.layout).to.be.equal('page');
         expect(dataset.key).to.be.equal('/_routes/index.html');
       });
 

@@ -19,7 +19,7 @@
  *     footer.js
  *   pages/
  *     index.js
- *   templates/
+ *   layouts/
  *     app.html
  */
 import chai from 'chai';
@@ -68,7 +68,7 @@ describe('Build Greenwood With: ', function() {
         expect(headings[0].textContent).to.equal('This is the home page.');
       });
 
-      it('should have one top level <app-header> tag with a <template> with an open shadowroot', function() {
+      it('should have one top level <app-header> tag with a <layout> with an open shadowroot', function() {
         const header = dom.window.document.querySelectorAll('app-header template[shadowroot="open"]');
         const headerContentsDom = new JSDOM(header[0].innerHTML);
         const heading = headerContentsDom.window.document.querySelectorAll('h1');

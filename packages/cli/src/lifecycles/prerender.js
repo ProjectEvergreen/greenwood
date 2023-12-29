@@ -66,6 +66,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     const request = new Request(url);
     let ssrContents;
 
+    // do we negate the worker pool by also running this, outside the pool?
     let body = await (await servePage(url, request, plugins)).text();
     body = await (await interceptPage(url, request, plugins, body)).text();
 
@@ -84,8 +85,6 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     }
 
     const resources = await trackResourcesForRoute(body, compilation, route);
-    await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
-
     const scripts = resources
       .filter(resource => resource.type === 'script')
       .map(resource => resource.sourcePathURL.href);
@@ -112,6 +111,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       body = body.replace('<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->', ssrContents);
     }
 
+    await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
     await fs.writeFile(outputPathUrl, body);
 
     console.info('generated page...', route);

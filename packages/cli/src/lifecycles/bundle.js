@@ -1,7 +1,7 @@
 /* eslint-disable max-depth, max-len */
 import fs from 'fs/promises';
 import { getRollupConfigForApis, getRollupConfigForScriptResources, getRollupConfigForSsr } from '../config/rollup.config.js';
-import { getAppTemplate, getPageTemplate, getUserScripts } from '../lib/templating-utils.js';
+import { getAppLayout, getPageLayout, getUserScripts } from '../lib/layout-utils.js';
 import { hashString } from '../lib/hashing-utils.js';
 import { checkResourceExists, mergeResponse, normalizePathnameForWindows, trackResourcesForRoute } from '../lib/resource-utils.js';
 import path from 'path';
@@ -235,12 +235,12 @@ async function bundleSsrPages(compilation) {
 
     for (const page of compilation.graph) {
       if (page.isSSR && !page.prerender) {
-        const { filename, imports, route, template, title, relativeWorkspacePagePath } = page;
+        const { filename, imports, route, layout, title, relativeWorkspacePagePath } = page;
         const entryFileUrl = new URL(`.${relativeWorkspacePagePath}`, scratchDir);
         const moduleUrl = new URL(`.${relativeWorkspacePagePath}`, pagesDir);
         const outputPathRootUrl = new URL(`file://${path.dirname(entryFileUrl.pathname)}`);
         const request = new Request(moduleUrl); // TODO not really sure how to best no-op this?
-        // TODO getTemplate has to be static (for now?)
+        // TODO getLayout has to be static (for now?)
         // https://github.com/ProjectEvergreen/greenwood/issues/955
         const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [], request });
         const pagesPathDiff = compilation.context.pagesDir.pathname.replace(compilation.context.projectDirectory.pathname, '');
@@ -249,16 +249,18 @@ async function bundleSsrPages(compilation) {
           : '../'.repeat(relativeWorkspacePagePath.replace(`/${filename}`, '').split('/').length);
         let staticHtml = '';
 
-        staticHtml = data.template ? data.template : await getPageTemplate(staticHtml, compilation.context, template, []);
-        staticHtml = await getAppTemplate(staticHtml, compilation.context, imports, [], false, title);
+        staticHtml = data.layout ? data.layout : await getPageLayout(staticHtml, compilation.context, layout, []);
+        staticHtml = await getAppLayout(staticHtml, compilation.context, imports, [], false, title);
         staticHtml = await getUserScripts(staticHtml, compilation);
         staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
 
         // track resources first before optimizing, so compilation.resources is correctly set
         await trackResourcesForRoute(staticHtml, compilation, route);
+        // TODO do we also need to re-bundle style resources?
         // TODO is there a way to avoid running this twice?
         // first time we call this at the start of this lifecycle, we haven't tracked the resources for SSR pages yet
         // so we have to do it again before optimizing, but after tracking
+        // or can we just customize the bundle inputs to only things that aren't already tracked?
         await bundleScriptResources(compilation);
 
         const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);

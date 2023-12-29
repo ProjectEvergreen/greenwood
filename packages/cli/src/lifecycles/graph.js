@@ -44,7 +44,7 @@ const generateGraph = async (compilation) => {
             const relativeWorkspacePath = directory.pathname.replace(projectDirectory.pathname, '');
             let route = relativePagePath.replace(extension, '');
             let id = filename.split('/')[filename.split('/').length - 1].replace(extension, '');
-            let template = extension === '.html' ? null : 'page';
+            let layout = extension === '.html' ? null : 'page';
             let title = null;
             let imports = [];
             let customData = {};
@@ -76,7 +76,7 @@ const generateGraph = async (compilation) => {
               const fileContents = await fs.readFile(filenameUrl, 'utf8');
               const { attributes } = fm(fileContents);
 
-              template = attributes.template || template;
+              layout = attributes.layout || layout;
               title = attributes.title || title;
               id = attributes.label || id;
               imports = attributes.imports || [];
@@ -89,7 +89,7 @@ const generateGraph = async (compilation) => {
               delete customData.label;
               delete customData.imports;
               delete customData.title;
-              delete customData.template;
+              delete customData.layout;
 
               /* Menu Query
               * Custom front matter - Variable Definitions
@@ -170,7 +170,7 @@ const generateGraph = async (compilation) => {
               });
 
               if (ssrFrontmatter) {
-                template = ssrFrontmatter.template || template;
+                layout = ssrFrontmatter.layout || layout;
                 title = ssrFrontmatter.title || title;
                 imports = ssrFrontmatter.imports || imports;
                 customData = ssrFrontmatter.data || customData;
@@ -203,7 +203,7 @@ const generateGraph = async (compilation) => {
              * outputPath: the filename to write to when generating static HTML
              * path: path to the file relative to the workspace
              * route: URL route for a given page on outputFilePath
-             * template: page template to use as a base for a generated component
+             * layout: page layout to use as a base for a generated component
              * title: a default value that can be used for <title></title>
              * isSSR: if this is a server side route
              * prerender: if this should be statically exported
@@ -226,7 +226,7 @@ const generateGraph = async (compilation) => {
                 : `${route}index.html`,
               path: filePath,
               route: `${basePath}${route}`,
-              template,
+              layout,
               title,
               isSSR: !isStatic,
               prerender,

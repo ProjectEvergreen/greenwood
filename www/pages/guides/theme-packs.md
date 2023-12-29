@@ -7,7 +7,7 @@ index: 3
 
 ## Creating a Theme Pack
 
-Introduced as a concept in the [Context Plugin docs](/plugins/context/), a theme pack is what Greenwood uses to refer to a plugin that aims to provide a set of reusable templates, pages and more to a user (think of [**CSS Zen Garden**](http://www.csszengarden.com/)).  A good example (and the one this guide is based on) is [**greenwood-starter-presentation**](https://github.com/thescientist13/greenwood-starter-presentation), which provides the starting point for creating a [slide deck entirely from markdown](https://github.com/thescientist13/knowing-your-tco), using Greenwood!
+Introduced as a concept in the [Context Plugin docs](/plugins/context/), a theme pack is what Greenwood uses to refer to a plugin that aims to provide a set of reusable layouts, pages and more to a user (think of [**CSS Zen Garden**](http://www.csszengarden.com/)).  A good example (and the one this guide is based on) is [**greenwood-starter-presentation**](https://github.com/thescientist13/greenwood-starter-presentation), which provides the starting point for creating a [slide deck entirely from markdown](https://github.com/thescientist13/knowing-your-tco), using Greenwood!
 
 ![greenwood-starter-presentation](/assets/greenwood-starter-presentation.png)
 
@@ -25,7 +25,7 @@ We encourage using Greenwood to develop your theme pack mainly so that you can e
 For the sake of development, you can create as much as you need to recreate a user workspace and to simulate what your theme pack would look like.  Think of it like creating a [Storybook](https://storybook.js.org/) for your theme pack.
 
 
-For this guide, we will be publishing _layouts/_ (templates) and _styles/_ to **npm**.  The _pages/_ directory is just being used to pull in the template for local development and testing purposes for you as the plugin author.
+For this guide, we will be publishing _layouts/_ (layouts) and _styles/_ to **npm**.  The _pages/_ directory is just being used to pull in the layout for local development and testing purposes for you as the plugin author.
 ```shell
 src/
   pages/
@@ -60,10 +60,10 @@ const myThemePack = () => [{
   name: 'my-theme-pack:context',
   provider: () => {
     return {
-      templates: [
+      layouts: [
         // import.meta.url will be located at _node_modules/your-package/_
         // when your plugin is run in a user's project
-        new URL('./dist/layouts/', import.meta.url)
+        new URL('./dist/my-layouts/', import.meta.url)
       ]
     };
   }
@@ -104,7 +104,7 @@ _src/styles/theme.css_
 _src/pages/index.md_
 ```md
 ---
-template: 'blog-post'
+layout: 'blog-post'
 ---
 
 # Title of blog post
@@ -126,14 +126,14 @@ const myThemePackPlugin = (options = {}) => [{
   type: 'context',
   name: 'my-theme-pack:context',
   provider: (compilation) => {
-    // you can use other directory names besides templates/ this way!
-    const templateLocation = options.__isDevelopment
+    // you can use other directory names besides layouts/ this way!
+    const layoutLocation = options.__isDevelopment
       ? new URL('./layouts/', compilation.context.userWorkspace)
       : new URL('dist/layouts/', import.meta.url);
 
     return {
-      templates: [
-        templateLocation
+      layouts: [
+        layoutLocation
       ]
     };
   }
@@ -214,7 +214,7 @@ You can also use Greenwood to test your theme pack using a production build so t
 ### Publishing
 When it comes to publishing, it should be fairly straightforward, and you'll just want to do the following:
 1. Add _dist/_ to _.gitignore_ (or whatever `files` location you want to use for publishing)
-1. Add a `prepublish` script to your _package.json_ to create the _dist/_ directory with all the needed _layouts_ (templates) /_ and _styles/_
+1. Add a `prepublish` script to your _package.json_ to create the _dist/_ directory with all the needed _layouts_ (layouts) /_ and _styles/_
     ```json
     {
       "name": "my-theme-pack",
@@ -251,10 +251,10 @@ For users, they would just need to do the following:
       ]
     };
     ```
-1. Then in any of their markdown files, users would just need to reference the published template's filename
+1. Then in any of their markdown files, users would just need to reference the published layout's filename
     ```md
     ---
-    template: 'blog-post'
+    layout: 'blog-post'
     ---
 
     My Blog Post using Theme Packs! 💯
@@ -262,7 +262,7 @@ For users, they would just need to do the following:
 
 Success! 🥳
 
-> _Don't forget, user's can also [include additional CSS / JS files in their frontmatter](/docs/front-matter/#imports), to further extend, customize, and override your templates!_
+> _Don't forget, user's can also [include additional CSS / JS files in their frontmatter](/docs/front-matter/#imports), to further extend, customize, and override your layouts!_
 
 
 ### FAQ
@@ -277,7 +277,7 @@ Support for [including pages as part of a theme pack](https://github.com/Project
 Yes, we do realize this current workflow is a bit clunky at the moment, so please follow [this discussion](https://github.com/ProjectEvergreen/greenwood/discussions/682) for ways we can try and make this more elegant!  🙏🏻
 
 
-#### Why can't I just use relative paths in my templates to help avoid the boilerplate?
+#### Why can't I just use relative paths in my layouts to help avoid the boilerplate?
 
 ex.
 ```html

@@ -18,6 +18,8 @@
  *   components/
  *     foobar.js
  *     header.js
+ *   layouts/
+ *     app.html
  *   pages/
  *     index.html
  *   styles/

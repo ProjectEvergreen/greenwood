@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with no config and custom page (and app) templates using relative paths.
+ * Run Greenwood build command with no config and custom page (and app) layouts using relative paths.
  *
  * User Result
  * Should generate the expected Greenwood build.
@@ -27,7 +27,7 @@
  *         three/
  *           index.md
  *     index.html
- *   templates/
+ *   layouts/
  *     app.html
  *     page.html
  */
@@ -43,7 +43,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom App and Page Templates using relative paths';
+  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom App and Page Layout using relative paths';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -71,7 +71,7 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('Custom App and Page Templates using relative paths', function() {
+    describe('Custom App and Page Layout using relative paths', function() {
       let cssFiles;
       let scriptFiles;
 

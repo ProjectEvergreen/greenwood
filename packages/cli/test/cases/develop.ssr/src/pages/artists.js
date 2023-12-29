@@ -1,4 +1,4 @@
-async function getTemplate(compilation, { route }) {
+async function getLayout(compilation, { route }) {
   return `
     <html>
       <head>
@@ -83,7 +83,7 @@ async function getFrontmatter(compilation, { route }) {
 }
 
 export {
-  getTemplate,
+  getLayout,
   getBody,
   getFrontmatter
 };

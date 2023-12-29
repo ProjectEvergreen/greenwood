@@ -78,7 +78,7 @@ Here are paths you can get from `context`, all of which are instances of [`URL`]
 - `pagesDir`: Path to the _pages/_ directory in the user's workspace
 - `projectDirectory`: Path to the root of the current project
 - `scratchDir`: Path to Greenwood's temporary output file directory (`${process.cwd()}.greenwood/`)s
-- `userTemplatesDir`: Path to the _templates/_ directory in the user's workspace
+- `userLayoutsDir`: Path to the _layouts/_ directory in the user's workspace
 - `userWorkspace`: Path to the workspace directory (_src/_ by default)
 
 > You can see a good example of this in use in our [context plugin docs](/plugins/copy/)
@@ -90,7 +90,7 @@ While each API has its own documentation section on the left sidebar of this pag
 [Copy plugins](/plugins/copy/) allow users to copy ad-hac files and folders as part of a production build.
 
 #### Context Plugins
-[Context plugins](/plugins/context/) allows users to extend where Greenwood can look for certain files and folders, like [templates and pages](/docs/layouts/).
+[Context plugins](/plugins/context/) allows users to extend where Greenwood can look for certain files and folders, like [layouts and pages](/docs/layouts/).
 
 #### Resource Plugins
 [Resource plugins](/plugins/resource/) allow users to interact with the request and response lifecycles of files at a variety of different ways.  These lifecycles provide the ability to do things like introduce new file types, to adding hosted 3rd party scripts to your site.

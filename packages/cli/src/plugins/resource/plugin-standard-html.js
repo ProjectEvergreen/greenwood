@@ -13,7 +13,7 @@ import remarkFrontmatter from 'remark-frontmatter';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import { getUserScripts, getPageTemplate, getAppTemplate } from '../../lib/templating-utils.js';
+import { getUserScripts, getPageLayout, getAppLayout } from '../../lib/layout-utils.js';
 import { requestAsObject } from '../../lib/resource-utils.js';
 import unified from 'unified';
 import { Worker } from 'worker_threads';
@@ -46,15 +46,15 @@ class StandardHtmlResource extends ResourceInterface {
 
     let body = '';
     let title = matchingRoute.title || null;
-    let template = matchingRoute.template || null;
+    let layout = matchingRoute.layout || null;
     let frontMatter = matchingRoute.data || {};
     let customImports = matchingRoute.imports || [];
     let ssrBody;
-    let ssrTemplate;
+    let ssrLayout;
     let processedMarkdown = null;
 
     if (matchingRoute.external) {
-      template = matchingRoute.template || template;
+      layout = matchingRoute.layout || layout;
     }
 
     if (isMarkdownContent) {
@@ -93,8 +93,8 @@ class StandardHtmlResource extends ResourceInterface {
           title = frontMatter.title;
         }
 
-        if (frontMatter.template) {
-          template = frontMatter.template;
+        if (frontMatter.layout) {
+          layout = frontMatter.layout;
         }
 
         if (frontMatter.imports) {
@@ -111,8 +111,8 @@ class StandardHtmlResource extends ResourceInterface {
         const worker = new Worker(new URL('../../lib/ssr-route-worker.js', import.meta.url));
 
         worker.on('message', (result) => {
-          if (result.template) {
-            ssrTemplate = result.template;
+          if (result.layout) {
+            ssrLayout = result.layout;
           }
 
           if (result.body) {
@@ -147,10 +147,10 @@ class StandardHtmlResource extends ResourceInterface {
     if (isSpaRoute) {
       body = await fs.readFile(new URL(`./${isSpaRoute.filename}`, userWorkspace), 'utf-8');
     } else {
-      body = ssrTemplate ? ssrTemplate : await getPageTemplate(filePath, context, template, contextPlugins);
+      body = ssrLayout ? ssrLayout : await getPageLayout(filePath, context, layout, contextPlugins);
     }
 
-    body = await getAppTemplate(body, context, customImports, contextPlugins, config.devServer.hud, title);
+    body = await getAppLayout(body, context, customImports, contextPlugins, config.devServer.hud, title);
     body = await getUserScripts(body, this.compilation);
 
     if (processedMarkdown) {

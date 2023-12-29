@@ -14,8 +14,8 @@ In this section, we'll walk through developing a site with Greenwood, and making
 
 What we'll cover in this section:
 
-1. Home Page Template: Single column layout for our home page
-1. Blog Page Template: Two column layout for our blog posts
+1. Home Page Layout: Single column layout for our home page
+1. Blog Page Layout: Two column layout for our blog posts
 1. Blog Posts: A couple sample pages of content written in markdown
 1. Using Greenwood's built in local development server
 
@@ -35,19 +35,19 @@ To go along with this guide, check out our [companion repo](https://github.com/P
     │   └── index.md
     ├── styles
     │   └── theme.css
-    └── templates
+    └── layouts
         ├── app.html
         ├── blog.html
         └── page.html
 ```
 
-### Home Page Template
+### Home Page Layout
 Out of the box, Greenwood provides some default content, so even if we use our npm build script, `npm build` right now, we will get a working site in the public directory.  (go ahead and try it out!)
 
 
 Neat!  But naturally you're here to learn how to make your own site, and this is our goal!  The first step towards making your site is to create a home page.  For this site, the home page will be a "full width" page.
 
-For this template, create a _page.html_ in a _src/templates/_ (make the _templates/_ directory if it doesn't exist) and include this code in it:
+For this layout, create a _page.html_ in a _src/layouts/_ (make the _layouts/_ directory if it doesn't exist) and include this code in it:
 
 ```html
 <html>
@@ -61,10 +61,10 @@ For this template, create a _page.html_ in a _src/templates/_ (make the _templat
 
 > _This will now be used as the default layout used for all your pages.  We'll discuss overriding this later on in the guide._
 
-### Blog Posts Template
-We just made a template for our home page, but for our individual blog posts, we're going to want a different layout for those pages.  So what do we do?   Just create a new template!
+### Blog Posts Layout
+We just made a layout for our home page, but for our individual blog posts, we're going to want a different layout for those pages.  So what do we do?   Just create a new layout!
 
-Create a _blog.html_ in _src/templates/_ and include this code in it.
+Create a _blog.html_ in _src/layouts/_ and include this code in it.
 ```html
 <html>
 
@@ -75,10 +75,10 @@ Create a _blog.html_ in _src/templates/_ and include this code in it.
 </html>
 ```
 
-> _Right now both of these templates are the same, but we'll be customizing these both shortly._  👇
+> _Right now both of these layouts are the same, but we'll be customizing these both shortly._  👇
 
-### App Template
-Now that we've created a couple page templates, it probably makes sense to wrap our site with a common layout.  By creating an _app.html_ in the _templates/_ directory, we can create a common layout for all templates and pages.
+### App Layout
+Now that we've created a couple page layouts, it probably makes sense to wrap our site with a common layout.  By creating an _app.html_ in the _layouts/_ directory, we can create a common layout for all layouts and pages.
 
 This is a great way to manage global styles, loading the header and footer, or for shared site meta data.
 
@@ -115,7 +115,7 @@ You'll want to create a folder called _blog/_ in _src/pages/_ and then create tw
 _first-post.md_
 ```md
 ---
-template: 'blog'
+layout: 'blog'
 ---
 
 ## My First Blog Post
@@ -127,7 +127,7 @@ Lorem Ipsum
 _second-post.md_
 ```md
 ---
-template: 'blog'
+layout: 'blog'
 ---
 
 ## My Second Blog Post
@@ -136,10 +136,10 @@ Sed ut perspiciatis
 [back](/)
 ```
 
-We are using something called ["front matter"](/docs/front-matter) to specify that these pages should use the _blog_ template we just created.
+We are using something called ["front matter"](/docs/front-matter) to specify that these pages should use the _blog_ layout we just created.
 
 ### Development Server
-At this point we have our templates and three pages of content, so let's fire up the Greenwood development server and see what things look like!
+At this point we have our layouts and three pages of content, so let's fire up the Greenwood development server and see what things look like!
 
 ```bash
 # using the npm script we made during project setup
