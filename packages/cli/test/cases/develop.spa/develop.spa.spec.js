@@ -59,14 +59,14 @@ describe('Develop Greenwood With: ', function() {
         `${outputPath}/node_modules/simpledotcss/`
       );
 
-      await runner.setup(outputPath, [...simpleCss]);
+      runner.setup(outputPath, [...simpleCss]);
 
-      return new Promise(async (resolve) => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 5000);
 
-        await runner.runCommand(cliPath, 'develop');
+        runner.runCommand(cliPath, 'develop', { async: true });
       });
     });
 

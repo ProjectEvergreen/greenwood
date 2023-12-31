@@ -55,11 +55,11 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/@greenwood/plugin-graphql/src/core/`
       );
 
-      await runner.setup(outputPath, [
+      runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...greenwoodGraphqlCoreLibs
       ]);
-      await runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, 'build');
     });
 
     runSmokeTest(['public', 'index'], LABEL);

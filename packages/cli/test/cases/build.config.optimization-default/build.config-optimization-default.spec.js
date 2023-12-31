@@ -52,11 +52,11 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/prismjs/themes/`
       );
 
-      await runner.setup(outputPath, [
+      runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...prismCss
       ]);
-      await runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, 'build');
     });
 
     describe('Output for JavaScript / CSS tags and files', function() {

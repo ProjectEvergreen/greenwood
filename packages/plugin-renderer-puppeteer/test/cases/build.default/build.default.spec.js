@@ -175,7 +175,7 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/prismjs/`
       );
 
-      await runner.setup(outputPath, [
+      runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...reduxLibs,
         ...reduxPackageJson,
@@ -208,8 +208,8 @@ describe('Build Greenwood With: ', function() {
         ...simpleCss,
         ...simpleCssPackageJson
       ]);
-      await runner.setup(outputPath, getSetupFiles(outputPath));
-      await runner.runCommand(cliPath, 'build');
+      runner.setup(outputPath, getSetupFiles(outputPath));
+      runner.runCommand(cliPath, 'build');
     });
 
     runSmokeTest(['public', 'index'], LABEL);

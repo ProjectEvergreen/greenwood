@@ -30,7 +30,7 @@ describe('Build Greenwood With: ', function() {
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
@@ -38,10 +38,10 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe('Custom Configuration with a bad value for devServer.extensions', function() {
-    it('should throw an error that provided extensions is not valid', async function() {
+    it('should throw an error that provided extensions is not valid', function() {
       try {
-        await runner.setup(outputPath);
-        await runner.runCommand(cliPath, 'build');
+        runner.setup(outputPath);
+        runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain('Error: provided extensions is not an array.  Please provide an array like [\'.txt\', \'.foo\']');
       }

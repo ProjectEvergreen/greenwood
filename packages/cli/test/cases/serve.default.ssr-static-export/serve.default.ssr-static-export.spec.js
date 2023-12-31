@@ -39,7 +39,7 @@ describe('Serve Greenwood With: ', function() {
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public'),
       hostname
@@ -109,7 +109,7 @@ describe('Serve Greenwood With: ', function() {
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
 
-      await runner.setup(outputPath, [
+      runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...lit,
         ...litPackageJson,
@@ -129,15 +129,15 @@ describe('Serve Greenwood With: ', function() {
     });
 
     before(async function() {
-      await runner.setup(outputPath, getSetupFiles(outputPath));
-      await runner.runCommand(cliPath, 'build');
+      runner.setup(outputPath, getSetupFiles(outputPath));
+      runner.runCommand(cliPath, 'build');
 
-      return new Promise(async (resolve) => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 10000);
 
-        await runner.runCommand(cliPath, 'serve');
+        runner.runCommand(cliPath, 'serve', { async: true });
       });
     });
 

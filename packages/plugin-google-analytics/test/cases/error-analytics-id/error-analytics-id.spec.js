@@ -41,10 +41,10 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe('Google Analytics Plugin with a bad value for analyticsId', function() {
-    it('should throw an error that analyticsId must be a string', async function() {
+    it('should throw an error that analyticsId must be a string', function() {
       try {
-        await runner.setup(outputPath);
-        await runner.runCommand(cliPath, 'build');
+        runner.setup(outputPath);
+        runner.runCommand(cliPath, 'build');
       } catch (err) {
         expect(err).to.contain('Error: analyticsId should be of type string.  got "undefined" instead.');
       }

@@ -37,9 +37,9 @@ xdescribe('Scaffold Greenwood and Run Develop command: ', function() {
 
   describe('default minimal template', function () {
 
-    before(async function() {
-      await runner.setup(outputPath);
-      await runner.runCommand(initPath, '--install');
+    before(function() {
+      runner.setup(outputPath);
+      runner.runCommand(initPath, '--install');
     });
 
     describe('Develop Greenwood With: ', function() {
@@ -60,16 +60,16 @@ xdescribe('Scaffold Greenwood and Run Develop command: ', function() {
 
         before(async function() {
 
-          await runner.setup(outputPath, [
+          runner.setup(outputPath, [
             ...getSetupFiles(outputPath)
           ]);
 
-          return new Promise(async (resolve) => {
+          return new Promise((resolve) => {
             setTimeout(() => {
               resolve();
             }, 5000);
 
-            await runner.runCommand(cliPath, 'develop');
+            runner.runCommand(cliPath, 'develop', { async: true });
           });
         });
 

@@ -38,7 +38,7 @@ describe('Develop Greenwood With: ', function() {
   const hostname = 'http://127.0.0.1:1984';
   let runner;
 
-  before(async function() {
+  before(function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
@@ -107,7 +107,7 @@ describe('Develop Greenwood With: ', function() {
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
 
-      await runner.setup(outputPath, [
+      runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
         ...lit,
         ...litPackageJson,
@@ -125,12 +125,12 @@ describe('Develop Greenwood With: ', function() {
         ...litReactiveElementPackageJson
       ]);
 
-      return new Promise(async (resolve) => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 10000);
 
-        await runner.runCommand(cliPath, 'develop');
+        runner.runCommand(cliPath, 'develop', { async: true });
       });
     });
 
