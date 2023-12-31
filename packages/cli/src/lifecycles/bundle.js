@@ -226,6 +226,7 @@ async function bundleSsrPages(compilation) {
   //   return plugin.provider(compilation);
   // });
   const hasSSRPages = compilation.graph.filter(page => page.isSSR).length > 0;
+  const staticContentsRouteMapper = {};
   const input = [];
 
   if (!compilation.config.prerender && hasSSRPages) {
@@ -233,20 +234,17 @@ async function bundleSsrPages(compilation) {
     const { executeRouteModule } = await import(executeModuleUrl);
     const { pagesDir, scratchDir } = compilation.context;
 
+    // one pass to generate initial static HTML and to track all combined static resources across layouts
+    // and before we optimize so that all bundled assets can tracked up front
+    // would be nice to see if this can be done in a single pass though...
     for (const page of compilation.graph) {
       if (page.isSSR && !page.prerender) {
-        const { filename, imports, route, layout, title, relativeWorkspacePagePath } = page;
-        const entryFileUrl = new URL(`.${relativeWorkspacePagePath}`, scratchDir);
+        const { imports, route, layout, title, relativeWorkspacePagePath } = page;
         const moduleUrl = new URL(`.${relativeWorkspacePagePath}`, pagesDir);
-        const outputPathRootUrl = new URL(`file://${path.dirname(entryFileUrl.pathname)}`);
-        const request = new Request(moduleUrl); // TODO not really sure how to best no-op this?
+        const request = new Request(moduleUrl);
         // TODO getLayout has to be static (for now?)
         // https://github.com/ProjectEvergreen/greenwood/issues/955
         const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [], request });
-        const pagesPathDiff = compilation.context.pagesDir.pathname.replace(compilation.context.projectDirectory.pathname, '');
-        const relativeDepth = relativeWorkspacePagePath.replace(`/${filename}`, '') === ''
-          ? '../'
-          : '../'.repeat(relativeWorkspacePagePath.replace(`/${filename}`, '').split('/').length);
         let staticHtml = '';
 
         staticHtml = data.layout ? data.layout : await getPageLayout(staticHtml, compilation.context, layout, []);
@@ -254,17 +252,30 @@ async function bundleSsrPages(compilation) {
         staticHtml = await getUserScripts(staticHtml, compilation);
         staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
 
-        // track resources first before optimizing, so compilation.resources is correctly set
         await trackResourcesForRoute(staticHtml, compilation, route);
-        // TODO do we also need to re-bundle style resources?
-        // TODO is there a way to avoid running this twice?
-        // first time we call this at the start of this lifecycle, we haven't tracked the resources for SSR pages yet
-        // so we have to do it again before optimizing, but after tracking
-        // or can we just customize the bundle inputs to only things that aren't already tracked?
-        await bundleScriptResources(compilation);
 
+        staticContentsRouteMapper[route] = staticHtml;
+      }
+    }
+
+    // technically this happens in the start of bundleCompilation once
+    // so might be nice to detect those static assets to see if they have be "de-duped" from bundling here
+    // TODO do we also need to re-bundle style resources?
+    await bundleScriptResources(compilation);
+
+    // second pass to link all bundled assets to their resources before optimizing and generating SSR bundles
+    for (const page of compilation.graph) {
+      if (page.isSSR && !page.prerender) {
+        const { filename, route, relativeWorkspacePagePath } = page;
+        const entryFileUrl = new URL(`.${relativeWorkspacePagePath}`, scratchDir);
+        const pagesPathDiff = compilation.context.pagesDir.pathname.replace(compilation.context.projectDirectory.pathname, '');
+        const outputPathRootUrl = new URL(`file://${path.dirname(entryFileUrl.pathname)}`);
+        const relativeDepth = relativeWorkspacePagePath.replace(`/${filename}`, '') === ''
+          ? '../'
+          : '../'.repeat(relativeWorkspacePagePath.replace(`/${filename}`, '').split('/').length);
         const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
 
+        let staticHtml = staticContentsRouteMapper[route];
         staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
         staticHtml = staticHtml.replace(/[`\\$]/g, '\\$&'); // https://stackoverflow.com/a/75688937/417806
 
