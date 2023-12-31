@@ -35,13 +35,8 @@ describe('Build Greenwood With: ', function() {
     runner = new Runner();
   });
 
-<<<<<<< HEAD:packages/cli/test/cases/build.config.error-templates-directory/build.config.error-templates-directory.spec.js
-  describe('Custom Configuration with a bad value for templatesDirectory', function() {
-    it('should throw an error that templatesDirectory must be a string', function() {
-=======
   describe('Custom Configuration with a bad value for layoutsDirectory', function() {
     it('should throw an error that layoutsDirectory must be a string', async function() {
->>>>>>> c6f77596 (rename templates directory to layouts):packages/cli/test/cases/build.config.error-layouts-directory/build.config.error-layouts-directory.spec.js
       try {
         runner.setup(outputPath);
         runner.runCommand(cliPath, 'build');
