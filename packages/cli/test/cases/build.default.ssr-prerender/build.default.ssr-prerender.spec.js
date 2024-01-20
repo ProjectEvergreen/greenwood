@@ -69,12 +69,12 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have one top level <app-footer> element with a <template> with an open shadowroot', function() {
-        expect(dom.window.document.querySelectorAll('app-footer template[shadowroot="open"]').length).to.equal(1);
+        expect(dom.window.document.querySelectorAll('app-footer template[shadowrootmode="open"]').length).to.equal(1);
         expect(dom.window.document.querySelectorAll('template').length).to.equal(1);
       });
 
       it('should have the expected SSR Shadow DOM content for the footer', function() {
-        const wrapper = new JSDOM(dom.window.document.querySelectorAll('app-footer template[shadowroot="open"]')[0].innerHTML);
+        const wrapper = new JSDOM(dom.window.document.querySelectorAll('app-footer template[shadowrootmode="open"]')[0].innerHTML);
         const footer = wrapper.window.document.querySelectorAll('footer');
 
         expect(footer.length).to.equal(1);

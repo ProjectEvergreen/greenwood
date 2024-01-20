@@ -16787,10 +16787,10 @@ wait-port@1.0.4:
     commander "^9.3.0"
     debug "^4.3.4"
 
-wc-compiler@~0.9.1:
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.9.1.tgz#65348882a63bf8094722a293c422b4d6f07215d5"
-  integrity sha512-zdXSXeeoB6jKGV8mELFpY3fe6kxeM+i+TULqMPaP+hXHyQHUWnGAqK6juQUOFc0TVixDTcCmCuQ/GXknqXwRqA==
+wc-compiler@~0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.10.0.tgz#3a0c32c500425c4493def7c47ea8df230d7cd0b8"
+  integrity sha512-GwtQw/cgbaCedoeguMc5YlRvHujDRTfpJxgglPAVT3LuJCRGXqG3nyckuV4mvblOBAPwePuP9T5nOTxbW/ZIRA==
   dependencies:
     acorn "^8.7.0"
     acorn-jsx "^5.3.2"

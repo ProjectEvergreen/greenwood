@@ -259,7 +259,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should have the expected number of <wc-card> tags in the <head>', function() {
-        const cards = dom.window.document.querySelectorAll('body > wc-card template[shadowroot="open"]');
+        const cards = dom.window.document.querySelectorAll('body > wc-card template[shadowrootmode="open"]');
 
         expect(cards.length).to.be.greaterThan(0);
       });
