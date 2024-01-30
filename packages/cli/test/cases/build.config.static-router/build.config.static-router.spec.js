@@ -32,7 +32,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
+describe.only('Build Greenwood With: ', function() {
   const LABEL = 'Static Router Configuration and Hybrid Workspace';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -187,7 +187,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+    //  runner.teardown(getOutputTeardownFiles(outputPath));
   });
 
 });

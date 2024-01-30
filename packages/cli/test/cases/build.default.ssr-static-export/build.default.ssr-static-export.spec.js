@@ -147,11 +147,10 @@ describe('Build Greenwood With: ', function() {
         expect(styles.length).to.equal(1);
       });
 
-      // TODO clean up lit-polyfill as part of https://github.com/ProjectEvergreen/greenwood/issues/728
       it('should have four script tags', function() {
         const scripts = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
 
-        expect(scripts.length).to.equal(4);
+        expect(scripts.length).to.equal(3);
       });
 
       it('should have expected SSR content from the non module script tag', function() {

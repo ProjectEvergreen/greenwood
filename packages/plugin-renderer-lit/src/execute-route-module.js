@@ -1,23 +1,7 @@
-// this needs to come first
-import { render } from '@lit-labs/ssr/lib/render-with-global-dom-shim.js';
-import { Buffer } from 'buffer';
+import { render } from '@lit-labs/ssr';
+import { collectResult } from '@lit-labs/ssr/lib/render-result.js';
 import { html } from 'lit';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
-import { Readable } from 'stream';
-
-async function streamToString (stream) {
-  const chunks = [];
-
-  for await (let chunk of stream) {
-    chunks.push(Buffer.from(chunk));
-  }
-
-  return Buffer.concat(chunks).toString('utf-8');
-}
-
-async function getTemplateResultString(template) {
-  return await streamToString(Readable.from(render(template)));
-}
 
 async function executeRouteModule({ moduleUrl, compilation, page, prerender, htmlContents, scripts }) {
   const data = {
@@ -25,6 +9,8 @@ async function executeRouteModule({ moduleUrl, compilation, page, prerender, htm
     body: null,
     frontmatter: null,
     html: null
+    // hydrate: false,
+    // pageData: {}
   };
 
   // prerender static content
@@ -35,7 +21,7 @@ async function executeRouteModule({ moduleUrl, compilation, page, prerender, htm
 
     const templateResult = html`${unsafeHTML(htmlContents)}`;
 
-    data.html = await getTemplateResultString(templateResult);
+    data.html = await collectResult(render(templateResult));
   } else {
     const module = await import(moduleUrl).then(module => module);
     const { getTemplate = null, getBody = null, getFrontmatter = null, isolation = true } = module;
@@ -46,23 +32,25 @@ async function executeRouteModule({ moduleUrl, compilation, page, prerender, htm
       data.isolation = true;
     }
 
-    if (module.default && module.tagName) {
-      const { tagName } = module;
-      const templateResult = html`
-        ${unsafeHTML(`<${tagName}></${tagName}>`)}
-      `;
+    // if (hydration) {
+    //   data.hydrate = true;
+    // }
 
-      data.body = await getTemplateResultString(templateResult);
-    } else if (getBody) {
-      const templateResult = await getBody(compilation, page);
+    // if (loader) {
+    //   data.pageData = await loader(); // request, compilation, etc can go here
+    //   console.log(data.pageData);
+    // }
 
-      data.body = await getTemplateResultString(templateResult);
+    if (getBody) {
+      const templateResult = await getBody(compilation, page, data.pageData);
+
+      data.body = await collectResult(render(templateResult));
     }
 
     if (getTemplate) {
       const templateResult = await getTemplate(compilation, page);
 
-      data.template = await getTemplateResultString(templateResult);
+      data.template = await collectResult(render(templateResult));
     }
 
     if (getFrontmatter) {

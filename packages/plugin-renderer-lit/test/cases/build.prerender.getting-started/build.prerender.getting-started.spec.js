@@ -96,6 +96,10 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
         `${process.cwd()}/node_modules/lit-html/*.js`,
         `${outputPath}/node_modules/lit-html/`
       );
+      const litHtmlNode = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/node/*.js`,
+        `${outputPath}/node_modules/lit-html/node/`
+      );
       const litHtmlPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-html/package.json`,
         `${outputPath}/node_modules/lit-html/`
@@ -116,6 +120,11 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
         `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
+      const litReactiveElementNode = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit/reactive-element/node/*.js`,
+        `${outputPath}/node_modules/@lit/reactive-element/node/`
+      );
+      // lit-html/node/directives/unsafe-html.js
       const litHtmlSourceMap = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-html/lit-html.js.map`,
         `${outputPath}/node_modules/lit-html/`
@@ -136,11 +145,13 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
         ...litElementDecorators,
         ...litHtmlPackageJson,
         ...litHtml,
+        ...litHtmlNode,
         ...litHtmlDirectives,
         ...trustedTypes,
         ...litReactiveElement,
         ...litReactiveElementDecorators,
         ...litReactiveElementPackageJson,
+        ...litReactiveElementNode,
         ...litHtmlSourceMap
       ]);
       runner.runCommand(cliPath, 'build');
