@@ -115,6 +115,14 @@ class StandardHtmlResource extends ResourceInterface {
           if (result.template) {
             ssrTemplate = result.template;
           }
+
+          // if (result.hydrate) {
+          //   matchingRoute.hydrate = result.hydrate;
+          //   matchingRoute.pageData = result.pageData;
+
+          //   console.log('Update Page', this.compilation.graph.find((node) => node.route === pathname));
+          // }
+
           if (result.body) {
             ssrBody = result.body;
           }
@@ -200,6 +208,20 @@ class StandardHtmlResource extends ResourceInterface {
         body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), frontMatter[fm]);
       }
     }
+
+    // if (matchingRoute.hydrate && matchingRoute.pageData) {
+    //   const id = '__GWD_HYDRATION_DATA__';
+    //   const { pageData } = matchingRoute;
+
+    //   console.log('hydrate with page data =>', { pageData });
+
+    //   body = body.replace('</head>', `
+    //     <script type="application/json" id="${id}">
+    //       ${JSON.stringify(pageData)}
+    //     </script>
+    //     </head>
+    //   `);
+    // }
 
     // give the user something to see so they know it works, if they have no content
     if (body.indexOf('<content-outlet></content-outlet>') > 0) {

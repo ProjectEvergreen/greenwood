@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import htmlparser from 'node-html-parser';
 import { checkResourceExists } from './resource-utils.js';
-import { getPackageJson } from './node-modules-utils.js';
+// import { getPackageJson } from './node-modules-utils.js';
 
 async function getCustomPageTemplatesFromPlugins(contextPlugins, templateName) {
   const customTemplateLocations = [];
@@ -177,7 +177,7 @@ async function getAppTemplate(pageTemplateContents, context, customImports = [],
 }
 
 async function getUserScripts (contents, compilation) {
-  const { context, config } = compilation;
+  const { config } = compilation;
 
   contents = contents.replace('<head>', `
     <head>
@@ -189,18 +189,18 @@ async function getUserScripts (contents, compilation) {
   // TODO get rid of lit polyfills in core
   // https://github.com/ProjectEvergreen/greenwood/issues/728
   // https://lit.dev/docs/tools/requirements/#polyfills
-  if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
-    const userPackageJson = await getPackageJson(context);
-    const dependencies = userPackageJson?.dependencies || {};
-    const litPolyfill = dependencies && dependencies.lit
-      ? '<script src="/node_modules/lit/polyfill-support.js"></script>\n'
-      : '';
+  // if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
+  //   const userPackageJson = await getPackageJson(context);
+  //   const dependencies = userPackageJson?.dependencies || {};
+  //   const litPolyfill = dependencies && dependencies.lit
+  //     ? '<script src="/node_modules/lit/polyfill-support.js"></script>\n'
+  //     : '';
 
-    contents = contents.replace('<head>', `
-      <head>
-        ${litPolyfill}
-    `);
-  }
+  //   contents = contents.replace('<head>', `
+  //     <head>
+  //       ${litPolyfill}
+  //   `);
+  // }
 
   return contents;
 }

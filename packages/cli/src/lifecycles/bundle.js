@@ -7,6 +7,28 @@ import { checkResourceExists, mergeResponse, normalizePathnameForWindows } from 
 import path from 'path';
 import { rollup } from 'rollup';
 
+async function interceptPage(url, request, plugins, body) {
+  let response = new Response(body, {
+    headers: new Headers({ 'Content-Type': 'text/html' })
+  });
+
+  for (const plugin of plugins) {
+    if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
+      response = await plugin.intercept(url, request, response);
+    }
+  }
+
+  return response;
+}
+
+function getPluginInstances(compilation) {
+  return [...compilation.config.plugins]
+    .filter(plugin => plugin.type === 'resource' && plugin.name !== 'plugin-node-modules:resource')
+    .map((plugin) => {
+      return plugin.provider(compilation);
+    });
+}
+
 async function emitResources(compilation) {
   const { outputDir } = compilation.context;
   const { resources, graph } = compilation;
@@ -202,8 +224,19 @@ async function bundleSsrPages(compilation) {
         staticHtml = data.template ? data.template : await getPageTemplate(staticHtml, compilation.context, template, []);
         staticHtml = await getAppTemplate(staticHtml, compilation.context, imports, [], false, title);
         staticHtml = await getUserScripts(staticHtml, compilation);
+        // TODO seems like we are missing general purpose intercepting and optimization when bundling SSR pages
+        staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
         staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
         staticHtml = staticHtml.replace(/[`\\$]/g, '\\$&'); // https://stackoverflow.com/a/75688937/417806
+
+        // TODO prune graph of hydration data
+        // const g = [ ...compilation.graph ];
+
+        // g.forEach(page => {
+        //   delete page.pageData;
+        // })
+
+        // compilation.graph = g;
 
         // better way to write out this inline code?
         await fs.writeFile(entryFileUrl, `

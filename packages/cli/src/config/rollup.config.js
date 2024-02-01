@@ -375,7 +375,9 @@ const getRollupConfigForApis = async (compilation) => {
     plugins: [
       greenwoodJsonLoader(),
       greenwoodResourceLoader(compilation),
-      nodeResolve(),
+      nodeResolve({
+        exportConditions: ['default', 'module', 'import', 'node']
+      }),
       commonjs(),
       greenwoodImportMetaUrl(compilation)
     ]
@@ -397,11 +399,12 @@ const getRollupConfigForSsr = async (compilation, input) => {
     plugins: [
       greenwoodJsonLoader(),
       greenwoodResourceLoader(compilation),
-      // TODO let this through for lit to enable nodeResolve({ preferBuiltins: true })
+      // TODO enable preferBuiltins for lit (do we still need this?)
       // https://github.com/lit/lit/issues/449
       // https://github.com/ProjectEvergreen/greenwood/issues/1118
       nodeResolve({
-        preferBuiltins: true
+        exportConditions: ['default', 'module', 'import', 'node']
+        // preferBuiltins: true,
       }),
       commonjs(),
       greenwoodImportMetaUrl(compilation),
