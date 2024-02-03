@@ -122,6 +122,14 @@ describe('Serve Greenwood With: ', function() {
         `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
+      const litSsrElementHydrationSupport = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js`,
+        `${outputPath}/node_modules/@lit-labs/ssr-client/`
+      );
+      const litSsrHtmlHydrationSupport = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit-labs/ssr-client/lib/*.js`,
+        `${outputPath}/node_modules/@lit-labs/ssr-client/lib/`
+      );
 
       runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
@@ -141,7 +149,9 @@ describe('Serve Greenwood With: ', function() {
         ...litReactiveElement,
         ...litReactiveElementNode,
         ...litReactiveElementDecorators,
-        ...litReactiveElementPackageJson
+        ...litReactiveElementPackageJson,
+        ...litSsrElementHydrationSupport,
+        ...litSsrHtmlHydrationSupport
       ]);
       runner.runCommand(cliPath, 'build');
 
@@ -275,6 +285,13 @@ describe('Serve Greenwood With: ', function() {
       it('should have the expected <app-footer> content in the <body>', function() {
         expect(usersPageHtml).to.contain('<footer class="footer">');
       });
+
+      it('should have the expected lit hydration script in the <head>', function() {
+        const scripts = Array.from(usersPageDom.window.document.querySelectorAll('head script'))
+          .filter((script) => script.getAttribute('src')?.indexOf('lit-element-hydrate-support') >= 0);
+
+        expect(scripts.length).to.equal(1);
+      });
     });
 
     describe('Serve command with API route server rendering LitElement <app-card> components as an HTML response', function() {
@@ -301,7 +318,6 @@ describe('Serve Greenwood With: ', function() {
         done();
       });
 
-      // content-type html
       it('should have a Content-Type header of text/html', function(done) {
         const type = response.headers.get('Content-Type');
 

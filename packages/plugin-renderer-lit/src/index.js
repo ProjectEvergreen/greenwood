@@ -15,13 +15,12 @@ class LitHydrationResource extends ResourceInterface {
   async shouldIntercept(url) {
     const { pathname } = url;
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
-    const { hydrate, pageData } = matchingRoute;
+    // const { hydrate, pageData } = matchingRoute;
 
-    return hydrate && pageData;
+    return matchingRoute.isSSR; // hydrate && pageData;
   }
 
   async intercept(url, request, response) {
-    console.log('SHOULD intercept', { url });
     let body = await response.text();
 
     // TODO would be nice not to have to do this, but
