@@ -8,7 +8,7 @@ function generateOutputFormat(id) {
   const handlerAlias = '$handler';
 
   return `
-    import { handler as ${handlerAlias} } from './__${id}.js';
+    import { handler as ${handlerAlias} } from './${id}.js';
 
     export async function handler (event, context = {}) {
       const { rawUrl, body, headers = {}, httpMethod } = event;
@@ -52,10 +52,9 @@ function generateOutputFormat(id) {
 }
 
 async function setupOutputDirectory(id, outputRoot, outputType) {
-  const outputFormat = generateOutputFormat(id, outputType);
-  const filename = outputType === 'api'
-    ? `api-${id}`
-    : `${id}`;
+  const entryPoint = outputType === 'api' ? id : `${id}.entry`;
+  const filename = outputType === 'api' ? `api-${id}` : id;
+  const outputFormat = generateOutputFormat(entryPoint, outputType);
 
   await fs.mkdir(outputRoot, { recursive: true });
   await fs.writeFile(new URL(`./${filename}.js`, outputRoot), outputFormat);
@@ -64,7 +63,7 @@ async function setupOutputDirectory(id, outputRoot, outputType) {
   }));
 }
 
-// TODO manifest options, like node version?
+// TODO do we need more manifest options, like node version?
 // https://github.com/netlify/zip-it-and-ship-it#options
 async function createOutputZip(id, outputType, outputRootUrl, projectDirectory) {
   const filename = outputType === 'api'
@@ -98,35 +97,23 @@ async function netlifyAdapter(compilation) {
     const { id } = page;
     const outputType = 'page';
     const outputRoot = new URL(`./${id}/`, adapterOutputUrl);
+    const files = (await fs.readdir(outputDir))
+      .filter(file => file.startsWith(`${id}.chunk.`) && file.endsWith('.js'));
 
     await setupOutputDirectory(id, outputRoot, outputType);
 
-    // one for the user's actual file
+    // handle user's actual route entry file
     await fs.cp(
-      new URL(`./_${id}.js`, outputDir),
-      new URL(`./_${id}.js`, outputRoot),
+      new URL(`./${id}.entry.js`, outputDir),
+      new URL(`./${id}.entry.js`, outputRoot),
       { recursive: true }
     );
 
-    // and one to act as the entry point into it (as produced by Greenwood CLI)
-    await fs.cp(
-      new URL(`./__${id}.js`, outputDir),
-      new URL(`./__${id}.js`, outputRoot),
-      { recursive: true }
-    );
-
-    // need this for URL referenced chunks
-    // ideally we would map bundles to pages to avoid copying the same files into every function
-    const ssrPageAssets = (await fs.readdir(outputDir))
-      .filter(file => !path.basename(file).startsWith('_')
-        && !path.basename(file).startsWith('execute')
-        && path.basename(file).endsWith('.js')
-      );
-
-    for (const asset of ssrPageAssets) {
+    // and the URL chunk for renderer plugin and executeRouteModule
+    for (const file of files) {
       await fs.cp(
-        new URL(`./${asset}`, outputDir),
-        new URL(`./${asset}`, outputRoot),
+        new URL(`./${file}`, outputDir),
+        new URL(`./${file}`, outputRoot),
         { recursive: true }
       );
     }
@@ -150,12 +137,12 @@ async function netlifyAdapter(compilation) {
 
     await fs.cp(
       new URL(`./api/${id}.js`, outputDir),
-      new URL(`./__${id}.js`, outputRoot),
+      new URL(`./${id}.js`, outputRoot),
       { recursive: true }
     );
 
     // need this for URL referenced chunks
-    // ideally we would map bundles to pages to avoid copying the same files into every function
+    // TODO ideally we would map bundles to specific API routes instead of copying all files just in case
     const ssrApiAssets = (await fs.readdir(new URL('./api/', outputDir)))
       .filter(file => new RegExp(/^[\w][\w-]*\.[a-zA-Z0-9]{4,20}\.[\w]{2,4}$/).test(path.basename(file)));
 

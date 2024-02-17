@@ -6,7 +6,7 @@ import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 function generateOutputFormat(id, type) {
   const handlerAlias = '$handler';
   const path = type === 'page'
-    ? `__${id}`
+    ? `${id}.entry`
     : id;
 
   return `
@@ -86,22 +86,26 @@ async function vercelAdapter(compilation) {
     const outputType = 'page';
     const { id } = page;
     const outputRoot = new URL(`./${basePath}/${id}.func/`, adapterOutputUrl);
+    const files = (await fs.readdir(outputDir))
+      .filter(file => file.startsWith(`${id}.chunk.`) && file.endsWith('.js'));
 
     await setupFunctionBuildFolder(id, outputType, outputRoot);
 
-    // one for the user's actual file
+    // handle user's actual route entry file
     await fs.cp(
-      new URL(`./_${id}.js`, outputDir),
-      new URL(`./_${id}.js`, outputRoot),
+      new URL(`./${id}.entry.js`, outputDir),
+      new URL(`./${id}.entry.js`, outputRoot),
       { recursive: true }
     );
 
-    // and one to act as the entry point into it (as produced by Greenwood CLI)
-    await fs.cp(
-      new URL(`./__${id}.js`, outputDir),
-      new URL(`./__${id}.js`, outputRoot),
-      { recursive: true }
-    );
+    // and the URL chunk for renderer plugin and executeRouteModule
+    for (const file of files) {
+      await fs.cp(
+        new URL(`./${file}`, outputDir),
+        new URL(`./${file}`, outputRoot),
+        { recursive: true }
+      );
+    }
   }
 
   for (const [key] of apiRoutes) {
@@ -118,7 +122,7 @@ async function vercelAdapter(compilation) {
     );
 
     // need this for URL referenced chunks
-    // ideally we would map bundles to pages to avoid copying the same files into every function
+    // TODO ideally we would map bundles to specific API routes instead of copying all files just in case
     const ssrApiAssets = (await fs.readdir(new URL('./api/', outputDir)))
       .filter(file => new RegExp(/^[\w][\w-]*\.[a-zA-Z0-9]{4,20}\.[\w]{2,4}$/).test(path.basename(file)));
 

@@ -217,12 +217,14 @@ async function bundleSsrPages(compilation) {
     for (const page of compilation.graph) {
       if (page.isSSR && !page.prerender) {
         const { filename, imports, route, template, title } = page;
-        const entryFileUrl = new URL(`./_${filename}`, scratchDir);
+        const entryFileUrl = new URL(`./${filename}`, scratchDir);
         const moduleUrl = new URL(`./${filename}`, pagesDir);
         const request = new Request(moduleUrl); // TODO not really sure how to best no-op this?
         // TODO getTemplate has to be static (for now?)
         // https://github.com/ProjectEvergreen/greenwood/issues/955
         const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [], request });
+        const pagesPathDiff = compilation.context.pagesDir.pathname.replace(compilation.context.projectDirectory.pathname, '');
+
         let staticHtml = '';
 
         staticHtml = data.template ? data.template : await getPageTemplate(staticHtml, compilation.context, template, []);
@@ -233,13 +235,16 @@ async function bundleSsrPages(compilation) {
         staticHtml = staticHtml.replace(/[`\\$]/g, '\\$&'); // https://stackoverflow.com/a/75688937/417806
 
         // better way to write out this inline code?
+        // using a URL here produces a bundled chunk, but at leasts its bundled
         await fs.writeFile(entryFileUrl, `
           import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
+
+          const moduleUrl = new URL('../${pagesPathDiff}/${filename}', import.meta.url);
 
           export async function handler(request) {
             const compilation = JSON.parse('${JSON.stringify(compilation)}');
             const page = JSON.parse('${JSON.stringify(page)}');
-            const moduleUrl = '___GWD_ENTRY_FILE_URL=${filename}___';
+            // const moduleUrl = '___GWD_ENTRY_FILE_URL=${filename}___';
             const data = await executeRouteModule({ moduleUrl, compilation, page, request });
             let staticHtml = \`${staticHtml}\`;
 
@@ -255,7 +260,6 @@ async function bundleSsrPages(compilation) {
           }
         `);
 
-        input.push(normalizePathnameForWindows(moduleUrl));
         input.push(normalizePathnameForWindows(entryFileUrl));
       }
     }

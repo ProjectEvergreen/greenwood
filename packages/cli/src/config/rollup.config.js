@@ -252,30 +252,6 @@ function greenwoodImportMetaUrl(compilation) {
   };
 }
 
-// TODO could we use this instead?
-// https://github.com/rollup/rollup/blob/v2.79.1/docs/05-plugin-development.md#resolveimportmeta
-// https://github.com/ProjectEvergreen/greenwood/issues/1087
-function greenwoodPatchSsrPagesEntryPointRuntimeImport() {
-  return {
-    name: 'greenwood-patch-ssr-pages-entry-point-runtime-import',
-    generateBundle(options, bundle) {
-      Object.keys(bundle).forEach((key) => {
-        if (key.startsWith('__')) {
-          // ___GWD_ENTRY_FILE_URL=${filename}___
-          const needle = bundle[key].code.match(/___GWD_ENTRY_FILE_URL=(.*.)___/);
-          if (needle) {
-            const entryPathMatch = needle[1];
-
-            bundle[key].code = bundle[key].code.replace(/'___GWD_ENTRY_FILE_URL=(.*.)___'/, `new URL('./_${entryPathMatch}', import.meta.url)`);
-          } else {
-            console.warn(`Could not find entry path match for bundle => ${key}`);
-          }
-        }
-      });
-    }
-  };
-}
-
 const getRollupConfigForScriptResources = async (compilation) => {
   const { outputDir } = compilation.context;
   const input = [...compilation.resources.values()]
@@ -370,8 +346,8 @@ const getRollupConfigForSsr = async (compilation, input) => {
     input: filepath,
     output: {
       dir: normalizePathnameForWindows(outputDir),
-      entryFileNames: '_[name].js',
-      chunkFileNames: '[name].[hash].js'
+      entryFileNames: '[name].entry.js',
+      chunkFileNames: '[name].chunk.[hash].js'
     },
     plugins: [
       greenwoodResourceLoader(compilation),
@@ -383,8 +359,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
         preferBuiltins: true
       }),
       commonjs(),
-      greenwoodImportMetaUrl(compilation),
-      greenwoodPatchSsrPagesEntryPointRuntimeImport() // TODO a little hacky but works for now
+      greenwoodImportMetaUrl(compilation)
     ],
     onwarn: (errorObj) => {
       const { code, message } = errorObj;

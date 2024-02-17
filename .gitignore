@@ -11,4 +11,4 @@ packages/**/test/**/netlify
 packages/**/test/**/.netlify
 packages/**/test/**/.vercel
 public/
-adapter-outlet/
+adapter-output/
