@@ -6,7 +6,7 @@ import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 function generateOutputFormat(id, type) {
   const handlerAlias = '$handler';
   const path = type === 'page'
-    ? `${id}.entry`
+    ? `${id}.route`
     : id;
 
   return `
@@ -87,14 +87,14 @@ async function vercelAdapter(compilation) {
     const { id } = page;
     const outputRoot = new URL(`./${basePath}/${id}.func/`, adapterOutputUrl);
     const files = (await fs.readdir(outputDir))
-      .filter(file => file.startsWith(`${id}.chunk.`) && file.endsWith('.js'));
+      .filter(file => file.startsWith(`${id}.route.chunk.`) && file.endsWith('.js'));
 
     await setupFunctionBuildFolder(id, outputType, outputRoot);
 
     // handle user's actual route entry file
     await fs.cp(
-      new URL(`./${id}.entry.js`, outputDir),
-      new URL(`./${id}.entry.js`, outputRoot),
+      new URL(`./${id}.route.js`, outputDir),
+      new URL(`./${id}.route.js`, outputRoot),
       { recursive: true }
     );
 

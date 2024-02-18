@@ -3,7 +3,7 @@ import { checkResourceExists } from '../../../../cli/src/lib/resource-utils.js';
 
 function generateOutputFormat(id, type) {
   const path = type === 'page'
-    ? `${id}.entry`
+    ? `${id}.route`
     : `api/${id}`;
 
   return `

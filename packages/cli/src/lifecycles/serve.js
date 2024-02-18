@@ -317,7 +317,7 @@ async function getHybridServer(compilation) {
             });
 
             worker.postMessage({
-              routeModuleUrl: new URL(`./${matchingRoute.id}.entry.js`, outputDir).href,
+              routeModuleUrl: new URL(`./${matchingRoute.id}.route.js`, outputDir).href,
               request,
               compilation: JSON.stringify(compilation)
             });

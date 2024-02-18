@@ -52,7 +52,7 @@ function generateOutputFormat(id) {
 }
 
 async function setupOutputDirectory(id, outputRoot, outputType) {
-  const entryPoint = outputType === 'api' ? id : `${id}.entry`;
+  const entryPoint = outputType === 'api' ? id : `${id}.route`;
   const filename = outputType === 'api' ? `api-${id}` : id;
   const outputFormat = generateOutputFormat(entryPoint, outputType);
 
@@ -98,14 +98,14 @@ async function netlifyAdapter(compilation) {
     const outputType = 'page';
     const outputRoot = new URL(`./${id}/`, adapterOutputUrl);
     const files = (await fs.readdir(outputDir))
-      .filter(file => file.startsWith(`${id}.chunk.`) && file.endsWith('.js'));
+      .filter(file => file.startsWith(`${id}.route.chunk.`) && file.endsWith('.js'));
 
     await setupOutputDirectory(id, outputRoot, outputType);
 
     // handle user's actual route entry file
     await fs.cp(
-      new URL(`./${id}.entry.js`, outputDir),
-      new URL(`./${id}.entry.js`, outputRoot),
+      new URL(`./${id}.route.js`, outputDir),
+      new URL(`./${id}.route.js`, outputRoot),
       { recursive: true }
     );
 
