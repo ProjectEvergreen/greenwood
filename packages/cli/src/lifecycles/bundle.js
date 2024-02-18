@@ -239,12 +239,11 @@ async function bundleSsrPages(compilation) {
         await fs.writeFile(entryFileUrl, `
           import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
 
-          const moduleUrl = new URL('../${pagesPathDiff}/${filename}', import.meta.url);
+          const moduleUrl = new URL('../${pagesPathDiff}${filename}', import.meta.url);
 
           export async function handler(request) {
             const compilation = JSON.parse('${JSON.stringify(compilation)}');
             const page = JSON.parse('${JSON.stringify(page)}');
-            // const moduleUrl = '___GWD_ENTRY_FILE_URL=${filename}___';
             const data = await executeRouteModule({ moduleUrl, compilation, page, request });
             let staticHtml = \`${staticHtml}\`;
 

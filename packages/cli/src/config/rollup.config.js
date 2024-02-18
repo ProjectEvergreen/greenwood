@@ -121,7 +121,8 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
 }
 
 function getMetaImportPath(node) {
-  return node.arguments[0].value.split('/').join(path.sep);
+  return node.arguments[0].value.split('/').join(path.sep)
+    .replace(/\\/g, '/')  // handle Windows style paths
 }
 
 function isNewUrlImportMetaUrl(node) {
@@ -235,13 +236,11 @@ function greenwoodImportMetaUrl(compilation) {
           ? { type, id: normalizePathnameForWindows(url), name }
           : { type, name: assetName, source: assetContents };
         const ref = this.emitFile(emitConfig);
-        // handle Windows style paths
-        const normalizedRelativeAssetPath = relativeAssetPath.replace(/\\/g, '/');
         const importRef = `import.meta.ROLLUP_FILE_URL_${ref}`;
 
         modifiedCode = code
-          .replace(`'${normalizedRelativeAssetPath}'`, importRef)
-          .replace(`"${normalizedRelativeAssetPath}"`, importRef);
+          .replace(`'${relativeAssetPath}'`, importRef)
+          .replace(`"${relativeAssetPath}"`, importRef);
       }
 
       return {
