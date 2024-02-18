@@ -46,7 +46,7 @@ import { checkResourceExists } from '../../../../cli/src/lib/resource-utils.js';
 
 function generateOutputFormat(id, type) {
   const path = type === 'page'
-    ? `__${id}`
+    ? `${id}.entry`
     : `api/${id}`;
 
   return `
@@ -75,15 +75,29 @@ async function genericAdapter(compilation) {
   for (const page of ssrPages) {
     const { id } = page;
     const outputFormat = generateOutputFormat(id, 'page');
+    const files = (await fs.readdir(outputDir))
+      .filter(file => file.startsWith(`${id}.route.chunk.`) && file.endsWith('.js'));
 
-    // generate a shim for all SSR pages
-    await fs.writeFile(new URL(`./${id}.js`, adapterOutputUrl), outputFormat);
+    // generate a facade for all SSR pages for your particular hosting provider
+    await fs.writeFile(new URL('./index.js', adapterOutputUrl), outputFormat);
 
-    // copy all entry points
-    await fs.cp(new URL(`./_${id}.js`, outputDir), new URL(`./_${id}.js`, adapterOutputUrl));
-    await fs.cp(new URL(`./__${id}.js`, outputDir), new URL(`./_${id}.js`, adapterOutputUrl));
+    // handle user's actual route entry file, appended with .route by Greenwood
+    await fs.cp(
+      new URL(`./${id}.route.js`, outputDir),
+      new URL(`./${id}.route.js`, outputRoot),
+      { recursive: true }
+    );
 
-    // generate a manifest
+    // and the URL chunk for renderer plugin and executeRouteModule
+    for (const file of files) {
+      await fs.cp(
+        new URL(`./${file}`, outputDir),
+        new URL(`./${file}`, outputRoot),
+        { recursive: true }
+      );
+    }
+
+    // generate a manifest (if hosting provider requires it, for example)
     await fs.writeFile(new URL('./metadata.json', adapterOutputUrl), JSON.stringify({
       version: '1.0.0',
       runtime: 'nodejs'
