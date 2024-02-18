@@ -1,0 +1,82 @@
+diff --git a/node_modules/wc-compiler/src/dom-shim.js b/node_modules/wc-compiler/src/dom-shim.js
+index 389b996..645b884 100644
+--- a/node_modules/wc-compiler/src/dom-shim.js
++++ b/node_modules/wc-compiler/src/dom-shim.js
+@@ -31,6 +31,18 @@ class Element extends Node {
+     this.attributes = {};
+   }
+ 
++  attachShadow(options) {
++    this.shadowRoot = new ShadowRoot(options);
++
++    return this.shadowRoot;
++  }
++
++  // https://github.com/mfreed7/declarative-shadow-dom/blob/master/README.md#serialization
++  // eslint-disable-next-line
++  getInnerHTML() {
++    return this.shadowRoot ? this.shadowRoot.innerHTML : this.innerHTML;
++  }
++
+   setAttribute(name, value) {
+     this.attributes[name] = value;
+   }
+@@ -68,19 +80,7 @@ class Document extends Node {
+ // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement
+ // EventTarget <- Node <- Element <- HTMLElement
+ class HTMLElement extends Element {
+-  attachShadow(options) {
+-    this.shadowRoot = new ShadowRoot(options);
+-
+-    return this.shadowRoot;
+-  }
+-
+   connectedCallback() { }
+-
+-  // https://github.com/mfreed7/declarative-shadow-dom/blob/master/README.md#serialization
+-  // eslint-disable-next-line
+-  getInnerHTML(options = {}) {
+-    return this.shadowRoot.innerHTML;
+-  }
+ }
+ 
+ // https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment
+@@ -123,15 +123,20 @@ class HTMLTemplateElement extends HTMLElement {
+ // https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry
+ class CustomElementsRegistry {
+   constructor() {
+-    this.customElementsRegistry = {};
++    // TODO this should probably be a set
++    this.customElementsRegistry = new Map();
+   }
+ 
+   define(tagName, BaseClass) {
+-    this.customElementsRegistry[tagName] = BaseClass;
++    this.customElementsRegistry.set(tagName, BaseClass);
+   }
+ 
+   get(tagName) {
+-    return this.customElementsRegistry[tagName];
++    if(this.customElementsRegistry.get(tagName)) {
++      return this.customElementsRegistry.get(tagName)
++    } else {
++      // uh oh...
++    }
+   }
+ }
+ 
+diff --git a/node_modules/wc-compiler/src/wcc.js b/node_modules/wc-compiler/src/wcc.js
+index 887e0b6..9bad926 100644
+--- a/node_modules/wc-compiler/src/wcc.js
++++ b/node_modules/wc-compiler/src/wcc.js
+@@ -134,9 +134,7 @@ async function initializeCustomElement(elementURL, tagName, attrs = [], definiti
+ 
+   // https://github.com/ProjectEvergreen/wcc/pull/67/files#r902061804
+   const { pathname } = elementURL;
+-  const element = tagName
+-    ? customElements.get(tagName)
+-    : (await import(pathname)).default;
++  const element = customElements.get(tagName) ?? (await import(pathname)).default;
+   const dataLoader = (await import(pathname)).getData;
+   const data = props
+     ? props
