@@ -149,6 +149,16 @@ describe('Build Greenwood With: ', function() {
         expect(headers.get('content-type')).to.be.equal('application/json');
         expect(JSON.parse(body).message).to.be.equal(`Hello ${param}!`);
       });
+
+      it('should not have a shared asset for the card component', async () => {
+        const assets = await glob.promise(path.join(normalizePathnameForWindows(vercelFunctionsOutputUrl), '/api/greeting.func/*'));
+        const exists = assets.find((asset) => {
+          const name = asset.split(path.sep).pop();
+          return name.startsWith('card') && name.endsWith('.js');
+        });
+
+        expect(!!exists).to.equal(false);
+      });
     });
 
     describe('Fragments API Route adapter', function() {
@@ -182,6 +192,16 @@ describe('Build Greenwood With: ', function() {
         expect(status).to.be.equal(200);
         expect(cardTags.length).to.be.equal(2);
         expect(headers.get('content-type')).to.be.equal('text/html');
+      });
+
+      it('should have a shared asset for the card component', async () => {
+        const assets = await glob.promise(path.join(normalizePathnameForWindows(vercelFunctionsOutputUrl), '/api/fragment.func/*'));
+        const exists = assets.find((asset) => {
+          const name = asset.split(path.sep).pop();
+          return name.startsWith('card') && name.endsWith('.js');
+        });
+
+        expect(!!exists).to.equal(true);
       });
     });
 

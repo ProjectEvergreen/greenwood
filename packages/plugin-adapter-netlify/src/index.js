@@ -128,11 +128,11 @@ async function netlifyAdapter(compilation) {
     redirects += `${basePath}/api/* /.netlify/functions/api-:splat 200`;
   }
 
-  for (const [key] of apiRoutes) {
+  for (const [key, value] of apiRoutes.entries()) {
     const outputType = 'api';
     const id = key.replace(`${basePath}/api/`, '');
     const outputRoot = new URL(`./api/${id}/`, adapterOutputUrl);
-
+    const { assets = [] } = value;
     await setupOutputDirectory(id, outputRoot, outputType);
 
     await fs.cp(
@@ -141,15 +141,10 @@ async function netlifyAdapter(compilation) {
       { recursive: true }
     );
 
-    // need this for URL referenced chunks
-    // TODO ideally we would map bundles to specific API routes instead of copying all files just in case
-    const ssrApiAssets = (await fs.readdir(new URL('./api/', outputDir)))
-      .filter(file => new RegExp(/^[\w][\w-]*\.[a-zA-Z0-9]{4,20}\.[\w]{2,4}$/).test(path.basename(file)));
-
-    for (const asset of ssrApiAssets) {
+    for (const asset of assets) {
       await fs.cp(
-        new URL(`./${asset}`, new URL('./api/', outputDir)),
-        new URL(`./${asset}`, outputRoot),
+        new URL(asset),
+        new URL(`./${asset.split(path.sep).pop()}`, outputRoot),
         { recursive: true }
       );
     }

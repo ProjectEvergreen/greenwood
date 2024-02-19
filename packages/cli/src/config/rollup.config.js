@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import fs from 'fs';
 import path from 'path';
 import { checkResourceExists, normalizePathnameForWindows } from '../lib/resource-utils.js';
@@ -122,7 +123,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
 
 function getMetaImportPath(node) {
   return node.arguments[0].value.split('/').join(path.sep)
-    .replace(/\\/g, '/')  // handle Windows style paths
+    .replace(/\\/g, '/'); // handle Windows style paths
 }
 
 function isNewUrlImportMetaUrl(node) {
@@ -238,6 +239,28 @@ function greenwoodImportMetaUrl(compilation) {
         const ref = this.emitFile(emitConfig);
         const importRef = `import.meta.ROLLUP_FILE_URL_${ref}`;
 
+        // loop through all URL bundle chunks from APIs and SSR pages
+        // and map to their parent file, to pick back up in generateBundle when full hashes are known
+        if (id.indexOf(compilation.context.apisDir.pathname) === 0) {
+          for (const entry of compilation.manifest.apis.keys()) {
+            const apiRoute = compilation.manifest.apis.get(entry);
+
+            if (id.endsWith(apiRoute.path)) {
+              const assets = apiRoute.assets || [];
+
+              assets.push(assetUrl.url.pathname);
+
+              compilation.manifest.apis.set(entry, {
+                ...apiRoute,
+                assets
+              });
+            }
+          }
+        } else {
+          // TODO figure out how to handle URL chunk from SSR pages
+          // https://github.com/ProjectEvergreen/greenwood/issues/1163
+        }
+
         modifiedCode = code
           .replace(`'${relativeAssetPath}'`, importRef)
           .replace(`"${relativeAssetPath}"`, importRef);
@@ -247,6 +270,30 @@ function greenwoodImportMetaUrl(compilation) {
         code: modifiedCode ? modifiedCode : code,
         map: null
       };
+    },
+
+    generateBundle(options, bundles) {
+      for (const bundle in bundles) {
+        const bundleExtension = bundle.split('.').pop();
+        const apiKey = `/api/${bundle.replace(`.${bundleExtension}`, '')}`;
+
+        if (compilation.manifest.apis.has(apiKey)) {
+          const apiManifestDetails = compilation.manifest.apis.get(apiKey);
+
+          for (const reference of bundles[bundle].referencedFiles) {
+            if (bundles[reference]) {
+              const assets = apiManifestDetails.assets;
+              const assetIdx = assets.indexOf(bundles[reference].facadeModuleId);
+
+              assets[assetIdx] = new URL(`./api/${reference}`, compilation.context.outputDir).href;
+              compilation.manifest.apis.set(apiKey, {
+                ...apiManifestDetails,
+                assets
+              });
+            }
+          }
+        }
+      }
     }
   };
 }
