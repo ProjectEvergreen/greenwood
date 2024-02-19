@@ -359,11 +359,6 @@ const getRollupConfigForScriptResources = async (compilation) => {
 const getRollupConfigForApis = async (compilation) => {
   const { outputDir, userWorkspace } = compilation.context;
 
-  // why is this needed?
-  await fs.promises.mkdir(new URL('./api/assets/', outputDir), {
-    recursive: true
-  });
-
   return [...compilation.manifest.apis.values()]
     .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)))
     .map(filepath => ({

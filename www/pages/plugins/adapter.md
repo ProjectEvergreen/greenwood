@@ -72,6 +72,7 @@ async function genericAdapter(compilation) {
     await fs.mkdir(adapterOutputUrl);
   }
 
+  // SSR pages
   for (const page of ssrPages) {
     const { id } = page;
     const outputFormat = generateOutputFormat(id, 'page');
@@ -95,6 +96,31 @@ async function genericAdapter(compilation) {
         new URL(`./${file}`, outputRoot),
         { recursive: true }
       );
+    }
+
+    // API routes
+    for (const [key, value] of apiRoutes.entries()) {
+      const outputType = 'api';
+      const id = key.replace(`${basePath}/api/`, '');
+      const outputRoot = new URL(`./${basePath}/api/${id}.func/`, adapterOutputUrl);
+      const { assets = [] } = value;
+
+      await setupFunctionBuildFolder(id, outputType, outputRoot);
+
+      await fs.cp(
+        new URL(`./api/${id}.js`, outputDir),
+        new URL(`./${id}.js`, outputRoot),
+        { recursive: true }
+      );
+
+      // copy any child assets, like URL bundles
+      for (const asset of assets) {
+        await fs.cp(
+          new URL(asset),
+          new URL(`./${asset.split(path.sep).pop()}`, outputRoot),
+          { recursive: true }
+        );
+      }
     }
 
     // generate a manifest (if hosting provider requires it, for example)
