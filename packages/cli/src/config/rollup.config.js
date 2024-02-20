@@ -159,6 +159,8 @@ function greenwoodImportMetaUrl(compilation) {
       }).map((plugin) => {
         return plugin.provider(compilation);
       });
+      const idAssetName = path.basename(id);
+      const normalizedId = id.replace(/\\\\/g, '/').replace(/\\/g, '/'); // windows shenanigans...
       const idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
       const extension = pathname.split('.').pop();
@@ -241,14 +243,14 @@ function greenwoodImportMetaUrl(compilation) {
 
         // loop through all URL bundle chunks from APIs and SSR pages
         // and map to their parent file, to pick back up in generateBundle when full hashes are known
-        if (id.indexOf(compilation.context.apisDir.pathname) === 0) {
+        if (`${compilation.context.apisDir.pathname}${idAssetName}`.indexOf(normalizedId) >= 0) {
           for (const entry of compilation.manifest.apis.keys()) {
             const apiRoute = compilation.manifest.apis.get(entry);
 
-            if (id.endsWith(apiRoute.path)) {
+            if (normalizedId.endsWith(apiRoute.path)) {
               const assets = apiRoute.assets || [];
 
-              assets.push(assetUrl.url.pathname);
+              assets.push(assetUrl.url.href);
 
               compilation.manifest.apis.set(entry, {
                 ...apiRoute,
@@ -283,9 +285,17 @@ function greenwoodImportMetaUrl(compilation) {
           for (const reference of bundles[bundle].referencedFiles) {
             if (bundles[reference]) {
               const assets = apiManifestDetails.assets;
-              const assetIdx = assets.indexOf(bundles[reference].facadeModuleId);
+              let assetIdx;
+
+              assets.forEach((asset, idx) => {
+                // more windows shenanigans...)
+                if (asset.indexOf(bundles[reference].facadeModuleId.replace(/\\/g, '/'))) {
+                  assetIdx = idx;
+                }
+              });
 
               assets[assetIdx] = new URL(`./api/${reference}`, compilation.context.outputDir).href;
+
               compilation.manifest.apis.set(apiKey, {
                 ...apiManifestDetails,
                 assets

@@ -153,7 +153,7 @@ describe('Build Greenwood With: ', function() {
       it('should not have a shared asset for the card component', async () => {
         const assets = await glob.promise(path.join(normalizePathnameForWindows(vercelFunctionsOutputUrl), '/api/greeting.func/*'));
         const exists = assets.find((asset) => {
-          const name = asset.split(path.sep).pop();
+          const name = asset.split('/').pop();
           return name.startsWith('card') && name.endsWith('.js');
         });
 
@@ -197,7 +197,7 @@ describe('Build Greenwood With: ', function() {
       it('should have a shared asset for the card component', async () => {
         const assets = await glob.promise(path.join(normalizePathnameForWindows(vercelFunctionsOutputUrl), '/api/fragment.func/*'));
         const exists = assets.find((asset) => {
-          const name = asset.split(path.sep).pop();
+          const name = asset.split('/').pop();
           return name.startsWith('card') && name.endsWith('.js');
         });
 

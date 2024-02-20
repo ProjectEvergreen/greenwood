@@ -142,9 +142,11 @@ async function netlifyAdapter(compilation) {
     );
 
     for (const asset of assets) {
+      const name = path.basename(asset);
+
       await fs.cp(
         new URL(asset),
-        new URL(`./${asset.split(path.sep).pop()}`, outputRoot),
+        new URL(`./${name}`, outputRoot),
         { recursive: true }
       );
     }

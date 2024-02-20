@@ -135,7 +135,7 @@ describe('Build Greenwood With: ', function() {
 
         const assets = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), `/${name}/*`));
         const exists = assets.find((asset) => {
-          const name = asset.split(path.sep).pop();
+          const name = asset.split('/').pop();
           return name.startsWith('card') && name.endsWith('.js');
         });
 
@@ -184,7 +184,7 @@ describe('Build Greenwood With: ', function() {
 
         const assets = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), `/${name}/*`));
         const exists = assets.find((asset) => {
-          const name = asset.split(path.sep).pop();
+          const name = asset.split('/').pop();
           return name.startsWith('card') && name.endsWith('.js');
         });
 
