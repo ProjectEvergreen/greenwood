@@ -89,7 +89,7 @@ async function genericAdapter(compilation) {
       { recursive: true }
     );
 
-    // and the URL chunk for renderer plugin and executeRouteModule
+    // and the URL generated chunk for the route
     for (const file of files) {
       await fs.cp(
         new URL(`./${file}`, outputDir),
@@ -115,20 +115,15 @@ async function genericAdapter(compilation) {
 
       // copy any child assets, like URL bundles
       for (const asset of assets) {
+        const name = path.basename(asset);
+
         await fs.cp(
           new URL(asset),
-          new URL(`./${asset.split(path.sep).pop()}`, outputRoot),
+          new URL(`./${name}`, outputRoot),
           { recursive: true }
         );
       }
     }
-
-    // generate a manifest (if hosting provider requires it, for example)
-    await fs.writeFile(new URL('./metadata.json', adapterOutputUrl), JSON.stringify({
-      version: '1.0.0',
-      runtime: 'nodejs'
-      // ...
-    }));
   }
 }
 
