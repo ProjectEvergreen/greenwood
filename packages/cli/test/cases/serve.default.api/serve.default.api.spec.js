@@ -14,7 +14,7 @@
  * User Workspace
  * src/
  *   api/
- *     fragment.js
+ *     fragment.js (isolation mode)
  *     greeting.js
  *     missing.js
  *     nothing.js

@@ -15,7 +15,7 @@ async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender
     data.html = html;
   } else {
     const module = await import(moduleUrl).then(module => module);
-    const { prerender = false, getTemplate = null, getBody = null, getFrontmatter = null } = module;
+    const { prerender = false, getTemplate = null, getBody = null, getFrontmatter = null, isolation } = module;
 
     if (module.default) {
       const { html } = await renderToString(new URL(moduleUrl), false, request);
@@ -35,7 +35,9 @@ async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender
       data.frontmatter = await getFrontmatter(compilation, page);
     }
 
+    // TODO cant we get these from just pulling from the file during the graph phase?
     data.prerender = prerender;
+    data.isolation = isolation;
   }
 
   return data;

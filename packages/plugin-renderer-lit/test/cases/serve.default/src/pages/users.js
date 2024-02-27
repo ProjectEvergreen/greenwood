@@ -20,5 +20,6 @@ class UsersComponent extends LitElement {
 
 customElements.define('app-users', UsersComponent);
 
+export const isolation = true;
 export const tagName = 'app-users';
 export default UsersComponent;

@@ -38,7 +38,12 @@ async function executeRouteModule({ moduleUrl, compilation, page, prerender, htm
     data.html = await getTemplateResultString(templateResult);
   } else {
     const module = await import(moduleUrl).then(module => module);
-    const { getTemplate = null, getBody = null, getFrontmatter = null } = module;
+    const { getTemplate = null, getBody = null, getFrontmatter = null, isolation } = module;
+
+    // TODO cant we get these from just pulling from the file during the graph phase?
+    if (isolation) {
+      data.isolation = true;
+    }
 
     if (module.default && module.tagName) {
       const { tagName } = module;
