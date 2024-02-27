@@ -11,26 +11,6 @@ function cleanRollupId(id) {
   return id.replace('\x00', '');
 }
 
-// specifically to handle escodegen and other node modules
-// using require for package.json or other json files
-// https://github.com/estools/escodegen/issues/455
-// function greenwoodJsonLoader() {
-//   return {
-//     name: 'greenwood-json-loader',
-//     async load(id) {
-//       const idUrl = new URL(`file://${cleanRollupId(id)}`);
-//       const extension = idUrl.pathname.split('.').pop();
-
-//       if (extension === 'json') {
-//         const json = JSON.parse(await fs.promises.readFile(idUrl, 'utf-8'));
-//         const contents = `export default ${JSON.stringify(json)}`;
-
-//         return contents;
-//       }
-//     }
-//   };
-// }
-
 function greenwoodResourceLoader (compilation) {
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
@@ -374,8 +354,9 @@ const getRollupConfigForApis = async (compilation) => {
       chunkFileNames: '[name].[hash].js'
     },
     plugins: [
-      // greenwoodJsonLoader(),
       greenwoodResourceLoader(compilation),
+      // support ESM favorable export conditions
+      // https://github.com/ProjectEvergreen/greenwood/issues/1118
       nodeResolve({
         exportConditions: ['default', 'module', 'import', 'node']
       }),
@@ -398,14 +379,11 @@ const getRollupConfigForSsr = async (compilation, input) => {
       chunkFileNames: '[name].[hash].js'
     },
     plugins: [
-      // greenwoodJsonLoader(),
       greenwoodResourceLoader(compilation),
-      // TODO enable preferBuiltins for lit (do we still need this?)
-      // https://github.com/lit/lit/issues/449
+      // support ESM favorable export conditions
       // https://github.com/ProjectEvergreen/greenwood/issues/1118
       nodeResolve({
         exportConditions: ['default', 'module', 'import', 'node']
-        // preferBuiltins: true,
       }),
       commonjs(),
       greenwoodImportMetaUrl(compilation),
