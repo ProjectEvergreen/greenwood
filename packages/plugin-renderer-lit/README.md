@@ -2,7 +2,7 @@
 
 ## Overview
 
-A Greenwood plugin for using [**Lit**'s SSR capabilities](https://github.com/lit/lit/tree/main/packages/labs/ssr) as a custom server-side renderer.  Although support is experimental at this time, this plugin also gives the ability to statically render entire pages and templates (instead of puppeteer) to output completely static sites.
+A Greenwood plugin for using [**Lit**'s SSR capabilities](https://github.com/lit/lit/tree/main/packages/labs/ssr) as a custom server-side renderer.  Although support is experimental at this time, this plugin also gives the ability to statically render entire pages and templates to output completely static sites.
 
 _We are still actively working on SSR features and enhancements for Greenwood [as part of our 1.0 release](https://github.com/ProjectEvergreen/greenwood/issues?q=is%3Aissue+is%3Aopen+label%3Assr+milestone%3A1.0) so please feel free to test it out and report your feedback._  🙏
 
@@ -11,7 +11,7 @@ _We are still actively working on SSR features and enhancements for Greenwood [a
 
 ## Prerequisite
 
-This packages depends on the Lit package as a `peerDependency`.  This means you must have Lit already installed in your project.  You can install anything following the `2.x` release line.
+This packages depends on the Lit package as a `peerDependency`.  This means you must have Lit already installed in your project.  You can install anything following the `3.x` release line.
 
 ```sh
 # npm
@@ -33,7 +33,18 @@ npm install @greenwood/plugin-renderer-lit --save-dev
 yarn add @greenwood/plugin-renderer-lit --dev
 ```
 
+## Caveats
+
+1. Please familiarize yourself with some of the [caveats](https://lit.dev/docs/ssr/overview/#library-status) called out in the Lit docs, like:
+    - Lit SSR [**only** renders into declarative shadow roots](https://github.com/lit/lit/issues/3080#issuecomment-1165158794), so you will have to keep browser support and polyfill usage in mind.
+    - At this time, `LitElement` does not support `async` work.  You can follow along with this issue [in the Lit repo](https://github.com/lit/lit/issues/2469).
+1. Lit only supports templates on the server side for HTML only generated content, thus Greenwood's `getBody` API must be used.  We would love for [server only components](https://github.com/lit/lit/issues/2469#issuecomment-1759583861) to be a thing though!
+1. Full hydration support is not available yet.  See [this Greenwood issue](https://github.com/ProjectEvergreen/greenwood/issues/880) to follow along when it will land
+
+> See [this repo](https://github.com/thescientist13/greenwood-lit-ssr) for a full demo of isomorphic Lit SSR with SSR pages and API routes deployed to Vercel serverless functions.
+
 ## Usage
+
 Add this plugin to your _greenwood.config.js_.
 
 ```javascript
@@ -48,47 +59,32 @@ export default {
 }
 ```
 
-Now, you can write some [SSR routes](/docs/server-rendering/) using Lit including all the [available APIs](docs/server-rendering/#api).  The below example uses the standard [SimpleGreeting](https://lit.dev/playground/) component from the Lit docs by also using a LitElement as the `default export`!
+Now, you can author [SSR pages](/docs/server-rendering/) using Lit templates and components using Greenwood's [`getBody` API](https://www.greenwoodjs.io/docs/server-rendering/#usage).  The below is an example of generating a template of LitElement based `<app-card>` web components.
+
 ```js
-import { html, LitElement } from 'lit';
-import './path/to/greeting.js';
+// src/pages/products.js
+import { html } from 'lit';
+import '../components/card.js';
 
-export default class ArtistsPage extends LitElement {
+export async function getBody() {
+  const products = await getProducts();
 
-  constructor() {
-    super();
-    this.artists = [{ /* ... */ }];
-  }
+  return html`
+    ${
+      products.map((product, idx) => {
+        const { title, thumbnail } = product;
 
-  render() {
-    const { artists } = this;
-
-    return html`
-      ${
-        artists.map((artist) => {
-          const { id, name, imageUrl } = artist;
-
-          return html`
-            <a href="/artists/${id}" target="_blank">
-              <simple-greeting .name="${name}"></simple-greeting>
-            </a>
-
-            <img src="${imageUrl}" loading="lazy"/>
-
-            <br/>
-          `;
-        })
-      }
-    `;
-  }
+        return html`
+          <app-card
+            title="${idx + 1}) ${title}"
+            thumbnail="${thumbnail}"
+          ></app-card>
+        `;
+      })
+    }
+  `;
 }
-
-// for now these are needed for the Lit specific implementations
-customElements.define('artists-page', ArtistsPage);
-export const tagName = 'artists-page';
 ```
-
-> _By default, this plugin sets `isolation` mode to `true` for all SSR pages.  See the [isolation configuration](https://www.greenwoodjs.io/docs/configuration/#isolation) docs for more information._
 
 ## Caveats
 
@@ -97,11 +93,29 @@ There are a few considerations to take into account when using a `LitElement` as
 - Depending on your use case, SSR bundling may break due to bundle chunking and code splitting by Rollup, which we are [hoping to correct ASAP](https://github.com/ProjectEvergreen/greenwood/issues/1118).
 - At this time, `LitElement` does [not support `async` work](https://lit.dev/docs/ssr/overview/#library-status) which makes data fetching in pages a bit of challenge.  You can follow along with this issue [in the Lit repo](https://github.com/lit/lit/issues/2469).
 
-> _You can see a work (in progress) demo of using Lit SSR (with Serverless!) [here](https://github.com/thescientist13/greenwood-demo-adapter-vercel-lit/)._
-
 ## Options
 
-### Prerender (experimental)
+### Isolation Mode
+
+By default, this plugin sets `isolation` mode to `true` for all SSR pages.  If you want to override this, just export an `isolation` const.
+
+```js
+// src/pages/products.js
+export const isolation = false;
+```
+
+> _See the [isolation configuration](https://www.greenwoodjs.io/docs/configuration/#isolation) docs for more information._
+
+### Hydration
+
+In order for server-rendered components to become interactive on the client side, Lit's [client-side hydration script](https://lit.dev/docs/ssr/client-usage/#loading-@lit-labsssr-clientlit-element-hydrate-support.js) must be included on the page.  For any page that would need this script added, you can simply `export` the **hydration** option from your page.
+
+```js
+// src/pages/products.js
+export const hydration = true;
+```
+
+### Prerender
 
 The plugin provides a setting that can be used to override Greenwood's [default _prerender_](/docs/configuration/#prerender) implementation which uses [WCC](https://github.com/ProjectEvergreen/wcc), to use Lit instead.
 

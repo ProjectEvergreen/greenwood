@@ -8,9 +8,8 @@ async function executeRouteModule({ moduleUrl, compilation, page, prerender, htm
     template: null,
     body: null,
     frontmatter: null,
-    html: null
-    // hydrate: false,
-    // pageData: {}
+    html: null,
+    hydration: false
   };
 
   // prerender static content
@@ -24,7 +23,7 @@ async function executeRouteModule({ moduleUrl, compilation, page, prerender, htm
     data.html = await collectResult(render(templateResult));
   } else {
     const module = await import(moduleUrl).then(module => module);
-    const { getTemplate = null, getBody = null, getFrontmatter = null, isolation = true } = module;
+    const { getTemplate = null, getBody = null, getFrontmatter = null, isolation = true, hydration = false } = module;
 
     // TODO cant we get these from just pulling from the file during the graph phase?
     // https://github.com/ProjectEvergreen/greenwood/issues/991
@@ -32,14 +31,10 @@ async function executeRouteModule({ moduleUrl, compilation, page, prerender, htm
       data.isolation = true;
     }
 
-    // if (hydration) {
-    //   data.hydrate = true;
-    // }
 
-    // if (loader) {
-    //   data.pageData = await loader(); // request, compilation, etc can go here
-    //   console.log(data.pageData);
-    // }
+    if (hydration) {
+      data.hydration = true;
+    }
 
     if (getBody) {
       const templateResult = await getBody(compilation, page, data.pageData);

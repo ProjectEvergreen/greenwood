@@ -211,15 +211,6 @@ describe('Serve Greenwood With: ', function() {
         expect(styles.length).to.equal(1);
       });
 
-      // TODO this should be managed via a plugin, not in core
-      // https://github.com/ProjectEvergreen/greenwood/issues/728
-      // it('should have one <script> tag in the <head> for lit polyfills', function() {
-      //   const scripts = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
-
-      //   expect(scripts.length).to.equal(1);
-      //   expect(scripts[0].getAttribute('src').startsWith('/polyfill-support')).to.equal(true);
-      // });
-
       it('should have the expected number of <tr> tags of content', function() {
         const rows = dom.window.document.querySelectorAll('body > table tr');
 
@@ -265,6 +256,13 @@ describe('Serve Greenwood With: ', function() {
       it('should have expected custom data values in its graph data', function() {
         expect(aboutPageGraphData.data.author).to.equal('Project Evergreen');
         expect(aboutPageGraphData.data.date).to.equal('01-01-2021');
+      });
+
+      it('should not have the expected lit hydration script in the <head>', function() {
+        const scripts = Array.from(dom.window.document.querySelectorAll('head script'))
+          .filter((script) => script.getAttribute('src')?.indexOf('lit-element-hydrate-support') >= 0);
+
+        expect(scripts.length).to.equal(0);
       });
     });
 

@@ -10,10 +10,10 @@ export const isolation = false;
 
 //   return { products };
 // }
+export const hydration = true;
 
 export async function getBody() {
   const users = JSON.parse(fs.readFileSync(new URL('../../artists.json', import.meta.url), 'utf-8'));
-  // const { products } = data;
 
   return html`
     <h1>Users Page</h1>

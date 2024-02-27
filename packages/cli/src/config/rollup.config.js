@@ -358,7 +358,8 @@ const getRollupConfigForApis = async (compilation) => {
       // support ESM favorable export conditions
       // https://github.com/ProjectEvergreen/greenwood/issues/1118
       nodeResolve({
-        exportConditions: ['default', 'module', 'import', 'node']
+        exportConditions: ['default', 'module', 'import', 'node'],
+        preferBuiltins: true
       }),
       commonjs(),
       greenwoodImportMetaUrl(compilation)
@@ -383,7 +384,8 @@ const getRollupConfigForSsr = async (compilation, input) => {
       // support ESM favorable export conditions
       // https://github.com/ProjectEvergreen/greenwood/issues/1118
       nodeResolve({
-        exportConditions: ['default', 'module', 'import', 'node']
+        exportConditions: ['default', 'module', 'import', 'node'],
+        preferBuiltins: true
       }),
       commonjs(),
       greenwoodImportMetaUrl(compilation),
