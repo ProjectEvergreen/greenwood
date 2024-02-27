@@ -283,6 +283,7 @@ async function getStaticServer(compilation, composable) {
 async function getHybridServer(compilation) {
   const { graph, manifest, context, config } = compilation;
   const { outputDir } = context;
+  const isolationMode = config.isolation;
   const app = await getStaticServer(compilation, true);
 
   app.use(koaBody());
@@ -297,7 +298,7 @@ async function getHybridServer(compilation) {
       if (!config.prerender && matchingRoute.isSSR && !matchingRoute.prerender) {
         let html;
 
-        if (matchingRoute.isolation) {
+        if (matchingRoute.isolation || isolationMode) {
           console.log('run SSR page in isolation mode!', { matchingRoute });
 
           await new Promise(async (resolve, reject) => {
@@ -335,10 +336,9 @@ async function getHybridServer(compilation) {
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
-        const { isolation } = apiRoute;
         let body, status, headers, statusText;
 
-        if (isolation) {
+        if (apiRoute.isolation || isolationMode) {
           console.log('run API route in isolation mode!', { apiRoute });
 
           await new Promise(async (resolve, reject) => {
