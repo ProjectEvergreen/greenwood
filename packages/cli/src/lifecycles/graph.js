@@ -253,6 +253,8 @@ const generateGraph = async (compilation) => {
 
             const relativeApiPath = filenameUrl.pathname.replace(userWorkspace.pathname, '/');
             const route = `${basePath}${relativeApiPath.replace(`.${extension}`, '')}`;
+            // TODO should this be run in isolation like SSR pages?
+            // https://github.com/ProjectEvergreen/greenwood/issues/991
             const { isolation } = await import(filenameUrl).then(module => module);
 
             /*

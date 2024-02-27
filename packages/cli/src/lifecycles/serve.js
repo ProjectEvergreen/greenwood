@@ -302,7 +302,7 @@ async function getHybridServer(compilation) {
           console.log('run SSR page in isolation mode!', { matchingRoute });
 
           await new Promise(async (resolve, reject) => {
-            const worker = new Worker(new URL('../lib/ssr-route-worker-prod.js', import.meta.url));
+            const worker = new Worker(new URL('../lib/ssr-route-worker-isolation-mode.js', import.meta.url));
             // TODO "faux" new Request here, a better way?
             const request = await requestAsObject(new Request(url));
 

@@ -36,6 +36,7 @@ async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender
     }
 
     // TODO cant we get these from just pulling from the file during the graph phase?
+    // https://github.com/ProjectEvergreen/greenwood/issues/991
     data.prerender = prerender;
     data.isolation = isolation;
   }
