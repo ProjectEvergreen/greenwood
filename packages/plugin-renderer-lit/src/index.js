@@ -14,9 +14,6 @@ class LitHydrationResource extends ResourceInterface {
 
   async intercept(url, request, response) {
     let body = await response.text();
-    const { pathname } = url;
-    const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
-    console.log('LIT intercept =>', { url, matchingRoute });
 
     // TODO would be nice not have to manually set module-shim
     // when we drop support for import-map shim - https://github.com/ProjectEvergreen/greenwood/pull/1115
@@ -24,9 +21,9 @@ class LitHydrationResource extends ResourceInterface {
       ? 'module-shim'
       : 'module';
 
+    // this needs to come first before any userland code
     body = body.replace('<head>', `
       <head>
-        <!-- this needs to come first before any userland code -->
         <script type="${type}" src="/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js"></script>
     `);
 

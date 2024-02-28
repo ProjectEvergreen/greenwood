@@ -205,9 +205,9 @@ const generateGraph = async (compilation) => {
              * template: page template to use as a base for a generated component
              * title: a default value that can be used for <title></title>
              * isSSR: if this is a server side route
-             * prerednder: if this should be statically exported
+             * prerender: if this should be statically exported
              * isolation: if this should be run in isolated mode
-             * prerednder: if this page needs hydration support
+             * hydration: if this page needs hydration support
              */
             pages.push({
               data: customData || {},
