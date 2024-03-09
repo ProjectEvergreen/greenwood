@@ -48,7 +48,7 @@ describe('Serve Greenwood With: ', function() {
   const publicPath = path.join(outputPath, 'public/');
   const hostname = 'http://127.0.0.1:8080';
   const basePath = '/my-path';
-  const jsHash = '4bcc801e';
+  const jsHash = '2ce3f02d';
   const cssHash = '1454013616';
   let runner;
 
