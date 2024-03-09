@@ -235,14 +235,14 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have the expected lit related files in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, 'lit-element.*.js'))).to.have.lengthOf(1);
+        expect(await glob.promise(path.join(this.context.publicDir, 'lit*.js'))).to.have.lengthOf(1);
       });
 
       it('should have the expected inline node_modules content in the first inline script', async function() {
         const inlineScriptTag = Array.from(dom.window.document.querySelectorAll('head > script:not([src])')).filter(tag => !tag.getAttribute('data-gwd'))[0];
 
         expect(inlineScriptTag.textContent.replace(/\n/g, '')).to
-          .equal('import"/lit-element.ae169679.js";import"/lit-html.7f7a9139.js";//# sourceMappingURL=116321042.6c5eb91c.js.map');
+          .equal('import"/116321042.262925e6.js";import"/lit-html.71ac31d8.js";//# sourceMappingURL=116321042.f667a8c7.js.map');
       });
     });
 
