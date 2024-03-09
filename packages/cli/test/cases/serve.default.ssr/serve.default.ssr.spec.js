@@ -364,7 +364,7 @@ describe('Serve Greenwood With: ', function() {
     });
 
     describe('Bundled image using new URL and import.meta.url', function() {
-      const bundledName = 'assets/logo-abb2e884.svg';
+      const bundledName = 'assets/logo-619de195.svg';
       let response = {};
       let body;
       let usersResponse = {};

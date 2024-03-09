@@ -298,7 +298,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(inlineScriptTag.textContent.replace('\n', '')).to
           // eslint-disable-next-line max-len
-          .contain('import"/lit-element.6ff69bae.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline";//# sourceMappingURL=');
+          .contain('import"/lit-element.76be1f9d.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline";//# sourceMappingURL=1635690801.3e40c728.js.map');
       });
 
       it('should have prerendered content from <app-header> component', function() {
