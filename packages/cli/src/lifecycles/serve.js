@@ -299,8 +299,6 @@ async function getHybridServer(compilation) {
         let html;
 
         if (matchingRoute.isolation || isolationMode) {
-          console.log('run SSR page in isolation mode!', { matchingRoute });
-
           await new Promise(async (resolve, reject) => {
             const worker = new Worker(new URL('../lib/ssr-route-worker-isolation-mode.js', import.meta.url));
             // TODO "faux" new Request here, a better way?
@@ -339,8 +337,6 @@ async function getHybridServer(compilation) {
         let body, status, headers, statusText;
 
         if (apiRoute.isolation || isolationMode) {
-          console.log('run API route in isolation mode!', { apiRoute });
-
           await new Promise(async (resolve, reject) => {
             const worker = new Worker(new URL('../lib/api-route-worker.js', import.meta.url));
             // TODO "faux" new Request here, a better way?
