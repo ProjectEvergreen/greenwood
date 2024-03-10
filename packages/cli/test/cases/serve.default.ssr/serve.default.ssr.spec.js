@@ -25,7 +25,7 @@
  *     artists.js
  *     index.js
  *     post.js
- *     users.js
+ *     users.js (isolation = true)
  *   templates/
  *     app.html
  */

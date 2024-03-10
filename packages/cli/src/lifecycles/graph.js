@@ -22,7 +22,8 @@ const generateGraph = async (compilation) => {
         data: {},
         imports: [],
         resources: [],
-        prerender: true
+        prerender: true,
+        isolation: false
       }];
 
       const walkDirectoryForPages = async function(directory, pages = []) {
@@ -49,6 +50,7 @@ const generateGraph = async (compilation) => {
             let customData = {};
             let filePath;
             let prerender = true;
+            let isolation = false;
 
             /*
              * check if additional nested directories exist to correctly determine route (minus filename)
@@ -131,6 +133,7 @@ const generateGraph = async (compilation) => {
 
                 worker.on('message', async (result) => {
                   prerender = result.prerender;
+                  isolation = result.isolation ?? isolation;
 
                   if (result.frontmatter) {
                     result.frontmatter.imports = result.frontmatter.imports || [];
@@ -201,6 +204,7 @@ const generateGraph = async (compilation) => {
              * title: a default value that can be used for <title></title>
              * isSSR: if this is a server side route
              * prerednder: if this should be statically exported
+             * isolation: if this should be run in isolated mode
              */
             pages.push({
               data: customData || {},
@@ -220,7 +224,8 @@ const generateGraph = async (compilation) => {
               template,
               title,
               isSSR: !isStatic,
-              prerender
+              prerender,
+              isolation
             });
           }
         }
@@ -240,27 +245,34 @@ const generateGraph = async (compilation) => {
             apis = await walkDirectoryForApis(filenameUrlAsDir, apis);
           } else {
             const extension = filenameUrl.pathname.split('.').pop();
-            const relativeApiPath = filenameUrl.pathname.replace(userWorkspace.pathname, '/');
-            const route = `${basePath}${relativeApiPath.replace(`.${extension}`, '')}`;
 
             if (extension !== 'js') {
               console.warn(`${filenameUrl} is not a JavaScript file, skipping...`);
-            } else {
-              /*
-              * API Properties (per route)
-              *----------------------
-              * filename: base filename of the page
-              * outputPath: the filename to write to when generating a build
-              * path: path to the file relative to the workspace
-              * route: URL route for a given page on outputFilePath
-              */
-              apis.set(route, {
-                filename: filename,
-                outputPath: `/api/${filename}`,
-                path: relativeApiPath,
-                route
-              });
+              return;
             }
+
+            const relativeApiPath = filenameUrl.pathname.replace(userWorkspace.pathname, '/');
+            const route = `${basePath}${relativeApiPath.replace(`.${extension}`, '')}`;
+            // TODO should this be run in isolation like SSR pages?
+            // https://github.com/ProjectEvergreen/greenwood/issues/991
+            const { isolation } = await import(filenameUrl).then(module => module);
+
+            /*
+            * API Properties (per route)
+            *----------------------
+            * filename: base filename of the page
+            * outputPath: the filename to write to when generating a build
+            * path: path to the file relative to the workspace
+            * route: URL route for a given page on outputFilePath
+            * isolation: if this should be run in isolated mode
+            */
+            apis.set(route, {
+              filename: filename,
+              outputPath: `/api/${filename}`,
+              path: relativeApiPath,
+              route,
+              isolation
+            });
           }
         }
 

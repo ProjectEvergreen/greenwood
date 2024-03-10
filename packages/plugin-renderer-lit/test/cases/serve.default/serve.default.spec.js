@@ -19,7 +19,7 @@
  *     greeting.js
  *   pages/
  *     artists.js
- *     users.js
+ *     users.js (isolation = false)
  *   templates/
  *     app.html
  */

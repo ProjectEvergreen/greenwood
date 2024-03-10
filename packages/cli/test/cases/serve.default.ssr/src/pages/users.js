@@ -18,3 +18,5 @@ export default class UsersPage extends HTMLElement {
     `;
   }
 }
+
+export const isolation = true;
