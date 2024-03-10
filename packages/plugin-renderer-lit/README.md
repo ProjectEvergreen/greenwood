@@ -88,6 +88,8 @@ customElements.define('artists-page', ArtistsPage);
 export const tagName = 'artists-page';
 ```
 
+> _By default, this plugin sets `isolation` mode to `true` for all SSR pages.  See the [isolation configuration](https://www.greenwoodjs.io/docs/configuration/#isolation) docs for more information._
+
 ## Caveats
 
 There are a few considerations to take into account when using a `LitElement` as your page component:
