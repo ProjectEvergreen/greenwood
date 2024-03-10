@@ -51,6 +51,7 @@ const generateGraph = async (compilation) => {
             let filePath;
             let prerender = true;
             let isolation = false;
+            let hydration = false;
 
             /*
              * check if additional nested directories exist to correctly determine route (minus filename)
@@ -132,8 +133,9 @@ const generateGraph = async (compilation) => {
                 const request = await requestAsObject(new Request(filenameUrl));
 
                 worker.on('message', async (result) => {
-                  prerender = result.prerender;
+                  prerender = result.prerender ?? false;
                   isolation = result.isolation ?? isolation;
+                  hydration = result.hydration ?? hydration;
 
                   if (result.frontmatter) {
                     result.frontmatter.imports = result.frontmatter.imports || [];
@@ -204,8 +206,9 @@ const generateGraph = async (compilation) => {
              * template: page template to use as a base for a generated component
              * title: a default value that can be used for <title></title>
              * isSSR: if this is a server side route
-             * prerednder: if this should be statically exported
+             * prerender: if this should be statically exported
              * isolation: if this should be run in isolated mode
+             * hydration: if this page needs hydration support
              */
             pages.push({
               data: customData || {},
@@ -227,7 +230,8 @@ const generateGraph = async (compilation) => {
               title,
               isSSR: !isStatic,
               prerender,
-              isolation
+              isolation,
+              hydration
             });
           }
         }

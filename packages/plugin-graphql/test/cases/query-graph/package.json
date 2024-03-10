@@ -2,6 +2,6 @@
   "name": "plugin-graphql-test-graph-query",
   "type": "module",
   "dependencies": {
-    "lit": "^2.0.0"
+    "lit": "^3.1.0"
   }
 }

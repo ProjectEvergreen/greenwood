@@ -13,8 +13,10 @@
  *
  * User Workspace
  *  src/
+ *   api/
+ *     search.js
  *   components/
- *     counter.js
+ *     card.js
  *     footer.js
  *     greeting.js
  *   pages/
@@ -82,6 +84,14 @@ describe('Serve Greenwood With: ', function() {
         `${process.cwd()}/node_modules/lit-html/*.js`,
         `${outputPath}/node_modules/lit-html/`
       );
+      const litHtmlNode = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/node/*.js`,
+        `${outputPath}/node_modules/lit-html/node/`
+      );
+      const litHtmlNodeDirectives = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/node/directives/*.js`,
+        `${outputPath}/node_modules/lit-html/node/directives/`
+      );
       const litHtmlPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-html/package.json`,
         `${outputPath}/node_modules/lit-html/`
@@ -100,6 +110,10 @@ describe('Serve Greenwood With: ', function() {
         `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
+      const litReactiveElementNode = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit/reactive-element/node/*.js`,
+        `${outputPath}/node_modules/@lit/reactive-element/node/`
+      );
       const litReactiveElementDecorators = await getDependencyFiles(
         `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
         `${outputPath}/node_modules/@lit/reactive-element/decorators/`
@@ -107,6 +121,14 @@ describe('Serve Greenwood With: ', function() {
       const litReactiveElementPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
         `${outputPath}/node_modules/@lit/reactive-element/`
+      );
+      const litSsrElementHydrationSupport = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js`,
+        `${outputPath}/node_modules/@lit-labs/ssr-client/`
+      );
+      const litSsrHtmlHydrationSupport = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit-labs/ssr-client/lib/*.js`,
+        `${outputPath}/node_modules/@lit-labs/ssr-client/lib/`
       );
 
       runner.setup(outputPath, [
@@ -120,11 +142,16 @@ describe('Serve Greenwood With: ', function() {
         ...litElementDecorators,
         ...litHtmlPackageJson,
         ...litHtml,
+        ...litHtmlNode,
         ...litHtmlDirectives,
+        ...litHtmlNodeDirectives,
         ...trustedTypes,
         ...litReactiveElement,
+        ...litReactiveElementNode,
         ...litReactiveElementDecorators,
-        ...litReactiveElementPackageJson
+        ...litReactiveElementPackageJson,
+        ...litSsrElementHydrationSupport,
+        ...litSsrHtmlHydrationSupport
       ]);
       runner.runCommand(cliPath, 'build');
 
@@ -160,7 +187,7 @@ describe('Serve Greenwood With: ', function() {
       usersPageDom = new JSDOM(usersPageHtml);
     });
 
-    describe('Serve command with HTML route response using getBody, getTemplate and getFrontmatter', function() {
+    describe('Serve command with HTML route response using getBody, getTemplate and getFrontmatter for the artists page', function() {
 
       it('should return a 200 status', function() {
         expect(response.status).to.equal(200);
@@ -182,15 +209,6 @@ describe('Serve Greenwood With: ', function() {
         const styles = dom.window.document.querySelectorAll('head > style');
 
         expect(styles.length).to.equal(1);
-      });
-
-      // TODO this should be managed via a plugin, not in core
-      // https://github.com/ProjectEvergreen/greenwood/issues/728
-      it('should have one <script> tag in the <head> for lit polyfills', function() {
-        const scripts = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
-
-        expect(scripts.length).to.equal(1);
-        expect(scripts[0].getAttribute('src').startsWith('/polyfill-support')).to.equal(true);
       });
 
       it('should have the expected number of <tr> tags of content', function() {
@@ -239,9 +257,16 @@ describe('Serve Greenwood With: ', function() {
         expect(aboutPageGraphData.data.author).to.equal('Project Evergreen');
         expect(aboutPageGraphData.data.date).to.equal('01-01-2021');
       });
+
+      it('should not have the expected lit hydration script in the <head>', function() {
+        const scripts = Array.from(dom.window.document.querySelectorAll('head script'))
+          .filter((script) => script.getAttribute('src')?.indexOf('lit-element-hydrate-support') >= 0);
+
+        expect(scripts.length).to.equal(0);
+      });
     });
 
-    describe('Serve command with HTML route response using LitElement as default export', function() {
+    describe('Serve command with HTML route response using LitElement as a getPage export with an <app-footer> component for the users page', function() {
       it('the response body should be valid HTML from JSDOM', function(done) {
         expect(usersPageDom).to.not.be.undefined;
         done();
@@ -257,6 +282,58 @@ describe('Serve Greenwood With: ', function() {
 
       it('should have the expected <app-footer> content in the <body>', function() {
         expect(usersPageHtml).to.contain('<footer class="footer">');
+      });
+
+      it('should have the expected lit hydration script in the <head>', function() {
+        const scripts = Array.from(usersPageDom.window.document.querySelectorAll('head script'))
+          .filter((script) => script.getAttribute('src')?.indexOf('lit-element-hydrate-support') >= 0);
+
+        expect(scripts.length).to.equal(1);
+      });
+    });
+
+    describe('Serve command with API route server rendering LitElement <app-card> components as an HTML response', function() {
+      const term = 'Analog';
+      let resp;
+      let html;
+      let dom;
+
+      before(async function() {
+        resp = await fetch(`${hostname}/api/search`, {
+          method: 'POST',
+          body: new URLSearchParams({ term }).toString(),
+          headers: new Headers({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
+        });
+        html = await resp.text();
+        dom = new JSDOM(html);
+      });
+
+      it('should have a response status of 200', function(done) {
+        expect(resp.status).to.equal(200);
+
+        done();
+      });
+
+      it('should have a Content-Type header of text/html', function(done) {
+        const type = response.headers.get('Content-Type');
+
+        expect(type).to.equal('text/html');
+
+        done();
+      });
+
+      it('should have the expected number of <app-card> components for a single search result', function(done) {
+        const cards = dom.window.document.querySelectorAll('app-card template[shadowrootmode="open"]');
+        const cardDom = new JSDOM(cards[0].innerHTML);
+
+        expect(cards.length).to.equal(1);
+        // TODO this should be real data (see issue with static in card.js)
+        expect(cardDom.window.document.querySelectorAll('h3')[0].textContent).to.equal('Foo');
+        expect(cardDom.window.document.querySelectorAll('img')[0].getAttribute('src')).to.equal('bar.png');
+
+        done();
       });
     });
   });

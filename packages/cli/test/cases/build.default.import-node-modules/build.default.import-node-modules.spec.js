@@ -217,9 +217,8 @@ describe('Build Greenwood With: ', function() {
         expect(mainScriptTags.length).to.be.equal(1);
       });
 
-      // TODO clean up lit-polyfill as part of https://github.com/ProjectEvergreen/greenwood/issues/728
       it('should have the total expected number of .js file in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(4);
+        expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(3);
       });
 
       it('should have the expected main.js file in the output directory', async function() {
@@ -242,7 +241,7 @@ describe('Build Greenwood With: ', function() {
         const inlineScriptTag = Array.from(dom.window.document.querySelectorAll('head > script:not([src])')).filter(tag => !tag.getAttribute('data-gwd'))[0];
 
         expect(inlineScriptTag.textContent.replace(/\n/g, '')).to
-          .equal('import"/116321042.262925e6.js";import"/lit-html.71ac31d8.js";//# sourceMappingURL=116321042.f667a8c7.js.map');
+          .equal('import"/116321042.4f3171e3.js";import"/lit-html.31ea57aa.js";//# sourceMappingURL=116321042.69f46fc1.js.map');
       });
     });
 

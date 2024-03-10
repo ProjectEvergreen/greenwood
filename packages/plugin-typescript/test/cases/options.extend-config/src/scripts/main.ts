@@ -1,4 +1,5 @@
-import { html, css, LitElement, customElement, property } from 'lit-element';
+import { html, css, LitElement } from 'lit-element';
+import { customElement, property } from 'lit/decorators.js';
 import { TemplateResult } from 'lit-html';
 
 @customElement('app-greeting')

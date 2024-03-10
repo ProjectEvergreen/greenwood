@@ -14,7 +14,9 @@ export default {
   interpolateFrontmatter: true,
   plugins: [
     greenwoodPluginGraphQL(),
-    greenwoodPluginPolyfills(),
+    greenwoodPluginPolyfills({
+      lit: true
+    }),
     greenwoodPluginPostCss(),
     greenwoodPluginImportJson(),
     greenwoodPluginImportCss(),

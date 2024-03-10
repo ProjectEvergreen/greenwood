@@ -139,15 +139,13 @@ describe('Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
-      // TODO need to reconcile how this lit polyfilling is working since the CLI already adds it?
-      // related to https://github.com/ProjectEvergreen/greenwood/issues/728
       it('should have one <script> tag for lit polyfills loaded in the <head> tag', function() {
         const scriptTags = dom.window.document.querySelectorAll('head > script');
         const polyfillScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
           return script.src.indexOf('polyfill-support') >= 0;
         });
 
-        expect(polyfillScriptTags.length).to.be.equal(2);
+        expect(polyfillScriptTags.length).to.be.equal(1);
       });
 
       it('should have the expected lit polyfill files in the output directory', function() {
