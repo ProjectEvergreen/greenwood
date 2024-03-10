@@ -296,6 +296,7 @@ async function getHybridServer(compilation) {
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
 
       if (!config.prerender && matchingRoute.isSSR && !matchingRoute.prerender) {
+        const entryPointUrl = new URL(`./${matchingRoute.id}.route.js`, outputDir);
         let html;
 
         if (matchingRoute.isolation || isolationMode) {
@@ -317,13 +318,13 @@ async function getHybridServer(compilation) {
             });
 
             worker.postMessage({
-              routeModuleUrl: new URL(`./${matchingRoute.id}.route.js`, outputDir).href,
+              routeModuleUrl: entryPointUrl.href,
               request,
               compilation: JSON.stringify(compilation)
             });
           });
         } else {
-          const { handler } = await import(new URL(`./__${matchingRoute.filename}`, outputDir));
+          const { handler } = await import(entryPointUrl);
           const response = await handler(request, compilation);
 
           html = Readable.from(response.body);
@@ -334,6 +335,7 @@ async function getHybridServer(compilation) {
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
+        const entryPointUrl = new URL(`.${apiRoute.path}`, outputDir);
         let body, status, headers, statusText;
 
         if (apiRoute.isolation || isolationMode) {
@@ -360,12 +362,12 @@ async function getHybridServer(compilation) {
             });
 
             worker.postMessage({
-              href: new URL(`.${apiRoute.path}`, outputDir).href,
+              href: entryPointUrl.href,
               request: req
             });
           });
         } else {
-          const { handler } = await import(new URL(`.${apiRoute.path}`, outputDir));
+          const { handler } = await import(entryPointUrl);
           const response = await handler(request);
 
           body = response.body;

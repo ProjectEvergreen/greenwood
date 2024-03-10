@@ -289,7 +289,7 @@ function greenwoodImportMetaUrl(compilation) {
 
               assets.forEach((asset, idx) => {
                 // more windows shenanigans...)
-                if (asset.indexOf(bundles[reference].facadeModuleId.replace(/\\/g, '/'))) {
+                if (asset.indexOf(bundles[reference]?.facadeModuleId?.replace(/\\/g, '/'))) {
                   assetIdx = idx;
                 }
               });
@@ -380,6 +380,9 @@ const getRollupConfigForApis = async (compilation) => {
       },
       plugins: [
         greenwoodResourceLoader(compilation),
+        // support node export conditions for SSR pages
+        // https://github.com/ProjectEvergreen/greenwood/issues/1118
+        // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
         nodeResolve({
           exportConditions: ['node'],
           preferBuiltins: true
