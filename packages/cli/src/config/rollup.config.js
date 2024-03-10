@@ -8,7 +8,7 @@ import * as walk from 'acorn-walk';
 // https://github.com/rollup/rollup/issues/2121
 // would be nice to get rid of this
 function cleanRollupId(id) {
-  return id.replace('\x00', '');
+  return id.replace('\x00', '').replace('?commonjs-proxy', '');
 }
 
 function greenwoodResourceLoader (compilation) {
@@ -355,10 +355,11 @@ const getRollupConfigForApis = async (compilation) => {
     },
     plugins: [
       greenwoodResourceLoader(compilation),
-      // support ESM favorable export conditions
+      // support node export conditions for API routes
       // https://github.com/ProjectEvergreen/greenwood/issues/1118
+      // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
       nodeResolve({
-        exportConditions: ['default', 'module', 'import', 'node'],
+        exportConditions: ['node'],
         preferBuiltins: true
       }),
       commonjs(),
@@ -381,10 +382,11 @@ const getRollupConfigForSsr = async (compilation, input) => {
     },
     plugins: [
       greenwoodResourceLoader(compilation),
-      // support ESM favorable export conditions
+      // support node export conditions for SSR pages
       // https://github.com/ProjectEvergreen/greenwood/issues/1118
+      // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
       nodeResolve({
-        exportConditions: ['default', 'module', 'import', 'node'],
+        exportConditions: ['node'],
         preferBuiltins: true
       }),
       commonjs(),
