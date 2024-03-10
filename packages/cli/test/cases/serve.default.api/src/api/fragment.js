@@ -1,5 +1,7 @@
 import { renderFromHTML } from 'wc-compiler';
 
+export const isolation = true;
+
 export async function handler(request) {
   const params = new URLSearchParams(request.url.slice(request.url.indexOf('?')));
   const name = params.has('name') ? params.get('name') : 'World';
