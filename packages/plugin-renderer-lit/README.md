@@ -38,7 +38,7 @@ yarn add @greenwood/plugin-renderer-lit --dev
 1. Please familiarize yourself with some of the [caveats](https://lit.dev/docs/ssr/overview/#library-status) called out in the Lit docs, like:
     - Lit SSR [**only** renders into declarative shadow roots](https://github.com/lit/lit/issues/3080#issuecomment-1165158794), so you will have to keep browser support and polyfill usage in mind.
     - At this time, `LitElement` does not support `async` work.  You can follow along with this issue [in the Lit repo](https://github.com/lit/lit/issues/2469).
-1. Lit only supports templates on the server side for HTML generated content, thus Greenwood's `getBody` API must be used.  We would love for [server only components](https://github.com/lit/lit/issues/2469#issuecomment-1759583861) to be a thing though!
+1. Lit only supports templates on the server side for HTML only generated content, thus Greenwood's `getBody` API must be used.  We would love for [server only components](https://github.com/lit/lit/issues/2469#issuecomment-1759583861) to be a thing though!
 1. Lit does not support [`CSSStyleSheet` (aka CSS Modules) in their SSR DOM shim](https://github.com/lit/lit/issues/2631#issuecomment-1065400805).
 1. Full hydration support is not available yet.  See [this Greenwood issue](https://github.com/ProjectEvergreen/greenwood/issues/880) to follow along with when it will land.
 
@@ -87,6 +87,16 @@ export async function getBody() {
 }
 ```
 
+<<<<<<< HEAD
+=======
+## Caveats
+
+There are a few considerations to take into account when using a `LitElement` as your page component:
+- Lit SSR [**only** renders into declarative shadow roots](https://github.com/lit/lit/issues/3080#issuecomment-1165158794), so you will have to keep browser support and polyfill usage in mind.
+- Depending on your use case, SSR bundling may break due to bundle chunking and code splitting by Rollup, which we are [hoping to correct ASAP](https://github.com/ProjectEvergreen/greenwood/issues/1118).
+- At this time, `LitElement` does [not support `async` work](https://lit.dev/docs/ssr/overview/#library-status) which makes data fetching in pages a bit of challenge.  You can follow along with this issue [in the Lit repo](https://github.com/lit/lit/issues/2469).
+
+>>>>>>> 82460ea4 (feature/issue 1197 Lit v3 upgrade and SSR fixes and enhancements (#1201))
 ## Options
 
 ### Isolation Mode
