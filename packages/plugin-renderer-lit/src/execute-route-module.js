@@ -23,7 +23,7 @@ async function executeRouteModule({ moduleUrl, compilation, page, prerender, htm
     data.html = await collectResult(render(templateResult));
   } else {
     const module = await import(moduleUrl).then(module => module);
-    const { getTemplate = null, getBody = null, getFrontmatter = null, isolation = true, hydration = false } = module;
+    const { getTemplate = null, getBody = null, getFrontmatter = null, isolation = true, hydration = true } = module;
 
     // TODO cant we get these from just pulling from the file during the graph phase?
     // https://github.com/ProjectEvergreen/greenwood/issues/991

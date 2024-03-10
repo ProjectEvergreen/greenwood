@@ -8,7 +8,7 @@ import * as walk from 'acorn-walk';
 // https://github.com/rollup/rollup/issues/2121
 // would be nice to get rid of this
 function cleanRollupId(id) {
-  return id.replace('\x00', '').replace('?commonjs-proxy', '');
+  return id.replace('\x00', '');
 }
 
 function greenwoodResourceLoader (compilation) {

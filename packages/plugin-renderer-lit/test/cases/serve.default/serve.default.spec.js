@@ -187,7 +187,7 @@ describe('Serve Greenwood With: ', function() {
       usersPageDom = new JSDOM(usersPageHtml);
     });
 
-    describe('Serve command with HTML route response using getBody, getTemplate and getFrontmatter', function() {
+    describe('Serve command with HTML route response using getBody, getTemplate and getFrontmatter for the artists page', function() {
 
       it('should return a 200 status', function() {
         expect(response.status).to.equal(200);
@@ -266,7 +266,7 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe('Serve command with HTML route response using LitElement as a getPage export with an <app-footer> component', function() {
+    describe('Serve command with HTML route response using LitElement as a getPage export with an <app-footer> component for the users page', function() {
       it('the response body should be valid HTML from JSDOM', function(done) {
         expect(usersPageDom).to.not.be.undefined;
         done();

@@ -108,11 +108,11 @@ export const isolation = false;
 
 ### Hydration
 
-In order for server-rendered components to become interactive on the client side, Lit's [client-side hydration script](https://lit.dev/docs/ssr/client-usage/#loading-@lit-labsssr-clientlit-element-hydrate-support.js) must be included on the page.  For any page that would need this script added, you can simply `export` the **hydration** option from your page.
+In order for server-rendered components to become interactive on the client side, Lit's [client-side hydration script](https://lit.dev/docs/ssr/client-usage/#loading-@lit-labsssr-clientlit-element-hydrate-support.js) must be included on the page.  This setting is `true` by default, but if you want to turn it off, you can `export` the **hydration** option from your page with a value of `false`.
 
 ```js
 // src/pages/products.js
-export const hydration = true;
+export const hydration = false; // disable Lit hydration scripts for this page
 ```
 
 ### Prerender
