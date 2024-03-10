@@ -87,7 +87,7 @@ async function vercelAdapter(compilation) {
     const { id } = page;
     const outputRoot = new URL(`./${basePath}/${id}.func/`, adapterOutputUrl);
     const files = (await fs.readdir(outputDir))
-      .filter(file => file.indexOf(`.route.chunk.`) > 0 && file.endsWith('.js'));
+      .filter(file => file.indexOf('.route.chunk.') > 0 && file.endsWith('.js'));
 
     await setupFunctionBuildFolder(id, outputType, outputRoot);
 
