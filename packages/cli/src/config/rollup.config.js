@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import fs from 'fs';
 import path from 'path';
 import { checkResourceExists, normalizePathnameForWindows } from '../lib/resource-utils.js';
@@ -121,7 +122,8 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
 }
 
 function getMetaImportPath(node) {
-  return node.arguments[0].value.split('/').join(path.sep);
+  return node.arguments[0].value.split('/').join(path.sep)
+    .replace(/\\/g, '/'); // handle Windows style paths
 }
 
 function isNewUrlImportMetaUrl(node) {
@@ -157,6 +159,8 @@ function greenwoodImportMetaUrl(compilation) {
       }).map((plugin) => {
         return plugin.provider(compilation);
       });
+      const idAssetName = path.basename(id);
+      const normalizedId = id.replace(/\\\\/g, '/').replace(/\\/g, '/'); // windows shenanigans...
       const idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
       const extension = pathname.split('.').pop();
@@ -235,43 +239,71 @@ function greenwoodImportMetaUrl(compilation) {
           ? { type, id: normalizePathnameForWindows(url), name }
           : { type, name: assetName, source: assetContents };
         const ref = this.emitFile(emitConfig);
-        // handle Windows style paths
-        const normalizedRelativeAssetPath = relativeAssetPath.replace(/\\/g, '/');
         const importRef = `import.meta.ROLLUP_FILE_URL_${ref}`;
 
+        // loop through all URL bundle chunks from APIs and SSR pages
+        // and map to their parent file, to pick back up in generateBundle when full hashes are known
+        if (`${compilation.context.apisDir.pathname}${idAssetName}`.indexOf(normalizedId) >= 0) {
+          for (const entry of compilation.manifest.apis.keys()) {
+            const apiRoute = compilation.manifest.apis.get(entry);
+
+            if (normalizedId.endsWith(apiRoute.path)) {
+              const assets = apiRoute.assets || [];
+
+              assets.push(assetUrl.url.href);
+
+              compilation.manifest.apis.set(entry, {
+                ...apiRoute,
+                assets
+              });
+            }
+          }
+        } else {
+          // TODO figure out how to handle URL chunk from SSR pages
+          // https://github.com/ProjectEvergreen/greenwood/issues/1163
+        }
+
         modifiedCode = code
-          .replace(`'${normalizedRelativeAssetPath}'`, importRef)
-          .replace(`"${normalizedRelativeAssetPath}"`, importRef);
+          .replace(`'${relativeAssetPath}'`, importRef)
+          .replace(`"${relativeAssetPath}"`, importRef);
       }
 
       return {
         code: modifiedCode ? modifiedCode : code,
         map: null
       };
-    }
-  };
-}
+    },
 
-// TODO could we use this instead?
-// https://github.com/rollup/rollup/blob/v2.79.1/docs/05-plugin-development.md#resolveimportmeta
-// https://github.com/ProjectEvergreen/greenwood/issues/1087
-function greenwoodPatchSsrPagesEntryPointRuntimeImport() {
-  return {
-    name: 'greenwood-patch-ssr-pages-entry-point-runtime-import',
-    generateBundle(options, bundle) {
-      Object.keys(bundle).forEach((key) => {
-        if (key.startsWith('__')) {
-          // ___GWD_ENTRY_FILE_URL=${filename}___
-          const needle = bundle[key].code.match(/___GWD_ENTRY_FILE_URL=(.*.)___/);
-          if (needle) {
-            const entryPathMatch = needle[1];
+    generateBundle(options, bundles) {
+      for (const bundle in bundles) {
+        const bundleExtension = bundle.split('.').pop();
+        const apiKey = `/api/${bundle.replace(`.${bundleExtension}`, '')}`;
 
-            bundle[key].code = bundle[key].code.replace(/'___GWD_ENTRY_FILE_URL=(.*.)___'/, `new URL('./_${entryPathMatch}', import.meta.url)`);
-          } else {
-            console.warn(`Could not find entry path match for bundle => ${key}`);
+        if (compilation.manifest.apis.has(apiKey)) {
+          const apiManifestDetails = compilation.manifest.apis.get(apiKey);
+
+          for (const reference of bundles[bundle].referencedFiles) {
+            if (bundles[reference]) {
+              const assets = apiManifestDetails.assets;
+              let assetIdx;
+
+              assets.forEach((asset, idx) => {
+                // more windows shenanigans...)
+                if (asset.indexOf(bundles[reference]?.facadeModuleId?.replace(/\\/g, '/'))) {
+                  assetIdx = idx;
+                }
+              });
+
+              assets[assetIdx] = new URL(`./api/${reference}`, compilation.context.outputDir).href;
+
+              compilation.manifest.apis.set(apiKey, {
+                ...apiManifestDetails,
+                assets
+              });
+            }
           }
         }
-      });
+      }
     }
   };
 }
@@ -336,49 +368,40 @@ const getRollupConfigForScriptResources = async (compilation) => {
 
 const getRollupConfigForApis = async (compilation) => {
   const { outputDir, userWorkspace } = compilation.context;
-  const input = [...compilation.manifest.apis.values()]
-    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)));
 
-  // why is this needed?
-  await fs.promises.mkdir(new URL('./api/assets/', outputDir), {
-    recursive: true
-  });
-
-  // TODO should routes and APIs have chunks?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1118
-  return [{
-    input,
-    output: {
-      dir: `${normalizePathnameForWindows(outputDir)}/api`,
-      entryFileNames: '[name].js',
-      chunkFileNames: '[name].[hash].js'
-    },
-    plugins: [
-      greenwoodResourceLoader(compilation),
-      // support node export conditions for API routes
-      // https://github.com/ProjectEvergreen/greenwood/issues/1118
-      // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
-      nodeResolve({
-        exportConditions: ['node'],
-        preferBuiltins: true
-      }),
-      commonjs(),
-      greenwoodImportMetaUrl(compilation)
-    ]
-  }];
+  return [...compilation.manifest.apis.values()]
+    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)))
+    .map(filepath => ({
+      input: filepath,
+      output: {
+        dir: `${normalizePathnameForWindows(outputDir)}/api`,
+        entryFileNames: '[name].js',
+        chunkFileNames: '[name].[hash].js'
+      },
+      plugins: [
+        greenwoodResourceLoader(compilation),
+        // support node export conditions for SSR pages
+        // https://github.com/ProjectEvergreen/greenwood/issues/1118
+        // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
+        nodeResolve({
+          exportConditions: ['node'],
+          preferBuiltins: true
+        }),
+        commonjs(),
+        greenwoodImportMetaUrl(compilation)
+      ]
+    }));
 };
 
 const getRollupConfigForSsr = async (compilation, input) => {
   const { outputDir } = compilation.context;
 
-  // TODO should routes and APIs have chunks?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1118
-  return [{
-    input,
+  return input.map(filepath => ({
+    input: filepath,
     output: {
       dir: normalizePathnameForWindows(outputDir),
-      entryFileNames: '_[name].js',
-      chunkFileNames: '[name].[hash].js'
+      entryFileNames: '[name].route.js',
+      chunkFileNames: '[name].route.chunk.[hash].js'
     },
     plugins: [
       greenwoodResourceLoader(compilation),
@@ -390,8 +413,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
         preferBuiltins: true
       }),
       commonjs(),
-      greenwoodImportMetaUrl(compilation),
-      greenwoodPatchSsrPagesEntryPointRuntimeImport() // TODO a little hacky but works for now
+      greenwoodImportMetaUrl(compilation)
     ],
     onwarn: (errorObj) => {
       const { code, message } = errorObj;
@@ -411,7 +433,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
 
       }
     }
-  }];
+  }));
 };
 
 export {
