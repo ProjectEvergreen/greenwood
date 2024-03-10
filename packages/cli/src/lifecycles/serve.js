@@ -335,6 +335,7 @@ async function getHybridServer(compilation) {
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
+        const entryPointUrl = new URL(`.${apiRoute.path}`, outputDir);
         let body, status, headers, statusText;
 
         if (apiRoute.isolation || isolationMode) {
@@ -361,12 +362,12 @@ async function getHybridServer(compilation) {
             });
 
             worker.postMessage({
-              href: new URL(`.${apiRoute.path}`, outputDir).href,
+              href: entryPointUrl.href,
               request: req
             });
           });
         } else {
-          const { handler } = await import(new URL(`.${apiRoute.path}`, outputDir));
+          const { handler } = await import(entryPointUrl);
           const response = await handler(request);
 
           body = response.body;

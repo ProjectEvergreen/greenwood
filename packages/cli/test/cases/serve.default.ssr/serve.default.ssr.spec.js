@@ -93,9 +93,8 @@ describe('Serve Greenwood With: ', function() {
         expect(headings[0].textContent).to.equal('Hello from the server rendered home page!');
       });
 
-      it('should have the expected bundled SSR output for the page', async function() {
-        const scriptFiles = (await glob.promise(path.join(this.context.publicDir, '*.js')))
-          .filter(file => file.indexOf('index.js') >= 0);
+      it('should have the expected bundled SSR output for the page entry point and chunk file', async function() {
+        const scriptFiles = await glob.promise(path.join(this.context.publicDir, 'index*.js'));
 
         expect(scriptFiles.length).to.equal(2);
       });
@@ -229,9 +228,8 @@ describe('Serve Greenwood With: ', function() {
         expect(resources.find(resource => resource.endsWith('/header.js'))).to.not.be.undefined;
       });
 
-      it('should have the expected bundled SSR output for the page', async function() {
-        const scriptFiles = (await glob.promise(path.join(this.context.publicDir, '*.js')))
-          .filter(file => file.indexOf('artists.js') >= 0);
+      it('should have the expected bundled SSR output for the page entry point and chunk file', async function() {
+        const scriptFiles = await glob.promise(path.join(this.context.publicDir, 'artists*.js'));
 
         expect(scriptFiles.length).to.equal(2);
       });
@@ -267,9 +265,8 @@ describe('Serve Greenwood With: ', function() {
         expect(cards.length).to.be.greaterThan(0);
       });
 
-      it('should have the expected bundled SSR output for the page', async function() {
-        const scriptFiles = (await glob.promise(path.join(this.context.publicDir, '*.js')))
-          .filter(file => file.indexOf('users.js') >= 0);
+      it('should have the expected bundled SSR output for the page entry point and chunk file', async function() {
+        const scriptFiles = await glob.promise(path.join(this.context.publicDir, 'users*.js'));
 
         expect(scriptFiles.length).to.equal(2);
       });
