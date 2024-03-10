@@ -226,6 +226,20 @@ export const prerender = true;
 > You can enable this for all pages using the [prerender configuration](/docs/configuration/#prerender) option.
 
 ### Isolation
+<<<<<<< HEAD
+=======
+
+To execute an SSR page in its own request context when running `greenwood serve`, you can export an `isolation` option from your page set to `true`.
+
+```js
+export const isolation = true;
+```
+
+> For more information and how you can enable this for all pages, please see the [isolation configuration](/docs/configuration/#isolation) docs.
+
+
+### Custom Imports
+>>>>>>> 55f36b76 (feature/discussion 1117 Isolation Mode (v1) (#1206))
 
 To execute an SSR page in its own request context when running `greenwood serve`, you can export an `isolation` option from your page set to `true`.
 
