@@ -16831,10 +16831,10 @@ wait-port@1.0.4:
     commander "^9.3.0"
     debug "^4.3.4"
 
-wc-compiler@~0.12.0:
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.12.0.tgz#f9d04b5bfca505f836487ce63040fdf30f1cea5b"
-  integrity sha512-eMgHEGhJGcyjSL9p6YIix0ReMViffhtabVEnNE1oRiNlNJL/Fd8e0GZ2gdWhIOV5ZvNMOocyAKFODKpg3CDMkg==
+wc-compiler@~0.12.1:
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.12.1.tgz#cf34a1a9758c0085580ddc82b5aa6312d3de20bf"
+  integrity sha512-+uEK9cL9MHIWnXoD11cQ77omBLekw1Oih2wqbrM2jBFGTPHvPauq3jtdWzlkg/0OwOJOyYqbBlQfZb/oA+HuNg==
   dependencies:
     "@projectevergreen/acorn-jsx-esm" "~0.1.0"
     "@projectevergreen/escodegen-esm" "~0.1.0"
