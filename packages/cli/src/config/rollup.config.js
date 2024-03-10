@@ -6,28 +6,9 @@ import commonjs from '@rollup/plugin-commonjs';
 import * as walk from 'acorn-walk';
 
 // https://github.com/rollup/rollup/issues/2121
+// would be nice to get rid of this
 function cleanRollupId(id) {
   return id.replace('\x00', '');
-}
-
-// specifically to handle escodegen and other node modules
-// using require for package.json or other json files
-// https://github.com/estools/escodegen/issues/455
-function greenwoodJsonLoader() {
-  return {
-    name: 'greenwood-json-loader',
-    async load(id) {
-      const idUrl = new URL(`file://${cleanRollupId(id)}`);
-      const extension = idUrl.pathname.split('.').pop();
-
-      if (extension === 'json') {
-        const json = JSON.parse(await fs.promises.readFile(idUrl, 'utf-8'));
-        const contents = `export default ${JSON.stringify(json)}`;
-
-        return contents;
-      }
-    }
-  };
 }
 
 function greenwoodResourceLoader (compilation) {
@@ -373,9 +354,14 @@ const getRollupConfigForApis = async (compilation) => {
       chunkFileNames: '[name].[hash].js'
     },
     plugins: [
-      greenwoodJsonLoader(),
       greenwoodResourceLoader(compilation),
-      nodeResolve(),
+      // support node export conditions for API routes
+      // https://github.com/ProjectEvergreen/greenwood/issues/1118
+      // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
+      nodeResolve({
+        exportConditions: ['node'],
+        preferBuiltins: true
+      }),
       commonjs(),
       greenwoodImportMetaUrl(compilation)
     ]
@@ -395,12 +381,12 @@ const getRollupConfigForSsr = async (compilation, input) => {
       chunkFileNames: '[name].[hash].js'
     },
     plugins: [
-      greenwoodJsonLoader(),
       greenwoodResourceLoader(compilation),
-      // TODO let this through for lit to enable nodeResolve({ preferBuiltins: true })
-      // https://github.com/lit/lit/issues/449
+      // support node export conditions for SSR pages
       // https://github.com/ProjectEvergreen/greenwood/issues/1118
+      // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
       nodeResolve({
+        exportConditions: ['node'],
         preferBuiltins: true
       }),
       commonjs(),
