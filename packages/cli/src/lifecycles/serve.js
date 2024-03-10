@@ -2,9 +2,10 @@ import fs from 'fs/promises';
 import { hashString } from '../lib/hashing-utils.js';
 import Koa from 'koa';
 import { koaBody } from 'koa-body';
-import { checkResourceExists, mergeResponse, transformKoaRequestIntoStandardRequest } from '../lib/resource-utils.js';
+import { checkResourceExists, mergeResponse, transformKoaRequestIntoStandardRequest, requestAsObject } from '../lib/resource-utils.js';
 import { Readable } from 'stream';
 import { ResourceInterface } from '../lib/resource-interface.js';
+import { Worker } from 'worker_threads';
 
 async function getDevServer(compilation) {
   const app = new Koa();
@@ -282,6 +283,7 @@ async function getStaticServer(compilation, composable) {
 async function getHybridServer(compilation) {
   const { graph, manifest, context, config } = compilation;
   const { outputDir } = context;
+  const isolationMode = config.isolation;
   const app = await getStaticServer(compilation, true);
 
   app.use(koaBody());
@@ -294,17 +296,84 @@ async function getHybridServer(compilation) {
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
 
       if (!config.prerender && matchingRoute.isSSR && !matchingRoute.prerender) {
-        const { handler } = await import(new URL(`./${matchingRoute.outputPath}`, outputDir));
-        const response = await handler(request, compilation);
+        const entryPointUrl = new URL(`./${matchingRoute.outputPath}`, outputDir);
+        let html;
 
-        ctx.body = Readable.from(response.body);
+        if (matchingRoute.isolation || isolationMode) {
+          await new Promise(async (resolve, reject) => {
+            const worker = new Worker(new URL('../lib/ssr-route-worker-isolation-mode.js', import.meta.url));
+            // TODO "faux" new Request here, a better way?
+            const request = await requestAsObject(new Request(url));
+
+            worker.on('message', async (result) => {
+              html = result;
+
+              resolve();
+            });
+            worker.on('error', reject);
+            worker.on('exit', (code) => {
+              if (code !== 0) {
+                reject(new Error(`Worker stopped with exit code ${code}`));
+              }
+            });
+
+            worker.postMessage({
+              routeModuleUrl: entryPointUrl.href,
+              request,
+              compilation: JSON.stringify(compilation)
+            });
+          });
+        } else {
+          const { handler } = await import(entryPointUrl);
+          const response = await handler(request, compilation);
+
+          html = Readable.from(response.body);
+        }
+
+        ctx.body = html;
         ctx.set('Content-Type', 'text/html');
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
-        const { handler } = await import(new URL(`.${apiRoute.path}`, outputDir));
-        const response = await handler(request);
-        const { body, status, headers, statusText } = response;
+        let body, status, headers, statusText;
+
+        if (apiRoute.isolation || isolationMode) {
+          await new Promise(async (resolve, reject) => {
+            const worker = new Worker(new URL('../lib/api-route-worker.js', import.meta.url));
+            // TODO "faux" new Request here, a better way?
+            const req = await requestAsObject(request);
+
+            worker.on('message', async (result) => {
+              const responseAsObject = result;
+
+              body = responseAsObject.body;
+              status = responseAsObject.status;
+              headers = new Headers(responseAsObject.headers);
+              statusText = responseAsObject.statusText;
+
+              resolve();
+            });
+            worker.on('error', reject);
+            worker.on('exit', (code) => {
+              if (code !== 0) {
+                reject(new Error(`Worker stopped with exit code ${code}`));
+              }
+            });
+
+            worker.postMessage({
+              href: new URL(`.${apiRoute.path}`, outputDir).href,
+              request: req
+            });
+          });
+        } else {
+          const { handler } = await import(new URL(`.${apiRoute.path}`, outputDir));
+          const response = await handler(request);
+
+          body = response.body;
+          status = response.status;
+          headers = response.headers;
+          statusText = response.statusText;
+        }
 
         ctx.body = body ? Readable.from(body) : null;
         ctx.status = status;

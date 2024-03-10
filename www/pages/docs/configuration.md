@@ -31,7 +31,8 @@ export default {
   plugins: [],
   workspace: new URL('./src/', import.meta.url),
   pagesDirectory: 'pages', // e.g. src/pages
-  templatesDirectory: 'templates' // e.g. src/templates
+  templatesDirectory: 'templates', // e.g. src/templates
+  isolation: false
 };
 ```
 
@@ -126,6 +127,36 @@ Lorum Ipsum.
   </body>
 </html>
 ```
+
+### Isolation Mode
+
+If running Greenwood as a server in production with the `greenwood serve` command, it may be desirable to isolate the server rendering of SSR pages and API routes from the global runtime (e.g. NodeJS) process.  This is a common assumption for many Web Component libraries that may aim to more faithfully honor the browser's native specification on the server.
+
+Examples include:
+- Custom Elements Registry - Per the spec, a custom element can only be defined once using `customElements.define`.
+- DOM Shims - These often assume a globally unique runtime, and so issues can arise when these DOM globals are repeatedly loaded and initialized into the global space
+
+> See these discussions for more information
+> - https://github.com/ProjectEvergreen/greenwood/discussions/1117
+> - https://github.com/ProjectEvergreen/wcc/discussions/145
+
+As servers have to support multiple clients (as opposed to a browser tab only serving one client at a time), Greenwood offers an isolation mode that can be used to run SSR pages and API routes in their own context per request.
+
+#### Example
+
+To configure an entire project for this, simply set the flag in your _greenwood.config.js_
+```js
+export default {
+  isolation: true // default value is false
+};
+```
+
+Optionally, you can opt-in on a per SSR page / API route basis by exporting an `isolation` option.
+```js
+// src/pages/products.js
+
+export const isolation = true;
+``` 
 
 ### Markdown
 You can install and provide custom **unifiedjs** [presets](https://github.com/unifiedjs/unified#preset) and [plugins](https://github.com/unifiedjs/unified#plugin) to further customize and process your markdown past what [Greenwood does by default](https://github.com/ProjectEvergreen/greenwood/blob/release/0.10.0/packages/cli/src/transforms/transform.md.js#L68).  After running an `npm install` you can provide their package names to Greenwood.
