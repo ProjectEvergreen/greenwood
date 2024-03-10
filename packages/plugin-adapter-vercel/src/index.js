@@ -6,7 +6,7 @@ import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 function generateOutputFormat(id, type) {
   const handlerAlias = '$handler';
   const path = type === 'page'
-    ? `__${id}`
+    ? `${id}.route`
     : id;
 
   return `
@@ -82,85 +82,52 @@ async function vercelAdapter(compilation) {
     'version': 3
   }));
 
-  const files = await fs.readdir(outputDir);
-  const isExecuteRouteModule = files.find(file => file.startsWith('execute-route-module'));
-
   for (const page of ssrPages) {
     const outputType = 'page';
     const { id } = page;
     const outputRoot = new URL(`./${basePath}/${id}.func/`, adapterOutputUrl);
+    const files = (await fs.readdir(outputDir))
+      .filter(file => file.startsWith(`${id}.route.chunk.`) && file.endsWith('.js'));
 
     await setupFunctionBuildFolder(id, outputType, outputRoot);
 
+    // handle user's actual route entry file
     await fs.cp(
-      new URL(`./_${id}.js`, outputDir),
-      new URL(`./_${id}.js`, outputRoot),
+      new URL(`./${id}.route.js`, outputDir),
+      new URL(`./${id}.route.js`, outputRoot),
       { recursive: true }
     );
 
-    await fs.cp(
-      new URL(`./__${id}.js`, outputDir),
-      new URL(`./__${id}.js`, outputRoot),
-      { recursive: true }
-    );
-
-    // TODO quick hack to make serverless pages are fully self-contained
-    // for example, execute-route-module.js will only get code split if there are more than one SSR pages
-    // https://github.com/ProjectEvergreen/greenwood/issues/1118
-    if (isExecuteRouteModule) {
+    // and the URL chunk for renderer plugin and executeRouteModule
+    for (const file of files) {
       await fs.cp(
-        new URL(`./${isExecuteRouteModule}`, outputDir),
-        new URL(`./${isExecuteRouteModule}`, outputRoot)
-      );
-    }
-
-    // TODO how to track SSR resources that get dumped out in the public directory?
-    // https://github.com/ProjectEvergreen/greenwood/issues/1118
-    const ssrPageAssets = (await fs.readdir(outputDir))
-      .filter(file => !path.basename(file).startsWith('_')
-        && !path.basename(file).startsWith('execute')
-        && path.basename(file).endsWith('.js')
-      );
-
-    for (const asset of ssrPageAssets) {
-      await fs.cp(
-        new URL(`./${asset}`, outputDir),
-        new URL(`./${asset}`, outputRoot),
+        new URL(`./${file}`, outputDir),
+        new URL(`./${file}`, outputRoot),
         { recursive: true }
       );
     }
   }
 
-  for (const [key] of apiRoutes) {
+  for (const [key, value] of apiRoutes.entries()) {
     const outputType = 'api';
     const id = key.replace(`${basePath}/api/`, '');
     const outputRoot = new URL(`./${basePath}/api/${id}.func/`, adapterOutputUrl);
+    const { assets = [] } = value;
 
     await setupFunctionBuildFolder(id, outputType, outputRoot);
 
-    // TODO ideally all functions would be self contained
-    // https://github.com/ProjectEvergreen/greenwood/issues/1118
     await fs.cp(
       new URL(`./api/${id}.js`, outputDir),
       new URL(`./${id}.js`, outputRoot),
       { recursive: true }
     );
 
-    if (await checkResourceExists(new URL('./api/assets/', outputDir))) {
-      await fs.cp(
-        new URL('./api/assets/', outputDir),
-        new URL('./assets/', outputRoot),
-        { recursive: true }
-      );
-    }
+    for (const asset of assets) {
+      const name = path.basename(asset);
 
-    const ssrApiAssets = (await fs.readdir(new URL('./api/', outputDir)))
-      .filter(file => new RegExp(/^[\w][\w-]*\.[a-zA-Z0-9]{4,20}\.[\w]{2,4}$/).test(path.basename(file)));
-
-    for (const asset of ssrApiAssets) {
       await fs.cp(
-        new URL(`./${asset}`, new URL('./api/', outputDir)),
-        new URL(`./${asset}`, outputRoot),
+        new URL(asset),
+        new URL(`./${name}`, outputRoot),
         { recursive: true }
       );
     }
