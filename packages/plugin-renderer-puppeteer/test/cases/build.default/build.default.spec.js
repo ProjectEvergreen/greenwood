@@ -303,7 +303,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(inlineScriptTag.textContent.replace('\n', '')).to
           // eslint-disable-next-line max-len
-          .contain('import"/lit-element.1177578e.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline";//# sourceMappingURL=1635690801.3e40c728.js.map');
+          .contain('import"/lit-element.6eb76f27.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline";//# sourceMappingURL=1635690801.4bc08000.js.map');
       });
 
       it('should have prerendered content from <app-header> component', function() {

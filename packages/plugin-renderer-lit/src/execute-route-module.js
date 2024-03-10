@@ -31,7 +31,6 @@ async function executeRouteModule({ moduleUrl, compilation, page, prerender, htm
       data.isolation = true;
     }
 
-
     if (hydration) {
       data.hydration = true;
     }
