@@ -86,8 +86,8 @@ async function vercelAdapter(compilation) {
     const outputType = 'page';
     const { id } = page;
     const outputRoot = new URL(`./${basePath}/${id}.func/`, adapterOutputUrl);
-    const files = (await fs.readdir(outputDir))
-      .filter(file => file.indexOf('.route.chunk.') > 0 && file.endsWith('.js'));
+    const chunks = (await fs.readdir(outputDir))
+      .filter(file => file.startsWith(`${id}.route.chunk`) && file.endsWith('.js'));
 
     await setupFunctionBuildFolder(id, outputType, outputRoot);
 
@@ -98,11 +98,11 @@ async function vercelAdapter(compilation) {
       { recursive: true }
     );
 
-    // and the URL chunk for renderer plugin and executeRouteModule
-    for (const file of files) {
+    // and any (URL) chunks for the page
+    for (const chunk of chunks) {
       await fs.cp(
-        new URL(`./${file}`, outputDir),
-        new URL(`./${file}`, outputRoot),
+        new URL(`./${chunk}`, outputDir),
+        new URL(`./${chunk}`, outputRoot),
         { recursive: true }
       );
     }

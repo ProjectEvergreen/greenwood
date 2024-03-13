@@ -400,8 +400,8 @@ const getRollupConfigForSsr = async (compilation, input) => {
     input: filepath,
     output: {
       dir: normalizePathnameForWindows(outputDir),
-      entryFileNames: '[name].route.js',
-      chunkFileNames: '[name].route.chunk.[hash].js'
+      entryFileNames: `${path.basename(filepath).split('.')[0]}.route.js`,
+      chunkFileNames: `${path.basename(filepath).split('.')[0]}.route.chunk.[hash].js`
     },
     plugins: [
       greenwoodResourceLoader(compilation),
