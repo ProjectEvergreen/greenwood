@@ -14,10 +14,15 @@
  * src/
  *   components/
  *     header.js
+ *   images/
+ *     webcomponents.jpg
  *   pages/
  *     index.html
  *   styles/
+ *     main.css
  *     theme.css
+ *   system
+ *     variables.css
  */
 import chai from 'chai';
 import fs from 'fs';
@@ -52,9 +57,15 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/prismjs/themes/`
       );
 
+      const geistFont = await getDependencyFiles(
+        `${process.cwd()}/node_modules/geist/dist/fonts/geist-sans/*`,
+        `${outputPath}/node_modules/geist/dist/fonts/geist-sans/`
+      );
+
       runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
-        ...prismCss
+        ...prismCss,
+        ...geistFont
       ]);
       runner.runCommand(cliPath, 'build');
     });
@@ -133,6 +144,42 @@ describe('Build Greenwood With: ', function() {
 
           expect(styleTags.length).to.equal(1);
           expect(styleTags[0].textContent.replace(/\n/g, '')).to.equal('*{color:red;font-size:blue;}');
+        });
+      });
+
+      describe('bundled URL references in CSS files', function() {
+        describe('node modules reference', () => {
+          const fontPath = 'node_modules/geist/dist/fonts/geist-sans';
+          let dom;
+
+          before(async function() {
+            dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+          });
+
+          it('should have the expected @font-face file from node_modules copied into the output directory', async function() {
+            expect(await glob.promise(path.join(this.context.publicDir, `${fontPath}/*.woff2`))).to.have.lengthOf(1);
+          });
+
+          it('should have the expected @font-face file bundle path in the referenced <style> tag in index.html', async function() {
+            const styleTag = Array.from(dom.window.document.querySelectorAll('head style'));
+
+            expect(styleTag[0].textContent).to.contain(`src:url('/${fontPath}/Geist-Regular.woff2')`);
+          });
+        });
+
+        describe('user workspace reference', () => {
+          const imagePath = 'images/webcomponents.jpg';
+
+          it('should have the expected background image from the user\'s workspace the output directory', async function() {
+            expect(await glob.promise(path.join(this.context.publicDir, imagePath))).to.have.lengthOf(1);
+          });
+
+          it('should have the expected @font-face file bundle path in the referenced <style> tag in index.html', async function() {
+            const mainCss = await glob.promise(`${path.join(this.context.publicDir, 'styles')}/main.*.css`);
+            const contents = await fs.promises.readFile(mainCss[0], 'utf-8');
+
+            expect(contents).to.contain(`body{background-color:green;background-image:url('/${imagePath}');}`);
+          });
         });
       });
     });
