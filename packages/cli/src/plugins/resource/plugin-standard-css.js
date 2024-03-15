@@ -5,10 +5,12 @@
  *
  */
 import fs from 'fs';
+import path from 'path';
 import { parse, walk } from 'css-tree';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
-function bundleCss(body, url, projectDirectory) {
+function bundleCss(body, url, context) {
+  const { projectDirectory, outputDir, userWorkspace } = context;
   const ast = parse(body, {
     onParseError(error) {
       console.log(error.formattedMessage);
@@ -29,9 +31,55 @@ function bundleCss(body, url, projectDirectory) {
             : new URL(value, url);
           const importContents = fs.readFileSync(resolvedUrl, 'utf-8');
 
-          optimizedCss += bundleCss(importContents, url, projectDirectory);
+          optimizedCss += bundleCss(importContents, url, context);
         } else {
           optimizedCss += `@import url('${value}');`;
+        }
+      } else if (type === 'Url' && this.atrule?.name !== 'import') {
+        console.log('WINNER!!!!', { url });
+        console.log({ type, name, value });
+        let root = value.replace(/\.\.\//g, '').replace('./', '');
+
+        if (value.startsWith('http') || value.startsWith('//')) {
+          optimizedCss += `url('${root}')`;
+          return;
+        }
+
+        if (root.startsWith('/')) {
+          root = root.replace('/', '');
+        }
+
+        console.log({ root });
+        if (root.startsWith('node_modules')) {
+          fs.mkdirSync(path.dirname(new URL(`./${root}`, outputDir).pathname), {
+            recursive: true
+          });
+
+          fs.promises.copyFile(
+            new URL(`./${root}`, projectDirectory),
+            new URL(`./${root}`, outputDir)
+          );
+
+          optimizedCss += `url('/${root}')`;
+        } else {
+          console.log('not from node_modules');
+          // TODO do we even need copy assets folder?
+          if (url.href.startsWith(userWorkspace.href)) {
+            const location = new URL(`./${root}`, userWorkspace);
+            console.log({ location });
+            fs.mkdirSync(path.dirname(new URL(`./${root}`, outputDir).pathname), {
+              recursive: true
+            });
+
+            fs.promises.copyFile(
+              location,
+              new URL(`./${root}`, outputDir)
+            );
+
+            optimizedCss += `url('/${root}')`;
+          } else {
+            // TODO
+          }
         }
       } else if (type === 'Atrule' && name !== 'import') {
         optimizedCss += `@${name} `;
@@ -257,7 +305,7 @@ class StandardCssResource extends ResourceInterface {
 
   async optimize(url, response) {
     const body = await response.text();
-    const optimizedBody = bundleCss(body, url, this.compilation.context.projectDirectory);
+    const optimizedBody = bundleCss(body, url, this.compilation.context);
 
     return new Response(optimizedBody);
   }
