@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { parse, walk } from 'css-tree';
 import { ResourceInterface } from '../../lib/resource-interface.js';
+import { normalizePathnameForWindows } from '../../lib/resource-utils.js';
 
 function bundleCss(body, url, context) {
   const { projectDirectory, outputDir, userWorkspace } = context;
@@ -51,7 +52,7 @@ function bundleCss(body, url, context) {
 
         console.log({ root });
         if (root.startsWith('node_modules')) {
-          fs.mkdirSync(path.dirname(new URL(`./${root}`, outputDir).pathname), {
+          fs.mkdirSync(normalizePathnameForWindows(new URL(`./${path.dirname(root)}/`, outputDir)), {
             recursive: true
           });
 
@@ -67,7 +68,7 @@ function bundleCss(body, url, context) {
           if (url.href.startsWith(userWorkspace.href)) {
             const location = new URL(`./${root}`, userWorkspace);
             console.log({ location });
-            fs.mkdirSync(path.dirname(new URL(`./${root}`, outputDir).pathname), {
+            fs.mkdirSync(normalizePathnameForWindows(new URL(`./${path.dirname(root)}/`, outputDir)), {
               recursive: true
             });
 
