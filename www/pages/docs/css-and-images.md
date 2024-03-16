@@ -25,7 +25,8 @@ Styles can be done in any standards compliant way that will work in a browser.  
 
       body {
         font-family: 'Source Sans Pro', sans-serif;
-        line-height:1.4;
+        background-image: url('../images/background.webp');
+        line-height: 1.4;
       }
     </style>
 
@@ -39,17 +40,20 @@ Styles can be done in any standards compliant way that will work in a browser.  
 </html>
 ```
 
+> _In the above example, Greenwood will also bundle any `url` references in your CSS automatically._
+
 ### Assets
 
-For convenience, **Greenwood** does support an "assets" directory wherein anything included in that directory will automatically be copied into the build output directory.  This is the recommended location for all your local images, fonts, etc.  At this time, anything that is not referenced through an `import`, `@import`, `<script>`, `<style>` or `<link>` will not be handled by **Greenwood**.
+For convenience, **Greenwood** does support an "assets" directory wherein anything included in that directory will automatically be copied into the build output directory.  This can be useful if you have files you want available as part of your build output that are not bundled through CSS or JavaScript as generally anything that is not referenced through an `import`, `@import`, `<script>`, `<style>` or `<link>` will not automatically be handled by **Greenwood** no matter where it is located in your workspace.
 
 #### Example
-To use an image in a markdown file, you would reference it as so using standard markdown syntax:
+
+To use an image in a markdown file (which would not be automatically bundled), you would reference it as so using standard markdown syntax:
 
 ```md
 # This is my page
 
-![my-image](/assets/images/my-image.png)
+![my-image](/assets/images/my-image.webp)
 ```
 
 You can do the same in your HTML
@@ -57,7 +61,7 @@ You can do the same in your HTML
 ```html
 <header>
   <h1>Welcome to My Site!</h1>
-  <img alt="logo" src="/assets/images/logo.png" />
+  <a href="/assets/download.pdf">Download our product catalog</a>
 </header>
 ```
 
