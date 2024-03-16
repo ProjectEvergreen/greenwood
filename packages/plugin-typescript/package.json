@@ -29,6 +29,6 @@
     "typescript": "^5.1.6"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.30.0-alpha.2"
+   "@greenwood/cli": "^0.30.0-alpha.2"
   }
 }

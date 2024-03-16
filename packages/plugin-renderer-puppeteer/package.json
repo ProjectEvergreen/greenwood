@@ -30,6 +30,6 @@
     "puppeteer": "^15.3.2"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.30.0-alpha.2"
+   "@greenwood/cli": "^0.30.0-alpha.2"
   }
 }
