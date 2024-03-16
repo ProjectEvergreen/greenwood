@@ -205,37 +205,19 @@ async function bundleSsrPages(compilation, optimizePlugins) {
   // }).map((plugin) => {
   //   return plugin.provider(compilation);
   // });
+  const { context, config } = compilation;
   const ssrPages = compilation.graph.filter(page => page.isSSR && !page.prerender);
   const ssrPrerenderPagesRouteMapper = {};
   const input = [];
 
-  if (!compilation.config.prerender && ssrPages.length > 0) {
-    const { executeModuleUrl } = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider();
+  if (!config.prerender && ssrPages.length > 0) {
+    const { executeModuleUrl } = config.plugins.find(plugin => plugin.type === 'renderer').provider();
     const { executeRouteModule } = await import(executeModuleUrl);
-    const { pagesDir, scratchDir } = compilation.context;
+    const { pagesDir, scratchDir } = context;
 
     // one pass to generate initial static HTML and to track all combined static resources across layouts
     // and before we optimize so that all bundled assets can tracked up front
     // would be nice to see if this can be done in a single pass though...
-// <<<<<<< HEAD
-//     for (const page of compilation.graph) {
-//       if (page.isSSR && !page.prerender) {
-//         const { filename, imports, route, layout, title } = page;
-//         const entryFileUrl = new URL(`./${filename}`, scratchDir);
-//         const moduleUrl = new URL(`./${filename}`, pagesDir);
-//         const request = new Request(moduleUrl);
-//         // TODO getLayout has to be static (for now?)
-//         // https://github.com/ProjectEvergreen/greenwood/issues/955
-//         const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [], request });
-//         const pagesPathDiff = compilation.context.pagesDir.pathname.replace(compilation.context.projectDirectory.pathname, '');
-
-//         let staticHtml = '';
-
-//         staticHtml = data.layout ? data.layout : await getPageLayout(staticHtml, compilation.context, layout, []);
-//         staticHtml = await getAppLayout(staticHtml, compilation.context, imports, [], false, title);
-//         staticHtml = await getUserScripts(staticHtml, compilation);
-//         staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
-// =======
     for (const page of ssrPages) {
       const { filename, imports, route, layout, title } = page;
       const moduleUrl = new URL(`./${filename}`, pagesDir);
@@ -246,7 +228,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
       let staticHtml = '';
 
       staticHtml = data.layout ? data.layout : await getPageLayout(staticHtml, compilation.context, layout, []);
-      staticHtml = await getAppLayout(staticHtml, compilation.context, imports, [], false, title);
+      staticHtml = await getAppLayout(staticHtml, context, imports, [], false, title);
       staticHtml = await getUserScripts(staticHtml, compilation);
       staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
 
@@ -263,8 +245,9 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     // second pass to link all bundled assets to their resources before optimizing and generating SSR bundles
     for (const page of ssrPages) {
       const { filename, route } = page;
-      const entryFileUrl = new URL(`./_${filename}`, scratchDir);
-      const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
+      const entryFileUrl = new URL(`./${filename}`, scratchDir);
+      const htmlOptimizer = config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
+      const pagesPathDiff = context.pagesDir.pathname.replace(context.projectDirectory.pathname, '');
 
       let staticHtml = ssrPrerenderPagesRouteMapper[route];
       staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();

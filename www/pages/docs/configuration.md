@@ -31,7 +31,7 @@ export default {
   plugins: [],
   workspace: new URL('./src/', import.meta.url),
   pagesDirectory: 'pages', // e.g. src/pages
-  layoutsDirectory: 'layouts' // e.g. src/layouts
+  layoutsDirectory: 'layouts', // e.g. src/layouts
   isolation: false
 };
 ```

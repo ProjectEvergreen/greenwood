@@ -21,13 +21,8 @@
  *     greeting.js
  *   pages/
  *     artists.js
-<<<<<<< HEAD
  *     users.js (isolation = false)
- *   templates/
-=======
- *     users.js
  *   layouts/
->>>>>>> 65d3fd43 (rename templates directory to layouts)
  *     app.html
  */
 import chai from 'chai';
@@ -192,11 +187,7 @@ describe('Serve Greenwood With: ', function() {
       usersPageDom = new JSDOM(usersPageHtml);
     });
 
-<<<<<<< HEAD
-    describe('Serve command with HTML route response using getBody, getTemplate and getFrontmatter for the artists page', function() {
-=======
-    describe('Serve command with HTML route response using getBody, getLayout and getFrontmatter', function() {
->>>>>>> 65d3fd43 (rename templates directory to layouts)
+    describe('Serve command with HTML route response using getBody, getLayout and getFrontmatter for the artists page', function() {
 
       it('should return a 200 status', function() {
         expect(response.status).to.equal(200);
