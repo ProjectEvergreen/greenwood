@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-import-commonjs",
-  "@greenwood/cli": "^0.30.0-alpha.2",
+  "version": "0.30.0-alpha.2",
   "description": "A plugin for loading CommonJS based modules in the browser using ESM (import / export) syntax.",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-commonjs",

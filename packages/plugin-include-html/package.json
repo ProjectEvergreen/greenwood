@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-include-html",
-  "@greenwood/cli": "^0.30.0-alpha.2",
+  "version": "0.30.0-alpha.2",
   "description": "A Greenwood plugin to let you render server side JS from HTML or JS at build time as HTML.",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-include-html",

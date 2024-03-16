@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-renderer-lit",
-  "@greenwood/cli": "^0.30.0-alpha.2",
+  "version": "0.30.0-alpha.2",
   "description": "A server-side rendering plugin for Lit based Greenwood projects.",
   "type": "module",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
