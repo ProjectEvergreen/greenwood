@@ -163,12 +163,12 @@ describe('Build Greenwood With: ', function() {
           it('should have the expected @font-face file bundle path in the referenced <style> tag in index.html', async function() {
             const styleTag = Array.from(dom.window.document.querySelectorAll('head style'));
 
-            expect(styleTag[0].textContent).to.contain(`src:url('/${fontPath}/Geist-Regular.woff2')`);
+            expect(styleTag[0].textContent).to.contain(`src:url('/${fontPath}/Geist-Regular.965782360.woff2')`);
           });
         });
 
         describe('user workspace reference', () => {
-          const imagePath = 'images/webcomponents.jpg';
+          const imagePath = 'images/webcomponents.1079385342.jpg';
 
           it('should have the expected background image from the user\'s workspace the output directory', async function() {
             expect(await glob.promise(path.join(this.context.publicDir, imagePath))).to.have.lengthOf(1);
@@ -186,6 +186,6 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+    // runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
