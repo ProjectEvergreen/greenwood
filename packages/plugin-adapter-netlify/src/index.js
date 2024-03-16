@@ -97,8 +97,8 @@ async function netlifyAdapter(compilation) {
     const { id } = page;
     const outputType = 'page';
     const outputRoot = new URL(`./${id}/`, adapterOutputUrl);
-    const files = (await fs.readdir(outputDir))
-      .filter(file => file.startsWith(`${id}.route.chunk.`) && file.endsWith('.js'));
+    const chunks = (await fs.readdir(outputDir))
+      .filter(file => file.startsWith(`${id}.route.chunk`) && file.endsWith('.js'));
 
     await setupOutputDirectory(id, outputRoot, outputType);
 
@@ -109,11 +109,11 @@ async function netlifyAdapter(compilation) {
       { recursive: true }
     );
 
-    // and the URL chunk for renderer plugin and executeRouteModule
-    for (const file of files) {
+    // and any (URL) chunks for the page
+    for (const chunk of chunks) {
       await fs.cp(
-        new URL(`./${file}`, outputDir),
-        new URL(`./${file}`, outputRoot),
+        new URL(`./${chunk}`, outputDir),
+        new URL(`./${chunk}`, outputRoot),
         { recursive: true }
       );
     }
