@@ -69,7 +69,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have one top level <app-header> tag with a <layout> with an open shadowroot', function() {
-        const header = dom.window.document.querySelectorAll('app-header template[shadowroot="open"]');
+        const header = dom.window.document.querySelectorAll('app-header template[shadowrootmode="open"]');
         const headerContentsDom = new JSDOM(header[0].innerHTML);
         const heading = headerContentsDom.window.document.querySelectorAll('h1');
 
