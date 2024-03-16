@@ -9,6 +9,7 @@ import path from 'path';
 import { parse, walk } from 'css-tree';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { normalizePathnameForWindows } from '../../lib/resource-utils.js';
+import { hashString } from '../../lib/hashing-utils.js';
 
 function bundleCss(body, url, compilation) {
   const { projectDirectory, outputDir, userWorkspace } = compilation.context;
@@ -53,19 +54,26 @@ function bundleCss(body, url, compilation) {
 
         console.log({ root });
         if (root.startsWith('node_modules')) {
+          const hash = hashString(fs.readFileSync(new URL(`./${root}`, projectDirectory), 'utf-8'));
+          const ext = root.split('.').pop();
+          const hashedRoot = root.replace(`.${ext}`, `.${hash}.${ext}`);
+
           fs.mkdirSync(normalizePathnameForWindows(new URL(`./${path.dirname(root)}/`, outputDir)), {
             recursive: true
           });
 
           fs.promises.copyFile(
             new URL(`./${root}`, projectDirectory),
-            new URL(`./${root}`, outputDir)
+            new URL(`./${hashedRoot}`, outputDir)
           );
 
-          optimizedCss += `url('${basePath}${root}')`;
+          optimizedCss += `url('${basePath}${hashedRoot}')`;
         } else {
           console.log('not from node_modules');
-          // TODO do we even need copy assets folder?
+          const hash = hashString(fs.readFileSync(new URL(`./${root}`, userWorkspace), 'utf-8'));
+          const ext = root.split('.').pop();
+          const hashedRoot = root.replace(`.${ext}`, `.${hash}.${ext}`);
+
           if (url.href.startsWith(userWorkspace.href)) {
             const location = new URL(`./${root}`, userWorkspace);
             console.log({ location });
@@ -75,10 +83,10 @@ function bundleCss(body, url, compilation) {
 
             fs.promises.copyFile(
               location,
-              new URL(`./${root}`, outputDir)
+              new URL(`./${hashedRoot}`, outputDir)
             );
 
-            optimizedCss += `url('${basePath}${root}')`;
+            optimizedCss += `url('${basePath}${hashedRoot}')`;
           } else {
             // TODO
           }
