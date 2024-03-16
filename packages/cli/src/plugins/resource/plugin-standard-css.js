@@ -10,8 +10,8 @@ import { parse, walk } from 'css-tree';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { normalizePathnameForWindows } from '../../lib/resource-utils.js';
 
-function bundleCss(body, url, context) {
-  const { projectDirectory, outputDir, userWorkspace } = context;
+function bundleCss(body, url, compilation) {
+  const { projectDirectory, outputDir, userWorkspace } = compilation.context;
   const ast = parse(body, {
     onParseError(error) {
       console.log(error.formattedMessage);
@@ -32,13 +32,14 @@ function bundleCss(body, url, context) {
             : new URL(value, url);
           const importContents = fs.readFileSync(resolvedUrl, 'utf-8');
 
-          optimizedCss += bundleCss(importContents, url, context);
+          optimizedCss += bundleCss(importContents, url, compilation);
         } else {
           optimizedCss += `@import url('${value}');`;
         }
       } else if (type === 'Url' && this.atrule?.name !== 'import') {
         console.log('WINNER!!!!', { url });
         console.log({ type, name, value });
+        const basePath = compilation.config.basePath === '' ? '/' : `${compilation.config.basePath}/`;
         let root = value.replace(/\.\.\//g, '').replace('./', '');
 
         if (value.startsWith('http') || value.startsWith('//')) {
@@ -61,7 +62,7 @@ function bundleCss(body, url, context) {
             new URL(`./${root}`, outputDir)
           );
 
-          optimizedCss += `url('/${root}')`;
+          optimizedCss += `url('${basePath}${root}')`;
         } else {
           console.log('not from node_modules');
           // TODO do we even need copy assets folder?
@@ -77,7 +78,7 @@ function bundleCss(body, url, context) {
               new URL(`./${root}`, outputDir)
             );
 
-            optimizedCss += `url('/${root}')`;
+            optimizedCss += `url('${basePath}${root}')`;
           } else {
             // TODO
           }
@@ -306,7 +307,7 @@ class StandardCssResource extends ResourceInterface {
 
   async optimize(url, response) {
     const body = await response.text();
-    const optimizedBody = bundleCss(body, url, this.compilation.context);
+    const optimizedBody = bundleCss(body, url, this.compilation);
 
     return new Response(optimizedBody);
   }
