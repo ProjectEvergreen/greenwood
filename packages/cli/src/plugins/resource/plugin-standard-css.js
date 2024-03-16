@@ -73,23 +73,18 @@ function bundleCss(body, url, compilation) {
           const hash = hashString(fs.readFileSync(new URL(`./${root}`, userWorkspace), 'utf-8'));
           const ext = root.split('.').pop();
           const hashedRoot = root.replace(`.${ext}`, `.${hash}.${ext}`);
+          const location = new URL(`./${root}`, userWorkspace);
 
-          if (url.href.startsWith(userWorkspace.href)) {
-            const location = new URL(`./${root}`, userWorkspace);
-            console.log({ location });
-            fs.mkdirSync(normalizePathnameForWindows(new URL(`./${path.dirname(root)}/`, outputDir)), {
-              recursive: true
-            });
+          fs.mkdirSync(normalizePathnameForWindows(new URL(`./${path.dirname(root)}/`, outputDir)), {
+            recursive: true
+          });
 
-            fs.promises.copyFile(
-              location,
-              new URL(`./${hashedRoot}`, outputDir)
-            );
+          fs.promises.copyFile(
+            location,
+            new URL(`./${hashedRoot}`, outputDir)
+          );
 
-            optimizedCss += `url('${basePath}${hashedRoot}')`;
-          } else {
-            // TODO
-          }
+          optimizedCss += `url('${basePath}${hashedRoot}')`;
         }
       } else if (type === 'Atrule' && name !== 'import') {
         optimizedCss += `@${name} `;
