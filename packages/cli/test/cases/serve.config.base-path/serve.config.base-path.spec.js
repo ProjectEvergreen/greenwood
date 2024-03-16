@@ -229,7 +229,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(body).to.contain('*{color:blue;background-image:url(\'/my-path/images/webcomponents.jpg\');}');
+        expect(body).to.contain('*{color:blue;background-image:url(\'/my-path/images/webcomponents.1079385342.jpg\');}');
         done();
       });
     });

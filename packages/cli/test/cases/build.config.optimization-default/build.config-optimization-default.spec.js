@@ -181,11 +181,25 @@ describe('Build Greenwood With: ', function() {
             expect(contents).to.contain(`body{background-color:green;background-image:url('/${imagePath}');}`);
           });
         });
+
+        describe('inline scratch dir workspace reference', () => {
+          const imagePath = 'images/link.1200825667.png';
+
+          it('should have the expected background image from the user\'s workspace the output directory', async function() {
+            expect(await glob.promise(path.join(this.context.publicDir, imagePath))).to.have.lengthOf(1);
+          });
+
+          it('should have the expected background-image url file bundle path in the referenced <style> tag in index.html', async function() {
+            const styleTag = Array.from(dom.window.document.querySelectorAll('head style'));
+
+            expect(styleTag[0].textContent).to.contain(`html{background-image:url('/${imagePath}')}`);
+          });
+        });
       });
     });
   });
 
   after(function() {
-    // runner.teardown(getOutputTeardownFiles(outputPath));
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
