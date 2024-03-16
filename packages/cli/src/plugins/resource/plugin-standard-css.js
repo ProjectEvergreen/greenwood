@@ -38,54 +38,35 @@ function bundleCss(body, url, compilation) {
           optimizedCss += `@import url('${value}');`;
         }
       } else if (type === 'Url' && this.atrule?.name !== 'import') {
-        console.log('WINNER!!!!', { url });
-        console.log({ type, name, value });
-        const basePath = compilation.config.basePath === '' ? '/' : `${compilation.config.basePath}/`;
-        let root = value.replace(/\.\.\//g, '').replace('./', '');
-
         if (value.startsWith('http') || value.startsWith('//')) {
-          optimizedCss += `url('${root}')`;
+          optimizedCss += `url('${value}')`;
           return;
         }
 
-        if (root.startsWith('/')) {
-          root = root.replace('/', '');
+        const basePath = compilation.config.basePath === '' ? '/' : `${compilation.config.basePath}/`;
+        let barePath = value.replace(/\.\.\//g, '').replace('./', '');
+
+        if (barePath.startsWith('/')) {
+          barePath = barePath.replace('/', '');
         }
 
-        console.log({ root });
-        if (root.startsWith('node_modules')) {
-          const hash = hashString(fs.readFileSync(new URL(`./${root}`, projectDirectory), 'utf-8'));
-          const ext = root.split('.').pop();
-          const hashedRoot = root.replace(`.${ext}`, `.${hash}.${ext}`);
+        const locationUrl = barePath.startsWith('node_modules')
+          ? new URL(`./${barePath}`, projectDirectory)
+          : new URL(`./${barePath}`, userWorkspace);
+        const hash = hashString(fs.readFileSync(locationUrl, 'utf-8'));
+        const ext = barePath.split('.').pop();
+        const hashedRoot = barePath.replace(`.${ext}`, `.${hash}.${ext}`);
 
-          fs.mkdirSync(normalizePathnameForWindows(new URL(`./${path.dirname(root)}/`, outputDir)), {
-            recursive: true
-          });
+        fs.mkdirSync(normalizePathnameForWindows(new URL(`./${path.dirname(barePath)}/`, outputDir)), {
+          recursive: true
+        });
 
-          fs.promises.copyFile(
-            new URL(`./${root}`, projectDirectory),
-            new URL(`./${hashedRoot}`, outputDir)
-          );
+        fs.promises.copyFile(
+          locationUrl,
+          new URL(`./${hashedRoot}`, outputDir)
+        );
 
-          optimizedCss += `url('${basePath}${hashedRoot}')`;
-        } else {
-          console.log('not from node_modules');
-          const hash = hashString(fs.readFileSync(new URL(`./${root}`, userWorkspace), 'utf-8'));
-          const ext = root.split('.').pop();
-          const hashedRoot = root.replace(`.${ext}`, `.${hash}.${ext}`);
-          const location = new URL(`./${root}`, userWorkspace);
-
-          fs.mkdirSync(normalizePathnameForWindows(new URL(`./${path.dirname(root)}/`, outputDir)), {
-            recursive: true
-          });
-
-          fs.promises.copyFile(
-            location,
-            new URL(`./${hashedRoot}`, outputDir)
-          );
-
-          optimizedCss += `url('${basePath}${hashedRoot}')`;
-        }
+        optimizedCss += `url('${basePath}${hashedRoot}')`;
       } else if (type === 'Atrule' && name !== 'import') {
         optimizedCss += `@${name} `;
       } else if (type === 'TypeSelector') {
