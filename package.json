@@ -27,7 +27,8 @@
     "lint:js": "eslint \"*.{js,md}\" \"./packages/**/**/*.{js,md}\" \"./test/*.js\" \"./www/**/**/*.{js,md}\"",
     "lint:ts": "eslint \"./packages/**/**/*.ts\"",
     "lint:css": "stylelint \"./www/**/*.js\", \"./www/**/*.css\"",
-    "lint": "ls-lint && yarn lint:js && yarn lint:ts && yarn lint:css"
+    "lint": "ls-lint && yarn lint:js && yarn lint:ts && yarn lint:css",
+    "postinstall": "patch-package"
   },
   "resolutions": {
     "lit": "^3.1.0"

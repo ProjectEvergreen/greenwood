@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with greenwoodPluginImportJson plugin with prerendering of JSON on the server side.
+ * Run Greenwood with prerendering of CSS and JSON being referenced using import attributes.
  *
  * User Result
  * Should generate a static Greenwood build with CSS properly prerendered.
@@ -9,26 +9,26 @@
  * greenwood build
  *
  * User Config
- * import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
+ * import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
  *
  * {
  *   prerender: true,
  *   plugins: [{
- *     greenwoodPluginImportJson()
+ *     greenwoodPluginImportCss()
  *   }]
  * }
  *
  * User Workspace
- * package.json
  * src/
  *   components/
- *     footer.js
- *   pages/
- *     index.md
- *   templates/
- *     app.html
+ *     hero/
+ *       hero.css
+ *       hero.js
+ *       hero.json
+*    index.html
  */
 import chai from 'chai';
+import fs from 'fs';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
@@ -39,8 +39,8 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-xdescribe('(Experimental) Build Greenwood With: ', function() {
-  const LABEL = 'Import JSON Plugin with static pre-rendering';
+describe('(Experimental) Build Greenwood With: ', function() {
+  const LABEL = 'ESM Import Attribute for CSS and JSON with prerendering';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -60,25 +60,33 @@ xdescribe('(Experimental) Build Greenwood With: ', function() {
 
     runSmokeTest(['public'], LABEL);
 
-    describe('importing JSON using ESM (import)', function() {
-      let dom;
+    describe('importing CSS w/ Constructable Stylesheets', function() {
       let scripts;
 
       before(async function() {
         scripts = await glob.promise(path.join(this.context.publicDir, '*.js'));
+      });
+
+      it('should have the expected output from importing hero.css as a Constructable Stylesheet', function() {
+        const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
+
+        expect(scriptContents).to.contain('const e=new CSSStyleSheet;e.replaceSync(":host {   text-align: center');
+      });
+    });
+
+    describe('importing JSON', function() {
+      let dom;
+
+      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      it('should contain no (JSON-in) JavaScript files in the output directory', function() {
-        expect(scripts.length).to.be.equal(0);
-      });
+      it('should have the expected inline content from the JSON file', function() {
+        const hero = new JSDOM(dom.window.document.querySelector('app-hero template[shadowrootmode="open"]').innerHTML);
+        const heading = hero.window.document.querySelectorAll('div.hero h2');
 
-      it('should have the expected content from importing values from package.json in index.html', function() {
-        const headings = dom.window.document.querySelectorAll('app-footer footer h4');
-        const year = new Date().getFullYear();
-
-        expect(headings.length).to.equal(1);
-        expect(headings[0].textContent.trim()).to.equal(`My Blog ${year} - Built with test-plugin-import-json-build-prerender-v0.27.0-alpha.0`);
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.be.equal('Welcome to my website');
       });
     });
   });

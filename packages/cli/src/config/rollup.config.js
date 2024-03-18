@@ -5,11 +5,12 @@ import { checkResourceExists, normalizePathnameForWindows } from '../lib/resourc
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import * as walk from 'acorn-walk';
+import { importAttributes } from 'acorn-import-attributes';
 
 // https://github.com/rollup/rollup/issues/2121
 // would be nice to get rid of this
 function cleanRollupId(id) {
-  return id.replace('\x00', '');
+  return id.replace('\x00', '').replace('?commonjs-proxy', '');
 }
 
 function greenwoodResourceLoader (compilation) {
@@ -328,6 +329,9 @@ const getRollupConfigForScriptResources = async (compilation) => {
       chunkFileNames: '[name].[hash].js',
       sourcemap: true
     },
+    acornInjectPlugins: [
+      importAttributes
+    ],
     plugins: [
       greenwoodResourceLoader(compilation),
       greenwoodSyncPageResourceBundlesPlugin(compilation),
@@ -378,6 +382,10 @@ const getRollupConfigForApis = async (compilation) => {
         entryFileNames: '[name].js',
         chunkFileNames: '[name].[hash].js'
       },
+      // TODO do we need this?
+      // acornInjectPlugins: [
+      //   importAttributes
+      // ],
       plugins: [
         greenwoodResourceLoader(compilation),
         // support node export conditions for SSR pages
@@ -403,6 +411,10 @@ const getRollupConfigForSsr = async (compilation, input) => {
       entryFileNames: `${path.basename(filepath).split('.')[0]}.route.js`,
       chunkFileNames: `${path.basename(filepath).split('.')[0]}.route.chunk.[hash].js`
     },
+    // TODO do we need this?
+    // acornInjectPlugins: [
+    //   importAttributes
+    // ],
     plugins: [
       greenwoodResourceLoader(compilation),
       // support node export conditions for SSR pages
