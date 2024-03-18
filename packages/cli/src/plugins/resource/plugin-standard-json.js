@@ -40,6 +40,28 @@ class StandardJsonResource extends ResourceInterface {
       })
     });
   }
+
+  // TODO how to best tell this was an import attribute specifically other then searchParams???
+  async shouldIntercept(url) {
+    // console.log('shouldIntercept', { url });
+    const { searchParams } = url;
+
+    return url.protocol === 'file:'
+      && this.extensions.indexOf(url.pathname.split('.').pop()) >= 0
+      && searchParams.get('type') === 'json';
+  }
+
+  async intercept(url, request, response) {
+    // console.log('INTERCEPTING', { url, request });
+    const json = await response.json();
+    const body = `export default ${JSON.stringify(json)}`;
+
+    return new Response(body, {
+      headers: {
+        'Content-Type': this.contentType
+      }
+    });
+  }
 }
 
 const pluginGreenwoodStandardJson = [{

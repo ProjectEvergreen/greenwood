@@ -227,11 +227,36 @@ class StandardCssResource extends ResourceInterface {
     });
   }
 
+  // TODO how to best tell this was an import attribute specifically other then searchParams???
+  async shouldIntercept(url) {
+    // console.log('shouldIntercept', { url });
+    const { searchParams } = url;
+
+    return url.protocol === 'file:'
+      && this.extensions.indexOf(url.pathname.split('.').pop()) >= 0
+      && searchParams.get('type') === 'css';
+  }
+
+  async intercept(url, request, response) {
+    // console.log('INTERCEPTING', { url, request });
+    const contents = await response.text();
+    const body = `const sheet = new CSSStyleSheet();sheet.replaceSync('${contents.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\')}');export default sheet;`;
+
+    return new Response(body, {
+      headers: {
+        'Content-Type': this.contentType
+      }
+    });
+  }
+
+  // TODO how to best tell this was an import attribute specifically other then searchParams???
+  // can we even optimize inline styles?
   async shouldOptimize(url, response) {
-    const { protocol, pathname } = url;
+    const { protocol, pathname, searchParams } = url;
     const isValidCss = pathname.split('.').pop() === this.extensions[0]
       && protocol === 'file:'
-      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
+      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0
+      && searchParams.get('type') !== 'css';
 
     return this.compilation.config.optimization !== 'none' && isValidCss;
   }
