@@ -50,6 +50,7 @@ const defaultConfig = {
   plugins: greenwoodPlugins,
   markdown: { plugins: [], settings: {} },
   prerender: false,
+  isolation: false,
   pagesDirectory: 'pages',
   templatesDirectory: 'templates'
 };
@@ -76,7 +77,7 @@ const readAndMergeConfig = async() => {
 
       if (hasConfigFile) {
         const userCfgFile = (await import(configUrl)).default;
-        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, templatesDirectory, interpolateFrontmatter } = userCfgFile;
+        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, templatesDirectory, interpolateFrontmatter, isolation } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -221,6 +222,14 @@ const readAndMergeConfig = async() => {
         // SPA should _not_ prerender unless if user has specified prerender should be true
         if (prerender === undefined && isSPA) {
           customConfig.prerender = false;
+        }
+
+        if (isolation !== undefined) {
+          if (typeof isolation === 'boolean') {
+            customConfig.isolation = isolation;
+          } else {
+            reject(`Error: greenwood.config.js isolation must be a boolean; true or false.  Passed value was typeof: ${typeof staticRouter}`);
+          }
         }
 
         if (staticRouter !== undefined) {

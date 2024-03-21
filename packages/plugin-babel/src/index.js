@@ -61,7 +61,7 @@ const greenwoodPluginBabel = (options = {}) => {
     type: 'rollup',
     name: 'plugin-babel:rollup',
     provider: (compilation) => [
-      rollupBabelPlugin.default({
+      rollupBabelPlugin({
         // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
         babelHelpers: 'bundled',
 

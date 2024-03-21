@@ -115,6 +115,7 @@ class StandardHtmlResource extends ResourceInterface {
           if (result.template) {
             ssrTemplate = result.template;
           }
+
           if (result.body) {
             ssrBody = result.body;
           }

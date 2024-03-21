@@ -46,7 +46,7 @@ import { checkResourceExists } from '../../../../cli/src/lib/resource-utils.js';
 
 function generateOutputFormat(id, type) {
   const path = type === 'page'
-    ? `__${id}`
+    ? `${id}.entry`
     : `api/${id}`;
 
   return `
@@ -72,23 +72,58 @@ async function genericAdapter(compilation) {
     await fs.mkdir(adapterOutputUrl);
   }
 
+  // SSR pages
   for (const page of ssrPages) {
     const { id } = page;
     const outputFormat = generateOutputFormat(id, 'page');
+    const files = (await fs.readdir(outputDir))
+      .filter(file => file.startsWith(`${id}.route.chunk.`) && file.endsWith('.js'));
 
-    // generate a shim for all SSR pages
-    await fs.writeFile(new URL(`./${id}.js`, adapterOutputUrl), outputFormat);
+    // generate a facade for all SSR pages for your particular hosting provider
+    await fs.writeFile(new URL('./index.js', adapterOutputUrl), outputFormat);
 
-    // copy all entry points
-    await fs.cp(new URL(`./_${id}.js`, outputDir), new URL(`./_${id}.js`, adapterOutputUrl));
-    await fs.cp(new URL(`./__${id}.js`, outputDir), new URL(`./_${id}.js`, adapterOutputUrl));
+    // handle user's actual route entry file, appended with .route by Greenwood
+    await fs.cp(
+      new URL(`./${id}.route.js`, outputDir),
+      new URL(`./${id}.route.js`, outputRoot),
+      { recursive: true }
+    );
 
-    // generate a manifest
-    await fs.writeFile(new URL('./metadata.json', adapterOutputUrl), JSON.stringify({
-      version: '1.0.0',
-      runtime: 'nodejs'
-      // ...
-    }));
+    // and the URL generated chunk for the route
+    for (const file of files) {
+      await fs.cp(
+        new URL(`./${file}`, outputDir),
+        new URL(`./${file}`, outputRoot),
+        { recursive: true }
+      );
+    }
+
+    // API routes
+    for (const [key, value] of apiRoutes.entries()) {
+      const outputType = 'api';
+      const id = key.replace(`${basePath}/api/`, '');
+      const outputRoot = new URL(`./${basePath}/api/${id}.func/`, adapterOutputUrl);
+      const { assets = [] } = value;
+
+      await setupFunctionBuildFolder(id, outputType, outputRoot);
+
+      await fs.cp(
+        new URL(`./api/${id}.js`, outputDir),
+        new URL(`./${id}.js`, outputRoot),
+        { recursive: true }
+      );
+
+      // copy any child assets, like URL bundles
+      for (const asset of assets) {
+        const name = path.basename(asset);
+
+        await fs.cp(
+          new URL(asset),
+          new URL(`./${name}`, outputRoot),
+          { recursive: true }
+        );
+      }
+    }
   }
 }
 

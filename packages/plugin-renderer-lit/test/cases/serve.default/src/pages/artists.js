@@ -77,6 +77,7 @@ async function getFrontmatter(compilation, { route }) {
   };
 }
 
+export const hydration = false;
 export {
   getTemplate,
   getBody,

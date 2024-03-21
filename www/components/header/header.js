@@ -1,7 +1,6 @@
 import { css, html, LitElement, unsafeCSS } from 'lit';
 import client from '@greenwood/plugin-graphql/src/core/client.js';
 import MenuQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
-import '@evergreen-wc/eve-container';
 import headerCss from './header.css?type=css';
 import '../social-icons/social-icons.js';
 

@@ -76,3 +76,13 @@ export async function handler(request) {
   return new Response(html, { headers });
 }
 ```
+
+### Isolation
+
+To execute an API route in its own request context when running `greenwood serve`, you can export an `isolation` option from your page set to `true`.
+
+```js
+export const isolation = true;
+```
+
+> For more information and how you can enable this for all pages, please see the [isolation configuration](/docs/configuration/#isolation) docs.
