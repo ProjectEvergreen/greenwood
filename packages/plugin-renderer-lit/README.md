@@ -86,13 +86,6 @@ export async function getBody() {
 }
 ```
 
-## Caveats
-
-There are a few considerations to take into account when using a `LitElement` as your page component:
-- Lit SSR [**only** renders into declarative shadow roots](https://github.com/lit/lit/issues/3080#issuecomment-1165158794), so you will have to keep browser support and polyfill usage in mind.
-- Depending on your use case, SSR bundling may break due to bundle chunking and code splitting by Rollup, which we are [hoping to correct ASAP](https://github.com/ProjectEvergreen/greenwood/issues/1118).
-- At this time, `LitElement` does [not support `async` work](https://lit.dev/docs/ssr/overview/#library-status) which makes data fetching in pages a bit of challenge.  You can follow along with this issue [in the Lit repo](https://github.com/lit/lit/issues/2469).
-
 ## Options
 
 ### Isolation Mode
