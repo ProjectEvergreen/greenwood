@@ -57,7 +57,7 @@ The [layout](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/
 - _lib/_ - Custom utility and client facing files
 - _lifecycles/_ - Tasks that can be composed by commands to support the full needs of that command
 - _plugins/_ - Custom default plugins maintained by the CLI project
-- _templates/_ - Default templates and / or pages provided by Greenwood.
+- _layouts/_ - Default layouts and / or pages provided by Greenwood.
 
 
 #### Lifecycles

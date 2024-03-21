@@ -1,15 +1,14 @@
-const template = document.createElement('template');
-
-template.innerHTML = '<footer>This is the footer component.</footer>';
+import './social-links.js';
 
 export default class FooterComponent extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-  }
 
   connectedCallback() {
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    this.innerHTML = `
+      <footer>
+        <p>This is the footer component.</p>
+        <app-social-links></app-social-links>
+      </footer>
+    `;
   }
 }
 

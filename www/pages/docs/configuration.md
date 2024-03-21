@@ -31,7 +31,7 @@ export default {
   plugins: [],
   workspace: new URL('./src/', import.meta.url),
   pagesDirectory: 'pages', // e.g. src/pages
-  templatesDirectory: 'templates', // e.g. src/templates
+  layoutsDirectory: 'layouts', // e.g. src/layouts
   isolation: false
 };
 ```
@@ -84,13 +84,13 @@ export default {
 
 ### Interpolate Frontmatter
 
-To support simple static templating in HTML and markdown pages and templates, the `interpolateFrontmatter` option can be set to `true` to allow the following kinds of simple static substitions using a syntax convention based on JavaScript [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
+To support simple static templating in HTML and markdown pages and layouts, the `interpolateFrontmatter` option can be set to `true` to allow the following kinds of simple static substitutions using a syntax convention based on JavaScript [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
 
 #### Example
 Given some frontmatter in a markdown file:
 ```md
 ---
-template: post
+layout: post
 title: Git Explorer
 published: 04.07.2020
 description: Local git repository viewer
@@ -186,7 +186,7 @@ Greenwood provides a number of different ways to send hints to Greenwood as to h
 |`none` | With this setting, _none_ of your JS or CSS will be minified or hinted at all. | The best choice if you want to handle everything yourself through custom [Resource plugins](/plugins/resource/). |
 |`static` | Only for `<script>` tags, but this setting will remove `<script>` tags from your HTML. | If your Web Components only need a single render just to emit some static HTML, or are otherwise not dynamic or needed at runtime, this will really speed up your site's performance by dropping unnecessary HTTP requests. |
 
-> _These settings are currently considered experimental.  Additional improvements and considerations include adding [`none` override support](https://github.com/ProjectEvergreen/greenwood/discussions/545#discussioncomment-957320), [SSR + hydration](https://github.com/ProjectEvergreen/greenwood/discussions/576), and [side effect free templates and pages](https://github.com/ProjectEvergreen/greenwood/discussions/644)._
+> _These settings are currently considered experimental.  Additional improvements and considerations include adding [`none` override support](https://github.com/ProjectEvergreen/greenwood/discussions/545#discussioncomment-957320), [SSR + hydration](https://github.com/ProjectEvergreen/greenwood/discussions/576), and [side effect free layouts and pages](https://github.com/ProjectEvergreen/greenwood/discussions/644)._
 
 #### Example
 ```js
@@ -232,7 +232,7 @@ export default {
 
 ### Prerender
 
-When set to `true` [Greenwood will pre-render](/about/how-it-works/) your application using [**WCC**](https://github.com/ProjectEvergreen/wcc) and generate HTML from any Web Components you include in your pages and templates as part of the final static HTML build output.
+When set to `true` [Greenwood will pre-render](/about/how-it-works/) your application using [**WCC**](https://github.com/ProjectEvergreen/wcc) and generate HTML from any Web Components you include in your pages and layouts as part of the final static HTML build output.
 
 You can combine this with ["static" components](/docs/configuration/#optimization) so that you can just do single pass rendering of your Web Components and get their output as static HTML and CSS at build time without having to ship any runtime JavaScript!
 
@@ -247,7 +247,7 @@ export default {
 
 > ⚠️ _This feature is experimental.  Please follow along with [our discussion](https://github.com/ProjectEvergreen/greenwood/discussions/1033) to learn more._
 
-Setting the `staticRouter` option to `true` will add a small router runtime in production for static pages to prevent needing full page reloads when navigation between pages that share a template.  For example, the Greenwood website is entirely static, outputting an HTML file per page however, if you navigate from the _Docs_ page to the _Getting Started_ page, you will notice the site does not require a full page load.  Instead, the router will just swap out the content of the page much like client-side SPA router would.  This technique is similar to how projects like [**pjax**](https://github.com/defunkt/jquery-pjax) and [**Turbolinks**](https://github.com/turbolinks/turbolinks) work, and like what you can see on websites like GitHub.
+Setting the `staticRouter` option to `true` will add a small router runtime in production for static pages to prevent needing full page reloads when navigation between pages that share a layout.  For example, the Greenwood website is entirely static, outputting an HTML file per page however, if you navigate from the _Docs_ page to the _Getting Started_ page, you will notice the site does not require a full page load.  Instead, the router will just swap out the content of the page much like client-side SPA router would.  This technique is similar to how projects like [**pjax**](https://github.com/defunkt/jquery-pjax) and [**Turbolinks**](https://github.com/turbolinks/turbolinks) work, and like what you can see on websites like GitHub.
 
 
 #### Example
@@ -258,14 +258,14 @@ export default {
 };
 ```
 
-### Templates Directory
+### Layouts Directory
 
-By default the directory Greenwood will use to look for your templates is _templates/_.  It is relative to your [user workspace](/docs/configuration#workspace) setting. (`${userWorkspace}/${templatesDirectory}`)
+By default the directory Greenwood will use to look for your layouts is in _layouts/_.  It is relative to your [user workspace](/docs/configuration#workspace) setting. (`${userWorkspace}/${layoutsDirectory}`)
 
 #### Example
 ```js
 export default {
-  templatesDirectory: 'layouts' // Greenwood will look for templates at src/layouts/
+  layoutsDirectory: 'layouts' // Greenwood will look for layouts at src/layouts/
 };
 ```
 

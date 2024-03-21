@@ -4,7 +4,7 @@
  * Greenwood Getting Started repo.
  *
  * User Result
- * Should generate a bare bones Greenwood build with correctly templated out HTML from a LitElement.
+ * Should generate a bare bones Greenwood build with correctly layoutd out HTML from a LitElement.
  *
  * User Command
  * greenwood build
@@ -34,7 +34,7 @@
  *     index.md
  *   styles/
  *     theme.css
- *   templates/
+ *   layouts/
  *     app.html
  *     blog.html
  */

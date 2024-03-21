@@ -18,7 +18,7 @@
  *   pages/
  *     artists.js
  *     post.js
- *   templates/
+ *   layouts/
  *     app.html
  */
 import chai from 'chai';
@@ -139,7 +139,7 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command with HTML route response using getTemplate, getBody, getFrontmatter', function() {
+    describe('Develop command with HTML route response using getLayout, getBody, getFrontmatter', function() {
       let response = {};
       let dom;
       let artistsPageGraphData;

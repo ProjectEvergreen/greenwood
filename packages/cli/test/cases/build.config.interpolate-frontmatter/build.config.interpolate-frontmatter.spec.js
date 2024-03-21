@@ -19,7 +19,7 @@
  *   pages/
  *     blog/
  *       first-post.md
- *   templates/
+ *   layouts/
  *     blog.html
  */
 import { JSDOM } from 'jsdom';

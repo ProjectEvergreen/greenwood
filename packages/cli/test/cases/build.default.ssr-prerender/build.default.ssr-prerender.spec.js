@@ -19,7 +19,7 @@
  *     footer.js
  *   pages/
  *     index.js
- *   templates/
+ *   layouts/
  *     app.html
  */
 import chai from 'chai';
@@ -68,17 +68,35 @@ describe('Build Greenwood With: ', function() {
         expect(headings[0].textContent).to.equal('This is the home page.');
       });
 
-      it('should have one top level <app-footer> element with a <template> with an open shadowroot', function() {
-        expect(dom.window.document.querySelectorAll('app-footer template[shadowrootmode="open"]').length).to.equal(1);
-        expect(dom.window.document.querySelectorAll('template').length).to.equal(1);
+      it('should have one top level <app-header> tag with a <layout> with an open shadowroot', function() {
+        const header = dom.window.document.querySelectorAll('app-header template[shadowrootmode="open"]');
+        const headerContentsDom = new JSDOM(header[0].innerHTML);
+        const heading = headerContentsDom.window.document.querySelectorAll('h1');
+
+        expect(header.length).to.equal(1);
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent.trim()).to.equal('This is the header component.');
       });
 
-      it('should have the expected SSR Shadow DOM content for the footer', function() {
-        const wrapper = new JSDOM(dom.window.document.querySelectorAll('app-footer template[shadowrootmode="open"]')[0].innerHTML);
-        const footer = wrapper.window.document.querySelectorAll('footer');
+      // specifically to test for these bugs
+      // https://github.com/ProjectEvergreen/greenwood/issues/1044
+      // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
+      it('should have one two top level <app-social-links> tag with expected link items', function() {
+        // one set comes from the HTML, one from the SSR page
+        const links = dom.window.document.querySelectorAll('body > app-social-links ul li a');
+
+        expect(links.length).to.equal(6);
+      });
+
+      it('should have one top level <app-footer> tag with expected link items', function() {
+        const footer = dom.window.document.querySelectorAll('app-footer');
+        const paragraph = footer[0].querySelectorAll('p');
+        const links = footer[0].querySelectorAll('app-social-links ul li a');
 
         expect(footer.length).to.equal(1);
-        expect(footer[0].textContent).to.equal('This is the footer component.');
+        expect(paragraph.length).to.equal(1);
+        expect(paragraph[0].textContent.trim()).to.equal('This is the footer component.');
+        expect(links.length).to.equal(3);
       });
     });
   });

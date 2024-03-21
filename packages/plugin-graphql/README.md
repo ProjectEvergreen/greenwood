@@ -67,7 +67,7 @@ class HeaderComponent extends HTMLElement {
     this.root.innerHTML = this.getTemplate(navigation);
   }
 
-  getTemplate(navigation) {
+  getLayout(navigation) {
     const navigationList = navigation.map((menuItem) => {
       return `
         <li>

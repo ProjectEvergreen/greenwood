@@ -1,11 +1,11 @@
 /*
  * Use Case
- * Run Greenwood build command with no config and custom page templates to ensure Greenwood
+ * Run Greenwood build command with no config and custom page layouts to ensure Greenwood
  * can build various  "states" of in development HTML files.
  * https://github.com/ProjectEvergreen/greenwood/issues/627
  *
  * User Result
- * Should generate a Greenwood build with custom page templates.
+ * Should generate a Greenwood build with custom page layouts.
  *
  * User Command
  * greenwood build
@@ -36,7 +36,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom Page Templates for HTML "forgiveness"';
+  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom Page Layout for HTML "forgiveness"';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -56,7 +56,7 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('Custom Page Templates', function() {
+    describe('Custom Page Layout', function() {
 
       describe('Standard page with <html>, <head>, and <body> tags using pages/index.html', function() {
         let dom;

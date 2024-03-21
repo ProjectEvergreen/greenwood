@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with no config and emplty page templates.
+ * Run Greenwood build command with no config and emplty page layouts.
  *
  * User Result
  * Should generate a bare bones Greenwood build.
@@ -15,7 +15,7 @@
  * src/
  *   pages/
  *     index.md
- *   templates/
+ *   layouts/
  *     page.html
  */
 import chai from 'chai';
@@ -101,7 +101,7 @@ describe('Build Greenwood With: ', function() {
           const h1 = dom.window.document.querySelectorAll('body h1');
 
           expect(h1.length).to.be.equal(1);
-          expect(h1[0].textContent).to.be.equal('Page Template Heading');
+          expect(h1[0].textContent).to.be.equal('Page Layout Heading');
         });
 
         it('should have expected h2 tag in the <body>', function() {

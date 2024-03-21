@@ -12,13 +12,13 @@ const myThemePackPlugin = () => [{
     const ls = spawnSync(command, ['ls', name]);
 
     const isInstalled = ls.stdout.toString().indexOf('(empty)') < 0;
-    const templateLocation = isInstalled
-      ? new URL(`./node_modules/${name}/dist/layouts/`, import.meta.url)
-      : new URL('./fixtures/layouts/', import.meta.url);
+    const layoutLocation = isInstalled
+      ? new URL(`./node_modules/${name}/dist/my-layouts/`, import.meta.url)
+      : new URL('./fixtures/my-layouts/', import.meta.url);
 
     return {
-      templates: [
-        templateLocation
+      layouts: [
+        layoutLocation
       ]
     };
   }

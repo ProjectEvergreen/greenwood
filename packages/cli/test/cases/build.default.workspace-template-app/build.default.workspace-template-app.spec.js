@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood build command with no config and custom app template.
+ * Run Greenwood build command with no config and custom app layout.
  *
  * User Result
- * Should generate a bare bones Greenwood build with custom app template.
+ * Should generate a bare bones Greenwood build with custom app layout.
  *
  * User Command
  * greenwood build
@@ -13,7 +13,7 @@
  *
  * User Workspace
  * src/
- *   templates/
+ *   layouts/
  *     app.html
  */
 import chai from 'chai';
@@ -28,7 +28,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom App Template';
+  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom App Layout';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -50,19 +50,19 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('Custom App Template', function() {
+    describe('Custom App Layout', function() {
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
       });
 
-      it('should output a single index.html file using our custom app template', function() {
+      it('should output a single index.html file using our custom app layout', function() {
         expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
       });
 
-      it('should have the specific element we added as part of our custom app template', function() {
+      it('should have the specific element we added as part of our custom app layout', function() {
         const customParagraph = dom.window.document.querySelector('body p').textContent;
 
-        expect(customParagraph).to.equal('My Custom App Template');
+        expect(customParagraph).to.equal('My Custom App Layout');
       });
     });
   });

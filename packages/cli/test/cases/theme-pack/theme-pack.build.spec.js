@@ -4,7 +4,7 @@
  * following the guide published on the Greenwood website. (https://www.greenwoodjs.io/guides/theme-packs/)
  *
  * User Result
- * Should correctly validate the develop and build / serve commands work correctly using tge expected templates
+ * Should correctly validate the develop and build / serve commands work correctly using tge expected layouts
  * being resolved correctly per the known work around needs as documented in the FAQ and tracked in a discussion.
  * https://github.com/ProjectEvergreen/greenwood/discussions/682
  *
@@ -18,7 +18,7 @@
  * src/
  *   components/
  *     header.js
- *   layouts/
+ *   my-layouts/
  *     blog-post.html
  *   pages/
  *     index.md
@@ -52,7 +52,7 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      const themePacktemplates = await getDependencyFiles(
+      const themePackLayouts = await getDependencyFiles(
         `${outputPath}/src/layouts/*.html`,
         `${outputPath}/node_modules/my-theme-pack/dist/layouts`
       );
@@ -67,7 +67,7 @@ describe('Build Greenwood With: ', function() {
 
       runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
-        ...themePacktemplates,
+        ...themePackLayouts,
         ...themePackStyles,
         ...themePackComponents
       ]);
@@ -76,7 +76,7 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('Custom Default App and Page Templates', function() {
+    describe('Custom Default App and Page Layout', function() {
       let dom;
 
       before(async function() {
@@ -84,9 +84,9 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have expected text from layout/blog-post.html', function() {
-        const pageTemplateHeading = dom.window.document.querySelectorAll('body h1')[0];
+        const pageLayoutHeading = dom.window.document.querySelectorAll('body h1')[0];
 
-        expect(pageTemplateHeading.textContent).to.be.equal('This is the blog post template called from the layouts directory.');
+        expect(pageLayoutHeading.textContent).to.be.equal('This is the blog post layout called from the layouts directory.');
       });
 
       it('should have expected text from (test) user workspace pages/index.md', function() {
@@ -98,7 +98,7 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('Custom Theme Pack theme.css in app template', function() {
+    describe('Custom Theme Pack theme.css in app layout', function() {
       let dom;
 
       before(async function() {
@@ -120,7 +120,7 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('Custom Theme Pack heading.js in custom title page template', function() {
+    describe('Custom Theme Pack heading.js in custom title page layout', function() {
       let dom;
 
       before(async function() {

@@ -12,7 +12,7 @@ const MOCK_GRAPH = {
       id: "index",
       label: "Index",
       route: "/",
-      template: "home",
+      layout: "home",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/index.md",
       title: "",
@@ -73,7 +73,7 @@ const MOCK_GRAPH = {
       id: "community",
       label: "Community",
       route: "/about/community",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/community.md",
       title: "Community",
@@ -134,7 +134,7 @@ const MOCK_GRAPH = {
       id: "features",
       label: "Features",
       route: "/about/features",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/features.md",
       title: "Features",
@@ -195,7 +195,7 @@ const MOCK_GRAPH = {
       id: "Goals",
       label: "Goals",
       route: "/about/goals",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/goals.md",
       title: "Goals",
@@ -285,7 +285,7 @@ const MOCK_GRAPH = {
       id: "how-it-works",
       label: "How It Works",
       route: "/about/how-it-works",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/how-it-works.md",
       title: "How It Works",
@@ -346,7 +346,7 @@ const MOCK_GRAPH = {
       id: "about",
       label: "About",
       route: "/about/",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/index.md",
       title: "About",
@@ -407,7 +407,7 @@ const MOCK_GRAPH = {
       id: "component-model",
       label: "Component Model",
       route: "/docs/component-model",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/component-model.md",
       title: "Component Model",
@@ -539,7 +539,7 @@ const MOCK_GRAPH = {
       id: "configuration",
       label: "Configuration",
       route: "/docs/configuration",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/configuration.md",
       title: "Configuration",
@@ -643,7 +643,7 @@ const MOCK_GRAPH = {
       id: "css-and-images",
       label: "CSS and Images",
       route: "/docs/css-and-images",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/css-and-images.md",
       title: "Styles and Assets",
@@ -845,7 +845,7 @@ const MOCK_GRAPH = {
       id: "data-sources",
       label: "Data Sources",
       route: "/docs/data",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/data.md",
       fileName: "data",
@@ -932,8 +932,8 @@ const MOCK_GRAPH = {
             seen: 1,
           },
           {
-            content: "Template",
-            slug: "template",
+            content: "Layout",
+            slug: "layout",
             lvl: 3,
             i: 5,
             seen: 0,
@@ -979,7 +979,7 @@ const MOCK_GRAPH = {
       id: "front-matter",
       label: "Front Matter",
       route: "/docs/front-matter",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/front-matter.md",
       title: "Front Matter",
@@ -1040,7 +1040,7 @@ const MOCK_GRAPH = {
       id: "docs",
       label: "Docs",
       route: "/docs/",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/index.md",
       title: "Docs",
@@ -1097,22 +1097,22 @@ const MOCK_GRAPH = {
         linkheadings: 3,
         tableOfContents: [
           {
-            content: "Page Template",
-            slug: "page-template",
+            content: "Page Layout",
+            slug: "page-layout",
             lvl: 3,
             i: 1,
             seen: 0,
           },
           {
-            content: "Template Hooks",
-            slug: "template-hooks",
+            content: "Layout Hooks",
+            slug: "layout-hooks",
             lvl: 4,
             i: 2,
             seen: 0,
           },
           {
-            content: "App Template",
-            slug: "app-template",
+            content: "App Layout",
+            slug: "app-layout",
             lvl: 3,
             i: 3,
             seen: 0,
@@ -1127,13 +1127,13 @@ const MOCK_GRAPH = {
         ],
       },
       filename: "./docs/layouts.md",
-      id: "templates",
-      label: "Templates",
+      id: "layouts",
+      label: "Layouts",
       route: "/docs/layouts",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/layouts.md",
-      title: "Templates and Pages",
+      title: "Layouts and Pages",
       meta: [
         {
           name: "description",
@@ -1213,7 +1213,7 @@ const MOCK_GRAPH = {
       id: "markdown",
       label: "Markdown",
       route: "/docs/markdown",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/markdown.md",
       title: "Markdown",
@@ -1303,7 +1303,7 @@ const MOCK_GRAPH = {
       id: "menus",
       label: "Menus",
       route: "/docs/menus",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/menus.md",
       title: "Menus",
@@ -1393,7 +1393,7 @@ const MOCK_GRAPH = {
       id: "tech-stack",
       label: "Tech Stack",
       route: "/docs/tech-stack",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/tech-stack.md",
       title: "Tech Stack",
@@ -1469,7 +1469,7 @@ const MOCK_GRAPH = {
       id: "branding",
       label: "Branding",
       route: "/getting-started/branding",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/branding.md",
       title: "Styles and Web Components",
@@ -1530,7 +1530,7 @@ const MOCK_GRAPH = {
       id: "build-and-deploy",
       label: "Build And Deploy",
       route: "/getting-started/build-and-deploy",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/build-and-deploy.md",
       title: "Build and Deploy",
@@ -1594,15 +1594,15 @@ const MOCK_GRAPH = {
             seen: 0,
           },
           {
-            content: "Home Page Template",
-            slug: "home-page-template",
+            content: "Home Page Layout",
+            slug: "home-page-layout",
             lvl: 3,
             i: 2,
             seen: 0,
           },
           {
-            content: "Blog Posts Template",
-            slug: "blog-posts-template",
+            content: "Blog Posts Layout",
+            slug: "blog-posts-layout",
             lvl: 3,
             i: 3,
             seen: 0,
@@ -1627,7 +1627,7 @@ const MOCK_GRAPH = {
       id: "creating-content",
       label: "Creating Content",
       route: "/getting-started/creating-content",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/creating-content.md",
       title: "Creating Content",
@@ -1688,7 +1688,7 @@ const MOCK_GRAPH = {
       id: "getting-started",
       label: "Getting Started",
       route: "/getting-started/",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/index.md",
       title: "Getting Started",
@@ -1752,8 +1752,8 @@ const MOCK_GRAPH = {
             seen: 0,
           },
           {
-            content: "Templates",
-            slug: "templates",
+            content: "Layouts",
+            slug: "layouts",
             lvl: 3,
             i: 2,
             seen: 0,
@@ -1771,7 +1771,7 @@ const MOCK_GRAPH = {
       id: "key-concepts",
       label: "Key Concepts",
       route: "/getting-started/key-concepts",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/key-concepts.md",
       title: "Key Concepts",
@@ -1832,7 +1832,7 @@ const MOCK_GRAPH = {
       id: "next-steps",
       label: "Next Steps",
       route: "/getting-started/next-steps",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/next-steps.md",
       title: "Next Steps",
@@ -1915,7 +1915,7 @@ const MOCK_GRAPH = {
       id: "project-setup",
       label: "Project Setup",
       route: "/getting-started/project-setup",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/project-setup.md",
       title: "Project Setup",
@@ -1976,7 +1976,7 @@ const MOCK_GRAPH = {
       id: "quick-start",
       label: "Quick Start",
       route: "/getting-started/quick-start",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/quick-start.md",
       title: "Quick Start",
@@ -2037,7 +2037,7 @@ const MOCK_GRAPH = {
       id: "composite-plugins",
       label: "Composite Plugins",
       route: "/plugins/composite-plugins",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/composite-plugins.md",
       title: "Composite Plugins",
@@ -2098,7 +2098,7 @@ const MOCK_GRAPH = {
       id: "index-hooks",
       label: "Index Hooks",
       route: "/plugins/index-hooks",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/index-hooks.md",
       title: "Index Hooks",
@@ -2159,7 +2159,7 @@ const MOCK_GRAPH = {
       id: "plugins",
       label: "Plugins",
       route: "/plugins/",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/index.md",
       title: "Plugins",
@@ -2220,7 +2220,7 @@ const MOCK_GRAPH = {
       id: "webpack",
       label: "Webpack",
       route: "/plugins/webpack",
-      template: "page",
+      layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/webpack.md",
       title: "Webpack Plugins",

@@ -21,9 +21,9 @@ document.addEventListener('click', async function(e) {
       return outlet.getAttribute('data-route') === targetUrl.pathname;
     })[0];
 
-    // maintain the app shell if we are navigating between pages that are built from the same page template
+    // maintain the app shell if we are navigating between pages that are built from the same page layout
     // also, some routes may be SSR, so we may not always match on a static route
-    if (routerOutlet && routerOutlet.getAttribute('data-template') === window.__greenwood.currentTemplate) {
+    if (routerOutlet && routerOutlet.getAttribute('data-layout') === window.__greenwood.currentLayout) {
       const { hash, pathname } = targetUrl;
 
       if (currentUrl.pathname !== pathname) {
@@ -36,7 +36,7 @@ document.addEventListener('click', async function(e) {
         currentUrl.hash = hash;
       }
     } else {
-      // this page uses is a completely different page template from the current page
+      // this page uses is a completely different page layout from the current page
       // so just load the new page
       window.location.href = href;
     }

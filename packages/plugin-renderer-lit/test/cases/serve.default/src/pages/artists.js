@@ -3,7 +3,7 @@ import { html } from 'lit';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import '../components/greeting.js';
 
-async function getTemplate(compilation, { route }) {
+async function getLayout(compilation, { route }) {
   return html`
     <html>
       <head>
@@ -79,7 +79,7 @@ async function getFrontmatter(compilation, { route }) {
 
 export const hydration = false;
 export {
-  getTemplate,
+  getLayout,
   getBody,
   getFrontmatter
 };

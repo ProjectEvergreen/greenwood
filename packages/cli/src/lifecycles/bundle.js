@@ -1,9 +1,9 @@
 /* eslint-disable max-depth, max-len */
 import fs from 'fs/promises';
 import { getRollupConfigForApis, getRollupConfigForScriptResources, getRollupConfigForSsr } from '../config/rollup.config.js';
-import { getAppTemplate, getPageTemplate, getUserScripts } from '../lib/templating-utils.js';
+import { getAppLayout, getPageLayout, getUserScripts } from '../lib/layout-utils.js';
 import { hashString } from '../lib/hashing-utils.js';
-import { checkResourceExists, mergeResponse, normalizePathnameForWindows } from '../lib/resource-utils.js';
+import { checkResourceExists, mergeResponse, normalizePathnameForWindows, trackResourcesForRoute } from '../lib/resource-utils.js';
 import path from 'path';
 import { rollup } from 'rollup';
 
@@ -197,7 +197,7 @@ async function bundleApiRoutes(compilation) {
   }
 }
 
-async function bundleSsrPages(compilation) {
+async function bundleSsrPages(compilation, optimizePlugins) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
   // TODO context plugins for SSR ?
   // const contextPlugins = compilation.config.plugins.filter((plugin) => {
@@ -205,67 +205,85 @@ async function bundleSsrPages(compilation) {
   // }).map((plugin) => {
   //   return plugin.provider(compilation);
   // });
-  const hasSSRPages = compilation.graph.filter(page => page.isSSR).length > 0;
+  const { context, config } = compilation;
+  const ssrPages = compilation.graph.filter(page => page.isSSR && !page.prerender);
+  const ssrPrerenderPagesRouteMapper = {};
   const input = [];
 
-  if (!compilation.config.prerender && hasSSRPages) {
-    const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
-    const { executeModuleUrl } = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider();
+  if (!config.prerender && ssrPages.length > 0) {
+    const { executeModuleUrl } = config.plugins.find(plugin => plugin.type === 'renderer').provider();
     const { executeRouteModule } = await import(executeModuleUrl);
-    const { pagesDir, scratchDir } = compilation.context;
+    const { pagesDir, scratchDir } = context;
 
-    for (const page of compilation.graph) {
-      if (page.isSSR && !page.prerender) {
-        const { filename, imports, route, template, title } = page;
-        const entryFileUrl = new URL(`./${filename}`, scratchDir);
-        const moduleUrl = new URL(`./${filename}`, pagesDir);
-        const request = new Request(moduleUrl); // TODO not really sure how to best no-op this?
-        // TODO getTemplate has to be static (for now?)
-        // https://github.com/ProjectEvergreen/greenwood/issues/955
-        const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [], request });
-        const pagesPathDiff = compilation.context.pagesDir.pathname.replace(compilation.context.projectDirectory.pathname, '');
+    // one pass to generate initial static HTML and to track all combined static resources across layouts
+    // and before we optimize so that all bundled assets can tracked up front
+    // would be nice to see if this can be done in a single pass though...
+    for (const page of ssrPages) {
+      const { filename, imports, route, layout, title } = page;
+      const moduleUrl = new URL(`./${filename}`, pagesDir);
+      const request = new Request(moduleUrl);
+      // TODO getLayout has to be static (for now?)
+      // https://github.com/ProjectEvergreen/greenwood/issues/955
+      const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [], request });
+      let staticHtml = '';
 
-        let staticHtml = '';
+      staticHtml = data.layout ? data.layout : await getPageLayout(staticHtml, compilation.context, layout, []);
+      staticHtml = await getAppLayout(staticHtml, context, imports, [], false, title);
+      staticHtml = await getUserScripts(staticHtml, compilation);
+      staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
 
-        staticHtml = data.template ? data.template : await getPageTemplate(staticHtml, compilation.context, template, []);
-        staticHtml = await getAppTemplate(staticHtml, compilation.context, imports, [], false, title);
-        staticHtml = await getUserScripts(staticHtml, compilation);
-        staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
-        staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
-        staticHtml = staticHtml.replace(/[`\\$]/g, '\\$&'); // https://stackoverflow.com/a/75688937/417806
+      await trackResourcesForRoute(staticHtml, compilation, route);
 
-        // better way to write out this inline code?
-        // using a URL here produces a bundled chunk, but at leasts its bundled
-        await fs.writeFile(entryFileUrl, `
-          import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
+      ssrPrerenderPagesRouteMapper[route] = staticHtml;
+    }
 
-          const moduleUrl = new URL('../${pagesPathDiff}${filename}', import.meta.url);
+    // technically this happens in the start of bundleCompilation once
+    // so might be nice to detect those static assets to see if they have be "de-duped" from bundling here
+    await bundleScriptResources(compilation);
+    await bundleStyleResources(compilation, optimizePlugins);
 
-          export async function handler(request) {
-            const compilation = JSON.parse('${JSON.stringify(compilation)}');
-            const page = JSON.parse('${JSON.stringify(page)}');
-            const data = await executeRouteModule({ moduleUrl, compilation, page, request });
-            let staticHtml = \`${staticHtml}\`;
+    // second pass to link all bundled assets to their resources before optimizing and generating SSR bundles
+    for (const page of ssrPages) {
+      const { filename, route } = page;
+      const entryFileUrl = new URL(`./${filename}`, scratchDir);
+      const htmlOptimizer = config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
+      const pagesPathDiff = context.pagesDir.pathname.replace(context.projectDirectory.pathname, '');
 
-            if (data.body) {
-              staticHtml = staticHtml.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, data.body);
-            }
+      let staticHtml = ssrPrerenderPagesRouteMapper[route];
+      staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
+      staticHtml = staticHtml.replace(/[`\\$]/g, '\\$&'); // https://stackoverflow.com/a/75688937/417806
 
-            return new Response(staticHtml, {
-              headers: {
-                'Content-Type': 'text/html'
-              }
-            });
+      // better way to write out this inline code?
+      await fs.writeFile(entryFileUrl, `
+        import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
+
+        const moduleUrl = new URL('../${pagesPathDiff}${filename}', import.meta.url);
+
+        export async function handler(request) {
+          const compilation = JSON.parse('${JSON.stringify(compilation)}');
+          const page = JSON.parse('${JSON.stringify(page)}');
+          const data = await executeRouteModule({ moduleUrl, compilation, page, request });
+          let staticHtml = \`${staticHtml}\`;
+
+          if (data.body) {
+            staticHtml = staticHtml.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, data.body);
           }
-        `);
 
-        input.push(normalizePathnameForWindows(entryFileUrl));
-      }
+          return new Response(staticHtml, {
+            headers: {
+              'Content-Type': 'text/html'
+            }
+          });
+        }
+      `);
+
+      input.push(normalizePathnameForWindows(entryFileUrl));
     }
 
     const ssrConfigs = await getRollupConfigForSsr(compilation, input);
 
     if (ssrConfigs.length > 0 && ssrConfigs[0].input !== '') {
+      console.info('bundling dynamic pages...');
       for (const configIndex in ssrConfigs) {
         const rollupConfig = ssrConfigs[configIndex];
         const bundle = await rollup(rollupConfig);
@@ -307,7 +325,7 @@ const bundleCompilation = async (compilation) => {
       ]);
 
       // bundleSsrPages depends on bundleScriptResources having run first
-      await bundleSsrPages(compilation);
+      await bundleSsrPages(compilation, optimizeResourcePlugins);
 
       console.info('optimizing static pages....');
       await optimizeStaticPages(compilation, optimizeResourcePlugins);
