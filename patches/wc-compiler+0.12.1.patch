@@ -1,108 +1,34 @@
 diff --git a/node_modules/wc-compiler/src/dom-shim.js b/node_modules/wc-compiler/src/dom-shim.js
-index ee621ea..37cdc53 100644
+index ee621ea..91214b4 100644
 --- a/node_modules/wc-compiler/src/dom-shim.js
 +++ b/node_modules/wc-compiler/src/dom-shim.js
-@@ -31,18 +31,6 @@ class Element extends Node {
-     this.attributes = {};
-   }
+@@ -1,5 +1,13 @@
+ function noop() { }
  
--  attachShadow(options) {
--    this.shadowRoot = new ShadowRoot(options);
--
--    return this.shadowRoot;
--  }
--
--  // https://github.com/mfreed7/declarative-shadow-dom/blob/master/README.md#serialization
--  // eslint-disable-next-line
--  getInnerHTML() {
--    return this.shadowRoot ? this.shadowRoot.innerHTML : this.innerHTML;
--  }
--
-   setAttribute(name, value) {
-     this.attributes[name] = value;
-   }
-@@ -80,12 +68,25 @@ class Document extends Node {
- // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement
- // EventTarget <- Node <- Element <- HTMLElement
- class HTMLElement extends Element {
-+  attachShadow(options) {
-+    this.shadowRoot = new ShadowRoot(options);
-+
-+    return this.shadowRoot;
-+  }
-+
-   connectedCallback() { }
-+
-+  // https://github.com/mfreed7/declarative-shadow-dom/blob/master/README.md#serialization
-+  // eslint-disable-next-line
-+  getInnerHTML(options = {}) {
-+    return this.shadowRoot.innerHTML;
-+  }
- }
- 
- // https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment
- // EventTarget <- Node <- DocumentFragment
--class DocumentFragment extends Node { }
-+class DocumentFragment extends Node {
-+}
- 
- // https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot
- // EventTarget <- Node <- DocumentFragment <- ShadowRoot
-@@ -123,27 +124,31 @@ class HTMLTemplateElement extends HTMLElement {
- // https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry
- class CustomElementsRegistry {
-   constructor() {
--    // TODO this should probably be a set or otherwise follow the spec?
--    // https://github.com/ProjectEvergreen/wcc/discussions/145
--    this.customElementsRegistry = new Map();
-+    this.customElementsRegistry = {};
-   }
- 
-   define(tagName, BaseClass) {
--    // TODO this should probably fail as per the spec...
--    // e.g. if(this.customElementsRegistry.get(tagName))
--    // https://github.com/ProjectEvergreen/wcc/discussions/145
--    this.customElementsRegistry.set(tagName, BaseClass);
-+    this.customElementsRegistry[tagName] = BaseClass;
-   }
- 
-   get(tagName) {
--    return this.customElementsRegistry.get(tagName);
-+    return this.customElementsRegistry[tagName];
-   }
- }
- 
-+// https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/CSSStyleSheet
 +// TODO flesh out constructor and methods
++// https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/CSSStyleSheet
 +class CSSStyleSheet {
 +  constructor(options) { }
-+
 +  replace() { }
 +  replaceSync() { }
 +}
 +
- // mock top level aliases (globalThis === window)
- // https://developer.mozilla.org/en-US/docs/Web/API/Window
--// make this "idempotent" for now until a better idea comes along - https://github.com/ProjectEvergreen/wcc/discussions/145
- globalThis.addEventListener = globalThis.addEventListener ?? noop;
+ // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget
+ class EventTarget {
+   constructor() {
+@@ -147,3 +155,4 @@ globalThis.addEventListener = globalThis.addEventListener ?? noop;
  globalThis.document = globalThis.document ?? new Document();
  globalThis.customElements = globalThis.customElements ?? new CustomElementsRegistry();
  globalThis.HTMLElement = globalThis.HTMLElement ?? HTMLElement;
 +globalThis.CSSStyleSheet = globalThis.CSSStyleSheet ?? CSSStyleSheet;
 \ No newline at end of file
 diff --git a/node_modules/wc-compiler/src/jsx-loader.js b/node_modules/wc-compiler/src/jsx-loader.js
-index 4012fe9..416347c 100644
+index 4012fe9..e1cf2a6 100644
 --- a/node_modules/wc-compiler/src/jsx-loader.js
 +++ b/node_modules/wc-compiler/src/jsx-loader.js
-@@ -2,10 +2,11 @@
- // https://nodejs.org/api/esm.html#esm_loaders
- import * as acorn from 'acorn';
- import * as walk from 'acorn-walk';
--import { generate } from '@projectevergreen/escodegen-esm';
-+import escodegen from 'escodegen';
+@@ -6,6 +6,7 @@ import { generate } from '@projectevergreen/escodegen-esm';
  import fs from 'fs';
--import jsx from '@projectevergreen/acorn-jsx-esm';
-+import jsx from 'acorn-jsx';
+ import jsx from '@projectevergreen/acorn-jsx-esm';
  import { parse, parseFragment, serialize } from 'parse5';
 +import { importAttributes } from 'acorn-import-attributes';
  
@@ -117,27 +43,7 @@ index 4012fe9..416347c 100644
      config: {
        // https://github.com/acornjs/acorn/issues/829#issuecomment-1172586171
        ...walk.base,
-@@ -38,7 +39,6 @@ export function getParser(moduleURL) {
-   };
- }
- 
--// replace all instances of __this__ marker with relative reference to the custom element parent node
- function applyDomDepthSubstitutions(tree, currentDepth = 1, hasShadowRoot = false) {
-   try {
-     for (const node of tree.childNodes) {
-@@ -51,9 +51,9 @@ function applyDomDepthSubstitutions(tree, currentDepth = 1, hasShadowRoot = fals
-           const { value } = attrs[attr];
- 
-           if (value.indexOf('__this__.') >= 0) {
--            const root = hasShadowRoot ? '.getRootNode().host' : `${'.parentElement'.repeat(currentDepth)}`;
-+            const root = hasShadowRoot ? 'parentNode.host' : 'parentElement';
- 
--            node.attrs[attr].value = value.replace(/__this__/g, `this${root}`);
-+            node.attrs[attr].value = value.replace(/__this__/g, `this${'.parentElement'.repeat(currentDepth - 1)}.${root}`);
-           }
-         }
-       }
-@@ -236,7 +236,7 @@ export function parseJsx(moduleURL) {
+@@ -236,7 +237,7 @@ export function parseJsx(moduleURL) {
    const hasOwnObservedAttributes = undefined;
    let inferredObservability = false;
    let observedAttributes = [];
@@ -146,116 +52,39 @@ index 4012fe9..416347c 100644
      ecmaVersion: 'latest',
      sourceType: 'module'
    });
-@@ -266,26 +266,8 @@ export function parseJsx(moduleURL) {
- 
-                   applyDomDepthSubstitutions(elementTree, undefined, hasShadowRoot);
- 
--                  const serializedHtml = serialize(elementTree);
--                  // we have to Shadow DOM use cases here
--                  // 1. No shadowRoot, so we attachShadow and append the template
--                  // 2. If there is root from the attachShadow signal, so we just need to inject innerHTML, say in an htmx
--                  // could / should we do something else instead of .innerHTML
--                  // https://github.com/ProjectEvergreen/wcc/issues/138
--                  const renderHandler = hasShadowRoot
--                    ? `
--                        const template = document.createElement('template');
--                        template.innerHTML = \`${serializedHtml}\`;
--
--                        if(!${elementRoot}) {
--                          this.attachShadow({ mode: 'open' });
--                          this.shadowRoot.appendChild(template.content.cloneNode(true));
--                        } else {
--                          this.shadowRoot.innerHTML = template.innerHTML;
--                        }
--                      `
--                    : `${elementRoot}.innerHTML = \`${serializedHtml}\`;`;
--                  const transformed = acorn.parse(renderHandler, {
-+                  const finalHtml = serialize(elementTree);
-+                  const transformed = acorn.parse(`${elementRoot}.innerHTML = \`${finalHtml}\`;`, {
-                     ecmaVersion: 'latest',
-                     sourceType: 'module'
-                   });
-@@ -319,11 +301,19 @@ export function parseJsx(moduleURL) {
-     for (const line of tree.body) {
-       // test for class MyComponent vs export default class MyComponent
-       if (line.type === 'ClassDeclaration' || (line.declaration && line.declaration.type) === 'ClassDeclaration') {
--        insertPoint = line.declaration.body.start + 1;
-+        const children = !line.declaration
-+          ? line.body.body
-+          : line.declaration.body.body;
-+        for (const method of children) {
-+          if (method.key.name === 'constructor') {
-+            insertPoint = method.start - 1;
-+            break;
-+          }
-+        }
-       }
-     }
- 
--    let newModuleContents = generate(tree);
-+    let newModuleContents = escodegen.generate(tree);
- 
-     // TODO better way to determine value type?
-     /* eslint-disable indent */
-@@ -391,7 +381,7 @@ export async function load(url, context, defaultLoad) {
- 
-     return {
-       format: 'module',
--      source: generate(jsFromJsx),
-+      source: escodegen.generate(jsFromJsx),
-       shortCircuit: true
-     };
-   }
 diff --git a/node_modules/wc-compiler/src/wcc.js b/node_modules/wc-compiler/src/wcc.js
-index 72088df..09ae55b 100644
+index 72088df..b8de6b7 100644
 --- a/node_modules/wc-compiler/src/wcc.js
 +++ b/node_modules/wc-compiler/src/wcc.js
-@@ -4,10 +4,11 @@ import './dom-shim.js';
- 
- import * as acorn from 'acorn';
- import * as walk from 'acorn-walk';
--import { generate } from '@projectevergreen/escodegen-esm';
-+import escodegen from 'escodegen';
+@@ -7,6 +7,7 @@ import * as walk from 'acorn-walk';
+ import { generate } from '@projectevergreen/escodegen-esm';
  import { getParser, parseJsx } from './jsx-loader.js';
  import { parse, parseFragment, serialize } from 'parse5';
- import fs from 'fs';
 +import { importAttributes } from 'acorn-import-attributes';
+ import fs from 'fs';
  
  function getParse(html) {
-   return html.indexOf('<html>') >= 0 || html.indexOf('<body>') >= 0 || html.indexOf('<head>') >= 0
-@@ -61,12 +62,14 @@ function registerDependencies(moduleURL, definitions, depth = 0) {
+@@ -61,12 +62,12 @@ function registerDependencies(moduleURL, definitions, depth = 0) {
    const moduleContents = fs.readFileSync(moduleURL, 'utf-8');
    const nextDepth = depth += 1;
    const customParser = getParser(moduleURL);
 -  const parser = customParser ? customParser.parser : acorn;
 +  const parser = customParser ? customParser.parser : acorn.Parser;
-+
    const config = customParser ? customParser.config : {
      ...walk.base
    };
  
 -  walk.simple(parser.parse(moduleContents, {
-+  console.log('registerDependencies', { moduleContents });
 +  walk.simple(parser.extend(importAttributes).parse(moduleContents, {
      ecmaVersion: 'latest',
      sourceType: 'module'
    }), {
-@@ -94,7 +97,7 @@ function registerDependencies(moduleURL, definitions, depth = 0) {
-         definitions[tagName] = {
-           instanceName: args[1].name,
-           moduleURL,
--          source: generate(tree),
-+          source: escodegen.generate(tree),
-           url: moduleURL,
-           isEntry
-         };
-@@ -106,13 +109,14 @@ function registerDependencies(moduleURL, definitions, depth = 0) {
+@@ -106,13 +107,13 @@ function registerDependencies(moduleURL, definitions, depth = 0) {
  async function getTagName(moduleURL) {
    const moduleContents = await fs.promises.readFile(moduleURL, 'utf-8');
    const customParser = getParser(moduleURL);
 -  const parser = customParser ? customParser.parser : acorn;
 +  const parser = customParser ? customParser.parser : acorn.Parser;
-+
    const config = customParser ? customParser.config : {
      ...walk.base
    };
@@ -266,14 +95,3 @@ index 72088df..09ae55b 100644
      ecmaVersion: 'latest',
      sourceType: 'module'
    }), {
-@@ -134,7 +138,9 @@ async function initializeCustomElement(elementURL, tagName, attrs = [], definiti
- 
-   // https://github.com/ProjectEvergreen/wcc/pull/67/files#r902061804
-   const { pathname } = elementURL;
--  const element = customElements.get(tagName) ?? (await import(pathname)).default;
-+  const element = tagName
-+    ? customElements.get(tagName)
-+    : (await import(pathname)).default;
-   const dataLoader = (await import(pathname)).getData;
-   const data = props
-     ? props
