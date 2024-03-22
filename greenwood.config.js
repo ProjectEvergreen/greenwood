@@ -1,9 +1,9 @@
 import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
 import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
-import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
-import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
+// import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
+// import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
 import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
-import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
+// TODO import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 
@@ -17,9 +17,9 @@ export default {
     greenwoodPluginPolyfills({
       lit: true
     }),
-    greenwoodPluginPostCss(),
-    greenwoodPluginImportJson(),
-    greenwoodPluginImportCss(),
+    // TODO greenwoodPluginPostCss(),
+    // greenwoodPluginImportJson(),
+    // greenwoodPluginImportCss(),
     greenwoodPluginIncludeHTML(),
     greenwoodPluginRendererPuppeteer(),
     {

@@ -228,23 +228,31 @@ class StandardCssResource extends ResourceInterface {
   }
 
   // TODO how to best tell this was an import attribute specifically other then searchParams???
-  async shouldIntercept(url) {
-    // console.log('shouldIntercept', { url });
-    const { searchParams } = url;
+  async shouldIntercept(url, request) {
+    const { searchParams, pathname } = url;
+    const accepts = request.headers.get('accept') || '';
+    const isCssFile = pathname.split('.').pop() === this.extensions[0];
+    const notFromBrowser = accepts.indexOf('text/css') < 0 && accepts.indexOf('application/signed-exchange') < 0;
 
-    return url.protocol === 'file:'
-      && this.extensions.indexOf(url.pathname.split('.').pop()) >= 0
-      && searchParams.get('type') === 'css';
+    // https://github.com/ProjectEvergreen/greenwood/issues/492
+    // TODO should probably create a standalone "raw" / text loader
+    return (url.protocol === 'file:' && isCssFile && (searchParams.get('type') === 'css' || searchParams.get('type') === 'raw'))
+      || (isCssFile && notFromBrowser && pathname.startsWith('/node_modules/'));
   }
 
   async intercept(url, request, response) {
-    // console.log('INTERCEPTING', { url, request });
-    const contents = await response.text();
-    const body = `const sheet = new CSSStyleSheet();sheet.replaceSync('${contents.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\')}');export default sheet;`;
+    const { searchParams } = url;
+    const contents = (await response.text()).replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\');
+    // TODO how, or do we(?), handle "legacy" webpack style import behaviors, e.g.
+    // import css from './eve-button.css';
+    const body = searchParams.get('type') === 'css'
+      ? `const sheet = new CSSStyleSheet();sheet.replaceSync('${contents}');export default sheet;`
+      : `const css = \`${contents}\`;\nexport default css;`;
 
+    // TODO what's the correct content type to return here
     return new Response(body, {
       headers: {
-        'Content-Type': this.contentType
+        'Content-Type': 'text/javascript'
       }
     });
   }

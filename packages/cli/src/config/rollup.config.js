@@ -38,11 +38,15 @@ function greenwoodResourceLoader (compilation) {
     async load(id) {
       const idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
-      const extension = pathname.split('.').pop();
+      // TODO how to best extract import attributes from file paths?
+      // and ideally refactor all of this URL stuff
+      const type = idUrl.searchParams.has('type')
+        ? idUrl.searchParams.get('type')
+        : pathname.split('.').pop();
 
       // filter first for any bare specifiers
-      if (await checkResourceExists(idUrl) && extension !== '' && extension !== 'js') {
-        const url = new URL(`${idUrl.href}?type=${extension}`);
+      if (await checkResourceExists(idUrl) && type !== '' && type !== 'js') {
+        const url = new URL(`file://${idUrl.pathname}?type=${type}`);
         const request = new Request(url.href);
         let response = new Response('');
 
@@ -162,16 +166,21 @@ function greenwoodImportMetaUrl(compilation) {
       });
       const idAssetName = path.basename(id);
       const normalizedId = id.replace(/\\\\/g, '/').replace(/\\/g, '/'); // windows shenanigans...
+      // TODO this double URL seems redundant...
       const idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
-      const extension = pathname.split('.').pop();
-      const urlWithType = new URL(`${idUrl.href}?type=${extension}`);
-      const request = new Request(urlWithType.href);
+      // TODO how to best extract import attributes from file paths?
+      const type = idUrl.searchParams.has('type')
+        ? idUrl.searchParams.get('type')
+        : pathname.split('.').pop();
+      const urlWithType = new URL(`file://${idUrl.pathname}?type=${type}`);
+      const request = new Request(urlWithType);
       let canTransform = false;
       let response = new Response(code);
 
       // handle any custom imports or pre-processing needed before passing to Rollup this.parse
-      if (await checkResourceExists(idUrl) && extension !== '' && extension !== 'json') {
+      // TODO can we stop excluding JSON now?
+      if (await checkResourceExists(idUrl) && type !== '' && type !== 'json') {
         for (const plugin of resourcePlugins) {
           if (plugin.shouldServe && await plugin.shouldServe(urlWithType, request)) {
             response = await plugin.serve(urlWithType, request);
