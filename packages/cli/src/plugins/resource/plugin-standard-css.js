@@ -235,7 +235,8 @@ class StandardCssResource extends ResourceInterface {
     const notFromBrowser = accepts.indexOf('text/css') < 0 && accepts.indexOf('application/signed-exchange') < 0;
 
     // https://github.com/ProjectEvergreen/greenwood/issues/492
-    // TODO should probably create a standalone "raw" / text loader
+    // TODO should probably create a standalone text loader
+    // TODO shouldn't be making exceptions for node modules
     return (url.protocol === 'file:' && isCssFile && (searchParams.get('type') === 'css' || searchParams.get('type') === 'raw'))
       || (isCssFile && notFromBrowser && pathname.startsWith('/node_modules/'));
   }
