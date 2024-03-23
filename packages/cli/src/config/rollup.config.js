@@ -5,11 +5,12 @@ import { checkResourceExists, normalizePathnameForWindows } from '../lib/resourc
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import * as walk from 'acorn-walk';
+import { importAttributes } from 'acorn-import-attributes';
 
 // https://github.com/rollup/rollup/issues/2121
 // would be nice to get rid of this
 function cleanRollupId(id) {
-  return id.replace('\x00', '');
+  return id.replace('\x00', '').replace('?commonjs-proxy', '');
 }
 
 function greenwoodResourceLoader (compilation) {
@@ -37,17 +38,27 @@ function greenwoodResourceLoader (compilation) {
     async load(id) {
       const idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
-      const extension = pathname.split('.').pop();
+      // TODO how to best extract import attributes from file paths?
+      // and ideally refactor all of this URL stuff
+      const type = idUrl.searchParams.has('type')
+        ? idUrl.searchParams.get('type')
+        : pathname.split('.').pop();
 
       // filter first for any bare specifiers
-      if (await checkResourceExists(idUrl) && extension !== '' && extension !== 'js') {
-        const url = new URL(`${idUrl.href}?type=${extension}`);
+      if (await checkResourceExists(idUrl) && type !== '' && type !== 'js') {
+        const url = new URL(`file://${idUrl.pathname}?type=${type}`);
         const request = new Request(url.href);
         let response = new Response('');
 
         for (const plugin of resourcePlugins) {
           if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
             response = await plugin.serve(url, request);
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, response.clone())) {
+            response = await plugin.preIntercept(url, request, response.clone());
           }
         }
 
@@ -161,19 +172,31 @@ function greenwoodImportMetaUrl(compilation) {
       });
       const idAssetName = path.basename(id);
       const normalizedId = id.replace(/\\\\/g, '/').replace(/\\/g, '/'); // windows shenanigans...
+      // TODO this double URL seems redundant...
       const idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
-      const extension = pathname.split('.').pop();
-      const urlWithType = new URL(`${idUrl.href}?type=${extension}`);
-      const request = new Request(urlWithType.href);
+      // TODO how to best extract import attributes from file paths?
+      const type = idUrl.searchParams.has('type')
+        ? idUrl.searchParams.get('type')
+        : pathname.split('.').pop();
+      const urlWithType = new URL(`file://${idUrl.pathname}?type=${type}`);
+      const request = new Request(urlWithType);
       let canTransform = false;
       let response = new Response(code);
 
       // handle any custom imports or pre-processing needed before passing to Rollup this.parse
-      if (await checkResourceExists(idUrl) && extension !== '' && extension !== 'json') {
+      // TODO can we stop excluding JSON now?
+      if (await checkResourceExists(idUrl) && type !== '' && type !== 'json') {
         for (const plugin of resourcePlugins) {
           if (plugin.shouldServe && await plugin.shouldServe(urlWithType, request)) {
             response = await plugin.serve(urlWithType, request);
+            canTransform = true;
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(urlWithType, request, response)) {
+            response = await plugin.preIntercept(urlWithType, request, response);
             canTransform = true;
           }
         }
@@ -328,6 +351,9 @@ const getRollupConfigForScriptResources = async (compilation) => {
       chunkFileNames: '[name].[hash].js',
       sourcemap: true
     },
+    acornInjectPlugins: [
+      importAttributes
+    ],
     plugins: [
       greenwoodResourceLoader(compilation),
       greenwoodSyncPageResourceBundlesPlugin(compilation),
@@ -378,6 +404,10 @@ const getRollupConfigForApis = async (compilation) => {
         entryFileNames: '[name].js',
         chunkFileNames: '[name].[hash].js'
       },
+      // TODO do we need this?
+      // acornInjectPlugins: [
+      //   importAttributes
+      // ],
       plugins: [
         greenwoodResourceLoader(compilation),
         // support node export conditions for SSR pages
@@ -403,6 +433,10 @@ const getRollupConfigForSsr = async (compilation, input) => {
       entryFileNames: `${path.basename(filepath).split('.')[0]}.route.js`,
       chunkFileNames: `${path.basename(filepath).split('.')[0]}.route.chunk.[hash].js`
     },
+    // TODO do we need this?
+    // acornInjectPlugins: [
+    //   importAttributes
+    // ],
     plugins: [
       greenwoodResourceLoader(compilation),
       // support node export conditions for SSR pages

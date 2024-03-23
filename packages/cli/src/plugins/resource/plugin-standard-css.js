@@ -227,11 +227,45 @@ class StandardCssResource extends ResourceInterface {
     });
   }
 
+  // TODO how to best tell this was an import attribute specifically other then searchParams???
+  async shouldIntercept(url, request) {
+    const { searchParams, pathname } = url;
+    const accepts = request.headers.get('accept') || '';
+    const isCssFile = pathname.split('.').pop() === this.extensions[0];
+    const notFromBrowser = accepts.indexOf('text/css') < 0 && accepts.indexOf('application/signed-exchange') < 0;
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/492
+    // TODO should probably create a standalone text loader
+    // TODO shouldn't be making exceptions for node modules
+    return (url.protocol === 'file:' && isCssFile && (searchParams.get('type') === 'css' || searchParams.get('type') === 'raw'))
+      || (isCssFile && notFromBrowser && pathname.startsWith('/node_modules/'));
+  }
+
+  async intercept(url, request, response) {
+    const { searchParams } = url;
+    const contents = (await response.text()).replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\');
+    // TODO how, or do we(?), handle "legacy" webpack style import behaviors, e.g.
+    // import css from './eve-button.css';
+    const body = searchParams.get('type') === 'css'
+      ? `const sheet = new CSSStyleSheet();sheet.replaceSync('${contents}');export default sheet;`
+      : `const css = \`${contents}\`;\nexport default css;`;
+
+    // TODO what's the correct content type to return here
+    return new Response(body, {
+      headers: {
+        'Content-Type': 'text/javascript'
+      }
+    });
+  }
+
+  // TODO how to best tell this was an import attribute specifically other then searchParams???
+  // can we even optimize inline styles?
   async shouldOptimize(url, response) {
-    const { protocol, pathname } = url;
+    const { protocol, pathname, searchParams } = url;
     const isValidCss = pathname.split('.').pop() === this.extensions[0]
       && protocol === 'file:'
-      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
+      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0
+      && searchParams.get('type') !== 'css';
 
     return this.compilation.config.optimization !== 'none' && isValidCss;
   }
