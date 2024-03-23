@@ -33,6 +33,14 @@ async function getCustomLoaderResponse(url, body = '', checkOnly = false) {
   }
 
   for (const plugin of resourcePlugins) {
+    if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, response.clone())) {
+      shouldHandle = true;
+
+      if (!checkOnly) {
+        response = await plugin.preIntercept(url, request, response.clone());
+      }
+    }
+
     if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
       shouldHandle = true;
 

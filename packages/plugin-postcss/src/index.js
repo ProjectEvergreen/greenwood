@@ -33,11 +33,11 @@ class PostCssResource extends ResourceInterface {
     this.contentType = ['text/css'];
   }
 
-  async shouldIntercept(url) {
+  async shouldPreIntercept(url) {
     return url.protocol === 'file:' && url.pathname.split('.').pop() === this.extensions[0];
   }
 
-  async intercept(url, request, response) {
+  async preIntercept(url, request, response) {
     const config = await getConfig(this.compilation, this.options.extendConfig);
     const plugins = config.plugins || [];
     const body = await response.text();

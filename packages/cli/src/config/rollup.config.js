@@ -57,6 +57,12 @@ function greenwoodResourceLoader (compilation) {
         }
 
         for (const plugin of resourcePlugins) {
+          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, response.clone())) {
+            response = await plugin.preIntercept(url, request, response.clone());
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
           if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
             response = await plugin.intercept(url, request, response.clone());
           }
@@ -184,6 +190,13 @@ function greenwoodImportMetaUrl(compilation) {
         for (const plugin of resourcePlugins) {
           if (plugin.shouldServe && await plugin.shouldServe(urlWithType, request)) {
             response = await plugin.serve(urlWithType, request);
+            canTransform = true;
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(urlWithType, request, response)) {
+            response = await plugin.preIntercept(urlWithType, request, response);
             canTransform = true;
           }
         }
