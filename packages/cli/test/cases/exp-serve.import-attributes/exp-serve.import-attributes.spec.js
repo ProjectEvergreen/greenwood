@@ -1,12 +1,12 @@
 /*
  * Use Case
- * Run Greenwood develop command with no config.
+ * Run Greenwood serve command with no config for using import attributes with API Routes and SSR pages..
  *
  * User Result
  * Should start the development server and render a bare bones Greenwood build.
  *
  * User Command
- * greenwood develop
+ * greenwood serve
  *
  * User Config
  * {}
@@ -33,16 +33,16 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Develop Greenwood With: ', function() {
+describe('Serve Greenwood With: ', function() {
   const LABEL = 'Import Attributes used in API Routes and SSR Pages';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const hostname = 'http://127.0.0.1:1984';
+  const hostname = 'http://localhost:8080';
   let runner;
 
   before(function() {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      hostname
     };
     runner = new Runner(false, true);
   });
@@ -51,13 +51,14 @@ describe('Develop Greenwood With: ', function() {
 
     before(async function() {
       runner.setup(outputPath);
+      runner.runCommand(cliPath, 'build');
 
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
-        }, 5000);
+        }, 10000);
 
-        runner.runCommand(cliPath, 'develop', { async: true });
+        runner.runCommand(cliPath, 'serve', { async: true });
       });
     });
 
