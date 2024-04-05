@@ -2,6 +2,7 @@ import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
 import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
 import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
+import { greenwoodPluginImportRaw } from '@greenwood/plugin-import-raw';
 import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 
@@ -16,6 +17,11 @@ export default {
       lit: true
     }),
     greenwoodPluginPostCss(),
+    greenwoodPluginImportRaw({
+      matches: [
+        'eve-container.css'
+      ]
+    }),
     greenwoodPluginIncludeHTML(),
     greenwoodPluginRendererPuppeteer(),
     {

@@ -53,7 +53,7 @@ index 4012fe9..e1cf2a6 100644
      sourceType: 'module'
    });
 diff --git a/node_modules/wc-compiler/src/wcc.js b/node_modules/wc-compiler/src/wcc.js
-index 72088df..b8de6b7 100644
+index 72088df..e8b2061 100644
 --- a/node_modules/wc-compiler/src/wcc.js
 +++ b/node_modules/wc-compiler/src/wcc.js
 @@ -7,6 +7,7 @@ import * as walk from 'acorn-walk';
@@ -95,3 +95,16 @@ index 72088df..b8de6b7 100644
      ecmaVersion: 'latest',
      sourceType: 'module'
    }), {
+@@ -133,9 +134,9 @@ async function initializeCustomElement(elementURL, tagName, attrs = [], definiti
+   }
+ 
+   // https://github.com/ProjectEvergreen/wcc/pull/67/files#r902061804
+-  const { pathname } = elementURL;
+-  const element = customElements.get(tagName) ?? (await import(pathname)).default;
+-  const dataLoader = (await import(pathname)).getData;
++  const { href } = elementURL;
++  const element = customElements.get(tagName) ?? (await import(href)).default;
++  const dataLoader = (await import(href)).getData;
+   const data = props
+     ? props
+     : dataLoader

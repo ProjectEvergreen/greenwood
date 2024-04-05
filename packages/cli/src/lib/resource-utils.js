@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import { hashString } from './hashing-utils.js';
 import htmlparser from 'node-html-parser';
 
+// TODO need to track dest here?
 async function modelResource(context, type, src = undefined, contents = undefined, optimizationAttr = undefined, rawAttributes = undefined) {
   const { projectDirectory, scratchDir, userWorkspace } = context;
   const extension = type === 'script' ? 'js' : 'css';
@@ -61,15 +62,18 @@ function mergeResponse(destination, source) {
 // https://github.com/rollup/rollup/issues/3779
 function normalizePathnameForWindows(url) {
   const windowsDriveRegex = /\/[a-zA-Z]{1}:\//;
-  const { pathname = '' } = url;
+  const { pathname = '', searchParams } = url;
+  const params = searchParams.size > 0
+    ? `?${searchParams.toString()}`
+    : '';
 
   if (windowsDriveRegex.test(pathname)) {
     const driveMatch = pathname.match(windowsDriveRegex)[0];
 
-    return pathname.replace(driveMatch, driveMatch.replace('/', ''));
+    return `${pathname.replace(driveMatch, driveMatch.replace('/', ''))}${params}`;
   }
 
-  return pathname;
+  return `${pathname}${params}`;
 }
 
 async function checkResourceExists(url) {

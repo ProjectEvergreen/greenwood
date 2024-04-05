@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with prerendering of CSS and JSON being referenced using import attributes.
+ * Run Greenwood with a plugin during prerendering to be able to import arbitrary text as a string using ESM.
  *
  * User Result
  * Should generate a static Greenwood build with CSS properly prerendered.
@@ -9,26 +9,26 @@
  * greenwood build
  *
  * User Config
- * import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
+ * import { greenwoodPluginImportRaw } from '@greenwood/plugin-import-raw';
  *
  * {
  *   prerender: true,
  *   plugins: [{
- *     greenwoodPluginImportCss()
+ *     greenwoodPluginImportRaw()
  *   }]
  * }
  *
  * User Workspace
  * src/
  *   components/
- *     hero/
- *       hero.css
- *       hero.js
- *       hero.json
-*    index.html
+ *     footer.css
+ *     footer.js
+ *   pages/
+ *     index.md
+ *   templates/
+ *     app.html
  */
 import chai from 'chai';
-import fs from 'fs';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
@@ -40,7 +40,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('(Experimental) Build Greenwood With: ', function() {
-  const LABEL = 'ESM Import Attribute for CSS and JSON with prerendering';
+  const LABEL = 'Import Raw Plugin with static pre-rendering for CSS as a string';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -60,33 +60,25 @@ describe('(Experimental) Build Greenwood With: ', function() {
 
     runSmokeTest(['public'], LABEL);
 
-    describe('Importing CSS w/ Constructable Stylesheets', function() {
+    describe('Importing CSS as a string using ESM (import)', function() {
+      let dom;
       let scripts;
 
       before(async function() {
         scripts = await glob.promise(path.join(this.context.publicDir, '*.js'));
-      });
-
-      it('should have the expected output from importing hero.css as a Constructable Stylesheet', function() {
-        const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
-
-        expect(scriptContents).to.contain('const e=new CSSStyleSheet;e.replaceSync(":host {   text-align: center');
-      });
-    });
-
-    describe('Importing JSON', function() {
-      let dom;
-
-      before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      it('should have the expected inline content from the JSON file', function() {
-        const hero = new JSDOM(dom.window.document.querySelector('app-hero template[shadowrootmode="open"]').innerHTML);
-        const heading = hero.window.document.querySelectorAll('div.hero h2');
+      it('should contain no (CSS-in) JavaScript file in the output directory', function() {
+        expect(scripts.length).to.be.equal(0);
+      });
 
-        expect(heading.length).to.equal(1);
-        expect(heading[0].textContent).to.be.equal('Welcome to my website');
+      it('should have the expected output from importing styles.css in index.html', function() {
+        const styles = dom.window.document.querySelectorAll('style');
+
+        // TODO minify CSS-in-JS?
+        expect(styles.length).to.equal(1);
+        expect(styles[0].textContent).to.contain('.footer { width: 90%; margin: 0 auto; padding: 0; text-align: center; }');
       });
     });
   });

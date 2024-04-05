@@ -38,33 +38,44 @@ function greenwoodResourceLoader (compilation) {
     async load(id) {
       const idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
+      const extension = pathname.split('.').pop();
       // TODO how to best extract import attributes from file paths?
       // and ideally refactor all of this URL stuff
-      const type = idUrl.searchParams.has('type')
-        ? idUrl.searchParams.get('type')
-        : pathname.split('.').pop();
+      // TODO make this into a utility
+      // const type = idUrl.searchParams.has('type')
+      //   ? idUrl.searchParams.get('type')
+      //   : pathname.split('.').pop();
+      // TODO how we _actually_ replicate this during bundling???
+      // const dest = type === 'css'
+      //   ? 'style'
+      //   : 'empty'
+      const headers = {
+        // 'Content-Type': type === 'css' ? 'text/css' : 'text/javascript',
+        'Sec-Fetch-Dest': 'empty'
+      };
 
       // filter first for any bare specifiers
-      if (await checkResourceExists(idUrl) && type !== '' && type !== 'js') {
-        const url = new URL(`file://${idUrl.pathname}?type=${type}`);
-        const request = new Request(url.href);
+      if (await checkResourceExists(idUrl) && extension !== 'js') {
+        const request = new Request(idUrl, {
+          headers
+        });
         let response = new Response('');
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
-            response = await plugin.serve(url, request);
+          if (plugin.shouldServe && await plugin.shouldServe(idUrl, request)) {
+            response = await plugin.serve(idUrl, request);
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, response.clone())) {
-            response = await plugin.preIntercept(url, request, response.clone());
+          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(idUrl, request, response.clone())) {
+            response = await plugin.preIntercept(idUrl, request, response.clone());
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
-            response = await plugin.intercept(url, request, response.clone());
+          if (plugin.shouldIntercept && await plugin.shouldIntercept(idUrl, request, response.clone())) {
+            response = await plugin.intercept(idUrl, request, response.clone());
           }
         }
 
@@ -172,38 +183,45 @@ function greenwoodImportMetaUrl(compilation) {
       });
       const idAssetName = path.basename(id);
       const normalizedId = id.replace(/\\\\/g, '/').replace(/\\/g, '/'); // windows shenanigans...
-      // TODO this double URL seems redundant...
+      // const resource = compilation.resources.get(normalizedId) || {};
+      // const { dest = 'empty' } = resource;
       const idUrl = new URL(`file://${cleanRollupId(id)}`);
-      const { pathname } = idUrl;
-      // TODO how to best extract import attributes from file paths?
-      const type = idUrl.searchParams.has('type')
-        ? idUrl.searchParams.get('type')
-        : pathname.split('.').pop();
-      const urlWithType = new URL(`file://${idUrl.pathname}?type=${type}`);
-      const request = new Request(urlWithType);
+      // const type = idUrl.searchParams.has('type')
+      //   ? idUrl.searchParams.get('type')
+      //   : idUrl.pathname.split('.').pop();
+      // const dest = type === 'css'
+      //   ? 'style'
+      //   : 'empty'
+      const headers = {
+        // 'Content-Type': type === 'css' ? 'text/css' : 'text/javascript',
+        'Sec-Fetch-Dest': 'empty'
+      };
+      const request = new Request(idUrl, {
+        headers
+      });
       let canTransform = false;
       let response = new Response(code);
 
       // handle any custom imports or pre-processing needed before passing to Rollup this.parse
       // TODO can we stop excluding JSON now?
-      if (await checkResourceExists(idUrl) && type !== '' && type !== 'json') {
+      if (await checkResourceExists(idUrl)) {
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldServe && await plugin.shouldServe(urlWithType, request)) {
-            response = await plugin.serve(urlWithType, request);
+          if (plugin.shouldServe && await plugin.shouldServe(idUrl, request)) {
+            response = await plugin.serve(idUrl, request);
             canTransform = true;
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(urlWithType, request, response)) {
-            response = await plugin.preIntercept(urlWithType, request, response);
+          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(idUrl, request, response)) {
+            response = await plugin.preIntercept(idUrl, request, response);
             canTransform = true;
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldIntercept && await plugin.shouldIntercept(urlWithType, request, response.clone())) {
-            response = await plugin.intercept(urlWithType, request, response.clone());
+          if (plugin.shouldIntercept && await plugin.shouldIntercept(idUrl, request, response.clone())) {
+            response = await plugin.intercept(idUrl, request, response.clone());
             canTransform = true;
           }
         }
@@ -227,8 +245,9 @@ function greenwoodImportMetaUrl(compilation) {
             const assetName = path.basename(absoluteAssetPath);
             const assetExtension = assetName.split('.').pop();
 
+            // TODO get rid of this type= usage
             assetUrls.push({
-              url: new URL(`file://${absoluteAssetPath}?type=${assetExtension}`),
+              url: new URL(`file://${absoluteAssetPath}`),
               relativeAssetPath
             });
           }

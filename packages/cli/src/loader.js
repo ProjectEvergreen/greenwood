@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import { readAndMergeConfig as initConfig } from './lifecycles/config.js';
 
+
 const config = await initConfig();
 const resourcePlugins = config.plugins.filter(plugin => plugin.type === 'resource').map(plugin => plugin.provider({
   // TODO best way to stub this out? or pull from output?
@@ -13,12 +14,16 @@ const resourcePlugins = config.plugins.filter(plugin => plugin.type === 'resourc
   graph: []
 }));
 
-async function getCustomLoaderResponse(url, body = '', checkOnly = false) {
-  const headers = new Headers({
-    'Content-Type': 'text/javascript'
-  });
-  const request = new Request(url.href, { headers });
-  const initResponse = new Response(body, { headers });
+async function getCustomLoaderResponse(url, type = '', checkOnly = false) {
+  // const dest = type === 'css'
+  //   ? 'style'
+  //   : 'empty'
+  const headers = {
+    // 'Content-Type': type === 'css' ? 'text/css' : 'text/javascript',
+    'Sec-Fetch-Dest': 'empty'
+  };
+  const request = new Request(url, { headers });
+  const initResponse = new Response('');
   let response = initResponse.clone();
   let shouldHandle = false;
 
@@ -59,6 +64,8 @@ async function getCustomLoaderResponse(url, body = '', checkOnly = false) {
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#resolvespecifier-context-nextresolve
 export async function resolve(specifier, context, defaultResolve) {
   const { parentURL } = context;
+  // const fauxType = specifier.indexOf('?type=raw') > 0 ? 'raw' : false;
+  const type = context?.importAttributes?.type || undefined;
   const url = specifier.startsWith('file://')
     ? new URL(specifier)
     : specifier.startsWith('.')
@@ -66,7 +73,7 @@ export async function resolve(specifier, context, defaultResolve) {
       : undefined;
 
   if (url) {
-    const { shouldHandle } = await getCustomLoaderResponse(url, null, true);
+    const { shouldHandle } = await getCustomLoaderResponse(url, type, true);
 
     if (shouldHandle) {
       return {
@@ -82,13 +89,13 @@ export async function resolve(specifier, context, defaultResolve) {
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#loadurl-context-nextload
 export async function load(source, context, defaultLoad) {
   const extension = source.split('.').pop();
-  const attribute = source.importAttributes?.type || extension;
-  const url = new URL(`${source}?type=${attribute}`);
-  const { shouldHandle } = await getCustomLoaderResponse(url, null, true);
+  // const fauxType = source.indexOf('?type=raw') > 0 ? 'raw' : false; // TODO
+  const type = context?.importAttributes?.type || undefined;
+  const url = new URL(source);
+  const { shouldHandle } = await getCustomLoaderResponse(url, type, true);
 
   if (shouldHandle && extension !== 'js') {
-    const contents = await fs.readFile(url, 'utf-8');
-    const { response } = await getCustomLoaderResponse(url, contents);
+    const { response } = await getCustomLoaderResponse(url, type);
     const body = await response.text();
 
     return {

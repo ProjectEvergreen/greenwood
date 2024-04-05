@@ -227,30 +227,19 @@ class StandardCssResource extends ResourceInterface {
     });
   }
 
-  // TODO how to best tell this was an import attribute specifically other then searchParams???
+  // TODO how to best tell this was an import attribute specifically other then searchParams??? (make a tracking dicussion)
   async shouldIntercept(url, request) {
-    const { searchParams, pathname } = url;
-    const accepts = request.headers.get('accept') || '';
-    const isCssFile = pathname.split('.').pop() === this.extensions[0];
-    const notFromBrowser = accepts.indexOf('text/css') < 0 && accepts.indexOf('application/signed-exchange') < 0;
+    const { pathname, searchParams } = url;
+    const type = pathname.split('.').pop();
+    const dest = request.headers.get('Sec-Fetch-Dest');
 
-    // https://github.com/ProjectEvergreen/greenwood/issues/492
-    // TODO should probably create a standalone text loader
-    // TODO shouldn't be making exceptions for node modules
-    return (url.protocol === 'file:' && isCssFile && (searchParams.get('type') === 'css' || searchParams.get('type') === 'raw'))
-      || (isCssFile && notFromBrowser && pathname.startsWith('/node_modules/'));
+    return url.protocol === 'file:' && type === this.extensions[0] && dest === 'empty' && searchParams.has('type') !== true;
   }
 
   async intercept(url, request, response) {
-    const { searchParams } = url;
     const contents = (await response.text()).replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\');
-    // TODO how, or do we(?), handle "legacy" webpack style import behaviors, e.g.
-    // import css from './eve-button.css';
-    const body = searchParams.get('type') === 'css'
-      ? `const sheet = new CSSStyleSheet();sheet.replaceSync('${contents}');export default sheet;`
-      : `const css = \`${contents}\`;\nexport default css;`;
+    const body = `const sheet = new CSSStyleSheet();sheet.replaceSync('${contents}');export default sheet;`;
 
-    // TODO what's the correct content type to return here
     return new Response(body, {
       headers: {
         'Content-Type': 'text/javascript'
@@ -258,8 +247,6 @@ class StandardCssResource extends ResourceInterface {
     });
   }
 
-  // TODO how to best tell this was an import attribute specifically other then searchParams???
-  // can we even optimize inline styles?
   async shouldOptimize(url, response) {
     const { protocol, pathname, searchParams } = url;
     const isValidCss = pathname.split('.').pop() === this.extensions[0]

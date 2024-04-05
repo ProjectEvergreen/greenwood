@@ -1,0 +1,26 @@
+diff --git a/node_modules/@evergreen-wc/eve-container/src/eve-container.css b/node_modules/@evergreen-wc/eve-container/src/eve-container.css
+index 073e95d..d5aae83 100644
+--- a/node_modules/@evergreen-wc/eve-container/src/eve-container.css
++++ b/node_modules/@evergreen-wc/eve-container/src/eve-container.css
+@@ -4,6 +4,10 @@
+ @custom-media --screen-lg (min-width: 992px);
+ @custom-media --screen-xl (min-width: 1200px);
+ 
++* {
++  background-color: red;
++}
++
+ :host {
+   & .container {
+     margin-right: auto;
+diff --git a/node_modules/@evergreen-wc/eve-container/src/eve-container.js b/node_modules/@evergreen-wc/eve-container/src/eve-container.js
+index f9daf30..a61cb93 100644
+--- a/node_modules/@evergreen-wc/eve-container/src/eve-container.js
++++ b/node_modules/@evergreen-wc/eve-container/src/eve-container.js
+@@ -1,5 +1,5 @@
+ import { html, LitElement } from 'lit';
+-import css from './eve-container.css';
++import css from './eve-container.css?type=raw';
+ 
+ class container extends LitElement {
+   static get properties() {

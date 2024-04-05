@@ -42,17 +42,15 @@ class StandardJsonResource extends ResourceInterface {
   }
 
   // TODO how to best tell this was an import attribute specifically other then searchParams???
-  async shouldIntercept(url) {
-    // console.log('shouldIntercept', { url });
-    const { searchParams } = url;
+  async shouldIntercept(url, request) {
+    const { protocol, pathname } = url;
+    const type = pathname.split('.').pop();
+    const dest = request.headers.get('sec-fetch-dest');
 
-    return url.protocol === 'file:'
-      && this.extensions.indexOf(url.pathname.split('.').pop()) >= 0
-      && searchParams.get('type') === 'json';
+    return protocol === 'file:' && dest === 'empty' && type === this.extensions[0];
   }
 
   async intercept(url, request, response) {
-    // console.log('INTERCEPTING', { url, request });
     const json = await response.json();
     const body = `export default ${JSON.stringify(json)}`;
 
