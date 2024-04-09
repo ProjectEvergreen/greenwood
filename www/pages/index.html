@@ -10,6 +10,12 @@
 
     <link rel="stylesheet" href="/node_modules/prismjs/themes/prism-tomorrow.css"/>
     <link rel="stylesheet" href="../styles/home.css"/>
+    <script type="module">
+      import themeSheet from '../styles/theme.css' with { type: 'css' };
+      import data from '../data.json' with { type: 'json' };
+
+      console.log({ themeSheet, data });
+    </script>
   </head>
   <body>
 
