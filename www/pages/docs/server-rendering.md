@@ -238,25 +238,26 @@ export const isolation = true;
 
 ### Custom Imports
 
-> ⚠️ _This feature is experimental._
-> 
-> _**Note**: At this time, [WCC can't handle non-standard javaScript formats](https://github.com/ProjectEvergreen/greenwood/issues/1004), though we hope to enable this by the 1.0 release._
+Greenwood supports custom imports through the Import Attributes syntax on the server, and by default automatically handles CSS and JSON modules.  For CSS, Greenwood emits a [`CSSStylesheet`](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/CSSStyleSheet).
 
-Combined with Greenwood's [custom import resource plugins](https://www.greenwoodjs.io/plugins/custom-plugins/) (or your own!), Greenwood can handle loading custom file extensions on the server side using ESM, like CSS and JSON!
-
-For example, you can now import JSON in your SSR pages and components.
 ```js
-import json from '../path/to/data.json';
+import sheet from './styles.css' with { type: 'css' };
+import data from './data.json' with { type: 'json' };
 
-console.log(json); // { status: 200, message: 'some data' }
+console.log({ sheet, data })
 ```
 
-**Steps**
-1. Make sure you are using Node `v18.15.0`
-1. Run the Greenwood CLI using the `--experimental-loaders` flag and pass Greenwood's custom loader
-    ```shell
-    $ node --experimental-loader ./node_modules/@greenwood/cli/src/loader.js ./node_modules/.bin/greenwood <command>
-    ```
+Combined with Greenwood's [custom import resource plugins](https://www.greenwoodjs.io/plugins/custom-plugins/) (or your own!), Greenwood can handle loading custom file extensions on the server side using ESM for anything you need.
+
+**Usage:**
+
+Run the Greenwood CLI using the `--loaders` flag and pass Greenwood's custom loader
+
+```shell
+$ node --loader ./node_modules/@greenwood/cli/src/loader.js ./node_modules/.bin/greenwood <command>
+```
+
+> _**Note**: At this time, [WCC can't handle non-standard JavaScript formats](https://github.com/ProjectEvergreen/greenwood/issues/1004), though we hope to enable this by the 1.0 release._
 
 ### Hybrid Projects
 

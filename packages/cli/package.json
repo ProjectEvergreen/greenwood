@@ -18,7 +18,7 @@
     "NodeJS"
   ],
   "engines": {
-    "node": ">=18.12.1"
+    "node": ">=18.20.0"
   },
   "bin": {
     "greenwood": "./src/index.js"
