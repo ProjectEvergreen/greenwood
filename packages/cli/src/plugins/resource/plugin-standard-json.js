@@ -41,7 +41,6 @@ class StandardJsonResource extends ResourceInterface {
     });
   }
 
-  // TODO how to best tell this was an import attribute specifically other then searchParams???
   async shouldIntercept(url, request) {
     const { protocol, pathname } = url;
     const type = pathname.split('.').pop();
@@ -56,7 +55,7 @@ class StandardJsonResource extends ResourceInterface {
 
     return new Response(body, {
       headers: {
-        'Content-Type': this.contentType
+        'Content-Type': 'text/javascript'
       }
     });
   }

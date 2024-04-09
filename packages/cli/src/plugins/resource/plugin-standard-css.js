@@ -227,7 +227,6 @@ class StandardCssResource extends ResourceInterface {
     });
   }
 
-  // TODO how to best tell this was an import attribute specifically other then searchParams??? (make a tracking dicussion)
   async shouldIntercept(url, request) {
     const { pathname, searchParams } = url;
     const type = pathname.split('.').pop();
@@ -238,7 +237,7 @@ class StandardCssResource extends ResourceInterface {
 
   async intercept(url, request, response) {
     const contents = (await response.text()).replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\');
-    const body = `const sheet = new CSSStyleSheet();sheet.replaceSync('${contents}');export default sheet;`;
+    const body = `const sheet = new CSSStyleSheet();sheet.replaceSync(\`${contents}\`);export default sheet;`;
 
     return new Response(body, {
       headers: {
