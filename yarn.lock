@@ -4531,6 +4531,11 @@ acorn-import-attributes@^1.9.2:
   resolved "https://registry.yarnpkg.com/acorn-import-attributes/-/acorn-import-attributes-1.9.2.tgz#bc3765bca6ec0c5c69d2293afd582216215279b0"
   integrity sha512-O+nfJwNolEA771IYJaiLWK1UAwjNsQmZbTRqqwBYxCgVQTmpFEMvBw6LOIQV0Me339L5UMVYFyRohGnGlQDdIQ==
 
+acorn-import-attributes@^1.9.5:
+  version "1.9.5"
+  resolved "https://registry.yarnpkg.com/acorn-import-attributes/-/acorn-import-attributes-1.9.5.tgz#7eb1557b1ba05ef18b5ed0ec67591bfab04688ef"
+  integrity sha512-n02Vykv5uA3eHGM/Z2dQrcD56kL8TyDb2p1+0P83PClMnC/nc+anbQRhIOWnSq4Ke/KvDPrY3C9hDtC/A3eHnQ==
+
 acorn-jsx@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"
@@ -17022,14 +17027,15 @@ wait-port@1.0.4:
     commander "^9.3.0"
     debug "^4.3.4"
 
-wc-compiler@~0.12.1:
-  version "0.12.1"
-  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.12.1.tgz#cf34a1a9758c0085580ddc82b5aa6312d3de20bf"
-  integrity sha512-+uEK9cL9MHIWnXoD11cQ77omBLekw1Oih2wqbrM2jBFGTPHvPauq3jtdWzlkg/0OwOJOyYqbBlQfZb/oA+HuNg==
+wc-compiler@~0.13.0:
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.13.0.tgz#6194bf03663f62d0d3a8276ae49966c66ddcaeb1"
+  integrity sha512-yyFr9MqBrlLM0vEWLL5fHTHgmM66R9BCStIqH8mFA3iJ9EKRk8hRb+wBzDSIE3B6TLsgxYKMPX3fy6ftiujNKg==
   dependencies:
     "@projectevergreen/acorn-jsx-esm" "~0.1.0"
     "@projectevergreen/escodegen-esm" "~0.1.0"
     acorn "^8.7.0"
+    acorn-import-attributes "^1.9.5"
     acorn-walk "^8.2.0"
     parse5 "^6.0.1"
 
