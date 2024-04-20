@@ -1,7 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with a static site and only prerendering the content (no JS!).  Modeled after the
- * Greenwood Getting Started repo.
+ * Run Greenwood build command with a static site and only prerendering the content (no JS!) and using import attributes
  *
  * User Result
  * Should generate a bare bones Greenwood build with correctly templated out HTML from a LitElement.
@@ -22,21 +21,13 @@
  *
  * User Workspace
  * src/
- *   assets/
- *     greenwood-logo.png
  *   components/
- *     footer.js
- *     header.js
+ *     header/
+ *       header.js
+ *       header.css
+ *       nav.json
  *   pages/
- *     blog/
- *       first-post.md
- *       second-post.md
- *     index.md
- *   styles/
- *     theme.css
- *   templates/
- *     app.html
- *     blog.html
+ *     index.html
  */
 import chai from 'chai';
 import { JSDOM } from 'jsdom';
@@ -58,7 +49,7 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner();
+    runner = new Runner(false, true);
   });
 
   describe(LABEL, function() {
@@ -99,6 +90,10 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
       const litHtmlNode = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-html/node/*.js`,
         `${outputPath}/node_modules/lit-html/node/`
+      );
+      const litHtmlNodeDirectives = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/node/directives/*.js`,
+        `${outputPath}/node_modules/lit-html/node/directives/`
       );
       const litHtmlPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-html/package.json`,
@@ -146,6 +141,7 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
         ...litHtmlPackageJson,
         ...litHtml,
         ...litHtmlNode,
+        ...litHtmlNodeDirectives,
         ...litHtmlDirectives,
         ...trustedTypes,
         ...litReactiveElement,
@@ -174,40 +170,21 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
     });
 
     describe('LitElement <app-header> statically rendered into index.html', function() {
-      let body;
+      let dom;
 
       before(async function() {
-        const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
-
-        body = dom.window.document.querySelector('body');
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      it('should have expected <h1> tag content in the <header>', function() {
-        const html = body.innerHTML.trim();
+      it('should have expected header <nav> content in the <body>', function() {
+        const wrapper = new JSDOM(dom.window.document.querySelectorAll('app-header template[shadowrootmode="open"]')[0].innerHTML);
+        const nav = wrapper.window.document.querySelectorAll('header nav ul li');
 
-        expect(html).to.contain('<header>');
-        expect(html).to.contain('This is the header component.');
-      });
-    });
-
-    describe('LitElement <app-footer> statically rendered into index.html', function() {
-      let body;
-
-      before(async function() {
-        const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
-
-        body = dom.window.document.querySelector('body');
-      });
-
-      it('should have expected footer <h4> tag content in the <body>', function() {
-        const html = body.innerHTML.trim();
-
-        expect(html).to.contain('<footer>');
-        expect(html).to.contain('My Blog');
-        expect(html).to.contain('2022');
+        expect(nav.length).to.equal(2);
+        expect(nav[0].textContent).to.equal('Home');
+        expect(nav[1].textContent).to.equal('About');
       });
     });
-
   });
 
   after(function() {
