@@ -4,7 +4,6 @@ import styles from '../styles/some.css?type=raw';
 
 export default class ProductsPage extends HTMLElement {
   async connectedCallback() {
-    console.log('PRODUCTS PAGE', { styles })
     const products = await getProducts();
     const html = products.map(product => {
       const { name, thumbnail } = product;

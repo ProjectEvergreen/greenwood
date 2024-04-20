@@ -15,11 +15,9 @@ const resourcePlugins = config.plugins.filter(plugin => plugin.type === 'resourc
 }));
 
 async function getCustomLoaderResponse(url, type = '', checkOnly = false) {
-  // const dest = type === 'css'
-  //   ? 'style'
-  //   : 'empty'
   const headers = {
     // 'Content-Type': type === 'css' ? 'text/css' : 'text/javascript',
+    'Accept': 'text/javascript',
     'Sec-Fetch-Dest': 'empty'
   };
   const request = new Request(url, { headers });
@@ -64,8 +62,7 @@ async function getCustomLoaderResponse(url, type = '', checkOnly = false) {
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#resolvespecifier-context-nextresolve
 export async function resolve(specifier, context, defaultResolve) {
   const { parentURL } = context;
-  // const fauxType = specifier.indexOf('?type=raw') > 0 ? 'raw' : false;
-  const type = context?.importAttributes?.type || undefined;
+  const type = context?.importAttributes?.type;
   const url = specifier.startsWith('file://')
     ? new URL(specifier)
     : specifier.startsWith('.')
@@ -89,18 +86,17 @@ export async function resolve(specifier, context, defaultResolve) {
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#loadurl-context-nextload
 export async function load(source, context, defaultLoad) {
   const extension = source.split('.').pop();
-  // const fauxType = source.indexOf('?type=raw') > 0 ? 'raw' : false; // TODO
-  const type = context?.importAttributes?.type || undefined;
+  const type = context?.importAttributes?.type;
   const url = new URL(source);
   const { shouldHandle } = await getCustomLoaderResponse(url, type, true);
 
   if (shouldHandle && extension !== 'js') {
     const { response } = await getCustomLoaderResponse(url, type);
-    const body = await response.text();
+    const contents = await response.text();
 
     return {
       format: 'module',
-      source: body,
+      source: contents,
       shortCircuit: true
     };
   }

@@ -229,10 +229,10 @@ class StandardCssResource extends ResourceInterface {
 
   async shouldIntercept(url, request) {
     const { pathname, searchParams } = url;
-    const type = pathname.split('.').pop();
-    const dest = request.headers.get('Sec-Fetch-Dest');
+    const ext = pathname.split('.').pop();
+    // const dest = request.headers.get('Sec-Fetch-Dest');
 
-    return url.protocol === 'file:' && type === this.extensions[0] && dest === 'empty' && searchParams.has('type') !== true;
+    return url.protocol === 'file:' && ext === this.extensions[0] && request.headers.get('Accept')?.indexOf('text/javascript') >= 0 && !searchParams.has('type') // dest === 'empty' && searchParams.has('type') !== true;
   }
 
   async intercept(url, request, response) {

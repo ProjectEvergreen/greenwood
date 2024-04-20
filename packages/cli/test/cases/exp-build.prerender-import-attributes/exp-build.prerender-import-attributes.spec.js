@@ -13,9 +13,6 @@
  *
  * {
  *   prerender: true,
- *   plugins: [{
- *     greenwoodPluginImportCss()
- *   }]
  * }
  *
  * User Workspace
@@ -67,10 +64,12 @@ describe('(Experimental) Build Greenwood With: ', function() {
         scripts = await glob.promise(path.join(this.context.publicDir, '*.js'));
       });
 
+      // TODO is this actually the output we want here?
+      // https://github.com/ProjectEvergreen/greenwood/discussions/1216
       it('should have the expected output from importing hero.css as a Constructable Stylesheet', function() {
         const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
 
-        expect(scriptContents).to.contain('const e=new CSSStyleSheet;e.replaceSync(":host {   text-align: center');
+        expect(scriptContents).to.contain('const t=new CSSStyleSheet;t.replaceSync(":host {   text-align: center');
       });
     });
 

@@ -42,11 +42,11 @@ class StandardJsonResource extends ResourceInterface {
   }
 
   async shouldIntercept(url, request) {
-    const { protocol, pathname } = url;
-    const type = pathname.split('.').pop();
-    const dest = request.headers.get('sec-fetch-dest');
+    const { protocol, pathname, searchParams } = url;
+    const ext = pathname.split('.').pop();
+    // const dest = request.headers.get('sec-fetch-dest');
 
-    return protocol === 'file:' && dest === 'empty' && type === this.extensions[0];
+    return protocol === 'file:' && request.headers.get('Accept')?.indexOf('text/javascript') >= 0 && ext === this.extensions[0] && !searchParams.has('type'); // dest === 'empty' && type === this.extensions[0];
   }
 
   async intercept(url, request, response) {

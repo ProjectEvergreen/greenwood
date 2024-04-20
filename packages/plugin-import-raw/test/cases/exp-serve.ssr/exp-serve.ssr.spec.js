@@ -76,7 +76,6 @@ describe('Serve Greenwood With: ', function() {
       before(async function() {
         response = await fetch(`${hostname}/products/`);
         data = await response.text();
-        console.log({ data });
         productsPageDom = new JSDOM(data);
       });
 
@@ -111,7 +110,7 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    xdescribe('Serve command with API specific behaviors for an HTML ("fragment") API', function() {
+    describe('Serve command with API specific behaviors for an HTML ("fragment") API', function() {
       let response = {};
       let fragmentsApiDom;
 

@@ -1,12 +1,12 @@
 /*
  * Use Case
- * Run Greenwood develop command with no config.
+ * Run Greenwood serve command with no config for using import attributes with API Routes and SSR pages..
  *
  * User Result
  * Should start the development server and render a bare bones Greenwood build.
  *
  * User Command
- * greenwood develop
+ * greenwood serve
  *
  * User Config
  * {}
@@ -22,10 +22,11 @@
  *       card.json
  *   pages/
  *     greeting.js
- *
- * package.json
+ * 
  */
 import chai from 'chai';
+import fs from 'fs';
+import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { Runner } from 'gallinago';
@@ -33,16 +34,16 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Develop Greenwood With: ', function() {
+describe('Serve Greenwood With: ', function() {
   const LABEL = 'Import Attributes used in API Routes and SSR Pages';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const hostname = 'http://127.0.0.1:1984';
+  const hostname = 'http://localhost:8080';
   let runner;
 
   before(function() {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      hostname
     };
     runner = new Runner(false, true);
   });
@@ -51,13 +52,14 @@ describe('Develop Greenwood With: ', function() {
 
     before(async function() {
       runner.setup(outputPath);
+      runner.runCommand(cliPath, 'build');
 
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
-        }, 5000);
+        }, 10000);
 
-        runner.runCommand(cliPath, 'develop', { async: true });
+        runner.runCommand(cliPath, 'serve', { async: true });
       });
     });
 
@@ -65,10 +67,12 @@ describe('Develop Greenwood With: ', function() {
       const name = 'Greenwood';
       let response = {};
       let body;
+      let scripts;
 
       before(async function() {
         response = await fetch(`${hostname}/api/fragment?name=${name}`);
         body = await response.clone().text();
+        scripts = await glob.promise(path.join(outputPath, 'public/api/card.*.js'));
       });
 
       it('should return a 200 status', function(done) {
@@ -92,15 +96,29 @@ describe('Develop Greenwood With: ', function() {
 
         done();
       });
+
+      it('should have the expected output from importing hero.css as a Constructable Stylesheet', function() {
+        const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
+
+        expect(scriptContents).to.contain('const sheet = new CSSStyleSheet();sheet.replaceSync(`:host {   color: red; }`);');
+      });
+
+      it('should have the expected output from importing hero.json', function() {
+        const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
+
+        expect(scriptContents).to.contain('var data = {"image":{"url":"/path/to/image.webp"}};');
+      });
     });
 
     describe('SSR route specific behaviors when using a custom element as the page', function() {
       let response = {};
       let body;
+      let scripts;
 
       before(async function() {
         response = await fetch(`${hostname}/greeting/`);
         body = await response.clone().text();
+        scripts = await glob.promise(path.join(outputPath, 'public/greeting.route.chunk.*.js'));
       });
 
       it('should return a 200 status', function(done) {
@@ -123,6 +141,18 @@ describe('Develop Greenwood With: ', function() {
         expect(image.getAttribute('href')).to.equal('/path/to/image.webp');
 
         done();
+      });
+
+      it('should have the expected output from importing hero.css as a Constructable Stylesheet', function() {
+        const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
+
+        expect(scriptContents).to.contain('const sheet = new CSSStyleSheet();sheet.replaceSync(`:host {   color: red; }`);');
+      });
+
+      it('should have the expected output from importing hero.json', function() {
+        const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
+
+        expect(scriptContents).to.contain('var data = {"image":{"url":"/path/to/image.webp"}};');
       });
     });
   });

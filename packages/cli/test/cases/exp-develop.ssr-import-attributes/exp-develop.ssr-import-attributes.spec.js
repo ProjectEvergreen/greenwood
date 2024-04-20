@@ -1,12 +1,12 @@
 /*
  * Use Case
- * Run Greenwood serve command with no config for using import attributes with API Routes and SSR pages..
+ * Run Greenwood develop command with no config.
  *
  * User Result
  * Should start the development server and render a bare bones Greenwood build.
  *
  * User Command
- * greenwood serve
+ * greenwood develop
  *
  * User Config
  * {}
@@ -22,8 +22,7 @@
  *       card.json
  *   pages/
  *     greeting.js
- *
- * package.json
+ * 
  */
 import chai from 'chai';
 import { JSDOM } from 'jsdom';
@@ -33,16 +32,16 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Serve Greenwood With: ', function() {
+describe('Develop Greenwood With: ', function() {
   const LABEL = 'Import Attributes used in API Routes and SSR Pages';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const hostname = 'http://localhost:8080';
+  const hostname = 'http://127.0.0.1:1984';
   let runner;
 
   before(function() {
     this.context = {
-      hostname
+      publicDir: path.join(outputPath, 'public')
     };
     runner = new Runner(false, true);
   });
@@ -51,14 +50,63 @@ describe('Serve Greenwood With: ', function() {
 
     before(async function() {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
 
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
-        }, 10000);
+        }, 5000);
 
-        runner.runCommand(cliPath, 'serve', { async: true });
+        runner.runCommand(cliPath, 'develop', { async: true });
+      });
+    });
+
+    describe('CSS file is returned as CSS (text/css)', function() {
+      let response = {};
+      let body;
+
+      before(async function() {
+        response = await fetch(`${hostname}/components/card/card.css`);
+        body = await response.clone().text();
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers.get('content-type')).to.equal('text/css');
+        done();
+      });
+
+      it('should return the correct response body', function(done) {
+        expect(body).to.equal(':host {\n  color: red;\n}');
+        done();
+      });
+    });
+
+    describe('JSON file is returned as JSON (application/json)', function() {
+      let response = {};
+      let data;
+
+      before(async function() {
+        response = await fetch(`${hostname}/components/card/card.json`);
+        data = await response.clone().json();
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers.get('content-type')).to.equal('application/json');
+        done();
+      });
+
+      it('should return the correct response body data', function(done) {
+        expect(data.image.url).to.equal('/path/to/image.webp');
+        done();
       });
     });
 

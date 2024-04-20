@@ -7,8 +7,6 @@ export default class HeroBanner extends HTMLElement {
   }
 
   connectedCallback() {
-    console.log({ sheet, data });
-
     if (!this.shadowRoot) {
       const template = document.createElement('template');
 

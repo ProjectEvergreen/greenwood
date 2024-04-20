@@ -144,7 +144,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
       } else {
         const url = resource.sourcePathURL;
         const contentType = 'text/css';
-        const headers = new Headers({ 'Content-Type': contentType });
+        const headers = new Headers({ 'Content-Type': contentType, 'Accept': contentType });
         const request = new Request(url, { headers });
         const initResponse = new Response(contents, { headers });
 

@@ -51,6 +51,7 @@ function greenwoodResourceLoader (compilation) {
       //   : 'empty'
       const headers = {
         // 'Content-Type': type === 'css' ? 'text/css' : 'text/javascript',
+        'Accept': 'text/javascript',
         'Sec-Fetch-Dest': 'empty'
       };
 
@@ -194,6 +195,7 @@ function greenwoodImportMetaUrl(compilation) {
       //   : 'empty'
       const headers = {
         // 'Content-Type': type === 'css' ? 'text/css' : 'text/javascript',
+        'Accept': 'text/javascript',
         'Sec-Fetch-Dest': 'empty'
       };
       const request = new Request(idUrl, {
@@ -370,9 +372,10 @@ const getRollupConfigForScriptResources = async (compilation) => {
       chunkFileNames: '[name].[hash].js',
       sourcemap: true
     },
-    acornInjectPlugins: [
-      importAttributes
-    ],
+    // TODO do we need this?
+    // acornInjectPlugins: [
+    //   importAttributes
+    // ],
     plugins: [
       greenwoodResourceLoader(compilation),
       greenwoodSyncPageResourceBundlesPlugin(compilation),
