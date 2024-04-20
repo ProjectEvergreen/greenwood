@@ -36,7 +36,7 @@ function greenwoodResourceLoader (compilation) {
       }
     },
     async load(id) {
-      const idUrl = new URL(`file://${cleanRollupId(id)}`);
+      let idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
       const extension = pathname.split('.').pop();
       // TODO how to best extract import attributes from file paths?
@@ -57,6 +57,12 @@ function greenwoodResourceLoader (compilation) {
 
       // filter first for any bare specifiers
       if (await checkResourceExists(idUrl) && extension !== 'js') {
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldResolve && await plugin.shouldResolve(idUrl)) {
+            idUrl = new URL((await plugin.resolve(idUrl)).url);
+          }
+        }
+
         const request = new Request(idUrl, {
           headers
         });
@@ -186,7 +192,7 @@ function greenwoodImportMetaUrl(compilation) {
       const normalizedId = id.replace(/\\\\/g, '/').replace(/\\/g, '/'); // windows shenanigans...
       // const resource = compilation.resources.get(normalizedId) || {};
       // const { dest = 'empty' } = resource;
-      const idUrl = new URL(`file://${cleanRollupId(id)}`);
+      let idUrl = new URL(`file://${cleanRollupId(id)}`);
       // const type = idUrl.searchParams.has('type')
       //   ? idUrl.searchParams.get('type')
       //   : idUrl.pathname.split('.').pop();
@@ -207,6 +213,12 @@ function greenwoodImportMetaUrl(compilation) {
       // handle any custom imports or pre-processing needed before passing to Rollup this.parse
       // TODO can we stop excluding JSON now?
       if (await checkResourceExists(idUrl)) {
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldResolve && await plugin.shouldResolve(idUrl)) {
+            idUrl = new URL((await plugin.resolve(idUrl)).url);
+          }
+        }
+
         for (const plugin of resourcePlugins) {
           if (plugin.shouldServe && await plugin.shouldServe(idUrl, request)) {
             response = await plugin.serve(idUrl, request);

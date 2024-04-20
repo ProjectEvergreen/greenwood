@@ -12,28 +12,29 @@ class ImportRawResource extends ResourceInterface {
     this.contentType = 'text/javascript';
   }
 
-  // TODO would be nice to have this instead
-  // would need  to add resolve plugin lifecycles to rollup, custom loader, etc
-  // async shouldResolve(url) {
-  //   const matches = (this.options.matches || []).filter(matcher => url.href.indexOf(matcher) >= 0);
+  async shouldResolve(url) {
+    const matches = (this.options.matches || []).filter(matcher => url.href.indexOf(matcher) >= 0);
 
-  //   if (matches.length > 0 && !url.searchParams.has('type')) {
-  //     return true;
-  //   }
-  // }
+    if (matches.length > 0 && !url.searchParams.has('type')) {
+      return true;
+    }
+  }
 
-  // async resolve(url) {
-  //   const { pathname, searchParams } = url;
-  //   const params = url.searchParams.size > 0
-  //     ? `?${searchParams.toString()}&type=raw`
-  //     : '?type=raw';
-  //   const root = pathname.indexOf('node_modules') >= 0
-  //     ? this.compilation.context.projectDirectory
-  //     : this.compilation.context.userWorkspace;
-  //   const matchedUrl = new URL(`.${pathname}${params}`, root);
+  async resolve(url) {
+    const { projectDirectory, userWorkspace } = this.compilation.context;
+    const { pathname, searchParams } = url;
+    const params = url.searchParams.size > 0
+      ? `${searchParams.toString()}&type=raw`
+      : 'type=raw';
+    const root = pathname.startsWith('file://')
+      ? new URL(`file://${pathname}`).href
+      : pathname.startsWith('/node_modules')
+        ? new URL(`.${pathname}`, projectDirectory).href
+        : new URL(`file://${pathname}`);
+    const matchedUrl = new URL(`${root}?${params}`);
 
-  //   return new Request(matchedUrl);
-  // }
+    return new Request(matchedUrl);
+  }
 
   async shouldIntercept(url, request) {
     const matches = (this.options.matches || []).filter(matcher => url.href.indexOf(matcher) >= 0);

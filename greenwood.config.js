@@ -19,6 +19,7 @@ export default {
     greenwoodPluginPostCss(),
     greenwoodPluginImportRaw({
       matches: [
+        'eve-button.css',
         'eve-container.css'
       ]
     }),
