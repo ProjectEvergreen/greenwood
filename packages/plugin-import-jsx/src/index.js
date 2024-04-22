@@ -15,13 +15,14 @@ class ImportJsxResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    const { pathname } = url;
+    const { pathname, protocol } = url;
+    const ext = pathname.split('.').pop();
 
-    return pathname.split('.').pop() === this.extensions[0] && (url.searchParams.has('type') && url.searchParams.get('type') === this.extensions[0]);
+    return protocol === 'file:' && ext === this.extensions[0];
   }
 
   async serve(url) {
-    // TODO refactor when WCC refactors
+    // refactor when WCC refactors
     // https://github.com/ProjectEvergreen/wcc/issues/116
     const tree = parseJsx(url);
     const result = escodegen.generate(tree);

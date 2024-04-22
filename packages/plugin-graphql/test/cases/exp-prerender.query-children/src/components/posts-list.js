@@ -1,5 +1,5 @@
 import client from '@greenwood/plugin-graphql/src/core/client.js';
-import ChildrenQuery from '@greenwood/plugin-graphql/src/queries/children.gql';
+import ChildrenQuery from '@greenwood/plugin-graphql/src/queries/children.gql' with { type: 'gql' };
 
 export default class PostsList extends HTMLElement {
   async connectedCallback() {
