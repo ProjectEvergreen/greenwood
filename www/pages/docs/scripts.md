@@ -7,6 +7,7 @@ linkheadings: 3
 ---
 
 ## Scripts and Imports
+
 **Greenwood** generally does not have any opinion on how you structure your site, aside from the pre-determined _pages/_ and (optional) _templates/_ directories.  It supports all standard files that you can open in a web browser.
 
 
@@ -34,6 +35,7 @@ Script tags can be done in any standards compliant way that will work in a brows
 ```
 
 ### Imports
+
 Greenwood also supports (and recommends) usage of ECMAScript Modules (ESM), like in the example below.
 
 ```html
@@ -41,13 +43,7 @@ Greenwood also supports (and recommends) usage of ECMAScript Modules (ESM), like
 <html lang="en" prefix="og:http://ogp.me/ns#">
 
   <head>
-    <script type="module">
-      import { Foo } from '/path/to/foo.js';
-
-      Foo.something();
-    </script>
-
-    <script type="module" src="/path/to/script.js"></script>
+    <script type="module" src="./path/to/script.js"></script>
   </head>
 
   <body>
@@ -56,6 +52,19 @@ Greenwood also supports (and recommends) usage of ECMAScript Modules (ESM), like
   
 </html>
 ```
+
+### Import Attributes
+
+[Import Attributes](https://github.com/tc39/proposal-import-attributes) are also supported on the client and on [the server](docs/server-rendering/#custom-imports).  By default automatically handles CSS and JSON modules and for CSS, emits a [`CSSStylesheet`](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/CSSStyleSheet).
+
+```js
+import sheet from './styles.css' with { type: 'css' };
+import data from './data.json' with { type: 'json' };
+
+console.log({ sheet, data });
+```
+
+Combined with Greenwood's [custom import resource plugins](https://www.greenwoodjs.io/plugins/custom-plugins/) (or your own!), Greenwood can handle loading custom file extensions for the client or the server using ESM for just about anything you could need!
 
 ### Extensions and Bare Imports
 

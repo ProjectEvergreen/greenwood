@@ -238,8 +238,13 @@ export const isolation = true;
 
 ### Custom Imports
 
-Greenwood supports custom imports through the Import Attributes syntax on the server, and by default automatically handles CSS and JSON modules.  For CSS, Greenwood emits a [`CSSStylesheet`](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/CSSStyleSheet).
+To enable custom [imports](/docs/scripts/#imports) on the server side for prerendering or SSR use cases, you will need to invoke Greenwood using `node` on the CLI and pass it the `--loaders` flag.
 
+```shell
+$ node --loader ./node_modules/@greenwood/cli/src/loader.js ./node_modules/.bin/greenwood <command>
+```
+
+Then you will be able to run this code with NodeJS, or for any custom format you want using a plugin. 
 ```js
 import sheet from './styles.css' with { type: 'css' };
 import data from './data.json' with { type: 'json' };
@@ -247,15 +252,8 @@ import data from './data.json' with { type: 'json' };
 console.log({ sheet, data });
 ```
 
-Combined with Greenwood's [custom import resource plugins](https://www.greenwoodjs.io/plugins/custom-plugins/) (or your own!), Greenwood can handle loading custom file extensions on the server side using ESM for anything you need.
-
-To use custom imports, run the Greenwood CLI using the `--loaders` flag and pass Greenwood's custom loader:
-
-```shell
-$ node --loader ./node_modules/@greenwood/cli/src/loader.js ./node_modules/.bin/greenwood <command>
-```
-
 _**Notes**_
+
 - At this time, [WCC can't handle non-standard JavaScript formats](https://github.com/ProjectEvergreen/greenwood/issues/1004), though we hope to enable this by the 1.0 release.
 - We would like to explore ways to [improve the DX here](https://github.com/ProjectEvergreen/greenwood/discussions/1217), and not require having to manually invoke `node`
 
