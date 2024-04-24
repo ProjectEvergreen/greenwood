@@ -20,7 +20,7 @@
  *       card.json
  *   pages/
  *     index.html
- * 
+ *
  */
 import chai from 'chai';
 import fs from 'fs';

@@ -35,7 +35,6 @@
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
     "acorn": "^8.0.1",
-    "acorn-import-attributes": "^1.9.2",
     "acorn-walk": "^8.0.0",
     "commander": "^2.20.0",
     "css-tree": "^2.2.1",

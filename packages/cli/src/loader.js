@@ -1,6 +1,4 @@
-import fs from 'fs/promises';
 import { readAndMergeConfig as initConfig } from './lifecycles/config.js';
-
 
 const config = await initConfig();
 const resourcePlugins = config.plugins.filter(plugin => plugin.type === 'resource').map(plugin => plugin.provider({
@@ -14,7 +12,7 @@ const resourcePlugins = config.plugins.filter(plugin => plugin.type === 'resourc
   graph: []
 }));
 
-async function getCustomLoaderResponse(url, type = '', checkOnly = false) {
+async function getCustomLoaderResponse(url, checkOnly = false) {
   const headers = {
     // 'Content-Type': type === 'css' ? 'text/css' : 'text/javascript',
     'Accept': 'text/javascript',
@@ -62,7 +60,7 @@ async function getCustomLoaderResponse(url, type = '', checkOnly = false) {
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#resolvespecifier-context-nextresolve
 export async function resolve(specifier, context, defaultResolve) {
   const { parentURL } = context;
-  const type = context?.importAttributes?.type;
+  // const type = context?.importAttributes?.type;
   const url = specifier.startsWith('file://')
     ? new URL(specifier)
     : specifier.startsWith('.')
@@ -70,7 +68,7 @@ export async function resolve(specifier, context, defaultResolve) {
       : undefined;
 
   if (url) {
-    const { shouldHandle } = await getCustomLoaderResponse(url, type, true);
+    const { shouldHandle } = await getCustomLoaderResponse(url, true);
 
     if (shouldHandle) {
       return {
@@ -86,12 +84,12 @@ export async function resolve(specifier, context, defaultResolve) {
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#loadurl-context-nextload
 export async function load(source, context, defaultLoad) {
   const extension = source.split('.').pop();
-  const type = context?.importAttributes?.type;
+  // const type = context?.importAttributes?.type;
   const url = new URL(source);
-  const { shouldHandle } = await getCustomLoaderResponse(url, type, true);
+  const { shouldHandle } = await getCustomLoaderResponse(url, true);
 
   if (shouldHandle && extension !== 'js') {
-    const { response } = await getCustomLoaderResponse(url, type);
+    const { response } = await getCustomLoaderResponse(url);
     const contents = await response.text();
 
     return {

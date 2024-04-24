@@ -22,7 +22,7 @@
  *       card.json
  *   pages/
  *     greeting.js
- * 
+ *
  */
 import chai from 'chai';
 import fs from 'fs';

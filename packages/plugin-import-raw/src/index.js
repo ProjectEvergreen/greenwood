@@ -21,7 +21,7 @@ class ImportRawResource extends ResourceInterface {
   }
 
   async resolve(url) {
-    const { projectDirectory, userWorkspace } = this.compilation.context;
+    const { projectDirectory } = this.compilation.context;
     const { pathname, searchParams } = url;
     const params = url.searchParams.size > 0
       ? `${searchParams.toString()}&type=raw`
@@ -38,7 +38,7 @@ class ImportRawResource extends ResourceInterface {
 
   async shouldIntercept(url, request) {
     const matches = (this.options.matches || []).filter(matcher => url.href.indexOf(matcher) >= 0);
-    const type = url.searchParams.get('type'); 
+    const type = url.searchParams.get('type');
     const dest = request.headers.get('Sec-Fetch-Dest');
 
     return (url.protocol === 'file:' && type === 'raw' && dest === 'empty') || matches.length > 0;

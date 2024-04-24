@@ -164,9 +164,11 @@ This lifecycle is useful for augmenting _standard_ web formats, where Greenwood 
 
 A good example of this is [Greenwood's "raw" plugin](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/plugin-import-raw/src/index.js) which can take a standard web format like CSS, and convert it onto a standard ES Module when a `?type=raw` is added to any `import`, which would be useful for CSS-in-JS use cases, for example:
 
+<!-- eslint-disable no-unused-vars -->
 ```js
 import styles from './hero.css?type=raw';
 ```
+<!-- eslint-enable no-unused-vars -->
 
 <!-- eslint-disable no-unused-vars -->
 ```js
@@ -175,7 +177,7 @@ import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js'
 class ImportRawResource extends ResourceInterface {
   async shouldIntercept(url) {
     const { protocol, searchParams } = url;
-    const type = searchParams.get('type'); 
+    const type = searchParams.get('type');
 
     return protocol === 'file:' && type === 'raw';
   }

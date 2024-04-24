@@ -5,7 +5,8 @@ import { checkResourceExists, normalizePathnameForWindows } from '../lib/resourc
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import * as walk from 'acorn-walk';
-import { importAttributes } from 'acorn-import-attributes';
+// TODO we don't need this?
+// import { importAttributes } from 'acorn-import-attributes';
 
 // https://github.com/rollup/rollup/issues/2121
 // would be nice to get rid of this
@@ -256,8 +257,6 @@ function greenwoodImportMetaUrl(compilation) {
             const absoluteScriptDir = path.dirname(id);
             const relativeAssetPath = getMetaImportPath(node);
             const absoluteAssetPath = path.resolve(absoluteScriptDir, relativeAssetPath);
-            const assetName = path.basename(absoluteAssetPath);
-            const assetExtension = assetName.split('.').pop();
 
             // TODO get rid of this type= usage
             assetUrls.push({

@@ -27,6 +27,7 @@
  *     index.md
  *   templates/
  *     app.html
+ *   main.js
  */
 import chai from 'chai';
 import glob from 'glob-promise';

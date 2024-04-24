@@ -1,1 +1,1 @@
-import './components/footer.jsx' with { type: 'jsx' }
+import './components/footer.jsx' with { type: 'jsx' };

@@ -1,4 +1,4 @@
-import { html, LitElement,  } from 'lit';
+import { html, LitElement } from 'lit';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import nav from './nav.json' with { type: 'json' };
 
