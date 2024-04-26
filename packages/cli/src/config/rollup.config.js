@@ -5,8 +5,6 @@ import { checkResourceExists, normalizePathnameForWindows } from '../lib/resourc
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import * as walk from 'acorn-walk';
-// TODO we don't need this?
-// import { importAttributes } from 'acorn-import-attributes';
 
 // https://github.com/rollup/rollup/issues/2121
 // would be nice to get rid of this
@@ -40,18 +38,7 @@ function greenwoodResourceLoader (compilation) {
       let idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
       const extension = pathname.split('.').pop();
-      // TODO how to best extract import attributes from file paths?
-      // and ideally refactor all of this URL stuff
-      // TODO make this into a utility
-      // const type = idUrl.searchParams.has('type')
-      //   ? idUrl.searchParams.get('type')
-      //   : pathname.split('.').pop();
-      // TODO how we _actually_ replicate this during bundling???
-      // const dest = type === 'css'
-      //   ? 'style'
-      //   : 'empty'
       const headers = {
-        // 'Content-Type': type === 'css' ? 'text/css' : 'text/javascript',
         'Accept': 'text/javascript',
         'Sec-Fetch-Dest': 'empty'
       };
@@ -191,17 +178,8 @@ function greenwoodImportMetaUrl(compilation) {
       });
       const idAssetName = path.basename(id);
       const normalizedId = id.replace(/\\\\/g, '/').replace(/\\/g, '/'); // windows shenanigans...
-      // const resource = compilation.resources.get(normalizedId) || {};
-      // const { dest = 'empty' } = resource;
       let idUrl = new URL(`file://${cleanRollupId(id)}`);
-      // const type = idUrl.searchParams.has('type')
-      //   ? idUrl.searchParams.get('type')
-      //   : idUrl.pathname.split('.').pop();
-      // const dest = type === 'css'
-      //   ? 'style'
-      //   : 'empty'
       const headers = {
-        // 'Content-Type': type === 'css' ? 'text/css' : 'text/javascript',
         'Accept': 'text/javascript',
         'Sec-Fetch-Dest': 'empty'
       };
@@ -212,7 +190,6 @@ function greenwoodImportMetaUrl(compilation) {
       let response = new Response(code);
 
       // handle any custom imports or pre-processing needed before passing to Rollup this.parse
-      // TODO can we stop excluding JSON now?
       if (await checkResourceExists(idUrl)) {
         for (const plugin of resourcePlugins) {
           if (plugin.shouldResolve && await plugin.shouldResolve(idUrl)) {
@@ -258,7 +235,6 @@ function greenwoodImportMetaUrl(compilation) {
             const relativeAssetPath = getMetaImportPath(node);
             const absoluteAssetPath = path.resolve(absoluteScriptDir, relativeAssetPath);
 
-            // TODO get rid of this type= usage
             assetUrls.push({
               url: new URL(`file://${absoluteAssetPath}`),
               relativeAssetPath
@@ -383,10 +359,6 @@ const getRollupConfigForScriptResources = async (compilation) => {
       chunkFileNames: '[name].[hash].js',
       sourcemap: true
     },
-    // TODO do we need this?
-    // acornInjectPlugins: [
-    //   importAttributes
-    // ],
     plugins: [
       greenwoodResourceLoader(compilation),
       greenwoodSyncPageResourceBundlesPlugin(compilation),
@@ -437,10 +409,6 @@ const getRollupConfigForApis = async (compilation) => {
         entryFileNames: '[name].js',
         chunkFileNames: '[name].[hash].js'
       },
-      // TODO do we need this?
-      // acornInjectPlugins: [
-      //   importAttributes
-      // ],
       plugins: [
         greenwoodResourceLoader(compilation),
         // support node export conditions for SSR pages
@@ -466,10 +434,6 @@ const getRollupConfigForSsr = async (compilation, input) => {
       entryFileNames: `${path.basename(filepath).split('.')[0]}.route.js`,
       chunkFileNames: `${path.basename(filepath).split('.')[0]}.route.chunk.[hash].js`
     },
-    // TODO do we need this?
-    // acornInjectPlugins: [
-    //   importAttributes
-    // ],
     plugins: [
       greenwoodResourceLoader(compilation),
       // support node export conditions for SSR pages

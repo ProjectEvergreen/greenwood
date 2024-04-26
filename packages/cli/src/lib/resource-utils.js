@@ -2,7 +2,6 @@ import fs from 'fs/promises';
 import { hashString } from './hashing-utils.js';
 import htmlparser from 'node-html-parser';
 
-// TODO need to track dest here?
 async function modelResource(context, type, src = undefined, contents = undefined, optimizationAttr = undefined, rawAttributes = undefined) {
   const { projectDirectory, scratchDir, userWorkspace } = context;
   const extension = type === 'script' ? 'js' : 'css';
@@ -112,7 +111,7 @@ async function resolveForRelativeUrl(url, rootUrl) {
   return reducedUrl;
 }
 
-// TODO does this make more sense in bundle lifecycle?
+// does this make more sense in bundle lifecycle?
 // https://github.com/ProjectEvergreen/greenwood/issues/970
 // or could this be done sooner (like in appTemplate building in html resource plugin)?
 // Or do we need to ensure userland code / plugins have gone first

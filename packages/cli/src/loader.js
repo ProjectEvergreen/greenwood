@@ -2,7 +2,6 @@ import { readAndMergeConfig as initConfig } from './lifecycles/config.js';
 
 const config = await initConfig();
 const resourcePlugins = config.plugins.filter(plugin => plugin.type === 'resource').map(plugin => plugin.provider({
-  // TODO best way to stub this out? or pull from output?
   context: {
     projectDirectory: new URL(`file://${process.cwd()}`)
   },
@@ -14,7 +13,6 @@ const resourcePlugins = config.plugins.filter(plugin => plugin.type === 'resourc
 
 async function getCustomLoaderResponse(url, checkOnly = false) {
   const headers = {
-    // 'Content-Type': type === 'css' ? 'text/css' : 'text/javascript',
     'Accept': 'text/javascript',
     'Sec-Fetch-Dest': 'empty'
   };
@@ -60,7 +58,6 @@ async function getCustomLoaderResponse(url, checkOnly = false) {
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#resolvespecifier-context-nextresolve
 export async function resolve(specifier, context, defaultResolve) {
   const { parentURL } = context;
-  // const type = context?.importAttributes?.type;
   const url = specifier.startsWith('file://')
     ? new URL(specifier)
     : specifier.startsWith('.')
@@ -84,7 +81,6 @@ export async function resolve(specifier, context, defaultResolve) {
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#loadurl-context-nextload
 export async function load(source, context, defaultLoad) {
   const extension = source.split('.').pop();
-  // const type = context?.importAttributes?.type;
   const url = new URL(source);
   const { shouldHandle } = await getCustomLoaderResponse(url, true);
 
