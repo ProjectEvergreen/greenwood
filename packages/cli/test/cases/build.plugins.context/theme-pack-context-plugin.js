@@ -7,7 +7,7 @@ const myThemePackPlugin = (options = {}) => [{
   provider: () => {
     const { name } = packageJson;
 
-    const templateLocation = options.__isDevelopment
+    const templateLocation = options.__isDevelopment // eslint-disable-line no-underscore-dangle
       ? new URL('./fixtures/layouts/', import.meta.url)
       : new URL(`./node_modules/${name}/dist/layouts/`, import.meta.url);
 

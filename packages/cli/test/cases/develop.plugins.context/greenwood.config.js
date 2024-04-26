@@ -26,7 +26,7 @@ export default {
   plugins: [
     ...myThemePackPlugin({
       __isDevelopment: true
-    })
+    }),
     {
       type: 'resource',
       name: 'my-theme-pack:resource',
