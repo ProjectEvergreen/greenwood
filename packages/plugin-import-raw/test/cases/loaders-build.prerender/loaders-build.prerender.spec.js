@@ -1,33 +1,32 @@
 /*
  * Use Case
- * Run Greenwood with greenwoodPluginImportJsx plugin with prerendering of JSX on the server side using wc-compiler.
+ * Run Greenwood with a plugin during prerendering to be able to import arbitrary text as a string using ESM.
  *
  * User Result
- * Should generate a static Greenwood build with JSX properly prerendered.
+ * Should generate a static Greenwood build with CSS properly prerendered.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * import { greenwoodPluginImportJsx } from '@greenwood/plugin-import-jsx';
+ * import { greenwoodPluginImportRaw } from '@greenwood/plugin-import-raw';
  *
  * {
  *   prerender: true,
  *   plugins: [{
- *     greenwoodPluginImportJsx()
+ *     greenwoodPluginImportRaw()
  *   }]
  * }
  *
  * User Workspace
- * package.json
  * src/
  *   components/
- *     footer.jsx
+ *     footer.css
+ *     footer.js
  *   pages/
  *     index.md
  *   templates/
  *     app.html
- *   main.js
  */
 import chai from 'chai';
 import glob from 'glob-promise';
@@ -40,8 +39,8 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('(Experimental) Build Greenwood With: ', function() {
-  const LABEL = 'Import JSX Plugin with static pre-rendering';
+describe('Build Greenwood With: ', function() {
+  const LABEL = 'Import Raw Plugin with static pre-rendering for CSS as a string';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -61,7 +60,7 @@ describe('(Experimental) Build Greenwood With: ', function() {
 
     runSmokeTest(['public'], LABEL);
 
-    describe('importing JSX using ESM (import)', function() {
+    describe('Importing CSS as a string using ESM (import)', function() {
       let dom;
       let scripts;
 
@@ -70,16 +69,16 @@ describe('(Experimental) Build Greenwood With: ', function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      it('should contain one bundled output file in the output directory', function() {
+      it('should contain no (CSS-in) JavaScript file in the output directory', function() {
         expect(scripts.length).to.be.equal(0);
       });
 
-      it('should have the expected content from importing values from package.json in index.html', function() {
-        const headings = dom.window.document.querySelectorAll('app-footer footer h4');
-        const year = new Date().getFullYear();
+      it('should have the expected output from importing styles.css in index.html', function() {
+        const styles = dom.window.document.querySelectorAll('style');
 
-        expect(headings.length).to.equal(1);
-        expect(headings[0].textContent.trim()).to.equal(`My Blog - ${year}`);
+        // TODO minify CSS-in-JS?
+        expect(styles.length).to.equal(1);
+        expect(styles[0].textContent).to.contain('.footer { width: 90%; margin: 0 auto; padding: 0; text-align: center; }');
       });
     });
   });

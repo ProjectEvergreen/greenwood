@@ -1,4 +1,4 @@
-name: Continuous Integration (Experimental)
+name: Continuous Integration (Loaders)
 
 on: [pull_request]
 
@@ -25,4 +25,4 @@ jobs:
         yarn install --frozen-lockfile && yarn lerna bootstrap
     - name: Test
       run: |
-        yarn test:exp
+        yarn test:loaders
