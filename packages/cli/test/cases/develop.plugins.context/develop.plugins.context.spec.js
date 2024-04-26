@@ -41,7 +41,7 @@ describe('Develop Greenwood With: ', function() {
     this.context = {
       hostname: `${hostname}:${port}`
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
