@@ -62,6 +62,8 @@ graph {
 
   outputPath, // (string) the relative path to write to when generating static HTML
 
+  relativeWorkspacePagePath, // the file path relative to the user's workspace directory
+
   path, // (string) path to the file
 
   route,  // (string) A URL, typically derived from the filesystem path, e.g. /blog/2019/first-post/
