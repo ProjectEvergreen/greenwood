@@ -23,6 +23,9 @@
  *   pages/
  *     about.md
  *     artists.js
+ *     blog/
+ *       first-post.js
+ *       index.js
  *     index.js
  *     post.js
  *     users.js
@@ -269,6 +272,94 @@ describe('Serve Greenwood With: ', function() {
           .filter(file => file.indexOf('users.js') >= 0);
 
         expect(scriptFiles.length).to.equal(2);
+      });
+    });
+
+    describe('Serve command with HTML route response using default export and nested SSR Blog Index page', function() {
+      let response = {};
+      let dom = {};
+      let body;
+
+      before(async function() {
+        response = await fetch(`${hostname}/blog/`);
+        body = await response.clone().text();
+        dom = new JSDOM(body);
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers.get('content-type')).to.equal('text/html');
+        done();
+      });
+
+      it('should return a response body', function(done) {
+        expect(body).to.not.be.undefined;
+        done();
+      });
+
+      it('should be valid HTML from JSDOM', function(done) {
+        expect(dom).to.not.be.undefined;
+        done();
+      });
+
+      it('should be valid HTML from JSDOM', function(done) {
+        expect(dom).to.not.be.undefined;
+        done();
+      });
+
+      it('should have the expected postId as an <h1> tag in the body', function() {
+        const heading = dom.window.document.querySelectorAll('body > h1');
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal('Nested SSR page should work!');
+      });
+    });
+
+    describe('Develop command with HTML route response using default export and nested SSR Blog First Post page', function() {
+      let response = {};
+      let dom = {};
+      let body;
+
+      before(async function() {
+        response = await fetch(`${hostname}/blog/first-post/`);
+        body = await response.clone().text();
+        dom = new JSDOM(body);
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it('should return the correct content type', function(done) {
+        expect(response.headers.get('content-type')).to.equal('text/html');
+        done();
+      });
+
+      it('should return a response body', function(done) {
+        expect(body).to.not.be.undefined;
+        done();
+      });
+
+      it('should be valid HTML from JSDOM', function(done) {
+        expect(dom).to.not.be.undefined;
+        done();
+      });
+
+      it('should be valid HTML from JSDOM', function(done) {
+        expect(dom).to.not.be.undefined;
+        done();
+      });
+
+      it('should have the expected postId as an <h1> tag in the body', function() {
+        const heading = dom.window.document.querySelectorAll('body > h1');
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal('Nested SSR First Post page should work!');
       });
     });
 

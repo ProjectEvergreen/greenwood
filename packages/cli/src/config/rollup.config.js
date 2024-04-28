@@ -274,20 +274,29 @@ function greenwoodImportMetaUrl(compilation) {
 // TODO could we use this instead?
 // https://github.com/rollup/rollup/blob/v2.79.1/docs/05-plugin-development.md#resolveimportmeta
 // https://github.com/ProjectEvergreen/greenwood/issues/1087
-function greenwoodPatchSsrPagesEntryPointRuntimeImport() {
+function greenwoodPatchSsrPagesEntryPointRuntimeImport(compilation) {
   return {
     name: 'greenwood-patch-ssr-pages-entry-point-runtime-import',
     generateBundle(options, bundle) {
       Object.keys(bundle).forEach((key) => {
-        if (key.startsWith('__')) {
-          // ___GWD_ENTRY_FILE_URL=${filename}___
+        // map rollup bundle names back to original SSR pages for output bundles and paths
+        if (key.startsWith('_')) {
           const needle = bundle[key].code.match(/___GWD_ENTRY_FILE_URL=(.*.)___/);
-          if (needle) {
+
+          if (bundle[key].facadeModuleId.startsWith(compilation.context.scratchDir.pathname) && needle) {
             const entryPathMatch = needle[1];
 
-            bundle[key].code = bundle[key].code.replace(/'___GWD_ENTRY_FILE_URL=(.*.)___'/, `new URL('./_${entryPathMatch}', import.meta.url)`);
-          } else {
-            console.warn(`Could not find entry path match for bundle => ${key}`);
+            Object.keys(bundle).forEach((_) => {
+              if (bundle[_].facadeModuleId === `${compilation.context.pagesDir.pathname}${entryPathMatch}`) {
+                bundle[key].code = bundle[key].code.replace(/'___GWD_ENTRY_FILE_URL=(.*.)___'/, `new URL('./${bundle[_].fileName}', import.meta.url)`);
+
+                compilation.graph.forEach((page, idx) => {
+                  if (page.relativeWorkspacePagePath === `/${entryPathMatch}`) {
+                    compilation.graph[idx].outputPath = key;
+                  }
+                });
+              }
+            });
           }
         }
       });
@@ -405,7 +414,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
       }),
       commonjs(),
       greenwoodImportMetaUrl(compilation),
-      greenwoodPatchSsrPagesEntryPointRuntimeImport() // TODO a little hacky but works for now
+      greenwoodPatchSsrPagesEntryPointRuntimeImport(compilation) // TODO a little hacky but works for now
     ],
     onwarn: (errorObj) => {
       const { code, message } = errorObj;

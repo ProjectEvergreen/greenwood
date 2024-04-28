@@ -190,9 +190,9 @@ async function bundleSsrPages(compilation) {
 
     for (const page of compilation.graph) {
       if (page.isSSR && !page.prerender) {
-        const { filename, imports, route, template, title } = page;
-        const entryFileUrl = new URL(`./_${filename}`, scratchDir);
-        const moduleUrl = new URL(`./${filename}`, pagesDir);
+        const { filename, imports, route, template, title, relativeWorkspacePagePath } = page;
+        const entryFileUrl = new URL(`./_${relativeWorkspacePagePath.replace('/', '')}`, scratchDir);
+        const moduleUrl = new URL(`./${relativeWorkspacePagePath.replace('/', '')}`, pagesDir);
         const request = new Request(moduleUrl); // TODO not really sure how to best no-op this?
         // TODO getTemplate has to be static (for now?)
         // https://github.com/ProjectEvergreen/greenwood/issues/955
@@ -206,13 +206,14 @@ async function bundleSsrPages(compilation) {
         staticHtml = staticHtml.replace(/[`\\$]/g, '\\$&'); // https://stackoverflow.com/a/75688937/417806
 
         // better way to write out this inline code?
+        await fs.mkdir(entryFileUrl.pathname.replace(filename, ''), { recursive: true });
         await fs.writeFile(entryFileUrl, `
           import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
 
           export async function handler(request) {
             const compilation = JSON.parse('${JSON.stringify(compilation)}');
             const page = JSON.parse('${JSON.stringify(page)}');
-            const moduleUrl = '___GWD_ENTRY_FILE_URL=${filename}___';
+            const moduleUrl = '___GWD_ENTRY_FILE_URL=${relativeWorkspacePagePath.replace('/', '')}___';
             const data = await executeRouteModule({ moduleUrl, compilation, page, request });
             let staticHtml = \`${staticHtml}\`;
 
