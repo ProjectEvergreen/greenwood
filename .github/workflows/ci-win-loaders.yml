@@ -22,4 +22,4 @@ jobs:
         yarn install --frozen-lockfile --network-timeout 1000000 && yarn lerna bootstrap
     - name: Test
       run: |
-        yarn test:loadersxp:win
+        yarn test:loaders:win
