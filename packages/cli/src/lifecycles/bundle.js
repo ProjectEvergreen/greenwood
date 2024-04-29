@@ -13,6 +13,10 @@ async function interceptPage(url, request, plugins, body) {
   });
 
   for (const plugin of plugins) {
+    if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, response)) {
+      response = await plugin.preIntercept(url, request, response);
+    }
+
     if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
       response = await plugin.intercept(url, request, response);
     }
@@ -140,11 +144,27 @@ async function bundleStyleResources(compilation, resourcePlugins) {
       } else {
         const url = resource.sourcePathURL;
         const contentType = 'text/css';
-        const headers = new Headers({ 'Content-Type': contentType });
+        const headers = new Headers({ 'Content-Type': contentType, 'Accept': contentType });
         const request = new Request(url, { headers });
         const initResponse = new Response(contents, { headers });
 
         let response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+          const intermediateResponse = await responsePromise;
+          const shouldPreIntercept = plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, intermediateResponse.clone());
+
+          if (shouldPreIntercept) {
+            const currentResponse = await plugin.preIntercept(url, request, intermediateResponse.clone());
+            const mergedResponse = mergeResponse(intermediateResponse.clone(), currentResponse.clone());
+
+            if (mergedResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
+              return Promise.resolve(mergedResponse.clone());
+            }
+          }
+
+          return Promise.resolve(responsePromise);
+        }, Promise.resolve(initResponse));
+
+        response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
           const intermediateResponse = await responsePromise;
           const shouldIntercept = plugin.shouldIntercept && await plugin.shouldIntercept(url, request, intermediateResponse.clone());
 
@@ -158,7 +178,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
           }
 
           return Promise.resolve(responsePromise);
-        }, Promise.resolve(initResponse));
+        }, Promise.resolve(response.clone()));
 
         response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
           const intermediateResponse = await responsePromise;
@@ -302,6 +322,7 @@ const bundleCompilation = async (compilation) => {
         return plugin.provider(compilation);
       }).filter((provider) => {
         return provider.shouldIntercept && provider.intercept
+          || provider.shouldPreIntercept && provider.preIntercept
           || provider.shouldOptimize && provider.optimize;
       });
 

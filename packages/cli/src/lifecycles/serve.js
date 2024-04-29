@@ -88,6 +88,42 @@ async function getDevServer(compilation) {
     await next();
   });
 
+  // allow pre-processing of userland plugins _before_ Greenwood "standardizes" it
+  app.use(async (ctx, next) => {
+    try {
+      const url = new URL(ctx.url);
+      const { header, status, message } = ctx.response;
+      const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
+      const initResponse = new Response(status === 204 ? null : ctx.body, {
+        statusText: message,
+        status,
+        headers: new Headers(header)
+      });
+      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        const intermediateResponse = await responsePromise;
+        if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, intermediateResponse.clone())) {
+          const current = await plugin.preIntercept(url, request, await intermediateResponse.clone());
+          const merged = mergeResponse(intermediateResponse.clone(), current);
+
+          return Promise.resolve(merged);
+        } else {
+          return Promise.resolve(await responsePromise);
+        }
+      }, Promise.resolve(initResponse.clone()));
+
+      ctx.body = response.body ? Readable.from(response.body) : '';
+      ctx.message = response.statusText;
+      response.headers.forEach((value, key) => {
+        ctx.set(key, value);
+      });
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
+    }
+
+    await next();
+  });
+
   // allow intercepting of responses for URLs
   app.use(async (ctx, next) => {
     try {

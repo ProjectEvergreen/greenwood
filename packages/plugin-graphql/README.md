@@ -45,7 +45,7 @@ This will then allow you to use GraphQL to query your content from your client s
 
 ```js
 import client from '@greenwood/plugin-graphql/src/core/client.js';
-import MenuQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
+import MenuQuery from '@greenwood/plugin-graphql/src/queries/menu.gql' with { type: 'gql' };
 
 class HeaderComponent extends HTMLElement {
   constructor() {
@@ -167,7 +167,7 @@ query($name: String!) {
 And then you can use it in your code as such:
 ```js
 import client from '@greenwood/plugin-graphql/src/core/client.js';
-import GalleryQuery from '../relative/path/to/data/queries/gallery.gql';
+import GalleryQuery from '../relative/path/to/data/queries/gallery.gql' with { type: 'gql' };
 
 client.query({
   query: GalleryQuery,

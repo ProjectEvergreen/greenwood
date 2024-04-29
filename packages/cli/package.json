@@ -18,7 +18,7 @@
     "NodeJS"
   ],
   "engines": {
-    "node": ">=18.12.1"
+    "node": ">=18.20.0"
   },
   "bin": {
     "greenwood": "./src/index.js"
@@ -38,7 +38,7 @@
     "acorn-walk": "^8.0.0",
     "commander": "^2.20.0",
     "css-tree": "^2.2.1",
-    "es-module-shims": "^1.2.0",
+    "es-module-shims": "^1.8.3",
     "front-matter": "^4.0.2",
     "koa": "^2.13.0",
     "koa-body": "^6.0.1",
@@ -52,7 +52,7 @@
     "remark-rehype": "^7.0.0",
     "rollup": "^3.29.4",
     "unified": "^9.2.0",
-    "wc-compiler": "~0.12.1"
+    "wc-compiler": "~0.13.0"
   },
   "devDependencies": {
     "@babel/runtime": "^7.10.4",

@@ -37,11 +37,11 @@ class BabelResource extends ResourceInterface {
     this.contentType = ['text/javascript'];
   }
 
-  async shouldIntercept(url) {
+  async shouldPreIntercept(url) {
     return url.pathname.split('.').pop() === this.extensions[0] && !url.pathname.startsWith('/node_modules/');
   }
 
-  async intercept(url, request, response) {
+  async preIntercept(url, request, response) {
     const config = await getConfig(this.compilation, this.options.extendConfig);
     const body = await response.text();
     const result = await babel.transform(body, config);
