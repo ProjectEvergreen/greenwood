@@ -1,14 +1,27 @@
+// need this custom parser configuration until ESLint natively supports import attributes
+// https://github.com/eslint/eslint/discussions/15305#discussioncomment-2508948
 module.exports = {
-  parser: '@typescript-eslint/parser',
+  parser: '@babel/eslint-parser',
   parserOptions: {
-    ecmaVersion: 2018,
-    sourceType: 'module'
+    ecmaVersion: 2022,
+    sourceType: 'module',
+    requireConfigFile: false,
+    ecmaFeatures: {
+      jsx: true
+    },
+    babelOptions: {
+      plugins: [
+        '@babel/plugin-syntax-import-assertions'
+      ],
+      presets: ['@babel/preset-react']
+    }
   },
   plugins: [
-    '@typescript-eslint',
     'no-only-tests'
   ],
-  extends: 'plugin:markdown/recommended',
+  // plugin does not seem to work well with custom parsers?
+  // https://github.com/eslint/eslint-plugin-markdown/discussions/221
+  // extends: 'plugin:markdown/recommended-legacy',
   env: {
     browser: true,
     node: false

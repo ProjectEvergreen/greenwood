@@ -29,7 +29,7 @@ class NodeModulesResource extends ResourceInterface {
   // https://github.com/ProjectEvergreen/greenwood/issues/953v
   async resolve(url) {
     const { projectDirectory } = this.compilation.context;
-    const { pathname } = url;
+    const { pathname, searchParams } = url;
     const packageName = getPackageNameFromUrl(pathname);
     const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(packageName);
     const packagePathPieces = pathname.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
@@ -37,8 +37,11 @@ class NodeModulesResource extends ResourceInterface {
     const absoluteNodeModulesPathname = absoluteNodeModulesLocation
       ? `${absoluteNodeModulesLocation}${packagePathPieces.join('/').replace(packageName, '')}`
       : (await resolveForRelativeUrl(url, projectDirectory)).pathname;
+    const params = searchParams.size > 0
+      ? `?${searchParams.toString()}`
+      : '';
 
-    return new Request(`file://${absoluteNodeModulesPathname}`);
+    return new Request(`file://${absoluteNodeModulesPathname}${params}`);
   }
 
   async shouldServe(url) {

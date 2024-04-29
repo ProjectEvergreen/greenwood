@@ -10,7 +10,7 @@
  * greenwood build
  *
  * User Config
- * import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
+ * import { greenwoodPluginRendererLit } from '@greenwood/plugin-renderer-lit';
  *
  * {
  *   plugins: [{
@@ -166,7 +166,7 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      it('should have expected footer <h4> tag content in the <body>', function() {
+      it('should have no script tags in the <body>', function() {
         const scripTags = dom.window.document.querySelectorAll('body script');
 
         expect(scripTags.length).to.be.equal(0);
@@ -182,7 +182,7 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
         body = dom.window.document.querySelector('body');
       });
 
-      it('should have expected footer <h4> tag content in the <body>', function() {
+      it('should have expected <h1> tag content in the <header>', function() {
         const html = body.innerHTML.trim();
 
         expect(html).to.contain('<header>');

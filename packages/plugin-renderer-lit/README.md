@@ -38,8 +38,9 @@ yarn add @greenwood/plugin-renderer-lit --dev
 1. Please familiarize yourself with some of the [caveats](https://lit.dev/docs/ssr/overview/#library-status) called out in the Lit docs, like:
     - Lit SSR [**only** renders into declarative shadow roots](https://github.com/lit/lit/issues/3080#issuecomment-1165158794), so you will have to keep browser support and polyfill usage in mind.
     - At this time, `LitElement` does not support `async` work.  You can follow along with this issue [in the Lit repo](https://github.com/lit/lit/issues/2469).
-1. Lit only supports templates on the server side for HTML only generated content, thus Greenwood's `getBody` API must be used.  We would love for [server only components](https://github.com/lit/lit/issues/2469#issuecomment-1759583861) to be a thing though!
-1. Full hydration support is not available yet.  See [this Greenwood issue](https://github.com/ProjectEvergreen/greenwood/issues/880) to follow along when it will land
+1. Lit only supports templates on the server side for HTML generated content, thus Greenwood's `getBody` API must be used.  We would love for [server only components](https://github.com/lit/lit/issues/2469#issuecomment-1759583861) to be a thing though!
+1. Lit does not support [`CSSStyleSheet` (aka CSS Modules) in their SSR DOM shim](https://github.com/lit/lit/issues/2631#issuecomment-1065400805).
+1. Full hydration support is not available yet.  See [this Greenwood issue](https://github.com/ProjectEvergreen/greenwood/issues/880) to follow along with when it will land.
 
 > See [this repo](https://github.com/thescientist13/greenwood-lit-ssr) for a full demo of isomorphic Lit SSR with SSR pages and API routes deployed to Vercel serverless functions.
 

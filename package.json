@@ -20,22 +20,24 @@
     "build": "cross-env __GWD_ROLLUP_MODE__=strict node . build",
     "serve": "node . serve",
     "develop": "node . develop",
-    "test": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 c8 mocha --exclude \"./packages/**/test/cases/exp-*/**\" \"./packages/**/**/*.spec.js\"",
-    "test:exp": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --experimental-loader $(pwd)/test/test-loader.js ./node_modules/mocha/bin/mocha \"./packages/**/**/*.spec.js\"",
-    "test:exp:win": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --experimental-loader file:\\\\%cd%\\test\\test-loader.js ./node_modules/mocha/bin/mocha --exclude \"./packages/init/test/cases/**\" \"./packages/**/**/*.spec.js\"",
+    "test": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 c8 mocha --exclude \"./packages/**/test/cases/loaders-*/**\" \"./packages/**/**/*.spec.js\"",
+    "test:loaders": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --loader $(pwd)/test/test-loader.js ./node_modules/mocha/bin/mocha \"./packages/**/**/*.spec.js\"",
+    "test:loaders:win": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --loader file:\\\\%cd%\\test\\test-loader.js ./node_modules/mocha/bin/mocha --exclude \"./packages/init/test/cases/**\" \"./packages/**/**/*.spec.js\"",
     "test:tdd": "yarn test --watch",
-    "lint:js": "eslint \"*.{js,md}\" \"./packages/**/**/*.{js,md}\" \"./test/*.js\" \"./www/**/**/*.{js,md}\"",
+    "lint:js": "eslint \"*.js\" \"./packages/**/**/*.js\" \"./test/*.js\" \"./www/**/**/*.js\"",
     "lint:ts": "eslint \"./packages/**/**/*.ts\"",
     "lint:css": "stylelint \"./www/**/*.js\", \"./www/**/*.css\"",
-    "lint": "ls-lint && yarn lint:js && yarn lint:ts && yarn lint:css"
+    "lint": "ls-lint && yarn lint:js && yarn lint:css"
   },
   "resolutions": {
     "lit": "^3.1.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.4",
+    "@babel/eslint-parser": "^7.24.1",
+    "@babel/plugin-syntax-import-assertions": "^7.24.1",
+    "@babel/preset-react": "^7.24.1",
     "@ls-lint/ls-lint": "^1.10.0",
-    "@typescript-eslint/eslint-plugin": "^6.7.5",
-    "@typescript-eslint/parser": "^6.7.5",
     "babel-eslint": "^10.1.0",
     "c8": "^7.10.0",
     "chai": "^4.2.0",

@@ -14,5 +14,6 @@ ls:
 ignore: 
   - .git 
   - node_modules
+  - packages/plugin-babel/node_modules
   - packages/init/node_modules
   - packages/plugin-typescript/node_modules
