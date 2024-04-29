@@ -1,5 +1,7 @@
 # @greenwood/plugin-import-json
 
+> _**THIS PACKAGE HAS BEEN DEPRECATED**_
+
 ## Overview
 A Greenwood plugin to allow you use ESM (`import`) syntax to load your JSON.
 

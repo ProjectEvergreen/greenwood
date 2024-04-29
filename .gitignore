@@ -5,6 +5,7 @@
 .vscode/
 coverage/
 node_modules/
+packages/init/test/**/my-app
 packages/**/test/**/yarn.lock
 packages/**/test/**/package-lock.json
 packages/**/test/**/netlify

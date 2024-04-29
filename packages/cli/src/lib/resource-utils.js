@@ -61,15 +61,18 @@ function mergeResponse(destination, source) {
 // https://github.com/rollup/rollup/issues/3779
 function normalizePathnameForWindows(url) {
   const windowsDriveRegex = /\/[a-zA-Z]{1}:\//;
-  const { pathname = '' } = url;
+  const { pathname = '', searchParams } = url;
+  const params = searchParams.size > 0
+    ? `?${searchParams.toString()}`
+    : '';
 
   if (windowsDriveRegex.test(pathname)) {
     const driveMatch = pathname.match(windowsDriveRegex)[0];
 
-    return pathname.replace(driveMatch, driveMatch.replace('/', ''));
+    return `${pathname.replace(driveMatch, driveMatch.replace('/', ''))}${params}`;
   }
 
-  return pathname;
+  return `${pathname}${params}`;
 }
 
 async function checkResourceExists(url) {
@@ -108,7 +111,7 @@ async function resolveForRelativeUrl(url, rootUrl) {
   return reducedUrl;
 }
 
-// TODO does this make more sense in bundle lifecycle?
+// does this make more sense in bundle lifecycle?
 // https://github.com/ProjectEvergreen/greenwood/issues/970
 // or could this be done sooner (like in appTemplate building in html resource plugin)?
 // Or do we need to ensure userland code / plugins have gone first

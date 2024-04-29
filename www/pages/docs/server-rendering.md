@@ -238,25 +238,24 @@ export const isolation = true;
 
 ### Custom Imports
 
-> ⚠️ _This feature is experimental._
-> 
-> _**Note**: At this time, [WCC can't handle non-standard javaScript formats](https://github.com/ProjectEvergreen/greenwood/issues/1004), though we hope to enable this by the 1.0 release._
+To enable custom [imports](/docs/scripts/#imports) on the server side for prerendering or SSR use cases, you will need to invoke Greenwood using `node` on the CLI and pass it the `--loaders` flag.
 
-Combined with Greenwood's [custom import resource plugins](https://www.greenwoodjs.io/plugins/custom-plugins/) (or your own!), Greenwood can handle loading custom file extensions on the server side using ESM, like CSS and JSON!
-
-For example, you can now import JSON in your SSR pages and components.
-```js
-import json from '../path/to/data.json';
-
-console.log(json); // { status: 200, message: 'some data' }
+```shell
+$ node --loader ./node_modules/@greenwood/cli/src/loader.js ./node_modules/.bin/greenwood <command>
 ```
 
-**Steps**
-1. Make sure you are using Node `v18.15.0`
-1. Run the Greenwood CLI using the `--experimental-loaders` flag and pass Greenwood's custom loader
-    ```shell
-    $ node --experimental-loader ./node_modules/@greenwood/cli/src/loader.js ./node_modules/.bin/greenwood <command>
-    ```
+Then you will be able to run this code with NodeJS, or for any custom format you want using a plugin. 
+```js
+import sheet from './styles.css' with { type: 'css' };
+import data from './data.json' with { type: 'json' };
+
+console.log({ sheet, data });
+```
+
+_**Notes**_
+
+- At this time, [WCC can't handle non-standard JavaScript formats](https://github.com/ProjectEvergreen/greenwood/issues/1004), though we hope to enable this by the 1.0 release.
+- We would like to explore ways to [improve the DX here](https://github.com/ProjectEvergreen/greenwood/discussions/1217), and not require having to manually invoke `node`
 
 ### Hybrid Projects
 

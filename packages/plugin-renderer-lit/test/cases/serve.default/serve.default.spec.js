@@ -9,7 +9,15 @@
  * greenwood build
  *
  * User Config
- * {}
+ * import { greenwoodPluginRendererLit } from '@greenwood/plugin-renderer-lit';
+ *
+ * {
+ *   plugins: [{
+ *     greenwoodPluginRendererLit({
+ *       prerender: true
+ *     })
+ *   }]
+ * }
  *
  * User Workspace
  *  src/

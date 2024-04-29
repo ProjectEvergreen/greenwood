@@ -9,7 +9,7 @@ import * as walk from 'acorn-walk';
 // https://github.com/rollup/rollup/issues/2121
 // would be nice to get rid of this
 function cleanRollupId(id) {
-  return id.replace('\x00', '');
+  return id.replace('\x00', '').replace('?commonjs-proxy', '');
 }
 
 function greenwoodResourceLoader (compilation) {
@@ -35,25 +35,42 @@ function greenwoodResourceLoader (compilation) {
       }
     },
     async load(id) {
-      const idUrl = new URL(`file://${cleanRollupId(id)}`);
+      let idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
       const extension = pathname.split('.').pop();
+      const headers = {
+        'Accept': 'text/javascript',
+        'Sec-Fetch-Dest': 'empty'
+      };
 
       // filter first for any bare specifiers
-      if (await checkResourceExists(idUrl) && extension !== '' && extension !== 'js') {
-        const url = new URL(`${idUrl.href}?type=${extension}`);
-        const request = new Request(url.href);
+      if (await checkResourceExists(idUrl) && extension !== 'js') {
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldResolve && await plugin.shouldResolve(idUrl)) {
+            idUrl = new URL((await plugin.resolve(idUrl)).url);
+          }
+        }
+
+        const request = new Request(idUrl, {
+          headers
+        });
         let response = new Response('');
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
-            response = await plugin.serve(url, request);
+          if (plugin.shouldServe && await plugin.shouldServe(idUrl, request)) {
+            response = await plugin.serve(idUrl, request);
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
-            response = await plugin.intercept(url, request, response.clone());
+          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(idUrl, request, response.clone())) {
+            response = await plugin.preIntercept(idUrl, request, response.clone());
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldIntercept && await plugin.shouldIntercept(idUrl, request, response.clone())) {
+            response = await plugin.intercept(idUrl, request, response.clone());
           }
         }
 
@@ -161,26 +178,42 @@ function greenwoodImportMetaUrl(compilation) {
       });
       const idAssetName = path.basename(id);
       const normalizedId = id.replace(/\\\\/g, '/').replace(/\\/g, '/'); // windows shenanigans...
-      const idUrl = new URL(`file://${cleanRollupId(id)}`);
-      const { pathname } = idUrl;
-      const extension = pathname.split('.').pop();
-      const urlWithType = new URL(`${idUrl.href}?type=${extension}`);
-      const request = new Request(urlWithType.href);
+      let idUrl = new URL(`file://${cleanRollupId(id)}`);
+      const headers = {
+        'Accept': 'text/javascript',
+        'Sec-Fetch-Dest': 'empty'
+      };
+      const request = new Request(idUrl, {
+        headers
+      });
       let canTransform = false;
       let response = new Response(code);
 
       // handle any custom imports or pre-processing needed before passing to Rollup this.parse
-      if (await checkResourceExists(idUrl) && extension !== '' && extension !== 'json') {
+      if (await checkResourceExists(idUrl)) {
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldServe && await plugin.shouldServe(urlWithType, request)) {
-            response = await plugin.serve(urlWithType, request);
+          if (plugin.shouldResolve && await plugin.shouldResolve(idUrl)) {
+            idUrl = new URL((await plugin.resolve(idUrl)).url);
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldServe && await plugin.shouldServe(idUrl, request)) {
+            response = await plugin.serve(idUrl, request);
             canTransform = true;
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldIntercept && await plugin.shouldIntercept(urlWithType, request, response.clone())) {
-            response = await plugin.intercept(urlWithType, request, response.clone());
+          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(idUrl, request, response)) {
+            response = await plugin.preIntercept(idUrl, request, response);
+            canTransform = true;
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldIntercept && await plugin.shouldIntercept(idUrl, request, response.clone())) {
+            response = await plugin.intercept(idUrl, request, response.clone());
             canTransform = true;
           }
         }
@@ -201,11 +234,9 @@ function greenwoodImportMetaUrl(compilation) {
             const absoluteScriptDir = path.dirname(id);
             const relativeAssetPath = getMetaImportPath(node);
             const absoluteAssetPath = path.resolve(absoluteScriptDir, relativeAssetPath);
-            const assetName = path.basename(absoluteAssetPath);
-            const assetExtension = assetName.split('.').pop();
 
             assetUrls.push({
-              url: new URL(`file://${absoluteAssetPath}?type=${assetExtension}`),
+              url: new URL(`file://${absoluteAssetPath}`),
               relativeAssetPath
             });
           }

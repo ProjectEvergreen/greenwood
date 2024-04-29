@@ -40,6 +40,24 @@ class StandardJsonResource extends ResourceInterface {
       })
     });
   }
+
+  async shouldIntercept(url, request) {
+    const { protocol, pathname, searchParams } = url;
+    const ext = pathname.split('.').pop();
+
+    return protocol === 'file:' && request.headers.get('Accept')?.indexOf('text/javascript') >= 0 && ext === this.extensions[0] && !searchParams.has('type');
+  }
+
+  async intercept(url, request, response) {
+    const json = await response.json();
+    const body = `export default ${JSON.stringify(json)}`;
+
+    return new Response(body, {
+      headers: {
+        'Content-Type': 'text/javascript'
+      }
+    });
+  }
 }
 
 const pluginGreenwoodStandardJson = [{
