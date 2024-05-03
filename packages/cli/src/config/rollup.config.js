@@ -278,16 +278,20 @@ function greenwoodPatchSsrPagesEntryPointRuntimeImport(compilation) {
   return {
     name: 'greenwood-patch-ssr-pages-entry-point-runtime-import',
     generateBundle(options, bundle) {
+      const { pagesDir, scratchDir } = compilation.context;
+
       Object.keys(bundle).forEach((key) => {
         // map rollup bundle names back to original SSR pages for output bundles and paths
         if (key.startsWith('_')) {
           const needle = bundle[key].code.match(/___GWD_ENTRY_FILE_URL=(.*.)___/);
 
-          if (bundle[key].facadeModuleId.startsWith(compilation.context.scratchDir.pathname) && needle) {
+          // handle windows shenanigans for facadeModuleId and path separators
+          if (new URL(`file://${bundle[key].facadeModuleId}`).pathname.startsWith(scratchDir.pathname) && needle) {
             const entryPathMatch = needle[1];
 
             Object.keys(bundle).forEach((_) => {
-              if (bundle[_].facadeModuleId === `${compilation.context.pagesDir.pathname}${entryPathMatch}`) {
+              // handle windows shenanigans for facadeModuleId and path separators
+              if (new URL(`file://${bundle[_].facadeModuleId}`).pathname === `${pagesDir.pathname}${entryPathMatch}`) {
                 bundle[key].code = bundle[key].code.replace(/'___GWD_ENTRY_FILE_URL=(.*.)___'/, `new URL('./${bundle[_].fileName}', import.meta.url)`);
 
                 compilation.graph.forEach((page, idx) => {
