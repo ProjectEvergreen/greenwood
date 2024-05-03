@@ -24,7 +24,9 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
 
 export default {
   plugins: [
-    ...myThemePackPlugin(),
+    ...myThemePackPlugin({
+      __isDevelopment: true
+    }),
     {
       type: 'resource',
       name: 'my-theme-pack:resource',
