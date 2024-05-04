@@ -8772,6 +8772,11 @@ gauge@~2.7.3:
     strip-ansi "^3.0.1"
     wide-align "^1.1.0"
 
+geist@^1.2.0:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/geist/-/geist-1.2.2.tgz#6e0c70afb7a99efaa403368b4935c62650619a06"
+  integrity sha512-uRDrxhvdnPwWJmh+K5+/5LXSKwvJzaYCl9tDXgiBi4hj7hB4K7+n/WLcvJMFs5btvyn0r9OSwCd1s6CmqAsxEw==
+
 genfun@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/genfun/-/genfun-5.0.0.tgz#9dd9710a06900a5c4a5bf57aca5da4e52fe76537"
