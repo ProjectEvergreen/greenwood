@@ -191,6 +191,7 @@ const generateGraph = async (compilation) => {
              * data: custom page frontmatter
              * filename: base filename of the page
              * id: filename without the extension
+             * relativeWorkspacePagePath: the file path relative to the user's workspace directory
              * label: "pretty" text representation of the filename
              * imports: per page JS or CSS file imports to be included in HTML output from frontmatter
              * resources: sum of all resources for the entire page
@@ -206,6 +207,7 @@ const generateGraph = async (compilation) => {
               data: customData || {},
               filename,
               id,
+              relativeWorkspacePagePath: relativePagePath,
               label: id.split('-')
                 .map((idPart) => {
                   return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;

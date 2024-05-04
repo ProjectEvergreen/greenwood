@@ -190,9 +190,10 @@ async function bundleSsrPages(compilation) {
 
     for (const page of compilation.graph) {
       if (page.isSSR && !page.prerender) {
-        const { filename, imports, route, template, title } = page;
-        const entryFileUrl = new URL(`./_${filename}`, scratchDir);
-        const moduleUrl = new URL(`./${filename}`, pagesDir);
+        const { imports, route, template, title, relativeWorkspacePagePath } = page;
+        const entryFileUrl = new URL(`./_${relativeWorkspacePagePath.replace('/', '')}`, scratchDir);
+        const moduleUrl = new URL(`./${relativeWorkspacePagePath.replace('/', '')}`, pagesDir);
+        const outputPathRootUrl = new URL(`file://${path.dirname(entryFileUrl.pathname)}`);
         const request = new Request(moduleUrl); // TODO not really sure how to best no-op this?
         // TODO getTemplate has to be static (for now?)
         // https://github.com/ProjectEvergreen/greenwood/issues/955
@@ -205,6 +206,12 @@ async function bundleSsrPages(compilation) {
         staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
         staticHtml = staticHtml.replace(/[`\\$]/g, '\\$&'); // https://stackoverflow.com/a/75688937/417806
 
+        if (!await checkResourceExists(outputPathRootUrl)) {
+          await fs.mkdir(outputPathRootUrl, {
+            recursive: true
+          });
+        }
+
         // better way to write out this inline code?
         await fs.writeFile(entryFileUrl, `
           import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
@@ -212,7 +219,7 @@ async function bundleSsrPages(compilation) {
           export async function handler(request) {
             const compilation = JSON.parse('${JSON.stringify(compilation)}');
             const page = JSON.parse('${JSON.stringify(page)}');
-            const moduleUrl = '___GWD_ENTRY_FILE_URL=${filename}___';
+            const moduleUrl = '___GWD_ENTRY_FILE_URL=${relativeWorkspacePagePath.replace('/', '')}___';
             const data = await executeRouteModule({ moduleUrl, compilation, page, request });
             let staticHtml = \`${staticHtml}\`;
 
