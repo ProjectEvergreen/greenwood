@@ -5,10 +5,14 @@
  *
  */
 import fs from 'fs';
+import path from 'path';
 import { parse, walk } from 'css-tree';
 import { ResourceInterface } from '../../lib/resource-interface.js';
+import { normalizePathnameForWindows } from '../../lib/resource-utils.js';
+import { hashString } from '../../lib/hashing-utils.js';
 
-function bundleCss(body, url, projectDirectory) {
+function bundleCss(body, url, compilation) {
+  const { projectDirectory, outputDir, userWorkspace } = compilation.context;
   const ast = parse(body, {
     onParseError(error) {
       console.log(error.formattedMessage);
@@ -29,10 +33,40 @@ function bundleCss(body, url, projectDirectory) {
             : new URL(value, url);
           const importContents = fs.readFileSync(resolvedUrl, 'utf-8');
 
-          optimizedCss += bundleCss(importContents, url, projectDirectory);
+          optimizedCss += bundleCss(importContents, url, compilation);
         } else {
           optimizedCss += `@import url('${value}');`;
         }
+      } else if (type === 'Url' && this.atrule?.name !== 'import') {
+        if (value.startsWith('http') || value.startsWith('//')) {
+          optimizedCss += `url('${value}')`;
+          return;
+        }
+
+        const basePath = compilation.config.basePath === '' ? '/' : `${compilation.config.basePath}/`;
+        let barePath = value.replace(/\.\.\//g, '').replace('./', '');
+
+        if (barePath.startsWith('/')) {
+          barePath = barePath.replace('/', '');
+        }
+
+        const locationUrl = barePath.startsWith('node_modules')
+          ? new URL(`./${barePath}`, projectDirectory)
+          : new URL(`./${barePath}`, userWorkspace);
+        const hash = hashString(fs.readFileSync(locationUrl, 'utf-8'));
+        const ext = barePath.split('.').pop();
+        const hashedRoot = barePath.replace(`.${ext}`, `.${hash}.${ext}`);
+
+        fs.mkdirSync(normalizePathnameForWindows(new URL(`./${path.dirname(barePath)}/`, outputDir)), {
+          recursive: true
+        });
+
+        fs.promises.copyFile(
+          locationUrl,
+          new URL(`./${hashedRoot}`, outputDir)
+        );
+
+        optimizedCss += `url('${basePath}${hashedRoot}')`;
       } else if (type === 'Atrule' && name !== 'import') {
         optimizedCss += `@${name} `;
       } else if (type === 'TypeSelector') {
@@ -257,7 +291,7 @@ class StandardCssResource extends ResourceInterface {
 
   async optimize(url, response) {
     const body = await response.text();
-    const optimizedBody = bundleCss(body, url, this.compilation.context.projectDirectory);
+    const optimizedBody = bundleCss(body, url, this.compilation);
 
     return new Response(optimizedBody);
   }

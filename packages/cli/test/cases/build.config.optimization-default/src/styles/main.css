@@ -8,6 +8,7 @@
 
 body {
   background-color: green;
+  background-image: url('../images/webcomponents.jpg');
 }
 
 h1, h2 {

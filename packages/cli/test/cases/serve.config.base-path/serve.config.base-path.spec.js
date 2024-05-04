@@ -49,7 +49,7 @@ describe('Serve Greenwood With: ', function() {
   const hostname = 'http://127.0.0.1:8080';
   const basePath = '/my-path';
   const jsHash = '2ce3f02d';
-  const cssHash = '1454013616';
+  const cssHash = '2106293974';
   let runner;
 
   before(function() {
@@ -229,7 +229,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(body).to.contain('*{color:blue}');
+        expect(body).to.contain('*{color:blue;background-image:url(\'/my-path/images/webcomponents.1079385342.jpg\');}');
         done();
       });
     });
