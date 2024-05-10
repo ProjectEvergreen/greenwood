@@ -170,8 +170,11 @@ class MyThemePackDevelopmentResource extends ResourceInterface {
   async resolve(url) {
     const { userWorkspace } = this.compilation.context;
     const filePath = this.getBareUrlPath(url).split(`/node_modules/${packageName}/dist/`)[1];
+    const params = searchParams.size > 0
+      ? `?${searchParams.toString()}`
+      : '';
 
-    return new URL(`./${filePath}`, userWorkspace, filePath);
+    return new URL(`./${filePath}${params}`, userWorkspace, filePath);
   }
 }
 
