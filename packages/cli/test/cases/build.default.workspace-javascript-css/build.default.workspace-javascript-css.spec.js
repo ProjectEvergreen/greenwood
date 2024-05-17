@@ -78,7 +78,7 @@ describe('Build Greenwood With: ', function() {
       it('should have two <script> tag with inline script in the <head>', function() {
         const scriptTagInline = Array.from(dom.window.document.querySelectorAll('head > script:not([src])')).filter(tag => !tag.getAttribute('data-gwd'));
 
-        expect(scriptTagInline.length).to.be.equal(4);
+        expect(scriptTagInline.length).to.be.equal(5);
       });
 
       it('should have the expected inline content from inline <script> tag one in index.html', async function() {
@@ -97,6 +97,13 @@ describe('Build Greenwood With: ', function() {
         const scriptTagSrcTwo = Array.from(dom.window.document.querySelectorAll('head > script:not([src])')).filter(tag => !tag.getAttribute('data-gwd'))[2];
 
         expect(scriptTagSrcTwo.textContent).to.contain('document.getElementsByClassName("output-script-inline-three")[0].innerHTML="script tag module inline three"');
+      });
+
+      it('should have the expected <script> tag of type application/json', async function() {
+        const scriptJson = Array.from(dom.window.document.querySelectorAll('head > script[type="application/json"]'));
+
+        expect(scriptJson.length).to.equal(1);
+        expect(JSON.parse(scriptJson[0].textContent).message).to.equal('calmer than you are');
       });
 
     });
