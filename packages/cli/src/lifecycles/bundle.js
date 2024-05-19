@@ -218,13 +218,6 @@ async function bundleApiRoutes(compilation) {
 }
 
 async function bundleSsrPages(compilation, optimizePlugins) {
-  // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  // TODO context plugins for SSR ?
-  // const contextPlugins = compilation.config.plugins.filter((plugin) => {
-  //   return plugin.type === 'context';
-  // }).map((plugin) => {
-  //   return plugin.provider(compilation);
-  // });
   const { context, config } = compilation;
   const ssrPages = compilation.graph.filter(page => page.isSSR && !page.prerender);
   const ssrPrerenderPagesRouteMapper = {};
@@ -247,8 +240,8 @@ async function bundleSsrPages(compilation, optimizePlugins) {
       const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [], request });
       let staticHtml = '';
 
-      staticHtml = data.layout ? data.layout : await getPageLayout(staticHtml, compilation.context, layout, []);
-      staticHtml = await getAppLayout(staticHtml, context, imports, [], false, title);
+      staticHtml = data.layout ? data.layout : await getPageLayout(staticHtml, compilation, layout);
+      staticHtml = await getAppLayout(staticHtml, compilation, imports, title);
       staticHtml = await getUserScripts(staticHtml, compilation);
       staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
 

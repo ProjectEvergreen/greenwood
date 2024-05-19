@@ -1,8 +1,17 @@
 import fs from 'fs/promises';
 import htmlparser from 'node-html-parser';
 import { checkResourceExists } from './resource-utils.js';
+import { Worker } from 'worker_threads';
 
-async function getCustomPageLayoutsFromPlugins(contextPlugins, layoutName) {
+async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {
+  // TODO confirm context plugins work for SSR
+  // TODO support context plugins for more than just HTML files
+  const contextPlugins = compilation.config.plugins.filter((plugin) => {
+    return plugin.type === 'context';
+  }).map((plugin) => {
+    return plugin.provider(compilation);
+  });
+
   const customLayoutLocations = [];
   const layoutDir = contextPlugins
     .map(plugin => plugin.layouts)
@@ -21,19 +30,21 @@ async function getCustomPageLayoutsFromPlugins(contextPlugins, layoutName) {
   return customLayoutLocations;
 }
 
-async function getPageLayout(filePath, context, layout, contextPlugins = []) {
+async function getPageLayout(filePath, compilation, layout) {
+  const { context } = compilation;
   const { layoutsDir, userLayoutsDir, pagesDir, projectDirectory } = context;
-  const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(contextPlugins, 'page');
-  const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(contextPlugins, layout);
+  const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, 'page');
+  const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, layout);
   const extension = filePath.split('.').pop();
   const is404Page = filePath.startsWith('404') && extension === 'html';
-  const hasCustomLayout = await checkResourceExists(new URL(`./${layout}.html`, userLayoutsDir));
+  const hasCustomStaticLayout = await checkResourceExists(new URL(`./${layout}.html`, userLayoutsDir));
+  const hasCustomDynamicLayout = await checkResourceExists(new URL(`./${layout}.js`, userLayoutsDir));
   const hasPageLayout = await checkResourceExists(new URL('./page.html', userLayoutsDir));
   const hasCustom404Page = await checkResourceExists(new URL('./404.html', pagesDir));
   const isHtmlPage = extension === 'html' && await checkResourceExists(new URL(`./${filePath}`, projectDirectory));
   let contents;
 
-  if (layout && (customPluginPageLayouts.length > 0 || hasCustomLayout)) {
+  if (layout && (customPluginPageLayouts.length > 0 || hasCustomStaticLayout)) {
     // use a custom layout, usually from markdown frontmatter
     contents = customPluginPageLayouts.length > 0
       ? await fs.readFile(new URL(`./${layout}.html`, customPluginPageLayouts[0]), 'utf-8')
@@ -47,6 +58,33 @@ async function getPageLayout(filePath, context, layout, contextPlugins = []) {
     contents = customPluginDefaultPageLayouts.length > 0
       ? await fs.readFile(new URL('./page.html', customPluginDefaultPageLayouts[0]), 'utf-8')
       : await fs.readFile(new URL('./page.html', userLayoutsDir), 'utf-8');
+  } else if (hasCustomDynamicLayout && !is404Page) {
+    const routeModuleLocationUrl = new URL(`./${layout}.js`, userLayoutsDir);
+    const routeWorkerUrl = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeModuleUrl;
+
+    await new Promise(async (resolve, reject) => {
+      const worker = new Worker(new URL('./ssr-route-worker.js', import.meta.url));
+
+      worker.on('message', (result) => {
+
+        if (result.body) {
+          contents = result.body;
+        }
+        resolve();
+      });
+      worker.on('error', reject);
+      worker.on('exit', (code) => {
+        if (code !== 0) {
+          reject(new Error(`Worker stopped with exit code ${code}`));
+        }
+      });
+
+      worker.postMessage({
+        executeModuleUrl: routeWorkerUrl.href,
+        moduleUrl: routeModuleLocationUrl.href,
+        compilation: JSON.stringify(compilation)
+      });
+    });
   } else if (is404Page && !hasCustom404Page) {
     contents = await fs.readFile(new URL('./404.html', layoutsDir), 'utf-8');
   } else {
@@ -58,16 +96,52 @@ async function getPageLayout(filePath, context, layout, contextPlugins = []) {
 }
 
 /* eslint-disable-next-line complexity */
-async function getAppLayout(pageLayoutContents, context, customImports = [], contextPlugins, enableHud, frontmatterTitle) {
-  const { layoutsDir, userLayoutsDir } = context;
-  const userAppLayoutUrl = new URL('./app.html', userLayoutsDir);
-  const customAppLayoutsFromPlugins = await getCustomPageLayoutsFromPlugins(contextPlugins, 'app');
-  const hasCustomUserAppLayout = await checkResourceExists(userAppLayoutUrl);
+async function getAppLayout(pageLayoutContents, compilation, customImports = [], frontmatterTitle) {
+  const enableHud = compilation.config.devServer.hud;
+  const { layoutsDir, userLayoutsDir } = compilation.context;
+  const userStaticAppLayoutUrl = new URL('./app.html', userLayoutsDir);
+  // TODO support more than just .js files
+  const userDynamicAppLayoutUrl = new URL('./app.js', userLayoutsDir);
+  const userHasStaticAppLayout = await checkResourceExists(userStaticAppLayoutUrl);
+  const userHasDynamicAppLayout = await checkResourceExists(userDynamicAppLayoutUrl);
+  const customAppLayoutsFromPlugins = await getCustomPageLayoutsFromPlugins(compilation, 'app');
+  let dynamicAppLayoutContents;
+
+  if (userHasDynamicAppLayout) {
+    const routeWorkerUrl = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeModuleUrl;
+
+    await new Promise(async (resolve, reject) => {
+      const worker = new Worker(new URL('./ssr-route-worker.js', import.meta.url));
+
+      worker.on('message', (result) => {
+
+        if (result.body) {
+          dynamicAppLayoutContents = result.body;
+        }
+        resolve();
+      });
+      worker.on('error', reject);
+      worker.on('exit', (code) => {
+        if (code !== 0) {
+          reject(new Error(`Worker stopped with exit code ${code}`));
+        }
+      });
+
+      worker.postMessage({
+        executeModuleUrl: routeWorkerUrl.href,
+        moduleUrl: userDynamicAppLayoutUrl.href,
+        compilation: JSON.stringify(compilation)
+      });
+    });
+  }
+
   let appLayoutContents = customAppLayoutsFromPlugins.length > 0
     ? await fs.readFile(new URL('./app.html', customAppLayoutsFromPlugins[0]))
-    : hasCustomUserAppLayout
-      ? await fs.readFile(userAppLayoutUrl, 'utf-8')
-      : await fs.readFile(new URL('./app.html', layoutsDir), 'utf-8');
+    : userHasStaticAppLayout
+      ? await fs.readFile(userStaticAppLayoutUrl, 'utf-8')
+      : userHasDynamicAppLayout
+        ? dynamicAppLayoutContents
+        : await fs.readFile(new URL('./app.html', layoutsDir), 'utf-8');
   let mergedLayoutContents = '';
 
   const pageRoot = pageLayoutContents && htmlparser.parse(pageLayoutContents, {

@@ -137,20 +137,13 @@ class StandardHtmlResource extends ResourceInterface {
       });
     }
 
-    // get context plugins
-    const contextPlugins = this.compilation.config.plugins.filter((plugin) => {
-      return plugin.type === 'context';
-    }).map((plugin) => {
-      return plugin.provider(this.compilation);
-    });
-
     if (isSpaRoute) {
       body = await fs.readFile(new URL(`./${isSpaRoute.filename}`, userWorkspace), 'utf-8');
     } else {
-      body = ssrLayout ? ssrLayout : await getPageLayout(filePath, context, layout, contextPlugins);
+      body = ssrLayout ? ssrLayout : await getPageLayout(filePath, this.compilation, layout);
     }
 
-    body = await getAppLayout(body, context, customImports, contextPlugins, config.devServer.hud, title);
+    body = await getAppLayout(body, this.compilation, customImports, title);
     body = await getUserScripts(body, this.compilation);
 
     if (processedMarkdown) {
