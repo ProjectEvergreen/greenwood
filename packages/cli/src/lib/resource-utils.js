@@ -124,7 +124,8 @@ async function trackResourcesForRoute(html, compilation, route) {
   const scripts = await Promise.all(root.querySelectorAll('script')
     .filter(script => (
       isLocalLink(script.getAttribute('src')) || script.rawText)
-      && script.rawAttrs.indexOf('importmap') < 0)
+      && script.rawAttrs.indexOf('importmap') < 0
+      && script.getAttribute('type') !== 'application/json')
     .map(async(script) => {
       const src = script.getAttribute('src');
       const optimizationAttr = script.getAttribute('data-gwd-opt');
