@@ -89,10 +89,16 @@ async function checkResourceExists(url) {
 // * and a nested path in the layout - ../../styles/theme.css
 // so will get resolved as `${rootUrl}/styles/theme.css`
 async function resolveForRelativeUrl(url, rootUrl) {
+  // console.log('resolveForRelativeUrl', url, rootUrl)
   const search = url.search || '';
   let reducedUrl;
 
-  if (await checkResourceExists(new URL(`.${url.pathname}`, rootUrl))) {
+  // TODO validate we still need this
+  if (!rootUrl) {
+    return url;
+  }
+
+  if (url.protocol !== 'file:' && await checkResourceExists(new URL(`.${url.pathname}`, rootUrl))) {
     return new URL(`.${url.pathname}${search}`, rootUrl);
   }
 

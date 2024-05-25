@@ -1,42 +1,63 @@
 import { readAndMergeConfig as initConfig } from './lifecycles/config.js';
+import { mergeResponse } from './lib/resource-utils.js';
 
 const config = await initConfig();
-const resourcePlugins = config.plugins.filter(plugin => plugin.type === 'resource').map(plugin => plugin.provider({
-  context: {
-    projectDirectory: new URL(`file://${process.cwd()}`)
-  },
-  config: {
-    devServer: {}
-  },
-  graph: []
-}));
+const resourcePlugins = config.plugins
+  .filter(plugin => plugin.type === 'resource')
+  .filter(plugin => plugin.name !== 'plugin-node-modules:resource')
+  .filter(plugin => plugin.name !== 'plugin-user-workspace')
+  .map(plugin => plugin.provider({
+    context: {
+      projectDirectory: new URL(`file://${process.cwd()}/`),
+      scratchDir: new URL(`file://${process.cwd()}/.greenwood/`)
+    },
+    config: {
+      devServer: {}
+    },
+    graph: []
+  }));
 
-async function getCustomLoaderResponse(url, checkOnly = false) {
+async function getCustomLoaderResponse(initUrl, checkOnly = false) {
+  // console.log('CUSTOM LOADER RESPONSE', { initUrl })
   const headers = {
     'Accept': 'text/javascript',
     'Sec-Fetch-Dest': 'empty'
   };
-  const request = new Request(url, { headers });
   const initResponse = new Response('');
+  let request = new Request(initUrl, { headers });
+  let url = initUrl;
   let response = initResponse.clone();
   let shouldHandle = false;
 
   for (const plugin of resourcePlugins) {
-    if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
+    if (initUrl.protocol === 'file:' && plugin.shouldResolve && await plugin.shouldResolve(initUrl, request)) {
       shouldHandle = true;
 
       if (!checkOnly) {
-        response = await plugin.serve(url, request);
+        // request = await plugin.resolve(url, request);
+        url = new URL((await plugin.resolve(initUrl, request)).url);
+        console.log('checking....', { url });
       }
     }
   }
 
   for (const plugin of resourcePlugins) {
+    if (plugin.shouldServe && await plugin.shouldServe(initUrl, request)) {
+      shouldHandle = true;
+
+      if (!checkOnly) {
+        response = mergeResponse(response, await plugin.serve(initUrl, request));
+      }
+    }
+  }
+
+  // TODO confirm we need mergeResponse
+  for (const plugin of resourcePlugins) {
     if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, response.clone())) {
       shouldHandle = true;
 
       if (!checkOnly) {
-        response = await plugin.preIntercept(url, request, response.clone());
+        response = mergeResponse(response, await plugin.preIntercept(url, request, response.clone()));
       }
     }
 
@@ -44,7 +65,7 @@ async function getCustomLoaderResponse(url, checkOnly = false) {
       shouldHandle = true;
 
       if (!checkOnly) {
-        response = await plugin.intercept(url, request, response.clone());
+        response = mergeResponse(response, await plugin.intercept(url, request, response.clone()));
       }
     }
   }

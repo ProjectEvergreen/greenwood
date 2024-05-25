@@ -44,6 +44,7 @@ function greenwoodResourceLoader (compilation) {
       };
 
       // filter first for any bare specifiers
+      // TODO test - if (await checkResourceExists(idUrl)) {
       if (await checkResourceExists(idUrl) && extension !== 'js') {
         for (const plugin of resourcePlugins) {
           if (plugin.shouldResolve && await plugin.shouldResolve(idUrl)) {
@@ -71,6 +72,12 @@ function greenwoodResourceLoader (compilation) {
         for (const plugin of resourcePlugins) {
           if (plugin.shouldIntercept && await plugin.shouldIntercept(idUrl, request, response.clone())) {
             response = await plugin.intercept(idUrl, request, response.clone());
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldOptimize && await plugin.shouldOptimize(idUrl, response.clone())) {
+            response = await plugin.optimize(idUrl, response.clone());
           }
         }
 
