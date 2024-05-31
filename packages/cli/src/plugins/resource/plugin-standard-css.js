@@ -54,12 +54,12 @@ function bundleCss(body, url, compilation) {
           ? new URL(`./${barePath}`, projectDirectory)
           : new URL(`./${barePath}`, userWorkspace);
 
-        if (fs.existsSync(locationUrl.pathname)) {
+        if (fs.existsSync(locationUrl)) {
           const hash = hashString(fs.readFileSync(locationUrl, 'utf-8'));
           const ext = barePath.split('.').pop();
           const hashedRoot = barePath.replace(`.${ext}`, `.${hash}.${ext}`);
 
-          fs.mkdirSync(normalizePathnameForWindows(new URL(`./${path.dirname(barePath)}/`, outputDir)), {
+          fs.mkdirSync(new URL(`./${path.dirname(barePath)}/`, outputDir), {
             recursive: true
           });
 
