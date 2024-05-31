@@ -61,3 +61,7 @@ h1:has(+h2){margin:0 0 0.25rem 0}
 :is(ol,ul,menu:unsupported) :is(ol,ul){color:green}
 
 .snippet{margin:var(--size-4) 0;padding:0 var(--size-4);}
+
+h1{background-image:url('/foo/bar.baz')}
+
+.has-success{background-image:url('data:image/svg+xml;...')}
