@@ -8,7 +8,6 @@ import fs from 'fs';
 import path from 'path';
 import { parse, walk } from 'css-tree';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import { normalizePathnameForWindows } from '../../lib/resource-utils.js';
 import { hashString } from '../../lib/hashing-utils.js';
 
 function bundleCss(body, url, compilation) {
