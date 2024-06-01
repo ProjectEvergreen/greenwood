@@ -451,13 +451,10 @@ const getRollupConfigForApis = async (compilation) => {
 const getRollupConfigForSsr = async (compilation, input) => {
   const { outputDir } = compilation.context;
 
-  console.log('getRollupConfigForSsr', { input });
   return input.map((filepath) => {
     const ext = filepath.split('.').pop();
     const entryName = filepath.replace(compilation.context.scratchDir.pathname, '').replace('/', '-').replace(`.${ext}`, '');
-    console.log('filepath', { filepath });
-    console.log('name', path.basename(filepath).split('.')[0]);
-    console.log('entryName', { entryName });
+
     return {
       input: filepath,
       output: {
