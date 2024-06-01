@@ -236,16 +236,18 @@ async function bundleSsrPages(compilation) {
 
     for (const page of compilation.graph) {
       if (page.isSSR && !page.prerender) {
-        const { imports, route, template, title, relativeWorkspacePagePath } = page;
-        const entryFileUrl = new URL(`./_${relativeWorkspacePagePath.replace('/', '')}`, scratchDir);
-        const moduleUrl = new URL(`./${relativeWorkspacePagePath.replace('/', '')}`, pagesDir);
+        const { filename, imports, route, template, title, relativeWorkspacePagePath } = page;
+        const entryFileUrl = new URL(`.${relativeWorkspacePagePath}`, scratchDir);
+        const moduleUrl = new URL(`.${relativeWorkspacePagePath}`, pagesDir);
         const outputPathRootUrl = new URL(`file://${path.dirname(entryFileUrl.pathname)}`);
         const request = new Request(moduleUrl); // TODO not really sure how to best no-op this?
         // TODO getTemplate has to be static (for now?)
         // https://github.com/ProjectEvergreen/greenwood/issues/955
         const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [], request });
         const pagesPathDiff = compilation.context.pagesDir.pathname.replace(compilation.context.projectDirectory.pathname, '');
-
+        const relativeDepth = relativeWorkspacePagePath.replace(`/${filename}`, '') === ''
+          ? '../'
+          : '../'.repeat(relativeWorkspacePagePath.replace(`/${filename}`, '').split('/').length);
         let staticHtml = '';
 
         staticHtml = data.template ? data.template : await getPageTemplate(staticHtml, compilation.context, template, []);
@@ -266,7 +268,7 @@ async function bundleSsrPages(compilation) {
         await fs.writeFile(entryFileUrl, `
           import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
 
-          const moduleUrl = new URL('../${pagesPathDiff}${relativeWorkspacePagePath}', import.meta.url);
+          const moduleUrl = new URL('${relativeDepth}${pagesPathDiff}${relativeWorkspacePagePath.replace('/', '')}', import.meta.url);
 
           export async function handler(request) {
             const compilation = JSON.parse('${JSON.stringify(compilation)}');
