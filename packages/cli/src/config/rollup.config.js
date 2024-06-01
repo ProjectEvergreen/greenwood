@@ -149,7 +149,8 @@ function greenwoodSyncSsrEntryPointsOutputPaths(compilation) {
       Object.keys(bundle).forEach((key) => {
         if (bundle[key].exports?.find(exp => exp === 'handler')) {
           const ext = bundle[key].facadeModuleId.split('.').pop();
-          const route = bundle[key].facadeModuleId.replace(scratchDir.pathname, `${basePath}/`).replace(`.${ext}`, '/').replace('/index/', '/');
+          // account for windows pathname shenanigans by "casting" facadeModuleId to a URL first
+          const route = new URL(`file://${bundle[key].facadeModuleId}`).pathname.replace(scratchDir.pathname, `${basePath}/`).replace(`.${ext}`, '/').replace('/index/', '/');
 
           compilation.graph.forEach((page, idx) => {
             if (page.route === route) {
@@ -453,7 +454,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
 
   return input.map((filepath) => {
     const ext = filepath.split('.').pop();
-    // account for windows pathname shenanigans first by "casting" filepath to URL first
+    // account for windows pathname shenanigans by "casting" filepath to a URL first
     const entryName = new URL(`file://${filepath}`).pathname.replace(compilation.context.scratchDir.pathname, '').replace('/', '-').replace(`.${ext}`, '');
 
     return {
