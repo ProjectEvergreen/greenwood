@@ -15,6 +15,8 @@
  * src/
  *   pages/
  *     api/
+ *       nested/
+ *         endpoint.js
  *       fragment.js (isolation mode)
  *       greeting.js
  *       missing.js

@@ -3,12 +3,12 @@ import { checkResourceExists } from '../../../../cli/src/lib/resource-utils.js';
 
 function generateOutputFormat(id, type) {
   const path = type === 'page'
-    ? `${id}.route`
-    : `api/${id}`;
-  const ref = id.replace(/-/g, '');
+    ? `/${id}.route`
+    : id;
+  const ref = id.replace(/-/g, '').replace(/\//g, '');
 
   return `
-    import { handler as ${ref} } from '../public/${path}.js';
+    import { handler as ${ref} } from '../public${path}.js';
 
     export async function handler (request) {
       const { url, headers } = request;
@@ -38,12 +38,11 @@ async function genericAdapter(compilation) {
     await fs.writeFile(new URL(`./${id}.js`, adapterOutputUrl), outputFormat);
   }
 
-  // public/api/
   for (const [key] of apiRoutes) {
-    const id = key.replace('/api/', '');
-    const outputFormat = generateOutputFormat(id, 'api');
+    const { outputPath } = apiRoutes.get(key);
+    const outputFormat = generateOutputFormat(outputPath.replace('.js', ''), 'api');
 
-    await fs.writeFile(new URL(`./${id}.js`, adapterOutputUrl), outputFormat);
+    await fs.writeFile(new URL(`.${outputPath.replace('/api/', '/api-')}`, adapterOutputUrl), outputFormat);
   }
 }
 
