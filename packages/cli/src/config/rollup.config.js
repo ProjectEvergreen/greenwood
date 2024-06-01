@@ -453,7 +453,8 @@ const getRollupConfigForSsr = async (compilation, input) => {
 
   return input.map((filepath) => {
     const ext = filepath.split('.').pop();
-    const entryName = filepath.replace(compilation.context.scratchDir.pathname, '').replace('/', '-').replace(`.${ext}`, '');
+    // account for windows pathname shenanigans first by "casting" filepath to URL first
+    const entryName = new URL(`file://${filepath}`).pathname.replace(compilation.context.scratchDir.pathname, '').replace('/', '-').replace(`.${ext}`, '');
 
     return {
       input: filepath,
