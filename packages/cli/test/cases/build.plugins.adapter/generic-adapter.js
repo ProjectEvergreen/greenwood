@@ -5,9 +5,10 @@ function generateOutputFormat(id, type) {
   const path = type === 'page'
     ? `${id}.route`
     : `api/${id}`;
+  const ref = id.replace(/-/g, '');
 
   return `
-    import { handler as ${id} } from '../public/${path}.js';
+    import { handler as ${ref} } from '../public/${path}.js';
 
     export async function handler (request) {
       const { url, headers } = request;
@@ -15,7 +16,7 @@ function generateOutputFormat(id, type) {
         headers: new Headers(headers)
       });
 
-      return await ${id}(req);
+      return await ${ref}(req);
     }
   `;
 }
@@ -30,7 +31,8 @@ async function genericAdapter(compilation) {
   }
 
   for (const page of ssrPages) {
-    const { id } = page;
+    const { outputPath } = page;
+    const id = outputPath.replace('.route.js', '');
     const outputFormat = generateOutputFormat(id, 'page');
 
     await fs.writeFile(new URL(`./${id}.js`, adapterOutputUrl), outputFormat);

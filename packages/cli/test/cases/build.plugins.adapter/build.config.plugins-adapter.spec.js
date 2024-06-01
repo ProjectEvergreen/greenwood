@@ -113,6 +113,54 @@ describe('Build Greenwood With: ', function() {
         expect(data.message).to.be.equal('Hello Greenwood!');
       });
     });
+
+    describe('Adapting a nested SSR Page (duplicate name)', function() {
+      let dom;
+      let response;
+
+      before(async function() {
+        const req = new Request(new URL('http://localhost:8080/blog/'));
+        const handler = (await import(new URL('./adapter-output/blog-index.js', pathToFileURL(outputPath)))).handler;
+
+        response = await handler(req);
+        dom = new JSDOM(await response.text());
+      });
+
+      it('should have the expected content-type for the response', function() {
+        expect(response.headers.get('content-type')).to.be.equal('text/html');
+      });
+
+      it('should have the expected number of <app-card> components on the page', function() {
+        const heading = dom.window.document.querySelectorAll('body > h1');
+
+        expect(heading).to.have.lengthOf(1);
+        expect(heading[0].textContent).to.equal('Duplicated and nested SSR page should work!');
+      });
+    });
+
+    describe('Adapting a nested SSR Page', function() {
+      let dom;
+      let response;
+
+      before(async function() {
+        const req = new Request(new URL('http://localhost:8080/blog/first-post/'));
+        const handler = (await import(new URL('./adapter-output/blog-first-post.js', pathToFileURL(outputPath)))).handler;
+
+        response = await handler(req);
+        dom = new JSDOM(await response.text());
+      });
+
+      it('should have the expected content-type for the response', function() {
+        expect(response.headers.get('content-type')).to.be.equal('text/html');
+      });
+
+      it('should have the expected number of <app-card> components on the page', function() {
+        const heading = dom.window.document.querySelectorAll('body > h1');
+
+        expect(heading).to.have.lengthOf(1);
+        expect(heading[0].textContent).to.equal('Nested SSR First Post page should work!');
+      });
+    });
   });
 
   after(function() {

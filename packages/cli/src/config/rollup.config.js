@@ -169,6 +169,34 @@ function greenwoodSyncSsrEntryPointsOutputPaths(compilation) {
   };
 }
 
+function greenwoodSyncApiRoutesOutputPath(compilation) {
+  return {
+    name: 'greenwood-sync-api-routes-output-paths',
+    generateBundle(options, bundle) {
+      const { basePath } = compilation.config;
+      const { apisDir } = compilation.context;
+
+      // map rollup bundle names back to original SSR pages for syncing input <> output bundle names
+      Object.keys(bundle).forEach((key) => {
+        if (bundle[key].exports?.find(exp => exp === 'handler')) {
+          const ext = bundle[key].facadeModuleId.split('.').pop();
+          const relativeFacade = new URL(`file://${bundle[key].facadeModuleId}`).pathname.replace(apisDir.pathname, `${basePath}/`).replace(`.${ext}`, '');
+          const route = `/api${relativeFacade}`; // ew URL(`file://${bundle[key].facadeModuleId}`).pathname.replace(apisDir.pathname, `${basePath}/`).replace(`.${ext}`, '');
+
+          if (compilation.manifest.apis.has(route)) {
+            const api = compilation.manifest.apis.get(route);
+
+            compilation.manifest.apis.set(route, {
+              ...api,
+              outputPath: `/api/${key}`
+            });
+          }
+        }
+      });
+    }
+  };
+}
+
 function getMetaImportPath(node) {
   return node.arguments[0].value.split('/').join(path.sep)
     .replace(/\\/g, '/'); // handle Windows style paths
@@ -433,46 +461,53 @@ const getRollupConfigForApis = async (compilation) => {
 
   return [...compilation.manifest.apis.values()]
     .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, pagesDir)))
-    .map(filepath => ({
-      input: filepath,
-      output: {
-        dir: `${normalizePathnameForWindows(outputDir)}/api`,
-        entryFileNames: '[name].js',
-        chunkFileNames: '[name].[hash].js'
-      },
-      plugins: [
-        greenwoodResourceLoader(compilation),
-        // support node export conditions for SSR pages
-        // https://github.com/ProjectEvergreen/greenwood/issues/1118
-        // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
-        nodeResolve({
-          exportConditions: ['node'],
-          preferBuiltins: true
-        }),
-        commonjs(),
-        greenwoodImportMetaUrl(compilation)
-      ],
-      onwarn: (errorObj) => {
-        const { code, message } = errorObj;
+    .map((filepath) => {
+      // account for windows pathname shenanigans by "casting" filepath to a URL first
+      const ext = filepath.split('.').pop();
+      const entryName = new URL(`file://${filepath}`).pathname.replace(pagesDir.pathname, '').replace('/', '-').replace(`.${ext}`, '');
 
-        switch (code) {
+      return {
+        input: filepath,
+        output: {
+          dir: `${normalizePathnameForWindows(outputDir)}/api`,
+          entryFileNames: `${entryName}.js`,
+          chunkFileNames: `${entryName}.[hash].js`
+        },
+        plugins: [
+          greenwoodResourceLoader(compilation),
+          // support node export conditions for SSR pages
+          // https://github.com/ProjectEvergreen/greenwood/issues/1118
+          // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
+          nodeResolve({
+            exportConditions: ['node'],
+            preferBuiltins: true
+          }),
+          commonjs(),
+          greenwoodImportMetaUrl(compilation),
+          greenwoodSyncApiRoutesOutputPath(compilation)
+        ],
+        onwarn: (errorObj) => {
+          const { code, message } = errorObj;
 
-          case 'CIRCULAR_DEPENDENCY':
-            // let this through for WCC + sucrase
-            // Circular dependency: ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js ->
-            //   ../../../../../node_modules/sucrase/dist/esm/parser/traverser/util.js -> ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js
-            // Circular dependency: ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js ->
-            //   ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/readWord.js -> ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js
-            // https://github.com/ProjectEvergreen/greenwood/pull/1212
-            // https://github.com/lit/lit/issues/449#issuecomment-416688319
-            break;
-          default:
-            // otherwise, log all warnings from rollup
-            console.debug(message);
+          switch (code) {
 
+            case 'CIRCULAR_DEPENDENCY':
+              // let this through for WCC + sucrase
+              // Circular dependency: ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js ->
+              //   ../../../../../node_modules/sucrase/dist/esm/parser/traverser/util.js -> ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js
+              // Circular dependency: ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js ->
+              //   ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/readWord.js -> ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js
+              // https://github.com/ProjectEvergreen/greenwood/pull/1212
+              // https://github.com/lit/lit/issues/449#issuecomment-416688319
+              break;
+            default:
+              // otherwise, log all warnings from rollup
+              console.debug(message);
+
+          }
         }
-      }
-    }));
+      };
+    });
 };
 
 const getRollupConfigForSsr = async (compilation, input) => {
