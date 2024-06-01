@@ -138,6 +138,31 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
   };
 }
 
+function greenwoodSyncSsrEntryPointsOutputPaths(compilation) {
+  return {
+    name: 'greenwood-sync-ssr-pages-entry-point-output-paths',
+    generateBundle(options, bundle) {
+      const { basePath } = compilation.config;
+      const { scratchDir } = compilation.context;
+
+      // map rollup bundle names back to original SSR pages for syncing input <> output bundle names
+      Object.keys(bundle).forEach((key) => {
+        if (bundle[key].exports?.find(exp => exp === 'handler')) {
+          const ext = bundle[key].facadeModuleId.split('.').pop();
+          // account for windows pathname shenanigans by "casting" facadeModuleId to a URL first
+          const route = new URL(`file://${bundle[key].facadeModuleId}`).pathname.replace(scratchDir.pathname, `${basePath}/`).replace(`.${ext}`, '/').replace('/index/', '/');
+
+          compilation.graph.forEach((page, idx) => {
+            if (page.route === route) {
+              compilation.graph[idx].outputPath = key;
+            }
+          });
+        }
+      });
+    }
+  };
+}
+
 function getMetaImportPath(node) {
   return node.arguments[0].value.split('/').join(path.sep)
     .replace(/\\/g, '/'); // handle Windows style paths
@@ -427,44 +452,51 @@ const getRollupConfigForApis = async (compilation) => {
 const getRollupConfigForSsr = async (compilation, input) => {
   const { outputDir } = compilation.context;
 
-  return input.map(filepath => ({
-    input: filepath,
-    output: {
-      dir: normalizePathnameForWindows(outputDir),
-      entryFileNames: `${path.basename(filepath).split('.')[0]}.route.js`,
-      chunkFileNames: `${path.basename(filepath).split('.')[0]}.route.chunk.[hash].js`
-    },
-    plugins: [
-      greenwoodResourceLoader(compilation),
-      // support node export conditions for SSR pages
-      // https://github.com/ProjectEvergreen/greenwood/issues/1118
-      // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
-      nodeResolve({
-        exportConditions: ['node'],
-        preferBuiltins: true
-      }),
-      commonjs(),
-      greenwoodImportMetaUrl(compilation)
-    ],
-    onwarn: (errorObj) => {
-      const { code, message } = errorObj;
+  return input.map((filepath) => {
+    const ext = filepath.split('.').pop();
+    // account for windows pathname shenanigans by "casting" filepath to a URL first
+    const entryName = new URL(`file://${filepath}`).pathname.replace(compilation.context.scratchDir.pathname, '').replace('/', '-').replace(`.${ext}`, '');
 
-      switch (code) {
+    return {
+      input: filepath,
+      output: {
+        dir: normalizePathnameForWindows(outputDir),
+        entryFileNames: `${entryName}.route.js`,
+        chunkFileNames: `${entryName}.route.chunk.[hash].js`
+      },
+      plugins: [
+        greenwoodResourceLoader(compilation),
+        // support node export conditions for SSR pages
+        // https://github.com/ProjectEvergreen/greenwood/issues/1118
+        // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
+        nodeResolve({
+          exportConditions: ['node'],
+          preferBuiltins: true
+        }),
+        commonjs(),
+        greenwoodImportMetaUrl(compilation),
+        greenwoodSyncSsrEntryPointsOutputPaths(compilation)
+      ],
+      onwarn: (errorObj) => {
+        const { code, message } = errorObj;
 
-        case 'CIRCULAR_DEPENDENCY':
-          // TODO let this through for lit by suppressing it
-          // Error: the string "Circular dependency: ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js ->
-          // ../../../../../node_modules/@lit-labs/ssr/lib/lit-element-renderer.js -> ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js\n" was thrown, throw an Error :)
-          // https://github.com/lit/lit/issues/449
-          // https://github.com/ProjectEvergreen/greenwood/issues/1118
-          break;
-        default:
-          // otherwise, log all warnings from rollup
-          console.debug(message);
+        switch (code) {
 
+          case 'CIRCULAR_DEPENDENCY':
+            // TODO let this through for lit by suppressing it
+            // Error: the string "Circular dependency: ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js ->
+            // ../../../../../node_modules/@lit-labs/ssr/lib/lit-element-renderer.js -> ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js\n" was thrown, throw an Error :)
+            // https://github.com/lit/lit/issues/449
+            // https://github.com/ProjectEvergreen/greenwood/issues/1118
+            break;
+          default:
+            // otherwise, log all warnings from rollup
+            console.debug(message);
+
+        }
       }
-    }
-  }));
+    };
+  });
 };
 
 export {
