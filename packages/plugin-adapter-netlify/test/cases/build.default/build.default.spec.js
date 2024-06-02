@@ -181,21 +181,16 @@ describe('Build Greenwood With: ', function() {
         expect(headers.get('content-type')).to.be.equal('text/html');
       });
 
-      // TODO not needed anymore post refactor?
-      xit('should have a shared asset for the card component', async () => {
+      it('should have a route chunk', async () => {
         const name = path.basename(apiFunctions[0]).replace('.zip', '');
 
         await extract(apiFunctions[0], {
           dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
         });
 
-        const assets = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), `/${name}/*`));
-        const exists = assets.find((asset) => {
-          const name = asset.split('/').pop();
-          return name.startsWith('card') && name.endsWith('.js');
-        });
+        const chunks = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), `/${name}/${name.replace('api-', '')}.*.js`));
 
-        expect(!!exists).to.equal(true);
+        expect(chunks.length).to.equal(1);
       });
     });
 
