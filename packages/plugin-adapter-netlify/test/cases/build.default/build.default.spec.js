@@ -86,11 +86,11 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('', function() {
-        expect(zipFiles.length).to.be.equal(11);
+        expect(zipFiles.length).to.be.equal(12);
       });
 
       it('should output the expected number of serverless function API zip files', function() {
-        expect(zipFiles.filter(file => path.basename(file).startsWith('api-')).length).to.be.equal(5);
+        expect(zipFiles.filter(file => path.basename(file).startsWith('api-')).length).to.be.equal(6);
       });
 
       it('should output the expected number of serverless function SSR page zip files', function() {
@@ -270,6 +270,75 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
+    describe('Search API Route adapter', function() {
+      let apiFunctions;
+
+      before(async function() {
+        apiFunctions = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), 'api-search.zip'));
+      });
+
+      it('should output one API route as a serverless function zip file', function() {
+        expect(apiFunctions.length).to.be.equal(1);
+      });
+
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const param = 'Analog';
+        const name = path.basename(apiFunctions[0]).replace('.zip', '');
+
+        await extract(apiFunctions[0], {
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+        });
+        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
+        const response = await handler({
+          rawUrl: `${hostname}/api/search`,
+          body: `term=${param}`,
+          httpMethod: 'POST',
+          headers: {
+            'content-type': 'application/x-www-form-urlencoded'
+          }
+        }, {});
+        const { statusCode, body, headers } = response;
+        const dom = new JSDOM(body);
+        const cardTags = dom.window.document.querySelectorAll('app-card');
+
+        expect(statusCode).to.be.equal(200);
+        expect(headers.get('content-type')).to.be.equal('text/html');
+
+        expect(cardTags.length).to.be.equal(1);
+      });
+    });
+
+    describe('Nested API Route adapter', function() {
+      let apiFunctions;
+
+      before(async function() {
+        apiFunctions = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), 'api-nested-endpoint.zip'));
+      });
+
+      it('should output one API route as a serverless function zip file', function() {
+        expect(apiFunctions.length).to.be.equal(1);
+      });
+
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const name = path.basename(apiFunctions[0]).replace('.zip', '');
+
+        await extract(apiFunctions[0], {
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+        });
+        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
+        const response = await handler({
+          rawUrl: `${hostname}/api/nested/endpoint`,
+          httpMethod: 'GET'
+        }, {});
+        const { statusCode, body, headers } = response;
+
+        expect(statusCode).to.be.equal(200);
+        expect(headers.get('content-type')).to.be.equal('text/html');
+
+        expect(body).to.be.equal('I am a nested API route!');
+      });
+    });
+
     describe('Index (collision testing) SSR Page adapter', function() {
       let pageFunctions;
 
@@ -438,7 +507,6 @@ describe('Build Greenwood With: ', function() {
 
       it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
         const name = path.basename(pageFunctions[0]).replace('.zip', '');
-        const postId = 1;
 
         await extract(pageFunctions[0], {
           dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
@@ -476,7 +544,6 @@ describe('Build Greenwood With: ', function() {
 
       it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
         const name = path.basename(pageFunctions[0]).replace('.zip', '');
-        const postId = 1;
 
         await extract(pageFunctions[0], {
           dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)

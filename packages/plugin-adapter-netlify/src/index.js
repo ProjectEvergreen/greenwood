@@ -70,8 +70,6 @@ async function createOutputZip(id, outputType, outputRootUrl, projectDirectory) 
     ? `api-${id}`
     : id;
 
-  console.log({ id, outputType, outputRootUrl, filename });
-
   await zip(
     normalizePathnameForWindows(outputRootUrl),
     normalizePathnameForWindows(new URL(`./netlify/functions/${filename}.zip`, projectDirectory))
@@ -104,7 +102,6 @@ async function netlifyAdapter(compilation) {
       .filter(file => file.startsWith(`${id}.route.chunk`) && file.endsWith('.js'));
     const outputRoot = new URL(`./${id}/`, adapterOutputUrl);
 
-    console.log({ page, id, outputRoot });
     await setupOutputDirectory(id, outputRoot, outputType);
 
     // handle user's actual route entry file
@@ -135,13 +132,16 @@ async function netlifyAdapter(compilation) {
 
   for (const [key, value] of apiRoutes.entries()) {
     const outputType = 'api';
-    const id = key.replace(`${basePath}/api/`, '');
+    const api = apiRoutes.get(key);
+    const { outputPath } = api;
+    const id = key.replace(`${basePath}/api/`, '').replace(/\//g, '-');
     const outputRoot = new URL(`./api/${id}/`, adapterOutputUrl);
     const { assets = [] } = value;
+
     await setupOutputDirectory(id, outputRoot, outputType);
 
     await fs.cp(
-      new URL(`./api/${id}.js`, outputDir),
+      new URL(`./${outputPath}`, outputDir),
       new URL(`./${id}.js`, outputRoot),
       { recursive: true }
     );
