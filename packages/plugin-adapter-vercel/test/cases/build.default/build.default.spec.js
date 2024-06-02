@@ -24,12 +24,18 @@
  *     card.js
  *   pages/
  *     api/
+ *       nested/
+ *         endpoint.js
  *       fragment.js
  *       greeting.js
  *       search.js
  *       submit-form-data.js
  *       submit-json.js
+ *     blog/
+ *       first-post.js
+ *       index.js
  *     artists.js
+ *     index.js
  *     post.js
  *     users.js
  *   services/
@@ -49,7 +55,7 @@ import { fileURLToPath } from 'url';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
+describe.only('Build Greenwood With: ', function() {
   const LABEL = 'Vercel Adapter plugin output';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -62,7 +68,7 @@ describe('Build Greenwood With: ', function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function() {
@@ -81,7 +87,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output the expected number of serverless function output folders', function() {
-        expect(functionFolders.length).to.be.equal(8);
+        expect(functionFolders.length).to.be.equal(11);
       });
 
       it('should output the expected configuration file for the build output', function() {
@@ -315,6 +321,117 @@ describe('Build Greenwood With: ', function() {
         expect(headings.length).to.be.equal(1);
         expect(headings[0].textContent).to.be.equal(`List of Artists: ${count}`);
         expect(headers.get('content-type')).to.be.equal('text/html');
+      });
+    });
+
+    describe('Blog Index (collision test) SSR Page adapter', function() {
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const handler = (await import(new URL('./blog-index.func/index.js', vercelFunctionsOutputUrl))).default;
+        const response = {
+          headers: new Headers()
+        };
+
+        await handler({
+          url: `${hostname}/blog/`,
+          headers: {
+            host: hostname
+          },
+          method: 'GET'
+        }, {
+          status: function(code) {
+            response.status = code;
+          },
+          send: function(body) {
+            response.body = body;
+          },
+          setHeader: function(key, value) {
+            response.headers.set(key, value);
+          }
+        });
+
+        const { status, body, headers } = response;
+        const dom = new JSDOM(body);
+        const headings = dom.window.document.querySelectorAll('body > h1');
+
+        expect(status).to.be.equal(200);
+        expect(headers.get('content-type')).to.be.equal('text/html');
+
+        expect(headings.length).to.be.equal(1);
+        expect(headings[0].textContent).to.be.equal('duplicated nested SSR page should work!');
+      });
+    });
+
+    describe('Blog First Post (nested) SSR Page adapter', function() {
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const handler = (await import(new URL('./blog-first-post.func/index.js', vercelFunctionsOutputUrl))).default;
+        const response = {
+          headers: new Headers()
+        };
+
+        await handler({
+          url: `${hostname}/blog/first-post/`,
+          headers: {
+            host: hostname
+          },
+          method: 'GET'
+        }, {
+          status: function(code) {
+            response.status = code;
+          },
+          send: function(body) {
+            response.body = body;
+          },
+          setHeader: function(key, value) {
+            response.headers.set(key, value);
+          }
+        });
+
+        const { status, body, headers } = response;
+        const dom = new JSDOM(body);
+        const headings = dom.window.document.querySelectorAll('body > h1');
+
+        expect(status).to.be.equal(200);
+        expect(headers.get('content-type')).to.be.equal('text/html');
+
+        expect(headings.length).to.be.equal(1);
+        expect(headings[0].textContent).to.be.equal('Nested SSR First Post page should work!');
+      });
+    });
+
+    describe('Index (collision test) SSR Page adapter', function() {
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const handler = (await import(new URL('./index.func/index.js', vercelFunctionsOutputUrl))).default;
+        const response = {
+          headers: new Headers()
+        };
+
+        await handler({
+          url: `${hostname}/`,
+          headers: {
+            host: hostname
+          },
+          method: 'GET'
+        }, {
+          status: function(code) {
+            response.status = code;
+          },
+          send: function(body) {
+            response.body = body;
+          },
+          setHeader: function(key, value) {
+            response.headers.set(key, value);
+          }
+        });
+
+        const { status, body, headers } = response;
+        const dom = new JSDOM(body);
+        const headings = dom.window.document.querySelectorAll('body > h1');
+
+        expect(status).to.be.equal(200);
+        expect(headers.get('content-type')).to.be.equal('text/html');
+
+        expect(headings.length).to.be.equal(1);
+        expect(headings[0].textContent).to.be.equal('Just here causing trouble! :D');
       });
     });
 
