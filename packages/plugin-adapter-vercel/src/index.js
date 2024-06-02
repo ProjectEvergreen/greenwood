@@ -84,7 +84,7 @@ async function vercelAdapter(compilation) {
 
   for (const page of ssrPages) {
     const outputType = 'page';
-    const { outputPath, route } = page;
+    const { outputPath } = page;
     const ext = outputPath.split('.').pop();
     const id = outputPath.replace(`.route.${ext}`, '').replace(/\./g, '-');
     const outputRoot = new URL(`./${basePath}/${id}.func/`, adapterOutputUrl);
@@ -112,14 +112,16 @@ async function vercelAdapter(compilation) {
 
   for (const [key, value] of apiRoutes.entries()) {
     const outputType = 'api';
-    const id = key.replace(`${basePath}/api/`, '');
+    const api = apiRoutes.get(key);
+    const { outputPath } = api;
+    const id = key.replace(`${basePath}/api/`, '').replace(/\//g, '-');
     const outputRoot = new URL(`./${basePath}/api/${id}.func/`, adapterOutputUrl);
     const { assets = [] } = value;
 
     await setupFunctionBuildFolder(id, outputType, outputRoot);
 
     await fs.cp(
-      new URL(`./api/${id}.js`, outputDir),
+      new URL(`./${outputPath}`, outputDir),
       new URL(`./${id}.js`, outputRoot),
       { recursive: true }
     );

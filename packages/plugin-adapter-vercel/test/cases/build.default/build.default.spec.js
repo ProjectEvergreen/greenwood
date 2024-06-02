@@ -55,7 +55,7 @@ import { fileURLToPath } from 'url';
 
 const expect = chai.expect;
 
-describe.only('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Vercel Adapter plugin output';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -68,7 +68,7 @@ describe.only('Build Greenwood With: ', function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {
@@ -87,7 +87,7 @@ describe.only('Build Greenwood With: ', function() {
       });
 
       it('should output the expected number of serverless function output folders', function() {
-        expect(functionFolders.length).to.be.equal(11);
+        expect(functionFolders.length).to.be.equal(12);
       });
 
       it('should output the expected configuration file for the build output', function() {
@@ -282,6 +282,74 @@ describe.only('Build Greenwood With: ', function() {
         expect(status).to.be.equal(200);
         expect(body).to.be.equal(`Thank you ${name} for your submission!`);
         expect(headers.get('Content-Type')).to.be.equal('text/html');
+      });
+    });
+
+    describe('Search API Route adapter', function() {
+      const term = 'Analog';
+
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const handler = (await import(new URL('./api/search.func/index.js', vercelFunctionsOutputUrl))).default;
+        const response = {
+          headers: new Headers()
+        };
+
+        await handler({
+          url: `${hostname}/api/search`,
+          headers: {
+            'host': hostname,
+            'content-type': 'application/x-www-form-urlencoded'
+          },
+          body: { term },
+          method: 'POST'
+        }, {
+          status: function(code) {
+            response.status = code;
+          },
+          send: function(body) {
+            response.body = body;
+          },
+          setHeader: function(key, value) {
+            response.headers.set(key, value);
+          }
+        });
+        const { status, body, headers } = response;
+        const dom = new JSDOM(body);
+        const cardTags = dom.window.document.querySelectorAll('app-card');
+
+        expect(status).to.be.equal(200);
+        expect(headers.get('Content-Type')).to.be.equal('text/html');
+
+        expect(cardTags.length).to.be.equal(1);
+      });
+    });
+
+    describe('Nested API Route adapter', function() {
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const handler = (await import(new URL('./api/nested-endpoint.func/index.js', vercelFunctionsOutputUrl))).default;
+        const response = {
+          headers: new Headers()
+        };
+
+        await handler({
+          url: `${hostname}/api/nested/endpoint`,
+          method: 'GET'
+        }, {
+          status: function(code) {
+            response.status = code;
+          },
+          send: function(body) {
+            response.body = body;
+          },
+          setHeader: function(key, value) {
+            response.headers.set(key, value);
+          }
+        });
+        const { status, body, headers } = response;
+
+        expect(status).to.be.equal(200);
+        expect(headers.get('Content-Type')).to.be.equal('text/html');
+        expect(body).to.be.equal('I am a nested API route!');
       });
     });
 
