@@ -68,7 +68,9 @@ async function setupOutputDirectory(id, outputRoot, outputType) {
 async function createOutputZip(id, outputType, outputRootUrl, projectDirectory) {
   const filename = outputType === 'api'
     ? `api-${id}`
-    : `${id}`;
+    : id;
+
+  console.log({ id, outputType, outputRootUrl, filename });
 
   await zip(
     normalizePathnameForWindows(outputRootUrl),
@@ -94,18 +96,21 @@ async function netlifyAdapter(compilation) {
   await fs.mkdir(new URL('./netlify/functions/', projectDirectory), { recursive: true });
 
   for (const page of ssrPages) {
-    const { id } = page;
+    const { outputPath, route } = page;
     const outputType = 'page';
-    const outputRoot = new URL(`./${id}/`, adapterOutputUrl);
+    const ext = outputPath.split('.').pop();
+    const id = outputPath.replace(`.route.${ext}`, '').replace(/\./g, '-');
     const chunks = (await fs.readdir(outputDir))
       .filter(file => file.startsWith(`${id}.route.chunk`) && file.endsWith('.js'));
+    const outputRoot = new URL(`./${id}/`, adapterOutputUrl);
 
+    console.log({ page, id, outputRoot });
     await setupOutputDirectory(id, outputRoot, outputType);
 
     // handle user's actual route entry file
     await fs.cp(
-      new URL(`./${id}.route.js`, outputDir),
-      new URL(`./${id}.route.js`, outputRoot),
+      new URL(`./${outputPath}`, outputDir),
+      new URL(`./${outputPath}`, outputRoot),
       { recursive: true }
     );
 
@@ -120,7 +125,7 @@ async function netlifyAdapter(compilation) {
 
     await createOutputZip(id, outputType, new URL(`./${id}/`, adapterOutputUrl), projectDirectory);
 
-    redirects += `${basePath}/${id}/ /.netlify/functions/${id} 200
+    redirects += `${route} /.netlify/functions/${id} 200
 `;
   }
 

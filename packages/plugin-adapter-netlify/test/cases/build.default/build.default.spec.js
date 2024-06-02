@@ -24,12 +24,18 @@
  *     card.js
  *   pages/
  *     api/
+ *       nested/
+ *         endpoint.js
  *       fragment.js
  *       greeting.js
  *       search.js
  *       submit-form-data.js
  *       submit-json.js
+ *     blog/
+ *       first-post.js
+ *       index.js
  *     artists.js
+ *     index.js
  *     post.js
  *     users.js
  *   services/
@@ -80,7 +86,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('', function() {
-        expect(zipFiles.length).to.be.equal(8);
+        expect(zipFiles.length).to.be.equal(11);
       });
 
       it('should output the expected number of serverless function API zip files', function() {
@@ -88,7 +94,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output the expected number of serverless function SSR page zip files', function() {
-        expect(zipFiles.filter(file => !path.basename(file).startsWith('api-')).length).to.be.equal(3);
+        expect(zipFiles.filter(file => !path.basename(file).includes('api-')).length).to.be.equal(6);
       });
 
       it('should output a _redirects file', function() {
@@ -264,6 +270,42 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
+    describe('Index (collision testing) SSR Page adapter', function() {
+      let pageFunctions;
+
+      before(async function() {
+        pageFunctions = (await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip')))
+          .filter(zipFile => path.basename(zipFile) === 'index.zip');
+      });
+
+      it('should output one SSR page as a serverless function zip file', function() {
+        expect(pageFunctions.length).to.be.equal(1);
+      });
+
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const name = path.basename(pageFunctions[0]).replace('.zip', '');
+
+        await extract(pageFunctions[0], {
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+        });
+        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
+        const response = await handler({
+          rawUrl: `${hostname}/`,
+          httpMethod: 'GET'
+        }, {});
+        const { statusCode, body, headers } = response;
+        const dom = new JSDOM(body);
+
+        const headings = dom.window.document.querySelectorAll('body > h1');
+
+        expect(statusCode).to.be.equal(200);
+        expect(headers.get('content-type')).to.be.equal('text/html');
+
+        expect(headings.length).to.be.equal(1);
+        expect(headings[0].textContent).to.be.equal('Just here causing trouble! :D');
+      });
+    });
+
     describe('Artists SSR Page adapter', function() {
       const count = 2;
       let pageFunctions;
@@ -382,6 +424,82 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
+    describe('Blog Index (collision test) SSR Page adapter', function() {
+      let pageFunctions;
+
+      before(async function() {
+        pageFunctions = (await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip')))
+          .filter(zipFile => path.basename(zipFile).startsWith('blog-index'));
+      });
+
+      it('should output one SSR page as a serverless function zip file', function() {
+        expect(pageFunctions.length).to.be.equal(1);
+      });
+
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const name = path.basename(pageFunctions[0]).replace('.zip', '');
+        const postId = 1;
+
+        await extract(pageFunctions[0], {
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+        });
+        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
+        const response = await handler({
+          rawUrl: `${hostname}/blog/`,
+          httpMethod: 'GET'
+        }, {});
+
+        const { statusCode, body, headers } = response;
+        const dom = new JSDOM(body);
+        const headingOne = dom.window.document.querySelectorAll('body > h1');
+
+        expect(statusCode).to.be.equal(200);
+        expect(headers.get('content-type')).to.be.equal('text/html');
+
+        expect(headingOne.length).to.be.equal(1);
+
+        expect(headingOne[0].textContent).to.be.equal('nested SSR page should work!');
+      });
+    });
+
+    describe('Blog First Post (nested page) SSR Page adapter', function() {
+      let pageFunctions;
+
+      before(async function() {
+        pageFunctions = (await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip')))
+          .filter(zipFile => path.basename(zipFile).startsWith('blog-first-post'));
+      });
+
+      it('should output one SSR page as a serverless function zip file', function() {
+        expect(pageFunctions.length).to.be.equal(1);
+      });
+
+      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+        const name = path.basename(pageFunctions[0]).replace('.zip', '');
+        const postId = 1;
+
+        await extract(pageFunctions[0], {
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+        });
+        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
+        const response = await handler({
+          rawUrl: `${hostname}/blog/first-post/`,
+          httpMethod: 'GET'
+        }, {});
+
+        const { statusCode, body, headers } = response;
+        const dom = new JSDOM(body);
+        const headingOne = dom.window.document.querySelectorAll('body > h1');
+
+        expect(statusCode).to.be.equal(200);
+        expect(headers.get('content-type')).to.be.equal('text/html');
+
+        expect(headingOne.length).to.be.equal(1);
+
+        expect(headingOne[0].textContent).to.be.equal('Nested SSR First Post page should work!');
+      });
+    });
+
     describe('_redirects file contents', function() {
       let redirectsFileContents;
 
@@ -392,6 +510,9 @@ describe('Build Greenwood With: ', function() {
       it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
         expect(redirectsFileContents).to.be.equal(
 `/artists/ /.netlify/functions/artists 200
+/blog/first-post/ /.netlify/functions/blog-first-post 200
+/blog/ /.netlify/functions/blog-index 200
+/ /.netlify/functions/index 200
 /post/ /.netlify/functions/post 200
 /users/ /.netlify/functions/users 200
 /api/* /.netlify/functions/api-:splat 200`
