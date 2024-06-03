@@ -4,8 +4,7 @@ import { mergeResponse } from './lib/resource-utils.js';
 const config = await initConfig();
 const resourcePlugins = config.plugins
   .filter(plugin => plugin.type === 'resource')
-  .filter(plugin => plugin.name !== 'plugin-node-modules:resource')
-  .filter(plugin => plugin.name !== 'plugin-user-workspace')
+  .filter(plugin => plugin.name !== 'plugin-node-modules:resource' && plugin.name !== 'plugin-user-workspace')
   .map(plugin => plugin.provider({
     context: {
       projectDirectory: new URL(`file://${process.cwd()}/`),
@@ -18,7 +17,6 @@ const resourcePlugins = config.plugins
   }));
 
 async function getCustomLoaderResponse(initUrl, checkOnly = false) {
-  // console.log('CUSTOM LOADER RESPONSE', { initUrl })
   const headers = {
     'Accept': 'text/javascript',
     'Sec-Fetch-Dest': 'empty'
@@ -34,9 +32,7 @@ async function getCustomLoaderResponse(initUrl, checkOnly = false) {
       shouldHandle = true;
 
       if (!checkOnly) {
-        // request = await plugin.resolve(url, request);
         url = new URL((await plugin.resolve(initUrl, request)).url);
-        console.log('checking....', { url });
       }
     }
   }
@@ -51,7 +47,6 @@ async function getCustomLoaderResponse(initUrl, checkOnly = false) {
     }
   }
 
-  // TODO confirm we need mergeResponse
   for (const plugin of resourcePlugins) {
     if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, response.clone())) {
       shouldHandle = true;
