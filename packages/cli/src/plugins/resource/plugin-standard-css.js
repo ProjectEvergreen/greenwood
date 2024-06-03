@@ -21,7 +21,7 @@ function bundleCss(body, url, compilation) {
 
   walk(ast, {
     enter: function (node, item) { // eslint-disable-line complexity
-      const { type, name, value } = node;
+      const { type, name, value, children } = node;
 
       if ((type === 'String' || type === 'Url') && this.atrulePrelude && this.atrule.name === 'import') {
         const { value } = node;
@@ -83,23 +83,26 @@ function bundleCss(body, url, compilation) {
       } else if (type === 'PseudoClassSelector') {
         optimizedCss += `:${name}`;
 
-        switch (name) {
+        if (children) {
+          switch (name) {
 
-          case 'dir':
-          case 'is':
-          case 'has':
-          case 'lang':
-          case 'not':
-          case 'nth-child':
-          case 'nth-last-child':
-          case 'nth-of-type':
-          case 'nth-last-of-type':
-          case 'where':
-            optimizedCss += '(';
-            break;
-          default:
-            break;
+            case 'dir':
+            case 'host':
+            case 'is':
+            case 'has':
+            case 'lang':
+            case 'not':
+            case 'nth-child':
+            case 'nth-last-child':
+            case 'nth-of-type':
+            case 'nth-last-of-type':
+            case 'where':
+              optimizedCss += '(';
+              break;
+            default:
+              break;
 
+          }
         }
       } else if (type === 'PseudoElementSelector') {
         optimizedCss += `::${name}`;
@@ -208,23 +211,26 @@ function bundleCss(body, url, compilation) {
           optimizedCss += ')';
           break;
         case 'PseudoClassSelector':
-          switch (node.name) {
+          if (node.children) {
+            switch (node.name) {
 
-            case 'dir':
-            case 'is':
-            case 'has':
-            case 'lang':
-            case 'not':
-            case 'nth-child':
-            case 'nth-last-child':
-            case 'nth-last-of-type':
-            case 'nth-of-type':
-            case 'where':
-              optimizedCss += ')';
-              break;
-            default:
-              break;
+              case 'dir':
+              case 'host':
+              case 'is':
+              case 'has':
+              case 'lang':
+              case 'not':
+              case 'nth-child':
+              case 'nth-last-child':
+              case 'nth-last-of-type':
+              case 'nth-of-type':
+              case 'where':
+                optimizedCss += ')';
+                break;
+              default:
+                break;
 
+            }
           }
           break;
         case 'PseudoElementSelector':

@@ -70,6 +70,8 @@ h1{background-image:url('/foo/bar.baz')}
 
 :dir(rtl){background-color:red}
 
+:host(h1){color:red}
+
 ::slotted(.content){background-color:aqua}
 
 h2 ::slotted(span){background:silver}

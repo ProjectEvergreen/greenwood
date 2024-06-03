@@ -153,6 +153,10 @@ h1 {
   background-color: red;
 }
 
+:host(h1) {
+  color: red;
+}
+
 ::slotted(.content) {
   background-color: aqua;
 }
