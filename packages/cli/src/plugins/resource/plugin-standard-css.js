@@ -85,6 +85,7 @@ function bundleCss(body, url, compilation) {
 
         switch (name) {
 
+          case 'dir':
           case 'is':
           case 'has':
           case 'lang':
@@ -93,6 +94,21 @@ function bundleCss(body, url, compilation) {
           case 'nth-last-child':
           case 'nth-of-type':
           case 'nth-last-of-type':
+          case 'where':
+            optimizedCss += '(';
+            break;
+          default:
+            break;
+
+        }
+      } else if (type === 'PseudoElementSelector') {
+        optimizedCss += `::${name}`;
+
+        switch (name) {
+
+          case 'highlight':
+          case 'part':
+          case 'slotted':
             optimizedCss += '(';
             break;
           default:
@@ -194,6 +210,7 @@ function bundleCss(body, url, compilation) {
         case 'PseudoClassSelector':
           switch (node.name) {
 
+            case 'dir':
             case 'is':
             case 'has':
             case 'lang':
@@ -202,6 +219,20 @@ function bundleCss(body, url, compilation) {
             case 'nth-last-child':
             case 'nth-last-of-type':
             case 'nth-of-type':
+            case 'where':
+              optimizedCss += ')';
+              break;
+            default:
+              break;
+
+          }
+          break;
+        case 'PseudoElementSelector':
+          switch (node.name) {
+
+            case 'highlight':
+            case 'part':
+            case 'slotted':
               optimizedCss += ')';
               break;
             default:
