@@ -110,3 +110,20 @@ customElements.define('x-header', HeaderComponent);
 >
 > customElements.define('x-header', HeaderComponent);
 > ```
+
+
+### Meta files
+
+The build includes a few [default copy plugins](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/src/plugins/copy) for common meta files.   Typically, they support copying the files from the source directory to the build directory.
+
+* `plugin-copy-favicon.js` - copies favicon.ico.  NOTE:  Does not support multiple favicons.  For multiple support, use the manifest.json or make a custom plugin
+* `plugin-copy-manifest-json.js` - copies manifest.json
+* `plugin-copy-robots.js` - copies robots.txt
+* `plugin-copy-sitemap.js` - copies sitemap.xml
+
+If you need to generate these files dynamically, build a custom copy plugin.  The [build.default.meta-files.spec.js](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/test/cases/build.default.meta-files/build.default.meta-files.spec.js) is a good example of how to test.  The test lifecycle is:
+
+* Read config
+* Build site using fixtures (fake files) in the test directory
+* Assert the copy executed properly
+
