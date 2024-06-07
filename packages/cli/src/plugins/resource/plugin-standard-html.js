@@ -17,6 +17,7 @@ import { getUserScripts, getPageLayout, getAppLayout } from '../../lib/layout-ut
 import { requestAsObject } from '../../lib/resource-utils.js';
 import unified from 'unified';
 import { Worker } from 'worker_threads';
+import htmlparser from 'node-html-parser';
 
 class StandardHtmlResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -200,11 +201,18 @@ class StandardHtmlResource extends ResourceInterface {
     const pageResources = this.compilation.graph.find(page => page.outputPath === pathname || page.route === pathname).resources;
     let body = await response.text();
 
+    const root = htmlparser.parse(body, {
+      script: true,
+      style: true
+    });
+
     for (const pageResource of pageResources) {
       const keyedResource = this.compilation.resources.get(pageResource);
       const { contents, src, type, optimizationAttr, optimizedFileContents, optimizedFileName, rawAttributes } = keyedResource;
 
       if (src) {
+        const tag = root.querySelectorAll('script').find(script => script.getAttribute('src') === src);
+
         if (type === 'script') {
           if (!optimizationAttr && optimization === 'default') {
             const optimizedFilePath = `${basePath}/${optimizedFileName}`;
@@ -223,7 +231,8 @@ class StandardHtmlResource extends ResourceInterface {
               </script>
             `);
           } else if (optimizationAttr === 'static' || optimization === 'static') {
-            body = body.replace(`<script ${rawAttributes}></script>`, '');
+            // TODO could we not get these rawAttrs pre-formatted in modelResource the first time???
+            body = body.replace(`<script ${tag.rawAttrs}></script>`, '');
           }
         } else if (type === 'link') {
           if (!optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
