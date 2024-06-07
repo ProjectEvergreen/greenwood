@@ -96,7 +96,6 @@ function bundleCss(body, url, compilation) {
         }
       } else if (type === 'Function') {
         /* ex: border-left: 3px solid var(--color-secondary); */
-        // TODO better way than just excluding things?
         if (this.declaration && item.prev && (item.prev.data.type !== 'Operator' && item.prev.data.type !== 'Url')) {
           optimizedCss += ' ';
         }
