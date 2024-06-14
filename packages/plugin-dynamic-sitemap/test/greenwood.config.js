@@ -4,7 +4,7 @@ console.log(greenwoodPluginDynamicExport);
 export default {
   plugins: [
     ...greenwoodPluginDynamicExport({
-      "base_url": "https://example.com"
+      'baseUrl': 'https://example.com'
     })
   ]
 };

@@ -14,7 +14,7 @@
  * {
  *   plugins: [{
  *     greenwoodPluginDynamicExport({
- *       "base_url": "https://example.com"
+ *       "baseUrl": "https://example.com"
  *     })
  *  }]
  *
@@ -30,14 +30,11 @@
 */
 
 import fs from 'fs';
-import chai from 'chai';
 import path from 'path';
 import { runSmokeTest } from '../../../test/smoke-test.js';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
-
-const expect = chai.expect;
 
 describe('Build Greenwood With Dynamic Sitemap Plugin: ', function() {
   const LABEL = 'Using Dynamic Sitemap feature';
@@ -62,9 +59,7 @@ describe('Build Greenwood With Dynamic Sitemap Plugin: ', function() {
     runSmokeTest(['public', 'index'], LABEL);
 
     describe('Sitemap.xml should exist and be well formed', function() {
-      let robots;
 
-      
       it('should have one sitemaps file in the output directory', function() {
         const sitemapXML = fs.readFileSync(path.join(this.context.publicDir, './sitemap.xml'));
         console.log(sitemapXML);
