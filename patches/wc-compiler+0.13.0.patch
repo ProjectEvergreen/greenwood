@@ -1,0 +1,265 @@
+diff --git a/node_modules/wc-compiler/src/jsx-loader.js b/node_modules/wc-compiler/src/jsx-loader.js
+index 53297cc..d8fdb6f 100644
+--- a/node_modules/wc-compiler/src/jsx-loader.js
++++ b/node_modules/wc-compiler/src/jsx-loader.js
+@@ -8,9 +8,29 @@ import jsx from '@projectevergreen/acorn-jsx-esm';
+ import { parse, parseFragment, serialize } from 'parse5';
+ // Need an acorn plugin for now - https://github.com/ProjectEvergreen/greenwood/issues/1218
+ import { importAttributes } from 'acorn-import-attributes';
++// import tsc from 'typescript';
++import tsPlugin from 'acorn-typescript';
++import { transform } from 'sucrase';
+ 
+ const jsxRegex = /\.(jsx)$/;
+ 
++const tsConfig = {
++  compilerOptions: {
++    "skipLibCheck": true,
++    "module": "ESNext",
++    "moduleResolution": "bundler",
++    "target": "ESNext",
++    "isolatedModules": true,
++    "esModuleInterop": true,
++    "noEmit": true,
++    "allowImportingTsExtensions": true,
++    "outDir": "dist",
++    "lib": [ "esnext" ],
++    "types": [ "node" ],
++    "baseUrl": "./",
++  }
++}
++
+ // TODO same hack as definitions
+ // https://github.com/ProjectEvergreen/wcc/discussions/74
+ let string;
+@@ -35,7 +55,8 @@ export function getParser(moduleURL) {
+     config: {
+       // https://github.com/acornjs/acorn/issues/829#issuecomment-1172586171
+       ...walk.base,
+-      JSXElement: () => {}
++      JSXElement: () => {},
++      // TSInterfaceDeclaration: () => {}
+     }
+   };
+ }
+@@ -231,16 +252,22 @@ function findThisReferences(context, statement) {
+ }
+ 
+ export function parseJsx(moduleURL) {
+-  const moduleContents = fs.readFileSync(moduleURL, 'utf-8');
++  console.log('parseJsx');
++  let moduleContents = fs.readFileSync(moduleURL, 'utf-8');
++  // const result = transform(moduleContents, {
++  //   transforms: ["typescript"],
++  // })
++  // moduleContents = tsc.transpileModule(moduleContents, tsConfig).outputText;
+   // would be nice if we could do this instead, so we could know ahead of time
+   // const { inferredObservability } = await import(moduleURL);
+   // however, this requires making parseJsx async, but WCC acorn walking is done sync
+   const hasOwnObservedAttributes = undefined;
+   let inferredObservability = false;
+   let observedAttributes = [];
+-  let tree = acorn.Parser.extend(jsx(), importAttributes).parse(moduleContents, {
++  let tree = acorn.Parser.extend(/* tsPlugin()*/jsx(), importAttributes).parse(moduleContents, {
+     ecmaVersion: 'latest',
+-    sourceType: 'module'
++    sourceType: 'module',
++    // locations: true
+   });
+   string = '';
+ 
+@@ -310,9 +337,9 @@ export function parseJsx(moduleURL) {
+       }
+     }
+   }, {
+-    // https://github.com/acornjs/acorn/issues/829#issuecomment-1172586171
+     ...walk.base,
+-    JSXElement: () => {}
++    JSXElement: () => {},
++    // TSInterfaceDeclaration: () => {}
+   });
+ 
+   // TODO - signals: use constructor, render, HTML attributes?  some, none, or all?
+@@ -363,9 +390,15 @@ export function parseJsx(moduleURL) {
+     `;
+     /* eslint-enable indent */
+ 
+-    tree = acorn.Parser.extend(jsx()).parse(newModuleContents, {
++    tree = acorn.Parser.extend(/*tsPlugin()*/jsx()).parse(newModuleContents, {
+       ecmaVersion: 'latest',
+-      sourceType: 'module'
++      sourceType: 'module',
++      // locations: true
++    }, {
++      // https://github.com/acornjs/acorn/issues/829#issuecomment-1172586171
++      ...walk.base,
++      JSXElement: () => {},
++      // TSInterfaceDeclaration: () => {}
+     });
+   }
+ 
+diff --git a/node_modules/wc-compiler/src/wcc.js b/node_modules/wc-compiler/src/wcc.js
+index 1247f3b..562bc10 100644
+--- a/node_modules/wc-compiler/src/wcc.js
++++ b/node_modules/wc-compiler/src/wcc.js
+@@ -10,6 +10,27 @@ import { parse, parseFragment, serialize } from 'parse5';
+ // Need an acorn plugin for now - https://github.com/ProjectEvergreen/greenwood/issues/1218
+ import { importAttributes } from 'acorn-import-attributes';
+ import fs from 'fs';
++// import tsc from 'typescript';
++import tsPlugin from 'acorn-typescript';
++import { transform } from 'sucrase';
++
++// TODO get from consumer?
++const tsConfig = {
++  compilerOptions: {
++    "skipLibCheck": true,
++    "module": "ESNext",
++    "moduleResolution": "bundler",
++    "target": "ESNext",
++    "isolatedModules": true,
++    "esModuleInterop": true,
++    "noEmit": true,
++    "allowImportingTsExtensions": true,
++    "outDir": "dist",
++    "lib": [ "esnext" ],
++    "types": [ "node" ],
++    "baseUrl": "./",
++  }
++}
+ 
+ function getParse(html) {
+   return html.indexOf('<html>') >= 0 || html.indexOf('<body>') >= 0 || html.indexOf('<head>') >= 0
+@@ -60,15 +81,41 @@ async function renderComponentRoots(tree, definitions) {
+ }
+ 
+ function registerDependencies(moduleURL, definitions, depth = 0) {
+-  const moduleContents = fs.readFileSync(moduleURL, 'utf-8');
++  let moduleContents = fs.readFileSync(moduleURL, 'utf-8');
++
++  // transform(code, {transforms: ["typescript", "imports"]}).code;
++  const result = transform(moduleContents, {
++    transforms: ["typescript", "jsx"],
++    // jsxPragma: opts.jsxPragma,
++    // jsxFragmentPragma: opts.jsxFragmentPragma,
++    // enableLegacyTypeScriptModuleInterop: opts.enableLegacyTypeScriptModuleInterop,
++    // enableLegacyBabel5ModuleInterop: opts.enableLegacyBabel5ModuleInterop,
++    // production: opts.production,
++    // disableESTransforms: opts.disableESTransforms,
++    // filePath: id,
++    // sourceMapOptions: {
++    //   compiledFilename: id
++    // }
++  });
++
++  console.log('$$$$$$', result.code);
++  // return {
++  //   code: result.code,
++  //   map: result.sourceMap
++  // };
++
++  // moduleContents = tsc.transpileModule(moduleContents, tsConfig).outputText;
+   const nextDepth = depth += 1;
+   const customParser = getParser(moduleURL);
+   const parser = customParser ? customParser.parser : acorn.Parser;
+   const config = customParser ? customParser.config : {
+-    ...walk.base
++    // https://github.com/acornjs/acorn/issues/829#issuecomment-1172586171
++    ...walk.base,
++    JSXElement: () => {},
++    // TSInterfaceDeclaration: () => {}
+   };
+ 
+-  walk.simple(parser.extend(importAttributes).parse(moduleContents, {
++  walk.simple(acorn.Parser.extend(importAttributes).parse(result.code, {
+     ecmaVersion: 'latest',
+     sourceType: 'module'
+   }), {
+@@ -76,10 +123,12 @@ function registerDependencies(moduleURL, definitions, depth = 0) {
+       const specifier = node.source.value;
+       const isBareSpecifier = specifier.indexOf('.') !== 0 && specifier.indexOf('/') !== 0;
+       const extension = specifier.split('.').pop();
++      console.log({ extension });
+ 
+       // TODO would like to decouple .jsx from the core, ideally
+-      if (!isBareSpecifier && ['js', 'jsx'].includes(extension)) {
++      if (!isBareSpecifier && ['js', 'jsx', 'ts', 'tsx'].includes(extension)) {
+         const dependencyModuleURL = new URL(node.source.value, moduleURL);
++        console.log({ dependencyModuleURL });
+ 
+         registerDependencies(dependencyModuleURL, definitions, nextDepth);
+       }
+@@ -90,40 +139,56 @@ function registerDependencies(moduleURL, definitions, depth = 0) {
+         const tagName = args[0].type === 'Literal'
+           ? args[0].value // single and double quotes
+           : args[0].quasis[0].value.raw; // template literal
+-        const tree = parseJsx(moduleURL);
++        // TODO restore this
++        // const tree = parseJsx(moduleURL);
+         const isEntry = nextDepth - 1 === 1;
+ 
+         definitions[tagName] = {
+           instanceName: args[1].name,
+           moduleURL,
+-          source: generate(tree),
++          // source: generate(tree),
+           url: moduleURL,
+           isEntry
+         };
+       }
+     }
+-  }, config);
++  // }, {
++    // https://github.com/acornjs/acorn/issues/829#issuecomment-1172586171
++    // ...walk.base,
++    // JSXElement: () => {},
++    // TSInterfaceDeclaration: () => {}
++  });
+ }
+ 
+ async function getTagName(moduleURL) {
+-  const moduleContents = await fs.promises.readFile(moduleURL, 'utf-8');
++  let moduleContents = fs.readFileSync(moduleURL, 'utf-8');
++  // moduleContents = tsc.transpileModule(moduleContents, tsConfig).outputText;
++  const result =  transform(moduleContents, {transforms: ["typescript"]}).code;
+   const customParser = getParser(moduleURL);
+   const parser = customParser ? customParser.parser : acorn.Parser;
+   const config = customParser ? customParser.config : {
+-    ...walk.base
++    // https://github.com/acornjs/acorn/issues/829#issuecomment-1172586171
++    ...walk.base,
++    JSXElement: () => {}
+   };
+   let tagName;
+ 
+-  walk.simple(parser.extend(importAttributes).parse(moduleContents, {
++  walk.simple(acorn.Parser.extend(/*tsPlugin(),*/ importAttributes).parse(result.code, {
+     ecmaVersion: 'latest',
+-    sourceType: 'module'
++    sourceType: 'module',
++    // locations: true
+   }), {
+     ExpressionStatement(node) {
+       if (isCustomElementDefinitionNode(node)) {
+         tagName = node.expression.arguments[0].value;
+       }
+     }
+-  }, config);
++  // }, {
++    // https://github.com/acornjs/acorn/issues/829#issuecomment-1172586171
++    // ...walk.base,
++    // TSInterfaceDeclaration: () => {},
++    // JSXElement: () => {}
++  });
+ 
+   return tagName;
+ }
+@@ -134,6 +199,8 @@ async function initializeCustomElement(elementURL, tagName, attrs = [], definiti
+     registerDependencies(elementURL, definitions, depth);
+   }
+ 
++  console.log('initializeCustomElement', { elementURL });
++
+   // https://github.com/ProjectEvergreen/wcc/pull/67/files#r902061804
+   // https://github.com/ProjectEvergreen/wcc/pull/159
+   const { href } = elementURL;

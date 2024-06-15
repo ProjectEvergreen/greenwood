@@ -37,11 +37,19 @@ const generateGraph = async (compilation) => {
           if (isDirectory) {
             pages = await walkDirectoryForPages(filenameUrlAsDir, pages);
           } else {
+            const req = new Request(filenameUrl, { headers: { 'Accept': 'text/html' } });
+            const customPageFormatPlugins = config.plugins
+              .filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin)
+              .map(plugin => plugin.provider(compilation));
             const extension = `.${filenameUrl.pathname.split('.').pop()}`;
-            const isStatic = extension === '.md' || extension === '.html';
-            const isDynamic = extension === '.js';
+            const isCustom = customPageFormatPlugins[0] && customPageFormatPlugins[0].shouldServe && await customPageFormatPlugins[0].shouldServe(filenameUrl, req)
+              ? customPageFormatPlugins[0].servePage
+              : null;
+            const isStatic = isCustom === 'static' || extension === '.md' || extension === '.html';
+            const isDynamic = isCustom === 'dynamic' || extension === '.js';
             const relativePagePath = filenameUrl.pathname.replace(pagesDir.pathname, '/');
             const relativeWorkspacePath = directory.pathname.replace(projectDirectory.pathname, '');
+
             let route = relativePagePath.replace(extension, '');
             let id = filename.split('/')[filename.split('/').length - 1].replace(extension, '');
             let layout = extension === '.html' ? null : 'page';
@@ -129,7 +137,6 @@ const generateGraph = async (compilation) => {
 
               await new Promise(async (resolve, reject) => {
                 const worker = new Worker(new URL('../lib/ssr-route-worker.js', import.meta.url));
-                // TODO "faux" new Request here, a better way?
                 const request = await requestAsObject(new Request(filenameUrl));
 
                 worker.on('message', async (result) => {
@@ -158,6 +165,7 @@ const generateGraph = async (compilation) => {
                   // TODO need to get as many of these params as possible
                   // or ignore completely?
                   page: JSON.stringify({
+                    servePage: isCustom,
                     route,
                     id,
                     label: id.split('-')
@@ -187,7 +195,7 @@ const generateGraph = async (compilation) => {
                 customData.index = ssrFrontmatter.index || '';
               }
             } else {
-              console.debug(`Unhandled extension (.${extension}) for route => ${route}`);
+              console.debug(`Unhandled extension (${extension}) for route => ${route}`);
             }
 
             /*
@@ -209,6 +217,7 @@ const generateGraph = async (compilation) => {
              * prerender: if this should be statically exported
              * isolation: if this should be run in isolated mode
              * hydration: if this page needs hydration support
+             * servePage: signal that this is a custom page file type (static | dynamic)
              */
             pages.push({
               data: customData || {},
@@ -231,7 +240,8 @@ const generateGraph = async (compilation) => {
               isSSR: !isStatic,
               prerender,
               isolation,
-              hydration
+              hydration,
+              servePage: isCustom
             });
           }
         }

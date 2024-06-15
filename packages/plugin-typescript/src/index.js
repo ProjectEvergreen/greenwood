@@ -29,6 +29,7 @@ class TypeScriptResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
     this.extensions = ['ts'];
+    this.servePage = options.servePage;
     this.contentType = 'text/javascript';
   }
 

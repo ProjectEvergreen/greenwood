@@ -31,8 +31,16 @@ async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {
 }
 
 async function getPageLayout(filePath, compilation, layout) {
-  const { context } = compilation;
+  const { config, context } = compilation;
   const { layoutsDir, userLayoutsDir, pagesDir, projectDirectory } = context;
+  const filePathUrl = new URL(`${filePath}`, projectDirectory);
+  const customPageFormatPlugins = config.plugins
+    .filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin)
+    .map(plugin => plugin.provider(compilation));
+  const isCustomStaticPage = customPageFormatPlugins[0]
+    && customPageFormatPlugins[0].servePage === 'static'
+    && customPageFormatPlugins[0].shouldServe
+    && await customPageFormatPlugins[0].shouldServe(filePathUrl);
   const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, 'page');
   const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, layout);
   const extension = filePath.split('.').pop();
@@ -44,6 +52,8 @@ async function getPageLayout(filePath, compilation, layout) {
   const isHtmlPage = extension === 'html' && await checkResourceExists(new URL(`./${filePath}`, projectDirectory));
   let contents;
 
+  console.log({ filePathUrl, isCustomStaticPage });
+
   if (layout && (customPluginPageLayouts.length > 0 || hasCustomStaticLayout)) {
     // use a custom layout, usually from markdown frontmatter
     contents = customPluginPageLayouts.length > 0
@@ -51,7 +61,11 @@ async function getPageLayout(filePath, compilation, layout) {
       : await fs.readFile(new URL(`./${layout}.html`, userLayoutsDir), 'utf-8');
   } else if (isHtmlPage) {
     // if the page is already HTML, use that as the layout, NOT accounting for 404 pages
-    contents = await fs.readFile(new URL(`./${filePath}`, projectDirectory), 'utf-8');
+    contents = await fs.readFile(filePathUrl, 'utf-8');
+  } else if (isCustomStaticPage) {
+    // transform, then use that as the layout, NOT accounting for 404 pages
+    const transformed = await customPageFormatPlugins[0].serve(filePathUrl);
+    contents = await transformed.text();
   } else if (customPluginDefaultPageLayouts.length > 0 || (!is404Page && hasPageLayout)) {
     // else look for default page layout from the user
     // and 404 pages should be their own "top level" layout
