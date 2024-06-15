@@ -52,8 +52,6 @@ async function getPageLayout(filePath, compilation, layout) {
   const isHtmlPage = extension === 'html' && await checkResourceExists(new URL(`./${filePath}`, projectDirectory));
   let contents;
 
-  console.log({ filePathUrl, isCustomStaticPage });
-
   if (layout && (customPluginPageLayouts.length > 0 || hasCustomStaticLayout)) {
     // use a custom layout, usually from markdown frontmatter
     contents = customPluginPageLayouts.length > 0

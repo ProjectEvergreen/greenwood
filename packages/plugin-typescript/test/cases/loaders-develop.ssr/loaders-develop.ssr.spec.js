@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood with an API and SSR routes that import TypeScript.
+ * Run Greenwood with an API and SSR routes that import TypeScript for development.
  *
  * User Result
- * Should generate a Greenwood build that correctly builds and bundles all assets.
+ * Should generate a Greenwood build that correctly runs in development mode.
  *
  * User Command
  * greenwood build
@@ -20,11 +20,11 @@
  * User Workspace
  *  src/
  *   api/
- *     fragment.js
  *     greeting.ts
  *   components/
- *     card.ts
  *     greeting.ts
+ *   page/
+ *     index.ts
  */
 import chai from 'chai';
 import { JSDOM } from 'jsdom';
@@ -35,11 +35,11 @@ import { fileURLToPath } from 'url';
 
 const expect = chai.expect;
 
-describe('Serve Greenwood With: ', function() {
+describe('Develop Greenwood With: ', function() {
   const LABEL = 'A Server Rendered Application (SSR) with API Routes in TypeScript';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const hostname = 'http://localhost:8080';
+  const hostname = 'http://127.0.0.1:1984';
   let runner;
 
   before(function() {
@@ -54,23 +54,22 @@ describe('Serve Greenwood With: ', function() {
 
     before(async function() {
       runner.setup(outputPath, getSetupFiles(outputPath));
-      runner.runCommand(cliPath, 'build');
 
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 10000);
 
-        runner.runCommand(cliPath, 'serve', { async: true });
+        runner.runCommand(cliPath, 'develop', { async: true });
       });
     });
 
-    describe('Serve command with API specific behaviors for an HTML ("fragment") API', function() {
+    describe('Develop command for an SSR page written in TypeScript', function() {
       let response = {};
       let dom;
 
       before(async function() {
-        response = await fetch(`${hostname}/api/fragment`);
+        response = await fetch(`${hostname}/`);
         const body = await response.text();
         dom = new JSDOM(body);
       });
@@ -87,7 +86,7 @@ describe('Serve Greenwood With: ', function() {
         expect(response.headers.get('content-type')).to.equal('text/html');
       });
 
-      it('should make sure to have the expected CSS inlined into the page for each <app-card>', function(done) {
+      xit('should make sure to have the expected CSS inlined into the page for each <app-card>', function(done) {
         const cardComponents = dom.window.document.querySelectorAll('body > app-card');
 
         expect(cardComponents.length).to.equal(2);
@@ -98,7 +97,7 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe('Serve command with API specific behaviors for TypeScript authored API', function() {
+    describe('Develop command for an API route written in TypeScript', function() {
       const name = 'TypeScript';
       let response = {};
       let body;

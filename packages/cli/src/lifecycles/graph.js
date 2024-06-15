@@ -12,6 +12,10 @@ const generateGraph = async (compilation) => {
       const { context, config } = compilation;
       const { basePath } = config;
       const { apisDir, pagesDir, projectDirectory, userWorkspace } = context;
+      const customPageFormatPlugins = config.plugins
+        .filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin)
+        .map(plugin => plugin.provider(compilation));
+
       let graph = [{
         outputPath: '/index.html',
         filename: 'index.html',
@@ -38,9 +42,6 @@ const generateGraph = async (compilation) => {
             pages = await walkDirectoryForPages(filenameUrlAsDir, pages);
           } else {
             const req = new Request(filenameUrl, { headers: { 'Accept': 'text/html' } });
-            const customPageFormatPlugins = config.plugins
-              .filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin)
-              .map(plugin => plugin.provider(compilation));
             const extension = `.${filenameUrl.pathname.split('.').pop()}`;
             const isCustom = customPageFormatPlugins[0] && customPageFormatPlugins[0].shouldServe && await customPageFormatPlugins[0].shouldServe(filenameUrl, req)
               ? customPageFormatPlugins[0].servePage
@@ -260,10 +261,12 @@ const generateGraph = async (compilation) => {
           if (isDirectory) {
             apis = await walkDirectoryForApis(filenameUrlAsDir, apis);
           } else {
+            const req = new Request(filenameUrl);
             const extension = filenameUrl.pathname.split('.').pop();
+            const isCustom = customPageFormatPlugins[0] && customPageFormatPlugins[0].shouldServe && await customPageFormatPlugins[0].shouldServe(filenameUrl, req);
 
-            if (extension !== 'js') {
-              console.warn(`${filenameUrl} is not a JavaScript file, skipping...`);
+            if (extension !== 'js' && !isCustom) {
+              console.warn(`${filenameUrl} is not a supported API file extension, skipping...`);
               return;
             }
 
@@ -284,7 +287,7 @@ const generateGraph = async (compilation) => {
             */
             apis.set(route, {
               filename: filename,
-              outputPath: `/api/${filename}`,
+              outputPath: `/api/${filename.replace(`.${extension}`, '.js')}`,
               path: relativeApiPath,
               route,
               isolation

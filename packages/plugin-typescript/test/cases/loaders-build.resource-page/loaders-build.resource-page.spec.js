@@ -13,13 +13,15 @@
  *   prerender: true,
  *   plugins: [
  *      greenwoodPluginTypeScript({
- *        servePage: 'dynamic
+ *        servePage: 'dynamic'
  *      })
  *   ]
  * }
  *
  * User Workspace
  *  src/
+ *   components/
+ *     greeting.ts
  *   pages/
  *     index.html
  *     about.ts
