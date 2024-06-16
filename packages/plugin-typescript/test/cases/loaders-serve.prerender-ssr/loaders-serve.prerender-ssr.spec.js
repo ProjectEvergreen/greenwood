@@ -87,7 +87,7 @@ describe('Serve Greenwood With: ', function() {
         const cardComponents = fragmentsApiDom.window.document.querySelectorAll('body > app-card');
 
         expect(cardComponents.length).to.equal(1);
-        expect(cardComponents[0].innerHTML).to.contain('<h3>foo</h3>')
+        expect(cardComponents[0].innerHTML).to.contain('<h3>foo</h3>');
 
         done();
       });
