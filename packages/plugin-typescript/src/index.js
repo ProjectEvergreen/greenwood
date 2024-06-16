@@ -55,7 +55,7 @@ class TypeScriptResource extends ResourceInterface {
   }
 }
 
-const greenwoodPluginTypeScript = (options = {}) => {
+const greenwoodPluginTypeScript = (options = { servePage: 'dynamic' }) => {
   return [{
     type: 'resource',
     name: 'plugin-import-typescript:resource',
