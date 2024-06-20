@@ -246,12 +246,6 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
-      it('should have the expected heading text within the index page in the public directory', function() {
-        const heading = dom.window.document.querySelector('body h1').textContent;
-
-        expect(heading).to.equal('Welcome to Greenwood!');
-      });
-
       it('should contain the expected number of javascript files in the output directory', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(3);
       });

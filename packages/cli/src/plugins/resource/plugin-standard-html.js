@@ -178,11 +178,9 @@ class StandardHtmlResource extends ResourceInterface {
       }
     }
 
-    // give the user something to see so they know it works, if they have no content
+    // clean up placeholder content-outlet
     if (body.indexOf('<content-outlet></content-outlet>') > 0) {
-      body = body.replace('<content-outlet></content-outlet>', `
-        <h1>Welcome to Greenwood!</h1>
-      `);
+      body = body.replace('<content-outlet></content-outlet>', '');
     }
 
     return new Response(body, {

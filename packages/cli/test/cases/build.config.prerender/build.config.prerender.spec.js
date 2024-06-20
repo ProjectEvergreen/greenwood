@@ -98,12 +98,6 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
-      it('should have the expected heading text within the index page in the public directory', function() {
-        const heading = dom.window.document.querySelector('body h1').textContent;
-
-        expect(heading).to.equal('Welcome to Greenwood!');
-      });
-
       it('should have prerendered content from <app-header> component', function() {
         const appHeader = dom.window.document.querySelectorAll('body app-header');
         const header = dom.window.document.querySelectorAll('body header');
