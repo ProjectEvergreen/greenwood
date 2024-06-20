@@ -445,7 +445,27 @@ const getRollupConfigForApis = async (compilation) => {
         }),
         commonjs(),
         greenwoodImportMetaUrl(compilation)
-      ]
+      ],
+      onwarn: (errorObj) => {
+        const { code, message } = errorObj;
+
+        switch (code) {
+
+          case 'CIRCULAR_DEPENDENCY':
+            // let this through for WCC + sucrase
+            // Circular dependency: ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js ->
+            //   ../../../../../node_modules/sucrase/dist/esm/parser/traverser/util.js -> ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js
+            // Circular dependency: ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js ->
+            //   ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/readWord.js -> ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js
+            // https://github.com/ProjectEvergreen/greenwood/pull/1212
+            // https://github.com/lit/lit/issues/449#issuecomment-416688319
+            break;
+          default:
+            // otherwise, log all warnings from rollup
+            console.debug(message);
+
+        }
+      }
     }));
 };
 
@@ -483,11 +503,12 @@ const getRollupConfigForSsr = async (compilation, input) => {
         switch (code) {
 
           case 'CIRCULAR_DEPENDENCY':
-            // TODO let this through for lit by suppressing it
+            // let this through for lit
             // Error: the string "Circular dependency: ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js ->
             // ../../../../../node_modules/@lit-labs/ssr/lib/lit-element-renderer.js -> ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js\n" was thrown, throw an Error :)
-            // https://github.com/lit/lit/issues/449
             // https://github.com/ProjectEvergreen/greenwood/issues/1118
+            // https://github.com/lit/lit/issues/449#issuecomment-416688319
+            // https://github.com/rollup/rollup/issues/1089#issuecomment-402109607
             break;
           default:
             // otherwise, log all warnings from rollup
