@@ -11,11 +11,12 @@ const generateGraph = async (compilation) => {
     try {
       const { context, config } = compilation;
       const { basePath } = config;
-      const { apisDir, pagesDir, projectDirectory, userWorkspace } = context;
+      const { pagesDir, projectDirectory, userWorkspace } = context;
       const customPageFormatPlugins = config.plugins
         .filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin)
         .map(plugin => plugin.provider(compilation));
 
+      let apis = new Map();
       let graph = [{
         outputPath: '/index.html',
         filename: 'index.html',
@@ -30,7 +31,7 @@ const generateGraph = async (compilation) => {
         isolation: false
       }];
 
-      const walkDirectoryForPages = async function(directory, pages = []) {
+      const walkDirectoryForPages = async function(directory, pages = [], apiRoutes = new Map()) {
         const files = await fs.readdir(directory);
 
         for (const filename of files) {
@@ -39,263 +40,254 @@ const generateGraph = async (compilation) => {
           const isDirectory = await checkResourceExists(filenameUrlAsDir) && (await fs.stat(filenameUrlAsDir)).isDirectory();
 
           if (isDirectory) {
-            pages = await walkDirectoryForPages(filenameUrlAsDir, pages);
+            const nextPages = await walkDirectoryForPages(filenameUrlAsDir, pages, apiRoutes);
+
+            pages = nextPages.pages;
+            apiRoutes = nextPages.apiRoutes;
           } else {
             const req = new Request(filenameUrl, { headers: { 'Accept': 'text/html' } });
             const extension = `.${filenameUrl.pathname.split('.').pop()}`;
             const isCustom = customPageFormatPlugins[0] && customPageFormatPlugins[0].shouldServe && await customPageFormatPlugins[0].shouldServe(filenameUrl, req)
               ? customPageFormatPlugins[0].servePage
               : null;
-            const isStatic = isCustom === 'static' || extension === '.md' || extension === '.html';
-            const isDynamic = isCustom === 'dynamic' || extension === '.js';
             const relativePagePath = filenameUrl.pathname.replace(pagesDir.pathname, '/');
             const relativeWorkspacePath = directory.pathname.replace(projectDirectory.pathname, '');
+            const isStatic = isCustom === 'static' || extension === '.md' || extension === '.html';
+            const isDynamic = isCustom === 'dynamic' || extension === '.js';
+            const isApiRoute = relativePagePath.startsWith('/api');
+            const isPage = isStatic || isDynamic;
 
-            let route = relativePagePath.replace(extension, '');
-            let id = filename.split('/')[filename.split('/').length - 1].replace(extension, '');
-            let layout = extension === '.html' ? null : 'page';
-            let title = null;
-            let imports = [];
-            let customData = {};
-            let filePath;
-            let prerender = true;
-            let isolation = false;
-            let hydration = false;
+            if (isApiRoute) {
+              const req = new Request(filenameUrl);
+              const extension = filenameUrl.pathname.split('.').pop();
+              const isCustom = customPageFormatPlugins[0] && customPageFormatPlugins[0].shouldServe && await customPageFormatPlugins[0].shouldServe(filenameUrl, req);
 
-            /*
-             * check if additional nested directories exist to correctly determine route (minus filename)
-             * examples:
-             * - pages/index.{html,md,js} -> /
-             * - pages/about.{html,md,js} -> /about/
-             * - pages/blog/index.{html,md,js} -> /blog/
-             * - pages/blog/some-post.{html,md,js} -> /blog/some-post/
-             */
-            if (relativePagePath.lastIndexOf('/') > 0) {
-              // https://github.com/ProjectEvergreen/greenwood/issues/455
-              route = id === 'index' || route.replace('/index', '') === `/${id}`
-                ? route.replace('index', '')
-                : `${route}/`;
-            } else {
-              route = route === '/index'
-                ? '/'
-                : `${route}/`;
-            }
-
-            if (isStatic) {
-              const fileContents = await fs.readFile(filenameUrl, 'utf8');
-              const { attributes } = fm(fileContents);
-
-              layout = attributes.layout || layout;
-              title = attributes.title || title;
-              id = attributes.label || id;
-              imports = attributes.imports || [];
-              filePath = `${relativeWorkspacePath}${filename}`;
-
-              // prune "reserved" attributes that are supported by Greenwood
-              // https://www.greenwoodjs.io/docs/front-matter
-              customData = attributes;
-
-              delete customData.label;
-              delete customData.imports;
-              delete customData.title;
-              delete customData.layout;
-
-              /* Menu Query
-              * Custom front matter - Variable Definitions
-              * --------------------------------------------------
-              * menu: the name of the menu in which this item can be listed and queried
-              * index: the index of this list item within a menu
-              * linkheadings: flag to tell us where to add page's table of contents as menu items
-              * tableOfContents: json object containing page's table of contents(list of headings)
-              */
-              // set specific menu to place this page
-              customData.menu = customData.menu || '';
-
-              // set specific index list priority of this item within a menu
-              customData.index = customData.index || '';
-
-              // set flag whether to gather a list of headings on a page as menu items
-              customData.linkheadings = customData.linkheadings || 0;
-              customData.tableOfContents = [];
-
-              if (customData.linkheadings > 0) {
-                // parse markdown for table of contents and output to json
-                customData.tableOfContents = toc(fileContents).json;
-                customData.tableOfContents.shift();
-
-                // parse table of contents for only the pages user wants linked
-                if (customData.tableOfContents.length > 0 && customData.linkheadings > 0) {
-                  customData.tableOfContents = customData.tableOfContents
-                    .filter((item) => item.lvl === customData.linkheadings);
-                }
+              if (extension !== 'js' && !isCustom) {
+                console.warn(`${filenameUrl} is not a supported API file extension, skipping...`);
+                return;
               }
-              /* ---------End Menu Query-------------------- */
-            } else if (isDynamic) {
-              const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation).executeModuleUrl;
-              let ssrFrontmatter;
 
-              filePath = route;
+              const relativeApiPath = filenameUrl.pathname.replace(pagesDir.pathname, '/');
+              const route = `${basePath}${relativeApiPath.replace(`.${extension}`, '')}`;
+              // TODO should this be run in isolation like SSR pages?
+              // https://github.com/ProjectEvergreen/greenwood/issues/991
+              const { isolation } = await import(filenameUrl).then(module => module);
 
-              await new Promise(async (resolve, reject) => {
-                const worker = new Worker(new URL('../lib/ssr-route-worker.js', import.meta.url));
-                const request = await requestAsObject(new Request(filenameUrl));
-
-                worker.on('message', async (result) => {
-                  prerender = result.prerender ?? false;
-                  isolation = result.isolation ?? isolation;
-                  hydration = result.hydration ?? hydration;
-
-                  if (result.frontmatter) {
-                    result.frontmatter.imports = result.frontmatter.imports || [];
-                    ssrFrontmatter = result.frontmatter;
-                  }
-
-                  resolve();
-                });
-                worker.on('error', reject);
-                worker.on('exit', (code) => {
-                  if (code !== 0) {
-                    reject(new Error(`Worker stopped with exit code ${code}`));
-                  }
-                });
-
-                worker.postMessage({
-                  executeModuleUrl: routeWorkerUrl.href,
-                  moduleUrl: filenameUrl.href,
-                  compilation: JSON.stringify(compilation),
-                  // TODO need to get as many of these params as possible
-                  // or ignore completely?
-                  page: JSON.stringify({
-                    servePage: isCustom,
-                    route,
-                    id,
-                    label: id.split('-')
-                      .map((idPart) => {
-                        return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
-                      }).join(' ')
-                  }),
-                  request
-                });
+              /*
+              * API Properties (per route)
+              *----------------------
+              * filename: base filename of the page
+              * outputPath: the filename to write to when generating a build
+              * path: path to the file relative to the workspace
+              * route: URL route for a given page on outputFilePath
+              * isolation: if this should be run in isolated mode
+              */
+              apiRoutes.set(route, {
+                filename: filename,
+                outputPath: `/api/${filename.replace(`.${extension}`, '.js')}`,
+                path: relativeApiPath,
+                route,
+                isolation
               });
+            } else if (isPage) {
+              let route = relativePagePath.replace(extension, '');
+              let id = filename.split('/')[filename.split('/').length - 1].replace(extension, '');
+              let layout = extension === '.html' ? null : 'page';
+              let title = null;
+              let imports = [];
+              let customData = {};
+              let filePath;
+              let prerender = true;
+              let isolation = false;
+              let hydration = false;
 
-              if (ssrFrontmatter) {
-                layout = ssrFrontmatter.layout || layout;
-                title = ssrFrontmatter.title || title;
-                imports = ssrFrontmatter.imports || imports;
-                customData = ssrFrontmatter.data || customData;
+              /*
+              * check if additional nested directories exist to correctly determine route (minus filename)
+              * examples:
+              * - pages/index.{html,md,js} -> /
+              * - pages/about.{html,md,js} -> /about/
+              * - pages/blog/index.{html,md,js} -> /blog/
+              * - pages/blog/some-post.{html,md,js} -> /blog/some-post/
+              */
+              if (relativePagePath.lastIndexOf('/') > 0) {
+                // https://github.com/ProjectEvergreen/greenwood/issues/455
+                route = id === 'index' || route.replace('/index', '') === `/${id}`
+                  ? route.replace('index', '')
+                  : `${route}/`;
+              } else {
+                route = route === '/index'
+                  ? '/'
+                  : `${route}/`;
+              }
+
+              if (isStatic) {
+                const fileContents = await fs.readFile(filenameUrl, 'utf8');
+                const { attributes } = fm(fileContents);
+
+                layout = attributes.layout || layout;
+                title = attributes.title || title;
+                id = attributes.label || id;
+                imports = attributes.imports || [];
+                filePath = `${relativeWorkspacePath}${filename}`;
+
+                // prune "reserved" attributes that are supported by Greenwood
+                // https://www.greenwoodjs.io/docs/front-matter
+                customData = attributes;
+
+                delete customData.label;
+                delete customData.imports;
+                delete customData.title;
+                delete customData.layout;
 
                 /* Menu Query
-                 * Custom front matter - Variable Definitions
-                 * --------------------------------------------------
-                 * menu: the name of the menu in which this item can be listed and queried
-                 * index: the index of this list item within a menu
-                 * linkheadings: flag to tell us where to add page's table of contents as menu items
-                 * tableOfContents: json object containing page's table of contents(list of headings)
-                 */
-                customData.menu = ssrFrontmatter.menu || '';
-                customData.index = ssrFrontmatter.index || '';
+                * Custom front matter - Variable Definitions
+                * --------------------------------------------------
+                * menu: the name of the menu in which this item can be listed and queried
+                * index: the index of this list item within a menu
+                * linkheadings: flag to tell us where to add page's table of contents as menu items
+                * tableOfContents: json object containing page's table of contents(list of headings)
+                */
+                // set specific menu to place this page
+                customData.menu = customData.menu || '';
+
+                // set specific index list priority of this item within a menu
+                customData.index = customData.index || '';
+
+                // set flag whether to gather a list of headings on a page as menu items
+                customData.linkheadings = customData.linkheadings || 0;
+                customData.tableOfContents = [];
+
+                if (customData.linkheadings > 0) {
+                  // parse markdown for table of contents and output to json
+                  customData.tableOfContents = toc(fileContents).json;
+                  customData.tableOfContents.shift();
+
+                  // parse table of contents for only the pages user wants linked
+                  if (customData.tableOfContents.length > 0 && customData.linkheadings > 0) {
+                    customData.tableOfContents = customData.tableOfContents
+                      .filter((item) => item.lvl === customData.linkheadings);
+                  }
+                }
+                /* ---------End Menu Query-------------------- */
+              } else if (isDynamic) {
+                const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation).executeModuleUrl;
+                let ssrFrontmatter;
+
+                filePath = route;
+
+                await new Promise(async (resolve, reject) => {
+                  const worker = new Worker(new URL('../lib/ssr-route-worker.js', import.meta.url));
+                  const request = await requestAsObject(new Request(filenameUrl));
+
+                  worker.on('message', async (result) => {
+                    prerender = result.prerender ?? false;
+                    isolation = result.isolation ?? isolation;
+                    hydration = result.hydration ?? hydration;
+
+                    if (result.frontmatter) {
+                      result.frontmatter.imports = result.frontmatter.imports || [];
+                      ssrFrontmatter = result.frontmatter;
+                    }
+
+                    resolve();
+                  });
+                  worker.on('error', reject);
+                  worker.on('exit', (code) => {
+                    if (code !== 0) {
+                      reject(new Error(`Worker stopped with exit code ${code}`));
+                    }
+                  });
+
+                  worker.postMessage({
+                    executeModuleUrl: routeWorkerUrl.href,
+                    moduleUrl: filenameUrl.href,
+                    compilation: JSON.stringify(compilation),
+                    // TODO need to get as many of these params as possible
+                    // or ignore completely?
+                    page: JSON.stringify({
+                      servePage: isCustom,
+                      route,
+                      id,
+                      label: id.split('-')
+                        .map((idPart) => {
+                          return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
+                        }).join(' ')
+                    }),
+                    request
+                  });
+                });
+
+                if (ssrFrontmatter) {
+                  layout = ssrFrontmatter.layout || layout;
+                  title = ssrFrontmatter.title || title;
+                  imports = ssrFrontmatter.imports || imports;
+                  customData = ssrFrontmatter.data || customData;
+
+                  /* Menu Query
+                  * Custom front matter - Variable Definitions
+                  * --------------------------------------------------
+                  * menu: the name of the menu in which this item can be listed and queried
+                  * index: the index of this list item within a menu
+                  * linkheadings: flag to tell us where to add page's table of contents as menu items
+                  * tableOfContents: json object containing page's table of contents(list of headings)
+                  */
+                  customData.menu = ssrFrontmatter.menu || '';
+                  customData.index = ssrFrontmatter.index || '';
+                }
               }
+
+              /*
+              * Graph Properties (per page)
+              *----------------------
+              * data: custom page frontmatter
+              * filename: base filename of the page
+              * id: filename without the extension
+              * relativeWorkspacePagePath: the file path relative to the user's workspace directory
+              * label: "pretty" text representation of the filename
+              * imports: per page JS or CSS file imports to be included in HTML output from frontmatter
+              * resources: sum of all resources for the entire page
+              * outputPath: the filename to write to when generating static HTML
+              * path: path to the file relative to the workspace
+              * route: URL route for a given page on outputFilePath
+              * layout: page layout to use as a base for a generated component
+              * title: a default value that can be used for <title></title>
+              * isSSR: if this is a server side route
+              * prerender: if this should be statically exported
+              * isolation: if this should be run in isolated mode
+              * hydration: if this page needs hydration support
+              * servePage: signal that this is a custom page file type (static | dynamic)
+              */
+              pages.push({
+                data: customData || {},
+                filename,
+                id,
+                relativeWorkspacePagePath: relativePagePath,
+                label: id.split('-')
+                  .map((idPart) => {
+                    return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
+                  }).join(' '),
+                imports,
+                resources: [],
+                outputPath: route === '/404/'
+                  ? '/404.html'
+                  : `${route}index.html`,
+                path: filePath,
+                route: `${basePath}${route}`,
+                layout,
+                title,
+                isSSR: !isStatic,
+                prerender,
+                isolation,
+                hydration,
+                servePage: isCustom
+              });
             } else {
               console.debug(`Unhandled extension (${extension}) for route => ${route}`);
             }
-
-            /*
-             * Graph Properties (per page)
-             *----------------------
-             * data: custom page frontmatter
-             * filename: base filename of the page
-             * id: filename without the extension
-             * relativeWorkspacePagePath: the file path relative to the user's workspace directory
-             * label: "pretty" text representation of the filename
-             * imports: per page JS or CSS file imports to be included in HTML output from frontmatter
-             * resources: sum of all resources for the entire page
-             * outputPath: the filename to write to when generating static HTML
-             * path: path to the file relative to the workspace
-             * route: URL route for a given page on outputFilePath
-             * layout: page layout to use as a base for a generated component
-             * title: a default value that can be used for <title></title>
-             * isSSR: if this is a server side route
-             * prerender: if this should be statically exported
-             * isolation: if this should be run in isolated mode
-             * hydration: if this page needs hydration support
-             * servePage: signal that this is a custom page file type (static | dynamic)
-             */
-            pages.push({
-              data: customData || {},
-              filename,
-              id,
-              relativeWorkspacePagePath: relativePagePath,
-              label: id.split('-')
-                .map((idPart) => {
-                  return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
-                }).join(' '),
-              imports,
-              resources: [],
-              outputPath: route === '/404/'
-                ? '/404.html'
-                : `${route}index.html`,
-              path: filePath,
-              route: `${basePath}${route}`,
-              layout,
-              title,
-              isSSR: !isStatic,
-              prerender,
-              isolation,
-              hydration,
-              servePage: isCustom
-            });
           }
         }
 
-        return pages;
-      };
-
-      const walkDirectoryForApis = async function(directory, apis = new Map()) {
-        const files = await fs.readdir(directory);
-
-        for (const filename of files) {
-          const filenameUrl = new URL(`./${filename}`, directory);
-          const filenameUrlAsDir = new URL(`./${filename}/`, directory);
-          const isDirectory = await checkResourceExists(filenameUrlAsDir) && (await fs.stat(filenameUrlAsDir)).isDirectory();
-
-          if (isDirectory) {
-            apis = await walkDirectoryForApis(filenameUrlAsDir, apis);
-          } else {
-            const req = new Request(filenameUrl);
-            const extension = filenameUrl.pathname.split('.').pop();
-            const isCustom = customPageFormatPlugins[0] && customPageFormatPlugins[0].shouldServe && await customPageFormatPlugins[0].shouldServe(filenameUrl, req);
-
-            if (extension !== 'js' && !isCustom) {
-              console.warn(`${filenameUrl} is not a supported API file extension, skipping...`);
-              return;
-            }
-
-            const relativeApiPath = filenameUrl.pathname.replace(userWorkspace.pathname, '/');
-            const route = `${basePath}${relativeApiPath.replace(`.${extension}`, '')}`;
-            // TODO should this be run in isolation like SSR pages?
-            // https://github.com/ProjectEvergreen/greenwood/issues/991
-            const { isolation } = await import(filenameUrl).then(module => module);
-
-            /*
-            * API Properties (per route)
-            *----------------------
-            * filename: base filename of the page
-            * outputPath: the filename to write to when generating a build
-            * path: path to the file relative to the workspace
-            * route: URL route for a given page on outputFilePath
-            * isolation: if this should be run in isolated mode
-            */
-            apis.set(route, {
-              filename: filename,
-              outputPath: `/api/${filename.replace(`.${extension}`, '.js')}`,
-              path: relativeApiPath,
-              route,
-              isolation
-            });
-          }
-        }
-
-        return apis;
+        return { pages, apiRoutes };
       };
 
       console.debug('building from local sources...');
@@ -309,8 +301,10 @@ const generateGraph = async (compilation) => {
         }];
       } else {
         const oldGraph = graph[0];
+        const pages = await checkResourceExists(pagesDir) ? await walkDirectoryForPages(pagesDir) : { pages: graph, apiRoutes: apis };
 
-        graph = await checkResourceExists(pagesDir) ? await walkDirectoryForPages(pagesDir) : graph;
+        graph = pages.pages;
+        apis = pages.apiRoutes;
 
         const has404Page = graph.find(page => page.route.endsWith('/404/'));
 
@@ -366,12 +360,7 @@ const generateGraph = async (compilation) => {
       }
 
       compilation.graph = graph;
-
-      if (await checkResourceExists(apisDir)) {
-        const apis = await walkDirectoryForApis(apisDir);
-
-        compilation.manifest = { apis };
-      }
+      compilation.manifest = { apis };
 
       resolve(compilation);
     } catch (err) {

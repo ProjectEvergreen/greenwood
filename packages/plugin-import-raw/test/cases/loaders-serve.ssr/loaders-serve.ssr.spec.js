@@ -17,12 +17,12 @@
  *
  * User Workspace
  *  src/
- *   api/
- *     fragment.js
  *   components/
  *     card.js
  *     card.css
  *   pages/
+ *     api/
+ *       fragment.js
  *     products.js
  *   services/
  *     products.js

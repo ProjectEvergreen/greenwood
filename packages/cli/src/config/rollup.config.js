@@ -423,10 +423,10 @@ const getRollupConfigForScriptResources = async (compilation) => {
 };
 
 const getRollupConfigForApis = async (compilation) => {
-  const { outputDir, userWorkspace } = compilation.context;
+  const { outputDir, pagesDir } = compilation.context;
 
   return [...compilation.manifest.apis.values()]
-    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)))
+    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, pagesDir)))
     .map(filepath => ({
       input: filepath,
       output: {

@@ -1,5 +1,5 @@
 import { renderFromHTML } from 'wc-compiler';
-import { getArtists } from '../services/artists.js';
+import { getArtists } from '../../services/artists.js';
 
 export async function handler(request) {
   const formData = await request.formData();
@@ -27,7 +27,7 @@ export async function handler(request) {
         }).join('')
       }
     `, [
-      new URL('../components/card.js', import.meta.url)
+      new URL('../../components/card.js', import.meta.url)
     ]);
 
     body = html;

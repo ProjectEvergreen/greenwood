@@ -16,13 +16,13 @@
  *
  * User Workspace
  * src/
- *   api/
- *     greeting.js
  *   assets/
  *     logo.png
  *   components/
  *     card.js
  *   pages/
+ *     api/
+ *       greeting.js
  *     about.md
  *     index.html
  *     users.js

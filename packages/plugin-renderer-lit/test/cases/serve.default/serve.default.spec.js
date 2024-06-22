@@ -21,13 +21,13 @@
  *
  * User Workspace
  *  src/
- *   api/
- *     search.js
  *   components/
  *     card.js
  *     footer.js
  *     greeting.js
  *   pages/
+ *     api/
+ *       search.js
  *     artists.js
  *     users.js (isolation = false)
  *   layouts/

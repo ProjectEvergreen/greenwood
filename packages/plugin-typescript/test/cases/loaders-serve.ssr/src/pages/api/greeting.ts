@@ -1,17 +1,17 @@
 import { renderFromHTML } from 'wc-compiler';
 
-export async function handler(request) {
+export async function handler(request: Request) {
   const params = new URLSearchParams(request.url.slice(request.url.indexOf('?')));
   const name = params.has('name') ? params.get('name') : 'World';
   const { html } = await renderFromHTML(`
-    <app-card name="${name}"></app-card>
+    <x-greeting name="${name}"></x-greeting>
   `, [
-    new URL('../components/card/card.js', import.meta.url)
+    new URL('../../components/greeting.ts', import.meta.url)
   ]);
 
   return new Response(html, {
-    headers: new Headers({
+    headers: {
       'Content-Type': 'text/html'
-    })
+    }
   });
 }

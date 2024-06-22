@@ -1,20 +1,17 @@
 import { renderFromHTML } from 'wc-compiler';
 
-export const isolation = true;
-
-export async function handler(request) {
+export async function handler(request: Request) {
   const params = new URLSearchParams(request.url.slice(request.url.indexOf('?')));
   const name = params.has('name') ? params.get('name') : 'World';
   const { html } = await renderFromHTML(`
-    <x-card name="${name}"></x-card>
+    <x-greeting name="${name}"></x-greeting>
   `, [
-    new URL('../components/card.js', import.meta.url)
+    new URL('../../components/greeting.ts', import.meta.url)
   ]);
 
   return new Response(html, {
-    headers: new Headers({
+    headers: {
       'Content-Type': 'text/html'
-    }),
-    statusText: 'SUCCESS!!!'
+    }
   });
 }

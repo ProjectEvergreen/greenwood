@@ -6,7 +6,7 @@ export async function handler(request) {
   const { html } = await renderFromHTML(`
     <app-card name="${name}"></app-card>
   `, [
-    new URL('../components/card/card.js', import.meta.url)
+    new URL('../../components/card/card.js', import.meta.url)
   ]);
 
   return new Response(html, {

@@ -15,11 +15,11 @@
  *
  * User Workspace
  *  src/
- *   api/
- *     greeting.js
  *   components/
  *     footer.js
  *   pages/
+ *     api/
+ *       greeting.js
  *     index.js
  *   layouts/
  *     app.html

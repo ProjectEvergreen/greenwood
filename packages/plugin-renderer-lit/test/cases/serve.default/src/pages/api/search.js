@@ -3,10 +3,10 @@ import { collectResultSync } from '@lit-labs/ssr/lib/render-result.js';
 import fs from 'fs';
 import { html } from 'lit';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import '../components/card.js';
+import '../../components/card.js';
 
 export async function handler(request) {
-  const artists = JSON.parse(fs.readFileSync(new URL('../../artists.json', import.meta.url), 'utf-8'));
+  const artists = JSON.parse(fs.readFileSync(new URL('../../../artists.json', import.meta.url), 'utf-8'));
   const formData = await request.formData();
   const term = formData.has('term') ? formData.get('term') : '';
   const filteredArtists = artists.filter((artist) => {

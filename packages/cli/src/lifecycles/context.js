@@ -13,8 +13,8 @@ const initContext = async({ config }) => {
       const dataDir = new URL('../data/', import.meta.url);
       const layoutsDir = new URL('../layouts/', import.meta.url);
       const userWorkspace = workspace;
-      const apisDir = new URL('./api/', userWorkspace);
       const pagesDir = new URL(`./${pagesDirectory}/`, userWorkspace);
+      const apisDir = new URL('./api/', pagesDir);
       const userLayoutsDir = new URL(`./${layoutsDirectory}/`, userWorkspace);
 
       const context = {

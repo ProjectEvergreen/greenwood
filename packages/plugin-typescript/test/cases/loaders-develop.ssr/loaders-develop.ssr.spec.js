@@ -19,11 +19,11 @@
  *
  * User Workspace
  *  src/
- *   api/
- *     greeting.ts
  *   components/
  *     greeting.ts
- *   page/
+ *   pages/
+ *     api/
+ *       greeting.ts
  *     index.ts
  */
 import chai from 'chai';

@@ -12,14 +12,15 @@ Greenwood has support for API routes, which are just functions that run on the s
 
 ### Usage
 
-API routes follow a file based routing convention, just like [pages](/docs/layouts/#pages).  So this structure
+API routes follow a file based routing convention, within the [pages directory](/docs/layouts/#pages).  So this structure
 ```shell
 src/
-  api/
-    greeting.js
+  pages/
+    api/
+      greeting.js
 ```
 
-Will yield an endpoint available at `/api/greeting`.
+Will yield an endpoint available at `/api/greeting` in the browser.
 
 Here is an example of that API, which reads a query parameter of `name` and returns a JSON response.
 
@@ -68,7 +69,7 @@ export async function handler(request) {
   const { html } = await renderFromHTML(`
     <x-card name="${name}"></x-card>
   `, [
-    new URL('path/to/card.js', import.meta.url)
+    new URL('../path/to/card.js', import.meta.url)
   ]);
 
   headers.append('Content-Type', 'text/html');

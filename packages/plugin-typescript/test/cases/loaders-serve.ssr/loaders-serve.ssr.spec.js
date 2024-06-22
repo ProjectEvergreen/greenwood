@@ -19,12 +19,14 @@
  *
  * User Workspace
  *  src/
- *   api/
- *     fragment.js
- *     greeting.ts
  *   components/
  *     card.ts
  *     greeting.ts
+ *   pages/
+ *     api/
+ *       fragment.js
+ *       greeting.ts
+ *     index.html
  */
 import chai from 'chai';
 import { JSDOM } from 'jsdom';
