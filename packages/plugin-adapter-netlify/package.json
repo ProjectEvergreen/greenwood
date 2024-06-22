@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-adapter-netlify",
-  "version": "0.30.0-alpha.2",
+  "version": "0.30.0-alpha.3",
   "description": "A Greenwood plugin for supporting Netlify serverless and edge runtimes.",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-adapter-netlify",
@@ -31,7 +31,7 @@
     "zip-a-folder": "^2.0.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.30.0-alpha.2",
+    "@greenwood/cli": "^0.30.0-alpha.3",
     "extract-zip": "^2.0.1"
   }
 }
