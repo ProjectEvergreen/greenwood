@@ -16,13 +16,13 @@
  *
  * User Workspace
  * src/
- *   api/
- *     greeting.js
  *   assets/
  *     logo.png
  *   components/
  *     card.js
  *   pages/
+ *     api/
+ *       greeting.js
  *     about.md
  *     index.html
  *     users.js
@@ -294,7 +294,7 @@ describe('Serve Greenwood With: ', function() {
           .filter(tag => tag.getAttribute('data-gwd') === 'static-router');
 
         expect(routerScriptTags.length).to.be.equal(1);
-        expect(routerScriptTags[0].textContent.replace(/ /g, '').replace(/\n/g, '')).to.contain(`window.__greenwood=window.__greenwood||{};window.__greenwood.currentTemplate="${basePath}/"`);
+        expect(routerScriptTags[0].textContent.replace(/ /g, '').replace(/\n/g, '')).to.contain(`window.__greenwood=window.__greenwood||{};window.__greenwood.currentLayout="${basePath}/"`);
       });
 
       it('should have one <router-outlet> tag in the <body> for the content', function() {
@@ -316,7 +316,7 @@ describe('Serve Greenwood With: ', function() {
         const dataset = aboutRouteTag[0].dataset;
 
         expect(aboutRouteTag.length).to.be.equal(1);
-        expect(dataset.template).to.be.equal('test');
+        expect(dataset.layout).to.be.equal('test');
         expect(dataset.key).to.be.equal(`${basePath}/_routes/about/index.html`);
       });
 
@@ -327,7 +327,7 @@ describe('Serve Greenwood With: ', function() {
         const dataset = aboutRouteTag[0].dataset;
 
         expect(aboutRouteTag.length).to.be.equal(1);
-        expect(dataset.template).to.be.equal(`${basePath}/`);
+        expect(dataset.layout).to.be.equal(`${basePath}/`);
         expect(dataset.key).to.be.equal(`${basePath}/_routes/index.html`);
       });
 

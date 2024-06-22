@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood and tests for correct `<meta>` tag merging for pages and templates.
+ * Run Greenwood and tests for correct `<meta>` tag merging for pages and layouts.
  *
  * User Result
  * Should generate a bare bones Greenwood build with one nested About page with expected meta values.
@@ -19,7 +19,7 @@
  *       index.md
  *     hello.md
  *     index.md
- *   template/
+ *   layout/
  *     app.html
  *     page.html
  */

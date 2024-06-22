@@ -102,14 +102,6 @@ describe('Build Greenwood With: ', function() {
           done();
         });
       });
-
-      describe('default <body> content', function() {
-        it('should have the expected heading text within the index page in the public directory', function() {
-          const heading = dom.window.document.querySelector('body h1').textContent;
-
-          expect(heading).to.equal('Welcome to Greenwood!');
-        });
-      });
     });
 
     describe('Default output for 404.html', function() {

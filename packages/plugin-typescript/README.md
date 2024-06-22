@@ -1,15 +1,13 @@
 # @greenwood/plugin-typescript
 
 ## Overview
+
 A Greenwood plugin for writing [**TypeScript**](https://www.typescriptlang.org/).   There is still a [little more work](https://github.com/ProjectEvergreen/greenwood/issues/658) we would like to do but this plugin should be suitable for general usage.
 
 > This package assumes you already have `@greenwood/cli` installed.
 
-## Caveats
-
-As of now, this transformation is only supported for client side (browser) code and will not run correctly in NodeJS until [support for this is introduced into Greenwood](https://github.com/ProjectEvergreen/greenwood/issues/878), or natively by NodeJS.  This means it will not work when using `prerender` option with WCC.
-
 ## Installation
+
 You can use your favorite JavaScript package manager to install this package.
 
 _examples:_
@@ -22,6 +20,7 @@ yarn add @greenwood/plugin-typescript --dev
 ```
 
 ## Usage
+
 Add this plugin to your _greenwood.config.js_.
 
 ```javascript
@@ -36,7 +35,7 @@ export default {
 };
 ```
 
-Then, you can write some TypeScript
+Then, you can write some TypeScript!
 ```ts
 import { html, css, LitElement, customElement, property } from 'lit-element';
 
@@ -59,6 +58,9 @@ And use it in your project like you would use a _.js_ file!
 ```
 
 ## Options
+
+### Configuration
+
 This plugin provides the following default `compilerOptions`.
 
 ```json
@@ -98,3 +100,21 @@ If you would like to extend / override these options:
     ```
 
 This will then process your JavaScript with TypeScript with the additional configuration settings you provide.  This also allows you to configure the rest of _tsconfig.json_ to support your IDE and local development environment settings.
+
+### Custom Pages
+
+By default, this plugin extends TypeScript support to processing SSR pages and API routes.  If you would like to _disable_ this, set the `servePage` option to `false`
+
+```js
+import { greenwoodPluginTypeScript } from '@greenwood/plugin-typescript';
+
+export default {
+  // ...
+
+  plugins: [
+    greenwoodPluginTypeScript({
+      servePage: false
+    })
+  ]
+};
+```

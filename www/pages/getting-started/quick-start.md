@@ -17,7 +17,7 @@ If you want to get right into the code, we have a few options to get you started
 
 ### Init Package
 
-You can use Greenwood's [`init` package](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/init/README.md) to scaffold out a new empty Greenwood project, or from a template.
+You can use Greenwood's [`init` package](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/init/README.md) to scaffold out a new empty Greenwood project, or from a layout.
 
 ```bash
 mkdir my-app && cd my-app

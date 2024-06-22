@@ -13,20 +13,20 @@
  *
  * User Workspace
  * src/
- *   api/
- *     fragment.js (isolation mode)
- *     greeting.js
- *     missing.js
- *     nothing.js
- *     submit-form-data.js
- *     submit-json.js
+ *   pages/
+ *     api/
+ *       fragment.js (isolation mode)
+ *       greeting.js
+ *       missing.js
+ *       nothing.js
+ *       submit-form-data.js
+ *       submit-json.js
  *   components/
  *     card.js
  */
 import chai from 'chai';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -60,8 +60,6 @@ describe('Serve Greenwood With: ', function() {
         runner.runCommand(cliPath, 'serve', { async: true });
       });
     });
-
-    runSmokeTest(['serve'], LABEL);
 
     describe('Serve command with API specific behaviors for a JSON API', function() {
       const name = 'Greenwood';

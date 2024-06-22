@@ -5,7 +5,7 @@ import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 
 async function executeRouteModule({ moduleUrl, compilation, page, prerender, htmlContents, scripts }) {
   const data = {
-    template: null,
+    layout: null,
     body: null,
     frontmatter: null,
     html: null,
@@ -23,7 +23,7 @@ async function executeRouteModule({ moduleUrl, compilation, page, prerender, htm
     data.html = await collectResult(render(templateResult));
   } else {
     const module = await import(moduleUrl).then(module => module);
-    const { getTemplate = null, getBody = null, getFrontmatter = null, isolation = true, hydration = true } = module;
+    const { getLayout = null, getBody = null, getFrontmatter = null, isolation = true, hydration = true } = module;
 
     // TODO cant we get these from just pulling from the file during the graph phase?
     // https://github.com/ProjectEvergreen/greenwood/issues/991
@@ -41,10 +41,10 @@ async function executeRouteModule({ moduleUrl, compilation, page, prerender, htm
       data.body = await collectResult(render(templateResult));
     }
 
-    if (getTemplate) {
-      const templateResult = await getTemplate(compilation, page);
+    if (getLayout) {
+      const templateResult = await getLayout(compilation, page);
 
-      data.template = await collectResult(render(templateResult));
+      data.layout = await collectResult(render(templateResult));
     }
 
     if (getFrontmatter) {

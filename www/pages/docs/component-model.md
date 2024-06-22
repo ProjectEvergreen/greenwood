@@ -16,7 +16,7 @@ Below are a couple examples to get you going.
 
 ## Example
 
-Below is an example of creating a footer component using native `HTMLElement` within a page template of a Greenwood project. This is all just vanilla HTML / CSS / JS.
+Below is an example of creating a footer component using native `HTMLElement` within a page layout of a Greenwood project. This is all just vanilla HTML / CSS / JS.
 
 ### Component
 
@@ -52,7 +52,7 @@ customElements.define('my-footer', FooterComponent);
 
 ### Usage
 
-You can then use it within a page template.
+You can then use it within a page layout.
 
 ```html
 <!DOCTYPE html>

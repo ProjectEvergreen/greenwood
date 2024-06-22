@@ -58,7 +58,7 @@ $ npm run develop
 #### Experience
 No advanced JavaScript / CSS experience is needed for using Greenwood.  Just knowing some [markdown](https://daringfireball.net/projects/markdown/) and following some basic steps from the command line will be enough to get you up and running quickly.
 
-We like to think that that as your experience grows, so can the way you build your site.  Greenwood has very few opinions on how you structure your project (aside from pages and templates), or what you're trying to build, or how.  _Our hope is to provide you a developer experience that is conducive to modern web development and the expectations around it_.
+We like to think that that as your experience grows, so can the way you build your site.  Greenwood has very few opinions on how you structure your project (aside from pages and layouts), or what you're trying to build, or how.  _Our hope is to provide you a developer experience that is conducive to modern web development and the expectations around it_.
 
 ## Tutorials
 So if you're ready to get started, let's get [your first project setup](/getting-started/project-setup/)!  Or if you just want to "code and go", check out our [quick start](/getting-started/quick-start/).

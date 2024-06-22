@@ -29,6 +29,7 @@ class TypeScriptResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
     this.extensions = ['ts'];
+    this.servePage = options.servePage;
     this.contentType = 'text/javascript';
   }
 
@@ -54,7 +55,7 @@ class TypeScriptResource extends ResourceInterface {
   }
 }
 
-const greenwoodPluginTypeScript = (options = {}) => {
+const greenwoodPluginTypeScript = (options = { servePage: 'dynamic' }) => {
   return [{
     type: 'resource',
     name: 'plugin-import-typescript:resource',

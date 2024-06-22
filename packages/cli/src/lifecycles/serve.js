@@ -371,7 +371,7 @@ async function getHybridServer(compilation) {
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
-        const entryPointUrl = new URL(`.${apiRoute.path}`, outputDir);
+        const entryPointUrl = new URL(`.${apiRoute.outputPath}`, outputDir);
         let body, status, headers, statusText;
 
         if (apiRoute.isolation || isolationMode) {

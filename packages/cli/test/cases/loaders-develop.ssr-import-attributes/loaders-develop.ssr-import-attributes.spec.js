@@ -13,14 +13,14 @@
  *
  * User Workspace
  * src/
- *   api/
- *     fragment.js
  *   components/
  *     card/
  *       card.css
  *       card.js
  *       card.json
  *   pages/
+ *    api/
+ *      fragment.js
  *     greeting.js
  *
  */

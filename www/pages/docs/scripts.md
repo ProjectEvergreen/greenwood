@@ -8,7 +8,7 @@ linkheadings: 3
 
 ## Scripts and Imports
 
-**Greenwood** generally does not have any opinion on how you structure your site, aside from the pre-determined _pages/_ and (optional) _templates/_ directories.  It supports all standard files that you can open in a web browser.
+**Greenwood** generally does not have any opinion on how you structure your site, aside from the pre-determined _pages/_ and (optional) _layouts/_ directories.  It supports all standard files that you can open in a web browser.
 
 
 ### Script Tags

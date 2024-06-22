@@ -21,12 +21,12 @@
  *
  * Custom Workspace
  * src/
- *   api/
- *     greeting.js
- *   pages/
- *     index.js
  *   components/
  *     card.js
+ *   pages/
+ *     api/
+ *       greeting.js
+ *     index.js
  */
 import chai from 'chai';
 import path from 'path';

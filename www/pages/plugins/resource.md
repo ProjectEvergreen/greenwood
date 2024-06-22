@@ -27,6 +27,7 @@ class ExampleResource extends ResourceInterface {
     this.compilation = compilation; // Greenwood's compilation object
     this.options = options; // any optional configuration provided by the user of your plugin
     this.extensions = ['foo', 'bar']; // add custom extensions for file watching + live reload here, ex. ts for TypeScript
+    this.servePage = `static|dynamic`; // optionally opt-in to Greenwood using the plugin's serve lifecycle for processing static pages ('static') or SSR pages and API routes ('dynamic') 
   }
 
   // lifecycles go here
@@ -40,6 +41,8 @@ export function myResourcePlugin(options = {}) {
   }
 };
 ```
+
+> _Note: Using `servePage` with the `'dynamic'` setting requires enabling [custom imports](/docs/server-rendering/#custom-imports)._
 
 
 ### Lifecycles

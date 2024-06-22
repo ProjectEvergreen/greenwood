@@ -63,24 +63,24 @@ class StaticRouterResource extends ResourceInterface {
     const partial = body.match(/<body>(.*)<\/body>/s)[0].replace('<body>', '').replace('</body>', '');
     const outputPartialDirUrl = new URL(`./_routes${url.pathname.replace(basePath, '')}`, outputDir);
     const outputPartialDirPathUrl = new URL(`file://${outputPartialDirUrl.pathname.split('/').slice(0, -1).join('/').concat('/')}`);
-    let currentTemplate;
+    let currentLayout;
 
     const routeTags = this.compilation.graph
       .filter(page => !page.isSSR)
       .filter(page => !page.route.endsWith('/404/'))
       .map((page) => {
-        const template = page.filename && page.filename.split('.').pop() === this.extensions[0]
+        const layout = page.filename && page.filename.split('.').pop() === this.extensions[0]
           ? page.route
-          : page.template;
+          : page.layout;
         const key = page.route === '/'
           ? ''
           : page.route.slice(0, page.route.lastIndexOf('/')).replace(basePath, '');
 
         if (pathname === page.route) {
-          currentTemplate = template;
+          currentLayout = layout;
         }
         return `
-          <greenwood-route data-route="${page.route}" data-template="${template}" data-key="${basePath}/_routes${key}/index.html"></greenwood-route>
+          <greenwood-route data-route="${page.route}" data-layout="${layout}" data-key="${basePath}/_routes${key}/index.html"></greenwood-route>
         `;
       });
 
@@ -98,7 +98,7 @@ class StaticRouterResource extends ResourceInterface {
       .replace('</head>', `
           <script data-gwd="static-router">
             window.__greenwood = window.__greenwood || {};
-            window.__greenwood.currentTemplate = "${currentTemplate}";
+            window.__greenwood.currentLayout = "${currentLayout}";
           </script>
         </head>
       `)

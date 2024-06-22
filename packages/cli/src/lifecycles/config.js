@@ -52,7 +52,7 @@ const defaultConfig = {
   prerender: false,
   isolation: false,
   pagesDirectory: 'pages',
-  templatesDirectory: 'templates'
+  layoutsDirectory: 'layouts'
 };
 
 const readAndMergeConfig = async() => {
@@ -77,7 +77,7 @@ const readAndMergeConfig = async() => {
 
       if (hasConfigFile) {
         const userCfgFile = (await import(configUrl)).default;
-        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, templatesDirectory, interpolateFrontmatter, isolation } = userCfgFile;
+        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, layoutsDirectory, interpolateFrontmatter, isolation } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -205,10 +205,10 @@ const readAndMergeConfig = async() => {
           reject(`Error: provided pagesDirectory "${pagesDirectory}" is not supported.  Please make sure to pass something like 'docs/'`);
         }
 
-        if (templatesDirectory && typeof templatesDirectory === 'string') {
-          customConfig.templatesDirectory = templatesDirectory;
-        } else if (templatesDirectory) {
-          reject(`Error: provided templatesDirectory "${templatesDirectory}" is not supported.  Please make sure to pass something like 'layouts/'`);
+        if (layoutsDirectory && typeof layoutsDirectory === 'string') {
+          customConfig.layoutsDirectory = layoutsDirectory;
+        } else if (layoutsDirectory) {
+          reject(`Error: provided layoutsDirectory "${layoutsDirectory}" is not supported.  Please make sure to pass something like 'layouts/'`);
         }
 
         if (prerender !== undefined) {

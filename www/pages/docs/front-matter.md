@@ -25,7 +25,7 @@ label: 'My Blog Post from 3/5/2020'
 
 
 ### Imports
-If you want to include files on a _per **page** basis_, you can use the predefined `imports` feature from Greenwood.  This is great for one off use cases where you don't want to ship a third party lib in all your templates, but just for this one particular page.  This is effectively a naive form of code splitting.  🤓
+If you want to include files on a _per **page** basis_, you can use the predefined `imports` feature from Greenwood.  This is great for one off use cases where you don't want to ship a third party lib in all your layouts, but just for this one particular page.  This is effectively a naive form of code splitting.  🤓
 
 #### Example
 ```md
@@ -45,22 +45,22 @@ You will then see the following emitted for file
 > _See our [Markdown Docs](/docs/markdown#imports) for more information about rendering custom elements in markdown files._
 
 
-### Template
-When creating multiple [page templates](/docs/layouts/), you can use the `template` front-matter to configure Greenwood to use that template for a given page.
+### Layouts
+When creating multiple [page layouts](/docs/layouts/), you can use the `layout` front-matter to configure Greenwood to use that layout for a given page.
 
 #### Example
 ```md
 ---
-template: 'home'
+layout: 'home'
 ---
 
 # Home Page
 This is the home page
 ```
 
-In this example, the _src/templates/home.html_ will be used to render the current markdown page.
+In this example, the _src/layouts/home.html_ will be used to render the current markdown page.
 
-> **Note:** By default, Greenwood will look for and use `src/templates/page.html` for all pages by default.
+> **Note:** By default, Greenwood will look for and use `src/layouts/page.html` for all pages by default.
 
 
 ### Title

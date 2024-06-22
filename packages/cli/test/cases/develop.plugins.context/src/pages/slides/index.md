@@ -1,5 +1,5 @@
 ---
-template: 'title'
+layout: 'title'
 ---
 
 ### Title Page

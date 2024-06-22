@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Develop with Greenwood when using a custom context plugin (e.g. installed via npm) that provides custom templates (app / page) and resources (JS / CSS); aka a "theme pack".
+ * Develop with Greenwood when using a custom context plugin (e.g. installed via npm) that provides custom layouts (app / page) and resources (JS / CSS); aka a "theme pack".
  *
  * User Result
- * Should start development server with expected templates being used from node_modules along with JS and CSS.
+ * Should start development server with expected layouts being used from node_modules along with JS and CSS.
  *
  * User Command
  * greenwood develop
@@ -76,16 +76,16 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should have expected text from from a mock package layout/app.html in node_modules/', function(done) {
-        const pageTemplateHeading = dom.window.document.querySelectorAll('body h1')[0];
+        const pageLayoutHeading = dom.window.document.querySelectorAll('body h1')[0];
 
-        expect(pageTemplateHeading.textContent).to.be.equal('This is a custom app template from the custom layouts directory.');
+        expect(pageLayoutHeading.textContent).to.be.equal('This is a custom app layout from the custom layouts directory.');
         done();
       });
 
       it('should have expected text from from a mock package layout/page.html in node_modules/', function(done) {
-        const pageTemplateHeading = dom.window.document.querySelectorAll('body h2')[0];
+        const pageLayoutHeading = dom.window.document.querySelectorAll('body h2')[0];
 
-        expect(pageTemplateHeading.textContent).to.be.equal('This is a custom (default) page template from the custom layouts directory.');
+        expect(pageLayoutHeading.textContent).to.be.equal('This is a custom (default) page layout from the custom layouts directory.');
         done();
       });
 

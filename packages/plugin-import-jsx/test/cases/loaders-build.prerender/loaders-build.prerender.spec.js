@@ -25,7 +25,7 @@
  *     footer.jsx
  *   pages/
  *     index.md
- *   templates/
+ *   layouts/
  *     app.html
  *   main.js
  */

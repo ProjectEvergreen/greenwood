@@ -118,8 +118,8 @@ describe('Unit Test: Data', function() {
             it('should have the correct sub items', function() {
               const subitem = shelf.children[2].children;
               expect(subitem[0].item.label).to.be.equal('Objectives');
-              expect(subitem[1].item.label).to.be.equal('Home Page Template');
-              expect(subitem[2].item.label).to.be.equal('Blog Posts Template');
+              expect(subitem[1].item.label).to.be.equal('Home Page Layout');
+              expect(subitem[2].item.label).to.be.equal('Blog Posts Layout');
               expect(subitem[3].item.label).to.be.equal('Creating Pages');
               expect(subitem[4].item.label).to.be.equal('Development Server');
             });
@@ -168,8 +168,8 @@ describe('Unit Test: Data', function() {
 
               expect(subitem[0].item.label).to.be.equal('Workspace');
               expect(subitem[0].item.route).to.be.equal('#workspace');
-              expect(subitem[1].item.label).to.be.equal('Templates');
-              expect(subitem[1].item.route).to.be.equal('#templates');
+              expect(subitem[1].item.label).to.be.equal('Layouts');
+              expect(subitem[1].item.route).to.be.equal('#layouts');
               expect(subitem[2].item.label).to.be.equal('Pages');
               expect(subitem[2].item.route).to.be.equal('#pages');
             });
@@ -313,8 +313,8 @@ describe('Unit Test: Data', function() {
 
               expect(subitem[0].item.label).to.be.equal('Workspace');
               expect(subitem[0].item.route).to.be.equal('#workspace');
-              expect(subitem[1].item.label).to.be.equal('Templates');
-              expect(subitem[1].item.route).to.be.equal('#templates');
+              expect(subitem[1].item.label).to.be.equal('Layouts');
+              expect(subitem[1].item.route).to.be.equal('#layouts');
               expect(subitem[2].item.label).to.be.equal('Pages');
               expect(subitem[2].item.route).to.be.equal('#pages');
             });
