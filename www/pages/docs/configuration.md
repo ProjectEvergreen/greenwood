@@ -270,7 +270,7 @@ export default {
 ```
 
 ### Workspace
-Path to where all your project files will be located.  Using an absolute path is recommended.
+Path to where all your project files will be located.  Using an absolute path is recommended.  Default is _src/_.
 
 #### Example
 
@@ -282,4 +282,4 @@ export default {
 };
 ```
 
-> Please note the trailing `/` here as for ESM, a path must end in a `/` for directories.
+> Please note the trailing `/` here as for ESM, as paths must end in a `/` for directories.
