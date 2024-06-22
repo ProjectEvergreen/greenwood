@@ -8,7 +8,6 @@ import fs from 'fs';
 import path from 'path';
 import { parse, walk } from 'css-tree';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import { normalizePathnameForWindows } from '../../lib/resource-utils.js';
 import { hashString } from '../../lib/hashing-utils.js';
 
 function bundleCss(body, url, compilation) {
@@ -38,7 +37,7 @@ function bundleCss(body, url, compilation) {
           optimizedCss += `@import url('${value}');`;
         }
       } else if (type === 'Url' && this.atrule?.name !== 'import') {
-        if (value.startsWith('http') || value.startsWith('//')) {
+        if (value.startsWith('http') || value.startsWith('//') || value.startsWith('data:')) {
           optimizedCss += `url('${value}')`;
           return;
         }
@@ -53,20 +52,26 @@ function bundleCss(body, url, compilation) {
         const locationUrl = barePath.startsWith('node_modules')
           ? new URL(`./${barePath}`, projectDirectory)
           : new URL(`./${barePath}`, userWorkspace);
-        const hash = hashString(fs.readFileSync(locationUrl, 'utf-8'));
-        const ext = barePath.split('.').pop();
-        const hashedRoot = barePath.replace(`.${ext}`, `.${hash}.${ext}`);
 
-        fs.mkdirSync(normalizePathnameForWindows(new URL(`./${path.dirname(barePath)}/`, outputDir)), {
-          recursive: true
-        });
+        if (fs.existsSync(locationUrl)) {
+          const hash = hashString(fs.readFileSync(locationUrl, 'utf-8'));
+          const ext = barePath.split('.').pop();
+          const hashedRoot = barePath.replace(`.${ext}`, `.${hash}.${ext}`);
 
-        fs.promises.copyFile(
-          locationUrl,
-          new URL(`./${hashedRoot}`, outputDir)
-        );
+          fs.mkdirSync(new URL(`./${path.dirname(barePath)}/`, outputDir), {
+            recursive: true
+          });
 
-        optimizedCss += `url('${basePath}${hashedRoot}')`;
+          fs.promises.copyFile(
+            locationUrl,
+            new URL(`./${hashedRoot}`, outputDir)
+          );
+
+          optimizedCss += `url('${basePath}${hashedRoot}')`;
+        } else {
+          console.warn(`Unable to locate ${value}.  You may need to manually copy this file from its source location to the build output directory.`);
+          optimizedCss += `url('${value}')`;
+        }
       } else if (type === 'Atrule' && name !== 'import') {
         optimizedCss += `@${name} `;
       } else if (type === 'TypeSelector') {
