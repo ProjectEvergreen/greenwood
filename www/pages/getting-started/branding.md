@@ -73,7 +73,7 @@ Now you can do the same for an `<app-header>`.  See the [companion repo](https:/
 ### CSS
 OK, so we've made some content and some custom elements, but what about the look and feel? Yes, of course, let's add some CSS!
 
-For global styles like Google fonts, Bootstrap, background colors, or browser resets, let's create a file called _src/styles/theme.css_ that we can reference in all our templates.
+For global styles like Google fonts, Bootstrap, background colors, or browser resets, let's create a file called _src/styles/theme.css_ that we can reference in all our layouts.
 
 Here are some styles you can add to your site to snap things into place a little bit.
 ```css
@@ -89,7 +89,7 @@ body {
 }
 ```
 
-Now we can `<link>` this CSS file into our template.  Easy!  💥
+Now we can `<link>` this CSS file into our layout.  Easy!  💥
 ```html
 <html>
 

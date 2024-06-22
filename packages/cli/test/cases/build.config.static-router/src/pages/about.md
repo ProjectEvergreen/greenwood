@@ -1,5 +1,5 @@
 ---
-template: test
+layout: test
 ---
 
 ### Greenwood

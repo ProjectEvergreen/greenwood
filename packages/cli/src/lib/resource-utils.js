@@ -86,7 +86,7 @@ async function checkResourceExists(url) {
 
 // turn relative paths into relatively absolute based on a known root directory
 // * deep link route - /blog/releases/some-post
-// * and a nested path in the template - ../../styles/theme.css
+// * and a nested path in the layout - ../../styles/theme.css
 // so will get resolved as `${rootUrl}/styles/theme.css`
 async function resolveForRelativeUrl(url, rootUrl) {
   const search = url.search || '';
@@ -111,11 +111,6 @@ async function resolveForRelativeUrl(url, rootUrl) {
   return reducedUrl;
 }
 
-// does this make more sense in bundle lifecycle?
-// https://github.com/ProjectEvergreen/greenwood/issues/970
-// or could this be done sooner (like in appTemplate building in html resource plugin)?
-// Or do we need to ensure userland code / plugins have gone first
-// before we can curate the final list of <script> / <style> / <link> tags to bundle
 async function trackResourcesForRoute(html, compilation, route) {
   const { context } = compilation;
   const root = htmlparser.parse(html, {

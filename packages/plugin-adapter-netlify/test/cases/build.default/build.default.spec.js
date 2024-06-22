@@ -20,15 +20,15 @@
  * User Workspace
  * package.json
  * src/
- *   api/
- *     fragment.js
- *     greeting.js
- *     search.js
- *     submit-form-data.js
- *     submit-json.js
  *   components/
  *     card.js
  *   pages/
+ *     api/
+ *       fragment.js
+ *       greeting.js
+ *       search.js
+ *       submit-form-data.js
+ *       submit-json.js
  *     artists.js
  *     post.js
  *     users.js

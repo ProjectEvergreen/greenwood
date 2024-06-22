@@ -11,16 +11,22 @@
  * User Config
  * {
  *   plugins: [
- *      greenwoodPluginTypeScript()
+ *      greenwoodPluginTypeScript({
+ *        servePages: 'dynamic'
+ *      })
  *   ]
  * }
  *
  * User Workspace
  *  src/
- *   api/
- *     fragment.js
  *   components/
  *     card.ts
+ *     greeting.ts
+ *   pages/
+ *     api/
+ *       fragment.js
+ *       greeting.ts
+ *     index.html
  */
 import chai from 'chai';
 import { JSDOM } from 'jsdom';
@@ -32,7 +38,7 @@ import { fileURLToPath } from 'url';
 const expect = chai.expect;
 
 describe('Serve Greenwood With: ', function() {
-  const LABEL = 'A Server Rendered Application (SSR) with API Routes importing TypeScript';
+  const LABEL = 'A Server Rendered Application (SSR) with API Routes in TypeScript';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://localhost:8080';
@@ -90,6 +96,40 @@ describe('Serve Greenwood With: ', function() {
         Array.from(cardComponents).forEach((card) => {
           expect(card.innerHTML).contain('font-size: 1.85rem');
         });
+        done();
+      });
+    });
+
+    describe('Serve command with API specific behaviors for TypeScript authored API', function() {
+      const name = 'TypeScript';
+      let response = {};
+      let body;
+      let dom;
+
+      before(async function() {
+        response = await fetch(`${hostname}/api/greeting?name=${name}`);
+        body = await response.text();
+        dom = new JSDOM(body);
+      });
+
+      it('should return a 200 status', function() {
+        expect(response.status).to.equal(200);
+      });
+
+      it('should return a custom status message', function() {
+        expect(response.statusText).to.equal('OK');
+      });
+
+      it('should return the correct content type', function() {
+        expect(response.headers.get('content-type')).to.equal('text/html');
+      });
+
+      it('should make sure to have the expected CSS inlined into the page for each <app-card>', function(done) {
+        const heading = dom.window.document.querySelectorAll('body > x-greeting');
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].innerHTML).contain(`<h3>Hello ${name}!`);
+
         done();
       });
     });

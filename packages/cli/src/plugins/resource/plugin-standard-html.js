@@ -13,7 +13,7 @@ import remarkFrontmatter from 'remark-frontmatter';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import { getUserScripts, getPageTemplate, getAppTemplate } from '../../lib/templating-utils.js';
+import { getUserScripts, getPageLayout, getAppLayout } from '../../lib/layout-utils.js';
 import { requestAsObject } from '../../lib/resource-utils.js';
 import unified from 'unified';
 import { Worker } from 'worker_threads';
@@ -44,18 +44,17 @@ class StandardHtmlResource extends ResourceInterface {
     const filePath = !matchingRoute.external ? matchingRoute.path : '';
     const isMarkdownContent = (matchingRoute?.filename || '').split('.').pop() === 'md';
 
-    let customImports = [];
     let body = '';
-    let title = null;
-    let template = null;
-    let frontMatter = {};
+    let title = matchingRoute.title || null;
+    let layout = matchingRoute.layout || null;
+    let frontMatter = matchingRoute.data || {};
+    let customImports = matchingRoute.imports || [];
     let ssrBody;
-    let ssrTemplate;
-    let ssrFrontmatter;
+    let ssrLayout;
     let processedMarkdown = null;
 
     if (matchingRoute.external) {
-      template = matchingRoute.template || template;
+      layout = matchingRoute.layout || layout;
     }
 
     if (isMarkdownContent) {
@@ -94,8 +93,8 @@ class StandardHtmlResource extends ResourceInterface {
           title = frontMatter.title;
         }
 
-        if (frontMatter.template) {
-          template = frontMatter.template;
+        if (frontMatter.layout) {
+          layout = frontMatter.layout;
         }
 
         if (frontMatter.imports) {
@@ -112,28 +111,12 @@ class StandardHtmlResource extends ResourceInterface {
         const worker = new Worker(new URL('../../lib/ssr-route-worker.js', import.meta.url));
 
         worker.on('message', (result) => {
-          if (result.template) {
-            ssrTemplate = result.template;
+          if (result.layout) {
+            ssrLayout = result.layout;
           }
 
           if (result.body) {
             ssrBody = result.body;
-          }
-          if (result.frontmatter) {
-            ssrFrontmatter = result.frontmatter;
-
-            if (ssrFrontmatter.title) {
-              title = ssrFrontmatter.title;
-              frontMatter.title = ssrFrontmatter.title;
-            }
-
-            if (ssrFrontmatter.template) {
-              template = ssrFrontmatter.template;
-            }
-
-            if (ssrFrontmatter.imports) {
-              customImports = customImports.concat(ssrFrontmatter.imports);
-            }
           }
           resolve();
         });
@@ -154,20 +137,13 @@ class StandardHtmlResource extends ResourceInterface {
       });
     }
 
-    // get context plugins
-    const contextPlugins = this.compilation.config.plugins.filter((plugin) => {
-      return plugin.type === 'context';
-    }).map((plugin) => {
-      return plugin.provider(this.compilation);
-    });
-
     if (isSpaRoute) {
       body = await fs.readFile(new URL(`./${isSpaRoute.filename}`, userWorkspace), 'utf-8');
     } else {
-      body = ssrTemplate ? ssrTemplate : await getPageTemplate(filePath, context, template, contextPlugins);
+      body = ssrLayout ? ssrLayout : await getPageLayout(filePath, this.compilation, layout);
     }
 
-    body = await getAppTemplate(body, context, customImports, contextPlugins, config.devServer.hud, title);
+    body = await getAppLayout(body, this.compilation, customImports, title);
     body = await getUserScripts(body, this.compilation);
 
     if (processedMarkdown) {
@@ -191,7 +167,7 @@ class StandardHtmlResource extends ResourceInterface {
     } else if (matchingRoute.external) {
       body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
     } else if (ssrBody) {
-      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, ssrBody);
+      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, '$$$')}<!-- greenwood-ssr-end -->`);
     }
 
     if (interpolateFrontmatter) {
@@ -202,11 +178,9 @@ class StandardHtmlResource extends ResourceInterface {
       }
     }
 
-    // give the user something to see so they know it works, if they have no content
+    // clean up placeholder content-outlet
     if (body.indexOf('<content-outlet></content-outlet>') > 0) {
-      body = body.replace('<content-outlet></content-outlet>', `
-        <h1>Welcome to Greenwood!</h1>
-      `);
+      body = body.replace('<content-outlet></content-outlet>', '');
     }
 
     return new Response(body, {
@@ -290,10 +264,6 @@ class StandardHtmlResource extends ResourceInterface {
         }
       }
     }
-
-    // TODO clean up lit-polyfill
-    // https://github.com/ProjectEvergreen/greenwood/issues/728
-    body = body.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
 
     return new Response(body);
   }

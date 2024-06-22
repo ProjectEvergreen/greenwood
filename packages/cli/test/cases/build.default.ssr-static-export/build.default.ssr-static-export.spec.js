@@ -18,7 +18,7 @@
  *     footer.js
  *   pages/
  *     artists.js
- *   templates/
+ *   layouts/
  *     app.html
  */
 import chai from 'chai';

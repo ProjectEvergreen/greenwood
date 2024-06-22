@@ -27,7 +27,7 @@
  *     pages/
  *       pages.js
  *     components.js
- *   templates/
+ *   layouts/
  *     page.html
  */
 import chai from 'chai';

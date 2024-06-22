@@ -14,7 +14,7 @@ From within the markdown you can also render components, not just their syntax, 
 
 
 #### Example
-At the top of a `.md` file add an [`import` section](/docs/front-matter/) to render a component inline to the page itself.  This can be helpful if there are situations where you may want to `import` a component for a specific set of pages, as opposed to through a page or app template.:
+At the top of a `.md` file add an [`import` section](/docs/front-matter/) to render a component inline to the page itself.  This can be helpful if there are situations where you may want to `import` a component for a specific set of pages, as opposed to through a page or app layout.
 
 ```md
 ---

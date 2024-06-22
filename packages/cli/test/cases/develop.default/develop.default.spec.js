@@ -17,13 +17,6 @@
  *
  * User Workspace
  * src/
- *   api/
- *     fragment.js
- *     greeting.js
- *     missing.js
- *     nothing.js
- *     submit-form-data.js
- *     submit-json.js
  *   assets/
  *     data.json
  *     favicon.ico
@@ -38,7 +31,14 @@
  *     card.js
  *     header.js
  *   pages/
- *     index.html
+ *     api/
+ *      fragment.js
+ *      greeting.js
+ *      missing.js
+ *      nothing.js
+ *      submit-form-data.js
+ *      submit-json.js
+ *      index.html
  *   styles/
  *     main.css
  * package.json

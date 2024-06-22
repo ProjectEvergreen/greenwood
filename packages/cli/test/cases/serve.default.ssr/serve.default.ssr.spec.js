@@ -29,7 +29,7 @@
  *     index.js
  *     post.js
  *     users.js (isolation = true)
- *   templates/
+ *   layouts/
  *     app.html
  */
 import chai from 'chai';
@@ -155,7 +155,7 @@ describe('Serve Greenwood With: ', function() {
         expect(scripts.length).to.equal(4);
       });
 
-      it('should have the expected <app-header> tag from the app template in the <head>', function() {
+      it('should have the expected <app-header> tag from the app layout in the <head>', function() {
         const scripts = Array.from(dom.window.document.querySelectorAll('head > script'))
           .filter(script => script.src && script.src.startsWith('/header.'));
 
@@ -221,7 +221,7 @@ describe('Serve Greenwood With: ', function() {
         expect(imports[0]).to.equal('/components/counter.js');
       });
 
-      it('should append the expected graph resource scripts for the page from a template', function() {
+      it('should append the expected graph resource scripts for the page from a layout', function() {
         const { resources } = artistsPageGraphData;
 
         expect(resources.length).to.equal(6);

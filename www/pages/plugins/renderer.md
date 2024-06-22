@@ -41,7 +41,7 @@ export {
 
 ### Default
 
-The recommended Greenwood API for executing server rendered code is in a function that is expected to implement any combination of [these APIs](/docs/server-rendering/#api); `default export`, `getBody`, `getTemplate`, and `getFrontmatter`.
+The recommended Greenwood API for executing server rendered code is in a function that is expected to implement any combination of [these APIs](/docs/server-rendering/#api); `default export`, `getBody`, `getLayout`, and `getFrontmatter`.
 
 You can follow the [WCC default implementation for Greenwood](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/src/lib/execute-route-module.js) as a reference.
 

@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood and tests for correct `<title>` tag merging for pages and templates.
+ * Run Greenwood and tests for correct `<title>` tag merging for pages and layouts.
  *
  * User Result
  * Should generate a bare bones Greenwood build with expected <title> values.
@@ -17,7 +17,7 @@
  *   pages/
  *     index.md
  *     hello.md
- *   templates/
+ *   layouts/
  *     page.html
  */
 import fs from 'fs';

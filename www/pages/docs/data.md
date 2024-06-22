@@ -68,7 +68,7 @@ graph {
 
   route,  // (string) A URL, typically derived from the filesystem path, e.g. /blog/2019/first-post/
 
-  template, // (string) page template used for the page
+  layout, // (string) page layout used for the page
 
   title,  // (string) Useful for a page's <title> tag or the title attribute for an <a> tag, inferred from the filesystem path, e.g. "First Post" or provided through front matter.
 }
@@ -94,7 +94,7 @@ query {
     outputPath,
     path,
     route,
-    template,
+    layout,
     title
   }
 }
@@ -131,7 +131,7 @@ This will return the full `graph` of all pages as an array
     outputPath: "index.html",
     path: "./index.md",
     route: "/",
-    template: "page",
+    layout: "page",
     title: "Home Page"
   }, {
     filename: "first-post.md",
@@ -140,7 +140,7 @@ This will return the full `graph` of all pages as an array
     outputPath: "/blog/2019/first-post/index.html",
     path: "./blog/2019/first-post.md",
     route: "/blog/2019/first-post",
-    template: "blog",
+    layout: "blog",
     title: "My First Blog Post"
   },
   {
@@ -150,7 +150,7 @@ This will return the full `graph` of all pages as an array
     outputPath: "/blog/2019/second-post/index.html",
     path: "./blog/2019/second-post.md",
     route: "/blog/2019/second-post",
-    template: "blog",
+    layout: "blog",
     title: "My Second Blog Post"
   }
 ]
@@ -173,7 +173,7 @@ query {
     outputPath,
     path,
     route,
-    template,
+    layout,
     title
   }
 }
@@ -213,7 +213,7 @@ This will return the full `graph` of all pages as an array that are under a give
     outputPath: "/blog/2019/first-post/index.html",
     path: "./blog/2019/first-post.md",
     route: "/blog/2019/first-post",
-    template: "blog",
+    layout: "blog",
     title: "My First Blog Post"
   },
   {
@@ -223,7 +223,7 @@ This will return the full `graph` of all pages as an array that are under a give
     outputPath: "/blog/2019/second-post/index.html",
     path: "./blog/2019/second-post.md",
     route: "/blog/2019/second-post",
-    template: "blog",
+    layout: "blog",
     title: "My Second Blog Post"
   }
 ]
@@ -393,7 +393,7 @@ graph {
   id,
   label,
   route,  // REQUIRED and MUST end in a forward slash
-  template,
+  layout,
   title,
   data
 }

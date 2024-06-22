@@ -74,5 +74,5 @@ To continue learning more about Greenwood, please feel free to browse the other 
 - [Front Matter](/docs/front-matter/): Page level configurations through page markdown.
 - [Markdown](/docs/markdown/): Using markdown and related authoring capabilities supported by Greenwood.
 - [Styles and Assets](/docs/css-and-images/): How to style and theme your project with CSS.
-- [Templates](/docs/layouts/): Controlling the layout of your pages.
+- [Layouts](/docs/layouts/): Controlling the layout of your pages.
 - [Tech Stack](/about/tech-stack/): What's under the hood.

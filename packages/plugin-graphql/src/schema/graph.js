@@ -112,7 +112,7 @@ const graphTypeDefs = gql`
     path: String,
     outputPath: String,
     route: String,
-    template: String,
+    layout: String,
     title: String
   }
 

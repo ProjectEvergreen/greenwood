@@ -32,9 +32,7 @@ import { fileURLToPath } from 'url';
 
 const expect = chai.expect;
 
-// TODO - this should work after this issue is resolved
-// https://github.com/ProjectEvergreen/wcc/issues/122
-xdescribe('Serve Greenwood With: ', function() {
+describe('Serve Greenwood With: ', function() {
   const LABEL = 'A Prerendered Application (SSR) with an HTML page importing a TypeScript component';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -70,7 +68,7 @@ xdescribe('Serve Greenwood With: ', function() {
       let fragmentsApiDom;
 
       before(async function() {
-        response = await fetch(`${hostname}/artists/`);
+        response = await fetch(`${hostname}/`);
         body = await response.clone().text();
         fragmentsApiDom = new JSDOM(body);
       });
@@ -81,17 +79,18 @@ xdescribe('Serve Greenwood With: ', function() {
       });
 
       it('should return a custom status message', function(done) {
-        expect(response.statusMessage).to.equal('OK');
+        expect(response.statusText).to.equal('OK');
         done();
       });
 
-      it('should ...', function(done) {
-        expect(fragmentsApiDom).to.not.be.undefined;
+      it('should have the expected pre-rendered app-card content', function(done) {
+        const cardComponents = fragmentsApiDom.window.document.querySelectorAll('body > app-card');
+
+        expect(cardComponents.length).to.equal(1);
+        expect(cardComponents[0].innerHTML).to.contain('<h3>foo</h3>');
+
         done();
       });
-
-      // it should return the correct h1 contents
-      // it should return the correct app-card contents
     });
   });
 

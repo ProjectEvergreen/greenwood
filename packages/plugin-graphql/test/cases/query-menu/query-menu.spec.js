@@ -21,7 +21,7 @@
  *     about.md
  *     contact.md
  *     index.md
- *   templates/
+ *   layouts/
  *     page.html
  */
 import chai from 'chai';
