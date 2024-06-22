@@ -110,3 +110,23 @@ customElements.define('x-header', HeaderComponent);
 >
 > customElements.define('x-header', HeaderComponent);
 > ```
+
+
+### Meta Files
+
+By default, Greenwood will automatically detect these "meta" files from the top-level of your [workspace directory](docs/configuration/#workspace) and automatically copy them over to the root of the build output directory.
+
+- _favicon.ico_
+- _robots.txt_
+- _sitemap.xml_
+
+Example:
+
+```shell
+src/
+  favicon.ico
+  robots.txt
+  sitemap.xml
+```
+
+> If you need support for more custom copying of static files like this, please check out our docs on creating your own [copy plugin](plugins/copy/).
