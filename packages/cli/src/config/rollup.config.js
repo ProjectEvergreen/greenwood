@@ -74,6 +74,12 @@ function greenwoodResourceLoader (compilation) {
           }
         }
 
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldOptimize && await plugin.shouldOptimize(idUrl, response.clone())) {
+            response = await plugin.optimize(idUrl, response.clone());
+          }
+        }
+
         return await response.text();
       }
     }
