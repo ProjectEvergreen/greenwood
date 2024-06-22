@@ -132,7 +132,6 @@ h1:has(+ h2) {
   color: green;
 }
 
-
 .snippet {
   margin: var(--size-4) 0;
   padding: 0 var(--size-4);
@@ -142,6 +141,36 @@ h1 {
   background-image: url('/foo/bar.baz');
 }
 
-.has-success{
+.has-success {
   background-image: url("data:image/svg+xml;...");
+}
+
+:where(html) {
+  --size-000: -.5rem;
+}
+
+:dir(rtl) {
+  background-color: red;
+}
+
+:host(h1) {
+  color: red;
+}
+
+::slotted(.content) {
+  background-color: aqua;
+}
+
+h2 ::slotted(span) {
+  background: silver;
+}
+
+tabbed-custom-element::part(tab) {
+  color: #0c0dcc;
+  border-bottom: transparent solid 2px;
+}
+
+::highlight(rainbow-color-1) {
+  color: #ad26ad;
+  text-decoration: underline;
 }
