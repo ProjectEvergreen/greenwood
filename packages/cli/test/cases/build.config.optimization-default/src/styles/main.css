@@ -131,3 +131,8 @@ h1:has(+ h2) {
 :is(ol, ul, menu:unsupported) :is(ol, ul) {
   color: green;
 }
+
+.snippet {
+  margin: var(--size-4) 0;
+  padding: 0 var(--size-4);
+}
