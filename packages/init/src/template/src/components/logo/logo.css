@@ -1,0 +1,23 @@
+
+:host img {
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+  width: 30%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  img {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}
