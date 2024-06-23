@@ -181,7 +181,7 @@ function greenwoodSyncApiRoutesOutputPath(compilation) {
         if (bundle[key].exports?.find(exp => exp === 'handler')) {
           const ext = bundle[key].facadeModuleId.split('.').pop();
           const relativeFacade = new URL(`file://${bundle[key].facadeModuleId}`).pathname.replace(apisDir.pathname, `${basePath}/`).replace(`.${ext}`, '');
-          const route = `/api${relativeFacade}`; // ew URL(`file://${bundle[key].facadeModuleId}`).pathname.replace(apisDir.pathname, `${basePath}/`).replace(`.${ext}`, '');
+          const route = `/api${relativeFacade}`;
 
           if (compilation.manifest.apis.has(route)) {
             const api = compilation.manifest.apis.get(route);
@@ -457,14 +457,14 @@ const getRollupConfigForScriptResources = async (compilation) => {
 };
 
 const getRollupConfigForApis = async (compilation) => {
-  const { outputDir, pagesDir } = compilation.context;
+  const { outputDir, pagesDir, apisDir } = compilation.context;
 
   return [...compilation.manifest.apis.values()]
     .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, pagesDir)))
     .map((filepath) => {
       // account for windows pathname shenanigans by "casting" filepath to a URL first
       const ext = filepath.split('.').pop();
-      const entryName = new URL(`file://${filepath}`).pathname.replace(pagesDir.pathname, '').replace('/', '-').replace(`.${ext}`, '');
+      const entryName = new URL(`file://${filepath}`).pathname.replace(apisDir.pathname, '').replace(/\//g, '-').replace(`.${ext}`, '');
 
       return {
         input: filepath,
