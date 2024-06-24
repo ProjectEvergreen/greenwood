@@ -3,7 +3,7 @@
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
-  width: 30%;
+  width: 15%;
 }
 
 @media (prefers-reduced-motion: no-preference) {
