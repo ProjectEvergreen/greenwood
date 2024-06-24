@@ -52,13 +52,27 @@
       ul {
         list-style-type: none;
         padding: 0;
-        display: block;
         display: flex;
         flex-wrap: wrap;
       }
 
-      li {
+      .card {
+        width: 40%;
+        margin: 5px auto;
+        padding: 1rem;
+        height: 100px;
+        display: inline-block;
+        background-color: #edefec;
+        border-radius: 1rem;
+        color: #020202;
 
+        @media(max-width: 768px) {
+          width: 80%;
+        }
+      }
+
+      a {
+        color: #020202;
       }
     </style>
 
@@ -66,7 +80,6 @@
   </head>
   
   <body>
-
     <main>
 
       <h1>Welcome to Greenwood!</h1>
@@ -75,25 +88,28 @@
 
       <h1>Edit <code>src/pages/index.html</code> to start making changes</h1>
       
-      <ul>
-        <li>
-          <a href="#">Getting Started</a>
-          <span>Lorum Ipsum</span>
-        </li>
-        <li>
-          <a href="#">Docs</a>
-          <span>Blah Blah</span>
-        </li>
-        <li>
-          <a href="#">Guides</a>
-          <span>Learn how to build and deploy your app!</span>
-        </li>
-        <li>
-          <a href="#">Community</a>
-          <span>Come reach out to us on GitHub or Discord</span>
-        </li>
-      </ul>
+      <div class="card-wrapper">
+        <div class="card">
+          <h2>Getting Started</h2>
+          <p>Follow our <a href="#">guide</a> on learning Greenwood for the first time.</p>
+        </div>
+
+        <div class="card">
+          <h2>Docs</h2>
+          <p>Learn about Greenwood's <a href="#">features and capabilities</a>.</p>
+        </div>
+
+        <div class="card">
+          <h2>Guides</h2>
+          <p>Walkthroughs on ways to <a href="#">build and deploy</a> with Greenwood.</p>
+        </div>
+
+        <div class="card">
+          <h2>Community</h2>
+          <p>Come join us <a href="https://github.com/ProjectEvergreen/greenwood">GitHub</a> and <a href="https://discord.gg/nhAq8zAS">Discord</a>.</p>
+        </div>
+      </div>
+
     </main>    
-    
   </body>
 </html> 
