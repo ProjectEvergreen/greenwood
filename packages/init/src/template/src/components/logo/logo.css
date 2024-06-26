@@ -1,5 +1,5 @@
 
-:host img {
+:host svg {
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
@@ -7,7 +7,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  img {
+  svg {
     animation: logo-spin infinite 20s linear;
   }
 }
