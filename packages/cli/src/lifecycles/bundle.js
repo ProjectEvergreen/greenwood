@@ -34,11 +34,22 @@ function getPluginInstances(compilation) {
 }
 
 async function emitResources(compilation) {
-  const { outputDir } = compilation.context;
-  const { resources, graph } = compilation;
+  const { outputDir, scratchDir } = compilation.context;
+  const { resources, graph, manifest } = compilation;
 
   // https://stackoverflow.com/a/56150320/417806
   await fs.writeFile(new URL('./resources.json', outputDir), JSON.stringify(resources, (key, value) => {
+    if (value instanceof Map) {
+      return {
+        dataType: 'Map',
+        value: [...value]
+      };
+    } else {
+      return value;
+    }
+  }));
+
+  await fs.writeFile(new URL('./manifest.json', scratchDir), JSON.stringify(manifest, (key, value) => {
     if (value instanceof Map) {
       return {
         dataType: 'Map',
