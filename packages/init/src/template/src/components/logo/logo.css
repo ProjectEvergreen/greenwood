@@ -1,23 +1,41 @@
-
-:host svg {
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.container {
+  margin: 0 auto;
   width: 15%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  svg {
-    animation: logo-spin infinite 20s linear;
-  }
+svg {
+  will-change: filter;
+  transition: filter 300ms;
+  width: 80%;
 }
 
 @keyframes logo-spin {
   from {
-    transform: rotate(360deg);
+    transform: rotate(0deg);
   }
 
   to {
-    transform: rotate(0deg);
+    transform: rotate(360deg);
+  }
+}
+
+/* https://stackoverflow.com/questions/40996292/css-animation-image-of-leaf-as-if-blowing-in-the-wind */
+@keyframes leafanimation {
+  0% {transform:translate(1000px,500px) rotate(0deg); color:rgba(255,0,0,0);}
+  20% {transform:translate(850px,450px) rotate(360deg); color:rgba(255,0,0,0);}
+  40% {transform:translate(450px,200px) rotate(720deg); color:rgba(255,0,0,0);}
+  60% {transform:translate(100px,100px) rotate(1080deg); color:rgba(255,0,0,0);}
+  80% {transform:translate(0,0) rotate(1440deg); color:rgba(255,0,0,0);}
+  100% {transform:translate(0,0) rotate(1440deg); color:rgba(255,0,0,1);}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .container {
+    animation: leafanimation 8s linear;
+  }
+
+  svg {
+    animation: logo-spin infinite 20s linear;
+    animation-delay: 2s, 0s;
   }
 }
