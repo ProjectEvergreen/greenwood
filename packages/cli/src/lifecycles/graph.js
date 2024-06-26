@@ -84,7 +84,7 @@ const generateGraph = async (compilation) => {
               */
               apiRoutes.set(route, {
                 filename: filename,
-                outputPath: `/api/${filename.replace(`.${extension}`, '.js')}`,
+                outputPath: relativeApiPath,
                 path: relativeApiPath,
                 route,
                 isolation

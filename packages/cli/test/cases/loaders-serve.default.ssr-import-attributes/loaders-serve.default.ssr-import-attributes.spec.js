@@ -72,7 +72,7 @@ describe('Serve Greenwood With: ', function() {
       before(async function() {
         response = await fetch(`${hostname}/api/fragment?name=${name}`);
         body = await response.clone().text();
-        scripts = await glob.promise(path.join(outputPath, 'public/api/card.*.js'));
+        scripts = await glob.promise(path.join(outputPath, 'public/api/fragment.*.js'));
       });
 
       it('should return a 200 status', function(done) {

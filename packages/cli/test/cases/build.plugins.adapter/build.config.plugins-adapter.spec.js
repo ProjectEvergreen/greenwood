@@ -25,7 +25,12 @@
  *     card.js
  *   pages/
  *     api/
+ *       nested/
+ *         endpoint.js
  *       greeting.js
+ *     blog/
+ *       first-post.js
+ *       index.js
  *     index.js
  */
 import chai from 'chai';
@@ -98,7 +103,7 @@ describe('Build Greenwood With: ', function() {
       let response;
 
       before(async function() {
-        const handler = (await import(new URL('./adapter-output/greeting.js', pathToFileURL(outputPath)))).handler;
+        const handler = (await import(new URL('./adapter-output/api-greeting.js', pathToFileURL(outputPath)))).handler;
         const req = new Request(new URL('http://localhost:8080/api/greeting?name=Greenwood'));
 
         response = await handler(req);
@@ -111,6 +116,75 @@ describe('Build Greenwood With: ', function() {
 
       it('should have the expected message from the API when a query is passed', function() {
         expect(data.message).to.be.equal('Hello Greenwood!');
+      });
+    });
+
+    describe('Adapting a nested API Route', function() {
+      let response;
+      let body;
+
+      before(async function() {
+        const handler = (await import(new URL('./adapter-output/api-nested-endpoint.js', pathToFileURL(outputPath)))).handler;
+        const req = new Request(new URL('http://localhost:8080/api/nested/endpoint'));
+
+        response = await handler(req);
+        body = await response.text();
+      });
+
+      it('should have the expected content-type for the response', function() {
+        expect(response.headers.get('content-type')).to.be.equal('text/html');
+      });
+
+      it('should have the expected message from the API when a query is passed', function() {
+        expect(body).to.be.equal('I am a nested API route!');
+      });
+    });
+
+    describe('Adapting a nested SSR Page (duplicate name)', function() {
+      let dom;
+      let response;
+
+      before(async function() {
+        const req = new Request(new URL('http://localhost:8080/blog/'));
+        const handler = (await import(new URL('./adapter-output/blog-index.js', pathToFileURL(outputPath)))).handler;
+
+        response = await handler(req);
+        dom = new JSDOM(await response.text());
+      });
+
+      it('should have the expected content-type for the response', function() {
+        expect(response.headers.get('content-type')).to.be.equal('text/html');
+      });
+
+      it('should have the expected number of <app-card> components on the page', function() {
+        const heading = dom.window.document.querySelectorAll('body > h1');
+
+        expect(heading).to.have.lengthOf(1);
+        expect(heading[0].textContent).to.equal('Duplicated and nested SSR page should work!');
+      });
+    });
+
+    describe('Adapting a nested SSR Page', function() {
+      let dom;
+      let response;
+
+      before(async function() {
+        const req = new Request(new URL('http://localhost:8080/blog/first-post/'));
+        const handler = (await import(new URL('./adapter-output/blog-first-post.js', pathToFileURL(outputPath)))).handler;
+
+        response = await handler(req);
+        dom = new JSDOM(await response.text());
+      });
+
+      it('should have the expected content-type for the response', function() {
+        expect(response.headers.get('content-type')).to.be.equal('text/html');
+      });
+
+      it('should have the expected number of <app-card> components on the page', function() {
+        const heading = dom.window.document.querySelectorAll('body > h1');
+
+        expect(heading).to.have.lengthOf(1);
+        expect(heading[0].textContent).to.equal('Nested SSR First Post page should work!');
       });
     });
   });

@@ -15,6 +15,8 @@
  * src/
  *   pages/
  *     api/
+ *       nested/
+ *         endpoint.js
  *       fragment.js (isolation mode)
  *       greeting.js
  *       missing.js
@@ -234,6 +236,31 @@ describe('Serve Greenwood With: ', function() {
 
       it('should return the expected response message', function(done) {
         expect(body).to.equal(`Thank you ${param} for your submission!`);
+        done();
+      });
+    });
+
+    describe('Serve command for nested API specific behaviors', function() {
+      let response = {};
+      let body;
+
+      before(async function() {
+        response = await fetch(`${hostname}/api/nested/endpoint`);
+        body = await response.clone().text();
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it('should return the expected content type header', function(done) {
+        expect(response.headers.get('content-type')).to.equal('text/html');
+        done();
+      });
+
+      it('should return the expected response message', function(done) {
+        expect(body).to.equal('I am a nested API route!');
         done();
       });
     });

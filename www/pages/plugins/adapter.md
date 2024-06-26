@@ -34,6 +34,36 @@ export {
 };
 ```
 
+## Build Output
+
+To provide a starting point, let's look at how Greenwood builds and outputs SSR pages and API routes.  Given this project structure
+```sh
+src/
+  api/
+    greeting.js
+    nested/
+      endpoint.js
+  pages/
+    blog/
+      first-post.js
+      index.js
+    index.js
+```
+
+The output would look like this, with additional chunks being generated as needed based on the input files.
+```
+public/
+  api/
+    greeting.js
+    nested-endpoint.js
+  blog-first-post.route.js
+  blog-first-post.chunk.[hash].js
+  blog-index.route.js
+  blog-index.route.chunk.[hash].js
+  index.route.js
+  index.route.chunk.[hash].js
+```
+
 ## Example
 
 The most common use case is to "shim" in a hosting platform handler function in front of Greenwood's, which is based on two parameters of `Request` / `Response`.  In addition, producing any hosting provided specific metadata is also doable at this stage.
@@ -45,85 +75,45 @@ import fs from 'fs/promises';
 import { checkResourceExists } from '../../../../cli/src/lib/resource-utils.js';
 
 function generateOutputFormat(id, type) {
-  const path = type === 'page'
-    ? `${id}.entry`
-    : `api/${id}`;
+  const path = type === 'page' ? `/${id}.route` : id;
+  const ref = id.replace(/-/g, '').replace(/\//g, '');
 
   return `
-    import { handler as ${id} } from './${path}.js';
+    import { handler as ${ref} } from '../public${path}.js';
 
     export async function handler (request) {
       const { url, headers } = request;
       const req = new Request(new URL(url, \`http://\${headers.host}\`), {
         headers: new Headers(headers)
       });
-      return await ${id}(req);
+
+      return await ${ref}(req);
     }
   `;
 }
 
 async function genericAdapter(compilation) {
-  const { outputDir, projectDirectory } = compilation.context;
-  // custom output directory, like for .vercel or .netlify
-  const adapterOutputUrl = new URL('./adapter-output/', projectDirectory);
+  const adapterOutputUrl = new URL('./adapter-output/', compilation.context.projectDirectory);
   const ssrPages = compilation.graph.filter(page => page.isSSR);
+  const apiRoutes = compilation.manifest.apis;
 
   if (!await checkResourceExists(adapterOutputUrl)) {
     await fs.mkdir(adapterOutputUrl);
   }
 
-  // SSR pages
   for (const page of ssrPages) {
-    const { id } = page;
+    const { outputPath } = page;
+    const id = outputPath.replace('.route.js', '');
     const outputFormat = generateOutputFormat(id, 'page');
-    const files = (await fs.readdir(outputDir))
-      .filter(file => file.startsWith(`${id}.route.chunk.`) && file.endsWith('.js'));
 
-    // generate a facade for all SSR pages for your particular hosting provider
-    await fs.writeFile(new URL('./index.js', adapterOutputUrl), outputFormat);
+    await fs.writeFile(new URL(`./${id}.js`, adapterOutputUrl), outputFormat);
+  }
 
-    // handle user's actual route entry file, appended with .route by Greenwood
-    await fs.cp(
-      new URL(`./${id}.route.js`, outputDir),
-      new URL(`./${id}.route.js`, outputRoot),
-      { recursive: true }
-    );
+  for (const [key] of apiRoutes) {
+    const { outputPath } = apiRoutes.get(key);
+    const outputFormat = generateOutputFormat(outputPath.replace('.js', ''), 'api');
 
-    // and the URL generated chunk for the route
-    for (const file of files) {
-      await fs.cp(
-        new URL(`./${file}`, outputDir),
-        new URL(`./${file}`, outputRoot),
-        { recursive: true }
-      );
-    }
-
-    // API routes
-    for (const [key, value] of apiRoutes.entries()) {
-      const outputType = 'api';
-      const id = key.replace(`${basePath}/api/`, '');
-      const outputRoot = new URL(`./${basePath}/api/${id}.func/`, adapterOutputUrl);
-      const { assets = [] } = value;
-
-      await setupFunctionBuildFolder(id, outputType, outputRoot);
-
-      await fs.cp(
-        new URL(`./api/${id}.js`, outputDir),
-        new URL(`./${id}.js`, outputRoot),
-        { recursive: true }
-      );
-
-      // copy any child assets, like URL bundles
-      for (const asset of assets) {
-        const name = path.basename(asset);
-
-        await fs.cp(
-          new URL(asset),
-          new URL(`./${name}`, outputRoot),
-          { recursive: true }
-        );
-      }
-    }
+    await fs.writeFile(new URL(`.${outputPath.replace('/api/', '/api-')}`, adapterOutputUrl), outputFormat);
   }
 }
 
