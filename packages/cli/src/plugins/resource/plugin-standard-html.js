@@ -17,6 +17,7 @@ import { getUserScripts, getPageLayout, getAppLayout } from '../../lib/layout-ut
 import { requestAsObject } from '../../lib/resource-utils.js';
 import unified from 'unified';
 import { Worker } from 'worker_threads';
+import htmlparser from 'node-html-parser';
 
 class StandardHtmlResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -200,12 +201,19 @@ class StandardHtmlResource extends ResourceInterface {
     const pageResources = this.compilation.graph.find(page => page.outputPath === pathname || page.route === pathname).resources;
     let body = await response.text();
 
+    const root = htmlparser.parse(body, {
+      script: true,
+      style: true
+    });
+
     for (const pageResource of pageResources) {
       const keyedResource = this.compilation.resources.get(pageResource);
-      const { contents, src, type, optimizationAttr, optimizedFileContents, optimizedFileName, rawAttributes } = keyedResource;
+      const { contents, src, type, optimizationAttr, optimizedFileContents, optimizedFileName } = keyedResource;
 
       if (src) {
         if (type === 'script') {
+          const tag = root.querySelectorAll('script').find(script => script.getAttribute('src') === src);
+
           if (!optimizationAttr && optimization === 'default') {
             const optimizedFilePath = `${basePath}/${optimizedFileName}`;
 
@@ -215,17 +223,19 @@ class StandardHtmlResource extends ResourceInterface {
               <link rel="modulepreload" href="${optimizedFilePath}" as="script">
             `);
           } else if (optimizationAttr === 'inline' || optimization === 'inline') {
-            const isModule = rawAttributes.indexOf('type="module') >= 0 ? ' type="module"' : '';
+            const isModule = tag.rawAttrs.indexOf('type="module') >= 0 ? ' type="module"' : '';
 
-            body = body.replace(`<script ${rawAttributes}></script>`, `
+            body = body.replace(`<script ${tag.rawAttrs}></script>`, `
               <script ${isModule}>
                 ${optimizedFileContents.replace(/\.\//g, `${basePath}/`).replace(/\$/g, '$$$')}
               </script>
             `);
           } else if (optimizationAttr === 'static' || optimization === 'static') {
-            body = body.replace(`<script ${rawAttributes}></script>`, '');
+            body = body.replace(`<script ${tag.rawAttrs}></script>`, '');
           }
         } else if (type === 'link') {
+          const tag = root.querySelectorAll('link').find(link => link.getAttribute('href') === src);
+
           if (!optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
             const optimizedFilePath = `${basePath}/${optimizedFileName}`;
 
@@ -239,11 +249,11 @@ class StandardHtmlResource extends ResourceInterface {
             // when pre-rendering, puppeteer normalizes everything to <link .../>
             // but if not using pre-rendering, then it could come out as <link ...></link>
             // not great, but best we can do for now until #742
-            body = body.replace(`<link ${rawAttributes}>`, `
+            body = body.replace(`<link ${tag.rawAttrs}>`, `
               <style>
                 ${optimizedFileContents}
               </style>
-            `).replace(`<link ${rawAttributes}/>`, `
+            `).replace(`<link ${tag.rawAttrs}/>`, `
               <style>
                 ${optimizedFileContents}
               </style>
@@ -252,8 +262,10 @@ class StandardHtmlResource extends ResourceInterface {
         }
       } else {
         if (type === 'script') {
+          const tag = root.querySelectorAll('script').find(script => script.innerHTML === contents);
+
           if (optimizationAttr === 'static' || optimization === 'static') {
-            body = body.replace(`<script ${rawAttributes}>${contents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}</script>`, '');
+            body = body.replace(`<script ${tag.rawAttrs}>${contents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}</script>`, '');
           } else if (optimizationAttr === 'none') {
             body = body.replace(contents, contents.replace(/\.\//g, `${basePath}/`).replace(/\$/g, '$$$'));
           } else {
