@@ -27,12 +27,12 @@ class StandardHtmlResource extends ResourceInterface {
     this.contentType = 'text/html';
   }
 
-  async shouldServe(url) {
+  async shouldServe(url, request) {
     const { protocol, pathname } = url;
     const hasMatchingPageRoute = this.compilation.graph.find(node => node.route === pathname);
     const isSPA = this.compilation.graph.find(node => node.isSPA) && pathname.indexOf('.') < 0;
 
-    return protocol.startsWith('http') && (hasMatchingPageRoute || isSPA);
+    return protocol.startsWith('http') && (hasMatchingPageRoute || (isSPA && request.headers.get('Accept').indexOf('text/html') >= 0));
   }
 
   async serve(url, request) {

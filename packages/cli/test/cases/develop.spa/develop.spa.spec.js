@@ -77,7 +77,7 @@ describe('Develop Greenwood With: ', function() {
       let body;
 
       before(async function() {
-        response = await fetch(`${hostname}:${port}/`);
+        response = await fetch(`${hostname}:${port}/`, { headers: { 'Accept': 'text/html' } });
         body = await response.clone().text();
       });
 
@@ -103,7 +103,7 @@ describe('Develop Greenwood With: ', function() {
       let body;
 
       before(async function() {
-        response = await fetch(`http://127.0.0.1:${port}/artists/`);
+        response = await fetch(`http://127.0.0.1:${port}/artists/`, { headers: { 'Accept': 'text/html' } });
         body = await response.clone().text();
       });
 
@@ -129,7 +129,7 @@ describe('Develop Greenwood With: ', function() {
       let body;
 
       before(async function() {
-        response = await fetch(`http://127.0.0.1:${port}/artists/1`);
+        response = await fetch(`http://127.0.0.1:${port}/artists/1`, { headers: { 'Accept': 'text/html' } });
         body = await response.clone().text();
       });
 
