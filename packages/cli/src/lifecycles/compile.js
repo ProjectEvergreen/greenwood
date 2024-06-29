@@ -22,7 +22,7 @@ const generateCompilation = () => {
       console.info('Initializing project config');
       compilation.config = await initConfig();
 
-      // determine whether to use default template or user detected workspace
+      // determine whether to use default layout or user detected workspace
       console.info('Initializing project workspace contexts');
       compilation.context = await initContext(compilation);
 

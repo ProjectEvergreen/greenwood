@@ -2,9 +2,10 @@ import fs from 'fs/promises';
 import { hashString } from '../lib/hashing-utils.js';
 import Koa from 'koa';
 import { koaBody } from 'koa-body';
-import { checkResourceExists, mergeResponse, transformKoaRequestIntoStandardRequest } from '../lib/resource-utils.js';
+import { checkResourceExists, mergeResponse, transformKoaRequestIntoStandardRequest, requestAsObject } from '../lib/resource-utils.js';
 import { Readable } from 'stream';
 import { ResourceInterface } from '../lib/resource-interface.js';
+import { Worker } from 'worker_threads';
 
 async function getDevServer(compilation) {
   const app = new Koa();
@@ -69,12 +70,47 @@ async function getDevServer(compilation) {
           const merged = mergeResponse(response.clone(), current.clone());
 
           response = merged;
-          break;
         }
       }
 
       ctx.body = response.body ? Readable.from(response.body) : '';
       ctx.status = response.status;
+      ctx.message = response.statusText;
+      response.headers.forEach((value, key) => {
+        ctx.set(key, value);
+      });
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
+    }
+
+    await next();
+  });
+
+  // allow pre-processing of userland plugins _before_ Greenwood "standardizes" it
+  app.use(async (ctx, next) => {
+    try {
+      const url = new URL(ctx.url);
+      const { header, status, message } = ctx.response;
+      const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
+      const initResponse = new Response(status === 204 ? null : ctx.body, {
+        statusText: message,
+        status,
+        headers: new Headers(header)
+      });
+      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        const intermediateResponse = await responsePromise;
+        if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, intermediateResponse.clone())) {
+          const current = await plugin.preIntercept(url, request, await intermediateResponse.clone());
+          const merged = mergeResponse(intermediateResponse.clone(), current);
+
+          return Promise.resolve(merged);
+        } else {
+          return Promise.resolve(await responsePromise);
+        }
+      }, Promise.resolve(initResponse.clone()));
+
+      ctx.body = response.body ? Readable.from(response.body) : '';
       ctx.message = response.statusText;
       response.headers.forEach((value, key) => {
         ctx.set(key, value);
@@ -282,6 +318,7 @@ async function getStaticServer(compilation, composable) {
 async function getHybridServer(compilation) {
   const { graph, manifest, context, config } = compilation;
   const { outputDir } = context;
+  const isolationMode = config.isolation;
   const app = await getStaticServer(compilation, true);
 
   app.use(koaBody());
@@ -294,17 +331,85 @@ async function getHybridServer(compilation) {
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
 
       if (!config.prerender && matchingRoute.isSSR && !matchingRoute.prerender) {
-        const { handler } = await import(new URL(`./${matchingRoute.outputPath}`, outputDir));
-        const response = await handler(request, compilation);
+        const entryPointUrl = new URL(`./${matchingRoute.outputPath}`, outputDir);
+        let html;
 
-        ctx.body = Readable.from(response.body);
+        if (matchingRoute.isolation || isolationMode) {
+          await new Promise(async (resolve, reject) => {
+            const worker = new Worker(new URL('../lib/ssr-route-worker-isolation-mode.js', import.meta.url));
+            // TODO "faux" new Request here, a better way?
+            const request = await requestAsObject(new Request(url));
+
+            worker.on('message', async (result) => {
+              html = result;
+
+              resolve();
+            });
+            worker.on('error', reject);
+            worker.on('exit', (code) => {
+              if (code !== 0) {
+                reject(new Error(`Worker stopped with exit code ${code}`));
+              }
+            });
+
+            worker.postMessage({
+              routeModuleUrl: entryPointUrl.href,
+              request,
+              compilation: JSON.stringify(compilation)
+            });
+          });
+        } else {
+          const { handler } = await import(entryPointUrl);
+          const response = await handler(request, compilation);
+
+          html = Readable.from(response.body);
+        }
+
+        ctx.body = html;
         ctx.set('Content-Type', 'text/html');
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
-        const { handler } = await import(new URL(`.${apiRoute.path}`, outputDir));
-        const response = await handler(request);
-        const { body, status, headers, statusText } = response;
+        const entryPointUrl = new URL(`.${apiRoute.outputPath}`, outputDir);
+        let body, status, headers, statusText;
+
+        if (apiRoute.isolation || isolationMode) {
+          await new Promise(async (resolve, reject) => {
+            const worker = new Worker(new URL('../lib/api-route-worker.js', import.meta.url));
+            // TODO "faux" new Request here, a better way?
+            const req = await requestAsObject(request);
+
+            worker.on('message', async (result) => {
+              const responseAsObject = result;
+
+              body = responseAsObject.body;
+              status = responseAsObject.status;
+              headers = new Headers(responseAsObject.headers);
+              statusText = responseAsObject.statusText;
+
+              resolve();
+            });
+            worker.on('error', reject);
+            worker.on('exit', (code) => {
+              if (code !== 0) {
+                reject(new Error(`Worker stopped with exit code ${code}`));
+              }
+            });
+
+            worker.postMessage({
+              href: entryPointUrl.href,
+              request: req
+            });
+          });
+        } else {
+          const { handler } = await import(entryPointUrl);
+          const response = await handler(request);
+
+          body = response.body;
+          status = response.status;
+          headers = response.headers;
+          statusText = response.statusText;
+        }
 
         ctx.body = body ? Readable.from(body) : null;
         ctx.status = status;

@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood build command with no config and custom 404 page (and app) template.
+ * Run Greenwood build command with no config and custom 404 page (and app) layout.
  *
  * User Result
- * Should generate a bare bones Greenwood build with custom page template.
+ * Should generate a bare bones Greenwood build with custom page layout.
  *
  * User Command
  * greenwood build
@@ -21,7 +21,7 @@
  *   styles/
  *     404.css
  *     theme.css
- *   templates/
+ *   layouts/
  *     app.html
  */
 import chai from 'chai';
@@ -37,7 +37,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom 404 Page and App Template';
+  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom 404 Page and App Layout';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -57,7 +57,7 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public'], LABEL);
 
-    describe('Custom 404 Page with App Template', function() {
+    describe('Custom 404 Page with App Layout', function() {
       let dom;
       let jsFiles;
       let cssFiles;
@@ -95,16 +95,16 @@ describe('Build Greenwood With: ', function() {
           expect(linkTags.length).to.equal(2);
         });
 
-        it('should have 1 app template specific <script> tag in the <head>', function() {
-          const scriptTagsTemplate = Array.from(scriptTags).filter(script => script.getAttribute('src').indexOf('404') < 0);
+        it('should have 1 app layout specific <script> tag in the <head>', function() {
+          const scriptTagsLayout = Array.from(scriptTags).filter(script => script.getAttribute('src').indexOf('404') < 0);
 
-          expect(scriptTagsTemplate.length).to.equal(1);
+          expect(scriptTagsLayout.length).to.equal(1);
         });
 
-        it('should have 1 app template specific <link> tag in the <head>', function() {
-          const linkTagsTemplate = Array.from(linkTags).filter(link => link.getAttribute('href').indexOf('404') < 0);
+        it('should have 1 app layout specific <link> tag in the <head>', function() {
+          const linkTagsLayout = Array.from(linkTags).filter(link => link.getAttribute('href').indexOf('404') < 0);
 
-          expect(linkTagsTemplate.length).to.equal(1);
+          expect(linkTagsLayout.length).to.equal(1);
         });
 
         it('should have 1 404 page specific <script> tags in the <head>', function() {

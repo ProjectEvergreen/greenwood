@@ -1,0 +1,7 @@
+export default class ContactPage extends HTMLElement {
+  connectedCallback() {
+    this.innerHTML = `
+      <h1>Welcome to our Contact page!</h1>
+    `;
+  }
+}

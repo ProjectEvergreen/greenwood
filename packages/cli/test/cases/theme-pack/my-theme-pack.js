@@ -5,13 +5,13 @@ const myThemePack = (options = {}) => [{
   type: 'context',
   name: `${packageJson.name}:context`,
   provider: (compilation) => {
-    const templateLocation = options.__isDevelopment // eslint-disable-line no-underscore-dangle
-      ? new URL('./layouts/', compilation.context.userWorkspace)
-      : new URL('./dist/layouts/', import.meta.url);
+    const layoutLocation = options.__isDevelopment // eslint-disable-line no-underscore-dangle
+      ? new URL('./my-layouts/', compilation.context.userWorkspace)
+      : new URL('./dist/my-layouts/', import.meta.url);
 
     return {
-      templates: [
-        templateLocation
+      layouts: [
+        layoutLocation
       ]
     };
   }

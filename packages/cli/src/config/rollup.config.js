@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import fs from 'fs';
 import path from 'path';
 import { checkResourceExists, normalizePathnameForWindows } from '../lib/resource-utils.js';
@@ -6,28 +7,9 @@ import commonjs from '@rollup/plugin-commonjs';
 import * as walk from 'acorn-walk';
 
 // https://github.com/rollup/rollup/issues/2121
+// would be nice to get rid of this
 function cleanRollupId(id) {
-  return id.replace('\x00', '');
-}
-
-// specifically to handle escodegen and other node modules
-// using require for package.json or other json files
-// https://github.com/estools/escodegen/issues/455
-function greenwoodJsonLoader() {
-  return {
-    name: 'greenwood-json-loader',
-    async load(id) {
-      const idUrl = new URL(`file://${cleanRollupId(id)}`);
-      const extension = idUrl.pathname.split('.').pop();
-
-      if (extension === 'json') {
-        const json = JSON.parse(await fs.promises.readFile(idUrl, 'utf-8'));
-        const contents = `export default ${JSON.stringify(json)}`;
-
-        return contents;
-      }
-    }
-  };
+  return id.replace('\x00', '').replace('?commonjs-proxy', '');
 }
 
 function greenwoodResourceLoader (compilation) {
@@ -53,25 +35,48 @@ function greenwoodResourceLoader (compilation) {
       }
     },
     async load(id) {
-      const idUrl = new URL(`file://${cleanRollupId(id)}`);
+      let idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
       const extension = pathname.split('.').pop();
+      const headers = {
+        'Accept': 'text/javascript',
+        'Sec-Fetch-Dest': 'empty'
+      };
 
       // filter first for any bare specifiers
-      if (await checkResourceExists(idUrl) && extension !== '' && extension !== 'js') {
-        const url = new URL(`${idUrl.href}?type=${extension}`);
-        const request = new Request(url.href);
+      if (await checkResourceExists(idUrl) && extension !== 'js') {
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldResolve && await plugin.shouldResolve(idUrl)) {
+            idUrl = new URL((await plugin.resolve(idUrl)).url);
+          }
+        }
+
+        const request = new Request(idUrl, {
+          headers
+        });
         let response = new Response('');
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
-            response = await plugin.serve(url, request);
+          if (plugin.shouldServe && await plugin.shouldServe(idUrl, request)) {
+            response = await plugin.serve(idUrl, request);
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
-            response = await plugin.intercept(url, request, response.clone());
+          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(idUrl, request, response.clone())) {
+            response = await plugin.preIntercept(idUrl, request, response.clone());
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldIntercept && await plugin.shouldIntercept(idUrl, request, response.clone())) {
+            response = await plugin.intercept(idUrl, request, response.clone());
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldOptimize && await plugin.shouldOptimize(idUrl, response.clone())) {
+            response = await plugin.optimize(idUrl, response.clone());
           }
         }
 
@@ -139,8 +144,62 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
   };
 }
 
+function greenwoodSyncSsrEntryPointsOutputPaths(compilation) {
+  return {
+    name: 'greenwood-sync-ssr-pages-entry-point-output-paths',
+    generateBundle(options, bundle) {
+      const { basePath } = compilation.config;
+      const { scratchDir } = compilation.context;
+
+      // map rollup bundle names back to original SSR pages for syncing input <> output bundle names
+      Object.keys(bundle).forEach((key) => {
+        if (bundle[key].exports?.find(exp => exp === 'handler')) {
+          const ext = bundle[key].facadeModuleId.split('.').pop();
+          // account for windows pathname shenanigans by "casting" facadeModuleId to a URL first
+          const route = new URL(`file://${bundle[key].facadeModuleId}`).pathname.replace(scratchDir.pathname, `${basePath}/`).replace(`.${ext}`, '/').replace('/index/', '/');
+
+          compilation.graph.forEach((page, idx) => {
+            if (page.route === route) {
+              compilation.graph[idx].outputPath = key;
+            }
+          });
+        }
+      });
+    }
+  };
+}
+
+function greenwoodSyncApiRoutesOutputPath(compilation) {
+  return {
+    name: 'greenwood-sync-api-routes-output-paths',
+    generateBundle(options, bundle) {
+      const { basePath } = compilation.config;
+      const { apisDir } = compilation.context;
+
+      // map rollup bundle names back to original SSR pages for syncing input <> output bundle names
+      Object.keys(bundle).forEach((key) => {
+        if (bundle[key].exports?.find(exp => exp === 'handler')) {
+          const ext = bundle[key].facadeModuleId.split('.').pop();
+          const relativeFacade = new URL(`file://${bundle[key].facadeModuleId}`).pathname.replace(apisDir.pathname, `${basePath}/`).replace(`.${ext}`, '');
+          const route = `/api${relativeFacade}`;
+
+          if (compilation.manifest.apis.has(route)) {
+            const api = compilation.manifest.apis.get(route);
+
+            compilation.manifest.apis.set(route, {
+              ...api,
+              outputPath: `/api/${key}`
+            });
+          }
+        }
+      });
+    }
+  };
+}
+
 function getMetaImportPath(node) {
-  return node.arguments[0].value.split('/').join(path.sep);
+  return node.arguments[0].value.split('/').join(path.sep)
+    .replace(/\\/g, '/'); // handle Windows style paths
 }
 
 function isNewUrlImportMetaUrl(node) {
@@ -176,26 +235,44 @@ function greenwoodImportMetaUrl(compilation) {
       }).map((plugin) => {
         return plugin.provider(compilation);
       });
-      const idUrl = new URL(`file://${cleanRollupId(id)}`);
-      const { pathname } = idUrl;
-      const extension = pathname.split('.').pop();
-      const urlWithType = new URL(`${idUrl.href}?type=${extension}`);
-      const request = new Request(urlWithType.href);
+      const idAssetName = path.basename(id);
+      const normalizedId = id.replace(/\\\\/g, '/').replace(/\\/g, '/'); // windows shenanigans...
+      let idUrl = new URL(`file://${cleanRollupId(id)}`);
+      const headers = {
+        'Accept': 'text/javascript',
+        'Sec-Fetch-Dest': 'empty'
+      };
+      const request = new Request(idUrl, {
+        headers
+      });
       let canTransform = false;
       let response = new Response(code);
 
       // handle any custom imports or pre-processing needed before passing to Rollup this.parse
-      if (await checkResourceExists(idUrl) && extension !== '' && extension !== 'json') {
+      if (await checkResourceExists(idUrl)) {
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldServe && await plugin.shouldServe(urlWithType, request)) {
-            response = await plugin.serve(urlWithType, request);
+          if (plugin.shouldResolve && await plugin.shouldResolve(idUrl)) {
+            idUrl = new URL((await plugin.resolve(idUrl)).url);
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldServe && await plugin.shouldServe(idUrl, request)) {
+            response = await plugin.serve(idUrl, request);
             canTransform = true;
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldIntercept && await plugin.shouldIntercept(urlWithType, request, response.clone())) {
-            response = await plugin.intercept(urlWithType, request, response.clone());
+          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(idUrl, request, response)) {
+            response = await plugin.preIntercept(idUrl, request, response);
+            canTransform = true;
+          }
+        }
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldIntercept && await plugin.shouldIntercept(idUrl, request, response.clone())) {
+            response = await plugin.intercept(idUrl, request, response.clone());
             canTransform = true;
           }
         }
@@ -216,11 +293,9 @@ function greenwoodImportMetaUrl(compilation) {
             const absoluteScriptDir = path.dirname(id);
             const relativeAssetPath = getMetaImportPath(node);
             const absoluteAssetPath = path.resolve(absoluteScriptDir, relativeAssetPath);
-            const assetName = path.basename(absoluteAssetPath);
-            const assetExtension = assetName.split('.').pop();
 
             assetUrls.push({
-              url: new URL(`file://${absoluteAssetPath}?type=${assetExtension}`),
+              url: new URL(`file://${absoluteAssetPath}`),
               relativeAssetPath
             });
           }
@@ -254,56 +329,71 @@ function greenwoodImportMetaUrl(compilation) {
           ? { type, id: normalizePathnameForWindows(url), name }
           : { type, name: assetName, source: assetContents };
         const ref = this.emitFile(emitConfig);
-        // handle Windows style paths
-        const normalizedRelativeAssetPath = relativeAssetPath.replace(/\\/g, '/');
         const importRef = `import.meta.ROLLUP_FILE_URL_${ref}`;
 
+        // loop through all URL bundle chunks from APIs and SSR pages
+        // and map to their parent file, to pick back up in generateBundle when full hashes are known
+        if (`${compilation.context.apisDir.pathname}${idAssetName}`.indexOf(normalizedId) >= 0) {
+          for (const entry of compilation.manifest.apis.keys()) {
+            const apiRoute = compilation.manifest.apis.get(entry);
+
+            if (normalizedId.endsWith(apiRoute.path)) {
+              const assets = apiRoute.assets || [];
+
+              assets.push(assetUrl.url.href);
+
+              compilation.manifest.apis.set(entry, {
+                ...apiRoute,
+                assets
+              });
+            }
+          }
+        } else {
+          // TODO figure out how to handle URL chunk from SSR pages
+          // https://github.com/ProjectEvergreen/greenwood/issues/1163
+        }
+
         modifiedCode = code
-          .replace(`'${normalizedRelativeAssetPath}'`, importRef)
-          .replace(`"${normalizedRelativeAssetPath}"`, importRef);
+          .replace(`'${relativeAssetPath}'`, importRef)
+          .replace(`"${relativeAssetPath}"`, importRef);
       }
 
       return {
         code: modifiedCode ? modifiedCode : code,
         map: null
       };
-    }
-  };
-}
+    },
 
-// TODO could we use this instead?
-// https://github.com/rollup/rollup/blob/v2.79.1/docs/05-plugin-development.md#resolveimportmeta
-// https://github.com/ProjectEvergreen/greenwood/issues/1087
-function greenwoodPatchSsrPagesEntryPointRuntimeImport(compilation) {
-  return {
-    name: 'greenwood-patch-ssr-pages-entry-point-runtime-import',
-    generateBundle(options, bundle) {
-      const { pagesDir, scratchDir } = compilation.context;
+    generateBundle(options, bundles) {
+      for (const bundle in bundles) {
+        const bundleExtension = bundle.split('.').pop();
+        const apiKey = `/api/${bundle.replace(`.${bundleExtension}`, '')}`;
 
-      Object.keys(bundle).forEach((key) => {
-        // map rollup bundle names back to original SSR pages for output bundles and paths
-        if (key.startsWith('_')) {
-          const needle = bundle[key].code.match(/___GWD_ENTRY_FILE_URL=(.*.)___/);
+        if (compilation.manifest.apis.has(apiKey)) {
+          const apiManifestDetails = compilation.manifest.apis.get(apiKey);
 
-          // handle windows shenanigans for facadeModuleId and path separators
-          if (new URL(`file://${bundle[key].facadeModuleId}`).pathname.startsWith(scratchDir.pathname) && needle) {
-            const entryPathMatch = needle[1];
+          for (const reference of bundles[bundle].referencedFiles) {
+            if (bundles[reference]) {
+              const assets = apiManifestDetails.assets;
+              let assetIdx;
 
-            Object.keys(bundle).forEach((_) => {
-              // handle windows shenanigans for facadeModuleId and path separators
-              if (new URL(`file://${bundle[_].facadeModuleId}`).pathname === `${pagesDir.pathname}${entryPathMatch}`) {
-                bundle[key].code = bundle[key].code.replace(/'___GWD_ENTRY_FILE_URL=(.*.)___'/, `new URL('./${bundle[_].fileName}', import.meta.url)`);
+              assets.forEach((asset, idx) => {
+                // more windows shenanigans...)
+                if (asset.indexOf(bundles[reference]?.facadeModuleId?.replace(/\\/g, '/'))) {
+                  assetIdx = idx;
+                }
+              });
 
-                compilation.graph.forEach((page, idx) => {
-                  if (page.relativeWorkspacePagePath === `/${entryPathMatch}`) {
-                    compilation.graph[idx].outputPath = key;
-                  }
-                });
-              }
-            });
+              assets[assetIdx] = new URL(`./api/${reference}`, compilation.context.outputDir).href;
+
+              compilation.manifest.apis.set(apiKey, {
+                ...apiManifestDetails,
+                assets
+              });
+            }
           }
         }
-      });
+      }
     }
   };
 }
@@ -367,78 +457,108 @@ const getRollupConfigForScriptResources = async (compilation) => {
 };
 
 const getRollupConfigForApis = async (compilation) => {
-  const { outputDir, userWorkspace } = compilation.context;
-  const input = [...compilation.manifest.apis.values()]
-    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, userWorkspace)));
+  const { outputDir, pagesDir, apisDir } = compilation.context;
 
-  // why is this needed?
-  await fs.promises.mkdir(new URL('./api/assets/', outputDir), {
-    recursive: true
-  });
+  return [...compilation.manifest.apis.values()]
+    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, pagesDir)))
+    .map((filepath) => {
+      // account for windows pathname shenanigans by "casting" filepath to a URL first
+      const ext = filepath.split('.').pop();
+      const entryName = new URL(`file://${filepath}`).pathname.replace(apisDir.pathname, '').replace(/\//g, '-').replace(`.${ext}`, '');
 
-  // TODO should routes and APIs have chunks?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1118
-  return [{
-    input,
-    output: {
-      dir: `${normalizePathnameForWindows(outputDir)}/api`,
-      entryFileNames: '[name].js',
-      chunkFileNames: '[name].[hash].js'
-    },
-    plugins: [
-      greenwoodJsonLoader(),
-      greenwoodResourceLoader(compilation),
-      nodeResolve(),
-      commonjs(),
-      greenwoodImportMetaUrl(compilation)
-    ]
-  }];
+      return {
+        input: filepath,
+        output: {
+          dir: `${normalizePathnameForWindows(outputDir)}/api`,
+          entryFileNames: `${entryName}.js`,
+          chunkFileNames: `${entryName}.[hash].js`
+        },
+        plugins: [
+          greenwoodResourceLoader(compilation),
+          // support node export conditions for SSR pages
+          // https://github.com/ProjectEvergreen/greenwood/issues/1118
+          // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
+          nodeResolve({
+            exportConditions: ['node'],
+            preferBuiltins: true
+          }),
+          commonjs(),
+          greenwoodImportMetaUrl(compilation),
+          greenwoodSyncApiRoutesOutputPath(compilation)
+        ],
+        onwarn: (errorObj) => {
+          const { code, message } = errorObj;
+
+          switch (code) {
+
+            case 'CIRCULAR_DEPENDENCY':
+              // let this through for WCC + sucrase
+              // Circular dependency: ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js ->
+              //   ../../../../../node_modules/sucrase/dist/esm/parser/traverser/util.js -> ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js
+              // Circular dependency: ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js ->
+              //   ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/readWord.js -> ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js
+              // https://github.com/ProjectEvergreen/greenwood/pull/1212
+              // https://github.com/lit/lit/issues/449#issuecomment-416688319
+              break;
+            default:
+              // otherwise, log all warnings from rollup
+              console.debug(message);
+
+          }
+        }
+      };
+    });
 };
 
 const getRollupConfigForSsr = async (compilation, input) => {
   const { outputDir } = compilation.context;
 
-  // TODO should routes and APIs have chunks?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1118
-  return [{
-    input,
-    output: {
-      dir: normalizePathnameForWindows(outputDir),
-      entryFileNames: '_[name].js',
-      chunkFileNames: '[name].[hash].js'
-    },
-    plugins: [
-      greenwoodJsonLoader(),
-      greenwoodResourceLoader(compilation),
-      // TODO let this through for lit to enable nodeResolve({ preferBuiltins: true })
-      // https://github.com/lit/lit/issues/449
-      // https://github.com/ProjectEvergreen/greenwood/issues/1118
-      nodeResolve({
-        preferBuiltins: true
-      }),
-      commonjs(),
-      greenwoodImportMetaUrl(compilation),
-      greenwoodPatchSsrPagesEntryPointRuntimeImport(compilation) // TODO a little hacky but works for now
-    ],
-    onwarn: (errorObj) => {
-      const { code, message } = errorObj;
+  return input.map((filepath) => {
+    const ext = filepath.split('.').pop();
+    // account for windows pathname shenanigans by "casting" filepath to a URL first
+    const entryName = new URL(`file://${filepath}`).pathname.replace(compilation.context.scratchDir.pathname, '').replace('/', '-').replace(`.${ext}`, '');
 
-      switch (code) {
+    return {
+      input: filepath,
+      output: {
+        dir: normalizePathnameForWindows(outputDir),
+        entryFileNames: `${entryName}.route.js`,
+        chunkFileNames: `${entryName}.route.chunk.[hash].js`
+      },
+      plugins: [
+        greenwoodResourceLoader(compilation),
+        // support node export conditions for SSR pages
+        // https://github.com/ProjectEvergreen/greenwood/issues/1118
+        // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
+        nodeResolve({
+          exportConditions: ['node'],
+          preferBuiltins: true
+        }),
+        commonjs(),
+        greenwoodImportMetaUrl(compilation),
+        greenwoodSyncSsrEntryPointsOutputPaths(compilation)
+      ],
+      onwarn: (errorObj) => {
+        const { code, message } = errorObj;
 
-        case 'CIRCULAR_DEPENDENCY':
-          // TODO let this through for lit by suppressing it
-          // Error: the string "Circular dependency: ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js ->
-          // ../../../../../node_modules/@lit-labs/ssr/lib/lit-element-renderer.js -> ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js\n" was thrown, throw an Error :)
-          // https://github.com/lit/lit/issues/449
-          // https://github.com/ProjectEvergreen/greenwood/issues/1118
-          break;
-        default:
-          // otherwise, log all warnings from rollup
-          console.debug(message);
+        switch (code) {
 
+          case 'CIRCULAR_DEPENDENCY':
+            // let this through for lit
+            // Error: the string "Circular dependency: ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js ->
+            // ../../../../../node_modules/@lit-labs/ssr/lib/lit-element-renderer.js -> ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js\n" was thrown, throw an Error :)
+            // https://github.com/ProjectEvergreen/greenwood/issues/1118
+            // https://github.com/lit/lit/issues/449#issuecomment-416688319
+            // https://github.com/rollup/rollup/issues/1089#issuecomment-402109607
+            break;
+          default:
+            // otherwise, log all warnings from rollup
+            console.debug(message);
+
+        }
       }
-    }
-  }];
+    };
+  });
 };
 
 export {

@@ -1,6 +1,6 @@
 ---
 title: Ny First Post
-template: blog
+layout: blog
 published: 11/11/2022
 author: Owen Buckley
 ---

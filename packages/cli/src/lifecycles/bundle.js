@@ -1,18 +1,55 @@
 /* eslint-disable max-depth, max-len */
 import fs from 'fs/promises';
 import { getRollupConfigForApis, getRollupConfigForScriptResources, getRollupConfigForSsr } from '../config/rollup.config.js';
-import { getAppTemplate, getPageTemplate, getUserScripts } from '../lib/templating-utils.js';
+import { getAppLayout, getPageLayout, getUserScripts } from '../lib/layout-utils.js';
 import { hashString } from '../lib/hashing-utils.js';
-import { checkResourceExists, mergeResponse, normalizePathnameForWindows } from '../lib/resource-utils.js';
+import { checkResourceExists, mergeResponse, normalizePathnameForWindows, trackResourcesForRoute } from '../lib/resource-utils.js';
 import path from 'path';
 import { rollup } from 'rollup';
 
+async function interceptPage(url, request, plugins, body) {
+  let response = new Response(body, {
+    headers: new Headers({ 'Content-Type': 'text/html' })
+  });
+
+  for (const plugin of plugins) {
+    if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, response)) {
+      response = await plugin.preIntercept(url, request, response);
+    }
+
+    if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
+      response = await plugin.intercept(url, request, response);
+    }
+  }
+
+  return response;
+}
+
+function getPluginInstances(compilation) {
+  return [...compilation.config.plugins]
+    .filter(plugin => plugin.type === 'resource' && plugin.name !== 'plugin-node-modules:resource')
+    .map((plugin) => {
+      return plugin.provider(compilation);
+    });
+}
+
 async function emitResources(compilation) {
-  const { outputDir } = compilation.context;
-  const { resources, graph } = compilation;
+  const { outputDir, scratchDir } = compilation.context;
+  const { resources, graph, manifest } = compilation;
 
   // https://stackoverflow.com/a/56150320/417806
   await fs.writeFile(new URL('./resources.json', outputDir), JSON.stringify(resources, (key, value) => {
+    if (value instanceof Map) {
+      return {
+        dataType: 'Map',
+        value: [...value]
+      };
+    } else {
+      return value;
+    }
+  }));
+
+  await fs.writeFile(new URL('./manifest.json', scratchDir), JSON.stringify(manifest, (key, value) => {
     if (value instanceof Map) {
       return {
         dataType: 'Map',
@@ -118,11 +155,27 @@ async function bundleStyleResources(compilation, resourcePlugins) {
       } else {
         const url = resource.sourcePathURL;
         const contentType = 'text/css';
-        const headers = new Headers({ 'Content-Type': contentType });
+        const headers = new Headers({ 'Content-Type': contentType, 'Accept': contentType });
         const request = new Request(url, { headers });
         const initResponse = new Response(contents, { headers });
 
         let response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+          const intermediateResponse = await responsePromise;
+          const shouldPreIntercept = plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, intermediateResponse.clone());
+
+          if (shouldPreIntercept) {
+            const currentResponse = await plugin.preIntercept(url, request, intermediateResponse.clone());
+            const mergedResponse = mergeResponse(intermediateResponse.clone(), currentResponse.clone());
+
+            if (mergedResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
+              return Promise.resolve(mergedResponse.clone());
+            }
+          }
+
+          return Promise.resolve(responsePromise);
+        }, Promise.resolve(initResponse));
+
+        response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
           const intermediateResponse = await responsePromise;
           const shouldIntercept = plugin.shouldIntercept && await plugin.shouldIntercept(url, request, intermediateResponse.clone());
 
@@ -136,7 +189,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
           }
 
           return Promise.resolve(responsePromise);
-        }, Promise.resolve(initResponse));
+        }, Promise.resolve(response.clone()));
 
         response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
           const intermediateResponse = await responsePromise;
@@ -163,88 +216,113 @@ async function bundleStyleResources(compilation, resourcePlugins) {
 
 async function bundleApiRoutes(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const [rollupConfig] = await getRollupConfigForApis(compilation);
+  const apiConfigs = await getRollupConfigForApis(compilation);
 
-  if (rollupConfig.input.length !== 0) {
-    const bundle = await rollup(rollupConfig);
-    await bundle.write(rollupConfig.output);
+  if (apiConfigs.length > 0 && apiConfigs[0].input.length !== 0) {
+    for (const configIndex in apiConfigs) {
+      const rollupConfig = apiConfigs[configIndex];
+      const bundle = await rollup(rollupConfig);
+      await bundle.write(rollupConfig.output);
+
+    }
   }
 }
 
-async function bundleSsrPages(compilation) {
-  // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  // TODO context plugins for SSR ?
-  // const contextPlugins = compilation.config.plugins.filter((plugin) => {
-  //   return plugin.type === 'context';
-  // }).map((plugin) => {
-  //   return plugin.provider(compilation);
-  // });
-  const hasSSRPages = compilation.graph.filter(page => page.isSSR).length > 0;
+async function bundleSsrPages(compilation, optimizePlugins) {
+  const { context, config } = compilation;
+  const ssrPages = compilation.graph.filter(page => page.isSSR && !page.prerender);
+  const ssrPrerenderPagesRouteMapper = {};
   const input = [];
 
-  if (!compilation.config.prerender && hasSSRPages) {
-    const htmlOptimizer = compilation.config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
-    const { executeModuleUrl } = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider();
+  if (!config.prerender && ssrPages.length > 0) {
+    const { executeModuleUrl } = config.plugins.find(plugin => plugin.type === 'renderer').provider();
     const { executeRouteModule } = await import(executeModuleUrl);
-    const { pagesDir, scratchDir } = compilation.context;
+    const { pagesDir, scratchDir } = context;
 
-    for (const page of compilation.graph) {
-      if (page.isSSR && !page.prerender) {
-        const { imports, route, template, title, relativeWorkspacePagePath } = page;
-        const entryFileUrl = new URL(`./_${relativeWorkspacePagePath.replace('/', '')}`, scratchDir);
-        const moduleUrl = new URL(`./${relativeWorkspacePagePath.replace('/', '')}`, pagesDir);
-        const outputPathRootUrl = new URL(`file://${path.dirname(entryFileUrl.pathname)}`);
-        const request = new Request(moduleUrl); // TODO not really sure how to best no-op this?
-        // TODO getTemplate has to be static (for now?)
-        // https://github.com/ProjectEvergreen/greenwood/issues/955
-        const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [], request });
-        let staticHtml = '';
+    // one pass to generate initial static HTML and to track all combined static resources across layouts
+    // and before we optimize so that all bundled assets can tracked up front
+    // would be nice to see if this can be done in a single pass though...
+    for (const page of ssrPages) {
+      const { imports, route, layout, title, relativeWorkspacePagePath } = page;
+      const moduleUrl = new URL(`.${relativeWorkspacePagePath}`, pagesDir);
+      const request = new Request(moduleUrl);
+      // TODO getLayout has to be static (for now?)
+      // https://github.com/ProjectEvergreen/greenwood/issues/955
+      const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [], request });
+      let staticHtml = '';
 
-        staticHtml = data.template ? data.template : await getPageTemplate(staticHtml, compilation.context, template, []);
-        staticHtml = await getAppTemplate(staticHtml, compilation.context, imports, [], false, title);
-        staticHtml = await getUserScripts(staticHtml, compilation);
-        staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
-        staticHtml = staticHtml.replace(/[`\\$]/g, '\\$&'); // https://stackoverflow.com/a/75688937/417806
+      staticHtml = data.layout ? data.layout : await getPageLayout(staticHtml, compilation, layout);
+      staticHtml = await getAppLayout(staticHtml, compilation, imports, title);
+      staticHtml = await getUserScripts(staticHtml, compilation);
+      staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
 
-        if (!await checkResourceExists(outputPathRootUrl)) {
-          await fs.mkdir(outputPathRootUrl, {
-            recursive: true
-          });
-        }
+      await trackResourcesForRoute(staticHtml, compilation, route);
 
-        // better way to write out this inline code?
-        await fs.writeFile(entryFileUrl, `
-          import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
-
-          export async function handler(request) {
-            const compilation = JSON.parse('${JSON.stringify(compilation)}');
-            const page = JSON.parse('${JSON.stringify(page)}');
-            const moduleUrl = '___GWD_ENTRY_FILE_URL=${relativeWorkspacePagePath.replace('/', '')}___';
-            const data = await executeRouteModule({ moduleUrl, compilation, page, request });
-            let staticHtml = \`${staticHtml}\`;
-
-            if (data.body) {
-              staticHtml = staticHtml.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, data.body);
-            }
-
-            return new Response(staticHtml, {
-              headers: {
-                'Content-Type': 'text/html'
-              }
-            });
-          }
-        `);
-
-        input.push(normalizePathnameForWindows(moduleUrl));
-        input.push(normalizePathnameForWindows(entryFileUrl));
-      }
+      ssrPrerenderPagesRouteMapper[route] = staticHtml;
     }
 
-    const [rollupConfig] = await getRollupConfigForSsr(compilation, input);
+    // technically this happens in the start of bundleCompilation once
+    // so might be nice to detect those static assets to see if they have be "de-duped" from bundling here
+    await bundleScriptResources(compilation);
+    await bundleStyleResources(compilation, optimizePlugins);
 
-    if (rollupConfig.input.length > 0) {
-      const bundle = await rollup(rollupConfig);
-      await bundle.write(rollupConfig.output);
+    // second pass to link all bundled assets to their resources before optimizing and generating SSR bundles
+    for (const page of ssrPages) {
+      const { filename, route, relativeWorkspacePagePath } = page;
+      const entryFileUrl = new URL(`.${relativeWorkspacePagePath}`, scratchDir);
+      const outputPathRootUrl = new URL(`file://${path.dirname(entryFileUrl.pathname)}`);
+      const htmlOptimizer = config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
+      const pagesPathDiff = context.pagesDir.pathname.replace(context.projectDirectory.pathname, '');
+      const relativeDepth = relativeWorkspacePagePath.replace(`/${filename}`, '') === ''
+        ? '../'
+        : '../'.repeat(relativeWorkspacePagePath.replace(`/${filename}`, '').split('/').length);
+
+      let staticHtml = ssrPrerenderPagesRouteMapper[route];
+      staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
+      staticHtml = staticHtml.replace(/[`\\$]/g, '\\$&'); // https://stackoverflow.com/a/75688937/417806
+
+      if (!await checkResourceExists(outputPathRootUrl)) {
+        await fs.mkdir(outputPathRootUrl, {
+          recursive: true
+        });
+      }
+
+      // better way to write out this inline code?
+      await fs.writeFile(entryFileUrl, `
+        import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
+
+        const moduleUrl = new URL('${relativeDepth}${pagesPathDiff}${relativeWorkspacePagePath.replace('/', '')}', import.meta.url);
+
+        export async function handler(request) {
+          const compilation = JSON.parse('${JSON.stringify(compilation)}');
+          const page = JSON.parse('${JSON.stringify(page)}');
+          const data = await executeRouteModule({ moduleUrl, compilation, page, request });
+          let staticHtml = \`${staticHtml}\`;
+
+          if (data.body) {
+            staticHtml = staticHtml.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, data.body);
+          }
+
+          return new Response(staticHtml, {
+            headers: {
+              'Content-Type': 'text/html'
+            }
+          });
+        }
+      `);
+
+      input.push(normalizePathnameForWindows(entryFileUrl));
+    }
+
+    const ssrConfigs = await getRollupConfigForSsr(compilation, input);
+
+    if (ssrConfigs.length > 0 && ssrConfigs[0].input !== '') {
+      console.info('bundling dynamic pages...');
+      for (const configIndex in ssrConfigs) {
+        const rollupConfig = ssrConfigs[configIndex];
+        const bundle = await rollup(rollupConfig);
+        await bundle.write(rollupConfig.output);
+      }
     }
   }
 }
@@ -269,6 +347,7 @@ const bundleCompilation = async (compilation) => {
         return plugin.provider(compilation);
       }).filter((provider) => {
         return provider.shouldIntercept && provider.intercept
+          || provider.shouldPreIntercept && provider.preIntercept
           || provider.shouldOptimize && provider.optimize;
       });
 
@@ -281,7 +360,7 @@ const bundleCompilation = async (compilation) => {
       ]);
 
       // bundleSsrPages depends on bundleScriptResources having run first
-      await bundleSsrPages(compilation);
+      await bundleSsrPages(compilation, optimizeResourcePlugins);
 
       console.info('optimizing static pages....');
       await optimizeStaticPages(compilation, optimizeResourcePlugins);

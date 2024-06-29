@@ -96,8 +96,8 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected CommonJS contents from main.js (lodash) in the output', async function() {
         const contents = fs.readFileSync(scripts[0], 'utf-8');
 
-        expect(contents).to.contain('n=e,t=e.exports,function()');
-        expect(contents).to.contain('document.getElementsByTagName("span")[0].innerHTML=`import from lodash ${i}`;');
+        expect(contents).to.contain('r=u,e=u.exports,function()');
+        expect(contents).to.contain('document.getElementsByTagName("span")[0].innerHTML=`import from lodash ${o}`');
       });
     });
   });

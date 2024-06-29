@@ -1,0 +1,28 @@
+name: Continuous Integration (Loaders)
+
+on: [pull_request]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        node: [18]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Chromium Library Dependencies
+      run: |
+        sh ./.github/workflows/chromium-lib-install.sh
+    - name: Use Node.js ${{ matrix.node }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node }}
+    - name: Installing project dependencies
+      run: |
+        yarn install --frozen-lockfile && yarn lerna bootstrap
+    - name: Test
+      run: |
+        yarn test:loaders

@@ -5,10 +5,13 @@
  *
  */
 import fs from 'fs';
+import path from 'path';
 import { parse, walk } from 'css-tree';
 import { ResourceInterface } from '../../lib/resource-interface.js';
+import { hashString } from '../../lib/hashing-utils.js';
 
-function bundleCss(body, url, projectDirectory) {
+function bundleCss(body, url, compilation) {
+  const { projectDirectory, outputDir, userWorkspace } = compilation.context;
   const ast = parse(body, {
     onParseError(error) {
       console.log(error.formattedMessage);
@@ -18,7 +21,7 @@ function bundleCss(body, url, projectDirectory) {
 
   walk(ast, {
     enter: function (node, item) { // eslint-disable-line complexity
-      const { type, name, value } = node;
+      const { type, name, value, children } = node;
 
       if ((type === 'String' || type === 'Url') && this.atrulePrelude && this.atrule.name === 'import') {
         const { value } = node;
@@ -29,9 +32,45 @@ function bundleCss(body, url, projectDirectory) {
             : new URL(value, url);
           const importContents = fs.readFileSync(resolvedUrl, 'utf-8');
 
-          optimizedCss += bundleCss(importContents, url, projectDirectory);
+          optimizedCss += bundleCss(importContents, url, compilation);
         } else {
           optimizedCss += `@import url('${value}');`;
+        }
+      } else if (type === 'Url' && this.atrule?.name !== 'import') {
+        if (value.startsWith('http') || value.startsWith('//') || value.startsWith('data:')) {
+          optimizedCss += `url('${value}')`;
+          return;
+        }
+
+        const basePath = compilation.config.basePath === '' ? '/' : `${compilation.config.basePath}/`;
+        let barePath = value.replace(/\.\.\//g, '').replace('./', '');
+
+        if (barePath.startsWith('/')) {
+          barePath = barePath.replace('/', '');
+        }
+
+        const locationUrl = barePath.startsWith('node_modules')
+          ? new URL(`./${barePath}`, projectDirectory)
+          : new URL(`./${barePath}`, userWorkspace);
+
+        if (fs.existsSync(locationUrl)) {
+          const hash = hashString(fs.readFileSync(locationUrl, 'utf-8'));
+          const ext = barePath.split('.').pop();
+          const hashedRoot = barePath.replace(`.${ext}`, `.${hash}.${ext}`);
+
+          fs.mkdirSync(new URL(`./${path.dirname(barePath)}/`, outputDir), {
+            recursive: true
+          });
+
+          fs.promises.copyFile(
+            locationUrl,
+            new URL(`./${hashedRoot}`, outputDir)
+          );
+
+          optimizedCss += `url('${basePath}${hashedRoot}')`;
+        } else {
+          console.warn(`Unable to locate ${value}.  You may need to manually copy this file from its source location to the build output directory.`);
+          optimizedCss += `url('${value}')`;
         }
       } else if (type === 'Atrule' && name !== 'import') {
         optimizedCss += `@${name} `;
@@ -44,16 +83,35 @@ function bundleCss(body, url, projectDirectory) {
       } else if (type === 'PseudoClassSelector') {
         optimizedCss += `:${name}`;
 
+        if (children) {
+          switch (name) {
+
+            case 'dir':
+            case 'host':
+            case 'is':
+            case 'has':
+            case 'lang':
+            case 'not':
+            case 'nth-child':
+            case 'nth-last-child':
+            case 'nth-of-type':
+            case 'nth-last-of-type':
+            case 'where':
+              optimizedCss += '(';
+              break;
+            default:
+              break;
+
+          }
+        }
+      } else if (type === 'PseudoElementSelector') {
+        optimizedCss += `::${name}`;
+
         switch (name) {
 
-          case 'is':
-          case 'has':
-          case 'lang':
-          case 'not':
-          case 'nth-child':
-          case 'nth-last-child':
-          case 'nth-of-type':
-          case 'nth-last-of-type':
+          case 'highlight':
+          case 'part':
+          case 'slotted':
             optimizedCss += '(';
             break;
           default:
@@ -62,7 +120,7 @@ function bundleCss(body, url, projectDirectory) {
         }
       } else if (type === 'Function') {
         /* ex: border-left: 3px solid var(--color-secondary); */
-        if (this.declaration && item.prev && item.prev.data.type === 'Identifier') {
+        if (this.declaration && item.prev && (item.prev.data.type !== 'Operator' && item.prev.data.type !== 'Url')) {
           optimizedCss += ' ';
         }
         optimizedCss += `${name}(`;
@@ -153,16 +211,34 @@ function bundleCss(body, url, projectDirectory) {
           optimizedCss += ')';
           break;
         case 'PseudoClassSelector':
+          if (node.children) {
+            switch (node.name) {
+
+              case 'dir':
+              case 'host':
+              case 'is':
+              case 'has':
+              case 'lang':
+              case 'not':
+              case 'nth-child':
+              case 'nth-last-child':
+              case 'nth-last-of-type':
+              case 'nth-of-type':
+              case 'where':
+                optimizedCss += ')';
+                break;
+              default:
+                break;
+
+            }
+          }
+          break;
+        case 'PseudoElementSelector':
           switch (node.name) {
 
-            case 'is':
-            case 'has':
-            case 'lang':
-            case 'not':
-            case 'nth-child':
-            case 'nth-last-child':
-            case 'nth-last-of-type':
-            case 'nth-of-type':
+            case 'highlight':
+            case 'part':
+            case 'slotted':
               optimizedCss += ')';
               break;
             default:
@@ -227,18 +303,37 @@ class StandardCssResource extends ResourceInterface {
     });
   }
 
+  async shouldIntercept(url, request) {
+    const { pathname, searchParams } = url;
+    const ext = pathname.split('.').pop();
+
+    return url.protocol === 'file:' && ext === this.extensions[0] && request.headers.get('Accept')?.indexOf('text/javascript') >= 0 && !searchParams.has('type');
+  }
+
+  async intercept(url, request, response) {
+    const contents = (await response.text()).replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\');
+    const body = `const sheet = new CSSStyleSheet();sheet.replaceSync(\`${contents}\`);export default sheet;`;
+
+    return new Response(body, {
+      headers: {
+        'Content-Type': 'text/javascript'
+      }
+    });
+  }
+
   async shouldOptimize(url, response) {
-    const { protocol, pathname } = url;
+    const { protocol, pathname, searchParams } = url;
     const isValidCss = pathname.split('.').pop() === this.extensions[0]
       && protocol === 'file:'
-      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
+      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0
+      && searchParams.get('type') !== 'css';
 
     return this.compilation.config.optimization !== 'none' && isValidCss;
   }
 
   async optimize(url, response) {
     const body = await response.text();
-    const optimizedBody = bundleCss(body, url, this.compilation.context.projectDirectory);
+    const optimizedBody = bundleCss(body, url, this.compilation);
 
     return new Response(optimizedBody);
   }

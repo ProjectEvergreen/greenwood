@@ -13,10 +13,11 @@ import remarkFrontmatter from 'remark-frontmatter';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import { getUserScripts, getPageTemplate, getAppTemplate } from '../../lib/templating-utils.js';
+import { getUserScripts, getPageLayout, getAppLayout } from '../../lib/layout-utils.js';
 import { requestAsObject } from '../../lib/resource-utils.js';
 import unified from 'unified';
 import { Worker } from 'worker_threads';
+import htmlparser from 'node-html-parser';
 
 class StandardHtmlResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -26,12 +27,12 @@ class StandardHtmlResource extends ResourceInterface {
     this.contentType = 'text/html';
   }
 
-  async shouldServe(url) {
+  async shouldServe(url, request) {
     const { protocol, pathname } = url;
     const hasMatchingPageRoute = this.compilation.graph.find(node => node.route === pathname);
     const isSPA = this.compilation.graph.find(node => node.isSPA) && pathname.indexOf('.') < 0;
 
-    return protocol.startsWith('http') && (hasMatchingPageRoute || isSPA);
+    return protocol.startsWith('http') && (hasMatchingPageRoute || (isSPA && request.headers.get('Accept').indexOf('text/html') >= 0));
   }
 
   async serve(url, request) {
@@ -44,18 +45,17 @@ class StandardHtmlResource extends ResourceInterface {
     const filePath = !matchingRoute.external ? matchingRoute.path : '';
     const isMarkdownContent = (matchingRoute?.filename || '').split('.').pop() === 'md';
 
-    let customImports = [];
     let body = '';
-    let title = null;
-    let template = null;
-    let frontMatter = {};
+    let title = matchingRoute.title || null;
+    let layout = matchingRoute.layout || null;
+    let frontMatter = matchingRoute.data || {};
+    let customImports = matchingRoute.imports || [];
     let ssrBody;
-    let ssrTemplate;
-    let ssrFrontmatter;
+    let ssrLayout;
     let processedMarkdown = null;
 
     if (matchingRoute.external) {
-      template = matchingRoute.template || template;
+      layout = matchingRoute.layout || layout;
     }
 
     if (isMarkdownContent) {
@@ -94,8 +94,8 @@ class StandardHtmlResource extends ResourceInterface {
           title = frontMatter.title;
         }
 
-        if (frontMatter.template) {
-          template = frontMatter.template;
+        if (frontMatter.layout) {
+          layout = frontMatter.layout;
         }
 
         if (frontMatter.imports) {
@@ -112,27 +112,12 @@ class StandardHtmlResource extends ResourceInterface {
         const worker = new Worker(new URL('../../lib/ssr-route-worker.js', import.meta.url));
 
         worker.on('message', (result) => {
-          if (result.template) {
-            ssrTemplate = result.template;
+          if (result.layout) {
+            ssrLayout = result.layout;
           }
+
           if (result.body) {
             ssrBody = result.body;
-          }
-          if (result.frontmatter) {
-            ssrFrontmatter = result.frontmatter;
-
-            if (ssrFrontmatter.title) {
-              title = ssrFrontmatter.title;
-              frontMatter.title = ssrFrontmatter.title;
-            }
-
-            if (ssrFrontmatter.template) {
-              template = ssrFrontmatter.template;
-            }
-
-            if (ssrFrontmatter.imports) {
-              customImports = customImports.concat(ssrFrontmatter.imports);
-            }
           }
           resolve();
         });
@@ -153,20 +138,13 @@ class StandardHtmlResource extends ResourceInterface {
       });
     }
 
-    // get context plugins
-    const contextPlugins = this.compilation.config.plugins.filter((plugin) => {
-      return plugin.type === 'context';
-    }).map((plugin) => {
-      return plugin.provider(this.compilation);
-    });
-
     if (isSpaRoute) {
       body = await fs.readFile(new URL(`./${isSpaRoute.filename}`, userWorkspace), 'utf-8');
     } else {
-      body = ssrTemplate ? ssrTemplate : await getPageTemplate(filePath, context, template, contextPlugins);
+      body = ssrLayout ? ssrLayout : await getPageLayout(filePath, this.compilation, layout);
     }
 
-    body = await getAppTemplate(body, context, customImports, contextPlugins, config.devServer.hud, title);
+    body = await getAppLayout(body, this.compilation, customImports, title);
     body = await getUserScripts(body, this.compilation);
 
     if (processedMarkdown) {
@@ -190,7 +168,7 @@ class StandardHtmlResource extends ResourceInterface {
     } else if (matchingRoute.external) {
       body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
     } else if (ssrBody) {
-      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, ssrBody);
+      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, '$$$')}<!-- greenwood-ssr-end -->`);
     }
 
     if (interpolateFrontmatter) {
@@ -201,11 +179,9 @@ class StandardHtmlResource extends ResourceInterface {
       }
     }
 
-    // give the user something to see so they know it works, if they have no content
+    // clean up placeholder content-outlet
     if (body.indexOf('<content-outlet></content-outlet>') > 0) {
-      body = body.replace('<content-outlet></content-outlet>', `
-        <h1>Welcome to Greenwood!</h1>
-      `);
+      body = body.replace('<content-outlet></content-outlet>', '');
     }
 
     return new Response(body, {
@@ -225,12 +201,19 @@ class StandardHtmlResource extends ResourceInterface {
     const pageResources = this.compilation.graph.find(page => page.outputPath === pathname || page.route === pathname).resources;
     let body = await response.text();
 
+    const root = htmlparser.parse(body, {
+      script: true,
+      style: true
+    });
+
     for (const pageResource of pageResources) {
       const keyedResource = this.compilation.resources.get(pageResource);
-      const { contents, src, type, optimizationAttr, optimizedFileContents, optimizedFileName, rawAttributes } = keyedResource;
+      const { contents, src, type, optimizationAttr, optimizedFileContents, optimizedFileName } = keyedResource;
 
       if (src) {
         if (type === 'script') {
+          const tag = root.querySelectorAll('script').find(script => script.getAttribute('src') === src);
+
           if (!optimizationAttr && optimization === 'default') {
             const optimizedFilePath = `${basePath}/${optimizedFileName}`;
 
@@ -240,17 +223,19 @@ class StandardHtmlResource extends ResourceInterface {
               <link rel="modulepreload" href="${optimizedFilePath}" as="script">
             `);
           } else if (optimizationAttr === 'inline' || optimization === 'inline') {
-            const isModule = rawAttributes.indexOf('type="module') >= 0 ? ' type="module"' : '';
+            const isModule = tag.rawAttrs.indexOf('type="module') >= 0 ? ' type="module"' : '';
 
-            body = body.replace(`<script ${rawAttributes}></script>`, `
+            body = body.replace(`<script ${tag.rawAttrs}></script>`, `
               <script ${isModule}>
                 ${optimizedFileContents.replace(/\.\//g, `${basePath}/`).replace(/\$/g, '$$$')}
               </script>
             `);
           } else if (optimizationAttr === 'static' || optimization === 'static') {
-            body = body.replace(`<script ${rawAttributes}></script>`, '');
+            body = body.replace(`<script ${tag.rawAttrs}></script>`, '');
           }
         } else if (type === 'link') {
+          const tag = root.querySelectorAll('link').find(link => link.getAttribute('href') === src);
+
           if (!optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
             const optimizedFilePath = `${basePath}/${optimizedFileName}`;
 
@@ -264,11 +249,11 @@ class StandardHtmlResource extends ResourceInterface {
             // when pre-rendering, puppeteer normalizes everything to <link .../>
             // but if not using pre-rendering, then it could come out as <link ...></link>
             // not great, but best we can do for now until #742
-            body = body.replace(`<link ${rawAttributes}>`, `
+            body = body.replace(`<link ${tag.rawAttrs}>`, `
               <style>
                 ${optimizedFileContents}
               </style>
-            `).replace(`<link ${rawAttributes}/>`, `
+            `).replace(`<link ${tag.rawAttrs}/>`, `
               <style>
                 ${optimizedFileContents}
               </style>
@@ -277,8 +262,10 @@ class StandardHtmlResource extends ResourceInterface {
         }
       } else {
         if (type === 'script') {
+          const tag = root.querySelectorAll('script').find(script => script.innerHTML === contents);
+
           if (optimizationAttr === 'static' || optimization === 'static') {
-            body = body.replace(`<script ${rawAttributes}>${contents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}</script>`, '');
+            body = body.replace(`<script ${tag.rawAttrs}>${contents.replace(/\.\//g, '/').replace(/\$/g, '$$$')}</script>`, '');
           } else if (optimizationAttr === 'none') {
             body = body.replace(contents, contents.replace(/\.\//g, `${basePath}/`).replace(/\$/g, '$$$'));
           } else {
@@ -289,10 +276,6 @@ class StandardHtmlResource extends ResourceInterface {
         }
       }
     }
-
-    // TODO clean up lit-polyfill
-    // https://github.com/ProjectEvergreen/greenwood/issues/728
-    body = body.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
 
     return new Response(body);
   }

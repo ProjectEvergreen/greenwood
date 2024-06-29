@@ -17,13 +17,6 @@
  *
  * User Workspace
  * src/
- *   api/
- *     fragment.js
- *     greeting.js
- *     missing.js
- *     nothing.js
- *     submit-form-data.js
- *     submit-json.js
  *   assets/
  *     data.json
  *     favicon.ico
@@ -38,7 +31,16 @@
  *     card.js
  *     header.js
  *   pages/
- *     index.html
+ *     api/
+ *       nested/
+ *         endpoint.js
+ *       fragment.js
+ *       greeting.js
+ *       missing.js
+ *       nothing.js
+ *       submit-form-data.js
+ *       submit-json.js
+*      index.html
  *   styles/
  *     main.css
  * package.json
@@ -100,6 +102,10 @@ describe('Develop Greenwood With: ', function() {
       const litPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit/package.json`,
         `${outputPath}/node_modules/lit/`
+      );
+      const litSsrPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit-labs/ssr-dom-shim/package.json`,
+        `${outputPath}/node_modules/@lit-labs/ssr-dom-shim/`
       );
       const litElement = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-element/*.js`,
@@ -379,6 +385,7 @@ describe('Develop Greenwood With: ', function() {
         ...getSetupFiles(outputPath),
         ...lit,
         ...litPackageJson,
+        ...litSsrPackageJson,
         ...litDirectives,
         ...litDecorators,
         ...litElementPackageJson,
@@ -1279,6 +1286,31 @@ describe('Develop Greenwood With: ', function() {
 
       it('should return the expected response message', function(done) {
         expect(body).to.equal(`Thank you ${param} for your submission!`);
+        done();
+      });
+    });
+
+    describe('Develop command nested API specific behaviors', function() {
+      let response = {};
+      let body;
+
+      before(async function() {
+        response = await fetch(`${hostname}:${port}/api/nested/endpoint`);
+        body = await response.clone().text();
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it('should return the expected content type header', function(done) {
+        expect(response.headers.get('content-type')).to.equal('text/html');
+        done();
+      });
+
+      it('should return the expected response message', function(done) {
+        expect(body).to.contain('I am a nested API route');
         done();
       });
     });

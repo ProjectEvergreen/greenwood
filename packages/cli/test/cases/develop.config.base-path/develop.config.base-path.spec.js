@@ -20,13 +20,13 @@
  *
  * User Workspace
  * src/
- *   api/
- *     greeting.js
  *   assets/
  *     logo.png
  *   components/
  *     card.js
  *   pages/
+ *     api/
+ *       greeting.js
  *     index.html
  *     users.js
  *   styles/

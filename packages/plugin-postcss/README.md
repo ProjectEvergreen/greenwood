@@ -32,8 +32,6 @@ export default {
 }
 ```
 
-> 👉 _If you are using this along with [**plugin-import-css**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-css), make sure **plugin-postcss** comes first.  All non standard transformations need to come last._
-
 Optionally, to use your own PostCSS configuration, you'll need to create _two (2)_ config files in the root of your project, by which you can provide your own custom plugins / settings that you've installed.
 - _postcss.config.js_
 - _postcss.config.mjs_

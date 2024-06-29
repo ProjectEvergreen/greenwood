@@ -51,11 +51,10 @@ export default class FooterComponent extends HTMLElement {
 customElements.define('app-footer', FooterComponent);
 ```
 
-A couple notes:
-- For SSR and `prerender` use cases, [follow these steps](/docs/server-rendering/#custom-imports-experimental)
-- For client side / browser code specifically, it is recommended to append `?type=jsx`, e.g.
-  ```js
-  import '../path/to/footer.jsx?type=jsx';
-  ```
+### Notes
 
-> _The plan is to coalesce around [import assertions](https://github.com/ProjectEvergreen/greenwood/issues/923) in time for the v1.0 release so the same standard syntax can be used on the client and the server._
+- For SSR and `prerender` use cases, [follow these steps](/docs/server-rendering/#custom-imports-experimental)
+- For client side / browser code specifically, it is recommended to use import attributes syntax, e.g.
+  ```js
+  import '../path/to/footer.jsx' with { type: 'jsx' };
+  ```

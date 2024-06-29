@@ -50,8 +50,9 @@ const defaultConfig = {
   plugins: greenwoodPlugins,
   markdown: { plugins: [], settings: {} },
   prerender: false,
+  isolation: false,
   pagesDirectory: 'pages',
-  templatesDirectory: 'templates'
+  layoutsDirectory: 'layouts'
 };
 
 const readAndMergeConfig = async() => {
@@ -76,7 +77,7 @@ const readAndMergeConfig = async() => {
 
       if (hasConfigFile) {
         const userCfgFile = (await import(configUrl)).default;
-        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, templatesDirectory, interpolateFrontmatter } = userCfgFile;
+        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, layoutsDirectory, interpolateFrontmatter, isolation } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -204,10 +205,10 @@ const readAndMergeConfig = async() => {
           reject(`Error: provided pagesDirectory "${pagesDirectory}" is not supported.  Please make sure to pass something like 'docs/'`);
         }
 
-        if (templatesDirectory && typeof templatesDirectory === 'string') {
-          customConfig.templatesDirectory = templatesDirectory;
-        } else if (templatesDirectory) {
-          reject(`Error: provided templatesDirectory "${templatesDirectory}" is not supported.  Please make sure to pass something like 'layouts/'`);
+        if (layoutsDirectory && typeof layoutsDirectory === 'string') {
+          customConfig.layoutsDirectory = layoutsDirectory;
+        } else if (layoutsDirectory) {
+          reject(`Error: provided layoutsDirectory "${layoutsDirectory}" is not supported.  Please make sure to pass something like 'layouts/'`);
         }
 
         if (prerender !== undefined) {
@@ -221,6 +222,14 @@ const readAndMergeConfig = async() => {
         // SPA should _not_ prerender unless if user has specified prerender should be true
         if (prerender === undefined && isSPA) {
           customConfig.prerender = false;
+        }
+
+        if (isolation !== undefined) {
+          if (typeof isolation === 'boolean') {
+            customConfig.isolation = isolation;
+          } else {
+            reject(`Error: greenwood.config.js isolation must be a boolean; true or false.  Passed value was typeof: ${typeof staticRouter}`);
+          }
         }
 
         if (staticRouter !== undefined) {
