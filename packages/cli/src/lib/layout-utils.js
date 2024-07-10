@@ -229,12 +229,11 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
       ...[...(pageRoot && pageRoot.querySelectorAll('head style')) || []],
       ...customImports.filter(resource => resource.split(' ')[0].split('.').pop() === 'css')
         .map((resource) => {
-          console.log({ resource });
           const [href, ...attributes] = resource.split(' ');
           const attrs = attributes?.length > 0
             ? attributes.join(' ')
             : '';
-          console.log({ href, attributes, attrs });
+
           return `<link rel="stylesheet" href="${href}" ${attrs}></link>`;
         })
     ].join('\n');
@@ -244,17 +243,14 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
       ...[...(pageRoot && pageRoot.querySelectorAll('head script')) || []],
       ...customImports.filter(resource => resource.split(' ')[0].split('.').pop() === 'js')
         .map((resource) => {
-          console.log({ resource });
           const [src, ...attributes] = resource.split(' ');
           const attrs = attributes?.length > 0
             ? attributes.join(' ')
             : '';
-          console.log({ src, attributes, attrs });
+
           return `<script src="${src}" ${attrs}></script>`;
         })
     ].join('\n');
-
-    console.log({ mergedStyles });
 
     const finalBody = pageLayoutContents
       ? appBody.replace(/<page-outlet><\/page-outlet>/, pageBody)
