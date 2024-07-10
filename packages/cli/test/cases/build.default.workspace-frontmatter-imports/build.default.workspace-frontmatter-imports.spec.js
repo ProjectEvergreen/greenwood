@@ -110,6 +110,16 @@ describe('Build Greenwood With: ', function() {
         it('should output a heading tag from the custom element', function() {
           expect(html).to.contain('<h3>My Counter</h3>');
         });
+
+        it('should have expected attributes on the `<link>` tag from frontmatter imports', async function() {
+          const link = Array.from(dom.window.document
+            .querySelectorAll('head link'))
+            .find(link => link.getAttribute('href')?.startsWith('/components/counter/'));
+
+          expect(link.getAttribute('data-gwd-opt')).to.equal(null);
+          expect(link.getAttribute('foo')).to.equal('bar');
+          expect(link.getAttribute('baz')).to.equal('bar');
+        });
       });
 
       describe('Custom Multihyphen component', () => {
@@ -126,6 +136,15 @@ describe('Build Greenwood With: ', function() {
 
         it('should have the expected prerendered content', function() {
           expect(html).to.contain('I have multiple hyphens in my tag name!');
+        });
+
+        it('should have expected attributes on the `<script>` tag from frontmatter imports', async function() {
+          const script = Array.from(dom.window.document
+            .querySelectorAll('head script'))
+            .find(script => script.getAttribute('src')?.startsWith('/multi-hyphen'));
+
+          expect(script.getAttribute('foo')).to.equal('bar');
+          expect(script.getAttribute('type')).to.equal('module');
         });
       });
     });
