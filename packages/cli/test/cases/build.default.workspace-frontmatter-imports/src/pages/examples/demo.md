@@ -2,7 +2,7 @@
 title: Demo Page
 imports:
   - /components/counter/counter.js
-  - /components/counter/counter.css data-gwd-opt="none" foo="bar" baz="bar"
+  - /components/counter/counter.css data-gwd-opt='none' foo='bar' baz='bar'
   - /components/multi-hyphen/multi-hyphen.js type="module" foo="bar"
 ---
 
