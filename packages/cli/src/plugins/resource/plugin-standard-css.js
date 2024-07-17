@@ -49,23 +49,26 @@ function bundleCss(body, url, compilation) {
           barePath = barePath.replace('/', '');
         }
 
-        const locationUrl = barePath.startsWith('node_modules')
+        const locationUrl = barePath.indexOf('node_modules/') >= 0
           ? new URL(`./${barePath}`, projectDirectory)
           : new URL(`./${barePath}`, userWorkspace);
 
         if (fs.existsSync(locationUrl)) {
+          const isDev = process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line no-underscore-dangle
           const hash = hashString(fs.readFileSync(locationUrl, 'utf-8'));
           const ext = barePath.split('.').pop();
-          const hashedRoot = barePath.replace(`.${ext}`, `.${hash}.${ext}`);
+          const hashedRoot = isDev ? barePath : barePath.replace(`.${ext}`, `.${hash}.${ext}`);
 
-          fs.mkdirSync(new URL(`./${path.dirname(barePath)}/`, outputDir), {
-            recursive: true
-          });
+          if (!isDev) {
+            fs.mkdirSync(new URL(`./${path.dirname(hashedRoot)}/`, outputDir), {
+              recursive: true
+            });
 
-          fs.promises.copyFile(
-            locationUrl,
-            new URL(`./${hashedRoot}`, outputDir)
-          );
+            fs.promises.copyFile(
+              locationUrl,
+              new URL(`./${hashedRoot}`, outputDir)
+            );
+          }
 
           optimizedCss += `url('${basePath}${hashedRoot}')`;
         } else {
@@ -311,7 +314,7 @@ class StandardCssResource extends ResourceInterface {
   }
 
   async intercept(url, request, response) {
-    let body = await response.text();
+    let body = bundleCss(await response.text(), url, this.compilation);
     let headers = {};
 
     if (request.headers.get('Accept')?.indexOf('text/javascript') >= 0 && !url.searchParams.has('type')) {
@@ -322,23 +325,6 @@ class StandardCssResource extends ResourceInterface {
     }
 
     return new Response(body, { headers });
-  }
-
-  async shouldOptimize(url, response) {
-    const { protocol, pathname, searchParams } = url;
-    const isValidCss = pathname.split('.').pop() === this.extensions[0]
-      && protocol === 'file:'
-      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0
-      && searchParams.get('type') !== 'css';
-
-    return this.compilation.config.optimization !== 'none' && isValidCss;
-  }
-
-  async optimize(url, response) {
-    const body = await response.text();
-    const optimizedBody = bundleCss(body, url, this.compilation);
-
-    return new Response(optimizedBody);
   }
 }
 
