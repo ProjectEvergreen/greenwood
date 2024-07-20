@@ -22,14 +22,27 @@ function greenwoodResourceLoader (compilation, browser = false) {
   return {
     name: 'greenwood-resource-loader',
     async resolveId(id, importer) {
-      const normalizedId = cleanRollupId(id); // idUrl.pathname;
+      const normalizedId = cleanRollupId(id);
       const { userWorkspace } = compilation.context;
 
+      // if (normalizedId.startsWith('.') && !normalizedId.startsWith(projectDirectory.pathname)) {
+      //   const prefix = normalizedId.startsWith('..') ? './' : '';
+      //   const userWorkspaceUrl = new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
+      //   const external = (userWorkspaceUrl.pathname.endsWith('.css') || userWorkspaceUrl.pathname.endsWith('.json')) && browser && !userWorkspaceUrl.searchParams.has('type');
+
+      //   // console.log({ userWorkspaceUrl, external });
+      //   if (await checkResourceExists(userWorkspaceUrl)) {
+      //     return {
+      //       id: normalizePathnameForWindows(userWorkspaceUrl),
+      //       external
+      //     };
+      //   }
+      // }
       if (normalizedId.startsWith('.')) {
         const absoluteUrl = new URL(normalizedId, `file://${importer}`);
         const isUserWorkspaceUrl = absoluteUrl.pathname.startsWith(userWorkspace.pathname);
-        const external = (absoluteUrl.pathname.endsWith('.css') || absoluteUrl.pathname.endsWith('.json')) && browser;
-
+        const external = (absoluteUrl.pathname.endsWith('.css') || absoluteUrl.pathname.endsWith('.json')) && browser && !absoluteUrl.searchParams.has('type');
+        // console.log({ absoluteUrl, external });
         if (isUserWorkspaceUrl && await checkResourceExists(absoluteUrl)) {
           return {
             id: normalizePathnameForWindows(absoluteUrl),
@@ -38,7 +51,7 @@ function greenwoodResourceLoader (compilation, browser = false) {
         } else {
           const prefix = normalizedId.startsWith('..') ? './' : '';
           const userWorkspaceUrl = new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
-
+          // console.log({ userWorkspaceUrl });
           if (await checkResourceExists(userWorkspaceUrl)) {
             return {
               id: normalizePathnameForWindows(userWorkspaceUrl),
@@ -431,20 +444,20 @@ function greenwoodSyncImportAttributes(compilation) {
       // TODO do we need to run all resource lifecycles  here?
       const that = this;
       for (const bundle in bundles) {
-        // console.log({ bundle });
+        //  console.log({ bundle });
 
         if (!bundle.endsWith('.map')) {
-          console.log('sync import attributes', { bundle });
+          // console.log('sync import attributes', { bundle });
           const { code } = bundles[bundle];
           const ast = this.parse(code);
 
           walk.simple(ast, {
             // TOOO should really get import attributes through the actual AST, not sure if possible though...
             ImportDeclaration(node) {
-              console.log('ImportDeclaration ########', node.source.raw);
-              const statement = code.slice(node.start, node.end);
+              // console.log('ImportDeclaration ########', node.source.raw);
+              // const statement = code.slice(node.start, node.end);
               const { value } = node.source;
-              console.log({ value, statement });
+              // console.log({ value, statement });
 
               // TODO will this also happen to module.css, need to filter somehow?
               if (value.endsWith('.css') || value.endsWith('.json')) {
@@ -455,7 +468,7 @@ function greenwoodSyncImportAttributes(compilation) {
                 // check for app level assets, like say a shared theme.css
                 compilation.resources.forEach((resource) => {
                   if (resource.sourcePathURL.pathname === new URL(value, compilation.context.projectDirectory).pathname) {
-                    // console.log('$$$ found pre-bundled CSS!!!', resource.optimizedFileName);
+                    //  console.log('$$$ found pre-bundled CSS!!!', resource.optimizedFileName);
                     bundles[bundle].code = bundles[bundle].code.replace(value, `/${resource.optimizedFileName}`);
                     preBundled = true;
                   }
@@ -463,14 +476,14 @@ function greenwoodSyncImportAttributes(compilation) {
 
                 // otherwise emit "one-offs" as Rollup assets
                 if (!preBundled) {
-                  console.log('#### not pre bundled', { value, bundle });
+                  // console.log('#### not pre bundled', { value, bundle });
                   const source = fs.readFileSync(new URL(value, compilation.context.projectDirectory), 'utf-8');
                   const type = 'asset';
                   const emitConfig = { type, name: value.split('/').pop(), source, needsCodeReference: true };
                   const ref = that.emitFile(emitConfig);
                   const importRef = `import.meta.ROLLUP_ASSET_URL_${ref}`;
 
-                  console.log({ importRef });
+                  // console.log({ importRef });
                   bundles[bundle].code = bundles[bundle].code.replace(value, `/${importRef}`);
                   if (!unbundledAssetsRefMapper[emitConfig.name]) {
                     unbundledAssetsRefMapper[emitConfig.name] = {
@@ -495,21 +508,21 @@ function greenwoodSyncImportAttributes(compilation) {
     // since it seems that Rollup will not do it after the bundling hook
     // https://github.com/rollup/rollup/blob/v3.29.4/docs/plugin-development/index.md#generatebundle
     writeBundle(options, bundles) {
-      console.log('WRITE BUNDLE', { unbundledAssetsRefMapper });
+      // console.log('WRITE BUNDLE', { unbundledAssetsRefMapper });
       for (const asset in unbundledAssetsRefMapper) {
-        console.log({ asset });
-        const ext = asset.split('.').pop();
-        const key = asset.replace(`.${ext}`, '');
+        // console.log({ asset });
+        // const ext = asset.split('.').pop();
+        // const key = asset.replace(`.${ext}`, '');
 
         for (const bundle in bundles) {
-          const { name, fileName } = bundles[bundle];
+          const { fileName } = bundles[bundle];
           const hash = fileName.split('.')[fileName.split('.').length - 2];
 
           // console.log(bundles[bundle])
-          console.log('CHECKING....', { bundle, fileName, name, key });
+          // console.log('CHECKING....', { bundle, fileName, name, key });
 
           if (fileName.replace(`.${hash}`, '') === asset) {
-            console.log('MONEY!!!!!!', unbundledAssetsRefMapper[asset], fileName);
+            // console.log('MONEY!!!!!!', unbundledAssetsRefMapper[asset], fileName);
             unbundledAssetsRefMapper[asset].importers.forEach((importer, idx) => {
               let contents = fs.readFileSync(new URL(`./${importer}`, compilation.context.outputDir), 'utf-8');
 
@@ -519,7 +532,7 @@ function greenwoodSyncImportAttributes(compilation) {
             });
           }
         }
-        console.log('====================');
+        // console.log('====================');
       }
     }
   };
