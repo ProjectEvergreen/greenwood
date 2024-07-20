@@ -30,6 +30,7 @@ import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { Runner } from 'gallinago';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
@@ -159,9 +160,6 @@ describe('Serve Greenwood With: ', function() {
 
   after(function() {
     runner.stopCommand();
-    runner.teardown([
-      path.join(outputPath, '.greenwood'),
-      path.join(outputPath, 'node_modules')
-    ]);
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

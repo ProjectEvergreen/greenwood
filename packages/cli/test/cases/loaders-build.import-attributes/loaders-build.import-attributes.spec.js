@@ -27,6 +27,7 @@ import fs from 'fs';
 import glob from 'glob-promise';
 import path from 'path';
 import { Runner } from 'gallinago';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
@@ -62,16 +63,13 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected output from importing hero.css as a Constructable Stylesheet', function() {
         const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
 
-        expect(scriptContents).to.contain('const e=new CSSStyleSheet;e.replaceSync(":host {   color: red; }");');
+        expect(scriptContents).to.contain('import e from"/card.bcdce3a3.css"with{type:"css"}');
       });
     });
   });
 
   after(function() {
     runner.stopCommand();
-    runner.teardown([
-      path.join(outputPath, '.greenwood'),
-      path.join(outputPath, 'node_modules')
-    ]);
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

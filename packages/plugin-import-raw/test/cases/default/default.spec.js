@@ -71,7 +71,7 @@ describe('Build Greenwood With: ', function() {
         const contents = fs.readFileSync(scripts[0], 'utf-8');
 
         // TODO minify CSS-in-JS?
-        expect(contents).to.contain('import from styles.css: p {   color: red; }"');
+        expect(contents).to.contain('import from styles.css: ${s}');
       });
     });
   });

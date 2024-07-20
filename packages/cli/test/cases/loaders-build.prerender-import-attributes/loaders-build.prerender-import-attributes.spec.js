@@ -69,7 +69,7 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected output from importing hero.css as a Constructable Stylesheet', function() {
         const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
 
-        expect(scriptContents).to.contain('const t=new CSSStyleSheet;t.replaceSync(":host {   text-align: center');
+        expect(scriptContents).to.contain('import e from"/hero.93e8cf36.css"with{type:"css"}');
       });
     });
 
