@@ -13,6 +13,8 @@ function cleanRollupId(id) {
 }
 
 function greenwoodResourceLoader (compilation, browser = false) {
+  // ConstructableStylesheets, JSON Modules
+  const externalizedResources = ['css', 'json'];
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
   }).map((plugin) => {
@@ -25,39 +27,25 @@ function greenwoodResourceLoader (compilation, browser = false) {
       const normalizedId = cleanRollupId(id);
       const { userWorkspace } = compilation.context;
 
-      // if (normalizedId.startsWith('.') && !normalizedId.startsWith(projectDirectory.pathname)) {
-      //   const prefix = normalizedId.startsWith('..') ? './' : '';
-      //   const userWorkspaceUrl = new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
-      //   const external = (userWorkspaceUrl.pathname.endsWith('.css') || userWorkspaceUrl.pathname.endsWith('.json')) && browser && !userWorkspaceUrl.searchParams.has('type');
-
-      //   // console.log({ userWorkspaceUrl, external });
-      //   if (await checkResourceExists(userWorkspaceUrl)) {
-      //     return {
-      //       id: normalizePathnameForWindows(userWorkspaceUrl),
-      //       external
-      //     };
-      //   }
-      // }
+      // check for non bare paths and resolve them to the user's workspace
+      // or Greenwood's scratch dir, like when bundling inline <script> tags
       if (normalizedId.startsWith('.')) {
-        const absoluteUrl = new URL(normalizedId, `file://${importer}`);
-        const isUserWorkspaceUrl = absoluteUrl.pathname.startsWith(userWorkspace.pathname);
-        const external = (absoluteUrl.pathname.endsWith('.css') || absoluteUrl.pathname.endsWith('.json')) && browser && !absoluteUrl.searchParams.has('type');
-        // console.log({ absoluteUrl, external });
-        if (isUserWorkspaceUrl && await checkResourceExists(absoluteUrl)) {
+        const importerUrl = new URL(normalizedId, `file://${importer}`);
+        const extension = importerUrl.pathname.split('.').pop();
+        const external = externalizedResources.includes(extension) && browser && !importerUrl.searchParams.has('type');
+        const isUserWorkspaceUrl = importerUrl.pathname.startsWith(userWorkspace.pathname);
+        const prefix = normalizedId.startsWith('..') ? './' : '';
+        // if its not in the users workspace, we clean up the dot-dots and check that against the user's workspace
+        const resolvedUrl = isUserWorkspaceUrl
+          ? importerUrl
+          : new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
+
+        // console.log({ normalizedId, importerUrl, external });
+        if (await checkResourceExists(resolvedUrl)) {
           return {
-            id: normalizePathnameForWindows(absoluteUrl),
+            id: normalizePathnameForWindows(resolvedUrl),
             external
           };
-        } else {
-          const prefix = normalizedId.startsWith('..') ? './' : '';
-          const userWorkspaceUrl = new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
-          // console.log({ userWorkspaceUrl });
-          if (await checkResourceExists(userWorkspaceUrl)) {
-            return {
-              id: normalizePathnameForWindows(userWorkspaceUrl),
-              external
-            };
-          }
         }
       }
     },
