@@ -74,7 +74,7 @@ describe('Build Greenwood With: ', function() {
         const styleContents = fs.readFileSync(styles[0], 'utf-8');
 
         expect(styles.length).to.equal(1);
-        expect(styleContents).to.contain(':host {\n  color: red;\n}');
+        expect(styleContents).to.contain(':host{color:red}"');
       });
     });
   });

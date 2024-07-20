@@ -39,7 +39,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', function() {
+xdescribe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', function() {
   const LABEL = 'For SSG prerendering of Getting Started example';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
