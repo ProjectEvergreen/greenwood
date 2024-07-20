@@ -21,18 +21,57 @@ function greenwoodResourceLoader (compilation) {
 
   return {
     name: 'greenwood-resource-loader',
-    async resolveId(id) {
+    async resolveId(id, importer) {
       const normalizedId = cleanRollupId(id); // idUrl.pathname;
       const { projectDirectory, userWorkspace } = compilation.context;
 
-      if (normalizedId.startsWith('.') && !normalizedId.startsWith(projectDirectory.pathname)) {
-        const prefix = normalizedId.startsWith('..') ? './' : '';
-        const userWorkspaceUrl = new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
+      // using importer
+      if (normalizedId.startsWith('.')) {
+        console.log({ normalizedId, importer });
+        // const prefix = normalizedId.startsWith('..') ? './' : '';
+        // const userWorkspaceUrl = new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
+        const absoluteUrl = new URL(normalizedId, `file://${importer}?type=raw`)
+        const isUserWorkspaceUrl = absoluteUrl.pathname.startsWith(userWorkspace.pathname);
+        const external = absoluteUrl.pathname.endsWith('.css') || absoluteUrl.pathname.endsWith('.json');
 
-        if (await checkResourceExists(userWorkspaceUrl)) {
-          return normalizePathnameForWindows(userWorkspaceUrl);
+        console.log('1111', { id, absoluteUrl, external });
+
+        if (isUserWorkspaceUrl && await checkResourceExists(absoluteUrl)) {
+          return {
+            id: normalizePathnameForWindows(absoluteUrl),
+            external
+          };
         }
       }
+
+      // downstream implementation
+      // if (normalizedId.startsWith('.') && !normalizedId.startsWith(projectDirectory.pathname)) {
+      //   const prefix = normalizedId.startsWith('..') ? './' : '';
+      //   const userWorkspaceUrl = new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
+
+      //   if (await checkResourceExists(new URL(id, `file://${cleanRollupId(importer)}`))) {
+      //     const external = userWorkspaceUrl.pathname.endsWith('.css') || userWorkspaceUrl.pathname.endsWith('.json');
+      //     const finalId = normalizePathnameForWindows(new URL(id, `file://${cleanRollupId(importer)}`));
+
+      //     console.log('1111', { id, importer, userWorkspaceUrl, external });
+      //     console.log({ finalId })
+
+      //     return {
+      //       id: finalId,
+      //       external
+      //     };
+      //   }
+      // }
+
+      // original
+      // if (normalizedId.startsWith('.') && !normalizedId.startsWith(projectDirectory.pathname)) {
+      //   const prefix = normalizedId.startsWith('..') ? './' : '';
+      //   const userWorkspaceUrl = new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
+
+      //   if (await checkResourceExists(userWorkspaceUrl)) {
+      //     return normalizePathnameForWindows(userWorkspaceUrl);
+      //   }
+      // }
     },
     async load(id) {
       let idUrl = new URL(`file://${cleanRollupId(id)}`);
@@ -364,6 +403,7 @@ function greenwoodImportMetaUrl(compilation) {
       };
     },
 
+    // sync bundles from API routes to the corresponding API route's entry in the manifest (useful for adapters)
     generateBundle(options, bundles) {
       for (const bundle in bundles) {
         const bundleExtension = bundle.split('.').pop();
@@ -398,6 +438,120 @@ function greenwoodImportMetaUrl(compilation) {
   };
 }
 
+// sync externalized import attributes usages within browser scripts
+// to corresponding static bundles, instead of being bundled and shipped as JavaScript
+// e.g. import theme from './theme.css' with { type: 'css' }
+//   -> import theme from './theme.ab345dcc.css' with { type: 'css' }
+//
+// this includes:
+// - replace all instances of assert with with (until Rollup supports with keyword)
+// - sync externalized import attribute paths with bundled CSS paths
+function greenwoodSyncImportAttributes(compilation) {
+  const unbundledAssetsRefMapper = {};
+
+  return {
+    name: 'greenwood-sync-import-attributes',
+
+    generateBundle(options, bundles) {
+      // TODO do we need to run all resource lifecycles  here?
+      const that = this;
+      for (const bundle in bundles) {
+        // console.log({ bundle });
+
+        if (!bundle.endsWith('.map')) {
+          console.log('sync import attributes', { bundle });
+          const { code } = bundles[bundle];
+          const ast = this.parse(code);
+
+          walk.simple(ast, {
+            // TOOO should really get import attributes through the actual AST, not sure if possible though...
+            ImportDeclaration(node) {
+              console.log('ImportDeclaration ########', node.source.raw);
+              const statement = code.slice(node.start, node.end);
+              const { value } = node.source;
+              console.log({ value, statement });
+
+              // TODO will this also happen to module.css, need to filter somehow?
+              if (value.endsWith('.css') || value.endsWith('.json')) {
+                // Rollup currently emits externals with assert keyword
+                let preBundled = false;
+                bundles[bundle].code = bundles[bundle].code.replace(/assert{/g, 'with{');
+
+                // check for app level assets, like say a shared theme.css
+                compilation.resources.forEach((resource, key) => {
+                  if (resource.sourcePathURL.pathname === new URL(value, compilation.context.projectDirectory).pathname) {
+                    // console.log('$$$ found pre-bundled CSS!!!', resource.optimizedFileName);
+                    bundles[bundle].code = bundles[bundle].code.replace(value, `/${resource.optimizedFileName}`);
+                    preBundled = true;
+                  }
+                });
+
+                // otherwise emit "one-offs" as Rollup assets
+                if (!preBundled) {
+                  console.log('#### not pre bundled', { value, bundle });
+                  const source = fs.readFileSync(new URL(value, compilation.context.projectDirectory), 'utf-8')
+                  const type = 'asset';
+                  const emitConfig = { type, name: value.split('/').pop(), source, needsCodeReference: true };
+                  const ref = that.emitFile(emitConfig);
+                  const importRef = `import.meta.ROLLUP_ASSET_URL_${ref}`;
+
+                  console.log({ importRef });
+                  bundles[bundle].code = bundles[bundle].code.replace(value, `/${importRef}`);
+                  if(!unbundledAssetsRefMapper[emitConfig.name]) {
+                    unbundledAssetsRefMapper[emitConfig.name] = {
+                      importers: [],
+                      importRefs: [],
+                    };
+                  }
+
+                  unbundledAssetsRefMapper[emitConfig.name] = {
+                    importers: [...unbundledAssetsRefMapper[emitConfig.name].importers, bundle],
+                    importRefs: [...unbundledAssetsRefMapper[emitConfig.name].importRefs, importRef]
+                  };
+                }
+              }
+            }
+          });
+        }
+      }
+    },
+
+    // we use write bundle here to handle import.meta.ROLLUP_ASSET_URL_${ref} linking
+    // since it seems that Rollup will not do it after the bundling hook
+    // https://github.com/rollup/rollup/blob/v3.29.4/docs/plugin-development/index.md#generatebundle
+    writeBundle(options, bundles) {
+      console.log('WRITE BUNDLE', { unbundledAssetsRefMapper });
+      for(const asset in unbundledAssetsRefMapper) {
+        console.log({ asset });
+        const ext = asset.split('.').pop();
+        const key = asset.replace(`.${ext}`, '');
+
+        for (const bundle in bundles) {
+          const { name, fileName } = bundles[bundle];
+          const hash = fileName.split('.')[fileName.split('.').length - 2];
+
+          // console.log(bundles[bundle])
+          console.log('CHECKING....', { bundle, fileName, name, key })
+
+          if(fileName.replace(`.${hash}`, '') === asset) {
+            console.log('MONEY!!!!!!', unbundledAssetsRefMapper[asset], fileName);
+            unbundledAssetsRefMapper[asset].importers.forEach((importer, idx) => {
+              let contents = fs.readFileSync(new URL(`./${importer}`, compilation.context.outputDir), 'utf-8');
+
+              contents = contents.replace(unbundledAssetsRefMapper[asset].importRefs[idx], fileName);
+  
+              fs.writeFileSync(new URL(`./${importer}`, compilation.context.outputDir), contents)
+            })
+          }
+        }
+        console.log('====================')
+      }
+    }
+  }
+  
+}
+
+// TODO should rename this to something like getRollupConfigForBrowser
 const getRollupConfigForScriptResources = async (compilation) => {
   const { outputDir } = compilation.context;
   const input = [...compilation.resources.values()]
@@ -416,11 +570,13 @@ const getRollupConfigForScriptResources = async (compilation) => {
       dir: normalizePathnameForWindows(outputDir),
       entryFileNames: '[name].[hash].js',
       chunkFileNames: '[name].[hash].js',
+      assetFileNames: '[name].[hash].[ext]',
       sourcemap: true
     },
     plugins: [
       greenwoodResourceLoader(compilation),
       greenwoodSyncPageResourceBundlesPlugin(compilation),
+      greenwoodSyncImportAttributes(compilation),
       greenwoodImportMetaUrl(compilation),
       ...customRollupPlugins
     ],

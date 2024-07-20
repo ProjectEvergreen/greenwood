@@ -7,6 +7,7 @@ const resourcePlugins = config.plugins
   .filter(plugin => plugin.name !== 'plugin-node-modules:resource' && plugin.name !== 'plugin-user-workspace')
   .map(plugin => plugin.provider({
     context: {
+      outputDir: new URL(`file://${process.cwd()}/public`), // TODO get from config
       projectDirectory: new URL(`file://${process.cwd()}/`),
       scratchDir: new URL(`file://${process.cwd()}/.greenwood/`)
     },

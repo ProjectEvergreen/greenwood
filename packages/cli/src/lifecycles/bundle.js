@@ -353,10 +353,12 @@ const bundleCompilation = async (compilation) => {
 
       console.info('bundling static assets...');
 
+      // need styles bundled first for usage with import attributes syncing in Rollup
+      await bundleStyleResources(compilation, optimizeResourcePlugins);
+
       await Promise.all([
         await bundleApiRoutes(compilation),
-        await bundleScriptResources(compilation),
-        await bundleStyleResources(compilation, optimizeResourcePlugins)
+        await bundleScriptResources(compilation)
       ]);
 
       // bundleSsrPages depends on bundleScriptResources having run first
