@@ -9,7 +9,7 @@ const expect = chai.expect;
 describe('Develop Sitemap With: ', function() {
 
   const LABEL = 'Sitemap Resource plugin output';
-  
+
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://localhost';
@@ -59,7 +59,7 @@ describe('Develop Sitemap With: ', function() {
         const match = text.match(regex);
 
         expect(match[1]).to.equal('http://www.example.com/about/');
-        
+
       });
     });
   });

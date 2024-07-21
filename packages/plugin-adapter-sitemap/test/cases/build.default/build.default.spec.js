@@ -10,7 +10,7 @@
  *
  * User Config
  * import { greenwoodPluginAdapterSitemap } from '../../../src/index.js';
-* 
+*
 * export default {
 *   plugins: [
 *     greenwoodPluginAdapterSitemap()
@@ -22,12 +22,9 @@
  */
 import chai from 'chai';
 import fs from 'fs/promises';
-import glob from 'glob-promise';
-import { JSDOM } from 'jsdom';
 import path from 'path';
 import { checkResourceExists } from '../../../../cli/src/lib/resource-utils.js';
-import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { normalizePathnameForWindows } from '../../../../cli/src/lib/resource-utils.js';
+import { getSetupFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath } from 'url';
 
@@ -37,8 +34,8 @@ describe('Build Greenwood With: ', function() {
   const LABEL = 'Sitemap Adapter plugin output';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const publicDir = path.join(outputPath, 'public')
-  
+  const publicDir = path.join(outputPath, 'public');
+
   let runner;
 
   before(function() {
@@ -56,7 +53,7 @@ describe('Build Greenwood With: ', function() {
 
     describe('sitemap.xml', function() {
       it('should be present', async function() {
-        const sitemapPath = path.join(publicDir, 'sitemap.xml')
+        const sitemapPath = path.join(publicDir, 'sitemap.xml');
 
         const itExists = await checkResourceExists(new URL(`file://${sitemapPath}`));
         expect(itExists).to.be.equal(true);
@@ -66,15 +63,13 @@ describe('Build Greenwood With: ', function() {
       it('should have the correct first element in the list', async function() {
         const sitemapPath = path.join(publicDir, 'sitemap.xml');
         const text = await fs.readFile(sitemapPath, 'utf8');
-    
-        
+
         const regex = /<loc>(http:\/\/www\.example\.com\/about\/)<\/loc>/;
         const match = text.match(regex);
 
         expect(match[1]).to.equal('http://www.example.com/about/');
       });
 
-      
     });
 
   });
