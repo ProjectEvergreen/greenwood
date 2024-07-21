@@ -79,11 +79,11 @@ describe('Build Greenwood With: ', function() {
 
   });
 
-  // after(function() {
-  //   runner.teardown([
-  //     path.join(outputPath, '.vercel'),
-  //     ...getOutputTeardownFiles(outputPath)
-  //   ]);
-  // });
+  after(function() {
+    runner.stopCommand();
+    runner.teardown([
+      path.join(outputPath, '.greenwood')
+    ]);
+  });
 
 });
