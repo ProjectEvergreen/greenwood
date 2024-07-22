@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 async function sitemapAdapter(compilation) {
   try {
@@ -16,23 +17,11 @@ async function sitemapAdapter(compilation) {
   }
 }
 
-const greenwoodPluginAdapterSitemap = (options = {}) => [{
-  type: 'adapter',
-  name: 'plugin-adapter-sitemap',
-  provider: (compilation) => {
-    return async () => {
-      await sitemapAdapter(compilation, options);
-    };
-  }
-}];
-
 /*
  *
  * Sitemap
  *
  */
-
-import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class SitemapResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -62,11 +51,19 @@ class SitemapResource extends ResourceInterface {
 
 }
 
-const greenwoodPluginResourceSitemap = {
+const greenwoodPluginSitemap = (options = {}) => [{
+  type: 'adapter',
+  name: 'plugin-adapter-sitemap',
+  provider: (compilation) => {
+    return async () => {
+      await sitemapAdapter(compilation, options);
+    };
+  }
+},
+{
   type: 'resource',
   name: 'plugin-sitemap',
   provider: (compilation, options) => new SitemapResource(compilation, options)
-};
+}];
 
-export { greenwoodPluginResourceSitemap };
-export { greenwoodPluginAdapterSitemap };
+export { greenwoodPluginSitemap };
