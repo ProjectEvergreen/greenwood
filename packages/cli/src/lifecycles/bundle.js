@@ -1,6 +1,6 @@
 /* eslint-disable max-depth, max-len */
 import fs from 'fs/promises';
-import { getRollupConfigForApis, getRollupConfigForScriptResources, getRollupConfigForSsr } from '../config/rollup.config.js';
+import { getRollupConfigForApiRoutes, getRollupConfigForBrowserScripts, getRollupConfigForSsrPages } from '../config/rollup.config.js';
 import { getAppLayout, getPageLayout, getUserScripts } from '../lib/layout-utils.js';
 import { hashString } from '../lib/hashing-utils.js';
 import { checkResourceExists, mergeResponse, normalizePathnameForWindows, trackResourcesForRoute } from '../lib/resource-utils.js';
@@ -216,7 +216,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
 
 async function bundleApiRoutes(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const apiConfigs = await getRollupConfigForApis(compilation);
+  const apiConfigs = await getRollupConfigForApiRoutes(compilation);
 
   if (apiConfigs.length > 0 && apiConfigs[0].input.length !== 0) {
     for (const configIndex in apiConfigs) {
@@ -314,7 +314,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
       input.push(normalizePathnameForWindows(entryFileUrl));
     }
 
-    const ssrConfigs = await getRollupConfigForSsr(compilation, input);
+    const ssrConfigs = await getRollupConfigForSsrPages(compilation, input);
 
     if (ssrConfigs.length > 0 && ssrConfigs[0].input !== '') {
       console.info('bundling dynamic pages...');
@@ -329,7 +329,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
 
 async function bundleScriptResources(compilation) {
   // https://rollupjs.org/guide/en/#differences-to-the-javascript-api
-  const [rollupConfig] = await getRollupConfigForScriptResources(compilation);
+  const [rollupConfig] = await getRollupConfigForBrowserScripts(compilation);
 
   if (rollupConfig.input.length !== 0) {
     const bundle = await rollup(rollupConfig);

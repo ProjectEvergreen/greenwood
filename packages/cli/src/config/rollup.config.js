@@ -528,7 +528,7 @@ function greenwoodSyncImportAttributes(compilation) {
 }
 
 // TODO should rename this to something like getRollupConfigForBrowser
-const getRollupConfigForScriptResources = async (compilation) => {
+const getRollupConfigForBrowserScripts = async (compilation) => {
   const { outputDir } = compilation.context;
   const input = [...compilation.resources.values()]
     .filter(resource => resource.type === 'script')
@@ -588,7 +588,7 @@ const getRollupConfigForScriptResources = async (compilation) => {
   }];
 };
 
-const getRollupConfigForApis = async (compilation) => {
+const getRollupConfigForApiRoutes = async (compilation) => {
   const { outputDir, pagesDir, apisDir } = compilation.context;
 
   return [...compilation.manifest.apis.values()]
@@ -642,7 +642,7 @@ const getRollupConfigForApis = async (compilation) => {
     });
 };
 
-const getRollupConfigForSsr = async (compilation, input) => {
+const getRollupConfigForSsrPages = async (compilation, input) => {
   const { outputDir } = compilation.context;
 
   return input.map((filepath) => {
@@ -694,7 +694,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
 };
 
 export {
-  getRollupConfigForApis,
-  getRollupConfigForScriptResources,
-  getRollupConfigForSsr
+  getRollupConfigForApiRoutes,
+  getRollupConfigForBrowserScripts,
+  getRollupConfigForSsrPages
 };
