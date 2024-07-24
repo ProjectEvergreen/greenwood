@@ -7,10 +7,12 @@ linkheadings: 3
 ---
 
 ## Styles and Assets
+
 **Greenwood** generally does not have any opinion on how you structure your site, aside from the pre-determined _pages/_ and (optional) _layouts/_ directories.  It supports all standard files that you can open in a web browser.
 
 
 ### Styles
+
 Styles can be done in any standards compliant way that will work in a browser.  So just as in HTML, you can do anything you need like below:
 
 ```html
@@ -30,7 +32,7 @@ Styles can be done in any standards compliant way that will work in a browser.  
       }
     </style>
 
-    <link rel="stylesheet" href="/styles/some-page.css"/>
+    <link rel="stylesheet" href="/styles/theme.css"/>
   </head>
 
   <body>
@@ -41,6 +43,38 @@ Styles can be done in any standards compliant way that will work in a browser.  
 ```
 
 > _In the above example, Greenwood will also bundle any `url` references in your CSS automatically._
+
+### Import Attributes
+
+[Import Attributes](https://github.com/tc39/proposal-import-attributes) with [Constructable Stylesheets and `adoptedStyleSheets`](https://web.dev/articles/constructable-stylesheets) are of course supported.  This can allow you to share styles across both Light and Shadow DOM boundaries.
+
+```js
+import themeSheet from '../styles/theme.css' with { type: 'css' };
+import cardSheet from './card.css' with { type: 'css' }
+
+export default class Card extends HTMLElement {
+  connectedCallback() {
+    if (!this.shadowRoot) {
+      const name = this.getAttribute('name') || 'World';
+      const template = document.createElement('template');
+
+      template.innerHTML = `
+        <div class="card">
+          <h2>Hello, ${name}!</h2>
+        </div>
+      `;
+
+      this.attachShadow({ mode: 'open' });
+      this.shadowRoot.appendChild(template.content.cloneNode(true));
+    }
+
+    this.shadowRoot.adoptedStyleSheets = [themeSheet, cardSheet];
+  }
+}
+
+customElements.define('x-card', Card);
+```
+
 
 ### Assets
 
