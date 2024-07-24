@@ -53,17 +53,28 @@ describe('Build Greenwood With: ', function() {
       runner.runCommand(cliPath, 'build');
     });
 
-    describe('Importing CSS w/ Constructable Stylesheets', function() {
+    describe('Custom Element Importing CSS w/ Constructable Stylesheet', function() {
+      const cssFileHash = 'bcdce3a3';
       let scripts;
+      let styles;
 
       before(async function() {
         scripts = await glob.promise(path.join(outputPath, 'public/card.*.js'));
+        styles = await glob.promise(path.join(outputPath, `public/card.${cssFileHash}.css`));
       });
 
-      it('should have the expected output from importing hero.css as a Constructable Stylesheet', function() {
+      it('should have the expected import attribute for importing card.css as a Constructable Stylesheet in the card.js bundle', function() {
         const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
 
-        expect(scriptContents).to.contain('import e from"/card.bcdce3a3.css"with{type:"css"}');
+        expect(scripts.length).to.equal(1);
+        expect(scriptContents).to.contain(`import e from"/card.${cssFileHash}.css"with{type:"css"}`);
+      });
+
+      it('should have the expected CSS output bundle for card.css', function() {
+        const styleContents = fs.readFileSync(styles[0], 'utf-8');
+
+        expect(styles.length).to.equal(1);
+        expect(styleContents).to.contain(':host {\n  color: red;\n}');
       });
     });
   });
