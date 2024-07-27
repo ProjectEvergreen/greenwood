@@ -1,27 +1,4 @@
-import fs from 'fs/promises';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
-
-async function sitemapAdapter(compilation) {
-  try {
-    const { outputDir, projectDirectory } = compilation.context;
-    const adapterOutputUrl = new URL('./sitemap.xml', outputDir);
-
-    // Check if module exists
-    const sitemapModule = await import(`${projectDirectory}/src/sitemap.xml.js`);
-    const sitemap = await sitemapModule.generateSitemap(compilation);
-
-    await fs.writeFile(adapterOutputUrl, sitemap);
-    console.info('Wrote sitemap to ./sitemap.xml');
-  } catch (error) {
-    console.error('Error in sitemapAdapter:', error);
-  }
-}
-
-/*
- *
- * Sitemap
- *
- */
 
 class SitemapResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -51,19 +28,10 @@ class SitemapResource extends ResourceInterface {
 
 }
 
-const greenwoodPluginSitemap = (options = {}) => [{
-  type: 'adapter',
-  name: 'plugin-adapter-sitemap',
-  provider: (compilation) => {
-    return async () => {
-      await sitemapAdapter(compilation, options);
-    };
-  }
-},
-{
+const greenwoodPluginSitemap = {
   type: 'resource',
-  name: 'plugin-sitemap',
+  name: 'plugin-resource-sitemap',
   provider: (compilation, options) => new SitemapResource(compilation, options)
-}];
+};
 
 export { greenwoodPluginSitemap };
