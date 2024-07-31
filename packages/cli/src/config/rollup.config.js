@@ -424,6 +424,7 @@ function greenwoodImportMetaUrl(compilation) {
 // - sync externalized import attribute paths with bundled CSS paths
 function greenwoodSyncImportAttributes(compilation) {
   const unbundledAssetsRefMapper = {};
+  const { basePath } = compilation.config;
 
   return {
     name: 'greenwood-sync-import-attributes',
@@ -475,7 +476,7 @@ function greenwoodSyncImportAttributes(compilation) {
                 const ref = that.emitFile(emitConfig);
                 const importRef = `import.meta.ROLLUP_ASSET_URL_${ref}`;
 
-                bundles[bundle].code = bundles[bundle].code.replace(value, `/${importRef}`);
+                bundles[bundle].code = bundles[bundle].code.replace(value, `${basePath}/${importRef}`);
 
                 if (!unbundledAssetsRefMapper[emitConfig.name]) {
                   unbundledAssetsRefMapper[emitConfig.name] = {
