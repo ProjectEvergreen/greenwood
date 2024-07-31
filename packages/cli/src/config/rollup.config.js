@@ -12,7 +12,10 @@ function cleanRollupId(id) {
   return id.replace('\x00', '').replace('?commonjs-proxy', '');
 }
 
-function greenwoodResourceLoader (compilation) {
+// ConstructableStylesheets, JSON Modules
+const externalizedResources = ['css', 'json'];
+
+function greenwoodResourceLoader (compilation, browser = false) {
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
   }).map((plugin) => {
@@ -21,16 +24,28 @@ function greenwoodResourceLoader (compilation) {
 
   return {
     name: 'greenwood-resource-loader',
-    async resolveId(id) {
-      const normalizedId = cleanRollupId(id); // idUrl.pathname;
-      const { projectDirectory, userWorkspace } = compilation.context;
+    async resolveId(id, importer) {
+      const normalizedId = cleanRollupId(id);
+      const { userWorkspace } = compilation.context;
 
-      if (normalizedId.startsWith('.') && !normalizedId.startsWith(projectDirectory.pathname)) {
+      // check for non bare paths and resolve them to the user's workspace
+      // or Greenwood's scratch dir, like when bundling inline <script> tags
+      if (normalizedId.startsWith('.')) {
+        const importerUrl = new URL(normalizedId, `file://${importer}`);
+        const extension = importerUrl.pathname.split('.').pop();
+        const external = externalizedResources.includes(extension) && browser && !importerUrl.searchParams.has('type');
+        const isUserWorkspaceUrl = importerUrl.pathname.startsWith(userWorkspace.pathname);
         const prefix = normalizedId.startsWith('..') ? './' : '';
-        const userWorkspaceUrl = new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
+        // if its not in the users workspace, we clean up the dot-dots and check that against the user's workspace
+        const resolvedUrl = isUserWorkspaceUrl
+          ? importerUrl
+          : new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
 
-        if (await checkResourceExists(userWorkspaceUrl)) {
-          return normalizePathnameForWindows(userWorkspaceUrl);
+        if (await checkResourceExists(resolvedUrl)) {
+          return {
+            id: normalizePathnameForWindows(resolvedUrl),
+            external
+          };
         }
       }
     },
@@ -364,6 +379,7 @@ function greenwoodImportMetaUrl(compilation) {
       };
     },
 
+    // sync bundles from API routes to the corresponding API route's entry in the manifest (useful for adapters)
     generateBundle(options, bundles) {
       for (const bundle in bundles) {
         const bundleExtension = bundle.split('.').pop();
@@ -398,7 +414,114 @@ function greenwoodImportMetaUrl(compilation) {
   };
 }
 
-const getRollupConfigForScriptResources = async (compilation) => {
+// sync externalized import attributes usages within browser scripts
+// to corresponding static bundles, instead of being bundled and shipped as JavaScript
+// e.g. import theme from './theme.css' with { type: 'css' }
+//   -> import theme from './theme.ab345dcc.css' with { type: 'css' }
+//
+// this includes:
+// - replace all instances of assert with with (until Rollup supports with keyword)
+// - sync externalized import attribute paths with bundled CSS paths
+function greenwoodSyncImportAttributes(compilation) {
+  const unbundledAssetsRefMapper = {};
+  const { basePath } = compilation.config;
+
+  return {
+    name: 'greenwood-sync-import-attributes',
+
+    generateBundle(options, bundles) {
+      const that = this;
+
+      for (const bundle in bundles) {
+        if (bundle.endsWith('.map')) {
+          return;
+        }
+
+        const { code } = bundles[bundle];
+        const ast = this.parse(code);
+
+        walk.simple(ast, {
+          // Rollup currently emits externals with assert keyword and
+          // ideally we get import attributes through the actual AST
+          // https://github.com/ProjectEvergreen/greenwood/issues/1218
+          ImportDeclaration(node) {
+            const { value } = node.source;
+            const extension = value.split('.').pop();
+
+            if (externalizedResources.includes(extension)) {
+              let preBundled = false;
+              let inlineOptimization = false;
+              bundles[bundle].code = bundles[bundle].code.replace(/assert{/g, 'with{');
+
+              // check for app level assets, like say a shared theme.css
+              compilation.resources.forEach((resource) => {
+                inlineOptimization = resource.optimizationAttr === 'inline' || compilation.config.optimization === 'inline';
+
+                if (resource.sourcePathURL.pathname === new URL(value, compilation.context.projectDirectory).pathname && !inlineOptimization) {
+                  bundles[bundle].code = bundles[bundle].code.replace(value, `/${resource.optimizedFileName}`);
+                  preBundled = true;
+                }
+              });
+
+              // otherwise emit "one-offs" as Rollup assets
+              if (!preBundled) {
+                const sourceURL = new URL(value, compilation.context.projectDirectory);
+                // inline global assets may already be optimized, check for those first
+                const source = compilation.resources.get(sourceURL.pathname)?.optimizedFileContents
+                  ? compilation.resources.get(sourceURL.pathname).optimizedFileContents
+                  : fs.readFileSync(sourceURL, 'utf-8');
+
+                const type = 'asset';
+                const emitConfig = { type, name: value.split('/').pop(), source, needsCodeReference: true };
+                const ref = that.emitFile(emitConfig);
+                const importRef = `import.meta.ROLLUP_ASSET_URL_${ref}`;
+
+                bundles[bundle].code = bundles[bundle].code.replace(value, `${basePath}/${importRef}`);
+
+                if (!unbundledAssetsRefMapper[emitConfig.name]) {
+                  unbundledAssetsRefMapper[emitConfig.name] = {
+                    importers: [],
+                    importRefs: []
+                  };
+                }
+
+                unbundledAssetsRefMapper[emitConfig.name] = {
+                  importers: [...unbundledAssetsRefMapper[emitConfig.name].importers, bundle],
+                  importRefs: [...unbundledAssetsRefMapper[emitConfig.name].importRefs, importRef]
+                };
+              }
+            }
+          }
+        });
+      }
+    },
+
+    // we use write bundle here to handle import.meta.ROLLUP_ASSET_URL_${ref} linking
+    // since it seems that Rollup will not do it after the bundling hook
+    // https://github.com/rollup/rollup/blob/v3.29.4/docs/plugin-development/index.md#generatebundle
+    writeBundle(options, bundles) {
+      for (const asset in unbundledAssetsRefMapper) {
+        for (const bundle in bundles) {
+          const { fileName } = bundles[bundle];
+          const hash = fileName.split('.')[fileName.split('.').length - 2];
+
+          if (fileName.replace(`.${hash}`, '') === asset) {
+            unbundledAssetsRefMapper[asset].importers.forEach((importer, idx) => {
+              let contents = fs.readFileSync(new URL(`./${importer}`, compilation.context.outputDir), 'utf-8');
+
+              contents = contents.replace(unbundledAssetsRefMapper[asset].importRefs[idx], fileName);
+
+              fs.writeFileSync(new URL(`./${importer}`, compilation.context.outputDir), contents);
+            });
+          }
+        }
+      }
+    }
+  };
+
+}
+
+const getRollupConfigForBrowserScripts = async (compilation) => {
   const { outputDir } = compilation.context;
   const input = [...compilation.resources.values()]
     .filter(resource => resource.type === 'script')
@@ -416,11 +539,13 @@ const getRollupConfigForScriptResources = async (compilation) => {
       dir: normalizePathnameForWindows(outputDir),
       entryFileNames: '[name].[hash].js',
       chunkFileNames: '[name].[hash].js',
+      assetFileNames: '[name].[hash].[ext]',
       sourcemap: true
     },
     plugins: [
-      greenwoodResourceLoader(compilation),
+      greenwoodResourceLoader(compilation, true),
       greenwoodSyncPageResourceBundlesPlugin(compilation),
+      greenwoodSyncImportAttributes(compilation),
       greenwoodImportMetaUrl(compilation),
       ...customRollupPlugins
     ],
@@ -456,7 +581,7 @@ const getRollupConfigForScriptResources = async (compilation) => {
   }];
 };
 
-const getRollupConfigForApis = async (compilation) => {
+const getRollupConfigForApiRoutes = async (compilation) => {
   const { outputDir, pagesDir, apisDir } = compilation.context;
 
   return [...compilation.manifest.apis.values()]
@@ -510,7 +635,7 @@ const getRollupConfigForApis = async (compilation) => {
     });
 };
 
-const getRollupConfigForSsr = async (compilation, input) => {
+const getRollupConfigForSsrPages = async (compilation, input) => {
   const { outputDir } = compilation.context;
 
   return input.map((filepath) => {
@@ -562,7 +687,7 @@ const getRollupConfigForSsr = async (compilation, input) => {
 };
 
 export {
-  getRollupConfigForApis,
-  getRollupConfigForScriptResources,
-  getRollupConfigForSsr
+  getRollupConfigForApiRoutes,
+  getRollupConfigForBrowserScripts,
+  getRollupConfigForSsrPages
 };

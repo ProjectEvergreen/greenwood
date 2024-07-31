@@ -303,22 +303,25 @@ class StandardCssResource extends ResourceInterface {
     });
   }
 
-  async shouldIntercept(url, request) {
-    const { pathname, searchParams } = url;
+  async shouldIntercept(url) {
+    const { pathname } = url;
     const ext = pathname.split('.').pop();
 
-    return url.protocol === 'file:' && ext === this.extensions[0] && request.headers.get('Accept')?.indexOf('text/javascript') >= 0 && !searchParams.has('type');
+    return url.protocol === 'file:' && ext === this.extensions[0];
   }
 
   async intercept(url, request, response) {
-    const contents = (await response.text()).replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\');
-    const body = `const sheet = new CSSStyleSheet();sheet.replaceSync(\`${contents}\`);export default sheet;`;
+    let body = await response.text();
+    let headers = {};
 
-    return new Response(body, {
-      headers: {
-        'Content-Type': 'text/javascript'
-      }
-    });
+    if (request.headers.get('Accept')?.indexOf('text/javascript') >= 0 && !url.searchParams.has('type')) {
+      const contents = body.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\');
+
+      body = `const sheet = new CSSStyleSheet();sheet.replaceSync(\`${contents}\`);export default sheet;`;
+      headers['Content-Type'] = 'text/javascript';
+    }
+
+    return new Response(body, { headers });
   }
 
   async shouldOptimize(url, response) {
