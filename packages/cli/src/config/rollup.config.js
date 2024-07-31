@@ -467,6 +467,7 @@ function greenwoodSyncImportAttributes(compilation) {
               if (!preBundled) {
                 const sourceURL = new URL(value, compilation.context.projectDirectory);
                 // inline global assets may already be optimized, check for those first
+                // TODO we should probably bundling one-offs, but how to handle when all plugins are async?
                 const source = compilation.resources.get(sourceURL.pathname)?.optimizedFileContents
                   ? compilation.resources.get(sourceURL.pathname).optimizedFileContents
                   : fs.readFileSync(sourceURL, 'utf-8');
