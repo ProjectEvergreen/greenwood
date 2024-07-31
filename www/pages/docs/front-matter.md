@@ -27,18 +27,20 @@ label: 'My Blog Post from 3/5/2020'
 ### Imports
 If you want to include files on a _per **page** basis_, you can use the predefined `imports` feature from Greenwood.  This is great for one off use cases where you don't want to ship a third party lib in all your layouts, but just for this one particular page.  This is effectively a naive form of code splitting.  🤓
 
+You can also add attributes by space delimiting them after the path.
+
 #### Example
 ```md
 ---
 imports:
-  - /components/my-component/component.js
+  - /components/my-component/component.js type="module" foo="bar"
   - /components/my-component/component.css
 ---
 ```
 
 You will then see the following emitted for file
 ```html
-<script type="module" src="/components/my-component/component.js"></script>
+<script type="module" src="/components/my-component/component.js" type="module" foo="bar"></script>
 <link rel="stylesheet" href="/components/my-component/component.css"/>
 ```
 

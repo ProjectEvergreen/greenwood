@@ -167,7 +167,7 @@ describe('Serve Greenwood With: ', function() {
           .filter(tag => !tag.getAttribute('data-gwd'))
           .filter(tag => !tag.getAttribute('type'));
 
-        expect(scripts.length).to.equal(2);
+        expect(scripts.length).to.equal(3);
         expect(scripts[1].textContent).to.contain('console.log');
       });
 
