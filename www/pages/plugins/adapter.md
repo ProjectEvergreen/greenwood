@@ -37,7 +37,7 @@ export {
 ## Build Output
 
 To provide a starting point, let's look at how Greenwood builds and outputs SSR pages and API routes.  Given this project structure
-```sh
+```shell
 src/
   api/
     greeting.js
