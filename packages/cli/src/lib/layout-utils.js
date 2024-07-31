@@ -227,15 +227,29 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
     const mergedStyles = [
       ...appRoot.querySelectorAll('head style'),
       ...[...(pageRoot && pageRoot.querySelectorAll('head style')) || []],
-      ...customImports.filter(resource => resource.split('.').pop() === 'css')
-        .map(resource => `<link rel="stylesheet" href="${resource}"></link>`)
+      ...customImports.filter(resource => resource.split(' ')[0].split('.').pop() === 'css')
+        .map((resource) => {
+          const [href, ...attributes] = resource.split(' ');
+          const attrs = attributes?.length > 0
+            ? attributes.join(' ')
+            : '';
+
+          return `<link rel="stylesheet" href="${href}" ${attrs}></link>`;
+        })
     ].join('\n');
 
     const mergedScripts = [
       ...appRoot.querySelectorAll('head script'),
       ...[...(pageRoot && pageRoot.querySelectorAll('head script')) || []],
-      ...customImports.filter(resource => resource.split('.').pop() === 'js')
-        .map(resource => `<script src="${resource}" type="module"></script>`)
+      ...customImports.filter(resource => resource.split(' ')[0].split('.').pop() === 'js')
+        .map((resource) => {
+          const [src, ...attributes] = resource.split(' ');
+          const attrs = attributes?.length > 0
+            ? attributes.join(' ')
+            : '';
+
+          return `<script src="${src}" ${attrs}></script>`;
+        })
     ].join('\n');
 
     const finalBody = pageLayoutContents
