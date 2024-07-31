@@ -57,19 +57,28 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public'], LABEL);
 
-    describe('Importing CSS w/ Constructable Stylesheets', function() {
+    describe('Custom Element Importing CSS w/ Constructable Stylesheet', function() {
+      const cssFileHash = '93e8cf36';
       let scripts;
+      let styles;
 
       before(async function() {
-        scripts = await glob.promise(path.join(this.context.publicDir, '*.js'));
+        scripts = await glob.promise(path.join(outputPath, 'public/hero.*.js'));
+        styles = await glob.promise(path.join(outputPath, `public/hero.${cssFileHash}.css`));
       });
 
-      // TODO is this actually the output we want here?
-      // https://github.com/ProjectEvergreen/greenwood/discussions/1216
-      it('should have the expected output from importing hero.css as a Constructable Stylesheet', function() {
+      it('should have the expected import attribute for importing hero.css as a Constructable Stylesheet in the hero.js bundle', function() {
         const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
 
-        expect(scriptContents).to.contain('const t=new CSSStyleSheet;t.replaceSync(":host {   text-align: center');
+        expect(scripts.length).to.equal(1);
+        expect(scriptContents).to.contain('import e from"/hero.93e8cf36.css"with{type:"css"}');
+      });
+
+      it('should have the expected CSS output bundle for hero.css', function() {
+        const styleContents = fs.readFileSync(styles[0], 'utf-8');
+
+        expect(styles.length).to.equal(1);
+        expect(styleContents).to.contain(':host {\n  text-align: center;');
       });
     });
 
