@@ -488,7 +488,10 @@ function greenwoodSyncImportAttributes(compilation) {
 
                 unbundledAssetsRefMapper[emitConfig.name] = {
                   importers: [...unbundledAssetsRefMapper[emitConfig.name].importers, bundle],
-                  importRefs: [...unbundledAssetsRefMapper[emitConfig.name].importRefs, importRef]
+                  importRefs: [...unbundledAssetsRefMapper[emitConfig.name].importRefs, importRef],
+                  preBundled,
+                  source,
+                  sourceURL
                 };
               }
             }
@@ -500,20 +503,67 @@ function greenwoodSyncImportAttributes(compilation) {
     // we use write bundle here to handle import.meta.ROLLUP_ASSET_URL_${ref} linking
     // since it seems that Rollup will not do it after the bundling hook
     // https://github.com/rollup/rollup/blob/v3.29.4/docs/plugin-development/index.md#generatebundle
-    writeBundle(options, bundles) {
+    async writeBundle(options, bundles) {
+      console.log({ unbundledAssetsRefMapper });
+      const resourcePlugins = compilation.config.plugins.filter((plugin) => {
+        return plugin.type === 'resource';
+      }).map((plugin) => {
+        return plugin.provider(compilation);
+      });
+
       for (const asset in unbundledAssetsRefMapper) {
+        const assetExtension = asset.split('.').pop();
+
         for (const bundle in bundles) {
           const { fileName } = bundles[bundle];
-          const hash = fileName.split('.')[fileName.split('.').length - 2];
+          const ext = fileName.split('.').pop();
 
-          if (fileName.replace(`.${hash}`, '') === asset) {
-            unbundledAssetsRefMapper[asset].importers.forEach((importer, idx) => {
-              let contents = fs.readFileSync(new URL(`./${importer}`, compilation.context.outputDir), 'utf-8');
+          if(externalizedResources.includes(ext)) {
+            console.log(bundles[bundle]);
+            const hash = fileName.split('.')[fileName.split('.').length - 2];
+  
+            if (fileName.replace(`.${hash}`, '') === asset) {
+              unbundledAssetsRefMapper[asset].importers.forEach((importer, idx) => {
+                let contents = fs.readFileSync(new URL(`./${importer}`, compilation.context.outputDir), 'utf-8');
+  
+                contents = contents.replace(unbundledAssetsRefMapper[asset].importRefs[idx], fileName);
+  
+                fs.writeFileSync(new URL(`./${importer}`, compilation.context.outputDir), contents);
+              });
 
-              contents = contents.replace(unbundledAssetsRefMapper[asset].importRefs[idx], fileName);
+              // have to apply Greenwood's optimizing here instead of in generateBundle
+              // since we can't do async work inside a async AST operation
+              if(!asset.preBundled) {
+                console.log('optimize this asset!', {asset});
+                const assetUrl = unbundledAssetsRefMapper[asset].sourceURL;
+                const request = new Request(assetUrl, { headers: { 'Content-Type': 'text/css'} });
+                let response = new Response(unbundledAssetsRefMapper[asset].source);
+      
+                for (const plugin of resourcePlugins) {
+                  if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(assetUrl, request, response.clone())) {
+                    response = await plugin.preIntercept(assetUrl, request, response.clone());
+                  }
+                }
 
-              fs.writeFileSync(new URL(`./${importer}`, compilation.context.outputDir), contents);
-            });
+                for (const plugin of resourcePlugins) {
+                  if (plugin.shouldIntercept && await plugin.shouldIntercept(assetUrl, request, response.clone())) {
+                    response = await plugin.intercept(assetUrl, request, response.clone());
+                  }
+                }
+
+                for (const plugin of resourcePlugins) {
+                  if (plugin.shouldOptimize && await plugin.shouldOptimize(assetUrl, response.clone())) {
+                    response = await plugin.optimize(assetUrl, response.clone());
+                  }
+                }
+
+                console.log({ response });
+                const optimized = await response.text();
+                console.log('!!!! optimized', { optimized, fileName });
+
+                fs.writeFileSync(new URL(`./${fileName}`, compilation.context.outputDir), optimized)
+              }
+            }
           }
         }
       }

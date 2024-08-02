@@ -35,7 +35,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-xdescribe('Serve Greenwood With: ', function() {
+describe('Serve Greenwood With: ', function() {
   const LABEL = 'Import Attributes used in API Routes and SSR Pages';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -101,7 +101,7 @@ xdescribe('Serve Greenwood With: ', function() {
       it('should have the expected output from importing hero.css as a Constructable Stylesheet', function() {
         const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
 
-        expect(scriptContents).to.contain('const sheet = new CSSStyleSheet();sheet.replaceSync(`:host {   color: red; }`);');
+        expect(scriptContents).to.contain('const sheet = new CSSStyleSheet();sheet.replaceSync(`:host{color:red}`);');
       });
 
       it('should have the expected output from importing hero.json', function() {
@@ -147,7 +147,7 @@ xdescribe('Serve Greenwood With: ', function() {
       it('should have the expected output from importing hero.css as a Constructable Stylesheet', function() {
         const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
 
-        expect(scriptContents).to.contain('const sheet = new CSSStyleSheet();sheet.replaceSync(`:host {   color: red; }`);');
+        expect(scriptContents).to.contain('const sheet = new CSSStyleSheet();sheet.replaceSync(`:host{color:red}`);');
       });
 
       it('should have the expected output from importing hero.json', function() {
