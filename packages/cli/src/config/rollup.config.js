@@ -467,7 +467,6 @@ function greenwoodSyncImportAttributes(compilation) {
               if (!preBundled) {
                 const sourceURL = new URL(value, compilation.context.projectDirectory);
                 // inline global assets may already be optimized, check for those first
-                // TODO we should probably bundling one-offs, but how to handle when all plugins are async?
                 const source = compilation.resources.get(sourceURL.pathname)?.optimizedFileContents
                   ? compilation.resources.get(sourceURL.pathname).optimizedFileContents
                   : fs.readFileSync(sourceURL, 'utf-8');
@@ -528,7 +527,7 @@ function greenwoodSyncImportAttributes(compilation) {
               });
 
               // have to apply Greenwood's optimizing here instead of in generateBundle
-              // since we can't do async work inside a async AST operation
+              // since we can't do async work inside a sync AST operation
               if (!asset.preBundled) {
                 const assetUrl = unbundledAssetsRefMapper[asset].sourceURL;
                 const request = new Request(assetUrl, { headers: { 'Content-Type': 'text/css' } });
