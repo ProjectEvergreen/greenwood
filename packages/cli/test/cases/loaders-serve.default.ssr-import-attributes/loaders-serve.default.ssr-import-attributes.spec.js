@@ -101,7 +101,7 @@ describe('Serve Greenwood With: ', function() {
       it('should have the expected output from importing hero.css as a Constructable Stylesheet', function() {
         const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
 
-        expect(scriptContents).to.contain('const sheet = new CSSStyleSheet();sheet.replaceSync(`:host {   color: red; }`);');
+        expect(scriptContents).to.contain('const sheet = new CSSStyleSheet();sheet.replaceSync(`:host{color:red}`);');
       });
 
       it('should have the expected output from importing hero.json', function() {
@@ -147,7 +147,7 @@ describe('Serve Greenwood With: ', function() {
       it('should have the expected output from importing hero.css as a Constructable Stylesheet', function() {
         const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
 
-        expect(scriptContents).to.contain('const sheet = new CSSStyleSheet();sheet.replaceSync(`:host {   color: red; }`);');
+        expect(scriptContents).to.contain('const sheet = new CSSStyleSheet();sheet.replaceSync(`:host{color:red}`);');
       });
 
       it('should have the expected output from importing hero.json', function() {

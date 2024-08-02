@@ -80,7 +80,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(body).to.equal(':host {\n  color: red;\n}');
+        expect(body).to.equal(':host{color:red}');
         done();
       });
     });

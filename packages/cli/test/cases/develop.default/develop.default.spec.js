@@ -639,7 +639,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(body).to.contain('color: blue;');
+        expect(body).to.contain('*{color:blue}');
         done();
       });
     });
@@ -983,7 +983,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should correctly return CSS from the developers local files', function(done) {
-        expect(body).to.contain('/* Set the global variables for everything. Change these to use your own fonts/colours. */');
+        expect(body).to.contain(':root{--sans-font:-apple-system');
         done();
       });
     });

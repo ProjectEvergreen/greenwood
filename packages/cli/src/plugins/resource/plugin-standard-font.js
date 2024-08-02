@@ -16,7 +16,9 @@ class StandardFontResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    return this.extensions.indexOf(url.pathname.split('.').pop()) >= 0;
+    const { pathname, protocol } = url;
+
+    return this.extensions.indexOf(pathname.split('.').pop()) >= 0 && protocol === 'file:';
   }
 
   async serve(url) {
