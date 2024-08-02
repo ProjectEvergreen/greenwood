@@ -36,7 +36,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'ESM Import Attribute for CSS and JSON with prerendering';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -78,7 +78,7 @@ xdescribe('Build Greenwood With: ', function() {
         const styleContents = fs.readFileSync(styles[0], 'utf-8');
 
         expect(styles.length).to.equal(1);
-        expect(styleContents).to.contain(':host {\n  text-align: center;');
+        expect(styleContents).to.contain(':host{text-align:center;margin-bottom:40px;}');
       });
     });
 

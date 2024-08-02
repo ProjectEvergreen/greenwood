@@ -1,4 +1,4 @@
-/* eslint-disable complexity */
+/* eslint-disable complexity, max-depth */
 import fs from 'fs';
 import path from 'path';
 import { checkResourceExists, normalizePathnameForWindows } from '../lib/resource-utils.js';
@@ -504,7 +504,6 @@ function greenwoodSyncImportAttributes(compilation) {
     // since it seems that Rollup will not do it after the bundling hook
     // https://github.com/rollup/rollup/blob/v3.29.4/docs/plugin-development/index.md#generatebundle
     async writeBundle(options, bundles) {
-      console.log({ unbundledAssetsRefMapper });
       const resourcePlugins = compilation.config.plugins.filter((plugin) => {
         return plugin.type === 'resource';
       }).map((plugin) => {
@@ -512,33 +511,29 @@ function greenwoodSyncImportAttributes(compilation) {
       });
 
       for (const asset in unbundledAssetsRefMapper) {
-        const assetExtension = asset.split('.').pop();
-
         for (const bundle in bundles) {
           const { fileName } = bundles[bundle];
           const ext = fileName.split('.').pop();
 
-          if(externalizedResources.includes(ext)) {
-            console.log(bundles[bundle]);
+          if (externalizedResources.includes(ext)) {
             const hash = fileName.split('.')[fileName.split('.').length - 2];
-  
+
             if (fileName.replace(`.${hash}`, '') === asset) {
               unbundledAssetsRefMapper[asset].importers.forEach((importer, idx) => {
                 let contents = fs.readFileSync(new URL(`./${importer}`, compilation.context.outputDir), 'utf-8');
-  
+
                 contents = contents.replace(unbundledAssetsRefMapper[asset].importRefs[idx], fileName);
-  
+
                 fs.writeFileSync(new URL(`./${importer}`, compilation.context.outputDir), contents);
               });
 
               // have to apply Greenwood's optimizing here instead of in generateBundle
               // since we can't do async work inside a async AST operation
-              if(!asset.preBundled) {
-                console.log('optimize this asset!', {asset});
+              if (!asset.preBundled) {
                 const assetUrl = unbundledAssetsRefMapper[asset].sourceURL;
-                const request = new Request(assetUrl, { headers: { 'Content-Type': 'text/css'} });
+                const request = new Request(assetUrl, { headers: { 'Content-Type': 'text/css' } });
                 let response = new Response(unbundledAssetsRefMapper[asset].source);
-      
+
                 for (const plugin of resourcePlugins) {
                   if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(assetUrl, request, response.clone())) {
                     response = await plugin.preIntercept(assetUrl, request, response.clone());
@@ -557,11 +552,7 @@ function greenwoodSyncImportAttributes(compilation) {
                   }
                 }
 
-                console.log({ response });
-                const optimized = await response.text();
-                console.log('!!!! optimized', { optimized, fileName });
-
-                fs.writeFileSync(new URL(`./${fileName}`, compilation.context.outputDir), optimized)
+                fs.writeFileSync(new URL(`./${fileName}`, compilation.context.outputDir), await response.text());
               }
             }
           }

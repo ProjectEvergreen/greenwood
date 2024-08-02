@@ -38,7 +38,7 @@ import { fileURLToPath } from 'url';
 
 const expect = chai.expect;
 
-xdescribe('Serve Greenwood With: ', function() {
+describe('Serve Greenwood With: ', function() {
   const LABEL = 'A Server Rendered Application (SSR) with API Routes importing raw CSS';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -95,7 +95,7 @@ xdescribe('Serve Greenwood With: ', function() {
         const styleTag = productsPageDom.window.document.querySelectorAll('body > style');
 
         expect(styleTag.length).to.equal(1);
-        expect(styleTag[0].textContent.replace(/ /g, '').replace(/\n/, '')).contain('h1{color:red;}');
+        expect(styleTag[0].textContent.replace(/ /g, '').replace(/\n/, '')).contain('h1{color:red}');
         done();
       });
 

@@ -35,7 +35,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-xdescribe('Build Greenwood With: ', function() {
+describe('Build Greenwood With: ', function() {
   const LABEL = 'Import Raw Plugin with default options';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -70,7 +70,7 @@ xdescribe('Build Greenwood With: ', function() {
       it('should have the expected output from importing styles.css in main.js', function() {
         const contents = fs.readFileSync(scripts[0], 'utf-8');
 
-        expect(contents).to.contain('import from styles.css: p {   color: red; }');
+        expect(contents).to.contain('import from styles.css: p{color:red}');
       });
     });
   });

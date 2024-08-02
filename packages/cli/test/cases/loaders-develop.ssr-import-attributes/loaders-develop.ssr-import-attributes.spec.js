@@ -32,7 +32,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-xdescribe('Develop Greenwood With: ', function() {
+describe('Develop Greenwood With: ', function() {
   const LABEL = 'Import Attributes used in API Routes and SSR Pages';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -80,7 +80,7 @@ xdescribe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(body).to.equal(':host {\n  color: red;\n}');
+        expect(body).to.equal(':host{color:red}');
         done();
       });
     });
