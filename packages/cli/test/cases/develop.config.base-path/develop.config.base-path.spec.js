@@ -174,7 +174,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(body).to.contain('color: blue;');
+        expect(body).to.contain('*{color:blue}');
         done();
       });
     });

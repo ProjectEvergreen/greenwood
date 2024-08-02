@@ -95,7 +95,7 @@ describe('Serve Greenwood With: ', function() {
         const styleTag = productsPageDom.window.document.querySelectorAll('body > style');
 
         expect(styleTag.length).to.equal(1);
-        expect(styleTag[0].textContent.replace(/ /g, '').replace(/\n/, '')).contain('h1{color:red;}');
+        expect(styleTag[0].textContent.replace(/ /g, '').replace(/\n/, '')).contain('h1{color:red}');
         done();
       });
 
@@ -104,7 +104,7 @@ describe('Serve Greenwood With: ', function() {
 
         expect(cardComponents.length).to.equal(2);
         Array.from(cardComponents).forEach((card) => {
-          expect(card.innerHTML).contain('display: flex;');
+          expect(card.innerHTML).contain('display:flex;');
         });
         done();
       });
@@ -137,7 +137,7 @@ describe('Serve Greenwood With: ', function() {
 
         expect(cardComponents.length).to.equal(2);
         Array.from(cardComponents).forEach((card) => {
-          expect(card.innerHTML).contain('display: flex;');
+          expect(card.innerHTML).contain('display:flex;');
         });
         done();
       });

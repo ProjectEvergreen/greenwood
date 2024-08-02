@@ -42,7 +42,7 @@ Styles can be done in any standards compliant way that will work in a browser.  
 </html>
 ```
 
-> _In the above example, Greenwood will also bundle any `url` references in your CSS automatically._
+> _In the above example, Greenwood will also bundle any `url` references in your CSS automatically as well as inline any usages of `@import` in your CSS files._
 
 ### Import Attributes
 

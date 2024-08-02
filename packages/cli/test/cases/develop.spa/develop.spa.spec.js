@@ -172,7 +172,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the expected body contents', function(done) {
-        expect(body.replace(/\n/g, '').indexOf('* {  color: red;}')).to.equal(0);
+        expect(body.replace(/\n/g, '').indexOf('*{color:red}')).to.equal(0);
         done();
       });
     });
@@ -203,7 +203,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the expected body contents', function(done) {
-        expect(body.indexOf('/* Set the global variables for everything. Change these to use your own fonts/colours. */')).to.equal(0);
+        expect(body.indexOf(':root{--sans-font:-apple-system')).to.equal(0);
         done();
       });
     });

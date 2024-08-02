@@ -78,7 +78,7 @@ describe('Build Greenwood With: ', function() {
         const styleContents = fs.readFileSync(styles[0], 'utf-8');
 
         expect(styles.length).to.equal(1);
-        expect(styleContents).to.contain(':host {\n  text-align: center;');
+        expect(styleContents).to.contain(':host{text-align:center;margin-bottom:40px;}');
       });
     });
 

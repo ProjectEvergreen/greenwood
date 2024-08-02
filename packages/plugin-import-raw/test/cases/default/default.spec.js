@@ -70,7 +70,7 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected output from importing styles.css in main.js', function() {
         const contents = fs.readFileSync(scripts[0], 'utf-8');
 
-        expect(contents).to.contain('import from styles.css: p {   color: red; }');
+        expect(contents).to.contain('import from styles.css: p{color:red}');
       });
     });
   });

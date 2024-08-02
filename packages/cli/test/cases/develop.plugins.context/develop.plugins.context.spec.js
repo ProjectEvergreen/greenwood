@@ -120,7 +120,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should correctly return CSS from the developers local files', function(done) {
-        expect(body).to.equal(':root {\n  --color-primary: #135;\n}');
+        expect(body).to.equal(':root{--color-primary:#135}');
 
         done();
       });

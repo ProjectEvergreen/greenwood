@@ -89,6 +89,7 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
+    // TODO not sure why this was disabled, but should enable this test case
     xdescribe('Custom Format Dynamic Contact Page', function() {
       let aboutPage;
 

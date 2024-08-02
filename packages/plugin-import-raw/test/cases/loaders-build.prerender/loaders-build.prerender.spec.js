@@ -76,9 +76,8 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected output from importing styles.css in index.html', function() {
         const styles = dom.window.document.querySelectorAll('style');
 
-        // TODO minify CSS-in-JS?
         expect(styles.length).to.equal(1);
-        expect(styles[0].textContent).to.contain('.footer { width: 90%; margin: 0 auto; padding: 0; text-align: center; }');
+        expect(styles[0].textContent).to.contain('.footer{width:90%;margin:0 auto;padding:0;text-align:center;}');
       });
     });
   });
