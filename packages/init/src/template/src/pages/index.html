@@ -11,31 +11,13 @@
     <link rel="icon" href="/favicon.ico">
 
     <style>
-      @font-face {
-        font-family: "Geist-Sans";
-        src: url("https://super-tapioca-5987ce.netlify.app/node_modules/geist/dist/fonts/geist-sans/Geist-Regular.1777562104.woff2")
-          format("truetype");
-      }
-
-      @font-face {
-        font-family: "Geist-Mono";
-        src: url("https://super-tapioca-5987ce.netlify.app/node_modules/geist/dist/fonts/geist-mono/GeistMono-Regular.1030497664.woff2")
-          format("truetype");
-      }
-
       :root {
-        --font-primary: "Geist-Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-        --font-secondary: "Geist-Mono", monospace;
+        --font-primary: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
       }
 
       body {
         font-family: var(--font-primary);
         margin: 0;
-        display: flex;
-        place-items: center;
-        min-width: 320px;
-        min-height: 100vh;
       }
 
       main {
@@ -43,10 +25,6 @@
         margin: 0 auto;
         padding: 2rem;
         text-align: center;
-      }
-
-      code {
-        font-family: var(--font-secondary);
       }
 
       ul {
@@ -57,26 +35,34 @@
       }
 
       .card {
-        width: 40%;
         margin: 5px auto;
         padding: 1rem;
-        height: 100px;
-        display: inline-block;
-        background-color: #edefec;
+        height: 125px;
+        vertical-align: text-top;
         border-radius: 1rem;
-        color: #020202;
+        color: #edefec;
+        background-image: linear-gradient(to top left, #020202, #2e3440);
+      }
 
-        @media(max-width: 768px) {
-          width: 80%;
+      a, a:visited, a:hover {
+        color: #edefec;
+        text-decoration: underline;
+      }
+
+      h2 {
+        text-decoration: underline;
+      }
+
+      @media(min-width: 768px) {
+        .card {
+          display: inline-block;
+          width: 40%;
         }
       }
 
-      a {
-        color: #020202;
-      }
-
-      x-logo:not(:defined) {
-        opacity: 0;
+      x-logo {
+        display: block;
+        min-height: 100px;
       }
     </style>
 
@@ -110,7 +96,7 @@
 
         <div class="card">
           <h2>Community</h2>
-          <p>Come join us <a href="https://github.com/ProjectEvergreen/greenwood">GitHub</a> and <a href="https://discord.gg/nhAq8zAS">Discord</a>.</p>
+          <p>Come join us on <a href="https://github.com/ProjectEvergreen/greenwood">GitHub</a> and <a href="https://discord.gg/nhAq8zAS">Discord</a> to get involved.</p>
         </div>
       </div>
 

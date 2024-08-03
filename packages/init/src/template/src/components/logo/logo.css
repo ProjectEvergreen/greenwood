@@ -7,9 +7,10 @@
 
 .my-logo div {
   display: inline-block;
-  width: 8%;
+  max-width: 35%;
   vertical-align: middle;
   border-radius: 20px;
+  vertical-align: top;
 }
 
 svg {
@@ -41,5 +42,23 @@ svg {
 @media (prefers-reduced-motion: no-preference) {
   .my-logo {
     animation: leafanimation 8s linear;
+  }
+}
+
+@media(min-width: 500px) {
+  .my-logo div {
+    max-width: 23%;
+  }
+}
+
+@media(min-width: 768px) {
+  .my-logo div {
+    max-width: 15%;
+  }
+}
+
+@media(min-width: 1024px) {
+  .my-logo div {
+    max-width: 10%;
   }
 }
