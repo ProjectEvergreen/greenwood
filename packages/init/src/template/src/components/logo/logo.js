@@ -4,7 +4,7 @@ const template = document.createElement('template');
 
 template.innerHTML = `
   <div class="my-logo">
-    <span>My Logo</span>
+    <span class="spacer"></span>
     <div>
       <svg width="100%" height="100%" viewBox="0 0 150 180" fill="#00b68f">
         <defs>

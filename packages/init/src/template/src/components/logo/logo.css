@@ -5,6 +5,13 @@
   color: transparent;
 }
 
+.spacer {
+  height: 100px;
+  width: 100px;
+  display: block;
+  margin-top: -100px;
+}
+
 .my-logo div {
   display: inline-block;
   max-width: 35%;
@@ -41,7 +48,7 @@ svg {
 
 @media (prefers-reduced-motion: no-preference) {
   .my-logo {
-    animation: leafanimation 8s linear;
+    animation: leafanimation 6s linear;
   }
 }
 
