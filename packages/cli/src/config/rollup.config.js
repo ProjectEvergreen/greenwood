@@ -530,8 +530,8 @@ function greenwoodSyncImportAttributes(compilation) {
               // since we can't do async work inside a sync AST operation
               if (!asset.preBundled) {
                 const assetUrl = unbundledAssetsRefMapper[asset].sourceURL;
-                const request = new Request(assetUrl, { headers: { 'Content-Type': 'text/css' } });
-                let response = new Response(unbundledAssetsRefMapper[asset].source);
+                const request = new Request(assetUrl, { headers: { 'Accept': 'text/css' } });
+                let response = new Response(unbundledAssetsRefMapper[asset].source, { headers: { 'Content-Type': 'text/css' } });
 
                 for (const plugin of resourcePlugins) {
                   if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(assetUrl, request, response.clone())) {
