@@ -29,11 +29,6 @@ export default class HeroBanner extends HTMLElement {
     }
 
     this.shadowRoot.adoptedStyleSheets = [sheet];
-    // TODO upstream to WCC?
-    // this.shadowRoot.querySelectorAll('button')
-    //   .forEach(button => {
-    //     button.addEventListener('click', () => this.clickButton(button))
-    //   });
   }
 }
 
