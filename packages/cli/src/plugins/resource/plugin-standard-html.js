@@ -74,7 +74,7 @@ class StandardHtmlResource extends ResourceInterface {
       }
 
       const settings = config.markdown.settings || {};
-      const fm = frontmatter(markdownContents);
+      const fm = frontmatter(markdownContents); // TODO we already got this once in the graph phase...
 
       processedMarkdown = await unified()
         .use(remarkParse, settings) // parse markdown into AST
@@ -172,14 +172,30 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     if (interpolateFrontmatter) {
+      console.log({ frontMatter, matchingRoute });
+      // TODO consolidate this
+      for (const fm in matchingRoute.data) {
+        console.log('11', { fm });
+        const interpolatedFrontmatter = '\\$\\{globalThis.page.' + fm + '\\}';
+        const needle = typeof matchingRoute.data[fm] === 'string' ? matchingRoute.data[fm] : JSON.stringify(matchingRoute.data[fm]).replace(/"/g, '&quot;');
+        console.log('replace', needle);
+        body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), needle);
+      }
+
       for (const fm in frontMatter) {
         const interpolatedFrontmatter = '\\$\\{globalThis.page.' + fm + '\\}';
 
         body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), frontMatter[fm]);
       }
+
+      for (const collection in this.compilation.collections) {
+        const interpolatedFrontmatter = '\\$\\{globalThis.collection.' + collection + '\\}';
+
+        body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), JSON.stringify(this.compilation.collections[collection]).replace(/"/g, '&quot;'));
+      }
     }
 
-    // clean up placeholder content-outlet
+    // clean up any empty placeholder content-outlet
     if (body.indexOf('<content-outlet></content-outlet>') > 0) {
       body = body.replace('<content-outlet></content-outlet>', '');
     }

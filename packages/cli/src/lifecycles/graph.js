@@ -12,6 +12,7 @@ const generateGraph = async (compilation) => {
       const { context, config } = compilation;
       const { basePath } = config;
       const { pagesDir, projectDirectory, userWorkspace } = context;
+      const collections = {};
       const customPageFormatPlugins = config.plugins
         .filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin)
         .map(plugin => plugin.provider(compilation));
@@ -263,7 +264,7 @@ const generateGraph = async (compilation) => {
               * hydration: if this page needs hydration support
               * servePage: signal that this is a custom page file type (static | dynamic)
               */
-              pages.push({
+              const page = {
                 data: customData || {},
                 filename,
                 id,
@@ -286,7 +287,21 @@ const generateGraph = async (compilation) => {
                 isolation,
                 hydration,
                 servePage: isCustom
-              });
+              };
+
+              pages.push(page);
+
+              const pageCollection = customData.collection;
+
+              if (pageCollection) {
+                if (!collections[pageCollection]) {
+                  collections[pageCollection] = [];
+                }
+
+                collections[pageCollection].push(page);
+              }
+
+              compilation.collections = collections;
             } else {
               console.debug(`Unhandled extension (${extension}) for route => ${route}`);
             }
