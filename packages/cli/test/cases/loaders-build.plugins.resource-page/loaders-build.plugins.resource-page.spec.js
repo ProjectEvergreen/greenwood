@@ -13,11 +13,19 @@
  *   // see complete implementation in the greenwood.config.js file used for this spec
  * }
  *
+ * class BarResource extends ResourceInterface {
+ *   // see complete implementation in the greenwood.config.js file used for this spec
+ * }
+ *
  * {
  *   plugins: [{
  *     type: 'resource',
  *     name: 'plugin-foo',
  *     provider: (compilation, options) => new FooResource(compilation, options)
+ *   },{
+ *     type: 'resource',
+ *     name: 'plugin-bar',
+ *     provider: (compilation, options) => new BarResource(compilation, options)
  *   }]
  * }
  *
@@ -48,7 +56,7 @@ describe('Build Greenwood With: ', function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner();
+    runner = new Runner(false, true);
   });
 
   describe(LABEL, function() {
@@ -89,24 +97,25 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    // TODO not sure why this was disabled, but should enable this test case
-    xdescribe('Custom Format Dynamic Contact Page', function() {
-      let aboutPage;
+    describe('Custom Format Dynamic Contact Page (exported with prerendering)', function() {
+      let contactPage;
 
       before(async function() {
-        aboutPage = await glob.promise(path.join(this.context.publicDir, 'contact.html'));
+        contactPage = await glob.promise(path.join(this.context.publicDir, 'contact/index.html'));
       });
 
-      it('should have the expected JavaScript equivalent file in the output directory', function() {
-        expect(aboutPage).to.have.lengthOf(1);
+      it('should have the expected pre-rendered HTML file in the output directory', function() {
+        expect(contactPage).to.have.lengthOf(1);
       });
 
-      it('should have expected text from from my-other-custom-file.foo in the script output file', function() {
-        const contents = fs.readFileSync(aboutPage[0], 'utf-8');
+      it('should have expected text from the output HTML file', function() {
+        const contents = fs.readFileSync(contactPage[0], 'utf-8');
 
-        expect(contents).to.contain('Welcome to our About page!');
+        expect(contents).to.contain('Welcome to our Contact page!');
       });
     });
+
+    // TODO test an API route with a dynamic format plugin
   });
 
   after(function() {
