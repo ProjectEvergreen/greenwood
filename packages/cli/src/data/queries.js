@@ -2,24 +2,24 @@
 const host = 'localhost';
 const port = 1985;
 
-async function getCollection(collection = '') {
-  return (await fetch(`http://${host}:${port}/graph.json`)
-    .then(resp => resp.json()))
-    .filter(page => page?.data?.collection === collection);
-}
-
-async function getCollectionByRoute(route = '') {
-  return (await fetch(`http://${host}:${port}/graph.json`)
-    .then(resp => resp.json()))
-    .filter(page => page?.route.startsWith(route));
-}
-
 async function getContent() {
   return await fetch(`http://${host}:${port}/graph.json`)
     .then(resp => resp.json());
 }
 
-export { getContent, getCollection, getCollectionByRoute };
+async function getContentByCollection(collection = '') {
+  return (await fetch(`http://${host}:${port}/graph.json`)
+    .then(resp => resp.json()))
+    .filter(page => page?.data?.collection === collection);
+}
+
+async function getContentByRoute(route = '') {
+  return (await fetch(`http://${host}:${port}/graph.json`)
+    .then(resp => resp.json()))
+    .filter(page => page?.route.startsWith(route));
+}
+
+export { getContent, getContentByCollection, getContentByRoute };
 // import { getQueryHash } from './common.js';
 
 // const client = {

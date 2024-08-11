@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with interpolateFrontmatter configuration enabled.
+ * Run Greenwood with interpolateFrontmatter configuration enabled for simple and rich frontmatter.
  *
  * User Result
  * Should generate a bare bones Greenwood build with correctly interpolated frontmatter variables in markdown and HTML.
@@ -19,6 +19,7 @@
  *   pages/
  *     blog/
  *       first-post.md
+ *       second-post.md
  *   layouts/
  *     blog.html
  */
@@ -51,7 +52,7 @@ describe('Build Greenwood With: ', function() {
       runner.runCommand(cliPath, 'build');
     });
 
-    describe('Frontmatter should be interpolated in the correct places', function() {
+    describe('Simple frontmatter should be interpolated in the correct places', function() {
       let dom;
 
       before(async function() {
@@ -74,6 +75,28 @@ describe('Build Greenwood With: ', function() {
         const heading = dom.window.document.querySelector('body h4').textContent;
 
         expect(heading).to.be.equal('Author: Owen Buckley');
+      });
+    });
+
+    describe('Rich frontmatter should be interpolated in the correct places', function() {
+      let dom;
+
+      before(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './blog/second-post/index.html'));
+      });
+
+      it('should have the correct songs frontmatter data in the page output', function() {
+        const contents = dom.window.document.querySelector('body span').innerHTML;
+        const songs = JSON.parse(contents);
+
+        expect(songs.length).to.equal(2);
+
+        songs.forEach((song, idx) => {
+          const num = idx += 1;
+
+          expect(song.title).to.equal(`Song ${num}`);
+          expect(song.url).to.equal(`song${num}.mp3`);
+        });
       });
     });
   });

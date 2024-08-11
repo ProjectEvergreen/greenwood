@@ -3,7 +3,7 @@
  * Run Greenwood build command with prerender config set to true.
  *
  * User Result
- * Should generate a Greenwood build with puppeteer generated output for Web Components.
+ * Should generate a Greenwood build with the expected generated output using custom elements.
  *
  * User Command
  * greenwood build
