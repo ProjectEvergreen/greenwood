@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood with a custom resource plugin and default workspace with a custom page format.
+ * Run Greenwood with a custom resource plugin and default workspace with a custom page formats.
  *
  * User Result
- * Should generate a bare bones Greenwood build with expected custom file (.foo) behavior.
+ * Should generate a bare bones Greenwood build with expected custom page format behaviors.
  *
  * User Command
  * greenwood build
@@ -32,6 +32,8 @@
  * Custom Workspace
  * src/
  *   pages/
+ *     api
+ *       greeting.bar
  *     about.foo
  *     contact.bar
  *     index.html
@@ -47,7 +49,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom FooResource Plugin and Default Workspace';
+  const LABEL = 'Custom Static and Dynamic Page Loaders';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -115,7 +117,21 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    // TODO test an API route with a dynamic format plugin
+    describe('Custom Format Dynamic API Route', function() {
+      let handler;
+
+      before(async function() {
+        handler = (await import(new URL('./public/api/greeting.js', import.meta.url))).handler;
+      });
+
+      it('should have the expected output from the API route', async function() {
+        const response = await handler(new Request(new URL('http://localhost:8080/api/greeting')));
+        const data = await response.json();
+
+        expect(data.message).to.equal('Hello World!!!');
+      });
+
+    });
   });
 
   after(function() {

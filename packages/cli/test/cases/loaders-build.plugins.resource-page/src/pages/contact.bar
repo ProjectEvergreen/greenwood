@@ -1,3 +1,5 @@
+interface User { }
+
 export default class ContactPage extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `

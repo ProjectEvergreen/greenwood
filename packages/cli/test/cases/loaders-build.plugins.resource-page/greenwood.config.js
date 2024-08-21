@@ -7,7 +7,7 @@ class FooResource {
     this.servePage = options.servePage;
 
     this.extensions = ['foo'];
-    this.contentType = 'text/javascript';
+    this.contentType = 'text/html';
   }
 
   async shouldServe(url) {
@@ -15,9 +15,7 @@ class FooResource {
   }
 
   async serve(url) {
-    let body = await fs.readFile(url, 'utf-8');
-
-    body = body.replace(/interface (.*){(.*)}/s, '');
+    const body = await fs.readFile(url, 'utf-8');
 
     return new Response(body, {
       headers: new Headers({
@@ -44,7 +42,7 @@ class BarResource {
   async serve(url) {
     let body = await fs.readFile(url, 'utf-8');
 
-    body = body.replace(/interface (.*){(.*)}/s, '');
+    body = body.replace(/interface (.*){(.*)}/, '');
 
     return new Response(body, {
       headers: new Headers({
