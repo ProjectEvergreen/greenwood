@@ -52,7 +52,11 @@ const defaultConfig = {
   prerender: false,
   isolation: false,
   pagesDirectory: 'pages',
-  layoutsDirectory: 'layouts'
+  layoutsDirectory: 'layouts',
+  polyfills: {
+    importAttributes: false, // or `css,json`
+    importMaps: false
+  }
 };
 
 const readAndMergeConfig = async() => {
@@ -77,7 +81,8 @@ const readAndMergeConfig = async() => {
 
       if (hasConfigFile) {
         const userCfgFile = (await import(configUrl)).default;
-        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, layoutsDirectory, interpolateFrontmatter, isolation } = userCfgFile;
+        // eslint-disable-next-line max-len
+        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, layoutsDirectory, interpolateFrontmatter, isolation, polyfills } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -237,6 +242,18 @@ const readAndMergeConfig = async() => {
             customConfig.staticRouter = staticRouter;
           } else {
             reject(`Error: greenwood.config.js staticRouter must be a boolean; true or false.  Passed value was typeof: ${typeof staticRouter}`);
+          }
+        }
+
+        if (polyfills !== undefined) {
+          const { importMaps } = polyfills;
+
+          customConfig.polyfills = {};
+
+          if (typeof importMaps === 'boolean') {
+            customConfig.polyfills.importMaps = true;
+          } else {
+            reject(`Error: greenwood.config.js polyfills.importMaps must be a boolean; true or false.  Passed value was typeof: ${typeof importMaps}`);
           }
         }
       } else {

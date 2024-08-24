@@ -121,6 +121,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
 async function preRenderCompilationCustom(compilation, customPrerender) {
   const { scratchDir } = compilation.context;
   const renderer = (await import(customPrerender.customUrl)).default;
+  const { importMaps } = compilation.config.polyfills;
 
   console.info('pages to generate', `\n ${compilation.graph.map(page => page.route).join('\n ')}`);
 
@@ -129,10 +130,14 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     const outputPathUrl = new URL(`.${outputPath}`, scratchDir);
 
     // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
-    body = body.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
-    body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
-    body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
-    body = body.replace(/type="module-shim"/g, 'type="module"');
+    // body = body.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
+    if (importMaps) {
+      body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
+      body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
+      body = body.replace(/type="module-shim"/g, 'type="module"');
+    } else {
+      body = body.replace(/<script type="importmap">.*?<\/script>/s, '');
+    }
 
     // clean this up to avoid sending webcomponents-bundle to rollup
     body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
