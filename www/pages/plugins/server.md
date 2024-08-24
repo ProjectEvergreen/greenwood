@@ -1,5 +1,4 @@
 ---
-label: 'Server'
 menu: side
 title: 'Server'
 index: 7

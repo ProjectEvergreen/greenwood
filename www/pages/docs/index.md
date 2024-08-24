@@ -1,5 +1,4 @@
 ---
-label: 'docs'
 menu: navigation
 title: Docs
 index: 2

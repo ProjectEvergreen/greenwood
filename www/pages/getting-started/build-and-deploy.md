@@ -1,5 +1,4 @@
 ---
-label: 'build-and-deploy'
 menu: side
 title: 'Build and Deploy'
 index: 6

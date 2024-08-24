@@ -1,5 +1,4 @@
 ---
-label: 'quick-start'
 menu: side
 title: 'Quick Start'
 index: 1

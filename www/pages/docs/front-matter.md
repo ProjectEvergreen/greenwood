@@ -1,5 +1,4 @@
 ---
-label: 'front-matter'
 menu: side
 title: 'Front Matter'
 index: 3

@@ -1,5 +1,5 @@
 ---
-label: 'components-and-styles'
+label: 'Components and Styles'
 menu: side
 title: 'Components and Styles'
 index: 5

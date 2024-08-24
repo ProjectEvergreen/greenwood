@@ -1,5 +1,4 @@
 ---
-label: 'how-it-works'
 menu: side
 title: 'How It Works'
 index: 1

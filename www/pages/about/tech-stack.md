@@ -1,5 +1,4 @@
 ---
-label: 'tech-stack'
 menu: side
 title: 'Tech Stack'
 index: 4

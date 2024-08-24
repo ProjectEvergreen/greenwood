@@ -1,5 +1,4 @@
 ---
-label: 'context'
 menu: side
 title: 'Context'
 index: 2

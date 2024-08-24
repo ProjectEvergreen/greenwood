@@ -1,5 +1,4 @@
 ---
-label: 'about'
 menu: navigation
 title: About
 index: 1

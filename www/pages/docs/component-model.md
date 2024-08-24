@@ -1,5 +1,4 @@
 ---
-label: 'component-model'
 menu: side
 title: 'Component Model'
 index: 1

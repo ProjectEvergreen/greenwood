@@ -1,5 +1,4 @@
 ---
-label: 'blog'
 menu: navigation
 title: Blog
 index: 6

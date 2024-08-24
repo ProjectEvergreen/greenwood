@@ -1,5 +1,4 @@
 ---
-label: 'Resource'
 menu: side
 title: 'Resource'
 index: 4

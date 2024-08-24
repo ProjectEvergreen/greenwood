@@ -1,5 +1,4 @@
 ---
-label: 'community'
 menu: side
 title: 'Community'
 index: 3

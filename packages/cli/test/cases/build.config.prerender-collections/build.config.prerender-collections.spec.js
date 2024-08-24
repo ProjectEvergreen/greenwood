@@ -85,7 +85,7 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('Default output for index.html with nav collection content', function() {
+    describe('Default output for index.html with header nav collection content', function() {
       let dom;
 
       before(async function() {
@@ -105,13 +105,13 @@ describe('Build Greenwood With: ', function() {
 
         it('should have the expected link content from all pages in the collection', function() {
           expect(navLinks[0].getAttribute('href')).to.equal('/');
-          expect(navLinks[0].textContent).to.equal('Index');
+          expect(navLinks[0].textContent).to.equal('Home');
 
           expect(navLinks[1].getAttribute('href')).to.equal('/blog/');
-          expect(navLinks[1].textContent).to.equal('Index');
+          expect(navLinks[1].textContent).to.equal('Blog');
 
           expect(navLinks[2].getAttribute('href')).to.equal('/toc/');
-          expect(navLinks[2].textContent).to.equal('Toc');
+          expect(navLinks[2].textContent).to.equal('Table of Contents');
         });
       });
     });

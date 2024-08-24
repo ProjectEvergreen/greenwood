@@ -1,5 +1,5 @@
 ---
-label: 'layouts-and-pages'
+label: 'Layouts and Pages'
 menu: side
 title: 'Layouts and Pages'
 index: 7

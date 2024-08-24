@@ -1,5 +1,4 @@
 ---
-label: 'server-rendering'
 menu: side
 title: 'Server Rendering'
 index: 8

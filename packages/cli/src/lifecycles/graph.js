@@ -5,6 +5,25 @@ import { checkResourceExists, requestAsObject } from '../lib/resource-utils.js';
 import toc from 'markdown-toc';
 import { Worker } from 'worker_threads';
 
+function labelFromRoute(_route) {
+  let route = _route;
+
+  if (route === '/index/') {
+    return 'Home';
+  } else if (route.endsWith('/index/')) {
+    route = route.replace('index/', '');
+  }
+
+  return route
+    .split('/')
+    .filter(part => part !== '')
+    .pop()
+    .split('-')
+    .map((routePart) => {
+      return `${routePart.charAt(0).toUpperCase()}${routePart.substring(1)}`;
+    })
+    .join(' ');
+}
 const generateGraph = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
@@ -98,9 +117,10 @@ const generateGraph = async (compilation) => {
               });
             } else if (isPage) {
               let route = relativePagePath.replace(extension, '');
-              let id = filename.split('/')[filename.split('/').length - 1].replace(extension, '');
+              let root = filename.split('/')[filename.split('/').length - 1].replace(extension, '');
               let layout = extension === '.html' ? null : 'page';
-              let title = null;
+              let label = labelFromRoute(`${route}/`);
+              let title = null; // TODO use label here
               let imports = [];
               let customData = {};
               let filePath;
@@ -118,7 +138,7 @@ const generateGraph = async (compilation) => {
               */
               if (relativePagePath.lastIndexOf('/') > 0) {
                 // https://github.com/ProjectEvergreen/greenwood/issues/455
-                route = id === 'index' || route.replace('/index', '') === `/${id}`
+                route = root === 'index' || route.replace('/index', '') === `/${root}`
                   ? route.replace('index', '')
                   : `${route}/`;
               } else {
@@ -133,7 +153,7 @@ const generateGraph = async (compilation) => {
 
                 layout = attributes.layout || layout;
                 title = attributes.title || title;
-                id = attributes.label || id;
+                label = attributes.label || label;
                 imports = attributes.imports || [];
                 filePath = `${relativeWorkspacePath}${filename}`;
 
@@ -214,11 +234,8 @@ const generateGraph = async (compilation) => {
                     page: JSON.stringify({
                       servePage: isCustom,
                       route,
-                      id,
-                      label: id.split('-')
-                        .map((idPart) => {
-                          return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
-                        }).join(' ')
+                      root,
+                      label
                     }),
                     request
                   });
@@ -229,6 +246,7 @@ const generateGraph = async (compilation) => {
                   title = ssrFrontmatter.title || title;
                   imports = ssrFrontmatter.imports || imports;
                   customData = ssrFrontmatter.data || customData;
+                  label = ssrFrontmatter.label || label;
 
                   /* Menu Query
                   * Custom front matter - Variable Definitions
@@ -248,7 +266,6 @@ const generateGraph = async (compilation) => {
               *----------------------
               * data: custom page frontmatter
               * filename: base filename of the page
-              * id: filename without the extension
               * relativeWorkspacePagePath: the file path relative to the user's workspace directory
               * label: "pretty" text representation of the filename
               * imports: per page JS or CSS file imports to be included in HTML output from frontmatter
@@ -267,12 +284,8 @@ const generateGraph = async (compilation) => {
               const page = {
                 data: customData || {},
                 filename,
-                id,
                 relativeWorkspacePagePath: relativePagePath,
-                label: id.split('-')
-                  .map((idPart) => {
-                    return `${idPart.charAt(0).toUpperCase()}${idPart.substring(1)}`;
-                  }).join(' '),
+                label,
                 imports,
                 resources: [],
                 outputPath: route === '/404/'

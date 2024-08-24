@@ -1,5 +1,5 @@
 ---
-label: 'data-sources'
+label: 'Data Sources'
 menu: side
 title: 'Data Sources'
 index: 11

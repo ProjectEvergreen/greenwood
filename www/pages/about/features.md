@@ -1,5 +1,4 @@
 ---
-label: 'features'
 menu: side
 title: 'Features'
 index: 2

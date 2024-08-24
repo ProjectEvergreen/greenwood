@@ -1,5 +1,4 @@
 ---
-label: 'getting-started'
 menu: navigation
 title: 'Getting Started'
 index: 3

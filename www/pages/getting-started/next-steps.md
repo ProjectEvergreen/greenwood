@@ -1,5 +1,4 @@
 ---
-label: 'next-steps'
 menu: side
 title: 'Next Steps'
 index: 8

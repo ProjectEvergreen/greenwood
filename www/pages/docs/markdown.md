@@ -1,5 +1,4 @@
 ---
-label: 'markdown'
 menu: side
 title: 'Markdown'
 index: 4

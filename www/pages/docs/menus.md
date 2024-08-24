@@ -1,5 +1,4 @@
 ---
-label: 'menus'
 menu: side
 title: 'Menus'
 index: 10

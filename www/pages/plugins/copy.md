@@ -1,5 +1,4 @@
 ---
-label: 'copy'
 menu: side
 title: 'Copy'
 index: 3

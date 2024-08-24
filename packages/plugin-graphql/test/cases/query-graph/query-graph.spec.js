@@ -192,7 +192,7 @@ describe('Build Greenwood With: ', function() {
 
         expect(listItems[0].innerHTML).to.contain('First Post');
         expect(listItems[1].innerHTML).to.contain('Second Post');
-        expect(listItems[2].innerHTML).to.contain('Index');
+        expect(listItems[2].innerHTML).to.contain('Home');
         expect(listItems[3].innerHTML).to.contain('Not Found');
       });
     });

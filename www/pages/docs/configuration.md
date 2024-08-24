@@ -1,5 +1,4 @@
 ---
-label: 'configuration'
 menu: side
 title: 'Configuration'
 index: 2

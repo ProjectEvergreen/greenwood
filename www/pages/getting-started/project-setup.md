@@ -1,5 +1,4 @@
 ---
-label: 'project-setup'
 menu: side
 title: 'Project Setup'
 index: 2

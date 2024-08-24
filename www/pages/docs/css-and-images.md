@@ -1,5 +1,5 @@
 ---
-label: 'styles-and-assets'
+label: 'Styles and Assets'
 menu: side
 title: 'Styles and Assets'
 index: 6

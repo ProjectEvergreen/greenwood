@@ -1,5 +1,4 @@
 ---
-label: 'Rollup'
 menu: side
 title: 'Rollup'
 index: 6

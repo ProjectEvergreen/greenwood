@@ -1,5 +1,4 @@
 ---
-label: 'optimizing'
 menu: side
 title: 'Optimizing'
 index: 7
