@@ -298,10 +298,14 @@ class StandardCssResource extends ResourceInterface {
 
   async serve(url) {
     const body = await fs.promises.readFile(url, 'utf-8');
+    // eslint-disable-next-line no-underscore-dangle
+    const contentType = process.env.__GWD_COMMAND__ === 'serve' && url.searchParams?.get('polyfill') === 'type-css'
+      ? 'text/javascript'
+      : this.contentType;
 
     return new Response(body, {
       headers: {
-        'Content-Type': this.contentType
+        'Content-Type': contentType
       }
     });
   }
@@ -312,14 +316,14 @@ class StandardCssResource extends ResourceInterface {
 
     return url.protocol === 'file:'
       && ext === this.extensions[0]
-      && (response.headers.get('Content-Type')?.indexOf('text/css') >= 0 || request.headers.get('Accept')?.indexOf('text/javascript') >= 0);
+      && (response.headers.get('Content-Type')?.indexOf('text/css') >= 0 || request.headers.get('Accept')?.indexOf('text/javascript') >= 0) || url.searchParams?.get('polyfill') === 'type-css';
   }
 
   async intercept(url, request, response) {
     let body = bundleCss(await response.text(), url, this.compilation);
     let headers = {};
 
-    if (request.headers.get('Accept')?.indexOf('text/javascript') >= 0 && !url.searchParams.has('type')) {
+    if ((request.headers.get('Accept')?.indexOf('text/javascript') >= 0 || url.searchParams?.get('polyfill') === 'type-css') && !url.searchParams.has('type')) {
       const contents = body.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\');
 
       body = `const sheet = new CSSStyleSheet();sheet.replaceSync(\`${contents}\`);export default sheet;`;

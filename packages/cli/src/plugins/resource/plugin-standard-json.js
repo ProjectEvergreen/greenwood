@@ -33,10 +33,14 @@ class StandardJsonResource extends ResourceInterface {
       ? new URL('./graph.json', scratchDir)
       : url;
     const contents = await fs.readFile(finalUrl, 'utf-8');
+    // eslint-disable-next-line no-underscore-dangle
+    const contentType = process.env.__GWD_COMMAND__ === 'serve' && url.searchParams?.get('polyfill') === 'type-json'
+      ? 'text/javascript'
+      : this.contentType;
 
     return new Response(contents, {
       headers: new Headers({
-        'Content-Type': this.contentType
+        'Content-Type': contentType
       })
     });
   }
@@ -45,7 +49,10 @@ class StandardJsonResource extends ResourceInterface {
     const { protocol, pathname, searchParams } = url;
     const ext = pathname.split('.').pop();
 
-    return protocol === 'file:' && request.headers.get('Accept')?.indexOf('text/javascript') >= 0 && ext === this.extensions[0] && !searchParams.has('type');
+    return protocol === 'file:'
+      && ext === this.extensions[0]
+      && !searchParams.has('type')
+      && (request.headers.get('Accept')?.indexOf('text/javascript') >= 0 || url.searchParams?.get('polyfill') === 'type-json');
   }
 
   async intercept(url, request, response) {

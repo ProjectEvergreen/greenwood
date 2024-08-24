@@ -424,7 +424,8 @@ function greenwoodImportMetaUrl(compilation) {
 // - sync externalized import attribute paths with bundled CSS paths
 function greenwoodSyncImportAttributes(compilation) {
   const unbundledAssetsRefMapper = {};
-  const { basePath } = compilation.config;
+  const { basePath, polyfills } = compilation.config;
+  const { importAttributes } = polyfills;
 
   return {
     name: 'greenwood-sync-import-attributes',
@@ -451,7 +452,16 @@ function greenwoodSyncImportAttributes(compilation) {
             if (externalizedResources.includes(extension)) {
               let preBundled = false;
               let inlineOptimization = false;
-              bundles[bundle].code = bundles[bundle].code.replace(/assert{/g, 'with{');
+
+              if (importAttributes && importAttributes.includes(extension)) {
+                importAttributes.forEach((attribute) => {
+                  if (attribute === extension) {
+                    bundles[bundle].code = bundles[bundle].code.replace(new RegExp(`"assert{type:"${attribute}"}`, 'g'), `?polyfill=type-${extension}"`);
+                  }
+                });
+              } else {
+                bundles[bundle].code = bundles[bundle].code.replace(/assert{/g, 'with{');
+              }
 
               // check for app level assets, like say a shared theme.css
               compilation.resources.forEach((resource) => {
@@ -529,7 +539,10 @@ function greenwoodSyncImportAttributes(compilation) {
               // have to apply Greenwood's optimizing here instead of in generateBundle
               // since we can't do async work inside a sync AST operation
               if (!asset.preBundled) {
-                const assetUrl = unbundledAssetsRefMapper[asset].sourceURL;
+                const assetUrl = importAttributes && importAttributes.includes(ext)
+                  ? new URL(`${unbundledAssetsRefMapper[asset].sourceURL.href}?polyfill=type-${ext}`)
+                  : unbundledAssetsRefMapper[asset].sourceURL;
+
                 const request = new Request(assetUrl, { headers: { 'Accept': 'text/css' } });
                 let response = new Response(unbundledAssetsRefMapper[asset].source, { headers: { 'Content-Type': 'text/css' } });
 

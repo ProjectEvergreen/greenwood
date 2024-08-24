@@ -54,7 +54,7 @@ const defaultConfig = {
   pagesDirectory: 'pages',
   layoutsDirectory: 'layouts',
   polyfills: {
-    importAttributes: false, // or `css,json`
+    importAttributes: null, // or ['css', 'json']
     importMaps: false
   }
 };
@@ -246,14 +246,24 @@ const readAndMergeConfig = async() => {
         }
 
         if (polyfills !== undefined) {
-          const { importMaps } = polyfills;
+          const { importMaps, importAttributes } = polyfills;
 
           customConfig.polyfills = {};
 
-          if (typeof importMaps === 'boolean') {
-            customConfig.polyfills.importMaps = true;
-          } else {
-            reject(`Error: greenwood.config.js polyfills.importMaps must be a boolean; true or false.  Passed value was typeof: ${typeof importMaps}`);
+          if (importMaps) {
+            if (typeof importMaps === 'boolean') {
+              customConfig.polyfills.importMaps = true;
+            } else {
+              reject(`Error: greenwood.config.js polyfills.importMaps must be a boolean; true or false.  Passed value was typeof: ${typeof importMaps}`);
+            }
+          }
+
+          if (importAttributes) {
+            if (Array.isArray(importAttributes)) {
+              customConfig.polyfills.importAttributes = importAttributes;
+            } else {
+              reject(`Error: greenwood.config.js polyfills.importAttributes must be an array of types; ['css', 'json'].  Passed value was typeof: ${typeof importAttributes}`);
+            }
           }
         }
       } else {
