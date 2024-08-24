@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with interpolateFrontmatter configuration enabled for simple and rich frontmatter.
+ * Run Greenwood with activeFrontmatter configuration enabled for simple and rich frontmatter.
  *
  * User Result
  * Should generate a bare bones Greenwood build with correctly interpolated frontmatter variables in markdown and HTML.
@@ -10,7 +10,7 @@
  *
  * User Config
  * {
- *   interpolateFrontmatter: true
+ *   activeFrontmatter: true
  * }
  *
  * User Workspace
@@ -33,7 +33,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Frontmatter Interpolation';
+  const LABEL = 'Active Frontmatter';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;

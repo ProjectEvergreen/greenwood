@@ -20,7 +20,7 @@ export default {
   },
   basePath: '',
   port: 8080,
-  interpolateFrontmatter: false,
+  activeFrontmatter: false,
   markdown: {
     plugins: [],
     settings: {}
@@ -86,9 +86,9 @@ export default {
 };
 ```
 
-### Interpolate Frontmatter
+### Active Frontmatter
 
-To support simple static templating in HTML and markdown pages and layouts, the `interpolateFrontmatter` option can be set to `true` to allow the following kinds of simple static substitutions using a syntax convention based on JavaScript [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
+To support simple static templating in HTML and markdown pages and layouts, the `activeFrontmatter` option can be set to `true` to allow the following kinds of simple static substitutions using a syntax convention based on JavaScript [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
 
 #### Example
 Given some frontmatter in a markdown file:

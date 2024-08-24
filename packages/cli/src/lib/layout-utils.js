@@ -193,10 +193,10 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
     const appBody = appRoot.querySelector('body') ? appRoot.querySelector('body').innerHTML : '';
     const pageBody = pageRoot && pageRoot.querySelector('body') ? pageRoot.querySelector('body').innerHTML : '';
     const pageTitle = pageRoot && pageRoot.querySelector('head title');
-    const hasInterpolatedFrontmatter = pageTitle && pageTitle.rawText.indexOf('${globalThis.page.title}') >= 0
+    const hasActiveFrontmatterTitle = pageTitle && pageTitle.rawText.indexOf('${globalThis.page.title}') >= 0
      || appTitle && appTitle.rawText.indexOf('${globalThis.page.title}') >= 0;
 
-    const title = hasInterpolatedFrontmatter // favor frontmatter interpolation first
+    const title = hasActiveFrontmatterTitle // favor active frontmatter title first
       ? pageTitle && pageTitle.rawText
         ? pageTitle.rawText
         : appTitle.rawText

@@ -38,7 +38,7 @@ class StandardHtmlResource extends ResourceInterface {
   async serve(url, request) {
     const { config, context } = this.compilation;
     const { pagesDir, userWorkspace } = context;
-    const { interpolateFrontmatter } = config;
+    const { activeFrontmatter } = config;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find(node => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
@@ -171,7 +171,7 @@ class StandardHtmlResource extends ResourceInterface {
       body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, '$$$')}<!-- greenwood-ssr-end -->`);
     }
 
-    if (interpolateFrontmatter) {
+    if (activeFrontmatter) {
       console.log({ frontMatter, matchingRoute });
       // TODO consolidate this
       for (const fm in matchingRoute.data) {
