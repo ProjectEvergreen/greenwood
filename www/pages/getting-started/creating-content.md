@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Creating Content'
 index: 4
 linkheadings: 3
 ---

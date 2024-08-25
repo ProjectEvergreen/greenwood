@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Server Rendering'
 index: 8
 linkheadings: 3
 ---

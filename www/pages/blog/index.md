@@ -1,6 +1,5 @@
 ---
 menu: navigation
-title: Blog
 index: 6
 layout: blog
 ---

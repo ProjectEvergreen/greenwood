@@ -108,7 +108,8 @@ async function getPageLayout(filePath, compilation, layout) {
 }
 
 /* eslint-disable-next-line complexity */
-async function getAppLayout(pageLayoutContents, compilation, customImports = [], frontmatterTitle) {
+async function getAppLayout(pageLayoutContents, compilation, customImports = [], matchingRoute) {
+  const activeFrontmatterTitleKey = '${globalThis.page.title}';
   const enableHud = compilation.config.devServer.hud;
   const { layoutsDir, userLayoutsDir } = compilation.context;
   const userStaticAppLayoutUrl = new URL('./app.html', userLayoutsDir);
@@ -193,20 +194,25 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
     const appBody = appRoot.querySelector('body') ? appRoot.querySelector('body').innerHTML : '';
     const pageBody = pageRoot && pageRoot.querySelector('body') ? pageRoot.querySelector('body').innerHTML : '';
     const pageTitle = pageRoot && pageRoot.querySelector('head title');
-    const hasActiveFrontmatterTitle = pageTitle && pageTitle.rawText.indexOf('${globalThis.page.title}') >= 0
-     || appTitle && appTitle.rawText.indexOf('${globalThis.page.title}') >= 0;
+    const hasActiveFrontmatterTitle = pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0
+     || appTitle && appTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0;
+    let title;
 
-    const title = hasActiveFrontmatterTitle // favor active frontmatter title first
-      ? pageTitle && pageTitle.rawText
+    if (hasActiveFrontmatterTitle) {
+      const text = pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0
         ? pageTitle.rawText
-        : appTitle.rawText
-      : frontmatterTitle // otherwise, work in order of specificity from page -> page layout -> app layout
-        ? frontmatterTitle
+        : appTitle.rawText;
+
+      title = text.replace(activeFrontmatterTitleKey, matchingRoute.title || matchingRoute.label);
+    } else {
+      title = matchingRoute.title
+        ? matchingRoute.title
         : pageTitle && pageTitle.rawText
           ? pageTitle.rawText
           : appTitle && appTitle.rawText
             ? appTitle.rawText
-            : 'My App';
+            : matchingRoute.label;
+    }
 
     const mergedHtml = pageRoot && pageRoot.querySelector('html').rawAttrs !== ''
       ? `<html ${pageRoot.querySelector('html').rawAttrs}>`

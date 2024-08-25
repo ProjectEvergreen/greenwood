@@ -243,7 +243,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     // and before we optimize so that all bundled assets can tracked up front
     // would be nice to see if this can be done in a single pass though...
     for (const page of ssrPages) {
-      const { imports, route, layout, title, relativeWorkspacePagePath } = page;
+      const { imports, route, layout, relativeWorkspacePagePath } = page;
       const moduleUrl = new URL(`.${relativeWorkspacePagePath}`, pagesDir);
       const request = new Request(moduleUrl);
       // TODO getLayout has to be static (for now?)
@@ -252,7 +252,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
       let staticHtml = '';
 
       staticHtml = data.layout ? data.layout : await getPageLayout(staticHtml, compilation, layout);
-      staticHtml = await getAppLayout(staticHtml, compilation, imports, title);
+      staticHtml = await getAppLayout(staticHtml, compilation, imports, page);
       staticHtml = await getUserScripts(staticHtml, compilation);
       staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
 

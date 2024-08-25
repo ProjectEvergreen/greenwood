@@ -1,6 +1,5 @@
 ---
 menu: navigation
-title: 'Getting Started'
 index: 3
 ---
 

@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Tech Stack'
 index: 4
 linkheadings: 3
 ---

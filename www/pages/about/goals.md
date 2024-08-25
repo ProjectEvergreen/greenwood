@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Goals'
 index: 0
 ---
 

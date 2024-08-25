@@ -1,6 +1,5 @@
 ---
 menu: navigation
-title: About
 index: 1
 ---
 

@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Custom Plugins'
 index: 9
 ---
 

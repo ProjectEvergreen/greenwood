@@ -1,6 +1,5 @@
 ---
 menu: navigation
-title: Plugins
 index: 4
 ---
 

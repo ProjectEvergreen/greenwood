@@ -1,5 +1,4 @@
 ---
-label: 'Netlify CMS'
 title: 'Netlify CMS'
 menu: side
 linkheadings: 3

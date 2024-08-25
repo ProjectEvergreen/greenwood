@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Adapter'
 index: 1
 ---
 

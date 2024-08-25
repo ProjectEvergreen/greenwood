@@ -5,7 +5,6 @@
  * This is a Greenwood default plugin.
  *
  */
-import frontmatter from 'front-matter';
 import fs from 'fs/promises';
 import rehypeStringify from 'rehype-stringify';
 import rehypeRaw from 'rehype-raw';
@@ -46,9 +45,7 @@ class StandardHtmlResource extends ResourceInterface {
     const isMarkdownContent = (matchingRoute?.filename || '').split('.').pop() === 'md';
 
     let body = '';
-    let title = matchingRoute.title || null;
     let layout = matchingRoute.layout || null;
-    let frontMatter = matchingRoute.data || {};
     let customImports = matchingRoute.imports || [];
     let ssrBody;
     let ssrLayout;
@@ -74,7 +71,6 @@ class StandardHtmlResource extends ResourceInterface {
       }
 
       const settings = config.markdown.settings || {};
-      const fm = frontmatter(markdownContents); // TODO we already got this once in the graph phase...
 
       processedMarkdown = await unified()
         .use(remarkParse, settings) // parse markdown into AST
@@ -85,23 +81,6 @@ class StandardHtmlResource extends ResourceInterface {
         .use(rehypePlugins) // apply userland rehype plugins
         .use(rehypeStringify) // convert AST to HTML string
         .process(markdownContents);
-
-      // configure via frontmatter
-      if (fm.attributes) {
-        frontMatter = fm.attributes;
-
-        if (frontMatter.title) {
-          title = frontMatter.title;
-        }
-
-        if (frontMatter.layout) {
-          layout = frontMatter.layout;
-        }
-
-        if (frontMatter.imports) {
-          customImports = frontMatter.imports;
-        }
-      }
     }
 
     if (matchingRoute.isSSR) {
@@ -144,7 +123,7 @@ class StandardHtmlResource extends ResourceInterface {
       body = ssrLayout ? ssrLayout : await getPageLayout(filePath, this.compilation, layout);
     }
 
-    body = await getAppLayout(body, this.compilation, customImports, title);
+    body = await getAppLayout(body, this.compilation, customImports, matchingRoute);
     body = await getUserScripts(body, this.compilation);
 
     if (processedMarkdown) {
@@ -172,21 +151,22 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     if (activeFrontmatter) {
-      console.log({ frontMatter, matchingRoute });
-      // TODO consolidate this
       for (const fm in matchingRoute.data) {
-        console.log('11', { fm });
         const interpolatedFrontmatter = '\\$\\{globalThis.page.' + fm + '\\}';
         const needle = typeof matchingRoute.data[fm] === 'string' ? matchingRoute.data[fm] : JSON.stringify(matchingRoute.data[fm]).replace(/"/g, '&quot;');
-        console.log('replace', needle);
+
         body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), needle);
       }
 
-      for (const fm in frontMatter) {
-        const interpolatedFrontmatter = '\\$\\{globalThis.page.' + fm + '\\}';
+      // TODO
+      // const activeFrontmatterForwardKeys = ['route', 'label'];
 
-        body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), frontMatter[fm]);
-      }
+      // for (const key of activeFrontmatterForwardKeys) {
+      //   console.log({ key })
+      //   const interpolatedFrontmatter = '\\$\\{globalThis.page.' + key + '\\}';
+
+      //   body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), matchingRoute[key]);
+      // }
 
       for (const collection in this.compilation.collections) {
         const interpolatedFrontmatter = '\\$\\{globalThis.collection.' + collection + '\\}';

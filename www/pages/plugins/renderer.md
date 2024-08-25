@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Renderer'
 index: 5
 ---
 

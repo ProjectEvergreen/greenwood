@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Quick Start'
 index: 1
 linkheadings: 3
 ---

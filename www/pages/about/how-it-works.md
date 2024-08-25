@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'How It Works'
 index: 1
 linkheadings: 3
 ---

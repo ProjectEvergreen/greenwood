@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Optimizing'
 index: 7
 linkheadings: 3
 ---

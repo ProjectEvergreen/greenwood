@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Features'
 index: 2
 linkheadings: 3
 ---

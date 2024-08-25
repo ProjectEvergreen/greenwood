@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Project Setup'
 index: 2
 linkheadings: 3
 ---

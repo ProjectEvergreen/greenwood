@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Source'
 index: 8
 ---
 

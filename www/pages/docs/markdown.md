@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Markdown'
 index: 4
 linkheadings: 3
 ---

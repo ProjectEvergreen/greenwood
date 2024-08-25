@@ -1,5 +1,4 @@
 ---
-label: 'API Routes'
 menu: side
 title: 'API Routes'
 index: 9

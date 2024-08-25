@@ -1,5 +1,4 @@
 ---
-label: 'Scripts and Imports'
 menu: side
 title: 'Scripts and Imports'
 index: 5

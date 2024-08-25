@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Key Concepts'
 index: 3
 linkheadings: 3
 ---

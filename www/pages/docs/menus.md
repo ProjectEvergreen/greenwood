@@ -1,6 +1,5 @@
 ---
 menu: side
-title: 'Menus'
 index: 10
 linkheadings: 3
 ---

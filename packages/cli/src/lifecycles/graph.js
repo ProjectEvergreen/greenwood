@@ -5,7 +5,7 @@ import { checkResourceExists, requestAsObject } from '../lib/resource-utils.js';
 import toc from 'markdown-toc';
 import { Worker } from 'worker_threads';
 
-function labelFromRoute(_route) {
+function getLabelFromRoute(_route) {
   let route = _route;
 
   if (route === '/index/') {
@@ -42,8 +42,8 @@ const generateGraph = async (compilation) => {
         filename: 'index.html',
         path: '/',
         route: `${basePath}/`,
-        id: 'index',
-        label: 'Index',
+        label: 'Home',
+        title: null,
         data: {},
         imports: [],
         resources: [],
@@ -119,8 +119,8 @@ const generateGraph = async (compilation) => {
               let route = relativePagePath.replace(extension, '');
               let root = filename.split('/')[filename.split('/').length - 1].replace(extension, '');
               let layout = extension === '.html' ? null : 'page';
-              let label = labelFromRoute(`${route}/`);
-              let title = null; // TODO use label here
+              let title = null;
+              let label = getLabelFromRoute(`${route}/`);
               let imports = [];
               let customData = {};
               let filePath;
@@ -267,14 +267,14 @@ const generateGraph = async (compilation) => {
               * data: custom page frontmatter
               * filename: base filename of the page
               * relativeWorkspacePagePath: the file path relative to the user's workspace directory
-              * label: "pretty" text representation of the filename
+              * label: by default is just a copy of title, otherwise can be overridden by the user
               * imports: per page JS or CSS file imports to be included in HTML output from frontmatter
               * resources: sum of all resources for the entire page
               * outputPath: the filename to write to when generating static HTML
               * path: path to the file relative to the workspace
               * route: URL route for a given page on outputFilePath
               * layout: page layout to use as a base for a generated component
-              * title: a default value that can be used for <title></title>
+              * title: A way to customize the <title></title> tag of the page, otherwise defaults tot the value of label
               * isSSR: if this is a server side route
               * prerender: if this should be statically exported
               * isolation: if this should be run in isolated mode
@@ -357,8 +357,8 @@ const generateGraph = async (compilation) => {
               filename: '404.html',
               route: `${basePath}/404/`,
               path: '404.html',
-              id: '404',
-              label: 'Not Found'
+              label: 'Not Found',
+              title: null
             }
           ];
         }

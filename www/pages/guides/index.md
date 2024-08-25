@@ -1,5 +1,4 @@
 ---
-title: 'Guides'
 menu: navigation
 index: 5
 ---
