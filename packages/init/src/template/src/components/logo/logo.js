@@ -1,10 +1,83 @@
-import sheet from './logo.css' with { type: 'css' };
-
 const template = document.createElement('template');
 
 template.innerHTML = `
   <div class="my-logo">
+    <style>
+      .my-logo {
+        height: 100px;
+        line-height: 100px;
+        font-size: 36px;
+        color: transparent;
+      }
+
+      .spacer {
+        height: 100px;
+        width: 100px;
+        display: block;
+        margin-top: -100px;
+      }
+
+      .my-logo div {
+        display: inline-block;
+        max-width: 35%;
+        vertical-align: middle;
+        border-radius: 20px;
+        vertical-align: top;
+      }
+
+      svg {
+        will-change: filter;
+        transition: filter 300ms;
+        width: 80%;
+      }
+
+      @keyframes logo-spin {
+        from {
+          transform: rotate(0deg);
+        }
+
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* https://stackoverflow.com/a/40996404/417806 */
+      @keyframes leafanimation {
+        0% {transform:translate(1000px,500px) rotate(0deg);}
+        20% {transform:translate(850px,450px) rotate(360deg);}
+        40% {transform:translate(450px,200px) rotate(720deg);}
+        60% {transform:translate(100px,100px) rotate(1080deg);}
+        80% {transform:translate(0,0) rotate(1440deg);}
+        100% {transform:translate(0,0) rotate(1440deg);}
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        .my-logo {
+          animation: leafanimation 6s linear;
+        }
+      }
+
+      @media(min-width: 500px) {
+        .my-logo div {
+          max-width: 23%;
+        }
+      }
+
+      @media(min-width: 768px) {
+        .my-logo div {
+          max-width: 15%;
+        }
+      }
+
+      @media(min-width: 1024px) {
+        .my-logo div {
+          max-width: 10%;
+        }
+      }
+    </style>
+
     <span class="spacer"></span>
+
     <div>
       <svg width="100%" height="100%" viewBox="0 0 150 180" fill="#00b68f">
         <defs>
@@ -35,8 +108,6 @@ class Logo extends HTMLElement {
       this.attachShadow({ mode: 'open' });
       this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
-
-    this.shadowRoot.adoptedStyleSheets = [sheet];
   }
 }
 
