@@ -257,7 +257,7 @@ const run = async () => {
     }
 
     // map all the template files and copy them to the current working directory
-    console.log('Initialzing project with files...');
+    console.log('Initializing project with files...');
     await srcInit();
 
     console.log('Creating manifest (package.json)...');
