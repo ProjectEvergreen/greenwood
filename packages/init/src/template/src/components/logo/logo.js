@@ -79,7 +79,7 @@ template.innerHTML = `
     <span class="spacer"></span>
 
     <div>
-      <svg width="100%" height="100%" viewBox="0 0 150 180" fill="#00b68f">
+      <svg width="100%" height="100%" viewBox="0 0 150 180" fill="#00b68f" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <style>
             .shading {
