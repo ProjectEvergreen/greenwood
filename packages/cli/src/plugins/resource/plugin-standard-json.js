@@ -33,14 +33,10 @@ class StandardJsonResource extends ResourceInterface {
       ? new URL('./graph.json', scratchDir)
       : url;
     const contents = await fs.readFile(finalUrl, 'utf-8');
-    // eslint-disable-next-line no-underscore-dangle
-    const contentType = process.env.__GWD_COMMAND__ === 'serve' && url.searchParams?.get('polyfill') === 'type-json'
-      ? 'text/javascript'
-      : this.contentType;
 
     return new Response(contents, {
       headers: new Headers({
-        'Content-Type': contentType
+        'Content-Type': this.contentType
       })
     });
   }

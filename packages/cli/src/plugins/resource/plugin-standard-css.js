@@ -298,14 +298,10 @@ class StandardCssResource extends ResourceInterface {
 
   async serve(url) {
     const body = await fs.promises.readFile(url, 'utf-8');
-    // eslint-disable-next-line no-underscore-dangle
-    const contentType = process.env.__GWD_COMMAND__ === 'serve' && url.searchParams?.get('polyfill') === 'type-css'
-      ? 'text/javascript'
-      : this.contentType;
 
     return new Response(body, {
       headers: {
-        'Content-Type': contentType
+        'Content-Type': this.contentType
       }
     });
   }

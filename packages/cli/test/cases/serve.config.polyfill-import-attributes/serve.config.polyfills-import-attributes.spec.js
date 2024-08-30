@@ -39,9 +39,6 @@ describe('Serve Greenwood With: ', function() {
   const outputUrl = new URL('.', import.meta.url);
   const outputPath = fileURLToPath(outputUrl);
   const hostname = 'http://127.0.0.1:8080';
-  const jsHash = '8b10e832';
-  const cssHash = '57750ec5';
-  const jsonHash = '46b4fc8c';
   let runner;
 
   before(function() {
@@ -75,6 +72,7 @@ describe('Serve Greenwood With: ', function() {
     });
 
     describe('Import Attributes Polyfill Behaviors for the initiating JavaScript file (hero.js) being served and bundled', function() {
+      const jsHash = 'f22adf2c';
       let response = {};
       let text;
       let contents;
@@ -104,75 +102,15 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should contain import attributes polyfill syntax for CSS', function(done) {
-        expect(text).to.contain(`import t from"/hero.${cssHash}.css?polyfill=type-css";`);
-        expect(contents).to.contain(`import t from"/hero.${cssHash}.css?polyfill=type-css";`);
+        expect(text).to.contain('const t=new CSSStyleSheet;t.replaceSync(":host h2{font-size:3em}");');
+        expect(contents).to.contain('const t=new CSSStyleSheet;t.replaceSync(":host h2{font-size:3em}");');
 
         done();
       });
 
       it('should contain import attributes polyfill syntax for JSON', function(done) {
-        expect(text).to.contain(`import e from"/hero.${jsonHash}.json?polyfill=type-json";`);
-        expect(contents).to.contain(`import e from"/hero.${jsonHash}.json?polyfill=type-json";`);
-
-        done();
-      });
-    });
-
-    describe('Import Attributes Polyfill Behavior for CSS (hero.css) being served and bundled', function() {
-      let response = {};
-      let text;
-      let contents;
-
-      before(async function() {
-        response = await fetch(`${hostname}/hero.${cssHash}.css?polyfill=type-css`);
-        text = await response.clone().text();
-        contents = await fs.promises.readFile(new URL(`./public/hero.${cssHash}.css`, outputUrl), 'utf-8');
-      });
-
-      it('should return the correct content type', function(done) {
-        expect(response.headers.get('content-type')).to.contain('text/javascript');
-        done();
-      });
-
-      it('should return a 200', function(done) {
-        expect(response.status).to.equal(200);
-
-        done();
-      });
-
-      it('should return the contents as an exported Constructable StyleSheet ES module', function(done) {
-        expect(text).to.equal('const sheet = new CSSStyleSheet();sheet.replaceSync(`:host h2{font-size:3em}`);export default sheet;');
-        expect(contents).to.equal('const sheet = new CSSStyleSheet();sheet.replaceSync(`:host h2{font-size:3em}`);export default sheet;');
-
-        done();
-      });
-    });
-
-    describe('Import Attributes Polyfill Behavior for JSON (hero.json) being served and bundled', function() {
-      let response = {};
-      let text;
-      let contents;
-
-      before(async function() {
-        response = await fetch(`${hostname}/hero.${jsonHash}.json?polyfill=type-json`);
-        text = await response.clone().text();
-        contents = await fs.promises.readFile(new URL(`./public/hero.${jsonHash}.json`, outputUrl), 'utf-8');
-      });
-
-      it('should return the correct content type', function(done) {
-        expect(response.headers.get('content-type')).to.contain('text/javascript');
-        done();
-      });
-
-      it('should return a 200', function(done) {
-        expect(response.status).to.equal(200);
-
-        done();
-      });
-
-      it('should return the contents as an exported Constructable StyleSheet ES module', function(done) {
-        expect(text).to.equal('export default {"msg":"Hello World"}');
-        expect(contents).to.equal('export default {"msg":"Hello World"}');
+        expect(text).to.contain('var e={msg:"Hello World"};');
+        expect(contents).to.contain('var e={msg:"Hello World"};');
 
         done();
       });

@@ -16,6 +16,7 @@ function cleanRollupId(id) {
 const externalizedResources = ['css', 'json'];
 
 function greenwoodResourceLoader (compilation, browser = false) {
+  const { importAttributes } = compilation.config?.polyfills;
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
   }).map((plugin) => {
@@ -33,7 +34,10 @@ function greenwoodResourceLoader (compilation, browser = false) {
       if (normalizedId.startsWith('.')) {
         const importerUrl = new URL(normalizedId, `file://${importer}`);
         const extension = importerUrl.pathname.split('.').pop();
-        const external = externalizedResources.includes(extension) && browser && !importerUrl.searchParams.has('type');
+        // if we are polyfilling import attributes for the browser we will want Rollup to bundles these as JS files
+        // instead of externalizing as their native content-type
+        const shouldPolyfill = browser && (importAttributes || []).includes(extension);
+        const external = !shouldPolyfill && externalizedResources.includes(extension) && browser && !importerUrl.searchParams.has('type');
         const isUserWorkspaceUrl = importerUrl.pathname.startsWith(userWorkspace.pathname);
         const prefix = normalizedId.startsWith('..') ? './' : '';
         // if its not in the users workspace, we clean up the dot-dots and check that against the user's workspace
