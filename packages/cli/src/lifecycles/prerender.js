@@ -130,7 +130,6 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     const outputPathUrl = new URL(`.${outputPath}`, scratchDir);
 
     // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
-    // body = body.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
     if (importMaps) {
       body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
       body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
