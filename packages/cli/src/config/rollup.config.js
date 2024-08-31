@@ -58,8 +58,7 @@ function greenwoodResourceLoader (compilation, browser = false) {
       const { pathname } = idUrl;
       const extension = pathname.split('.').pop();
       const headers = {
-        'Accept': 'text/javascript',
-        'Sec-Fetch-Dest': 'empty'
+        'Accept': 'text/javascript'
       };
 
       // filter first for any bare specifiers
@@ -258,8 +257,7 @@ function greenwoodImportMetaUrl(compilation) {
       const normalizedId = id.replace(/\\\\/g, '/').replace(/\\/g, '/'); // windows shenanigans...
       let idUrl = new URL(`file://${cleanRollupId(id)}`);
       const headers = {
-        'Accept': 'text/javascript',
-        'Sec-Fetch-Dest': 'empty'
+        'Accept': 'text/javascript'
       };
       const request = new Request(idUrl, {
         headers
@@ -543,12 +541,17 @@ function greenwoodSyncImportAttributes(compilation) {
               // have to apply Greenwood's optimizing here instead of in generateBundle
               // since we can't do async work inside a sync AST operation
               if (!asset.preBundled) {
+                const type = ext === 'css'
+                  ? 'text/css'
+                  : ext === 'css'
+                    ? 'application/json'
+                    : '';
                 const assetUrl = importAttributes && importAttributes.includes(ext)
                   ? new URL(`${unbundledAssetsRefMapper[asset].sourceURL.href}?polyfill=type-${ext}`)
                   : unbundledAssetsRefMapper[asset].sourceURL;
 
-                const request = new Request(assetUrl, { headers: { 'Accept': 'text/css' } });
-                let response = new Response(unbundledAssetsRefMapper[asset].source, { headers: { 'Content-Type': 'text/css' } });
+                const request = new Request(assetUrl, { headers: { 'Accept': type } });
+                let response = new Response(unbundledAssetsRefMapper[asset].source, { headers: { 'Content-Type': type } });
 
                 for (const plugin of resourcePlugins) {
                   if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(assetUrl, request, response.clone())) {
