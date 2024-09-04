@@ -32,15 +32,16 @@ class StandardJavaScriptResource extends ResourceInterface {
     });
   }
 
-  async shouldPreIntercept(url) {
+  async shouldPreIntercept(url, request, response) {
     const { polyfills } = this.compilation.config;
 
-    return (polyfills?.importAttributes || []).length > 0 && url.protocol === 'file:' && this.extensions.includes(url.pathname.split('.').pop());
+    return (polyfills?.importAttributes || []).length > 0 && url.protocol === 'file:' && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
   }
 
-  async preIntercept(url) {
+  async preIntercept(url, request, response) {
     const { polyfills } = this.compilation.config;
-    let body = await fs.readFile(url, 'utf-8');
+    const body = await response.clone().text();
+    let polyfilled = body;
 
     walk.simple(acorn.Parser.extend(importAttributes).parse(body, {
       ecmaVersion: 'latest',
@@ -52,14 +53,14 @@ class StandardJavaScriptResource extends ResourceInterface {
 
         polyfills.importAttributes.forEach((attribute) => {
           if (line.replace(/ /g, '').replace(/"/g, '\'').includes(`with{type:'${attribute}'}`)) {
-            body = body.replace(line, `${line.split('with')[0]};\n`);
-            body = body.replace(value, `${value}?polyfill=type-${attribute}`);
+            polyfilled = polyfilled.replace(line, `${line.split('with')[0]};\n`);
+            polyfilled = polyfilled.replace(value, `${value}?polyfill=type-${attribute}`);
           }
         });
       }
     });
 
-    return new Response(body, {
+    return new Response(polyfilled, {
       headers: {
         'Content-Type': this.contentType
       }
