@@ -11,10 +11,6 @@ export default {
   optimization: 'inline',
   staticRouter: true,
   interpolateFrontmatter: true,
-  polyfills: {
-    // importMaps: true,
-    importAttributes: ['css', 'json']
-  },
   plugins: [
     greenwoodPluginGraphQL(),
     greenwoodPluginPolyfills({
