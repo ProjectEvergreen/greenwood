@@ -20,6 +20,7 @@
  *     hero.css
  *     hero.json
  *   index.html
+ *   theme.css
  * greenwood.config.js
  * package.json
  *
@@ -95,8 +96,9 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
 
-      it('should contain import attributes polyfill syntax for CSS', function(done) {
+      it('should contain import attributes polyfill syntax for CSS files', function(done) {
         expect(text.replace(/ /g, '')).to.contain('importsheetfrom\'./hero.css?polyfill=type-css\'');
+        expect(text.replace(/ /g, '')).to.contain('importthemefrom\'../theme.css?polyfill=type-css\'');
 
         done();
       });

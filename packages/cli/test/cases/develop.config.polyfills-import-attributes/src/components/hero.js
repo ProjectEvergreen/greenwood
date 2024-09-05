@@ -1,6 +1,7 @@
 // intentionally break formatting to validate our AST parsing is not impacted / naive
 import sheet from './hero.css'
 with { type: 'css' }; // eslint-disable-line indent
+import theme from '../theme.css' with { type: 'css' };
 import json from './hero.json'
   with { type: 'json' };
 
@@ -42,7 +43,7 @@ export default class HeroBanner extends HTMLElement {
       this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
 
-    this.shadowRoot.adoptedStyleSheets = [sheet];
+    this.shadowRoot.adoptedStyleSheets = [theme, sheet];
     this.shadowRoot.querySelectorAll('button')
       .forEach(button => {
         button.addEventListener('click', () => this.clickButton(button));
