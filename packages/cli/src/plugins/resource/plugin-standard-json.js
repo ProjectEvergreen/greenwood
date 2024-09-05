@@ -45,7 +45,10 @@ class StandardJsonResource extends ResourceInterface {
     const { protocol, pathname, searchParams } = url;
     const ext = pathname.split('.').pop();
 
-    return protocol === 'file:' && request.headers.get('Accept')?.indexOf('text/javascript') >= 0 && ext === this.extensions[0] && !searchParams.has('type');
+    return protocol === 'file:'
+      && ext === this.extensions[0]
+      && !searchParams.has('type')
+      && (request.headers.get('Accept')?.indexOf('text/javascript') >= 0 || url.searchParams?.get('polyfill') === 'type-json');
   }
 
   async intercept(url, request, response) {

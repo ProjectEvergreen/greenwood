@@ -488,7 +488,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return an import map shim <script> in the <head> of the document', function(done) {
-        const importMapTag = dom.window.document.querySelectorAll('head > script[type="importmap-shim"]')[0];
+        const importMapTag = dom.window.document.querySelectorAll('head > script[type="importmap"]')[0];
         const importMap = JSON.parse(importMapTag.textContent).imports;
 
         Object.keys(expectedImportMap).forEach((key) => {
@@ -520,15 +520,6 @@ describe('Develop Greenwood With: ', function() {
         expect(importMap['@material/base/component']).to.equal('/node_modules/@material/base/component.js');
         expect(importMap['@material/base/foundation']).to.equal('/node_modules/@material/base/foundation.js');
         expect(importMap['@material/base/types']).to.equal('/node_modules/@material/base/types.js');
-
-        done();
-      });
-
-      it('should return an import map in the <head> of the document', function(done) {
-        const importMapShimTag = dom.window.document.querySelectorAll('head > script[defer]')[0];
-        const shimSrc = importMapShimTag.getAttribute('src');
-
-        expect(shimSrc).to.equal('/node_modules/es-module-shims/dist/es-module-shims.js');
 
         done();
       });

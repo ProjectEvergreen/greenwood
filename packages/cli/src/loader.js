@@ -19,8 +19,7 @@ const resourcePlugins = config.plugins
 
 async function getCustomLoaderResponse(initUrl, checkOnly = false) {
   const headers = {
-    'Accept': 'text/javascript',
-    'Sec-Fetch-Dest': 'empty'
+    'Accept': 'text/javascript'
   };
   const initResponse = new Response('');
   let request = new Request(initUrl, { headers });

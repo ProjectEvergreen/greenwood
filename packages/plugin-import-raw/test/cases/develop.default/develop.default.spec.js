@@ -67,11 +67,7 @@ describe('Develop Greenwood With: ', function() {
       let data;
 
       before(async function() {
-        response = await fetch(`${hostname}:${port}/main.css?type=raw`, {
-          headers: {
-            'Sec-Fetch-Dest': 'empty'
-          }
-        });
+        response = await fetch(`${hostname}:${port}/main.css?type=raw`);
         data = await response.text();
       });
 

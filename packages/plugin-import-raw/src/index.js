@@ -36,12 +36,11 @@ class ImportRawResource extends ResourceInterface {
     return new Request(matchedUrl);
   }
 
-  async shouldIntercept(url, request) {
+  async shouldIntercept(url) {
     const matches = (this.options.matches || []).filter(matcher => url.href.indexOf(matcher) >= 0);
     const type = url.searchParams.get('type');
-    const dest = request.headers.get('Sec-Fetch-Dest');
 
-    return (url.protocol === 'file:' && type === 'raw' && dest === 'empty') || matches.length > 0;
+    return (url.protocol === 'file:' && type === 'raw') || matches.length > 0;
   }
 
   async intercept(url, request, response) {
