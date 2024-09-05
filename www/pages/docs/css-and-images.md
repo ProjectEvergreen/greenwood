@@ -75,6 +75,8 @@ export default class Card extends HTMLElement {
 customElements.define('x-card', Card);
 ```
 
+> ⚠️ _Although Import Attributes are not baseline yet, Greenwood supports polyfilling them with a [configuration flag](/docs/configuration/#polyfills)._
+
 
 ### Assets
 

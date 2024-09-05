@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood serve command with no basePath configuration set (and staticRouter).
+ * Run Greenwood develop command with no basePath configuration set (and staticRouter).
  *
  * User Result
  * Should start the development server and render a the Greenwood application.

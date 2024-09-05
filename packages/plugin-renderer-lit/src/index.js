@@ -13,18 +13,16 @@ class LitHydrationResource extends ResourceInterface {
   }
 
   async intercept(url, request, response) {
-    let body = await response.text();
-
-    // TODO would be nice not have to manually set module-shim
-    // when we drop support for import-map shim - https://github.com/ProjectEvergreen/greenwood/pull/1115
-    const type = process.env.__GWD_COMMAND__ === 'develop' // eslint-disable-line  no-underscore-dangle
+    const { importMaps } = this.compilation.config.polyfills;
+    const importMapType = process.env.__GWD_COMMAND__ === 'develop' && importMaps // eslint-disable-line  no-underscore-dangle
       ? 'module-shim'
       : 'module';
+    let body = await response.text();
 
     // this needs to come first before any userland code
     body = body.replace('<head>', `
       <head>
-        <script type="${type}" src="/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js"></script>
+        <script type="${importMapType}" src="/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js"></script>
     `);
 
     return new Response(body);

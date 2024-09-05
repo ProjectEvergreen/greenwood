@@ -32,7 +32,11 @@ export default {
   workspace: new URL('./src/', import.meta.url),
   pagesDirectory: 'pages', // e.g. src/pages
   layoutsDirectory: 'layouts', // e.g. src/layouts
-  isolation: false
+  isolation: false,
+  polyfills: {
+    importAttributes: null, // e.g. ['css', 'json']
+    importMaps: false
+  }
 };
 ```
 
@@ -218,6 +222,57 @@ By default the directory Greenwood will use to look for your local content is _p
 export default {
   pagesDirectory: 'docs' // Greenwood will look for pages at src/docs/
 };
+```
+
+### Polyfills
+
+Greenwood provides polyfills for a few Web APIs out of the box.
+
+#### Import Maps
+
+> _Only applies to development mode._
+
+If you are developing with Greenwood in a browser that doesn't support [import maps](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap#browser_compatibility), with this flag enabled, Greenwood will add the [**ES Module Shims**](https://github.com/guybedford/es-module-shims) polyfill to provide support for import maps.
+
+```js
+export default {
+  polyfills: {
+    importMaps: true
+  }
+};
+```
+
+#### Import Attributes
+
+[Import Attributes](https://github.com/tc39/proposal-import-attributes), which are the underlying mechanism for supporting [CSS](https://web.dev/articles/css-module-scripts) and [JSON](https://github.com/tc39/proposal-json-modules) module scripts, are not widely supported in [all browsers yet](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#browser_compatibility).  Greenwood can enable this in a browser compatible why by specifying which attributes you want handled.  In both cases, Greenwood bundles these as ES Modules and will strip the attributes syntax.
+
+```js
+export default {
+  polyfills: {
+    importAttributes: ['css', 'json']
+  }
+};
+```
+
+
+In the case of CSS, Greenwood will inline and export your CSS as a [Constructable Stylesheet](https://web.dev/articles/constructable-stylesheets)
+
+```js
+// this
+import sheet from './styles.css' with { type: 'css'};
+
+// will fallback to this
+const sheet = new CSSStyleSheet();sheet.replaceSync(' /* ... */ ');export default sheet;
+```
+
+For JSON, Greenwood will simply export an object
+
+```js
+// this
+import data from './data.css' with { type: 'json'};
+
+// will fallback to this
+export default { /* ... */ }
 ```
 
 ### Port
