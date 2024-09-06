@@ -1,19 +1,16 @@
-import { readAndMergeConfig as initConfig } from './lifecycles/config.js';
+import { readAndMergeConfig } from './lifecycles/config.js';
+import { initContext } from './lifecycles/context.js';
 import { mergeResponse } from './lib/resource-utils.js';
 
-const config = await initConfig();
+const config = await readAndMergeConfig();
+const context = await initContext({ config });
+
 const resourcePlugins = config.plugins
   .filter(plugin => plugin.type === 'resource')
   .filter(plugin => plugin.name !== 'plugin-node-modules:resource' && plugin.name !== 'plugin-user-workspace')
   .map(plugin => plugin.provider({
-    context: {
-      outputDir: new URL(`file://${process.cwd()}/public`),
-      projectDirectory: new URL(`file://${process.cwd()}/`),
-      scratchDir: new URL(`file://${process.cwd()}/.greenwood/`)
-    },
-    config: {
-      devServer: {}
-    },
+    context,
+    config,
     graph: []
   }));
 
