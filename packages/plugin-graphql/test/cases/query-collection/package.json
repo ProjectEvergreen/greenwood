@@ -1,5 +1,5 @@
 {
-  "name": "plugin-graphql-test-menu-query",
+  "name": "plugin-graphql-test-collection-query",
   "type": "module",
   "dependencies": {
     "lit": "^3.1.0"

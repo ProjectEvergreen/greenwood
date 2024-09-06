@@ -30,10 +30,10 @@ async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {
   return customLayoutLocations;
 }
 
-async function getPageLayout(filePath, compilation, layout) {
+async function getPageLayout(filePath = '', compilation, layout) {
   const { config, context } = compilation;
-  const { layoutsDir, userLayoutsDir, pagesDir, projectDirectory } = context;
-  const filePathUrl = new URL(`${filePath}`, projectDirectory);
+  const { layoutsDir, userLayoutsDir, pagesDir } = context;
+  const filePathUrl = new URL(filePath, pagesDir);
   const customPageFormatPlugins = config.plugins
     .filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin)
     .map(plugin => plugin.provider(compilation));
@@ -43,13 +43,13 @@ async function getPageLayout(filePath, compilation, layout) {
     && await customPageFormatPlugins[0].shouldServe(filePathUrl);
   const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, 'page');
   const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, layout);
-  const extension = filePath.split('.').pop();
-  const is404Page = filePath.startsWith('404') && extension === 'html';
+  const extension = filePath?.split('.')?.pop();
+  const is404Page = filePath?.endsWith('404.html') && extension === 'html';
   const hasCustomStaticLayout = await checkResourceExists(new URL(`./${layout}.html`, userLayoutsDir));
   const hasCustomDynamicLayout = await checkResourceExists(new URL(`./${layout}.js`, userLayoutsDir));
   const hasPageLayout = await checkResourceExists(new URL('./page.html', userLayoutsDir));
   const hasCustom404Page = await checkResourceExists(new URL('./404.html', pagesDir));
-  const isHtmlPage = extension === 'html' && await checkResourceExists(new URL(`./${filePath}`, projectDirectory));
+  const isHtmlPage = extension === 'html' && await checkResourceExists(new URL(filePath, pagesDir));
   let contents;
 
   if (layout && (customPluginPageLayouts.length > 0 || hasCustomStaticLayout)) {
@@ -113,7 +113,6 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
   const enableHud = compilation.config.devServer.hud;
   const { layoutsDir, userLayoutsDir } = compilation.context;
   const userStaticAppLayoutUrl = new URL('./app.html', userLayoutsDir);
-  // TODO support more than just .js files
   const userDynamicAppLayoutUrl = new URL('./app.js', userLayoutsDir);
   const userHasStaticAppLayout = await checkResourceExists(userStaticAppLayoutUrl);
   const userHasDynamicAppLayout = await checkResourceExists(userDynamicAppLayoutUrl);

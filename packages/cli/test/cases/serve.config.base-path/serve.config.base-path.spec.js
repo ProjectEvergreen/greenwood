@@ -356,7 +356,7 @@ describe('Serve Greenwood With: ', function() {
 
     });
 
-    describe('Develop command with dev proxy', function() {
+    describe('Serve command with dev proxy', function() {
       let response = {};
       let data;
 
@@ -381,7 +381,7 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command with API specific behaviors', function() {
+    describe('Serve command with API specific behaviors', function() {
       const name = 'Greenwood';
       let response = {};
       let data = {};

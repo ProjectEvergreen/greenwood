@@ -214,9 +214,9 @@ describe('Develop Greenwood With: ', function() {
         expect(artistsPageGraphData).to.not.be.undefined;
       });
 
-      it('should have the expected menu and index values in the graph', function() {
-        expect(artistsPageGraphData.data.menu).to.equal('navigation');
-        expect(artistsPageGraphData.data.index).to.equal(7);
+      it('should have the expected collection and order values in the graph', function() {
+        expect(artistsPageGraphData.data.collection).to.equal('navigation');
+        expect(artistsPageGraphData.data.order).to.equal(7);
       });
 
       it('should have expected custom data values in its graph data', function() {

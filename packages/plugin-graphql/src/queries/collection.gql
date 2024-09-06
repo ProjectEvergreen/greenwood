@@ -1,5 +1,5 @@
-query {
-  graph {
+query($name: String!, $orderBy: CollectionOrderBy) {
+  collection(name: $name, orderBy: $orderBy) {
     label,
     title,
     workspacePath,

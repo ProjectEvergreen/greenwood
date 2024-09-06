@@ -1,5 +1,6 @@
 ---
-menu: navigation
+collection: navigation
+order: 2
 ---
 
 ## Contact Page

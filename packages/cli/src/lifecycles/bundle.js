@@ -243,15 +243,13 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     // and before we optimize so that all bundled assets can tracked up front
     // would be nice to see if this can be done in a single pass though...
     for (const page of ssrPages) {
-      const { imports, route, layout, relativeWorkspacePagePath } = page;
-      const moduleUrl = new URL(`.${relativeWorkspacePagePath}`, pagesDir);
+      const { imports, route, layout, pagePath } = page;
+      const moduleUrl = new URL(pagePath, pagesDir);
       const request = new Request(moduleUrl);
-      // TODO getLayout has to be static (for now?)
-      // https://github.com/ProjectEvergreen/greenwood/issues/955
       const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [], request });
       let staticHtml = '';
 
-      staticHtml = data.layout ? data.layout : await getPageLayout(staticHtml, compilation, layout);
+      staticHtml = data.layout ? data.layout : await getPageLayout(pagePath, compilation, layout);
       staticHtml = await getAppLayout(staticHtml, compilation, imports, page);
       staticHtml = await getUserScripts(staticHtml, compilation);
       staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
@@ -268,14 +266,13 @@ async function bundleSsrPages(compilation, optimizePlugins) {
 
     // second pass to link all bundled assets to their resources before optimizing and generating SSR bundles
     for (const page of ssrPages) {
-      const { filename, route, relativeWorkspacePagePath } = page;
-      const entryFileUrl = new URL(`.${relativeWorkspacePagePath}`, scratchDir);
-      const outputPathRootUrl = new URL(`file://${path.dirname(entryFileUrl.pathname)}`);
+      const { route, pagePath } = page;
+      const entryFileUrl = new URL(pagePath, pagesDir);
+      const entryFileOutputUrl = new URL(`file://${entryFileUrl.pathname.replace(pagesDir.pathname, scratchDir.pathname)}`);
+      const outputPathRootUrl = new URL(`file://${path.dirname(entryFileOutputUrl.pathname)}/`);
       const htmlOptimizer = config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
       const pagesPathDiff = context.pagesDir.pathname.replace(context.projectDirectory.pathname, '');
-      const relativeDepth = relativeWorkspacePagePath.replace(`/${filename}`, '') === ''
-        ? '../'
-        : '../'.repeat(relativeWorkspacePagePath.replace(`/${filename}`, '').split('/').length);
+      const relativeDepth = '../'.repeat(pagePath.split('/').length - 1);
 
       let staticHtml = ssrPrerenderPagesRouteMapper[route];
       staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
@@ -288,10 +285,10 @@ async function bundleSsrPages(compilation, optimizePlugins) {
       }
 
       // better way to write out this inline code?
-      await fs.writeFile(entryFileUrl, `
+      await fs.writeFile(entryFileOutputUrl, `
         import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
 
-        const moduleUrl = new URL('${relativeDepth}${pagesPathDiff}${relativeWorkspacePagePath.replace('/', '')}', import.meta.url);
+        const moduleUrl = new URL('${relativeDepth}${pagesPathDiff}${pagePath.replace('./', '')}', import.meta.url);
 
         export async function handler(request) {
           const compilation = JSON.parse('${JSON.stringify(compilation)}');
@@ -311,7 +308,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
         }
       `);
 
-      input.push(normalizePathnameForWindows(entryFileUrl));
+      input.push(normalizePathnameForWindows(entryFileOutputUrl));
     }
 
     const ssrConfigs = await getRollupConfigForSsrPages(compilation, input);

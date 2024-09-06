@@ -337,7 +337,7 @@ async function getHybridServer(compilation) {
         if (matchingRoute.isolation || isolationMode) {
           await new Promise(async (resolve, reject) => {
             const worker = new Worker(new URL('../lib/ssr-route-worker-isolation-mode.js', import.meta.url));
-            // TODO "faux" new Request here, a better way?
+            // "faux" new Request here, a better way?
             const request = await requestAsObject(new Request(url));
 
             worker.on('message', async (result) => {
@@ -370,13 +370,13 @@ async function getHybridServer(compilation) {
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
-        const entryPointUrl = new URL(`.${apiRoute.outputPath}`, outputDir);
+        const entryPointUrl = new URL(`./${apiRoute.outputPath}`, outputDir);
         let body, status, headers, statusText;
 
         if (apiRoute.isolation || isolationMode) {
           await new Promise(async (resolve, reject) => {
             const worker = new Worker(new URL('../lib/api-route-worker.js', import.meta.url));
-            // TODO "faux" new Request here, a better way?
+            // "faux" new Request here, a better way?
             const req = await requestAsObject(request);
 
             worker.on('message', async (result) => {

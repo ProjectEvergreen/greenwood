@@ -1,12 +1,14 @@
 query($parent: String!) {
   children(parent: $parent) {
-    id,
-    filename,
     label,
+    title,
+    workspacePath,
     outputPath,
-    path,
     route,
     layout,
-    title
+    tableOfContents {
+      label,
+      route
+    }
   }
 }

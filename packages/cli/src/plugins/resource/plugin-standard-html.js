@@ -36,14 +36,14 @@ class StandardHtmlResource extends ResourceInterface {
 
   async serve(url, request) {
     const { config, context } = this.compilation;
-    const { pagesDir, userWorkspace } = context;
+    const { projectDirectory, pagesDir } = context;
     const { activeFrontmatter } = config;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find(node => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
-    const filePath = !matchingRoute.external ? matchingRoute.path : '';
-    const isMarkdownContent = (matchingRoute?.filename || '').split('.').pop() === 'md';
-
+    const { pagePath } = matchingRoute;
+    const filePath = !matchingRoute.external ? pagePath : '';
+    const isMarkdownContent = (filePath || '').split('.').pop() === 'md';
     let body = '';
     let layout = matchingRoute.layout || null;
     let customImports = matchingRoute.imports || [];
@@ -56,7 +56,7 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     if (isMarkdownContent) {
-      const markdownContents = await fs.readFile(filePath, 'utf-8');
+      const markdownContents = await fs.readFile(new URL(pagePath, pagesDir), 'utf-8');
       const rehypePlugins = [];
       const remarkPlugins = [];
 
@@ -84,7 +84,7 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     if (matchingRoute.isSSR) {
-      const routeModuleLocationUrl = new URL(`.${matchingRoute.relativeWorkspacePagePath}`, pagesDir);
+      const routeModuleLocationUrl = new URL(pagePath, pagesDir);
       const routeWorkerUrl = this.compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeModuleUrl;
 
       await new Promise(async (resolve, reject) => {
@@ -118,9 +118,9 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     if (isSpaRoute) {
-      body = await fs.readFile(new URL(`./${isSpaRoute.filename}`, userWorkspace), 'utf-8');
+      body = await fs.readFile(new URL(isSpaRoute.pagePath, projectDirectory), 'utf-8');
     } else {
-      body = ssrLayout ? ssrLayout : await getPageLayout(filePath, this.compilation, layout);
+      body = ssrLayout ? ssrLayout : await getPageLayout(pagePath, this.compilation, layout);
     }
 
     body = await getAppLayout(body, this.compilation, customImports, matchingRoute);

@@ -354,7 +354,7 @@ function greenwoodImportMetaUrl(compilation) {
           for (const entry of compilation.manifest.apis.keys()) {
             const apiRoute = compilation.manifest.apis.get(entry);
 
-            if (normalizedId.endsWith(apiRoute.path)) {
+            if (normalizedId.endsWith(apiRoute.pagePath.replace('.', ''))) {
               const assets = apiRoute.assets || [];
 
               assets.push(assetUrl.url.href);
@@ -646,7 +646,7 @@ const getRollupConfigForApiRoutes = async (compilation) => {
   const { outputDir, pagesDir, apisDir } = compilation.context;
 
   return [...compilation.manifest.apis.values()]
-    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, pagesDir)))
+    .map(api => normalizePathnameForWindows(new URL(api.pagePath, pagesDir)))
     .map((filepath) => {
       // account for windows pathname shenanigans by "casting" filepath to a URL first
       const ext = filepath.split('.').pop();

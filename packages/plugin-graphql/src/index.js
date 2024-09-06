@@ -9,9 +9,8 @@ const importMap = {
   '@greenwood/plugin-graphql/src/core/client.js': '/node_modules/@greenwood/plugin-graphql/src/core/client.js',
   '@greenwood/plugin-graphql/src/core/common.js': '/node_modules/@greenwood/plugin-graphql/src/core/common.js',
   '@greenwood/plugin-graphql/src/queries/children.gql': '/node_modules/@greenwood/plugin-graphql/src/queries/children.gql',
-  '@greenwood/plugin-graphql/src/queries/config.gql': '/node_modules/@greenwood/plugin-graphql/src/queries/config.gql',
   '@greenwood/plugin-graphql/src/queries/graph.gql': '/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql',
-  '@greenwood/plugin-graphql/src/queries/menu.gql': '/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql'
+  '@greenwood/plugin-graphql/src/queries/collection.gql': '/node_modules/@greenwood/plugin-graphql/src/queries/collection.gql'
 };
 
 class GraphQLResource extends ResourceInterface {

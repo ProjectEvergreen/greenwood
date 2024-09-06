@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
 import client from '@greenwood/plugin-graphql/src/core/client.js';
-import MenuQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
+import CollectionQuery from '@greenwood/plugin-graphql/src/queries/collection.gql';
 
 class HeaderComponent extends LitElement {
 
@@ -21,13 +21,13 @@ class HeaderComponent extends LitElement {
     super.connectedCallback();
 
     const response = await client.query({
-      query: MenuQuery,
+      query: CollectionQuery,
       variables: {
-        menu: 'navigation'
+        name: 'navigation'
       }
     });
 
-    this.navigation = response.data.menu.children.map(item => item.item);
+    this.navigation = response.data.collection;
   }
 
   /* eslint-disable indent */

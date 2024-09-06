@@ -11,7 +11,7 @@
  * User Command
  * greenwood build
  *
- * Default Config (+ plugin-graphql and prerender)
+ * Default Config (+ plugin-graphql)
  *
  * Custom Workspace
  * src/
@@ -37,7 +37,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', async function() {
-  const LABEL = 'MenuQuery from GraphQL';
+  const LABEL = 'CollectionQuery from GraphQL';
   const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
@@ -149,7 +149,7 @@ describe('Build Greenwood With: ', async function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('Home Page navigation w/ MenuQuery', function() {
+    describe('Home Page navigation w/ CollectionQuery for <app-header> navigation', function() {
       let dom;
 
       before(async function() {
@@ -187,7 +187,7 @@ describe('Build Greenwood With: ', async function() {
         expect(headers.length).to.be.equal(1);
       });
 
-      it('should have a expected navigation output in the <header> based on pages with menu: navigation frontmatter', function() {
+      it('should have a expected navigation output in the <header> based on pages with collection: navigation frontmatter', function() {
         const listItems = dom.window.document.querySelectorAll('body header ul li');
         const link1 = listItems[0].querySelector('a');
         const link2 = listItems[1].querySelector('a');

@@ -30,7 +30,7 @@ const generateGraph = async (compilation) => {
     try {
       const { context, config } = compilation;
       const { basePath } = config;
-      const { pagesDir, projectDirectory, userWorkspace } = context;
+      const { pagesDir, userWorkspace } = context;
       const collections = {};
       const customPageFormatPlugins = config.plugins
         .filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin)
@@ -39,8 +39,7 @@ const generateGraph = async (compilation) => {
       let apis = new Map();
       let graph = [{
         outputPath: '/index.html',
-        filename: 'index.html',
-        path: '/',
+        pagePath: './src/index.html',
         route: `${basePath}/`,
         label: 'Home',
         title: null,
@@ -66,9 +65,8 @@ const generateGraph = async (compilation) => {
             apiRoutes = nextPages.apiRoutes;
           } else {
             const extension = `.${filenameUrl.pathname.split('.').pop()}`;
-            const relativePagePath = filenameUrl.pathname.replace(pagesDir.pathname, '/');
-            const relativeWorkspacePath = directory.pathname.replace(projectDirectory.pathname, '');
-            const isApiRoute = relativePagePath.startsWith('/api');
+            const relativePagePath = filenameUrl.pathname.replace(pagesDir.pathname, './');
+            const isApiRoute = relativePagePath.startsWith('./api');
             const req = isApiRoute
               ? new Request(filenameUrl)
               : new Request(filenameUrl, { headers: { 'Accept': 'text/html' } });
@@ -84,6 +82,8 @@ const generateGraph = async (compilation) => {
             const isStatic = isCustom === 'static' || extension === '.md' || extension === '.html';
             const isDynamic = isCustom === 'dynamic' || extension === '.js';
             const isPage = isStatic || isDynamic;
+            let route = `${relativePagePath.replace('.', '').replace(`${extension}`, '')}`;
+            let fileContents;
 
             if (isApiRoute) {
               const extension = filenameUrl.pathname.split('.').pop();
@@ -93,9 +93,7 @@ const generateGraph = async (compilation) => {
                 return;
               }
 
-              const relativeApiPath = filenameUrl.pathname.replace(pagesDir.pathname, '/');
-              const route = `${basePath}${relativeApiPath.replace(`.${extension}`, '')}`;
-              // TODO should this be run in isolation like SSR pages?
+              // should this be run in isolation like SSR pages?
               // https://github.com/ProjectEvergreen/greenwood/issues/991
               const { isolation } = await import(filenameUrl).then(module => module);
 
@@ -108,22 +106,19 @@ const generateGraph = async (compilation) => {
               * route: URL route for a given page on outputFilePath
               * isolation: if this should be run in isolated mode
               */
-              apiRoutes.set(route, {
-                filename: filename,
-                outputPath: relativeApiPath,
-                path: relativeApiPath,
-                route,
+              apiRoutes.set(`${basePath}${route}`, {
+                pagePath: relativePagePath,
+                outputPath: relativePagePath,
+                route: `${basePath}${route}`,
                 isolation
               });
             } else if (isPage) {
-              let route = relativePagePath.replace(extension, '');
               let root = filename.split('/')[filename.split('/').length - 1].replace(extension, '');
               let layout = extension === '.html' ? null : 'page';
               let title = null;
               let label = getLabelFromRoute(`${route}/`);
               let imports = [];
               let customData = {};
-              let filePath;
               let prerender = true;
               let isolation = false;
               let hydration = false;
@@ -136,7 +131,7 @@ const generateGraph = async (compilation) => {
               * - pages/blog/index.{html,md,js} -> /blog/
               * - pages/blog/some-post.{html,md,js} -> /blog/some-post/
               */
-              if (relativePagePath.lastIndexOf('/') > 0) {
+              if (relativePagePath.lastIndexOf('/index') > 0) {
                 // https://github.com/ProjectEvergreen/greenwood/issues/455
                 route = root === 'index' || route.replace('/index', '') === `/${root}`
                   ? route.replace('index', '')
@@ -148,59 +143,18 @@ const generateGraph = async (compilation) => {
               }
 
               if (isStatic) {
-                const fileContents = await fs.readFile(filenameUrl, 'utf8');
+                fileContents = await fs.readFile(filenameUrl, 'utf8');
                 const { attributes } = fm(fileContents);
 
                 layout = attributes.layout || layout;
                 title = attributes.title || title;
                 label = attributes.label || label;
                 imports = attributes.imports || [];
-                filePath = `${relativeWorkspacePath}${filename}`;
 
-                // prune "reserved" attributes that are supported by Greenwood
-                // https://www.greenwoodjs.io/docs/front-matter
                 customData = attributes;
-
-                delete customData.label;
-                delete customData.imports;
-                delete customData.title;
-                delete customData.layout;
-
-                /* Menu Query
-                * Custom front matter - Variable Definitions
-                * --------------------------------------------------
-                * menu: the name of the menu in which this item can be listed and queried
-                * index: the index of this list item within a menu
-                * linkheadings: flag to tell us where to add page's table of contents as menu items
-                * tableOfContents: json object containing page's table of contents(list of headings)
-                */
-                // set specific menu to place this page
-                customData.menu = customData.menu || '';
-
-                // set specific index list priority of this item within a menu
-                customData.index = customData.index || '';
-
-                // set flag whether to gather a list of headings on a page as menu items
-                customData.linkheadings = customData.linkheadings || 0;
-                customData.tableOfContents = [];
-
-                if (customData.linkheadings > 0) {
-                  // parse markdown for table of contents and output to json
-                  customData.tableOfContents = toc(fileContents).json;
-                  customData.tableOfContents.shift();
-
-                  // parse table of contents for only the pages user wants linked
-                  if (customData.tableOfContents.length > 0 && customData.linkheadings > 0) {
-                    customData.tableOfContents = customData.tableOfContents
-                      .filter((item) => item.lvl === customData.linkheadings);
-                  }
-                }
-                /* ---------End Menu Query-------------------- */
               } else if (isDynamic) {
                 const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation).executeModuleUrl;
                 let ssrFrontmatter;
-
-                filePath = route;
 
                 await new Promise(async (resolve, reject) => {
                   const worker = new Worker(new URL('../lib/ssr-route-worker.js', import.meta.url));
@@ -245,56 +199,72 @@ const generateGraph = async (compilation) => {
                   layout = ssrFrontmatter.layout || layout;
                   title = ssrFrontmatter.title || title;
                   imports = ssrFrontmatter.imports || imports;
-                  customData = ssrFrontmatter.data || customData;
                   label = ssrFrontmatter.label || label;
-
-                  /* Menu Query
-                  * Custom front matter - Variable Definitions
-                  * --------------------------------------------------
-                  * menu: the name of the menu in which this item can be listed and queried
-                  * index: the index of this list item within a menu
-                  * linkheadings: flag to tell us where to add page's table of contents as menu items
-                  * tableOfContents: json object containing page's table of contents(list of headings)
-                  */
-                  customData.menu = ssrFrontmatter.menu || '';
-                  customData.index = ssrFrontmatter.index || '';
+                  customData = ssrFrontmatter || customData;
                 }
               }
 
               /*
-              * Graph Properties (per page)
-              *----------------------
-              * data: custom page frontmatter
-              * filename: base filename of the page
-              * relativeWorkspacePagePath: the file path relative to the user's workspace directory
-              * label: by default is just a copy of title, otherwise can be overridden by the user
-              * imports: per page JS or CSS file imports to be included in HTML output from frontmatter
-              * resources: sum of all resources for the entire page
-              * outputPath: the filename to write to when generating static HTML
-              * path: path to the file relative to the workspace
-              * route: URL route for a given page on outputFilePath
-              * layout: page layout to use as a base for a generated component
-              * title: A way to customize the <title></title> tag of the page, otherwise defaults tot the value of label
-              * isSSR: if this is a server side route
-              * prerender: if this should be statically exported
-              * isolation: if this should be run in isolated mode
-              * hydration: if this page needs hydration support
-              * servePage: signal that this is a custom page file type (static | dynamic)
-              */
+               * Custom front matter - Variable Definitions
+               * --------------------------------------------------
+               * collection: the name of the collection for the page
+               * order: the order of this item within the collection
+               * tocHeading: heading size to use a Table of Contents for a page
+               * tableOfContents: json object containing page's table of contents (list of headings)
+               */
+
+              // prune "reserved" attributes that are supported by Greenwood
+              // https://www.greenwoodjs.io/docs/front-matter
+              delete customData.label;
+              delete customData.imports;
+              delete customData.title;
+              delete customData.layout;
+
+              // set flag whether to gather a list of headings on a page as menu items
+              customData.tocHeading = customData.tocHeading || 0;
+              customData.tableOfContents = [];
+
+              if (fileContents && customData.tocHeading > 0 && customData.tocHeading <= 6) {
+                // parse markdown for table of contents and output to json
+                customData.tableOfContents = toc(fileContents).json;
+                customData.tableOfContents.shift();
+
+                // parse table of contents for only the pages user wants linked
+                if (customData.tableOfContents.length > 0 && customData.tocHeading > 0) {
+                  customData.tableOfContents = customData.tableOfContents
+                    .filter((item) => item.lvl === customData.tocHeading);
+                }
+              }
+
+              /*
+               * Page Properties
+               *----------------------
+               * label: Display text for the page inferred, by default is the value of title
+               * title: used to customize the <title></title> tag of the page, inferred from the filename
+               * route: URL for accessing the page from the browser
+               * layout: the custom layout of the page
+               * data: custom page frontmatter
+               * imports: per page JS or CSS file imports specified from frontmatter
+               * resources: all script, style, etc resources for the entire page as URLs
+               * outputPath: the name of the file in the output folder
+               * isSSR: if this is a server side route
+               * prerender: if this page should be statically exported
+               * isolation: if this page should be run in isolated mode
+               * hydration: if this page needs hydration support
+               * servePage: signal that this is a custom page file type (static | dynamic)
+               */
               const page = {
-                data: customData || {},
-                filename,
-                relativeWorkspacePagePath: relativePagePath,
                 label,
+                title,
+                route: `${basePath}${route}`,
+                layout,
+                data: customData || {},
                 imports,
                 resources: [],
+                pagePath: relativePagePath,
                 outputPath: route === '/404/'
                   ? '/404.html'
                   : `${route}index.html`,
-                path: filePath,
-                route: `${basePath}${route}`,
-                layout,
-                title,
                 isSSR: !isStatic,
                 prerender,
                 isolation,
@@ -304,6 +274,7 @@ const generateGraph = async (compilation) => {
 
               pages.push(page);
 
+              // handle collections
               const pageCollection = customData.collection;
 
               if (pageCollection) {
@@ -354,11 +325,11 @@ const generateGraph = async (compilation) => {
             {
               ...oldGraph,
               outputPath: '/404.html',
-              filename: '404.html',
+              pagePath: './src/404.html',
               route: `${basePath}/404/`,
               path: '404.html',
               label: 'Not Found',
-              title: null
+              title: 'Page Not Found'
             }
           ];
         }
@@ -380,8 +351,7 @@ const generateGraph = async (compilation) => {
             }
 
             graph.push({
-              filename: null,
-              path: null,
+              pagePath: null,
               data: {},
               imports: [],
               resources: [],

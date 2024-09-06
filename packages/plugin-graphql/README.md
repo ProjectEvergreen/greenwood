@@ -59,7 +59,7 @@ class HeaderComponent extends HTMLElement {
       query: MenuQuery,
       variables: {
         name: 'navigation',
-        order: 'index_asc'
+        order: 'order_asc'
       }
     });
 
