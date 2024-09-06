@@ -1,7 +1,7 @@
 ---
-menu: side
-index: 2
-linkheadings: 3
+collection: about
+order: 2
+tocHeading: 3
 ---
 
 ## Features

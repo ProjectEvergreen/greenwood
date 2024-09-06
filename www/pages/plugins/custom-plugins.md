@@ -1,6 +1,6 @@
 ---
-menu: side
-index: 9
+collection: plugins
+order: 9
 ---
 
 ## Custom Plugins

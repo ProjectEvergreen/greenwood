@@ -1,6 +1,6 @@
 ---
-menu: side
-index: 3
+collection: plugins
+order: 3
 ---
 
 ## Copy

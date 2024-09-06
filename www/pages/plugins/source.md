@@ -1,6 +1,6 @@
 ---
-menu: side
-index: 8
+collection: plugins
+order: 8
 ---
 
 ## Source

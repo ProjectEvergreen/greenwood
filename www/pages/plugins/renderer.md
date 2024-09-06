@@ -1,6 +1,6 @@
 ---
-menu: side
-index: 5
+collection: plugins
+order: 5
 ---
 
 ## Renderer

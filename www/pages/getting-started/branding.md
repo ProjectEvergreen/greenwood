@@ -1,8 +1,8 @@
 ---
-menu: side
+collection: getting-started
 title: 'Components and Styles'
-index: 5
-linkheadings: 3
+order: 5
+tocHeading: 3
 ---
 
 ## Component and Styles

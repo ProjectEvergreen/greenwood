@@ -1,7 +1,7 @@
 ---
-menu: side
+collection: getting-started
 title: 'Build and Deploy'
-index: 6
+order: 6
 ---
 
 ## Build and Deploy

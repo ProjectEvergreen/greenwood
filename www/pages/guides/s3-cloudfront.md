@@ -1,8 +1,8 @@
 ---
 title: 'AWS S3 & CloudFront Deployment'
-menu: side
-linkheadings: 3
-index: 7
+collection: guides
+tocHeading: 3
+order: 7
 ---
 
 ## Deployment from AWS S3 & CloudFront

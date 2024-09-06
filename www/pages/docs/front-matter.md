@@ -1,8 +1,8 @@
 ---
-menu: side
+collection: docs
 title: 'Front Matter'
-index: 3
-linkheadings: 3
+order: 3
+tocHeading: 3
 ---
 
 ## Front Matter

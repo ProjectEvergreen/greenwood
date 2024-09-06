@@ -1,7 +1,7 @@
 ---
-menu: side
-index: 10
-linkheadings: 3
+collection: docs
+order: 10
+tocHeading: 3
 ---
 
 ## Menus
@@ -30,8 +30,8 @@ e.g. create the following in a new directory within your `/pages` directory.
 ```md
 ---
 title: 'About'
-menu: 'navigation'
-index: 1
+collection: 'navigation'
+order: 1
 ---
 
 # About
@@ -43,8 +43,8 @@ index: 1
 ```md
 ---
 title: 'Docs'
-menu: 'navigation'
-index: 2
+collection: 'navigation'
+order: 2
 ---
 
 # Documentation
@@ -55,9 +55,9 @@ index: 2
 ```md
 ---
 title: 'Contact'
-menu: 'navigation'
-index: 3
-linkheadings: 3
+collection: 'navigation'
+order: 3
+tocHeading: 3
 ---
 
 # Contact
@@ -157,7 +157,7 @@ const response = await client.query({
   query: MenuQuery,
   variables: {
     name: 'navigation',
-    order: 'index_asc'
+    order: 'order_asc'
   }
 });
 
@@ -170,8 +170,8 @@ The following sorts are available.
 | Sort      | Description
 |-----------|:---------------|
 |           | no order declared, sorts by alphabetical file name |
-|index_asc  | Sort by index, ascending order |
-|index_desc | Sort by index, descending order |
+|order_asc  | Sort by index, ascending order |
+|order_desc | Sort by index, descending order |
 |title_asc  | Sort by title, ascending order |
 |title_desc | Sort by title, descending order |
 
@@ -184,7 +184,7 @@ const response = await client.query({
   query: MenuQuery,
   variables: {
     name: 'shelf',
-    order: 'index_asc',
+    order: 'order_asc',
     route: window.location.pathname
   }
 });
@@ -248,7 +248,7 @@ const response = await client.query({
   query: MenuQuery,
   variables: {
     name: 'shelf',
-    order: 'index_asc',
+    order: 'order_asc',
     route: window.location.pathname
   }
 });

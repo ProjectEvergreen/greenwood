@@ -1,8 +1,8 @@
 ---
-menu: side
+collection: docs
 title: 'Data Sources'
-index: 11
-linkheadings: 3
+order: 11
+tocHeading: 3
 ---
 
 
@@ -69,7 +69,7 @@ graph {
 
   layout, // (string) page layout used for the page
 
-  title,  // (string) Useful for a page's <title> tag or the title attribute for an <a> tag, inferred from the filesystem path, e.g. "First Post" or provided through front matter.
+  title,  // (string) Used for a page's <title> tag inferred from the filesystem path, e.g. "First Post" or provided through front matter.
 }
 ```
 

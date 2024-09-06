@@ -1,6 +1,6 @@
 ---
-menu: side
-index: 6
+collection: plugins
+order: 6
 ---
 
 ## Rollup

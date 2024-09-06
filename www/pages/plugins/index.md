@@ -1,6 +1,6 @@
 ---
-menu: navigation
-index: 4
+collection: navigation
+order: 4
 ---
 
 ## Plugins

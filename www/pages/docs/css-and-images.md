@@ -1,8 +1,8 @@
 ---
-menu: side
+collection: docs
 title: 'Styles and Assets'
-index: 6
-linkheadings: 3
+order: 6
+tocHeading: 3
 ---
 
 ## Styles and Assets

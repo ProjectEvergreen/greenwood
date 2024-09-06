@@ -1,6 +1,6 @@
 ---
-menu: navigation
-index: 2
+collection: navigation
+order: 2
 ---
 
 ## Documentation

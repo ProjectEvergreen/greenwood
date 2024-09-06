@@ -1,8 +1,8 @@
 ---
-menu: side
+collection: docs
 title: 'Layouts and Pages'
-index: 7
-linkheadings: 3
+order: 7
+tocHeading: 3
 ---
 
 ## Layouts and Pages

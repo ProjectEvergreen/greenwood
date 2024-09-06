@@ -1,8 +1,8 @@
 ---
-menu: side
+collection: docs
 title: 'Scripts and Imports'
-index: 5
-linkheadings: 3
+order: 5
+tocHeading: 3
 ---
 
 ## Scripts and Imports

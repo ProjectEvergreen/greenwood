@@ -1,6 +1,6 @@
 ---
-menu: side
-index: 1
+collection: docs
+order: 1
 ---
 
 ## Component Model

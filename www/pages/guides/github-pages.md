@@ -1,8 +1,8 @@
 ---
 title: 'Deploy with GitHub Pages'
-menu: side
-linkheadings: 3
-index: 2
+collection: guides
+tocHeading: 3
+order: 2
 ---
 
 ## Deploying your site with GitHub Pages

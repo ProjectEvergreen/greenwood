@@ -1,7 +1,7 @@
 ---
-menu: side
-index: 7
-linkheadings: 3
+collection: getting-started
+order: 7
+tocHeading: 3
 ---
 
 ## Optimizing

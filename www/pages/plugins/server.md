@@ -1,6 +1,6 @@
 ---
-menu: side
-index: 7
+collection: plugins
+order: 7
 ---
 
 ## Server

@@ -1,6 +1,6 @@
 ---
-menu: navigation
-index: 6
+collection: navigation
+order: 6
 layout: blog
 ---
 

@@ -1,6 +1,6 @@
 ---
-menu: navigation
-index: 1
+collection: navigation
+order: 1
 ---
 
 ## About Greenwood

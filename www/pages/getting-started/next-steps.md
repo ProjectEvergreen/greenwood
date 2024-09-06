@@ -1,6 +1,6 @@
 ---
-menu: side
-index: 8
+collection: getting-started
+order: 8
 ---
 
 ## Next Steps

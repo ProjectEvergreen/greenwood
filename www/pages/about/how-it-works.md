@@ -1,7 +1,7 @@
 ---
-menu: side
-index: 1
-linkheadings: 3
+collection: about
+order: 1
+tocHeading: 3
 ---
 
 ## How It Works

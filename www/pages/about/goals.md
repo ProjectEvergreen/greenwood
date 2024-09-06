@@ -1,6 +1,6 @@
 ---
-menu: side
-index: 0
+collection: about
+order: 0
 ---
 
 ## Goals

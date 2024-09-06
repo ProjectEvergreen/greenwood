@@ -1,6 +1,6 @@
 ---
-menu: side
-index: 2
+collection: plugins
+order: 2
 ---
 
 ## Context

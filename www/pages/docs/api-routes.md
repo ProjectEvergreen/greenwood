@@ -1,8 +1,8 @@
 ---
-menu: side
+collection: docs
 title: 'API Routes'
-index: 9
-linkheadings: 3
+order: 9
+tocHeading: 3
 ---
 
 ## API Routes

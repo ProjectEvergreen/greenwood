@@ -1,7 +1,7 @@
 ---
-menu: side
-index: 1
-linkheadings: 3
+collection: getting-started
+order: 1
+tocHeading: 3
 ---
 
 ## Quick Start

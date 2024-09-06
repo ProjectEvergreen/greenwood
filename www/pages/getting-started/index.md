@@ -1,6 +1,6 @@
 ---
-menu: navigation
-index: 3
+collection: navigation
+order: 3
 ---
 
 ## Introduction

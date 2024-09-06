@@ -1,6 +1,6 @@
 ---
-menu: navigation
-index: 5
+collection: navigation
+order: 5
 ---
 
 ## Guides

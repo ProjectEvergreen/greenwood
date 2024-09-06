@@ -1,6 +1,6 @@
 ---
-menu: side
-index: 3
+collection: about
+order: 3
 ---
 
 ## Community

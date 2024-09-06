@@ -1,7 +1,7 @@
 ---
-menu: side
-index: 3
-linkheadings: 3
+collection: getting-started
+order: 3
+tocHeading: 3
 ---
 
 ## Overview

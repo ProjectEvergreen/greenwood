@@ -1,6 +1,6 @@
 ---
-menu: side
-index: 4
+collection: plugins
+order: 4
 ---
 
 ## Resource

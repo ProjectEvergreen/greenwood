@@ -1,7 +1,7 @@
 ---
-menu: side
-index: 2
-linkheadings: 3
+collection: docs
+order: 2
+tocHeading: 3
 ---
 
 ## Configuration
@@ -34,52 +34,6 @@ export default {
   polyfills: {
     importAttributes: null, // e.g. ['css', 'json']
     importMaps: false
-  }
-};
-```
-
-### Base Path
-
-There are cases where an application might be deployed and hosted from a "sub" pathname that acts as the relative "web root".  (GitHub Pages is an example of this)
-
-So with a URL of `http://www.example.com/app-a/`, the `basePath` could be set as such:
-```js
-export default {
-  basePath: '/app-a'
-};
-```
-
-This would then configure Greenwood's routing and `<script>` and `<link>` tags to reference this segment automatically.  For example:
-```html
-<script type="module" src="/app-a/some-script.a243dccss.js"></script>
-```
-
-For convenience, the value of `basePath` will also be made available as a global variable in the `<head>` of your pages.  For example:
-```html
-<script data-gwd="base-path">
-  globalThis.__GWD_BASE_PATH__ = '/app-a';
-</script>
-```
-
-> _User content, like `<a>` and `<img>` tags will require manually prefixing the basePath in your code._
-
-### Dev Server
-Configuration for Greenwood's development server is available using the `devServer` option.
-- `extensions`: Provide an array of extensions to watch for changes and reload the live server with.  By default, Greenwood will already watch all "standard" web assets (HTML, CSS, JS, etc) it supports by default, as well as any extensions set by [resource plugins](/plugins/resource) you are using in your _greenwood.config.json_.
-- `hud`: The HUD option ([_head-up display_](https://en.wikipedia.org/wiki/Head-up_display)) is some additional HTML added to your site's page when Greenwood wants to help provide information to you in the browser.  For example, if your HTML is detected as malformed, which could break the parser.  Set this to `false` if you would like to turn it off.
-- `port`: Pick a different port when starting the dev server
-- `proxy`: A set of paths to match and re-route to other hosts.  Highest specificity should go at the end.
-
-#### Example
-```js
-export default {
-  devServer: {
-    extensions: ['txt', 'rtf'],
-    port: 3000,
-    proxy: {
-      '/api': 'https://stage.myapp.com',
-      '/api/foo': 'https://foo.otherdomain.net'
-    }
   }
 };
 ```
@@ -128,6 +82,52 @@ Lorum Ipsum.
     ...
   </body>
 </html>
+```
+
+### Base Path
+
+There are cases where an application might be deployed and hosted from a "sub" pathname that acts as the relative "web root".  (GitHub Pages is an example of this)
+
+So with a URL of `http://www.example.com/app-a/`, the `basePath` could be set as such:
+```js
+export default {
+  basePath: '/app-a'
+};
+```
+
+This would then configure Greenwood's routing and `<script>` and `<link>` tags to reference this segment automatically.  For example:
+```html
+<script type="module" src="/app-a/some-script.a243dccss.js"></script>
+```
+
+For convenience, the value of `basePath` will also be made available as a global variable in the `<head>` of your pages.  For example:
+```html
+<script data-gwd="base-path">
+  globalThis.__GWD_BASE_PATH__ = '/app-a';
+</script>
+```
+
+> _User content, like `<a>` and `<img>` tags will require manually prefixing the basePath in your code._
+
+### Dev Server
+Configuration for Greenwood's development server is available using the `devServer` option.
+- `extensions`: Provide an array of extensions to watch for changes and reload the live server with.  By default, Greenwood will already watch all "standard" web assets (HTML, CSS, JS, etc) it supports by default, as well as any extensions set by [resource plugins](/plugins/resource) you are using in your _greenwood.config.json_.
+- `hud`: The HUD option ([_head-up display_](https://en.wikipedia.org/wiki/Head-up_display)) is some additional HTML added to your site's page when Greenwood wants to help provide information to you in the browser.  For example, if your HTML is detected as malformed, which could break the parser.  Set this to `false` if you would like to turn it off.
+- `port`: Pick a different port when starting the dev server
+- `proxy`: A set of paths to match and re-route to other hosts.  Highest specificity should go at the end.
+
+#### Example
+```js
+export default {
+  devServer: {
+    extensions: ['txt', 'rtf'],
+    port: 3000,
+    proxy: {
+      '/api': 'https://stage.myapp.com',
+      '/api/foo': 'https://foo.otherdomain.net'
+    }
+  }
+};
 ```
 
 ### Isolation Mode

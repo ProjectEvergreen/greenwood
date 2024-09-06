@@ -1,7 +1,7 @@
 ---
-menu: side
-index: 8
-linkheadings: 3
+collection: docs
+order: 8
+tocHeading: 3
 ---
 
 ## Server Rendering (Beta)
@@ -99,8 +99,8 @@ You can even define a `layout` and reuse all your existing [layouts](/docs/layou
 export async function getFrontmatter(compilation, route) {
   return {
     layout: 'user',
-    menu: 'header',
-    index: 1,
+    collection: 'header',
+    order: 1,
     title: `${compilation.config.title} - ${route}`,
     imports: [
       '/components/user.js'

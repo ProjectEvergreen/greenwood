@@ -1,6 +1,6 @@
 ---
-menu: side
-index: 1
+collection: plugins
+order: 1
 ---
 
 ## Adapter
