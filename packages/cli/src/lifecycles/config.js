@@ -81,6 +81,7 @@ const readAndMergeConfig = async() => {
 
       if (hasConfigFile) {
         const userCfgFile = (await import(configUrl)).default;
+        // eslint-disable-next-line max-len
         const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, layoutsDirectory, activeFrontmatter, isolation, polyfills } = userCfgFile;
 
         // workspace validation
