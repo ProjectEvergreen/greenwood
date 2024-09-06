@@ -31,7 +31,8 @@ class HeaderComponent extends LitElement {
     const response = await client.query({
       query: CollectionQuery,
       variables: {
-        name: 'navigation'
+        name: 'navigation',
+        orderBy: 'order_asc'
       }
     });
 
