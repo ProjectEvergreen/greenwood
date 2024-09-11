@@ -28,11 +28,11 @@ const templateStandardName = 'greenwood-template-';
 let selectedTemplate = null;
 const scriptPkg = JSON.parse(fs.readFileSync(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf-8'));
 let templateDir = fileURLToPath(new URL('./template', import.meta.url));
-const TARGET_DIR = process.cwd();
+let TARGET_DIR = process.cwd();
 const clonedTemplateDir = path.join(TARGET_DIR, '.greenwood', '.template');
 
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
-console.log(`${chalk.rgb(175, 207, 71)('Initialize Greenwood Template ♻️')}`);
+console.log(`${chalk.rgb(175, 207, 71)('Initialize a Greenwood Project ♻️')}`);
 console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
 
 const program = new commander.Command(scriptPkg.name)
@@ -53,7 +53,7 @@ const npmInit = async () => {
   const appPkg = JSON.parse(await fs.promises.readFile(path.join(templateDir, '/package.json'), 'utf-8'));
 
   // use installation path's folder name for packages
-  appPkg.name = path.basename(process.cwd());
+  appPkg.name = path.basename(TARGET_DIR);
 
   // make sure users get latest and greatest version of Greenwood
   // https://github.com/ProjectEvergreen/greenwood/issues/781
@@ -247,6 +247,18 @@ const cleanUp = async () => {
 
 const run = async () => {
   try {
+    const firstArg = process.argv[process.argv.length - 1].split(' ')[0];
+
+    if (!firstArg.startsWith('--')) {
+      TARGET_DIR = path.join(TARGET_DIR, `./${firstArg}`);
+
+      if (!fs.existsSync(TARGET_DIR)) {
+        fs.mkdirSync(TARGET_DIR);
+      }
+    }
+
+    console.log(`Initializing into project directory... ${TARGET_DIR}`);
+
     if (program.template) {
       await listAndSelectTemplate();
 
