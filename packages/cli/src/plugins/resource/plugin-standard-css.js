@@ -135,7 +135,7 @@ function bundleCss(body, url, compilation) {
         optimizedCss += `::${name}`;
       } else if (type === 'MediaQuery') {
         // TODO modifier seems to be null
-        // https://github.com/csstree/csstree/releases/tag/v3.0.0
+        // https://github.com/csstree/csstree/issues/285
         const { mediaType, modifier } = node;
 
         optimizedCss += `${mediaType} ${modifier ?? 'and'}`;
