@@ -127,12 +127,18 @@ function bundleCss(body, url, compilation) {
           optimizedCss += ' ';
         }
         optimizedCss += `${name}(`;
-      } else if (type === 'MediaFeature') {
+      } else if (type === 'Feature') {
         optimizedCss += ` (${name}:`;
-      } else if (type === 'Parentheses') {
+      } else if (type === 'Parentheses' || type === 'SupportsDeclaration') {
         optimizedCss += '(';
       } else if (type === 'PseudoElementSelector') {
         optimizedCss += `::${name}`;
+      } else if (type === 'MediaQuery') {
+        // TODO modifier seems to be null
+        // https://github.com/csstree/csstree/releases/tag/v3.0.0
+        const { mediaType, modifier } = node;
+
+        optimizedCss += `${mediaType} ${modifier ?? 'and'}`;
       } else if (type === 'Block') {
         optimizedCss += '{';
       } else if (type === 'AttributeSelector') {
@@ -209,8 +215,8 @@ function bundleCss(body, url, compilation) {
           optimizedCss += '}';
           break;
         case 'Function':
-        case 'MediaFeature':
         case 'Parentheses':
+        case 'SupportsDeclaration':
           optimizedCss += ')';
           break;
         case 'PseudoClassSelector':
@@ -254,7 +260,7 @@ function bundleCss(body, url, compilation) {
             optimizedCss += '!important';
           }
 
-          if (item.next || (item.prev && !item.next)) {
+          if (item?.next || (item?.prev && !item?.next)) {
             optimizedCss += ';';
           }
 
@@ -274,6 +280,9 @@ function bundleCss(body, url, compilation) {
             optimizedCss = optimizedCss.replace(`${name}${value}`, `${name}${node.matcher}${value}`);
           }
           optimizedCss += ']';
+          break;
+        case 'MediaQuery':
+          optimizedCss += ')';
           break;
         default:
           break;
