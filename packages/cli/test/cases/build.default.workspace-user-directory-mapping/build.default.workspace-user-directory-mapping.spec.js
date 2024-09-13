@@ -83,7 +83,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have one <script> tags in the <head>', async function() {
-        const scriptTags = Array.from(dom.window.document.querySelectorAll('head script')).filter(tag => !tag.getAttribute('data-gwd'));
+        const scriptTags = Array.from(dom.window.document.querySelectorAll('head script[type="module"')).filter(tag => !tag.getAttribute('data-gwd'));
 
         expect(scriptTags.length).to.be.equal(1);
       });
@@ -119,7 +119,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have one <script> tags in the <head>', async function() {
-        const scriptTags = Array.from(dom.window.document.querySelectorAll('head script')).filter(tag => !tag.getAttribute('data-gwd'));
+        const scriptTags = Array.from(dom.window.document.querySelectorAll('head script[type="module"')).filter(tag => !tag.getAttribute('data-gwd'));
 
         expect(scriptTags.length).to.be.equal(1);
       });

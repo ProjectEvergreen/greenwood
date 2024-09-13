@@ -13,12 +13,12 @@ class ContentAsDataResource extends ResourceInterface {
   }
 
   async shouldIntercept(url, request, response) {
-    return response.headers.get('Content-Type')?.indexOf(this.contentType[0]) >= 0;
+    return response.headers.get('Content-Type')?.indexOf(this.contentType[0]) >= 0 && process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line no-underscore-dangle
   }
 
   async intercept(url, request, response) {
     const body = await response.text();
-    const newBody = mergeImportMap(body, importMap);
+    const newBody = mergeImportMap(body, importMap, this.compilation.config.polyfills.importMaps);
 
     // TODO how come we need to forward headers, shouldn't mergeResponse do that for us?
     return new Response(newBody, {

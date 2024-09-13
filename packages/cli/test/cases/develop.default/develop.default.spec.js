@@ -56,7 +56,6 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-// TODO good first issue, to abstract along with copy plugin
 async function rreaddir (dir, allFiles = []) {
   const files = (await fs.promises.readdir(dir)).map(f => path.join(dir, f));
 
@@ -207,7 +206,7 @@ describe('Develop Greenwood With: ', function() {
         `${process.cwd()}/node_modules/@lion/localize/src/*.js`,
         `${outputPath}/node_modules/@lion/localize/src/`
       );
-      const owcDepupLibPackageJson = await getDependencyFiles(
+      const owcDedupeLibPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/@open-wc/dedupe-mixin/package.json`,
         `${outputPath}/node_modules/@open-wc/dedupe-mixin/`
       );
@@ -413,7 +412,7 @@ describe('Develop Greenwood With: ', function() {
         ...lionLocalizeLibsPackageJson,
         ...lionLocalizeTesterLibs,
         ...lionLocalizeSrcLibs,
-        ...owcDepupLibPackageJson,
+        ...owcDedupeLibPackageJson,
         ...owcScopedLibPackageJson,
         ...messageFormatLibs,
         ...messageFormatLibsPackageJson,
@@ -488,8 +487,11 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return an import map shim <script> in the <head> of the document', function(done) {
-        const importMapTag = dom.window.document.querySelectorAll('head > script[type="importmap"]')[0];
+        const importMapTags = dom.window.document.querySelectorAll('head > script[type="importmap"]');
+        const importMapTag = importMapTags[0];
         const importMap = JSON.parse(importMapTag.textContent).imports;
+
+        expect(importMapTags.length).to.equal(1);
 
         Object.keys(expectedImportMap).forEach((key) => {
           expect(importMap[key]).to.equal(expectedImportMap[key]);

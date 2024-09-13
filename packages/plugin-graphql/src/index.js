@@ -43,7 +43,7 @@ class GraphQLResource extends ResourceInterface {
 
   async intercept(url, request, response) {
     const body = await response.text();
-    const newBody = mergeImportMap(body, importMap);
+    const newBody = mergeImportMap(body, importMap, this.compilation?.config?.polyfills?.importMaps);
 
     return new Response(newBody);
   }

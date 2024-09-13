@@ -70,7 +70,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have no <script> tags in the <head>', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head script');
+        const scriptTags = dom.window.document.querySelectorAll('head script[type="module"');
 
         expect(scriptTags.length).to.be.equal(0);
       });
