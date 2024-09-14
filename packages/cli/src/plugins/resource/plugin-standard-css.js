@@ -83,6 +83,8 @@ function bundleCss(body, url, compilation) {
         optimizedCss += `#${name}`;
       } else if (type === 'ClassSelector') {
         optimizedCss += `.${name}`;
+      } else if (type === 'NestingSelector') {
+        optimizedCss += '&';
       } else if (type === 'PseudoClassSelector') {
         optimizedCss += `:${name}`;
 

@@ -79,3 +79,5 @@ h2 ::slotted(span){background:silver}
 tabbed-custom-element::part(tab){color:#0c0dcc;border-bottom:transparent solid 2px;}
 
 ::highlight(rainbow-color-1){color:#ad26ad;text-decoration:underline;}
+
+h2{& span{color:red}}
