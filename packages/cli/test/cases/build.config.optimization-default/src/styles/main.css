@@ -180,3 +180,10 @@ h2 {
     color: red;
   }
 }
+
+@media (max-width: 768px) {
+  span {
+    flex-direction: column;
+    text-align: center;
+  }
+}

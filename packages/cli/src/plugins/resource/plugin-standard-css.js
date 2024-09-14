@@ -136,11 +136,18 @@ function bundleCss(body, url, compilation) {
       } else if (type === 'PseudoElementSelector') {
         optimizedCss += `::${name}`;
       } else if (type === 'MediaQuery') {
-        // TODO modifier seems to be null
-        // https://github.com/csstree/csstree/issues/285
+        // https://github.com/csstree/csstree/issues/285#issuecomment-2350230333
         const { mediaType, modifier } = node;
+        const type = mediaType !== null
+          ? mediaType
+          : '';
+        const operator = mediaType && node.condition
+          ? ' and'
+          : modifier !== null
+            ? ` ${modifier}`
+            : '';
 
-        optimizedCss += `${mediaType} ${modifier ?? 'and'}`;
+        optimizedCss += `${type}${operator}`;
       } else if (type === 'Block') {
         optimizedCss += '{';
       } else if (type === 'AttributeSelector') {
