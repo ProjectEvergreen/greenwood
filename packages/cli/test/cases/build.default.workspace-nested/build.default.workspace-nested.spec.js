@@ -51,8 +51,8 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-function pagePathToId(pagePath) {
-  return pagePath.replace('.md', '').replace('.html', '').replace('./', '').replace(/\//g, '-');
+function generatePageHref(pagePath) {
+  return new URL(`./src/pages/${pagePath}`, import.meta.url).href;
 }
 
 describe('Build Greenwood With: ', function() {
@@ -86,31 +86,32 @@ describe('Build Greenwood With: ', function() {
       it('should have the expected ordering of pages in graph.json', function() {
         expect(graph.length).to.equal(21);
 
-        expect(graph[0].pagePath).to.be.equal('./blog/2017/03/26/index.md');
-        expect(graph[0].id).to.be.equal(pagePathToId(graph[0].pagePath));
-        expect(graph[1].pagePath).to.be.equal('./blog/2017/03/30/index.md');
-        expect(graph[2].pagePath).to.be.equal('./blog/2017/04/10/index.md');
-        expect(graph[3].pagePath).to.be.equal('./blog/2017/04/22/index.md');
-        expect(graph[4].pagePath).to.be.equal('./blog/2017/05/05/index.md');
-        expect(graph[5].pagePath).to.be.equal('./blog/2017/06/07/index.md');
-        expect(graph[6].pagePath).to.be.equal('./blog/2017/09/10/index.md');
-        expect(graph[7].pagePath).to.be.equal('./blog/2017/10/15/index.md');
-        expect(graph[8].pagePath).to.be.equal('./blog/2018/01/24/index.md');
-        expect(graph[9].pagePath).to.be.equal('./blog/2018/05/16/index.md');
-        expect(graph[10].pagePath).to.be.equal('./blog/2018/06/06/index.md');
-        expect(graph[11].pagePath).to.be.equal('./blog/2018/09/26/index.md');
-        expect(graph[12].pagePath).to.be.equal('./blog/2018/10/28/index.md');
-        expect(graph[13].pagePath).to.be.equal('./blog/2018/11/19/index.md');
-        expect(graph[14].pagePath).to.be.equal('./blog/2019/11/11/index.md');
-        expect(graph[15].pagePath).to.be.equal('./blog/2020/04/07/index.md');
-        expect(graph[16].pagePath).to.be.equal('./blog/2020/08/15/index.md');
-        expect(graph[17].pagePath).to.be.equal('./blog/2020/10/28/index.md');
-        expect(graph[18].pagePath).to.be.equal('./blog/index.md');
-        expect(graph[18].id).to.be.equal(pagePathToId(graph[18].pagePath));
-        expect(graph[19].pagePath).to.be.equal('./index.html');
-        expect(graph[19].id).to.be.equal(pagePathToId(graph[19].pagePath));
-        expect(graph[20].pagePath).to.be.equal('./404.html');
-        expect(graph[20].id).to.be.equal(pagePathToId(graph[20].pagePath));
+        // expect(graph[0].pageHref.endsWith('/blog/2017/03/26/index.md')).to.be.equal(true);
+        expect(graph[0].pageHref).to.equal(generatePageHref('blog/2017/03/26/index.md'));
+        expect(graph[0].id).to.be.equal('blog-2017-03-26-index');
+        expect(graph[1].pageHref).to.equal(generatePageHref('blog/2017/03/30/index.md'));
+        expect(graph[2].pageHref).to.equal(generatePageHref('blog/2017/04/10/index.md'));
+        expect(graph[3].pageHref).to.equal(generatePageHref('blog/2017/04/22/index.md'));
+        expect(graph[4].pageHref).to.equal(generatePageHref('blog/2017/05/05/index.md'));
+        expect(graph[5].pageHref).to.equal(generatePageHref('blog/2017/06/07/index.md'));
+        expect(graph[6].pageHref).to.equal(generatePageHref('blog/2017/09/10/index.md'));
+        expect(graph[7].pageHref).to.equal(generatePageHref('blog/2017/10/15/index.md'));
+        expect(graph[8].pageHref).to.equal(generatePageHref('blog/2018/01/24/index.md'));
+        expect(graph[9].pageHref).to.equal(generatePageHref('blog/2018/05/16/index.md'));
+        expect(graph[10].pageHref).to.equal(generatePageHref('blog/2018/06/06/index.md'));
+        expect(graph[11].pageHref).to.equal(generatePageHref('blog/2018/09/26/index.md'));
+        expect(graph[12].pageHref).to.equal(generatePageHref('blog/2018/10/28/index.md'));
+        expect(graph[13].pageHref).to.equal(generatePageHref('blog/2018/11/19/index.md'));
+        expect(graph[14].pageHref).to.equal(generatePageHref('blog/2019/11/11/index.md'));
+        expect(graph[15].pageHref).to.equal(generatePageHref('blog/2020/04/07/index.md'));
+        expect(graph[16].pageHref).to.equal(generatePageHref('blog/2020/08/15/index.md'));
+        expect(graph[17].pageHref).to.equal(generatePageHref('blog/2020/10/28/index.md'));
+        expect(graph[18].pageHref).to.equal(generatePageHref('blog/index.md'));
+        expect(graph[18].id).to.be.equal('blog-index');
+        expect(graph[19].pageHref).to.equal(generatePageHref('index.html'));
+        expect(graph[19].id).to.be.equal('index');
+        expect(graph[20].pageHref).to.equal(generatePageHref('404.html'));
+        expect(graph[20].id).to.be.equal('404');
       });
 
       it('should create a top level blog pages directory', function() {
