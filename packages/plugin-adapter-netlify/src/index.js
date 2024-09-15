@@ -94,10 +94,8 @@ async function netlifyAdapter(compilation) {
   await fs.mkdir(new URL('./netlify/functions/', projectDirectory), { recursive: true });
 
   for (const page of ssrPages) {
-    const { outputPath, route } = page;
+    const { id, outputPath, route } = page;
     const outputType = 'page';
-    const ext = outputPath.split('.').pop();
-    const id = outputPath.replace(`.route.${ext}`, '').replace(/\./g, '-');
     const chunks = (await fs.readdir(outputDir))
       .filter(file => file.startsWith(`${id}.route.chunk`) && file.endsWith('.js'));
     const outputRoot = new URL(`./${id}/`, adapterOutputUrl);
@@ -132,9 +130,7 @@ async function netlifyAdapter(compilation) {
 
   for (const [key, value] of apiRoutes.entries()) {
     const outputType = 'api';
-    const api = apiRoutes.get(key);
-    const { outputPath } = api;
-    const id = key.replace(`${basePath}/api/`, '').replace(/\//g, '-');
+    const { id, outputPath } = apiRoutes.get(key);
     const outputRoot = new URL(`./api/${id}/`, adapterOutputUrl);
     const { assets = [] } = value;
 

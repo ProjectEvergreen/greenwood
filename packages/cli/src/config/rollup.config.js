@@ -643,21 +643,24 @@ const getRollupConfigForBrowserScripts = async (compilation) => {
 };
 
 const getRollupConfigForApiRoutes = async (compilation) => {
-  const { outputDir, pagesDir, apisDir } = compilation.context;
+  const { outputDir, pagesDir } = compilation.context;
 
   return [...compilation.manifest.apis.values()]
-    .map(api => normalizePathnameForWindows(new URL(api.pagePath, pagesDir)))
-    .map((filepath) => {
-      // account for windows pathname shenanigans by "casting" filepath to a URL first
-      const ext = filepath.split('.').pop();
-      const entryName = new URL(`file://${filepath}`).pathname.replace(apisDir.pathname, '').replace(/\//g, '-').replace(`.${ext}`, '');
+    .map((api) => {
+      const { id, pagePath } = api;
 
       return {
-        input: filepath,
+        id,
+        inputPath: normalizePathnameForWindows(new URL(pagePath, pagesDir))
+      };
+    })
+    .map(({ id, inputPath }) => {
+      return {
+        input: inputPath,
         output: {
           dir: `${normalizePathnameForWindows(outputDir)}/api`,
-          entryFileNames: `${entryName}.js`,
-          chunkFileNames: `${entryName}.[hash].js`
+          entryFileNames: `${id}.js`,
+          chunkFileNames: `${id}.[hash].js`
         },
         plugins: [
           greenwoodResourceLoader(compilation),
@@ -696,20 +699,16 @@ const getRollupConfigForApiRoutes = async (compilation) => {
     });
 };
 
-const getRollupConfigForSsrPages = async (compilation, input) => {
+const getRollupConfigForSsrPages = async (compilation, inputs) => {
   const { outputDir } = compilation.context;
 
-  return input.map((filepath) => {
-    const ext = filepath.split('.').pop();
-    // account for windows pathname shenanigans by "casting" filepath to a URL first
-    const entryName = new URL(`file://${filepath}`).pathname.replace(compilation.context.scratchDir.pathname, '').replace('/', '-').replace(`.${ext}`, '');
-
+  return inputs.map(({ id, inputPath }) => {
     return {
-      input: filepath,
+      input: inputPath,
       output: {
         dir: normalizePathnameForWindows(outputDir),
-        entryFileNames: `${entryName}.route.js`,
-        chunkFileNames: `${entryName}.route.chunk.[hash].js`
+        entryFileNames: `${id}.route.js`,
+        chunkFileNames: `${id}.route.chunk.[hash].js`
       },
       plugins: [
         greenwoodResourceLoader(compilation),

@@ -96,6 +96,7 @@ const graphTypeDefs = gql`
   }
 
   type Page {
+    id: String,
     label: String,
     title: String,
     route: String,

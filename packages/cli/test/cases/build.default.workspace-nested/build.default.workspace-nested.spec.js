@@ -51,6 +51,10 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
+function pagePathToId(pagePath) {
+  return pagePath.replace('.md', '').replace('.html', '').replace('./', '').replace(/\//g, '-');
+}
+
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Default Workspace w/ Nested Directories';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
@@ -81,7 +85,9 @@ describe('Build Greenwood With: ', function() {
 
       it('should have the expected ordering of pages in graph.json', function() {
         expect(graph.length).to.equal(21);
+
         expect(graph[0].pagePath).to.be.equal('./blog/2017/03/26/index.md');
+        expect(graph[0].id).to.be.equal(pagePathToId(graph[0].pagePath));
         expect(graph[1].pagePath).to.be.equal('./blog/2017/03/30/index.md');
         expect(graph[2].pagePath).to.be.equal('./blog/2017/04/10/index.md');
         expect(graph[3].pagePath).to.be.equal('./blog/2017/04/22/index.md');
@@ -100,8 +106,11 @@ describe('Build Greenwood With: ', function() {
         expect(graph[16].pagePath).to.be.equal('./blog/2020/08/15/index.md');
         expect(graph[17].pagePath).to.be.equal('./blog/2020/10/28/index.md');
         expect(graph[18].pagePath).to.be.equal('./blog/index.md');
+        expect(graph[18].id).to.be.equal(pagePathToId(graph[18].pagePath));
         expect(graph[19].pagePath).to.be.equal('./index.html');
-        expect(graph[20].pagePath).to.be.equal('./src/404.html');
+        expect(graph[19].id).to.be.equal(pagePathToId(graph[19].pagePath));
+        expect(graph[20].pagePath).to.be.equal('./404.html');
+        expect(graph[20].id).to.be.equal(pagePathToId(graph[20].pagePath));
       });
 
       it('should create a top level blog pages directory', function() {

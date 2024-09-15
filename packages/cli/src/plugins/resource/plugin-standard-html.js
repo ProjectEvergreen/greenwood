@@ -36,7 +36,7 @@ class StandardHtmlResource extends ResourceInterface {
 
   async serve(url, request) {
     const { config, context } = this.compilation;
-    const { projectDirectory, pagesDir } = context;
+    const { userWorkspace, pagesDir } = context;
     const { activeFrontmatter } = config;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find(node => node.isSPA);
@@ -118,7 +118,7 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     if (isSpaRoute) {
-      body = await fs.readFile(new URL(isSpaRoute.pagePath, projectDirectory), 'utf-8');
+      body = await fs.readFile(new URL(isSpaRoute.pagePath, userWorkspace), 'utf-8');
     } else {
       body = ssrLayout ? ssrLayout : await getPageLayout(pagePath, this.compilation, layout);
     }

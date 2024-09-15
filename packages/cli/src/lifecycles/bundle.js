@@ -266,7 +266,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
 
     // second pass to link all bundled assets to their resources before optimizing and generating SSR bundles
     for (const page of ssrPages) {
-      const { route, pagePath } = page;
+      const { id, route, pagePath } = page;
       const entryFileUrl = new URL(pagePath, pagesDir);
       const entryFileOutputUrl = new URL(`file://${entryFileUrl.pathname.replace(pagesDir.pathname, scratchDir.pathname)}`);
       const outputPathRootUrl = new URL(`file://${path.dirname(entryFileOutputUrl.pathname)}/`);
@@ -308,7 +308,10 @@ async function bundleSsrPages(compilation, optimizePlugins) {
         }
       `);
 
-      input.push(normalizePathnameForWindows(entryFileOutputUrl));
+      input.push({
+        id,
+        inputPath: normalizePathnameForWindows(entryFileOutputUrl)
+      });
     }
 
     const ssrConfigs = await getRollupConfigForSsrPages(compilation, input);

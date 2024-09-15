@@ -31,8 +31,7 @@ async function genericAdapter(compilation) {
   }
 
   for (const page of ssrPages) {
-    const { outputPath } = page;
-    const id = outputPath.replace('.route.js', '');
+    const { id } = page;
     const outputFormat = generateOutputFormat(id, 'page');
 
     await fs.writeFile(new URL(`./${id}.js`, adapterOutputUrl), outputFormat);

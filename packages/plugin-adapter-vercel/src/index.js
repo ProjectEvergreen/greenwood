@@ -84,9 +84,7 @@ async function vercelAdapter(compilation) {
 
   for (const page of ssrPages) {
     const outputType = 'page';
-    const { outputPath } = page;
-    const ext = outputPath.split('.').pop();
-    const id = outputPath.replace(`.route.${ext}`, '').replace(/\./g, '-');
+    const { id, outputPath } = page;
     const outputRoot = new URL(`./${basePath}/${id}.func/`, adapterOutputUrl);
     const chunks = (await fs.readdir(outputDir))
       .filter(file => file.startsWith(`${id}.route.chunk`) && file.endsWith('.js'));
@@ -112,9 +110,7 @@ async function vercelAdapter(compilation) {
 
   for (const [key, value] of apiRoutes.entries()) {
     const outputType = 'api';
-    const api = apiRoutes.get(key);
-    const { outputPath } = api;
-    const id = key.replace(`${basePath}/api/`, '').replace(/\//g, '-');
+    const { id, outputPath } = apiRoutes.get(key);
     const outputRoot = new URL(`.${basePath}/api/${id}.func/`, adapterOutputUrl);
     const { assets = [] } = value;
 

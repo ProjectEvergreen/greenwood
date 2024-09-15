@@ -24,6 +24,11 @@ function getLabelFromRoute(_route) {
     })
     .join(' ');
 }
+
+function getIdFromRelativePathPath(relativePathPath, extension) {
+  return relativePathPath.replace(extension, '').replace('./', '').replace(/\//g, '-');
+}
+
 const generateGraph = async (compilation) => {
 
   return new Promise(async (resolve, reject) => {
@@ -38,8 +43,9 @@ const generateGraph = async (compilation) => {
 
       let apis = new Map();
       let graph = [{
+        id: 'index',
         outputPath: '/index.html',
-        pagePath: './src/index.html',
+        pagePath: './index.html',
         route: `${basePath}/`,
         label: 'Home',
         title: null,
@@ -100,13 +106,14 @@ const generateGraph = async (compilation) => {
               /*
               * API Properties (per route)
               *----------------------
-              * filename: base filename of the page
+              * id: unique hyphen delimited string of the filename, relative to the page/api directory
+              * pagePath: path to the page file relative to context.pagesDirectory
               * outputPath: the filename to write to when generating a build
-              * path: path to the file relative to the workspace
               * route: URL route for a given page on outputFilePath
               * isolation: if this should be run in isolated mode
               */
               apiRoutes.set(`${basePath}${route}`, {
+                id: getIdFromRelativePathPath(relativePagePath, `.${extension}`).replace('api-', ''),
                 pagePath: relativePagePath,
                 outputPath: relativePagePath,
                 route: `${basePath}${route}`,
@@ -219,6 +226,7 @@ const generateGraph = async (compilation) => {
               delete customData.imports;
               delete customData.title;
               delete customData.layout;
+              delete customData.id;
 
               // set flag whether to gather a list of headings on a page as menu items
               customData.tocHeading = customData.tocHeading || 0;
@@ -239,6 +247,7 @@ const generateGraph = async (compilation) => {
               /*
                * Page Properties
                *----------------------
+               * id: unique hyphen delimited string of the filename, relative to the pages directory
                * label: Display text for the page inferred, by default is the value of title
                * title: used to customize the <title></title> tag of the page, inferred from the filename
                * route: URL for accessing the page from the browser
@@ -247,6 +256,7 @@ const generateGraph = async (compilation) => {
                * imports: per page JS or CSS file imports specified from frontmatter
                * resources: all script, style, etc resources for the entire page as URLs
                * outputPath: the name of the file in the output folder
+               * pagePath: path to the page file relative to context.pagesDirectory
                * isSSR: if this is a server side route
                * prerender: if this page should be statically exported
                * isolation: if this page should be run in isolated mode
@@ -254,6 +264,7 @@ const generateGraph = async (compilation) => {
                * servePage: signal that this is a custom page file type (static | dynamic)
                */
               const page = {
+                id: getIdFromRelativePathPath(relativePagePath, extension),
                 label,
                 title,
                 route: `${basePath}${route}`,
@@ -324,8 +335,9 @@ const generateGraph = async (compilation) => {
             ...graph,
             {
               ...oldGraph,
+              id: '404',
               outputPath: '/404.html',
-              pagePath: './src/404.html',
+              pagePath: './404.html',
               route: `${basePath}/404/`,
               path: '404.html',
               label: 'Not Found',
