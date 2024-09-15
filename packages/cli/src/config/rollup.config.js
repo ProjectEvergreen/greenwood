@@ -353,8 +353,9 @@ function greenwoodImportMetaUrl(compilation) {
         if (`${compilation.context.apisDir.pathname}${idAssetName}`.indexOf(normalizedId) >= 0) {
           for (const entry of compilation.manifest.apis.keys()) {
             const apiRoute = compilation.manifest.apis.get(entry);
+            const pagePath = new URL(apiRoute.pageHref).pathname.replace(`${compilation.context.pagesDir}/api/`, '');
 
-            if (normalizedId.endsWith(apiRoute.pagePath.replace('.', ''))) {
+            if (normalizedId.endsWith(pagePath)) {
               const assets = apiRoute.assets || [];
 
               assets.push(assetUrl.url.href);
@@ -643,16 +644,13 @@ const getRollupConfigForBrowserScripts = async (compilation) => {
 };
 
 const getRollupConfigForApiRoutes = async (compilation) => {
-  const { outputDir, pagesDir } = compilation.context;
+  const { outputDir } = compilation.context;
 
   return [...compilation.manifest.apis.values()]
     .map((api) => {
-      const { id, pagePath } = api;
+      const { id, pageHref } = api;
 
-      return {
-        id,
-        inputPath: normalizePathnameForWindows(new URL(pagePath, pagesDir))
-      };
+      return { id, inputPath: normalizePathnameForWindows(new URL(pageHref)) };
     })
     .map(({ id, inputPath }) => {
       return {

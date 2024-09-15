@@ -243,13 +243,13 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     // and before we optimize so that all bundled assets can tracked up front
     // would be nice to see if this can be done in a single pass though...
     for (const page of ssrPages) {
-      const { imports, route, layout, pagePath } = page;
-      const moduleUrl = new URL(pagePath, pagesDir);
+      const { imports, route, layout, pageHref } = page;
+      const moduleUrl = new URL(pageHref);
       const request = new Request(moduleUrl);
       const data = await executeRouteModule({ moduleUrl, compilation, page, prerender: false, htmlContents: null, scripts: [], request });
       let staticHtml = '';
 
-      staticHtml = data.layout ? data.layout : await getPageLayout(pagePath, compilation, layout);
+      staticHtml = data.layout ? data.layout : await getPageLayout(pageHref, compilation, layout);
       staticHtml = await getAppLayout(staticHtml, compilation, imports, page);
       staticHtml = await getUserScripts(staticHtml, compilation);
       staticHtml = await (await interceptPage(new URL(`http://localhost:8080${route}`), new Request(new URL(`http://localhost:8080${route}`)), getPluginInstances(compilation), staticHtml)).text();
@@ -266,8 +266,9 @@ async function bundleSsrPages(compilation, optimizePlugins) {
 
     // second pass to link all bundled assets to their resources before optimizing and generating SSR bundles
     for (const page of ssrPages) {
-      const { id, route, pagePath } = page;
-      const entryFileUrl = new URL(pagePath, pagesDir);
+      const { id, route, pageHref } = page;
+      const pagePath = new URL(pageHref).pathname.replace(pagesDir.pathname, './');
+      const entryFileUrl = new URL(pageHref);
       const entryFileOutputUrl = new URL(`file://${entryFileUrl.pathname.replace(pagesDir.pathname, scratchDir.pathname)}`);
       const outputPathRootUrl = new URL(`file://${path.dirname(entryFileOutputUrl.pathname)}/`);
       const htmlOptimizer = config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);

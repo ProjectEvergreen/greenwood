@@ -45,7 +45,6 @@ const generateGraph = async (compilation) => {
       let graph = [{
         id: 'index',
         outputPath: '/index.html',
-        pagePath: './index.html',
         route: `${basePath}/`,
         label: 'Home',
         title: null,
@@ -107,14 +106,14 @@ const generateGraph = async (compilation) => {
               * API Properties (per route)
               *----------------------
               * id: unique hyphen delimited string of the filename, relative to the page/api directory
-              * pagePath: path to the page file relative to context.pagesDirectory
+              * pageHref: href to the page's filesystem file
               * outputPath: the filename to write to when generating a build
               * route: URL route for a given page on outputFilePath
               * isolation: if this should be run in isolated mode
               */
               apiRoutes.set(`${basePath}${route}`, {
                 id: getIdFromRelativePathPath(relativePagePath, `.${extension}`).replace('api-', ''),
-                pagePath: relativePagePath,
+                pageHref: new URL(relativePagePath, pagesDir).href,
                 outputPath: relativePagePath,
                 route: `${basePath}${route}`,
                 isolation
@@ -256,7 +255,7 @@ const generateGraph = async (compilation) => {
                * imports: per page JS or CSS file imports specified from frontmatter
                * resources: all script, style, etc resources for the entire page as URLs
                * outputPath: the name of the file in the output folder
-               * pagePath: path to the page file relative to context.pagesDirectory
+               * pageHref: href to the page's filesystem file
                * isSSR: if this is a server side route
                * prerender: if this page should be statically exported
                * isolation: if this page should be run in isolated mode
@@ -272,7 +271,7 @@ const generateGraph = async (compilation) => {
                 data: customData || {},
                 imports,
                 resources: [],
-                pagePath: relativePagePath,
+                pageHref: new URL(relativePagePath, pagesDir).href,
                 outputPath: route === '/404/'
                   ? '/404.html'
                   : `${route}index.html`,
@@ -312,7 +311,7 @@ const generateGraph = async (compilation) => {
       if (await checkResourceExists(new URL('./index.html', userWorkspace))) {
         graph = [{
           ...graph[0],
-          path: `${userWorkspace.pathname}index.html`,
+          pageHref: new URL('./index.html', userWorkspace).href,
           isSPA: true
         }];
       } else {
@@ -337,7 +336,7 @@ const generateGraph = async (compilation) => {
               ...oldGraph,
               id: '404',
               outputPath: '/404.html',
-              pagePath: './404.html',
+              pageHref: new URL('./404.html', pagesDir).href,
               route: `${basePath}/404/`,
               path: '404.html',
               label: 'Not Found',
@@ -363,7 +362,7 @@ const generateGraph = async (compilation) => {
             }
 
             graph.push({
-              pagePath: null,
+              pageHref: null,
               data: {},
               imports: [],
               resources: [],

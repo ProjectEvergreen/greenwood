@@ -1,11 +1,10 @@
+/* eslint-disable complexity */
 import fs from 'fs/promises';
 import htmlparser from 'node-html-parser';
 import { checkResourceExists } from './resource-utils.js';
 import { Worker } from 'worker_threads';
 
 async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {
-  // TODO confirm context plugins work for SSR
-  // TODO support context plugins for more than just HTML files
   const contextPlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'context';
   }).map((plugin) => {
@@ -30,10 +29,10 @@ async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {
   return customLayoutLocations;
 }
 
-async function getPageLayout(filePath = '', compilation, layout) {
+async function getPageLayout(pageHref = '', compilation, layout) {
   const { config, context } = compilation;
   const { layoutsDir, userLayoutsDir, pagesDir } = context;
-  const filePathUrl = new URL(filePath, pagesDir);
+  const filePathUrl = pageHref && pageHref !== '' ? new URL(pageHref) : pageHref;
   const customPageFormatPlugins = config.plugins
     .filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin)
     .map(plugin => plugin.provider(compilation));
@@ -43,13 +42,13 @@ async function getPageLayout(filePath = '', compilation, layout) {
     && await customPageFormatPlugins[0].shouldServe(filePathUrl);
   const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, 'page');
   const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, layout);
-  const extension = filePath?.split('.')?.pop();
-  const is404Page = filePath?.endsWith('404.html') && extension === 'html';
+  const extension = pageHref?.split('.')?.pop();
+  const is404Page = pageHref?.endsWith('404.html') && extension === 'html';
   const hasCustomStaticLayout = await checkResourceExists(new URL(`./${layout}.html`, userLayoutsDir));
   const hasCustomDynamicLayout = await checkResourceExists(new URL(`./${layout}.js`, userLayoutsDir));
   const hasPageLayout = await checkResourceExists(new URL('./page.html', userLayoutsDir));
   const hasCustom404Page = await checkResourceExists(new URL('./404.html', pagesDir));
-  const isHtmlPage = extension === 'html' && await checkResourceExists(new URL(filePath, pagesDir));
+  const isHtmlPage = extension === 'html' && await checkResourceExists(new URL(pageHref));
   let contents;
 
   if (layout && (customPluginPageLayouts.length > 0 || hasCustomStaticLayout)) {

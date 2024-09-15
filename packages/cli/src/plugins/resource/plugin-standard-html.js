@@ -36,13 +36,13 @@ class StandardHtmlResource extends ResourceInterface {
 
   async serve(url, request) {
     const { config, context } = this.compilation;
-    const { userWorkspace, pagesDir } = context;
+    const { userWorkspace } = context;
     const { activeFrontmatter } = config;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find(node => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
-    const { pagePath } = matchingRoute;
-    const filePath = !matchingRoute.external ? pagePath : '';
+    const { pageHref } = matchingRoute;
+    const filePath = !matchingRoute.external && pageHref ? new URL(pageHref).pathname.replace(userWorkspace.pathname, './') : '';
     const isMarkdownContent = (filePath || '').split('.').pop() === 'md';
     let body = '';
     let layout = matchingRoute.layout || null;
@@ -56,7 +56,7 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     if (isMarkdownContent) {
-      const markdownContents = await fs.readFile(new URL(pagePath, pagesDir), 'utf-8');
+      const markdownContents = await fs.readFile(new URL(pageHref), 'utf-8');
       const rehypePlugins = [];
       const remarkPlugins = [];
 
@@ -84,7 +84,7 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     if (matchingRoute.isSSR) {
-      const routeModuleLocationUrl = new URL(pagePath, pagesDir);
+      const routeModuleLocationUrl = new URL(pageHref);
       const routeWorkerUrl = this.compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeModuleUrl;
 
       await new Promise(async (resolve, reject) => {
@@ -118,9 +118,9 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     if (isSpaRoute) {
-      body = await fs.readFile(new URL(isSpaRoute.pagePath, userWorkspace), 'utf-8');
+      body = await fs.readFile(new URL(isSpaRoute.pageHref), 'utf-8');
     } else {
-      body = ssrLayout ? ssrLayout : await getPageLayout(pagePath, this.compilation, layout);
+      body = ssrLayout ? ssrLayout : await getPageLayout(pageHref, this.compilation, layout);
     }
 
     body = await getAppLayout(body, this.compilation, customImports, matchingRoute);
