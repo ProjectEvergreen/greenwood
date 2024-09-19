@@ -58,6 +58,10 @@ describe('Scaffold Greenwood With Default Template: ', function() {
         expect(fs.existsSync(path.join(outputPath, 'package-lock.json'))).to.be.false;
       });
 
+      it('should generate a .npmrc file', function() {
+        expect(fs.existsSync(path.join(outputPath, '.npmrc'))).to.be.true;
+      });
+
       it('should not generate a yarn.lock file', function() {
         expect(fs.existsSync(path.join(outputPath, 'yarn.lock'))).to.be.false;
       });

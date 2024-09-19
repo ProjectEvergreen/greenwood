@@ -68,13 +68,19 @@ const npmInit = async () => {
 
 // Copy root and src files to target directory
 const srcInit = async () => {
-  const templateFiles = [];
+  let templateFiles = [];
 
   await createGitIgnore();
 
   fs.readdirSync(templateDir).forEach(file => {
     templateFiles.push(file);
   });
+
+  if (program.yarn) {
+    // we only need .npmrc if we're using npm
+    // because npm struggles with peer dependencies :/
+    templateFiles = templateFiles.filter(file => file !== '.npmrc');
+  }
 
   await Promise.all(
     templateFiles.map(async file => {
@@ -272,7 +278,7 @@ const run = async () => {
     console.log('Initializing project with files...');
     await srcInit();
 
-    console.log('Creating manifest (package.json)...');
+    console.log('Creating package.json...');
     await npmInit();
 
     if (program.install || program.yarn) {

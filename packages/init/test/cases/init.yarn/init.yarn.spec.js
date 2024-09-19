@@ -58,6 +58,10 @@ xdescribe('Scaffold Greenwood With Yarn: ', function() {
         expect(fs.existsSync(path.join(outputPath, 'package-lock.json'))).to.be.false;
       });
 
+      it('should not generate a .npmrc file', function() {
+        expect(fs.existsSync(path.join(outputPath, '.npmrc'))).to.be.false;
+      });
+
       it('should generate a public directory', function() {
         expect(fs.existsSync(path.join(outputPath, 'public'))).to.be.true;
       });
