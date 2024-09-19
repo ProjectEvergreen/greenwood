@@ -19,7 +19,7 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-describe('Scaffold Greenwood With Default Template: ', function() {
+describe.only('Scaffold Greenwood With Default Template: ', function() {
   const initPath = path.join(process.cwd(), 'packages/init/src/index.js');
   const outputPath = fileURLToPath(new URL('./my-app', import.meta.url));
   let runner;
@@ -81,7 +81,8 @@ describe('Scaffold Greenwood With Default Template: ', function() {
       it('the should have the correct Greenwood scripts', function() {
         const scripts = pkgJson.scripts;
 
-        expect(scripts.start).to.equal('greenwood develop');
+        expect(scripts.dev).to.equal('greenwood develop');
+        expect(scripts.start).to.equal(scripts.dev);
         expect(scripts.build).to.equal('greenwood build');
         expect(scripts.serve).to.equal('greenwood serve');
       });
