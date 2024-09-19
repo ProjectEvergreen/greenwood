@@ -223,7 +223,7 @@ const listAndSelectTemplate = async () => {
       });
 
       if (selectedTemplate) {
-        console.log('\Installing Selected Template:', selectedTemplate.name);
+        console.log('Installing Selected Template:', selectedTemplate.name);
       }
     });
   }
@@ -254,8 +254,10 @@ const cleanUp = async () => {
 const run = async () => {
   try {
     const firstArg = process.argv[process.argv.length - 1].split(' ')[0];
+    const taskRunner = program.yarn ? 'yarn' : 'npm run';
+    const shouldChangeDirectory = !firstArg.startsWith('--') && firstArg !== '';
 
-    if (!firstArg.startsWith('--')) {
+    if (!firstArg.startsWith('--') && firstArg !== '') {
       TARGET_DIR = path.join(TARGET_DIR, `./${firstArg}`);
 
       if (!fs.existsSync(TARGET_DIR)) {
@@ -289,6 +291,12 @@ const run = async () => {
     await cleanUp();
 
     console.log(`${chalk.rgb(175, 207, 71)('Initializing new project complete!')}`);
+
+    if (shouldChangeDirectory) {
+      console.log(`Change directories by running => cd ${firstArg}`);
+    }
+
+    console.log(`To start developing run => ${taskRunner} dev`);
   } catch (err) {
     console.error(err);
   }
