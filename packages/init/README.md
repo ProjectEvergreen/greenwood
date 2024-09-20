@@ -1,28 +1,40 @@
 # @greenwood/init
 
 ## Overview
+
 Init package for scaffolding out a new Greenwood project.  For more information and complete docs, please visit the [Greenwood website](https://www.greenwoodjs.io/docs).
 
 ## Usage
 
-Create a directory and then run the `init` command to scaffold a minimal Greenwood project.
+Run the `init` command to scaffold a minimal Greenwood project into a directory of your choosing.
 
 ```bash
-mkdir my-app && cd my-app
-npx @greenwood/init@latest
+# providing an output directory of my-app
+npx @greenwood/init@latest my-app
 ```
 
-This will then output the following
+This will then output your project files into a directory called _my-app_
 ```bash
-├── greenwood.config.js
+my-app
 ├── .gitignore
+├── greenwood.config.js
 ├── package.json
 └── src/
-     └─ pages/
-         └─ index.md
+     └─ ...
 ```
 
 ## API
+
+### Project Name
+
+By providing a name as the first argument, the `init` command will output the project files into a directory of the same name and configure the `name` property _package.json_.
+
+```bash
+# example
+npx @greenwood/init@latest my-app
+```
+
+> _Omitting my-app will install project files into the current directory._
 
 ### Template
 

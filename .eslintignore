@@ -3,6 +3,8 @@
 **/node_modules/**
 !.eslintrc.cjs
 !.mocharc.js
-packages/init/src/template/src/**/*.js
+packages/init/src/template/**
+packages/init/test/cases/**/output/**
+packages/init/test/cases/**/my-app/**
 packages/plugin-babel/test/cases/**/*main.js
 TODO.md

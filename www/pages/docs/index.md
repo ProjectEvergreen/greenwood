@@ -10,7 +10,7 @@ This is the documentation space for **Greenwood** that we hope will help you get
 
 
 ### Installation
-Greenwood can be installed with any of the common package managers available today.
+Greenwood can be installed manually with any of the common package managers available today or you scaffold a new project through our [`init` package](/getting-started/quick-start/#init-package).
 
 ```bash
 # npm
