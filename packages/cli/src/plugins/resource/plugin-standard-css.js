@@ -83,6 +83,8 @@ function bundleCss(body, url, compilation) {
         optimizedCss += `#${name}`;
       } else if (type === 'ClassSelector') {
         optimizedCss += `.${name}`;
+      } else if (type === 'NestingSelector') {
+        optimizedCss += '&';
       } else if (type === 'PseudoClassSelector') {
         optimizedCss += `:${name}`;
 
@@ -127,12 +129,25 @@ function bundleCss(body, url, compilation) {
           optimizedCss += ' ';
         }
         optimizedCss += `${name}(`;
-      } else if (type === 'MediaFeature') {
+      } else if (type === 'Feature') {
         optimizedCss += ` (${name}:`;
-      } else if (type === 'Parentheses') {
+      } else if (type === 'Parentheses' || type === 'SupportsDeclaration') {
         optimizedCss += '(';
       } else if (type === 'PseudoElementSelector') {
         optimizedCss += `::${name}`;
+      } else if (type === 'MediaQuery') {
+        // https://github.com/csstree/csstree/issues/285#issuecomment-2350230333
+        const { mediaType, modifier } = node;
+        const type = mediaType !== null
+          ? mediaType
+          : '';
+        const operator = mediaType && node.condition
+          ? ' and'
+          : modifier !== null
+            ? ` ${modifier}`
+            : '';
+
+        optimizedCss += `${type}${operator}`;
       } else if (type === 'Block') {
         optimizedCss += '{';
       } else if (type === 'AttributeSelector') {
@@ -209,8 +224,8 @@ function bundleCss(body, url, compilation) {
           optimizedCss += '}';
           break;
         case 'Function':
-        case 'MediaFeature':
         case 'Parentheses':
+        case 'SupportsDeclaration':
           optimizedCss += ')';
           break;
         case 'PseudoClassSelector':
@@ -254,7 +269,7 @@ function bundleCss(body, url, compilation) {
             optimizedCss += '!important';
           }
 
-          if (item.next || (item.prev && !item.next)) {
+          if (item?.next || (item?.prev && !item?.next)) {
             optimizedCss += ';';
           }
 
@@ -274,6 +289,9 @@ function bundleCss(body, url, compilation) {
             optimizedCss = optimizedCss.replace(`${name}${value}`, `${name}${node.matcher}${value}`);
           }
           optimizedCss += ']';
+          break;
+        case 'MediaQuery':
+          optimizedCss += ')';
           break;
         default:
           break;
