@@ -17,12 +17,10 @@ If you want to get right into the code, we have a few options to get you started
 
 ### Init Package
 
-You can use Greenwood's [`init` package](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/init/README.md) to scaffold out a new empty Greenwood project, or from a layout.
+You can use Greenwood's [`init` package](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/init/README.md) to scaffold out a new empty Greenwood project or use one our template starter kits.
 
 ```bash
-mkdir my-app && cd my-app
-
-npx @greenwood/init@latest
+$ npx @greenwood/init@latest my-app
 ```
 
 ### Command Line
