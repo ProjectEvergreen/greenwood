@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood with a custom resource plugin and default workspace with a custom page format.
+ * Run Greenwood with a custom resource plugin and default workspace with a custom page formats.
  *
  * User Result
- * Should generate a bare bones Greenwood build with expected custom file (.foo) behavior.
+ * Should generate a bare bones Greenwood build with expected custom page format behaviors.
  *
  * User Command
  * greenwood build
@@ -13,17 +13,27 @@
  *   // see complete implementation in the greenwood.config.js file used for this spec
  * }
  *
+ * class BarResource extends ResourceInterface {
+ *   // see complete implementation in the greenwood.config.js file used for this spec
+ * }
+ *
  * {
  *   plugins: [{
  *     type: 'resource',
  *     name: 'plugin-foo',
  *     provider: (compilation, options) => new FooResource(compilation, options)
+ *   },{
+ *     type: 'resource',
+ *     name: 'plugin-bar',
+ *     provider: (compilation, options) => new BarResource(compilation, options)
  *   }]
  * }
  *
  * Custom Workspace
  * src/
  *   pages/
+ *     api
+ *       greeting.bar
  *     about.foo
  *     contact.bar
  *     index.html
@@ -39,7 +49,7 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom FooResource Plugin and Default Workspace';
+  const LABEL = 'Custom Static and Dynamic Page Loaders';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
@@ -48,7 +58,7 @@ describe('Build Greenwood With: ', function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner();
+    runner = new Runner(false, true);
   });
 
   describe(LABEL, function() {
@@ -89,23 +99,38 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    // TODO not sure why this was disabled, but should enable this test case
-    xdescribe('Custom Format Dynamic Contact Page', function() {
-      let aboutPage;
+    describe('Custom Format Dynamic Contact Page (exported with prerendering)', function() {
+      let contactPage;
 
       before(async function() {
-        aboutPage = await glob.promise(path.join(this.context.publicDir, 'contact.html'));
+        contactPage = await glob.promise(path.join(this.context.publicDir, 'contact/index.html'));
       });
 
-      it('should have the expected JavaScript equivalent file in the output directory', function() {
-        expect(aboutPage).to.have.lengthOf(1);
+      it('should have the expected pre-rendered HTML file in the output directory', function() {
+        expect(contactPage).to.have.lengthOf(1);
       });
 
-      it('should have expected text from from my-other-custom-file.foo in the script output file', function() {
-        const contents = fs.readFileSync(aboutPage[0], 'utf-8');
+      it('should have expected text from the output HTML file', function() {
+        const contents = fs.readFileSync(contactPage[0], 'utf-8');
 
-        expect(contents).to.contain('Welcome to our About page!');
+        expect(contents).to.contain('Welcome to our Contact page!');
       });
+    });
+
+    describe('Custom Format Dynamic API Route', function() {
+      let handler;
+
+      before(async function() {
+        handler = (await import(new URL('./public/api/greeting.js', import.meta.url))).handler;
+      });
+
+      it('should have the expected output from the API route', async function() {
+        const response = await handler(new Request(new URL('http://localhost:8080/api/greeting')));
+        const data = await response.json();
+
+        expect(data.message).to.equal('Hello World!!!');
+      });
+
     });
   });
 

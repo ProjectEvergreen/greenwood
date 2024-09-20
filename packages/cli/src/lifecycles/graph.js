@@ -45,22 +45,28 @@ const generateGraph = async (compilation) => {
             pages = nextPages.pages;
             apiRoutes = nextPages.apiRoutes;
           } else {
-            const req = new Request(filenameUrl, { headers: { 'Accept': 'text/html' } });
             const extension = `.${filenameUrl.pathname.split('.').pop()}`;
-            const isCustom = customPageFormatPlugins[0] && customPageFormatPlugins[0].shouldServe && await customPageFormatPlugins[0].shouldServe(filenameUrl, req)
-              ? customPageFormatPlugins[0].servePage
-              : null;
             const relativePagePath = filenameUrl.pathname.replace(pagesDir.pathname, '/');
             const relativeWorkspacePath = directory.pathname.replace(projectDirectory.pathname, '');
+            const isApiRoute = relativePagePath.startsWith('/api');
+            const req = isApiRoute
+              ? new Request(filenameUrl)
+              : new Request(filenameUrl, { headers: { 'Accept': 'text/html' } });
+            let isCustom = null;
+
+            for (const plugin of customPageFormatPlugins) {
+              if (plugin.shouldServe && await plugin.shouldServe(filenameUrl, req)) {
+                isCustom = plugin.servePage;
+                break;
+              }
+            }
+
             const isStatic = isCustom === 'static' || extension === '.md' || extension === '.html';
             const isDynamic = isCustom === 'dynamic' || extension === '.js';
-            const isApiRoute = relativePagePath.startsWith('/api');
             const isPage = isStatic || isDynamic;
 
             if (isApiRoute) {
-              const req = new Request(filenameUrl);
               const extension = filenameUrl.pathname.split('.').pop();
-              const isCustom = customPageFormatPlugins[0] && customPageFormatPlugins[0].shouldServe && await customPageFormatPlugins[0].shouldServe(filenameUrl, req);
 
               if (extension !== 'js' && !isCustom) {
                 console.warn(`${filenameUrl} is not a supported API file extension, skipping...`);
