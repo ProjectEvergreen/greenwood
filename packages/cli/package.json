@@ -38,7 +38,7 @@
     "acorn-import-attributes": "^1.9.5",
     "acorn-walk": "^8.0.0",
     "commander": "^2.20.0",
-    "css-tree": "^2.2.1",
+    "css-tree": "^3.0.0",
     "es-module-shims": "^1.8.3",
     "front-matter": "^4.0.2",
     "koa": "^2.13.0",
