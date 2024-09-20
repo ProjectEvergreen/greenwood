@@ -1,4 +1,4 @@
-async function getTemplate(compilation, { route }) {
+async function getLayout(compilation, { route }) {
   return `
     <html>
       <head>
@@ -85,7 +85,7 @@ async function getFrontmatter() {
 export const prerender = true;
 
 export {
-  getTemplate,
+  getLayout,
   getBody,
   getFrontmatter
 };

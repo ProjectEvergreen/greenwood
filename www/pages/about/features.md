@@ -9,7 +9,7 @@ linkheadings: 3
 ## Features
 
 ### Easy Onboarding
-We built Greenwood in the hopes that getting started would be easy.  By default Greenwood will build an app for you.  Just start with some HTML by adding pages and customizing templates and you're good to go!  Greenwood makes as few assumptions as needed to deliver an optimal development experience with minimum configuration needed or work from you.
+We built Greenwood in the hopes that getting started would be easy.  By default Greenwood will build an app for you.  Just start with some HTML by adding pages and customizing layouts and you're good to go!  Greenwood makes as few assumptions as needed to deliver an optimal development experience with minimum configuration needed or work from you.
 
 We strive to provide good documentation, intuitive developer experiences, and stable workflows.  Even if you don't know anything about ESM or Web Components, if you can learn a little markdown and some HTML / CSS, you can get started making a modern website right away!
 

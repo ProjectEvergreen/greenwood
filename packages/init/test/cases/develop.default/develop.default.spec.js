@@ -108,18 +108,10 @@ xdescribe('Scaffold Greenwood and Run Develop command: ', function() {
             done();
           });
 
-          it('should display My Project heading', function(done) {
-            const heading = dom.window.document.querySelector('body > h2');
-
-            expect(heading.textContent).to.equal('My Project');
-
-            done();
-          });
-
-          it('should display My Project title', function(done) {
+          it('should display default project title', function(done) {
             const title = dom.window.document.querySelector('head > title');
 
-            expect(title.textContent).to.equal('My App');
+            expect(title.textContent).to.equal('Greenwood');
 
             done();
           });

@@ -35,6 +35,7 @@ describe('Scaffold Greenwood With Default Template: ', function() {
 
     before(async function() {
       await fs.promises.mkdir(outputPath);
+
       runner.setup(outputPath);
       runner.runCommand(initPath);
     });
@@ -57,6 +58,10 @@ describe('Scaffold Greenwood With Default Template: ', function() {
         expect(fs.existsSync(path.join(outputPath, 'package-lock.json'))).to.be.false;
       });
 
+      it('should generate a .npmrc file', function() {
+        expect(fs.existsSync(path.join(outputPath, '.npmrc'))).to.be.true;
+      });
+
       it('should not generate a yarn.lock file', function() {
         expect(fs.existsSync(path.join(outputPath, 'yarn.lock'))).to.be.false;
       });
@@ -76,7 +81,8 @@ describe('Scaffold Greenwood With Default Template: ', function() {
       it('the should have the correct Greenwood scripts', function() {
         const scripts = pkgJson.scripts;
 
-        expect(scripts.start).to.equal('greenwood develop');
+        expect(scripts.dev).to.equal('greenwood develop');
+        expect(scripts.start).to.equal(scripts.dev);
         expect(scripts.build).to.equal('greenwood build');
         expect(scripts.serve).to.equal('greenwood serve');
       });
@@ -88,11 +94,27 @@ describe('Scaffold Greenwood With Default Template: ', function() {
       });
     });
 
-    describe('initial page contents', function() {
-      it('should have the correct contents for src/pages.index.md', function() {
-        const pageContents = fs.readFileSync(path.join(outputPath, 'src/pages/index.md'), 'utf-8');
+    describe('home page contents', function() {
+      let pageContents;
 
-        expect(pageContents).to.equal('## My Project');
+      before(async function() {
+        pageContents = fs.readFileSync(path.join(outputPath, 'src/pages/index.html'), 'utf-8');
+      });
+
+      it('should have the expected getting started prompt', function() {
+        expect(pageContents).to.contain('<h1>Edit <code>src/pages/index.html</code> to start making changes</h1>');
+      });
+
+      it('should have the card headings for src/pages/index.html', function() {
+        expect(pageContents).to.contain('<h2>Getting Started</h2>');
+        expect(pageContents).to.contain('<h2>Docs</h2>');
+        expect(pageContents).to.contain('<h2>Guides</h2>');
+        expect(pageContents).to.contain('<h2>Community</h2>');
+      });
+
+      it('should have a <script> tag to the logo component', function() {
+        expect(pageContents).to.contain('<script type="module" src="../components/logo/logo.js"></script>');
+        expect(pageContents).to.contain('<x-logo></x-logo>');
       });
     });
   });

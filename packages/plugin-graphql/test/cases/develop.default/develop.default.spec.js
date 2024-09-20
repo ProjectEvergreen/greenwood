@@ -77,7 +77,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return an import map shim <script> in the <head> of the document', function(done) {
-        const importMapTag = dom.window.document.querySelectorAll('head > script[type="importmap-shim"]')[0];
+        const importMapTag = dom.window.document.querySelectorAll('head > script[type="importmap"]')[0];
         const importMap = JSON.parse(importMapTag.textContent).imports;
 
         expect(importMap['@greenwood/plugin-graphql/src/core/client.js']).to.equal('/node_modules/@greenwood/plugin-graphql/src/core/client.js');

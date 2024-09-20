@@ -16,13 +16,13 @@
  *
  * User Workspace
  * src/
- *   api/
- *     greeting.js
  *   assets/
  *     logo.png
  *   components/
  *     card.js
  *   pages/
+ *     api/
+ *       greeting.js
  *     about.md
  *     index.html
  *     users.js
@@ -48,8 +48,8 @@ describe('Serve Greenwood With: ', function() {
   const publicPath = path.join(outputPath, 'public/');
   const hostname = 'http://127.0.0.1:8080';
   const basePath = '/my-path';
-  const jsHash = '4bcc801e';
-  const cssHash = '1454013616';
+  const jsHash = '2ce3f02d';
+  const cssHash = '2106293974';
   let runner;
 
   before(function() {
@@ -229,7 +229,7 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(body).to.contain('*{color:blue}');
+        expect(body).to.contain('*{color:blue;background-image:url(\'/my-path/images/webcomponents.1079385342.jpg\');}');
         done();
       });
     });
@@ -294,7 +294,7 @@ describe('Serve Greenwood With: ', function() {
           .filter(tag => tag.getAttribute('data-gwd') === 'static-router');
 
         expect(routerScriptTags.length).to.be.equal(1);
-        expect(routerScriptTags[0].textContent.replace(/ /g, '').replace(/\n/g, '')).to.contain(`window.__greenwood=window.__greenwood||{};window.__greenwood.currentTemplate="${basePath}/"`);
+        expect(routerScriptTags[0].textContent.replace(/ /g, '').replace(/\n/g, '')).to.contain(`window.__greenwood=window.__greenwood||{};window.__greenwood.currentLayout="${basePath}/"`);
       });
 
       it('should have one <router-outlet> tag in the <body> for the content', function() {
@@ -316,7 +316,7 @@ describe('Serve Greenwood With: ', function() {
         const dataset = aboutRouteTag[0].dataset;
 
         expect(aboutRouteTag.length).to.be.equal(1);
-        expect(dataset.template).to.be.equal('test');
+        expect(dataset.layout).to.be.equal('test');
         expect(dataset.key).to.be.equal(`${basePath}/_routes/about/index.html`);
       });
 
@@ -327,7 +327,7 @@ describe('Serve Greenwood With: ', function() {
         const dataset = aboutRouteTag[0].dataset;
 
         expect(aboutRouteTag.length).to.be.equal(1);
-        expect(dataset.template).to.be.equal(`${basePath}/`);
+        expect(dataset.layout).to.be.equal(`${basePath}/`);
         expect(dataset.key).to.be.equal(`${basePath}/_routes/index.html`);
       });
 

@@ -4,13 +4,13 @@
  * Greenwood Getting Started repo.
  *
  * User Result
- * Should generate a bare bones Greenwood build with correctly templated out HTML from a LitElement.
+ * Should generate a bare bones Greenwood build with correctly layoutd out HTML from a LitElement.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
+ * import { greenwoodPluginRendererLit } from '@greenwood/plugin-renderer-lit';
  *
  * {
  *   plugins: [{
@@ -34,7 +34,7 @@
  *     index.md
  *   styles/
  *     theme.css
- *   templates/
+ *   layouts/
  *     app.html
  *     blog.html
  */
@@ -96,6 +96,10 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
         `${process.cwd()}/node_modules/lit-html/*.js`,
         `${outputPath}/node_modules/lit-html/`
       );
+      const litHtmlNode = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/node/*.js`,
+        `${outputPath}/node_modules/lit-html/node/`
+      );
       const litHtmlPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-html/package.json`,
         `${outputPath}/node_modules/lit-html/`
@@ -116,6 +120,11 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
         `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
+      const litReactiveElementNode = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit/reactive-element/node/*.js`,
+        `${outputPath}/node_modules/@lit/reactive-element/node/`
+      );
+      // lit-html/node/directives/unsafe-html.js
       const litHtmlSourceMap = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-html/lit-html.js.map`,
         `${outputPath}/node_modules/lit-html/`
@@ -136,11 +145,13 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
         ...litElementDecorators,
         ...litHtmlPackageJson,
         ...litHtml,
+        ...litHtmlNode,
         ...litHtmlDirectives,
         ...trustedTypes,
         ...litReactiveElement,
         ...litReactiveElementDecorators,
         ...litReactiveElementPackageJson,
+        ...litReactiveElementNode,
         ...litHtmlSourceMap
       ]);
       runner.runCommand(cliPath, 'build');
@@ -155,7 +166,7 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
       });
 
-      it('should have expected footer <h4> tag content in the <body>', function() {
+      it('should have no script tags in the <body>', function() {
         const scripTags = dom.window.document.querySelectorAll('body script');
 
         expect(scripTags.length).to.be.equal(0);
@@ -171,7 +182,7 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
         body = dom.window.document.querySelector('body');
       });
 
-      it('should have expected footer <h4> tag content in the <body>', function() {
+      it('should have expected <h1> tag content in the <header>', function() {
         const html = body.innerHTML.trim();
 
         expect(html).to.contain('<header>');

@@ -13,20 +13,22 @@
  *
  * User Workspace
  * src/
- *   api/
- *     fragment.js
- *     greeting.js
- *     missing.js
- *     nothing.js
- *     submit-form-data.js
- *     submit-json.js
+ *   pages/
+ *     api/
+ *       nested/
+ *         endpoint.js
+ *       fragment.js (isolation mode)
+ *       greeting.js
+ *       missing.js
+ *       nothing.js
+ *       submit-form-data.js
+ *       submit-json.js
  *   components/
  *     card.js
  */
 import chai from 'chai';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -60,8 +62,6 @@ describe('Serve Greenwood With: ', function() {
         runner.runCommand(cliPath, 'serve', { async: true });
       });
     });
-
-    runSmokeTest(['serve'], LABEL);
 
     describe('Serve command with API specific behaviors for a JSON API', function() {
       const name = 'Greenwood';
@@ -236,6 +236,31 @@ describe('Serve Greenwood With: ', function() {
 
       it('should return the expected response message', function(done) {
         expect(body).to.equal(`Thank you ${param} for your submission!`);
+        done();
+      });
+    });
+
+    describe('Serve command for nested API specific behaviors', function() {
+      let response = {};
+      let body;
+
+      before(async function() {
+        response = await fetch(`${hostname}/api/nested/endpoint`);
+        body = await response.clone().text();
+      });
+
+      it('should return a 200 status', function(done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it('should return the expected content type header', function(done) {
+        expect(response.headers.get('content-type')).to.equal('text/html');
+        done();
+      });
+
+      it('should return the expected response message', function(done) {
+        expect(body).to.equal('I am a nested API route!');
         done();
       });
     });

@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Build with Greenwood when using a custom context plugin (e.g. installed via npm) that provides custom templates (app / page) and resources (JS / CSS); aka a "theme pack".
+ * Build with Greenwood when using a custom context plugin (e.g. installed via npm) that provides custom layouts (app / page) and resources (JS / CSS); aka a "theme pack".
  *
  * User Result
- * Should generate a bare bones Greenwood build with expected templates being used from node_modules along with JS and CSS.
+ * Should generate a bare bones Greenwood build with expected layouts being used from node_modules along with JS and CSS.
  *
  * User Command
  * greenwood build
@@ -47,9 +47,9 @@ describe('Build Greenwood With: ', function() {
     before(async function() {
       // copy fixtures into node_modules
       // to match the location specified in the plugin under test
-      const themePacktemplates = await getDependencyFiles(
-        `${outputPath}/fixtures/layouts/*.html`,
-        `${outputPath}/node_modules/my-theme-pack/dist/layouts`
+      const themePackLayouts = await getDependencyFiles(
+        `${outputPath}/fixtures/my-layouts/*.html`,
+        `${outputPath}/node_modules/my-theme-pack/dist/my-layouts`
       );
       const themePackStyles = await getDependencyFiles(
         `${outputPath}/fixtures/styles/*.css`,
@@ -62,7 +62,7 @@ describe('Build Greenwood With: ', function() {
 
       runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
-        ...themePacktemplates,
+        ...themePackLayouts,
         ...themePackStyles,
         ...themePackComponents
       ]);
@@ -71,7 +71,7 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public', 'index'], LABEL);
 
-    describe('Custom Default App and Page Templates', function() {
+    describe('Custom Default App and Page Layout', function() {
       let dom;
 
       before(async function() {
@@ -79,15 +79,15 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have expected text from from a mock package layout/app.html in node_modules/', function() {
-        const pageTemplateHeading = dom.window.document.querySelectorAll('body h1')[0];
+        const pageLayoutHeading = dom.window.document.querySelectorAll('body h1')[0];
 
-        expect(pageTemplateHeading.textContent).to.be.equal('This is a custom app template from the custom layouts directory.');
+        expect(pageLayoutHeading.textContent).to.be.equal('This is a custom app layout from the custom layouts directory.');
       });
 
       it('should have expected text from from a mock package layout/page.html in node_modules/', function() {
-        const pageTemplateHeading = dom.window.document.querySelectorAll('body h2')[0];
+        const pageLayoutHeading = dom.window.document.querySelectorAll('body h2')[0];
 
-        expect(pageTemplateHeading.textContent).to.be.equal('This is a custom (default) page template from the custom layouts directory.');
+        expect(pageLayoutHeading.textContent).to.be.equal('This is a custom (default) page layout from the custom layouts directory.');
       });
 
       it('should have expected text from user workspace pages/index.md', function() {
@@ -99,7 +99,7 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('Custom Title Page Template', function() {
+    describe('Custom Title Page Layout', function() {
       let dom;
 
       before(async function() {
@@ -107,15 +107,15 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have expected text from from a mock package layout/app.html in node_modules/', function() {
-        const pageTemplateHeading = dom.window.document.querySelectorAll('body h1')[0];
+        const pageLayoutHeading = dom.window.document.querySelectorAll('body h1')[0];
 
-        expect(pageTemplateHeading.textContent).to.be.equal('This is a custom app template from the custom layouts directory.');
+        expect(pageLayoutHeading.textContent).to.be.equal('This is a custom app layout from the custom layouts directory.');
       });
 
       it('should have expected text from from a mock package layout/title.html in node_modules/', function() {
-        const pageTemplateHeading = dom.window.document.querySelectorAll('body h2')[0];
+        const pageLayoutHeading = dom.window.document.querySelectorAll('body h2')[0];
 
-        expect(pageTemplateHeading.textContent).to.be.equal('This is a custom page template called title from the layouts directory.');
+        expect(pageLayoutHeading.textContent).to.be.equal('This is a custom page layout called title from the layouts directory.');
       });
 
       it('should have expected text from user workspace pages/index.md', function() {
@@ -127,7 +127,7 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('Custom Theme Pack theme.css in app template', function() {
+    describe('Custom Theme Pack theme.css in app layout', function() {
       let dom;
 
       before(async function() {
@@ -149,7 +149,7 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('Custom Theme Pack greeting.js in custom title page template', function() {
+    describe('Custom Theme Pack greeting.js in custom title page layout', function() {
       let dom;
 
       before(async function() {

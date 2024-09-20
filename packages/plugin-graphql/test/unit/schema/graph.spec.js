@@ -27,7 +27,7 @@ describe('Unit Test: Data', function() {
             expect(page.id).to.exist;
             expect(page.path).to.exist;
             expect(page.filename).to.exist;
-            expect(page.template).to.exist;
+            expect(page.layout).to.exist;
             expect(page.title).to.exist;
             expect(page.route).to.exist;
           });
@@ -82,9 +82,9 @@ describe('Unit Test: Data', function() {
           });
         });
 
-        it('should have "page" as the template for all children', function() {
+        it('should have "page" as the layout for all children', function() {
           children.forEach(function(child) {
-            expect(child.template).to.equal('page');
+            expect(child.layout).to.equal('page');
           });
         });
 

@@ -29,7 +29,7 @@ class NodeModulesResource extends ResourceInterface {
   // https://github.com/ProjectEvergreen/greenwood/issues/953v
   async resolve(url) {
     const { projectDirectory } = this.compilation.context;
-    const { pathname } = url;
+    const { pathname, searchParams } = url;
     const packageName = getPackageNameFromUrl(pathname);
     const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(packageName);
     const packagePathPieces = pathname.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
@@ -37,8 +37,11 @@ class NodeModulesResource extends ResourceInterface {
     const absoluteNodeModulesPathname = absoluteNodeModulesLocation
       ? `${absoluteNodeModulesLocation}${packagePathPieces.join('/').replace(packageName, '')}`
       : (await resolveForRelativeUrl(url, projectDirectory)).pathname;
+    const params = searchParams.size > 0
+      ? `?${searchParams.toString()}`
+      : '';
 
-    return new Request(`file://${absoluteNodeModulesPathname}`);
+    return new Request(`file://${absoluteNodeModulesPathname}${params}`);
   }
 
   async shouldServe(url) {
@@ -70,11 +73,14 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   async intercept(url, request, response) {
-    const { context } = this.compilation;
+    const { context, config } = this.compilation;
+    const { importMaps } = config.polyfills;
+    const importMapType = importMaps ? 'importmap-shim' : 'importmap';
+    const importMapShimScript = importMaps ? '<script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>' : '';
     let body = await response.text();
     const hasHead = body.match(/\<head>(.*)<\/head>/s);
 
-    if (hasHead && hasHead.length > 0) {
+    if (importMaps && hasHead && hasHead.length > 0) {
       const contents = hasHead[0].replace(/type="module"/g, 'type="module-shim"');
 
       body = body.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
@@ -94,8 +100,8 @@ class NodeModulesResource extends ResourceInterface {
     // apply import map and shim for users
     body = body.replace('<head>', `
       <head>
-        <script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>
-        <script type="importmap-shim">
+        ${importMapShimScript}
+        <script type="${importMapType}">
           {
             "imports": ${JSON.stringify(importMap, null, 1)}
           }

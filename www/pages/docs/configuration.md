@@ -31,7 +31,12 @@ export default {
   plugins: [],
   workspace: new URL('./src/', import.meta.url),
   pagesDirectory: 'pages', // e.g. src/pages
-  templatesDirectory: 'templates' // e.g. src/templates
+  layoutsDirectory: 'layouts', // e.g. src/layouts
+  isolation: false,
+  polyfills: {
+    importAttributes: null, // e.g. ['css', 'json']
+    importMaps: false
+  }
 };
 ```
 
@@ -83,13 +88,13 @@ export default {
 
 ### Interpolate Frontmatter
 
-To support simple static templating in HTML and markdown pages and templates, the `interpolateFrontmatter` option can be set to `true` to allow the following kinds of simple static substitions using a syntax convention based on JavaScript [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
+To support simple static templating in HTML and markdown pages and layouts, the `interpolateFrontmatter` option can be set to `true` to allow the following kinds of simple static substitutions using a syntax convention based on JavaScript [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
 
 #### Example
 Given some frontmatter in a markdown file:
 ```md
 ---
-template: post
+layout: post
 title: Git Explorer
 published: 04.07.2020
 description: Local git repository viewer
@@ -127,6 +132,36 @@ Lorum Ipsum.
 </html>
 ```
 
+### Isolation Mode
+
+If running Greenwood as a server in production with the `greenwood serve` command, it may be desirable to isolate the server rendering of SSR pages and API routes from the global runtime (e.g. NodeJS) process.  This is a common assumption for many Web Component libraries that may aim to more faithfully honor the browser's native specification on the server.
+
+Examples include:
+- Custom Elements Registry - Per the spec, a custom element can only be defined once using `customElements.define`.
+- DOM Shims - These often assume a globally unique runtime, and so issues can arise when these DOM globals are repeatedly loaded and initialized into the global space
+
+> See these discussions for more information
+> - https://github.com/ProjectEvergreen/greenwood/discussions/1117
+> - https://github.com/ProjectEvergreen/wcc/discussions/145
+
+As servers have to support multiple clients (as opposed to a browser tab only serving one client at a time), Greenwood offers an isolation mode that can be used to run SSR pages and API routes in their own context per request.
+
+#### Example
+
+To configure an entire project for this, simply set the flag in your _greenwood.config.js_
+```js
+export default {
+  isolation: true // default value is false
+};
+```
+
+Optionally, you can opt-in on a per SSR page / API route basis by exporting an `isolation` option.
+```js
+// src/pages/products.js
+
+export const isolation = true;
+``` 
+
 ### Markdown
 You can install and provide custom **unifiedjs** [presets](https://github.com/unifiedjs/unified#preset) and [plugins](https://github.com/unifiedjs/unified#plugin) to further customize and process your markdown past what [Greenwood does by default](https://github.com/ProjectEvergreen/greenwood/blob/release/0.10.0/packages/cli/src/transforms/transform.md.js#L68).  After running an `npm install` you can provide their package names to Greenwood.
 
@@ -155,7 +190,7 @@ Greenwood provides a number of different ways to send hints to Greenwood as to h
 |`none` | With this setting, _none_ of your JS or CSS will be minified or hinted at all. | The best choice if you want to handle everything yourself through custom [Resource plugins](/plugins/resource/). |
 |`static` | Only for `<script>` tags, but this setting will remove `<script>` tags from your HTML. | If your Web Components only need a single render just to emit some static HTML, or are otherwise not dynamic or needed at runtime, this will really speed up your site's performance by dropping unnecessary HTTP requests. |
 
-> _These settings are currently considered experimental.  Additional improvements and considerations include adding [`none` override support](https://github.com/ProjectEvergreen/greenwood/discussions/545#discussioncomment-957320), [SSR + hydration](https://github.com/ProjectEvergreen/greenwood/discussions/576), and [side effect free templates and pages](https://github.com/ProjectEvergreen/greenwood/discussions/644)._
+> _These settings are currently considered experimental.  Additional improvements and considerations include adding [`none` override support](https://github.com/ProjectEvergreen/greenwood/discussions/545#discussioncomment-957320), [SSR + hydration](https://github.com/ProjectEvergreen/greenwood/discussions/576), and [side effect free layouts and pages](https://github.com/ProjectEvergreen/greenwood/discussions/644)._
 
 #### Example
 ```js
@@ -189,6 +224,57 @@ export default {
 };
 ```
 
+### Polyfills
+
+Greenwood provides polyfills for a few Web APIs out of the box.
+
+#### Import Maps
+
+> _Only applies to development mode._
+
+If you are developing with Greenwood in a browser that doesn't support [import maps](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap#browser_compatibility), with this flag enabled, Greenwood will add the [**ES Module Shims**](https://github.com/guybedford/es-module-shims) polyfill to provide support for import maps.
+
+```js
+export default {
+  polyfills: {
+    importMaps: true
+  }
+};
+```
+
+#### Import Attributes
+
+[Import Attributes](https://github.com/tc39/proposal-import-attributes), which are the underlying mechanism for supporting [CSS](https://web.dev/articles/css-module-scripts) and [JSON](https://github.com/tc39/proposal-json-modules) module scripts, are not widely supported in [all browsers yet](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#browser_compatibility).  Greenwood can enable this in a browser compatible why by specifying which attributes you want handled.  In both cases, Greenwood bundles these as ES Modules and will strip the attributes syntax.
+
+```js
+export default {
+  polyfills: {
+    importAttributes: ['css', 'json']
+  }
+};
+```
+
+
+In the case of CSS, Greenwood will inline and export your CSS as a [Constructable Stylesheet](https://web.dev/articles/constructable-stylesheets)
+
+```js
+// this
+import sheet from './styles.css' with { type: 'css'};
+
+// will fallback to this
+const sheet = new CSSStyleSheet();sheet.replaceSync(' /* ... */ ');export default sheet;
+```
+
+For JSON, Greenwood will simply export an object
+
+```js
+// this
+import data from './data.css' with { type: 'json'};
+
+// will fallback to this
+export default { /* ... */ }
+```
+
 ### Port
 Unlike the port option for `devServer` configuration, this option allows you to configure the port that your production server will run on when running `greenwood serve`.
 
@@ -201,7 +287,7 @@ export default {
 
 ### Prerender
 
-When set to `true` [Greenwood will pre-render](/about/how-it-works/) your application using [**WCC**](https://github.com/ProjectEvergreen/wcc) and generate HTML from any Web Components you include in your pages and templates as part of the final static HTML build output.
+When set to `true` [Greenwood will pre-render](/about/how-it-works/) your application using [**WCC**](https://github.com/ProjectEvergreen/wcc) and generate HTML from any Web Components you include in your pages and layouts as part of the final static HTML build output.
 
 You can combine this with ["static" components](/docs/configuration/#optimization) so that you can just do single pass rendering of your Web Components and get their output as static HTML and CSS at build time without having to ship any runtime JavaScript!
 
@@ -216,7 +302,7 @@ export default {
 
 > ⚠️ _This feature is experimental.  Please follow along with [our discussion](https://github.com/ProjectEvergreen/greenwood/discussions/1033) to learn more._
 
-Setting the `staticRouter` option to `true` will add a small router runtime in production for static pages to prevent needing full page reloads when navigation between pages that share a template.  For example, the Greenwood website is entirely static, outputting an HTML file per page however, if you navigate from the _Docs_ page to the _Getting Started_ page, you will notice the site does not require a full page load.  Instead, the router will just swap out the content of the page much like client-side SPA router would.  This technique is similar to how projects like [**pjax**](https://github.com/defunkt/jquery-pjax) and [**Turbolinks**](https://github.com/turbolinks/turbolinks) work, and like what you can see on websites like GitHub.
+Setting the `staticRouter` option to `true` will add a small router runtime in production for static pages to prevent needing full page reloads when navigation between pages that share a layout.  For example, the Greenwood website is entirely static, outputting an HTML file per page however, if you navigate from the _Docs_ page to the _Getting Started_ page, you will notice the site does not require a full page load.  Instead, the router will just swap out the content of the page much like client-side SPA router would.  This technique is similar to how projects like [**pjax**](https://github.com/defunkt/jquery-pjax) and [**Turbolinks**](https://github.com/turbolinks/turbolinks) work, and like what you can see on websites like GitHub.
 
 
 #### Example
@@ -227,19 +313,19 @@ export default {
 };
 ```
 
-### Templates Directory
+### Layouts Directory
 
-By default the directory Greenwood will use to look for your templates is _templates/_.  It is relative to your [user workspace](/docs/configuration#workspace) setting. (`${userWorkspace}/${templatesDirectory}`)
+By default the directory Greenwood will use to look for your layouts is in _layouts/_.  It is relative to your [user workspace](/docs/configuration#workspace) setting. (`${userWorkspace}/${layoutsDirectory}`)
 
 #### Example
 ```js
 export default {
-  templatesDirectory: 'layouts' // Greenwood will look for templates at src/layouts/
+  layoutsDirectory: 'layouts' // Greenwood will look for layouts at src/layouts/
 };
 ```
 
 ### Workspace
-Path to where all your project files will be located.  Using an absolute path is recommended.
+Path to where all your project files will be located.  Using an absolute path is recommended.  Default is _src/_.
 
 #### Example
 
@@ -251,4 +337,4 @@ export default {
 };
 ```
 
-> Please note the trailing `/` here as for ESM, a path must end in a `/` for directories.
+> Please note the trailing `/` here as for ESM, as paths must end in a `/` for directories.

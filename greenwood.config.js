@@ -1,9 +1,8 @@
 import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
 import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
-import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
-import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
 import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
+import { greenwoodPluginImportRaw } from '@greenwood/plugin-import-raw';
 import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 
@@ -14,10 +13,16 @@ export default {
   interpolateFrontmatter: true,
   plugins: [
     greenwoodPluginGraphQL(),
-    greenwoodPluginPolyfills(),
+    greenwoodPluginPolyfills({
+      lit: true
+    }),
     greenwoodPluginPostCss(),
-    greenwoodPluginImportJson(),
-    greenwoodPluginImportCss(),
+    greenwoodPluginImportRaw({
+      matches: [
+        'eve-button.css',
+        'eve-container.css'
+      ]
+    }),
     greenwoodPluginIncludeHTML(),
     greenwoodPluginRendererPuppeteer(),
     {

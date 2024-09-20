@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood serve command with no basePath configuration set (and staticRouter).
+ * Run Greenwood develop command with no basePath configuration set (and staticRouter).
  *
  * User Result
  * Should start the development server and render a the Greenwood application.
@@ -20,13 +20,13 @@
  *
  * User Workspace
  * src/
- *   api/
- *     greeting.js
  *   assets/
  *     logo.png
  *   components/
  *     card.js
  *   pages/
+ *     api/
+ *       greeting.js
  *     index.html
  *     users.js
  *   styles/
@@ -174,7 +174,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(body).to.contain('color: blue;');
+        expect(body).to.contain('*{color:blue}');
         done();
       });
     });

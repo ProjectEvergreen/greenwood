@@ -3,7 +3,7 @@ label: 'blog'
 menu: navigation
 title: Blog
 index: 6
-template: blog
+layout: blog
 ---
 
 <style>

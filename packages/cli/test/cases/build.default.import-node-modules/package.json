@@ -2,7 +2,7 @@
   "name": "test-import-node-modules",
   "type": "module",
   "dependencies": {
-    "lit": "^2.0.0",
+    "lit": "^3.1.0",
     "lodash-es": "^4.17.20",
     "prismjs": "^1.21.0",
     "pwa-helpers": "^0.9.1",

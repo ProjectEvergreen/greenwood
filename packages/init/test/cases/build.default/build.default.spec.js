@@ -3,10 +3,10 @@
  * Scaffold from minimal template and run Greenwood build command.
  *
  * User Result
- * Should scaffold from template and run the buildå.
+ * Should scaffold from template and run the build.
  *
  * User Command
- * @greenwood/init --install && greenwood buildå
+ * @greenwood/init --install && greenwood build
  *
  * User Workspace
  * N / A

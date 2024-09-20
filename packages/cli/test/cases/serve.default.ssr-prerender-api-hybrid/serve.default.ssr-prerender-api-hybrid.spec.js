@@ -15,13 +15,13 @@
  *
  * User Workspace
  *  src/
- *   api/
- *     greeting.js
  *   components/
  *     footer.js
  *   pages/
+ *     api/
+ *       greeting.js
  *     index.js
- *   templates/
+ *   layouts/
  *     app.html
  */
 import chai from 'chai';

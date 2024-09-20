@@ -7,7 +7,8 @@ linkheadings: 3
 ---
 
 ## Scripts and Imports
-**Greenwood** generally does not have any opinion on how you structure your site, aside from the pre-determined _pages/_ and (optional) _templates/_ directories.  It supports all standard files that you can open in a web browser.
+
+**Greenwood** generally does not have any opinion on how you structure your site, aside from the pre-determined _pages/_ and (optional) _layouts/_ directories.  It supports all standard files that you can open in a web browser.
 
 
 ### Script Tags
@@ -34,6 +35,7 @@ Script tags can be done in any standards compliant way that will work in a brows
 ```
 
 ### Imports
+
 Greenwood also supports (and recommends) usage of ECMAScript Modules (ESM), like in the example below.
 
 ```html
@@ -41,13 +43,7 @@ Greenwood also supports (and recommends) usage of ECMAScript Modules (ESM), like
 <html lang="en" prefix="og:http://ogp.me/ns#">
 
   <head>
-    <script type="module">
-      import { Foo } from '/path/to/foo.js';
-
-      Foo.something();
-    </script>
-
-    <script type="module" src="/path/to/script.js"></script>
+    <script type="module" src="./path/to/script.js"></script>
   </head>
 
   <body>
@@ -56,6 +52,17 @@ Greenwood also supports (and recommends) usage of ECMAScript Modules (ESM), like
   
 </html>
 ```
+
+### Import Attributes
+
+Greenwood supports [Import Attributes](https://github.com/tc39/proposal-import-attributes) for the client and the [the server](docs/server-rendering/#custom-imports) seamlessly, supporting both CSS and JSON module scripts seamlessly.
+
+```js
+import sheet from './styles.css' with { type: 'css' };
+import data from './data.json' with { type: 'json' };
+```
+
+> ⚠️ _Although Import Attributes are not baseline yet, Greenwood supports polyfilling them with a [configuration flag](/docs/configuration/#polyfills)._
 
 ### Extensions and Bare Imports
 
