@@ -1,3 +1,5 @@
+interface User { }
+
 export default class ContactPage extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
@@ -5,3 +7,5 @@ export default class ContactPage extends HTMLElement {
     `;
   }
 }
+
+export const prerender = true;

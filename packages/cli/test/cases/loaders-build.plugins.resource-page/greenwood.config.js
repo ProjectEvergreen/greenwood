@@ -7,6 +7,31 @@ class FooResource {
     this.servePage = options.servePage;
 
     this.extensions = ['foo'];
+    this.contentType = 'text/html';
+  }
+
+  async shouldServe(url) {
+    return url.pathname.split('.').pop() === this.extensions[0] && this.servePage;
+  }
+
+  async serve(url) {
+    const body = await fs.readFile(url, 'utf-8');
+
+    return new Response(body, {
+      headers: new Headers({
+        'Content-Type': this.contentType
+      })
+    });
+  }
+}
+
+class BarResource {
+  constructor(compilation, options) {
+    this.compilation = compilation;
+    this.options = options;
+    this.servePage = options.servePage;
+
+    this.extensions = ['bar'];
     this.contentType = 'text/javascript';
   }
 
@@ -17,7 +42,7 @@ class FooResource {
   async serve(url) {
     let body = await fs.readFile(url, 'utf-8');
 
-    body = body.replace(/interface (.*){(.*)}/s, '');
+    body = body.replace(/interface (.*){(.*)}/, '');
 
     return new Response(body, {
       headers: new Headers({
@@ -35,10 +60,21 @@ const greenwoodPluginFooResource = (options = {}) => {
   }];
 };
 
+const greenwoodPluginBarResource = (options = {}) => {
+  return [{
+    type: 'resource',
+    name: 'plugin-import-bar:resource',
+    provider: (compilation) => new BarResource(compilation, options)
+  }];
+};
+
 export default {
   plugins: [
     greenwoodPluginFooResource({
       servePage: 'static'
+    }),
+    greenwoodPluginBarResource({
+      servePage: 'dynamic'
     })
   ]
 };
