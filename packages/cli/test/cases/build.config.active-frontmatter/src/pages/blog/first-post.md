@@ -7,7 +7,7 @@ author: Owen Buckley
 
 # My First Post
 
-### Published: ${globalThis.page.published}
-#### Author: ${globalThis.page.author}
+### Published: ${globalThis.page.data.published}
+#### Author: ${globalThis.page.data.author}
 
 Lorum Ipsum.

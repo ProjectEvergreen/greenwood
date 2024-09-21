@@ -14,4 +14,4 @@ songs:
 
 ## Playlist
 
-<span>${globalThis.page.songs}</span>
+<span>${globalThis.page.data.songs}</span>

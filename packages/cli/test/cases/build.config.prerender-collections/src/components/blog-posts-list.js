@@ -10,10 +10,11 @@ export default class BlogPostsList extends HTMLElement {
       <ol>
         ${
           posts.map((post) => {
-            const { label, route } = post;
+            const { label, route, title } = post;
+
             return `
               <li>
-                <a href='${route}'>${label}</a>
+                <a href='${route}' title="${title}">${label}</a>
               </li>
             `;
           }).join('')

@@ -12,10 +12,10 @@ export default class Header extends HTMLElement {
           <ul>
             ${
               navItems.map((item) => {
-                const { route, label } = item;
+                const { route, label, title } = item;
 
                 return `
-                  <li><a href='${route}'>${label}</a></li>
+                  <li><a href="${route}" title="${title}">${label}</a></li>
                 `;
               }).join('')
             }

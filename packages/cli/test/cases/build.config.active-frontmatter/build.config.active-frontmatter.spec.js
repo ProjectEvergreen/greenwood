@@ -52,6 +52,38 @@ describe('Build Greenwood With: ', function() {
       runner.runCommand(cliPath, 'build');
     });
 
+    describe('Default Greenwood frontmatter should be interpolated in the correct places for the home page', function() {
+      let dom;
+
+      before(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+      });
+
+      it('should have the correct value for the <title> tag in the <head> for the home page', function() {
+        const title = dom.window.document.querySelector('head title').textContent;
+
+        expect(title).to.be.equal('Home');
+      });
+
+      it('should have the correct graph value for id in a <span> tag', function() {
+        const id = dom.window.document.querySelector('body span.id').textContent;
+
+        expect(id).to.be.equal('index');
+      });
+
+      it('should have the correct graph value for route in a <span> tag', function() {
+        const route = dom.window.document.querySelector('body span.route').textContent;
+
+        expect(route).to.be.equal('/');
+      });
+
+      it('should have the correct graph value for label in a <span> tag', function() {
+        const label = dom.window.document.querySelector('body span.label').textContent;
+
+        expect(label).to.be.equal('Home');
+      });
+    });
+
     describe('Simple frontmatter should be interpolated in the correct places', function() {
       let dom;
 

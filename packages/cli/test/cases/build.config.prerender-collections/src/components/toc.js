@@ -8,10 +8,10 @@ export default class ToC extends HTMLElement {
       <ol>
         ${
           pages.map((page) => {
-            const { label, route } = page;
+            const { label, route, title } = page;
             return `
               <li>
-                <a href='${route}'>${label}</a>
+                <a href="${route}" title="${title}">${label}</a>
               </li>
             `;
           }).join('')

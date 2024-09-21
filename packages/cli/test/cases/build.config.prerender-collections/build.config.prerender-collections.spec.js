@@ -105,12 +105,15 @@ describe('Build Greenwood With: ', function() {
 
         it('should have the expected link content from all pages in the collection', function() {
           expect(navLinks[0].getAttribute('href')).to.equal('/');
+          expect(navLinks[0].getAttribute('title')).to.equal('Home');
           expect(navLinks[0].textContent).to.equal('Home');
 
           expect(navLinks[1].getAttribute('href')).to.equal('/blog/');
+          expect(navLinks[1].getAttribute('title')).to.equal('Blog');
           expect(navLinks[1].textContent).to.equal('Blog');
 
           expect(navLinks[2].getAttribute('href')).to.equal('/toc/');
+          expect(navLinks[2].getAttribute('title')).to.equal('Table of Contents');
           expect(navLinks[2].textContent).to.equal('Table of Contents');
         });
       });
@@ -136,9 +139,11 @@ describe('Build Greenwood With: ', function() {
 
         it('should have the expected link content from all pages in the collection', function() {
           expect(postLinks[0].getAttribute('href')).to.equal('/blog/first-post/');
+          expect(postLinks[0].getAttribute('title')).to.equal('First Post');
           expect(postLinks[0].textContent).to.equal('First Post');
 
           expect(postLinks[1].getAttribute('href')).to.equal('/blog/second-post/');
+          expect(postLinks[1].getAttribute('title')).to.equal('Second Post');
           expect(postLinks[1].textContent).to.equal('Second Post');
         });
       });

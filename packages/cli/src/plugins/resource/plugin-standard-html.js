@@ -150,23 +150,27 @@ class StandardHtmlResource extends ResourceInterface {
       body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, '$$$')}<!-- greenwood-ssr-end -->`);
     }
 
+    // TODO should this be happening in content as data plugin?
     if (activeFrontmatter) {
+      // custom user frontmatter data
       for (const fm in matchingRoute.data) {
-        const interpolatedFrontmatter = '\\$\\{globalThis.page.' + fm + '\\}';
+        const interpolatedFrontmatter = '\\$\\{globalThis.page.data.' + fm + '\\}';
         const needle = typeof matchingRoute.data[fm] === 'string' ? matchingRoute.data[fm] : JSON.stringify(matchingRoute.data[fm]).replace(/"/g, '&quot;');
 
         body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), needle);
       }
 
-      // TODO
-      // const activeFrontmatterForwardKeys = ['route', 'label'];
+      // Greenwood default data
+      const activeFrontmatterForwardKeys = ['route', 'label', 'title', 'id'];
 
-      // for (const key of activeFrontmatterForwardKeys) {
-      //   console.log({ key })
-      //   const interpolatedFrontmatter = '\\$\\{globalThis.page.' + key + '\\}';
+      for (const key of activeFrontmatterForwardKeys) {
+        const interpolatedFrontmatter = '\\$\\{globalThis.page.' + key + '\\}';
+        const needle = key === 'title' && !matchingRoute.title
+          ? matchingRoute.label
+          : matchingRoute[key];
 
-      //   body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), matchingRoute[key]);
-      // }
+        body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), needle);
+      }
 
       for (const collection in this.compilation.collections) {
         const interpolatedFrontmatter = '\\$\\{globalThis.collection.' + collection + '\\}';
