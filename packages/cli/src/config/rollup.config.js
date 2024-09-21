@@ -353,7 +353,7 @@ function greenwoodImportMetaUrl(compilation) {
         if (`${compilation.context.apisDir.pathname}${idAssetName}`.indexOf(normalizedId) >= 0) {
           for (const entry of compilation.manifest.apis.keys()) {
             const apiRoute = compilation.manifest.apis.get(entry);
-            const pagePath = new URL(apiRoute.pageHref).pathname.replace(`${compilation.context.pagesDir}/api/`, '');
+            const pagePath = apiRoute.pageHref.replace(`${compilation.context.pagesDir}api/`, '');
 
             if (normalizedId.endsWith(pagePath)) {
               const assets = apiRoute.assets || [];
