@@ -1,4 +1,4 @@
-import { getContentByRoute } from '@greenwood/cli/src/data/queries.js';
+import { getContentByRoute } from '@greenwood/cli/src/data/client.js';
 
 export default class BlogPostsList extends HTMLElement {
   async connectedCallback() {

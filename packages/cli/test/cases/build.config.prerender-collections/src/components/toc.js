@@ -1,4 +1,4 @@
-import { getContent } from '@greenwood/cli/src/data/queries.js';
+import { getContent } from '@greenwood/cli/src/data/client.js';
 
 export default class ToC extends HTMLElement {
   async connectedCallback() {

@@ -2,7 +2,7 @@ import { mergeImportMap } from '../../lib/walker-package-ranger.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 
 const importMap = {
-  '@greenwood/cli/src/data/queries.js': '/node_modules/@greenwood/cli/src/data/queries.js'
+  '@greenwood/cli/src/data/client.js': '/node_modules/@greenwood/cli/src/data/client.js'
 };
 
 class ContentAsDataResource extends ResourceInterface {

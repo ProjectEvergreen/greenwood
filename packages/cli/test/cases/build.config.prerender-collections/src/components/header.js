@@ -1,4 +1,4 @@
-import { getContentByCollection } from '@greenwood/cli/src/data/queries.js';
+import { getContentByCollection } from '@greenwood/cli/src/data/client.js';
 
 export default class Header extends HTMLElement {
   async connectedCallback() {

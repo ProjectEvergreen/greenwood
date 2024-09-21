@@ -55,16 +55,16 @@ describe('Build Greenwood With: ', function() {
 
     before(async function() {
       const greenwoodDataLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/cli/src/data/queries.js`,
+        `${process.cwd()}/packages/cli/src/data/client.js`,
         `${outputPath}/node_modules/@greenwood/cli/src/data`
       );
 
       /*
        * need a workaround here or else we get a module loader error
        * ```
-       * import { getContentByCollection } from "@greenwood/cli/src/data/queries.js";
+       * import { getContentByCollection } from "@greenwood/cli/src/data/client.js";
        * ^^^^^^
-       * SyntaxError: Named export 'getContentByCollection' not found. The requested module '@greenwood/cli/src/data/queries.js'
+       * SyntaxError: Named export 'getContentByCollection' not found. The requested module '@greenwood/cli/src/data/client.js'
        * is a CommonJS module, which may not support all module.exports as named exports.
        * ```
        *
