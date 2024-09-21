@@ -37,7 +37,6 @@ class StandardHtmlResource extends ResourceInterface {
   async serve(url, request) {
     const { config, context } = this.compilation;
     const { userWorkspace } = context;
-    const { activeFrontmatter } = config;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find(node => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
@@ -148,35 +147,6 @@ class StandardHtmlResource extends ResourceInterface {
       body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
     } else if (ssrBody) {
       body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, '$$$')}<!-- greenwood-ssr-end -->`);
-    }
-
-    // TODO should this be happening in content as data plugin?
-    if (activeFrontmatter) {
-      // custom user frontmatter data
-      for (const fm in matchingRoute.data) {
-        const interpolatedFrontmatter = '\\$\\{globalThis.page.data.' + fm + '\\}';
-        const needle = typeof matchingRoute.data[fm] === 'string' ? matchingRoute.data[fm] : JSON.stringify(matchingRoute.data[fm]).replace(/"/g, '&quot;');
-
-        body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), needle);
-      }
-
-      // Greenwood default data
-      const activeFrontmatterForwardKeys = ['route', 'label', 'title', 'id'];
-
-      for (const key of activeFrontmatterForwardKeys) {
-        const interpolatedFrontmatter = '\\$\\{globalThis.page.' + key + '\\}';
-        const needle = key === 'title' && !matchingRoute.title
-          ? matchingRoute.label
-          : matchingRoute[key];
-
-        body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), needle);
-      }
-
-      for (const collection in this.compilation.collections) {
-        const interpolatedFrontmatter = '\\$\\{globalThis.collection.' + collection + '\\}';
-
-        body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), JSON.stringify(this.compilation.collections[collection]).replace(/"/g, '&quot;'));
-      }
     }
 
     // clean up any empty placeholder content-outlet
