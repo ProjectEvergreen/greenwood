@@ -1,40 +1,22 @@
-// TODO how to sync host and port with greenwood config
 const host = 'localhost';
-const port = 1985;
+const port = globalThis?.__CONTENT_SERVER__?.PORT ?? 1985; // eslint-disable-line no-underscore-dangle
+const endpoint = `http://${host}:${port}`;
 
 async function getContent() {
-  return (await fetch(`http://${host}:${port}/graph.json`)
-    .then(resp => resp.json()))
-    .map((page) => {
-      return {
-        ...page,
-        title: page.title || page.label
-      };
-    });
+  return await fetch(`${endpoint}/graph.json`)
+    .then(resp => resp.json());
 }
 
 async function getContentByCollection(collection = '') {
-  return (await fetch(`http://${host}:${port}/graph.json`)
+  return (await fetch(`${endpoint}/graph.json`)
     .then(resp => resp.json()))
-    .filter(page => page?.data?.collection === collection)
-    .map((page) => {
-      return {
-        ...page,
-        title: page.title || page.label
-      };
-    });
+    .filter(page => page?.data?.collection === collection);
 }
 
 async function getContentByRoute(route = '') {
-  return (await fetch(`http://${host}:${port}/graph.json`)
+  return (await fetch(`${endpoint}/graph.json`)
     .then(resp => resp.json()))
-    .filter(page => page?.route.startsWith(route))
-    .map((page) => {
-      return {
-        ...page,
-        title: page.title || page.label
-      };
-    });
+    .filter(page => page?.route.startsWith(route));
 }
 
 export { getContent, getContentByCollection, getContentByRoute };

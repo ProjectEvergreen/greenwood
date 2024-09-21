@@ -10,6 +10,7 @@
  *
  * User Config
  * {
+ *   activeFrontmatter: true,
  *   prerender: true
  * }
  *
@@ -115,6 +116,26 @@ describe('Build Greenwood With: ', function() {
           expect(navLinks[2].getAttribute('href')).to.equal('/toc/');
           expect(navLinks[2].getAttribute('title')).to.equal('Table of Contents');
           expect(navLinks[2].textContent).to.equal('Table of Contents');
+        });
+
+        it('should have the expected inline active frontmatter collection data', function() {
+          const collection = JSON.parse(dom.window.document.querySelector('body span').textContent)
+            .sort((a, b) => a.data.order > b.data.order ? 1 : -1);
+
+          expect(collection[0].route).to.equal('/');
+          expect(collection[0].title).to.equal('Home');
+          expect(collection[0].label).to.equal(collection[0].title);
+          expect(collection[0].id).to.equal('index');
+
+          expect(collection[1].route).to.equal('/blog/');
+          expect(collection[1].title).to.equal('Blog');
+          expect(collection[1].label).to.equal(collection[1].title);
+          expect(collection[1].id).to.equal('blog-index');
+
+          expect(collection[2].route).to.equal('/toc/');
+          expect(collection[2].title).to.equal('Table of Contents');
+          expect(collection[2].label).to.equal(collection[2].title);
+          expect(collection[2].id).to.equal('toc');
         });
       });
     });

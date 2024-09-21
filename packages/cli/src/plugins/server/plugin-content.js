@@ -1,5 +1,6 @@
 import Koa from 'koa';
 import { ServerInterface } from '../../lib/server-interface.js';
+import { cleanContentCollection } from '../../lib/content-utils.js';
 import { Readable } from 'stream';
 
 class ContentServer extends ServerInterface {
@@ -15,7 +16,7 @@ class ContentServer extends ServerInterface {
         if (ctx.request.path.startsWith('/graph.json')) {
           const { graph } = this.compilation;
 
-          ctx.body = Readable.from(JSON.stringify(graph));
+          ctx.body = Readable.from(JSON.stringify(cleanContentCollection(graph)));
           ctx.status = 200;
           ctx.message = 'OK';
 

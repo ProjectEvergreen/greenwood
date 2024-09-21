@@ -1,5 +1,6 @@
 import { mergeImportMap } from '../../lib/walker-package-ranger.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
+import { activeGreenwoodFrontmatterKeys, cleanContentCollection } from '../../lib/content-utils.js';
 
 const importMap = {
   '@greenwood/cli/src/data/client.js': '/node_modules/@greenwood/cli/src/data/client.js'
@@ -23,10 +24,32 @@ class ContentAsDataResource extends ResourceInterface {
 
     if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
       newBody = mergeImportMap(body, importMap, this.compilation.config.polyfills.importMaps);
+
+      // make some of the configuration available to the client utils
+      newBody = newBody.replace('<head>', `
+          <head>
+            <script id="content-as-data">
+              globalThis.__CONTENT_SERVER__ = globalThis.__CONTENT_SERVER__
+                ? globalThis.__CONTENT_SERVER__
+                : {
+                    PORT: "${this.compilation.config.port + 1}"
+                  }
+            </script>
+        `);
     }
 
     if (activeFrontmatter) {
       const matchingRoute = this.compilation.graph.find(page => page.route === url.pathname);
+
+      // Greenwood default graph data
+      for (const key of activeGreenwoodFrontmatterKeys) {
+        const interpolatedFrontmatter = '\\$\\{globalThis.page.' + key + '\\}';
+        const needle = key === 'title' && !matchingRoute.title
+          ? matchingRoute.label
+          : matchingRoute[key];
+
+        newBody = newBody.replace(new RegExp(interpolatedFrontmatter, 'g'), needle);
+      }
 
       // custom user frontmatter data
       for (const fm in matchingRoute.data) {
@@ -36,22 +59,12 @@ class ContentAsDataResource extends ResourceInterface {
         newBody = newBody.replace(new RegExp(interpolatedFrontmatter, 'g'), needle);
       }
 
-      // Greenwood default graph data
-      const activeFrontmatterForwardKeys = ['route', 'label', 'title', 'id'];
-
-      for (const key of activeFrontmatterForwardKeys) {
-        const interpolatedFrontmatter = '\\$\\{globalThis.page.' + key + '\\}';
-        const needle = key === 'title' && !matchingRoute.title
-          ? matchingRoute.label
-          : matchingRoute[key];
-
-        newBody = newBody.replace(new RegExp(interpolatedFrontmatter, 'g'), needle);
-      }
-
+      // collections
       for (const collection in this.compilation.collections) {
         const interpolatedFrontmatter = '\\$\\{globalThis.collection.' + collection + '\\}';
+        const cleanedCollections = cleanContentCollection(this.compilation.collections[collection]);
 
-        newBody = newBody.replace(new RegExp(interpolatedFrontmatter, 'g'), JSON.stringify(this.compilation.collections[collection]).replace(/"/g, '&quot;'));
+        newBody = newBody.replace(new RegExp(interpolatedFrontmatter, 'g'), JSON.stringify(cleanedCollections).replace(/"/g, '&quot;'));
       }
     }
 
