@@ -1,6 +1,7 @@
 ---
 collection: docs
-title: 'Layouts and Pages'
+title: Layouts and Pages
+label: Layouts and Pages
 order: 7
 tocHeading: 3
 ---

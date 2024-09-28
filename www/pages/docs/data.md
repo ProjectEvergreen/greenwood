@@ -1,6 +1,7 @@
 ---
 collection: docs
-title: 'Data Sources'
+title: Data Sources
+label: Data Sources
 order: 11
 tocHeading: 3
 ---

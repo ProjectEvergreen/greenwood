@@ -1,6 +1,7 @@
 ---
 collection: docs
-title: 'Styles and Assets'
+title: Styles and Assets
+label: Styles and Assets
 order: 6
 tocHeading: 3
 ---

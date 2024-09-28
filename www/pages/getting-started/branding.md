@@ -1,6 +1,7 @@
 ---
 collection: getting-started
-title: 'Components and Styles'
+title: Components and Styles
+label: Components and Styles
 order: 5
 tocHeading: 3
 ---

@@ -1,6 +1,7 @@
 ---
 collection: docs
-title: 'Scripts and Imports'
+title: Scripts and Imports
+label: Scripts and Imports
 order: 5
 tocHeading: 3
 ---

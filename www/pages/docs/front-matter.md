@@ -1,6 +1,6 @@
 ---
 collection: docs
-title: 'Front Matter'
+title: Front Matter
 order: 3
 tocHeading: 3
 ---

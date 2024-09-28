@@ -1,6 +1,7 @@
 ---
 collection: docs
-title: 'API Routes'
+title: API Routes
+label: API Routes
 order: 9
 tocHeading: 3
 ---
