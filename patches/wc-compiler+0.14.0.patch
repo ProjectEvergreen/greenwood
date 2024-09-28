@@ -1,0 +1,90 @@
+diff --git a/node_modules/wc-compiler/src/wcc.js b/node_modules/wc-compiler/src/wcc.js
+index 35884d4..e37a4a4 100644
+--- a/node_modules/wc-compiler/src/wcc.js
++++ b/node_modules/wc-compiler/src/wcc.js
+@@ -32,16 +32,27 @@ async function renderComponentRoots(tree, definitions) {
+       const { tagName } = node;
+ 
+       if (definitions[tagName]) {
++        console.log('renderComponentRoots', { tagName });
+         const { moduleURL } = definitions[tagName];
+-        const elementInstance = await initializeCustomElement(moduleURL, tagName, node.attrs, definitions);
+-        const elementHtml = elementInstance.shadowRoot
++        console.log({ node });
++        const elementInstance = await initializeCustomElement(moduleURL, tagName, node, definitions);
++        const hasShadow = elementInstance.shadowRoot;
++        const elementHtml = hasShadow
+           ? elementInstance.getInnerHTML({ includeShadowRoots: true })
+           : elementInstance.innerHTML;
+         const elementTree = parseFragment(elementHtml);
++        const hasLight = elementTree.childNodes > 0;
+ 
+-        node.childNodes = node.childNodes.length === 0
++        console.log('elementHtml', { elementHtml });
++        console.log('elementTree', { elementTree });
++        console.log('elementTree.childNodes', elementTree.childNodes);
++        console.log('node.childNodes', node.childNodes);
++
++        node.childNodes = node.childNodes.length === 0 && hasLight > 0 && !hasShadow
+           ? elementTree.childNodes
+-          : [...elementTree.childNodes, ...node.childNodes];
++          : hasShadow
++            ? [...elementTree.childNodes, ...node.childNodes]
++            : elementTree.childNodes;
+       } else {
+         console.warn(`WARNING: customElement <${tagName}> is not defined.  You may not have imported it yet.`);
+       }
+@@ -138,7 +149,10 @@ async function getTagName(moduleURL) {
+   return tagName;
+ }
+ 
+-async function initializeCustomElement(elementURL, tagName, attrs = [], definitions = [], isEntry, props = {}) {
++async function initializeCustomElement(elementURL, tagName, node = {}, definitions = [], isEntry, props = {}) {
++  const { attrs = [], childNodes = [] } = node;
++  console.log('initializeCustomElement', { node });
++
+   if (!tagName) {
+     const depth = isEntry ? 1 : 0;
+     registerDependencies(elementURL, definitions, depth);
+@@ -157,6 +171,41 @@ async function initializeCustomElement(elementURL, tagName, attrs = [], definiti
+ 
+   if (element) {
+     const elementInstance = new element(data); // eslint-disable-line new-cap
++    let innerHTML = elementInstance.innerHTML || '';
++
++    // TODO
++    // 1. Needs to be recursive
++    // 2. ~~Needs to handle attributes~~
++    // 3. Needs to handle duplicate content
++    // 4. Needs to handle self closing tags
++    // 5. handle all node types
++    childNodes.forEach((child) => {
++      const { nodeName, attrs = [] } = child;
++
++      if (nodeName !== '#text') {
++        innerHTML += `<${nodeName}`;
++
++        if (attrs.length > 0) {
++          attrs.forEach(attr => {
++            innerHTML += ` ${attr.name}="${attr.value}"`;
++          });
++        }
++
++        innerHTML += '>';
++
++        child.childNodes.forEach((c) => {
++          if (c.nodeName === '#text') {
++            innerHTML += c.value;
++          }
++        });
++
++        innerHTML += `</${nodeName}>`;
++      }
++    });
++
++    console.log({ innerHTML });
++    elementInstance.innerHTML = innerHTML;
++    console.log('=================');
+ 
+     attrs.forEach((attr) => {
+       elementInstance.setAttribute(attr.name, attr.value);
