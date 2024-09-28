@@ -84,7 +84,7 @@ async function vercelAdapter(compilation) {
 
   for (const page of ssrPages) {
     const outputType = 'page';
-    const { id, outputPath } = page;
+    const { id, outputHref } = page;
     const outputRoot = new URL(`./${basePath}/${id}.func/`, adapterOutputUrl);
     const chunks = (await fs.readdir(outputDir))
       .filter(file => file.startsWith(`${id}.route.chunk`) && file.endsWith('.js'));
@@ -93,8 +93,8 @@ async function vercelAdapter(compilation) {
 
     // handle user's actual route entry file
     await fs.cp(
-      new URL(`./${outputPath}`, outputDir),
-      new URL(`./${outputPath}`, outputRoot),
+      new URL(outputHref),
+      new URL(`./${outputHref.replace(outputDir.href, '')}`, outputRoot),
       { recursive: true }
     );
 
@@ -110,14 +110,14 @@ async function vercelAdapter(compilation) {
 
   for (const [key, value] of apiRoutes.entries()) {
     const outputType = 'api';
-    const { id, outputPath } = apiRoutes.get(key);
+    const { id, outputHref } = apiRoutes.get(key);
     const outputRoot = new URL(`.${basePath}/api/${id}.func/`, adapterOutputUrl);
     const { assets = [] } = value;
 
     await setupFunctionBuildFolder(id, outputType, outputRoot);
 
     await fs.cp(
-      new URL(`./${outputPath}`, outputDir),
+      new URL(outputHref),
       new URL(`./${id}.js`, outputRoot),
       { recursive: true }
     );

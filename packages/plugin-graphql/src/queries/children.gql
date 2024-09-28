@@ -3,8 +3,6 @@ query($parent: String!) {
     id,
     label,
     title,
-    workspacePath,
-    outputPath,
     route,
     layout,
     tableOfContents {

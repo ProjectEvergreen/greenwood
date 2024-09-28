@@ -3,8 +3,6 @@ query($name: String!, $orderBy: CollectionOrderBy) {
     id,
     label,
     title,
-    workspacePath,
-    outputPath,
     route,
     layout,
     tableOfContents {

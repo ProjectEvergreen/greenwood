@@ -102,8 +102,6 @@ const graphTypeDefs = gql`
     route: String,
     layout: String,
     data: Data,
-    outputPath: String,
-    workspacePath: String,
     tableOfContents: [TocItem]
   }
 

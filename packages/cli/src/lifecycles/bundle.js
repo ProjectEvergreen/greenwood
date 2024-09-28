@@ -83,10 +83,10 @@ async function optimizeStaticPages(compilation, plugins) {
   return Promise.all(compilation.graph
     .filter(page => !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender))
     .map(async (page) => {
-      const { route, outputPath } = page;
-      const outputDirUrl = new URL(`.${outputPath.replace('index.html', '').replace('404.html', '')}`, outputDir);
+      const { route, outputHref } = page;
+      const outputDirUrl = new URL(outputHref.replace('index.html', '').replace('404.html', ''));
       const url = new URL(`http://localhost:${compilation.config.port}${route}`);
-      const contents = await fs.readFile(new URL(`./${outputPath}`, scratchDir), 'utf-8');
+      const contents = await fs.readFile(new URL(`./${outputHref.replace(outputDir.href, '')}`, scratchDir), 'utf-8');
       const headers = new Headers({ 'Content-Type': 'text/html' });
       let response = new Response(contents, { headers });
 
@@ -107,7 +107,7 @@ async function optimizeStaticPages(compilation, plugins) {
       // clean up optimization markers
       const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, '');
 
-      await fs.writeFile(new URL(`.${outputPath}`, outputDir), body);
+      await fs.writeFile(new URL(outputHref), body);
     })
   );
 }

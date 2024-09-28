@@ -50,9 +50,15 @@ function getPluginInstances (compilation) {
     });
 }
 
+function toScratchUrl(outputHref, context) {
+  const { outputDir, scratchDir } = context;
+
+  return new URL(`./${outputHref.replace(outputDir.href, '')}`, scratchDir);
+}
+
 async function preRenderCompilationWorker(compilation, workerPrerender) {
   const pages = compilation.graph.filter(page => !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender));
-  const { scratchDir } = compilation.context;
+  const { context, config } = compilation;
   const plugins = getPluginInstances(compilation);
 
   console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
@@ -60,9 +66,9 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
   const pool = new WorkerPool(os.cpus().length, new URL('../lib/ssr-route-worker.js', import.meta.url));
 
   for (const page of pages) {
-    const { route, outputPath } = page;
-    const outputPathUrl = new URL(`.${outputPath}`, scratchDir);
-    const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+    const { route, outputHref } = page;
+    const scratchUrl = toScratchUrl(outputHref, context);
+    const url = new URL(`http://localhost:${config.port}${route}`);
     const request = new Request(url);
     let ssrContents;
 
@@ -111,23 +117,23 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       body = body.replace('<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->', ssrContents);
     }
 
-    await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
-    await fs.writeFile(outputPathUrl, body);
+    await createOutputDirectory(route, new URL(scratchUrl.href.replace('index.html', '')));
+    await fs.writeFile(scratchUrl, body);
 
     console.info('generated page...', route);
   }
 }
 
 async function preRenderCompilationCustom(compilation, customPrerender) {
-  const { scratchDir } = compilation.context;
+  const { config, context } = compilation;
   const renderer = (await import(customPrerender.customUrl)).default;
-  const { importMaps } = compilation.config.polyfills;
+  const { importMaps } = config.polyfills;
 
   console.info('pages to generate', `\n ${compilation.graph.map(page => page.route).join('\n ')}`);
 
   await renderer(compilation, async (page, body) => {
-    const { route, outputPath } = page;
-    const outputPathUrl = new URL(`.${outputPath}`, scratchDir);
+    const { route, outputHref } = page;
+    const scratchUrl = toScratchUrl(outputHref, context);
 
     // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
     if (importMaps) {
@@ -142,32 +148,32 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
 
     await trackResourcesForRoute(body, compilation, route);
-    await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
-    await fs.writeFile(outputPathUrl, body);
+    await createOutputDirectory(route, new URL(scratchUrl.href.replace('index.html', '')));
+    await fs.writeFile(scratchUrl, body);
 
     console.info('generated page...', route);
   });
 }
 
 async function staticRenderCompilation(compilation) {
-  const { scratchDir } = compilation.context;
+  const { config, context } = compilation;
   const pages = compilation.graph.filter(page => !page.isSSR || page.isSSR && page.prerender);
   const plugins = getPluginInstances(compilation);
 
   console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
 
   await Promise.all(pages.map(async (page) => {
-    const { route, outputPath } = page;
-    const outputPathUrl = new URL(`.${outputPath}`, scratchDir);
-    const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+    const { route, outputHref } = page;
+    const scratchUrl = toScratchUrl(outputHref, context);
+    const url = new URL(`http://localhost:${config.port}${route}`);
     const request = new Request(url);
 
     let body = await (await servePage(url, request, plugins)).text();
     body = await (await interceptPage(url, request, plugins, body)).text();
 
     await trackResourcesForRoute(body, compilation, route);
-    await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
-    await fs.writeFile(outputPathUrl, body);
+    await createOutputDirectory(route, new URL(scratchUrl.href.replace('index.html', '')));
+    await fs.writeFile(scratchUrl, body);
 
     console.info('generated page...', route);
 

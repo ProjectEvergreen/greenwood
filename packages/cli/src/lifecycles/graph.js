@@ -35,7 +35,7 @@ const generateGraph = async (compilation) => {
     try {
       const { context, config } = compilation;
       const { basePath } = config;
-      const { pagesDir, userWorkspace } = context;
+      const { pagesDir, userWorkspace, outputDir } = context;
       const collections = {};
       const customPageFormatPlugins = config.plugins
         .filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin)
@@ -44,7 +44,7 @@ const generateGraph = async (compilation) => {
       let apis = new Map();
       let graph = [{
         id: 'index',
-        outputPath: '/index.html',
+        outputHref: new URL('./index.html', outputDir).href,
         route: `${basePath}/`,
         label: 'Home',
         title: null,
@@ -107,14 +107,15 @@ const generateGraph = async (compilation) => {
               *----------------------
               * id: unique hyphen delimited string of the filename, relative to the page/api directory
               * pageHref: href to the page's filesystem file
-              * outputPath: the filename to write to when generating a build
+              * outputHref: href of the filename to write to when generating a build
               * route: URL route for a given page on outputFilePath
               * isolation: if this should be run in isolated mode
               */
               apiRoutes.set(`${basePath}${route}`, {
                 id: getIdFromRelativePathPath(relativePagePath, `.${extension}`).replace('api-', ''),
                 pageHref: new URL(relativePagePath, pagesDir).href,
-                outputPath: relativePagePath,
+                outputHref: new URL(relativePagePath, outputDir).href,
+                // outputPath: relativePagePath,
                 route: `${basePath}${route}`,
                 isolation
               });
@@ -254,7 +255,7 @@ const generateGraph = async (compilation) => {
                * data: custom page frontmatter
                * imports: per page JS or CSS file imports specified from frontmatter
                * resources: all script, style, etc resources for the entire page as URLs
-               * outputPath: the name of the file in the output folder
+               * outputHref: href to the file in the output folder
                * pageHref: href to the page's filesystem file
                * isSSR: if this is a server side route
                * prerender: if this page should be statically exported
@@ -272,9 +273,12 @@ const generateGraph = async (compilation) => {
                 imports,
                 resources: [],
                 pageHref: new URL(relativePagePath, pagesDir).href,
-                outputPath: route === '/404/'
-                  ? '/404.html'
-                  : `${route}index.html`,
+                outputHref: route === '/404/'
+                  ? new URL('./404.html', outputDir).href
+                  : new URL(`.${route}index.html`, outputDir).href,
+                // outputPath: route === '/404/'
+                //   ? '/404.html'
+                //   : `${route}index.html`,
                 isSSR: !isStatic,
                 prerender,
                 isolation,
@@ -335,7 +339,8 @@ const generateGraph = async (compilation) => {
             {
               ...oldGraph,
               id: '404',
-              outputPath: '/404.html',
+              // outputPath: '/404.html',
+              outputHref: new URL('./404.html', outputDir).href,
               pageHref: new URL('./404.html', pagesDir).href,
               route: `${basePath}/404/`,
               path: '404.html',
@@ -366,7 +371,7 @@ const generateGraph = async (compilation) => {
               data: {},
               imports: [],
               resources: [],
-              outputPath: `${node.route}index.html`,
+              outputHref: new URL(`.${node.route}index.html`, outputDir).href,
               ...node,
               external: true
             });

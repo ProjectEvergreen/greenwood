@@ -218,12 +218,12 @@ async function getStaticServer(compilation, composable) {
       const isStatic = matchingRoute && !isSSR || isSSR && compilation.config.prerender || isSSR && matchingRoute.prerender;
 
       if (isSPA || (matchingRoute && isStatic) || url.pathname.split('.').pop() === 'html') {
-        const pathname = isSPA
-          ? 'index.html'
+        const outputHref = isSPA
+          ? isSPA.outputHref
           : isStatic
-            ? matchingRoute.outputPath
-            : url.pathname.replace(basePath, '');
-        const body = await fs.readFile(new URL(`./${pathname}`, outputDir), 'utf-8');
+            ? matchingRoute.outputHref
+            : new URL(`.${url.pathname.replace(basePath, '')}`, outputDir).href;
+        const body = await fs.readFile(new URL(outputHref), 'utf-8');
 
         ctx.set('Content-Type', 'text/html');
         ctx.body = body;
@@ -316,8 +316,7 @@ async function getStaticServer(compilation, composable) {
 }
 
 async function getHybridServer(compilation) {
-  const { graph, manifest, context, config } = compilation;
-  const { outputDir } = context;
+  const { graph, manifest, config } = compilation;
   const isolationMode = config.isolation;
   const app = await getStaticServer(compilation, true);
 
@@ -331,7 +330,7 @@ async function getHybridServer(compilation) {
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
 
       if (!config.prerender && matchingRoute.isSSR && !matchingRoute.prerender) {
-        const entryPointUrl = new URL(`./${matchingRoute.outputPath}`, outputDir);
+        const entryPointUrl = new URL(matchingRoute.outputHref);
         let html;
 
         if (matchingRoute.isolation || isolationMode) {
@@ -370,7 +369,7 @@ async function getHybridServer(compilation) {
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
-        const entryPointUrl = new URL(`./${apiRoute.outputPath}`, outputDir);
+        const entryPointUrl = new URL(apiRoute.outputHref);
         let body, status, headers, statusText;
 
         if (apiRoute.isolation || isolationMode) {

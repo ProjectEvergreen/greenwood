@@ -167,7 +167,7 @@ function greenwoodSyncSsrEntryPointsOutputPaths(compilation) {
     name: 'greenwood-sync-ssr-pages-entry-point-output-paths',
     generateBundle(options, bundle) {
       const { basePath } = compilation.config;
-      const { scratchDir } = compilation.context;
+      const { scratchDir, outputDir } = compilation.context;
 
       // map rollup bundle names back to original SSR pages for syncing input <> output bundle names
       Object.keys(bundle).forEach((key) => {
@@ -178,7 +178,7 @@ function greenwoodSyncSsrEntryPointsOutputPaths(compilation) {
 
           compilation.graph.forEach((page, idx) => {
             if (page.route === route) {
-              compilation.graph[idx].outputPath = key;
+              compilation.graph[idx].outputHref = new URL(`./${key}`, outputDir).href;
             }
           });
         }
@@ -192,7 +192,7 @@ function greenwoodSyncApiRoutesOutputPath(compilation) {
     name: 'greenwood-sync-api-routes-output-paths',
     generateBundle(options, bundle) {
       const { basePath } = compilation.config;
-      const { apisDir } = compilation.context;
+      const { apisDir, outputDir } = compilation.context;
 
       // map rollup bundle names back to original SSR pages for syncing input <> output bundle names
       Object.keys(bundle).forEach((key) => {
@@ -206,7 +206,7 @@ function greenwoodSyncApiRoutesOutputPath(compilation) {
 
             compilation.manifest.apis.set(route, {
               ...api,
-              outputPath: `/api/${key}`
+              outputHref: new URL(`./api/${key}`, outputDir).href
             });
           }
         }

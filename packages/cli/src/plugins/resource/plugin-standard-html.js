@@ -168,7 +168,7 @@ class StandardHtmlResource extends ResourceInterface {
   async optimize(url, response) {
     const { optimization, basePath } = this.compilation.config;
     const { pathname } = url;
-    const pageResources = this.compilation.graph.find(page => page.outputPath === pathname || page.route === pathname).resources;
+    const pageResources = this.compilation.graph.find(page => page.route === pathname).resources;
     let body = await response.text();
 
     const root = htmlparser.parse(body, {
