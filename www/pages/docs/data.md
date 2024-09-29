@@ -1,17 +1,16 @@
 ---
 collection: docs
-title: Data Sources
-label: Data Sources
-order: 11
+title: Content as Data
+label: Content as Data
+order: 10
 tocHeading: 3
 ---
 
-
-## Data Sources
+## Content as Data
 
 ### Overview
 
-Having to repeat things when programming is no fun, and that's why (web) component based development is so useful!  As websites start to grow, there comes a point where being able to have access to the content and structure of your site's layout and configuration as part of the development process becomes essential towards maintainability, performance, and scalability.
+Having to repeat things when programming is no fun, and that's why (web) component based development is so useful!  As websites start to grow, there comes a point where being able to have access to the content and structure of your site's layout becomes essential towards maintainability, performance, and scalability.
 
 As an example, if you are developing a blog site, like in our [Getting Started](/getting-started/) guide, having to manually list a couple of blog posts by hand isn't so bad.
 
@@ -32,7 +31,7 @@ render() {
     <ul>
       ${pages.map((page) => {
         return html`
-          <li><a href="${page.path}">${page.title}</a></li>
+          <li><a href="${page.route}">${page.title}</a></li>
         `;
       })}
     </ul>
@@ -40,361 +39,180 @@ render() {
 }
 ```
 
-To assist with this, Greenwood provides all your content as data, accessible from a single _graph.json_ file that you can simply [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) RESTfully or, if you install our [plugin for GraphQL](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql), you can use a GraphQL from your client side code instead! 💯
+To assist with this, Greenwood provides all your content as data, so let's review.
 
+### Pages Data
 
-### Internal Sources
-Greenwood (via [**plugin-graphql**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql)) exposes an [Apollo](https://www.apollographql.com/docs/apollo-server/) server locally available at `localhost:4000` as well as a custom Apollo client that can both be used when developing to get information about your local content like path, "slug", title and other useful information that will be dynamic to the content you create.  Programmatic access to this data can provide you the opportunity to share your content with your users in a way that supports sorting, filter, organizing, and more!
-
-![graphql-playground](/assets/graphql-playground.png)
+To get started with, let's review the kind of content you can get as data.  Each page will return data in the following schema:
 
 #### Schema
-To kick things off, let's review what is available to you.  Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type definition](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's `graph`.
 
-This is what the schema looks like:
-```javascript
-graph {
-  filename, // (string) base filename
+So for a page at _src/pages/blog/first-post.md_, this is the data you would get back
+```md
+---
+author: Project Evergreen
+published: 2024-01-01
+---
 
-  id, // (string) filename without the extension
+# First Post
 
-  label, // (string) best guess pretty text / display based on filename
-
-  outputPath, // (string) the relative path to write to when generating static HTML
-
-  relativeWorkspacePagePath, // the file path relative to the user's workspace directory
-
-  path, // (string) path to the file
-
-  route,  // (string) A URL, typically derived from the filesystem path, e.g. /blog/2019/first-post/
-
-  layout, // (string) page layout used for the page
-
-  title,  // (string) Used for a page's <title> tag inferred from the filesystem path, e.g. "First Post" or provided through front matter.
-}
+This is my first post.
 ```
 
-> All queries return subsets and / or derivatives of the `graph`.
-
-#### Queries
-To help facilitate development, Greenwood provides a couple queries out of the box that you can use to get access to the `graph` and start using it in your components, which we'll get to next.
-
-Below are the queries available:
-
-##### Graph
-The Graph query returns an array of all pages.
-
-###### Definition
-```javascript
-query {
-  graph {
-    filename,
-    id,
-    label,
-    outputPath,
-    path,
-    route,
-    layout,
-    title
-  }
-}
-```
-
-###### Usage
-`import` the query in your component
-```javascript
-import client from '@greenwood/plugin-graphql/src/core/client.js';
-import GraphQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
-
-.
-.
-.
-
-async connectedCallback() {
-  super.connectedCallback();
-  const response = await client.query({
-    query: GraphQuery
-  });
-
-  this.posts = response.data.graph;
-}
-```
-
-###### Response
-This will return the full `graph` of all pages as an array
-```javascript
-[
-  {
-    filename: "index.md",
-    id: "index",
-    label: "Index",
-    outputPath: "index.html",
-    path: "./index.md",
-    route: "/",
-    layout: "page",
-    title: "Home Page"
-  }, {
-    filename: "first-post.md",
-    id: "first-post",
-    label: "First Post",
-    outputPath: "/blog/2019/first-post/index.html",
-    path: "./blog/2019/first-post.md",
-    route: "/blog/2019/first-post",
-    layout: "blog",
-    title: "My First Blog Post"
-  },
-  {
-    filename: "second-post.md",
-    id: "second-post",
-    label: "Second Post",
-    outputPath: "/blog/2019/second-post/index.html",
-    path: "./blog/2019/second-post.md",
-    route: "/blog/2019/second-post",
-    layout: "blog",
-    title: "My Second Blog Post"
-  }
-]
-```
-
-##### Menu Query
-
-See [Menus](/docs/menu) for documentation on querying for custom menus.
-
-##### Children
-The Children query returns an array of all pages below a given top level route.
-
-###### Definition
-```javascript
-query {
-  children {
-    id,
-    filename,
-    label,
-    outputPath,
-    path,
-    route,
-    layout,
-    title
-  }
-}
-```
-
-###### Usage
-`import` the query in your component
-```javascript
-import client from '@greenwood/plugin-graphql/src/core/client.js';
-import ChildrenQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
-
-.
-.
-.
-
-async connectedCallback() {
-  super.connectedCallback();
-  const response = await client.query({
-    query: ChildrenQuery,
-    variables: {
-      parent: '/blog'
-    }
-  });
-
-  this.posts = response.data.children;
-}
-```
-
-###### Response
-This will return the full `graph` of all pages as an array that are under a given root, e.g. _/blog_.
-```javascript
-[
-  {
-    filename: "first-post.md",
-    id: "first-post",
-    label: "First Post",
-    outputPath: "/blog/2019/first-post/index.html",
-    path: "./blog/2019/first-post.md",
-    route: "/blog/2019/first-post",
-    layout: "blog",
-    title: "My First Blog Post"
-  },
-  {
-    filename: "second-post.md",
-    id: "second-post",
-    label: "Second Post",
-    outputPath: "/blog/2019/second-post/index.html",
-    path: "./blog/2019/second-post.md",
-    route: "/blog/2019/second-post",
-    layout: "blog",
-    title: "My Second Blog Post"
-  }
-]
-```
-
-##### Config
-The Config query returns the configuration values from your _greenwood.config.js_.  Useful for populating tags like `<title>` and `<meta>`.
-
-###### Definition
-```javascript
-query {
-  config {
-  	devServer {
-      port
-    },
-    meta {
-      name,
-      rel,
-      content,
-      property,
-      value,
-      href
-    },
-    optimization,
-    port,
-    staticRouter,
-    title,
-    workspace
-  }
-}
-```
-
-###### Usage
-`import` the query in your component
-```javascript
-import client from '@greenwood/plugin-graphql/src/core/client.js';
-import ConfigQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
-.
-.
-.
-
-async connectedCallback() {
-  super.connectedCallback();
-  const response = await client.query({
-    query: ConfigQuery
-  });
-
-  this.meta = response.data.config.meta;
-}
-```
-
-###### Response
-This will return an object of your _greenwood.config.js_ as an object.  Example:
-```javascript
+```json
 {
-  devServer: {
-    port: 1984
-  },
-  meta: [
-    { name: 'twitter:site', content: '@PrjEvergreen' },
-    { rel: 'icon', href: '/assets/favicon.ico' }
-  ],
-  title: 'My App',
-  workspace: 'src' // equivalent to => fileURLToPath(new URL('./www', import.meta.url))
-}
-```
-
-##### Custom
-You can of course come up with your own as needed!  Greenwood provides the [`gql-tag`](https://github.com/apollographql/graphql-tag) module and will also resolve _.gql_ or _.graphql_ file extensions!
-
-###### example:
-```javascript
-/* src/data/my-query.gql */
-query {
-  graph {
-    /* whatever you are looking for */
+  "id": "blog-first-post",
+  "title": "First Post",
+  "label": "First Post",
+  "route": "/blog/first-post/",
+  "data": {
+    "author": "Project Evergreen",
+    "published": "2024-01-01"
   }
 }
 ```
 
-Or within your component
-```javascript
-import gql from 'graphql-tag';  // comes with Greenwood
+#### Table of Contents
 
-const query = gql`
-  {
-    user(id: 5) {
-      firstName
-      lastName
-    }
-  }
-`
+Additionally for markdown pages, you can add a frontmatter property called `tocHeadings` that will read all the HTML heading tags that match that number, and provide a subset of data, useful for generated a table of contents.
+
+Taking our previous example, if we were to configure this for `<h2>` tags
+```md
+---
+author: Project Evergreen
+published: 2024-01-01
+tocHeading: 2
+---
+
+# First Post
+
+This is my first post.
+
+## Overview
+
+Lorum Ipsum
+
+## First Point
+
+Something something...
 ```
 
-Then you can use `import` anywhere in your components!
+We would get this additional content as data out.
 
-##### Complete Example
-Now of course comes the fun part, actually seeing it all come together.  Here is an example from the Greenwood website's own [header component](https://github.com/ProjectEvergreen/greenwood/blob/master/www/components/header/header.js).
-
-```javascript
-import { LitElement, html } from 'lit';
-import client from '@greenwood/plugin-graphql/src/core/client.js';
-import MenuQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
-
-class HeaderComponent extends LitElement {
-
-  static get properties() {
-    return {
-      navigation: {
-        type: Array
-      }
-    };
+```json
+{
+  "id": "blog-first-post",
+  "title": "First Post",
+  "label": "First Post",
+  "route": "/blog/first-post/",
+  "data": {
+    "author": "Project Evergreen",
+    "published": "2024-01-01",
+    "tocHeading": 2,
+    "tableOfContents": [{
+      "content": "Overview",
+      "slug": "overview"
+    }, {
+      "content": "First Point",
+      "slug": "first-post"
+    }]
   }
+}
+```
 
-  constructor() {
-    super();
-    this.navigation = [];
-  }
 
+#### External Content
+
+Using our [Source plugin](/plugins/source/), just as you can get your content as data _out_ of Greenwood, so can you provide your own sources of content (as data) _to_ Greenwood.  This is great for pulling content from a headless CMS, database, or anything else you can imagine!
+
+### Data Client
+
+To fetch content as data, there are three pre-made APIs you can use, based your needs.
+
+```js
+// get turn the entire set of pages as an array
+import { getContent } from '@greenwood/cli/src/data/client.js';
+
+const pages = await getContent();
+
+// get content by a collection name
+import { getContentByCollection } from '@greenwood/cli/src/data/client.js';
+
+const items = await getContentByCollection('nav');
+
+// get all content under a route (like all blog posts)
+import { getContentByRoute } from '@greenwood/cli/src/data/client.js';
+
+const posts = await getContentByCollection('/blog/');
+```
+
+### Collections
+
+Collections are a feature in Greenwood by which you can use [front matter](/docs/front-matter/) to group pages that can the be referenced through JavaScript or [`activeFrontmatter`](/docs/configuration/#active-frontmatter).  This can be a useful way to group pages for things like navigation menus based on the content in your pages directory.
+
+#### Usage
+
+To define collections, you can simply add a **collection** property to the frontmatter of any static file, like markdown or HTML.
+
+```md
+---
+collection: nav
+---
+
+# About Page
+```
+
+#### Active Frontmatter
+
+With [`activeFrontmatter`](/docs/configuration/#active-frontmatter) enabled, you can then access your collections right from your HTML, like for passing attributes to a custom element.  It will get serialized to JSON for you.
+
+```html
+<!-- src/pages/index.html -->
+<html>
+  <head>
+    <title>Home Page</title>
+    <script type="module" src="../components/navigation.js"></script>
+  </head>
+
+  <body>
+    <app-navigation items="${globalThis.collection.nav}">
+  </body>
+</html>
+```
+
+#### Data Client
+
+You can also access this content using our data client.
+
+```js
+import { getContentByCollection } from '@greenwood/cli/src/data/client.js';
+
+export default class Navigation extends HTMLElement {
   async connectedCallback() {
-    super.connectedCallback();
+    const items = await getContentByCollection('nav');
 
-    const response = await client.query({
-      query: MenuQuery,
-      variables: {
-        name: 'navigation'
-      }
-    });
-
-    this.navigation = response.data.menu.children.map(item => item.item);
-  }
-
-  render() {
-    const { navigation } = this;
-
-    return html`
-      <header class="header">
-
-        <nav>
-          <ul>
-            ${navigation.map(({ item }) => {
-              return html`
-                <li><a href="${item.route}" title="Click to visit the ${item.label} page">${item.label}</a></li>
+    this.innerHTML = `
+      <nav role="main navigation">
+        <ul>
+          ${
+            items.maps(item => {
+              return `
+                <li>
+                  <a href="${route}">${item.label}</a>
+                </li>
               `;
-            })}
-          </ul>
-        </nav>
-
-      </header>
+            })
+          }
+        </ul>
+      </nav>
     `;
   }
 }
-
-customElements.define('app-header', HeaderComponent);
 ```
 
-> _For more information on using GraphQL with Greenwood, please see our [GraphQL plugin's README](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql)._
 
-### External Sources
+### GraphQL
 
-Using our [Source plugin](/plugins/source/), just as you can get your content as data _out_ of Greenwood, so can you provide your own sources of data _to_ Greenwood.  This is great for pulling content from a headless CMS, database, or anything else you can imagine!
+For GraphQL support, please see our [**GraphQL plugin**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-graphql) which in additional to exposing an [Apollo server and playground](https://www.apollographql.com/docs/apollo-server/) locally at `http://localhost:4000`, also provides GraphQL alternatives to our Data Client through a customized (read only) Apollo client based wrapper.
 
-The supported [fields from Greenwood's schema](/docs/data/#internal-sources) are:
-```javascript
-graph {
-  body, // REQUIRED (string of your content)
-  id,
-  label,
-  route,  // REQUIRED and MUST end in a forward slash
-  layout,
-  title,
-  data
-}
-```
+![graphql-playground](/assets/graphql-playground.png)
