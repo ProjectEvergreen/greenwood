@@ -1,0 +1,37 @@
+{
+  "name": "@greenwood/plugin-css-modules",
+  "version": "0.30.0-alpha.6",
+  "description": "A Greenwood plugin for authoring CSS Modules",
+  "repository": "https://github.com/ProjectEvergreen/greenwood",
+  "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-css-modules",
+  "author": "Owen Buckley <owen@thegreenhouse.io>",
+  "license": "MIT",
+  "keywords": [
+    "Greenwood",
+    "Static Site Generator",
+    "Full Stack Web Development",
+    "Web Components",
+    "CSS Modules"
+  ],
+  "main": "src/index.js",
+  "type": "module",
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@greenwood/cli": "^0.4.0"
+  },
+  "dependencies": {
+    "acorn": "^8.0.1",
+    "acorn-import-attributes": "^1.9.5",
+    "acorn-walk": "^8.0.0",
+    "css-tree": "^3.0.0",
+    "node-html-parser": "^1.2.21"
+  },
+  "devDependencies": {
+    "@greenwood/cli": "^0.30.0-alpha.6"
+  }
+}
