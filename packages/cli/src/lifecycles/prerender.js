@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-import { checkResourceExists, trackResourcesForRoute } from '../lib/resource-utils.js';
+import { checkResourceExists, trackResourcesForRoute, mergeResponse } from '../lib/resource-utils.js';
 import os from 'os';
 import { WorkerPool } from '../lib/threadpool.js';
 
@@ -30,12 +30,12 @@ async function interceptPage(url, request, plugins, body) {
   });
 
   for (const plugin of plugins) {
-    if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, response)) {
-      response = await plugin.preIntercept(url, request, response);
+    if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, response.clone())) {
+      response = mergeResponse(response, await plugin.preIntercept(url, request, response.clone()));
     }
 
-    if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
-      response = await plugin.intercept(url, request, response);
+    if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
+      response = mergeResponse(response, await plugin.intercept(url, request, response.clone()));
     }
   }
 
