@@ -289,6 +289,7 @@ class StripCssModulesResource extends ResourceInterface {
 
                 Object.keys(module).forEach((key) => {
                   contents = contents.replace(
+                    // https://stackoverflow.com/a/20851557/417806
                     // (((?<![-\w\d\W])|(?<=[> \n\r\b]))styles\.compactMenuSectionListItem((?![-\w\d\W])|(?=[ <.,:;!?\n\r\b])))
                     new RegExp(String.raw`(((?<![-\w\d\W])|(?<=[> \n\r\b]))styles\.${key}((?![-\w\d\W])|(?=[ <.,:;!?\n\r\b])))`, 'g'),
                     `'${module[key]}'`

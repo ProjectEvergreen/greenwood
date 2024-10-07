@@ -6,110 +6,20 @@
   border-bottom: 2px dotted var(--color-gray);
 }
 
-.logoLink {
-  display: flex;
-}
-
-.logoLink svg.greenwood-logo-full {
-  width: 100%;
-}
-
-.logoLink svg.greenwood-logo-full g.letters {
-  fill: var(--color-logo-shade-dark);
-}
-
-.navBar {
-  display: flex;
-  align-items: center;
-  gap: var(--size-5);
-}
-
 .navBarMenu {
   display: flex;
-  gap: var(--size-5);
-  list-style-type: none;
 }
 
 .navBarMenuItem {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  cursor: pointer;
-  font-size: var(--font-size-8);
-  padding: 0;
+  & a {
+    text-decoration: none;
+    color: var(--color-black);
+  }
 }
 
-.navBarMenuItem a {
-  text-decoration: none;
-  color: var(--color-black);
-}
-
-.navBarMenuItem a:hover {
-  text-decoration: underline;
-}
-
-.socialTray {
-  display: flex;
-  gap: var(--size-3);
-  list-style-type: none;
-  background-color: var(--color-gray);
-  width: fit-content;
-  border: var(--border-size-1) solid #4d4d4d45;
-  border-radius: var(--radius-6);
-  padding: var(--size-1);
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.socialIcon {
-  display: flex;
-  align-items: center;
-  line-height: 100%;
-}
-
-.socialIcon svg {
-  fill: var(--color-secondary);
-}
-
-.mobileMenuIcon {
-  display: none;
-  border: none;
-  background-color: transparent;
-}
-
-.mobileMenuBackdrop {
-  height: 100vh;
-  width: 100vw;
-  margin: 0;
-  background-color: #f5f5f58e;
-  padding: var(--size-5) var(--size-6);
-  text-align: right;
-}
-
-.mobileMenuCloseButton {
-  background: transparent;
-  font-size: var(--font-size-5);
-  cursor: pointer;
-  border: none;
-  padding: 0 12px;
-}
-
-.mobileMenuList {
-  text-align: left;
-  margin: var(--size-4) 0 0;
-}
-
-.mobileMenuListItem {
-  list-style-type: none;
-  margin: 10px 0;
-  font-size: var(--font-size-5);
-}
-
-.mobileMenuListItem a {
-  color: var(--color-black);
-  text-decoration: none;
+.navBarMenu,
+.navBarMenuItem {
+  color: red;
 }
 
 @media screen and (min-width: 480px) {
@@ -118,35 +28,13 @@
   }
 }
 
-@media (max-width: 600px) {
-  .navBar {
-    display: flex;
-    align-items: center;
-    gap: var(--size-2);
-  }
-
+@media screen and (min-width: 768px) {
   .navBarMenu {
     display: none;
   }
 
-  .mobileMenuIcon {
+  .navBarMenuItem {
     display: flex;
     cursor: pointer;
-  }
-}
-
-@media screen and (min-width: 768px) {
-  .logoLink svg.greenwood-logo-full {
-    width: 60%;
-  }
-
-  .socialTray {
-    padding: var(--size-1) var(--size-2);
-  }
-}
-
-@media screen and (min-width: 1024px) {
-  .logoLink svg.greenwood-logo-full {
-    width: 70%;
   }
 }
