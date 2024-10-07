@@ -252,7 +252,6 @@ class StripCssModulesResource extends ResourceInterface {
   }
 
   async serve(url) {
-    console.log('serve???', { url });
     const { context } = this.compilation;
     let contents = await fs.promises.readFile(url); // response.clone().text();
 
@@ -302,8 +301,7 @@ class StripCssModulesResource extends ResourceInterface {
       }
     );
 
-    // console.log({ contents });
-    return new Response(contents); // { headers: response.headers });
+    return new Response(contents);
   }
 }
 

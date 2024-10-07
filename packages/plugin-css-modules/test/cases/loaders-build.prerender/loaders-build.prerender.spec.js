@@ -12,9 +12,10 @@
  * import { greenwoodPluginCssModules } import '@greenwood/plugin-css-modules';
  *
  * {
+ *   prerender: true,
  *   plugins: [
  *     greenwoodPluginCssModules()
- *  ]
+ *   ]
  * }
  *
  * User Workspace
