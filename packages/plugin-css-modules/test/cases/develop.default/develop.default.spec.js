@@ -18,12 +18,15 @@
  * }
  *
  * User Workspace
- *  src/
+ * src/
  *   components/
  *     header/
  *       header.js
  *       header.module.css
- *     index.html
+ *     logo/
+ *       logo.js
+ *       logo.module.css
+ *   index.html
  */
 import chai from 'chai';
 import { JSDOM } from 'jsdom';
@@ -202,9 +205,20 @@ describe('Develop Greenwood With: ', function() {
           });
 
           it('the served content should be untouched', function() {
-            expect(contents.replace(/ /g, '').replace('\n', '').replace(/;/g, ''))
+            expect(contents.replace(/ /g, '').replace(/\n/g, '').replace(/;/g, ''))
               .to.equal(expectedHeaderCss.replace(/\.header-\[placeholder\]-/g, '.').replace(/ /g, '').replace(/\n/g, '').replace(/;/g, ''));
           });
+        });
+      });
+
+      describe('Logo component nested in <app-header> component', () => {
+        it('should have the expected logo CSS inlined into the style tag', () => {
+          const styles = dom.window.document.querySelectorAll('head style');
+          const styleText = styles[0].textContent;
+          const expectedStyles = '.logo-1501575137-container{display:flex}.logo-1501575137-logo{display:inline-block;width:100%;}';
+
+          expect(styleText.replace(/ /g, '').replace(/\n/g, '').replace(/;/g, ''))
+            .to.contain(expectedStyles.replace(/;/g, ''));
         });
       });
     });
