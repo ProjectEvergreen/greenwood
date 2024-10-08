@@ -40,11 +40,10 @@ function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
         // TODO bare specifiers support?
         if (
           value.endsWith('.module.css') &&
-          specifiers.length === 1 &&
-          // would be nice if the identifier wasn't hardcoded
-          specifiers[0].local.name === 'styles'
+          specifiers.length === 1
         ) {
           // console.log('WE GOT A WINNER!!!', value);
+          const identifier = specifiers[0].local.name;
           const cssModuleUrl = new URL(value, scriptUrl);
           const scope = cssModuleUrl.pathname.split('/').pop().split('.')[0];
           const cssContents = fs.readFileSync(cssModuleUrl, 'utf-8');
@@ -114,7 +113,8 @@ function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
               [`${cssModuleUrl.href}`]: {
                 module: classNameMap,
                 contents: scopedCssContents,
-                importer: scriptUrl
+                importer: scriptUrl,
+                identifier
               }
             })
           );
@@ -265,21 +265,20 @@ class StripCssModulesResource extends ResourceInterface {
 
           if (
             value.endsWith('.module.css') &&
-            specifiers.length === 1 &&
-            specifiers[0].local.name === 'styles'
+            specifiers.length === 1
           ) {
             // console.log('WE GOT A WINNER!!!', value);
             contents = `${contents.slice(0, start)} \n ${contents.slice(end)}`;
             const cssModulesMap = getCssModulesMap({ context });
 
             Object.values(cssModulesMap).forEach((value) => {
-              const { importer, module } = value;
+              const { importer, module, identifier } = value;
               // console.log('$$$$$$$', { importer, url });
 
               if (importer === url.href) {
                 Object.keys(module).forEach((key) => {
                   contents = contents.replace(
-                    new RegExp(String.raw`\$\{styles.${key}\}`, 'g'),
+                    new RegExp(String.raw`\$\{${identifier}.${key}\}`, 'g'),
                     module[key]
                   );
                 });
@@ -288,7 +287,7 @@ class StripCssModulesResource extends ResourceInterface {
                   contents = contents.replace(
                     // https://stackoverflow.com/a/20851557/417806
                     // (((?<![-\w\d\W])|(?<=[> \n\r\b]))styles\.compactMenuSectionListItem((?![-\w\d\W])|(?=[ <.,:;!?\n\r\b])))
-                    new RegExp(String.raw`(((?<![-\w\d\W])|(?<=[> \n\r\b]))styles\.${key}((?![-\w\d\W])|(?=[ <.,:;!?\n\r\b])))`, 'g'),
+                    new RegExp(String.raw`(((?<![-\w\d\W])|(?<=[> \n\r\b]))${identifier}\.${key}((?![-\w\d\W])|(?=[ <.,:;!?\n\r\b])))`, 'g'),
                     `'${module[key]}'`
                   );
                 });
