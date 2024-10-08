@@ -35,11 +35,7 @@ import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
-
-// JSDOM doesn't support CSS nesting and kind of blows up in the console as it tries to parse it automatically
-// https://github.com/jsdom/jsdom/issues/2005#issuecomment-2397495853
 import { implementation } from 'jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js';
-implementation.prototype._updateAStyleBlock = () => {}; // eslint-disable-line no-underscore-dangle
 
 const expect = chai.expect;
 
@@ -48,6 +44,7 @@ describe('Build Greenwood With: ', function() {
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   let runner;
+  let updateAStyleBlockRef;
 
   before(function() {
     this.context = {
@@ -59,6 +56,11 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(function() {
+      // JSDOM doesn't support CSS nesting and kind of blows up in the console as it tries to parse it automatically
+      // https://github.com/jsdom/jsdom/issues/2005#issuecomment-2397495853
+      updateAStyleBlockRef = implementation.prototype._updateAStyleBlock; // eslint-disable-line no-underscore-dangle
+      implementation.prototype._updateAStyleBlock = () => {}; // eslint-disable-line no-underscore-dangle
+
       runner.setup(outputPath, getSetupFiles(outputPath));
       runner.runCommand(cliPath, 'build');
     });
@@ -186,10 +188,11 @@ describe('Build Greenwood With: ', function() {
         });
       });
     });
-
   });
 
   after(function() {
+    implementation.prototype._updateAStyleBlock = updateAStyleBlockRef; // eslint-disable-line no-underscore-dangle
+
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
