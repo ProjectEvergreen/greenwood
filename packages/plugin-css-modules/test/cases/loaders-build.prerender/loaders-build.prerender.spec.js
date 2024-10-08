@@ -357,6 +357,25 @@ describe('Build Greenwood With: ', function() {
           });
         });
       });
+
+      describe('Logo component nested in <app-header> component', () => {
+        it('should have the expected logo CSS inlined into the style tag', () => {
+          const styles = dom.window.document.querySelectorAll('head style');
+          const styleText = styles[0].textContent;
+          const expectedStyles = '.logo-1501575137-container{display:flex}.logo-1501575137-logo{display:inline-block;width:100%;}';
+
+          expect(styleText).to.contain(expectedStyles);
+        });
+
+        it('should have the expected logo CSS class names in the HTML', () => {
+          const classNames = ['logo-1501575137-container', 'logo-1501575137-logo'];
+          const bodyHtml = dom.window.document.querySelector('body').innerHTML;
+
+          classNames.forEach((name) => {
+            expect(bodyHtml).to.contain(`class="${name}"`);
+          });
+        });
+      });
     });
   });
 
@@ -365,5 +384,4 @@ describe('Build Greenwood With: ', function() {
 
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
-
 });
