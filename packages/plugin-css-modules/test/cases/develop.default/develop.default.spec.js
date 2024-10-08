@@ -39,7 +39,7 @@ import { implementation } from 'jsdom/lib/jsdom/living/nodes/HTMLStyleElement-im
 const expect = chai.expect;
 
 describe('Develop Greenwood With: ', function() {
-  const LABEL = 'Default Configuration for CSS Modules with pre-rendering';
+  const LABEL = 'Default Configuration for CSS Modules';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://localhost';
