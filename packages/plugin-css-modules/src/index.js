@@ -10,7 +10,7 @@ import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js'
 import * as acornWalk from 'acorn-walk';
 import * as acorn from 'acorn';
 import { hashString } from '@greenwood/cli/src/lib/hashing-utils.js';
-import { importAttributes } from 'acorn-import-attributes'; // comes from Greenwood
+import { importAttributes } from 'acorn-import-attributes';
 
 function getCssModulesMap(compilation) {
   const locationUrl = new URL('./__css-modules-map.json', compilation.context.scratchDir);
@@ -41,6 +41,7 @@ function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
         if (
           value.endsWith('.module.css') &&
           specifiers.length === 1 &&
+          // would be nice if the identifier wasn't hardcoded
           specifiers[0].local.name === 'styles'
         ) {
           // console.log('WE GOT A WINNER!!!', value);
@@ -182,10 +183,11 @@ class CssModulesResource extends ResourceInterface {
       const sheets = []; // TODO use a map here?
 
       for (const script of scripts) {
-        const type = script.getAttribute('type');
+        const type = script.getAttribute('type') ?? '';
         const src = script.getAttribute('src');
-        // TODO handle module shims
-        if (src && ['module', 'module-shim'].includes(type)) {
+
+        // allow module and module-shims
+        if (src && type.startsWith('module')) {
           // console.log('check this file for CSS Modules', src);
           // await resolveForRelativeUrl(new URL(src, import.meta.url this.compilation.context.userWorkspace)
           const scriptUrl = new URL(
@@ -197,11 +199,7 @@ class CssModulesResource extends ResourceInterface {
       }
 
       const cssModulesMap = getCssModulesMap(this.compilation);
-      // console.log({ cssModulesMap });
 
-      // for(const cssModule of cssModulesMap) {
-      //   // console.log({ cssModule });
-      // }
       Object.keys(cssModulesMap).forEach((key) => {
         sheets.push(cssModulesMap[key].contents);
       });
