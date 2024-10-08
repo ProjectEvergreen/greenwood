@@ -1,14 +1,14 @@
-import styles from './header.module.css';
+import header from './header.module.css';
 
 export default class Header extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
-      <header class="${styles.container}">
-        <ul class="${styles.navBarMenu}">
-          <li class="${styles.navBarMenuItem}">
+      <header class="${header.container}">
+        <ul class="${header.navBarMenu}">
+          <li class="${header.navBarMenuItem}">
             <a href="/about/" title="Documentation">About</a>
           </li>
-          <li class="${styles.navBarMenuItem}">
+          <li class="${header.navBarMenuItem}">
             <a href="/contact/" title="Guides">Contact</a>
           </li>
         </ul>

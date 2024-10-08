@@ -100,14 +100,6 @@ From there, Greenwood will scope your CSS by prefixing with the filename and a h
 
 There are some caveats to consider when using this plugin:
 
-1. Only `styles` is supported as the name of the identifier
-    ```js
-    /* works ✅ */
-    import styles from './header.module.css';
-
-    /* does not work 🚫 */
-    import header from './header.module.css';
-    ```
 1. This plugin only checks for [lower camelCase](https://github.com/css-modules/css-modules/blob/master/docs/naming.md) based class names
     ```css
     /* works ✅ */
