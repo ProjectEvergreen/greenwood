@@ -98,9 +98,9 @@ From there, Greenwood will scope your CSS by prefixing with the filename and a h
 
 > This plugin aims to cover a representative majority of the specification, though if you find missing capabilities please consider submitting an issue and / or PR!
 
-There are some caveats to consider when using this
+There are some caveats to consider when using this plugin:
 
-1. Only `styles` is supported as the name of the import
+1. Only `styles` is supported as the name of the identifier
     ```js
     /* works ✅ */
     import styles from './header.module.css';
