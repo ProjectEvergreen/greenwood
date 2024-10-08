@@ -1,9 +1,11 @@
 import styles from './header.module.css';
+import '../logo/logo.js';
 
 export default class Header extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
       <header class="${styles.container}">
+        <app-logo></app-logo>
         <ul class="${styles.navBarMenu}">
           <li class="${styles.navBarMenuItem}">
             <a href="/about/" title="Documentation">About</a>

@@ -18,12 +18,15 @@
  * }
  *
  * User Workspace
- *  src/
+ * src/
  *   components/
  *     header/
  *       header.js
  *       header.module.css
- *     index.html
+ *     logo/
+ *       logo.js
+ *       logo.module.css
+ *   index.html
  */
 import chai from 'chai';
 import { JSDOM } from 'jsdom';
@@ -185,6 +188,16 @@ describe('Build Greenwood With: ', function() {
           it('should not have any references to \'undefined\' in the JavaScript bundle', function() {
             expect(contents).to.not.contain('undefined');
           });
+        });
+      });
+
+      describe('Logo component nested in <app-header> component', () => {
+        it('should have the expected logo CSS inlined into the style tag', () => {
+          const styles = dom.window.document.querySelectorAll('head style');
+          const styleText = styles[0].textContent;
+          const expectedStyles = '.logo-1501575137-container{display:flex}.logo-1501575137-logo{display:inline-block;width:100%;}';
+
+          expect(styleText).to.contain(expectedStyles);
         });
       });
     });

@@ -19,7 +19,7 @@
  * }
  *
  * User Workspace
- *  src/
+ * src/
  *   components/
  *     footer/
  *       footer.js
@@ -27,7 +27,10 @@
  *     header/
  *       header.js
  *       header.module.css
- *     index.html
+ *     logo/
+ *       logo.js
+ *       logo.module.css
+ *   index.html
  */
 import chai from 'chai';
 import { JSDOM } from 'jsdom';

@@ -1,4 +1,5 @@
 import styles from './header.module.css';
+import '../logo/logo.js';
 
 export default class Header extends HTMLElement {
   connectedCallback() {
