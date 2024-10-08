@@ -16,8 +16,8 @@ function getCssModulesMap(compilation) {
   const locationUrl = new URL('./__css-modules-map.json', compilation.context.scratchDir);
   let cssModulesMap = {};
 
-  if (fs.existsSync(locationUrl.pathname)) {
-    cssModulesMap = JSON.parse(fs.readFileSync(locationUrl.pathname));
+  if (fs.existsSync(locationUrl)) {
+    cssModulesMap = JSON.parse(fs.readFileSync(locationUrl));
   }
 
   return cssModulesMap;
@@ -147,12 +147,10 @@ class CssModulesResource extends ResourceInterface {
     this.extensions = ['module.css'];
     this.contentType = 'text/javascript';
 
-    // // console.log('constructor???')
-    if (!fs.existsSync(this.compilation.context.scratchDir.pathname)) {
-      // // console.log('!!!!!!!!! make it!');
-      fs.mkdirSync(this.compilation.context.scratchDir.pathname, { recursive: true });
+    if (!fs.existsSync(this.compilation.context.scratchDir)) {
+      fs.mkdirSync(this.compilation.context.scratchDir, { recursive: true });
       fs.writeFileSync(
-        new URL('./__css-modules-map.json', this.compilation.context.scratchDir).pathname,
+        new URL('./__css-modules-map.json', this.compilation.context.scratchDir),
         JSON.stringify({})
       );
     }
