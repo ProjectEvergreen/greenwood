@@ -118,6 +118,7 @@ function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
             })
           );
         } else if (node.source.value.endsWith('.js')) {
+          // TODO this will be an issue with say TypeScript...
           const recursiveScriptUrl = new URL(value, scriptUrl);
 
           if (fs.existsSync(recursiveScriptUrl)) {
@@ -162,7 +163,7 @@ class ScanForCssModulesResource extends ResourceInterface {
     const { pathname, protocol } = url;
     const mapKey = `${protocol}//${pathname}`;
     const cssModulesMap = getCssModulesMap(this.compilation);
-    console.log('intercept', { url, cssModulesMap });
+
     if (url.pathname.endsWith('/')) {
       const body = await response.text();
       const dom = htmlparser.parse(body, { script: true });
@@ -223,7 +224,7 @@ class StripCssModulesResource extends ResourceInterface {
     this.contentType = 'text/javascript';
   }
 
-  async shouldServe(url) {
+  async shouldIntercept(url) {
     const cssModulesMap = getCssModulesMap(this.compilation);
 
     for (const [, value] of Object.entries(cssModulesMap)) {
@@ -233,9 +234,9 @@ class StripCssModulesResource extends ResourceInterface {
     }
   }
 
-  async serve(url) {
+  async intercept(url, request, response) {
     const { context } = this.compilation;
-    let contents = await fs.promises.readFile(url); // response.clone().text();
+    let contents = await response.text();
 
     acornWalk.simple(
       acorn.Parser.extend(importAttributes).parse(contents, {
@@ -259,18 +260,15 @@ class StripCssModulesResource extends ResourceInterface {
 
               if (importer === url.href) {
                 Object.keys(module).forEach((key) => {
-                  contents = contents.replace(
-                    new RegExp(String.raw`\$\{${identifier}.${key}\}`, 'g'),
-                    module[key]
-                  );
-                });
+                  const literalUsageRegex = new RegExp(String.raw`\$\{${identifier}.${key}\}`, 'g');
+                  // https://stackoverflow.com/a/20851557/417806
+                  const expressionUsageRegex = new RegExp(String.raw`(((?<![-\w\d\W])|(?<=[> \n\r\b]))${identifier}\.${key}((?![-\w\d\W])|(?=[ <.,:;!?\n\r\b])))`, 'g');
 
-                Object.keys(module).forEach((key) => {
-                  contents = contents.replace(
-                    // https://stackoverflow.com/a/20851557/417806
-                    new RegExp(String.raw`(((?<![-\w\d\W])|(?<=[> \n\r\b]))${identifier}\.${key}((?![-\w\d\W])|(?=[ <.,:;!?\n\r\b])))`, 'g'),
-                    `'${module[key]}'`
-                  );
+                  if (literalUsageRegex.test(contents)) {
+                    contents = contents.replace(literalUsageRegex, module[key]);
+                  } else if (expressionUsageRegex.test(contents)) {
+                    contents = contents.replace(expressionUsageRegex, `'${module[key]}'`);
+                  }
                 });
               }
             });
