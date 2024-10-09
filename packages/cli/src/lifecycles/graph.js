@@ -288,7 +288,7 @@ const generateGraph = async (compilation) => {
                 servePage: isCustom
               });
             } else {
-              console.debug(`Unhandled extension (${extension}) for page => ${filename}`);
+              console.debug(`Unhandled extension (${extension}) for route => ${route}`);
             }
           }
         }
