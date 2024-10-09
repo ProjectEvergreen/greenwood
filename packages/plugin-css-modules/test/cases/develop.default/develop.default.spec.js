@@ -192,21 +192,22 @@ describe('Develop Greenwood With: ', function() {
           });
         });
 
-        // TODO why does this return an export?
-        // related to special handling in the plugin
-        xdescribe('CSS module contents should not be processed', function() {
-          let contents;
+        describe('CSS module should be processed as ESM', function() {
+          let headerModuleText;
+          let modulesMap;
 
           before(async function() {
             const response = await fetch(`http://127.0.0.1:${port}/components/header/header.module.css`);
 
-            contents = await response.text();
-            expectedHeaderCss = await fs.promises.readFile(new URL('./expected.header.css', import.meta.url), 'utf-8');
+            headerModuleText = await response.text();
+            modulesMap = JSON.parse(await fs.promises.readFile(new URL('./.greenwood/__css-modules-map.json', import.meta.url), 'utf-8'));
           });
 
           it('the served content should be untouched', function() {
-            expect(contents.replace(/ /g, '').replace(/\n/g, '').replace(/;/g, ''))
-              .to.equal(expectedHeaderCss.replace(/\.header-\[placeholder\]-/g, '.').replace(/ /g, '').replace(/\n/g, '').replace(/;/g, ''));
+            const headerModule = modulesMap[new URL('./src/components/header/header.module.css', import.meta.url).href];
+            const expected = `export default ${JSON.stringify(headerModule.module)}`;
+
+            expect(headerModuleText).to.equal(expected);
           });
         });
       });
