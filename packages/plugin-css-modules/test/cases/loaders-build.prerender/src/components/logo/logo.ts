@@ -1,5 +1,7 @@
 import styles from './logo.module.css';
 
+interface Props { title: string }
+
 export default class Logo extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `

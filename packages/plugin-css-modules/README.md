@@ -100,6 +100,7 @@ From there, Greenwood will scope your CSS by prefixing with the filename and a h
 
 There are some caveats to consider when using this plugin:
 
+1. This plugin only supports usage of CSS Modules within vanilla JavaScript, or [TypeScript (_.ts_)](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-typescript) and [JSX (_.jsx_)](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-jsx) when combined with our plugins
 1. This plugin only checks for [lower camelCase](https://github.com/css-modules/css-modules/blob/master/docs/naming.md) based class names
     ```css
     /* works ✅ */
