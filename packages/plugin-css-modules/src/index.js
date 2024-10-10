@@ -11,6 +11,7 @@ import * as acornWalk from 'acorn-walk';
 import * as acorn from 'acorn';
 import { hashString } from '@greenwood/cli/src/lib/hashing-utils.js';
 import { importAttributes } from 'acorn-import-attributes';
+import { transform } from 'sucrase';
 
 const MODULES_MAP_FILENAME = '__css-modules-map.json';
 /*
@@ -33,10 +34,14 @@ function getCssModulesMap(compilation) {
 
 function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
   const scriptContents = fs.readFileSync(scriptUrl, 'utf-8');
+  const result = transform(scriptContents, {
+    transforms: ['typescript', 'jsx'],
+    jsxRuntime: 'preserve'
+  });
 
   acornWalk.simple(
-    acorn.Parser.extend(importAttributes).parse(scriptContents, {
-      ecmaVersion: '2020',
+    acorn.Parser.extend(importAttributes).parse(result.code, {
+      ecmaVersion: 'latest',
       sourceType: 'module'
     }),
     {
@@ -67,6 +72,7 @@ function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
               // drill down from a SelectorList to its first Selector
               // and check its first child to see if it is a ClassSelector
               // and if so, hash that initial class selector
+
               if (node.type === 'SelectorList') {
                 if (node.children?.head?.data?.type === 'Selector') {
                   if (node.children?.head?.data?.children?.head?.data?.type === 'ClassSelector') {
@@ -117,8 +123,9 @@ function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
               }
             })
           );
-        } else if (node.source.value.endsWith('.js')) {
-          // TODO this will be an issue with say TypeScript...
+        } else if (value.endsWith('.js') || value.endsWith('.jsx') || value.endsWith('.ts')) {
+          // no good way to get at async plugin processing so right now
+          // we can only support what we can provide to acorn
           const recursiveScriptUrl = new URL(value, scriptUrl);
 
           if (fs.existsSync(recursiveScriptUrl)) {
@@ -240,7 +247,7 @@ class StripCssModulesResource extends ResourceInterface {
 
     acornWalk.simple(
       acorn.Parser.extend(importAttributes).parse(contents, {
-        ecmaVersion: '2020',
+        ecmaVersion: 'latest',
         sourceType: 'module'
       }),
       {

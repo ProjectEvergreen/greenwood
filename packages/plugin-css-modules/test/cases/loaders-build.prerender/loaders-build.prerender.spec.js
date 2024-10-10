@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build with CSS Modules plugin and pre-rendering.
+ * Run Greenwood build with CSS Modules plugin and pre-rendering, including an example using TypeScript.
  *
  * User Result
  * Should generate a Greenwood project with CSS Modules properly transformed.
@@ -28,7 +28,7 @@
  *       header.js
  *       header.module.css
  *     logo/
- *       logo.js
+ *       logo.ts
  *       logo.module.css
  *   index.html
  */
@@ -253,7 +253,7 @@ describe('Build Greenwood With: ', function() {
           expect(styleText).to.contain(expectedFooterCss.replace(/\[placeholder\]/g, scopedHash));
         });
 
-        it('should have the source <app-header> CSS class names as scoped class names inlined in a <style> tag', () => {
+        it('should have the source <app-footer> CSS class names as scoped class names inlined in a <style> tag', () => {
           const styles = dom.window.document.querySelectorAll('head style');
           const styleText = styles[0].textContent;
           let classes = [];

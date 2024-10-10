@@ -29,7 +29,8 @@
     "acorn-import-attributes": "^1.9.5",
     "acorn-walk": "^8.0.0",
     "css-tree": "^3.0.0",
-    "node-html-parser": "^1.2.21"
+    "node-html-parser": "^1.2.21",
+    "sucrase": "^3.35.0"
   },
   "devDependencies": {
     "@greenwood/cli": "^0.30.0-alpha.6"
