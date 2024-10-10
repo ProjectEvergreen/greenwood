@@ -1,0 +1,47 @@
+.footer {
+  background-color: var(--color-tertiary);
+  padding: var(--size-fluid-1) var(--size-fluid-3);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.logo {
+  padding-left: var(--size-fluid-1);
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: 1;
+  justify-content: center;
+  color: var(--color-gray);
+}
+
+.logo svg {
+  width: 150px;
+}
+
+.logo svg g.letters {
+  fill: var(--color-white);
+}
+
+.socialTray {
+  display: flex;
+  gap: var(--size-2);
+  list-style-type: none;
+  background-color: var(--color-secondary);
+  border: var(--border-size-1) solid var(--color-black);
+  border-radius: var(--radius-6);
+  padding: var(--size-2) var(--size-3);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.socialIcon {
+  display: flex;
+  align-items: center;
+}
+
+.socialIcon svg {
+  fill: var(--color-gray);
+}
