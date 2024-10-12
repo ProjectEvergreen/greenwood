@@ -56,7 +56,7 @@ const generateGraph = async (compilation) => {
       }];
 
       const walkDirectoryForPages = async function(directory, pages = [], apiRoutes = new Map()) {
-        const files = await fs.readdir(directory);
+        const files = (await fs.readdir(directory)).filter(file => !file.startsWith('.'));
 
         for (const filename of files) {
           const filenameUrl = new URL(`./${filename}`, directory);
@@ -301,7 +301,7 @@ const generateGraph = async (compilation) => {
 
               compilation.collections = collections;
             } else {
-              console.debug(`Unhandled extension (${extension}) for route => ${route}`);
+              console.warn(`Unsupported format detected for page => ${filename}`);
             }
           }
         }
