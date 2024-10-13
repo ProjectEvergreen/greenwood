@@ -47,6 +47,7 @@ const defaultConfig = {
   basePath: '',
   optimization: optimizations[0],
   activeFrontmatter: false,
+  contentAsData: false,
   plugins: greenwoodPlugins,
   markdown: { plugins: [], settings: {} },
   prerender: false,
@@ -82,7 +83,7 @@ const readAndMergeConfig = async() => {
       if (hasConfigFile) {
         const userCfgFile = (await import(configUrl)).default;
         // eslint-disable-next-line max-len
-        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, layoutsDirectory, activeFrontmatter, isolation, polyfills } = userCfgFile;
+        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, layoutsDirectory, activeFrontmatter, contentAsData, isolation, polyfills } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -108,6 +109,13 @@ const readAndMergeConfig = async() => {
             reject('Error: greenwood.config.js activeFrontmatter must be a boolean');
           }
           customConfig.activeFrontmatter = activeFrontmatter;
+        }
+
+        if (contentAsData) {
+          if (typeof contentAsData !== 'boolean') {
+            reject('Error: greenwood.config.js contentAsData must be a boolean');
+          }
+          customConfig.contentAsData = contentAsData;
         }
 
         if (plugins && plugins.length > 0) {

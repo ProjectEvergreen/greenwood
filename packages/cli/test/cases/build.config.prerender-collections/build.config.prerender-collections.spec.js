@@ -24,7 +24,7 @@
  *     blog/
  *       first-post.md
  *       second-post.md
- *     index.html
+ *       index.html
  *     index.html
  *     toc.html
  */

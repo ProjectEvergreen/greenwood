@@ -14,28 +14,29 @@ class ContentAsDataResource extends ResourceInterface {
   }
 
   async shouldIntercept(url, request, response) {
-    return response.headers.get('Content-Type')?.indexOf(this.contentType[0]) >= 0;
+    const { activeFrontmatter, contentAsData } = this.compilation.config;
+
+    return response.headers.get('Content-Type')?.indexOf(this.contentType[0]) >= 0
+      && (activeFrontmatter || contentAsData);
   }
 
   async intercept(url, request, response) {
-    const { activeFrontmatter } = this.compilation.config;
+    const { activeFrontmatter, contentAsData, polyfills } = this.compilation.config;
     const body = await response.text();
     let newBody = body;
 
-    if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
-      newBody = mergeImportMap(body, importMap, this.compilation.config.polyfills.importMaps);
-
-      // make some of the configuration available to the client utils
+    if (process.env.__GWD_COMMAND__ === 'develop' && contentAsData) { // eslint-disable-line no-underscore-dangle
+      newBody = mergeImportMap(body, importMap, polyfills.importMaps);
       newBody = newBody.replace('<head>', `
-          <head>
-            <script id="content-as-data">
-              globalThis.__CONTENT_SERVER__ = globalThis.__CONTENT_SERVER__
-                ? globalThis.__CONTENT_SERVER__
-                : {
-                    PORT: "${this.compilation.config.port + 1}"
-                  }
-            </script>
-        `);
+        <head>
+          <script id="content-server">
+            globalThis.__CONTENT_SERVER__ = globalThis.__CONTENT_SERVER__
+              ? globalThis.__CONTENT_SERVER__
+              : {
+                  PORT: "${this.compilation.config.port + 1}"
+                }
+          </script>
+      `);
     }
 
     if (activeFrontmatter) {
@@ -74,23 +75,24 @@ class ContentAsDataResource extends ResourceInterface {
     });
   }
 
-  // TODO graphql based hydration?
-  // async shouldOptimize(url, response) {
-  //   return response.headers.get('Content-Type').indexOf(this.contentType[1]) >= 0;
-  // }
+  async shouldOptimize(url, response) {
+    const { contentAsData } = this.compilation.config;
 
-  // async optimize(url, response) {
-  //   let body = await response.text();
+    return response.headers.get('Content-Type').indexOf(this.contentType[0]) >= 0 && contentAsData;
+  }
 
-  //   body = body.replace('<head>', `
-  //     <head>
-  //       <script data-state="apollo" data-gwd-opt="none">
-  //         window.__APOLLO_STATE__ = true;
-  //       </script>
-  //   `);
+  async optimize(url, response) {
+    let body = await response.text();
 
-  //   return new Response(body);
-  // }
+    body = body.replace('<head>', `
+      <head>
+        <script id="content-state">
+          globalThis.__CONTENT_AS_DATA_STATE__ = true;
+        </script>
+    `);
+
+    return new Response(body);
+  }
 }
 
 const greenwoodPluginContentAsData = {
