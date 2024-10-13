@@ -19,6 +19,7 @@ export default {
   basePath: '',
   port: 8080,
   activeFrontmatter: false,
+  contentAsData: false,
   markdown: {
     plugins: [],
     settings: {}
@@ -108,6 +109,16 @@ For convenience, the value of `basePath` will also be made available as a global
 ```
 
 > _User content, like `<a>` and `<img>` tags will require manually prefixing the basePath in your code._
+
+### Content As Data
+
+To enable support for Greenwood's [content as data](/docs/data/) capabilities, set the `contentAsData` flag to `true`.
+
+```js
+export default {
+  contentAsData: true
+};
+```
 
 ### Dev Server
 Configuration for Greenwood's development server is available using the `devServer` option.
