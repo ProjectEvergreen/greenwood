@@ -2,6 +2,7 @@
 import fs from 'fs/promises';
 import fm from 'front-matter';
 import { checkResourceExists, requestAsObject } from '../lib/resource-utils.js';
+import { activeFrontmatterKeys } from '../lib/content-utils.js';
 import toc from 'markdown-toc';
 import { Worker } from 'worker_threads';
 
@@ -221,12 +222,9 @@ const generateGraph = async (compilation) => {
                */
 
               // prune "reserved" attributes that are supported by Greenwood
-              // https://www.greenwoodjs.io/docs/front-matter
-              delete customData.label;
-              delete customData.imports;
-              delete customData.title;
-              delete customData.layout;
-              delete customData.id;
+              [...activeFrontmatterKeys, 'layout'].forEach((key) => {
+                delete customData[key];
+              });
 
               // set flag whether to gather a list of headings on a page as menu items
               customData.tocHeading = customData.tocHeading || 0;

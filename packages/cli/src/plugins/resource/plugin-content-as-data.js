@@ -1,7 +1,7 @@
 import { mergeImportMap } from '../../lib/walker-package-ranger.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { checkResourceExists } from '../../lib/resource-utils.js';
-import { activeGreenwoodFrontmatterKeys, cleanContentCollection } from '../../lib/content-utils.js';
+import { activeFrontmatterKeys, cleanContentCollection } from '../../lib/content-utils.js';
 import fs from 'fs/promises';
 
 function pruneGraph(pages) {
@@ -103,8 +103,8 @@ class ContentAsDataResource extends ResourceInterface {
     if (activeFrontmatter) {
       const matchingRoute = this.compilation.graph.find(page => page.route === url.pathname);
 
-      // Greenwood default graph data
-      for (const key of activeGreenwoodFrontmatterKeys) {
+      // Greenwood active frontmatter keys
+      for (const key of activeFrontmatterKeys) {
         const interpolatedFrontmatter = '\\$\\{globalThis.page.' + key + '\\}';
         const needle = key === 'title' && !matchingRoute.title
           ? matchingRoute.label
@@ -130,10 +130,7 @@ class ContentAsDataResource extends ResourceInterface {
       }
     }
 
-    // TODO how come we need to forward headers, shouldn't mergeResponse do that for us?
-    return new Response(newBody, {
-      headers: response.headers
-    });
+    return new Response(newBody);
   }
 
   async shouldOptimize(url, response) {

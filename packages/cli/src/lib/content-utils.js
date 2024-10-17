@@ -1,11 +1,11 @@
-const activeGreenwoodFrontmatterKeys = ['route', 'label', 'title', 'id'];
+const activeFrontmatterKeys = ['route', 'label', 'title', 'id'];
 
 function cleanContentCollection(collection = []) {
   return collection.map((page) => {
     let prunedPage = {};
 
     Object.keys(page).forEach((key) => {
-      if ([...activeGreenwoodFrontmatterKeys, 'data'].includes(key)) {
+      if ([...activeFrontmatterKeys, 'data'].includes(key)) {
         prunedPage[key] = page[key];
       }
     });
@@ -18,6 +18,6 @@ function cleanContentCollection(collection = []) {
 }
 
 export {
-  activeGreenwoodFrontmatterKeys,
+  activeFrontmatterKeys,
   cleanContentCollection
 };
