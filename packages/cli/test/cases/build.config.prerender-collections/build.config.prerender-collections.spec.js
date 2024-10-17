@@ -49,7 +49,7 @@ describe('Build Greenwood With: ', function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function() {
@@ -91,6 +91,18 @@ describe('Build Greenwood With: ', function() {
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+      });
+
+      describe('Data Client Import Map', () => {
+        let map;
+
+        before(function() {
+          map = dom.window.document.querySelectorAll('script[type="importmap"]');
+        });
+
+        it('should not have a <script> tag of type importmap', async () => {
+          expect(map.length).to.equal(0);
+        });
       });
 
       describe('navigation links from getContentByCollection', function() {

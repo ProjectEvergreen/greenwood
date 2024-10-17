@@ -87,7 +87,10 @@ class ContentAsDataResource extends ResourceInterface {
     let newBody = body;
 
     if (contentAsData) {
-      newBody = mergeImportMap(body, importMap, polyfills.importMaps);
+      if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
+        newBody = mergeImportMap(body, importMap, polyfills.importMaps);
+      }
+
       newBody = newBody.replace('<head>', `
         <head>
           <script id="content-server">

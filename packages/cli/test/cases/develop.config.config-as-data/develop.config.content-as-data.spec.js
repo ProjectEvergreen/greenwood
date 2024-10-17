@@ -31,6 +31,7 @@
  */
 
 import chai from 'chai';
+import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
@@ -66,6 +67,29 @@ describe('Develop Greenwood With: ', function() {
         }, 5000);
 
         runner.runCommand(cliPath, 'develop', { async: true });
+      });
+    });
+
+    describe('Data Client Import Map', () => {
+      let response;
+      let dom;
+
+      before(async function() {
+        response = await fetch(`${hostname}:${port}/`);
+        dom = new JSDOM(await response.text());
+      });
+
+      it('should have a <script> tag of type importmap', async () => {
+        const map = dom.window.document.querySelectorAll('script[type="importmap"]');
+
+        expect(map.length).to.equal(1);
+      });
+
+      it('should have the expected entry in the importmap', async () => {
+        const map = dom.window.document.querySelectorAll('script[type="importmap"]');
+        const contents = JSON.parse(map[0].textContent);
+
+        expect(contents.imports['@greenwood/cli/src/data/client.js']).to.equal('/node_modules/@greenwood/cli/src/data/client.js');
       });
     });
 
