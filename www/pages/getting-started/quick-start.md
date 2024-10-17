@@ -1,9 +1,7 @@
 ---
-label: 'quick-start'
-menu: side
-title: 'Quick Start'
-index: 1
-linkheadings: 3
+collection: getting-started
+order: 1
+tocHeading: 3
 ---
 
 ## Quick Start

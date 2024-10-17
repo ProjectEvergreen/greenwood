@@ -198,8 +198,8 @@ describe('Serve Greenwood With: ', function() {
 
       it('should have the expected menu and index values in the graph', function() {
         expect(artistsPageGraphData.label).to.equal('Artists');
-        expect(artistsPageGraphData.data.menu).to.equal('navigation');
-        expect(artistsPageGraphData.data.index).to.equal(7);
+        expect(artistsPageGraphData.data.collection).to.equal('navigation');
+        expect(artistsPageGraphData.data.order).to.equal(7);
       });
 
       it('should have expected custom data values in its graph data', function() {

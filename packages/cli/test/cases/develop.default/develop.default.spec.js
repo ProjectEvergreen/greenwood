@@ -56,7 +56,6 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-// TODO good first issue, to abstract along with copy plugin
 async function rreaddir (dir, allFiles = []) {
   const files = (await fs.promises.readdir(dir)).map(f => path.join(dir, f));
 
@@ -207,7 +206,7 @@ describe('Develop Greenwood With: ', function() {
         `${process.cwd()}/node_modules/@lion/localize/src/*.js`,
         `${outputPath}/node_modules/@lion/localize/src/`
       );
-      const owcDepupLibPackageJson = await getDependencyFiles(
+      const owcDedupeLibPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/@open-wc/dedupe-mixin/package.json`,
         `${outputPath}/node_modules/@open-wc/dedupe-mixin/`
       );
@@ -413,7 +412,7 @@ describe('Develop Greenwood With: ', function() {
         ...lionLocalizeLibsPackageJson,
         ...lionLocalizeTesterLibs,
         ...lionLocalizeSrcLibs,
-        ...owcDepupLibPackageJson,
+        ...owcDedupeLibPackageJson,
         ...owcScopedLibPackageJson,
         ...messageFormatLibs,
         ...messageFormatLibsPackageJson,
@@ -488,8 +487,11 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return an import map shim <script> in the <head> of the document', function(done) {
-        const importMapTag = dom.window.document.querySelectorAll('head > script[type="importmap"]')[0];
+        const importMapTags = dom.window.document.querySelectorAll('head > script[type="importmap"]');
+        const importMapTag = importMapTags[0];
         const importMap = JSON.parse(importMapTag.textContent).imports;
+
+        expect(importMapTags.length).to.equal(1);
 
         Object.keys(expectedImportMap).forEach((key) => {
           expect(importMap[key]).to.equal(expectedImportMap[key]);
@@ -1302,31 +1304,6 @@ describe('Develop Greenwood With: ', function() {
 
       it('should return the expected response message', function(done) {
         expect(body).to.contain('I am a nested API route');
-        done();
-      });
-    });
-
-    describe('Fetching graph.json client side', function() {
-      let response;
-      let graph;
-
-      before(async function() {
-        response = await fetch(`${hostname}:${port}/graph.json`);
-        graph = await response.clone().json();
-      });
-
-      it('should return the correct content type', function(done) {
-        expect(response.headers.get('content-type')).to.contain('application/json');
-        done();
-      });
-
-      it('should return a 200', function(done) {
-        expect(response.status).to.equal(200);
-        done();
-      });
-
-      it('should have the expected length for all content', function(done) {
-        expect(graph.length).to.equal(2);
         done();
       });
     });

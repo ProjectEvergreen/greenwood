@@ -1,8 +1,6 @@
 ---
-label: 'docs'
-menu: navigation
-title: Docs
-index: 2
+collection: navigation
+order: 2
 ---
 
 ## Documentation

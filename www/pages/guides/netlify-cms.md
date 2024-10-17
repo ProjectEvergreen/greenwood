@@ -1,8 +1,8 @@
 ---
 title: 'Netlify CMS'
-menu: side
-linkheadings: 3
-index: 8
+collection: guides
+tocHeading: 3
+order: 8
 ---
 
 ## Using a CMS

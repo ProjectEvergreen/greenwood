@@ -1,9 +1,9 @@
 ---
-label: 'layouts-and-pages'
-menu: side
-title: 'Layouts and Pages'
-index: 7
-linkheadings: 3
+collection: docs
+title: Layouts and Pages
+label: Layouts and Pages
+order: 7
+tocHeading: 3
 ---
 
 ## Layouts and Pages

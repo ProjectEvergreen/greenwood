@@ -1,6 +1,6 @@
 import { css, html, LitElement, unsafeCSS } from 'lit';
 import client from '@greenwood/plugin-graphql/src/core/client.js';
-import MenuQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
+import CollectionQuery from '@greenwood/plugin-graphql/src/queries/collection.gql';
 import headerCss from './header.css?type=raw';
 import '../social-icons/social-icons.js';
 
@@ -29,14 +29,14 @@ class HeaderComponent extends LitElement {
     super.connectedCallback();
 
     const response = await client.query({
-      query: MenuQuery,
+      query: CollectionQuery,
       variables: {
         name: 'navigation',
-        order: 'index_asc'
+        orderBy: 'order_asc'
       }
     });
 
-    this.navigation = response.data.menu.children.map(item => item.item);
+    this.navigation = response.data.collection;
   }
 
   /* eslint-disable indent */
@@ -61,8 +61,8 @@ class HeaderComponent extends LitElement {
             <nav>
               <ul>
                 ${navigation.map((item) => {
-                  const isCurentPageLink = activeRoute.indexOf(item.route) >= 0;
-                  const activeClassName = isCurentPageLink ? 'active' : '';
+                  const isCurrentPageLink = activeRoute.indexOf(item.route) >= 0;
+                  const activeClassName = isCurrentPageLink ? 'active' : '';
 
                   return html`
                     <li>

@@ -1,9 +1,7 @@
 ---
-label: 'key-concepts'
-menu: side
-title: 'Key Concepts'
-index: 3
-linkheadings: 3
+collection: getting-started
+order: 3
+tocHeading: 3
 ---
 
 ## Overview

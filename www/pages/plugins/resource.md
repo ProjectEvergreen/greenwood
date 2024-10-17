@@ -1,8 +1,6 @@
 ---
-label: 'Resource'
-menu: side
-title: 'Resource'
-index: 4
+collection: plugins
+order: 4
 ---
 
 ## Resource

@@ -1,8 +1,6 @@
 ---
-label: 'plugins'
-menu: navigation
-title: Plugins
-index: 4
+collection: navigation
+order: 4
 ---
 
 ## Plugins

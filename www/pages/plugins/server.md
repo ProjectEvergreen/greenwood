@@ -1,8 +1,6 @@
 ---
-label: 'Server'
-menu: side
-title: 'Server'
-index: 7
+collection: plugins
+order: 7
 ---
 
 ## Server

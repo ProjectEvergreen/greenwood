@@ -1,54 +1,43 @@
 import gql from 'graphql-tag';
 
-const getMenuFromGraph = async (root, { name, pathname, orderBy }, context) => {
+const getCollection = (root, { name, orderBy }, context) => {
   const { graph } = context;
-  const { basePath } = context.config;
   let items = [];
 
   graph
     .forEach((page) => {
-      const { route, data, label } = page;
-      const { menu, index, tableOfContents, linkheadings } = data;
-      let children = getParsedHeadingsFromPage(tableOfContents, linkheadings);
+      const { data, label, title } = page;
+      const { collection, tableOfContents, tocHeading } = data;
+      const toc = getParsedHeadingsFromPage(tableOfContents, tocHeading);
 
-      if (menu && menu.search(name) > -1) {
-        if (pathname) {
-          const normalizedRoute = basePath === ''
-            ? route
-            : route.replace(basePath, '');
-
-          if (normalizedRoute.startsWith(pathname)) {
-            items.push({ item: { route, label, index }, children });
-          }
-        } else {
-          items.push({ item: { route, label, index }, children });
-        }
+      if (collection === name) {
+        items.push({ ...page, title: title || label, tableOfContents: toc });
       }
     });
 
-  if (orderBy !== '') {
-    items = sortMenuItems(items, orderBy);
+  if (orderBy) {
+    items = sortCollection(items, orderBy);
   }
 
-  return Promise.resolve({ item: { label: name }, children: items });
+  return items;
 };
 
-const sortMenuItems = (menuItems, order) => {
+const sortCollection = (collection, orderBy) => {
   const compare = (a, b) => {
-    if (order === 'title_asc' || order === 'title_desc') {
-      a = a.item.label, b = b.item.label;
+    if (orderBy === 'title_asc' || orderBy === 'title_desc') {
+      a = a?.title, b = b?.title;
     }
-    if (order === 'index_asc' || order === 'index_desc') {
-      a = a.item.index, b = b.item.index;
+    if (orderBy === 'order_asc' || orderBy === 'order_desc') {
+      a = a?.data.order, b = b?.data?.order;
     }
-    if (order === 'title_asc' || order === 'index_asc') {
+    if (orderBy === 'title_asc' || orderBy === 'order_asc') {
       if (a < b) {
         return -1;
       }
       if (a > b) {
         return 1;
       }
-    } else if (order === 'title_desc' || order === 'index_desc') {
+    } else if (orderBy === 'title_desc' || orderBy === 'order_desc') {
       if (a > b) {
         return -1;
       }
@@ -59,8 +48,7 @@ const sortMenuItems = (menuItems, order) => {
     return 0;
   };
 
-  menuItems.sort(compare);
-  return menuItems;
+  return collection.sort(compare);
 };
 
 const getParsedHeadingsFromPage = (tableOfContents = [], headingLevel) => {
@@ -70,10 +58,11 @@ const getParsedHeadingsFromPage = (tableOfContents = [], headingLevel) => {
     tableOfContents.forEach(({ content, slug, lvl }) => {
       // make sure we only add heading elements of the same level (h1, h2, h3)
       if (lvl === headingLevel) {
-        children.push({ item: { label: content, route: '#' + slug }, children: [] });
+        children.push({ label: content, route: '#' + slug });
       }
     });
   }
+
   return children;
 };
 
@@ -85,17 +74,14 @@ const getChildrenFromParentRoute = async (root, query, context) => {
   const pages = [];
   const { parent } = query;
   const { graph } = context;
-  const { basePath } = context.config;
+  // TODO handle base path
+  // const { basePath } = context.config;
 
   graph
     .forEach((page) => {
-      const { route, path } = page;
-      const normalizedRoute = basePath === ''
-        ? route
-        : route.replace(basePath, '/');
-      const root = normalizedRoute.split('/')[1];
+      const { route } = page;
 
-      if (`/${root}` === parent && path.indexOf(`${parent}/index.md`) < 0) {
+      if (`${parent}/` !== route && route.startsWith(parent)) {
         pages.push(page);
       }
     });
@@ -104,46 +90,39 @@ const getChildrenFromParentRoute = async (root, query, context) => {
 };
 
 const graphTypeDefs = gql`
+  type TocItem {
+    label: String,
+    route: String,
+  }
+
   type Page {
-    data: Data,
-    filename: String,
     id: String,
     label: String,
-    path: String,
-    outputPath: String,
+    title: String,
     route: String,
     layout: String,
-    title: String
+    data: Data,
+    tableOfContents: [TocItem]
   }
 
-  type Link {
-    label: String,
-    route: String
-  }
-
-  type Menu {
-    item: Link
-    children: [Menu]
-  }
-
-  enum MenuOrderBy {
+  enum CollectionOrderBy {
     title_asc,
     title_desc
-    index_asc,
-    index_desc
+    order_asc,
+    order_desc
   }
 
   type Query {
     graph: [Page]
-    menu(name: String, orderBy: MenuOrderBy, pathname: String): Menu
-    children(parent: String): [Page]
+    collection(name: String!, orderBy: CollectionOrderBy): [Page]
+    children(parent: String!): [Page]
   }
 `;
 
 const graphResolvers = {
   Query: {
     graph: getPagesFromGraph,
-    menu: getMenuFromGraph,
+    collection: getCollection,
     children: getChildrenFromParentRoute
   }
 };

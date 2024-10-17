@@ -83,9 +83,8 @@ describe('Develop Greenwood With: ', function() {
         expect(importMap['@greenwood/plugin-graphql/src/core/client.js']).to.equal('/node_modules/@greenwood/plugin-graphql/src/core/client.js');
         expect(importMap['@greenwood/plugin-graphql/src/core/common.js']).to.equal('/node_modules/@greenwood/plugin-graphql/src/core/common.js');
         expect(importMap['@greenwood/plugin-graphql/src/queries/children.gql']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/children.gql');
-        expect(importMap['@greenwood/plugin-graphql/src/queries/config.gql']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/config.gql');
         expect(importMap['@greenwood/plugin-graphql/src/queries/graph.gql']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql');
-        expect(importMap['@greenwood/plugin-graphql/src/queries/menu.gql']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/menu.gql');
+        expect(importMap['@greenwood/plugin-graphql/src/queries/collection.gql']).to.equal('/node_modules/@greenwood/plugin-graphql/src/queries/collection.gql');
 
         done();
       });

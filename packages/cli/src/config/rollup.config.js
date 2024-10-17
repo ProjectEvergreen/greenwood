@@ -167,7 +167,7 @@ function greenwoodSyncSsrEntryPointsOutputPaths(compilation) {
     name: 'greenwood-sync-ssr-pages-entry-point-output-paths',
     generateBundle(options, bundle) {
       const { basePath } = compilation.config;
-      const { scratchDir } = compilation.context;
+      const { scratchDir, outputDir } = compilation.context;
 
       // map rollup bundle names back to original SSR pages for syncing input <> output bundle names
       Object.keys(bundle).forEach((key) => {
@@ -178,7 +178,7 @@ function greenwoodSyncSsrEntryPointsOutputPaths(compilation) {
 
           compilation.graph.forEach((page, idx) => {
             if (page.route === route) {
-              compilation.graph[idx].outputPath = key;
+              compilation.graph[idx].outputHref = new URL(`./${key}`, outputDir).href;
             }
           });
         }
@@ -192,7 +192,7 @@ function greenwoodSyncApiRoutesOutputPath(compilation) {
     name: 'greenwood-sync-api-routes-output-paths',
     generateBundle(options, bundle) {
       const { basePath } = compilation.config;
-      const { apisDir } = compilation.context;
+      const { apisDir, outputDir } = compilation.context;
 
       // map rollup bundle names back to original SSR pages for syncing input <> output bundle names
       Object.keys(bundle).forEach((key) => {
@@ -206,7 +206,7 @@ function greenwoodSyncApiRoutesOutputPath(compilation) {
 
             compilation.manifest.apis.set(route, {
               ...api,
-              outputPath: `/api/${key}`
+              outputHref: new URL(`./api/${key}`, outputDir).href
             });
           }
         }
@@ -353,8 +353,9 @@ function greenwoodImportMetaUrl(compilation) {
         if (`${compilation.context.apisDir.pathname}${idAssetName}`.indexOf(normalizedId) >= 0) {
           for (const entry of compilation.manifest.apis.keys()) {
             const apiRoute = compilation.manifest.apis.get(entry);
+            const pagePath = apiRoute.pageHref.replace(`${compilation.context.pagesDir}api/`, '');
 
-            if (normalizedId.endsWith(apiRoute.path)) {
+            if (normalizedId.endsWith(pagePath)) {
               const assets = apiRoute.assets || [];
 
               assets.push(assetUrl.url.href);
@@ -643,21 +644,21 @@ const getRollupConfigForBrowserScripts = async (compilation) => {
 };
 
 const getRollupConfigForApiRoutes = async (compilation) => {
-  const { outputDir, pagesDir, apisDir } = compilation.context;
+  const { outputDir } = compilation.context;
 
   return [...compilation.manifest.apis.values()]
-    .map(api => normalizePathnameForWindows(new URL(`.${api.path}`, pagesDir)))
-    .map((filepath) => {
-      // account for windows pathname shenanigans by "casting" filepath to a URL first
-      const ext = filepath.split('.').pop();
-      const entryName = new URL(`file://${filepath}`).pathname.replace(apisDir.pathname, '').replace(/\//g, '-').replace(`.${ext}`, '');
+    .map((api) => {
+      const { id, pageHref } = api;
 
+      return { id, inputPath: normalizePathnameForWindows(new URL(pageHref)) };
+    })
+    .map(({ id, inputPath }) => {
       return {
-        input: filepath,
+        input: inputPath,
         output: {
           dir: `${normalizePathnameForWindows(outputDir)}/api`,
-          entryFileNames: `${entryName}.js`,
-          chunkFileNames: `${entryName}.[hash].js`
+          entryFileNames: `${id}.js`,
+          chunkFileNames: `${id}.[hash].js`
         },
         plugins: [
           greenwoodResourceLoader(compilation),
@@ -696,20 +697,16 @@ const getRollupConfigForApiRoutes = async (compilation) => {
     });
 };
 
-const getRollupConfigForSsrPages = async (compilation, input) => {
+const getRollupConfigForSsrPages = async (compilation, inputs) => {
   const { outputDir } = compilation.context;
 
-  return input.map((filepath) => {
-    const ext = filepath.split('.').pop();
-    // account for windows pathname shenanigans by "casting" filepath to a URL first
-    const entryName = new URL(`file://${filepath}`).pathname.replace(compilation.context.scratchDir.pathname, '').replace('/', '-').replace(`.${ext}`, '');
-
+  return inputs.map(({ id, inputPath }) => {
     return {
-      input: filepath,
+      input: inputPath,
       output: {
         dir: normalizePathnameForWindows(outputDir),
-        entryFileNames: `${entryName}.route.js`,
-        chunkFileNames: `${entryName}.route.chunk.[hash].js`
+        entryFileNames: `${id}.route.js`,
+        chunkFileNames: `${id}.route.chunk.[hash].js`
       },
       plugins: [
         greenwoodResourceLoader(compilation),

@@ -1,5 +1,4 @@
 ---
-label: 'blog'
 title: State of Greenwood (2023)
 layout: blog
 ---

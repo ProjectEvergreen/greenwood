@@ -11,3 +11,18 @@
 [[redirects]]
   from = "/docs/tech-stack/"
   to = "/about/tech-stack/"
+
+[[redirects]]
+  from = "/docs/menus/:splat"
+  to = "/docs/data/"
+  status = 200
+
+[[redirects]]
+  from = "/docs/data/#external-sources"
+  to = "/docs/data/#pages-data"
+  status = 200
+
+[[redirects]]
+  from = "/docs/data/#internal-sources"
+  to = "/docs/data/#pages-data"
+  status = 200

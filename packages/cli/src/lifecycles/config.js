@@ -46,7 +46,8 @@ const defaultConfig = {
   port: 8080,
   basePath: '',
   optimization: optimizations[0],
-  interpolateFrontmatter: false,
+  activeFrontmatter: false,
+  contentAsData: false,
   plugins: greenwoodPlugins,
   markdown: { plugins: [], settings: {} },
   prerender: false,
@@ -82,7 +83,7 @@ const readAndMergeConfig = async() => {
       if (hasConfigFile) {
         const userCfgFile = (await import(configUrl)).default;
         // eslint-disable-next-line max-len
-        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, layoutsDirectory, interpolateFrontmatter, isolation, polyfills } = userCfgFile;
+        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, layoutsDirectory, activeFrontmatter, contentAsData, isolation, polyfills } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -103,11 +104,18 @@ const readAndMergeConfig = async() => {
           reject(`Error: provided optimization "${optimization}" is not supported.  Please use one of: ${optimizations.join(', ')}.`);
         }
 
-        if (interpolateFrontmatter) {
-          if (typeof interpolateFrontmatter !== 'boolean') {
-            reject('Error: greenwood.config.js interpolateFrontmatter must be a boolean');
+        if (activeFrontmatter) {
+          if (typeof activeFrontmatter !== 'boolean') {
+            reject('Error: greenwood.config.js activeFrontmatter must be a boolean');
           }
-          customConfig.interpolateFrontmatter = interpolateFrontmatter;
+          customConfig.activeFrontmatter = activeFrontmatter;
+        }
+
+        if (contentAsData) {
+          if (typeof contentAsData !== 'boolean') {
+            reject('Error: greenwood.config.js contentAsData must be a boolean');
+          }
+          customConfig.contentAsData = contentAsData;
         }
 
         if (plugins && plugins.length > 0) {

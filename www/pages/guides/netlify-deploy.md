@@ -1,8 +1,8 @@
 ---
 title: 'Deploy on Netlify'
-menu: side
-linkheadings: 3
-index: 1
+collection: guides
+tocHeading: 3
+order: 1
 ---
 
 ## Deploying your site on Netlify

@@ -1,8 +1,6 @@
 ---
-label: 'Renderer'
-menu: side
-title: 'Renderer'
-index: 5
+collection: plugins
+order: 5
 ---
 
 ## Renderer

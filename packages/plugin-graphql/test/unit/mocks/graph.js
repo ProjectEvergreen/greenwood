@@ -3,18 +3,18 @@ const MOCK_GRAPH = {
   graph: [
     {
       data: {
-        menu: "",
-        index: "",
-        linkheadings: 0,
+        collection: "",
+        order: "",
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./index.md",
-      id: "index",
-      label: "Index",
+      workspacePath: "./order.md",
+      id: "order",
+      label: "order",
       route: "/",
       layout: "home",
       path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/index.md",
+        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/order.md",
       title: "",
       meta: [
         {
@@ -64,12 +64,12 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 3,
-        linkheadings: 0,
+        collection: "side",
+        order: 3,
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./about/community.md",
+      workspacePath: "./about/community.md",
       id: "community",
       label: "Community",
       route: "/about/community",
@@ -125,12 +125,12 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 2,
-        linkheadings: 0,
+        collection: "side",
+        order: 2,
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./about/features.md",
+      workspacePath: "./about/features.md",
       id: "features",
       label: "Features",
       route: "/about/features",
@@ -186,12 +186,12 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: "",
-        linkheadings: 0,
+        collection: "side",
+        order: "",
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./about/goals.md",
+      workspacePath: "./about/goals.md",
       id: "Goals",
       label: "Goals",
       route: "/about/goals",
@@ -247,9 +247,9 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 1,
-        linkheadings: 3,
+        collection: "side",
+        order: 1,
+        tocHeading: 3,
         tableOfContents: [
           {
             content: "CLI",
@@ -281,7 +281,7 @@ const MOCK_GRAPH = {
           },
         ],
       },
-      filename: "./about/how-it-works.md",
+      workspacePath: "./about/how-it-works.md",
       id: "how-it-works",
       label: "How It Works",
       route: "/about/how-it-works",
@@ -337,18 +337,18 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "navigation",
-        index: "",
-        linkheadings: 0,
+        collection: "navigation",
+        order: "",
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./about/index.md",
+      workspacePath: "./about/order.md",
       id: "about",
       label: "About",
       route: "/about/",
       layout: "page",
       path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/index.md",
+        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/order.md",
       title: "About",
       meta: [
         {
@@ -398,12 +398,12 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 1,
-        linkheadings: 0,
+        collection: "side",
+        order: 1,
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./docs/component-model.md",
+      workspacePath: "./docs/component-model.md",
       id: "component-model",
       label: "Component Model",
       route: "/docs/component-model",
@@ -459,9 +459,9 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 2,
-        linkheadings: 3,
+        collection: "side",
+        order: 2,
+        tocHeading: 3,
         tableOfContents: [
           {
             content: "Dev Server",
@@ -535,7 +535,7 @@ const MOCK_GRAPH = {
           },
         ],
       },
-      filename: "./docs/configuration.md",
+      workspacePath: "./docs/configuration.md",
       id: "configuration",
       label: "Configuration",
       route: "/docs/configuration",
@@ -591,9 +591,9 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 5,
-        linkheadings: 3,
+        collection: "side",
+        order: 5,
+        tocHeading: 3,
         tableOfContents: [
           {
             content: "Theming",
@@ -639,7 +639,7 @@ const MOCK_GRAPH = {
           },
         ],
       },
-      filename: "./docs/css-and-images.md",
+      workspacePath: "./docs/css-and-images.md",
       id: "css-and-images",
       label: "CSS and Images",
       route: "/docs/css-and-images",
@@ -695,9 +695,9 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 7,
-        linkheadings: 3,
+        collection: "side",
+        order: 7,
+        tocHeading: 3,
         tableOfContents: [
           {
             content: "Internal Sources",
@@ -749,8 +749,8 @@ const MOCK_GRAPH = {
             seen: 0,
           },
           {
-            content: "Menu Query",
-            slug: "menu-query",
+            content: "collection Query",
+            slug: "collection-query",
             lvl: 5,
             i: 8,
             seen: 0,
@@ -841,14 +841,14 @@ const MOCK_GRAPH = {
           },
         ],
       },
-      filename: "./docs/data.md",
+      workspacePath: "./docs/data.md",
       id: "data-sources",
       label: "Data Sources",
       route: "/docs/data",
       layout: "page",
       path:
         "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/data.md",
-      fileName: "data",
+      workspacePath: "data",
       relativeExpectedPath: "'../docs/data/data.js'",
       title: "Data Sources",
       meta: [
@@ -899,9 +899,9 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 3,
-        linkheadings: 3,
+        collection: "side",
+        order: 3,
+        tocHeading: 3,
         tableOfContents: [
           {
             content: "Element Label",
@@ -975,7 +975,7 @@ const MOCK_GRAPH = {
           },
         ],
       },
-      filename: "./docs/front-matter.md",
+      workspacePath: "./docs/front-matter.md",
       id: "front-matter",
       label: "Front Matter",
       route: "/docs/front-matter",
@@ -1031,18 +1031,18 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "navigation",
-        index: "",
-        linkheadings: 0,
+        collection: "navigation",
+        order: "",
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./docs/index.md",
+      workspacePath: "./docs/order.md",
       id: "docs",
       label: "Docs",
       route: "/docs/",
       layout: "page",
       path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/index.md",
+        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/order.md",
       title: "Docs",
       meta: [
         {
@@ -1092,9 +1092,9 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 6,
-        linkheadings: 3,
+        collection: "side",
+        order: 6,
+        tocHeading: 3,
         tableOfContents: [
           {
             content: "Page Layout",
@@ -1126,7 +1126,7 @@ const MOCK_GRAPH = {
           },
         ],
       },
-      filename: "./docs/layouts.md",
+      workspacePath: "./docs/layouts.md",
       id: "layouts",
       label: "Layouts",
       route: "/docs/layouts",
@@ -1182,9 +1182,9 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 4,
-        linkheadings: 3,
+        collection: "side",
+        order: 4,
+        tocHeading: 3,
         tableOfContents: [
           {
             content: "Syntax Highlighting",
@@ -1209,7 +1209,7 @@ const MOCK_GRAPH = {
           },
         ],
       },
-      filename: "./docs/markdown.md",
+      workspacePath: "./docs/markdown.md",
       id: "markdown",
       label: "Markdown",
       route: "/docs/markdown",
@@ -1265,20 +1265,20 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 5,
-        linkheadings: 3,
+        collection: "side",
+        order: 5,
+        tocHeading: 3,
         tableOfContents: [
           {
-            content: "Declare Menu",
-            slug: "declare-menu",
+            content: "Declare collection",
+            slug: "declare-collection",
             lvl: 3,
             i: 1,
             seen: 0,
           },
           {
-            content: "Retrieve Menu",
-            slug: "retrieve-menu",
+            content: "Retrieve collection",
+            slug: "retrieve-collection",
             lvl: 3,
             i: 2,
             seen: 0,
@@ -1299,14 +1299,14 @@ const MOCK_GRAPH = {
           },
         ],
       },
-      filename: "./docs/menus.md",
-      id: "menus",
-      label: "Menus",
-      route: "/docs/menus",
+      workspacePath: "./docs/collections.md",
+      id: "collections",
+      label: "collections",
+      route: "/docs/collections",
       layout: "page",
       path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/menus.md",
-      title: "Menus",
+        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/collections.md",
+      title: "collections",
       meta: [
         {
           name: "description",
@@ -1355,9 +1355,9 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 8,
-        linkheadings: 3,
+        collection: "side",
+        order: 8,
+        tocHeading: 3,
         tableOfContents: [
           {
             content: "NodeJS",
@@ -1389,7 +1389,7 @@ const MOCK_GRAPH = {
           },
         ],
       },
-      filename: "./docs/tech-stack.md",
+      workspacePath: "./docs/tech-stack.md",
       id: "tech-stack",
       label: "Tech Stack",
       route: "/docs/tech-stack",
@@ -1445,9 +1445,9 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 5,
-        linkheadings: 3,
+        collection: "side",
+        order: 5,
+        tocHeading: 3,
         tableOfContents: [
           {
             content: "Web Components",
@@ -1465,7 +1465,7 @@ const MOCK_GRAPH = {
           },
         ],
       },
-      filename: "./getting-started/branding.md",
+      workspacePath: "./getting-started/branding.md",
       id: "branding",
       label: "Branding",
       route: "/getting-started/branding",
@@ -1521,12 +1521,12 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 6,
-        linkheadings: 0,
+        collection: "side",
+        order: 6,
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./getting-started/build-and-deploy.md",
+      workspacePath: "./getting-started/build-and-deploy.md",
       id: "build-and-deploy",
       label: "Build And Deploy",
       route: "/getting-started/build-and-deploy",
@@ -1582,9 +1582,9 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 4,
-        linkheadings: 3,
+        collection: "side",
+        order: 4,
+        tocHeading: 3,
         tableOfContents: [
           {
             content: "Objectives",
@@ -1623,7 +1623,7 @@ const MOCK_GRAPH = {
           },
         ],
       },
-      filename: "./getting-started/creating-content.md",
+      workspacePath: "./getting-started/creating-content.md",
       id: "creating-content",
       label: "Creating Content",
       route: "/getting-started/creating-content",
@@ -1679,18 +1679,18 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "navigation",
-        index: "",
-        linkheadings: 0,
+        collection: "navigation",
+        order: "",
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./getting-started/index.md",
+      workspacePath: "./getting-started/order.md",
       id: "getting-started",
       label: "Getting Started",
       route: "/getting-started/",
       layout: "page",
       path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/index.md",
+        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/order.md",
       title: "Getting Started",
       meta: [
         {
@@ -1740,9 +1740,9 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 2,
-        linkheadings: 3,
+        collection: "side",
+        order: 2,
+        tocHeading: 3,
         tableOfContents: [
           {
             content: "Workspace",
@@ -1767,7 +1767,7 @@ const MOCK_GRAPH = {
           },
         ],
       },
-      filename: "./getting-started/key-concepts.md",
+      workspacePath: "./getting-started/key-concepts.md",
       id: "key-concepts",
       label: "Key Concepts",
       route: "/getting-started/key-concepts",
@@ -1823,12 +1823,12 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 7,
-        linkheadings: 0,
+        collection: "side",
+        order: 7,
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./getting-started/next-steps.md",
+      workspacePath: "./getting-started/next-steps.md",
       id: "next-steps",
       label: "Next Steps",
       route: "/getting-started/next-steps",
@@ -1884,9 +1884,9 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 2,
-        linkheadings: 3,
+        collection: "side",
+        order: 2,
+        tocHeading: 3,
         tableOfContents: [
           {
             content: "Installing Greenwood",
@@ -1911,7 +1911,7 @@ const MOCK_GRAPH = {
           },
         ],
       },
-      filename: "./getting-started/project-setup.md",
+      workspacePath: "./getting-started/project-setup.md",
       id: "project-setup",
       label: "Project Setup",
       route: "/getting-started/project-setup",
@@ -1967,12 +1967,12 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 1,
-        linkheadings: 0,
+        collection: "side",
+        order: 1,
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./getting-started/quick-start.md",
+      workspacePath: "./getting-started/quick-start.md",
       id: "quick-start",
       label: "Quick Start",
       route: "/getting-started/quick-start",
@@ -2028,12 +2028,12 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 1,
-        linkheadings: 0,
+        collection: "side",
+        order: 1,
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./plugins/composite-plugins.md",
+      workspacePath: "./plugins/composite-plugins.md",
       id: "composite-plugins",
       label: "Composite Plugins",
       route: "/plugins/composite-plugins",
@@ -2089,19 +2089,19 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 2,
-        linkheadings: 0,
+        collection: "side",
+        order: 2,
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./plugins/index-hooks.md",
-      id: "index-hooks",
-      label: "Index Hooks",
-      route: "/plugins/index-hooks",
+      workspacePath: "./plugins/order-hooks.md",
+      id: "order-hooks",
+      label: "order Hooks",
+      route: "/plugins/order-hooks",
       layout: "page",
       path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/index-hooks.md",
-      title: "Index Hooks",
+        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/order-hooks.md",
+      title: "order Hooks",
       meta: [
         {
           name: "description",
@@ -2150,18 +2150,18 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "navigation",
-        index: "",
-        linkheadings: 0,
+        collection: "navigation",
+        order: "",
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./plugins/index.md",
+      workspacePath: "./plugins/order.md",
       id: "plugins",
       label: "Plugins",
       route: "/plugins/",
       layout: "page",
       path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/index.md",
+        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/order.md",
       title: "Plugins",
       meta: [
         {
@@ -2211,12 +2211,12 @@ const MOCK_GRAPH = {
     },
     {
       data: {
-        menu: "side",
-        index: 3,
-        linkheadings: 0,
+        collection: "side",
+        order: 3,
+        tocHeading: 0,
         tableOfContents: [],
       },
-      filename: "./plugins/webpack.md",
+      workspacePath: "./plugins/webpack.md",
       id: "webpack",
       label: "Webpack",
       route: "/plugins/webpack",

@@ -1,8 +1,6 @@
 ---
-label: 'getting-started'
-menu: navigation
-title: 'Getting Started'
-index: 3
+collection: navigation
+order: 3
 ---
 
 ## Introduction

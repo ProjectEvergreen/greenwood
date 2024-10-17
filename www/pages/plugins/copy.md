@@ -1,8 +1,6 @@
 ---
-label: 'copy'
-menu: side
-title: 'Copy'
-index: 3
+collection: plugins
+order: 3
 ---
 
 ## Copy

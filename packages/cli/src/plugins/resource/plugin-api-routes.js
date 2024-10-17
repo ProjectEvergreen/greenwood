@@ -20,7 +20,7 @@ class ApiRoutesResource extends ResourceInterface {
 
   async serve(url, request) {
     const api = this.compilation.manifest.apis.get(url.pathname);
-    const apiUrl = new URL(`.${api.path}`, this.compilation.context.pagesDir);
+    const apiUrl = new URL(api.pageHref);
     const href = apiUrl.href;
 
     if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle

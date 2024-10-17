@@ -1,8 +1,6 @@
 ---
-label: 'goals'
-menu: side
-title: 'Goals'
-index: 0
+collection: about
+order: 0
 ---
 
 ## Goals

@@ -1,6 +1,7 @@
 import { bundleCompilation } from '../lifecycles/bundle.js';
 import { checkResourceExists } from '../lib/resource-utils.js';
 import { copyAssets } from '../lifecycles/copy.js';
+import { getDevServer } from '../lifecycles/serve.js';
 import fs from 'fs/promises';
 import { preRenderCompilationWorker, preRenderCompilationCustom, staticRenderCompilation } from '../lifecycles/prerender.js';
 import { ServerInterface } from '../lib/server-interface.js';
@@ -10,7 +11,7 @@ const runProductionBuild = async (compilation) => {
   return new Promise(async (resolve, reject) => {
 
     try {
-      const { prerender } = compilation.config;
+      const { prerender, contentAsData, plugins } = compilation.config;
       const outputDir = compilation.context.outputDir;
       const prerenderPlugin = compilation.config.plugins.find(plugin => plugin.type === 'renderer')
         ? compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider(compilation)
@@ -18,6 +19,7 @@ const runProductionBuild = async (compilation) => {
       const adapterPlugin = compilation.config.plugins.find(plugin => plugin.type === 'adapter')
         ? compilation.config.plugins.find(plugin => plugin.type === 'adapter').provider(compilation)
         : null;
+      const shouldPrerender = prerender || prerenderPlugin.prerender;
 
       if (!await checkResourceExists(outputDir)) {
         await fs.mkdir(outputDir, {
@@ -25,10 +27,10 @@ const runProductionBuild = async (compilation) => {
         });
       }
 
-      if (prerender || prerenderPlugin.prerender) {
-        // start any servers if needed
+      if (shouldPrerender || (contentAsData && shouldPrerender)) {
+        // start any of the user's server plugins if needed
         const servers = [...compilation.config.plugins.filter((plugin) => {
-          return plugin.type === 'server';
+          return plugin.type === 'server' && !plugin.isGreenwoodDefaultPlugin;
         }).map((plugin) => {
           const provider = plugin.provider(compilation);
 
@@ -38,6 +40,16 @@ const runProductionBuild = async (compilation) => {
 
           return provider;
         })];
+
+        if (contentAsData) {
+          // prune for the content as data plugin and start the dev server with only that plugin enabled
+          (await getDevServer({
+            ...compilation,
+            plugins: [plugins.find(plugin => plugin.name === 'plugin-content-as-data')]
+          })).listen(1984, () => {
+            console.info('initializing content as data...');
+          });
+        }
 
         await Promise.all(servers.map(async (server) => {
           await server.start();

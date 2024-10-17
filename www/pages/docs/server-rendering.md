@@ -1,9 +1,7 @@
 ---
-label: 'server-rendering'
-menu: side
-title: 'Server Rendering'
-index: 8
-linkheadings: 3
+collection: docs
+order: 8
+tocHeading: 3
 ---
 
 ## Server Rendering (Beta)
@@ -29,7 +27,7 @@ The above would serve content in a browser at `/users/`.
 
 In your page _.js_ file, Greenwood supports the following functions you can `export` for providing server rendered configuration and content:
 - `default`: Use a custom element to render your page content.  Will take precedence over `getBody`.  Will also automatically track your custom element dependencies, in place of having to define [frontmatter imports](/docs/front-matter/#imports) in `getFrontmatter`.
-- `getFrontmatter`: Static [frontmatter](/docs/front-matter/), useful in conjunction with [menus](/docs/menus/) or otherwise static configuration / meta data.
+- `getFrontmatter`: Static [frontmatter](/docs/front-matter/), useful in conjunction with [content as data](/docs/data/) or otherwise static configuration / metadata.
 - `getBody`: Effectively anything that you could put into a [`<content-outlet></content-outlet>`](/docs/layouts/#page-layouts).
 - `getLayout`: Effectively the same as a [page layout](/docs/layouts/#page-layouts).
 
@@ -93,16 +91,14 @@ A couple of notes:
 
 #### Frontmatter
 
-Any Greenwood supported frontmatter can be returned here.  _This is only run once when the server is started_ to populate the graph, which is helpful if you want your dynamic route to show up in a menu like in your header for navigation.
-
-You can even define a `layout` and reuse all your existing [layouts](/docs/layouts/), even for server routes!
+Any Greenwood supported frontmatter can be returned here.  _This is only run once when the server is started_ to populate the graph, which is helpful if you want your dynamic route to show up in the metadata for your pages. You can even define a `layout` and reuse all your existing [layouts](/docs/layouts/), even for server routes!
 
 ```js
 export async function getFrontmatter(compilation, route) {
   return {
     layout: 'user',
-    menu: 'header',
-    index: 1,
+    collection: 'header',
+    order: 1,
     title: `${compilation.config.title} - ${route}`,
     imports: [
       '/components/user.js'

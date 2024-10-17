@@ -5,7 +5,6 @@
  * This is a Greenwood default plugin.
  *
  */
-import frontmatter from 'front-matter';
 import fs from 'fs/promises';
 import rehypeStringify from 'rehype-stringify';
 import rehypeRaw from 'rehype-raw';
@@ -37,18 +36,15 @@ class StandardHtmlResource extends ResourceInterface {
 
   async serve(url, request) {
     const { config, context } = this.compilation;
-    const { pagesDir, userWorkspace } = context;
-    const { interpolateFrontmatter } = config;
+    const { userWorkspace } = context;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find(node => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
-    const filePath = !matchingRoute.external ? matchingRoute.path : '';
-    const isMarkdownContent = (matchingRoute?.filename || '').split('.').pop() === 'md';
-
+    const { pageHref } = matchingRoute;
+    const filePath = !matchingRoute.external && pageHref ? new URL(pageHref).pathname.replace(userWorkspace.pathname, './') : '';
+    const isMarkdownContent = (filePath || '').split('.').pop() === 'md';
     let body = '';
-    let title = matchingRoute.title || null;
     let layout = matchingRoute.layout || null;
-    let frontMatter = matchingRoute.data || {};
     let customImports = matchingRoute.imports || [];
     let ssrBody;
     let ssrLayout;
@@ -59,7 +55,7 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     if (isMarkdownContent) {
-      const markdownContents = await fs.readFile(filePath, 'utf-8');
+      const markdownContents = await fs.readFile(new URL(pageHref), 'utf-8');
       const rehypePlugins = [];
       const remarkPlugins = [];
 
@@ -74,7 +70,6 @@ class StandardHtmlResource extends ResourceInterface {
       }
 
       const settings = config.markdown.settings || {};
-      const fm = frontmatter(markdownContents);
 
       processedMarkdown = await unified()
         .use(remarkParse, settings) // parse markdown into AST
@@ -85,27 +80,10 @@ class StandardHtmlResource extends ResourceInterface {
         .use(rehypePlugins) // apply userland rehype plugins
         .use(rehypeStringify) // convert AST to HTML string
         .process(markdownContents);
-
-      // configure via frontmatter
-      if (fm.attributes) {
-        frontMatter = fm.attributes;
-
-        if (frontMatter.title) {
-          title = frontMatter.title;
-        }
-
-        if (frontMatter.layout) {
-          layout = frontMatter.layout;
-        }
-
-        if (frontMatter.imports) {
-          customImports = frontMatter.imports;
-        }
-      }
     }
 
     if (matchingRoute.isSSR) {
-      const routeModuleLocationUrl = new URL(`.${matchingRoute.relativeWorkspacePagePath}`, pagesDir);
+      const routeModuleLocationUrl = new URL(pageHref);
       const routeWorkerUrl = this.compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeModuleUrl;
 
       await new Promise(async (resolve, reject) => {
@@ -139,12 +117,12 @@ class StandardHtmlResource extends ResourceInterface {
     }
 
     if (isSpaRoute) {
-      body = await fs.readFile(new URL(`./${isSpaRoute.filename}`, userWorkspace), 'utf-8');
+      body = await fs.readFile(new URL(isSpaRoute.pageHref), 'utf-8');
     } else {
-      body = ssrLayout ? ssrLayout : await getPageLayout(filePath, this.compilation, layout);
+      body = ssrLayout ? ssrLayout : await getPageLayout(pageHref, this.compilation, layout);
     }
 
-    body = await getAppLayout(body, this.compilation, customImports, title);
+    body = await getAppLayout(body, this.compilation, customImports, matchingRoute);
     body = await getUserScripts(body, this.compilation);
 
     if (processedMarkdown) {
@@ -171,15 +149,7 @@ class StandardHtmlResource extends ResourceInterface {
       body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, '$$$')}<!-- greenwood-ssr-end -->`);
     }
 
-    if (interpolateFrontmatter) {
-      for (const fm in frontMatter) {
-        const interpolatedFrontmatter = '\\$\\{globalThis.page.' + fm + '\\}';
-
-        body = body.replace(new RegExp(interpolatedFrontmatter, 'g'), frontMatter[fm]);
-      }
-    }
-
-    // clean up placeholder content-outlet
+    // clean up any empty placeholder content-outlet
     if (body.indexOf('<content-outlet></content-outlet>') > 0) {
       body = body.replace('<content-outlet></content-outlet>', '');
     }
@@ -198,7 +168,7 @@ class StandardHtmlResource extends ResourceInterface {
   async optimize(url, response) {
     const { optimization, basePath } = this.compilation.config;
     const { pathname } = url;
-    const pageResources = this.compilation.graph.find(page => page.outputPath === pathname || page.route === pathname).resources;
+    const pageResources = this.compilation.graph.find(page => page.route === pathname).resources;
     let body = await response.text();
 
     const root = htmlparser.parse(body, {

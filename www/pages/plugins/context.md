@@ -1,8 +1,6 @@
 ---
-label: 'context'
-menu: side
-title: 'Context'
-index: 2
+collection: plugins
+order: 2
 ---
 
 ## Context

@@ -1,6 +1,6 @@
 import { css, html, LitElement, unsafeCSS } from 'lit';
 import client from '@greenwood/plugin-graphql/src/core/client.js';
-import MenuQuery from '@greenwood/plugin-graphql/src/queries/menu.gql';
+import CollectionQuery from '@greenwood/plugin-graphql/src/queries/collection.gql';
 import shelfCss from './shelf.css?type=raw';
 import chevronRt from '../icons/chevron-right.js';
 import chevronDwn from '../icons/chevron-down.js';
@@ -83,11 +83,10 @@ class Shelf extends LitElement {
 
   async fetchShelfData() {
     return await client.query({
-      query: MenuQuery,
+      query: CollectionQuery,
       variables: {
-        name: 'side',
-        route: `/${this.page}/`,
-        order: 'index_asc'
+        name: this.page,
+        orderBy: 'order_asc'
       }
     });
   }
@@ -96,12 +95,7 @@ class Shelf extends LitElement {
     if (changedProperties.has('page') && this.page !== '' && this.page !== '/') {
       const response = await this.fetchShelfData();
 
-      this.shelfList = response.data.menu.children.map((item) => {
-        return {
-          ...item.item,
-          children: item.children
-        };
-      });
+      this.shelfList = response.data.collection;
       this.expandRoute(window.location.pathname);
       this.requestUpdate();
     }
@@ -118,7 +112,7 @@ class Shelf extends LitElement {
             ${children.map((child) => {
               return html`
                 <li class="${selected ? '' : 'hidden'}">
-                  <a href="${mainRoute}${child.item.route}">${child.item.label}</a>
+                  <a href="${mainRoute}${child.route}">${child.label}</a>
                 </li>
               `;
             })}
@@ -132,7 +126,7 @@ class Shelf extends LitElement {
     /* eslint-enable */
     return this.shelfList.map((item, index) => {
       let id = `index_${index}`;
-      let chevron = item.children && item.children.length > 0
+      let chevron = item.tableOfContents && item.tableOfContents.length > 0
         ? item.selected === true ? chevronDwn : chevronRt
         : '';
 
@@ -143,7 +137,7 @@ class Shelf extends LitElement {
             <a id="${id}" @click="${this.handleShelfClick}"><span class="pointer">${chevron}</span></a>
           </div>
 
-          ${renderListItems(item.route, item.children, item.selected)}
+          ${renderListItems(item.route, item.tableOfContents, item.selected)}
         </li>
       `;
     });

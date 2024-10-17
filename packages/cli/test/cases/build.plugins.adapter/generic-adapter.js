@@ -4,7 +4,7 @@ import { checkResourceExists } from '../../../../cli/src/lib/resource-utils.js';
 function generateOutputFormat(id, type) {
   const path = type === 'page'
     ? `/${id}.route`
-    : id;
+    : `/api/${id}`;
   const ref = id.replace(/-/g, '').replace(/\//g, '');
 
   return `
@@ -31,18 +31,17 @@ async function genericAdapter(compilation) {
   }
 
   for (const page of ssrPages) {
-    const { outputPath } = page;
-    const id = outputPath.replace('.route.js', '');
+    const { id } = page;
     const outputFormat = generateOutputFormat(id, 'page');
 
     await fs.writeFile(new URL(`./${id}.js`, adapterOutputUrl), outputFormat);
   }
 
   for (const [key] of apiRoutes) {
-    const { outputPath } = apiRoutes.get(key);
-    const outputFormat = generateOutputFormat(outputPath.replace('.js', ''), 'api');
+    const { id } = apiRoutes.get(key);
+    const outputFormat = generateOutputFormat(id, 'api');
 
-    await fs.writeFile(new URL(`.${outputPath.replace('/api/', '/api-')}`, adapterOutputUrl), outputFormat);
+    await fs.writeFile(new URL(`./api-${id}.js`, adapterOutputUrl), outputFormat);
   }
 }
 

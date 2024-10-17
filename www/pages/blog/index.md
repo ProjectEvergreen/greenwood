@@ -1,8 +1,6 @@
 ---
-label: 'blog'
-menu: navigation
-title: Blog
-index: 6
+collection: navigation
+order: 6
 layout: blog
 ---
 

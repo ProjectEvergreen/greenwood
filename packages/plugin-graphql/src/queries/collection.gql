@@ -1,0 +1,13 @@
+query($name: String!, $orderBy: CollectionOrderBy) {
+  collection(name: $name, orderBy: $orderBy) {
+    id,
+    label,
+    title,
+    route,
+    layout,
+    tableOfContents {
+      label,
+      route
+    }
+  }
+}
