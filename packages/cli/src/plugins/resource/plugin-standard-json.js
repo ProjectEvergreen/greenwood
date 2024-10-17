@@ -17,22 +17,14 @@ class StandardJsonResource extends ResourceInterface {
 
   async shouldServe(url) {
     const { protocol, pathname } = url;
-    const { basePath } = this.compilation.config;
     const isJson = pathname.split('.').pop() === this.extensions[0];
-    const isGraphJson = pathname === `${basePath}/graph.json`;
-    const isWorkspaceFile = protocol === 'file:' && await checkResourceExists(url);
+    const isLocalFile = protocol === 'file:' && await checkResourceExists(url);
 
-    return isJson && (isWorkspaceFile || isGraphJson);
+    return isJson && isLocalFile;
   }
 
   async serve(url) {
-    const { pathname } = url;
-    const { scratchDir } = this.compilation.context;
-    const { basePath } = this.compilation.config;
-    const finalUrl = pathname === `${basePath}/graph.json`
-      ? new URL('./graph.json', scratchDir)
-      : url;
-    const contents = await fs.readFile(finalUrl, 'utf-8');
+    const contents = await fs.readFile(url, 'utf-8');
 
     return new Response(contents, {
       headers: new Headers({

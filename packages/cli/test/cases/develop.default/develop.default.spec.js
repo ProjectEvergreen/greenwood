@@ -1307,31 +1307,6 @@ describe('Develop Greenwood With: ', function() {
         done();
       });
     });
-
-    describe('Fetching graph.json client side', function() {
-      let response;
-      let graph;
-
-      before(async function() {
-        response = await fetch(`${hostname}:${port}/graph.json`);
-        graph = await response.clone().json();
-      });
-
-      it('should return the correct content type', function(done) {
-        expect(response.headers.get('content-type')).to.contain('application/json');
-        done();
-      });
-
-      it('should return a 200', function(done) {
-        expect(response.status).to.equal(200);
-        done();
-      });
-
-      it('should have the expected length for all content', function(done) {
-        expect(graph.length).to.equal(2);
-        done();
-      });
-    });
   });
 
   after(function() {

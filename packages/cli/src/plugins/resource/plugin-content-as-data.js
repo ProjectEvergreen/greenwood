@@ -1,6 +1,22 @@
 import { mergeImportMap } from '../../lib/walker-package-ranger.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
+import { checkResourceExists } from '../../lib/resource-utils.js';
 import { activeGreenwoodFrontmatterKeys, cleanContentCollection } from '../../lib/content-utils.js';
+import fs from 'fs/promises';
+
+function pruneGraph(pages) {
+  return pages.map(page => {
+    const p = {
+      ...page,
+      title: page.title ?? page.label
+    };
+
+    delete p.resources;
+    delete p.imports;
+
+    return p;
+  });
+}
 
 const importMap = {
   '@greenwood/cli/src/data/client.js': '/node_modules/@greenwood/cli/src/data/client.js'
@@ -13,6 +29,51 @@ class ContentAsDataResource extends ResourceInterface {
     this.contentType = ['text/html'];
   }
 
+  async shouldServe(url) {
+    const { contentAsData } = this.compilation.config;
+    const { pathname } = url;
+
+    return contentAsData && pathname === '/___graph.json';
+  }
+
+  async serve(url, request) {
+    const { graph } = this.compilation;
+    const contentKey = request.headers.get('x-content-key') ?? '';
+    const keyPieces = contentKey.split('-');
+    let status;
+    let body = [];
+
+    if (contentKey === '') {
+      status = 403;
+      body = 'Bad Request - No Cache Key found';
+    } else {
+      status = 200;
+
+      if (contentKey === 'graph') {
+        body = graph;
+      } else if (keyPieces[0] === 'collection') {
+        body = graph.filter(page => page?.data?.collection === keyPieces[1]);
+      } else if (keyPieces[0] === 'route') {
+        body = graph.filter(page => page?.route.startsWith(keyPieces[1]));
+      }
+
+      if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
+        const fileKey = `./data-${contentKey.replace(/\//g, '_')}.json`;
+
+        if (!await checkResourceExists(new URL(fileKey, this.compilation.context.outputDir))) {
+          await fs.writeFile(new URL(fileKey, this.compilation.context.outputDir), JSON.stringify(pruneGraph(body)), 'utf-8');
+        }
+      }
+    }
+
+    return new Response(JSON.stringify(pruneGraph(body)), {
+      status,
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      })
+    });
+  }
+
   async shouldIntercept(url, request, response) {
     const { activeFrontmatter, contentAsData } = this.compilation.config;
 
@@ -21,11 +82,11 @@ class ContentAsDataResource extends ResourceInterface {
   }
 
   async intercept(url, request, response) {
-    const { activeFrontmatter, contentAsData, polyfills } = this.compilation.config;
+    const { activeFrontmatter, contentAsData, polyfills, devServer } = this.compilation.config;
     const body = await response.text();
     let newBody = body;
 
-    if (process.env.__GWD_COMMAND__ === 'develop' && contentAsData) { // eslint-disable-line no-underscore-dangle
+    if (contentAsData) {
       newBody = mergeImportMap(body, importMap, polyfills.importMaps);
       newBody = newBody.replace('<head>', `
         <head>
@@ -33,7 +94,7 @@ class ContentAsDataResource extends ResourceInterface {
             globalThis.__CONTENT_SERVER__ = globalThis.__CONTENT_SERVER__
               ? globalThis.__CONTENT_SERVER__
               : {
-                  PORT: "${this.compilation.config.port + 1}"
+                  PORT: ${devServer.port}
                 }
           </script>
       `);
@@ -97,7 +158,7 @@ class ContentAsDataResource extends ResourceInterface {
 
 const greenwoodPluginContentAsData = {
   type: 'resource',
-  name: 'plugin-content-as-data:resource',
+  name: 'plugin-content-as-data',
   provider: (compilation) => new ContentAsDataResource(compilation)
 };
 

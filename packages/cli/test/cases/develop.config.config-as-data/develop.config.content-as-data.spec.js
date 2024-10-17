@@ -10,7 +10,8 @@
  *
  * User Config
  * {
- *   activeFrontmatter: true
+ *   activeFrontmatter: true,
+ *   contentAsData: true
  * }
  *
  * User Workspace
@@ -38,11 +39,11 @@ import { fileURLToPath, URL } from 'url';
 const expect = chai.expect;
 
 describe('Develop Greenwood With: ', function() {
-  const LABEL = 'Content Server and Content as Data';
+  const LABEL = 'Content as Data';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
   const outputPath = fileURLToPath(new URL('.', import.meta.url));
   const hostname = 'http://localhost';
-  const port = 1985;
+  const port = 1984;
   let runner;
 
   before(function() {
@@ -68,35 +69,17 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
-    describe('Content Server', () => {
-      describe('CORS', () => {
-        let response;
-
-        before(async function() {
-          response = await fetch(`${hostname}:${port}/graph.json`, { method: 'OPTIONS' });
-        });
-
-        it('should have the expected CORS headers', () => {
-          expect(response.headers.get('access-control-allow-origin')).to.equal('*');
-          expect(response.headers.get('access-control-allow-headers')).to.equal('*');
-        });
-      });
-
+    describe('Content Request Types', () => {
       describe('Graph Request', () => {
         let response;
 
         before(async function() {
-          response = await fetch(`${hostname}:${port}/graph.json`, {
+          response = await fetch(`${hostname}:${port}/___graph.json`, {
             method: 'GET',
             headers: {
               'x-content-key': 'graph'
             }
           });
-        });
-
-        it('should have the expected CORS headers', () => {
-          expect(response.headers.get('access-control-allow-origin')).to.equal('*');
-          expect(response.headers.get('access-control-allow-headers')).to.equal('*');
         });
 
         it('should have the expected content response data', async () => {
@@ -110,16 +93,11 @@ describe('Develop Greenwood With: ', function() {
         let response;
 
         before(async function() {
-          response = await fetch(`${hostname}:${port}/graph.json`, {
+          response = await fetch(`${hostname}:${port}/___graph.json`, {
             headers: {
               'x-content-key': 'route-/blog'
             }
           });
-        });
-
-        it('should have the expected CORS headers', () => {
-          expect(response.headers.get('access-control-allow-origin')).to.equal('*');
-          expect(response.headers.get('access-control-allow-headers')).to.equal('*');
         });
 
         it('should have the expected content response data', async () => {
@@ -133,16 +111,11 @@ describe('Develop Greenwood With: ', function() {
         let response;
 
         before(async function() {
-          response = await fetch(`${hostname}:${port}/graph.json`, {
+          response = await fetch(`${hostname}:${port}/___graph.json`, {
             headers: {
               'x-content-key': 'collection-nav'
             }
           });
-        });
-
-        it('should have the expected CORS headers', () => {
-          expect(response.headers.get('access-control-allow-origin')).to.equal('*');
-          expect(response.headers.get('access-control-allow-headers')).to.equal('*');
         });
 
         it('should have the expected content response data', async () => {
