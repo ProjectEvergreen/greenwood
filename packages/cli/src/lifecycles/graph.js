@@ -116,7 +116,6 @@ const generateGraph = async (compilation) => {
                 id: getIdFromRelativePathPath(relativePagePath, `.${extension}`).replace('api-', ''),
                 pageHref: new URL(relativePagePath, pagesDir).href,
                 outputHref: new URL(relativePagePath, outputDir).href,
-                // outputPath: relativePagePath,
                 route: `${basePath}${route}`,
                 isolation
               });
@@ -191,8 +190,6 @@ const generateGraph = async (compilation) => {
                     executeModuleUrl: routeWorkerUrl.href,
                     moduleUrl: filenameUrl.href,
                     compilation: JSON.stringify(compilation),
-                    // TODO need to get as many of these params as possible
-                    // or ignore completely?
                     page: JSON.stringify({
                       servePage: isCustom,
                       route,
@@ -274,9 +271,6 @@ const generateGraph = async (compilation) => {
                 outputHref: route === '/404/'
                   ? new URL('./404.html', outputDir).href
                   : new URL(`.${route}index.html`, outputDir).href,
-                // outputPath: route === '/404/'
-                //   ? '/404.html'
-                //   : `${route}index.html`,
                 isSSR: !isStatic,
                 prerender,
                 isolation,
@@ -337,7 +331,6 @@ const generateGraph = async (compilation) => {
             {
               ...oldGraph,
               id: '404',
-              // outputPath: '/404.html',
               outputHref: new URL('./404.html', outputDir).href,
               pageHref: new URL('./404.html', pagesDir).href,
               route: `${basePath}/404/`,

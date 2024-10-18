@@ -1,22 +1,8 @@
 import { mergeImportMap } from '../../lib/walker-package-ranger.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { checkResourceExists } from '../../lib/resource-utils.js';
-import { activeFrontmatterKeys, cleanContentCollection } from '../../lib/content-utils.js';
+import { activeFrontmatterKeys, cleanContentCollection, pruneGraph } from '../../lib/content-utils.js';
 import fs from 'fs/promises';
-
-function pruneGraph(pages) {
-  return pages.map(page => {
-    const p = {
-      ...page,
-      title: page.title ?? page.label
-    };
-
-    delete p.resources;
-    delete p.imports;
-
-    return p;
-  });
-}
 
 const importMap = {
   '@greenwood/cli/src/data/client.js': '/node_modules/@greenwood/cli/src/data/client.js'

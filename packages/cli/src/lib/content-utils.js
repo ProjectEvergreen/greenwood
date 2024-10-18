@@ -1,5 +1,19 @@
 const activeFrontmatterKeys = ['route', 'label', 'title', 'id'];
 
+function pruneGraph(pages) {
+  return pages.map(page => {
+    const p = {
+      ...page,
+      title: page.title ?? page.label
+    };
+
+    delete p.resources;
+    delete p.imports;
+
+    return p;
+  });
+}
+
 function cleanContentCollection(collection = []) {
   return collection.map((page) => {
     let prunedPage = {};
@@ -18,6 +32,7 @@ function cleanContentCollection(collection = []) {
 }
 
 export {
+  pruneGraph,
   activeFrontmatterKeys,
   cleanContentCollection
 };
