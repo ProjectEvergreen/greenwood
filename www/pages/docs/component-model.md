@@ -1,8 +1,6 @@
 ---
-label: 'component-model'
-menu: side
-title: 'Component Model'
-index: 1
+collection: docs
+order: 1
 ---
 
 ## Component Model

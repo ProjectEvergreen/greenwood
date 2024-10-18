@@ -1,8 +1,8 @@
 ---
 title: 'Deploy on Now'
-menu: side
-linkheadings: 3
-index: 4
+collection: guides
+tocHeading: 3
+order: 4
 ---
 
 ## Deploying your site on Now

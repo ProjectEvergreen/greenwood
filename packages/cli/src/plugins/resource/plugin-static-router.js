@@ -69,7 +69,7 @@ class StaticRouterResource extends ResourceInterface {
       .filter(page => !page.isSSR)
       .filter(page => !page.route.endsWith('/404/'))
       .map((page) => {
-        const layout = page.filename && page.filename.split('.').pop() === this.extensions[0]
+        const layout = page.pageHref && page.pageHref.split('.').pop() === this.extensions[0]
           ? page.route
           : page.layout;
         const key = page.route === '/'

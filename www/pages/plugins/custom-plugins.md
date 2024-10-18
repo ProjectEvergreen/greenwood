@@ -1,8 +1,6 @@
 ---
-label: 'custom-plugins'
-menu: side
-title: 'Custom Plugins'
-index: 9
+collection: plugins
+order: 9
 ---
 
 ## Custom Plugins

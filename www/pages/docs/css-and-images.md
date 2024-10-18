@@ -1,9 +1,9 @@
 ---
-label: 'styles-and-assets'
-menu: side
-title: 'Styles and Assets'
-index: 6
-linkheadings: 3
+collection: docs
+title: Styles and Assets
+label: Styles and Assets
+order: 6
+tocHeading: 3
 ---
 
 ## Styles and Assets

@@ -1,9 +1,9 @@
 ---
-label: 'scripts-and-imports'
-menu: side
-title: 'Scripts and Imports'
-index: 5
-linkheadings: 3
+collection: docs
+title: Scripts and Imports
+label: Scripts and Imports
+order: 5
+tocHeading: 3
 ---
 
 ## Scripts and Imports

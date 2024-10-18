@@ -10,7 +10,7 @@ import replace from '@rollup/plugin-replace';
 import { getNodeModulesLocationForPackage, getPackageJson, getPackageNameFromUrl } from '../../lib/node-modules-utils.js';
 import { resolveForRelativeUrl } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import { walkPackageJson } from '../../lib/walker-package-ranger.js';
+import { walkPackageJson, mergeImportMap } from '../../lib/walker-package-ranger.js';
 
 let importMap;
 
@@ -75,7 +75,6 @@ class NodeModulesResource extends ResourceInterface {
   async intercept(url, request, response) {
     const { context, config } = this.compilation;
     const { importMaps } = config.polyfills;
-    const importMapType = importMaps ? 'importmap-shim' : 'importmap';
     const importMapShimScript = importMaps ? '<script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>' : '';
     let body = await response.text();
     const hasHead = body.match(/\<head>(.*)<\/head>/s);
@@ -97,15 +96,10 @@ class NodeModulesResource extends ResourceInterface {
       ? await walkPackageJson(userPackageJson)
       : importMap || {};
 
-    // apply import map and shim for users
+    body = mergeImportMap(body, importMap, importMaps);
     body = body.replace('<head>', `
       <head>
         ${importMapShimScript}
-        <script type="${importMapType}">
-          {
-            "imports": ${JSON.stringify(importMap, null, 1)}
-          }
-        </script>
     `);
 
     return new Response(body);

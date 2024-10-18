@@ -1,9 +1,7 @@
 ---
-label: 'markdown'
-menu: side
-title: 'Markdown'
-index: 4
-linkheadings: 3
+collection: docs
+order: 4
+tocHeading: 3
 ---
 
 ## Markdown

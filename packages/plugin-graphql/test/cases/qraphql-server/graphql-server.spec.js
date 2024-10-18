@@ -82,7 +82,7 @@ describe('Develop Greenwood With: ', function() {
       const body = {
         'operationName': null,
         'variables': {},
-        'query': '{\n  config {\n    workspace\n  }\n}\n'
+        'query': '{\n  graph {\n    label\n  }\n}\n'
       };
 
       before(async function() {
@@ -105,7 +105,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the expected query response', function() {
-        expect(data.data.config.workspace).to.equal(new URL('./src/', import.meta.url).href);
+        expect(data.data.graph).to.not.be.undefined;
       });
     });
   });

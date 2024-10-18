@@ -1,9 +1,7 @@
 ---
-label: 'features'
-menu: side
-title: 'Features'
-index: 2
-linkheadings: 3
+collection: about
+order: 2
+tocHeading: 3
 ---
 
 ## Features

@@ -1,8 +1,6 @@
 ---
-label: 'about'
-menu: navigation
-title: About
-index: 1
+collection: navigation
+order: 1
 ---
 
 ## About Greenwood
