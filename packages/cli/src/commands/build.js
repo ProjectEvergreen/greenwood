@@ -11,7 +11,7 @@ const runProductionBuild = async (compilation) => {
   return new Promise(async (resolve, reject) => {
 
     try {
-      const { prerender, contentAsData, plugins } = compilation.config;
+      const { prerender, activeContent, plugins } = compilation.config;
       const outputDir = compilation.context.outputDir;
       const prerenderPlugin = compilation.config.plugins.find(plugin => plugin.type === 'renderer')
         ? compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider(compilation)
@@ -27,7 +27,7 @@ const runProductionBuild = async (compilation) => {
         });
       }
 
-      if (shouldPrerender || (contentAsData && shouldPrerender)) {
+      if (shouldPrerender || (activeContent && shouldPrerender)) {
         // start any of the user's server plugins if needed
         const servers = [...compilation.config.plugins.filter((plugin) => {
           return plugin.type === 'server' && !plugin.isGreenwoodDefaultPlugin;
@@ -41,13 +41,13 @@ const runProductionBuild = async (compilation) => {
           return provider;
         })];
 
-        if (contentAsData) {
-          // prune for the content as data plugin and start the dev server with only that plugin enabled
+        if (activeContent) {
           (await getDevServer({
             ...compilation,
-            plugins: [plugins.find(plugin => plugin.name === 'plugin-content-as-data')]
-          })).listen(1984, () => {
-            console.info('initializing content as data...');
+            // prune for the content as data plugin and start the dev server with only that plugin enabled
+            plugins: [plugins.find(plugin => plugin.name === 'plugin-active-content')]
+          })).listen(compilation.config.devServer.port, () => {
+            console.info('Initializing active content...');
           });
         }
 

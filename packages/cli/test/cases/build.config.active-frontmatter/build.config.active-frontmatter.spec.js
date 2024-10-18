@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with activeFrontmatter configuration enabled for simple and rich frontmatter.
+ * Run Greenwood with activeContent configuration enabled for simple and active frontmatter.
  *
  * User Result
  * Should generate a bare bones Greenwood build with correctly interpolated frontmatter variables in markdown and HTML.
@@ -10,7 +10,7 @@
  *
  * User Config
  * {
- *   activeFrontmatter: true
+ *   activeContent: true
  * }
  *
  * User Workspace

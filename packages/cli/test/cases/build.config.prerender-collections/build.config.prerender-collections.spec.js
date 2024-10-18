@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood build command with prerender config set to true and using various content as data APIs.
+ * Run Greenwood build command with prerender config set to true and using various Content as Data APIs.
  *
  * User Result
  * Should generate a Greenwood build with the expected generated output using custom elements.
@@ -10,7 +10,7 @@
  *
  * User Config
  * {
- *   activeFrontmatter: true,
+ *   activeContent: true,
  *   prerender: true
  * }
  *
@@ -49,7 +49,7 @@ describe('Build Greenwood With: ', function() {
     this.context = {
       publicDir: path.join(outputPath, 'public')
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function() {

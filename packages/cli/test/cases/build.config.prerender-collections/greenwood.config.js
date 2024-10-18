@@ -1,5 +1,4 @@
 export default {
-  activeFrontmatter: true,
-  prerender: true,
-  contentAsData: true
+  activeContent: true,
+  prerender: true
 };

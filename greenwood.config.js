@@ -10,7 +10,7 @@ export default {
   workspace: new URL('./www/', import.meta.url),
   optimization: 'inline',
   staticRouter: true,
-  activeFrontmatter: true,
+  activeContent: true,
   plugins: [
     greenwoodPluginGraphQL(),
     greenwoodPluginPolyfills({

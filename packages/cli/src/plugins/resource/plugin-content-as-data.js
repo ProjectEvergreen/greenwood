@@ -30,10 +30,10 @@ class ContentAsDataResource extends ResourceInterface {
   }
 
   async shouldServe(url) {
-    const { contentAsData } = this.compilation.config;
+    const { activeContent } = this.compilation.config;
     const { pathname } = url;
 
-    return contentAsData && pathname === '/___graph.json';
+    return activeContent && pathname === '/___graph.json';
   }
 
   async serve(url, request) {
@@ -75,71 +75,65 @@ class ContentAsDataResource extends ResourceInterface {
   }
 
   async shouldIntercept(url, request, response) {
-    const { activeFrontmatter, contentAsData } = this.compilation.config;
+    const { activeContent } = this.compilation.config;
 
-    return response.headers.get('Content-Type')?.indexOf(this.contentType[0]) >= 0
-      && (activeFrontmatter || contentAsData);
+    return response.headers.get('Content-Type')?.indexOf(this.contentType[0]) >= 0 && activeContent;
   }
 
   async intercept(url, request, response) {
-    const { activeFrontmatter, contentAsData, polyfills, devServer } = this.compilation.config;
+    const { polyfills, devServer } = this.compilation.config;
+    const matchingRoute = this.compilation.graph.find(page => page.route === url.pathname);
     const body = await response.text();
     let newBody = body;
 
-    if (contentAsData) {
-      if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
-        newBody = mergeImportMap(body, importMap, polyfills.importMaps);
-      }
-
-      newBody = newBody.replace('<head>', `
-        <head>
-          <script id="content-server">
-            globalThis.__CONTENT_SERVER__ = globalThis.__CONTENT_SERVER__
-              ? globalThis.__CONTENT_SERVER__
-              : {
-                  PORT: ${devServer.port}
-                }
-          </script>
-      `);
+    if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
+      newBody = mergeImportMap(body, importMap, polyfills.importMaps);
     }
 
-    if (activeFrontmatter) {
-      const matchingRoute = this.compilation.graph.find(page => page.route === url.pathname);
+    newBody = newBody.replace('<head>', `
+      <head>
+        <script id="content-server">
+          globalThis.__CONTENT_SERVER__ = globalThis.__CONTENT_SERVER__
+            ? globalThis.__CONTENT_SERVER__
+            : {
+                PORT: ${devServer.port}
+              }
+        </script>
+    `);
 
-      // Greenwood active frontmatter keys
-      for (const key of activeFrontmatterKeys) {
-        const interpolatedFrontmatter = '\\$\\{globalThis.page.' + key + '\\}';
-        const needle = key === 'title' && !matchingRoute.title
-          ? matchingRoute.label
-          : matchingRoute[key];
+    // Greenwood active frontmatter keys
+    for (const key of activeFrontmatterKeys) {
+      const interpolatedFrontmatter = '\\$\\{globalThis.page.' + key + '\\}';
+      const needle = key === 'title' && !matchingRoute.title
+        ? matchingRoute.label
+        : matchingRoute[key];
 
-        newBody = newBody.replace(new RegExp(interpolatedFrontmatter, 'g'), needle);
-      }
+      newBody = newBody.replace(new RegExp(interpolatedFrontmatter, 'g'), needle);
+    }
 
-      // custom user frontmatter data
-      for (const fm in matchingRoute.data) {
-        const interpolatedFrontmatter = '\\$\\{globalThis.page.data.' + fm + '\\}';
-        const needle = typeof matchingRoute.data[fm] === 'string' ? matchingRoute.data[fm] : JSON.stringify(matchingRoute.data[fm]).replace(/"/g, '&quot;');
+    // custom user frontmatter data
+    for (const fm in matchingRoute.data) {
+      const interpolatedFrontmatter = '\\$\\{globalThis.page.data.' + fm + '\\}';
+      const needle = typeof matchingRoute.data[fm] === 'string' ? matchingRoute.data[fm] : JSON.stringify(matchingRoute.data[fm]).replace(/"/g, '&quot;');
 
-        newBody = newBody.replace(new RegExp(interpolatedFrontmatter, 'g'), needle);
-      }
+      newBody = newBody.replace(new RegExp(interpolatedFrontmatter, 'g'), needle);
+    }
 
-      // collections
-      for (const collection in this.compilation.collections) {
-        const interpolatedFrontmatter = '\\$\\{globalThis.collection.' + collection + '\\}';
-        const cleanedCollections = cleanContentCollection(this.compilation.collections[collection]);
+    // collections
+    for (const collection in this.compilation.collections) {
+      const interpolatedFrontmatter = '\\$\\{globalThis.collection.' + collection + '\\}';
+      const cleanedCollections = cleanContentCollection(this.compilation.collections[collection]);
 
-        newBody = newBody.replace(new RegExp(interpolatedFrontmatter, 'g'), JSON.stringify(cleanedCollections).replace(/"/g, '&quot;'));
-      }
+      newBody = newBody.replace(new RegExp(interpolatedFrontmatter, 'g'), JSON.stringify(cleanedCollections).replace(/"/g, '&quot;'));
     }
 
     return new Response(newBody);
   }
 
   async shouldOptimize(url, response) {
-    const { contentAsData } = this.compilation.config;
+    const { activeContent } = this.compilation.config;
 
-    return response.headers.get('Content-Type').indexOf(this.contentType[0]) >= 0 && contentAsData;
+    return response.headers.get('Content-Type').indexOf(this.contentType[0]) >= 0 && activeContent;
   }
 
   async optimize(url, response) {
@@ -158,7 +152,7 @@ class ContentAsDataResource extends ResourceInterface {
 
 const greenwoodPluginContentAsData = {
   type: 'resource',
-  name: 'plugin-content-as-data',
+  name: 'plugin-active-content',
   provider: (compilation) => new ContentAsDataResource(compilation)
 };
 

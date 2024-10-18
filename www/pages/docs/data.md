@@ -41,7 +41,7 @@ render() {
 
 To assist with this, Greenwood provides all your content as data, so let's check it out!
 
-> First thing though, make sure you've set the [`contentAsData` flag to `true`](/docs/configuration/#content-as-data) in your _greenwood.config.js_.
+> First thing though, make sure you've set the [`activeContent` flag to `true`](/docs/configuration/#active-content) in your _greenwood.config.js_.
 >
 > This feature works best when used for build time templating combining our [**prerender**](/docs/configuration/#prerender) and [**static** optimization](/docs/configuration/#optimization) configurations.
 
@@ -178,9 +178,11 @@ collection: nav
 # About Page
 ```
 
-#### Active Frontmatter
+### Active Frontmatter
 
-With [`activeFrontmatter`](/docs/configuration/#active-frontmatter) enabled, you can then access your collections right from your HTML, like for passing attributes to a custom element.  It will get serialized to JSON for you.
+Active Frontmatter enables the ability to apply templating of static pages and layouts, inspired by JavaScript [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) syntax.
+
+You can then access your collections or any other frontmatter substituted right from your HTML, like for passing attributes to a custom element.
 
 ```html
 <!-- src/pages/index.html -->
@@ -192,6 +194,48 @@ With [`activeFrontmatter`](/docs/configuration/#active-frontmatter) enabled, you
 
   <body>
     <app-navigation items="${globalThis.collection.nav}">
+  </body>
+</html>
+```
+
+Or given some frontmatter in a markdown file:
+
+```md
+---
+layout: post
+title: Git Explorer
+published: 04.07.2020
+description: Local git repository viewer
+author: Owen Buckley
+image: /assets/blog-post-images/git.png
+---
+```
+
+It can be accessed and substituted statically in either markdown:
+
+```md
+# My Blog Post
+
+Published: ${globalThis.page.published}
+
+Lorum Ipsum.
+```
+
+Or HTML:
+
+```html
+<html>
+  <head>
+    <title>My Blog - ${globalThis.page.title}</title>
+    <meta name="author" content="${globalThis.page.data.author}">
+    <meta property="og:title" content="My Blog -  ${globalThis.page.title}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.myblog.dev">
+    <meta property="og:image" content="https://www.myblog.dev/${globalThis.page.data.image}">
+    <meta property="og:description" content="My Blog - ${globalThis.page.data.description}">
+  </head>
+  <body>
+    ...
   </body>
 </html>
 ```

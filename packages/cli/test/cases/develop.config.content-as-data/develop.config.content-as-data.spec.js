@@ -10,8 +10,7 @@
  *
  * User Config
  * {
- *   activeFrontmatter: true,
- *   contentAsData: true
+ *   activeContent: true
  * }
  *
  * User Workspace

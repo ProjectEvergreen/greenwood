@@ -1,4 +1,3 @@
 export default {
-  activeFrontmatter: true,
-  contentAsData: true
+  activeContent: true
 };
