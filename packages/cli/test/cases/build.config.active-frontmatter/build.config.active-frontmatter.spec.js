@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with activeContent configuration enabled for simple and active frontmatter.
+ * Run Greenwood with activeContent configuration enabled for validating active frontmatter.
  *
  * User Result
  * Should generate a bare bones Greenwood build with correctly interpolated frontmatter variables in markdown and HTML.
