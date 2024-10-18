@@ -24,10 +24,7 @@ describe('Unit Test: Data', function() {
         it('should have all expected properties for each page', function() {
           pages.forEach(function(page) {
             expect(page.label).to.exist;
-            expect(page.id).to.exist;
-            expect(page.path).to.exist;
-            expect(page.filename).to.exist;
-            expect(page.template).to.exist;
+            expect(page.layout).to.exist;
             expect(page.title).to.exist;
             expect(page.route).to.exist;
           });
@@ -50,20 +47,14 @@ describe('Unit Test: Data', function() {
           expect(children.length).to.equal(7);
         });
 
-        it('should have the expected value for id for each child', function() {
-          expect(children[0].id).to.equal('branding');
-          expect(children[1].id).to.equal('build-and-deploy');
-          expect(children[2].id).to.equal('creating-content');
-          expect(children[3].id).to.equal('key-concepts');
-          expect(children[4].id).to.equal('next-steps');
-          expect(children[5].id).to.equal('project-setup');
-          expect(children[6].id).to.equal('quick-start');
-        });
-
         it('should have the expected route for each child', function() {
-          children.forEach(function(child) {
-            expect(child.route).to.equal(`/getting-started/${child.id}`);
-          });
+          expect(children[0].route).to.equal('/getting-started/branding');
+          expect(children[1].route).to.equal('/getting-started/build-and-deploy');
+          expect(children[2].route).to.equal('/getting-started/creating-content');
+          expect(children[3].route).to.equal('/getting-started/key-concepts');
+          expect(children[4].route).to.equal('/getting-started/next-steps');
+          expect(children[5].route).to.equal('/getting-started/project-setup');
+          expect(children[6].route).to.equal('/getting-started/quick-start');
         });
 
         it('should have the expected label for each child', function() {
@@ -76,15 +67,9 @@ describe('Unit Test: Data', function() {
           expect(children[6].label).to.equal('Quick Start');
         });
 
-        it('should have the expected path for each child', function() {
+        it('should have "page" as the layout for all children', function() {
           children.forEach(function(child) {
-            expect(child.path).to.contain(`/getting-started/${child.id}.md`);
-          });
-        });
-
-        it('should have "page" as the template for all children', function() {
-          children.forEach(function(child) {
-            expect(child.template).to.equal('page');
+            expect(child.layout).to.equal('page');
           });
         });
 
@@ -99,7 +84,7 @@ describe('Unit Test: Data', function() {
         });
 
         it('should have expected custom front matter data if it is set', function() {
-          expect(children[0].data.menu).to.equal('side');
+          expect(children[0].data.collection).to.equal('side');
         });
       });
     });

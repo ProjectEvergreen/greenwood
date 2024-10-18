@@ -3,7 +3,7 @@ import { html } from 'lit';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import '../components/greeting.js';
 
-async function getTemplate(compilation, { route }) {
+async function getLayout(compilation, { route }) {
   return html`
     <html>
       <head>
@@ -67,18 +67,17 @@ async function getBody() {
 
 async function getFrontmatter(compilation, { route }) {
   return {
-    menu: 'navigation',
-    index: 7,
+    collection: 'navigation',
+    order: 7,
     title: `My App - ${route}`,
-    data: {
-      author: 'Project Evergreen',
-      date: '01-01-2021'
-    }
+    author: 'Project Evergreen',
+    date: '01-01-2021'
   };
 }
 
+export const hydration = false;
 export {
-  getTemplate,
+  getLayout,
   getBody,
   getFrontmatter
 };

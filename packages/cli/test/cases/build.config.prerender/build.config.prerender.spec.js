@@ -3,7 +3,7 @@
  * Run Greenwood build command with prerender config set to true.
  *
  * User Result
- * Should generate a Greenwood build with puppeteer generated output for Web Components.
+ * Should generate a Greenwood build with the expected generated output using custom elements.
  *
  * User Command
  * greenwood build
@@ -96,12 +96,6 @@ describe('Build Greenwood With: ', function() {
           expect(amwasbsMeta.getAttribute('name')).to.be.equal('apple-mobile-web-app-status-bar-style');
           expect(amwasbsMeta.getAttribute('content')).to.be.equal('black');
         });
-      });
-
-      it('should have the expected heading text within the index page in the public directory', function() {
-        const heading = dom.window.document.querySelector('body h1').textContent;
-
-        expect(heading).to.equal('Welcome to Greenwood!');
       });
 
       it('should have prerendered content from <app-header> component', function() {

@@ -3,33 +3,65 @@
 
   <head>
     <script type="module">
+      import { LitElement, html } from 'lit';
       import client from '@greenwood/plugin-graphql/src/core/client.js';
       import GalleryQuery from '../data/queries/gallery.gql';
 
-      client.query({
-        query: GalleryQuery,
-        variables: {
-          name: 'logos'
+      class PhotoGallery extends LitElement {
+
+        static get properties() {
+          return {
+            galleries: {
+              type: Array
+            }
+          };
         }
-      }).then((response) => {
-        const logosGallery = response.data.gallery[0];
-        const title = logosGallery.title;
 
-        Array.from(document.getElementsByTagName('img')).forEach((image, i) => {
-          image.setAttribute('src', logosGallery.images[i].path);
-          image.setAttribute('title', `${title} - Logo #${++i}`);
-        });
+        constructor() {
+          super();
+          this.galleries = [];
+        }
 
-        document.getElementsByTagName('h2')[0].innerHTML = title;
-      });
+        async connectedCallback() {
+          super.connectedCallback();
+
+          const response = await client.query({
+            query: GalleryQuery,
+            variables: {
+              name: 'logos'
+            }
+          });
+
+          this.galleries = response.data.gallery;
+        }
+
+        /* eslint-disable indent */
+        render() {
+          if(this.galleries.length > 0) {
+            const { galleries } = this;
+            const gallery = galleries[0];
+            const { images, title } = gallery;
+        
+            return html`
+              <h2>${title}</h2>
+              ${images.map((image, i) => {
+                return html`
+                  <img src="${image.path}" title="${title} - Logo #${++i}">
+                `;
+              })}
+            `;
+            /* eslint-enable */
+          }
+
+        }
+      }
+
+      customElements.define('photo-gallery', PhotoGallery);
     </script>
   </head>
   
   <body>
-    <h2></h2>
-    <img src="#"/>
-    <img src="#"/>
-    <img src="#"/>
+    <photo-gallery></photo-gallery>
   </body>
 
 </html>

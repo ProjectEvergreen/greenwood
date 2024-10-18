@@ -1,10 +1,8 @@
 import fs from 'fs/promises';
-import { checkResourceExists, trackResourcesForRoute } from '../lib/resource-utils.js';
+import { checkResourceExists, trackResourcesForRoute, mergeResponse } from '../lib/resource-utils.js';
 import os from 'os';
 import { WorkerPool } from '../lib/threadpool.js';
 
-// TODO a lot of these are duplicated in the build lifecycle too
-// would be good to refactor
 async function createOutputDirectory(route, outputDir) {
   if (!route.endsWith('/404/') && !await checkResourceExists(outputDir)) {
     await fs.mkdir(outputDir, {
@@ -32,8 +30,12 @@ async function interceptPage(url, request, plugins, body) {
   });
 
   for (const plugin of plugins) {
-    if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response)) {
-      response = await plugin.intercept(url, request, response);
+    if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, response.clone())) {
+      response = mergeResponse(response, await plugin.preIntercept(url, request, response.clone()));
+    }
+
+    if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
+      response = mergeResponse(response, await plugin.intercept(url, request, response.clone()));
     }
   }
 
@@ -48,9 +50,15 @@ function getPluginInstances (compilation) {
     });
 }
 
+function toScratchUrl(outputHref, context) {
+  const { outputDir, scratchDir } = context;
+
+  return new URL(`./${outputHref.replace(outputDir.href, '')}`, scratchDir);
+}
+
 async function preRenderCompilationWorker(compilation, workerPrerender) {
   const pages = compilation.graph.filter(page => !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender));
-  const { scratchDir } = compilation.context;
+  const { context, config } = compilation;
   const plugins = getPluginInstances(compilation);
 
   console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
@@ -58,18 +66,32 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
   const pool = new WorkerPool(os.cpus().length, new URL('../lib/ssr-route-worker.js', import.meta.url));
 
   for (const page of pages) {
-    const { route, outputPath, resources } = page;
-    const outputPathUrl = new URL(`.${outputPath}`, scratchDir);
-    const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+    const { route, outputHref } = page;
+    const scratchUrl = toScratchUrl(outputHref, context);
+    const url = new URL(`http://localhost:${config.port}${route}`);
     const request = new Request(url);
+    let ssrContents;
 
+    // do we negate the worker pool by also running this, outside the pool?
     let body = await (await servePage(url, request, plugins)).text();
     body = await (await interceptPage(url, request, plugins, body)).text();
 
-    await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
+    // hack to avoid over-rendering SSR content
+    // https://github.com/ProjectEvergreen/greenwood/issues/1044
+    // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
+    if (page.isSSR) {
+      const ssrContentsMatch = /<!-- greenwood-ssr-start -->(.*.)<!-- greenwood-ssr-end -->/s;
 
+      ssrContents = body.match(ssrContentsMatch)[0];
+      body = body.replace(ssrContents, '<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->');
+
+      ssrContents = ssrContents
+        .replace('<!-- greenwood-ssr-start -->', '')
+        .replace('<!-- greenwood-ssr-end -->', '');
+    }
+
+    const resources = await trackResourcesForRoute(body, compilation, route);
     const scripts = resources
-      .map(resource => compilation.resources.get(resource))
       .filter(resource => resource.type === 'script')
       .map(resource => resource.sourcePathURL.href);
 
@@ -91,57 +113,67 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       });
     });
 
-    await fs.writeFile(outputPathUrl, body);
+    if (page.isSSR) {
+      body = body.replace('<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->', ssrContents);
+    }
+
+    await createOutputDirectory(route, new URL(scratchUrl.href.replace('index.html', '')));
+    await fs.writeFile(scratchUrl, body);
 
     console.info('generated page...', route);
   }
 }
 
 async function preRenderCompilationCustom(compilation, customPrerender) {
-  const { scratchDir } = compilation.context;
+  const { config, context } = compilation;
   const renderer = (await import(customPrerender.customUrl)).default;
+  const { importMaps } = config.polyfills;
 
   console.info('pages to generate', `\n ${compilation.graph.map(page => page.route).join('\n ')}`);
 
   await renderer(compilation, async (page, body) => {
-    const { route, outputPath } = page;
-    const outputPathUrl = new URL(`.${outputPath}`, scratchDir);
+    const { route, outputHref } = page;
+    const scratchUrl = toScratchUrl(outputHref, context);
 
     // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
-    body = body.replace(/<script src="(.*lit\/polyfill-support.js)"><\/script>/, '');
-    body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
-    body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
-    body = body.replace(/type="module-shim"/g, 'type="module"');
+    if (importMaps) {
+      body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
+      body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
+      body = body.replace(/type="module-shim"/g, 'type="module"');
+    } else {
+      body = body.replace(/<script type="importmap">.*?<\/script>/s, '');
+    }
 
-    // clean this up here to avoid sending webcomponents-bundle to rollup
+    // clean this up to avoid sending webcomponents-bundle to rollup
     body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
 
     await trackResourcesForRoute(body, compilation, route);
-    await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
-    await fs.writeFile(outputPathUrl, body);
+    await createOutputDirectory(route, new URL(scratchUrl.href.replace('index.html', '')));
+    await fs.writeFile(scratchUrl, body);
 
     console.info('generated page...', route);
   });
 }
 
 async function staticRenderCompilation(compilation) {
-  const { scratchDir } = compilation.context;
+  const { config, context } = compilation;
   const pages = compilation.graph.filter(page => !page.isSSR || page.isSSR && page.prerender);
   const plugins = getPluginInstances(compilation);
 
   console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
 
   await Promise.all(pages.map(async (page) => {
-    const { route, outputPath } = page;
-    const outputPathUrl = new URL(`.${outputPath}`, scratchDir);
-    const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+    const { route, outputHref } = page;
+    const scratchUrl = toScratchUrl(outputHref, context);
+    const url = new URL(`http://localhost:${config.port}${route}`);
     const request = new Request(url);
 
     let body = await (await servePage(url, request, plugins)).text();
     body = await (await interceptPage(url, request, plugins, body)).text();
 
-    await createOutputDirectory(route, new URL(outputPathUrl.href.replace('index.html', '')));
-    await fs.writeFile(outputPathUrl, body);
+    await trackResourcesForRoute(body, compilation, route);
+    await createOutputDirectory(route, new URL(scratchUrl.href.replace('index.html', '')));
+    await fs.writeFile(scratchUrl, body);
 
     console.info('generated page...', route);
 

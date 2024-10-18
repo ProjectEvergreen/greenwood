@@ -77,7 +77,7 @@ describe('Develop Greenwood With: ', function() {
       let body;
 
       before(async function() {
-        response = await fetch(`${hostname}:${port}/`);
+        response = await fetch(`${hostname}:${port}/`, { headers: { 'Accept': 'text/html' } });
         body = await response.clone().text();
       });
 
@@ -103,7 +103,7 @@ describe('Develop Greenwood With: ', function() {
       let body;
 
       before(async function() {
-        response = await fetch(`http://127.0.0.1:${port}/artists/`);
+        response = await fetch(`http://127.0.0.1:${port}/artists/`, { headers: { 'Accept': 'text/html' } });
         body = await response.clone().text();
       });
 
@@ -129,7 +129,7 @@ describe('Develop Greenwood With: ', function() {
       let body;
 
       before(async function() {
-        response = await fetch(`http://127.0.0.1:${port}/artists/1`);
+        response = await fetch(`http://127.0.0.1:${port}/artists/1`, { headers: { 'Accept': 'text/html' } });
         body = await response.clone().text();
       });
 
@@ -172,7 +172,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the expected body contents', function(done) {
-        expect(body.replace(/\n/g, '').indexOf('* {  color: red;}')).to.equal(0);
+        expect(body.replace(/\n/g, '').indexOf('*{color:red}')).to.equal(0);
         done();
       });
     });
@@ -203,7 +203,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the expected body contents', function(done) {
-        expect(body.indexOf('/* Set the global variables for everything. Change these to use your own fonts/colours. */')).to.equal(0);
+        expect(body.indexOf(':root{--sans-font:-apple-system')).to.equal(0);
         done();
       });
     });

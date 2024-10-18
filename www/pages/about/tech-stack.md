@@ -1,9 +1,7 @@
 ---
-label: 'tech-stack'
-menu: side
-title: 'Tech Stack'
-index: 4
-linkheadings: 3
+collection: about
+order: 4
+tocHeading: 3
 ---
 
 ## Tech Stack

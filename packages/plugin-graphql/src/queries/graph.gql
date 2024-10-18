@@ -1,12 +1,13 @@
 query {
   graph {
     id,
-    filename,
     label,
-    outputPath,
-    path,
+    title,
     route,
-    template,
-    title
+    layout,
+    tableOfContents {
+      label,
+      route
+    }
   }
 }

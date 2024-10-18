@@ -9,7 +9,7 @@ class LiveReloadServer extends ServerInterface {
   }
 
   async start() {
-    const { userWorkspace } = this.compilation.context;
+    const { userWorkspace, projectDirectory } = this.compilation.context;
     const standardPluginsDirectoryPath = new URL('../resource/', import.meta.url);
     const standardPluginsNames = (await fs.readdir(standardPluginsDirectoryPath))
       .filter(filename => filename.indexOf('plugin-standard') === 0);
@@ -34,18 +34,21 @@ class LiveReloadServer extends ServerInterface {
       ...customPluginsExtensions,
       ...this.compilation.config.devServer.extensions
     ]
-      .filter((ext) => ext !== '*' || ext !== '')
-      .map((ext) => ext.replace('.', ''));
+      .filter((ext) => ext !== '*' || ext !== '') // basic filter for false positives
+      .filter((ext, idx, array) => array.indexOf(ext) === idx) // dedupe
+      .map((ext) => ext.startsWith('.') ? ext.replace('.', '') : ext); // trim . from all entries
 
     const liveReloadServer = livereload.createServer({
-      exts: allExtensions.filter((ext, idx) => idx === allExtensions.indexOf(ext)),
-      applyCSSLive: false // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
+      exts: allExtensions,
+      applyCSSLive: false, // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
+      applyImgLive: false // https://github.com/ProjectEvergreen/greenwood/issues/1263
+    }, () => {
+      const abridgedWorkspacePath = userWorkspace.pathname.replace(projectDirectory.pathname, '').replace('/', '');
+
+      console.info(`Now watching workspace directory (./${abridgedWorkspacePath}) for changes...`);
     });
 
-    liveReloadServer.watch(userWorkspace.pathname, () => {
-      console.info(`Now watching directory "${userWorkspace}" for changes.`);
-      return Promise.resolve(true);
-    });
+    liveReloadServer.watch(userWorkspace.pathname);
   }
 }
 

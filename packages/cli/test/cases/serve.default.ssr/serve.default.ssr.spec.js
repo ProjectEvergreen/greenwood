@@ -28,8 +28,8 @@
  *       index.js
  *     index.js
  *     post.js
- *     users.js
- *   templates/
+ *     users.js (isolation = true)
+ *   layouts/
  *     app.html
  */
 import chai from 'chai';
@@ -93,9 +93,8 @@ describe('Serve Greenwood With: ', function() {
         expect(headings[0].textContent).to.equal('Hello from the server rendered home page!');
       });
 
-      it('should have the expected bundled SSR output for the page', async function() {
-        const scriptFiles = (await glob.promise(path.join(this.context.publicDir, '*.js')))
-          .filter(file => file.indexOf('index.js') >= 0);
+      it('should have the expected bundled SSR output for the page entry point and chunk file', async function() {
+        const scriptFiles = await glob.promise(path.join(this.context.publicDir, 'index*.js'));
 
         expect(scriptFiles.length).to.equal(2);
       });
@@ -156,7 +155,7 @@ describe('Serve Greenwood With: ', function() {
         expect(scripts.length).to.equal(4);
       });
 
-      it('should have the expected <app-header> tag from the app template in the <head>', function() {
+      it('should have the expected <app-header> tag from the app layout in the <head>', function() {
         const scripts = Array.from(dom.window.document.querySelectorAll('head > script'))
           .filter(script => script.src && script.src.startsWith('/header.'));
 
@@ -168,7 +167,7 @@ describe('Serve Greenwood With: ', function() {
           .filter(tag => !tag.getAttribute('data-gwd'))
           .filter(tag => !tag.getAttribute('type'));
 
-        expect(scripts.length).to.equal(2);
+        expect(scripts.length).to.equal(3);
         expect(scripts[1].textContent).to.contain('console.log');
       });
 
@@ -199,8 +198,8 @@ describe('Serve Greenwood With: ', function() {
 
       it('should have the expected menu and index values in the graph', function() {
         expect(artistsPageGraphData.label).to.equal('Artists');
-        expect(artistsPageGraphData.data.menu).to.equal('navigation');
-        expect(artistsPageGraphData.data.index).to.equal(7);
+        expect(artistsPageGraphData.data.collection).to.equal('navigation');
+        expect(artistsPageGraphData.data.order).to.equal(7);
       });
 
       it('should have expected custom data values in its graph data', function() {
@@ -222,16 +221,15 @@ describe('Serve Greenwood With: ', function() {
         expect(imports[0]).to.equal('/components/counter.js');
       });
 
-      it('should append the expected graph resource scripts for the page from a template', function() {
+      it('should append the expected graph resource scripts for the page from a layout', function() {
         const { resources } = artistsPageGraphData;
 
         expect(resources.length).to.equal(6);
         expect(resources.find(resource => resource.endsWith('/header.js'))).to.not.be.undefined;
       });
 
-      it('should have the expected bundled SSR output for the page', async function() {
-        const scriptFiles = (await glob.promise(path.join(this.context.publicDir, '*.js')))
-          .filter(file => file.indexOf('artists.js') >= 0);
+      it('should have the expected bundled SSR output for the page entry point and chunk file', async function() {
+        const scriptFiles = await glob.promise(path.join(this.context.publicDir, 'artists*.js'));
 
         expect(scriptFiles.length).to.equal(2);
       });
@@ -267,9 +265,8 @@ describe('Serve Greenwood With: ', function() {
         expect(cards.length).to.be.greaterThan(0);
       });
 
-      it('should have the expected bundled SSR output for the page', async function() {
-        const scriptFiles = (await glob.promise(path.join(this.context.publicDir, '*.js')))
-          .filter(file => file.indexOf('users.js') >= 0);
+      it('should have the expected bundled SSR output for the page entry point and chunk file', async function() {
+        const scriptFiles = await glob.promise(path.join(this.context.publicDir, 'users*.js'));
 
         expect(scriptFiles.length).to.equal(2);
       });
@@ -364,7 +361,7 @@ describe('Serve Greenwood With: ', function() {
     });
 
     describe('Bundled image using new URL and import.meta.url', function() {
-      const bundledName = 'assets/logo-abb2e884.svg';
+      const bundledName = 'assets/logo-619de195.svg';
       let response = {};
       let body;
       let usersResponse = {};

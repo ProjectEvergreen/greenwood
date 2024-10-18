@@ -1,6 +1,5 @@
 import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 import { makeExecutableSchema } from 'apollo-server-express';
-import { configTypeDefs, configResolvers } from './config.js';
 import { graphTypeDefs, graphResolvers } from './graph.js';
 import fs from 'fs/promises';
 import gql from 'graphql-tag';
@@ -51,7 +50,6 @@ const createSchema = async (compilation) => {
     const mergedResolvers = Object.assign({}, {
       Query: {
         ...graphResolvers.Query,
-        ...configResolvers.Query,
         ...customUserResolvers.reduce((resolvers, resolver) => {
           return {
             ...resolvers,
@@ -64,7 +62,6 @@ const createSchema = async (compilation) => {
     const schema = makeExecutableSchema({
       typeDefs: [
         graphTypeDefs,
-        configTypeDefs,
         customDataDefs,
         ...customUserDefs
       ],

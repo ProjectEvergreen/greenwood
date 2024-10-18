@@ -1,9 +1,7 @@
 ---
-label: 'blog'
-menu: navigation
-title: Blog
-index: 6
-template: blog
+collection: navigation
+order: 6
+layout: blog
 ---
 
 <style>

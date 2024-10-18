@@ -21,7 +21,7 @@
  *       index.js
  *     artists.js
  *     post.js
- *   templates/
+ *   layouts/
  *     app.html
  */
 import chai from 'chai';
@@ -66,6 +66,10 @@ describe('Develop Greenwood With: ', function() {
       const litPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit/package.json`,
         `${outputPath}/node_modules/lit/`
+      );
+      const litSsrPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit-labs/ssr-dom-shim/package.json`,
+        `${outputPath}/node_modules/@lit-labs/ssr-dom-shim/`
       );
       const litElement = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-element/*.js`,
@@ -114,6 +118,7 @@ describe('Develop Greenwood With: ', function() {
         ...getSetupFiles(outputPath),
         ...lit,
         ...litPackageJson,
+        ...litSsrPackageJson,
         ...litDirectives,
         ...litDecorators,
         ...litElementPackageJson,
@@ -137,7 +142,7 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
-    describe('Develop command with HTML route response using getTemplate, getBody, getFrontmatter', function() {
+    describe('Develop command with HTML route response using getLayout, getBody, getFrontmatter', function() {
       let response = {};
       let dom;
       let artistsPageGraphData;
@@ -209,9 +214,9 @@ describe('Develop Greenwood With: ', function() {
         expect(artistsPageGraphData).to.not.be.undefined;
       });
 
-      it('should have the expected menu and index values in the graph', function() {
-        expect(artistsPageGraphData.data.menu).to.equal('navigation');
-        expect(artistsPageGraphData.data.index).to.equal(7);
+      it('should have the expected collection and order values in the graph', function() {
+        expect(artistsPageGraphData.data.collection).to.equal('navigation');
+        expect(artistsPageGraphData.data.order).to.equal(7);
       });
 
       it('should have expected custom data values in its graph data', function() {

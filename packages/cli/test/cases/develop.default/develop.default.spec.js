@@ -17,13 +17,6 @@
  *
  * User Workspace
  * src/
- *   api/
- *     fragment.js
- *     greeting.js
- *     missing.js
- *     nothing.js
- *     submit-form-data.js
- *     submit-json.js
  *   assets/
  *     data.json
  *     favicon.ico
@@ -38,7 +31,16 @@
  *     card.js
  *     header.js
  *   pages/
- *     index.html
+ *     api/
+ *       nested/
+ *         endpoint.js
+ *       fragment.js
+ *       greeting.js
+ *       missing.js
+ *       nothing.js
+ *       submit-form-data.js
+ *       submit-json.js
+*      index.html
  *   styles/
  *     main.css
  * package.json
@@ -54,7 +56,6 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
-// TODO good first issue, to abstract along with copy plugin
 async function rreaddir (dir, allFiles = []) {
   const files = (await fs.promises.readdir(dir)).map(f => path.join(dir, f));
 
@@ -100,6 +101,10 @@ describe('Develop Greenwood With: ', function() {
       const litPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit/package.json`,
         `${outputPath}/node_modules/lit/`
+      );
+      const litSsrPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit-labs/ssr-dom-shim/package.json`,
+        `${outputPath}/node_modules/@lit-labs/ssr-dom-shim/`
       );
       const litElement = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-element/*.js`,
@@ -201,7 +206,7 @@ describe('Develop Greenwood With: ', function() {
         `${process.cwd()}/node_modules/@lion/localize/src/*.js`,
         `${outputPath}/node_modules/@lion/localize/src/`
       );
-      const owcDepupLibPackageJson = await getDependencyFiles(
+      const owcDedupeLibPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/@open-wc/dedupe-mixin/package.json`,
         `${outputPath}/node_modules/@open-wc/dedupe-mixin/`
       );
@@ -379,6 +384,7 @@ describe('Develop Greenwood With: ', function() {
         ...getSetupFiles(outputPath),
         ...lit,
         ...litPackageJson,
+        ...litSsrPackageJson,
         ...litDirectives,
         ...litDecorators,
         ...litElementPackageJson,
@@ -406,7 +412,7 @@ describe('Develop Greenwood With: ', function() {
         ...lionLocalizeLibsPackageJson,
         ...lionLocalizeTesterLibs,
         ...lionLocalizeSrcLibs,
-        ...owcDepupLibPackageJson,
+        ...owcDedupeLibPackageJson,
         ...owcScopedLibPackageJson,
         ...messageFormatLibs,
         ...messageFormatLibsPackageJson,
@@ -481,8 +487,11 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return an import map shim <script> in the <head> of the document', function(done) {
-        const importMapTag = dom.window.document.querySelectorAll('head > script[type="importmap-shim"]')[0];
+        const importMapTags = dom.window.document.querySelectorAll('head > script[type="importmap"]');
+        const importMapTag = importMapTags[0];
         const importMap = JSON.parse(importMapTag.textContent).imports;
+
+        expect(importMapTags.length).to.equal(1);
 
         Object.keys(expectedImportMap).forEach((key) => {
           expect(importMap[key]).to.equal(expectedImportMap[key]);
@@ -513,15 +522,6 @@ describe('Develop Greenwood With: ', function() {
         expect(importMap['@material/base/component']).to.equal('/node_modules/@material/base/component.js');
         expect(importMap['@material/base/foundation']).to.equal('/node_modules/@material/base/foundation.js');
         expect(importMap['@material/base/types']).to.equal('/node_modules/@material/base/types.js');
-
-        done();
-      });
-
-      it('should return an import map in the <head> of the document', function(done) {
-        const importMapShimTag = dom.window.document.querySelectorAll('head > script[defer]')[0];
-        const shimSrc = importMapShimTag.getAttribute('src');
-
-        expect(shimSrc).to.equal('/node_modules/es-module-shims/dist/es-module-shims.js');
 
         done();
       });
@@ -632,7 +632,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(body).to.contain('color: blue;');
+        expect(body).to.contain('*{color:blue}');
         done();
       });
     });
@@ -976,7 +976,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should correctly return CSS from the developers local files', function(done) {
-        expect(body).to.contain('/* Set the global variables for everything. Change these to use your own fonts/colours. */');
+        expect(body).to.contain(':root{--sans-font:-apple-system');
         done();
       });
     });
@@ -1283,27 +1283,27 @@ describe('Develop Greenwood With: ', function() {
       });
     });
 
-    describe('Fetching graph.json client side', function() {
-      let response;
-      let graph;
+    describe('Develop command nested API specific behaviors', function() {
+      let response = {};
+      let body;
 
       before(async function() {
-        response = await fetch(`${hostname}:${port}/graph.json`);
-        graph = await response.clone().json();
+        response = await fetch(`${hostname}:${port}/api/nested/endpoint`);
+        body = await response.clone().text();
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers.get('content-type')).to.contain('application/json');
-        done();
-      });
-
-      it('should return a 200', function(done) {
+      it('should return a 200 status', function(done) {
         expect(response.status).to.equal(200);
         done();
       });
 
-      it('should have the expected length for all content', function(done) {
-        expect(graph.length).to.equal(2);
+      it('should return the expected content type header', function(done) {
+        expect(response.headers.get('content-type')).to.equal('text/html');
+        done();
+      });
+
+      it('should return the expected response message', function(done) {
+        expect(body).to.contain('I am a nested API route');
         done();
       });
     });

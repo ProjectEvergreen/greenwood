@@ -1,8 +1,6 @@
 ---
-label: 'custom-plugins'
-menu: side
-title: 'Custom Plugins'
-index: 9
+collection: plugins
+order: 9
 ---
 
 ## Custom Plugins
@@ -15,12 +13,12 @@ The available plugins built and maintained by Greenwood team and contributors ha
 | [Adapter Netlify](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-adapter-netlify) | Allows usage of [**Netlify**](https://www.netlify.com/) static hosting with  serverless and edge functions to deploy and host full stack Greenwood applications. |
 | [Adapter Vercel](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-adapter-vercel) | Allows usage of [**Vercel**](https://vercel.com/) static hosting with serverless and edge functions to deploy and host full stack Greenwood applications. |
 | [Babel](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-babel) | Allows usage of [**Babel**](https://babeljs.io/) plugins, presets, and configuration in your project. |
+| [CSS Modules](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-css-modules) | Allows usage of [**CSS Modules ™️**](https://github.com/css-modules/css-modules) for your (Light DOM) Web Components. |
 | [Google Analytics](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-google-analytics) | Easily add usage tracking to your site with Google Analytics. |
 | [Include HTML](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-include-html) | Provides additional methods for generating static HTML at build time, inspired by the original [HTML Imports spec](https://www.html5rocks.com/en/tutorials/webcomponents/imports/). |
 | [Import CommonJs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-commonjs) | Enables usage of `import` syntax for loading CommonJS modules from _node_modules_. |
-| [Import CSS](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-css) | Enables usage of `import` syntax for loading CSS files. |
-| [Import JSON](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-json) | Enables usage of `import` syntax for loading JSON files. |
 | [Import JSX](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-jsx) | Enables usage of `import` syntax for loading JSX rendering Web Components compatible with [**WCC**](https://github.com/ProjectEvergreen/wcc). |
+| [Import Raw](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-import-raw) | Enables usage of `import` syntax for loading arbitrary file contents as a string. |
 | [Polyfills](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-polyfills) | Although most modern browsers now support the APIs that make up Web Component, for older browsers use this plugin to Let Greenwood automatically take care of progressively loading polyfills for you. |
 | [PostCSS](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss) | Allows usage of [**PostCSS**](https://postcss.org/) plugins and configuration in your project. |
 | [Renderer Lit](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-lit) | A server-side rendering plugin for Lit based Greenwood projects. |

@@ -1,9 +1,7 @@
 ---
-label: 'server-rendering'
-menu: side
-title: 'Server Rendering'
-index: 8
-linkheadings: 3
+collection: docs
+order: 8
+tocHeading: 3
 ---
 
 ## Server Rendering (Beta)
@@ -29,9 +27,9 @@ The above would serve content in a browser at `/users/`.
 
 In your page _.js_ file, Greenwood supports the following functions you can `export` for providing server rendered configuration and content:
 - `default`: Use a custom element to render your page content.  Will take precedence over `getBody`.  Will also automatically track your custom element dependencies, in place of having to define [frontmatter imports](/docs/front-matter/#imports) in `getFrontmatter`.
-- `getFrontmatter`: Static [frontmatter](/docs/front-matter/), useful in conjunction with [menus](/docs/menus/) or otherwise static configuration / meta data.
-- `getBody`: Effectively anything that you could put into a [`<content-outlet></content-outlet>`](/docs/layouts/#page-templates).
-- `getTemplate`: Effectively the same as a [page template](/docs/layouts/#page-templates).
+- `getFrontmatter`: Static [frontmatter](/docs/front-matter/), useful in conjunction with [content as data](/docs/data/) or otherwise static configuration / metadata.
+- `getBody`: Effectively anything that you could put into a [`<content-outlet></content-outlet>`](/docs/layouts/#page-layouts).
+- `getLayout`: Effectively the same as a [page layout](/docs/layouts/#page-layouts).
 
 <!-- eslint-disable no-unused-vars -->
 ```js
@@ -43,7 +41,7 @@ async function getBody(compilation, route) {
   return '<!-- some HTML here -->';
 }
 
-async function getTemplate(compilation, route) {
+async function getLayout(compilation, route) {
   return '<!-- some HTML here -->';
 }
 
@@ -57,7 +55,7 @@ export default class MyPage extends HTMLElement {
 export {
   getFrontmatter,
   getBody,
-  getTemplate
+  getLayout
 };
 ```
 
@@ -89,20 +87,18 @@ export default class UsersPage extends HTMLElement {
 A couple of notes:
 - WSCs run only on the server, thus you have full access to any APIs of the runtime, with the ability to perform one time `async` operations for [data loading](/docs/server-rendering/#data-loading) in `connectedCallback`.
 - In the above example, card.js will automatically be bundled for you on the client side!
--  Keep in mind that for these "page" components, you will likely want to _avoid_ rendering into a shadow root in your SSR pages so as to avoid wrapping static content in a Declarative Shadow DOM wrapping `<template>` tag.  However, for any interactive elements within your page, Definitely use Declarative Shadow DOM!
+-  Keep in mind that for these "page" components, you will likely want to _avoid_ rendering into a shadow root in your SSR pages so as to avoid wrapping static content in a Declarative Shadow DOM wrapping `<layout>` tag.  However, for any interactive elements within your page, Definitely use Declarative Shadow DOM!
 
 #### Frontmatter
 
-Any Greenwood supported frontmatter can be returned here.  _This is only run once when the server is started_ to populate the graph, which is helpful if you want your dynamic route to show up in a menu like in your header for navigation.
-
-You can even define a `template` and reuse all your existing [templates](/docs/layouts/), even for server routes!
+Any Greenwood supported frontmatter can be returned here.  _This is only run once when the server is started_ to populate the graph, which is helpful if you want your dynamic route to show up in the metadata for your pages. You can even define a `layout` and reuse all your existing [layouts](/docs/layouts/), even for server routes!
 
 ```js
 export async function getFrontmatter(compilation, route) {
   return {
-    template: 'user',
-    menu: 'header',
-    index: 1,
+    layout: 'user',
+    collection: 'header',
+    order: 1,
     title: `${compilation.config.title} - ${route}`,
     imports: [
       '/components/user.js'
@@ -114,7 +110,7 @@ export async function getFrontmatter(compilation, route) {
 }
 ```
 
-> _For defining custom dynamic based metadata, like for `<meta>` tags, use `getTemplate` and define those tags right in your HTML._
+> _For defining custom dynamic based metadata, like for `<meta>` tags, use `getLayout` and define those tags right in your HTML._
 
 So for example, `/pages/artist.js` would render out as `/artists/index.html` and would not require the serve task.  So if you need more flexibility in how you create your pages, but still want to just serve it statically, you can!
 
@@ -155,12 +151,12 @@ export async function getBody(compilation, page, request) {
 ```
 <!-- eslint-enable no-unused-vars -->
 
-#### Templates
+#### Layouts
 
-For creating a template dynamically, you can use `getTemplate` and return the HTML you need.
+For creating a layout dynamically, you can use `getLayout` and return the HTML you need.
 
 ```js
-export async function getTemplate(compilation, route) {
+export async function getLayout(compilation, route) {
   return `
     <html>
       <head>
@@ -225,27 +221,37 @@ export const prerender = true;
 
 > You can enable this for all pages using the [prerender configuration](/docs/configuration/#prerender) option.
 
-### Custom Imports
+### Isolation
 
-> ⚠️ _This feature is experimental._
-> 
-> _**Note**: At this time, [WCC can't handle non-standard javaScript formats](https://github.com/ProjectEvergreen/greenwood/issues/1004), though we hope to enable this by the 1.0 release._
+To execute an SSR page in its own request context when running `greenwood serve`, you can export an `isolation` option from your page set to `true`.
 
-Combined with Greenwood's [custom import resource plugins](https://www.greenwoodjs.io/plugins/custom-plugins/) (or your own!), Greenwood can handle loading custom file extensions on the server side using ESM, like CSS and JSON!
-
-For example, you can now import JSON in your SSR pages and components.
 ```js
-import json from '../path/to/data.json';
-
-console.log(json); // { status: 200, message: 'some data' }
+export const isolation = true;
 ```
 
-**Steps**
-1. Make sure you are using Node `v18.15.0`
-1. Run the Greenwood CLI using the `--experimental-loaders` flag and pass Greenwood's custom loader
-    ```shell
-    $ node --experimental-loader ./node_modules/@greenwood/cli/src/loader.js ./node_modules/.bin/greenwood <command>
-    ```
+> For more information and how you can enable this for all pages, please see the [isolation configuration](/docs/configuration/#isolation) docs.
+
+
+### Custom Imports
+
+To enable custom [imports](/docs/scripts/#imports) on the server side for prerendering or SSR use cases, you will need to invoke Greenwood using `node` on the CLI and pass it the `--loaders` flag.
+
+```shell
+$ node --loader ./node_modules/@greenwood/cli/src/loader.js ./node_modules/.bin/greenwood <command>
+```
+
+Then you will be able to run this code with NodeJS, or for any custom format you want using a plugin. 
+```js
+import sheet from './styles.css' with { type: 'css' };
+import data from './data.json' with { type: 'json' };
+
+console.log({ sheet, data });
+```
+
+_**Notes**_
+
+- At this time, [WCC can't handle non-standard JavaScript formats](https://github.com/ProjectEvergreen/greenwood/issues/1004), though we hope to enable this by the 1.0 release.
+- We would like to explore ways to [improve the DX here](https://github.com/ProjectEvergreen/greenwood/discussions/1217), and not require having to manually invoke `node`
 
 ### Hybrid Projects
 
@@ -283,7 +289,7 @@ Greenwood will now build and serve all the static content from the _pages/_ dire
 
 Greenwood provides the ability to [prerender](/docs/configuration/#prerender) your project and Web Components.  So what is the difference between that and rendering?   In the context of Greenwood, _rendering_ is the process of generating the _initial_ HTML as you would when running on a server.  _Prerendering_ is the ability to execute exclusively browser code in a browser and capture that result as static HTML.
 
-So what does that mean, exactly?  Basically, you can think of them as being complimentary, where in you might have server side routes that pull content server side (`getBody`), but can be composed of static HTML templates (in your _src/templates_ directory) that can have client side code (Web Components) with `<script>` tags that could be run after through a headless browser.
+So what does that mean, exactly?  Basically, you can think of them as being complimentary, where in you might have server side routes that pull content server side (`getBody`), but can be composed of static HTML layouts (in your _src/layouts_ directory) that can have client side code (Web Components) with `<script>` tags that could be run after through a headless browser.
 
 The hope with Greenwood is that user's can choose the best blend of server rendering and browser prerendering that fits their projects best because running in a browser unlocks more client side capabilities that will (likely) never be available in a server context, like:
 - `window` / `document` objects

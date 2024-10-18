@@ -18,7 +18,7 @@
  *     footer.js
  *   pages/
  *     artists.js
- *   templates/
+ *   layouts/
  *     app.html
  */
 import chai from 'chai';
@@ -147,11 +147,10 @@ describe('Build Greenwood With: ', function() {
         expect(styles.length).to.equal(1);
       });
 
-      // TODO clean up lit-polyfill as part of https://github.com/ProjectEvergreen/greenwood/issues/728
       it('should have four script tags', function() {
         const scripts = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
 
-        expect(scripts.length).to.equal(4);
+        expect(scripts.length).to.equal(3);
       });
 
       it('should have expected SSR content from the non module script tag', function() {
@@ -196,9 +195,9 @@ describe('Build Greenwood With: ', function() {
         expect(artistsPageGraphData).to.not.be.undefined;
       });
 
-      it('should have the expected menu and index values in the graph', function() {
-        expect(artistsPageGraphData.data.menu).to.equal('navigation');
-        expect(artistsPageGraphData.data.index).to.equal(7);
+      it('should have the expected collection and order values in the graph', function() {
+        expect(artistsPageGraphData.data.collection).to.equal('navigation');
+        expect(artistsPageGraphData.data.order).to.equal(7);
       });
 
       it('should have expected custom data values in its graph data', function() {
