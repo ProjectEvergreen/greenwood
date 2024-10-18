@@ -69,16 +69,14 @@ async function getBody(compilation) {
 
 async function getFrontmatter(compilation, { route }) {
   return {
-    menu: 'navigation',
-    index: 7,
+    collection: 'navigation',
+    order: 7,
     title: route,
     imports: [
       '/components/counter.js'
     ],
-    data: {
-      author: 'Project Evergreen',
-      date: '01-01-2021'
-    }
+    author: 'Project Evergreen',
+    date: '01-01-2021'
   };
 }
 

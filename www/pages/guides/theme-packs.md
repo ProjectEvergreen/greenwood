@@ -1,8 +1,8 @@
 ---
 title: 'Creating a Theme Pack'
-menu: side
-linkheadings: 3
-index: 3
+collection: guides
+tocHeading: 3
+order: 3
 ---
 
 ## Creating a Theme Pack

@@ -1,8 +1,8 @@
 ---
 title: 'Firebase Deployment'
-menu: side
-linkheadings: 3
-index: 5
+collection: guides
+tocHeading: 3
+order: 5
 ---
 
 ### Deploy on Firebase

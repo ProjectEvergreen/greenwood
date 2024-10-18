@@ -178,13 +178,13 @@ describe('Serve Greenwood With: ', function() {
     let dom;
     let usersPageDom;
     let usersPageHtml;
-    let aboutPageGraphData;
+    let artistsPageGraphData;
 
     before(async function() {
       const graph = JSON.parse(await fs.promises.readFile(path.join(outputPath, 'public/graph.json'), 'utf-8'));
       artists = JSON.parse(await fs.promises.readFile(new URL('./artists.json', import.meta.url), 'utf-8'));
 
-      aboutPageGraphData = graph.filter(page => page.route === '/artists/')[0];
+      artistsPageGraphData = graph.filter(page => page.route === '/artists/')[0];
 
       response = await fetch(`${hostname}/artists/`);
       data = await response.text();
@@ -252,17 +252,17 @@ describe('Serve Greenwood With: ', function() {
       });
 
       it('should be a part of graph.json', function() {
-        expect(aboutPageGraphData).to.not.be.undefined;
+        expect(artistsPageGraphData).to.not.be.undefined;
       });
 
       it('should have the expected menu and index values in the graph', function() {
-        expect(aboutPageGraphData.data.menu).to.equal('navigation');
-        expect(aboutPageGraphData.data.index).to.equal(7);
+        expect(artistsPageGraphData.data.collection).to.equal('navigation');
+        expect(artistsPageGraphData.data.order).to.equal(7);
       });
 
       it('should have expected custom data values in its graph data', function() {
-        expect(aboutPageGraphData.data.author).to.equal('Project Evergreen');
-        expect(aboutPageGraphData.data.date).to.equal('01-01-2021');
+        expect(artistsPageGraphData.data.author).to.equal('Project Evergreen');
+        expect(artistsPageGraphData.data.date).to.equal('01-01-2021');
       });
 
       it('should not have the expected lit hydration script in the <head>', function() {

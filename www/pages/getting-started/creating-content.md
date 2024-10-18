@@ -1,9 +1,7 @@
 ---
-label: 'creating-content'
-menu: side
-title: 'Creating Content'
-index: 4
-linkheadings: 3
+collection: getting-started
+order: 4
+tocHeading: 3
 ---
 
 ## Overview

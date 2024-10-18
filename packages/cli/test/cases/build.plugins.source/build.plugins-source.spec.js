@@ -106,7 +106,7 @@ describe('Build Greenwood With: ', function() {
         }));
       });
 
-      it('should emit one about page', function() {
+      it('should emit three pages from source', function() {
         expect(pages.length).to.equal(3);
       });
 

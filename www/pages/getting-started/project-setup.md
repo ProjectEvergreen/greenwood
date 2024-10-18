@@ -1,9 +1,7 @@
 ---
-label: 'project-setup'
-menu: side
-title: 'Project Setup'
-index: 2
-linkheadings: 3
+collection: getting-started
+order: 2
+tocHeading: 3
 ---
 
 ## Overview

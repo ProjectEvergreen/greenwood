@@ -1,8 +1,7 @@
 ---
-title: 'Cloudflare Workers Deployment'
-menu: side
-linkheadings: 3
-index: 6
+collection: guides
+tocHeading: 3
+order: 6
 ---
 
 ## Cloudflare Workers Deployment

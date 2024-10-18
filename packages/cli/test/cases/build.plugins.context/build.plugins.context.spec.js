@@ -161,7 +161,7 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have expected link tag in the head', function() {
-        const scriptTag = Array.from(dom.window.document.querySelectorAll('head script'))
+        const scriptTag = Array.from(dom.window.document.querySelectorAll('head script[type="module"]'))
           .filter((tag) => !tag.getAttribute('data-gwd'))
           .filter((tag) => tag.getAttribute('src').indexOf('/greeting.') === 0);
 

@@ -1,8 +1,6 @@
 ---
-label: 'source'
-menu: side
-title: 'Source'
-index: 8
+collection: plugins
+order: 8
 ---
 
 ## Source

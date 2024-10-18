@@ -51,6 +51,10 @@ import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
 
+function generatePageHref(pagePath) {
+  return new URL(`./src/pages/${pagePath}`, import.meta.url).href;
+}
+
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Default Greenwood Configuration and Default Workspace w/ Nested Directories';
   const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
@@ -76,38 +80,38 @@ describe('Build Greenwood With: ', function() {
       let graph;
 
       before(async function() {
-        graph = JSON.parse(await fs.promises.readFile(path.join(this.context.publicDir, 'graph.json'), 'utf-8'))
-          .map(item => {
-            return {
-              ...item,
-              path: item.path.replace(/\\/g, '/')
-            };
-          });
+        graph = JSON.parse(await fs.promises.readFile(path.join(this.context.publicDir, 'graph.json'), 'utf-8'));
       });
 
       it('should have the expected ordering of pages in graph.json', function() {
         expect(graph.length).to.equal(21);
-        expect(graph[0].path).to.be.equal('src/pages/blog/2017/03/26/index.md');
-        expect(graph[1].path).to.be.equal('src/pages/blog/2017/03/30/index.md');
-        expect(graph[2].path).to.be.equal('src/pages/blog/2017/04/10/index.md');
-        expect(graph[3].path).to.be.equal('src/pages/blog/2017/04/22/index.md');
-        expect(graph[4].path).to.be.equal('src/pages/blog/2017/05/05/index.md');
-        expect(graph[5].path).to.be.equal('src/pages/blog/2017/06/07/index.md');
-        expect(graph[6].path).to.be.equal('src/pages/blog/2017/09/10/index.md');
-        expect(graph[7].path).to.be.equal('src/pages/blog/2017/10/15/index.md');
-        expect(graph[8].path).to.be.equal('src/pages/blog/2018/01/24/index.md');
-        expect(graph[9].path).to.be.equal('src/pages/blog/2018/05/16/index.md');
-        expect(graph[10].path).to.be.equal('src/pages/blog/2018/06/06/index.md');
-        expect(graph[11].path).to.be.equal('src/pages/blog/2018/09/26/index.md');
-        expect(graph[12].path).to.be.equal('src/pages/blog/2018/10/28/index.md');
-        expect(graph[13].path).to.be.equal('src/pages/blog/2018/11/19/index.md');
-        expect(graph[14].path).to.be.equal('src/pages/blog/2019/11/11/index.md');
-        expect(graph[15].path).to.be.equal('src/pages/blog/2020/04/07/index.md');
-        expect(graph[16].path).to.be.equal('src/pages/blog/2020/08/15/index.md');
-        expect(graph[17].path).to.be.equal('src/pages/blog/2020/10/28/index.md');
-        expect(graph[18].path).to.be.equal('src/pages/blog/index.md');
-        expect(graph[19].path).to.be.equal('src/pages/index.html');
-        expect(graph[20].path).to.be.equal('404.html');
+
+        // expect(graph[0].pageHref.endsWith('/blog/2017/03/26/index.md')).to.be.equal(true);
+        expect(graph[0].pageHref).to.equal(generatePageHref('blog/2017/03/26/index.md'));
+        expect(graph[0].id).to.be.equal('blog-2017-03-26-index');
+        expect(graph[1].pageHref).to.equal(generatePageHref('blog/2017/03/30/index.md'));
+        expect(graph[2].pageHref).to.equal(generatePageHref('blog/2017/04/10/index.md'));
+        expect(graph[3].pageHref).to.equal(generatePageHref('blog/2017/04/22/index.md'));
+        expect(graph[4].pageHref).to.equal(generatePageHref('blog/2017/05/05/index.md'));
+        expect(graph[5].pageHref).to.equal(generatePageHref('blog/2017/06/07/index.md'));
+        expect(graph[6].pageHref).to.equal(generatePageHref('blog/2017/09/10/index.md'));
+        expect(graph[7].pageHref).to.equal(generatePageHref('blog/2017/10/15/index.md'));
+        expect(graph[8].pageHref).to.equal(generatePageHref('blog/2018/01/24/index.md'));
+        expect(graph[9].pageHref).to.equal(generatePageHref('blog/2018/05/16/index.md'));
+        expect(graph[10].pageHref).to.equal(generatePageHref('blog/2018/06/06/index.md'));
+        expect(graph[11].pageHref).to.equal(generatePageHref('blog/2018/09/26/index.md'));
+        expect(graph[12].pageHref).to.equal(generatePageHref('blog/2018/10/28/index.md'));
+        expect(graph[13].pageHref).to.equal(generatePageHref('blog/2018/11/19/index.md'));
+        expect(graph[14].pageHref).to.equal(generatePageHref('blog/2019/11/11/index.md'));
+        expect(graph[15].pageHref).to.equal(generatePageHref('blog/2020/04/07/index.md'));
+        expect(graph[16].pageHref).to.equal(generatePageHref('blog/2020/08/15/index.md'));
+        expect(graph[17].pageHref).to.equal(generatePageHref('blog/2020/10/28/index.md'));
+        expect(graph[18].pageHref).to.equal(generatePageHref('blog/index.md'));
+        expect(graph[18].id).to.be.equal('blog-index');
+        expect(graph[19].pageHref).to.equal(generatePageHref('index.html'));
+        expect(graph[19].id).to.be.equal('index');
+        expect(graph[20].pageHref).to.equal(generatePageHref('404.html'));
+        expect(graph[20].id).to.be.equal('404');
       });
 
       it('should create a top level blog pages directory', function() {
@@ -125,8 +129,8 @@ describe('Build Greenwood With: ', function() {
         graph.filter((page) => {
           return page.route.indexOf('2017') > 0;
         }).forEach((page) => {
-          const outputpath = path.join(this.context.publicDir, page.route, 'index.html');
-          expect(fs.existsSync(outputpath)).to.be.true;
+          const outputPath = path.join(this.context.publicDir, page.route, 'index.html');
+          expect(fs.existsSync(outputPath)).to.be.true;
         });
       });
 
@@ -134,8 +138,8 @@ describe('Build Greenwood With: ', function() {
         graph.filter((page) => {
           return page.route.indexOf('2018') > 0;
         }).forEach((page) => {
-          const outputpath = path.join(this.context.publicDir, page.route, 'index.html');
-          expect(fs.existsSync(outputpath)).to.be.true;
+          const outputPath = path.join(this.context.publicDir, page.route, 'index.html');
+          expect(fs.existsSync(outputPath)).to.be.true;
         });
       });
 
@@ -143,8 +147,8 @@ describe('Build Greenwood With: ', function() {
         graph.filter((page) => {
           return page.route.indexOf('2019') > 0;
         }).forEach((page) => {
-          const outputpath = path.join(this.context.publicDir, page.route, 'index.html');
-          expect(fs.existsSync(outputpath)).to.be.true;
+          const outputPath = path.join(this.context.publicDir, page.route, 'index.html');
+          expect(fs.existsSync(outputPath)).to.be.true;
         });
       });
 
@@ -152,8 +156,8 @@ describe('Build Greenwood With: ', function() {
         graph.filter((page) => {
           return page.route.indexOf('2020') > 0;
         }).forEach((page) => {
-          const outputpath = path.join(this.context.publicDir, page.route, 'index.html');
-          expect(fs.existsSync(outputpath)).to.be.true;
+          const outputPath = path.join(this.context.publicDir, page.route, 'index.html');
+          expect(fs.existsSync(outputPath)).to.be.true;
         });
       });
 

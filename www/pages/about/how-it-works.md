@@ -1,9 +1,7 @@
 ---
-label: 'how-it-works'
-menu: side
-title: 'How It Works'
-index: 1
-linkheadings: 3
+collection: about
+order: 1
+tocHeading: 3
 ---
 
 ## How It Works

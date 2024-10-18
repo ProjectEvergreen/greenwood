@@ -1,4 +1,7 @@
 {
   "name": "test-develop-command-config-import-maps",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "lit": "^3.0.0"
+  }
 }
