@@ -16,8 +16,8 @@
  * User Workspace
  *  src/
  *   components/
- *     footer.js
- *     header.js
+ *     caption.js
+ *     picture-frame.js
  *   pages/
  *     index.html
  */
