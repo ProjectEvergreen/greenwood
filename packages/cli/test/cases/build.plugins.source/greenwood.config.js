@@ -18,12 +18,10 @@ const customExternalSourcesPlugin = {
             <img src='${imageUrl}'/>
           `,
           route,
-          id,
-          template: 'artist',
+          layout: 'artist',
           label: name,
-          data: {
-            imageUrl
-          }
+          imageUrl,
+          id
         };
       });
     };

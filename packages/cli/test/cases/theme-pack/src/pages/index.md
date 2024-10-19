@@ -1,5 +1,5 @@
 ---
-template: 'blog-post'
+layout: 'blog-post'
 ---
 
 ## Title of blog post

@@ -1,8 +1,6 @@
 ---
-label: 'Rollup'
-menu: side
-title: 'Rollup'
-index: 6
+collection: plugins
+order: 6
 ---
 
 ## Rollup

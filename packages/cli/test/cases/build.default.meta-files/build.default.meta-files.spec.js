@@ -71,6 +71,18 @@ describe('Build Greenwood With: ', function() {
         expect(robots.length).to.equal(1);
       });
     });
+
+    describe('Default output for project level sitemap.xml', function() {
+      let sitemaps;
+
+      before(async function() {
+        sitemaps = await glob(`${this.context.publicDir}/sitemap.xml`);
+      });
+
+      it('should have one sitemap.xml file in the output directory', function() {
+        expect(sitemaps.length).to.equal(1);
+      });
+    });
   });
 
   after(function() {

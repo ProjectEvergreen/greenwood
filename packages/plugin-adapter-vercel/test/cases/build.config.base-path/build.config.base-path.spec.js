@@ -21,9 +21,9 @@
  * User Workspace
  * package.json
  * src/
- *   api/
- *     greeting.js
  *   pages/
+ *     api/
+ *       greeting.js
  *     users.js
  */
 import chai from 'chai';

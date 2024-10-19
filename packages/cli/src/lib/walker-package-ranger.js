@@ -215,17 +215,33 @@ async function walkPackageJson(packageJson = {}) {
   return importMap;
 }
 
-function mergeImportMap(html = '', map = {}) {
-  // es-modules-shims breaks on dangling commas in an importMap :/
-  const danglingComma = html.indexOf('"imports": {}') > 0 ? '' : ',';
-  const importMap = JSON.stringify(map).replace('}', '').replace('{', '');
+function mergeImportMap(html = '', map = {}, shouldShim = false) {
+  const importMapType = shouldShim ? 'importmap-shim' : 'importmap';
+  const hasImportMap = html.indexOf(`script type="${importMapType}"`) > 0;
+  const danglingComma = hasImportMap ? ',' : '';
+  const importMap = JSON.stringify(map, null, 2).replace('}', '').replace('{', '');
 
-  const merged = html.replace('"imports": {', `
-    "imports": {
-      ${importMap}${danglingComma}
-  `);
+  if (Object.entries(map).length === 0) {
+    return html;
+  }
 
-  return merged;
+  if (hasImportMap) {
+    return html.replace('"imports": {', `
+      "imports": {
+        ${importMap}${danglingComma}
+    `);
+  } else {
+    return html.replace('<head>', `
+      <head>
+      <script type="${importMapType}">
+        {
+          "imports": {
+            ${importMap}
+          }
+        }
+      </script>
+    `);
+  }
 }
 
 export {

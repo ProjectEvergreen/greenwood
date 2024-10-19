@@ -1,8 +1,6 @@
 ---
-label: 'docs'
-menu: navigation
-title: Docs
-index: 2
+collection: navigation
+order: 2
 ---
 
 ## Documentation
@@ -10,7 +8,7 @@ This is the documentation space for **Greenwood** that we hope will help you get
 
 
 ### Installation
-Greenwood can be installed with any of the common package managers available today.
+Greenwood can be installed manually with any of the common package managers available today or you scaffold a new project through our [`init` package](/getting-started/quick-start/#init-package).
 
 ```bash
 # npm
@@ -74,5 +72,5 @@ To continue learning more about Greenwood, please feel free to browse the other 
 - [Front Matter](/docs/front-matter/): Page level configurations through page markdown.
 - [Markdown](/docs/markdown/): Using markdown and related authoring capabilities supported by Greenwood.
 - [Styles and Assets](/docs/css-and-images/): How to style and theme your project with CSS.
-- [Templates](/docs/layouts/): Controlling the layout of your pages.
+- [Layouts](/docs/layouts/): Controlling the layout of your pages.
 - [Tech Stack](/about/tech-stack/): What's under the hood.

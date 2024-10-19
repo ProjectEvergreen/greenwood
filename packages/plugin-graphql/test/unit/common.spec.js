@@ -14,19 +14,17 @@ describe('Unit Test: Data', function() {
         const query = `
           query {
             graph {
-              id,
               title,
               route,
               path,
-              filename,
-              template,
+              layout,
               __typename
             }
           }
         `;
         const hash = getQueryHash(query);
 
-        expect(hash).to.be.equal('380713565');
+        expect(hash).to.be.equal('309961297');
       });
 
       it('should return the expected hash for a custom graph query with custom data', function () {
@@ -51,12 +49,10 @@ describe('Unit Test: Data', function() {
         const query = `
           query($parent: String!) {
             children(parent: $parent) {
-              id,
               title,
               route,
               path,
-              filename,
-              template
+              layout
             }
           }
         `;
@@ -64,7 +60,7 @@ describe('Unit Test: Data', function() {
           parent: '/docs/'
         });
 
-        expect(hash).to.be.equal('1696894039');
+        expect(hash).to.be.equal('1893453381');
       });
     });
 

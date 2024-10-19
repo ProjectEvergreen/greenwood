@@ -1,8 +1,6 @@
 ---
-label: 'community'
-menu: side
-title: 'Community'
-index: 3
+collection: about
+order: 3
 ---
 
 ## Community

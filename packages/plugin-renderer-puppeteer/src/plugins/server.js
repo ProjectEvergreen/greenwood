@@ -10,9 +10,10 @@ class PuppeteerServer extends ServerInterface {
   async start() {
     if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
       const { port } = this.compilation.config.devServer;
+      const offsetPort = port + 1; // don't try and start the dev server on the same port as the CLI
 
-      (await getDevServer(this.compilation)).listen(port, async () => {
-        console.info(`Started puppeteer prerender server at http://localhost:${port}`);
+      (await getDevServer(this.compilation)).listen(offsetPort, async () => {
+        console.info(`Started puppeteer prerender server at http://localhost:${offsetPort}`);
       });
     } else {
       await Promise.resolve();

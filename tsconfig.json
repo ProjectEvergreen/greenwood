@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true
+    "allowImportingTsExtensions": true,
+    "experimentalDecorators": true,
+    "module": "NodeNext",
+    "noEmit": true
   }
 }

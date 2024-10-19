@@ -1,7 +1,0 @@
-{
-  "name": "plugin-graphql-test-menu-query",
-  "type": "module",
-  "dependencies": {
-    "lit": "^2.0.0"
-  }
-}

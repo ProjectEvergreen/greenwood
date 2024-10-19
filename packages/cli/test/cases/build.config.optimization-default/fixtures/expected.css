@@ -4,13 +4,13 @@
 
 :root,:host{--primary-color:#16f;--secondary-color:#ff7;}
 
-@font-face {font-family:'Source Sans Pro';font-style:normal;font-weight:400;font-display:swap;src:local('Source Sans Pro Regular'),local('SourceSansPro-Regular'),url('/assets/fonts/source-sans-pro-v13-latin-regular.woff2')format('woff2'),url('/assets/fonts/source-sans-pro-v13-latin-regular.woff')format('woff'),url('/assets/fonts/source-sans-pro-v13-latin-regular.ttf')format('truetype');}
+@font-face {font-family:'Source Sans Pro';font-style:normal;font-weight:400;font-display:swap;src:local('Source Sans Pro Regular'),local('SourceSansPro-Regular'),url('https://www.example.com/assets/fonts/source-sans-pro-v13-latin-regular.woff2')format('woff2'),url('https://www.example.com/assets/fonts/source-sans-pro-v13-latin-regular.woff')format('woff'),url('https://www.example.com/assets/fonts/source-sans-pro-v13-latin-regular.ttf')format('truetype');}
 
 @import url('https://fonts.googleapis.com/css?family=Raleway&display=swap');
 
 *{margin:0;padding:0;font-family:'Comic Sans',sans-serif;}
 
-body{background-color:green}
+body{background-color:green;background-image:url('/images/webcomponents.1079385342.jpg');}
 
 h1,h2{color:var(--primary-color);border:0.5px solid #dddde1;border-left:3px solid var(--color-secondary);border-top:3px solid var(--color-secondary);}
 
@@ -59,3 +59,27 @@ a[href*='greenwood'],a[href$='.pdf']{color:orange}
 h1:has(+h2){margin:0 0 0.25rem 0}
 
 :is(ol,ul,menu:unsupported) :is(ol,ul){color:green}
+
+.snippet{margin:var(--size-4) 0;padding:0 var(--size-4);}
+
+h1{background-image:url('/foo/bar.baz')}
+
+.has-success{background-image:url('data:image/svg+xml;...')}
+
+:where(html){--size-000:-.5rem}
+
+:dir(rtl){background-color:red}
+
+:host(h1){color:red}
+
+::slotted(.content){background-color:aqua}
+
+h2 ::slotted(span){background:silver}
+
+tabbed-custom-element::part(tab){color:#0c0dcc;border-bottom:transparent solid 2px;}
+
+::highlight(rainbow-color-1){color:#ad26ad;text-decoration:underline;}
+
+h2{& span{color:red}}
+
+@media  (max-width:768px){span{flex-direction:column;text-align:center;}}

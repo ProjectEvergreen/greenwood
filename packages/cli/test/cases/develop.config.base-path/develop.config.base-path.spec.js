@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood serve command with no basePath configuration set (and staticRouter).
+ * Run Greenwood develop command with no basePath configuration set (and staticRouter).
  *
  * User Result
  * Should start the development server and render a the Greenwood application.
@@ -20,13 +20,13 @@
  *
  * User Workspace
  * src/
- *   api/
- *     greeting.js
  *   assets/
  *     logo.png
  *   components/
  *     card.js
  *   pages/
+ *     api/
+ *       greeting.js
  *     index.html
  *     users.js
  *   styles/
@@ -174,7 +174,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return the correct response body', function(done) {
-        expect(body).to.contain('color: blue;');
+        expect(body).to.contain('*{color:blue}');
         done();
       });
     });
@@ -285,31 +285,6 @@ describe('Develop Greenwood With: ', function() {
         const cards = usersPageDom.window.document.querySelectorAll('body > section');
 
         expect(cards.length).to.be.greaterThan(0);
-      });
-    });
-
-    describe('Fetching graph.json client side', function() {
-      let response;
-      let graph;
-
-      before(async function() {
-        response = await fetch(`${hostname}:${port}${basePath}/graph.json`);
-        graph = await response.clone().json();
-      });
-
-      it('should return the correct content type', function(done) {
-        expect(response.headers.get('content-type')).to.contain('application/json');
-        done();
-      });
-
-      it('should return a 200', function(done) {
-        expect(response.status).to.equal(200);
-        done();
-      });
-
-      it('should have the expected length for all content', function(done) {
-        expect(graph.length).to.equal(3);
-        done();
       });
     });
   });

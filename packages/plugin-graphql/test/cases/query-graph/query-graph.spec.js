@@ -75,6 +75,10 @@ describe('Build Greenwood With: ', function() {
         `${process.cwd()}/node_modules/lit/package.json`,
         `${outputPath}/node_modules/lit/`
       );
+      const litSsrPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit-labs/ssr-dom-shim/package.json`,
+        `${outputPath}/node_modules/@lit-labs/ssr-dom-shim/`
+      );
       const litElement = await getDependencyFiles(
         `${process.cwd()}/node_modules/lit-element/*.js`,
         `${outputPath}/node_modules/lit-element/`
@@ -124,6 +128,7 @@ describe('Build Greenwood With: ', function() {
         ...greenwoodGraphqlQueryLibs,
         ...lit,
         ...litPackageJson,
+        ...litSsrPackageJson,
         ...litDirectives,
         ...litDecorators,
         ...litElementPackageJson,
@@ -180,14 +185,14 @@ describe('Build Greenwood With: ', function() {
         expect(lists.length).to.be.equal(1);
       });
 
-      it('should have a expected navigation output in the <header> based on pages with menu: navigation frontmatter', function() {
+      it('should have a expected navigation output in the <header> based on pages in the graph', function() {
         const listItems = dom.window.document.querySelectorAll('body ul li');
 
         expect(listItems.length).to.be.equal(4);
 
         expect(listItems[0].innerHTML).to.contain('First Post');
         expect(listItems[1].innerHTML).to.contain('Second Post');
-        expect(listItems[2].innerHTML).to.contain('Index');
+        expect(listItems[2].innerHTML).to.contain('Home');
         expect(listItems[3].innerHTML).to.contain('Not Found');
       });
     });

@@ -2,7 +2,7 @@ import { renderToString, renderFromHTML } from 'wc-compiler';
 
 async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender = false, htmlContents = null, scripts = [], request }) {
   const data = {
-    template: null,
+    layout: null,
     body: null,
     frontmatter: null,
     html: null
@@ -15,7 +15,7 @@ async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender
     data.html = html;
   } else {
     const module = await import(moduleUrl).then(module => module);
-    const { prerender = false, getTemplate = null, getBody = null, getFrontmatter = null } = module;
+    const { prerender = false, getLayout = null, getBody = null, getFrontmatter = null, isolation } = module;
 
     if (module.default) {
       const { html } = await renderToString(new URL(moduleUrl), false, request);
@@ -27,15 +27,18 @@ async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender
       }
     }
 
-    if (getTemplate) {
-      data.template = await getTemplate(compilation, page);
+    if (getLayout) {
+      data.layout = await getLayout(compilation, page);
     }
 
     if (getFrontmatter) {
       data.frontmatter = await getFrontmatter(compilation, page);
     }
 
+    // TODO cant we get these from just pulling from the file during the graph phase?
+    // https://github.com/ProjectEvergreen/greenwood/issues/991
     data.prerender = prerender;
+    data.isolation = isolation;
   }
 
   return data;

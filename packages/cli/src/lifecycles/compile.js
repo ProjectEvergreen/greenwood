@@ -1,8 +1,8 @@
 import { checkResourceExists } from '../lib/resource-utils.js';
 import { generateGraph } from './graph.js';
 import { initContext } from './context.js';
+import { readAndMergeConfig } from './config.js';
 import fs from 'fs/promises';
-import { readAndMergeConfig as initConfig } from './config.js';
 
 const generateCompilation = () => {
   return new Promise(async (resolve, reject) => {
@@ -20,9 +20,9 @@ const generateCompilation = () => {
       };
 
       console.info('Initializing project config');
-      compilation.config = await initConfig();
+      compilation.config = await readAndMergeConfig();
 
-      // determine whether to use default template or user detected workspace
+      // determine whether to use default layout or user detected workspace
       console.info('Initializing project workspace contexts');
       compilation.context = await initContext(compilation);
 

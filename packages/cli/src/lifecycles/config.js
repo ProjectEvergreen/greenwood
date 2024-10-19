@@ -46,12 +46,17 @@ const defaultConfig = {
   port: 8080,
   basePath: '',
   optimization: optimizations[0],
-  interpolateFrontmatter: false,
+  activeContent: false,
   plugins: greenwoodPlugins,
   markdown: { plugins: [], settings: {} },
   prerender: false,
+  isolation: false,
   pagesDirectory: 'pages',
-  templatesDirectory: 'templates'
+  layoutsDirectory: 'layouts',
+  polyfills: {
+    importAttributes: null, // or ['css', 'json']
+    importMaps: false
+  }
 };
 
 const readAndMergeConfig = async() => {
@@ -76,7 +81,8 @@ const readAndMergeConfig = async() => {
 
       if (hasConfigFile) {
         const userCfgFile = (await import(configUrl)).default;
-        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, templatesDirectory, interpolateFrontmatter } = userCfgFile;
+        // eslint-disable-next-line max-len
+        const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, layoutsDirectory, activeContent, isolation, polyfills } = userCfgFile;
 
         // workspace validation
         if (workspace) {
@@ -97,11 +103,11 @@ const readAndMergeConfig = async() => {
           reject(`Error: provided optimization "${optimization}" is not supported.  Please use one of: ${optimizations.join(', ')}.`);
         }
 
-        if (interpolateFrontmatter) {
-          if (typeof interpolateFrontmatter !== 'boolean') {
-            reject('Error: greenwood.config.js interpolateFrontmatter must be a boolean');
+        if (activeContent) {
+          if (typeof activeContent !== 'boolean') {
+            reject('Error: greenwood.config.js activeContent must be a boolean');
           }
-          customConfig.interpolateFrontmatter = interpolateFrontmatter;
+          customConfig.activeContent = activeContent;
         }
 
         if (plugins && plugins.length > 0) {
@@ -204,10 +210,10 @@ const readAndMergeConfig = async() => {
           reject(`Error: provided pagesDirectory "${pagesDirectory}" is not supported.  Please make sure to pass something like 'docs/'`);
         }
 
-        if (templatesDirectory && typeof templatesDirectory === 'string') {
-          customConfig.templatesDirectory = templatesDirectory;
-        } else if (templatesDirectory) {
-          reject(`Error: provided templatesDirectory "${templatesDirectory}" is not supported.  Please make sure to pass something like 'layouts/'`);
+        if (layoutsDirectory && typeof layoutsDirectory === 'string') {
+          customConfig.layoutsDirectory = layoutsDirectory;
+        } else if (layoutsDirectory) {
+          reject(`Error: provided layoutsDirectory "${layoutsDirectory}" is not supported.  Please make sure to pass something like 'layouts/'`);
         }
 
         if (prerender !== undefined) {
@@ -223,11 +229,41 @@ const readAndMergeConfig = async() => {
           customConfig.prerender = false;
         }
 
+        if (isolation !== undefined) {
+          if (typeof isolation === 'boolean') {
+            customConfig.isolation = isolation;
+          } else {
+            reject(`Error: greenwood.config.js isolation must be a boolean; true or false.  Passed value was typeof: ${typeof staticRouter}`);
+          }
+        }
+
         if (staticRouter !== undefined) {
           if (typeof staticRouter === 'boolean') {
             customConfig.staticRouter = staticRouter;
           } else {
             reject(`Error: greenwood.config.js staticRouter must be a boolean; true or false.  Passed value was typeof: ${typeof staticRouter}`);
+          }
+        }
+
+        if (polyfills !== undefined) {
+          const { importMaps, importAttributes } = polyfills;
+
+          customConfig.polyfills = {};
+
+          if (importMaps) {
+            if (typeof importMaps === 'boolean') {
+              customConfig.polyfills.importMaps = true;
+            } else {
+              reject(`Error: greenwood.config.js polyfills.importMaps must be a boolean; true or false.  Passed value was typeof: ${typeof importMaps}`);
+            }
+          }
+
+          if (importAttributes) {
+            if (Array.isArray(importAttributes)) {
+              customConfig.polyfills.importAttributes = importAttributes;
+            } else {
+              reject(`Error: greenwood.config.js polyfills.importAttributes must be an array of types; ['css', 'json'].  Passed value was typeof: ${typeof importAttributes}`);
+            }
           }
         }
       } else {

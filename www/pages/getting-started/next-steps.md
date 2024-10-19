@@ -1,8 +1,6 @@
 ---
-label: 'next-steps'
-menu: side
-title: 'Next Steps'
-index: 8
+collection: getting-started
+order: 8
 ---
 
 ## Next Steps

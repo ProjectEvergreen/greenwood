@@ -54,10 +54,97 @@ describe('Build Greenwood With: ', function() {
         `${process.cwd()}/packages/plugin-graphql/src/core/*.js`,
         `${outputPath}/node_modules/@greenwood/plugin-graphql/src/core/`
       );
+      const greenwoodGraphqlQueryLibs = await getDependencyFiles(
+        `${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`,
+        `${outputPath}/node_modules/@greenwood/plugin-graphql/src/queries/`
+      );
+      const greenwoodLibs = await getDependencyFiles(
+        `${process.cwd()}/packages/cli/src/lib/*.js`,
+        `${outputPath}/node_modules/cli/src/lib/`
+      );
+      const lit = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit/*.js`,
+        `${outputPath}/node_modules/lit/`
+      );
+      const litDecorators = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit/decorators/*.js`,
+        `${outputPath}/node_modules/lit/decorators/`
+      );
+      const litDirectives = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit/directives/*.js`,
+        `${outputPath}/node_modules/lit/directives/`
+      );
+      const litPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit/package.json`,
+        `${outputPath}/node_modules/lit/`
+      );
+      const litSsrPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit-labs/ssr-dom-shim/package.json`,
+        `${outputPath}/node_modules/@lit-labs/ssr-dom-shim/`
+      );
+      const litElement = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-element/*.js`,
+        `${outputPath}/node_modules/lit-element/`
+      );
+      const litElementPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-element/package.json`,
+        `${outputPath}/node_modules/lit-element/`
+      );
+      const litElementDecorators = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-element/decorators/*.js`,
+        `${outputPath}/node_modules/lit-element/decorators/`
+      );
+      const litHtml = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/*.js`,
+        `${outputPath}/node_modules/lit-html/`
+      );
+      const litHtmlPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/package.json`,
+        `${outputPath}/node_modules/lit-html/`
+      );
+      const litHtmlDirectives = await getDependencyFiles(
+        `${process.cwd()}/node_modules/lit-html/directives/*.js`,
+        `${outputPath}/node_modules/lit-html/directives/`
+      );
+      // lit-html has a dependency on this
+      // https://github.com/lit/lit/blob/main/packages/lit-html/package.json#L82
+      const trustedTypes = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
+        `${outputPath}/node_modules/@types/trusted-types/`
+      );
+      const litReactiveElement = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
+        `${outputPath}/node_modules/@lit/reactive-element/`
+      );
+      const litReactiveElementDecorators = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
+        `${outputPath}/node_modules/@lit/reactive-element/decorators/`
+      );
+      const litReactiveElementPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
+        `${outputPath}/node_modules/@lit/reactive-element/`
+      );
 
       runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
-        ...greenwoodGraphqlCoreLibs
+        ...greenwoodGraphqlCoreLibs,
+        ...greenwoodGraphqlQueryLibs,
+        ...lit,
+        ...litPackageJson,
+        ...litSsrPackageJson,
+        ...litDirectives,
+        ...litDecorators,
+        ...litElementPackageJson,
+        ...litElement,
+        ...litElementDecorators,
+        ...litHtmlPackageJson,
+        ...litHtml,
+        ...litHtmlDirectives,
+        ...trustedTypes,
+        ...litReactiveElement,
+        ...litReactiveElementDecorators,
+        ...litReactiveElementPackageJson,
+        ...greenwoodLibs
       ]);
       runner.runCommand(cliPath, 'build');
     });
@@ -96,37 +183,26 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
-      describe('<img> tag output from query', function() {
+      describe('content output from the <photo-gallery></photo-gallery> component', function() {
         const title = 'Home Page Logos';
-        let images;
 
-        before(function() {
-          images = dom.window.document.querySelectorAll('body img');
-        });
+        it('should have a expected image tag content', function() {
+          const images = dom.window.document.querySelectorAll('photo-gallery img');
 
-        it('should have three <img> tags in the <body>', function() {
           expect(images.length).to.be.equal(3);
-        });
 
-        it('should have a expected src attribute value for all three <img> tags', function() {
           images.forEach((image, i) => {
             const count = i += 1;
             expect(image.src).to.contain(`/assets/logo${count}.png`);
-          });
-        });
-
-        it('should have a expected title attribute value for all three <img> tags', function() {
-          images.forEach((image, i) => {
-            const count = i += 1;
             expect(image.title).to.contain(`${title} - Logo #${count}`);
           });
         });
 
         it('should have a expected title content in the <h2> tag', function() {
-          const h2 = dom.window.document.querySelectorAll('body h2');
+          const heading = dom.window.document.querySelectorAll('photo-gallery h2');
 
-          expect(h2.length).to.be.equal(1);
-          expect(h2[0].textContent).to.be.equal(title);
+          expect(heading.length).to.be.equal(1);
+          expect(heading[0].textContent).to.be.equal(title);
         });
       });
     });
