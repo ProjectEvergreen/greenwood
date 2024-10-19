@@ -1,8 +1,34 @@
 diff --git a/node_modules/wc-compiler/src/wcc.js b/node_modules/wc-compiler/src/wcc.js
-index 35884d4..0b75773 100644
+index 35884d4..6a80191 100644
 --- a/node_modules/wc-compiler/src/wcc.js
 +++ b/node_modules/wc-compiler/src/wcc.js
-@@ -33,17 +33,26 @@ async function renderComponentRoots(tree, definitions) {
+@@ -12,6 +12,25 @@ import { importAttributes } from 'acorn-import-attributes';
+ import { transform } from 'sucrase';
+ import fs from 'fs';
+ 
++const VOID_ELEMENTS = [
++  'area',
++  'base',
++  'br',
++  'col',
++  'embed',
++  'hr',
++  'img',
++  'input',
++  'keygen',
++  'link',
++  'menuitem',
++  'meta',
++  'param',
++  'source',
++  'track',
++  'wbr'
++];
++
+ function getParse(html) {
+   return html.indexOf('<html>') >= 0 || html.indexOf('<body>') >= 0 || html.indexOf('<head>') >= 0
+     ? parse
+@@ -33,17 +52,26 @@ async function renderComponentRoots(tree, definitions) {
  
        if (definitions[tagName]) {
          const { moduleURL } = definitions[tagName];
@@ -39,7 +65,7 @@ index 35884d4..0b75773 100644
        }
      }
  
-@@ -82,7 +91,7 @@ function registerDependencies(moduleURL, definitions, depth = 0) {
+@@ -82,7 +110,7 @@ function registerDependencies(moduleURL, definitions, depth = 0) {
        const isBareSpecifier = specifier.indexOf('.') !== 0 && specifier.indexOf('/') !== 0;
        const extension = specifier.split('.').pop();
  
@@ -48,53 +74,60 @@ index 35884d4..0b75773 100644
        // https://github.com/ProjectEvergreen/wcc/issues/122
        if (!isBareSpecifier && ['js', 'jsx', 'ts'].includes(extension)) {
          const dependencyModuleURL = new URL(node.source.value, moduleURL);
-@@ -138,7 +147,9 @@ async function getTagName(moduleURL) {
+@@ -138,7 +166,41 @@ async function getTagName(moduleURL) {
    return tagName;
  }
  
 -async function initializeCustomElement(elementURL, tagName, attrs = [], definitions = [], isEntry, props = {}) {
++function renderLightDomChildren(childNodes, iHTML = '') {
++  let innerHTML = iHTML;
++
++  childNodes.forEach((child) => {
++    const { nodeName, attrs = [], value } = child;
++
++    if (nodeName !== '#text') {
++      innerHTML += `<${nodeName}`;
++
++      if (attrs.length > 0) {
++        attrs.forEach(attr => {
++          innerHTML += ` ${attr.name}="${attr.value}"`;
++        });
++      }
++
++      innerHTML += '>';
++
++      if (child.childNodes.length > 0) {
++        innerHTML = renderLightDomChildren(child.childNodes, innerHTML);
++      }
++
++      innerHTML += VOID_ELEMENTS.includes(nodeName)
++        ? ''
++        : `</${nodeName}>`;
++    } else if (nodeName === '#text') {
++      innerHTML += value;
++    }
++  });
++
++  return innerHTML;
++}
++
 +async function initializeCustomElement(elementURL, tagName, node = {}, definitions = [], isEntry, props = {}) {
 +  const { attrs = [], childNodes = [] } = node;
 +
    if (!tagName) {
      const depth = isEntry ? 1 : 0;
      registerDependencies(elementURL, definitions, depth);
-@@ -157,6 +168,34 @@ async function initializeCustomElement(elementURL, tagName, attrs = [], definiti
- 
+@@ -158,6 +220,9 @@ async function initializeCustomElement(elementURL, tagName, attrs = [], definiti
    if (element) {
      const elementInstance = new element(data); // eslint-disable-line new-cap
-+    let innerHTML = elementInstance.innerHTML || '';
-+
-+    // support for HTML (Light DOM) Web Components
-+    childNodes.forEach((child) => {
-+      const { nodeName, attrs = [] } = child;
-+
-+      if (nodeName !== '#text') {
-+        innerHTML += `<${nodeName}`;
-+
-+        if (attrs.length > 0) {
-+          attrs.forEach(attr => {
-+            innerHTML += ` ${attr.name}="${attr.value}"`;
-+          });
-+        }
-+
-+        innerHTML += '>';
-+
-+        child.childNodes.forEach((c) => {
-+          if (c.nodeName === '#text') {
-+            innerHTML += c.value;
-+          }
-+        });
-+
-+        innerHTML += `</${nodeName}>`;
-+      }
-+    });
-+
-+    elementInstance.innerHTML = innerHTML;
  
++    // support for HTML (Light DOM) Web Components
++    elementInstance.innerHTML = renderLightDomChildren(childNodes);
++
      attrs.forEach((attr) => {
        elementInstance.setAttribute(attr.name, attr.value);
-@@ -207,7 +246,7 @@ async function renderFromHTML(html, elements = []) {
+   
+@@ -207,7 +272,7 @@ async function renderFromHTML(html, elements = []) {
    const definitions = [];
  
    for (const url of elements) {
