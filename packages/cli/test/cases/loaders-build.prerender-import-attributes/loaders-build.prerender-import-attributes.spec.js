@@ -9,7 +9,6 @@
  * greenwood build
  *
  * User Config
- * import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
  *
  * {
  *   prerender: true,
