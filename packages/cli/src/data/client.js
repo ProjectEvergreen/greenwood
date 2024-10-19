@@ -1,5 +1,5 @@
 const CONTENT_STATE = globalThis.__CONTENT_AS_DATA_STATE__ ?? false; // eslint-disable-line no-underscore-dangle
-const PORT = globalThis?.__CONTENT_SERVER__?.PORT ?? 1985; // eslint-disable-line no-underscore-dangle
+const PORT = globalThis?.__CONTENT_SERVER__?.PORT ?? 1984; // eslint-disable-line no-underscore-dangle
 const BASE_PATH = globalThis?.__GWD_BASE_PATH__ ?? ''; // eslint-disable-line no-underscore-dangle
 
 async function getContentAsData(key = '') {
