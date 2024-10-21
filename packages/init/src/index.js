@@ -256,6 +256,8 @@ const run = async () => {
     const firstArg = process.argv[process.argv.length - 1].split(' ')[0];
     const taskRunner = program.yarn ? 'yarn' : 'npm run';
     const shouldChangeDirectory = !firstArg.startsWith('--') && firstArg !== '';
+    const shouldInstallDeps = program.install || program.yarn;
+    const instructions = [];
 
     if (!firstArg.startsWith('--') && firstArg !== '') {
       TARGET_DIR = path.join(TARGET_DIR, `./${firstArg}`);
@@ -283,7 +285,7 @@ const run = async () => {
     console.log('Creating package.json...');
     await npmInit();
 
-    if (program.install || program.yarn) {
+    if (shouldInstallDeps) {
       console.log('Installing project dependencies...');
       await install();
     }
@@ -291,12 +293,24 @@ const run = async () => {
     await cleanUp();
 
     console.log(`${chalk.rgb(175, 207, 71)('Initializing new project complete!')}`);
+    console.log(`${chalk.rgb(175, 207, 71)('Complete the follow steps to get started:')}`);
 
     if (shouldChangeDirectory) {
-      console.log(`Change directories by running => cd ${firstArg}`);
+      instructions.push(`Change directories by running => cd ${firstArg}`);
     }
 
-    console.log(`To start developing run => ${taskRunner} dev`);
+    if (!shouldInstallDeps) {
+      instructions.push('Install dependencies with your package manager, e.g. => npm i');
+    }
+
+    instructions.push(`To start developing run => ${taskRunner} dev`);
+
+    // output all instructions in step-based order
+    instructions.forEach((instruction, idx) => {
+      const step = idx += 1;
+
+      console.log(`${step}) ${instruction}`);
+    });
   } catch (err) {
     console.error(err);
   }
