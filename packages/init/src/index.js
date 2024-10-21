@@ -255,11 +255,13 @@ const run = async () => {
   try {
     const firstArg = process.argv[process.argv.length - 1].split(' ')[0];
     const taskRunner = program.yarn ? 'yarn' : 'npm run';
+    // bypassing commander here for my-app directory option, since I couldn't get it to work as an argument :/
+    // https://github.com/tj/commander.js?tab=readme-ov-file#command-arguments
     const shouldChangeDirectory = !firstArg.startsWith('--') && firstArg !== '';
     const shouldInstallDeps = program.install || program.yarn;
     const instructions = [];
 
-    if (!firstArg.startsWith('--') && firstArg !== '') {
+    if (shouldChangeDirectory) {
       TARGET_DIR = path.join(TARGET_DIR, `./${firstArg}`);
 
       if (!fs.existsSync(TARGET_DIR)) {
