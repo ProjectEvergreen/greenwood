@@ -13,9 +13,7 @@
  *
  * {
  *   plugins: [{
- *     greenwoodPluginRendererLit({
- *       prerender: true
- *     })
+ *     greenwoodPluginRendererLit()
  *   }]
  * }
  *
