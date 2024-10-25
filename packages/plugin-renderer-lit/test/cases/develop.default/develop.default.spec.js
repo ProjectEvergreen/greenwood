@@ -213,7 +213,7 @@ describe('Develop Greenwood With: ', function() {
 
       it('should have the expected lit hydration script _after_ any importmaps in the <head>', function() {
         // make sure this does NOT come before an importmap
-        const scripts = Array.from(dom.window.document.querySelectorAll('script[src*="lit-element-hydrate-support"] + script[type="importmap"'));
+        const scripts = Array.from(dom.window.document.querySelectorAll('script[src*="lit-element-hydrate-support"] + script[type="importmap"]'));
 
         expect(scripts.length).to.equal(0);
       });

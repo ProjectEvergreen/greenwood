@@ -108,7 +108,7 @@ function commonIndexSpecs(dom, html, label) {
       });
 
       it('should not have any module based <script> tags that come _before_ any importmaps in the <head>', function() {
-        const scripts = Array.from(dom.window.document.querySelectorAll('script[type="module"] + script[type*="importmap"'));
+        const scripts = Array.from(dom.window.document.querySelectorAll('script[type="module"] + script[type*="importmap"]'));
 
         expect(scripts.length).to.equal(0);
       });

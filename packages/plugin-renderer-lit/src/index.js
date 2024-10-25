@@ -25,8 +25,8 @@ class LitHydrationResource extends ResourceInterface {
     const hydrationSupportScriptPath = '/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js';
     let body = await response.text();
 
-    // this needs to come first before any userland code
-    // but before any import maps
+    // this needs to come first before any userland code, but before any import maps
+    // https://github.com/ProjectEvergreen/greenwood/pull/1289
     if (isDevelopment) {
       // quick way to find the ending position of the importmap <script> tag
       // and append the hydration support <script> right after it
