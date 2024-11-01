@@ -106,6 +106,12 @@ function commonIndexSpecs(dom, html, label) {
       it('should not have any optimization markers left in the HTML', function() {
         expect(html.match(/data-gwd-opt=".*[a-z]"/)).to.be.equal(null);
       });
+
+      it('should not have any module based <script> tags that come _before_ any importmaps in the <head>', function() {
+        const scripts = Array.from(dom.window.document.querySelectorAll('script[type="module"] + script[type*="importmap"]'));
+
+        expect(scripts.length).to.equal(0);
+      });
     });
 
     describe('document <body>', function() {
