@@ -80,13 +80,13 @@ _Eventually once [PostCSS adds support for ESM configuration files](https://gith
 
 If you would like to _extend_ the default configuration with your own custom _postcss.config.js_, you can enable the `extendConfig` option of this plugin
 ```js
-import { greenwoodPluginPostcss } from '@greenwood/plugin-postcss';
+import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 
 export default {
   // ...
 
   plugins: [
-    greenwoodPluginPostcss({
+    greenwoodPluginPostCss({
       extendConfig: true
     })
   ]
