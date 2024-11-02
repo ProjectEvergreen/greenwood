@@ -1,5 +1,5 @@
 {
-  "version": "0.30.0-alpha.8",
+  "version": "0.30.0",
   "packages": [
     "packages/*",
     "www"
