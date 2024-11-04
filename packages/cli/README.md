@@ -1,31 +1,39 @@
 # @greenwood/cli
 
 ## Overview
-CLI package for Greenwood.  For more information and complete docs, please visit the [Greenwood website](https://www.greenwoodjs.io/docs).
+
+CLI package for Greenwood.  For more information and complete docs, please visit the [Greenwood website](https://www.greenwoodjs.dev).
 
 ## Installation
-You can use your favorite JavaScript package manager to install this package.
 
-_examples:_
+Greenwood can be installed with your favorite JavaScript package manager.
+
 ```bash
 # npm
-npm install @greenwood/cli --save-dev
+npm i -D @greenwood/cli
 
 # yarn
 yarn add @greenwood/cli --dev
+
+# pnpm
+pnpm add -D @greenwood/cli
 ```
 
 ## Usage
-Then in your _package.json_, add the `type` field and `scripts` for the CLI like so:
+
+Then in your _package.json_, add the `type` field and `scripts` for the CLI:
+
 ```json
 {
   "type": "module",
   "scripts": {
     "build": "greenwood build",
-    "start": "greenwood develop"
+    "dev": "greenwood develop",
+    "serve": "greenwood serve"
   }
 }
 ```
 
-- `npm run build`: generates a static build of your project
-- `npm start`: starts a local development server for your project
+- `greenwood build`: Generates a production build of your project
+- `greenwood develop`: Starts a local development server for your project
+- `greenwood serve`: Runs a production server for a production build
