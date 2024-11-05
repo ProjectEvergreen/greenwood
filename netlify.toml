@@ -9,8 +9,169 @@
   NODE_VERSION = "18.12.1"
 
 [[redirects]]
+  from = "/"
+  to = "https://www.greenwoodjs.dev"
+  status = 301
+
+[[redirects]]
+  from = "/guides/cloudflare-workers-deployment/"
+  to = "https://www.greenwoodjs.dev/guides/hosting/cloudflare/"
+  status = 301
+
+[[redirects]]
+  from = "/guides/firebase/"
+  to = "https://www.greenwoodjs.dev/guides/hosting/"
+  status = 301
+
+[[redirects]]
+  from = "/guides/github-pages/"
+  to = "https://www.greenwoodjs.dev/guides/hosting/github/"
+  status = 301
+
+[[redirects]]
+  from = "/guides/netlify-deploy/"
+  to = "https://www.greenwoodjs.dev/guides/hosting/netlify/"
+  status = 301
+
+[[redirects]]
+  from = "/guides/netlify-cms/"
+  to = "https://www.greenwoodjs.dev/guides/hosting/netlify/"
+  status = 301
+
+[[redirects]]
+  from = "/guides/now/"
+  to = "https://www.greenwoodjs.dev/guides/hosting/vercel/"
+  status = 301
+
+[[redirects]]
+  from = "/guides/s3-cloudfront/"
+  to = "https://www.greenwoodjs.dev/guides/hosting/aws/"
+  status = 301
+
+[[redirects]]
+  from = "/guides/theme-packs/"
+  to = "https://www.greenwoodjs.dev/guides/tutorials/theme-packs/"
+  status = 301
+
+[[redirects]]
+  from = "/getting-started/"
+  to = "https://www.greenwoodjs.dev/guides/getting-started/"
+  status = 301
+
+[[redirects]]
+  from = "/about/:splat"
+  to = "https://www.greenwoodjs.dev/docs/introduction/about/"
+  status = 301
+
+[[redirects]]
+  from = "/plugins/"
+  to = "https://www.greenwoodjs.dev/docs/references/plugins-api/"
+  status = 301
+
+[[redirects]]
+  from = "/plugins/adapter/"
+  to = "https://www.greenwoodjs.dev/docs/reference/plugins-api/#adapter"
+  status = 301
+
+[[redirects]]
+  from = "/plugins/context/"
+  to = "https://www.greenwoodjs.dev/docs/reference/plugins-api/#context"
+  status = 301
+
+[[redirects]]
+  from = "/plugins/copy/"
+  to = "https://www.greenwoodjs.dev/docs/reference/plugins-api/#copy"
+  status = 301
+
+[[redirects]]
+  from = "/plugins/renderer/"
+  to = "https://www.greenwoodjs.dev/docs/reference/plugins-api/#renderer"
+  status = 301
+
+[[redirects]]
+  from = "/plugins/resource/"
+  to = "https://www.greenwoodjs.dev/docs/reference/plugins-api/#resource"
+  status = 301
+
+[[redirects]]
+  from = "/plugins/rollup/"
+  to = "https://www.greenwoodjs.dev/docs/reference/plugins-api/#rollup"
+  status = 301
+
+[[redirects]]
+  from = "/plugins/server/"
+  to = "https://www.greenwoodjs.dev/docs/reference/plugins-api/#server"
+  status = 301
+
+[[redirects]]
+  from = "/plugins/source/"
+  to = "https://www.greenwoodjs.dev/docs/reference/plugins-api/#source"
+  status = 301
+
+[[redirects]]
+  from = "/plugins/custom-plugins/"
+  to = "https://www.greenwoodjs.dev/docs/plugins/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/component-model/"
+  to = "https://www.greenwoodjs.dev/docs/introduction/web-standards/#web-components"
+  status = 301
+
+[[redirects]]
+  from = "/docs/configuration/"
+  to = "https://www.greenwoodjs.dev/docs/reference/configuration/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/front-matter/"
+  to = "https://www.greenwoodjs.dev/docs/resources/markdown/#frontmatter"
+  status = 301
+
+[[redirects]]
+  from = "/docs/markdown/"
+  to = "https://www.greenwoodjs.dev/docs/resources/markdown/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/scripts/"
+  to = "https://www.greenwoodjs.dev/docs/resources/scripts/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/css-and-images/"
+  to = "https://www.greenwoodjs.dev/docs/resources/styles/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/layouts/"
+  to = "https://www.greenwoodjs.dev/docs/pages/layouts/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/server-rendering/"
+  to = "https://www.greenwoodjs.dev/docs/pages/server-rendering/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/api-routes/"
+  to = "https://www.greenwoodjs.dev/docs/pages/api-routes/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/menus/"
+  to = "https://www.greenwoodjs.dev/docs/content-as-data/collections/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/data/"
+  to = "https://www.greenwoodjs.dev/docs/content-as-data/"
+  status = 301
+
+[[redirects]]
   from = "/docs/tech-stack/"
   to = "/about/tech-stack/"
+  status = 200
 
 [[redirects]]
   from = "/docs/menus/:splat"
