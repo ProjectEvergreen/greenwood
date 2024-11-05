@@ -9,9 +9,10 @@
   "keywords": [
     "Greenwood",
     "Static Site Generator",
+    "Server Side Rendering",
     "Full Stack Web Development",
+    "Serverless",
     "Web Components",
-    "NodeJS",
     "ESM"
   ],
   "main": "src/index.js",

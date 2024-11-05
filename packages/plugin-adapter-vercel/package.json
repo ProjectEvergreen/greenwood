@@ -9,10 +9,11 @@
   "keywords": [
     "Greenwood",
     "Static Site Generator",
-    "SSR",
+    "Server Side Rendering",
     "Full Stack Web Development",
-    "Vercel",
     "Serverless",
+    "Web Components",
+    "Vercel",
     "Edge"
   ],
   "main": "src/index.js",

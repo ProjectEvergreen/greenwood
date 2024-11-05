@@ -10,11 +10,16 @@
   "type": "module",
   "keywords": [
     "Greenwood",
+    "Scaffolding",
     "Static Site Generator",
+    "Server Side Rendering",
     "Full Stack Web Development",
+    "Serverless",
     "Web Components",
-    "NodeJS",
-    "Scaffolding"
+    "HTML",
+    "CSS",
+    "JavaScript",
+    "NodeJS"
   ],
   "bin": {
     "init": "./src/index.js"
