@@ -41,7 +41,7 @@ export default {
 }
 ```
 
-> _It should be noted that this plugin would more or less be another way to achieve what the [`static` optimization setting](https://www.greenwoodjs.io/docs/configuration/#optimization) already does._
+> _It should be noted that this plugin would more or less be another way to achieve what the [`static` optimization setting](https://www.greenwoodjs.dev/docs/reference/configuration/#optimization) already does._
 
 ### `<link>` Tag (HTML only)
 
