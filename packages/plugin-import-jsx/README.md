@@ -1,30 +1,35 @@
 # @greenwood/plugin-import-jsx
 
 ## Overview
-Enables usage of `import` syntax for loading [JSX rendering Web Components](https://merry-caramel-524e61.netlify.app/docs/#jsx) compatible with [**WCC**](https://github.com/ProjectEvergreen/wcc).  (This is _**not**_ React JSX!)
+Enables usage of `import` syntax for loading [JSX rendering Web Components](https://merry-caramel-524e61.netlify.app/docs/#jsx) compatible with [**WCC**](https://github.com/ProjectEvergreen/wcc). For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
+
+_Note: This is _**not**_ React JSX!_
 
 > This package assumes you already have `@greenwood/cli` installed.
 
 ## Installation
 You can use your favorite JavaScript package manager to install this package.
 
-_examples:_
 ```bash
 # npm
-npm install @greenwood/plugin-import-jsx --save-dev
+$ npm i -D @greenwood/plugin-import-jsx
 
 # yarn
-yarn add @greenwood/plugin-import-jsx --dev
+$ yarn add @greenwood/plugin-import-jsx --dev
+
+# pnpm
+$ pnpm add -D @greenwood/plugin-import-jsx
 ```
 
 ## Usage
-Add this plugin to your _greenwood.config.js_.
+
+Add this plugin to your _greenwood.config.js_:
 
 ```javascript
 import { greenwoodPluginImportJsx } from '@greenwood/plugin-import-jsx';
 
 export default {
-  ...
+  // ...
 
   plugins: [
     greenwoodPluginImportJsx()
@@ -32,7 +37,7 @@ export default {
 }
 ```
 
-This will then allow you to use `import` to include [WCC](https://merry-caramel-524e61.netlify.app/docs/#jsx) compatible JSX rendering Web Components.
+This will then allow you to use `import` to include [WCC](https://merry-caramel-524e61.netlify.app/docs/#jsx) compatible JSX rendering Web Components:
 ```js
 export default class FooterComponent extends HTMLElement {
   connectedCallback() {

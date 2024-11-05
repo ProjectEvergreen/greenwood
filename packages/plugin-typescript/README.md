@@ -21,7 +21,7 @@ yarn add @greenwood/plugin-typescript --dev
 
 ## Usage
 
-Add this plugin to your _greenwood.config.js_.
+Add this plugin to your _greenwood.config.js_:
 
 ```javascript
 import { greenwoodPluginTypeScript } from '@greenwood/plugin-typescript';
@@ -35,7 +35,7 @@ export default {
 };
 ```
 
-Then, you can write some TypeScript!
+Now, you can write some TypeScript!
 ```ts
 import { html, css, LitElement, customElement, property } from 'lit-element';
 

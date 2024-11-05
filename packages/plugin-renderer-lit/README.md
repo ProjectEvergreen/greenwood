@@ -2,12 +2,9 @@
 
 ## Overview
 
-A Greenwood plugin for using [**Lit**'s SSR capabilities](https://github.com/lit/lit/tree/main/packages/labs/ssr) as a custom server-side renderer.  Although support is experimental at this time, this plugin also gives the ability to statically render entire pages and layouts to output completely static sites.
-
-_We are still actively working on SSR features and enhancements for Greenwood [as part of our 1.0 release](https://github.com/ProjectEvergreen/greenwood/issues?q=is%3Aissue+is%3Aopen+label%3Assr+milestone%3A1.0) so please feel free to test it out and report your feedback._  🙏
+A Greenwood plugin for using [**Lit**'s SSR capabilities](https://github.com/lit/lit/tree/main/packages/labs/ssr) as a custom server-side renderer instead of Greenwood's default renderer (WCC). This plugin also gives the ability to statically render entire pages and layouts to output completely static sites. For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
 > This package assumes you already have `@greenwood/cli` installed.
-
 
 ## Prerequisite
 
@@ -15,10 +12,13 @@ This packages depends on the Lit package as a `peerDependency`.  This means you 
 
 ```sh
 # npm
-$ npm install lit --dev
+$ npm -i lit
 
 # yarn
-$ yarn add lit --dev
+$ yarn add lit
+
+# pnpm
+$ pnpm add lit
 ```
 
 ## Installation
@@ -27,10 +27,13 @@ You can use your favorite JavaScript package manager to install this package.
 
 ```bash
 # npm
-npm install @greenwood/plugin-renderer-lit --save-dev
+$ npm i -D @greenwood/plugin-renderer-lit
 
 # yarn
-yarn add @greenwood/plugin-renderer-lit --dev
+$ yarn add @greenwood/plugin-renderer-lit --dev
+
+# pnpm
+$ pnpm add -D @greenwood/plugin-renderer-lit
 ```
 
 ## Caveats
@@ -46,13 +49,13 @@ yarn add @greenwood/plugin-renderer-lit --dev
 
 ## Usage
 
-Add this plugin to your _greenwood.config.js_.
+Add this plugin to your _greenwood.config.js_:
 
 ```javascript
 import { greenwoodPluginRendererLit } from '@greenwood/plugin-renderer-lit';
 
 export default {
-  ...
+  // ...
 
   plugins: [
     greenwoodPluginRendererLit()

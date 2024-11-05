@@ -2,7 +2,7 @@
 
 ## Overview
 
-A Greenwood plugin for loading [**PostCSS**](https://postcss.org/) configuration and applying it to your CSS.
+A Greenwood plugin for loading [**PostCSS**](https://postcss.org/) configuration and applying it to your CSS.  For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
 > This package assumes you already have `@greenwood/cli` installed.
 
@@ -10,24 +10,26 @@ A Greenwood plugin for loading [**PostCSS**](https://postcss.org/) configuration
 
 You can use your favorite JavaScript package manager to install this package.
 
-_examples:_
 ```bash
 # npm
-npm install @greenwood/plugin-postcss --save-dev
+$ npm i -D @greenwood/plugin-postcss
 
 # yarn
-yarn add @greenwood/plugin-postcss --dev
+$ yarn add @greenwood/plugin-postcss --dev
+
+# pnpm
+$ pnpm add -D @greenwood/plugin-postcss
 ```
 
 ## Usage
 
-Add this plugin to your _greenwood.config.js_.
+Add this plugin to your _greenwood.config.js_:
 
 ```javascript
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 
 export default {
-  ...
+  // ...
 
   plugins: [
     greenwoodPluginPostCss()
@@ -46,7 +48,7 @@ export default {
 };
 ```
 
-> Note: Greenwood provides the postcss-import behavior out of the box.
+> Note: Greenwood provides the behavior of postcss-import out of the box.
 
 ## Options
 

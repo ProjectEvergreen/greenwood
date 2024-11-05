@@ -2,24 +2,28 @@
 
 ## Overview
 
-A Greenwood plugin to use ESM (`import`) syntax to load any file contents as a string exported as a JavaScript module.  Inspired by **webpack**'s [raw loader](https://v4.webpack.js.org/loaders/raw-loader/).
+A Greenwood plugin to use ESM (`import`) syntax to load any file contents as a string exported as a JavaScript module.  Inspired by **webpack**'s [raw loader](https://v4.webpack.js.org/loaders/raw-loader/).  For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
 > This package assumes you already have `@greenwood/cli` installed.
 
 ## Installation
+
 You can use your favorite JavaScript package manager to install this package.
 
-_examples:_
 ```bash
 # npm
-npm install @greenwood/plugin-import-raw --save-dev
+$ npm i -D @greenwood/plugin-import-raw
 
 # yarn
-yarn add @greenwood/plugin-import-raw --dev
+$ yarn add @greenwood/plugin-import-raw --dev
+
+# npm
+$ pnpm add -D @greenwood/plugin-import-raw
 ```
 
 ## Usage
-Add this plugin to your _greenwood.config.js_ and spread the `export`.
+
+Add this plugin to your _greenwood.config.js_:
 
 ```javascript
 import { greenwoodPluginImportRaw } from '@greenwood/plugin-import-raw';

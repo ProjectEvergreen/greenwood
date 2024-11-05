@@ -2,7 +2,7 @@
 
 ## Overview
 
-CLI package for Greenwood.  For more information and complete docs, please visit the [Greenwood website](https://www.greenwoodjs.dev).
+CLI package for Greenwood.  For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
 ## Installation
 
@@ -10,13 +10,13 @@ Greenwood can be installed with your favorite JavaScript package manager.
 
 ```bash
 # npm
-npm i -D @greenwood/cli
+$ npm i -D @greenwood/cli
 
 # yarn
-yarn add @greenwood/cli --dev
+$ yarn add @greenwood/cli --dev
 
 # pnpm
-pnpm add -D @greenwood/cli
+$ pnpm add -D @greenwood/cli
 ```
 
 ## Usage
