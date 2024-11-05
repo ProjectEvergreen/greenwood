@@ -69,7 +69,7 @@
   force = true
 
 [[redirects]]
-  from = "/about/:splat"
+  from = "/about/*"
   to = "https://www.greenwoodjs.dev/docs/introduction/about/"
   status = 301
   force = true
