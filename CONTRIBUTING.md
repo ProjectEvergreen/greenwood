@@ -4,7 +4,7 @@
 
 We're excited for your interest in Greenwood, and maybe even your contribution!
 
-> _We encourage all contributors to first read about the project's vision and motivation on our [website](https://www.greenwoodjs.io/docs/introduction/)._
+> _We encourage all contributors to first read about the project's vision and motivation on our [website](https://www.greenwoodjs.dev/docs/introduction/)._
 
 ## Setup
 
@@ -214,7 +214,7 @@ Our [sequentially named project boards](https://github.com/ProjectEvergreen/gree
 
 ### Discussions
 
-We believe good collaboration starts with good communication.  As with most of the open source community, Greenwood is a 100% volunteer project and so we understand the importance of respecting everyone's [time and expectations](https://www.jason.af/setting-expectations) when it comes to contributing and investing in a project.  Although we don't mind issues being made, unless the issue is clearly actionable and falls in-line with the motivations and trajectory of the project, then feel free to go ahead an open a [Discussion](https://github.com/ProjectEvergreen/greenwood/discussions) first.
+We believe good collaboration starts with good communication.  As with most of the open source community, Greenwood is a 100% volunteer project and so we understand the importance of respecting everyone's [time and expectations](https://jason.energy/setting-expectations/) when it comes to contributing and investing in a project.  Although we don't mind issues being made, unless the issue is clearly actionable and falls in-line with the motivations and trajectory of the project, then feel free to go ahead an open a [Discussion](https://github.com/ProjectEvergreen/greenwood/discussions) first.
 
 We encourage discussions as we believe it is better to hash out technical discussions and proposals ahead of time since coding and reviewing PRs are very time consuming activities.  As maintainers, we want to make sure everyone gets the time they are desire for contributing and this this workflow helps us plan our time in advance to best ensure a smooth flow of contributions through the project.
 
