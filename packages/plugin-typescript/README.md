@@ -99,7 +99,7 @@ If you would like to extend / override these options:
     };
     ```
 
-This will then process your JavaScript with TypeScript with the additional configuration settings you provide.  This also allows you to configure the rest of _tsconfig.json_ to support your IDE and local development environment settings.
+This will then process your JavaScript with TypeScript with the additional configuration settings you provide.  This also allows you to configure the rest of your _tsconfig.json_ to support your project specific IDE and local development environment settings.
 
 ### Pages
 
