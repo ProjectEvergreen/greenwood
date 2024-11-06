@@ -12,9 +12,7 @@
  * {
  *   prerender: true,
  *   plugins: [
- *      greenwoodPluginTypeScript({
- *        servePage: 'dynamic'
- *      })
+ *      greenwoodPluginTypeScript()
  *   ]
  * }
  *
