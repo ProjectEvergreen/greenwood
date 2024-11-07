@@ -1,7 +1,7 @@
 /*
  * Use Case
  * A theme pack _author_ creating a theme pack and using Greenwood for development and testing
- * following the guide published on the Greenwood website. (https://www.greenwoodjs.io/guides/theme-packs/)
+ * following the guide published on the Greenwood website. (https://www.greenwoodjs.dev/guides/theme-packs/)
  *
  * User Result
  * Should correctly validate the develop and build / serve commands work correctly using tge expected layouts

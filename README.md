@@ -7,21 +7,21 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
 ## Overview
-**Greenwood** is your _workbench for the web_; focused on supporting modern web standards and development to help you create your next project. For information on getting started, reviewing our docs, or to learn more about the project and how it works, please [visit our website](https://www.greenwoodjs.io/).
+**Greenwood** is your _workbench for the web_; focused on supporting modern web standards and development to help you create your next project. For information on getting started, reviewing our docs, or to learn more about the project and how it works, please [visit our website](https://www.greenwoodjs.dev/).
 
 Features:
-- ⚡ [No bundle development](https://www.greenwoodjs.io/about/how-it-works/). Pages are built on the fly.
-- 📝 HTML (and markdown) first [authoring experience](https://www.greenwoodjs.io/docs/layouts/) and ESM friendly.
-- 🎁 [Optimized](https://www.greenwoodjs.io/docs/configuration/#optimization) production builds.
+- ⚡ [No bundle development](https://www.greenwoodjs.dev/about/how-it-works/). Pages are built on the fly.
+- 📝 HTML (and markdown) first [authoring experience](https://www.greenwoodjs.dev/docs/layouts/) and ESM friendly.
+- 🎁 [Optimized](https://www.greenwoodjs.dev/docs/configuration/#optimization) production builds.
 - 🚫 No JavaScript by default.
 - 📖 Prerendering support for Web Components.
-- ⚒️ Extensible via [plugins](https://www.greenwoodjs.io/plugins/).
-- ⚙️ Supports [SSG, MPA, SPA, and SSR project types](https://www.greenwoodjs.io/docs/layouts/). (or a hybrid!)
+- ⚒️ Extensible via [plugins](https://www.greenwoodjs.dev/plugins/).
+- ⚙️ Supports [SSG, MPA, SPA, and SSR project types](https://www.greenwoodjs.dev/docs/layouts/). (or a hybrid!)
 
-> Greenwood is currently working towards a [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3).  If you're interested in learning more about the web and web development (at any skill level!), or interested in checking out our high level roadmap and how Greenwood got where it is today, you can read our [State of GreenwoodJS blog post](https://www.greenwoodjs.io/blog/state-of-greenwood-2022/).  We would love to have your help making Greenwood! ✌️
+> Greenwood is currently working towards a [1.0 release](https://github.com/ProjectEvergreen/greenwood/milestone/3).  If you're interested in learning more about the web and web development (at any skill level!), or interested in checking out our high level roadmap and how Greenwood got where it is today, you can read our [State of GreenwoodJS blog post](https://www.greenwoodjs.dev/blog/state-of-greenwood-2022/).  We would love to have your help making Greenwood! ✌️
 
 ## Getting Started
-Our website has a complete [Getting Started](http://www.greenwoodjs.io/getting-started) section that will walk you through creating a Greenwood project from scratch.
+Our website has a complete [Getting Started](https://www.greenwoodjs.dev/getting-started) section that will walk you through creating a Greenwood project from scratch.
 
 You can follow along with, or clone and go, the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started).
 
@@ -52,7 +52,7 @@ Then in your _package.json_, add the `type` field and `scripts` for the CLI, lik
 - `greenwood serve`: Generates a production build of your project and runs it on a NodeJS based web server
 
 ## Documentation
-All of our documentation is on our [website](https://www.greenwoodjs.io/) (which itself is built by Greenwood!).  See our website documentation to learn more about:
+All of our documentation is on our [website](https://www.greenwoodjs.dev/) (which itself is built by Greenwood!).  See our website documentation to learn more about:
 - Configuration
 - Pages
 - Templates

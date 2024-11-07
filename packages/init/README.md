@@ -2,7 +2,7 @@
 
 ## Overview
 
-Init package for scaffolding out a new Greenwood project.  For more information and complete docs, please visit the [Greenwood website](https://www.greenwoodjs.io/docs).
+Init package for scaffolding out a new Greenwood project.  For more information and complete docs, please visit the [Greenwood website](https://www.greenwoodjs.dev/docs).
 
 ## Usage
 

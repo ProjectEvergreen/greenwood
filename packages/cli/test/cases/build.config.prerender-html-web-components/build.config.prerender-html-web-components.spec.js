@@ -81,7 +81,7 @@ describe('Build Greenwood With: ', function() {
 
           expect(img.length).to.equal(1);
           expect(img[0].getAttribute('alt')).to.equal('Greenwood logo');
-          expect(img[0].getAttribute('src')).to.equal('https://www.greenwoodjs.io/assets/greenwood-logo-og.png');
+          expect(img[0].getAttribute('src')).to.equal('https://www.greenwoodjs.dev/assets/greenwood-logo-og.png');
         });
 
         it('should have the expected Author name <span> from userland in the HTML', () => {

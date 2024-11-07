@@ -1,7 +1,7 @@
 # @greenwood/cli
 
 ## Overview
-CLI package for Greenwood.  For more information and complete docs, please visit the [Greenwood website](https://www.greenwoodjs.io/docs).
+CLI package for Greenwood.  For more information and complete docs, please visit the [Greenwood website](https://www.greenwoodjs.dev/docs).
 
 ## Installation
 You can use your favorite JavaScript package manager to install this package.

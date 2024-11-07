@@ -20,7 +20,7 @@ export default {
 }
 ```
 
-> _It should be noted that this plugin would more or less be another way to achieve what the [`static` optimization setting](https://www.greenwoodjs.io/docs/configuration/#optimization) already does._
+> _It should be noted that this plugin would more or less be another way to achieve what the [`static` optimization setting](https://www.greenwoodjs.dev/docs/configuration/#optimization) already does._
 
 ### `<link>` Tag (HTML only)
 This is the simplest "flavor" and follows the spec more closely to address the use case where you have static HTML that you want to reuse across your pages, like a global header or footer.  The location of this file can be anywhere in your workspace, I just chose to put it in an _includes/_ directory for the sake of this example.

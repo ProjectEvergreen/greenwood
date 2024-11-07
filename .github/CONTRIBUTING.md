@@ -3,7 +3,7 @@
 ## Welcome!
 We're excited for your interest in Greenwood, and maybe even your contribution!
 
-> _We encourage all contributors to first read about the project's vision and motivation's on the website's [About page](https://www.greenwoodjs.io/about/).  Greenwood is opinionated in the sense that it is designed to support development for the modern web platform and aims to deliver a first class developer experience tailored for that expectation.  So if that page is the "why", this page is the "how"._
+> _We encourage all contributors to first read about the project's vision and motivation's on the website's [About page](https://www.greenwoodjs.dev/about/).  Greenwood is opinionated in the sense that it is designed to support development for the modern web platform and aims to deliver a first class developer experience tailored for that expectation.  So if that page is the "why", this page is the "how"._
 
 ## Setup
 
@@ -32,7 +32,7 @@ The Greenwood GitHub repository is a combination [Yarn workspace](https://classi
 
 The two main directories are:
 - [_packages/_](https://github.com/ProjectEvergreen/greenwood/tree/master/packages) - Packages published to NPM under the `@greenwood/` scope
-- [_www/_](https://github.com/ProjectEvergreen/greenwood/tree/master/www) - [website](https://www.greenwoodjs.io) / documentation code
+- [_www/_](https://github.com/ProjectEvergreen/greenwood/tree/master/www) - [website](https://www.greenwoodjs.dev) / documentation code
 
 
 > _This guide is mainly intended to walk through the **cli** package; it being the principal package within the project supporting all other packages._
@@ -121,7 +121,7 @@ To develop for the project, you'll want to follow these steps:
 1. Run `yarn lerna bootstrap`
 
 ### NPM Scripts
-The [Greenwood website](https://www.greenwoodjs.io/) is currently built by Greenwood, and all files for it are located in this repository under the [_www/_ directory](https://github.com/ProjectEvergreen/greenwood/tree/master/www) workspace.  In addition to unit tests, you will want to verify any changes by running the website locally.
+The [Greenwood website](https://www.greenwoodjs.dev/) is currently built by Greenwood, and all files for it are located in this repository under the [_www/_ directory](https://github.com/ProjectEvergreen/greenwood/tree/master/www) workspace.  In addition to unit tests, you will want to verify any changes by running the website locally.
 
 Below are the development tasks available for working on this project:
 - `yarn develop` - Develop for the website locally using the dev server at `localhost:1984` in your browser.
@@ -212,7 +212,7 @@ Available on:
 Hit CTRL-C to stop the server
 ```
 
-It's featured on the Greenwood website [home page](https://www.greenwoodjs.io/) and in the [Quick Start guide](https://www.greenwoodjs.io/getting-started/quick-start/#command-line) as an option for using Greenwood.  There is a [spec for it](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/test/cases/build.default.quick-start-npx) to try and simulate running it.
+It's featured on the Greenwood website [home page](https://www.greenwoodjs.dev/) and in the [Quick Start guide](https://www.greenwoodjs.dev/getting-started/quick-start/#command-line) as an option for using Greenwood.  There is a [spec for it](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/cli/test/cases/build.default.quick-start-npx) to try and simulate running it.
 
 You can use it for local development with Greenwood by using [npm link](https://docs.npmjs.com/cli/v7/commands/npm-link) to make `greenwood` available to your local CLI.
 ```sh
@@ -229,7 +229,7 @@ Running Greenwood with the  command.
 
           Error: not able to detect command. try using the --help flag if
           you're encountering issues running Greenwood.  Visit our docs for more
-          info at https://www.greenwoodjs.io/docs/.
+          info at https://www.greenwoodjs.dev/docs/.
 ```
 
 ### Docker

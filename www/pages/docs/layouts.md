@@ -173,7 +173,7 @@ And the directory structure for it:
 
 ### Not Found Page
 
-Greenwood will automatically generate a [default _404.html_](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/src/layouts/app.html) for you but it is [fairly generic](https://greenwoodjs.io/404.html).  You can create your own though by simply creating a _404.html_ in your pages directory.
+Greenwood will automatically generate a [default _404.html_](https://github.com/ProjectEvergreen/greenwood/blob/master/packages/cli/src/layouts/app.html) for you but it is [fairly generic](https://greenwoodjs.dev/404.html).  You can create your own though by simply creating a _404.html_ in your pages directory.
 
 
 ```shell

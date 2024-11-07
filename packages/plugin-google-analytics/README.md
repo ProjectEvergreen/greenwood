@@ -7,7 +7,7 @@ A Greenwood plugin adding support for [Google Analytics](https://developers.goog
 const analyticsId = process.env.NODE_ENV === 'xxx' ? 'UA-123...' : 'UA-345...';
 ```
 
-> _For more information and complete docs about Greenwood, please visit the [Greenwood website](https://www.greenwoodjs.io/)._
+> _For more information and complete docs about Greenwood, please visit the [Greenwood website](https://www.greenwoodjs.dev/)._
 
 
 ## Installation

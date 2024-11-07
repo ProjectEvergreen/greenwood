@@ -60,7 +60,7 @@ export default {
 }
 ```
 
-Now, you can author [SSR pages](/docs/server-rendering/) using Lit templates and components using Greenwood's [`getBody` API](https://www.greenwoodjs.io/docs/server-rendering/#usage).  The below is an example of generating a template of LitElement based `<app-card>` web components.
+Now, you can author [SSR pages](/docs/server-rendering/) using Lit templates and components using Greenwood's [`getBody` API](https://www.greenwoodjs.dev/docs/server-rendering/#usage).  The below is an example of generating a template of LitElement based `<app-card>` web components.
 
 ```js
 // src/pages/products.js
@@ -98,7 +98,7 @@ By default, this plugin sets `isolation` mode to `true` for all SSR pages.  If y
 export const isolation = false;
 ```
 
-> _See the [isolation configuration](https://www.greenwoodjs.io/docs/configuration/#isolation) docs for more information._
+> _See the [isolation configuration](https://www.greenwoodjs.dev/docs/configuration/#isolation) docs for more information._
 
 ### Hydration
 

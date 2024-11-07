@@ -9,9 +9,9 @@ As of right now, you will likely need this plugin to load additional polyfills i
 - Mobile Browsers
 - Declarative Shadow DOM
 
-See Greenwood's [browser support](https://www.greenwoodjs.io/about/how-it-works#browser-support) and [evergreen build](https://www.greenwoodjs.io/about/how-it-works#evergreen-build) docs for more information on how Greenwood handles browser support out of the box.  Or visit [caniuse.com](https://caniuse.com/) to look up specific support for specific browsers.
+See Greenwood's [browser support](https://www.greenwoodjs.dev/about/how-it-works#browser-support) and [evergreen build](https://www.greenwoodjs.dev/about/how-it-works#evergreen-build) docs for more information on how Greenwood handles browser support out of the box.  Or visit [caniuse.com](https://caniuse.com/) to look up specific support for specific browsers.
 
-> _For more information and complete docs about Greenwood, please visit the [Greenwood website](https://www.greenwoodjs.io/)._
+> _For more information and complete docs about Greenwood, please visit the [Greenwood website](https://www.greenwoodjs.dev/)._
 
 ## Installation
 You can use your favorite JavaScript package manager to install this package.  This package assumes you already have `@greenwood/cli` installed.
