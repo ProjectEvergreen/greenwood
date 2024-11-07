@@ -257,7 +257,9 @@ const run = async () => {
     const taskRunner = program.yarn ? 'yarn' : 'npm run';
     // bypassing commander here for my-app directory option, since I couldn't get it to work as an argument :/
     // https://github.com/tj/commander.js?tab=readme-ov-file#command-arguments
-    const shouldChangeDirectory = !firstArg.startsWith('--') && firstArg !== '';
+    // hacky little work around to solve this issue until we can get this behavior integrated directly into inquirer
+    // https://github.com/ProjectEvergreen/greenwood/issues/1302
+    const shouldChangeDirectory = !firstArg.startsWith('--') && !firstArg.endsWith('/init/src/index.js');
     const shouldInstallDeps = program.install || program.yarn;
     const instructions = [];
 
