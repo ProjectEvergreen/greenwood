@@ -253,18 +253,21 @@ const cleanUp = async () => {
 
 const run = async () => {
   try {
-    const firstArg = process.argv[process.argv.length - 1].split(' ')[0];
-    const taskRunner = program.yarn ? 'yarn' : 'npm run';
     // bypassing commander here for my-app directory option, since I couldn't get it to work as an argument :/
     // https://github.com/tj/commander.js?tab=readme-ov-file#command-arguments
-    // hacky little work around to solve this issue until we can get this behavior integrated directly into inquirer
+    // bit of a hack job for now and its known custom directory and additional flags don't well together right now
     // https://github.com/ProjectEvergreen/greenwood/issues/1302
-    const shouldChangeDirectory = !firstArg.startsWith('--') && !firstArg.endsWith('/init/src/index.js');
+    // https://stackoverflow.com/a/31643053/417806
+    const args = process.argv;
+    const noArgs = args.length === 2;
+    const lastArg = args[args.length - 1].split(' ')[0];
+    const hasCustomDirectoryArg = !noArgs && !lastArg.startsWith('--');
+    const taskRunner = program.yarn ? 'yarn' : 'npm run';
     const shouldInstallDeps = program.install || program.yarn;
     const instructions = [];
 
-    if (shouldChangeDirectory) {
-      TARGET_DIR = path.join(TARGET_DIR, `./${firstArg}`);
+    if (hasCustomDirectoryArg) {
+      TARGET_DIR = path.join(TARGET_DIR, `./${lastArg}`);
 
       if (!fs.existsSync(TARGET_DIR)) {
         fs.mkdirSync(TARGET_DIR);
@@ -299,8 +302,8 @@ const run = async () => {
     console.log(`${chalk.rgb(175, 207, 71)('Initializing new project complete!')}`);
     console.log(`${chalk.rgb(175, 207, 71)('Complete the follow steps to get started:')}`);
 
-    if (shouldChangeDirectory) {
-      instructions.push(`Change directories by running => cd ${firstArg}`);
+    if (hasCustomDirectoryArg) {
+      instructions.push(`Change directories by running => cd ${lastArg}`);
     }
 
     if (!shouldInstallDeps) {
