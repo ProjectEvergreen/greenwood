@@ -22,7 +22,7 @@
     "src/"
   ],
   "peerDependencies": {
-    "@greenwood/cli": "^0.4.0"
+    "@greenwood/cli": "^0.30.0"
   },
   "devDependencies": {
     "@greenwood/cli": "^0.30.0"
