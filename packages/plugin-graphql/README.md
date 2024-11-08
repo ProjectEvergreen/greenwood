@@ -2,14 +2,14 @@
 
 ## Overview
 
-A plugin for Greenwood to support using [GraphQL](https://graphql.org/) to query Greenwood's [content graph](https://www.greenwoodjs.io/docs/data/) with our optional [pre-made queries](https://www.greenwoodjs.io/docs/data/#data-client).  It runs [**apollo-server**](https://www.apollographql.com/docs/apollo-server/) on the backend at build time and provides a **"read-only"** [**@apollo/client** _"like"_](https://www.apollographql.com/docs/react/api/core/ApolloClient/#ApolloClient.readQuery) interface for the frontend that you can use.
+A plugin for Greenwood to support using [GraphQL](https://graphql.org/) to query Greenwood's [content graph](https://www.greenwoodjs.dev/docs/content-as-data/) with our optional pre-made queries custom for GraphQL.  It runs [**apollo-server**](https://www.apollographql.com/docs/apollo-server/) on the backend at build time and provides a **"read-only"** [**@apollo/client** _"like"_](https://www.apollographql.com/docs/react/api/core/ApolloClient/#ApolloClient.readQuery) interface for the frontend that you can use.  For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
 > This package assumes you already have `@greenwood/cli` installed.
 
 ## Caveats
 
-As of now, this plugin requires some form of [prerendering](https://www.greenwoodjs.io/docs/server-rendering/#render-vs-prerender) either through:
-1. Enabling [custom imports](https://www.greenwoodjs.io/docs/server-rendering/#custom-imports) or
+As of now, this plugin requires some form of [prerendering](https://www.greenwoodjs.dev/docs/reference/rendering-strategies/) either through:
+1. Enabling [custom imports](https://www.greenwoodjs.dev/docs/pages/server-rendering/#custom-imports), or
 1. Installing the [Puppeteer renderer plugin](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-puppeteer).
 
 ## Installation
@@ -18,10 +18,13 @@ You can use your favorite JavaScript package manager to install this package.
 
 ```bash
 # npm
-npm install @greenwood/plugin-graphql --save-dev
+$ npm i -D @greenwood/plugin-graphql
 
 # yarn
-yarn add @greenwood/plugin-graphql --dev
+$ yarn add @greenwood/plugin-graphql --dev
+
+# pnpm
+$ pnpm add -D @greenwood/plugin-graphql
 ```
 
 ## Usage
@@ -90,8 +93,6 @@ class HeaderComponent extends HTMLElement {
 customElements.define('app-header', HeaderComponent);
 ```
 
-> _For more general purpose information on content with data in Greenwood, [please see our docs](https://www.greenwoodjs.io/docs/data/)._
-
 ## Schema
 
 The basic page schema follow the structure of the [page data]() structure.   Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type definition](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's `graph`.
@@ -122,9 +123,7 @@ The Graph query returns an array of all pages.
 import client from '@greenwood/plugin-graphql/src/core/client.js';
 import GraphQuery from '@greenwood/plugin-graphql/src/queries/graph.gql';
 
-.
-.
-.
+//
 
 async connectedCallback() {
   super.connectedCallback();
@@ -138,15 +137,13 @@ async connectedCallback() {
 
 ### Collections
 
-Based on [our Collections feature](http://www.greenwoodjs.io/docs/data/#collections) for querying based on collections.
+Based on [our Collections feature](http://www.greenwoodjs.dev/docs/content-as-data/collections/) for querying based on collections.
 
 ```javascript
 import client from '@greenwood/plugin-graphql/src/core/client.js';
 import CollectionQuery from '@greenwood/plugin-graphql/src/queries/collection.gql';
 
-.
-.
-.
+// ...
 
 async connectedCallback() {
   super.connectedCallback();
@@ -163,15 +160,13 @@ async connectedCallback() {
 
 ### Children 
 
-This will return a set of pages under a specific route and is akin to using [`getContentByRoute`](http://www.greenwoodjs.io/docs/data/#data-client).
+This will return a set of pages under a specific route and is akin to using [`getContentByRoute`](http://www.greenwoodjs.dev/docs/content-as-data/data-client/#content-by-route).
 
 ```javascript
 import client from '@greenwood/plugin-graphql/src/core/client.js';
 import ChildrenQuery from '@greenwood/plugin-graphql/src/queries/children.gql';
 
-.
-.
-.
+// ...
 
 async connectedCallback() {
   super.connectedCallback();
@@ -200,7 +195,8 @@ query {
 }
 ```
 
-Or within your component
+Or within your component:
+
 ```javascript
 import gql from 'graphql-tag';  // comes with Greenwood
 

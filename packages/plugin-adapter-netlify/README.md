@@ -1,13 +1,14 @@
 # @greenwood/plugin-adapter-netlify
 
 ## Overview
-This plugin enables usage of the [Netlify](https://www.netlify.com/) platform for hosting a Greenwood application.
+
+This plugin enables usage of the [Netlify](https://www.netlify.com/) platform for hosting a Greenwood application.  For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
 > This package assumes you already have `@greenwood/cli` installed.
 
 ## Features
 
-In addition to publishing a project's static assets to the Netlify CDN, this plugin adapts Greenwood [API routes](https://www.greenwoodjs.io/docs/api-routes/) and [SSR pages](https://www.greenwoodjs.io/docs/server-rendering/) into Netlify [Serverless functions](https://docs.netlify.com/functions/overview/) using their [custom build](https://docs.netlify.com/functions/deploy/?fn-language=js#custom-build-2) approach
+In addition to publishing a project's static assets to the Netlify CDN, this plugin adapts Greenwood [API routes](https://www.greenwoodjs.dev/docs/pages/api-routes/) and [SSR pages](https://www.greenwoodjs.dev/docs/docs/pages/server-rendering/) into Netlify [Serverless functions](https://docs.netlify.com/functions/overview/) using their [custom build](https://docs.netlify.com/functions/deploy/?fn-language=js#custom-build-2) approach.
 
 This plugin will automatically generate a custom [__redirects_](https://docs.netlify.com/routing/redirects/) file to correctly map your SSR page and API route URLs to the corresponding Netlify function endpoint (as a rewrite).  You can continue to customize your Netlify project using your _netlify.toml_ file as needed.
 
@@ -15,15 +16,18 @@ This plugin will automatically generate a custom [__redirects_](https://docs.net
 
 
 ## Installation
+
 You can use your favorite JavaScript package manager to install this package.
 
-_examples:_
 ```bash
 # npm
-npm install @greenwood/plugin-adapter-netlify --save-dev
+$ npm i -D @greenwood/plugin-adapter-netlify
 
 # yarn
-yarn add @greenwood/plugin-adapter-netlify --dev
+$ yarn add @greenwood/plugin-adapter-netlify --dev
+
+# pnpm
+$ pnpm add -D @greenwood/plugin-adapter-netlify
 ```
 
 
@@ -45,13 +49,14 @@ Set the `AWS_LAMBDA_JS_RUNTIME` environment variable [in your Netlify UI](https:
 
 
 ## Usage
-Add this plugin to your _greenwood.config.js_.
+
+Add this plugin to your _greenwood.config.js_:
 
 ```javascript
 import { greenwoodPluginAdapterNetlify } from '@greenwood/plugin-adapter-netlify';
 
 export default {
-  ...
+  // ...
 
   plugins: [
     greenwoodPluginAdapterNetlify()
@@ -59,7 +64,9 @@ export default {
 }
 ```
 
-Optionally, your API routes will have access to Netlify's `context` object as the second parameter to the `handler` function.  For example:
+Optionally, your API routes will have access to Netlify's `context` object as the second parameter to the `handler` function.
+
+For example:
 ```js
 export async function handler(request, context = {}) {
   console.log({ request, context });
@@ -82,6 +89,7 @@ Then when you run it, you will be able to run and test a production build of you
 > _Please see caveats section for more information on this feature. 👇_
 
 ## Caveats
+
 1. [Edge runtime](https://docs.netlify.com/edge-functions/overview/) is not supported ([yet](https://github.com/ProjectEvergreen/greenwood/issues/1141)).
 1. Netlify CLI / Local Dev
     - [`context` object](https://docs.netlify.com/functions/create/?fn-language=js#code-your-function-2) not supported when running `greenwood develop` command

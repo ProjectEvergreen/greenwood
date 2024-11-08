@@ -4,7 +4,7 @@
 
 A Greenwood plugin for authoring [**CSS Modules ™️**](https://github.com/css-modules/css-modules).  It is a modest implementation of [the specification](https://github.com/css-modules/icss).  🙂
 
-This is NOT to be confused with [CSS Module _Scripts_](https://web.dev/articles/css-module-scripts), which Greenwood already supports.
+This is NOT to be confused with [CSS Module _Scripts_](https://web.dev/articles/css-module-scripts), which Greenwood already supports.  For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
 > This package assumes you already have `@greenwood/cli` installed.
 
@@ -12,24 +12,26 @@ This is NOT to be confused with [CSS Module _Scripts_](https://web.dev/articles/
 
 You can use your favorite JavaScript package manager to install this package.
 
-_examples:_
 ```bash
 # npm
-npm i -D @greenwood/plugin-css-modules
+$ npm i -D @greenwood/plugin-css-modules
 
 # yarn
-yarn add @greenwood/plugin-css-modules --dev
+$ yarn add @greenwood/plugin-css-modules --dev
+
+# pnpm
+$ pnpm add -D @greenwood/plugin-css-modules
 ```
 
 ## Usage
 
-Add this plugin to your _greenwood.config.js_.
+Add this plugin to your _greenwood.config.js_:
 
 ```javascript
 import { greenwoodPluginCssModules } from '@greenwood/plugin-css-modules';
 
 export default {
-  ...
+  // ...
 
   plugins: [
     greenwoodPluginCssModules()
@@ -37,7 +39,7 @@ export default {
 }
 ```
 
-Now you can create a CSS file that ends in _.module.css_
+Now you can create a CSS file that ends in _.module.css_:
 
 ```css
 /* header.module.css */
@@ -65,7 +67,7 @@ Now you can create a CSS file that ends in _.module.css_
 ```
 
 
-And reference that in your (Light DOM) HTML based Web Component
+And reference that in your (Light DOM) HTML based Web Component:
 
 ```js
 // header.js

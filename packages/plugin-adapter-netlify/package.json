@@ -9,10 +9,11 @@
   "keywords": [
     "Greenwood",
     "Static Site Generator",
-    "SSR",
+    "Server Side Rendering",
     "Full Stack Web Development",
-    "Netlify",
     "Serverless",
+    "Web Components",
+    "Netlify",
     "Edge"
   ],
   "main": "src/index.js",

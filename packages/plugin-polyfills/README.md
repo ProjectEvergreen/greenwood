@@ -9,30 +9,34 @@ As of right now, you will likely need this plugin to load additional polyfills i
 - Mobile Browsers
 - Declarative Shadow DOM
 
-See Greenwood's [browser support](https://www.greenwoodjs.io/about/how-it-works#browser-support) and [evergreen build](https://www.greenwoodjs.io/about/how-it-works#evergreen-build) docs for more information on how Greenwood handles browser support out of the box.  Or visit [caniuse.com](https://caniuse.com/) to look up specific support for specific browsers.
+For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
-> _For more information and complete docs about Greenwood, please visit the [Greenwood website](https://www.greenwoodjs.io/)._
+> This package assumes you already have `@greenwood/cli` installed.
 
 ## Installation
+
 You can use your favorite JavaScript package manager to install this package.  This package assumes you already have `@greenwood/cli` installed.
 
-_examples:_
 ```bash
 # npm
-npm install @greenwood/plugin-polyfills --save-dev
+$ npm i -D @greenwood/plugin-polyfills
 
 # yarn
-yarn add @greenwood/plugin-polyfills --dev
+$ yarn add @greenwood/plugin-polyfills --dev
+
+# pnpm
+$ pnpm add -D @greenwood/plugin-polyfills
 ```
 
 ## Usage
-Use this plugin in your _greenwood.config.js_.
+
+Use this plugin in your _greenwood.config.js_:
 
 ```javascript
 import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
 
 export default {
-  ...
+  // ...
 
   plugins: [
     greenwoodPluginPolyfills()
@@ -57,7 +61,7 @@ You can adjust either of these default behaviors by providing `true` or `false` 
 import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
 
 export default {
-  ...
+  // ...
 
   // default values shown here
   plugins: [
