@@ -2,7 +2,7 @@
 
 ## Overview
 
-A Greenwood plugin for writing [**TypeScript**](https://www.typescriptlang.org/).   There is still a [little more work](https://github.com/ProjectEvergreen/greenwood/issues/658) we would like to do but this plugin should be suitable for general usage.
+A Greenwood plugin for writing [**TypeScript**](https://www.typescriptlang.org/). For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
 > This package assumes you already have `@greenwood/cli` installed.
 
@@ -10,13 +10,15 @@ A Greenwood plugin for writing [**TypeScript**](https://www.typescriptlang.org/)
 
 You can use your favorite JavaScript package manager to install this package.
 
-_examples:_
 ```bash
 # npm
-npm install @greenwood/plugin-typescript --save-dev
+$ npm i -D @greenwood/plugin-typescript
 
 # yarn
-yarn add @greenwood/plugin-typescript --dev
+$ yarn add @greenwood/plugin-typescript --dev
+
+# pnpm
+$ pnpm add -D @greenwood/plugin-typescript
 ```
 
 ## Usage

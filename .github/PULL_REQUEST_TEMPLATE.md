@@ -9,7 +9,7 @@ We love contributions and appreciate any help you can offer!
 
 ## Documentation 
 
-<!-- if this issue has been labeled as documentation, please submit a PR to our website repo -->
+<!-- if this issue has been labeled with documentation, please make sure submit a PR to our website repo and link it -->
 <!-- https://github.com/ProjectEvergreen/www.greenwoodjs.dev -->
 
 ## Summary of Changes

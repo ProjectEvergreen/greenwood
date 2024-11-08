@@ -21,18 +21,18 @@ To develop for the project, you'll want to follow these steps:
 
 ### Patch Package
 
-Generally we prefer to develop new features in the context of a project, working directly within _node_modules_ and validating the behavior first hand.  Since Greenwood runs on plugins, just like any other user of Greenwood, a lot can often be achieved by just creating a custom plugin in a project's _greenwood.config.js_ file.
+Generally we prefer to develop new features in the context of a project, working directly within _node_modules_ and validating the behavior or fix first hand.  Since Greenwood runs on plugins, just like any other user of Greenwood, a lot can often be achieved by just creating a custom plugin in a project's _greenwood.config.js_ file.
 
 If changes to _node_modules_ are needed, use [**patch-package**](https://www.npmjs.com/package/patch-package) to create a snapshot of those changes and provide that repo and patch along with your PR.
-
 
 ### Testing
 
 #### Test Cases
 
-Greenwood relies on a large set of test suites that are very behavior based, in that we scaffold out a full Greenwood project, including a _greenwood.config.js_.  Combined with mocha for testing and [**gallinago**](https://github.com/thescientist13/gallinago) for running Greenwood commands, any combination of configuration, project structure, and Greenwood command can be tested for its output.  (in other words, we are more E2E / BDD testing, not unit testing).
+Greenwood relies on a large set of test suites that are very behavior based, in that we can scaffold out a full Greenwood project, including a _greenwood.config.js_ and run any of Greenwood's commands over the project files.  Combined with mocha for testing and [**gallinago**](https://github.com/thescientist13/gallinago) for running Greenwood commands, any combination of configuration, project structure, and Greenwood command can be tested for its output.  (in other words, we favor E2E / BDD testing, as opposed to unit testing).
 
 Here an example test case:
+
 ```js
 import chai from 'chai';
 import { JSDOM } from 'jsdom';
@@ -94,11 +94,13 @@ describe('Build Greenwood With: ', function() {
 ### Running Tests
 
 To run tests in watch mode, use:
+
 ```shell
 $ yarn test:tdd
 ```
 
 To verify compliance with coverage and watermark thresholds (what CI server runs), use:
+
 ```shell
 $ yarn test
 ```
@@ -114,6 +116,7 @@ Below are some tips to help with running / debugging tests:
 ### Writing Tests
 
 Test cases follow a convention starting with the command (e.g. `build`) and and the capability and features being tested, like configuration with a particular option (e.g. `port`):
+
 ```shell
 <command>.<capability>.<feature>-<modifier>.spec.js
 ```
@@ -137,7 +140,7 @@ Test cases that exercise custom loaders (like TypeScript, JSX plugins) for SSR a
       runner = new Runner(false, true);
     });
     ```
-1. Use `yarn test:loaders` npm script
+1. Use the `yarn test:loaders` npm script
 
 #### Notes
 
@@ -150,7 +153,8 @@ Here are some things to keep in mind while writing your tests, due to the asynch
 
 To add and remove packages for any workspace, make sure you `cd` into the directory with the _package.json_ first before running `yarn add` or `yarn remove`.
 
-For example
+For example:
+
 ```shell
 $ cd packages/cli
 $ yarn add <package>
@@ -210,7 +214,7 @@ We take advantage of quite a few features on GitHub to assist in tracking issues
 
 ### Project Boards
 
-Our [sequentially named project boards](https://github.com/ProjectEvergreen/greenwood/projects) help us organize work into buckets that will generally include a small handful of "top line" goals and objectives we would like to focus on for that particular time box.  It also serves as a catch-all for the usual work and bug fixes that happens throughout general maintenance of the project.  Additionally, we leverage this as a means to shine insight into good opportunities for those interested in contributing as what the Greenwood team would appreciate help with the most.
+Our [sequentially named project boards](https://github.com/ProjectEvergreen/greenwood/projects) help us organize work into buckets that will generally include a small handful of "top line" goals and objectives we would like to focus on for that particular phase of work.  It also serves as a catch-all for the usual work and bug fixes that happens throughout general maintenance of the project.  Additionally, we leverage this as a means to shine insight into good opportunities for those interested in contributing as to what the Greenwood team would appreciate help with the most.
 
 ### Discussions
 
@@ -218,7 +222,7 @@ We believe good collaboration starts with good communication.  As with most of t
 
 We encourage discussions as we believe it is better to hash out technical discussions and proposals ahead of time since coding and reviewing PRs are very time consuming activities.  As maintainers, we want to make sure everyone gets the time they are desire for contributing and this this workflow helps us plan our time in advance to best ensure a smooth flow of contributions through the project.
 
-> _Put another way, we like to think of this approach as **measure twice, cut once**._
+> _Put another way, we like to think of this approach as **measuring twice, cut once**._
 
 ### Issues
 
@@ -232,6 +236,7 @@ Our standard issue template requests some of the following information to be pre
 ### Pull Requests
 
 Pull requests are the best!  To best help facilitate contributions to the project, here are some requests:
+
 - We generally prefer an issue be opened first, to help facilitate general discussion outside of the code review process itself and align on the ask and any expectations.  However, for typos in docs and minor "chore" like tasks a PR is usually sufficient.  When in doubt, open an issue.
 - For bugs, please consider reviewing the issue tracker first.
 - For branching, we generally follow the convention `<issue-label>/issue-<number>-<issue-title>`, e.g. _bug/issue-12-fixed-bug-with-yada-yada-yada_

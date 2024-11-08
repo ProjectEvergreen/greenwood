@@ -5,7 +5,7 @@ If asking a question, looking for help, or you have an idea for Greenwood, pleas
 
 ## Type of Change
 
-<!-- Please write out from of the following options: -->
+<!-- Please select from one of the following options: -->
 <!-- Feature / Bug / Other -->
 
 ## Summary
