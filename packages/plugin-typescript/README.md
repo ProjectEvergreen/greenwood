@@ -99,11 +99,13 @@ If you would like to extend / override these options:
     };
     ```
 
-This will then process your JavaScript with TypeScript with the additional configuration settings you provide.  This also allows you to configure the rest of _tsconfig.json_ to support your IDE and local development environment settings.
+This will then process your JavaScript with TypeScript with the additional configuration settings you provide.  This also allows you to configure the rest of your _tsconfig.json_ to support your project specific IDE and local development environment settings.
 
-### Custom Pages
+### Pages
 
-By default, this plugin extends TypeScript support to processing SSR pages and API routes.  If you would like to _disable_ this, set the `servePage` option to `false`
+By default, this plugin extends TypeScript support for processing [SSR pages](https://www.greenwoodjs.dev/docs/pages/server-rendering/) and [API routes](https://www.greenwoodjs.dev/docs/pages/api-routes/).  For this feature, you will need to enable [custom imports](https://www.greenwoodjs.dev/docs/pages/server-rendering/#custom-imports).
+
+If you would like to _disable_ this feature completely, set the `servePage` option to `false`:
 
 ```js
 import { greenwoodPluginTypeScript } from '@greenwood/plugin-typescript';
