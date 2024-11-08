@@ -230,7 +230,6 @@ const generateGraph = async (compilation) => {
               if (fileContents && customData.tocHeading > 0 && customData.tocHeading <= 6) {
                 // parse markdown for table of contents and output to json
                 customData.tableOfContents = toc(fileContents).json;
-                customData.tableOfContents.shift();
 
                 // parse table of contents for only the pages user wants linked
                 if (customData.tableOfContents.length > 0 && customData.tocHeading > 0) {
