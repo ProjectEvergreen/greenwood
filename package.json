@@ -45,7 +45,7 @@
     "eslint": "^8.51.0",
     "eslint-plugin-markdown": "^3.0.0",
     "eslint-plugin-no-only-tests": "^2.6.0",
-    "gallinago": "^0.8.1",
+    "gallinago": "^0.8.2",
     "glob-promise": "^3.4.0",
     "jsdom": "^16.5.0",
     "lerna": "^3.16.4",
