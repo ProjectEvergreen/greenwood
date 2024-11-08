@@ -22,7 +22,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.4.0"
+    "@greenwood/cli": "^0.30.0"
   },
   "dependencies": {
     "acorn": "^8.0.1",
