@@ -29,6 +29,7 @@
     "lint:css": "stylelint \"./www/**/*.js\", \"./www/**/*.css\"",
     "lint": "ls-lint && yarn lint:js && yarn lint:css"
   },
+  "trustedDependencies": ["puppeteer"],
   "devDependencies": {
     "@babel/core": "^7.24.4",
     "@babel/eslint-parser": "^7.24.1",
