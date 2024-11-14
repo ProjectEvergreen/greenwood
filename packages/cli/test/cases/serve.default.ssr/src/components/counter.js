@@ -13,9 +13,12 @@ template.innerHTML = `
 `;
 
 class MyCounter extends HTMLElement {
+  static staticProperty = 'foo';
+  #count;
+
   constructor() {
     super();
-    this.count = 0;
+    this.#count = 0;
     this.attachShadow({ mode: 'open' });
   }
 
@@ -23,19 +26,20 @@ class MyCounter extends HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.shadowRoot.getElementById('inc').onclick = () => this.inc();
     this.shadowRoot.getElementById('dec').onclick = () => this.dec();
+    this.#count = this.getAttribute('count') ?? this.#count;
     this.update();
   }
 
   inc() {
-    this.update(++this.count); // eslint-disable-line
+    this.update(++this.#count); // eslint-disable-line
   }
 
   dec() {
-    this.update(--this.count); // eslint-disable-line
+    this.update(--this.#count); // eslint-disable-line
   }
 
   update(count) {
-    this.shadowRoot.getElementById('count').innerHTML = count || this.count;
+    this.shadowRoot.getElementById('count').innerHTML = count || this.#count;
   }
 }
 
