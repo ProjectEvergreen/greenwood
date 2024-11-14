@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-import-json",
-  "version": "0.30.1",
+  "version": "0.30.2",
   "private": true,
   "description": "A Greenwood plugin to allow you to use ESM (import) syntax to load your JSON.",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
@@ -25,6 +25,6 @@
     "@greenwood/cli": "^0.12.3"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.30.1"
+    "@greenwood/cli": "^0.30.2"
   }
 }
