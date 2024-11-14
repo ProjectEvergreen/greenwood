@@ -12,7 +12,8 @@ ls:
   .woff2: lowercase
 
 ignore: 
-  - .git 
+  - .git
+  - public
   - node_modules
   - packages/plugin-babel/node_modules
   - packages/init/node_modules

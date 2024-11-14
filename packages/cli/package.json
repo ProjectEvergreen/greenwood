@@ -32,13 +32,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-node-resolve": "^15.0.0",
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
-    "acorn": "^8.0.1",
-    "acorn-import-attributes": "^1.9.5",
-    "acorn-walk": "^8.0.0",
+    "acorn": "^8.14.0",
+    "acorn-walk": "^8.3.4",
     "commander": "^2.20.0",
     "css-tree": "^3.0.0",
     "es-module-shims": "^1.8.3",
@@ -53,7 +52,7 @@
     "remark-frontmatter": "^2.0.0",
     "remark-parse": "^8.0.3",
     "remark-rehype": "^7.0.0",
-    "rollup": "^3.29.4",
+    "rollup": "^4.26.0",
     "unified": "^9.2.0",
     "wc-compiler": "~0.15.0"
   },

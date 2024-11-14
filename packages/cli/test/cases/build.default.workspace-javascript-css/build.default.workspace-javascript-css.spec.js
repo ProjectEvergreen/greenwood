@@ -58,7 +58,7 @@ describe('Build Greenwood With: ', function() {
       it('should have one <script> tag for other.js loaded in the <head>', function() {
         const scriptTags = dom.window.document.querySelectorAll('head > script[type="module"]');
         const mainScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
-          return (/other.*[a-z0-9].js/).test(script.src);
+          return (/other.*[a-zA-Z0-9].js/).test(script.src);
         });
 
         expect(mainScriptTags.length).to.be.equal(1);
@@ -66,11 +66,11 @@ describe('Build Greenwood With: ', function() {
 
       // this includes the non module file in a spec below
       it('should have the expected number of bundled .js files in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, '*.*[a-z0-9].js'))).to.have.lengthOf(3);
+        expect(await glob.promise(path.join(this.context.publicDir, '*.*[a-zA-Z0-9].js'))).to.have.lengthOf(3);
       });
 
       it('should have the expected other.js file in the output directory', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, 'other.*[a-z0-9].js'))).to.have.lengthOf(1);
+        expect(await glob.promise(path.join(this.context.publicDir, 'other.*[a-zA-Z0-9].js'))).to.have.lengthOf(1);
       });
     });
 
