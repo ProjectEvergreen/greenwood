@@ -25,7 +25,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.28.0-alpha.4"
+    "@greenwood/cli": "^0.30.0"
   },
   "dependencies": {
     "wc-compiler": "~0.15.0"
