@@ -10,7 +10,8 @@ import replace from '@rollup/plugin-replace';
 import { getNodeModulesLocationForPackage, getPackageJson, getPackageNameFromUrl } from '../../lib/node-modules-utils.js';
 import { resolveForRelativeUrl } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import { walkPackageJson, mergeImportMap } from '../../lib/walker-package-ranger.js';
+import { mergeImportMap } from '../../lib/walker-package-ranger.js';
+import { walkPackageJson } from '../../lib/walker-package-ranger2.js';
 
 let importMap;
 

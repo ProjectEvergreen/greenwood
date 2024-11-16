@@ -8,8 +8,11 @@
     <script type="module" src="../components/banner/banner.js"></script>
     <script type="module" src="../components/card/card.js" data-gwd-opt="static"></script>
 
+    <link rel="stylesheet" href="/node_modules/@shoelace-style/shoelace/dist/themes/light.css" />
     <link rel="stylesheet" href="/node_modules/prismjs/themes/prism-tomorrow.css"/>
     <link rel="stylesheet" href="../styles/home.css"/>
+
+    <script type="module" src="/node_modules/@shoelace-style/shoelace/dist/shoelace.js"></script>
   </head>
   <body>
 
@@ -17,7 +20,7 @@
       <app-banner></app-banner>
 
       <div class='gwd-content-wrapper'>
-
+          <sl-button variant="neutral" type="submit">Click me for a greeting!</sl-button>
           <div class='gwd-page-template gwd-content'>
             <div id="gwd-message-wrapper">
               <div class="message">
