@@ -1,11 +1,42 @@
+import fs from 'fs/promises';
+
 /* eslint-disable max-depth,complexity */
 const importMap = {};
+const extensionFilters = ['map', 'd.ts'];
 
 function updateImportMap(key, value) {
   importMap[key.replace('./', '')] = value.replace('./', '');
 }
 
-function walkPackageForExports(dependency, packageJson) {
+// https://nodejs.org/api/packages.html#subpath-patterns
+async function walkExportPatterns(dependency, exp, resolvedRoot) {
+  if (exp.endsWith('*')) {
+    const dir = new URL(exp.replace('*', ''), resolvedRoot);
+    const files = await fs.readdir(dir);
+    // console.log({ dependency, exp, dir });
+
+    files
+      .filter((file) => {
+        let shouldNotFilter = true;
+
+        extensionFilters.forEach((extFilter) => {
+          if (file.endsWith(extFilter)) {
+            shouldNotFilter = false;
+          }
+        });
+
+        return shouldNotFilter;
+      })
+      .forEach((file) => {
+        updateImportMap(`${dependency}/${exp.replace('/*', '')}/${file}`, `/node_modules/${dependency}/${exp.replace('/*', '')}/${file}`);
+      });
+  } else {
+    // TODO
+    // "./feature/*": "./feature/*.js",
+  }
+}
+
+async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
   const { exports, module, main } = packageJson;
 
   // console.log('walkPackageForExports', { dependency, exports, module, main });
@@ -27,9 +58,17 @@ function walkPackageForExports(dependency, packageJson) {
           } else {
             updateImportMap(`${dependency}/${exp}`, `/node_modules/${dependency}/${exports[exp].default}`);
           }
+        } else {
+          // TODO what to do here?  what else is there besides default?
         }
       } else {
-        // TODO, probably
+        if (exp === '.') {
+          updateImportMap(dependency, `/node_modules/${dependency}/${exports[exp]}`);
+        } else if (exp.indexOf('*') >= 0) {
+          await walkExportPatterns(dependency, exp, resolvedRoot);
+        } else {
+          updateImportMap(`${dependency}/${exp}`, `/node_modules/${dependency}/${exp}`);
+        }
       }
     }
   } else if (module || main) {
@@ -48,7 +87,7 @@ async function walkPackageJson(packageJson = {}) {
         const resolvedRoot = new URL(`./${dependency}/`, resolved.split(dependency)[0]);
         const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
 
-        walkPackageForExports(dependency, resolvedPackageJson);
+        walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
 
         if (resolvedPackageJson.dependencies) {
           for (const dependency in resolvedPackageJson.dependencies) {
@@ -60,7 +99,7 @@ async function walkPackageJson(packageJson = {}) {
               const resolvedRoot = new URL(`./${dependency}/`, resolved.split(dependency)[0]);
               const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
 
-              walkPackageForExports(dependency, resolvedPackageJson);
+              walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
               // console.log('### resolve direct dependency', { dependency, resolved, resolvedRoot: resolvedRoot.href, resolvedPackageJson })
               await walkPackageJson(resolvedPackageJson);
             }
@@ -72,7 +111,7 @@ async function walkPackageJson(packageJson = {}) {
     console.error('Error building up import map', e);
   }
 
-  console.log({ importMap });
+  // console.log({ importMap });
   return importMap;
 }
 
