@@ -1,8 +1,8 @@
 @import url('../assets/fonts/source-sans-pro.css');
 
-/* */
-@import '../../node_modules/@spectrum-web-components/styles/all-medium-darkest.css';
-@import url('../../node_modules/@spectrum-web-components/styles/all-large-darkest.css');
+/* TODO these break */
+/* @import '../../node_modules/@spectrum-web-components/styles/theme-dark.css'; */
+/* @import url('../../node_modules/@spectrum-web-components/styles/all-large-darkest.css'); */
 
 * {
   margin: 0;
