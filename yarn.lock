@@ -3925,17 +3925,6 @@
   resolved "https://registry.yarnpkg.com/@projectevergreen/acorn-jsx-esm/-/acorn-jsx-esm-0.1.0.tgz#9870be988907048b5b432425d6157b84f8e4fdef"
   integrity sha512-ZBSkr0e2M4ylq74dTGHSkWI2dF3Mz8zwBLyzIXZMftecKDADcsCTj7bWltVgtdl8Rh4+bmY1jNWUw7AlSV/r7A==
 
-"@projectevergreen/escodegen-esm@~0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@projectevergreen/escodegen-esm/-/escodegen-esm-0.1.0.tgz#c9259d51178d4be948dd19e561ce5e2a16948a0f"
-  integrity sha512-LM9FFffsXPHiOFt78K3bgF8kO8Fx+qluAPy9jP3H4lvCFE+2nbwQM4cWdOpVik++rHf4pkDA7FxDPWWATyBABg==
-  dependencies:
-    esprima "^4.0.1"
-    estraverse "^5.2.0"
-    esutils "^2.0.2"
-  optionalDependencies:
-    source-map "~0.6.1"
-
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@protobufjs/aspromise/-/aspromise-1.1.2.tgz#9b8b0cc663d669a7d8f6f5d0893a14d348f30fbf"
@@ -4804,11 +4793,6 @@ acorn-globals@^6.0.0:
     acorn "^7.1.1"
     acorn-walk "^7.1.1"
 
-acorn-import-attributes@^1.9.5:
-  version "1.9.5"
-  resolved "https://registry.yarnpkg.com/acorn-import-attributes/-/acorn-import-attributes-1.9.5.tgz#7eb1557b1ba05ef18b5ed0ec67591bfab04688ef"
-  integrity sha512-n02Vykv5uA3eHGM/Z2dQrcD56kL8TyDb2p1+0P83PClMnC/nc+anbQRhIOWnSq4Ke/KvDPrY3C9hDtC/A3eHnQ==
-
 acorn-jsx@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"
@@ -4819,7 +4803,7 @@ acorn-walk@^7.1.1:
   resolved "https://registry.yarnpkg.com/acorn-walk/-/acorn-walk-7.2.0.tgz#0de889a601203909b0fbe07b8938dc21d2e967bc"
   integrity sha512-OPdCF6GsMIP+Az+aWfAAOEt2/+iVDKE7oy6lJ098aoe59oAmK76qV6Gw60SbZ8jHuG2wH058GF4pLFbYamYrVA==
 
-acorn-walk@^8.1.1, acorn-walk@^8.2.0:
+acorn-walk@^8.1.1:
   version "8.2.0"
   resolved "https://registry.yarnpkg.com/acorn-walk/-/acorn-walk-8.2.0.tgz#741210f2e2426454508853a2f44d0ab83b7f69c1"
   integrity sha512-k+iyHEuPgSw6SbuDpGQM+06HQUa04DZ3o+F6CSzXMvvI5KMvnaEqXe+YVe555R9nn6GPt404fos4wcgpw12SDA==
@@ -4836,7 +4820,7 @@ acorn@^7.1.1:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-7.4.1.tgz#feaed255973d2e77555b83dbc08851a6c63520fa"
   integrity sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==
 
-acorn@^8.0.5, acorn@^8.4.1, acorn@^8.6.0, acorn@^8.7.0, acorn@^8.9.0:
+acorn@^8.0.5, acorn@^8.4.1, acorn@^8.6.0, acorn@^8.9.0:
   version "8.11.3"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.11.3.tgz#71e0b14e13a4ec160724b38fb7b0f233b1b81d7a"
   integrity sha512-Y9rRfJG5jcKOE0CLisYbojUjIrIEE7AGMzA/Sm4BslANhbS+cDMpgBdcPT91oJ7OuJ9hYJBx59RjbhxVnrF8Xg==
@@ -5437,6 +5421,11 @@ astral-regex@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/astral-regex/-/astral-regex-2.0.0.tgz#483143c567aeed4785759c0865786dc77d7d2e31"
   integrity sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==
+
+astring@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/astring/-/astring-1.9.0.tgz#cc73e6062a7eb03e7d19c22d8b0b3451fd9bfeef"
+  integrity sha512-LElXdjswlqjWrPpJFg1Fx4wpkOCxj1TDHlSV4PlaRxHGWko024xICaa97ZkMfs6DRKlCguiAI+rbXv5GWwXIkg==
 
 async-limiter@~1.0.0:
   version "1.0.1"
@@ -17307,16 +17296,15 @@ wait-port@1.0.4:
     commander "^9.3.0"
     debug "^4.3.4"
 
-wc-compiler@~0.15.0:
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.15.0.tgz#f8c0a2b074d39490725718ddf0824ca0ee33ae67"
-  integrity sha512-bzRjWEal5QGKrryZAsD3V9abuQ4blu2LP23GdrIM1UFybDRor6hcRhYJwdBLPriw017x/J69yPuRXLgAm2xUPQ==
+wc-compiler@~0.15.1:
+  version "0.15.1"
+  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.15.1.tgz#fe7698d81c24cea1290ee6f1e3b32783148b5bcc"
+  integrity sha512-pSDhO7r2jBf4x+t1mqLt/GGNw8KfF0g0TQuK8euP7TsNhcMslyP3wOjIai0xzEYkVr9wbJyIRt7LJSLtD776wg==
   dependencies:
     "@projectevergreen/acorn-jsx-esm" "~0.1.0"
-    "@projectevergreen/escodegen-esm" "~0.1.0"
-    acorn "^8.7.0"
-    acorn-import-attributes "^1.9.5"
-    acorn-walk "^8.2.0"
+    acorn "^8.14.0"
+    acorn-walk "^8.3.4"
+    astring "^1.9.0"
     parse5 "^6.0.1"
     sucrase "^3.35.0"
 
