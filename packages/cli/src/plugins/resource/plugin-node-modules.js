@@ -7,7 +7,7 @@ import { checkResourceExists } from '../../lib/resource-utils.js';
 import fs from 'fs/promises';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
-import { getNodeModulesLocationForPackage, getPackageJson, getPackageNameFromUrl } from '../../lib/node-modules-utils.js';
+import { getNodeModulesLocationForPackage, getPackageJsonForProject, getPackageNameFromUrl } from '../../lib/node-modules-utils.js';
 import { resolveForRelativeUrl } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { mergeImportMap } from '../../lib/walker-package-ranger.js';
@@ -86,7 +86,7 @@ class NodeModulesResource extends ResourceInterface {
       body = body.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
     }
 
-    const userPackageJson = await getPackageJson(context);
+    const userPackageJson = await getPackageJsonForProject(context);
 
     // if there are dependencies and we haven't generated the importMap already
     // walk the project's package.json for all its direct dependencies

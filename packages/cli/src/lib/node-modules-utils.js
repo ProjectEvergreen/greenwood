@@ -2,6 +2,7 @@ import { createRequire } from 'module';
 import { checkResourceExists } from './resource-utils.js';
 import fs from 'fs/promises';
 
+// TODO delete me
 async function getNodeModulesLocationForPackage(packageName) {
   let nodeModulesUrl;
 
@@ -29,6 +30,28 @@ async function getNodeModulesLocationForPackage(packageName) {
   return nodeModulesUrl;
 }
 
+function resolveBareSpecifier(specifier) {
+  let resolvedPath;
+
+  // sometimes a package.json has no main field :/
+  // https://unpkg.com/browse/@types/trusted-types@2.0.7/package.json
+  try {
+    resolvedPath = import.meta.resolve(specifier);
+  } catch (e) {
+    // TODO console.log(`WARNING: unable to resolve specifier \`${specifier}\``);
+  }
+
+  return resolvedPath;
+}
+
+function resolveRootForSpecifier(specifier) {
+  const resolved = resolveBareSpecifier(specifier);
+
+  if (resolved) {
+    return `${resolved.split(specifier)[0]}${specifier}/`;
+  }
+}
+
 // extract the package name from a URL like /node_modules/<some>/<package>/index.js
 function getPackageNameFromUrl(url) {
   const packagePathPieces = url.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
@@ -42,7 +65,7 @@ function getPackageNameFromUrl(url) {
   return packageName;
 }
 
-async function getPackageJson({ userWorkspace, projectDirectory }) {
+async function getPackageJsonForProject({ userWorkspace, projectDirectory }) {
   const monorepoPackageJsonUrl = new URL('./package.json', userWorkspace);
   const topLevelPackageJsonUrl = new URL('./package.json', projectDirectory);
   const hasMonorepoPackageJson = await checkResourceExists(monorepoPackageJsonUrl);
@@ -56,7 +79,9 @@ async function getPackageJson({ userWorkspace, projectDirectory }) {
 }
 
 export {
+  resolveBareSpecifier,
+  resolveRootForSpecifier,
+  getPackageJsonForProject,
   getNodeModulesLocationForPackage,
-  getPackageJson,
   getPackageNameFromUrl
 };

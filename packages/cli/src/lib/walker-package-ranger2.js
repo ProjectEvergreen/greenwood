@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { resolveBareSpecifier } from './node-modules-utils.js';
 
 /* eslint-disable max-depth,complexity */
 const importMap = {};
@@ -80,10 +81,9 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
 async function walkPackageJson(packageJson = {}) {
   try {
     for (const dependency of Object.keys(packageJson.dependencies || {})) {
-      // TODO why empty main :/
-      // https://unpkg.com/browse/@types/trusted-types@2.0.7/package.json
-      if (dependency !== '@types/trusted-types') {
-        const resolved = import.meta.resolve(dependency);
+      const resolved = resolveBareSpecifier(dependency);
+
+      if (resolved) {
         const resolvedRoot = new URL(`./${dependency}/`, resolved.split(dependency)[0]);
         const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
 
@@ -91,16 +91,14 @@ async function walkPackageJson(packageJson = {}) {
 
         if (resolvedPackageJson.dependencies) {
           for (const dependency in resolvedPackageJson.dependencies) {
-            // TODO why empty main
-            // https://unpkg.com/browse/@types/trusted-types@2.0.7/package.json
-            if (dependency !== '@types/trusted-types') {
-              // TODO do we have to duplicate this look here and above??
-              const resolved = import.meta.resolve(dependency);
+            const resolved = resolveBareSpecifier(dependency);
+
+            if (resolved) {
               const resolvedRoot = new URL(`./${dependency}/`, resolved.split(dependency)[0]);
               const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
 
               walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
-              // console.log('### resolve direct dependency', { dependency, resolved, resolvedRoot: resolvedRoot.href, resolvedPackageJson })
+
               await walkPackageJson(resolvedPackageJson);
             }
           }
@@ -108,7 +106,7 @@ async function walkPackageJson(packageJson = {}) {
       }
     }
   } catch (e) {
-    console.error('Error building up import map', e);
+    // TODO console.error('Error building up import map', e);
   }
 
   // console.log({ importMap });
