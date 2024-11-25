@@ -1,4 +1,4 @@
-import { resolveRootForSpecifier } from '@greenwood/cli/src/lib/node-modules-utils.js';
+import { getNodeModulesLocationForPackage } from '@greenwood/cli/src/lib/node-modules-utils.js';
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 class PolyfillsResource extends ResourceInterface {
@@ -79,18 +79,18 @@ const greenwoodPluginPolyfills = (options = {}) => {
     provider: async (compilation) => {
       const { outputDir } = compilation.context;
       const polyfillPackageName = '@webcomponents/webcomponentsjs';
-      const polyfillNodeModulesLocation = resolveRootForSpecifier(polyfillPackageName);
-      const litNodeModulesLocation = resolveRootForSpecifier('lit');
+      const polyfillNodeModulesLocation = await getNodeModulesLocationForPackage(polyfillPackageName);
+      const litNodeModulesLocation = await getNodeModulesLocationForPackage('lit');
 
       const standardPolyfills = [{
-        from: new URL('./webcomponents-loader.js', polyfillNodeModulesLocation),
+        from: new URL('./webcomponents-loader.js', new URL(`file://${polyfillNodeModulesLocation}/`)),
         to: new URL('./webcomponents-loader.js', outputDir)
       }, {
-        from: new URL('./bundles/', polyfillNodeModulesLocation),
+        from: new URL('./bundles/', new URL(`file://${polyfillNodeModulesLocation}/`)),
         to: new URL('./bundles/', outputDir)
       }];
       const litPolyfills = [{
-        from: new URL('./polyfill-support.js', litNodeModulesLocation),
+        from: new URL('./polyfill-support.js', new URL(`file://${litNodeModulesLocation}/`)),
         to: new URL('./polyfill-support.js', outputDir)
       }];
 
