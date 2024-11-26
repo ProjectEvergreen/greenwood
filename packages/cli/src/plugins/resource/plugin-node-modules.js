@@ -6,7 +6,6 @@
 import { checkResourceExists } from '../../lib/resource-utils.js';
 import fs from 'fs/promises';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import replace from '@rollup/plugin-replace';
 import { getNodeModulesLocationForPackage, getPackageJsonForProject, getPackageNameFromUrl } from '../../lib/node-modules-utils.js';
 import { resolveForRelativeUrl } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
@@ -116,13 +115,6 @@ const greenwoodPluginNodeModules = [{
   name: 'plugin-node-modules:rollup',
   provider: () => {
     return [
-      replace({
-        // https://github.com/ProjectEvergreen/greenwood/issues/582
-        'preventAssignment': true,
-
-        // https://github.com/rollup/rollup/issues/487#issuecomment-177596512
-        'process.env.NODE_ENV': JSON.stringify('production')
-      }),
       nodeResolve()
     ];
   }

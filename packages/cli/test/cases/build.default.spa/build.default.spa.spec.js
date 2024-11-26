@@ -301,7 +301,7 @@ describe('Build Greenwood With: ', function() {
   });
 
   after(function() {
-    // runner.teardown(getOutputTeardownFiles(outputPath));
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 
 });
