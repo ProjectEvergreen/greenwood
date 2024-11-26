@@ -70,8 +70,8 @@
     "lodash-es": "^4.17.20",
     "postcss-nested": "^4.1.2",
     "pwa-helpers": "^0.9.1",
-    "redux": "^4.0.5",
-    "redux-thunk": "^2.3.0",
+    "redux": "^5.0.1",
+    "redux-thunk": "^3.1.0",
     "rehype-autolink-headings": "^4.0.0",
     "rehype-slug": "^3.0.0",
     "simpledotcss": "^1.0.0"

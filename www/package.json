@@ -19,7 +19,8 @@
     "@spectrum-web-components/theme": "^1.0.1",
     "@spectrum-web-components/top-nav": "^1.0.1",
     "lit": "^3.1.0",
-    "prismjs": "^1.21.0"
+    "prismjs": "^1.21.0",
+    "redux": "^5.0.1"
   },
   "devDependencies": {
     "@mapbox/rehype-prism": "^0.5.0",

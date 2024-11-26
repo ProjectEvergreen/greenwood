@@ -46,7 +46,6 @@ async function walkExportPatterns(dependency, exp, resolvedRoot) {
   if (exp.endsWith('*')) {
     const dir = new URL(exp.replace('*', ''), resolvedRoot);
     const files = await fs.readdir(dir);
-    // console.log({ dependency, exp, dir });
 
     files
       .filter((file) => {
@@ -82,6 +81,9 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
             } else {
               updateImportMap(`${dependency}/${exp}`, `/node_modules/${dependency}/${exports[exp].import.default ?? exports[exp].import}`);
             }
+          } else {
+            // https://unpkg.com/browse/redux@5.0.1/package.json
+            updateImportMap(dependency, `/node_modules/${dependency}/${exports[exp].import }`);
           }
         } else if (exports[exp].default) {
           if (exp === '.') {

@@ -104,9 +104,13 @@ describe('Build Greenwood With: ', function() {
         `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
         `${outputPath}/node_modules/@lit/reactive-element/`
       );
-      const reduxLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/redux/es/redux.mjs`,
-        `${outputPath}/node_modules/redux/es`
+      const reduxDist = await getDependencyFiles(
+        `${process.cwd()}/node_modules/redux/dist/*.js`,
+        `${outputPath}/node_modules/redux/dist/`
+      );
+      const reduxDistMjs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/redux/dist/*.mjs`,
+        `${outputPath}/node_modules/redux/dist/`
       );
       const reduxPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/redux/package.json`,
@@ -171,7 +175,8 @@ describe('Build Greenwood With: ', function() {
 
       runner.setup(outputPath, [
         ...getSetupFiles(outputPath),
-        ...reduxLibs,
+        ...reduxDist,
+        ...reduxDistMjs,
         ...reduxPackageJson,
         ...looseLibs,
         ...looseLibsPackageJson,
