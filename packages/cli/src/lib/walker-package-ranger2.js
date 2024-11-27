@@ -40,7 +40,7 @@ function derivePackageRoot(dependencyName, resolved) {
   return derived;
 }
 
-// Helper function to convert glob pattern to regex (thanks ChatGPT)
+// Helper function to convert export patterns to a regex (thanks ChatGPT :D)
 function globToRegex(pattern) {
   // Escape special regex characters
   pattern = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&');
@@ -74,12 +74,18 @@ function patternRoot(pattern) {
   return root;
 }
 
+/*
+ * https://nodejs.org/api/packages.html#subpath-patterns
+ *
+ * Examples
+ * "./icons/*": "./icons/*" - https://unpkg.com/browse/@spectrum-web-components/icons-workflow@1.0.1/package.json
+ * "./components/*": "./dist/components/*.js" - https://unpkg.com/browse/@uswds/web-components@0.0.1-alpha/package.json
+ * "./src/components/*": "./src/components/* /index.js - https://unpkg.com/browse/@uswds/web-components@0.0.1-alpha/package.json
+ */
 async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
   // find the "deepest" segment we can start from
   // to avoid unnecessary file scanning / crawling
   const rootSubValueOffset = patternRoot(subValue);
-
-  // console.log('walkExportPatterns', { dependency, sub, subValue, rootSubValueOffset });
 
   // ideally we can use fs.glob when it comes out of experimental
   // https://nodejs.org/docs/latest-v22.x/api/fs.html#fspromisesglobpattern-options
@@ -93,13 +99,11 @@ async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
       const regexPattern = globToRegex(pattern);
 
       if (stat.isDirectory()) {
-        // console.log('>>>>>> keep walking', { file });
         walkDirectoryForExportPatterns(new URL(`./${file}/`, directoryUrl));
       } else if (regexPattern.test(filePathUrl.href)) {
         const rootSubOffset = patternRoot(sub);
         const relativePath = filePathUrl.href.replace(resolvedRoot, '');
 
-        // console.log('$$$$$$ we got a match!', { rootSubOffset, relativePath });
         updateImportMap(`${dependency}${rootSubOffset}/${file}`, `/node_modules/${dependency}/${relativePath}`);
       }
     });
