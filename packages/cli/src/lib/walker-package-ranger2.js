@@ -2,7 +2,6 @@ import fs from 'fs';
 
 /* eslint-disable max-depth,complexity */
 const importMap = {};
-// TODO const extensionFilters = ['map', 'd.ts'];
 
 function updateImportMap(key, value) {
   importMap[key.replace('./', '')] = value.replace('./', '');
@@ -41,22 +40,6 @@ function derivePackageRoot(dependencyName, resolved) {
   return derived;
 }
 
-/*
- * https://nodejs.org/api/packages.html#subpath-patterns
- *
- * Examples
- * "./icons/*": "./icons/*" - https://unpkg.com/browse/@spectrum-web-components/icons-workflow@1.0.1/package.json
- * "./components/*": "./dist/components/*.js" - https://unpkg.com/browse/@uswds/web-components@0.0.1-alpha/package.json
- * "./src/components/*": "./src/components/* /index.js - https://unpkg.com/browse/@uswds/web-components@0.0.1-alpha/package.json
- */
-
-// Helper function to match patterns using regular expressions (thanks ChatGPT)
-function matchPattern(file, pattern) {
-  const regexPattern = globToRegex(pattern);
-
-  return regexPattern.test(file);
-}
-
 // Helper function to convert glob pattern to regex (thanks ChatGPT)
 function globToRegex(pattern) {
   // Escape special regex characters
@@ -65,167 +48,54 @@ function globToRegex(pattern) {
   // Replace glob `*` with regex `[^/]*` (any characters except slashes)
   pattern = pattern.replace(/\*/g, '[^/]*');
 
+  // Replace glob `**` with regex `(.*)` (zero or more directories or files)
+  // pattern = pattern.replace(/\*\*/g, '(.*)');
+
   // Return the final regex
   return new RegExp('^' + pattern + '$');
 }
 
 async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
-  // console.log('walkExportPatterns', { dependency, sub, subValue });
   const segments = subValue.split('/').filter((segment) => segment !== '.');
   let startingSegmentOffset = '';
 
   // find the "deepest" segment we can start from
-  // to avoid unnecessary file scanning / walking
-  segments.forEach((segment) => {
-    if (segment.indexOf('*') < 0) {
+  // to avoid unnecessary file scanning / crawling
+  for (const segment of segments) {
+    // is there a better way to fuzzy test for a filename other than checking for a dot?
+    if (segment.indexOf('*') < 0 && segment.indexOf('.') < 0) {
       startingSegmentOffset += `/${segment}`;
-    }
-  });
 
-  // console.log({ dependency, sub, subValue, resolvedRoot, segments });
+      break;
+    }
+  }
+
+  // console.log('walkExportPatterns', { dependency, sub, subValue, segments, startingSegmentOffset });
 
   // ideally we can use fs.glob when it comes out of experimental
   // https://nodejs.org/docs/latest-v22.x/api/fs.html#fspromisesglobpattern-options
-  function walkDirectory(directoryUrl) {
+  function walkDirectoryForExportPatterns(directoryUrl) {
     const filesInDir = fs.readdirSync(directoryUrl);
 
     filesInDir.forEach(file => {
       const filePathUrl = new URL(`./${file}`, directoryUrl);
       const stat = fs.statSync(filePathUrl);
+      const regexPattern = globToRegex(`${resolvedRoot}${sub.replace('./', '')}`);
 
       if (stat.isDirectory()) {
-        // console.log('>>>>>> keep walking');
-        walkDirectory(new URL(`./${file}/`, directoryUrl));
-      } else if (matchPattern(filePathUrl.href, `${resolvedRoot}${sub.replace('./', '')}`)) {
-        // console.log('$$$$$$ we got a match!');
+        // console.log('>>>>>> keep walking', { file });
+        walkDirectoryForExportPatterns(new URL(`./${file}/`, directoryUrl));
+      } else if (regexPattern.test(filePathUrl.href)) {
         const relativePath = filePathUrl.href.replace(resolvedRoot, '');
 
-        // console.log({ startingSegmentOffset, relativePath });
+        // console.log('$$$$$$ we got a match!', { startingSegmentOffset, relativePath });
         updateImportMap(`${dependency}${startingSegmentOffset}/${file}`, `/node_modules/${dependency}/${relativePath}`);
       }
     });
   }
 
-  // Start the directory search from the root
-  walkDirectory(new URL(`.${startingSegmentOffset}/`, resolvedRoot));
+  walkDirectoryForExportPatterns(new URL(`.${startingSegmentOffset}/`, resolvedRoot));
 }
-
-// async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
-//   console.log('walkExportPatterns', { dependency, sub, subValue, resolvedRoot });
-//   const exportPatternFiles = [];
-//   const segments = subValue.split('/').filter((segment) => segment !== '.');
-
-//   console.log({ segments });
-
-//   segments.reduce((acc, curr, index) => {
-//     console.log({ acc, curr, index });
-//     const nextSegment = `${acc}/${segments[index + 1]}`;
-
-//     if (curr.indexOf('*') >= 0) {
-//       console.log('*** handle wildcard');
-//       if (curr === '*') {
-//         // if we are NOT at the end of the pattern, keep walking
-//         if (index < segments.length - 1) {
-//           console.log('nested wildcard, walk nextSegment');
-//           return nextSegment;
-//         } else {
-//           console.log('globbing for files, track');
-//           // else grab all these files
-//           // TODO handle filtering
-//           const dirName = acc.replace(curr, '');
-//           // console.log({ dirName });
-//           const files = fs.readdirSync(new URL(`./${dirName}/`, resolvedRoot));
-//           // console.log({ files });
-//           files.forEach((file) => {
-//             exportPatternFiles.push(`./${dirName}${file}`);
-//           });
-//         }
-//       }
-//     } else {
-//       console.log('### handle something else (file or directory)?');
-//       const stat = fs.statSync(new URL(`./${acc}`, resolvedRoot));
-//       if (stat.isDirectory()) {
-//         console.log('is directory, walk nextSegment');
-//         return nextSegment;
-//       }
-//     }
-
-//     // return `${acc}/${segments[index + 1]}`;
-//   }, segments[0]);
-//   // segments.f()
-
-//   // function walkDirectory(directory) {
-//   //   const filesInDir = fs.readdirSync(directory);
-
-//   //   filesInDir.forEach((file) => {
-//   //     const fileUrl = new URL(`.${file}`, directory);
-//   //     const stat = fs.statSync(fileUrl);
-
-//   //     console.log({ fileUrl, stat });
-
-//   //     if (stat.isDirectory()) {
-//   //       console.log('keep walking')
-//   //       // Recursively search inside directories
-//   //       // walkDirectory(filePath);
-//   //     } else {
-//   //       console.log('find a match');
-//   //     }
-//   //     // } else if (matchPattern(filePath, pattern)) {
-//   //     //   // If file matches the pattern, add to the result
-//   //     //   files.push(filePath);
-//   //     // }
-//   //   });
-//   // }
-
-//   // walkDirectory(resolvedRoot);
-
-//   // if (sub.endsWith('*')) {
-//   //   const dir = new URL(sub.replace('*', ''), resolvedRoot);
-//   //   const files = await fs.readdir(dir);
-
-//   //   files
-//   //     .filter((file) => {
-//   //       let shouldNotFilter = true;
-
-//   //       // TODO do we actually need this filter?
-//   //       extensionFilters.forEach((extFilter) => {
-//   //         if (file.endsWith(extFilter)) {
-//   //           shouldNotFilter = false;
-//   //         }
-//   //       });
-
-//   //       return shouldNotFilter;
-//   //     })
-//   //     .forEach((file) => {
-//   //       updateImportMap(`${dependency}/${sub.replace('/*', '')}/${file}`, `/node_modules/${dependency}/${sub.replace('/*', '')}/${file}`);
-//   //     });
-//   // } else {
-//   //   // TODO
-//   //   // "./feature/*": "./feature/*.js",
-//   // }
-
-//   console.log({ exportPatternFiles })
-
-//   // ./dist/themes/*
-//   // {
-//   //   exportPatternFiles: [
-//   //     './dist/themes/dark.css',
-//   //     './dist/themes/dark.styles.d.ts',
-//   //     './dist/themes/dark.styles.js',
-//   //     './dist/themes/light.css',
-//   //     './dist/themes/light.styles.d.ts',
-//   //     './dist/themes/light.styles.js'
-//   //   ]
-//   // }
-//   // expand sub to all subValue
-//   exportPatternFiles.forEach((patternFile) => {
-//     // if(patternFile.indexOf)
-//     if (sub.endsWith('*')) {
-//       updateImportMap(`${dependency}/${patternFile}`, `/node_modules/${dependency}/${patternFile}`);
-//     }
-//   })
-//   // TODO apply exportPatternFiles to importMap
-// }
 
 // https://nodejs.org/api/packages.html#conditional-exports
 async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
@@ -234,7 +104,8 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
   // favor exports over main / module
   if (exports) {
     for (const sub in exports) {
-      /* test for conditional subpath exports
+      /*
+       * test for conditional subpath exports
        * 1. import
        * 2. default
        */
