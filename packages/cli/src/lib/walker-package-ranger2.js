@@ -1,6 +1,8 @@
 import fs from 'fs';
 
 /* eslint-disable max-depth,complexity */
+// priority if from L -> R
+const SUPPORTED_EXPORT_CONDITIONS = ['import', 'module-sync', 'default'];
 const importMap = {};
 
 function updateImportMap(key, value) {
@@ -112,6 +114,21 @@ async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
   walkDirectoryForExportPatterns(new URL(`.${rootSubValueOffset}/`, resolvedRoot));
 }
 
+function trackExportConditions(dependency, exports, sub, condition) {
+  if (typeof exports[sub] === 'object') {
+    // also check for nested conditions of conditions, default to default for now
+    // https://unpkg.com/browse/@floating-ui/dom@1.6.12/package.json
+    if (sub === '.') {
+      updateImportMap(dependency, `/node_modules/${dependency}/${exports[sub][condition].default ?? exports[sub][condition]}`);
+    } else {
+      updateImportMap(`${dependency}/${sub}`, `/node_modules/${dependency}/${exports[sub][condition].default ?? exports[sub][condition]}`);
+    }
+  } else {
+    // https://unpkg.com/browse/redux@5.0.1/package.json
+    updateImportMap(dependency, `/node_modules/${dependency}/${exports[sub][condition]}`);
+  }
+}
+
 // https://nodejs.org/api/packages.html#conditional-exports
 async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
   const { exports, module, main } = packageJson;
@@ -122,32 +139,26 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
       /*
        * test for conditional subpath exports
        * 1. import
-       * 2. default
+       * 2. module-sync
+       * 3. default
        */
       if (typeof exports[sub] === 'object') {
-        if (exports[sub].import) {
-          // nested conditions
-          if (typeof exports[sub].import === 'object') {
-            if (sub === '.') {
-              updateImportMap(dependency, `/node_modules/${dependency}/${exports[sub].import.default ?? exports[sub].import }`);
-            } else {
-              updateImportMap(`${dependency}/${sub}`, `/node_modules/${dependency}/${exports[sub].import.default ?? exports[sub].import}`);
-            }
-          } else {
-            // https://unpkg.com/browse/redux@5.0.1/package.json
-            updateImportMap(dependency, `/node_modules/${dependency}/${exports[sub].import }`);
+        let matched = false;
+
+        for (const condition of SUPPORTED_EXPORT_CONDITIONS) {
+          if (exports[sub][condition]) {
+            matched = true;
+            trackExportConditions(dependency, exports, sub, condition);
+            break;
           }
-        } else if (exports[sub].default) {
-          if (sub === '.') {
-            updateImportMap(dependency, `/node_modules/${dependency}/${exports[sub].default}`);
-          } else {
-            updateImportMap(`${dependency}/${sub}`, `/node_modules/${dependency}/${exports[sub].default}`);
-          }
-        } else {
+        }
+
+        if (!matched) {
           // TODO what to do here?  what else is there besides default?
+          // console.log(`unsupported condition \`${exports[sub]}\` for dependency => \`${dependency}\``);
         }
       } else {
-        // handle subpath exports
+        // handle (unconditional) subpath exports
         if (sub === '.') {
           updateImportMap(dependency, `/node_modules/${dependency}/${exports[sub]}`);
         } else if (sub.indexOf('*') >= 0) {
