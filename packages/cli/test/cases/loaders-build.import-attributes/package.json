@@ -1,0 +1,7 @@
+{
+  "name": "test-loaders-build-import-attributes",
+  "type": "module",
+  "dependencies": {
+    "@spectrum-css/card": "^9.3.0"
+  }
+}

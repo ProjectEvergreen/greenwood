@@ -22,7 +22,7 @@
  *    api/
  *      fragment.js
  *     greeting.js
- *
+ * package.json
  */
 import chai from 'chai';
 import { JSDOM } from 'jsdom';
