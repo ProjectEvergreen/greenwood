@@ -10,8 +10,8 @@ import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js'
 import * as acornWalk from 'acorn-walk';
 import * as acorn from 'acorn';
 import { hashString } from '@greenwood/cli/src/lib/hashing-utils.js';
-import { importAttributes } from 'acorn-import-attributes';
 import { transform } from 'sucrase';
+import { acornOptions } from '@greenwood/cli/src/lib/parsing-utils.js';
 
 const MODULES_MAP_FILENAME = '__css-modules-map.json';
 /*
@@ -40,11 +40,7 @@ function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
   });
 
   acornWalk.simple(
-    acorn.Parser.extend(importAttributes).parse(result.code, {
-      ecmaVersion: 'latest',
-      sourceType: 'module'
-    }),
-    {
+    acorn.parse(result.code, acornOptions), {
       ImportDeclaration(node) {
         const { specifiers = [], source = {} } = node;
         const { value = '' } = source;
@@ -246,11 +242,7 @@ class StripCssModulesResource extends ResourceInterface {
     let contents = await response.text();
 
     acornWalk.simple(
-      acorn.Parser.extend(importAttributes).parse(contents, {
-        ecmaVersion: 'latest',
-        sourceType: 'module'
-      }),
-      {
+      acorn.parse(contents, acornOptions), {
         ImportDeclaration(node) {
           const { specifiers = [], source = {}, start, end } = node;
           const { value = '' } = source;

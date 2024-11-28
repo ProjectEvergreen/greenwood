@@ -54,7 +54,7 @@ describe('Build Greenwood With: ', function() {
     });
 
     describe('Custom Element Importing CSS w/ Constructable Stylesheet', function() {
-      const cssFileHash = 'bcdce3a3';
+      const cssFileHash = 'YPhf6BPs';
       let scripts;
       let styles;
 

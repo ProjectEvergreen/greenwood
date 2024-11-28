@@ -4,6 +4,7 @@ import fs from 'fs';
 import { getNodeModulesLocationForPackage } from './node-modules-utils.js';
 import path from 'path';
 import * as walk from 'acorn-walk';
+import { acornOptions } from './parsing-utils.js';
 
 const importMap = {};
 
@@ -46,10 +47,7 @@ async function getPackageEntryPath(packageJson) {
 async function walkModule(modulePath, dependency) {
   const moduleContents = fs.readFileSync(modulePath, 'utf-8');
 
-  walk.simple(acorn.parse(moduleContents, {
-    ecmaVersion: '2020',
-    sourceType: 'module'
-  }), {
+  walk.simple(acorn.parse(moduleContents, acornOptions), {
     async ImportDeclaration(node) {
       let { value: sourceValue } = node.source;
       const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(dependency);

@@ -119,7 +119,7 @@ describe('Serve Greenwood With: ', function() {
     });
 
     describe('Import Attributes Polyfill Behaviors for the initiating JavaScript file (hero.js) being served and bundled', function() {
-      const jsHash = '9acf7b4c';
+      const jsHash = 'B7j93uYq';
       let response = {};
       let text;
       let contents;

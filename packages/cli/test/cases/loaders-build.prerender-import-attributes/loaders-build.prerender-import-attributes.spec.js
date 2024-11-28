@@ -57,7 +57,7 @@ describe('Build Greenwood With: ', function() {
     runSmokeTest(['public'], LABEL);
 
     describe('Custom Element Importing CSS w/ Constructable Stylesheet', function() {
-      const cssFileHash = '93e8cf36';
+      const cssFileHash = 'Cg2xlj-Z';
       let scripts;
       let styles;
 
@@ -70,7 +70,7 @@ describe('Build Greenwood With: ', function() {
         const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
 
         expect(scripts.length).to.equal(1);
-        expect(scriptContents).to.contain('import e from"/hero.93e8cf36.css"with{type:"css"}');
+        expect(scriptContents).to.contain('import e from"/hero.Cg2xlj-Z.css"with{type:"css"}');
       });
 
       it('should have the expected CSS output bundle for hero.css', function() {

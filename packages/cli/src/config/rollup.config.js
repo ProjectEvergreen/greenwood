@@ -25,7 +25,7 @@ function greenwoodResourceLoader (compilation, browser = false) {
 
   return {
     name: 'greenwood-resource-loader',
-    async resolveId(id, importer) {
+    async resolveId(id, importer, options) {
       const normalizedId = cleanRollupId(id);
       const { userWorkspace } = compilation.context;
 
@@ -33,11 +33,11 @@ function greenwoodResourceLoader (compilation, browser = false) {
       // or Greenwood's scratch dir, like when bundling inline <script> tags
       if (normalizedId.startsWith('.')) {
         const importerUrl = new URL(normalizedId, `file://${importer}`);
-        const extension = importerUrl.pathname.split('.').pop();
+        const type = options.attributes?.type ?? '';
         // if we are polyfilling import attributes for the browser we will want Rollup to bundles these as JS files
         // instead of externalizing as their native content-type
-        const shouldPolyfill = browser && (importAttributes || []).includes(extension);
-        const external = !shouldPolyfill && externalizedResources.includes(extension) && browser && !importerUrl.searchParams.has('type');
+        const shouldPolyfill = browser && (importAttributes || []).includes(type);
+        const external = !shouldPolyfill && externalizedResources.includes(type) && browser && !importerUrl.searchParams.has('type');
         const isUserWorkspaceUrl = importerUrl.pathname.startsWith(userWorkspace.pathname);
         const prefix = normalizedId.startsWith('..') ? './' : '';
         // if its not in the users workspace, we clean up the dot-dots and check that against the user's workspace
@@ -267,7 +267,7 @@ function greenwoodImportMetaUrl(compilation) {
       let canTransform = false;
       let response = new Response(code);
 
-      // handle any custom imports or pre-processing needed before passing to Rollup this.parse
+      // handle any custom imports or pre-processing first to ensure valid JavaScript for parsing
       if (await checkResourceExists(idUrl)) {
         for (const plugin of resourcePlugins) {
           if (plugin.shouldResolve && await plugin.shouldResolve(idUrl)) {
@@ -301,6 +301,9 @@ function greenwoodImportMetaUrl(compilation) {
         return null;
       }
 
+      // ideally we would use our own custom Acorn config + parsing
+      // but need to wait for Rollup to remove `assert` which will break Acorn, which only understands `with`
+      // https://github.com/rollup/rollup/issues/5685
       const ast = this.parse(await response.text());
       const assetUrls = [];
       let modifiedCode = false;
@@ -444,6 +447,14 @@ function greenwoodSyncImportAttributes(compilation) {
         }
 
         const { code } = bundles[bundle];
+
+        if (!code) {
+          return;
+        }
+
+        // ideally we would use our own custom Acorn config + parsing
+        // but need to wait for Rollup to remove `assert` which will break Acorn, which only understands `with`
+        // https://github.com/rollup/rollup/issues/5685
         const ast = this.parse(code);
 
         walk.simple(ast, {
@@ -465,6 +476,8 @@ function greenwoodSyncImportAttributes(compilation) {
                   }
                 });
               } else {
+                // waiting on Rollup to formally support `with`
+                // https://github.com/rollup/rollup/issues/5685
                 bundles[bundle].code = bundles[bundle].code.replace(/assert{/g, 'with{');
               }
 
