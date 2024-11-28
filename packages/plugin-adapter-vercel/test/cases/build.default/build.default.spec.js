@@ -106,7 +106,7 @@ describe('Build Greenwood With: ', function() {
         functionFolders.forEach(async (folder) => {
           const packageJson = await fs.readFile(new URL('./vc-config.json', `file://${folder}/`), 'utf-8');
 
-          expect(packageJson).to.be.equal('{"runtime":"nodejs18.x","handler":"index.js","launcherType":"Nodejs","shouldAddHelpers":true}');
+          expect(packageJson).to.be.equal('{"runtime":"nodejs20.x","handler":"index.js","launcherType":"Nodejs","shouldAddHelpers":true}');
         });
       });
     });
