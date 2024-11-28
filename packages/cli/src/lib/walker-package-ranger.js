@@ -20,7 +20,6 @@ function resolveBareSpecifier(specifier) {
   try {
     resolvedPath = import.meta.resolve(specifier);
   } catch (e) {
-    // ex. https://unpkg.com/browse/@types/trusted-types@2.0.7/package.json
     diagnostics[specifier] = `ERROR (${e.code}): unable to resolve specifier => \`${specifier}\` \n${e.message}`;
   }
 
@@ -86,8 +85,7 @@ function patternRoot(pattern) {
  * "./src/components/*": "./src/components/* /index.js - https://unpkg.com/browse/@uswds/web-components@0.0.1-alpha/package.json
  */
 async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
-  // find the "deepest" segment we can start from
-  // to avoid unnecessary file scanning / crawling
+  // find the "deepest" segment we can start from to avoid unnecessary file scanning / crawling
   const rootSubValueOffset = patternRoot(subValue);
 
   // ideally we can use fs.glob when it comes out of experimental
@@ -177,7 +175,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
     updateImportMap(dependency, `/node_modules/${dependency}/${module ?? main}`);
   } else {
     // ex: https://unpkg.com/browse/uuid@3.4.0/package.json
-    diagnostics[dependency] = `WARNING: No supported export detected for => \`${dependency}\``;
+    diagnostics[dependency] = `WARNING: No supported entry point detected for => \`${dependency}\``;
   }
 }
 
