@@ -4,6 +4,7 @@ import fs from 'fs';
 // priority if from L -> R
 const SUPPORTED_EXPORT_CONDITIONS = ['import', 'module-sync', 'default'];
 const importMap = {};
+const diagnostics = {};
 
 function updateImportMap(key, value) {
   importMap[key.replace('./', '')] = value.replace('./', '');
@@ -19,8 +20,8 @@ function resolveBareSpecifier(specifier) {
   try {
     resolvedPath = import.meta.resolve(specifier);
   } catch (e) {
-    // console.log({ e });
-    // TODO console.log(`WARNING: unable to resolve specifier \`${specifier}\``);
+    // ex. https://unpkg.com/browse/@types/trusted-types@2.0.7/package.json
+    diagnostics[specifier] = `ERROR (${e.code}): unable to resolve specifier => \`${specifier}\` \n${e.message}`;
   }
 
   return resolvedPath;
@@ -158,8 +159,8 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
         }
 
         if (!matched) {
-          // TODO what to do here?  what else is there besides default?
-          // console.log(`unsupported condition \`${exports[sub]}\` for dependency => \`${dependency}\``);
+          // ex. https://unpkg.com/browse/matches-selector@1.2.0/package.json
+          diagnostics[dependency] = `no supported export conditions (\`${SUPPORTED_EXPORT_CONDITIONS.join(', ')}\`) for dependency => \`${dependency}\``;
         }
       } else {
         // handle (unconditional) subpath exports
@@ -175,7 +176,8 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
   } else if (module || main) {
     updateImportMap(dependency, `/node_modules/${dependency}/${module ?? main}`);
   } else {
-    // TODO warn about no exports found
+    // ex: https://unpkg.com/browse/uuid@3.4.0/package.json
+    diagnostics[dependency] = `WARNING: No supported export detected for => \`${dependency}\``;
   }
 }
 
@@ -211,7 +213,7 @@ async function walkPackageJson(packageJson = {}) {
     console.error('Error building up import map', e);
   }
 
-  return importMap;
+  return { importMap, diagnostics };
 }
 
 // could probably go somewhere else, in a util?

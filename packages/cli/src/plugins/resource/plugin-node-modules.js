@@ -12,7 +12,7 @@ import { ResourceInterface } from '../../lib/resource-interface.js';
 import { mergeImportMap } from '../../lib/walker-package-ranger.js';
 import { walkPackageJson } from '../../lib/walker-package-ranger.js';
 
-let importMap;
+let generatedImportMap;
 
 class NodeModulesResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -25,8 +25,6 @@ class NodeModulesResource extends ResourceInterface {
     return url.pathname.indexOf('/node_modules/') === 0;
   }
 
-  // TODO convert node modules util to URL
-  // https://github.com/ProjectEvergreen/greenwood/issues/953v
   async resolve(url) {
     const { projectDirectory } = this.compilation.context;
     const { pathname, searchParams } = url;
@@ -88,15 +86,25 @@ class NodeModulesResource extends ResourceInterface {
     const userPackageJson = await getPackageJsonForProject(context);
 
     // if there are dependencies and we haven't generated the importMap already
-    // walk the project's package.json for all its direct dependencies
-    // for each entry found in dependencies, find its entry point
-    // then walk its entry point (e.g. index.js) for imports / exports to add to the importMap
-    // and then walk its package.json for transitive dependencies and all those import / exports
-    importMap = !importMap && Object.keys(userPackageJson.dependencies || []).length > 0
-      ? await walkPackageJson(userPackageJson)
-      : importMap || {};
+    // walk the project's package.json for all its direct and transitive dependencies
+    if (!generatedImportMap && Object.keys(userPackageJson.dependencies || []).length > 0) {
+      console.log('Generating import map from project dependencies...');
+      const { importMap, diagnostics } = await walkPackageJson(userPackageJson);
 
-    body = mergeImportMap(body, importMap, importMaps);
+      if (Object.keys(diagnostics).length > 0) {
+        console.log('****************************************************************************');
+        Object.keys(diagnostics).forEach((diagnostic) => {
+          console.warn(diagnostics[diagnostic]);
+        });
+        console.log('****************************************************************************');
+      }
+
+      generatedImportMap = importMap;
+    } else {
+      generatedImportMap = generatedImportMap || {};
+    }
+
+    body = mergeImportMap(body, generatedImportMap, importMaps);
     body = body.replace('<head>', `
       <head>
         ${importMapShimScript}
