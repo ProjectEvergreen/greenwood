@@ -116,8 +116,11 @@ describe('Develop Greenwood With: ', function() {
         const importMapTags = dom.window.document.querySelectorAll('head > script[type="importmap"]');
         const importMapTag = importMapTags[0];
         const importMap = JSON.parse(importMapTag.textContent).imports;
+        const expectedEntriesCount = Object.keys(expectedImportMap).length;
+        const actualEntriesCount = Object.keys(importMap).length;
 
         expect(importMapTags.length).to.equal(1);
+        expect(actualEntriesCount).to.equal(expectedEntriesCount);
 
         Object.keys(expectedImportMap).forEach((key) => {
           expect(importMap[key]).to.equal(expectedImportMap[key]);

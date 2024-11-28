@@ -104,9 +104,13 @@ async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
         walkDirectoryForExportPatterns(new URL(`./${file}/`, directoryUrl));
       } else if (regexPattern.test(filePathUrl.href)) {
         const rootSubOffset = patternRoot(sub);
-        const relativePath = filePathUrl.href.replace(resolvedRoot, '');
+        const relativePath = filePathUrl.href.replace(resolvedRoot, '/');
+        // naive way to offset a subValue pattern to the sub pattern
+        // ex. "./js/*": "./packages/*/src/index.js",
+        // https://unpkg.com/browse/@uswds/uswds@3.10.0/package.json
+        const rootSubRelativePath = relativePath.replace(rootSubValueOffset, '');
 
-        updateImportMap(`${dependency}${rootSubOffset}/${file}`, `/node_modules/${dependency}/${relativePath}`);
+        updateImportMap(`${dependency}${rootSubOffset}${rootSubRelativePath}`, `/node_modules/${dependency}${relativePath}`);
       }
     });
   }
@@ -164,7 +168,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
         } else if (sub.indexOf('*') >= 0) {
           await walkExportPatterns(dependency, sub, exports[sub], resolvedRoot);
         } else {
-          updateImportMap(`${dependency}/${sub}`, `/node_modules/${dependency}/${sub}`);
+          updateImportMap(`${dependency}/${sub}`, `/node_modules/${dependency}/${exports[sub]}`);
         }
       }
     }
