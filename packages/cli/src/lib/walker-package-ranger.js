@@ -1,218 +1,220 @@
-/* eslint-disable max-depth,complexity */
-import * as acorn from 'acorn';
 import fs from 'fs';
-import { getNodeModulesLocationForPackage } from './node-modules-utils.js';
-import path from 'path';
-import * as walk from 'acorn-walk';
-import { acornOptions } from './parsing-utils.js';
 
+/* eslint-disable max-depth,complexity */
+// priority if from L -> R
+const SUPPORTED_EXPORT_CONDITIONS = ['import', 'module-sync', 'default'];
 const importMap = {};
 
-const updateImportMap = (entry, entryPath) => {
-
-  if (path.extname(entryPath) === '') {
-    entryPath = `${entryPath}.js`;
-  }
-
-  // handle WIn v Unix-style path separators and force to /
-  importMap[entry.replace(/\\/g, '/')] = entryPath.replace(/\\/g, '/');
-};
-
-// handle ESM paths that have varying levels of nesting, e.g. export * from '../../something.js'
-// https://github.com/ProjectEvergreen/greenwood/issues/820
-async function resolveRelativeSpecifier(specifier, modulePath, dependency) {
-  const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(dependency);
-
-  // handle WIn v Unix-style path separators and force to /
-  return `${dependency}${path.join(path.dirname(modulePath), specifier).replace(/\\/g, '/').replace(absoluteNodeModulesLocation.replace(/\\/g, '/', ''), '')}`;
+function updateImportMap(key, value) {
+  importMap[key.replace('./', '')] = value.replace('./', '');
 }
 
-async function getPackageEntryPath(packageJson) {
-  let entry = packageJson.exports
-    ? Object.keys(packageJson.exports) // first favor export maps first
-    : packageJson.module // next favor ESM entry points
-      ? packageJson.module
-      : packageJson.main && packageJson.main !== '' // then favor main
-        ? packageJson.main
-        : 'index.js'; // lastly, fallback to index.js
+// wrapper around import.meta.resolve to provide graceful error handling / logging
+// as sometimes a package.json has no main field :/
+// https://unpkg.com/browse/@types/trusted-types@2.0.7/package.json
+// https://github.com/nodejs/node/issues/49445#issuecomment-2484334036
+function resolveBareSpecifier(specifier) {
+  let resolvedPath;
 
-  // use .mjs version if it exists, for packages like redux
-  if (!Array.isArray(entry) && fs.existsSync(`${await getNodeModulesLocationForPackage(packageJson.name)}/${entry.replace('.js', '.mjs')}`)) {
-    entry = entry.replace('.js', '.mjs');
+  try {
+    resolvedPath = import.meta.resolve(specifier);
+  } catch (e) {
+    // console.log({ e });
+    // TODO console.log(`WARNING: unable to resolve specifier \`${specifier}\``);
   }
 
-  return entry;
+  return resolvedPath;
 }
 
-async function walkModule(modulePath, dependency) {
-  const moduleContents = fs.readFileSync(modulePath, 'utf-8');
+/*
+ * Find root directory for a package based on result of import.meta.resolve, since dependencyName could show in multiple places
+ * until this becomes a thing - https://github.com/nodejs/node/issues/49445
+ * {
+ *   dependencyName: 'lit-html',
+ *   resolved: 'file:///path/to/project/greenwood-lit-ssr/node_modules/.pnpm/lit-html@3.2.1/node_modules/lit-html/node/lit-html.js',
+ *   root: 'file:///path/to/project/greenwood-lit-ssr/node_modules/.pnpm/lit-html@3.2.1/node_modules/lit-html/package.json'
+ *  }
+ */
+function derivePackageRoot(dependencyName, resolved) {
+  const root = resolved.slice(0, resolved.lastIndexOf(`/node_modules/${dependencyName}/`));
+  const derived = `${root}/node_modules/${dependencyName}/`;
 
-  walk.simple(acorn.parse(moduleContents, acornOptions), {
-    async ImportDeclaration(node) {
-      let { value: sourceValue } = node.source;
-      const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(dependency);
-      const isBarePath = sourceValue.indexOf('http') !== 0 && sourceValue.charAt(0) !== '.' && sourceValue.charAt(0) !== path.sep;
-      const hasExtension = path.extname(sourceValue) !== '';
+  return derived;
+}
 
-      if (isBarePath && !hasExtension) {
-        if (!importMap[sourceValue]) {
-          updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
+// Helper function to convert export patterns to a regex (thanks ChatGPT :D)
+function globToRegex(pattern) {
+  // Escape special regex characters
+  pattern = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+
+  // Replace glob `*` with regex `[^/]*` (any characters except slashes)
+  pattern = pattern.replace(/\*/g, '[^/]*');
+
+  // Replace glob `**` with regex `(.*)` (zero or more directories or files)
+  // pattern = pattern.replace(/\*\*/g, '(.*)');
+
+  // Return the final regex
+  return new RegExp('^' + pattern + '$');
+}
+
+// convert path to its lowest common root
+// e.g. ./img/path/*/index.js -> /img/path
+// https://unpkg.com/browse/@uswds/uswds@3.10.0/package.json
+function patternRoot(pattern) {
+  const segments = pattern.split('/').filter((segment) => segment !== '.');
+  let root = '';
+
+  for (const segment of segments) {
+    // is there a better way to fuzzy test for a filename other than checking for a dot?
+    if (segment.indexOf('*') < 0 && segment.indexOf('.') < 0) {
+      root += `/${segment}`;
+    } else {
+      break;
+    }
+  }
+
+  return root;
+}
+
+/*
+ * https://nodejs.org/api/packages.html#subpath-patterns
+ *
+ * Examples
+ * "./icons/*": "./icons/*" - https://unpkg.com/browse/@spectrum-web-components/icons-workflow@1.0.1/package.json
+ * "./components/*": "./dist/components/*.js" - https://unpkg.com/browse/@uswds/web-components@0.0.1-alpha/package.json
+ * "./src/components/*": "./src/components/* /index.js - https://unpkg.com/browse/@uswds/web-components@0.0.1-alpha/package.json
+ */
+async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
+  // find the "deepest" segment we can start from
+  // to avoid unnecessary file scanning / crawling
+  const rootSubValueOffset = patternRoot(subValue);
+
+  // ideally we can use fs.glob when it comes out of experimental
+  // https://nodejs.org/docs/latest-v22.x/api/fs.html#fspromisesglobpattern-options
+  function walkDirectoryForExportPatterns(directoryUrl) {
+    const filesInDir = fs.readdirSync(directoryUrl);
+
+    filesInDir.forEach(file => {
+      const filePathUrl = new URL(`./${file}`, directoryUrl);
+      const stat = fs.statSync(filePathUrl);
+      const pattern = `${resolvedRoot}${subValue.replace('./', '')}`;
+      const regexPattern = globToRegex(pattern);
+
+      if (stat.isDirectory()) {
+        walkDirectoryForExportPatterns(new URL(`./${file}/`, directoryUrl));
+      } else if (regexPattern.test(filePathUrl.href)) {
+        const rootSubOffset = patternRoot(sub);
+        const relativePath = filePathUrl.href.replace(resolvedRoot, '/');
+        // naive way to offset a subValue pattern to the sub pattern
+        // ex. "./js/*": "./packages/*/src/index.js",
+        // https://unpkg.com/browse/@uswds/uswds@3.10.0/package.json
+        const rootSubRelativePath = relativePath.replace(rootSubValueOffset, '');
+
+        updateImportMap(`${dependency}${rootSubOffset}${rootSubRelativePath}`, `/node_modules/${dependency}${relativePath}`);
+      }
+    });
+  }
+
+  walkDirectoryForExportPatterns(new URL(`.${rootSubValueOffset}/`, resolvedRoot));
+}
+
+function trackExportConditions(dependency, exports, sub, condition) {
+  if (typeof exports[sub] === 'object') {
+    // also check for nested conditions of conditions, default to default for now
+    // https://unpkg.com/browse/@floating-ui/dom@1.6.12/package.json
+    if (sub === '.') {
+      updateImportMap(dependency, `/node_modules/${dependency}/${exports[sub][condition].default ?? exports[sub][condition]}`);
+    } else {
+      updateImportMap(`${dependency}/${sub}`, `/node_modules/${dependency}/${exports[sub][condition].default ?? exports[sub][condition]}`);
+    }
+  } else {
+    // https://unpkg.com/browse/redux@5.0.1/package.json
+    updateImportMap(dependency, `/node_modules/${dependency}/${exports[sub][condition]}`);
+  }
+}
+
+// https://nodejs.org/api/packages.html#conditional-exports
+async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
+  const { exports, module, main } = packageJson;
+
+  // favor exports over main / module
+  if (exports) {
+    for (const sub in exports) {
+      /*
+       * test for conditional subpath exports
+       * 1. import
+       * 2. module-sync
+       * 3. default
+       */
+      if (typeof exports[sub] === 'object') {
+        let matched = false;
+
+        for (const condition of SUPPORTED_EXPORT_CONDITIONS) {
+          if (exports[sub][condition]) {
+            matched = true;
+            trackExportConditions(dependency, exports, sub, condition);
+            break;
+          }
         }
 
-        await walkPackageJson(path.join(absoluteNodeModulesLocation, 'package.json'));
-      } else if (isBarePath) {
-        updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
+        if (!matched) {
+          // TODO what to do here?  what else is there besides default?
+          // console.log(`unsupported condition \`${exports[sub]}\` for dependency => \`${dependency}\``);
+        }
       } else {
-        // walk this module for all its dependencies
-        sourceValue = !hasExtension
-          ? `${sourceValue}.js`
-          : sourceValue;
-
-        if (fs.existsSync(path.join(absoluteNodeModulesLocation, sourceValue))) {
-          const entry = `/node_modules/${await resolveRelativeSpecifier(sourceValue, modulePath, dependency)}`;
-          await walkModule(path.join(absoluteNodeModulesLocation, sourceValue), dependency);
-
-          updateImportMap(path.join(dependency, sourceValue), entry);
-        }
-      }
-    },
-    async ExportNamedDeclaration(node) {
-      const sourceValue = node && node.source ? node.source.value : '';
-
-      if (sourceValue !== '' && sourceValue.indexOf('http') !== 0) {
-        // handle relative specifier
-        if (sourceValue.indexOf('.') === 0) {
-          const entry = `/node_modules/${await resolveRelativeSpecifier(sourceValue, modulePath, dependency)}`;
-
-          updateImportMap(path.join(dependency, sourceValue), entry);
+        // handle (unconditional) subpath exports
+        if (sub === '.') {
+          updateImportMap(dependency, `/node_modules/${dependency}/${exports[sub]}`);
+        } else if (sub.indexOf('*') >= 0) {
+          await walkExportPatterns(dependency, sub, exports[sub], resolvedRoot);
         } else {
-          // handle bare specifier
-          updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
-        }
-      }
-    },
-    async ExportAllDeclaration(node) {
-      const sourceValue = node && node.source ? node.source.value : '';
-
-      if (sourceValue !== '' && sourceValue.indexOf('http') !== 0) {
-        if (sourceValue.indexOf('.') === 0) {
-          const entry = `/node_modules/${await resolveRelativeSpecifier(sourceValue, modulePath, dependency)}`;
-
-          updateImportMap(path.join(dependency, sourceValue), entry);
-        } else {
-          updateImportMap(sourceValue, `/node_modules/${sourceValue}`);
+          updateImportMap(`${dependency}/${sub}`, `/node_modules/${dependency}/${exports[sub]}`);
         }
       }
     }
-  });
+  } else if (module || main) {
+    updateImportMap(dependency, `/node_modules/${dependency}/${module ?? main}`);
+  } else {
+    // TODO warn about no exports found
+  }
 }
 
+// https://nodejs.org/api/packages.html#package-entry-points
 async function walkPackageJson(packageJson = {}) {
-  // while walking a package.json we need to find its entry point, e.g. index.js
-  // and then walk that for import / export statements
-  // and walk its package.json for its dependencies
+  try {
+    for (const dependency of Object.keys(packageJson.dependencies || {})) {
+      const resolved = resolveBareSpecifier(dependency);
 
-  for (const dependency of Object.keys(packageJson.dependencies || {})) {
-    const dependencyPackageRootPath = path.join(process.cwd(), 'node_modules', dependency);
-    const dependencyPackageJsonPath = path.join(dependencyPackageRootPath, 'package.json');
-    const dependencyPackageJson = JSON.parse(fs.readFileSync(dependencyPackageJsonPath, 'utf-8'));
-    const entry = await getPackageEntryPath(dependencyPackageJson);
-    const isJavascriptPackage = Array.isArray(entry) || typeof entry === 'string' && entry.endsWith('.js') || entry.endsWith('.mjs');
+      if (resolved) {
+        const resolvedRoot = derivePackageRoot(dependency, resolved);
+        const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
 
-    if (isJavascriptPackage) {
-      const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(dependency);
+        walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
 
-      // https://nodejs.org/api/packages.html#packages_determining_module_system
-      if (Array.isArray(entry)) {
-        // we have an exportMap
-        const exportMap = entry;
+        if (resolvedPackageJson.dependencies) {
+          for (const dependency in resolvedPackageJson.dependencies) {
+            const resolved = resolveBareSpecifier(dependency);
 
-        for (const entry of exportMap) {
-          const exportMapEntry = dependencyPackageJson.exports[entry];
-          let packageExport;
+            if (resolved) {
+              const resolvedRoot = derivePackageRoot(dependency, resolved);
+              const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
 
-          if (Array.isArray(exportMapEntry)) {
-            let fallbackPath;
-            let esmPath;
+              walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
 
-            exportMapEntry.forEach((mapItem) => {
-              switch (typeof mapItem) {
-
-                case 'string':
-                  fallbackPath = mapItem;
-                  break;
-                case 'object':
-                  const entryTypes = Object.keys(mapItem);
-
-                  if (entryTypes.import) {
-                    esmPath = entryTypes.import;
-                  } else if (entryTypes.require) {
-                    console.error('The package you are importing needs commonjs support.  Please use our commonjs plugin to fix this error.');
-                    fallbackPath = entryTypes.require;
-                  } else if (entryTypes.default) {
-                    console.warn('The package you are requiring may need commonjs support.  If this module is not working for you, consider adding our commonjs plugin.');
-                    fallbackPath = entryTypes.default;
-                  }
-                  break;
-                default:
-                  console.warn(`Sorry, we were unable to detect the module type for ${mapItem} :(.  please consider opening an issue to let us know about your use case.`);
-                  break;
-
-              }
-            });
-
-            packageExport = esmPath
-              ? esmPath
-              : fallbackPath;
-          } else if (exportMapEntry.import || exportMapEntry.default) {
-            packageExport = exportMapEntry.import
-              ? exportMapEntry.import
-              : exportMapEntry.default;
-
-            // use the dependency itself as an entry in the importMap
-            if (entry === '.') {
-              updateImportMap(dependency, `/node_modules/${path.join(dependency, packageExport)}`);
-            }
-          } else if (exportMapEntry.endsWith && (exportMapEntry.endsWith('.js') || exportMapEntry.endsWith('.mjs')) && exportMapEntry.indexOf('*') < 0) {
-            // is probably a file, so _not_ an export array, package.json, or wildcard export
-            packageExport = exportMapEntry;
-          }
-
-          if (packageExport) {
-            const packageExportLocation = path.resolve(absoluteNodeModulesLocation, packageExport);
-
-            if (packageExport.endsWith('js')) {
-              updateImportMap(path.join(dependency, entry), `/node_modules/${path.join(dependency, packageExport)}`);
-            } else if (fs.lstatSync(packageExportLocation).isDirectory()) {
-              fs.readdirSync(packageExportLocation)
-                .filter(file => file.endsWith('.js') || file.endsWith('.mjs'))
-                .forEach((file) => {
-                  updateImportMap(path.join(dependency, packageExport, file), `/node_modules/${path.join(dependency, packageExport, file)}`);
-                });
-            } else {
-              console.warn('Warning, not able to handle export', path.join(dependency, packageExport));
+              await walkPackageJson(resolvedPackageJson);
             }
           }
-        }
-
-        await walkPackageJson(dependencyPackageJson);
-      } else {
-        const packageEntryPointPath = path.join(absoluteNodeModulesLocation, entry);
-
-        // sometimes a main file is actually just an empty string... :/
-        if (fs.existsSync(packageEntryPointPath)) {
-          updateImportMap(dependency, `/node_modules/${path.join(dependency, entry)}`);
-
-          await walkModule(packageEntryPointPath, dependency);
-          await walkPackageJson(dependencyPackageJson);
         }
       }
     }
+  } catch (e) {
+    console.error('Error building up import map', e);
   }
 
   return importMap;
 }
 
+// could probably go somewhere else, in a util?
 function mergeImportMap(html = '', map = {}, shouldShim = false) {
   const importMapType = shouldShim ? 'importmap-shim' : 'importmap';
   const hasImportMap = html.indexOf(`script type="${importMapType}"`) > 0;
@@ -243,7 +245,6 @@ function mergeImportMap(html = '', map = {}, shouldShim = false) {
 }
 
 export {
-  mergeImportMap,
   walkPackageJson,
-  walkModule
+  mergeImportMap
 };

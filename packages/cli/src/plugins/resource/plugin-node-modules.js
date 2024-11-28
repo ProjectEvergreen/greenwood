@@ -10,7 +10,7 @@ import { getNodeModulesLocationForPackage, getPackageJsonForProject, getPackageN
 import { resolveForRelativeUrl } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { mergeImportMap } from '../../lib/walker-package-ranger.js';
-import { walkPackageJson } from '../../lib/walker-package-ranger2.js';
+import { walkPackageJson } from '../../lib/walker-package-ranger.js';
 
 let importMap;
 
