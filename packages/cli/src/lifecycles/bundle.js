@@ -150,6 +150,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
         });
       }
 
+      // keep the original contents, but still hash the filename based on content
       if (compilation.config.optimization === 'none' || optimizationAttr === 'none') {
         optimizedFileContents = contents;
       } else {

@@ -309,11 +309,12 @@ function greenwoodImportMetaUrl(compilation) {
         const assetExtension = assetName.split('.').pop();
         const assetContents = await fs.promises.readFile(url, 'utf-8');
         const name = assetName.replace(`.${assetExtension}`, '');
+        const request = new Request(url, { headers: { 'Accept': 'text/javascript' } });
         let bundleExtensions = ['js'];
 
         for (const plugin of customResourcePlugins) {
-          if (plugin.shouldServe && await plugin.shouldServe(url)) {
-            const response = await plugin.serve(url);
+          if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
+            const response = await plugin.serve(url, request);
 
             if (response?.headers?.get('content-type') || ''.indexOf('text/javascript') >= 0) {
               bundleExtensions = [...bundleExtensions, ...plugin.extensions];

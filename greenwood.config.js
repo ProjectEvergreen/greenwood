@@ -5,6 +5,7 @@ import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 import { greenwoodPluginImportRaw } from '@greenwood/plugin-import-raw';
 import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
+import { greenwoodPluginTypeScript } from '@greenwood/plugin-typescript';
 
 export default {
   workspace: new URL('./www/', import.meta.url),
@@ -12,6 +13,7 @@ export default {
   staticRouter: true,
   activeContent: true,
   plugins: [
+    greenwoodPluginTypeScript(),
     greenwoodPluginGraphQL(),
     greenwoodPluginPolyfills({
       lit: true
