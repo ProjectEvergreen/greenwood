@@ -168,7 +168,9 @@ async function bundleStyleResources(compilation, resourcePlugins) {
             const currentResponse = await plugin.serve(url, request);
             const mergedResponse = mergeResponse(intermediateResponse.clone(), currentResponse.clone());
 
-            return Promise.resolve(mergedResponse.clone());
+            if (mergedResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
+              return Promise.resolve(mergedResponse.clone());
+            }
           }
 
           return Promise.resolve(responsePromise);

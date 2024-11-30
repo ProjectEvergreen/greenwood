@@ -24,7 +24,8 @@
  *       counter.js
  *       counter.css
  *   scripts/
- *     frontmatter-custom.ts
+ *     frontmatter-standard.js
+*      frontmatter-custom.ts
  *   styles/
  *     frontmatter-custom.scss
  *   pages/
@@ -155,7 +156,7 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
-      describe('Custom Frontmatter JavaScript import format with expected contents transformed', () => {
+      describe('Frontmatter JavaScript import', () => {
         it('should output a transformed frontmatter-standard.js file from custom frontmatter import', async function() {
           const jsFiles = await glob.promise(`${this.context.publicDir}**/**/frontmatter-standard.*.js`);
           const contents = await fs.promises.readFile(jsFiles[0], 'utf-8');
@@ -191,13 +192,13 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
-      describe('Custom Frontmatter CSS import format', () => {
+      describe('Custom Frontmatter CSS import format with expected contents transformed', () => {
         it('should output a frontmatter-custom.css file from custom frontmatter import', async function() {
           const cssFiles = await glob.promise(`${this.context.publicDir}**/**/frontmatter-custom.*.css`);
           const contents = await fs.promises.readFile(cssFiles[0], 'utf-8');
 
           expect(cssFiles).to.have.lengthOf(1);
-          expect(contents.replace(/ /g, '').replace(/\n/g, '')).to.equal('body{--primary-color:\'red\';}');
+          expect(contents).to.equal('body{--primary-color:\'red\'}');
         });
 
         it('should have expected attributes on the `<link>` tag from frontmatter imports', async function() {
