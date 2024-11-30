@@ -74,7 +74,7 @@ const generateGraph = async (compilation) => {
             const relativePagePath = filenameUrl.pathname.replace(pagesDir.pathname, './');
             const isApiRoute = relativePagePath.startsWith('./api');
             const req = isApiRoute
-              ? new Request(filenameUrl)
+              ? new Request(filenameUrl, { headers: { 'Accept': 'text/javascript' } })
               : new Request(filenameUrl, { headers: { 'Accept': 'text/html' } });
             let isCustom = null;
 
