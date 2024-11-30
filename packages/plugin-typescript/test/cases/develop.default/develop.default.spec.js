@@ -60,7 +60,9 @@ describe('Develop Greenwood With: ', function() {
       let data;
 
       before(async function() {
-        response = await fetch(`${hostname}:${port}/main.ts`);
+        response = await fetch(`${hostname}:${port}/main.ts`, { headers: {
+          'Accept': 'text/javascript'
+        } });
         data = await response.text();
       });
 

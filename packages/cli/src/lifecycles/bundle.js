@@ -150,6 +150,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
         });
       }
 
+      // keep the original contents, but still hash the filename based on content
       if (compilation.config.optimization === 'none' || optimizationAttr === 'none') {
         optimizedFileContents = contents;
       } else {
@@ -160,6 +161,22 @@ async function bundleStyleResources(compilation, resourcePlugins) {
         const initResponse = new Response(contents, { headers });
 
         let response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+          const intermediateResponse = await responsePromise;
+          const shouldServe = plugin.shouldServe && await plugin.shouldServe(url, request);
+
+          if (shouldServe) {
+            const currentResponse = await plugin.serve(url, request);
+            const mergedResponse = mergeResponse(intermediateResponse.clone(), currentResponse.clone());
+
+            if (mergedResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
+              return Promise.resolve(mergedResponse.clone());
+            }
+          }
+
+          return Promise.resolve(responsePromise);
+        }, Promise.resolve(initResponse));
+
+        response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
           const intermediateResponse = await responsePromise;
           const shouldPreIntercept = plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, intermediateResponse.clone());
 
@@ -173,7 +190,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
           }
 
           return Promise.resolve(responsePromise);
-        }, Promise.resolve(initResponse));
+        }, Promise.resolve(response.clone()));
 
         response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
           const intermediateResponse = await responsePromise;
@@ -346,10 +363,6 @@ const bundleCompilation = async (compilation) => {
         return plugin.type === 'resource';
       }).map((plugin) => {
         return plugin.provider(compilation);
-      }).filter((provider) => {
-        return provider.shouldIntercept && provider.intercept
-          || provider.shouldPreIntercept && provider.preIntercept
-          || provider.shouldOptimize && provider.optimize;
       });
 
       console.info('bundling static assets...');

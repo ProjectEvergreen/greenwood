@@ -64,12 +64,6 @@ describe('Build Greenwood With: ', function() {
         cssFiles = await glob.promise(`${path.join(this.context.publicDir, 'styles')}/theme.*.css`);
       });
 
-      it('should contain no <link> preload tags in the <head>', function() {
-        const preloadTags = dom.window.document.querySelectorAll('head link[rel="preload"]');
-
-        expect(preloadTags.length).to.be.equal(0);
-      });
-
       describe('<script> tag and preloading', function() {
         it('should contain one un-minified javascript file in the output directory', async function() {
           expect(jsFiles).to.have.lengthOf(1);
@@ -95,7 +89,7 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
-      describe('<link> tags should not be preloaded', function() {
+      describe('theme.css', function() {
         it('should contain one style.css in the output directory', async function() {
           expect(cssFiles).to.have.lengthOf(1);
         });
@@ -106,10 +100,10 @@ describe('Build Greenwood With: ', function() {
           expect(css).to.contain('{\n  margin: 0;\n  padding: 0;\n  font-family: \'Comic Sans\', sans-serif;\n}');
         });
 
-        it('should have only one expected <link> tag in the <head>', function() {
+        it('should have two <link> tag in the <head>', function() {
           const linkTags = dom.window.document.querySelectorAll('head link');
 
-          expect(linkTags.length).to.be.equal(1);
+          expect(linkTags.length).to.be.equal(2);
         });
       });
     });

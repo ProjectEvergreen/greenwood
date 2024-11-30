@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import htmlparser from 'node-html-parser';
 import { checkResourceExists } from './resource-utils.js';
 import { Worker } from 'worker_threads';
+import { asyncFilter } from './async-utils.js';
 
 async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {
   const contextPlugins = compilation.config.plugins.filter((plugin) => {
@@ -194,6 +195,11 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
     const pageTitle = pageRoot && pageRoot.querySelector('head title');
     const hasActiveFrontmatterTitle = compilation.config.activeContent && (pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0
       || appTitle && appTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0);
+    const resourcePlugins = compilation.config.plugins.filter((plugin) => {
+      return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
+    }).map((plugin) => {
+      return plugin.provider(compilation);
+    });
     let title;
 
     if (hasActiveFrontmatterTitle) {
@@ -231,7 +237,27 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
     const mergedStyles = [
       ...appRoot.querySelectorAll('head style'),
       ...[...(pageRoot && pageRoot.querySelectorAll('head style')) || []],
-      ...customImports.filter(resource => resource.split(' ')[0].split('.').pop() === 'css')
+      ...(await asyncFilter(customImports, async (resource) => {
+        const [href] = resource.split(' ');
+        const isCssFile = href.split(' ')[0].split('.').pop() === 'css';
+
+        if (isCssFile) {
+          return true;
+        }
+
+        const resourceUrl = new URL(`file://${href}`);
+        const request = new Request(resourceUrl, { headers: { 'Accept': 'text/css' } });
+        let isSupportedCustomFormat = false;
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldServe && await plugin.shouldServe(resourceUrl, request)) {
+            isSupportedCustomFormat = true;
+            break;
+          }
+        }
+
+        return isSupportedCustomFormat;
+      }))
         .map((resource) => {
           const [href, ...attributes] = resource.split(' ');
           const attrs = attributes?.length > 0
@@ -245,7 +271,27 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
     const mergedScripts = [
       ...appRoot.querySelectorAll('head script'),
       ...[...(pageRoot && pageRoot.querySelectorAll('head script')) || []],
-      ...customImports.filter(resource => resource.split(' ')[0].split('.').pop() === 'js')
+      ...(await asyncFilter(customImports, async (resource) => {
+        const [src] = resource.split(' ');
+        const isJavaScriptFile = src.split(' ')[0].split('.').pop() === 'js';
+
+        if (isJavaScriptFile) {
+          return true;
+        }
+
+        const resourceUrl = new URL(`file://${src}`);
+        const request = new Request(resourceUrl, { headers: { 'Accept': 'text/javascript' } });
+        let isSupportedCustomFormat = false;
+
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldServe && await plugin.shouldServe(resourceUrl, request)) {
+            isSupportedCustomFormat = true;
+            break;
+          }
+        }
+
+        return isSupportedCustomFormat;
+      }))
         .map((resource) => {
           const [src, ...attributes] = resource.split(' ');
           const attrs = attributes?.length > 0
