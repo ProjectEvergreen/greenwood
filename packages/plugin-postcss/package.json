@@ -27,8 +27,8 @@
     "@greenwood/cli": "^0.30.0"
   },
   "dependencies": {
-    "postcss": "^8.3.11",
-    "postcss-import": "^13.0.0",
+    "postcss": "^8.4.49",
+    "postcss-import": "^16.1.0",
     "postcss-preset-env": "^7.0.1"
   },
   "devDependencies": {
