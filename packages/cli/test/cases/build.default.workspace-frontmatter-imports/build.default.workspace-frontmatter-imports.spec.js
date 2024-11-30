@@ -192,13 +192,12 @@ describe('Build Greenwood With: ', function() {
       });
 
       describe('Custom Frontmatter CSS import format', () => {
-        it('should output a frontmatter-custom.js file from custom frontmatter import', async function() {
+        it('should output a frontmatter-custom.css file from custom frontmatter import', async function() {
           const cssFiles = await glob.promise(`${this.context.publicDir}**/**/frontmatter-custom.*.css`);
           const contents = await fs.promises.readFile(cssFiles[0], 'utf-8');
 
-          console.log({ contents });
-
           expect(cssFiles).to.have.lengthOf(1);
+          expect(contents.replace(/ /g, '').replace(/\n/g, '')).to.equal('body{--primary-color:\'red\';}');
         });
 
         it('should have expected attributes on the `<link>` tag from frontmatter imports', async function() {

@@ -36,21 +36,14 @@ class NaiveSassResource {
   }
 
   async shouldServe(url, request) {
-    // console.log(url);
-    // console.log('111', url.pathname.split('.').pop());
-    // console.log('222', request.headers?.get('Accept'));
-    // console.log('333', url.pathname.split('.').pop() === this.extensions[0]);
-    // console.log('444', request.headers?.get('Accept').indexOf(this.contentType) >= 0);
     return url.pathname.split('.').pop() === this.extensions[0] && request.headers?.get('Accept').indexOf(this.contentType) >= 0;
   }
 
   async serve(url) {
-    console.log('$$$$', url);
     let body = await fs.readFile(url, 'utf-8');
 
-    body = body.replace('red', 'blue');
-    // body = body.replace(/\\$my-color;/, 'red');
-    console.log({ body });
+    body = body.replace(/\$my-color: red;/, '');
+    body = body.replace(/\$my-color/, '\'red\'');
 
     return new Response(body, {
       headers: new Headers({
