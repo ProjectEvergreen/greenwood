@@ -15,6 +15,7 @@ ignore:
   - .git
   - public
   - node_modules
+  - packages/plugin-postcss/node_modules
   - packages/plugin-babel/node_modules
   - packages/init/node_modules
   - packages/plugin-typescript/node_modules
