@@ -127,9 +127,13 @@ describe('Build Greenwood With: ', function() {
         `${process.cwd()}/node_modules/pwa-helpers/package.json`,
         `${outputPath}/node_modules/pwa-helpers/`
       );
-      const reduxLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/redux/es/redux.mjs`,
-        `${outputPath}/node_modules/redux/es`
+      const reduxDist = await getDependencyFiles(
+        `${process.cwd()}/node_modules/redux/dist/*.js`,
+        `${outputPath}/node_modules/redux/dist/`
+      );
+      const reduxMjs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/redux/dist/*.mjs`,
+        `${outputPath}/node_modules/redux/dist/`
       );
       const reduxPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/redux/package.json`,
@@ -168,8 +172,12 @@ describe('Build Greenwood With: ', function() {
         `${outputPath}/node_modules/symbol-observable/`
       );
       const reduxThunk = await getDependencyFiles(
-        `${process.cwd()}/node_modules/redux-thunk/es/*.js`,
-        `${outputPath}/node_modules/redux-thunk/es`
+        `${process.cwd()}/node_modules/redux-thunk/dist/*.js`,
+        `${outputPath}/node_modules/redux-thunk/dist/`
+      );
+      const reduxThunkMjs = await getDependencyFiles(
+        `${process.cwd()}/node_modules/redux-thunk/dist/*.mjs`,
+        `${outputPath}/node_modules/redux-thunk/dist/`
       );
       const reduxThunkPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/redux-thunk/package.json`,
@@ -197,7 +205,8 @@ describe('Build Greenwood With: ', function() {
         ...litReduxRouterLibs,
         ...pwaHelpersLibs,
         ...pwaHelpersPackageJson,
-        ...reduxLibs,
+        ...reduxDist,
+        ...reduxMjs,
         ...reduxPackageJson,
         ...regexParam,
         ...regexParamPackageJson,
@@ -208,7 +217,8 @@ describe('Build Greenwood With: ', function() {
         ...symbolLibs,
         ...symbolLibsPackageJson,
         ...reduxThunkPackageJson,
-        ...reduxThunk
+        ...reduxThunk,
+        ...reduxThunkMjs
       ]);
       runner.runCommand(cliPath, 'build');
     });

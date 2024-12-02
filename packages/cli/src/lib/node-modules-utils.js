@@ -2,6 +2,8 @@ import { createRequire } from 'module';
 import { checkResourceExists } from './resource-utils.js';
 import fs from 'fs/promises';
 
+// TODO delete me and everything else in this file
+// https://github.com/ProjectEvergreen/greenwood/issues/684
 async function getNodeModulesLocationForPackage(packageName) {
   let nodeModulesUrl;
 
@@ -42,7 +44,7 @@ function getPackageNameFromUrl(url) {
   return packageName;
 }
 
-async function getPackageJson({ userWorkspace, projectDirectory }) {
+async function getPackageJsonForProject({ userWorkspace, projectDirectory }) {
   const monorepoPackageJsonUrl = new URL('./package.json', userWorkspace);
   const topLevelPackageJsonUrl = new URL('./package.json', projectDirectory);
   const hasMonorepoPackageJson = await checkResourceExists(monorepoPackageJsonUrl);
@@ -56,7 +58,7 @@ async function getPackageJson({ userWorkspace, projectDirectory }) {
 }
 
 export {
+  getPackageJsonForProject,
   getNodeModulesLocationForPackage,
-  getPackageJson,
   getPackageNameFromUrl
 };

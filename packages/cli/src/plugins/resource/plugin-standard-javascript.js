@@ -9,7 +9,7 @@ import { ResourceInterface } from '../../lib/resource-interface.js';
 import terser from '@rollup/plugin-terser';
 import * as acorn from 'acorn';
 import * as walk from 'acorn-walk';
-import { acornOptions } from '../../lib/parsing-utils.js';
+import { ACORN_OPTIONS } from '../../lib/parsing-utils.js';
 
 class StandardJavaScriptResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -43,7 +43,7 @@ class StandardJavaScriptResource extends ResourceInterface {
     const body = await response.clone().text();
     let polyfilled = body;
 
-    walk.simple(acorn.parse(body, acornOptions), {
+    walk.simple(acorn.parse(body, ACORN_OPTIONS), {
       async ImportDeclaration(node) {
         const line = body.slice(node.start, node.end);
         const { value } = node.source;

@@ -20,7 +20,7 @@
  *       card.json
  *   pages/
  *     index.html
- *
+ * package.json
  */
 import chai from 'chai';
 import fs from 'fs';
@@ -67,7 +67,13 @@ describe('Build Greenwood With: ', function() {
         const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
 
         expect(scripts.length).to.equal(1);
-        expect(scriptContents).to.contain(`import e from"/card.${cssFileHash}.css"with{type:"css"}`);
+        expect(scriptContents).to.contain(`import r from"/card.${cssFileHash}.css"with{type:"css"};`);
+      });
+
+      it('should have the expected import attribute for importing @spectrum-css/card as a Constructable Stylesheet in the card.js bundle', function() {
+        const scriptContents = fs.readFileSync(scripts[0], 'utf-8');
+
+        expect(scriptContents).to.contain('const c=new CSSStyleSheet;c.replaceSync(".spectrum-Card{--spectrum-card-background-color');
       });
 
       it('should have the expected CSS output bundle for card.css', function() {
