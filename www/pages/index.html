@@ -8,50 +8,15 @@
     <script type="module" src="../components/banner/banner.js"></script>
     <script type="module" src="../components/card/card.js" data-gwd-opt="static"></script>
 
-    <link rel="stylesheet" href="/node_modules/@shoelace-style/shoelace/dist/themes/light.css" />
     <link rel="stylesheet" href="/node_modules/prismjs/themes/prism-tomorrow.css"/>
     <link rel="stylesheet" href="../styles/home.css"/>
-
-    <script type="module" src="/node_modules/@shoelace-style/shoelace/dist/shoelace.js"></script>
-    <script type="module" src="../components/spectrum.js"></script>
-    <script type="module" src="../components/uswds.js"></script>
-    <script type="module" src="../components/redux.js"></script>
   </head>
   <body>
 
     <div class="gwd-content-outlet">
       <app-banner></app-banner>
-      <usa-banner data-testid="banner"></usa-banner>
 
       <div class='gwd-content-wrapper'>
-          <sl-button variant="neutral" type="submit">Click me for a greeting!</sl-button>
-
-          <sp-theme system="spectrum" color="dark" scale="large">
-            <sp-button size="xl">I'm a button!</sp-button>
-
-            <sp-action-menu size="xl">
-              <span slot="label">More Actions</span>
-              <sp-menu-item>
-                  Deselect
-              </sp-menu-item>
-              <sp-menu-item>
-                  Select inverse
-              </sp-menu-item>
-              <sp-menu-item>
-                  Feather...
-              </sp-menu-item>
-              <sp-menu-item>
-                  Select and mask...
-              </sp-menu-item>
-              <sp-menu-divider></sp-menu-divider>
-              <sp-menu-item>
-                  Save selection
-              </sp-menu-item>
-              <sp-menu-item disabled>
-                  Make work path
-              </sp-menu-item>
-            </sp-action-menu>
-          </sp-theme>
 
           <div class='gwd-page-template gwd-content'>
             <div id="gwd-message-wrapper">

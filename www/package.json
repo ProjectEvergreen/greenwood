@@ -8,21 +8,10 @@
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-cloudfront": "^3.58.0",
     "@evergreen-wc/eve-button": "^0.1.1",
     "@evergreen-wc/eve-container": "^0.1.1",
-    "@shoelace-style/shoelace": "^2.18.0",
-    "@spectrum-css/card": "^9.3.0",
-    "@spectrum-web-components/action-menu": "^1.0.1",
-    "@spectrum-web-components/menu": "^1.0.1",
-    "@spectrum-web-components/shared": "^1.0.1",
-    "@spectrum-web-components/styles": "^1.0.1",
-    "@spectrum-web-components/theme": "^1.0.1",
-    "@spectrum-web-components/top-nav": "^1.0.1",
-    "@uswds/web-components": "^0.0.1-alpha",
     "lit": "^3.1.0",
-    "prismjs": "^1.21.0",
-    "redux": "^5.0.1"
+    "prismjs": "^1.21.0"
   },
   "devDependencies": {
     "@mapbox/rehype-prism": "^0.5.0",
