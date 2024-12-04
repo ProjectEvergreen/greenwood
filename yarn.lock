@@ -4382,6 +4382,18 @@
     "@spectrum-web-components/base" "^1.0.1"
     lit "^2.5.0 || ^3.1.3"
 
+"@spectrum-web-components/tabs@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@spectrum-web-components/tabs/-/tabs-1.0.1.tgz#0d93fc27749a7f52fae8bd386eb33118df3bbe84"
+  integrity sha512-JTaIBvNn1P2Y1PRntplgPVye7PyaygHrslvzWfDmB4OJD5CVIFfVKX2z/bVM2TEmwABi7SDEK/MMUQ43xpRLbw==
+  dependencies:
+    "@lit-labs/observers" "^2.0.2"
+    "@spectrum-web-components/base" "^1.0.1"
+    "@spectrum-web-components/icon" "^1.0.1"
+    "@spectrum-web-components/icons-ui" "^1.0.1"
+    "@spectrum-web-components/reactive-controllers" "^1.0.1"
+    "@spectrum-web-components/shared" "^1.0.1"
+
 "@spectrum-web-components/theme@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@spectrum-web-components/theme/-/theme-1.0.1.tgz#3f656ca336d77de8f78578b3bc10fe55b482cee6"
@@ -4399,6 +4411,16 @@
     "@spectrum-web-components/overlay" "^1.0.1"
     "@spectrum-web-components/reactive-controllers" "^1.0.1"
     "@spectrum-web-components/shared" "^1.0.1"
+
+"@spectrum-web-components/top-nav@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@spectrum-web-components/top-nav/-/top-nav-1.0.1.tgz#4cdd1bf5c9a54c5980184f024040b73ab83ea2be"
+  integrity sha512-7BOetIQsjl/vJ6/xw3e4jXIp+qLz8s5LKSHYXDBBFpBsBIJdkFaeV9slj6Kt5SumkSxg1C6W+RMpnMjznCAc1g==
+  dependencies:
+    "@lit-labs/observers" "^2.0.2"
+    "@spectrum-web-components/base" "^1.0.1"
+    "@spectrum-web-components/shared" "^1.0.1"
+    "@spectrum-web-components/tabs" "^1.0.1"
 
 "@spectrum-web-components/tray@^1.0.1":
   version "1.0.1"
