@@ -3,11 +3,14 @@ import fs from 'fs';
 /* eslint-disable max-depth,complexity */
 // priority if from L -> R
 const SUPPORTED_EXPORT_CONDITIONS = ['import', 'module-sync', 'default'];
+const IMPORT_MAP_RESOLVED_PREFIX = '/~';
 const importMap = {};
 const diagnostics = {};
 
-function updateImportMap(key, value) {
-  importMap[key.replace('./', '')] = value.replace('./', '');
+function updateImportMap(key, value, resolvedRoot) {
+  if (!importMap[key.replace('./', '')]) {
+    importMap[key.replace('./', '')] = `${IMPORT_MAP_RESOLVED_PREFIX}${resolvedRoot.replace('file://', '')}${value.replace('./', '')}`;
+  }
 }
 
 // wrapper around import.meta.resolve to provide graceful error handling / logging
@@ -109,7 +112,7 @@ async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
         // https://unpkg.com/browse/@uswds/uswds@3.10.0/package.json
         const rootSubRelativePath = relativePath.replace(rootSubValueOffset, '');
 
-        updateImportMap(`${dependency}${rootSubOffset}${rootSubRelativePath}`, `/node_modules/${dependency}${relativePath}`);
+        updateImportMap(`${dependency}${rootSubOffset}${rootSubRelativePath}`, relativePath, resolvedRoot);
       }
     });
   }
@@ -117,18 +120,18 @@ async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
   walkDirectoryForExportPatterns(new URL(`.${rootSubValueOffset}/`, resolvedRoot));
 }
 
-function trackExportConditions(dependency, exports, sub, condition) {
+function trackExportConditions(dependency, exports, sub, condition, resolvedRoot) {
   if (typeof exports[sub] === 'object') {
     // also check for nested conditions of conditions, default to default for now
     // https://unpkg.com/browse/@floating-ui/dom@1.6.12/package.json
     if (sub === '.') {
-      updateImportMap(dependency, `/node_modules/${dependency}/${exports[sub][condition].default ?? exports[sub][condition]}`);
+      updateImportMap(dependency, `${exports[sub][condition].default ?? exports[sub][condition]}`, resolvedRoot);
     } else {
-      updateImportMap(`${dependency}/${sub}`, `/node_modules/${dependency}/${exports[sub][condition].default ?? exports[sub][condition]}`);
+      updateImportMap(`${dependency}/${sub}`, `${exports[sub][condition].default ?? exports[sub][condition]}`, resolvedRoot);
     }
   } else {
     // https://unpkg.com/browse/redux@5.0.1/package.json
-    updateImportMap(dependency, `/node_modules/${dependency}/${exports[sub][condition]}`);
+    updateImportMap(dependency, `${exports[sub][condition]}`);
   }
 }
 
@@ -151,7 +154,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
         for (const condition of SUPPORTED_EXPORT_CONDITIONS) {
           if (exports[sub][condition]) {
             matched = true;
-            trackExportConditions(dependency, exports, sub, condition);
+            trackExportConditions(dependency, exports, sub, condition, resolvedRoot);
             break;
           }
         }
@@ -163,16 +166,16 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
       } else {
         // handle (unconditional) subpath exports
         if (sub === '.') {
-          updateImportMap(dependency, `/node_modules/${dependency}/${exports[sub]}`);
+          updateImportMap(dependency, `${exports[sub]}`, resolvedRoot);
         } else if (sub.indexOf('*') >= 0) {
           await walkExportPatterns(dependency, sub, exports[sub], resolvedRoot);
         } else {
-          updateImportMap(`${dependency}/${sub}`, `/node_modules/${dependency}/${exports[sub]}`);
+          updateImportMap(`${dependency}/${sub}`, `${exports[sub]}`, resolvedRoot);
         }
       }
     }
   } else if (module || main) {
-    updateImportMap(dependency, `/node_modules/${dependency}/${module ?? main}`);
+    updateImportMap(dependency, `${module ?? main}`, resolvedRoot);
   } else {
     // ex: https://unpkg.com/browse/uuid@3.4.0/package.json
     diagnostics[dependency] = `WARNING: No supported entry point detected for => \`${dependency}\``;
@@ -246,5 +249,6 @@ function mergeImportMap(html = '', map = {}, shouldShim = false) {
 
 export {
   walkPackageJson,
-  mergeImportMap
+  mergeImportMap,
+  IMPORT_MAP_RESOLVED_PREFIX
 };

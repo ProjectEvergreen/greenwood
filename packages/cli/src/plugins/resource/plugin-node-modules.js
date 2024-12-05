@@ -10,7 +10,7 @@ import { getNodeModulesLocationForPackage, getPackageJsonForProject, getPackageN
 import { resolveForRelativeUrl } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { mergeImportMap } from '../../lib/walker-package-ranger.js';
-import { walkPackageJson } from '../../lib/walker-package-ranger.js';
+import { walkPackageJson, IMPORT_MAP_RESOLVED_PREFIX } from '../../lib/walker-package-ranger.js';
 
 let generatedImportMap;
 
@@ -22,42 +22,58 @@ class NodeModulesResource extends ResourceInterface {
   }
 
   async shouldResolve(url) {
-    return url.pathname.indexOf('/node_modules/') === 0;
+    const { pathname } = url;
+
+    // TODO how do we best handle hardcode node_modules?
+    // e.g. <script src="/node_modules/....."
+    return pathname.startsWith(IMPORT_MAP_RESOLVED_PREFIX) || pathname.startsWith('/node_modules/');
   }
 
   async resolve(url) {
     const { projectDirectory } = this.compilation.context;
     const { pathname, searchParams } = url;
-    const packageName = getPackageNameFromUrl(pathname);
-    const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(packageName);
-    const packagePathPieces = pathname.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
-    // use node modules resolution logic first, else hope for the best from the root of the project
-    const absoluteNodeModulesPathname = absoluteNodeModulesLocation
-      ? `${absoluteNodeModulesLocation}${packagePathPieces.join('/').replace(packageName, '')}`
-      : (await resolveForRelativeUrl(url, projectDirectory)).pathname;
+    const fromImportMap = pathname.startsWith(IMPORT_MAP_RESOLVED_PREFIX) && pathname.indexOf('/node_modules/') >= 0;
+    const resolvedHref = fromImportMap
+      ? pathname.replace(IMPORT_MAP_RESOLVED_PREFIX, 'file://')
+      : new URL(`.${pathname}`, projectDirectory).href;
     const params = searchParams.size > 0
       ? `?${searchParams.toString()}`
       : '';
 
-    return new Request(`file://${absoluteNodeModulesPathname}${params}`);
+    // console.log({ pathname, resolvedHref });
+    // const { projectDirectory } = this.compilation.context;
+    // const { pathname, searchParams } = url;
+    // const packageName = getPackageNameFromUrl(pathname);
+    // const absoluteNodeModulesLocation = await getNodeModulesLocationForPackage(packageName);
+    // const packagePathPieces = pathname.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
+    // // use node modules resolution logic first, else hope for the best from the root of the project
+    // const absoluteNodeModulesPathname = absoluteNodeModulesLocation
+    //   ? `${absoluteNodeModulesLocation}${packagePathPieces.join('/').replace(packageName, '')}`
+    //   : (await resolveForRelativeUrl(url, projectDirectory)).pathname;
+    // const params = searchParams.size > 0
+    //   ? `?${searchParams.toString()}`
+    //   : '';
+
+    return new Request(`${resolvedHref}${params}`);
   }
 
   async shouldServe(url) {
-    const { href, pathname, protocol } = url;
-    const extension = pathname.split('.').pop();
-    const existsAsJs = protocol === 'file:' && await checkResourceExists(new URL(`${href}.js`));
+    const { href, protocol } = url;
+    // const extension = pathname.split('.').pop();
+    // const existsAsJs = protocol === 'file:' && await checkResourceExists(new URL(`${href}.js`));
 
-    return extension === 'mjs'
-      || extension === '' && existsAsJs
-      || extension === 'js' && url.pathname.startsWith('/node_modules/');
+    // return extension === 'mjs'
+    //   || extension === '' && existsAsJs
+    //   || extension === 'js' && url.pathname.startsWith('/node_modules/');
+    return protocol === 'file:' && await checkResourceExists(new URL(href));
   }
 
   async serve(url) {
-    const pathname = url.pathname;
-    const urlExtended = pathname.split('.').pop() === ''
-      ? new URL(`file://${pathname}.js`)
-      : url;
-    const body = await fs.readFile(urlExtended, 'utf-8');
+    // const pathname = url.pathname;
+    // const urlExtended = pathname.split('.').pop() === ''
+    //   ? new URL(`file://${pathname}.js`)
+    //   : url;
+    const body = await fs.readFile(url, 'utf-8');
 
     return new Response(body, {
       headers: new Headers({

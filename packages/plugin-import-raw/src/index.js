@@ -4,6 +4,7 @@
  *
  */
 import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
+import { IMPORT_MAP_RESOLVED_PREFIX } from '@greenwood/cli/src/lib/walker-package-ranger.js';
 
 class ImportRawResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -13,9 +14,10 @@ class ImportRawResource extends ResourceInterface {
   }
 
   async shouldResolve(url) {
-    const matches = (this.options.matches || []).filter(matcher => url.href.indexOf(matcher) >= 0);
+    const { href, pathname, searchParams } = url;
+    const matches = (this.options.matches || []).filter(matcher => href.indexOf(matcher) >= 0);
 
-    if (matches.length > 0 && !url.searchParams.has('type')) {
+    if (matches.length > 0 && !searchParams.has('type') && !pathname.startsWith(IMPORT_MAP_RESOLVED_PREFIX)) {
       return true;
     }
   }
