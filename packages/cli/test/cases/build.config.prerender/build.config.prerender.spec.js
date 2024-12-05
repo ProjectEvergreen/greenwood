@@ -99,12 +99,10 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have prerendered content from <app-header> component', function() {
-        const appHeader = dom.window.document.querySelectorAll('body app-header');
-        const header = dom.window.document.querySelectorAll('body header');
+        const appHeader = dom.window.document.querySelectorAll('body app-header template[shadowrootmode="open"]');
 
         expect(appHeader.length).to.equal(1);
-        expect(header.length).to.equal(1);
-        expect(header[0].textContent).to.equal('This is the header component.');
+        expect(appHeader[0].innerHTML.trim()).to.equal('<header>This is the header component.</header>');
       });
     });
   });

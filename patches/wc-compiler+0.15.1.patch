@@ -1,0 +1,53 @@
+diff --git a/node_modules/wc-compiler/src/dom-shim.js b/node_modules/wc-compiler/src/dom-shim.js
+index be289a3..cbf5398 100644
+--- a/node_modules/wc-compiler/src/dom-shim.js
++++ b/node_modules/wc-compiler/src/dom-shim.js
+@@ -45,10 +45,9 @@ class Element extends Node {
+     return this.shadowRoot;
+   }
+ 
+-  // https://github.com/mfreed7/declarative-shadow-dom/blob/master/README.md#serialization
+-  // eslint-disable-next-line
+-  getInnerHTML() {
+-    return this.shadowRoot ? this.shadowRoot.innerHTML : this.innerHTML;
++  getHTML({ serializableShadowRoots = false }) {
++    return this.shadowRoot && serializableShadowRoots ?
++      `<template shadowrootmode="open">${this.shadowRoot.innerHTML}</template>` : this.innerHTML;
+   }
+ 
+   setAttribute(name, value) {
+@@ -116,11 +115,7 @@ class HTMLTemplateElement extends HTMLElement {
+   // TODO open vs closed shadow root
+   set innerHTML(html) {
+     if (this.content) {
+-      this.content.innerHTML = `
+-        <template shadowrootmode="open">
+-          ${html}
+-        </template>
+-      `;
++      this.content.innerHTML = html;
+     }
+   }
+ 
+diff --git a/node_modules/wc-compiler/src/wcc.js b/node_modules/wc-compiler/src/wcc.js
+index 68c7a2e..c687239 100644
+--- a/node_modules/wc-compiler/src/wcc.js
++++ b/node_modules/wc-compiler/src/wcc.js
+@@ -54,7 +54,7 @@ async function renderComponentRoots(tree, definitions) {
+         if (elementInstance) {
+           const hasShadow = elementInstance.shadowRoot;
+           const elementHtml = hasShadow
+-            ? elementInstance.getInnerHTML({ includeShadowRoots: true })
++            ? elementInstance.getHTML({ serializableShadowRoots: true })
+             : elementInstance.innerHTML;
+           const elementTree = parseFragment(elementHtml);
+           const hasLight = elementTree.childNodes > 0;
+@@ -244,7 +244,7 @@ async function renderToString(elementURL, wrappingEntryTag = true, props = {}) {
+   // in case the entry point isn't valid
+   if (elementInstance) {
+     const elementHtml = elementInstance.shadowRoot
+-      ? elementInstance.getInnerHTML({ includeShadowRoots: true })
++      ? elementInstance.getHTML({ serializableShadowRoots: true })
+       : elementInstance.innerHTML;
+     const elementTree = getParse(elementHtml)(elementHtml);
+     const finalTree = await renderComponentRoots(elementTree, definitions);
