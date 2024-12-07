@@ -13,9 +13,8 @@
  *
  * {
  *   plugins: [{
- *     ...greenwoodPluginPolyfills()
- *  }]
- *
+ *     greenwoodPluginPolyfills()
+ *   }]
  * }
  *
  * User Workspace

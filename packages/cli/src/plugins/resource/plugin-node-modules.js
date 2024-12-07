@@ -6,30 +6,12 @@
 import { checkResourceExists } from '../../lib/resource-utils.js';
 import fs from 'fs/promises';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import { getPackageJsonForProject } from '../../lib/node-modules-utils.js';
+import { getPackageJsonForProject, getResolvedHrefFromPathnameShortcut } from '../../lib/node-modules-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import { mergeImportMap, resolveBareSpecifier, derivePackageRoot } from '../../lib/walker-package-ranger.js';
+import { mergeImportMap } from '../../lib/walker-package-ranger.js';
 import { walkPackageJson, IMPORT_MAP_RESOLVED_PREFIX } from '../../lib/walker-package-ranger.js';
 
 let generatedImportMap;
-
-// take a "shortcut" pathname, e.g. /node_modules/lit/lit-html.js
-// and resolve it using import.meta.resolve
-function getResolvedHrefFromPathnameShortcut(pathname) {
-  const segments = pathname.replace('/node_modules/', '').split('/');
-  const hasScope = segments[0].startsWith('@');
-  const specifier = hasScope ? `${segments[0]}/${segments[1]}` : segments[0];
-  const resolved = resolveBareSpecifier(specifier);
-
-  if (resolved) {
-    const root = derivePackageRoot(resolved);
-
-    return `${root}${segments.slice(hasScope ? 2 : 1).join('/')}`;
-  } else {
-    // for example, local theme pack development
-    return `file://${pathname}`;
-  }
-}
 
 class NodeModulesResource extends ResourceInterface {
   constructor(compilation, options) {

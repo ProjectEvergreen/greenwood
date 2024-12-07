@@ -13,7 +13,7 @@
  *
  * {
  *   plugins: [
- *     ...greenwoodPluginPolyfills({
+ *     greenwoodPluginPolyfills({
  *       lit: true
  *     })
  *   ]

@@ -1,47 +1,23 @@
-import { createRequire } from 'module';
 import { checkResourceExists } from './resource-utils.js';
+import { resolveBareSpecifier, derivePackageRoot } from './walker-package-ranger.js';
 import fs from 'fs/promises';
 
-// TODO delete me and everything else in this file
-// https://github.com/ProjectEvergreen/greenwood/issues/684
-async function getNodeModulesLocationForPackage(packageName) {
-  let nodeModulesUrl;
+// take a "shortcut" pathname, e.g. /node_modules/lit/lit-html.js
+// and resolve it using import.meta.resolve
+function getResolvedHrefFromPathnameShortcut(pathname) {
+  const segments = pathname.replace('/node_modules/', '').split('/');
+  const hasScope = segments[0].startsWith('@');
+  const specifier = hasScope ? `${segments[0]}/${segments[1]}` : segments[0];
+  const resolved = resolveBareSpecifier(specifier);
 
-  // require.resolve may fail in the event a package has no main in its package.json
-  // so as a fallback, ask for node_modules paths and find its location manually
-  // https://github.com/ProjectEvergreen/greenwood/issues/557#issuecomment-923332104
-  // // https://stackoverflow.com/a/62499498/417806
-  const require = createRequire(import.meta.url);
-  const locations = require.resolve.paths(packageName);
+  if (resolved) {
+    const root = derivePackageRoot(resolved);
 
-  for (const location in locations) {
-    const nodeModulesPackageRoot = `${locations[location]}/${packageName}`;
-    const packageJsonLocation = `${nodeModulesPackageRoot}/package.json`;
-
-    if (await checkResourceExists(new URL(`file://${packageJsonLocation}`))) {
-      nodeModulesUrl = nodeModulesPackageRoot;
-    }
+    return `${root}${segments.slice(hasScope ? 2 : 1).join('/')}`;
+  } else {
+    // for example, local theme pack development
+    return `file://${pathname}`;
   }
-
-  if (!nodeModulesUrl) {
-    console.debug(`Unable to look up ${packageName} using NodeJS require.resolve.  Falling back to process.cwd()`);
-    nodeModulesUrl = new URL(`./node_modules/${packageName}`, `file://${process.cwd()}`).pathname;
-  }
-
-  return nodeModulesUrl;
-}
-
-// extract the package name from a URL like /node_modules/<some>/<package>/index.js
-function getPackageNameFromUrl(url) {
-  const packagePathPieces = url.split('node_modules/')[1].split('/'); // double split to handle node_modules within nested paths
-  let packageName = packagePathPieces.shift();
-
-  // handle scoped packages
-  if (packageName.indexOf('@') === 0) {
-    packageName = `${packageName}/${packagePathPieces.shift()}`;
-  }
-
-  return packageName;
 }
 
 async function getPackageJsonForProject({ userWorkspace, projectDirectory }) {
@@ -59,6 +35,5 @@ async function getPackageJsonForProject({ userWorkspace, projectDirectory }) {
 
 export {
   getPackageJsonForProject,
-  getNodeModulesLocationForPackage,
-  getPackageNameFromUrl
+  getResolvedHrefFromPathnameShortcut
 };
