@@ -38,11 +38,27 @@ function resolveBareSpecifier(specifier) {
  *   root: 'file:///path/to/project/greenwood-lit-ssr/node_modules/.pnpm/lit-html@3.2.1/node_modules/lit-html/package.json'
  *  }
  */
-function derivePackageRoot(dependencyName, resolved) {
-  const root = resolved.slice(0, resolved.lastIndexOf(`/node_modules/${dependencyName}/`));
-  const derived = `${root}/node_modules/${dependencyName}/`;
+function derivePackageRoot(resolved) {
+  // can't rely on the specifier, for example in monorepos
+  // where @foo/bar may point to a non node_modules location
+  // e.g. packages/some-namespace/package.json
+  // so we walk backwards looking for nearest package.json
+  const segments = resolved
+    .replace('file://', '')
+    .split('/')
+    .filter(segment => segment !== '')
+    .reverse();
+  let root = resolved.replace(segments[0], '');
 
-  return derived;
+  for (const segment of segments.slice(1)) {
+    if (fs.existsSync(new URL('./package.json', root).pathname)) {
+      break;
+    }
+
+    root = root.replace(`${segment}/`, '');
+  }
+
+  return root;
 }
 
 // Helper function to convert export patterns to a regex (thanks ChatGPT :D)
@@ -189,7 +205,7 @@ async function walkPackageJson(packageJson = {}) {
       const resolved = resolveBareSpecifier(dependency);
 
       if (resolved) {
-        const resolvedRoot = derivePackageRoot(dependency, resolved);
+        const resolvedRoot = derivePackageRoot(resolved);
         const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
 
         walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
@@ -199,7 +215,7 @@ async function walkPackageJson(packageJson = {}) {
             const resolved = resolveBareSpecifier(dependency);
 
             if (resolved) {
-              const resolvedRoot = derivePackageRoot(dependency, resolved);
+              const resolvedRoot = derivePackageRoot(resolved);
               const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
 
               walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
@@ -250,5 +266,7 @@ function mergeImportMap(html = '', map = {}, shouldShim = false) {
 export {
   walkPackageJson,
   mergeImportMap,
+  resolveBareSpecifier,
+  derivePackageRoot,
   IMPORT_MAP_RESOLVED_PREFIX
 };
