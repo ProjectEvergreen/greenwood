@@ -2,7 +2,7 @@ import { greenwoodPluginPolyfills } from '../../../src/index.js';
 
 export default {
   plugins: [
-    ...greenwoodPluginPolyfills({
+    greenwoodPluginPolyfills({
       wc: false,
       lit: true
     })
