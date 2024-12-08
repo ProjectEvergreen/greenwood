@@ -246,7 +246,7 @@ describe('Build Greenwood With: ', function() {
         const inlineScriptTag = Array.from(dom.window.document.querySelectorAll('head > script:not([src])')).filter(tag => !tag.getAttribute('data-gwd'))[0];
 
         expect(inlineScriptTag.textContent.replace(/\n/g, '')).to
-          .equal('import"/116321042.dlaVsmnb.js";import"/lit-html.CYd3Xodq.js";//# sourceMappingURL=116321042.SNvCd9wk.js.map');
+          .equal('import"/116321042.5o_Y6C1Q.js";//# sourceMappingURL=116321042.znS4IvqR.js.map');
       });
     });
 

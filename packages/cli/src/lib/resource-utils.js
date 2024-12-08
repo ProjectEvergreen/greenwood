@@ -1,15 +1,16 @@
 import fs from 'fs/promises';
 import { hashString } from './hashing-utils.js';
+import { getResolvedHrefFromPathnameShortcut } from '../lib/node-modules-utils.js';
 import htmlparser from 'node-html-parser';
 
 async function modelResource(context, type, src = undefined, contents = undefined, optimizationAttr = undefined, rawAttributes = undefined) {
-  const { projectDirectory, scratchDir, userWorkspace } = context;
+  const { scratchDir, userWorkspace } = context;
   const extension = type === 'script' ? 'js' : 'css';
   let sourcePathURL;
 
   if (src) {
     sourcePathURL = src.startsWith('/node_modules')
-      ? new URL(`.${src}`, projectDirectory)
+      ? new URL(getResolvedHrefFromPathnameShortcut(src))
       : src.startsWith('/')
         ? new URL(`.${src}`, userWorkspace)
         : new URL(`./${src.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace);
