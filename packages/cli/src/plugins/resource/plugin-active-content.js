@@ -1,4 +1,4 @@
-import { mergeImportMap } from '../../lib/walker-package-ranger.js';
+import { mergeImportMap } from '../../lib/node-modules-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { checkResourceExists } from '../../lib/resource-utils.js';
 import { activeFrontmatterKeys, cleanContentCollection, pruneGraph } from '../../lib/content-utils.js';

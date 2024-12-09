@@ -6,9 +6,8 @@
 import { checkResourceExists } from '../../lib/resource-utils.js';
 import fs from 'fs/promises';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import { getPackageJsonForProject, getResolvedHrefFromPathnameShortcut } from '../../lib/node-modules-utils.js';
+import { getPackageJsonForProject, getResolvedHrefFromPathnameShortcut, mergeImportMap } from '../../lib/node-modules-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
-import { mergeImportMap } from '../../lib/walker-package-ranger.js';
 import { walkPackageJson, IMPORT_MAP_RESOLVED_PREFIX } from '../../lib/walker-package-ranger.js';
 
 let generatedImportMap;
@@ -89,6 +88,7 @@ class NodeModulesResource extends ResourceInterface {
         Object.keys(diagnostics).forEach((diagnostic) => {
           console.warn(diagnostics[diagnostic]);
         });
+        console.log('Learn more about these warnings at => https://greenwoodjs.dev/docs/introduction/web-standards/#import-maps');
         console.log('****************************************************************************');
       }
 

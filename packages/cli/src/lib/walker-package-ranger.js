@@ -121,14 +121,13 @@ async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
       if (stat.isDirectory()) {
         walkDirectoryForExportPatterns(new URL(`./${file}/`, directoryUrl));
       } else if (regexPattern.test(filePathUrl.href)) {
-        const rootSubOffset = patternRoot(sub);
-        const relativePath = filePathUrl.href.replace(resolvedRoot, '/');
+        const relativePath = filePathUrl.href.replace(resolvedRoot, '');
         // naive way to offset a subValue pattern to the sub pattern
         // ex. "./js/*": "./packages/*/src/index.js",
         // https://unpkg.com/browse/@uswds/uswds@3.10.0/package.json
         const rootSubRelativePath = relativePath.replace(rootSubValueOffset, '');
 
-        updateImportMap(`${dependency}${rootSubOffset}${rootSubRelativePath}`, relativePath, resolvedRoot);
+        updateImportMap(`${dependency}/${rootSubRelativePath}`, relativePath, resolvedRoot);
       }
     });
   }
@@ -192,6 +191,11 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
     }
   } else if (module || main) {
     updateImportMap(dependency, `${module ?? main}`, resolvedRoot);
+  } else if (fs.existsSync(new URL('./index.js', resolvedRoot))) {
+    // if an index.js file exists but with no main entry point, then it should count as a main entry point
+    // https://docs.npmjs.com/cli/v7/configuring-npm/package-json#main
+    // https://unpkg.com/browse/object-assign@4.1.1/package.json
+    updateImportMap(dependency, 'index.js', resolvedRoot);
   } else {
     // ex: https://unpkg.com/browse/uuid@3.4.0/package.json
     diagnostics[dependency] = `WARNING: No supported entry point detected for => \`${dependency}\``;
@@ -233,39 +237,8 @@ async function walkPackageJson(packageJson = {}) {
   return { importMap, diagnostics };
 }
 
-// could probably go somewhere else, in a util?
-function mergeImportMap(html = '', map = {}, shouldShim = false) {
-  const importMapType = shouldShim ? 'importmap-shim' : 'importmap';
-  const hasImportMap = html.indexOf(`script type="${importMapType}"`) > 0;
-  const danglingComma = hasImportMap ? ',' : '';
-  const importMap = JSON.stringify(map, null, 2).replace('}', '').replace('{', '');
-
-  if (Object.entries(map).length === 0) {
-    return html;
-  }
-
-  if (hasImportMap) {
-    return html.replace('"imports": {', `
-      "imports": {
-        ${importMap}${danglingComma}
-    `);
-  } else {
-    return html.replace('<head>', `
-      <head>
-      <script type="${importMapType}">
-        {
-          "imports": {
-            ${importMap}
-          }
-        }
-      </script>
-    `);
-  }
-}
-
 export {
   walkPackageJson,
-  mergeImportMap,
   resolveBareSpecifier,
   derivePackageRoot,
   IMPORT_MAP_RESOLVED_PREFIX
