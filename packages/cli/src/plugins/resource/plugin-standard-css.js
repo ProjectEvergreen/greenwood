@@ -29,7 +29,7 @@ function bundleCss(body, url, compilation) {
 
         if (value.indexOf('.') === 0 || value.indexOf('/node_modules') === 0) {
           const resolvedUrl = value.startsWith('/node_modules')
-            ? new URL(getResolvedHrefFromPathnameShortcut(value))
+            ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
             : new URL(value, url);
           const importContents = fs.readFileSync(resolvedUrl, 'utf-8');
 

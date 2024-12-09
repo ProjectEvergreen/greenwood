@@ -34,7 +34,7 @@ class NodeModulesResource extends ResourceInterface {
     const resolvedHref = fromImportMap
       ? pathname.replace(IMPORT_MAP_RESOLVED_PREFIX, 'file://')
       : isNodeModulesPathnameShortcut
-        ? getResolvedHrefFromPathnameShortcut(pathname)
+        ? getResolvedHrefFromPathnameShortcut(pathname, projectDirectory)
         : new URL(`.${pathname}`, projectDirectory).href; // worst case fall back, assume project root
     const params = searchParams.size > 0
       ? `?${searchParams.toString()}`

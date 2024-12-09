@@ -4,7 +4,7 @@ import fs from 'fs/promises';
 
 // take a "shortcut" pathname, e.g. /node_modules/lit/lit-html.js
 // and resolve it using import.meta.resolve
-function getResolvedHrefFromPathnameShortcut(pathname) {
+function getResolvedHrefFromPathnameShortcut(pathname, rootFallbackUrl) {
   const segments = pathname.replace('/node_modules/', '').split('/');
   const hasScope = segments[0].startsWith('@');
   const specifier = hasScope ? `${segments[0]}/${segments[1]}` : segments[0];
@@ -15,8 +15,8 @@ function getResolvedHrefFromPathnameShortcut(pathname) {
 
     return `${root}${segments.slice(hasScope ? 2 : 1).join('/')}`;
   } else {
-    // for example, local theme pack development
-    return `file://${pathname}`;
+    // best guess fallback, for example for local theme pack development
+    return new URL(`.${pathname}`, rootFallbackUrl);
   }
 }
 

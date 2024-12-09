@@ -123,7 +123,14 @@ describe('Develop Greenwood With: ', function() {
         expect(actualEntriesCount).to.equal(expectedEntriesCount);
 
         Object.keys(expectedImportMap).forEach((key) => {
-          expect(importMap[key]).to.equal(expectedImportMap[key]);
+          expect(expectedImportMap[key].startsWith('/~/')).to.equal(true);
+
+          // truncate full location to avoid difference between local dev and CI workspace paths
+          // e.g. passes on my machine
+          const actualSubPath = importMap[key].slice(importMap[key].indexOf('/node_modules/'));
+          const expectedSubPath = expectedImportMap[key].slice(expectedImportMap[key].indexOf('/node_modules/'));
+
+          expect(actualSubPath).to.equal(expectedSubPath);
         });
 
         done();

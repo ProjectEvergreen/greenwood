@@ -4,13 +4,13 @@ import { getResolvedHrefFromPathnameShortcut } from '../lib/node-modules-utils.j
 import htmlparser from 'node-html-parser';
 
 async function modelResource(context, type, src = undefined, contents = undefined, optimizationAttr = undefined, rawAttributes = undefined) {
-  const { scratchDir, userWorkspace } = context;
+  const { scratchDir, userWorkspace, projectDirectory } = context;
   const extension = type === 'script' ? 'js' : 'css';
   let sourcePathURL;
 
   if (src) {
-    sourcePathURL = src.startsWith('/node_modules')
-      ? new URL(getResolvedHrefFromPathnameShortcut(src))
+    sourcePathURL = src.startsWith('/node_modules/')
+      ? new URL(getResolvedHrefFromPathnameShortcut(src, projectDirectory))
       : src.startsWith('/')
         ? new URL(`.${src}`, userWorkspace)
         : new URL(`./${src.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace);
