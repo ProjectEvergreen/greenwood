@@ -14,26 +14,24 @@ class ImportRawResource extends ResourceInterface {
   }
 
   async shouldResolve(url) {
-    const { href, pathname, searchParams } = url;
+    const { href, searchParams } = url;
     const matches = (this.options.matches || []).filter(matcher => href.indexOf(matcher) >= 0);
 
-    if (matches.length > 0 && !searchParams.has('type') && !pathname.startsWith(IMPORT_MAP_RESOLVED_PREFIX)) {
+    if (matches.length > 0 && !searchParams.has('type')) {
       return true;
     }
   }
 
   async resolve(url) {
-    const { projectDirectory } = this.compilation.context;
-    const { pathname, searchParams } = url;
+    const { searchParams, href, pathname } = url;
     const params = url.searchParams.size > 0
       ? `${searchParams.toString()}&type=raw`
       : 'type=raw';
-    const root = pathname.startsWith('file://')
-      ? new URL(`file://${pathname}`).href
-      : pathname.startsWith('/node_modules')
-        ? new URL(`.${pathname}`, projectDirectory).href
-        : new URL(`file://${pathname}`);
-    const matchedUrl = new URL(`${root}?${params}`);
+    const fromImportMap = pathname.startsWith(IMPORT_MAP_RESOLVED_PREFIX);
+    const resolvedHref = fromImportMap
+      ? pathname.replace(IMPORT_MAP_RESOLVED_PREFIX, 'file://')
+      : href;
+    const matchedUrl = new URL(`${resolvedHref}?${params}`);
 
     return new Request(matchedUrl);
   }
