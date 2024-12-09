@@ -11,7 +11,7 @@
  * User Config
  * {
  *   plugins: [
- *     ...greenwoodPluginPolyfills({
+ *     greenwoodPluginPolyfills({
  *       dsd: true
  *     })
  *   ]
