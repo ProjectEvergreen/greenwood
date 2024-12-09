@@ -51,7 +51,7 @@ function derivePackageRoot(resolved) {
   let root = resolved.replace(segments[0], '');
 
   for (const segment of segments.slice(1)) {
-    if (fs.existsSync(new URL('./package.json', root).pathname)) {
+    if (fs.existsSync(new URL('./package.json', root))) {
       break;
     }
 
