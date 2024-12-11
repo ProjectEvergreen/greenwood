@@ -11,7 +11,7 @@ import { ResourceInterface } from '../../lib/resource-interface.js';
 import { hashString } from '../../lib/hashing-utils.js';
 import { getResolvedHrefFromPathnameShortcut } from '../../lib/node-modules-utils.js';
 
-function bundleCss(body, url, compilation, resolvedUrl) {
+function bundleCss(body, sourceUrl, compilation, workingUrl) {
   const { projectDirectory, outputDir, userWorkspace } = compilation.context;
   const ast = parse(body, {
     onParseError(error) {
@@ -35,14 +35,14 @@ function bundleCss(body, url, compilation, resolvedUrl) {
 
             const importContents = fs.readFileSync(resolvedUrl, 'utf-8');
 
-            optimizedCss += bundleCss(importContents, url, compilation, resolvedUrl);
-          } else if (resolvedUrl) {
-            const relativeUrl = new URL(`./${value}`, resolvedUrl);
-            const importContents = fs.readFileSync(relativeUrl, 'utf-8');
+            optimizedCss += bundleCss(importContents, sourceUrl, compilation, resolvedUrl);
+          } else if (workingUrl) {
+            const resolvedUrl = new URL(`./${value}`, workingUrl);
+            const importContents = fs.readFileSync(resolvedUrl, 'utf-8');
 
-            optimizedCss += bundleCss(importContents, resolvedUrl, compilation);
+            optimizedCss += bundleCss(importContents, workingUrl, compilation);
           } else {
-            console.warn(`Unable to resolve ${value} from file => ${url}`);
+            console.warn(`Unable to resolve ${value} from file => ${sourceUrl}`);
           }
         } else {
           optimizedCss += `@import url('${value}');`;
