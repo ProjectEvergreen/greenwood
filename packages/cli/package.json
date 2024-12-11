@@ -61,6 +61,7 @@
     "@shoelace-style/shoelace": "^2.18.0",
     "@spectrum-css/card": "^9.3.0",
     "@spectrum-web-components/action-menu": "^1.0.1",
+    "@spectrum-web-components/styles": "^1.0.1",
     "@uswds/web-components": "^0.0.1-alpha",
     "geist": "^1.2.0",
     "lit": "^3.1.0",
