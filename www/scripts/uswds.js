@@ -1,1 +1,0 @@
-import '@uswds/web-components';

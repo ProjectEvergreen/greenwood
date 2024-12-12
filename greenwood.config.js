@@ -3,7 +3,7 @@ import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
 import { greenwoodPluginPolyfills } from '@greenwood/plugin-polyfills';
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 import { greenwoodPluginImportRaw } from '@greenwood/plugin-import-raw';
-// import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
+import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
 import rollupPluginAnalyzer from 'rollup-plugin-analyzer';
 
 export default {
@@ -24,7 +24,7 @@ export default {
       ]
     }),
     greenwoodPluginIncludeHTML(),
-    // greenwoodPluginRendererPuppeteer(),
+    greenwoodPluginRendererPuppeteer(),
     {
       type: 'rollup',
       name: 'rollup-plugin-analyzer',
