@@ -35,7 +35,7 @@ import glob from 'glob-promise';
 import path from 'path';
 import { parse, walk } from 'css-tree';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 import { implementation } from 'jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js';
@@ -64,7 +64,7 @@ describe('Build Greenwood With: ', function() {
       updateAStyleBlockRef = implementation.prototype._updateAStyleBlock; // eslint-disable-line no-underscore-dangle
       implementation.prototype._updateAStyleBlock = () => {}; // eslint-disable-line no-underscore-dangle
 
-      runner.setup(outputPath, getSetupFiles(outputPath));
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
     });
 

@@ -29,7 +29,7 @@ import fs from 'fs';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getDependencyFiles, getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -52,19 +52,15 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      const prismCss = await getDependencyFiles(
-        `${process.cwd()}/node_modules/prismjs/themes/*.css`,
-        `${outputPath}/node_modules/prismjs/themes/`
-      );
-
       const geistFont = await getDependencyFiles(
         `${process.cwd()}/node_modules/geist/dist/fonts/geist-sans/*`,
         `${outputPath}/node_modules/geist/dist/fonts/geist-sans/`
       );
 
       runner.setup(outputPath, [
-        ...getSetupFiles(outputPath),
-        ...prismCss,
+        // this package has a known issue with import.meta.resolve
+        // if this gets fixed, we can remove the need for this setup
+        // https://github.com/vercel/geist-font/issues/150
         ...geistFont
       ]);
       runner.runCommand(cliPath, 'build');

@@ -17,7 +17,7 @@ import fs from 'fs';
 import glob from 'glob-promise';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getSetupFiles, getOutputTeardownFiles, getDependencyFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -38,15 +38,7 @@ describe('Build Greenwood With: ', function() {
 
   describe(LABEL, function() {
     before(async function() {
-      const prismCss = await getDependencyFiles(
-        `${process.cwd()}/node_modules/prismjs/themes/*.css`,
-        `${outputPath}/node_modules/prismjs/themes/`
-      );
-
-      runner.setup(outputPath, [
-        ...getSetupFiles(outputPath),
-        ...prismCss
-      ]);
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
     });
 

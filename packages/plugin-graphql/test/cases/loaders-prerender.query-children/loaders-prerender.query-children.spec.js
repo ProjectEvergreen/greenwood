@@ -30,7 +30,7 @@ import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -52,36 +52,8 @@ describe('Build Greenwood With: ', function() {
 
   describe(LABEL, function() {
 
-    before(async function() {
-      const greenwoodGraphqlCoreLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/plugin-graphql/src/core/*.js`,
-        `${outputPath}/node_modules/@greenwood/plugin-graphql/src/core/`
-      );
-      const greenwoodGraphqlQueryLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`,
-        `${outputPath}/node_modules/@greenwood/plugin-graphql/src/queries/`
-      );
-
-      /*
-       * need a workaround here or else we get a module loader error
-       * ```
-       * import { getQueryHash } from './common.js';
-       * ^^^^^^
-       * SyntaxError: Cannot use import statement outside a module
-       * ```
-       *
-       * but it works fine IRL - https://github.com/ProjectEvergreen/www.greenwoodjs.dev/pull/1
-       */
-      const packageJson = await getDependencyFiles(
-        `${outputPath}/package.json`,
-        `${outputPath}/node_modules/@greenwood/plugin-graphql/`
-      );
-
-      runner.setup(outputPath, [
-        ...greenwoodGraphqlCoreLibs,
-        ...greenwoodGraphqlQueryLibs,
-        ...packageJson
-      ]);
+    before(function() {
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
     });
 

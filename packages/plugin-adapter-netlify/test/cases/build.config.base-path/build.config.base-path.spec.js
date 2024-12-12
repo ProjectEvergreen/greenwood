@@ -31,7 +31,7 @@ import fs from 'fs/promises';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath } from 'url';
 import { normalizePathnameForWindows } from '../../../../cli/src/lib/resource-utils.js';
@@ -56,7 +56,7 @@ describe('Build Greenwood With: ', function() {
 
   describe(LABEL, function() {
     before(function() {
-      runner.setup(outputPath, getSetupFiles(outputPath));
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
     });
 

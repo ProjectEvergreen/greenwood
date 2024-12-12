@@ -32,7 +32,7 @@ import chai from 'chai';
 import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getSetupFiles, getOutputTeardownFiles, getDependencyFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -56,15 +56,7 @@ describe('Serve Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      const greenwoodRouterLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/cli/src/lib/router.js`,
-        `${outputPath}/node_modules/@greenwood/cli/src/lib`
-      );
-
-      runner.setup(outputPath, [
-        ...getSetupFiles(outputPath),
-        ...greenwoodRouterLibs
-      ]);
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
 
       return new Promise((resolve) => {

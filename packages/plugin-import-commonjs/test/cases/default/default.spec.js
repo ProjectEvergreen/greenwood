@@ -31,7 +31,7 @@ import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -51,21 +51,8 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe(LABEL, function() {
-    before(async function() {
-      const lodashLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lodash/lodash.js`,
-        `${outputPath}/node_modules/lodash/`
-      );
-      const lodashLibsPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lodash/package.json`,
-        `${outputPath}/node_modules/lodash/`
-      );
-
-      runner.setup(outputPath, [
-        ...getSetupFiles(outputPath),
-        ...lodashLibs,
-        ...lodashLibsPackageJson
-      ]);
+    before(function() {
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
     });
 

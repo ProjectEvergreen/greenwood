@@ -15,7 +15,6 @@ import chai from 'chai';
 import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getSetupFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { fileURLToPath, URL } from 'url';
@@ -59,10 +58,7 @@ xdescribe('Scaffold Greenwood and Run Develop command: ', function() {
       describe(LABEL, function() {
 
         before(async function() {
-
-          runner.setup(outputPath, [
-            ...getSetupFiles(outputPath)
-          ]);
+          runner.setup(outputPath);
 
           return new Promise((resolve) => {
             setTimeout(() => {
