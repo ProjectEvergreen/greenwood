@@ -43,22 +43,22 @@ function bundleCss(body, url, compilation) {
           return;
         }
 
-        const basePath = compilation.config.basePath === '' ? '/' : `${compilation.config.basePath}/`;
-        let barePath = value.replace(/\.\.\//g, '').replace('./', '');
+        const { basePath } = compilation.config;
+        let rootPath = value.replace(/\.\.\//g, '').replace('./', '');
 
-        if (barePath.startsWith('/')) {
-          barePath = barePath.replace('/', '');
+        if (!rootPath.startsWith('/')) {
+          rootPath = `/${rootPath}`;
         }
 
-        const locationUrl = barePath.indexOf('node_modules/') >= 0
-          ? new URL(`./${barePath}`, projectDirectory)
-          : new URL(`./${barePath}`, userWorkspace);
+        const resolvedUrl = rootPath.indexOf('node_modules/') >= 0
+          ? new URL(getResolvedHrefFromPathnameShortcut(rootPath, projectDirectory))
+          : new URL(`.${rootPath}`, userWorkspace);
 
-        if (fs.existsSync(locationUrl)) {
+        if (fs.existsSync(resolvedUrl)) {
           const isDev = process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line no-underscore-dangle
-          const hash = hashString(fs.readFileSync(locationUrl, 'utf-8'));
-          const ext = barePath.split('.').pop();
-          const hashedRoot = isDev ? barePath : barePath.replace(`.${ext}`, `.${hash}.${ext}`);
+          const hash = hashString(fs.readFileSync(resolvedUrl, 'utf-8'));
+          const ext = rootPath.split('.').pop();
+          const hashedRoot = isDev ? rootPath : rootPath.replace(`.${ext}`, `.${hash}.${ext}`);
 
           if (!isDev) {
             fs.mkdirSync(new URL(`./${path.dirname(hashedRoot)}/`, outputDir), {
@@ -66,7 +66,7 @@ function bundleCss(body, url, compilation) {
             });
 
             fs.promises.copyFile(
-              locationUrl,
+              resolvedUrl,
               new URL(`./${hashedRoot}`, outputDir)
             );
           }
