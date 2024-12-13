@@ -2,6 +2,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
 
+const DEFAULT_RUNTIME = 'nodejs20.x';
+
 // https://vercel.com/docs/functions/serverless-functions/runtimes/node-js#node.js-helpers
 function generateOutputFormat(id, type) {
   const handlerAlias = '$handler';
@@ -51,7 +53,7 @@ function generateOutputFormat(id, type) {
   `;
 }
 
-async function setupFunctionBuildFolder(id, outputType, outputRoot) {
+async function setupFunctionBuildFolder(id, outputType, outputRoot, runtime) {
   const outputFormat = generateOutputFormat(id, outputType);
 
   await fs.mkdir(outputRoot, { recursive: true });
@@ -60,14 +62,15 @@ async function setupFunctionBuildFolder(id, outputType, outputRoot) {
     type: 'module'
   }));
   await fs.writeFile(new URL('./.vc-config.json', outputRoot), JSON.stringify({
-    runtime: 'nodejs18.x',
+    runtime,
     handler: 'index.js',
     launcherType: 'Nodejs',
     shouldAddHelpers: true
   }));
 }
 
-async function vercelAdapter(compilation) {
+async function vercelAdapter(compilation, options) {
+  const { runtime = DEFAULT_RUNTIME } = options;
   const { outputDir, projectDirectory } = compilation.context;
   const { basePath } = compilation.config;
   const adapterOutputUrl = new URL('./.vercel/output/functions/', projectDirectory);
@@ -89,7 +92,7 @@ async function vercelAdapter(compilation) {
     const chunks = (await fs.readdir(outputDir))
       .filter(file => file.startsWith(`${id}.route.chunk`) && file.endsWith('.js'));
 
-    await setupFunctionBuildFolder(id, outputType, outputRoot);
+    await setupFunctionBuildFolder(id, outputType, outputRoot, runtime);
 
     // handle user's actual route entry file
     await fs.cp(
