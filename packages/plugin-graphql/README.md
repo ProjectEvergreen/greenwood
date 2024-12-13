@@ -10,7 +10,7 @@ A plugin for Greenwood to support using [GraphQL](https://graphql.org/) to query
 
 As of now, this plugin requires some form of [prerendering](https://www.greenwoodjs.dev/docs/reference/rendering-strategies/) either through:
 1. Enabling [custom imports](https://www.greenwoodjs.dev/docs/pages/server-rendering/#custom-imports), or
-1. Installing the [Puppeteer renderer plugin](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-puppeteer).
+1. Installing the [Puppeteer renderer plugin](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-puppeteer)
 
 ## Installation
 
@@ -29,15 +29,14 @@ $ pnpm add -D @greenwood/plugin-graphql
 
 ## Usage
 
-Add this plugin to your _greenwood.config.js_ and configure with either `prerender: true` _or_ by adding the `greenwoodPluginRendererPuppeteer` plugin.
+Add this plugin to your _greenwood.config.js_ and then choose your flavor.  For example, this is the configuration for using Puppeteer.
 
-```javascript
+```js
 import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
-import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer'; // if using puppeteer
+import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
 
 export default {
-  // ...
-  prerender: true, // if using custom imports
+  prerender: true,
   plugins: [
     greenwoodPluginGraphQL(),
     greenwoodPluginRendererPuppeteer()
@@ -95,7 +94,7 @@ customElements.define('app-header', HeaderComponent);
 
 ## Schema
 
-The basic page schema follow the structure of the [page data]() structure.   Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type definition](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's `graph`.
+The basic page schema follow the structure of the [page data](https://greenwoodjs.dev/docs/content-as-data/pages-data/) structure.   Currently, the main "API" is just a list of all pages in your _pages/_ directory, represented as a `Page` [type definition](https://graphql.org/graphql-js/basic-types/).   This is called Greenwood's [**graph**](https://greenwoodjs.dev/docs/reference/appendix/#graph).
 
 This is what the schema looks like:
 ```gql

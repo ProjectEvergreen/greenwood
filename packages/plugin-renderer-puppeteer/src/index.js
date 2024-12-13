@@ -15,8 +15,7 @@ const greenwoodPluginRendererPuppeteer = (options = {}) => {
     name: 'plugin-renderer-puppeteer:renderer',
     provider: () => {
       return {
-        customUrl: new URL('./puppeteer-handler.js', import.meta.url),
-        prerender: true
+        customUrl: new URL('./puppeteer-handler.js', import.meta.url)
       };
     }
   }];
