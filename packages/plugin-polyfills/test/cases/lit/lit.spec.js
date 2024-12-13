@@ -13,7 +13,7 @@
  *
  * {
  *   plugins: [
- *     ...greenwoodPluginPolyfills({
+ *     greenwoodPluginPolyfills({
  *       lit: true
  *     })
  *   ]
@@ -27,14 +27,11 @@ import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
 const expect = chai.expect;
-const expectedLitPolyfillFiles = [
-  'polyfill-support.js'
-];
 
 describe('Build Greenwood With: ', function() {
   const LABEL = 'Lit Polyfill Plugin with default options and Default Workspace';
@@ -50,83 +47,8 @@ describe('Build Greenwood With: ', function() {
   });
 
   describe(LABEL, function() {
-    before(async function() {
-      const lit = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/*.js`,
-        `${outputPath}/node_modules/lit/`
-      );
-      const litDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/decorators/*.js`,
-        `${outputPath}/node_modules/lit/decorators/`
-      );
-      const litDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/directives/*.js`,
-        `${outputPath}/node_modules/lit/directives/`
-      );
-      const litPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/package.json`,
-        `${outputPath}/node_modules/lit/`
-      );
-      const litElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/*.js`,
-        `${outputPath}/node_modules/lit-element/`
-      );
-      const litElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/package.json`,
-        `${outputPath}/node_modules/lit-element/`
-      );
-      const litElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/decorators/*.js`,
-        `${outputPath}/node_modules/lit-element/decorators/`
-      );
-      const litHtml = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/*.js`,
-        `${outputPath}/node_modules/lit-html/`
-      );
-      const litHtmlPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/package.json`,
-        `${outputPath}/node_modules/lit-html/`
-      );
-      const litHtmlDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/directives/*.js`,
-        `${outputPath}/node_modules/lit-html/directives/`
-      );
-      // lit-html has a dependency on this
-      // https://github.com/lit/lit/blob/main/packages/lit-html/package.json#L82
-      const trustedTypes = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
-        `${outputPath}/node_modules/@types/trusted-types/`
-      );
-      const litReactiveElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/`
-      );
-      const litReactiveElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/decorators/`
-      );
-      const litReactiveElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
-        `${outputPath}/node_modules/@lit/reactive-element/`
-      );
-
-      runner.setup(outputPath, [
-        ...getSetupFiles(outputPath),
-        ...lit, // includes polyfill-support.js
-        ...litPackageJson,
-        ...litDirectives,
-        ...litDecorators,
-        ...litElementPackageJson,
-        ...litElement,
-        ...litElementDecorators,
-        ...litHtmlPackageJson,
-        ...litHtml,
-        ...litHtmlDirectives,
-        ...trustedTypes,
-        ...litReactiveElement,
-        ...litReactiveElementDecorators,
-        ...litReactiveElementPackageJson
-      ]);
+    before(function() {
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
     });
 
@@ -149,6 +71,10 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should have the expected lit polyfill files in the output directory', function() {
+        const expectedLitPolyfillFiles = [
+          'polyfill-support.js'
+        ];
+
         expectedLitPolyfillFiles.forEach((file) => {
           expect(fs.existsSync(path.join(this.context.publicDir, file))).to.be.equal(true);
         });

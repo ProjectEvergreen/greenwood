@@ -20,7 +20,7 @@ import chai from 'chai';
 import glob from 'glob-promise';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -42,7 +42,7 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(function() {
-      runner.setup(outputPath, getSetupFiles(outputPath));
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
     });
 

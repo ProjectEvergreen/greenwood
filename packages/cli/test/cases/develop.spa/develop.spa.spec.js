@@ -20,7 +20,6 @@
 import chai from 'chai';
 import fs from 'fs';
 import path from 'path';
-import { getDependencyFiles } from '../../../../../test/utils.js';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
@@ -54,12 +53,7 @@ describe('Develop Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      const simpleCss = await getDependencyFiles(
-        `${process.cwd()}/node_modules/simpledotcss/simple.css`,
-        `${outputPath}/node_modules/simpledotcss/`
-      );
-
-      runner.setup(outputPath, [...simpleCss]);
+      runner.setup(outputPath);
 
       return new Promise((resolve) => {
         setTimeout(() => {

@@ -33,7 +33,7 @@ import chai from 'chai';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getSetupFiles, getOutputTeardownFiles, getDependencyFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -54,33 +54,8 @@ describe('Build Greenwood With: ', function() {
 
   describe(LABEL, function() {
 
-    before(async function() {
-      const greenwoodDataLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/cli/src/data/client.js`,
-        `${outputPath}/node_modules/@greenwood/cli/src/data`
-      );
-
-      /*
-       * need a workaround here or else we get a module loader error
-       * ```
-       * import { getContentByCollection } from "@greenwood/cli/src/data/client.js";
-       * ^^^^^^
-       * SyntaxError: Named export 'getContentByCollection' not found. The requested module '@greenwood/cli/src/data/client.js'
-       * is a CommonJS module, which may not support all module.exports as named exports.
-       * ```
-       *
-       * but it works fine IRL - https://github.com/ProjectEvergreen/www.greenwoodjs.dev/pull/1
-       */
-      const packageJson = await getDependencyFiles(
-        `${outputPath}/package.json`,
-        `${outputPath}/node_modules/@greenwood/cli/`
-      );
-
-      runner.setup(outputPath, [
-        ...getSetupFiles(outputPath),
-        ...greenwoodDataLibs,
-        ...packageJson
-      ]);
+    before(function() {
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
     });
 

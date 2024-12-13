@@ -1,15 +1,16 @@
 import fs from 'fs/promises';
 import { hashString } from './hashing-utils.js';
+import { getResolvedHrefFromPathnameShortcut } from '../lib/node-modules-utils.js';
 import htmlparser from 'node-html-parser';
 
 async function modelResource(context, type, src = undefined, contents = undefined, optimizationAttr = undefined, rawAttributes = undefined) {
-  const { projectDirectory, scratchDir, userWorkspace } = context;
+  const { scratchDir, userWorkspace, projectDirectory } = context;
   const extension = type === 'script' ? 'js' : 'css';
   let sourcePathURL;
 
   if (src) {
-    sourcePathURL = src.startsWith('/node_modules')
-      ? new URL(`.${src}`, projectDirectory)
+    sourcePathURL = src.startsWith('/node_modules/')
+      ? new URL(getResolvedHrefFromPathnameShortcut(src, projectDirectory))
       : src.startsWith('/')
         ? new URL(`.${src}`, userWorkspace)
         : new URL(`./${src.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace);
@@ -57,7 +58,7 @@ function mergeResponse(destination, source) {
 }
 
 // On Windows, a URL with a drive letter like C:/ thinks it is a protocol and so prepends a /, e.g. /C:/
-// This is fine with never fs methods that Greenwood uses, but tools like Rollup and PostCSS will need this handled manually
+// This is fine with newer fs methods that Greenwood uses, but tools like Rollup and PostCSS will need this handled manually
 // https://github.com/rollup/rollup/issues/3779
 function normalizePathnameForWindows(url) {
   const windowsDriveRegex = /\/[a-zA-Z]{1}:\//;

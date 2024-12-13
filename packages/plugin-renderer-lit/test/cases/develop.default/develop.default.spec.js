@@ -25,7 +25,7 @@
 import chai from 'chai';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -139,8 +139,8 @@ describe('Develop Greenwood With: ', function() {
         `${outputPath}/node_modules/@lit-labs/ssr-dom-shim/lib/`
       );
 
+      // would be nice to figure out why this test case still requires manually copying in dependencies
       runner.setup(outputPath, [
-        ...getSetupFiles(outputPath),
         ...lit,
         ...litPackageJson,
         ...litDirectives,

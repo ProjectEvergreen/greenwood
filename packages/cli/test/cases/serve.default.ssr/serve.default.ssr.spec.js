@@ -37,7 +37,7 @@ import glob from 'glob-promise';
 import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath } from 'url';
@@ -62,7 +62,7 @@ describe('Serve Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      runner.setup(outputPath, getSetupFiles(outputPath));
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
 
       return new Promise((resolve) => {

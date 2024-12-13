@@ -35,7 +35,7 @@ import chai from 'chai';
 import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -58,107 +58,7 @@ describe('Serve Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      const lit = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/*.js`,
-        `${outputPath}/node_modules/lit/`
-      );
-      const litDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/decorators/*.js`,
-        `${outputPath}/node_modules/lit/decorators/`
-      );
-      const litDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/directives/*.js`,
-        `${outputPath}/node_modules/lit/directives/`
-      );
-      const litPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/package.json`,
-        `${outputPath}/node_modules/lit/`
-      );
-      const litElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/*.js`,
-        `${outputPath}/node_modules/lit-element/`
-      );
-      const litElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/package.json`,
-        `${outputPath}/node_modules/lit-element/`
-      );
-      const litElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/decorators/*.js`,
-        `${outputPath}/node_modules/lit-element/decorators/`
-      );
-      const litHtml = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/*.js`,
-        `${outputPath}/node_modules/lit-html/`
-      );
-      const litHtmlNode = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/node/*.js`,
-        `${outputPath}/node_modules/lit-html/node/`
-      );
-      const litHtmlNodeDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/node/directives/*.js`,
-        `${outputPath}/node_modules/lit-html/node/directives/`
-      );
-      const litHtmlPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/package.json`,
-        `${outputPath}/node_modules/lit-html/`
-      );
-      const litHtmlDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/directives/*.js`,
-        `${outputPath}/node_modules/lit-html/directives/`
-      );
-      // lit-html has a dependency on this
-      // https://github.com/lit/lit/blob/main/packages/lit-html/package.json#L82
-      const trustedTypes = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
-        `${outputPath}/node_modules/@types/trusted-types/`
-      );
-      const litReactiveElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/`
-      );
-      const litReactiveElementNode = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/node/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/node/`
-      );
-      const litReactiveElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/decorators/`
-      );
-      const litReactiveElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
-        `${outputPath}/node_modules/@lit/reactive-element/`
-      );
-      const litSsrElementHydrationSupport = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js`,
-        `${outputPath}/node_modules/@lit-labs/ssr-client/`
-      );
-      const litSsrHtmlHydrationSupport = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit-labs/ssr-client/lib/*.js`,
-        `${outputPath}/node_modules/@lit-labs/ssr-client/lib/`
-      );
-
-      runner.setup(outputPath, [
-        ...getSetupFiles(outputPath),
-        ...lit,
-        ...litPackageJson,
-        ...litDirectives,
-        ...litDecorators,
-        ...litElementPackageJson,
-        ...litElement,
-        ...litElementDecorators,
-        ...litHtmlPackageJson,
-        ...litHtml,
-        ...litHtmlNode,
-        ...litHtmlDirectives,
-        ...litHtmlNodeDirectives,
-        ...trustedTypes,
-        ...litReactiveElement,
-        ...litReactiveElementNode,
-        ...litReactiveElementDecorators,
-        ...litReactiveElementPackageJson,
-        ...litSsrElementHydrationSupport,
-        ...litSsrHtmlHydrationSupport
-      ]);
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
 
       return new Promise((resolve) => {

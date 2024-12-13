@@ -27,7 +27,7 @@ import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getSetupFiles, getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -49,103 +49,8 @@ describe('Build Greenwood With: ', function() {
 
   describe(LABEL, function() {
 
-    before(async function() {
-      const greenwoodGraphqlCoreLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/plugin-graphql/src/core/*.js`,
-        `${outputPath}/node_modules/@greenwood/plugin-graphql/src/core/`
-      );
-      const greenwoodGraphqlQueryLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/plugin-graphql/src/queries/*.gql`,
-        `${outputPath}/node_modules/@greenwood/plugin-graphql/src/queries/`
-      );
-      const greenwoodLibs = await getDependencyFiles(
-        `${process.cwd()}/packages/cli/src/lib/*.js`,
-        `${outputPath}/node_modules/cli/src/lib/`
-      );
-      const lit = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/*.js`,
-        `${outputPath}/node_modules/lit/`
-      );
-      const litDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/decorators/*.js`,
-        `${outputPath}/node_modules/lit/decorators/`
-      );
-      const litDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/directives/*.js`,
-        `${outputPath}/node_modules/lit/directives/`
-      );
-      const litPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/package.json`,
-        `${outputPath}/node_modules/lit/`
-      );
-      const litSsrPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit-labs/ssr-dom-shim/package.json`,
-        `${outputPath}/node_modules/@lit-labs/ssr-dom-shim/`
-      );
-      const litElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/*.js`,
-        `${outputPath}/node_modules/lit-element/`
-      );
-      const litElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/package.json`,
-        `${outputPath}/node_modules/lit-element/`
-      );
-      const litElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/decorators/*.js`,
-        `${outputPath}/node_modules/lit-element/decorators/`
-      );
-      const litHtml = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/*.js`,
-        `${outputPath}/node_modules/lit-html/`
-      );
-      const litHtmlPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/package.json`,
-        `${outputPath}/node_modules/lit-html/`
-      );
-      const litHtmlDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/directives/*.js`,
-        `${outputPath}/node_modules/lit-html/directives/`
-      );
-      // lit-html has a dependency on this
-      // https://github.com/lit/lit/blob/main/packages/lit-html/package.json#L82
-      const trustedTypes = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
-        `${outputPath}/node_modules/@types/trusted-types/`
-      );
-      const litReactiveElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/`
-      );
-      const litReactiveElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/decorators/`
-      );
-      const litReactiveElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
-        `${outputPath}/node_modules/@lit/reactive-element/`
-      );
-
-      runner.setup(outputPath, [
-        ...getSetupFiles(outputPath),
-        ...greenwoodGraphqlCoreLibs,
-        ...greenwoodGraphqlQueryLibs,
-        ...lit,
-        ...litPackageJson,
-        ...litSsrPackageJson,
-        ...litDirectives,
-        ...litDecorators,
-        ...litElementPackageJson,
-        ...litElement,
-        ...litElementDecorators,
-        ...litHtmlPackageJson,
-        ...litHtml,
-        ...litHtmlDirectives,
-        ...trustedTypes,
-        ...litReactiveElement,
-        ...litReactiveElementDecorators,
-        ...litReactiveElementPackageJson,
-        ...greenwoodLibs
-      ]);
+    before(function() {
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
     });
 

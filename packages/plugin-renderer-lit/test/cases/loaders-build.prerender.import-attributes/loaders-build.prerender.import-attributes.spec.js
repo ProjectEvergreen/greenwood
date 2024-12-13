@@ -33,7 +33,7 @@ import chai from 'chai';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getDependencyFiles, getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -54,102 +54,8 @@ describe('Build Greenwood With Custom Lit Renderer for SSG prerendering: ', func
 
   describe(LABEL, function() {
 
-    before(async function() {
-      const lit = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/*.js`,
-        `${outputPath}/node_modules/lit/`
-      );
-      const litDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/decorators/*.js`,
-        `${outputPath}/node_modules/lit/decorators/`
-      );
-      const litDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/directives/*.js`,
-        `${outputPath}/node_modules/lit/directives/`
-      );
-      const litPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/package.json`,
-        `${outputPath}/node_modules/lit/`
-      );
-      const litElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/*.js`,
-        `${outputPath}/node_modules/lit-element/`
-      );
-      const litElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/package.json`,
-        `${outputPath}/node_modules/lit-element/`
-      );
-      const litElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/decorators/*.js`,
-        `${outputPath}/node_modules/lit-element/decorators/`
-      );
-      const litHtml = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/*.js`,
-        `${outputPath}/node_modules/lit-html/`
-      );
-      const litHtmlNode = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/node/*.js`,
-        `${outputPath}/node_modules/lit-html/node/`
-      );
-      const litHtmlNodeDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/node/directives/*.js`,
-        `${outputPath}/node_modules/lit-html/node/directives/`
-      );
-      const litHtmlPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/package.json`,
-        `${outputPath}/node_modules/lit-html/`
-      );
-      const litHtmlDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/directives/*.js`,
-        `${outputPath}/node_modules/lit-html/directives/`
-      );
-      const litReactiveElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/`
-      );
-      const litReactiveElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/decorators/`
-      );
-      const litReactiveElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
-        `${outputPath}/node_modules/@lit/reactive-element/`
-      );
-      const litReactiveElementNode = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/node/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/node/`
-      );
-      // lit-html/node/directives/unsafe-html.js
-      const litHtmlSourceMap = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/lit-html.js.map`,
-        `${outputPath}/node_modules/lit-html/`
-      );
-      const trustedTypes = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
-        `${outputPath}/node_modules/@types/trusted-types/`
-      );
-
-      runner.setup(outputPath, [
-        ...getSetupFiles(outputPath),
-        ...lit,
-        ...litPackageJson,
-        ...litDirectives,
-        ...litDecorators,
-        ...litElementPackageJson,
-        ...litElement,
-        ...litElementDecorators,
-        ...litHtmlPackageJson,
-        ...litHtml,
-        ...litHtmlNode,
-        ...litHtmlNodeDirectives,
-        ...litHtmlDirectives,
-        ...trustedTypes,
-        ...litReactiveElement,
-        ...litReactiveElementDecorators,
-        ...litReactiveElementPackageJson,
-        ...litReactiveElementNode,
-        ...litHtmlSourceMap
-      ]);
+    before(function() {
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
     });
 

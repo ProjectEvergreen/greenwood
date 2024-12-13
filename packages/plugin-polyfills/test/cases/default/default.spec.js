@@ -13,9 +13,8 @@
  *
  * {
  *   plugins: [{
- *     ...greenwoodPluginPolyfills()
- *  }]
- *
+ *     greenwoodPluginPolyfills()
+ *   }]
  * }
  *
  * User Workspace
@@ -26,7 +25,7 @@ import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -58,16 +57,7 @@ describe('Build Greenwood With: ', function() {
 
   describe(LABEL, function() {
     before(function() {
-      runner.setup(outputPath, [...getSetupFiles(outputPath), ...expectedPolyfillFiles.map((file) => {
-        const dir = file === 'webcomponents-loader.js'
-          ? 'node_modules/@webcomponents/webcomponentsjs'
-          : 'node_modules/@webcomponents/webcomponentsjs/bundles';
-
-        return {
-          source: `${process.cwd()}/${dir}/${file}`,
-          destination: `${outputPath}/${dir}/${file}`
-        };
-      })]);
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
     });
 

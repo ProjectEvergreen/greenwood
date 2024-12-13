@@ -21,7 +21,7 @@ import chai from 'chai';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getSetupFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -44,7 +44,7 @@ describe('Build Greenwood With: ', function() {
     let dom;
 
     before(async function() {
-      runner.setup(outputPath, getSetupFiles(outputPath));
+      runner.setup(outputPath);
       runner.runCommand(cliPath, 'build');
 
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));

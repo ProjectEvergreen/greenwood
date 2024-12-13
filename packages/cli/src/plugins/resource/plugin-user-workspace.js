@@ -6,6 +6,7 @@
  */
 import { resolveForRelativeUrl } from '../../lib/resource-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
+import { IMPORT_MAP_RESOLVED_PREFIX } from '../../lib/walker-package-ranger.js';
 
 class UserWorkspaceResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -14,11 +15,13 @@ class UserWorkspaceResource extends ResourceInterface {
 
   async shouldResolve(url) {
     const { userWorkspace } = this.compilation.context;
-    const extension = url.pathname.split('.').pop();
+    const { pathname } = url;
+    const extension = pathname.split('.').pop();
     const hasExtension = extension !== '' && !extension.startsWith('/');
 
     return hasExtension
-      && !url.pathname.startsWith('/node_modules')
+      && !pathname.startsWith('/node_modules')
+      && !pathname.startsWith(IMPORT_MAP_RESOLVED_PREFIX)
       && await resolveForRelativeUrl(url, userWorkspace);
   }
 

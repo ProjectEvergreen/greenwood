@@ -116,30 +116,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
         const resourceKey = normalizePathnameForWindows(resource.sourcePathURL);
 
         for (const bundle in bundles) {
-          let facadeModuleId = (bundles[bundle].facadeModuleId || '').replace(/\\/g, '/');
-          /*
-           * this is an odd issue related to symlinking in our Greenwood monorepo when building the website
-           * and managing packages that we create as "virtual" modules, like for the mpa router
-           *
-           * ex. import @greenwood/router/router.js -> /node_modules/@greenwood/cli/src/lib/router.js
-           *
-           * when running our tests, which better emulates a real user
-           * facadeModuleId will be in node_modules, which is like how it would be for a user:
-           * /node_modules/@greenwood/cli/src/lib/router.js
-           *
-           * however, when building our website, where symlinking points back to our packages/ directory
-           * facadeModuleId will look like this:
-           * /<workspace>/greenwood/packages/cli/src/lib/router.js
-           *
-           * so we need to massage facadeModuleId a bit for Rollup for our internal development
-           * pathToMatch (before): /node_modules/@greenwood/cli/src/lib/router.js
-           * pathToMatch (after): /cli/src/lib/router.js
-           */
-          if (resourceKey?.indexOf('/node_modules/@greenwood/cli') > 0 && facadeModuleId?.indexOf('/packages/cli') > 0) {
-            if (await checkResourceExists(new URL(`file://${facadeModuleId}`))) {
-              facadeModuleId = facadeModuleId.replace('/packages/cli', '/node_modules/@greenwood/cli');
-            }
-          }
+          const facadeModuleId = (bundles[bundle].facadeModuleId || '').replace(/\\/g, '/');
 
           if (resourceKey === facadeModuleId) {
             const { fileName } = bundles[bundle];
