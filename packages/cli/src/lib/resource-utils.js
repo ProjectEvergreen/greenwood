@@ -170,7 +170,7 @@ async function trackResourcesForRoute(html, compilation, route) {
 }
 
 function isLocalLink(url = '') {
-  return url !== '' && (url.indexOf('http') !== 0 && url.indexOf('//') !== 0);
+  return url !== '' && !url.startsWith('http') && !url.startsWith('//');
 }
 
 // TODO handle full request
@@ -269,5 +269,6 @@ export {
   requestAsObject,
   resolveForRelativeUrl,
   trackResourcesForRoute,
-  transformKoaRequestIntoStandardRequest
+  transformKoaRequestIntoStandardRequest,
+  isLocalLink
 };
