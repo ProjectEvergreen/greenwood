@@ -52,9 +52,22 @@ export default {
 
 ## Options
 
+### Configuration
+
+To use your own PostCSS configuration, you'll want to create your own _postcss.config.js_ file at the root of your project, by which you can provide your own [custom plugins and settings](https://github.com/postcss/postcss-cli?tab=readme-ov-file#config).
+
+```js
+export default {
+  plugins: [
+    (await import('postcss-nested')).default
+  ]
+};
+```
+
 ### Extend Config
 
-If you would like to _extend_ the default configuration with your own custom _postcss.config.js_, you can enable the `extendConfig` option of this plugin
+If you would like to _extend_ the default configuration with your own custom _postcss.config.js_, you can enable the `extendConfig` option of this plugin.
+
 ```js
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 
