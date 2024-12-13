@@ -18,8 +18,11 @@
  *     index.html
  *   scripts/
  *     main.js
+ *   styles/
+ *     theme.css
  */
 import chai from 'chai';
+import fs from 'fs';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
@@ -117,6 +120,25 @@ describe('Build Greenwood With: ', function() {
 
       it('should have the expected prism.css file in the output directory', async function() {
         expect(await glob.promise(path.join(this.context.publicDir, 'prism-tomorrow.*.css'))).to.have.lengthOf(1);
+      });
+    });
+
+    describe('<link rel="stylesheet" href="..."> with reference to node_modules with bare @import paths in the <head> tag', function() {
+      it('should have one <link href="..."> tag in the <head> tag', function() {
+        const linkTags = dom.window.document.querySelectorAll('head > link[rel="stylesheet"]');
+        const themeLinkTag = Array.prototype.slice.call(linkTags).filter(link => {
+          return (/theme.*.css/).test(link.href);
+        });
+
+        expect(themeLinkTag.length).to.be.equal(1);
+      });
+
+      it('should have the expected theme.css file in the output directory with the expected content', async function() {
+        const themeFile = await glob.promise(path.join(this.context.publicDir, 'styles/theme.*.css'));
+        const contents = fs.readFileSync(themeFile[0], 'utf-8');
+
+        expect(themeFile).to.have.lengthOf(1);
+        expect(contents.indexOf(':root,:host{--spectrum-global-animation-linear:cubic-bezier(0, 0, 1, 1);')).to.equal(0);
       });
     });
   });
