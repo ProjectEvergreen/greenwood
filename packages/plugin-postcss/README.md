@@ -54,21 +54,9 @@ export default {
 
 ### Configuration
 
-To use your own PostCSS configuration, you'll need to create _two (2)_ config files in the root of your project, by which you can provide your own custom plugins / settings that you've installed.
-- _postcss.config.js_
-- _postcss.config.mjs_
+To use your own PostCSS configuration, you'll want to create your own _postcss.config.js_ file at the root of your project, by which you can provide your own [custom plugins and settings](https://github.com/postcss/postcss-cli?tab=readme-ov-file#config).
 
-Example:
-
-```javascript
-// postcss.config.js
-module.exports = {
-  plugins: [
-    require('postcss-nested')
-  ]
-};
-
-// postcss.config.mjs
+```js
 export default {
   plugins: [
     (await import('postcss-nested')).default
@@ -76,11 +64,10 @@ export default {
 };
 ```
 
-_Eventually once [PostCSS adds support for ESM configuration files](https://github.com/postcss/postcss-cli/issues/387), then this will drop to only needing one file._
-
 ### Extend Config
 
-If you would like to _extend_ the default configuration with your own custom _postcss.config.js_, you can enable the `extendConfig` option of this plugin
+If you would like to _extend_ the default configuration with your own custom _postcss.config.js_, you can enable the `extendConfig` option of this plugin.
+
 ```js
 import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 
