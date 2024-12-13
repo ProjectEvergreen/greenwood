@@ -3,6 +3,7 @@
 **/node_modules/**
 !.eslintrc.cjs
 !.mocharc.js
+packages/**/test/cases/**/adapter-output/**
 packages/init/src/template/**
 packages/init/test/cases/**/output/**
 packages/init/test/cases/**/my-app/**
