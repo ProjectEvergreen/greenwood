@@ -24,7 +24,6 @@ class LitHydrationResource extends ResourceInterface {
     const headSelector = isDevelopment ? `<script type="${importMapType}">` : '<head>';
     const hydrationSupportScriptPath = '/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js';
     let body = await response.text();
-    console.log({ body });
 
     // this needs to come first before any userland code, but before any import maps
     // https://github.com/ProjectEvergreen/greenwood/pull/1289
@@ -57,19 +56,17 @@ class LitHydrationResource extends ResourceInterface {
       `);
     }
 
-    console.log({ body });
     return new Response(body);
   }
 }
 
-const greenwoodPluginRendererLit = (options = {}) => {
+const greenwoodPluginRendererLit = () => {
   return [{
     type: 'renderer',
     name: 'plugin-renderer-lit:renderer',
     provider: () => {
       return {
-        executeModuleUrl: new URL('./execute-route-module.js', import.meta.url),
-        prerender: options.prerender
+        executeModuleUrl: new URL('./execute-route-module.js', import.meta.url)
       };
     }
   }, {

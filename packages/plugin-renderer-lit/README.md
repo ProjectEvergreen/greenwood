@@ -98,6 +98,24 @@ export async function getBody() {
 
 ## Options
 
+### Prerender
+
+The plugin works with Greenwood's [**prerender**](https://greenwoodjs.dev/docs/reference/configuration/#prerender) configuration, allowing for the use of Lit's SSR renderer for [prerendering](https://greenwoodjs.dev/docs/reference/rendering-strategies/#prerendering) your content.
+
+```javascript
+import { greenwoodPluginRendererLit } from '@greenwood/plugin-renderer-lit';
+
+export default {
+  prerender: true,
+
+  plugins: [
+    greenwoodPluginRendererLit()
+  ]
+}
+```
+
+> _Keep in mind you will need to make sure your Lit Web Components are isomorphic and [properly leveraging `LitElement`'s lifecycles](https://github.com/lit/lit/tree/main/packages/labs/ssr#notes-and-limitations) and browser / Node APIs accordingly for maximum compatibility and portability._
+
 ### Isolation Mode
 
 By default, this plugin sets `isolation` mode to `true` for all SSR pages.  If you want to override this, just export an `isolation` const.
@@ -117,23 +135,3 @@ In order for server-rendered components to become interactive on the client side
 // src/pages/products.js
 export const hydration = false; // disable Lit hydration scripts for this page
 ```
-
-### Prerender
-
-The plugin provides a setting that can be used to override Greenwood's [default _prerender_](/docs/configuration/#prerender) implementation which uses [WCC](https://github.com/ProjectEvergreen/wcc), to use Lit instead.
-
-```javascript
-import { greenwoodPluginRendererLit } from '@greenwood/plugin-renderer-lit';
-
-export default {
-  // ...
-
-  plugins: [
-    greenwoodPluginRendererLit({
-      prerender: true
-    })
-  ]
-}
-```
-
-> _Keep in mind you will need to make sure your Lit Web Components are isomorphic and [properly leveraging `LitElement`'s lifecycles](https://github.com/lit/lit/tree/main/packages/labs/ssr#notes-and-limitations) and browser / Node APIs accordingly for maximum compatibility and portability._
