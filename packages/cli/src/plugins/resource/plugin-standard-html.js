@@ -206,7 +206,7 @@ class StandardHtmlResource extends ResourceInterface {
         } else if (type === 'link') {
           const tag = root.querySelectorAll('link').find(link => link.getAttribute('href') === src);
 
-          if (!optimizationAttr && (optimization !== 'none' && optimization !== 'inline')) {
+          if (optimizationAttr !== 'inline' && optimization !== 'inline') {
             const optimizedFilePath = `${basePath}/${optimizedFileName}`;
 
             body = body.replace(src, optimizedFilePath);

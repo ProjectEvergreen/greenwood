@@ -336,12 +336,9 @@ class StandardCssResource extends ResourceInterface {
   }
 
   async shouldIntercept(url, request, response) {
-    const { pathname } = url;
-    const ext = pathname.split('.').pop();
-
     return url.protocol === 'file:'
-      && ext === this.extensions[0]
-      && (response.headers.get('Content-Type')?.indexOf('text/css') >= 0 || request.headers.get('Accept')?.indexOf('text/javascript') >= 0) || url.searchParams?.get('polyfill') === 'type-css';
+      && (response.headers.get('Content-Type')?.indexOf(this.contentType) >= 0 || request.headers.get('Accept')?.indexOf(this.contentType) >= 0)
+      || (request.headers.get('Accept')?.indexOf('text/javascript') > 0 || url.searchParams?.get('polyfill') === 'type-css');
   }
 
   async intercept(url, request, response) {

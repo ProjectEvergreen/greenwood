@@ -33,11 +33,13 @@ class TypeScriptResource extends ResourceInterface {
     this.contentType = 'text/javascript';
   }
 
-  async shouldServe(url) {
+  async shouldServe(url, request) {
     const { pathname, protocol } = url;
+    const hasJsHeaders = (request?.headers.get('Accept') ?? '').indexOf(this.contentType) >= 0 || request.headers.get('Sec-Fetch-Dest') === 'script';
+    const serveAsPage = (request?.headers.get('Accept') ?? '').indexOf('text/html') >= 0 && this.options.servePage;
     const isTsFile = protocol === 'file:' && pathname.split('.').pop() === this.extensions[0];
 
-    return isTsFile || isTsFile && url.searchParams.has('type') && url.searchParams.get('type') === this.extensions[0];
+    return (serveAsPage && isTsFile) || (isTsFile && hasJsHeaders) || isTsFile && url.searchParams.has('type') && url.searchParams.get('type') === this.extensions[0];
   }
 
   async serve(url) {

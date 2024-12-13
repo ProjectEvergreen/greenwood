@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import { hashString } from './hashing-utils.js';
 import { getResolvedHrefFromPathnameShortcut } from '../lib/node-modules-utils.js';
 import htmlparser from 'node-html-parser';
+import { asyncMap } from './async-utils.js';
 
 async function modelResource(context, type, src = undefined, contents = undefined, optimizationAttr = undefined, rawAttributes = undefined) {
   const { scratchDir, userWorkspace, projectDirectory } = context;
@@ -120,37 +121,38 @@ async function trackResourcesForRoute(html, compilation, route) {
   });
 
   // intentionally support <script> tags from the <head> or <body>
-  const scripts = await Promise.all(root.querySelectorAll('script')
+  const scripts = await asyncMap(Array.from(root.querySelectorAll('script'))
     .filter(script => (
       isLocalLink(script.getAttribute('src')) || script.rawText)
       && script.rawAttrs.indexOf('importmap') < 0
       && script.getAttribute('type') !== 'application/json')
-    .map(async(script) => {
-      const src = script.getAttribute('src');
-      const optimizationAttr = script.getAttribute('data-gwd-opt');
-      const { rawAttrs } = script;
+  , async (script) => {
+    const src = script.getAttribute('src');
+    const optimizationAttr = script.getAttribute('data-gwd-opt');
+    const { rawAttrs } = script;
 
-      if (src) {
-        // <script src="...."></script>
-        return await modelResource(context, 'script', src, null, optimizationAttr, rawAttrs);
-      } else if (script.rawText) {
-        // <script>...</script>
-        return await modelResource(context, 'script', null, script.rawText, optimizationAttr, rawAttrs);
-      }
-    }));
+    if (src) {
+      // <script src="...."></script>
+      return await modelResource(context, 'script', src, null, optimizationAttr, rawAttrs);
+    } else if (script.rawText) {
+      // <script>...</script>
+      return await modelResource(context, 'script', null, script.rawText, optimizationAttr, rawAttrs);
+    }
+  });
 
-  const styles = await Promise.all(root.querySelectorAll('style')
+  const styles = await asyncMap(Array.from(root.querySelectorAll('style'))
     .filter(style => !(/\$/).test(style.rawText) && !(/<!-- Shady DOM styles for -->/).test(style.rawText)) // filter out Shady DOM <style> tags that happen when using puppeteer
-    .map(async(style) => await modelResource(context, 'style', null, style.rawText, null, style.getAttribute('data-gwd-opt'))));
+  , async(style) => await modelResource(context, 'style', null, style.rawText, null, style.getAttribute('data-gwd-opt')));
 
-  const links = await Promise.all(root.querySelectorAll('head link')
+  const links = await asyncMap(Array.from(root.querySelectorAll('link'))
     .filter(link => {
       // <link rel="stylesheet" href="..."></link>
       return link.getAttribute('rel') === 'stylesheet'
         && link.getAttribute('href') && isLocalLink(link.getAttribute('href'));
-    }).map(async(link) => {
-      return modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'), link.rawAttrs);
-    }));
+    })
+  , async(link) => {
+    return await modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'), link.rawAttrs);
+  });
 
   const resources = [
     ...scripts,
