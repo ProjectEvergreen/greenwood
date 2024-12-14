@@ -10,6 +10,7 @@ import { parse, walk } from 'css-tree';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { hashString } from '../../lib/hashing-utils.js';
 import { getResolvedHrefFromPathnameShortcut } from '../../lib/node-modules-utils.js';
+import { isLocalLink } from '../../lib/resource-utils.js';
 
 function bundleCss(body, sourceUrl, compilation, workingUrl) {
   const { projectDirectory, outputDir, userWorkspace } = compilation.context;
@@ -27,7 +28,7 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
       if ((type === 'String' || type === 'Url') && this.atrulePrelude && this.atrule.name === 'import') {
         const { value } = node;
 
-        if (!value.startsWith('http')) {
+        if (isLocalLink(value)) {
           if (value.indexOf('.') === 0 || value.indexOf('/node_modules') === 0) {
             const resolvedUrl = value.startsWith('/node_modules')
               ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
@@ -48,7 +49,7 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
           optimizedCss += `@import url('${value}');`;
         }
       } else if (type === 'Url' && this.atrule?.name !== 'import') {
-        if (value.startsWith('http') || value.startsWith('//') || value.startsWith('data:')) {
+        if (!isLocalLink(value) || value.startsWith('data:')) {
           optimizedCss += `url('${value}')`;
           return;
         }
