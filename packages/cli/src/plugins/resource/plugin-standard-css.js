@@ -58,15 +58,16 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
         const { basePath } = compilation.config;
 
         // TODO document our resolution strategy here
-        const resolvedUrl = workingUrl
-          ? new URL(value, workingUrl)
-          : value.startsWith('/node_modules/')
-            ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
-            : sourceUrl.href.startsWith(scratchDir.href)
-              ? new URL(`./${value.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace)
-              : new URL(value, sourceUrl);
+        const resolvedUrl = value.startsWith('/node_modules/')
+          ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
+          : value.startsWith('/')
+            ? new URL(`.${value}`, userWorkspace)
+            : workingUrl
+              ? new URL(value, workingUrl)
+              : sourceUrl.href.startsWith(scratchDir.href)
+                ? new URL(`./${value.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace)
+                : new URL(value, sourceUrl);
 
-        console.log({ value, resolvedUrl, sourceUrl, workingUrl });
         if (fs.existsSync(resolvedUrl)) {
           const isDev = process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line no-underscore-dangle
           let finalValue;
@@ -80,7 +81,6 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
             const resolvedRootSegments = resolvedRoot.split('/').reverse().filter(segment => segment !== '');
             const specifier = resolvedRootSegments[1].startsWith('@') ? `${resolvedRootSegments[0]}/${resolvedRootSegments[1]}` : resolvedRootSegments[0];
 
-            // console.log({ resolvedRoot, resolvedRootSegments, specifier });
             finalValue = `/node_modules/${specifier}/${value.replace(/\.\.\//g, '').replace('./', '')}`;
           }
 
@@ -99,8 +99,6 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
               new URL(`.${finalValue}`, outputDir)
             );
           }
-
-          // console.log({ finalValue });
 
           optimizedCss += `url('${basePath}${finalValue}')`;
         } else {
