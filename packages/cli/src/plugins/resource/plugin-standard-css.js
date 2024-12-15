@@ -11,9 +11,10 @@ import { ResourceInterface } from '../../lib/resource-interface.js';
 import { hashString } from '../../lib/hashing-utils.js';
 import { getResolvedHrefFromPathnameShortcut } from '../../lib/node-modules-utils.js';
 import { isLocalLink } from '../../lib/resource-utils.js';
+import { derivePackageRoot } from '../../lib/walker-package-ranger.js';
 
 function bundleCss(body, sourceUrl, compilation, workingUrl) {
-  const { projectDirectory, outputDir, userWorkspace } = compilation.context;
+  const { projectDirectory, outputDir, userWorkspace, scratchDir } = compilation.context;
   const ast = parse(body, {
     onParseError(error) {
       console.log(error.formattedMessage);
@@ -55,34 +56,53 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
         }
 
         const { basePath } = compilation.config;
-        let rootPath = value.replace(/\.\.\//g, '').replace('./', '');
 
-        if (!rootPath.startsWith('/')) {
-          rootPath = `/${rootPath}`;
-        }
+        // TODO document our resolution strategy here
+        const resolvedUrl = workingUrl
+          ? new URL(value, workingUrl)
+          : value.startsWith('/node_modules/')
+            ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
+            : sourceUrl.href.startsWith(scratchDir.href)
+              ? new URL(`./${value.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace)
+              : new URL(value, sourceUrl);
 
-        const resolvedUrl = rootPath.indexOf('node_modules/') >= 0
-          ? new URL(getResolvedHrefFromPathnameShortcut(rootPath, projectDirectory))
-          : new URL(`.${rootPath}`, userWorkspace);
-
+        console.log({ value, resolvedUrl, sourceUrl, workingUrl });
         if (fs.existsSync(resolvedUrl)) {
           const isDev = process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line no-underscore-dangle
-          const hash = hashString(fs.readFileSync(resolvedUrl, 'utf-8'));
-          const ext = rootPath.split('.').pop();
-          const hashedRoot = isDev ? rootPath : rootPath.replace(`.${ext}`, `.${hash}.${ext}`);
+          let finalValue;
+
+          if (resolvedUrl.href.startsWith(userWorkspace.href)) {
+            finalValue = resolvedUrl.href.replace(userWorkspace.href, '/');
+          } else if (value.startsWith('/node_modules/')) {
+            finalValue = value;
+          } else if (resolvedUrl.href.indexOf('/node_modules/') >= 0) {
+            const resolvedRoot = derivePackageRoot(resolvedUrl.href);
+            const resolvedRootSegments = resolvedRoot.split('/').reverse().filter(segment => segment !== '');
+            const specifier = resolvedRootSegments[1].startsWith('@') ? `${resolvedRootSegments[0]}/${resolvedRootSegments[1]}` : resolvedRootSegments[0];
+
+            // console.log({ resolvedRoot, resolvedRootSegments, specifier });
+            finalValue = `/node_modules/${specifier}/${value.replace(/\.\.\//g, '').replace('./', '')}`;
+          }
 
           if (!isDev) {
-            fs.mkdirSync(new URL(`./${path.dirname(hashedRoot)}/`, outputDir), {
+            const hash = hashString(fs.readFileSync(resolvedUrl, 'utf-8'));
+            const ext = resolvedUrl.pathname.split('.').pop();
+
+            finalValue = finalValue.replace(`.${ext}`, `.${hash}.${ext}`);
+
+            fs.mkdirSync(new URL(`.${path.dirname(finalValue)}/`, outputDir), {
               recursive: true
             });
 
             fs.promises.copyFile(
               resolvedUrl,
-              new URL(`./${hashedRoot}`, outputDir)
+              new URL(`.${finalValue}`, outputDir)
             );
           }
 
-          optimizedCss += `url('${basePath}${hashedRoot}')`;
+          // console.log({ finalValue });
+
+          optimizedCss += `url('${basePath}${finalValue}')`;
         } else {
           console.warn(`Unable to locate ${value}.  You may need to manually copy this file from its source location to the build output directory.`);
           optimizedCss += `url('${value}')`;
