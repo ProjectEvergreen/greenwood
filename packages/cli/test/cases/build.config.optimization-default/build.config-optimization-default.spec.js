@@ -52,16 +52,21 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      const geistFont = await getDependencyFiles(
+      // this package has a known issue with import.meta.resolve
+      // if this gets fixed, we can remove the need for this setup
+      // https://github.com/vercel/geist-font/issues/150
+      const geistPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/geist/package.json`,
+        `${outputPath}/node_modules/geist/`
+      );
+      const geistFonts = await getDependencyFiles(
         `${process.cwd()}/node_modules/geist/dist/fonts/geist-sans/*`,
         `${outputPath}/node_modules/geist/dist/fonts/geist-sans/`
       );
 
       runner.setup(outputPath, [
-        // this package has a known issue with import.meta.resolve
-        // if this gets fixed, we can remove the need for this setup
-        // https://github.com/vercel/geist-font/issues/150
-        ...geistFont
+        ...geistPackageJson,
+        ...geistFonts
       ]);
       runner.runCommand(cliPath, 'build');
     });
