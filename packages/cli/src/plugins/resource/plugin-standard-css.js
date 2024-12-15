@@ -57,7 +57,14 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
 
         const { basePath } = compilation.config;
 
-        // TODO document our resolution strategy here
+        /*
+         * Our resolution algorithm works as follows:
+         * 1. First, check if it is a shortcut alias to node_modules, in which we use Node's resolution algorithm
+         * 2. Next, check if it is an absolute path "escape" hatch based path and just resolve to the user's workspace
+         * 3. If there is a workingUrl, then just join the current value with the current working file we're processing
+         * 4. If the starting file is in the scratch directory, likely means it is just an extracted inline <style> tag, so resolve to user workspace
+         * 5. Lastly, match the current value with the current source file
+         */
         const resolvedUrl = value.startsWith('/node_modules/')
           ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
           : value.startsWith('/')
@@ -70,13 +77,16 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
 
         if (fs.existsSync(resolvedUrl)) {
           const isDev = process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line no-underscore-dangle
-          let finalValue;
+          let finalValue = '';
 
           if (resolvedUrl.href.startsWith(userWorkspace.href)) {
+            // truncate to just get /path/in/users/workspace.png
             finalValue = resolvedUrl.href.replace(userWorkspace.href, '/');
           } else if (value.startsWith('/node_modules/')) {
+            // if it's a node modules shortcut alias, just use that
             finalValue = value;
           } else if (resolvedUrl.href.indexOf('/node_modules/') >= 0) {
+            // if we are deep in node_modules land, use resolution logic to figure out the specifier
             const resolvedRoot = derivePackageRoot(resolvedUrl.href);
             const resolvedRootSegments = resolvedRoot.split('/').reverse().filter(segment => segment !== '');
             const specifier = resolvedRootSegments[1].startsWith('@') ? `${resolvedRootSegments[0]}/${resolvedRootSegments[1]}` : resolvedRootSegments[0];
