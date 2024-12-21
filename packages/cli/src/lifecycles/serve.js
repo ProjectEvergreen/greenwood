@@ -69,7 +69,7 @@ async function getDevServer(compilation) {
           const current = await plugin.serve(url, request);
           const merged = mergeResponse(response.clone(), current.clone());
 
-          response = merged;
+          response = merged.clone();
         }
       }
 
@@ -167,7 +167,7 @@ async function getDevServer(compilation) {
     // don't interfere with external requests or API calls, only files
     // and only run in development
     if (process.env.__GWD_COMMAND__ === 'develop' && url.protocol === 'file:') { // eslint-disable-line no-underscore-dangle
-      // TODO there's probably a better way to do this with tee-ing streams but this works for now
+      // there's probably a better way to do this with tee-ing streams but this works for now
       const { header, status, message } = ctx.response;
       const response = new Response(ctx.body, {
         statusText: message,
