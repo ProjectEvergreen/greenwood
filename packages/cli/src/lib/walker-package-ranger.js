@@ -35,7 +35,7 @@ function resolveBareSpecifier(specifier) {
  * {
  *   dependencyName: 'lit-html',
  *   resolved: 'file:///path/to/project/greenwood-lit-ssr/node_modules/.pnpm/lit-html@3.2.1/node_modules/lit-html/node/lit-html.js',
- *   root: 'file:///path/to/project/greenwood-lit-ssr/node_modules/.pnpm/lit-html@3.2.1/node_modules/lit-html/package.json'
+ *   root: 'file:///path/to/project/greenwood-lit-ssr/node_modules/.pnpm/lit-html@3.2.1/node_modules/lit-html/
  *  }
  */
 function derivePackageRoot(resolved) {
@@ -52,7 +52,15 @@ function derivePackageRoot(resolved) {
 
   for (const segment of segments.slice(1)) {
     if (fs.existsSync(new URL('./package.json', root))) {
-      break;
+      // we have to check that this package.json actually has as a name AND version
+      // https://github.com/moment/luxon/issues/1543#issuecomment-2546858540
+      // https://github.com/ProjectEvergreen/greenwood/issues/1349
+      const resolvedPackageJson = JSON.parse(fs.readFileSync(new URL('./package.json', root), 'utf-8'));
+      const { name, version } = resolvedPackageJson;
+
+      if (name && version) {
+        break;
+      }
     }
 
     root = root.replace(`${segment}/`, '');
