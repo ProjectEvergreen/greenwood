@@ -26,7 +26,7 @@ const runProductionBuild = async (compilation) => {
         });
       }
 
-      if (prerender || (activeContent && prerender)) {
+      if (prerender) {
         // start any of the user's server plugins if needed
         const servers = [...compilation.config.plugins.filter((plugin) => {
           return plugin.type === 'server' && !plugin.isGreenwoodDefaultPlugin;
