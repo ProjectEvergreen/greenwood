@@ -79,12 +79,12 @@ class ContentAsDataResource extends ResourceInterface {
 
     newBody = newBody.replace('<head>', `
       <head>
-        <script id="active-content-data">
+        <script id="data-client-options">
           globalThis.__CONTENT_OPTIONS__ = globalThis.__CONTENT_OPTIONS__
             ? globalThis.__CONTENT_OPTIONS__
             : {
                 PORT: ${devServer.port},
-                PRERENDER: ${this.compilation.config.prerender},
+                PRERENDER: "${this.compilation.config.prerender}",
               }
         </script>
     `);
@@ -129,7 +129,7 @@ class ContentAsDataResource extends ResourceInterface {
 
     body = body.replace('<head>', `
       <head>
-        <script id="content-state">
+        <script id="content-as-data-state">
           globalThis.__CONTENT_AS_DATA_STATE__ = true;
         </script>
     `);
