@@ -2,7 +2,7 @@
 
 ## Overview
 
-A Greenwood plugin for using [**Puppeteer**](https://pptr.dev) as a custom [_pre-rendering_ solution](/docs/server-rendering/#render-vs-prerender).  As Puppeteer is a headless browser, it provides a lot more power and capabilities for fully rendering things like Web Components, GraphQL calls, and other very browser dependent features. For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
+A Greenwood plugin for using [**Puppeteer**](https://pptr.dev) as a custom [_prerendering_ solution](https://greenwoodjs.dev/docs/reference/rendering-strategies/#prerendering).  As Puppeteer is a headless browser, it provides a lot more power and capabilities for fully rendering things like Web Components, GraphQL calls, and other very browser dependent features. For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
 > This package assumes you already have `@greenwood/cli` installed.
 
@@ -23,13 +23,13 @@ $ pnpm add -D @greenwood/plugin-renderer-puppeteer
 
 ## Usage
 
-Add this plugin to your _greenwood.config.js_:
+Add this plugin and enable the `prerender` setting in your _greenwood.config.js_:
 
 ```javascript
 import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
 
 export default {
-  // ...
+  prerender: true,
 
   plugins: [
     greenwoodPluginRendererPuppeteer()
@@ -42,14 +42,15 @@ Now, when running `greenwood build`, all your pages will get run through Puppete
 ## Caveats
 
 ### Limitations
-Given this plugin instruments an entire browser, this plugin _only_ supports Greenwood's [`prerender` configuration](/docs/configuration/#prerender) option and so will NOT be viable for any [SSR](/docs/server-rendering/) or [Serverless and Edge](https://github.com/ProjectEvergreen/greenwood/discussions/626) features.  Instead, Greenwood will be focusing on making [**WCC**](https://github.com/ProjectEvergreen/wcc) the default and recommended first-party solution.
+
+Given this plugin instruments an entire browser, this plugin _only_ works with Greenwood's [`prerender` configuration](https://greenwoodjs.dev/docs/reference/configuration/#prerender) option and so will NOT be viable for any of Greenwood's [SSR or Serverless](https://greenwoodjs.dev/docs/pages/server-rendering/) capabilities.  Instead, Greenwood will be focusing on making [**WCC**](https://github.com/ProjectEvergreen/wcc) the default and recommended first-party solution.
 
 In addition, **puppeteer** also leverages npm `postinstall` scripts which in some environments, like [Stackblitz](https://github.com/ProjectEvergreen/greenwood/discussions/639), would be disabled and so [YMMV](https://dictionary.cambridge.org/us/dictionary/english/ymmv).
 
 
 ### Dependencies
 
-You may need to install additional Operating System level libraries and dependencies depending on the system you are running on to support headless Chrome. For example, for a Docker based environment like [GitHub Actions](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/master.yml#L19), you would need to add [this below setup script (or similar)](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/chromium-lib-install.sh) to your runner
+You may need to install additional Operating System level libraries and dependencies depending on the system you are running on to support headless Chrome. For example, for a Docker based environment like [GitHub Actions](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/ci.yml#L19), you would need to add [this below setup script (or similar)](https://github.com/ProjectEvergreen/greenwood/blob/master/.github/workflows/chromium-lib-install.sh) to your runner
 ```shell
 #!/usr/bin/bash
 

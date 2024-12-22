@@ -19,7 +19,6 @@ const runProductionBuild = async (compilation) => {
       const adapterPlugin = compilation.config.plugins.find(plugin => plugin.type === 'adapter')
         ? compilation.config.plugins.find(plugin => plugin.type === 'adapter').provider(compilation)
         : null;
-      const shouldPrerender = prerender || prerenderPlugin.prerender;
 
       if (!await checkResourceExists(outputDir)) {
         await fs.mkdir(outputDir, {
@@ -27,7 +26,7 @@ const runProductionBuild = async (compilation) => {
         });
       }
 
-      if (shouldPrerender || (activeContent && shouldPrerender)) {
+      if (prerender) {
         // start any of the user's server plugins if needed
         const servers = [...compilation.config.plugins.filter((plugin) => {
           return plugin.type === 'server' && !plugin.isGreenwoodDefaultPlugin;
