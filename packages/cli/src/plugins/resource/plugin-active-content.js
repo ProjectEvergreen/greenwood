@@ -1,11 +1,12 @@
 import { mergeImportMap } from '../../lib/node-modules-utils.js';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { checkResourceExists } from '../../lib/resource-utils.js';
-import { activeFrontmatterKeys, cleanContentCollection, pruneGraph } from '../../lib/content-utils.js';
+import { activeFrontmatterKeys, cleanContentCollection, pruneGraph, filterContentByCollection, filterContentByRoute } from '../../lib/content-utils.js';
 import fs from 'fs/promises';
 
 const importMap = {
-  '@greenwood/cli/src/data/client.js': '/node_modules/@greenwood/cli/src/data/client.js'
+  '@greenwood/cli/src/data/client.js': '/node_modules/@greenwood/cli/src/data/client.js',
+  '@greenwood/cli/src/lib/content-utils.js': '/node_modules/@greenwood/cli/src/lib/content-utils.js'
 };
 
 class ContentAsDataResource extends ResourceInterface {
@@ -38,9 +39,9 @@ class ContentAsDataResource extends ResourceInterface {
       if (contentKey === 'graph') {
         body = graph;
       } else if (keyPieces[0] === 'collection') {
-        body = graph.filter(page => page?.data?.collection === keyPieces[1]);
+        body = filterContentByCollection(graph, keyPieces[1]);
       } else if (keyPieces[0] === 'route') {
-        body = graph.filter(page => page?.route.startsWith(keyPieces[1]));
+        body = filterContentByRoute(graph, keyPieces[1]);
       }
 
       if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
@@ -78,11 +79,12 @@ class ContentAsDataResource extends ResourceInterface {
 
     newBody = newBody.replace('<head>', `
       <head>
-        <script id="content-server">
-          globalThis.__CONTENT_SERVER__ = globalThis.__CONTENT_SERVER__
-            ? globalThis.__CONTENT_SERVER__
+        <script id="data-client-options">
+          globalThis.__CONTENT_OPTIONS__ = globalThis.__CONTENT_OPTIONS__
+            ? globalThis.__CONTENT_OPTIONS__
             : {
-                PORT: ${devServer.port}
+                PORT: ${devServer.port},
+                PRERENDER: "${this.compilation.config.prerender}",
               }
         </script>
     `);
@@ -127,7 +129,7 @@ class ContentAsDataResource extends ResourceInterface {
 
     body = body.replace('<head>', `
       <head>
-        <script id="content-state">
+        <script id="content-as-data-state">
           globalThis.__CONTENT_AS_DATA_STATE__ = true;
         </script>
     `);

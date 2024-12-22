@@ -80,6 +80,28 @@ describe('Build Greenwood With: ', function() {
         });
       });
 
+      describe('<script> tag setup for active content', function() {
+        let stateScripts;
+        let optionsScript;
+
+        before(function() {
+          stateScripts = dom.window.document.querySelectorAll('script#content-as-data-state');
+          optionsScript = dom.window.document.querySelectorAll('script#data-client-options');
+        });
+
+        it('should have a <script> tag that confirms content as data is set', function() {
+          expect(stateScripts.length).to.equal(1);
+          expect(stateScripts[0].textContent).to.contain('globalThis.__CONTENT_AS_DATA_STATE__ = true;');
+        });
+
+        it('should have a <script> tag that captures content as data related options', function() {
+          expect(optionsScript.length).to.equal(1);
+
+          expect(optionsScript[0].textContent).to.contain('PORT:1984');
+          expect(optionsScript[0].textContent).to.contain('PRERENDER:"true"');
+        });
+      });
+
       describe('navigation links from getContentByCollection', function() {
         let navLinks;
 

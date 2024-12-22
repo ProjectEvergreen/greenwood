@@ -15,7 +15,8 @@
  *      '/post': 'https://jsonplaceholder.typicode.com'
  *    }
  *   },
- *   port: 8181
+ *   port: 8181,
+ *   activeContent: true // just here to test some basic content as data defaults
  * }
  *
  * User Workspace
@@ -33,6 +34,7 @@
  *     webcomponents.svg
  */
 import chai from 'chai';
+import { JSDOM } from 'jsdom';
 import path from 'path';
 import { getOutputTeardownFiles } from '../../../../../test/utils.js';
 import { runSmokeTest } from '../../../../../test/smoke-test.js';
@@ -71,6 +73,30 @@ describe('Serve Greenwood With: ', function() {
     });
 
     runSmokeTest(['serve'], LABEL);
+
+    describe('<script> tag setup for active content', function() {
+      let dom;
+
+      before(async function() {
+        const response = await fetch(`${hostname}`);
+        dom = new JSDOM(await response.text());
+      });
+
+      it('should have a <script> tag that confirms content as data is set', function() {
+        const stateScripts = dom.window.document.querySelectorAll('script#content-as-data-state');
+
+        expect(stateScripts.length).to.equal(1);
+        expect(stateScripts[0].textContent).to.contain('globalThis.__CONTENT_AS_DATA_STATE__ = true;');
+      });
+
+      it('should have a <script> tag that captures content as data related options', function() {
+        const optionsScript = dom.window.document.querySelectorAll('script#data-client-options');
+
+        expect(optionsScript.length).to.equal(1);
+        expect(optionsScript[0].textContent).to.contain('PORT:1984');
+        expect(optionsScript[0].textContent).to.contain('PRERENDER:"false"');
+      });
+    });
 
     // proxies to https://jsonplaceholder.typicode.com/posts via greenwood.config.js
     describe('Serve command with dev proxy', function() {
