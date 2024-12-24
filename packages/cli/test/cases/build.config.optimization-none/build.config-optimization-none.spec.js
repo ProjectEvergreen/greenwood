@@ -77,9 +77,18 @@ describe('Build Greenwood With: ', function() {
         });
 
         it('should have the expected <script> tag in the <head>', function() {
-          const scriptTags = Array.from(dom.window.document.querySelectorAll('head script[type="module"]')).filter(tag => !tag.getAttribute('data-gwd'));
+          const src = jsFiles[0].replace(this.context.publicDir.replace(/\\/g, '/'), '');
+          const scriptTags = Array.from(dom.window.document.querySelectorAll('head script[type="module"]')).filter(tag => tag.getAttribute('src') === src);
 
           expect(scriptTags.length).to.be.equal(1);
+        });
+
+        it('should have the expected preload <script> tag in the <head>', function() {
+          const src = jsFiles[0].replace(this.context.publicDir.replace(/\\/g, '/'), '');
+          const scriptPreloadTags = Array.from(dom.window.document.querySelectorAll('head link[as="script"]'));
+
+          expect(scriptPreloadTags.length).to.be.equal(1);
+          expect(scriptPreloadTags[0].getAttribute('href')).to.be.equal(src);
         });
 
         it('should contain the expected <app-header> in the <body>', function() {
@@ -100,10 +109,19 @@ describe('Build Greenwood With: ', function() {
           expect(css).to.contain('{\n  margin: 0;\n  padding: 0;\n  font-family: \'Comic Sans\', sans-serif;\n}');
         });
 
-        it('should have two <link> tag in the <head>', function() {
-          const linkTags = dom.window.document.querySelectorAll('head link');
+        it('should have the expected preload <link> tag in the <head>', function() {
+          const href = cssFiles[0].replace(this.context.publicDir.replace(/\\/g, '/'), '');
+          const linkPreloadTags = Array.from(dom.window.document.querySelectorAll('head link[as="style"]'));
 
-          expect(linkTags.length).to.be.equal(2);
+          expect(linkPreloadTags.length).to.be.equal(1);
+          expect(linkPreloadTags[0].getAttribute('href')).to.be.equal(href);
+        });
+
+        it('should have the expected <link> tag href  for theme.css', function() {
+          const href = cssFiles[0].replace(this.context.publicDir.replace(/\\/g, '/'), '');
+          const linkTags = Array.from(dom.window.document.querySelectorAll('head link[rel="stylesheet"]')).filter(tag => tag.getAttribute('href') === href);
+
+          expect(linkTags.length).to.be.equal(1);
         });
       });
     });

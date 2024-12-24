@@ -184,7 +184,7 @@ class StandardHtmlResource extends ResourceInterface {
         if (type === 'script') {
           const tag = root.querySelectorAll('script').find(script => script.getAttribute('src') === src);
 
-          if (!optimizationAttr && optimization === 'default') {
+          if (!optimizationAttr && (optimization === 'default' || optimization === 'none')) {
             const optimizedFilePath = `${basePath}/${optimizedFileName}`;
 
             body = body.replace(src, optimizedFilePath);
