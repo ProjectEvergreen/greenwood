@@ -116,7 +116,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
   const { outputDir } = compilation.context;
 
   for (const resource of compilation.resources.values()) {
-    const { contents, optimizationAttr, src = '', type } = resource;
+    const { contents, src = '', type } = resource;
 
     if (['style', 'link'].includes(type)) {
       const resourceKey = resource.sourcePathURL.pathname;
@@ -150,75 +150,70 @@ async function bundleStyleResources(compilation, resourcePlugins) {
         });
       }
 
-      // keep the original contents, but still hash the filename based on content
-      if (compilation.config.optimization === 'none' || optimizationAttr === 'none') {
-        optimizedFileContents = contents;
-      } else {
-        const url = resource.sourcePathURL;
-        const contentType = 'text/css';
-        const headers = new Headers({ 'Content-Type': contentType, 'Accept': contentType });
-        const request = new Request(url, { headers });
-        const initResponse = new Response(contents, { headers });
+      const url = resource.sourcePathURL;
+      const contentType = 'text/css';
+      const headers = new Headers({ 'Content-Type': contentType, 'Accept': contentType });
+      const request = new Request(url, { headers });
+      const initResponse = new Response(contents, { headers });
 
-        let response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-          const intermediateResponse = await responsePromise;
-          const shouldServe = plugin.shouldServe && await plugin.shouldServe(url, request);
+      let response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        const intermediateResponse = await responsePromise;
+        const shouldServe = plugin.shouldServe && await plugin.shouldServe(url, request);
 
-          if (shouldServe) {
-            const currentResponse = await plugin.serve(url, request);
-            const mergedResponse = mergeResponse(intermediateResponse.clone(), currentResponse.clone());
+        if (shouldServe) {
+          const currentResponse = await plugin.serve(url, request);
+          const mergedResponse = mergeResponse(intermediateResponse.clone(), currentResponse.clone());
 
-            if (mergedResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
-              return Promise.resolve(mergedResponse.clone());
-            }
+          if (mergedResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
+            return Promise.resolve(mergedResponse.clone());
           }
+        }
 
-          return Promise.resolve(responsePromise);
-        }, Promise.resolve(initResponse));
+        return Promise.resolve(responsePromise);
+      }, Promise.resolve(initResponse));
 
-        response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-          const intermediateResponse = await responsePromise;
-          const shouldPreIntercept = plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, intermediateResponse.clone());
+      response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        const intermediateResponse = await responsePromise;
+        const shouldPreIntercept = plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, intermediateResponse.clone());
 
-          if (shouldPreIntercept) {
-            const currentResponse = await plugin.preIntercept(url, request, intermediateResponse.clone());
-            const mergedResponse = mergeResponse(intermediateResponse.clone(), currentResponse.clone());
+        if (shouldPreIntercept) {
+          const currentResponse = await plugin.preIntercept(url, request, intermediateResponse.clone());
+          const mergedResponse = mergeResponse(intermediateResponse.clone(), currentResponse.clone());
 
-            if (mergedResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
-              return Promise.resolve(mergedResponse.clone());
-            }
+          if (mergedResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
+            return Promise.resolve(mergedResponse.clone());
           }
+        }
 
-          return Promise.resolve(responsePromise);
-        }, Promise.resolve(response.clone()));
+        return Promise.resolve(responsePromise);
+      }, Promise.resolve(response.clone()));
 
-        response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-          const intermediateResponse = await responsePromise;
-          const shouldIntercept = plugin.shouldIntercept && await plugin.shouldIntercept(url, request, intermediateResponse.clone());
+      response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        const intermediateResponse = await responsePromise;
+        const shouldIntercept = plugin.shouldIntercept && await plugin.shouldIntercept(url, request, intermediateResponse.clone());
 
-          if (shouldIntercept) {
-            const currentResponse = await plugin.intercept(url, request, intermediateResponse.clone());
-            const mergedResponse = mergeResponse(intermediateResponse.clone(), currentResponse.clone());
+        if (shouldIntercept) {
+          const currentResponse = await plugin.intercept(url, request, intermediateResponse.clone());
+          const mergedResponse = mergeResponse(intermediateResponse.clone(), currentResponse.clone());
 
-            if (mergedResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
-              return Promise.resolve(mergedResponse.clone());
-            }
+          if (mergedResponse.headers.get('Content-Type').indexOf(contentType) >= 0) {
+            return Promise.resolve(mergedResponse.clone());
           }
+        }
 
-          return Promise.resolve(responsePromise);
-        }, Promise.resolve(response.clone()));
+        return Promise.resolve(responsePromise);
+      }, Promise.resolve(response.clone()));
 
-        response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-          const intermediateResponse = await responsePromise;
-          const shouldOptimize = plugin.shouldOptimize && await plugin.shouldOptimize(url, intermediateResponse.clone());
+      response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        const intermediateResponse = await responsePromise;
+        const shouldOptimize = plugin.shouldOptimize && await plugin.shouldOptimize(url, intermediateResponse.clone());
 
-          return shouldOptimize
-            ? Promise.resolve(await plugin.optimize(url, intermediateResponse.clone()))
-            : Promise.resolve(responsePromise);
-        }, Promise.resolve(response.clone()));
+        return shouldOptimize
+          ? Promise.resolve(await plugin.optimize(url, intermediateResponse.clone()))
+          : Promise.resolve(responsePromise);
+      }, Promise.resolve(response.clone()));
 
-        optimizedFileContents = await response.text();
-      }
+      optimizedFileContents = await response.text();
 
       compilation.resources.set(resourceKey, {
         ...compilation.resources.get(resourceKey),
