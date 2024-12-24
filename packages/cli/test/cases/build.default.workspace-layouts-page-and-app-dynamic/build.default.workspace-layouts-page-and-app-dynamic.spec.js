@@ -14,7 +14,8 @@
  * User Workspace
  * src/
  *   pages/
- *     index.md
+ *     about.md
+ *     index.html
  *   layouts/
  *     app.js
  *     page.js
@@ -50,11 +51,58 @@ describe('Build Greenwood With: ', function() {
 
     runSmokeTest(['public'], LABEL);
 
-    describe('Custom App and Page Layout', function() {
+    describe('Custom App and page with no <html> wrapping element', function() {
       let dom;
 
       before(async function() {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+      });
+
+      it('should have the expected <title> tag from the dynamic app layout', function() {
+        const title = dom.window.document.querySelectorAll('head title');
+
+        expect(title.length).to.equal(1);
+        expect(title[0].textContent).to.equal('App Layout');
+      });
+
+      it('should have the expected <h1> tag from the dynamic app layout', function() {
+        const heading = dom.window.document.querySelectorAll('h1');
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal('App Layout');
+      });
+
+      it('should not have the expected <h2> tag from the dynamic page layout', function() {
+        const heading = dom.window.document.querySelectorAll('h2');
+
+        expect(heading.length).to.equal(0);
+      });
+
+      it('should have the expected content from the index.md', function() {
+        const heading = dom.window.document.querySelectorAll('h3');
+        const paragraph = dom.window.document.querySelectorAll('p');
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal('Home Page');
+
+        expect(paragraph.length).to.equal(1);
+        expect(paragraph[0].textContent).to.equal('Coffey was here');
+      });
+
+      it('should have the expected <footer> tag from the dynamic app layout', function() {
+        const year = new Date().getFullYear();
+        const footer = dom.window.document.querySelectorAll('footer');
+
+        expect(footer.length).to.equal(1);
+        expect(footer[0].textContent).to.equal(`${year}`);
+      });
+    });
+
+    describe('Custom App and Page Layout', function() {
+      let dom;
+
+      before(async function() {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'about/index.html'));
       });
 
       it('should have the expected <title> tag from the dynamic app layout', function() {
@@ -83,10 +131,10 @@ describe('Build Greenwood With: ', function() {
         const paragraph = dom.window.document.querySelectorAll('p');
 
         expect(heading.length).to.equal(1);
-        expect(heading[0].textContent).to.equal('Home Page');
+        expect(heading[0].textContent).to.equal('About Page');
 
         expect(paragraph.length).to.equal(1);
-        expect(paragraph[0].textContent).to.equal('Coffey was here');
+        expect(paragraph[0].textContent).to.equal('Learn more about us');
       });
 
       it('should have the expected <footer> tag from the dynamic app layout', function() {

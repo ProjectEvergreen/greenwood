@@ -218,9 +218,9 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
             : matchingRoute.label;
     }
 
-    const mergedHtml = pageRoot && pageRoot.querySelector('html').rawAttrs !== ''
+    const mergedHtml = pageRoot && pageRoot.querySelector('html') && pageRoot.querySelector('html')?.rawAttrs !== ''
       ? `<html ${pageRoot.querySelector('html').rawAttrs}>`
-      : appRoot.querySelector('html').rawAttrs !== ''
+      : appRoot && appRoot.querySelector('html') && appRoot.querySelector('html')?.rawAttrs !== ''
         ? `<html ${appRoot.querySelector('html').rawAttrs}>`
         : '<html>';
 
