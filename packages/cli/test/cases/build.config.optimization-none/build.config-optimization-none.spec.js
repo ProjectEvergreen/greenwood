@@ -77,14 +77,14 @@ describe('Build Greenwood With: ', function() {
         });
 
         it('should have the expected <script> tag in the <head>', function() {
-          const src = jsFiles[0].replace(this.context.publicDir, '');
+          const src = jsFiles[0].replace(this.context.publicDir.replace(/\\/g, '/'), '');
           const scriptTags = Array.from(dom.window.document.querySelectorAll('head script[type="module"]')).filter(tag => tag.getAttribute('src') === src);
 
           expect(scriptTags.length).to.be.equal(1);
         });
 
         it('should have the expected preload <script> tag in the <head>', function() {
-          const src = jsFiles[0].replace(this.context.publicDir, '');
+          const src = jsFiles[0].replace(this.context.publicDir.replace(/\\/g, '/'), '');
           const scriptPreloadTags = Array.from(dom.window.document.querySelectorAll('head link[as="script"]'));
 
           expect(scriptPreloadTags.length).to.be.equal(1);
@@ -110,7 +110,7 @@ describe('Build Greenwood With: ', function() {
         });
 
         it('should have the expected preload <link> tag in the <head>', function() {
-          const href = cssFiles[0].replace(this.context.publicDir, '');
+          const href = cssFiles[0].replace(this.context.publicDir.replace(/\\/g, '/'), '');
           const linkPreloadTags = Array.from(dom.window.document.querySelectorAll('head link[as="style"]'));
 
           expect(linkPreloadTags.length).to.be.equal(1);
@@ -118,7 +118,7 @@ describe('Build Greenwood With: ', function() {
         });
 
         it('should have the expected <link> tag href  for theme.css', function() {
-          const href = cssFiles[0].replace(this.context.publicDir, '');
+          const href = cssFiles[0].replace(this.context.publicDir.replace(/\\/g, '/'), '');
           const linkTags = Array.from(dom.window.document.querySelectorAll('head link[rel="stylesheet"]')).filter(tag => tag.getAttribute('href') === href);
 
           expect(linkTags.length).to.be.equal(1);
