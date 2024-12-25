@@ -35,8 +35,7 @@ class PostCssResource extends ResourceInterface {
 
   async shouldPreIntercept(url, request, response) {
     return url.protocol === 'file:'
-      && url.pathname.split('.').pop() === this.extensions[0]
-      && (request?.headers?.get('Content-Type')?.includes('text/css') || response?.headers?.get('Content-Type')?.includes('text/css'));
+      && (request?.headers?.get('Accept')?.includes('text/css') && response?.headers?.get('Content-Type')?.includes('text/css'));
   }
 
   async preIntercept(url, request, response) {

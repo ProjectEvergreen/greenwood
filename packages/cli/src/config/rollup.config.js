@@ -242,7 +242,11 @@ function greenwoodImportMetaUrl(compilation) {
         headers
       });
       let canTransform = false;
-      let response = new Response(code);
+      let response = new Response(code, {
+        headers: {
+          'Content-Type': 'text/javascript'
+        }
+      });
 
       // handle any custom imports or pre-processing first to ensure valid JavaScript for parsing
       if (await checkResourceExists(idUrl)) {
