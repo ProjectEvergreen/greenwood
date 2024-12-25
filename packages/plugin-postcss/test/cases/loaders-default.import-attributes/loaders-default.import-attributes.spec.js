@@ -73,7 +73,6 @@ describe('Build Greenwood With: ', function() {
 
       it('should output correctly processed import attributes in header.js bundle output', function() {
         const headerFiles = glob.sync(path.join(this.context.publicDir, 'header.*.js'));
-        console.log({ headerFiles });
         const js = fs.readFileSync(headerFiles[0], 'utf-8');
 
         expect(headerFiles.length).to.equal(1);
