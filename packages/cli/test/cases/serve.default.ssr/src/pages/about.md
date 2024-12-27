@@ -1,3 +1,10 @@
-## About Page
+---
+title: |
+  Greenwood's Super Cool About Page
+imports:
+  - ../components/counter.js type="module"
+sidebar:
+  order: 1
+---
 
-Lorum Ipsum.
+# Welcome to the about page!

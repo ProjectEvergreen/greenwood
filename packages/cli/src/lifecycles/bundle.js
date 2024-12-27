@@ -6,6 +6,7 @@ import { hashString } from '../lib/hashing-utils.js';
 import { checkResourceExists, mergeResponse, normalizePathnameForWindows, trackResourcesForRoute } from '../lib/resource-utils.js';
 import path from 'path';
 import { rollup } from 'rollup';
+import { pruneGraph } from '../lib/content-utils.js';
 
 async function interceptPage(url, request, plugins, body) {
   let response = new Response(body, {
@@ -304,8 +305,8 @@ async function bundleSsrPages(compilation, optimizePlugins) {
         const moduleUrl = new URL('${relativeDepth}${pagesPathDiff}${pagePath.replace('./', '')}', import.meta.url);
 
         export async function handler(request) {
-          const compilation = JSON.parse('${JSON.stringify(compilation)}');
-          const page = JSON.parse('${JSON.stringify(page)}');
+          const compilation = JSON.parse(\`${JSON.stringify({ ...compilation, graph: pruneGraph(compilation.graph) }).replace(/\\"/g, '&quote').replace(/\\n/g, '')}\`);
+          const page = JSON.parse(\`${JSON.stringify(pruneGraph([page])[0]).replace(/\\"/g, '&quote').replace(/\\n/g, '')}\`);
           const data = await executeRouteModule({ moduleUrl, compilation, page, request });
           let staticHtml = \`${staticHtml}\`;
 
