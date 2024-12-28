@@ -14,6 +14,8 @@
  * src/
  *   components/
  *     header.js
+ *   foo/
+ *     bar.baz
  *   images/
  *     webcomponents.jpg
  *   pages/
@@ -52,16 +54,21 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      const geistFont = await getDependencyFiles(
+      // this package has a known issue with import.meta.resolve
+      // if this gets fixed, we can remove the need for this setup
+      // https://github.com/vercel/geist-font/issues/150
+      const geistPackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/geist/package.json`,
+        `${outputPath}/node_modules/geist/`
+      );
+      const geistFonts = await getDependencyFiles(
         `${process.cwd()}/node_modules/geist/dist/fonts/geist-sans/*`,
         `${outputPath}/node_modules/geist/dist/fonts/geist-sans/`
       );
 
       runner.setup(outputPath, [
-        // this package has a known issue with import.meta.resolve
-        // if this gets fixed, we can remove the need for this setup
-        // https://github.com/vercel/geist-font/issues/150
-        ...geistFont
+        ...geistPackageJson,
+        ...geistFonts
       ]);
       runner.runCommand(cliPath, 'build');
     });
@@ -189,6 +196,14 @@ describe('Build Greenwood With: ', function() {
             const styleTag = Array.from(dom.window.document.querySelectorAll('head style'));
 
             expect(styleTag[0].textContent).to.contain(`html{background-image:url('/${imagePath}')}`);
+          });
+        });
+
+        describe('absolute user workspace reference', () => {
+          const resourcePath = 'foo/bar.642520792.baz';
+
+          it('should have the expected resource reference from the user\'s workspace in the output directory', async function() {
+            expect(await glob.promise(path.join(this.context.publicDir, resourcePath))).to.have.lengthOf(1);
           });
         });
       });

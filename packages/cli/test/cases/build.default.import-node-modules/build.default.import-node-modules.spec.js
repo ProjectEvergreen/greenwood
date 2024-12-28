@@ -26,7 +26,7 @@ import fs from 'fs';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
+import { getOutputTeardownFiles, getDependencyFiles } from '../../../../../test/utils.js';
 import { Runner } from 'gallinago';
 import { fileURLToPath, URL } from 'url';
 
@@ -49,7 +49,29 @@ describe('Build Greenwood With: ', function() {
     let dom;
 
     before(async function() {
-      runner.setup(outputPath);
+      // this package has a known issue with import.meta.resolve
+      // in that it has no main, module, or exports so it has to be hoisted
+      // at least for this current version
+      // https://unpkg.com/browse/font-awesome@4.7.0/package.json
+      // https://github.com/FortAwesome/Font-Awesome/pull/19041
+      const fontAwesomePackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/font-awesome/package.json`,
+        `${outputPath}/node_modules/font-awesome/`
+      );
+      const fontAwesomeCssFiles = await getDependencyFiles(
+        `${process.cwd()}/node_modules/font-awesome/css/*`,
+        `${outputPath}/node_modules/font-awesome/css/`
+      );
+      const fontAwesomeFontFiles = await getDependencyFiles(
+        `${process.cwd()}/node_modules/font-awesome/fonts/*`,
+        `${outputPath}/node_modules/font-awesome/fonts/`
+      );
+
+      runner.setup(outputPath, [
+        ...fontAwesomePackageJson,
+        ...fontAwesomeCssFiles,
+        ...fontAwesomeFontFiles
+      ]);
       runner.runCommand(cliPath, 'build');
 
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
@@ -141,10 +163,22 @@ describe('Build Greenwood With: ', function() {
         expect(contents.indexOf(':root,:host{--spectrum-global-animation-linear:cubic-bezier(0, 0, 1, 1);')).to.equal(0);
       });
     });
+
+    describe('<link rel="stylesheet" href="..."> with reference to transient relative node_modules url(...) references', function() {
+      it('should have the expected number of font files referenced in vendor CSS file in the output directory', async function() {
+        expect(await glob.promise(path.join(this.context.publicDir, 'node_modules/font-awesome/fonts/*'))).to.have.lengthOf(5);
+      });
+
+      it('should have the expected url link for the bundled font-awesome file', async function() {
+        const themeFile = await glob.promise(path.join(this.context.publicDir, 'styles/theme.*.css'));
+        const contents = fs.readFileSync(themeFile[0], 'utf-8');
+
+        expect(contents.indexOf('@font-face {font-family:\'FontAwesome\';src:url(\'/node_modules/font-awesome/fonts/fontawesome-webfont.139345087.eot?v=4.7.0\');') > 0).to.equal(true);
+      });
+    });
   });
 
   after(function() {
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
-
 });

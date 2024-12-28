@@ -11,9 +11,10 @@ import { ResourceInterface } from '../../lib/resource-interface.js';
 import { hashString } from '../../lib/hashing-utils.js';
 import { getResolvedHrefFromPathnameShortcut } from '../../lib/node-modules-utils.js';
 import { isLocalLink } from '../../lib/resource-utils.js';
+import { derivePackageRoot } from '../../lib/walker-package-ranger.js';
 
 function bundleCss(body, sourceUrl, compilation, workingUrl) {
-  const { projectDirectory, outputDir, userWorkspace } = compilation.context;
+  const { projectDirectory, outputDir, userWorkspace, scratchDir } = compilation.context;
   const ast = parse(body, {
     onParseError(error) {
       console.log(error.formattedMessage);
@@ -29,7 +30,7 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
         const { value } = node;
 
         if (isLocalLink(value)) {
-          if (value.indexOf('.') === 0 || value.indexOf('/node_modules') === 0) {
+          if (value.startsWith('.') || value.indexOf('/node_modules') === 0) {
             const resolvedUrl = value.startsWith('/node_modules')
               ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
               : new URL(value, sourceUrl);
@@ -38,7 +39,10 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
 
             optimizedCss += bundleCss(importContents, sourceUrl, compilation, resolvedUrl);
           } else if (workingUrl) {
-            const resolvedUrl = new URL(`./${value}`, workingUrl);
+            const urlPrefix = value.startsWith('.')
+              ? ''
+              : './';
+            const resolvedUrl = new URL(`${urlPrefix}${value}`, workingUrl);
             const importContents = fs.readFileSync(resolvedUrl, 'utf-8');
 
             optimizedCss += bundleCss(importContents, workingUrl, compilation);
@@ -55,34 +59,64 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
         }
 
         const { basePath } = compilation.config;
-        let rootPath = value.replace(/\.\.\//g, '').replace('./', '');
 
-        if (!rootPath.startsWith('/')) {
-          rootPath = `/${rootPath}`;
-        }
-
-        const resolvedUrl = rootPath.indexOf('node_modules/') >= 0
-          ? new URL(getResolvedHrefFromPathnameShortcut(rootPath, projectDirectory))
-          : new URL(`.${rootPath}`, userWorkspace);
+        /*
+         * Our resolution algorithm works as follows:
+         * 1. First, check if it is a shortcut alias to node_modules, in which we use Node's resolution algorithm
+         * 2. Next, check if it is an absolute path "escape" hatch based path and just resolve to the user's workspace
+         * 3. If there is a workingUrl, then just join the current value with the current working file we're processing
+         * 4. If the starting file is in the scratch directory, likely means it is just an extracted inline <style> tag, so resolve to user workspace
+         * 5. Lastly, match the current value with the current source file
+         */
+        const urlPrefix = value.startsWith('.')
+          ? ''
+          : './';
+        const resolvedUrl = value.startsWith('/node_modules/')
+          ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
+          : value.startsWith('/')
+            ? new URL(`.${value}`, userWorkspace)
+            : workingUrl
+              ? new URL(`${urlPrefix}${value}`, workingUrl)
+              : sourceUrl.href.startsWith(scratchDir.href)
+                ? new URL(`./${value.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace)
+                : new URL(`${urlPrefix}${value}`, sourceUrl);
 
         if (fs.existsSync(resolvedUrl)) {
           const isDev = process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line no-underscore-dangle
-          const hash = hashString(fs.readFileSync(resolvedUrl, 'utf-8'));
-          const ext = rootPath.split('.').pop();
-          const hashedRoot = isDev ? rootPath : rootPath.replace(`.${ext}`, `.${hash}.${ext}`);
+          let finalValue = '';
+
+          if (resolvedUrl.href.startsWith(userWorkspace.href)) {
+            // truncate to just get /path/in/users/workspace.png
+            finalValue = resolvedUrl.href.replace(userWorkspace.href, '/');
+          } else if (value.startsWith('/node_modules/')) {
+            // if it's a node modules shortcut alias, just use that
+            finalValue = value;
+          } else if (resolvedUrl.href.indexOf('/node_modules/') >= 0) {
+            // if we are deep in node_modules land, use resolution logic to figure out the specifier
+            const resolvedRoot = derivePackageRoot(resolvedUrl.href);
+            const resolvedRootSegments = resolvedRoot.split('/').reverse().filter(segment => segment !== '');
+            const specifier = resolvedRootSegments[1].startsWith('@') ? `${resolvedRootSegments[0]}/${resolvedRootSegments[1]}` : resolvedRootSegments[0];
+
+            finalValue = `/node_modules/${specifier}/${value.replace(/\.\.\//g, '').replace('./', '')}`;
+          }
 
           if (!isDev) {
-            fs.mkdirSync(new URL(`./${path.dirname(hashedRoot)}/`, outputDir), {
+            const hash = hashString(fs.readFileSync(resolvedUrl, 'utf-8'));
+            const ext = resolvedUrl.pathname.split('.').pop();
+
+            finalValue = finalValue.replace(`.${ext}`, `.${hash}.${ext}`);
+
+            fs.mkdirSync(new URL(`.${path.dirname(finalValue)}/`, outputDir), {
               recursive: true
             });
 
             fs.promises.copyFile(
               resolvedUrl,
-              new URL(`./${hashedRoot}`, outputDir)
+              new URL(`.${finalValue}`, outputDir)
             );
           }
 
-          optimizedCss += `url('${basePath}${hashedRoot}')`;
+          optimizedCss += `url('${basePath}${finalValue}')`;
         } else {
           console.warn(`Unable to locate ${value}.  You may need to manually copy this file from its source location to the build output directory.`);
           optimizedCss += `url('${value}')`;
