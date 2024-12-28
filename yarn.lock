@@ -4179,6 +4179,11 @@
   resolved "https://registry.yarnpkg.com/@spectrum-css/card/-/card-9.3.0.tgz#736d6035f75b34e49e9fcb0198ba4667d024ebf9"
   integrity sha512-uMWwh/kkkcOSf8W5Kz1TyQjaWxKeTKm1Gm5XaAyHu+IHk+mYJPrDeZNoYfyIqZ+x/RgyVcCzx2H3VXA/uUaaeA==
 
+"@spectrum-css/typography@^6.2.0":
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/@spectrum-css/typography/-/typography-6.2.0.tgz#2bf928d9fb7fb51bc67feeb3d8a82f8ee093ee87"
+  integrity sha512-yaqc4wFY3asUhh3zzdqRI5dVJow7xJ2nL2bo4AADDLT305Dtje5PYO89m+f3nTVf2utKE3H8nlJbWUG57QpFqw==
+
 "@spectrum-web-components/action-button@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@spectrum-web-components/action-button/-/action-button-1.0.1.tgz#98fd0af1d825ec5c40a54f2d1cc1d311815a169e"

@@ -35,7 +35,6 @@ class PostCssResource extends ResourceInterface {
 
   async shouldPreIntercept(url, request, response) {
     return url.protocol === 'file:'
-      && url.pathname.split('.').pop() === this.extensions[0]
       && (request?.headers?.get('Content-Type')?.includes('text/css') || response?.headers?.get('Content-Type')?.includes('text/css'));
   }
 
@@ -47,7 +46,11 @@ class PostCssResource extends ResourceInterface {
       ? (await postcss(plugins).process(body, { from: normalizePathnameForWindows(url) })).css
       : body;
 
-    return new Response(css);
+    // preserve original headers (content type / accept)
+    // since this could be used in JS or CSS contexts
+    return new Response(css, {
+      headers: response.headers
+    });
   }
 }
 

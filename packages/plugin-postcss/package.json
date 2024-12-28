@@ -32,6 +32,7 @@
     "postcss-preset-env": "^7.0.1"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.31.0-alpha.1"
+    "@greenwood/cli": "^0.31.0-alpha.1",
+    "@spectrum-css/typography": "^6.2.0"
   }
 }
