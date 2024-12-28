@@ -120,8 +120,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
 
           if (resourceKey === facadeModuleId) {
             const { fileName } = bundles[bundle];
-            const { rawAttributes, contents } = resource;
-            const noop = rawAttributes && rawAttributes.indexOf('data-gwd-opt="none"') >= 0 || compilation.config.optimization === 'none';
+            const { contents } = resource;
             const outputPath = new URL(`./${fileName}`, outputDir);
 
             compilation.resources.set(resource.sourcePathURL.pathname, {
@@ -130,10 +129,6 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
               optimizedFileContents: await fs.promises.readFile(outputPath, 'utf-8'),
               contents
             });
-
-            if (noop) {
-              await fs.promises.writeFile(outputPath, contents);
-            }
           }
         }
       }

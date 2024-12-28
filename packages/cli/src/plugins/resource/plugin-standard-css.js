@@ -377,7 +377,9 @@ class StandardCssResource extends ResourceInterface {
   }
 
   async intercept(url, request, response) {
-    let body = bundleCss(await response.text(), url, this.compilation);
+    let body = this.compilation.config.optimization !== 'none'
+      ? bundleCss(await response.text(), url, this.compilation)
+      : await response.text();
     let headers = {};
 
     if ((request.headers.get('Accept')?.indexOf('text/javascript') >= 0 || url.searchParams?.get('polyfill') === 'type-css') && !url.searchParams.has('type')) {
