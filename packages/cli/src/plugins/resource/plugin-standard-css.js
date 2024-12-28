@@ -30,7 +30,7 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
         const { value } = node;
 
         if (isLocalLink(value)) {
-          if (value.indexOf('.') === 0 || value.indexOf('/node_modules') === 0) {
+          if (value.startsWith('.') || value.indexOf('/node_modules') === 0) {
             const resolvedUrl = value.startsWith('/node_modules')
               ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
               : new URL(value, sourceUrl);
@@ -39,7 +39,10 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
 
             optimizedCss += bundleCss(importContents, sourceUrl, compilation, resolvedUrl);
           } else if (workingUrl) {
-            const resolvedUrl = new URL(`./${value}`, workingUrl);
+            const urlPrefix = value.startsWith('.')
+              ? ''
+              : './';
+            const resolvedUrl = new URL(`${urlPrefix}${value}`, workingUrl);
             const importContents = fs.readFileSync(resolvedUrl, 'utf-8');
 
             optimizedCss += bundleCss(importContents, workingUrl, compilation);
@@ -65,15 +68,18 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
          * 4. If the starting file is in the scratch directory, likely means it is just an extracted inline <style> tag, so resolve to user workspace
          * 5. Lastly, match the current value with the current source file
          */
+        const urlPrefix = value.startsWith('.')
+          ? ''
+          : './';
         const resolvedUrl = value.startsWith('/node_modules/')
           ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
           : value.startsWith('/')
             ? new URL(`.${value}`, userWorkspace)
             : workingUrl
-              ? new URL(value, workingUrl)
+              ? new URL(`${urlPrefix}${value}`, workingUrl)
               : sourceUrl.href.startsWith(scratchDir.href)
                 ? new URL(`./${value.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace)
-                : new URL(value, sourceUrl);
+                : new URL(`${urlPrefix}${value}`, sourceUrl);
 
         if (fs.existsSync(resolvedUrl)) {
           const isDev = process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line no-underscore-dangle
