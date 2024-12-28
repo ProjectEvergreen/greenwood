@@ -37,8 +37,12 @@ class BabelResource extends ResourceInterface {
     this.contentType = ['text/javascript'];
   }
 
-  async shouldPreIntercept(url) {
-    return url.pathname.split('.').pop() === this.extensions[0] && !url.pathname.startsWith('/node_modules/');
+  async shouldPreIntercept(url, request, response) {
+    const { protocol, pathname } = url;
+
+    return protocol === 'file:'
+      && !pathname.startsWith('/node_modules/')
+      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
   }
 
   async preIntercept(url, request, response) {
