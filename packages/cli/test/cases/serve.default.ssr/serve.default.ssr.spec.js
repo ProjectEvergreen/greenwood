@@ -79,10 +79,11 @@ describe('Serve Greenwood With: ', function() {
     describe('Serve command with HTML route response for the home page using "get" functions', function() {
       let response;
       let dom;
+      let body;
 
       before(async function() {
         response = await fetch(`${hostname}/`);
-        const body = await response.clone().text();
+        body = await response.clone().text();
         dom = new JSDOM(body);
       });
 
@@ -97,6 +98,10 @@ describe('Serve Greenwood With: ', function() {
         const scriptFiles = await glob.promise(path.join(this.context.publicDir, 'index*.js'));
 
         expect(scriptFiles.length).to.equal(2);
+      });
+
+      it('should have the expected resource plugin optimization lifecycle content for SSR pages', async function() {
+        expect(body.indexOf('<!-- banner plugin was here -->') >= 0).to.equal(true);
       });
     });
 

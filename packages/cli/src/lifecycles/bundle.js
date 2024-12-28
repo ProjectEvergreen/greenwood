@@ -26,9 +26,26 @@ async function interceptPage(url, request, plugins, body) {
   return response;
 }
 
-function getPluginInstances(compilation) {
+async function optimizePage(url, plugins, body) {
+  let response = new Response(body, {
+    headers: new Headers({ 'Content-Type': 'text/html' })
+  });
+
+  for (const plugin of plugins) {
+    if (plugin.shouldOptimize && await plugin.shouldOptimize(url, response.clone())) {
+      response = mergeResponse(response.clone(), await plugin.optimize(url, response.clone()));
+    }
+  }
+
+  return response;
+}
+
+function getPluginInstances(compilation, pluginFilters = []) {
   return [...compilation.config.plugins]
-    .filter(plugin => plugin.type === 'resource' && plugin.name !== 'plugin-node-modules:resource')
+    .filter(plugin => plugin.type === 'resource'
+      && plugin.name !== 'plugin-node-modules:resource'
+      && pluginFilters.indexOf(plugin.name) < 0
+    )
     .map((plugin) => {
       return plugin.provider(compilation);
     });
@@ -251,6 +268,9 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     const { executeModuleUrl } = config.plugins.find(plugin => plugin.type === 'renderer').provider();
     const { executeRouteModule } = await import(executeModuleUrl);
     const { pagesDir, scratchDir } = context;
+    // SSR pages do not support static routing (yet)
+    // https://github.com/ProjectEvergreen/greenwood/discussions/1033
+    const plugins = getPluginInstances(compilation, ['plugin-static-router']);
 
     // one pass to generate initial static HTML and to track all combined static resources across layouts
     // and before we optimize so that all bundled assets can tracked up front
@@ -284,12 +304,11 @@ async function bundleSsrPages(compilation, optimizePlugins) {
       const entryFileUrl = new URL(pageHref);
       const entryFileOutputUrl = new URL(`file://${entryFileUrl.pathname.replace(pagesDir.pathname, scratchDir.pathname)}`);
       const outputPathRootUrl = new URL(`file://${path.dirname(entryFileOutputUrl.pathname)}/`);
-      const htmlOptimizer = config.plugins.find(plugin => plugin.name === 'plugin-standard-html').provider(compilation);
       const pagesPathDiff = context.pagesDir.pathname.replace(context.projectDirectory.pathname, '');
       const relativeDepth = '../'.repeat(pagePath.split('/').length - 1);
 
       let staticHtml = ssrPrerenderPagesRouteMapper[route];
-      staticHtml = await (await htmlOptimizer.optimize(new URL(`http://localhost:8080${route}`), new Response(staticHtml))).text();
+      staticHtml = await (await optimizePage(new URL(`http://localhost:8080${route}`), plugins, staticHtml)).text();
       staticHtml = staticHtml.replace(/[`\\$]/g, '\\$&'); // https://stackoverflow.com/a/75688937/417806
 
       if (!await checkResourceExists(outputPathRootUrl)) {
