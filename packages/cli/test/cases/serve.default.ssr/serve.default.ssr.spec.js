@@ -100,6 +100,25 @@ describe('Serve Greenwood With: ', function() {
       });
     });
 
+    // https://github.com/ProjectEvergreen/greenwood/issues/1351
+    describe('Serve command with HTML route response for the about page using various frontmatter syntaxes', function() {
+      let response;
+      let dom;
+
+      before(async function() {
+        response = await fetch(`${hostname}/about/`);
+        const body = await response.clone().text();
+        dom = new JSDOM(body);
+      });
+
+      it('should have the expected output for the page', function() {
+        const headings = dom.window.document.querySelectorAll('body > h1');
+
+        expect(headings.length).to.equal(1);
+        expect(headings[0].textContent).to.equal('Welcome to the about page!');
+      });
+    });
+
     describe('Serve command with HTML route response for artists page using "get" functions', function() {
       let response;
       let dom;
