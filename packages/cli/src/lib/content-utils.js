@@ -31,8 +31,18 @@ function cleanContentCollection(collection = []) {
   });
 }
 
+function filterContentByCollection(graph, collection) {
+  return graph.filter(page => page?.data?.collection === collection);
+}
+
+function filterContentByRoute(graph, route) {
+  return graph.filter(page => page?.route.startsWith(route));
+}
+
 export {
   pruneGraph,
   activeFrontmatterKeys,
-  cleanContentCollection
+  cleanContentCollection,
+  filterContentByCollection,
+  filterContentByRoute
 };
