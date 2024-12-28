@@ -51,7 +51,7 @@ describe('Build Greenwood With: ', function() {
     before(async function() {
       // this package has a known issue with import.meta.resolve
       // in that it has no main, module, or exports so it has to be hoisted
-      // at least for this current version
+      // at least for this current version, as well as for testing relative ../node_modules references
       // https://unpkg.com/browse/font-awesome@4.7.0/package.json
       // https://github.com/FortAwesome/Font-Awesome/pull/19041
       const fontAwesomePackageJson = await getDependencyFiles(
