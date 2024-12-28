@@ -91,6 +91,9 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
           } else if (value.startsWith('/node_modules/')) {
             // if it's a node modules shortcut alias, just use that
             finalValue = value;
+          } else if (value.indexOf('../node_modules/') >= 0) {
+            // if it's a relative node_modules path, convert it to a shortcut alias
+            finalValue = `/${value.replace(/\.\.\//g, '')}`;
           } else if (resolvedUrl.href.indexOf('/node_modules/') >= 0) {
             // if we are deep in node_modules land, use resolution logic to figure out the specifier
             const resolvedRoot = derivePackageRoot(resolvedUrl.href);
