@@ -86,14 +86,14 @@ describe('Develop Greenwood With: ', function() {
         expect(response.headers.get('content-type')).to.equal('text/html');
       });
 
-      xit('should make sure to have the expected CSS inlined into the page for each <app-card>', function(done) {
-        const cardComponents = dom.window.document.querySelectorAll('body > app-card');
+      it('should make sure to have the expected HTML output with SSR for the <x-greeting> component', function() {
+        const greetingComponents = dom.window.document.querySelectorAll('body > x-greeting');
+        const greetingContentsDom = new JSDOM(greetingComponents[0].innerHTML);
+        const greeting = greetingContentsDom.window.document.querySelectorAll('h3');
 
-        expect(cardComponents.length).to.equal(2);
-        Array.from(cardComponents).forEach((card) => {
-          expect(card.innerHTML).contain('font-size: 1.85rem');
-        });
-        done();
+        expect(greetingComponents.length).to.equal(1);
+        expect(greeting.length).to.equal(1);
+        expect(greeting[0].textContent.trim()).to.equal('Hello About Page!');
       });
     });
 
