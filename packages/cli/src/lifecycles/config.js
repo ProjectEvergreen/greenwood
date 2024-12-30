@@ -48,7 +48,7 @@ const defaultConfig = {
   optimization: optimizations[0],
   activeContent: false,
   plugins: greenwoodPlugins,
-  markdown: { plugins: [], settings: {} },
+  markdown: { plugins: [] },
   prerender: false,
   isolation: false,
   pagesDirectory: 'pages',
@@ -183,7 +183,6 @@ const readAndMergeConfig = async() => {
 
         if (markdown && Object.keys(markdown).length > 0) {
           customConfig.markdown.plugins = markdown.plugins && markdown.plugins.length > 0 ? markdown.plugins : [];
-          customConfig.markdown.settings = markdown.settings ? markdown.settings : {};
         }
 
         if (port) {

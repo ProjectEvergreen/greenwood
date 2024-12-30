@@ -46,7 +46,8 @@ export default {
       '@mapbox/rehype-prism',
       'rehype-slug',
       'rehype-autolink-headings',
-      'remark-github'
+      'remark-github',
+      'remark-gfm'
     ]
   }
 };
