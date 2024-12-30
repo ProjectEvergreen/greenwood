@@ -14,7 +14,7 @@ import remarkRehype from 'remark-rehype';
 import { ResourceInterface } from '../../lib/resource-interface.js';
 import { getUserScripts, getPageLayout, getAppLayout } from '../../lib/layout-utils.js';
 import { requestAsObject } from '../../lib/resource-utils.js';
-import unified from 'unified';
+import { unified } from 'unified';
 import { Worker } from 'worker_threads';
 import htmlparser from 'node-html-parser';
 
@@ -69,10 +69,8 @@ class StandardHtmlResource extends ResourceInterface {
         }
       }
 
-      const settings = config.markdown.settings || {};
-
       processedMarkdown = await unified()
-        .use(remarkParse, settings) // parse markdown into AST
+        .use(remarkParse) // parse markdown into AST
         .use(remarkFrontmatter) // extract frontmatter from AST
         .use(remarkPlugins) // apply userland remark plugins
         .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
@@ -127,22 +125,22 @@ class StandardHtmlResource extends ResourceInterface {
 
     if (processedMarkdown) {
       const wrappedCustomElementRegex = /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
-      const ceTest = wrappedCustomElementRegex.test(processedMarkdown.contents);
+      const ceTest = wrappedCustomElementRegex.test(processedMarkdown.value);
 
       if (ceTest) {
-        const ceMatches = processedMarkdown.contents.match(wrappedCustomElementRegex);
+        const ceMatches = processedMarkdown.value.match(wrappedCustomElementRegex);
 
         ceMatches.forEach((match) => {
           const stripWrappingTags = match
             .replace('<p>', '')
             .replace('</p>', '');
 
-          processedMarkdown.contents = processedMarkdown.contents.replace(match, stripWrappingTags);
+          processedMarkdown.value = processedMarkdown.value.replace(match, stripWrappingTags);
         });
       }
 
       // https://github.com/ProjectEvergreen/greenwood/issues/1126
-      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.contents.replace(/\$/g, '$$$'));
+      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.value.replace(/\$/g, '$$$'));
     } else if (matchingRoute.external) {
       body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
     } else if (ssrBody) {
