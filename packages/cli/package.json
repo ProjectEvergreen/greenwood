@@ -20,7 +20,7 @@
     "NodeJS"
   ],
   "engines": {
-    "node": ">=18.20.0"
+    "node": ">=18.20.5"
   },
   "main": "./src/index.js",
   "bin": {
