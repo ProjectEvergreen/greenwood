@@ -61,7 +61,26 @@ export default {
 }
 ```
 
+## Options
+
+### Runtime
+
+Vercel supports [multiple semver major NodeJS versions](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions#default-and-available-versions) for the serverless runtime as part of the [build output API](https://vercel.com/docs/build-output-api/v3/primitives#serverless-functions).  With the **runtime** option, you can configure your functions for any supported NodeJS version.  Current default version is `nodejs20.x`. 
+
+```javascript
+import { greenwoodPluginAdapterVercel } from '@greenwood/plugin-adapter-vercel';
+
+export default {
+  plugins: [
+    greenwoodPluginAdapterVercel({
+      runtime: 'nodejs22.x'
+    })
+  ]
+}
+```
+
 ## Caveats
+
 1. [Edge runtime](https://vercel.com/docs/concepts/functions/edge-functions) is not supported ([yet](https://github.com/ProjectEvergreen/greenwood/issues/1141)).
 1. The Vercel CLI (`vercel dev`) is not compatible with Build Output v3.
     ```sh
