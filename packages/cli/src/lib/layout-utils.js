@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 import fs from 'fs/promises';
-import htmlparser from 'node-html-parser';
+import * as htmlparser from 'node-html-parser';
 import { checkResourceExists } from './resource-utils.js';
 import { Worker } from 'worker_threads';
 import { asyncFilter } from './async-utils.js';
