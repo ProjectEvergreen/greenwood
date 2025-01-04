@@ -25,6 +25,7 @@ export default [
       'node_modules/*',
       'public/*',
       'reports/*',
+      'coverage/*',
       'CONTRIBUTING.md',
       'packages/plugin-import-jsx/README.md',
       'packages/plugin-graphql/README.md',
