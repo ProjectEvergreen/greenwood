@@ -5,18 +5,6 @@ import js from '@eslint/js';
 import globals from 'globals';
 import noOnlyTests from 'eslint-plugin-no-only-tests';
 
-// **/.greenwood/**
-// **/public/**
-// **/node_modules/**
-// !.eslintrc.cjs
-// !.mocharc.js
-// packages/**/test/cases/**/adapter-output/**
-// packages/init/src/template/**
-// packages/init/test/cases/**/output/**
-// packages/init/test/cases/**/my-app/**
-// packages/plugin-babel/test/cases/**/*main.js
-// TODO.md
-
 export default [
   {
     // https://github.com/eslint/eslint/discussions/18304#discussioncomment-9069706
