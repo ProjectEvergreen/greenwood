@@ -118,74 +118,79 @@ Greenwood provides a couple of queries out of the box that you can use to get ac
 
 The Graph query returns an array of all pages.
 
-```javascript
+```js
 import client from '@greenwood/plugin-graphql/src/core/client.js';
 import GraphQuery from '@greenwood/plugin-graphql/src/queries/graph.gql';
 
-//
+class SomeComponent extends HTMLElement {
+  async connectedCallback() {
+    super.connectedCallback();
+    const response = await client.query({
+      query: GraphQuery
+    });
 
-async connectedCallback() {
-  super.connectedCallback();
-  const response = await client.query({
-    query: GraphQuery
-  });
-
-  this.posts = response.data.graph;
+    this.posts = response.data.graph;
+  }
 }
+
+customElements.define('x-component', SomeComponent);
 ```
 
 ### Collections
 
 Based on [our Collections feature](http://www.greenwoodjs.dev/docs/content-as-data/collections/) for querying based on collections.
 
-```javascript
+```js
 import client from '@greenwood/plugin-graphql/src/core/client.js';
 import CollectionQuery from '@greenwood/plugin-graphql/src/queries/collection.gql';
 
-// ...
+class SomeComponent extends HTMLElement {
+  async connectedCallback() {
+    super.connectedCallback();
+    const response = await client.query({
+      query: CollectionQuery,
+      variables: {
+        name: 'nav'
+      }
+    });
 
-async connectedCallback() {
-  super.connectedCallback();
-  const response = await client.query({
-    query: CollectionQuery,
-    variables: {
-      name: 'nav'
-    }
-  });
-
-  this.items = response.data.collection;
+    this.items = response.data.collection;
+  }
 }
+
+customElements.define('x-component', SomeComponent);
 ```
 
 ### Children 
 
 This will return a set of pages under a specific route and is akin to using [`getContentByRoute`](http://www.greenwoodjs.dev/docs/content-as-data/data-client/#content-by-route).
 
-```javascript
+```js
 import client from '@greenwood/plugin-graphql/src/core/client.js';
 import ChildrenQuery from '@greenwood/plugin-graphql/src/queries/children.gql';
 
-// ...
+class SomeComponent extends HTMLElement {
+  async connectedCallback() {
+    super.connectedCallback();
+    const response = await client.query({
+      query: ChildrenQuery,
+      variables: {
+        parent: '/blog'
+      }
+    });
 
-async connectedCallback() {
-  super.connectedCallback();
-  const response = await client.query({
-    query: ChildrenQuery,
-    variables: {
-      parent: '/blog'
-    }
-  });
-
-  this.posts = response.data.children;
+    this.posts = response.data.children;
+  }
 }
-```
 
+customElements.define('x-component', SomeComponent);
+```
 
 ### Custom
 
 You can of course come up with your own as needed!  Greenwood provides the [`gql-tag`](https://github.com/apollographql/graphql-tag) module and will also resolve _.gql_ or _.graphql_ file extensions!
 
-```javascript
+```gql
 /* src/data/my-query.gql */
 query {
   graph {
@@ -196,7 +201,7 @@ query {
 
 Or within your component:
 
-```javascript
+```js
 import gql from 'graphql-tag';  // comes with Greenwood
 
 const query = gql`
@@ -207,6 +212,8 @@ const query = gql`
     }
   }
 `
+
+console.log({ query })
 ```
 
 ### Sorting
@@ -214,6 +221,9 @@ const query = gql`
 The position of items within a query can be sorted by simply adding the `order` variable to our query.
 
 ```js
+import client from '@greenwood/plugin-graphql/src/core/client.js';
+import CollectionQuery from '@greenwood/plugin-graphql/src/queries/collection.gql';
+
 const response = await client.query({
   query: CollectionQuery,
   variables: {
@@ -221,6 +231,8 @@ const response = await client.query({
     order: 'order_asc'
   }
 });
+
+console.log({ response });
 ```
 
 The following sorts are available.
@@ -235,17 +247,22 @@ The following sorts are available.
 
 ### Filtering
 
-If you only want specific items to show within a specific subdirectory. You can also include the `route` variable to narrow down a set of pages.  This would be useful for a sub navigation menu, for example if you only want pages under `/blog/`, you can set the `route` variable accordingly.
+If you only want specific items to show within a specific subdirectory. You can also include the `parent` variable to narrow down a set of pages in a `ChildrenQuery`.  This would be useful for a sub navigation menu, for example if you only want pages under `/blog/`, you can set the `parent` variable accordingly.
 
 ```js
+import client from '@greenwood/plugin-graphql/src/core/client.js';
+import ChildrenQuery from '@greenwood/plugin-graphql/src/queries/children.gql';
+
 const response = await client.query({
-  query: CollectionQuery,
+  query: ChildrenQuery,
   variables: {
     name: 'shelf',
     order: 'order_asc',
-    route: '/blog/'
+    parent: '/blog/'
   }
 });
+
+console.log({ response });
 ```
 
 ## Custom Schemas
@@ -306,7 +323,7 @@ export {
 };
 ```
 
-```graphql
+```gql
 // gallery.gql
 query($name: String!) {
   gallery(name: $name)  {

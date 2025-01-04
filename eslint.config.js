@@ -14,9 +14,7 @@ export default [
       'public/*',
       'reports/*',
       'coverage/*',
-      'CONTRIBUTING.md',
-      'packages/plugin-import-jsx/README.md',
-      'packages/plugin-graphql/README.md',
+      // 'packages/plugin-graphql/README.md',
       'www/**'
     ],
   },
@@ -28,7 +26,7 @@ export default [
         sourceType: 'module',
         requireConfigFile: false,
         babelOptions: {
-          plugins: ['@babel/plugin-syntax-import-assertions'],
+          plugins: ['@babel/plugin-syntax-import-assertions', '@babel/plugin-syntax-jsx'],
         },
       },
       globals: {
