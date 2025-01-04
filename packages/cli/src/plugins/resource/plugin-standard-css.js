@@ -23,7 +23,7 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
   let optimizedCss = '';
 
   walk(ast, {
-    enter: function (node, item) { // eslint-disable-line complexity
+    enter: function (node, item) {
       const { type, name, value, children } = node;
 
       if ((type === 'String' || type === 'Url') && this.atrulePrelude && this.atrule.name === 'import') {
@@ -82,7 +82,7 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
                 : new URL(`${urlPrefix}${value}`, sourceUrl);
 
         if (fs.existsSync(resolvedUrl)) {
-          const isDev = process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line no-underscore-dangle
+          const isDev = process.env.__GWD_COMMAND__ === 'develop';
           let finalValue = '';
 
           if (resolvedUrl.href.startsWith(userWorkspace.href)) {
@@ -182,8 +182,6 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
         optimizedCss += ` (${name}:`;
       } else if (type === 'Parentheses' || type === 'SupportsDeclaration') {
         optimizedCss += '(';
-      } else if (type === 'PseudoElementSelector') {
-        optimizedCss += `::${name}`;
       } else if (type === 'MediaQuery') {
         // https://github.com/csstree/csstree/issues/285#issuecomment-2350230333
         const { mediaType, modifier } = node;
@@ -222,9 +220,7 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
         }
       } else if (type === 'Declaration') {
         optimizedCss += `${node.property}:`;
-      } else if (type === 'Url' && this.atrule?.name !== 'import') {
-        optimizedCss += `url('${node.value}')`;
-      } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && (this.atrule?.type !== 'import')) || type === 'Operator' || type === 'Raw' || type === 'Percentage') { // eslint-disable-line max-len
+      } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && (this.atrule?.type !== 'import')) || type === 'Operator' || type === 'Raw' || type === 'Percentage') {
         if (item && item.prev && type !== 'Operator' && item.prev.data.type !== 'Operator') {
           optimizedCss += ' ';
         }
@@ -261,7 +257,7 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
         }
       }
     },
-    leave: function(node, item) { // eslint-disable-line complexity
+    leave: function(node, item) {
       switch (node.type) {
 
         case 'Atrule':

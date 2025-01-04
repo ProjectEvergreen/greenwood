@@ -9,6 +9,7 @@ import { getQueryHash } from './common.js';
 /* Extract cache server-side */
 const createCache = async (req, context) => {
 
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async(resolve, reject) => {
     try {
       const client = await new ApolloClient({

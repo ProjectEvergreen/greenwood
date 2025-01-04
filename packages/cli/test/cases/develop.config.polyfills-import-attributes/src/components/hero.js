@@ -1,6 +1,6 @@
 // intentionally break formatting to validate our AST parsing is not impacted / naive
 import sheet from './hero.css'
-with { type: 'css' }; // eslint-disable-line indent
+with { type: 'css' };
 import theme from '../theme.css' with { type: 'css' };
 import json from './hero.json'
   with { type: 'json' };

@@ -73,7 +73,7 @@ class HeaderComponent extends HTMLElement {
             ${navigation.map((item) => {
               const { route, label } = item;
 
-              return html`
+              return `
                 <li>
                   <a href="${route}" title="Click to visit the ${label} page">${label}</a>
                 </li>
@@ -330,7 +330,7 @@ client.query({
     name: 'logos'
   }
 }).then((response) => {
-  const logos = response.data.gallery[0].images[i];
+  const logos = response.data.gallery[0].images;
 
   logos.forEach((logo) => {
     console.log(logo.path); // /assets/logo1.png, /assets/logo2.png, /assets/logo3.png

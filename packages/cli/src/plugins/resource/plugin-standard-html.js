@@ -1,4 +1,3 @@
-/* eslint-disable complexity, max-depth */
 /*
  *
  * Manages web standard resource related operations for HTML and markdown.
@@ -84,6 +83,7 @@ class StandardHtmlResource extends ResourceInterface {
       const routeModuleLocationUrl = new URL(pageHref);
       const routeWorkerUrl = this.compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeModuleUrl;
 
+      // eslint-disable-next-line no-async-promise-executor
       await new Promise(async (resolve, reject) => {
         const worker = new Worker(new URL('../../lib/ssr-route-worker.js', import.meta.url));
 
@@ -140,11 +140,11 @@ class StandardHtmlResource extends ResourceInterface {
       }
 
       // https://github.com/ProjectEvergreen/greenwood/issues/1126
-      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.value.replace(/\$/g, '$$$'));
+      body = body.replace(/<content-outlet>(.*)<\/content-outlet>/s, processedMarkdown.value.replace(/\$/g, '$$$'));
     } else if (matchingRoute.external) {
-      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
+      body = body.replace(/<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
     } else if (ssrBody) {
-      body = body.replace(/\<content-outlet>(.*)<\/content-outlet>/s, `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, '$$$')}<!-- greenwood-ssr-end -->`);
+      body = body.replace(/<content-outlet>(.*)<\/content-outlet>/s, `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, '$$$')}<!-- greenwood-ssr-end -->`);
     }
 
     // clean up any empty placeholder content-outlet

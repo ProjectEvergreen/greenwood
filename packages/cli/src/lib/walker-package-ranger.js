@@ -1,6 +1,5 @@
 import fs from 'fs';
 
-/* eslint-disable max-depth,complexity */
 // priority if from L -> R
 const SUPPORTED_EXPORT_CONDITIONS = ['import', 'module-sync', 'default'];
 const IMPORT_MAP_RESOLVED_PREFIX = '/~';

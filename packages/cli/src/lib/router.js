@@ -1,5 +1,3 @@
-/* eslint-disable no-underscore-dangle */
-
 document.addEventListener('click', async function(e) {
   const currentUrl = window.location;
   // https://developer.mozilla.org/en-US/docs/Web/API/Event/composedPath

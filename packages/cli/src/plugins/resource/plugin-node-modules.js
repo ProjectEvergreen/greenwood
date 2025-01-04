@@ -64,12 +64,12 @@ class NodeModulesResource extends ResourceInterface {
     const { importMaps } = config.polyfills;
     const importMapShimScript = importMaps ? '<script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>' : '';
     let body = await response.text();
-    const hasHead = body.match(/\<head>(.*)<\/head>/s);
+    const hasHead = body.match(/<head>(.*)<\/head>/s);
 
     if (importMaps && hasHead && hasHead.length > 0) {
       const contents = hasHead[0].replace(/type="module"/g, 'type="module-shim"');
 
-      body = body.replace(/\<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
+      body = body.replace(/<head>(.*)<\/head>/s, contents.replace(/\$/g, '$$$')); // https://github.com/ProjectEvergreen/greenwood/issues/656);
     }
 
     const userPackageJson = await getPackageJsonForProject(context);

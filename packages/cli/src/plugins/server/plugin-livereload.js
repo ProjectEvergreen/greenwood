@@ -57,7 +57,7 @@ class LiveReloadResource extends ResourceInterface {
   async shouldIntercept(url, request, response) {
     const contentType = response.headers.get('Content-Type');
 
-    return contentType?.indexOf('text/html') >= 0 && process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line no-underscore-dangle
+    return contentType?.indexOf('text/html') >= 0 && process.env.__GWD_COMMAND__ === 'develop';
   }
 
   async intercept(url, request, response) {

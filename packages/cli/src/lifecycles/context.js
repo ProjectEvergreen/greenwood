@@ -3,6 +3,7 @@ import { checkResourceExists } from '../lib/resource-utils.js';
 
 const initContext = async({ config }) => {
 
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
       const { workspace, pagesDirectory, layoutsDirectory } = config;

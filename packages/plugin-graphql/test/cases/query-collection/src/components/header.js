@@ -30,7 +30,6 @@ class HeaderComponent extends LitElement {
     this.navigation = response.data.collection;
   }
 
-  /* eslint-disable indent */
   render() {
     const { navigation } = this;
 
@@ -50,7 +49,6 @@ class HeaderComponent extends LitElement {
         </nav>
       </header>
     `;
-    /* eslint-enable */
   }
 }
 

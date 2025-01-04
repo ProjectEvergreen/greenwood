@@ -38,7 +38,6 @@ class PostsListTemplate extends LitElement {
       .filter(page => page.id !== 'index');
   }
 
-  /* eslint-disable indent */
   render() {
     const { posts } = this;
 
@@ -60,7 +59,6 @@ class PostsListTemplate extends LitElement {
       </div>
     `;
   }
-  /* eslint-enable */
 }
 
 customElements.define('posts-list', PostsListTemplate);

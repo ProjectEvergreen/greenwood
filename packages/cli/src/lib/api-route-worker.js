@@ -4,7 +4,7 @@ import { transformKoaRequestIntoStandardRequest } from './resource-utils.js';
 
 // based on https://stackoverflow.com/questions/57447685/how-can-i-convert-a-request-object-into-a-stringifiable-object-in-javascript
 async function responseAsObject (response) {
-  if (!response instanceof Response) {
+  if (!(response instanceof Response)) {
     throw Object.assign(
       new Error(),
       { name: 'TypeError', message: 'Argument must be a Response object' }

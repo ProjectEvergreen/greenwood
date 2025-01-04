@@ -3,6 +3,7 @@ import { checkResourceExists } from '../lib/resource-utils.js';
 
 const runProdServer = async (compilation) => {
 
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
 
     try {

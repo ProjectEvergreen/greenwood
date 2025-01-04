@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 
 const ejectConfiguration = async (compilation) => {
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
       const configFileDirUrl = new URL('../config/', import.meta.url);

@@ -26,7 +26,7 @@ Add this plugin to your _greenwood.config.js_ and spread the `export`.
 import { greenwoodPluginImportJson } from '@greenwood/plugin-import-json';
 
 export default {
-  ...
+  // ...
 
   plugins: [
     greenwoodPluginImportJson()

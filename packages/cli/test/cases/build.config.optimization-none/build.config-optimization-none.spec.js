@@ -72,7 +72,6 @@ describe('Build Greenwood With: ', function() {
         it('should output the contents of the JavaScript file un-minified', function() {
           const js = fs.readFileSync(jsFiles[0], 'utf-8');
 
-          // eslint-disable-next-line max-len
           expect(js).to.contain('class HeaderComponent extends HTMLElement {\n  constructor() {\n    super();\n\n    this.root = this.attachShadow({ mode: \'open\' });\n    this.root.innerHTML = `\n      <header>This is the header component.</header>\n    `;\n  }\n}\n\ncustomElements.define(\'app-header\', HeaderComponent);');
         });
 

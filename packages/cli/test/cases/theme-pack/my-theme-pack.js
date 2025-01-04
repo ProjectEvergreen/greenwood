@@ -5,7 +5,7 @@ const myThemePack = (options = {}) => [{
   type: 'context',
   name: `${packageJson.name}:context`,
   provider: (compilation) => {
-    const layoutLocation = options.__isDevelopment // eslint-disable-line no-underscore-dangle
+    const layoutLocation = options.__isDevelopment
       ? new URL('./my-layouts/', compilation.context.userWorkspace)
       : new URL('./dist/my-layouts/', import.meta.url);
 

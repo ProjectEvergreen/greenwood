@@ -60,7 +60,7 @@ const defaultConfig = {
 };
 
 const readAndMergeConfig = async() => {
-  // eslint-disable-next-line complexity
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
       // deep clone of default config
@@ -81,7 +81,6 @@ const readAndMergeConfig = async() => {
 
       if (hasConfigFile) {
         const userCfgFile = (await import(configUrl)).default;
-        // eslint-disable-next-line max-len
         const { workspace, devServer, markdown, optimization, plugins, port, prerender, basePath, staticRouter, pagesDirectory, layoutsDirectory, activeContent, isolation, polyfills } = userCfgFile;
 
         // workspace validation
@@ -151,7 +150,7 @@ const readAndMergeConfig = async() => {
 
         if (devServer && Object.keys(devServer).length > 0) {
 
-          if (devServer.hasOwnProperty('hud')) {
+          if (Object.prototype.hasOwnProperty.call(devServer, "hud")) {
             if (typeof devServer.hud === 'boolean') {
               customConfig.devServer.hud = devServer.hud;
             } else {
@@ -160,7 +159,6 @@ const readAndMergeConfig = async() => {
           }
 
           if (devServer.port) {
-            // eslint-disable-next-line max-depth
             if (!Number.isInteger(devServer.port)) {
               reject(`Error: greenwood.config.js devServer port must be an integer.  Passed value was: ${devServer.port}`);
             } else {
@@ -186,7 +184,6 @@ const readAndMergeConfig = async() => {
         }
 
         if (port) {
-          // eslint-disable-next-line max-depth
           if (!Number.isInteger(port)) {
             reject(`Error: greenwood.config.js port must be an integer.  Passed value was: ${port}`);
           } else {
@@ -195,7 +192,6 @@ const readAndMergeConfig = async() => {
         }
 
         if (basePath) {
-          // eslint-disable-next-line max-depth
           if (typeof basePath !== 'string') {
             reject(`Error: greenwood.config.js basePath must be a string.  Passed value was: ${basePath}`);
           } else {

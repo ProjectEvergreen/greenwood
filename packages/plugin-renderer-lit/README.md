@@ -74,6 +74,7 @@ Now, you can author [SSR pages](/docs/server-rendering/) using Lit templates and
 ```js
 // src/pages/products.js
 import { html } from 'lit';
+import { getProducts } from '../services/products.js';
 import '../components/card.js';
 
 export async function getBody() {

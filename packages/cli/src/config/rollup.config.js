@@ -1,4 +1,3 @@
-/* eslint-disable complexity, max-depth */
 import fs from 'fs';
 import path from 'path';
 import { checkResourceExists, normalizePathnameForWindows } from '../lib/resource-utils.js';
@@ -16,7 +15,7 @@ function cleanRollupId(id) {
 const externalizedResources = ['css', 'json'];
 
 function greenwoodResourceLoader (compilation, browser = false) {
-  const { importAttributes } = compilation.config?.polyfills;
+  const { importAttributes } = compilation.config.polyfills ?? {};
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
   }).map((plugin) => {
@@ -612,7 +611,7 @@ const getRollupConfigForBrowserScripts = async (compilation) => {
           break;
         case 'UNRESOLVED_IMPORT':
           // this could be a legit warning for users, but...
-          if (process.env.__GWD_ROLLUP_MODE__ === 'strict') { // eslint-disable-line no-underscore-dangle
+          if (process.env.__GWD_ROLLUP_MODE__ === 'strict') {
             // if we see it happening in our tests / website build
             // treat it as an error for us since it usually is...
             // https://github.com/ProjectEvergreen/greenwood/issues/620

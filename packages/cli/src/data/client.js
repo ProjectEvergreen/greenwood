@@ -1,9 +1,9 @@
 import { filterContentByCollection, filterContentByRoute } from '@greenwood/cli/src/lib/content-utils.js';
 
-const CONTENT_STATE = globalThis.__CONTENT_AS_DATA_STATE__ ?? false; // eslint-disable-line no-underscore-dangle
-const PRERENDER = globalThis.__CONTENT_OPTIONS__?.PRERENDER === 'true'; // eslint-disable-line no-underscore-dangle
-const PORT = globalThis?.__CONTENT_OPTIONS__?.PORT ?? 1984; // eslint-disable-line no-underscore-dangle
-const BASE_PATH = globalThis?.__GWD_BASE_PATH__ ?? ''; // eslint-disable-line no-underscore-dangle
+const CONTENT_STATE = globalThis.__CONTENT_AS_DATA_STATE__ ?? false;
+const PRERENDER = globalThis.__CONTENT_OPTIONS__?.PRERENDER === 'true';
+const PORT = globalThis?.__CONTENT_OPTIONS__?.PORT ?? 1984;
+const BASE_PATH = globalThis?.__GWD_BASE_PATH__ ?? '';
 
 async function getContentAsData(key = '') {
   if (CONTENT_STATE && PRERENDER) {

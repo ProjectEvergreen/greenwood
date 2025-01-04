@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable no-underscore-dangle */
 import { generateCompilation } from './lifecycles/compile.js';
 import fs from 'fs/promises';
 import program from 'commander';
@@ -88,10 +87,10 @@ const run = async() => {
         break;
 
     }
-    process.exit(0); // eslint-disable-line no-process-exit
+    process.exit(0);
   } catch (err) {
     console.error(err);
-    process.exit(1); // eslint-disable-line no-process-exit
+    process.exit(1);
   }
 };
 

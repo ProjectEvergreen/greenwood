@@ -18,8 +18,8 @@ const client = {
   }
 };
 
-const APOLLO_STATE = globalThis.__APOLLO_STATE__; // eslint-disable-line no-underscore-dangle
-const BASE_PATH = globalThis.__GWD_BASE_PATH__; // eslint-disable-line no-underscore-dangle
+const APOLLO_STATE = globalThis.__APOLLO_STATE__;
+const BASE_PATH = globalThis.__GWD_BASE_PATH__;
 const backupQuery = client.query;
 
 client.query = (params) => {

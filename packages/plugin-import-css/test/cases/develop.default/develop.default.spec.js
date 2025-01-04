@@ -83,7 +83,7 @@ xdescribe('Develop Greenwood With: ', function() {
       // https://unpkg.com/browse/font-awesome@4.7.0/css/font-awesome.css
       it('should return an ECMASCript module', function() {
         expect(data.replace('\n', '').replace(/ /g, '').trim())
-          .to.equal('constcss=`*{background-image:url("/assets/background.jpg");font-family:\'Arial\'}.blockquote-footer::before{content:"\\\\2014\\\\00A0";}.fa-chevron-right:before{content:"\\\\f054";}`;exportdefaultcss;'); // eslint-disable-line max-len
+          .to.equal('constcss=`*{background-image:url("/assets/background.jpg");font-family:\'Arial\'}.blockquote-footer::before{content:"\\\\2014\\\\00A0";}.fa-chevron-right:before{content:"\\\\f054";}`;exportdefaultcss;');
       });
     });
 

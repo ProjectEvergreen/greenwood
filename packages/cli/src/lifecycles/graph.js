@@ -1,4 +1,3 @@
-/* eslint-disable complexity, max-depth */
 import fs from 'fs/promises';
 import fm from 'front-matter';
 import { checkResourceExists, requestAsObject } from '../lib/resource-utils.js';
@@ -32,6 +31,7 @@ function getIdFromRelativePathPath(relativePathPath, extension) {
 
 const generateGraph = async (compilation) => {
 
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
       const { context, config } = compilation;
@@ -163,6 +163,7 @@ const generateGraph = async (compilation) => {
                 const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation).executeModuleUrl;
                 let ssrFrontmatter;
 
+                // eslint-disable-next-line no-async-promise-executor
                 await new Promise(async (resolve, reject) => {
                   const worker = new Worker(new URL('../lib/ssr-route-worker.js', import.meta.url));
                   const request = await requestAsObject(new Request(filenameUrl));
