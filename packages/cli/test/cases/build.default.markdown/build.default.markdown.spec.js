@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood with custom markdown preset in greenwood config.
+ * Run Greenwood with markdown content.
  *
  * User Result
- * Should generate a bare bones Greenwood build.  (same as build.default.spec.js) with custom markdown and rehype links
+ * Should generate a bare bones Greenwood build with markdown correctly transformed.
  *
  * User Command
  * greenwood build
@@ -12,7 +12,9 @@
  * None
  *
  * User Workspace
- * Greenwood default
+ * src/
+ *   pages/
+ *     index.md
  */
 import { JSDOM } from 'jsdom';
 import path from 'path';
