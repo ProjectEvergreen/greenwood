@@ -95,7 +95,6 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       .filter(resource => resource.type === 'script')
       .map(resource => resource.sourcePathURL.href);
 
-    // TODO we should probably do this in the HTML plugin
     body = await new Promise((resolve, reject) => {
       pool.runTask({
         executeModuleUrl: workerPrerender.executeModuleUrl.href,
@@ -103,7 +102,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
         compilation: JSON.stringify(compilation),
         page: JSON.stringify(page),
         prerender: true,
-        htmlContents: body.replace(/&#x3C;/g, 'greenwood-custom-left-bracket'),
+        htmlContents: body,
         scripts: JSON.stringify(scripts)
       }, (err, result) => {
         if (err) {
@@ -117,8 +116,6 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     if (page.isSSR) {
       body = body.replace('<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->', ssrContents);
     }
-
-    body = body.replace(/greenwood-custom-left-bracket/g, '&lt;');
 
     await createOutputDirectory(route, new URL(scratchUrl.href.replace('index.html', '')));
     await fs.writeFile(scratchUrl, body);
