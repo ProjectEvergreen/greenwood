@@ -3,13 +3,15 @@ import fs from 'fs';
 // priority if from L -> R
 const SUPPORTED_EXPORT_CONDITIONS = ['import', 'module-sync', 'default'];
 const IMPORT_MAP_RESOLVED_PREFIX = '/~';
-const importMap = {};
+const importMap = new Map();
+const walkedPackages = new Set();
 const diagnostics = {};
 
 function updateImportMap(key, value, resolvedRoot) {
-  if (!importMap[key.replace('./', '')]) {
-    importMap[key.replace('./', '')] = `${IMPORT_MAP_RESOLVED_PREFIX}${resolvedRoot.replace('file://', '')}${value.replace('./', '')}`;
-  }
+  importMap.set(
+    key.replace('./', ''),
+    `${IMPORT_MAP_RESOLVED_PREFIX}${resolvedRoot.replace('file://', '')}${value.replace('./', '')}`
+  );
 }
 
 // wrapper around import.meta.resolve to provide graceful error handling / logging
@@ -209,8 +211,6 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
   }
 }
 
-const parents = {};
-
 // https://nodejs.org/api/packages.html#package-entry-points
 async function walkPackageJson(packageJson = {}) {
   try {
@@ -224,13 +224,14 @@ async function walkPackageJson(packageJson = {}) {
 
         if (resolvedRoot) {
           const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
+          const { name } = resolvedPackageJson;
 
           walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
 
-          if (!parents[`${resolvedPackageJson.name}-${resolvedPackageJson.version}`]) {
-            parents[`${resolvedPackageJson.name}-${resolvedPackageJson.version}`] = true;
+          if (!walkedPackages.has(name)) {
+            walkedPackages.add(name);
 
-            await walkPackageJson(resolvedPackageJson, dependency);
+            await walkPackageJson(resolvedPackageJson);
           }
         }
       }

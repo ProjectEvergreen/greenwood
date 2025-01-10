@@ -82,14 +82,16 @@ class NodeModulesResource extends ResourceInterface {
 
       if (Object.keys(diagnostics).length > 0) {
         console.log('****************************************************************************');
+
         Object.keys(diagnostics).forEach((diagnostic) => {
           console.warn(diagnostics[diagnostic]);
         });
+
         console.log('Learn more about these warnings at => https://greenwoodjs.dev/docs/introduction/web-standards/#import-maps');
         console.log('****************************************************************************');
       }
 
-      generatedImportMap = importMap;
+      generatedImportMap = Object.fromEntries(importMap);
     } else {
       generatedImportMap = generatedImportMap || {};
     }
