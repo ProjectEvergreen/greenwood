@@ -209,30 +209,28 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
   }
 }
 
+const parents = {};
+
 // https://nodejs.org/api/packages.html#package-entry-points
 async function walkPackageJson(packageJson = {}) {
   try {
-    for (const dependency of Object.keys(packageJson.dependencies || {})) {
+    const dependencies = Object.keys(packageJson.dependencies || {});
+
+    for (const dependency of dependencies) {
       const resolved = resolveBareSpecifier(dependency);
 
       if (resolved) {
         const resolvedRoot = derivePackageRoot(resolved);
-        const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
 
-        walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
+        if (resolvedRoot) {
+          const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
 
-        if (resolvedPackageJson.dependencies) {
-          for (const dependency in resolvedPackageJson.dependencies) {
-            const resolved = resolveBareSpecifier(dependency);
+          walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
 
-            if (resolved) {
-              const resolvedRoot = derivePackageRoot(resolved);
-              const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
+          if (!parents[`${resolvedPackageJson.name}-${resolvedPackageJson.version}`]) {
+            parents[`${resolvedPackageJson.name}-${resolvedPackageJson.version}`] = true;
 
-              walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
-
-              await walkPackageJson(resolvedPackageJson);
-            }
+            await walkPackageJson(resolvedPackageJson, dependency);
           }
         }
       }
