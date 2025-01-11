@@ -248,6 +248,7 @@ async function bundleApiRoutes(compilation) {
   const apiConfigs = await getRollupConfigForApiRoutes(compilation);
 
   if (apiConfigs.length > 0 && apiConfigs[0].input.length !== 0) {
+    console.info('bundling API routes...');
     for (const configIndex in apiConfigs) {
       const rollupConfig = apiConfigs[configIndex];
       const bundle = await rollup(rollupConfig);
