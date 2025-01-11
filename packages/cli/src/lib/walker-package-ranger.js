@@ -4,7 +4,6 @@ import fs from 'fs';
 const SUPPORTED_EXPORT_CONDITIONS = ['import', 'module-sync', 'default'];
 const IMPORT_MAP_RESOLVED_PREFIX = '/~';
 const importMap = new Map();
-const walkedPackages = new Set();
 const diagnostics = {};
 
 function updateImportMap(key, value, resolvedRoot) {
@@ -70,7 +69,7 @@ function derivePackageRoot(resolved) {
   return root;
 }
 
-// Helper function to convert export patterns to a regex (thanks ChatGPT :D)
+// helper function to convert export patterns to a regex (thanks ChatGPT :D)
 function globToRegex(pattern) {
   // Escape special regex characters
   pattern = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&');
@@ -85,7 +84,7 @@ function globToRegex(pattern) {
   return new RegExp('^' + pattern + '$');
 }
 
-// convert path to its lowest common root
+// helper function to convert path to its lowest common root
 // e.g. ./img/path/*/index.js -> /img/path
 // https://unpkg.com/browse/@uswds/uswds@3.10.0/package.json
 function patternRoot(pattern) {
@@ -211,8 +210,9 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
   }
 }
 
-// https://nodejs.org/api/packages.html#package-entry-points
-async function walkPackageJson(packageJson = {}) {
+// we recursively cache / memoize walkedPackages to account for scenarios where Greenwood can (pre)render concurrently
+async function walkPackageJson(packageJson = {}, walkedPackages = new Set()) {
+
   try {
     const dependencies = Object.keys(packageJson.dependencies || {});
 
@@ -231,7 +231,7 @@ async function walkPackageJson(packageJson = {}) {
           if (!walkedPackages.has(name)) {
             walkedPackages.add(name);
 
-            await walkPackageJson(resolvedPackageJson);
+            await walkPackageJson(resolvedPackageJson, walkedPackages);
           }
         }
       }
