@@ -6,7 +6,7 @@
   skip_processing = true
 
 [build.environment]
-  NODE_VERSION = "18.12.1"
+  NODE_VERSION = "20.10.0"
 
 [[redirects]]
   from = "/"
