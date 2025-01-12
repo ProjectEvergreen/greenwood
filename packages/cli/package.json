@@ -23,6 +23,11 @@
     "node": "^18.20.5 || ^20.10.0 || ^22.12.0"
   },
   "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./register": "./src/register.js",
+    "./src/*": "./src/*"
+  },
   "bin": {
     "greenwood": "./src/index.js"
   },
