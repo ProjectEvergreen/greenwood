@@ -12,12 +12,12 @@ jobs:
         node: [20, 22]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Install Chromium Library Dependencies
       run: |
         sh ./.github/workflows/chromium-lib-install.sh
     - name: Use Node.js ${{ matrix.node }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node }}
     - name: Installing project dependencies
