@@ -11,7 +11,6 @@ export default class PostsList extends HTMLElement {
     });
     const posts = response.data.children;
 
-    /* eslint-disable indent */
     this.innerHTML = `
       <h1>My Posts</h1>
 
@@ -27,7 +26,6 @@ export default class PostsList extends HTMLElement {
         </ul>
       </div>
     `;
-    /* eslint-enable indent */
   }
 }
 

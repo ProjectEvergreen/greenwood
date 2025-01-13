@@ -128,7 +128,6 @@ describe('Build Greenwood With: ', function() {
       it('should have an inline <script> tag in the <head>', function() {
         const footerScriptTags = Array.from(dom.window.document.querySelectorAll('head script'))
           .filter((script) => {
-            // eslint-disable-next-line max-len
             return script.textContent.indexOf('const e=document.createElement("template");e.innerHTML="<footer>This is the footer component.</footer>";class t extends HTMLElement{constructor(){super(),this.attachShadow({mode:"open"})}connectedCallback(){this.shadowRoot.appendChild(e.content.cloneNode(!0))}}customElements.define("app-footer",t);') >= 0
               && !script.getAttribute('src');
           });

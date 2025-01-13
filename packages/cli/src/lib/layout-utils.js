@@ -1,4 +1,3 @@
-/* eslint-disable complexity */
 import fs from 'fs/promises';
 import htmlparser from 'node-html-parser';
 import { checkResourceExists } from './resource-utils.js';
@@ -74,6 +73,7 @@ async function getPageLayout(pageHref = '', compilation, layout) {
     const routeModuleLocationUrl = new URL(`./${layout}.js`, userLayoutsDir);
     const routeWorkerUrl = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeModuleUrl;
 
+    // eslint-disable-next-line no-async-promise-executor
     await new Promise(async (resolve, reject) => {
       const worker = new Worker(new URL('./ssr-route-worker.js', import.meta.url));
 
@@ -107,7 +107,6 @@ async function getPageLayout(pageHref = '', compilation, layout) {
   return contents;
 }
 
-/* eslint-disable-next-line complexity */
 async function getAppLayout(pageLayoutContents, compilation, customImports = [], matchingRoute) {
   const activeFrontmatterTitleKey = '${globalThis.page.title}';
   const enableHud = compilation.config.devServer.hud;
@@ -122,6 +121,7 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
   if (userHasDynamicAppLayout) {
     const routeWorkerUrl = compilation.config.plugins.find(plugin => plugin.type === 'renderer').provider().executeModuleUrl;
 
+    // eslint-disable-next-line no-async-promise-executor
     await new Promise(async (resolve, reject) => {
       const worker = new Worker(new URL('./ssr-route-worker.js', import.meta.url));
 

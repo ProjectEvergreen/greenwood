@@ -11,7 +11,7 @@ class PuppeteerResource extends ResourceInterface {
   async shouldIntercept(url, request, response) {
     const { protocol } = url;
 
-    return process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
+    return process.env.__GWD_COMMAND__ === 'build'
       && protocol.startsWith('http')
       && response.headers.get('Content-Type')?.indexOf(this.contentType) >= 0;
   }

@@ -2,7 +2,7 @@ import { ApolloServer } from 'apollo-server';
 
 const graphqlServer = async (compilation) => {
   const { config, graph, context } = compilation;
-  const isDev = process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line no-underscore-dangle
+  const isDev = process.env.__GWD_COMMAND__ === 'develop';
   const { createSchema } = await import('../schema/schema.js');
   const { createCache } = await import('./cache.js');
   // disable playground for production builds

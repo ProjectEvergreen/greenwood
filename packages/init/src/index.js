@@ -179,11 +179,12 @@ const listAndSelectTemplate = async () => {
         return repo.name.includes(templateStandardName);
       });
 
-      return templateRepos.map(({ clone_url, name }) => { // eslint-disable-line camelcase
+      return templateRepos.map(({ clone_url, name }) => {
         const templateName = name.substring(templateStandardName.length, name.length);
-        return { clone_url, name: templateName }; // eslint-disable-line camelcase
+        return { clone_url, name: templateName };
       });
     } catch (err) {
+      console.error(err);
       throw err;
     }
   };
@@ -242,7 +243,10 @@ const cloneTemplate = async () => {
   try {
     await git.clone(selectedTemplate.clone_url, clonedTemplateDir);
     templateDir = clonedTemplateDir;
-  } catch (e) { throw e; }
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 };
 
 const cleanUp = async () => {
@@ -322,7 +326,7 @@ const run = async () => {
     console.error(err);
   }
 
-  process.exit(); // eslint-disable-line no-process-exit
+  process.exit();
 };
 
 run();

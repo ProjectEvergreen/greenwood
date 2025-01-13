@@ -8,7 +8,7 @@ class PuppeteerServer extends ServerInterface {
 
   // only need this running for production builds when prerendering
   async start() {
-    if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
+    if (process.env.__GWD_COMMAND__ === 'build') {
       const { port } = this.compilation.config.devServer;
       const offsetPort = port + 1; // don't try and start the dev server on the same port as the CLI
 

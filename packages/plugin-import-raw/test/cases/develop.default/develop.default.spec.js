@@ -86,7 +86,7 @@ describe('Develop Greenwood With: ', function() {
       // https://github.com/csstree/csstree/issues/179
       xit('should return an ECMASCript module', function() {
         expect(data.replace('\n', '').replace(/ /g, '').trim())
-          .to.equal('constraw=`*{background-image:url(\'/assets/background.jpg\');font-family:\'Arial\';}.blockquote-footer::before{content:"\\\\2014\\\\00A0";}.fa-chevron-right:before{content:"\\\\f054";}`;exportdefaultraw;'); // eslint-disable-line max-len
+          .to.equal('constraw=`*{background-image:url(\'/assets/background.jpg\');font-family:\'Arial\';}.blockquote-footer::before{content:"\\\\2014\\\\00A0";}.fa-chevron-right:before{content:"\\\\f054";}`;exportdefaultraw;');
       });
     });
 
@@ -110,7 +110,7 @@ describe('Develop Greenwood With: ', function() {
       });
 
       it('should return an ECMASCript module', function() {
-        expect(data).to.equal('export const styles = css `.mdc-touch-target-wrapper{display:inline}`;');
+        expect(data).to.equal('export const styles = `.mdc-touch-target-wrapper{display:inline}`;');
       });
     });
   });

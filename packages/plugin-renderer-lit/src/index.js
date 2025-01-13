@@ -14,7 +14,7 @@ class LitHydrationResource extends ResourceInterface {
 
   async intercept(url, request, response) {
     const { importMaps } = this.compilation.config.polyfills;
-    const isDevelopment = process.env.__GWD_COMMAND__ === 'develop'; // eslint-disable-line  no-underscore-dangle
+    const isDevelopment = process.env.__GWD_COMMAND__ === 'develop';
     const importType = isDevelopment && importMaps
       ? 'module-shim'
       : 'module';

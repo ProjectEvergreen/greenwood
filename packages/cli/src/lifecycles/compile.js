@@ -5,6 +5,7 @@ import { readAndMergeConfig } from './config.js';
 import fs from 'fs/promises';
 
 const generateCompilation = () => {
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
 
@@ -32,7 +33,7 @@ const generateCompilation = () => {
         await fs.mkdir(scratchDir);
       }
 
-      if (process.env.__GWD_COMMAND__ === 'serve') { // eslint-disable-line no-underscore-dangle
+      if (process.env.__GWD_COMMAND__ === 'serve') {
         console.info('Loading graph from build output...');
 
         if (!await checkResourceExists(new URL('./graph.json', outputDir))) {

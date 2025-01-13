@@ -133,12 +133,15 @@ Test cases that exercise custom loaders (like TypeScript, JSX plugins) for SSR a
 1. Prefix the test case directory and spec file with _loaders-_
 1. Make sure to pass `true` as the second param to `Runner`
     ```js
+    import { Runner } from 'gallinago';
+    let runner;
+
     before(function() {
-      this.context = {
-        publicDir: path.join(outputPath, 'public')
-      };
+      // pass true as the second param here
       runner = new Runner(false, true);
     });
+
+    runner.runCommand(/* ... */);
     ```
 1. Use the `yarn test:loaders` npm script
 

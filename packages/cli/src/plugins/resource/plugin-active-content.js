@@ -44,7 +44,7 @@ class ContentAsDataResource extends ResourceInterface {
         body = filterContentByRoute(graph, keyPieces[1]);
       }
 
-      if (process.env.__GWD_COMMAND__ === 'build') { // eslint-disable-line no-underscore-dangle
+      if (process.env.__GWD_COMMAND__ === 'build') {
         const fileKey = `./data-${contentKey.replace(/\//g, '_')}.json`;
 
         if (!await checkResourceExists(new URL(fileKey, this.compilation.context.outputDir))) {
@@ -73,7 +73,7 @@ class ContentAsDataResource extends ResourceInterface {
     const body = await response.text();
     let newBody = body;
 
-    if (process.env.__GWD_COMMAND__ === 'develop') { // eslint-disable-line no-underscore-dangle
+    if (process.env.__GWD_COMMAND__ === 'develop') {
       newBody = mergeImportMap(body, importMap, polyfills.importMaps);
     }
 

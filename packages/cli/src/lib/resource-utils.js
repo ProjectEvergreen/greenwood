@@ -81,7 +81,7 @@ async function checkResourceExists(url) {
   try {
     await fs.access(url);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -212,7 +212,7 @@ function transformKoaRequestIntoStandardRequest(url, request) {
 
 // https://stackoverflow.com/questions/57447685/how-can-i-convert-a-request-object-into-a-stringifiable-object-in-javascript
 async function requestAsObject (_request) {
-  if (!_request instanceof Request) {
+  if (!(_request instanceof Request)) {
     throw Object.assign(
       new Error(),
       { name: 'TypeError', message: 'Argument must be a Request object' }

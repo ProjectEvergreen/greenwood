@@ -1,4 +1,3 @@
-/* eslint-disable max-depth, max-len */
 import fs from 'fs/promises';
 import { getRollupConfigForApiRoutes, getRollupConfigForBrowserScripts, getRollupConfigForSsrPages } from '../config/rollup.config.js';
 import { getAppLayout, getPageLayout, getUserScripts } from '../lib/layout-utils.js';
@@ -318,6 +317,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
       }
 
       // better way to write out this inline code?
+      /* eslint-disable no-useless-escape */
       await fs.writeFile(entryFileOutputUrl, `
         import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
 
@@ -340,6 +340,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
           });
         }
       `);
+      /* eslint-enable no-useless-escape */
 
       input.push({
         id,
@@ -372,6 +373,7 @@ async function bundleScriptResources(compilation) {
 
 const bundleCompilation = async (compilation) => {
 
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
       const optimizeResourcePlugins = compilation.config.plugins.filter((plugin) => {

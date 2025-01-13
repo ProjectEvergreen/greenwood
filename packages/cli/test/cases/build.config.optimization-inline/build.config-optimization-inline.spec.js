@@ -95,7 +95,6 @@ describe('Build Greenwood With: ', function() {
           const scriptTag = Array.from(dom.window.document.querySelectorAll('head script[type="module"]')).filter(tag => !tag.getAttribute('data-gwd'))[0];
 
           expect(scriptTag.type).to.be.equal('module');
-          // eslint-disable-next-line max-len
           expect(scriptTag.textContent).to.contain('class e extends HTMLElement{constructor(){super(),this.root=this.attachShadow({mode:"open"}),this.root.innerHTML="\\n      <header>This is the header component.</header>\\n    "}}customElements.define("app-header",e);');
         });
       });
@@ -106,7 +105,6 @@ describe('Build Greenwood With: ', function() {
         it('should contain one <script> tag with the expected JS content inlined of type="module" for FooBar', function() {
           const scriptTag = Array.from(dom.window.document.querySelectorAll('head script[type="module"]')).filter(tag => !tag.getAttribute('data-gwd'))[1];
 
-          // eslint-disable-next-line max-len
           expect(scriptTag.textContent).to.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex((e=>new RegExp(`^${t}$`).test(e.route)))}}export{t as Foobar};');
         });
       });
@@ -118,7 +116,6 @@ describe('Build Greenwood With: ', function() {
           const scriptTag = Array.from(dom.window.document.querySelectorAll('head script[type="module"]')).filter(tag => !tag.getAttribute('data-gwd'))[2];
 
           expect(scriptTag.type).to.be.equal('module');
-          // eslint-disable-next-line max-len
           expect(scriptTag.textContent).to.contain('class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex((e=>new RegExp(`^${t}$`).test(e.route)))}}export{t as Baz};');
         });
       });

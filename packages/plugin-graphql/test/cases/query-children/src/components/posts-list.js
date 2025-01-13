@@ -29,7 +29,6 @@ class PostsListTemplate extends LitElement {
     this.posts = response.data.children;
   }
 
-  /* eslint-disable indent */
   render() {
     const { posts } = this;
 
@@ -49,7 +48,6 @@ class PostsListTemplate extends LitElement {
       </div>
     `;
   }
-  /* eslint-enable */
 }
 
 customElements.define('posts-list', PostsListTemplate);

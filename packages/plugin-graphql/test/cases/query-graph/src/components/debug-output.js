@@ -24,7 +24,6 @@ class DebugOutputComponent extends LitElement {
     this.pages = response.data.graph;
   }
 
-  /* eslint-disable indent */
   render() {
     const { pages } = this;
 
@@ -42,7 +41,6 @@ class DebugOutputComponent extends LitElement {
       </div>
     `;
   }
-  /* eslint-enable */
 }
 
 customElements.define('debug-output', DebugOutputComponent);

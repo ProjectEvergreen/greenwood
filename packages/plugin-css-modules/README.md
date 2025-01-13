@@ -117,9 +117,13 @@ There are some caveats to consider when using this plugin:
 
     export default class Header extends HTMLElement {
       connectedCallback() {
-        const { container, navBar, ... } = styles;
+        const { container } = styles;
 
-        // ...
+      this.innerHTML = `
+        <header class="${container}">
+          <!-- ... -->
+        </header>
+      `;
       }
     }
 

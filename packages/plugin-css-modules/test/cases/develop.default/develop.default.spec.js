@@ -62,8 +62,8 @@ describe('Develop Greenwood With: ', function() {
     before(function() {
       // JSDOM doesn't support CSS nesting and kind of blows up in the console as it tries to parse it automatically
       // https://github.com/jsdom/jsdom/issues/2005#issuecomment-2397495853
-      updateAStyleBlockRef = implementation.prototype._updateAStyleBlock; // eslint-disable-line no-underscore-dangle
-      implementation.prototype._updateAStyleBlock = () => {}; // eslint-disable-line no-underscore-dangle
+      updateAStyleBlockRef = implementation.prototype._updateAStyleBlock;
+      implementation.prototype._updateAStyleBlock = () => {};
 
       runner.setup(outputPath);
 
@@ -226,7 +226,7 @@ describe('Develop Greenwood With: ', function() {
   });
 
   after(function() {
-    implementation.prototype._updateAStyleBlock = updateAStyleBlockRef; // eslint-disable-line no-underscore-dangle
+    implementation.prototype._updateAStyleBlock = updateAStyleBlockRef;
 
     runner.stopCommand();
     runner.teardown(getOutputTeardownFiles(outputPath));

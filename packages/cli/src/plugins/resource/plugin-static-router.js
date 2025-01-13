@@ -31,7 +31,7 @@ class StaticRouterResource extends ResourceInterface {
     const { pathname, protocol } = url;
     const contentType = response.headers.get('Content-Type') || '';
 
-    return process.env.__GWD_COMMAND__ === 'build' // eslint-disable-line no-underscore-dangle
+    return process.env.__GWD_COMMAND__ === 'build'
       && this.compilation.config.staticRouter
       && !pathname.startsWith('/404')
       && (protocol === 'http:' && contentType.indexOf(this.contentType) >= 0);

@@ -20,8 +20,7 @@ export default async function(compilation, callback) {
           });
       }));
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(err);
+      console.error(e);
       return false;
     }
   };
@@ -46,6 +45,7 @@ export default async function(compilation, callback) {
     return Promise.reject();
   }
 
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
       const pages = compilation.graph.filter(page => !page.isSSR);

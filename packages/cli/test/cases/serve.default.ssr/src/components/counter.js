@@ -31,11 +31,11 @@ class MyCounter extends HTMLElement {
   }
 
   inc() {
-    this.update(++this.#count); // eslint-disable-line
+    this.update(++this.#count);
   }
 
   dec() {
-    this.update(--this.#count); // eslint-disable-line
+    this.update(--this.#count);
   }
 
   update(count) {

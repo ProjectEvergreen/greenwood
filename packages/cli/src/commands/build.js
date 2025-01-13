@@ -8,6 +8,7 @@ import { ServerInterface } from '../lib/server-interface.js';
 
 const runProductionBuild = async (compilation) => {
 
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
 
     try {

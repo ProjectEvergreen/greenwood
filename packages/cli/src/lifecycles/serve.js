@@ -166,7 +166,7 @@ async function getDevServer(compilation) {
 
     // don't interfere with external requests or API calls, only files
     // and only run in development
-    if (process.env.__GWD_COMMAND__ === 'develop' && url.protocol === 'file:') { // eslint-disable-line no-underscore-dangle
+    if (process.env.__GWD_COMMAND__ === 'develop' && url.protocol === 'file:') {
       // there's probably a better way to do this with tee-ing streams but this works for now
       const { header, status, message } = ctx.response;
       const response = new Response(ctx.body, {
@@ -188,7 +188,6 @@ async function getDevServer(compilation) {
         ctx.set('Cache-Control', 'no-cache');
       } else if (!inm || inm !== etagHash) {
         ctx.body = Readable.from(response.body);
-        ctx.status = ctx.status;
         ctx.set('Etag', etagHash);
         ctx.message = response.statusText;
         response.headers.forEach((value, key) => {
@@ -334,6 +333,7 @@ async function getHybridServer(compilation) {
         let html;
 
         if (matchingRoute.isolation || isolationMode) {
+          // eslint-disable-next-line no-async-promise-executor
           await new Promise(async (resolve, reject) => {
             const worker = new Worker(new URL('../lib/ssr-route-worker-isolation-mode.js', import.meta.url));
             // "faux" new Request here, a better way?
@@ -373,6 +373,7 @@ async function getHybridServer(compilation) {
         let body, status, headers, statusText;
 
         if (apiRoute.isolation || isolationMode) {
+          // eslint-disable-next-line no-async-promise-executor
           await new Promise(async (resolve, reject) => {
             const worker = new Worker(new URL('../lib/api-route-worker.js', import.meta.url));
             // "faux" new Request here, a better way?

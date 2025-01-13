@@ -3,6 +3,7 @@ import { getDevServer } from '../lifecycles/serve.js';
 
 const runDevServer = async (compilation) => {
 
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
 
     try {
