@@ -117,7 +117,7 @@ async function vercelAdapter(compilation, options) {
     const outputRoot = new URL(`.${basePath}/api/${id}.func/`, adapterOutputUrl);
     const { assets = [] } = value;
 
-    await setupFunctionBuildFolder(id, outputType, outputRoot);
+    await setupFunctionBuildFolder(id, outputType, outputRoot, runtime);
 
     await fs.cp(
       new URL(outputHref),
