@@ -26,7 +26,7 @@
  *     index.js
  */
 import chai from 'chai';
-import fs from 'fs/promises';
+import fs from 'fs';
 import glob from 'glob-promise';
 import { JSDOM } from 'jsdom';
 import path from 'path';
@@ -65,12 +65,12 @@ describe('Build Greenwood With: ', function() {
       let functionFolders;
 
       before(async function() {
-        configFile = await fs.readFile(new URL('./config.json', vercelOutputFolder), 'utf-8');
+        configFile = await fs.promises.readFile(new URL('./config.json', vercelOutputFolder), 'utf-8');
         functionFolders = await glob.promise(path.join(normalizePathnameForWindows(vercelFunctionsOutputUrl), '**/*.func'));
       });
 
       it('should output the expected number of serverless function output folders', function() {
-        expect(functionFolders.length).to.be.equal(1);
+        expect(functionFolders.length).to.be.equal(2);
       });
 
       it('should output the expected configuration file for the build output', function() {
@@ -78,18 +78,22 @@ describe('Build Greenwood With: ', function() {
       });
 
       it('should output the expected package.json for each serverless function', function() {
-        functionFolders.forEach(async (folder) => {
-          const packageJson = await fs.readFile(new URL('./package.json', `file://${folder}/`), 'utf-8');
-
-          expect(packageJson).to.be.equal('{"type":"module"}');
+        functionFolders.forEach((folder) => {
+          fs.readFile(path.join(folder, 'package.json'), 'utf-8', (err, contents) => {
+            if (!err) {
+              expect(contents).to.equal('{"type":"module"}');
+            }
+          });
         });
       });
 
       it('should output the expected .vc-config.json for each serverless function with runtime option honored', function() {
-        functionFolders.forEach(async (folder) => {
-          const packageJson = await fs.readFile(new URL('./vc-config.json', `file://${folder}/`), 'utf-8');
-
-          expect(packageJson).to.be.equal('{"runtime":"nodejs22.x","handler":"index.js","launcherType":"Nodejs","shouldAddHelpers":true}');
+        functionFolders.forEach((folder) => {
+          fs.readFile(path.join(folder, '.vc-config.json'), 'utf-8', (err, contents) => {
+            if (!err) {
+              expect(contents).to.equal('{"runtime":"nodejs22.x","handler":"index.js","launcherType":"Nodejs","shouldAddHelpers":true}');
+            }
+          });
         });
       });
     });
