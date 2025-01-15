@@ -15,7 +15,7 @@ function cleanRollupId(id) {
 const externalizedResources = ['css', 'json'];
 
 function greenwoodResourceLoader (compilation, browser = false) {
-  const { importAttributes } = compilation.config.polyfills ?? {};
+  const { importAttributes  } = compilation.config?.polyfills || [];
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
   }).map((plugin) => {
@@ -25,22 +25,23 @@ function greenwoodResourceLoader (compilation, browser = false) {
   return {
     name: 'greenwood-resource-loader',
     async resolveId(id, importer, options) {
+      const { userWorkspace, scratchDir } = compilation.context;
       const normalizedId = cleanRollupId(id);
-      const { userWorkspace } = compilation.context;
+      const isUserWorkspaceImporter = importer?.startsWith(userWorkspace.pathname);
+      const isScratchDirImporter = importer?.startsWith(scratchDir.pathname)
 
-      // check for non bare paths and resolve them to the user's workspace
-      // or Greenwood's scratch dir, like when bundling inline <script> tags
-      if (normalizedId.startsWith('.') && !normalizedId.endsWith('/')) {
+      // check for relative paths and resolve them to the user's workspace or Greenwood's scratch dir
+      // like when bundling inline <script> tags with relative paths
+      if (id.startsWith('.') && (isUserWorkspaceImporter || isScratchDirImporter)) {
         const importerUrl = new URL(normalizedId, `file://${importer}`);
         const type = options.attributes?.type ?? '';
         // if we are polyfilling import attributes for the browser we will want Rollup to bundles these as JS files
         // instead of externalizing as their native content-type
         const shouldPolyfill = browser && (importAttributes || []).includes(type);
         const external = !shouldPolyfill && externalizedResources.includes(type) && browser && !importerUrl.searchParams.has('type');
-        const isUserWorkspaceUrl = importerUrl.pathname.startsWith(userWorkspace.pathname);
         const prefix = normalizedId.startsWith('..') ? './' : '';
         // if its not in the users workspace, we clean up the dot-dots and check that against the user's workspace
-        const resolvedUrl = isUserWorkspaceUrl
+        const resolvedUrl = isUserWorkspaceImporter
           ? importerUrl
           : new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
 
@@ -49,6 +50,8 @@ function greenwoodResourceLoader (compilation, browser = false) {
             id: normalizePathnameForWindows(resolvedUrl),
             external
           };
+        } else {
+          console.warn(`unable to resolve \`${id}\` as imported by => ${importer}`);
         }
       }
     },
@@ -631,6 +634,7 @@ const getRollupConfigForBrowserScripts = async (compilation) => {
 };
 
 const getRollupConfigForApiRoutes = async (compilation) => {
+  // console.log('getRollupConfigForApiRoutes', compilation.manifest.apis.values())
   const { outputDir } = compilation.context;
 
   return [...compilation.manifest.apis.values()]
