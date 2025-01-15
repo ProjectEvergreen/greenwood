@@ -27,22 +27,23 @@ function greenwoodResourceLoader (compilation, browser = false) {
     async resolveId(id, importer, options) {
       const { userWorkspace, scratchDir } = compilation.context;
       const normalizedId = cleanRollupId(id);
-      const isUserWorkspaceImporter = importer?.startsWith(userWorkspace.pathname);
-      const isScratchDirImporter = importer?.startsWith(scratchDir.pathname)
+      const importerUrl = new URL(`file://${importer ?? ''}`);
+      const isUserWorkspaceImporter = importerUrl?.pathname?.startsWith(userWorkspace.pathname);
+      const isScratchDirImporter = importerUrl?.pathname?.startsWith(scratchDir.pathname);
 
       // check for relative paths and resolve them to the user's workspace or Greenwood's scratch dir
       // like when bundling inline <script> tags with relative paths
       if (id.startsWith('.') && (isUserWorkspaceImporter || isScratchDirImporter)) {
-        const importerUrl = new URL(normalizedId, `file://${importer}`);
+        const normalizedIdImporterUrl = new URL(normalizedId,  importerUrl);
         const type = options.attributes?.type ?? '';
         // if we are polyfilling import attributes for the browser we will want Rollup to bundles these as JS files
         // instead of externalizing as their native content-type
         const shouldPolyfill = browser && (importAttributes || []).includes(type);
-        const external = !shouldPolyfill && externalizedResources.includes(type) && browser && !importerUrl.searchParams.has('type');
+        const external = !shouldPolyfill && externalizedResources.includes(type) && browser && !normalizedIdImporterUrl.searchParams.has('type');
         const prefix = normalizedId.startsWith('..') ? './' : '';
         // if its not in the users workspace, we clean up the dot-dots and check that against the user's workspace
         const resolvedUrl = isUserWorkspaceImporter
-          ? importerUrl
+          ? normalizedIdImporterUrl
           : new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
 
         if (await checkResourceExists(resolvedUrl)) {
