@@ -30,7 +30,7 @@ function greenwoodResourceLoader (compilation, browser = false) {
 
       // check for non bare paths and resolve them to the user's workspace
       // or Greenwood's scratch dir, like when bundling inline <script> tags
-      if (normalizedId.startsWith('.')) {
+      if (normalizedId.startsWith('.') && !normalizedId.endsWith('/')) {
         const importerUrl = new URL(normalizedId, `file://${importer}`);
         const type = options.attributes?.type ?? '';
         // if we are polyfilling import attributes for the browser we will want Rollup to bundles these as JS files
@@ -167,7 +167,7 @@ function greenwoodSyncApiRoutesOutputPath(compilation) {
       const { basePath } = compilation.config;
       const { apisDir, outputDir } = compilation.context;
 
-      // map rollup bundle names back to original SSR pages for syncing input <> output bundle names
+      // map rollup bundle names back to original API routes for syncing input <> output bundle names in the manifest
       Object.keys(bundle).forEach((key) => {
         if (bundle[key].exports?.find(exp => exp === 'handler')) {
           const ext = bundle[key].facadeModuleId.split('.').pop();
@@ -649,7 +649,7 @@ const getRollupConfigForApiRoutes = async (compilation) => {
         },
         plugins: [
           greenwoodResourceLoader(compilation),
-          // support node export conditions for SSR pages
+          // support node export conditions for API routes
           // https://github.com/ProjectEvergreen/greenwood/issues/1118
           // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
           nodeResolve({
