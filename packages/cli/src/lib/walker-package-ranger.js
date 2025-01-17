@@ -64,6 +64,7 @@ function derivePackageRoot(resolved) {
     }
 
     // make sure we are trimming from the end
+    // https://github.com/ProjectEvergreen/greenwood/issues/1386
     root = root.substring(0, root.lastIndexOf(segment));
   }
 
