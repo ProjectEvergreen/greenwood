@@ -63,7 +63,8 @@ function derivePackageRoot(resolved) {
       }
     }
 
-    root = root.replace(`${segment}/`, '');
+    // make sure we are trimming from the end
+    root = root.substring(0, root.lastIndexOf(segment));
   }
 
   return root;
