@@ -3,13 +3,14 @@ import fs from 'fs';
 // priority if from L -> R
 const SUPPORTED_EXPORT_CONDITIONS = ['import', 'module-sync', 'default'];
 const IMPORT_MAP_RESOLVED_PREFIX = '/~';
-const importMap = {};
+const importMap = new Map();
 const diagnostics = {};
 
 function updateImportMap(key, value, resolvedRoot) {
-  if (!importMap[key.replace('./', '')]) {
-    importMap[key.replace('./', '')] = `${IMPORT_MAP_RESOLVED_PREFIX}${resolvedRoot.replace('file://', '')}${value.replace('./', '')}`;
-  }
+  importMap.set(
+    key.replace('./', ''),
+    `${IMPORT_MAP_RESOLVED_PREFIX}${resolvedRoot.replace('file://', '')}${value.replace('./', '')}`
+  );
 }
 
 // wrapper around import.meta.resolve to provide graceful error handling / logging
@@ -68,7 +69,7 @@ function derivePackageRoot(resolved) {
   return root;
 }
 
-// Helper function to convert export patterns to a regex (thanks ChatGPT :D)
+// helper function to convert export patterns to a regex (thanks ChatGPT :D)
 function globToRegex(pattern) {
   // Escape special regex characters
   pattern = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&');
@@ -83,7 +84,7 @@ function globToRegex(pattern) {
   return new RegExp('^' + pattern + '$');
 }
 
-// convert path to its lowest common root
+// helper function to convert path to its lowest common root
 // e.g. ./img/path/*/index.js -> /img/path
 // https://unpkg.com/browse/@uswds/uswds@3.10.0/package.json
 function patternRoot(pattern) {
@@ -209,30 +210,28 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
   }
 }
 
-// https://nodejs.org/api/packages.html#package-entry-points
-async function walkPackageJson(packageJson = {}) {
+// we recursively cache / memoize walkedPackages to account for scenarios where Greenwood can (pre)render concurrently
+async function walkPackageJson(packageJson = {}, walkedPackages = new Set()) {
+
   try {
-    for (const dependency of Object.keys(packageJson.dependencies || {})) {
+    const dependencies = Object.keys(packageJson.dependencies || {});
+
+    for (const dependency of dependencies) {
       const resolved = resolveBareSpecifier(dependency);
 
       if (resolved) {
         const resolvedRoot = derivePackageRoot(resolved);
-        const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
 
-        walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
+        if (resolvedRoot) {
+          const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
+          const { name } = resolvedPackageJson;
 
-        if (resolvedPackageJson.dependencies) {
-          for (const dependency in resolvedPackageJson.dependencies) {
-            const resolved = resolveBareSpecifier(dependency);
+          walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
 
-            if (resolved) {
-              const resolvedRoot = derivePackageRoot(resolved);
-              const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
+          if (!walkedPackages.has(name)) {
+            walkedPackages.add(name);
 
-              walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
-
-              await walkPackageJson(resolvedPackageJson);
-            }
+            await walkPackageJson(resolvedPackageJson, walkedPackages);
           }
         }
       }
