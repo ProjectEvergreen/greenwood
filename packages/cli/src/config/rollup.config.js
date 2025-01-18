@@ -15,7 +15,7 @@ function cleanRollupId(id) {
 const externalizedResources = ['css', 'json'];
 
 function greenwoodResourceLoader (compilation, browser = false) {
-  const { importAttributes } = compilation.config.polyfills ?? {};
+  const { importAttributes  } = compilation.config?.polyfills || [];
   const resourcePlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === 'resource';
   }).map((plugin) => {
@@ -25,23 +25,25 @@ function greenwoodResourceLoader (compilation, browser = false) {
   return {
     name: 'greenwood-resource-loader',
     async resolveId(id, importer, options) {
+      const { userWorkspace, scratchDir } = compilation.context;
       const normalizedId = cleanRollupId(id);
-      const { userWorkspace } = compilation.context;
+      const importerUrl = new URL(`file://${importer ?? ''}`);
+      const isUserWorkspaceImporter = importerUrl?.pathname?.startsWith(userWorkspace.pathname);
+      const isScratchDirImporter = importerUrl?.pathname?.startsWith(scratchDir.pathname);
 
-      // check for non bare paths and resolve them to the user's workspace
-      // or Greenwood's scratch dir, like when bundling inline <script> tags
-      if (normalizedId.startsWith('.')) {
-        const importerUrl = new URL(normalizedId, `file://${importer}`);
+      // check for relative paths and resolve them to the user's workspace or Greenwood's scratch dir
+      // like when bundling inline <script> tags with relative paths
+      if (id.startsWith('.') && (isUserWorkspaceImporter || isScratchDirImporter)) {
+        const normalizedIdImporterUrl = new URL(normalizedId,  importerUrl);
         const type = options.attributes?.type ?? '';
         // if we are polyfilling import attributes for the browser we will want Rollup to bundles these as JS files
         // instead of externalizing as their native content-type
         const shouldPolyfill = browser && (importAttributes || []).includes(type);
-        const external = !shouldPolyfill && externalizedResources.includes(type) && browser && !importerUrl.searchParams.has('type');
-        const isUserWorkspaceUrl = importerUrl.pathname.startsWith(userWorkspace.pathname);
+        const external = !shouldPolyfill && externalizedResources.includes(type) && browser && !normalizedIdImporterUrl.searchParams.has('type');
         const prefix = normalizedId.startsWith('..') ? './' : '';
         // if its not in the users workspace, we clean up the dot-dots and check that against the user's workspace
-        const resolvedUrl = isUserWorkspaceUrl
-          ? importerUrl
+        const resolvedUrl = isUserWorkspaceImporter
+          ? normalizedIdImporterUrl
           : new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
 
         if (await checkResourceExists(resolvedUrl)) {
@@ -49,6 +51,8 @@ function greenwoodResourceLoader (compilation, browser = false) {
             id: normalizePathnameForWindows(resolvedUrl),
             external
           };
+        } else {
+          console.warn(`unable to resolve \`${id}\` as imported by => ${importer}`);
         }
       }
     },
@@ -167,7 +171,7 @@ function greenwoodSyncApiRoutesOutputPath(compilation) {
       const { basePath } = compilation.config;
       const { apisDir, outputDir } = compilation.context;
 
-      // map rollup bundle names back to original SSR pages for syncing input <> output bundle names
+      // map rollup bundle names back to original API routes for syncing input <> output bundle names in the manifest
       Object.keys(bundle).forEach((key) => {
         if (bundle[key].exports?.find(exp => exp === 'handler')) {
           const ext = bundle[key].facadeModuleId.split('.').pop();
@@ -631,6 +635,7 @@ const getRollupConfigForBrowserScripts = async (compilation) => {
 };
 
 const getRollupConfigForApiRoutes = async (compilation) => {
+  // console.log('getRollupConfigForApiRoutes', compilation.manifest.apis.values())
   const { outputDir } = compilation.context;
 
   return [...compilation.manifest.apis.values()]
@@ -649,7 +654,7 @@ const getRollupConfigForApiRoutes = async (compilation) => {
         },
         plugins: [
           greenwoodResourceLoader(compilation),
-          // support node export conditions for SSR pages
+          // support node export conditions for API routes
           // https://github.com/ProjectEvergreen/greenwood/issues/1118
           // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
           nodeResolve({

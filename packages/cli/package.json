@@ -68,6 +68,7 @@
     "@spectrum-web-components/action-menu": "^1.0.1",
     "@spectrum-web-components/styles": "^1.0.1",
     "@uswds/web-components": "^0.0.1-alpha",
+    "call-bind": "^1.0.8",
     "font-awesome": "^4.6.3",
     "geist": "^1.2.0",
     "lit": "^3.1.0",
