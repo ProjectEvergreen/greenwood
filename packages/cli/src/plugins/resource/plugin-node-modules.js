@@ -84,10 +84,10 @@ class NodeModulesResource extends ResourceInterface {
         console.log('****************************************************************************');
 
         Object.keys(diagnostics).forEach((diagnostic) => {
-          console.warn(diagnostics[diagnostic]);
+          console.warn(`- ${diagnostics[diagnostic]}\n`);
         });
 
-        console.log('Learn more about these warnings at => https://greenwoodjs.dev/docs/introduction/web-standards/#import-maps');
+        console.log('>>> Learn more about these warnings at https://greenwoodjs.dev/docs/introduction/web-standards/#import-maps <<<');
         console.log('****************************************************************************');
       }
 
