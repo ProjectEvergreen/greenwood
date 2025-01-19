@@ -1,9 +1,11 @@
 import fs from 'fs';
+import { isBuiltin } from 'node:module';
 
 // priority if from L -> R
 const SUPPORTED_EXPORT_CONDITIONS = ['import', 'module-sync', 'default'];
 const IMPORT_MAP_RESOLVED_PREFIX = '/~';
 const importMap = new Map();
+// TODO make diagnostics a Map
 const diagnostics = {};
 
 function updateImportMap(key, value, resolvedRoot) {
@@ -68,7 +70,9 @@ function derivePackageRoot(resolved) {
     root = root.substring(0, root.lastIndexOf(segment));
   }
 
-  return root;
+  return root !== ''
+    ? root
+    : null;
 }
 
 // helper function to convert export patterns to a regex (thanks ChatGPT :D)
@@ -234,6 +238,13 @@ async function walkPackageJson(packageJson = {}, walkedPackages = new Set()) {
             walkedPackages.add(name);
 
             await walkPackageJson(resolvedPackageJson, walkedPackages);
+          }
+        } else {
+          // ignore built-ins since NodeJS resolves them automatically
+          // https://github.com/nodejs/node/issues/56652
+          // https://nodejs.org/api/modules.html#built-in-modules
+          if (!isBuiltin(resolved)) {
+            diagnostics[dependency] = `WARNING: No package.json resolved for => \`${dependency}\`, resolved to \`${resolved}\``;
           }
         }
       }
