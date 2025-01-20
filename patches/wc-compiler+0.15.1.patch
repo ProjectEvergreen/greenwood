@@ -1,5 +1,5 @@
 diff --git a/node_modules/wc-compiler/src/dom-shim.js b/node_modules/wc-compiler/src/dom-shim.js
-index be289a3..b25255d 100644
+index be289a3..a53190d 100644
 --- a/node_modules/wc-compiler/src/dom-shim.js
 +++ b/node_modules/wc-compiler/src/dom-shim.js
 @@ -1,3 +1,57 @@
@@ -19,7 +19,7 @@ index be289a3..b25255d 100644
 +
 +function deepClone(obj, map = new WeakMap()) {
 +  if (obj === null || typeof obj !== 'object') {
-+    return obj; // Return primitives or functions as-is
++    return obj;
 +  }
 +
 +  if (typeof obj === 'function') {
@@ -60,7 +60,7 @@ index be289a3..b25255d 100644
  function noop() { }
  
  // https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/CSSStyleSheet
-@@ -19,13 +73,84 @@ class EventTarget {
+@@ -19,13 +73,81 @@ class EventTarget {
  // EventTarget <- Node
  // TODO should be an interface?
  class Node extends EventTarget {
@@ -84,7 +84,7 @@ index be289a3..b25255d 100644
 +    const childNodes = (this.nodeName === 'template' ? this.content : this).childNodes;
 +
 +    if (node.parentNode) {
-+      node.parentNode?.removeChild?.(node); // Remove from current parent
++      node.parentNode?.removeChild?.(node);
 +    }
 +
 +    if (node.nodeName === 'template') {
@@ -124,31 +124,28 @@ index be289a3..b25255d 100644
 +
 +  get textContent() {
 +    if (this.nodeName === '#text') {
-+      return this.value || ''; // Text nodes should return their value
++      return this.value || '';
 +    }
 +
-+    // Compute textContent for elements by concatenating text of all descendants
 +    return this.childNodes
 +      .map((child) => child.nodeName === '#text' ? child.value : child.textContent)
 +      .join('');
 +  }
 +
 +  set textContent(value) {
-+    // Remove all current child nodes
 +    this.childNodes = [];
 +
 +    if (value) {
-+      // Create a single text node with the given value
 +      const textNode = new Node();
 +      textNode.nodeName = '#text';
-+      textNode.value = value; // Text node content
++      textNode.value = value;
 +      textNode.parentNode = this;
 +      this.childNodes.push(textNode);
 +    }
    }
  }
  
-@@ -34,33 +159,48 @@ class Node extends EventTarget {
+@@ -34,33 +156,44 @@ class Node extends EventTarget {
  class Element extends Node {
    constructor() {
      super();
@@ -174,7 +171,6 @@ index be289a3..b25255d 100644
  
 -  setAttribute(name, value) {
 -    this.attributes[name] = value;
-+  // Serialize the content of the DocumentFragment when getting innerHTML
 +  get innerHTML() {
 +    const childNodes = (this.nodeName === 'template' ? this.content : this).childNodes;
 +    return childNodes ? serialize({ childNodes }) : '';
@@ -183,23 +179,20 @@ index be289a3..b25255d 100644
 -  getAttribute(name) {
 -    return this.attributes[name];
 +  set innerHTML(html) {
-+    (this.nodeName === 'template' ? this.content : this).childNodes = getParse(html)(html).childNodes; // Replace content's child nodes
++    (this.nodeName === 'template' ? this.content : this).childNodes = getParse(html)(html).childNodes;
    }
  
    hasAttribute(name) {
 -    return !!this.attributes[name];
-+    // Modified attribute handling to work with parse5
 +    return this.attrs.some((attr) => attr.name === name);
 +  }
 +
 +  getAttribute(name) {
-+    // Modified attribute handling to work with parse5
 +    const attr = this.attrs.find((attr) => attr.name === name);
 +    return attr ? attr.value : null;
 +  }
 +
 +  setAttribute(name, value) {
-+    // Modified attribute handling to work with parse5
 +    const attr = this.attrs?.find((attr) => attr.name === name);
 +
 +    if (attr) {
@@ -210,7 +203,7 @@ index be289a3..b25255d 100644
    }
  }
  
-@@ -75,7 +215,7 @@ class Document extends Node {
+@@ -75,7 +208,7 @@ class Document extends Node {
          return new HTMLTemplateElement();
  
        default:
@@ -219,7 +212,7 @@ index be289a3..b25255d 100644
  
      }
    }
-@@ -88,6 +228,10 @@ class Document extends Node {
+@@ -88,6 +221,10 @@ class Document extends Node {
  // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement
  // EventTarget <- Node <- Element <- HTMLElement
  class HTMLElement extends Element {
@@ -230,7 +223,7 @@ index be289a3..b25255d 100644
    connectedCallback() { }
  }
  
-@@ -100,9 +244,18 @@ class DocumentFragment extends Node { }
+@@ -100,9 +237,18 @@ class DocumentFragment extends Node { }
  class ShadowRoot extends DocumentFragment {
    constructor(options) {
      super();
@@ -250,7 +243,7 @@ index be289a3..b25255d 100644
  }
  
  // https://developer.mozilla.org/en-US/docs/Web/API/HTMLTemplateElement
-@@ -110,22 +263,11 @@ class ShadowRoot extends DocumentFragment {
+@@ -110,22 +256,11 @@ class ShadowRoot extends DocumentFragment {
  class HTMLTemplateElement extends HTMLElement {
    constructor() {
      super();
@@ -278,7 +271,7 @@ index be289a3..b25255d 100644
    }
  }
  
-@@ -156,4 +298,5 @@ globalThis.addEventListener = globalThis.addEventListener ?? noop;
+@@ -156,4 +291,5 @@ globalThis.addEventListener = globalThis.addEventListener ?? noop;
  globalThis.document = globalThis.document ?? new Document();
  globalThis.customElements = globalThis.customElements ?? new CustomElementsRegistry();
  globalThis.HTMLElement = globalThis.HTMLElement ?? HTMLElement;
@@ -286,7 +279,7 @@ index be289a3..b25255d 100644
  globalThis.CSSStyleSheet = globalThis.CSSStyleSheet ?? CSSStyleSheet;
 \ No newline at end of file
 diff --git a/node_modules/wc-compiler/src/wcc.js b/node_modules/wc-compiler/src/wcc.js
-index 68c7a2e..b328cf3 100644
+index 68c7a2e..d394f17 100644
 --- a/node_modules/wc-compiler/src/wcc.js
 +++ b/node_modules/wc-compiler/src/wcc.js
 @@ -1,39 +1,15 @@
@@ -388,7 +381,7 @@ index 68c7a2e..b328cf3 100644
        await renderComponentRoots(node.content, definitions);
      }
    }
-@@ -163,38 +143,6 @@ async function getTagName(moduleURL) {
+@@ -163,40 +143,7 @@ async function getTagName(moduleURL) {
    return tagName;
  }
  
@@ -425,9 +418,11 @@ index 68c7a2e..b328cf3 100644
 -}
 -
  async function initializeCustomElement(elementURL, tagName, node = {}, definitions = [], isEntry, props = {}) {
-   const { attrs = [], childNodes = [] } = node;
+-  const { attrs = [], childNodes = [] } = node;
  
-@@ -208,24 +156,15 @@ async function initializeCustomElement(elementURL, tagName, node = {}, definitio
+   if (!tagName) {
+     const depth = isEntry ? 1 : 0;
+@@ -208,25 +155,12 @@ async function initializeCustomElement(elementURL, tagName, node = {}, definitio
    const { href } = elementURL;
    const element = customElements.get(tagName) ?? (await import(href)).default;
    const dataLoader = (await import(href)).getData;
@@ -443,18 +438,19 @@ index 68c7a2e..b328cf3 100644
  
 -    // support for HTML (Light DOM) Web Components
 -    elementInstance.innerHTML = renderLightDomChildren(childNodes);
-+    elementInstance.childNodes = childNodes;
- 
-     attrs.forEach((attr) => {
-       elementInstance.setAttribute(attr.name, attr.value);
+-
+-    attrs.forEach((attr) => {
+-      elementInstance.setAttribute(attr.name, attr.value);
 -  
 -      if (attr.name === 'hydrate') {
 -        definitions[tagName].hydrate = attr.value;
 -      }
-     });
+-    });
++    Object.assign(elementInstance, node);
  
      await elementInstance.connectedCallback();
-@@ -239,22 +178,31 @@ async function renderToString(elementURL, wrappingEntryTag = true, props = {}) {
+ 
+@@ -239,22 +173,31 @@ async function renderToString(elementURL, wrappingEntryTag = true, props = {}) {
    const elementTagName = wrappingEntryTag && await getTagName(elementURL);
    const isEntry = !!elementTagName;
    const elementInstance = await initializeCustomElement(elementURL, undefined, undefined, definitions, isEntry, props);
