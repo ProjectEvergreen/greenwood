@@ -159,28 +159,13 @@ class StandardHtmlResource extends ResourceInterface {
     });
   }
 
-  // https://github.com/ProjectEvergreen/greenwood/issues/1375
-  async shouldIntercept(url) {
-    const { pathname } = url;
-    const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
-
-    return matchingRoute?.pageHref?.endsWith(this.extensions[1]) && this.compilation.config.prerender && process.env.__GWD_COMMAND__ === 'build'; // eslint-disable-line no-underscore-dangle
-  }
-
-  async intercept(url, request, response) {
-    const body = await response.text();
-
-    return new Response(body.replace(/&#x3C;/g, 'greenwood-custom-left-bracket'));
-  }
-
   async shouldOptimize(url, response) {
     return response.headers.get('Content-Type')?.indexOf(this.contentType) >= 0;
   }
 
   async optimize(url, response) {
-    const { optimization, basePath, prerender } = this.compilation.config;
+    const { optimization, basePath } = this.compilation.config;
     const { pathname } = url;
-    const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
     const pageResources = this.compilation.graph.find(page => page.route === pathname).resources;
     let body = await response.text();
 
@@ -258,10 +243,6 @@ class StandardHtmlResource extends ResourceInterface {
           body = body.replace(contents, optimizedFileContents);
         }
       }
-    }
-
-    if (matchingRoute?.pageHref?.endsWith(this.extensions[1]) && prerender) {
-      body = body.replace(/greenwood-custom-left-bracket/g, '&lt;');
     }
 
     return new Response(body);
