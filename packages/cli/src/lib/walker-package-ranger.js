@@ -1,10 +1,11 @@
 import fs from 'fs';
+import { isBuiltin } from 'node:module';
 
 // priority if from L -> R
 const SUPPORTED_EXPORT_CONDITIONS = ['import', 'module-sync', 'default'];
 const IMPORT_MAP_RESOLVED_PREFIX = '/~';
 const importMap = new Map();
-const diagnostics = {};
+const diagnostics = new Map();
 
 function updateImportMap(key, value, resolvedRoot) {
   importMap.set(
@@ -23,7 +24,7 @@ function resolveBareSpecifier(specifier) {
   try {
     resolvedPath = import.meta.resolve(specifier);
   } catch (e) {
-    diagnostics[specifier] = `ERROR (${e.code}): unable to resolve specifier => \`${specifier}\` \n${e.message}`;
+    diagnostics.set(specifier, `ERROR (${e.code}): unable to resolve specifier => \`${specifier}\`\n${e.message}`);
   }
 
   return resolvedPath;
@@ -68,7 +69,9 @@ function derivePackageRoot(resolved) {
     root = root.substring(0, root.lastIndexOf(segment));
   }
 
-  return root;
+  return root !== ''
+    ? root
+    : null;
 }
 
 // helper function to convert export patterns to a regex (thanks ChatGPT :D)
@@ -186,7 +189,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
 
         if (!matched) {
           // ex. https://unpkg.com/browse/matches-selector@1.2.0/package.json
-          diagnostics[dependency] = `no supported export conditions (\`${SUPPORTED_EXPORT_CONDITIONS.join(', ')}\`) for dependency => \`${dependency}\``;
+          diagnostics.set(dependency, `no supported export conditions (\`${SUPPORTED_EXPORT_CONDITIONS.join(', ')}\`) for dependency => \`${dependency}\``);
         }
       } else {
         // handle (unconditional) subpath exports
@@ -208,7 +211,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
     updateImportMap(dependency, 'index.js', resolvedRoot);
   } else {
     // ex: https://unpkg.com/browse/uuid@3.4.0/package.json
-    diagnostics[dependency] = `WARNING: No supported entry point detected for => \`${dependency}\``;
+    diagnostics.set(dependency, `WARNING: No supported entry point detected for => \`${dependency}\``);
   }
 }
 
@@ -234,6 +237,13 @@ async function walkPackageJson(packageJson = {}, walkedPackages = new Set()) {
             walkedPackages.add(name);
 
             await walkPackageJson(resolvedPackageJson, walkedPackages);
+          }
+        } else {
+          // ignore built-ins since NodeJS resolves them automatically
+          // https://github.com/nodejs/node/issues/56652
+          // https://nodejs.org/api/modules.html#built-in-modules
+          if (!isBuiltin(resolved)) {
+            diagnostics.set(dependency, `WARNING: No package.json resolved for => \`${dependency}\`, resolved to \`${resolved}\``);
           }
         }
       }

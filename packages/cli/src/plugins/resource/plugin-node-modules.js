@@ -80,14 +80,14 @@ class NodeModulesResource extends ResourceInterface {
       console.log('Generating import map from project dependencies...');
       const { importMap, diagnostics } = await walkPackageJson(userPackageJson);
 
-      if (Object.keys(diagnostics).length > 0) {
+      if (diagnostics.size > 0) {
         console.log('****************************************************************************');
 
-        Object.keys(diagnostics).forEach((diagnostic) => {
-          console.warn(diagnostics[diagnostic]);
+        diagnostics.forEach((value) => {
+          console.warn(`- ${value}\n`);
         });
 
-        console.log('Learn more about these warnings at => https://greenwoodjs.dev/docs/introduction/web-standards/#import-maps');
+        console.log('\n>>> Some issue were detected, learn more about these warnings at https://greenwoodjs.dev/docs/introduction/web-standards/#import-maps');
         console.log('****************************************************************************');
       }
 
