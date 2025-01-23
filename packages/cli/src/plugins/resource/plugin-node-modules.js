@@ -84,7 +84,7 @@ class NodeModulesResource extends ResourceInterface {
         console.log('****************************************************************************');
 
         diagnostics.forEach((value) => {
-          console.warn(`- ${value}`);
+          console.warn(`- ${value}\n`);
         });
 
         console.log('\n>>> Some issue were detected, learn more about these warnings at https://greenwoodjs.dev/docs/introduction/web-standards/#import-maps');

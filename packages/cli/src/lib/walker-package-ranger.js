@@ -24,7 +24,7 @@ function resolveBareSpecifier(specifier) {
   try {
     resolvedPath = import.meta.resolve(specifier);
   } catch (e) {
-    diagnostics.set(specifier, `ERROR (${e.code}): unable to resolve specifier => \`${specifier}\`\n${e.message}\n`);
+    diagnostics.set(specifier, `ERROR (${e.code}): unable to resolve specifier => \`${specifier}\`\n${e.message}`);
   }
 
   return resolvedPath;
