@@ -7,7 +7,7 @@ import * as walk from 'acorn-walk';
 
 // https://github.com/rollup/rollup/issues/2121
 // would be nice to get rid of this
-function cleanRollupId(id) {
+function cleanRollupId(id = '') {
   return id.replace('\x00', '').replace('?commonjs-proxy', '');
 }
 
@@ -27,7 +27,7 @@ function greenwoodResourceLoader (compilation, browser = false) {
     async resolveId(id, importer, options) {
       const { userWorkspace, scratchDir } = compilation.context;
       const normalizedId = cleanRollupId(id);
-      const importerUrl = new URL(`file://${importer ?? ''}`);
+      const importerUrl = new URL(`file://${cleanRollupId(importer) ?? ''}`);
       const isUserWorkspaceImporter = importerUrl?.pathname?.startsWith(userWorkspace.pathname);
       const isScratchDirImporter = importerUrl?.pathname?.startsWith(scratchDir.pathname);
 
