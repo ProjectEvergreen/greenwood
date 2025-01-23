@@ -1,6 +1,6 @@
 [build]
   publish = "public/"
-  command = "yarn build"
+  command = "npx puppeteer browsers install chrome && yarn build"
 
 [build.processing]
   skip_processing = true
