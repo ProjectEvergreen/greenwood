@@ -81,6 +81,7 @@
     "redux-thunk": "^3.1.0",
     "rehype-autolink-headings": "^4.0.0",
     "rehype-slug": "^3.0.0",
+    "signal-utils": "^0.21.1",
     "simpledotcss": "^1.0.0",
     "tslib": "^2.8.1"
   }

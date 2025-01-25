@@ -115,10 +115,12 @@ function patternRoot(pattern) {
  * "./icons/*": "./icons/*" - https://unpkg.com/browse/@spectrum-web-components/icons-workflow@1.0.1/package.json
  * "./components/*": "./dist/components/*.js" - https://unpkg.com/browse/@uswds/web-components@0.0.1-alpha/package.json
  * "./src/components/*": "./src/components/* /index.js - https://unpkg.com/browse/@uswds/web-components@0.0.1-alpha/package.json
+ *  "./*": { "default": "./dist/*.ts.js" } - https://unpkg.com/browse/signal-utils@0.21.1/package.json
  */
 async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
   // find the "deepest" segment we can start from to avoid unnecessary file scanning / crawling
   const rootSubValueOffset = patternRoot(subValue);
+  const rootSubValueOffsetLeft = patternRoot(sub);
 
   // ideally we can use fs.glob when it comes out of experimental
   // https://nodejs.org/docs/latest-v22.x/api/fs.html#fspromisesglobpattern-options
@@ -135,12 +137,13 @@ async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
         walkDirectoryForExportPatterns(new URL(`./${file}/`, directoryUrl));
       } else if (regexPattern.test(filePathUrl.href)) {
         const relativePath = filePathUrl.href.replace(resolvedRoot, '');
-        // naive way to offset a subValue pattern to the sub pattern
-        // ex. "./js/*": "./packages/*/src/index.js",
-        // https://unpkg.com/browse/@uswds/uswds@3.10.0/package.json
-        const rootSubRelativePath = relativePath.replace(rootSubValueOffset, '');
+        // naive way to offset a subValue pattern to the sub pattern when dealing with wildcards
+        // ex. "./js/*": "./packages/*/src/index.js" -> /js/<package-name>/src/index.js
+        const rootSubRelativePath = sub.endsWith('*') > 0
+          ? `./${relativePath}`.replace(subValue.split('*')[0], '').replace(subValue.split('*')[1], '')
+          : relativePath.replace(rootSubValueOffset, '');
 
-        updateImportMap(`${dependency}/${rootSubRelativePath}`, relativePath, resolvedRoot);
+        updateImportMap(`${dependency}${rootSubValueOffsetLeft}/${rootSubRelativePath}`, relativePath, resolvedRoot);
       }
     });
   }
@@ -182,7 +185,11 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
         for (const condition of SUPPORTED_EXPORT_CONDITIONS) {
           if (exports[sub][condition]) {
             matched = true;
-            trackExportConditions(dependency, exports, sub, condition, resolvedRoot);
+            if (sub.indexOf('*') >= 0) {
+              await walkExportPatterns(dependency, sub, exports[sub][condition], resolvedRoot);
+            } else {
+              trackExportConditions(dependency, exports, sub, condition, resolvedRoot);
+            }
             break;
           }
         }
