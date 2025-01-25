@@ -119,8 +119,8 @@ function patternRoot(pattern) {
  */
 async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
   // find the "deepest" segment we can start from to avoid unnecessary file scanning / crawling
+  const rootSubOffset = patternRoot(sub);
   const rootSubValueOffset = patternRoot(subValue);
-  const rootSubValueOffsetLeft = patternRoot(sub);
 
   // ideally we can use fs.glob when it comes out of experimental
   // https://nodejs.org/docs/latest-v22.x/api/fs.html#fspromisesglobpattern-options
@@ -139,11 +139,11 @@ async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
         const relativePath = filePathUrl.href.replace(resolvedRoot, '');
         // naive way to offset a subValue pattern to the sub pattern when dealing with wildcards
         // ex. "./js/*": "./packages/*/src/index.js" -> /js/<package-name>/src/index.js
-        const rootSubRelativePath = sub.endsWith('*') > 0
+        const rootSubRelativePath = sub.endsWith('*')
           ? `./${relativePath}`.replace(subValue.split('*')[0], '').replace(subValue.split('*')[1], '')
           : relativePath.replace(rootSubValueOffset, '');
 
-        updateImportMap(`${dependency}${rootSubValueOffsetLeft}/${rootSubRelativePath}`, relativePath, resolvedRoot);
+        updateImportMap(`${dependency}${rootSubOffset}/${rootSubRelativePath}`, relativePath, resolvedRoot);
       }
     });
   }
