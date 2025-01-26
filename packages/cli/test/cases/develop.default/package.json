@@ -8,6 +8,7 @@
     "@uswds/web-components": "^0.0.1-alpha",
     "lit": "^3.1.0",
     "luxon": "^3.5.0",
+    "signal-utils": "^0.21.1",
     "tslib": "^2.8.1"
   }
 }
