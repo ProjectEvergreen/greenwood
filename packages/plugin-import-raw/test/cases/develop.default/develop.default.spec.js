@@ -110,7 +110,9 @@ describe("Develop Greenwood With: ", function () {
       });
 
       it("should return an ECMASCript module", function () {
-        expect(data.replace(/\n/g, '')).to.equal("export const styles = `.mdc-touch-target-wrapper{display:inline}`;");
+        expect(data.replace(/\n/g, "")).to.equal(
+          "export const styles = `.mdc-touch-target-wrapper{display:inline}`;",
+        );
       });
     });
   });

@@ -92,16 +92,16 @@ describe("Develop Greenwood With: ", function () {
       });
 
       it("should contain import attributes polyfill syntax for CSS files", function (done) {
-        expect(text.replace(/ /g, "")).to.contain("importsheetfrom\"./hero.css?polyfill=type-css\"");
+        expect(text.replace(/ /g, "")).to.contain('importsheetfrom"./hero.css?polyfill=type-css"');
         expect(text.replace(/ /g, "")).to.contain(
-          "importthemefrom\"../theme.css?polyfill=type-css\"",
+          'importthemefrom"../theme.css?polyfill=type-css"',
         );
 
         done();
       });
 
       it("should contain import attributes polyfill syntax for JSON", function (done) {
-        expect(text.replace(/ /g, "")).to.contain("importjsonfrom\"./hero.json?polyfill=type-json\"");
+        expect(text.replace(/ /g, "")).to.contain('importjsonfrom"./hero.json?polyfill=type-json"');
 
         done();
       });

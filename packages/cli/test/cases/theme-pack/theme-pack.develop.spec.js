@@ -126,7 +126,7 @@ describe("Develop Greenwood With: ", function () {
 
       it("should correctly return CSS from the developers local files", function (done) {
         expect(body).to.equal(
-          ":root{--color-primary:#135;--color-secondary:#74b238;--font-family:\"Optima\", sans-serif;}",
+          ':root{--color-primary:#135;--color-secondary:#74b238;--font-family:"Optima", sans-serif;}',
         );
 
         done();
@@ -156,7 +156,7 @@ describe("Develop Greenwood With: ", function () {
       });
 
       it("should correctly return JavaScript from the developers local files", function (done) {
-        expect(body).to.contain("customElements.define(\"x-header\", HeaderComponent);");
+        expect(body).to.contain('customElements.define("x-header", HeaderComponent);');
 
         done();
       });

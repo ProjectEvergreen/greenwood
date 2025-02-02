@@ -23,8 +23,11 @@ function commonIndexSpecs(dom, html, label) {
         const trimmedHtml = html.replace(/<!--*.*-->/, "");
 
         expect(trimmedHtml).to.satisfy(function () {
-          return trimmedHtml.indexOf("<!doctype html>") === 0 || trimmedHtml.indexOf("<!DOCTYPE html>") === 0;
-        })
+          return (
+            trimmedHtml.indexOf("<!doctype html>") === 0 ||
+            trimmedHtml.indexOf("<!DOCTYPE html>") === 0
+          );
+        });
       });
 
       it("should have a <head> tag with the lang attribute on it", function () {

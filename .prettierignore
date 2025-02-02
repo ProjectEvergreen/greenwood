@@ -1,5 +1,5 @@
 *.md
-**/*expected.css
+**/*expected*.*
 packages/cli/test/cases/build.config.optimization-default/src/styles/*.css
 packages/cli/test/cases/develop.default.hud-disabled/src/pages/index.html
 packages/cli/test/cases/develop.default.hud/src/pages/index.html

@@ -619,7 +619,7 @@ describe("Develop Greenwood With: ", function () {
       });
 
       it("should return the correct response body", function (done) {
-        expect(body.replace(/\n/g, '')).to.equal("console.debug(\"its just a prank bro!\");");
+        expect(body.replace(/\n/g, "")).to.equal('console.debug("its just a prank bro!");');
         done();
       });
     });
