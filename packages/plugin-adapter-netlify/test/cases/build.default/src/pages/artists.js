@@ -1,20 +1,22 @@
-import '../components/card.js';
-import { getArtists } from '../services/artists.js';
+import "../components/card.js";
+import { getArtists } from "../services/artists.js";
 
 export default class ArtistsPage extends HTMLElement {
   async connectedCallback() {
     const artists = getArtists();
-    const html = artists.map(artist => {
-      const { name, imageUrl } = artist;
+    const html = artists
+      .map((artist) => {
+        const { name, imageUrl } = artist;
 
-      return `
+        return `
         <app-card
           title="${name}"
           thumbnail="${imageUrl}"
         >
         </app-card>
       `;
-    }).join('');
+      })
+      .join("");
 
     this.innerHTML = `
       <a href="/">&lt; Back</a>

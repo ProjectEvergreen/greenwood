@@ -1,13 +1,12 @@
-import { html, LitElement } from 'lit';
-import client from '@greenwood/plugin-graphql/src/core/client.js';
+import { html, LitElement } from "lit";
+import client from "@greenwood/plugin-graphql/src/core/client.js";
 
 class PostsListTemplate extends LitElement {
-
   static get properties() {
     return {
       posts: {
-        type: Array
-      }
+        type: Array,
+      },
     };
   }
 
@@ -30,12 +29,12 @@ class PostsListTemplate extends LitElement {
             }
           }
         }
-      `
+      `,
     });
 
     this.posts = response.data.graph
-      .filter(page => page.route.indexOf('/blog/') >= 0)
-      .filter(page => page.id !== 'index');
+      .filter((page) => page.route.indexOf("/blog/") >= 0)
+      .filter((page) => page.id !== "index");
   }
 
   render() {
@@ -44,12 +43,14 @@ class PostsListTemplate extends LitElement {
     return html`
       <h1>My Posts</h1>
 
-      <div class="posts">          
+      <div class="posts">
         <ul>
           ${posts.map((post) => {
             return html`
               <li>
-                <a href="${post.route}" title="Click to read my ${post.title} blog post">${post.title}</a>
+                <a href="${post.route}" title="Click to read my ${post.title} blog post"
+                  >${post.title}</a
+                >
                 <span class="author">Written By: ${post.data.author}</span>
                 <span class="date">On: ${post.data.date}</span>
               </li>
@@ -61,4 +62,4 @@ class PostsListTemplate extends LitElement {
   }
 }
 
-customElements.define('posts-list', PostsListTemplate);
+customElements.define("posts-list", PostsListTemplate);

@@ -1,3 +1,3 @@
 export default {
-  staticRouter: true
+  staticRouter: true,
 };

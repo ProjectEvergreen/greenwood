@@ -1,4 +1,4 @@
-import styles from './logo.module.css';
+import styles from "./logo.module.css";
 
 export default class Logo extends HTMLElement {
   connectedCallback() {
@@ -10,4 +10,4 @@ export default class Logo extends HTMLElement {
   }
 }
 
-customElements.define('app-logo', Logo);
+customElements.define("app-logo", Logo);

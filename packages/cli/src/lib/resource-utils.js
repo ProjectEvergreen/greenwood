@@ -1,22 +1,29 @@
-import fs from 'fs/promises';
-import { hashString } from './hashing-utils.js';
-import { getResolvedHrefFromPathnameShortcut } from '../lib/node-modules-utils.js';
-import htmlparser from 'node-html-parser';
-import { asyncMap } from './async-utils.js';
+import fs from "fs/promises";
+import { hashString } from "./hashing-utils.js";
+import { getResolvedHrefFromPathnameShortcut } from "../lib/node-modules-utils.js";
+import htmlparser from "node-html-parser";
+import { asyncMap } from "./async-utils.js";
 
-async function modelResource(context, type, src = undefined, contents = undefined, optimizationAttr = undefined, rawAttributes = undefined) {
+async function modelResource(
+  context,
+  type,
+  src = undefined,
+  contents = undefined,
+  optimizationAttr = undefined,
+  rawAttributes = undefined,
+) {
   const { scratchDir, userWorkspace, projectDirectory } = context;
-  const extension = type === 'script' ? 'js' : 'css';
+  const extension = type === "script" ? "js" : "css";
   let sourcePathURL;
 
   if (src) {
-    sourcePathURL = src.startsWith('/node_modules/')
+    sourcePathURL = src.startsWith("/node_modules/")
       ? new URL(getResolvedHrefFromPathnameShortcut(src, projectDirectory))
-      : src.startsWith('/')
+      : src.startsWith("/")
         ? new URL(`.${src}`, userWorkspace)
-        : new URL(`./${src.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace);
+        : new URL(`./${src.replace(/\.\.\//g, "").replace("./", "")}`, userWorkspace);
 
-    contents = await fs.readFile(sourcePathURL, 'utf-8');
+    contents = await fs.readFile(sourcePathURL, "utf-8");
   } else {
     const scratchFileName = hashString(contents);
 
@@ -32,7 +39,7 @@ async function modelResource(context, type, src = undefined, contents = undefine
     optimizedFileName: undefined,
     optimizedFileContents: undefined,
     optimizationAttr,
-    rawAttributes
+    rawAttributes,
   };
 }
 
@@ -44,7 +51,8 @@ function mergeResponse(destination, source) {
   source.headers.forEach((value, key) => {
     // TODO better way to handle Response automatically setting content-type
     // https://github.com/ProjectEvergreen/greenwood/issues/1049
-    const isDefaultHeader = key.toLowerCase() === 'content-type' && value === 'text/plain;charset=UTF-8';
+    const isDefaultHeader =
+      key.toLowerCase() === "content-type" && value === "text/plain;charset=UTF-8";
 
     if (!isDefaultHeader) {
       headers.set(key, value);
@@ -54,7 +62,7 @@ function mergeResponse(destination, source) {
   return new Response(source.body, {
     headers,
     status,
-    statusText
+    statusText,
   });
 }
 
@@ -63,15 +71,13 @@ function mergeResponse(destination, source) {
 // https://github.com/rollup/rollup/issues/3779
 function normalizePathnameForWindows(url) {
   const windowsDriveRegex = /\/[a-zA-Z]{1}:\//;
-  const { pathname = '', searchParams } = url;
-  const params = searchParams.size > 0
-    ? `?${searchParams.toString()}`
-    : '';
+  const { pathname = "", searchParams } = url;
+  const params = searchParams.size > 0 ? `?${searchParams.toString()}` : "";
 
   if (windowsDriveRegex.test(pathname)) {
     const driveMatch = pathname.match(windowsDriveRegex)[0];
 
-    return `${pathname.replace(driveMatch, driveMatch.replace('/', ''))}${params}`;
+    return `${pathname.replace(driveMatch, driveMatch.replace("/", ""))}${params}`;
   }
 
   return `${pathname}${params}`;
@@ -91,19 +97,19 @@ async function checkResourceExists(url) {
 // * and a nested path in the layout - ../../styles/theme.css
 // so will get resolved as `${rootUrl}/styles/theme.css`
 async function resolveForRelativeUrl(url, rootUrl) {
-  const search = url.search || '';
+  const search = url.search || "";
   let reducedUrl;
 
   if (await checkResourceExists(new URL(`.${url.pathname}`, rootUrl))) {
     return new URL(`.${url.pathname}${search}`, rootUrl);
   }
 
-  const segments = url.pathname.split('/').filter(segment => segment !== '');
+  const segments = url.pathname.split("/").filter((segment) => segment !== "");
   segments.shift();
 
   for (let i = 0, l = segments.length; i < l; i += 1) {
     const nextSegments = segments.slice(i);
-    const urlToCheck = new URL(`./${nextSegments.join('/')}`, rootUrl);
+    const urlToCheck = new URL(`./${nextSegments.join("/")}`, rootUrl);
 
     if (await checkResourceExists(urlToCheck)) {
       reducedUrl = new URL(`${urlToCheck}${search}`);
@@ -117,60 +123,90 @@ async function trackResourcesForRoute(html, compilation, route) {
   const { context } = compilation;
   const root = htmlparser.parse(html, {
     script: true,
-    style: true
+    style: true,
   });
 
   // intentionally support <script> tags from the <head> or <body>
-  const scripts = await asyncMap(Array.from(root.querySelectorAll('script'))
-    .filter(script => (
-      isLocalLink(script.getAttribute('src')) || script.rawText)
-      && script.rawAttrs.indexOf('importmap') < 0
-      && script.getAttribute('type') !== 'application/json')
-  , async (script) => {
-    const src = script.getAttribute('src');
-    const optimizationAttr = script.getAttribute('data-gwd-opt');
-    const { rawAttrs } = script;
+  const scripts = await asyncMap(
+    Array.from(root.querySelectorAll("script")).filter(
+      (script) =>
+        (isLocalLink(script.getAttribute("src")) || script.rawText) &&
+        script.rawAttrs.indexOf("importmap") < 0 &&
+        script.getAttribute("type") !== "application/json",
+    ),
+    async (script) => {
+      const src = script.getAttribute("src");
+      const optimizationAttr = script.getAttribute("data-gwd-opt");
+      const { rawAttrs } = script;
 
-    if (src) {
-      // <script src="...."></script>
-      return await modelResource(context, 'script', src, null, optimizationAttr, rawAttrs);
-    } else if (script.rawText) {
-      // <script>...</script>
-      return await modelResource(context, 'script', null, script.rawText, optimizationAttr, rawAttrs);
-    }
-  });
+      if (src) {
+        // <script src="...."></script>
+        return await modelResource(context, "script", src, null, optimizationAttr, rawAttrs);
+      } else if (script.rawText) {
+        // <script>...</script>
+        return await modelResource(
+          context,
+          "script",
+          null,
+          script.rawText,
+          optimizationAttr,
+          rawAttrs,
+        );
+      }
+    },
+  );
 
-  const styles = await asyncMap(Array.from(root.querySelectorAll('style'))
-    .filter(style => !(/\$/).test(style.rawText) && !(/<!-- Shady DOM styles for -->/).test(style.rawText)) // filter out Shady DOM <style> tags that happen when using puppeteer
-  , async(style) => await modelResource(context, 'style', null, style.rawText, null, style.getAttribute('data-gwd-opt')));
+  const styles = await asyncMap(
+    Array.from(root.querySelectorAll("style")).filter(
+      (style) => !/\$/.test(style.rawText) && !/<!-- Shady DOM styles for -->/.test(style.rawText),
+    ), // filter out Shady DOM <style> tags that happen when using puppeteer
+    async (style) =>
+      await modelResource(
+        context,
+        "style",
+        null,
+        style.rawText,
+        null,
+        style.getAttribute("data-gwd-opt"),
+      ),
+  );
 
-  const links = await asyncMap(Array.from(root.querySelectorAll('link'))
-    .filter(link => {
+  const links = await asyncMap(
+    Array.from(root.querySelectorAll("link")).filter((link) => {
       // <link rel="stylesheet" href="..."></link>
-      return link.getAttribute('rel') === 'stylesheet'
-        && link.getAttribute('href') && isLocalLink(link.getAttribute('href'));
-    })
-  , async(link) => {
-    return await modelResource(context, 'link', link.getAttribute('href'), null, link.getAttribute('data-gwd-opt'), link.rawAttrs);
-  });
+      return (
+        link.getAttribute("rel") === "stylesheet" &&
+        link.getAttribute("href") &&
+        isLocalLink(link.getAttribute("href"))
+      );
+    }),
+    async (link) => {
+      return await modelResource(
+        context,
+        "link",
+        link.getAttribute("href"),
+        null,
+        link.getAttribute("data-gwd-opt"),
+        link.rawAttrs,
+      );
+    },
+  );
 
-  const resources = [
-    ...scripts,
-    ...styles,
-    ...links
-  ];
+  const resources = [...scripts, ...styles, ...links];
 
-  resources.forEach(resource => {
+  resources.forEach((resource) => {
     compilation.resources.set(resource.sourcePathURL.pathname, resource);
   });
 
-  compilation.graph.find(page => page.route === route).resources = resources.map(resource => resource.sourcePathURL.pathname);
+  compilation.graph.find((page) => page.route === route).resources = resources.map(
+    (resource) => resource.sourcePathURL.pathname,
+  );
 
   return resources;
 }
 
-function isLocalLink(url = '') {
-  return url !== '' && !url.startsWith('http') && !url.startsWith('//');
+function isLocalLink(url = "") {
+  return url !== "" && !url.startsWith("http") && !url.startsWith("//");
 }
 
 // TODO handle full request
@@ -178,10 +214,10 @@ function isLocalLink(url = '') {
 function transformKoaRequestIntoStandardRequest(url, request) {
   const { body, method, header } = request;
   const headers = new Headers(header);
-  const contentType = headers.get('content-type') || '';
+  const contentType = headers.get("content-type") || "";
   let format;
 
-  if (contentType.includes('application/x-www-form-urlencoded')) {
+  if (contentType.includes("application/x-www-form-urlencoded")) {
     const formData = new FormData();
 
     for (const key of Object.keys(body)) {
@@ -191,10 +227,10 @@ function transformKoaRequestIntoStandardRequest(url, request) {
     // when using FormData, let Request set the correct headers
     // or else it will come out as multipart/form-data
     // https://stackoverflow.com/a/43521052/417806
-    headers.delete('content-type');
+    headers.delete("content-type");
 
     format = formData;
-  } else if (contentType.includes('application/json')) {
+  } else if (contentType.includes("application/json")) {
     format = JSON.stringify(body);
   } else {
     format = body;
@@ -202,39 +238,37 @@ function transformKoaRequestIntoStandardRequest(url, request) {
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#parameters
   return new Request(url, {
-    body: ['GET', 'HEAD'].includes(method.toUpperCase())
-      ? null
-      : format,
+    body: ["GET", "HEAD"].includes(method.toUpperCase()) ? null : format,
     method,
-    headers
+    headers,
   });
 }
 
 // https://stackoverflow.com/questions/57447685/how-can-i-convert-a-request-object-into-a-stringifiable-object-in-javascript
-async function requestAsObject (_request) {
+async function requestAsObject(_request) {
   if (!(_request instanceof Request)) {
-    throw Object.assign(
-      new Error(),
-      { name: 'TypeError', message: 'Argument must be a Request object' }
-    );
+    throw Object.assign(new Error(), {
+      name: "TypeError",
+      message: "Argument must be a Request object",
+    });
   }
 
   const request = _request.clone();
-  const contentType = request.headers.get('content-type') || '';
+  const contentType = request.headers.get("content-type") || "";
   let headers = Object.fromEntries(request.headers);
   let format;
 
-  function stringifiableObject (obj) {
+  function stringifiableObject(obj) {
     const filtered = {};
     for (const key in obj) {
-      if (['boolean', 'number', 'string'].includes(typeof obj[key]) || obj[key] === null) {
+      if (["boolean", "number", "string"].includes(typeof obj[key]) || obj[key] === null) {
         filtered[key] = obj[key];
       }
     }
     return filtered;
   }
 
-  if (contentType.includes('application/x-www-form-urlencoded')) {
+  if (contentType.includes("application/x-www-form-urlencoded")) {
     const formData = await request.formData();
     const params = {};
 
@@ -246,9 +280,9 @@ async function requestAsObject (_request) {
     // or else it will come out as multipart/form-data
     // for serialization between route workers, leave a special marker for Greenwood
     // https://stackoverflow.com/a/43521052/417806
-    headers['content-type'] = 'x-greenwood/www-form-urlencoded';
+    headers["content-type"] = "x-greenwood/www-form-urlencoded";
     format = JSON.stringify(params);
-  } else if (contentType.includes('application/json')) {
+  } else if (contentType.includes("application/json")) {
     format = JSON.stringify(await request.json());
   } else {
     format = await request.text();
@@ -257,7 +291,7 @@ async function requestAsObject (_request) {
   return {
     ...stringifiableObject(request),
     body: format,
-    headers
+    headers,
   };
 }
 
@@ -270,5 +304,5 @@ export {
   resolveForRelativeUrl,
   trackResourcesForRoute,
   transformKoaRequestIntoStandardRequest,
-  isLocalLink
+  isLocalLink,
 };

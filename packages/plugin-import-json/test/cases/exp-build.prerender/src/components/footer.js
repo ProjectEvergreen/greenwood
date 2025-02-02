@@ -1,4 +1,4 @@
-import packageJson from '../../package.json';
+import packageJson from "../../package.json";
 
 export default class FooterComponent extends HTMLElement {
   connectedCallback() {
@@ -19,4 +19,4 @@ export default class FooterComponent extends HTMLElement {
   }
 }
 
-customElements.define('app-footer', FooterComponent);
+customElements.define("app-footer", FooterComponent);

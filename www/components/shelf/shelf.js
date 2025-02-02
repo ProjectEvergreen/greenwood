@@ -1,17 +1,16 @@
-import { css, html, LitElement, unsafeCSS } from 'lit';
-import client from '@greenwood/plugin-graphql/src/core/client.js';
-import CollectionQuery from '@greenwood/plugin-graphql/src/queries/collection.gql';
-import shelfCss from './shelf.css?type=raw';
-import chevronRt from '../icons/chevron-right.js';
-import chevronDwn from '../icons/chevron-down.js';
+import { css, html, LitElement, unsafeCSS } from "lit";
+import client from "@greenwood/plugin-graphql/src/core/client.js";
+import CollectionQuery from "@greenwood/plugin-graphql/src/queries/collection.gql";
+import shelfCss from "./shelf.css?type=raw";
+import chevronRt from "../icons/chevron-right.js";
+import chevronDwn from "../icons/chevron-down.js";
 
 class Shelf extends LitElement {
-
   static get properties() {
     return {
       page: {
-        type: String
-      }
+        type: String,
+      },
     };
   }
 
@@ -23,8 +22,8 @@ class Shelf extends LitElement {
 
   constructor() {
     super();
-    this.page = '';
-    this.selectedIndex = '';
+    this.page = "";
+    this.selectedIndex = "";
     this.shelfList = [];
   }
 
@@ -34,7 +33,7 @@ class Shelf extends LitElement {
   }
 
   expandRoute(path) {
-    let routeShelfListIndex = this.shelfList.findIndex(item => {
+    let routeShelfListIndex = this.shelfList.findIndex((item) => {
       let expRoute = new RegExp(`^${path}$`);
       return expRoute.test(item.route);
     });
@@ -46,17 +45,20 @@ class Shelf extends LitElement {
   }
 
   collapseAll() {
-    this.shelfList = this.shelfList.map(item => {
+    this.shelfList = this.shelfList.map((item) => {
       item.selected = false;
       return item;
     });
   }
 
   toggleSelectedItem() {
-    let selectedShelfListIndex = this.shelfList.findIndex((list, index) => index === this.selectedIndex);
+    let selectedShelfListIndex = this.shelfList.findIndex(
+      (list, index) => index === this.selectedIndex,
+    );
 
     if (selectedShelfListIndex > -1) {
-      this.shelfList[selectedShelfListIndex].selected = !this.shelfList[selectedShelfListIndex].selected;
+      this.shelfList[selectedShelfListIndex].selected =
+        !this.shelfList[selectedShelfListIndex].selected;
     }
   }
 
@@ -66,7 +68,7 @@ class Shelf extends LitElement {
     this.selectedIndex = parseInt(evt.target.id.substring(6, evt.target.id.length), 10);
 
     if (this.selectedIndex === previousSelected) {
-      this.selectedIndex = '';
+      this.selectedIndex = "";
     }
 
     this.toggleSelectedItem();
@@ -86,13 +88,13 @@ class Shelf extends LitElement {
       query: CollectionQuery,
       variables: {
         name: this.page,
-        orderBy: 'order_asc'
-      }
+        orderBy: "order_asc",
+      },
     });
   }
 
   async updated(changedProperties) {
-    if (changedProperties.has('page') && this.page !== '' && this.page !== '/') {
+    if (changedProperties.has("page") && this.page !== "" && this.page !== "/") {
       const response = await this.fetchShelfData();
 
       this.shelfList = response.data.collection;
@@ -104,14 +106,14 @@ class Shelf extends LitElement {
   renderList() {
     /* eslint-disable indent */
     const renderListItems = (mainRoute, children, selected) => {
-      let listItems = '';
+      let listItems = "";
 
       if (children && children.length > 0) {
         listItems = html`
           <ul>
             ${children.map((child) => {
               return html`
-                <li class="${selected ? '' : 'hidden'}">
+                <li class="${selected ? "" : "hidden"}">
                   <a href="${mainRoute}${child.route}">${child.label}</a>
                 </li>
               `;
@@ -126,15 +128,20 @@ class Shelf extends LitElement {
     /* eslint-enable */
     return this.shelfList.map((item, index) => {
       let id = `index_${index}`;
-      let chevron = item.tableOfContents && item.tableOfContents.length > 0
-        ? item.selected === true ? chevronDwn : chevronRt
-        : '';
+      let chevron =
+        item.tableOfContents && item.tableOfContents.length > 0
+          ? item.selected === true
+            ? chevronDwn
+            : chevronRt
+          : "";
 
       return html`
         <li class="list-wrap">
           <div>
             <a href="${item.route}">${item.label}</a>
-            <a id="${id}" @click="${this.handleShelfClick}"><span class="pointer">${chevron}</span></a>
+            <a id="${id}" @click="${this.handleShelfClick}"
+              ><span class="pointer">${chevron}</span></a
+            >
           </div>
 
           ${renderListItems(item.route, item.tableOfContents, item.selected)}
@@ -154,4 +161,4 @@ class Shelf extends LitElement {
   }
 }
 
-customElements.define('app-shelf', Shelf);
+customElements.define("app-shelf", Shelf);

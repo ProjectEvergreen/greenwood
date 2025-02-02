@@ -1,19 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" prefix="og:http://ogp.me/ns#">
-
   <head>
     <script type="module">
-      import { LitElement, html } from 'lit';
-      import client from '@greenwood/plugin-graphql/src/core/client.js';
-      import GalleryQuery from '../data/queries/gallery.gql';
+      import { LitElement, html } from "lit";
+      import client from "@greenwood/plugin-graphql/src/core/client.js";
+      import GalleryQuery from "../data/queries/gallery.gql";
 
       class PhotoGallery extends LitElement {
-
         static get properties() {
           return {
             galleries: {
-              type: Array
-            }
+              type: Array,
+            },
           };
         }
 
@@ -28,39 +26,35 @@
           const response = await client.query({
             query: GalleryQuery,
             variables: {
-              name: 'logos'
-            }
+              name: "logos",
+            },
           });
 
           this.galleries = response.data.gallery;
         }
 
         render() {
-          if(this.galleries.length > 0) {
+          if (this.galleries.length > 0) {
             const { galleries } = this;
             const gallery = galleries[0];
             const { images, title } = gallery;
-        
+
             return html`
               <h2>${title}</h2>
               ${images.map((image, i) => {
-                return html`
-                  <img src="${image.path}" title="${title} - Logo #${++i}">
-                `;
+                return html` <img src="${image.path}" title="${title} - Logo #${++i}" /> `;
               })}
             `;
             /* eslint-enable */
           }
-
         }
       }
 
-      customElements.define('photo-gallery', PhotoGallery);
+      customElements.define("photo-gallery", PhotoGallery);
     </script>
   </head>
-  
+
   <body>
     <photo-gallery></photo-gallery>
   </body>
-
 </html>

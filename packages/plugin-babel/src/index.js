@@ -3,16 +3,16 @@
  * Enable using Babel for processing JavaScript files.
  *
  */
-import babel from '@babel/core';
-import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
-import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
-import rollupBabelPlugin from '@rollup/plugin-babel';
+import babel from "@babel/core";
+import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
+import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
+import rollupBabelPlugin from "@rollup/plugin-babel";
 
 async function getConfig(compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
-  const configFile = 'babel.config.mjs';
+  const configFile = "babel.config.mjs";
   const defaultConfig = (await import(new URL(`./${configFile}`, import.meta.url))).default;
-  const userConfig = await checkResourceExists(new URL(`./${configFile}`, projectDirectory))
+  const userConfig = (await checkResourceExists(new URL(`./${configFile}`, projectDirectory)))
     ? (await import(`${projectDirectory}/${configFile}`)).default
     : {};
   const finalConfig = Object.assign({}, userConfig);
@@ -33,16 +33,18 @@ async function getConfig(compilation, extendConfig = false) {
 class BabelResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['js'];
-    this.contentType = ['text/javascript'];
+    this.extensions = ["js"];
+    this.contentType = ["text/javascript"];
   }
 
   async shouldPreIntercept(url, request, response) {
     const { protocol, pathname } = url;
 
-    return protocol === 'file:'
-      && !pathname.startsWith('/node_modules/')
-      && response.headers.get('Content-Type').indexOf(this.contentType) >= 0;
+    return (
+      protocol === "file:" &&
+      !pathname.startsWith("/node_modules/") &&
+      response.headers.get("Content-Type").indexOf(this.contentType) >= 0
+    );
   }
 
   async preIntercept(url, request, response) {
@@ -51,28 +53,31 @@ class BabelResource extends ResourceInterface {
     const result = await babel.transform(body, config);
 
     return new Response(result.code, {
-      headers: response.headers
+      headers: response.headers,
     });
   }
 }
 
 const greenwoodPluginBabel = (options = {}) => {
-  return [{
-    type: 'resource',
-    name: 'plugin-babel:resource',
-    provider: (compilation) => new BabelResource(compilation, options)
-  }, {
-    type: 'rollup',
-    name: 'plugin-babel:rollup',
-    provider: (compilation) => [
-      rollupBabelPlugin({
-        // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
-        babelHelpers: 'bundled',
+  return [
+    {
+      type: "resource",
+      name: "plugin-babel:resource",
+      provider: (compilation) => new BabelResource(compilation, options),
+    },
+    {
+      type: "rollup",
+      name: "plugin-babel:rollup",
+      provider: (compilation) => [
+        rollupBabelPlugin({
+          // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
+          babelHelpers: "bundled",
 
-        ...getConfig(compilation, options.extendConfig)
-      })
-    ]
-  }];
+          ...getConfig(compilation, options.extendConfig),
+        }),
+      ],
+    },
+  ];
 };
 
 export { greenwoodPluginBabel };

@@ -1,12 +1,11 @@
 export default class Card extends HTMLElement {
-
   selectArtist() {
-    alert(`selected artist is => ${this.getAttribute('title')}!`);
+    alert(`selected artist is => ${this.getAttribute("title")}!`);
   }
 
   connectedCallback() {
-    const thumbnail = this.getAttribute('thumbnail');
-    const title = this.getAttribute('title');
+    const thumbnail = this.getAttribute("thumbnail");
+    const title = this.getAttribute("title");
 
     this.innerHTML = `
       <div>
@@ -19,4 +18,4 @@ export default class Card extends HTMLElement {
   }
 }
 
-customElements.define('app-card', Card);
+customElements.define("app-card", Card);

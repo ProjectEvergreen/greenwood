@@ -5,7 +5,7 @@ async function getLayout(compilation, { route }) {
         <meta name="description" content="${route} (this was generated server side!!!)">
 
         <script>
-          console.log(${JSON.stringify(compilation.graph.map(page => page.title).join(''))});
+          console.log(${JSON.stringify(compilation.graph.map((page) => page.title).join(""))});
         </script>
 
         <style>
@@ -30,10 +30,12 @@ async function getLayout(compilation, { route }) {
 }
 
 async function getBody(compilation) {
-  const artists = await fetch('http://www.analogstudios.net/api/v2/artists').then(resp => resp.json());
+  const artists = await fetch("http://www.analogstudios.net/api/v2/artists").then((resp) =>
+    resp.json(),
+  );
   const timestamp = new Date().getTime();
   const artistsListItems = artists
-    .filter(artist => artist.isActive === 1)
+    .filter((artist) => artist.isActive === 1)
     .map((artist) => {
       const { id, name, bio, imageUrl } = artist;
 
@@ -57,11 +59,11 @@ async function getBody(compilation) {
           <th>Description</th>
           <th>Genre</th>
         </tr>
-        ${artistsListItems.join('')}
+        ${artistsListItems.join("")}
       </table>
       <h6>Fetched at: ${timestamp}</h6>
       <pre>
-        ${JSON.stringify(compilation.graph.map(page => page.title).join(''))}
+        ${JSON.stringify(compilation.graph.map((page) => page.title).join(""))}
       </pre>
     </body>
   `;
@@ -69,19 +71,13 @@ async function getBody(compilation) {
 
 async function getFrontmatter(compilation, { route }) {
   return {
-    collection: 'navigation',
+    collection: "navigation",
     order: 7,
     title: route,
-    imports: [
-      '/components/counter.js'
-    ],
-    author: 'Project Evergreen',
-    date: '01-01-2021'
+    imports: ["/components/counter.js"],
+    author: "Project Evergreen",
+    date: "01-01-2021",
   };
 }
 
-export {
-  getLayout,
-  getBody,
-  getFrontmatter
-};
+export { getLayout, getBody, getFrontmatter };

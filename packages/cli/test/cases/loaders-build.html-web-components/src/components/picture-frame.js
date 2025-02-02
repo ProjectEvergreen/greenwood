@@ -1,6 +1,6 @@
 export default class PictureFrame extends HTMLElement {
   connectedCallback() {
-    const title = this.getAttribute('title');
+    const title = this.getAttribute("title");
 
     this.innerHTML = `
       <div class="picture-frame">
@@ -11,4 +11,4 @@ export default class PictureFrame extends HTMLElement {
   }
 }
 
-customElements.define('app-picture-frame', PictureFrame);
+customElements.define("app-picture-frame", PictureFrame);

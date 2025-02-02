@@ -35,68 +35,67 @@
  *   ]
  * };
  */
-import chai from 'chai';
-import fs from 'fs';
-import glob from 'glob-promise';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import path from 'path';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import fs from "fs";
+import glob from "glob-promise";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import path from "path";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom Babel Options for extending Default Configuration';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+describe("Build Greenwood With: ", function () {
+  const LABEL = "Custom Babel Options for extending Default Configuration";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
+  describe(LABEL, function () {
     let jsFiles;
 
-    before(function() {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
 
-      jsFiles = glob.sync(path.join(this.context.publicDir, '*.js'));
+      jsFiles = glob.sync(path.join(this.context.publicDir, "*.js"));
     });
 
-    runSmokeTest(['public', 'index'], LABEL);
+    runSmokeTest(["public", "index"], LABEL);
 
-    it('should output one JavaScript file', function() {
+    it("should output one JavaScript file", function () {
       expect(jsFiles.length).to.equal(1);
     });
 
-    describe('Babel should process JavaScript that reference private class members / methods', function() {
-      it('should output correctly processed JavaScript without private members', function() {
-        const notExpectedJavaScript = '#x;';
-        const javascript = fs.readFileSync(jsFiles[0], 'utf-8');
+    describe("Babel should process JavaScript that reference private class members / methods", function () {
+      it("should output correctly processed JavaScript without private members", function () {
+        const notExpectedJavaScript = "#x;";
+        const javascript = fs.readFileSync(jsFiles[0], "utf-8");
 
         expect(javascript).to.not.contain(notExpectedJavaScript);
       });
     });
 
     // find a better way to test for preset-env specifically?
-    describe('Babel should handle processing of JavaScript per usage of @babel/preset-env', function() {
-      xit('should output correctly processed JavaScript...', function() {
-        const expectedJavaScript = 'return e&&e.__esModule';
-        const javascript = fs.readFileSync(jsFiles[0], 'utf-8');
+    describe("Babel should handle processing of JavaScript per usage of @babel/preset-env", function () {
+      xit("should output correctly processed JavaScript...", function () {
+        const expectedJavaScript = "return e&&e.__esModule";
+        const javascript = fs.readFileSync(jsFiles[0], "utf-8");
 
         expect(javascript).to.contain(expectedJavaScript);
       });
     });
   });
 
-  after(function() {
+  after(function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
-
 });

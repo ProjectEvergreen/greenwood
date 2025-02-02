@@ -1,9 +1,9 @@
-import glob from 'glob-promise';
-import path from 'path';
+import glob from "glob-promise";
+import path from "path";
 
 function tagsMatch(tagName, html, expected = null) {
-  const openTagRegex = new RegExp(`<${tagName}`, 'g');
-  const closeTagRegex = new RegExp(`</${tagName.replace('>', '')}>`, 'g');
+  const openTagRegex = new RegExp(`<${tagName}`, "g");
+  const closeTagRegex = new RegExp(`</${tagName.replace(">", "")}>`, "g");
   const openingCount = (html.match(openTagRegex) || []).length;
   const closingCount = (html.match(closeTagRegex) || []).length;
   const expectedMatches = parseInt(expected, 10) ? expected : openingCount;
@@ -13,9 +13,9 @@ function tagsMatch(tagName, html, expected = null) {
 
 function getOutputTeardownFiles(outputPath) {
   return [
-    path.join(outputPath, '.greenwood'),
-    path.join(outputPath, 'public'),
-    path.join(outputPath, 'node_modules')
+    path.join(outputPath, ".greenwood"),
+    path.join(outputPath, "public"),
+    path.join(outputPath, "node_modules"),
   ];
 }
 
@@ -25,13 +25,9 @@ async function getDependencyFiles(sourcePath, outputPath) {
   return files.map((lib) => {
     return {
       source: path.join(lib),
-      destination: path.join(outputPath, path.basename(lib))
+      destination: path.join(outputPath, path.basename(lib)),
     };
   });
 }
 
-export {
-  getDependencyFiles,
-  getOutputTeardownFiles,
-  tagsMatch
-};
+export { getDependencyFiles, getOutputTeardownFiles, tagsMatch };

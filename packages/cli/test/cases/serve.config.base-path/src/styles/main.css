@@ -1,4 +1,4 @@
 * {
   color: blue;
-  background-image: url('../images/webcomponents.jpg');
+  background-image: url("../images/webcomponents.jpg");
 }

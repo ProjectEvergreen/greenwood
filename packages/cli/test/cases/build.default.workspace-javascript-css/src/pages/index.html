@@ -1,13 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" prefix="og:http://ogp.me/ns#">
-
   <head>
     <script src="../scripts/other.js" type="module"></script>
-    
-    <script type="module">
-      const one = 'script tag module inline one';
 
-      document.getElementsByClassName('output-script-inline-one')[0].innerHTML = one;
+    <script type="module">
+      const one = "script tag module inline one";
+
+      document.getElementsByClassName("output-script-inline-one")[0].innerHTML = one;
     </script>
 
     <style>
@@ -16,13 +15,13 @@
       }
     </style>
 
-    <link rel="stylesheet" href="../styles/main.css"/>
-    <link href="/styles/other.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../styles/main.css" />
+    <link href="/styles/other.css" rel="stylesheet" />
 
     <script type="module">
-      const two = 'script tag module inline two';
+      const two = "script tag module inline two";
 
-      document.getElementsByClassName('output-script-inline-two')[0].innerHTML = two;
+      document.getElementsByClassName("output-script-inline-two")[0].innerHTML = two;
     </script>
 
     <style>
@@ -32,25 +31,25 @@
     </style>
 
     <script>
-      const three = 'script tag module inline three';
-      
-      document.getElementsByClassName('output-script-inline-three')[0].innerHTML = three;
+      const three = "script tag module inline three";
+
+      document.getElementsByClassName("output-script-inline-three")[0].innerHTML = three;
     </script>
 
     <script type="module">
-      fetch('/assets/data.json')
+      fetch("/assets/data.json")
         .then((resp) => resp.json())
         .then((resp) => {
-          const msg =  `${resp.message} via fetch, status is - ${resp.status}`;
-          document.getElementsByClassName('output-json-fetch')[0].innerHTML = msg;
-        })
+          const msg = `${resp.message} via fetch, status is - ${resp.status}`;
+          document.getElementsByClassName("output-json-fetch")[0].innerHTML = msg;
+        });
     </script>
 
     <script src="/scripts/non-module.js"></script>
 
     <script type="application/json">
-      {"message": "calmer than you are" }
-     </script>
+      { "message": "calmer than you are" }
+    </script>
   </head>
 
   <body>
@@ -72,5 +71,4 @@
       }
     </style>
   </body>
-
 </html>

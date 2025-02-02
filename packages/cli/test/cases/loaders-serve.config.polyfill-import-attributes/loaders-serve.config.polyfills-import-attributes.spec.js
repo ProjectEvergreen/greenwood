@@ -28,133 +28,147 @@
  * package.json
  *
  */
-import chai from 'chai';
-import fs from 'fs';
-import { JSDOM } from 'jsdom';
-import path from 'path';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import fs from "fs";
+import { JSDOM } from "jsdom";
+import path from "path";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Serve Greenwood With: ', function() {
-  const LABEL = 'Import Attributes Polyfill Configuration and prerendering';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputUrl = new URL('.', import.meta.url);
+describe("Serve Greenwood With: ", function () {
+  const LABEL = "Import Attributes Polyfill Configuration and prerendering";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputUrl = new URL(".", import.meta.url);
   const outputPath = fileURLToPath(outputUrl);
-  const hostname = 'http://127.0.0.1:8080';
+  const hostname = "http://127.0.0.1:8080";
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      hostname
+      hostname,
     };
     runner = new Runner(false, true);
   });
 
-  describe(LABEL, function() {
-
-    before(async function() {
+  describe(LABEL, function () {
+    before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
 
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 10000);
 
-        runner.runCommand(cliPath, 'serve', { async: true });
+        runner.runCommand(cliPath, "serve", { async: true });
       });
     });
 
-    describe('Import Attributes Polyfill Behaviors when used for pre-rendering and returning HTML', function() {
+    describe("Import Attributes Polyfill Behaviors when used for pre-rendering and returning HTML", function () {
       let response;
       let dom;
 
-      before(async function() {
+      before(async function () {
         response = await fetch(`${hostname}/`);
         dom = new JSDOM(await response.text());
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers.get('content-type')).to.contain('text/html');
+      it("should return the correct content type", function (done) {
+        expect(response.headers.get("content-type")).to.contain("text/html");
         done();
       });
 
-      it('should return a 200', function(done) {
+      it("should return a 200", function (done) {
         expect(response.status).to.equal(200);
 
         done();
       });
 
-      it('should have the expected SSR output in the HTML for an <h2> tag from JSON import', function(done) {
-        const hero = new JSDOM(dom.window.document.querySelectorAll('app-hero template[shadowrootmode="open"]')[0].innerHTML);
-        const headings = hero.window.document.querySelectorAll('div h2');
+      it("should have the expected SSR output in the HTML for an <h2> tag from JSON import", function (done) {
+        const hero = new JSDOM(
+          dom.window.document.querySelectorAll(
+            'app-hero template[shadowrootmode="open"]',
+          )[0].innerHTML,
+        );
+        const headings = hero.window.document.querySelectorAll("div h2");
 
         expect(headings.length).to.equal(1);
-        expect(headings[0].textContent).to.equal('Hello World');
+        expect(headings[0].textContent).to.equal("Hello World");
 
         done();
       });
 
-      it('should have the expected SSR output in the HTML for <a> tags', function(done) {
-        const hero = new JSDOM(dom.window.document.querySelectorAll('app-hero template[shadowrootmode="open"]')[0].innerHTML);
-        const links = hero.window.document.querySelectorAll('div a');
+      it("should have the expected SSR output in the HTML for <a> tags", function (done) {
+        const hero = new JSDOM(
+          dom.window.document.querySelectorAll(
+            'app-hero template[shadowrootmode="open"]',
+          )[0].innerHTML,
+        );
+        const links = hero.window.document.querySelectorAll("div a");
 
         expect(links.length).to.equal(2);
-        expect(links[0].getAttribute('href')).to.equal('/get-started');
-        expect(links[1].getAttribute('href')).to.equal('/learn-more');
+        expect(links[0].getAttribute("href")).to.equal("/get-started");
+        expect(links[1].getAttribute("href")).to.equal("/learn-more");
 
         done();
       });
     });
 
-    describe('Import Attributes Polyfill Behaviors for the initiating JavaScript file (hero.js) being served and bundled', function() {
-      const jsHash = 'B7j93uYq';
+    describe("Import Attributes Polyfill Behaviors for the initiating JavaScript file (hero.js) being served and bundled", function () {
+      const jsHash = "B7j93uYq";
       let response = {};
       let text;
       let contents;
 
-      before(async function() {
+      before(async function () {
         response = await fetch(`${hostname}/hero.${jsHash}.js`);
         text = await response.clone().text();
-        contents = await fs.promises.readFile(new URL(`./public/hero.${jsHash}.js`, outputUrl), 'utf-8');
+        contents = await fs.promises.readFile(
+          new URL(`./public/hero.${jsHash}.js`, outputUrl),
+          "utf-8",
+        );
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers.get('content-type')).to.contain('text/javascript');
+      it("should return the correct content type", function (done) {
+        expect(response.headers.get("content-type")).to.contain("text/javascript");
         done();
       });
 
-      it('should return a 200', function(done) {
+      it("should return a 200", function (done) {
         expect(response.status).to.equal(200);
 
         done();
       });
 
-      it('should not contain import attributes syntax in the response or bundled output', function(done) {
-        expect(text.replace(/ /g, '')).to.not.contain('with{type:');
-        expect(contents.replace(/ /g, '')).to.not.contain('with{type:');
+      it("should not contain import attributes syntax in the response or bundled output", function (done) {
+        expect(text.replace(/ /g, "")).to.not.contain("with{type:");
+        expect(contents.replace(/ /g, "")).to.not.contain("with{type:");
 
         done();
       });
 
-      it('should contain import attributes polyfill syntax for the theme CSS', function(done) {
+      it("should contain import attributes polyfill syntax for the theme CSS", function (done) {
         expect(text).to.contain('const t=new CSSStyleSheet;t.replaceSync("a{color:blue}");');
         expect(contents).to.contain('const t=new CSSStyleSheet;t.replaceSync("a{color:blue}");');
 
         done();
       });
 
-      it('should contain import attributes polyfill syntax for the component CSS', function(done) {
-        expect(text).to.contain('const e=new CSSStyleSheet;e.replaceSync(":host h2{font-size:3em}");');
-        expect(contents).to.contain('const e=new CSSStyleSheet;e.replaceSync(":host h2{font-size:3em}");');
+      it("should contain import attributes polyfill syntax for the component CSS", function (done) {
+        expect(text).to.contain(
+          'const e=new CSSStyleSheet;e.replaceSync(":host h2{font-size:3em}");',
+        );
+        expect(contents).to.contain(
+          'const e=new CSSStyleSheet;e.replaceSync(":host h2{font-size:3em}");',
+        );
 
         done();
       });
 
-      it('should contain import attributes polyfill syntax for JSON', function(done) {
+      it("should contain import attributes polyfill syntax for JSON", function (done) {
         expect(text).to.contain('var n="Hello World";');
         expect(contents).to.contain('var n="Hello World";');
 
@@ -163,7 +177,7 @@ describe('Serve Greenwood With: ', function() {
     });
   });
 
-  after(function() {
+  after(function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
     runner.stopCommand();
   });

@@ -1,5 +1,5 @@
 export default {
   polyfills: {
-    importMaps: true
-  }
+    importMaps: true,
+  },
 };

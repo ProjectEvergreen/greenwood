@@ -1,15 +1,17 @@
-import fs from 'fs/promises';
+import fs from "fs/promises";
 
 const customExternalSourcesPlugin = {
-  type: 'source',
-  name: 'source-plugin-analogstudios',
+  type: "source",
+  name: "source-plugin-analogstudios",
   provider: () => {
     return async function () {
-      const artists = JSON.parse(await fs.readFile(new URL('./data.json', import.meta.url), 'utf-8'));
+      const artists = JSON.parse(
+        await fs.readFile(new URL("./data.json", import.meta.url), "utf-8"),
+      );
 
       return artists.map((artist) => {
         const { bio, id, imageUrl, name } = artist;
-        const route = `/artists/${name.toLowerCase().replace(/ /g, '-')}/`;
+        const route = `/artists/${name.toLowerCase().replace(/ /g, "-")}/`;
 
         return {
           title: name,
@@ -18,18 +20,16 @@ const customExternalSourcesPlugin = {
             <img src='${imageUrl}'/>
           `,
           route,
-          layout: 'artist',
+          layout: "artist",
           label: name,
           imageUrl,
-          id
+          id,
         };
       });
     };
-  }
+  },
 };
 
 export default {
-  plugins: [
-    customExternalSourcesPlugin
-  ]
+  plugins: [customExternalSourcesPlugin],
 };

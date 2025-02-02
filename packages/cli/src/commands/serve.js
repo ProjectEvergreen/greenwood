@@ -1,17 +1,18 @@
-import { getStaticServer, getHybridServer } from '../lifecycles/serve.js';
-import { checkResourceExists } from '../lib/resource-utils.js';
+import { getStaticServer, getHybridServer } from "../lifecycles/serve.js";
+import { checkResourceExists } from "../lib/resource-utils.js";
 
 const runProdServer = async (compilation) => {
-
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
-
     try {
       const { basePath, port } = compilation.config;
-      const postfixSlash = basePath === '' ? '' : '/';
+      const postfixSlash = basePath === "" ? "" : "/";
       const hasApisDir = await checkResourceExists(compilation.context.apisDir);
-      const hasDynamicRoutes = compilation.graph.find(page => page.isSSR && !page.prerender);
-      const server = (hasDynamicRoutes && !compilation.config.prerender) || hasApisDir ? getHybridServer : getStaticServer;
+      const hasDynamicRoutes = compilation.graph.find((page) => page.isSSR && !page.prerender);
+      const server =
+        (hasDynamicRoutes && !compilation.config.prerender) || hasApisDir
+          ? getHybridServer
+          : getStaticServer;
 
       (await server(compilation)).listen(port, () => {
         console.info(`Started server at http://localhost:${port}${basePath}${postfixSlash}`);
@@ -19,7 +20,6 @@ const runProdServer = async (compilation) => {
     } catch (err) {
       reject(err);
     }
-
   });
 };
 

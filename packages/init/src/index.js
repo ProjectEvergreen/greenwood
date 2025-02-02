@@ -12,45 +12,53 @@
  * - init.yarn
  *
  */
-import chalk from 'chalk';
-import simpleGit from 'simple-git';
-import commander from 'commander';
-import { copyFolder } from './copy-folder.js';
-import fs from 'fs';
-import inquirer from 'inquirer';
-import os from 'os';
-import path from 'path';
-import { spawn } from 'child_process';
-import { fileURLToPath, URL } from 'url';
+import chalk from "chalk";
+import simpleGit from "simple-git";
+import commander from "commander";
+import { copyFolder } from "./copy-folder.js";
+import fs from "fs";
+import inquirer from "inquirer";
+import os from "os";
+import path from "path";
+import { spawn } from "child_process";
+import { fileURLToPath, URL } from "url";
 
-const projectGitHubAPIUrl = 'https://api.github.com/orgs/ProjectEvergreen/repos';
-const templateStandardName = 'greenwood-template-';
+const projectGitHubAPIUrl = "https://api.github.com/orgs/ProjectEvergreen/repos";
+const templateStandardName = "greenwood-template-";
 let selectedTemplate = null;
-const scriptPkg = JSON.parse(fs.readFileSync(fileURLToPath(new URL('../package.json', import.meta.url)), 'utf-8'));
-let templateDir = fileURLToPath(new URL('./template', import.meta.url));
+const scriptPkg = JSON.parse(
+  fs.readFileSync(fileURLToPath(new URL("../package.json", import.meta.url)), "utf-8"),
+);
+let templateDir = fileURLToPath(new URL("./template", import.meta.url));
 let TARGET_DIR = process.cwd();
-const clonedTemplateDir = path.join(TARGET_DIR, '.greenwood', '.template');
+const clonedTemplateDir = path.join(TARGET_DIR, ".greenwood", ".template");
 
-console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
-console.log(`${chalk.rgb(175, 207, 71)('Initialize a Greenwood Project ♻️')}`);
-console.log(`${chalk.rgb(175, 207, 71)('-------------------------------------------------------')}`);
+console.log(
+  `${chalk.rgb(175, 207, 71)("-------------------------------------------------------")}`,
+);
+console.log(`${chalk.rgb(175, 207, 71)("Initialize a Greenwood Project ♻️")}`);
+console.log(
+  `${chalk.rgb(175, 207, 71)("-------------------------------------------------------")}`,
+);
 
 const program = new commander.Command(scriptPkg.name)
   .version(scriptPkg.version)
-  .usage(`${chalk.green('<application-directory>')} [options]`)
-  .option('--yarn', 'Use yarn package manager instead of npm default')
-  .option('--install', 'Install dependencies upon init')
-  .option('--template [type]', 'Select from list of Greenwood curated templates')
+  .usage(`${chalk.green("<application-directory>")} [options]`)
+  .option("--yarn", "Use yarn package manager instead of npm default")
+  .option("--install", "Install dependencies upon init")
+  .option("--template [type]", "Select from list of Greenwood curated templates")
   .parse(process.argv)
   .opts();
 
 if (program.yarn) {
-  console.log('Yarn Enabled');
+  console.log("Yarn Enabled");
 }
 
 // Create new package.json
 const npmInit = async () => {
-  const appPkg = JSON.parse(await fs.promises.readFile(path.join(templateDir, '/package.json'), 'utf-8'));
+  const appPkg = JSON.parse(
+    await fs.promises.readFile(path.join(templateDir, "/package.json"), "utf-8"),
+  );
 
   // use installation path's folder name for packages
   appPkg.name = path.basename(TARGET_DIR);
@@ -58,11 +66,11 @@ const npmInit = async () => {
   // make sure users get latest and greatest version of Greenwood
   // https://github.com/ProjectEvergreen/greenwood/issues/781
   // https://github.com/ProjectEvergreen/greenwood/issues/809
-  appPkg.devDependencies['@greenwood/cli'] = `~${scriptPkg.version}`;
+  appPkg.devDependencies["@greenwood/cli"] = `~${scriptPkg.version}`;
 
   await fs.writeFileSync(
-    path.join(TARGET_DIR, 'package.json'),
-    JSON.stringify(appPkg, null, 2) + os.EOL
+    path.join(TARGET_DIR, "package.json"),
+    JSON.stringify(appPkg, null, 2) + os.EOL,
   );
 };
 
@@ -72,50 +80,46 @@ const srcInit = async () => {
 
   await createGitIgnore();
 
-  fs.readdirSync(templateDir).forEach(file => {
+  fs.readdirSync(templateDir).forEach((file) => {
     templateFiles.push(file);
   });
 
   if (program.yarn) {
     // we only need .npmrc if we're using npm
     // because npm struggles with peer dependencies :/
-    templateFiles = templateFiles.filter(file => file !== '.npmrc');
+    templateFiles = templateFiles.filter((file) => file !== ".npmrc");
   }
 
   await Promise.all(
-    templateFiles.map(async file => {
+    templateFiles.map(async (file) => {
       const resolvedPath = path.join(templateDir, file);
 
       if (fs.lstatSync(resolvedPath).isDirectory()) {
         return await copyFolder(resolvedPath, TARGET_DIR);
       } else if (await fs.existsSync(resolvedPath)) {
-        return await fs.copyFileSync(
-          resolvedPath,
-          path.join(TARGET_DIR, file)
-        );
+        return await fs.copyFileSync(resolvedPath, path.join(TARGET_DIR, file));
       }
-    })
+    }),
   );
 };
 
 // Create the missing gitignore because npm won't publish it https://docs.npmjs.com/files/package.json#files
 const createGitIgnore = () => {
   return new Promise((resolve, reject) => {
-
-    const resolvedPath = path.join(TARGET_DIR, '.gitignore');
+    const resolvedPath = path.join(TARGET_DIR, ".gitignore");
     const stream = fs.createWriteStream(resolvedPath);
-    const patterns = ['*DS_Store', '*.log', 'node_modules/', 'public/', '.greenwood/'];
+    const patterns = ["*DS_Store", "*.log", "node_modules/", "public/", ".greenwood/"];
 
-    stream.once('open', () => {
-      patterns.forEach(pattern => {
+    stream.once("open", () => {
+      patterns.forEach((pattern) => {
         stream.write(`${pattern}\n`);
       });
       stream.end();
     });
-    stream.once('close', () => {
+    stream.once("close", () => {
       resolve();
     });
-    stream.once('error', (err) => {
+    stream.once("error", (err) => {
       reject(err);
     });
   });
@@ -123,18 +127,17 @@ const createGitIgnore = () => {
 
 // Install npm dependencies
 const install = async () => {
-  const pkgMng = program.yarn ? 'yarn' : 'npm'; // default to npm
-  const pkgCommand = os.platform() === 'win32' ? `${pkgMng}.cmd` : pkgMng;
-  const args = ['install', '--loglevel', 'error'];
+  const pkgMng = program.yarn ? "yarn" : "npm"; // default to npm
+  const pkgCommand = os.platform() === "win32" ? `${pkgMng}.cmd` : pkgMng;
+  const args = ["install", "--loglevel", "error"];
 
   return new Promise((resolve, reject) => {
+    const process = spawn(pkgCommand, args, { stdio: "inherit" });
 
-    const process = spawn(pkgCommand, args, { stdio: 'inherit' });
-
-    process.on('close', code => {
+    process.on("close", (code) => {
       if (code !== 0) {
         reject({
-          command: `${pkgCommand} ${args.join(' ')}`
+          command: `${pkgCommand} ${args.join(" ")}`,
         });
         return;
       }
@@ -144,10 +147,8 @@ const install = async () => {
 };
 
 const listAndSelectTemplate = async () => {
-
   const getTemplates = async () => {
     try {
-
       // create error response
       class HTTPResponseError extends Error {
         constructor(response, ...args) {
@@ -157,25 +158,25 @@ const listAndSelectTemplate = async () => {
       }
 
       // check response from repo list fetch
-      const checkStatus = response => {
+      const checkStatus = (response) => {
         if (response.ok) {
           // response.status >= 200 && response.status < 300
           return response.json();
         } else {
-          console.log('Couldn\'t locate any templates, check your connection and try again');
+          console.log("Couldn't locate any templates, check your connection and try again");
           throw new HTTPResponseError(response);
         }
       };
 
-      const repos = await fetch(projectGitHubAPIUrl).then(resp => checkStatus(resp));
+      const repos = await fetch(projectGitHubAPIUrl).then((resp) => checkStatus(resp));
 
       // assuming it did resolve but there are no templates listed
       if (!repos || repos.length === 0) {
-        console.log('Couldn\'t locate any templates, check your connection and try again');
+        console.log("Couldn't locate any templates, check your connection and try again");
         return [];
       }
 
-      const templateRepos = repos.filter(repo => {
+      const templateRepos = repos.filter((repo) => {
         return repo.name.includes(templateStandardName);
       });
 
@@ -193,18 +194,18 @@ const listAndSelectTemplate = async () => {
 
   const questions = [
     {
-      type: 'list',
-      name: 'template',
-      message: 'Which template would you like to use?',
-      choices: templates.map(template => template.name),
+      type: "list",
+      name: "template",
+      message: "Which template would you like to use?",
+      choices: templates.map((template) => template.name),
       filter(val) {
         return val.toLowerCase();
-      }
-    }
+      },
+    },
   ];
 
   // if the user has provided one, use that, else prompt from the list
-  if (typeof program.template !== 'boolean') {
+  if (typeof program.template !== "boolean") {
     const userSelection = program.template;
     const matchedTemplate = templates.find((template) => template.name === userSelection);
 
@@ -212,19 +213,21 @@ const listAndSelectTemplate = async () => {
       console.debug(`using user provided template => ${userSelection}...`);
       selectedTemplate = matchedTemplate;
     } else {
-      const choices = templates.map(template => template.name).join('\n');
+      const choices = templates.map((template) => template.name).join("\n");
 
-      console.error(`unable to match user provided template "${userSelection}". please try again.  choices are ${choices}`);
+      console.error(
+        `unable to match user provided template "${userSelection}". please try again.  choices are ${choices}`,
+      );
     }
   } else {
     return inquirer.prompt(questions).then((answers) => {
       // set the selected template based on the selected template name
-      selectedTemplate = templates.find(template => {
+      selectedTemplate = templates.find((template) => {
         return template.name === answers.template;
       });
 
       if (selectedTemplate) {
-        console.log('Installing Selected Template:', selectedTemplate.name);
+        console.log("Installing Selected Template:", selectedTemplate.name);
       }
     });
   }
@@ -239,7 +242,7 @@ const cloneTemplate = async () => {
   }
 
   // clone to .template directory
-  console.log('clone template', selectedTemplate.name, 'to directory', clonedTemplateDir);
+  console.log("clone template", selectedTemplate.name, "to directory", clonedTemplateDir);
   try {
     await git.clone(selectedTemplate.clone_url, clonedTemplateDir);
     templateDir = clonedTemplateDir;
@@ -264,9 +267,9 @@ const run = async () => {
     // https://stackoverflow.com/a/31643053/417806
     const args = process.argv;
     const noArgs = args.length === 2;
-    const lastArg = args[args.length - 1].split(' ')[0];
-    const hasCustomDirectoryArg = !noArgs && !lastArg.startsWith('--');
-    const taskRunner = program.yarn ? 'yarn' : 'npm run';
+    const lastArg = args[args.length - 1].split(" ")[0];
+    const hasCustomDirectoryArg = !noArgs && !lastArg.startsWith("--");
+    const taskRunner = program.yarn ? "yarn" : "npm run";
     const shouldInstallDeps = program.install || program.yarn;
     const instructions = [];
 
@@ -290,35 +293,35 @@ const run = async () => {
     }
 
     // map all the template files and copy them to the current working directory
-    console.log('Initializing project with files...');
+    console.log("Initializing project with files...");
     await srcInit();
 
-    console.log('Creating package.json...');
+    console.log("Creating package.json...");
     await npmInit();
 
     if (shouldInstallDeps) {
-      console.log('Installing project dependencies...');
+      console.log("Installing project dependencies...");
       await install();
     }
 
     await cleanUp();
 
-    console.log(`${chalk.rgb(175, 207, 71)('Initializing new project complete!')}`);
-    console.log(`${chalk.rgb(175, 207, 71)('Complete the follow steps to get started:')}`);
+    console.log(`${chalk.rgb(175, 207, 71)("Initializing new project complete!")}`);
+    console.log(`${chalk.rgb(175, 207, 71)("Complete the follow steps to get started:")}`);
 
     if (hasCustomDirectoryArg) {
       instructions.push(`Change directories by running => cd ${lastArg}`);
     }
 
     if (!shouldInstallDeps) {
-      instructions.push('Install dependencies with your package manager, e.g. => npm i');
+      instructions.push("Install dependencies with your package manager, e.g. => npm i");
     }
 
     instructions.push(`To start developing run => ${taskRunner} dev`);
 
     // output all instructions in step-based order
     instructions.forEach((instruction, idx) => {
-      const step = idx += 1;
+      const step = (idx += 1);
 
       console.log(`${step}) ${instruction}`);
     });

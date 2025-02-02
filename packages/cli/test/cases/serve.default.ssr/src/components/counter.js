@@ -1,4 +1,4 @@
-const template = document.createElement('template');
+const template = document.createElement("template");
 
 template.innerHTML = `
   <style>
@@ -13,20 +13,20 @@ template.innerHTML = `
 `;
 
 class MyCounter extends HTMLElement {
-  static staticProperty = 'foo';
+  static staticProperty = "foo";
   #count;
 
   constructor() {
     super();
     this.#count = 0;
-    this.attachShadow({ mode: 'open' });
+    this.attachShadow({ mode: "open" });
   }
 
   async connectedCallback() {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
-    this.shadowRoot.getElementById('inc').onclick = () => this.inc();
-    this.shadowRoot.getElementById('dec').onclick = () => this.dec();
-    this.#count = this.getAttribute('count') ?? this.#count;
+    this.shadowRoot.getElementById("inc").onclick = () => this.inc();
+    this.shadowRoot.getElementById("dec").onclick = () => this.dec();
+    this.#count = this.getAttribute("count") ?? this.#count;
     this.update();
   }
 
@@ -39,8 +39,8 @@ class MyCounter extends HTMLElement {
   }
 
   update(count) {
-    this.shadowRoot.getElementById('count').innerHTML = count || this.#count;
+    this.shadowRoot.getElementById("count").innerHTML = count || this.#count;
   }
 }
 
-customElements.define('x-counter', MyCounter);
+customElements.define("x-counter", MyCounter);

@@ -1,20 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" prefix="og:http://ogp.me/ns#">
-
   <head>
     <script type="module" src="/components/header.js"></script>
     <script type="module" src="/components/foobar.js"></script>
 
     <script type="module">
       class Baz extends HTMLElement {
-
         constructor() {
           super();
           this.list = [];
         }
 
         find(path) {
-          this.list.findIndex(item => {
+          this.list.findIndex((item) => {
             return new RegExp(`^${path}$`).test(item.route);
           });
         }
@@ -24,20 +22,17 @@
     </script>
 
     <script data-gwd-opt="static" type="module">
-      console.log('I should not be here');
+      console.log("I should not be here");
     </script>
 
-    <link rel="stylesheet" href="/styles/page.css"/>
+    <link rel="stylesheet" href="/styles/page.css" />
   </head>
 
   <body>
-
     <div class="gwd-content-outlet">
       <div>
         <app-header></app-header>
       </div>
     </div>
-
   </body>
-
 </html>

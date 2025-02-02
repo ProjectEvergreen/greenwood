@@ -1,21 +1,25 @@
-import fs from 'fs/promises';
-import { checkResourceExists, trackResourcesForRoute, mergeResponse } from '../lib/resource-utils.js';
-import os from 'os';
-import { WorkerPool } from '../lib/threadpool.js';
+import fs from "fs/promises";
+import {
+  checkResourceExists,
+  trackResourcesForRoute,
+  mergeResponse,
+} from "../lib/resource-utils.js";
+import os from "os";
+import { WorkerPool } from "../lib/threadpool.js";
 
 async function createOutputDirectory(route, outputDir) {
-  if (!route.endsWith('/404/') && !await checkResourceExists(outputDir)) {
+  if (!route.endsWith("/404/") && !(await checkResourceExists(outputDir))) {
     await fs.mkdir(outputDir, {
-      recursive: true
+      recursive: true,
     });
   }
 }
 
 async function servePage(url, request, plugins) {
-  let response = new Response('');
+  let response = new Response("");
 
   for (const plugin of plugins) {
-    if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
+    if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {
       response = await plugin.serve(url, request);
       break;
     }
@@ -26,15 +30,18 @@ async function servePage(url, request, plugins) {
 
 async function interceptPage(url, request, plugins, body) {
   let response = new Response(body, {
-    headers: new Headers({ 'Content-Type': 'text/html' })
+    headers: new Headers({ "Content-Type": "text/html" }),
   });
 
   for (const plugin of plugins) {
-    if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, response.clone())) {
+    if (
+      plugin.shouldPreIntercept &&
+      (await plugin.shouldPreIntercept(url, request, response.clone()))
+    ) {
       response = mergeResponse(response, await plugin.preIntercept(url, request, response.clone()));
     }
 
-    if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
+    if (plugin.shouldIntercept && (await plugin.shouldIntercept(url, request, response.clone()))) {
       response = mergeResponse(response, await plugin.intercept(url, request, response.clone()));
     }
   }
@@ -42,9 +49,11 @@ async function interceptPage(url, request, plugins, body) {
   return response;
 }
 
-function getPluginInstances (compilation) {
+function getPluginInstances(compilation) {
   return [...compilation.config.plugins]
-    .filter(plugin => plugin.type === 'resource' && plugin.name !== 'plugin-node-modules:resource')
+    .filter(
+      (plugin) => plugin.type === "resource" && plugin.name !== "plugin-node-modules:resource",
+    )
     .map((plugin) => {
       return plugin.provider(compilation);
     });
@@ -53,17 +62,23 @@ function getPluginInstances (compilation) {
 function toScratchUrl(outputHref, context) {
   const { outputDir, scratchDir } = context;
 
-  return new URL(`./${outputHref.replace(outputDir.href, '')}`, scratchDir);
+  return new URL(`./${outputHref.replace(outputDir.href, "")}`, scratchDir);
 }
 
 async function preRenderCompilationWorker(compilation, workerPrerender) {
-  const pages = compilation.graph.filter(page => !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender));
+  const pages = compilation.graph.filter(
+    (page) =>
+      !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender),
+  );
   const { context, config } = compilation;
   const plugins = getPluginInstances(compilation);
 
-  console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
+  console.info("pages to generate", `\n ${pages.map((page) => page.route).join("\n ")}`);
 
-  const pool = new WorkerPool(os.cpus().length, new URL('../lib/ssr-route-worker.js', import.meta.url));
+  const pool = new WorkerPool(
+    os.cpus().length,
+    new URL("../lib/ssr-route-worker.js", import.meta.url),
+  );
 
   for (const page of pages) {
     const { route, outputHref } = page;
@@ -83,44 +98,47 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       const ssrContentsMatch = /<!-- greenwood-ssr-start -->(.*.)<!-- greenwood-ssr-end -->/s;
 
       ssrContents = body.match(ssrContentsMatch)[0];
-      body = body.replace(ssrContents, '<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->');
+      body = body.replace(ssrContents, "<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->");
 
       ssrContents = ssrContents
-        .replace('<!-- greenwood-ssr-start -->', '')
-        .replace('<!-- greenwood-ssr-end -->', '');
+        .replace("<!-- greenwood-ssr-start -->", "")
+        .replace("<!-- greenwood-ssr-end -->", "");
     }
 
     const resources = await trackResourcesForRoute(body, compilation, route);
     const scripts = resources
-      .filter(resource => resource.type === 'script')
-      .map(resource => resource.sourcePathURL.href);
+      .filter((resource) => resource.type === "script")
+      .map((resource) => resource.sourcePathURL.href);
 
     body = await new Promise((resolve, reject) => {
-      pool.runTask({
-        executeModuleUrl: workerPrerender.executeModuleUrl.href,
-        modulePath: null,
-        compilation: JSON.stringify(compilation),
-        page: JSON.stringify(page),
-        prerender: true,
-        htmlContents: body,
-        scripts: JSON.stringify(scripts)
-      }, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
+      pool.runTask(
+        {
+          executeModuleUrl: workerPrerender.executeModuleUrl.href,
+          modulePath: null,
+          compilation: JSON.stringify(compilation),
+          page: JSON.stringify(page),
+          prerender: true,
+          htmlContents: body,
+          scripts: JSON.stringify(scripts),
+        },
+        (err, result) => {
+          if (err) {
+            return reject(err);
+          }
 
-        return resolve(result.html);
-      });
+          return resolve(result.html);
+        },
+      );
     });
 
     if (page.isSSR) {
-      body = body.replace('<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->', ssrContents);
+      body = body.replace("<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->", ssrContents);
     }
 
-    await createOutputDirectory(route, new URL(scratchUrl.href.replace('index.html', '')));
+    await createOutputDirectory(route, new URL(scratchUrl.href.replace("index.html", "")));
     await fs.writeFile(scratchUrl, body);
 
-    console.info('generated page...', route);
+    console.info("generated page...", route);
   }
 }
 
@@ -129,7 +147,10 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
   const renderer = (await import(customPrerender.customUrl)).default;
   const { importMaps } = config.polyfills;
 
-  console.info('pages to generate', `\n ${compilation.graph.map(page => page.route).join('\n ')}`);
+  console.info(
+    "pages to generate",
+    `\n ${compilation.graph.map((page) => page.route).join("\n ")}`,
+  );
 
   await renderer(compilation, async (page, body) => {
     const { route, outputHref } = page;
@@ -137,52 +158,50 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
 
     // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
     if (importMaps) {
-      body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, '');
-      body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, '');
+      body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, "");
+      body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, "");
       body = body.replace(/type="module-shim"/g, 'type="module"');
     } else {
-      body = body.replace(/<script type="importmap">.*?<\/script>/s, '');
+      body = body.replace(/<script type="importmap">.*?<\/script>/s, "");
     }
 
     // clean this up to avoid sending webcomponents-bundle to rollup
-    body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, '');
+    body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, "");
 
     await trackResourcesForRoute(body, compilation, route);
-    await createOutputDirectory(route, new URL(scratchUrl.href.replace('index.html', '')));
+    await createOutputDirectory(route, new URL(scratchUrl.href.replace("index.html", "")));
     await fs.writeFile(scratchUrl, body);
 
-    console.info('generated page...', route);
+    console.info("generated page...", route);
   });
 }
 
 async function staticRenderCompilation(compilation) {
   const { config, context } = compilation;
-  const pages = compilation.graph.filter(page => !page.isSSR || page.isSSR && page.prerender);
+  const pages = compilation.graph.filter((page) => !page.isSSR || (page.isSSR && page.prerender));
   const plugins = getPluginInstances(compilation);
 
-  console.info('pages to generate', `\n ${pages.map(page => page.route).join('\n ')}`);
+  console.info("pages to generate", `\n ${pages.map((page) => page.route).join("\n ")}`);
 
-  await Promise.all(pages.map(async (page) => {
-    const { route, outputHref } = page;
-    const scratchUrl = toScratchUrl(outputHref, context);
-    const url = new URL(`http://localhost:${config.port}${route}`);
-    const request = new Request(url);
+  await Promise.all(
+    pages.map(async (page) => {
+      const { route, outputHref } = page;
+      const scratchUrl = toScratchUrl(outputHref, context);
+      const url = new URL(`http://localhost:${config.port}${route}`);
+      const request = new Request(url);
 
-    let body = await (await servePage(url, request, plugins)).text();
-    body = await (await interceptPage(url, request, plugins, body)).text();
+      let body = await (await servePage(url, request, plugins)).text();
+      body = await (await interceptPage(url, request, plugins, body)).text();
 
-    await trackResourcesForRoute(body, compilation, route);
-    await createOutputDirectory(route, new URL(scratchUrl.href.replace('index.html', '')));
-    await fs.writeFile(scratchUrl, body);
+      await trackResourcesForRoute(body, compilation, route);
+      await createOutputDirectory(route, new URL(scratchUrl.href.replace("index.html", "")));
+      await fs.writeFile(scratchUrl, body);
 
-    console.info('generated page...', route);
+      console.info("generated page...", route);
 
-    return Promise.resolve();
-  }));
+      return Promise.resolve();
+    }),
+  );
 }
 
-export {
-  preRenderCompilationWorker,
-  preRenderCompilationCustom,
-  staticRenderCompilation
-};
+export { preRenderCompilationWorker, preRenderCompilationCustom, staticRenderCompilation };

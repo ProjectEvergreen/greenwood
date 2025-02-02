@@ -1,7 +1,5 @@
-import { greenwoodPluginIncludeHTML } from '../../../src/index.js';
+import { greenwoodPluginIncludeHTML } from "../../../src/index.js";
 
 export default {
-  plugins: [
-    ...greenwoodPluginIncludeHTML()
-  ]
+  plugins: [...greenwoodPluginIncludeHTML()],
 };

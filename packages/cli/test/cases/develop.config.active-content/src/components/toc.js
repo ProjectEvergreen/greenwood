@@ -1,4 +1,4 @@
-import { getContent } from '@greenwood/cli/src/data/client.js';
+import { getContent } from "@greenwood/cli/src/data/client.js";
 
 export default class ToC extends HTMLElement {
   async connectedCallback() {
@@ -6,19 +6,19 @@ export default class ToC extends HTMLElement {
 
     this.innerHTML = `
       <ol>
-        ${
-          pages.map((page) => {
+        ${pages
+          .map((page) => {
             const { label, route, title } = page;
             return `
               <li>
                 <a href="${route}" title="${title}">${label}</a>
               </li>
             `;
-          }).join('')
-        }
+          })
+          .join("")}
       </ol>
     `;
   }
 }
 
-customElements.define('x-toc', ToC);
+customElements.define("x-toc", ToC);

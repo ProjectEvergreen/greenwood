@@ -1,4 +1,4 @@
-const logger = (message = '') => {
+const logger = (message = "") => {
   console.log(`LOGGER [components] => ${message}`);
 };
 

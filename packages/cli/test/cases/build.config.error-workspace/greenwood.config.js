@@ -1,3 +1,3 @@
 export default {
-  workspace: 123
+  workspace: 123,
 };

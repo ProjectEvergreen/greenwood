@@ -3,7 +3,6 @@ name: Continuous Integration Windows
 on: [pull_request]
 
 jobs:
-
   build:
     runs-on: windows-latest
 
@@ -12,20 +11,20 @@ jobs:
         node: [20]
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node }}
-    - name: Installing project dependencies
-      run: |
-        yarn install --frozen-lockfile --network-timeout 1000000 && yarn lerna bootstrap
-    - name: Lint
-      run: |
-        yarn lint
-    - name: Test
-      run: |
-        yarn test
-    - name: Build
-      run: |
-        yarn clean && yarn build
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Installing project dependencies
+        run: |
+          yarn install --frozen-lockfile --network-timeout 1000000 && yarn lerna bootstrap
+      - name: Lint
+        run: |
+          yarn lint
+      - name: Test
+        run: |
+          yarn test
+      - name: Build
+        run: |
+          yarn clean && yarn build

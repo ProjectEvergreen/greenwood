@@ -3,9 +3,9 @@
  * Manages routing to API routes.
  *
  */
-import { ResourceInterface } from '../../lib/resource-interface.js';
-import { requestAsObject } from '../../lib/resource-utils.js';
-import { Worker } from 'worker_threads';
+import { ResourceInterface } from "../../lib/resource-interface.js";
+import { requestAsObject } from "../../lib/resource-utils.js";
+import { Worker } from "worker_threads";
 
 class ApiRoutesResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -15,7 +15,7 @@ class ApiRoutesResource extends ResourceInterface {
   async shouldServe(url) {
     const { protocol, pathname } = url;
 
-    return protocol.startsWith('http') && this.compilation.manifest.apis.has(pathname);
+    return protocol.startsWith("http") && this.compilation.manifest.apis.has(pathname);
   }
 
   async serve(url, request) {
@@ -23,19 +23,19 @@ class ApiRoutesResource extends ResourceInterface {
     const apiUrl = new URL(api.pageHref);
     const href = apiUrl.href;
 
-    if (process.env.__GWD_COMMAND__ === 'develop') {
-      const workerUrl = new URL('../../lib/api-route-worker.js', import.meta.url);
+    if (process.env.__GWD_COMMAND__ === "develop") {
+      const workerUrl = new URL("../../lib/api-route-worker.js", import.meta.url);
       const req = await requestAsObject(request);
 
       // eslint-disable-next-line no-async-promise-executor
       const response = await new Promise(async (resolve, reject) => {
         const worker = new Worker(workerUrl);
 
-        worker.on('message', (result) => {
+        worker.on("message", (result) => {
           resolve(result);
         });
-        worker.on('error', reject);
-        worker.on('exit', (code) => {
+        worker.on("error", reject);
+        worker.on("exit", (code) => {
           if (code !== 0) {
             reject(new Error(`Worker stopped with exit code ${code}`));
           }
@@ -48,7 +48,7 @@ class ApiRoutesResource extends ResourceInterface {
       return new Response(status === 204 ? null : body, {
         headers: new Headers(headers),
         status,
-        statusText
+        statusText,
       });
     } else {
       const { handler } = await import(href);
@@ -59,9 +59,9 @@ class ApiRoutesResource extends ResourceInterface {
 }
 
 const greenwoodApiRoutesPlugin = {
-  type: 'resource',
-  name: 'plugin-api-routes',
-  provider: (compilation, options) => new ApiRoutesResource(compilation, options)
+  type: "resource",
+  name: "plugin-api-routes",
+  provider: (compilation, options) => new ApiRoutesResource(compilation, options),
 };
 
 export { greenwoodApiRoutesPlugin };

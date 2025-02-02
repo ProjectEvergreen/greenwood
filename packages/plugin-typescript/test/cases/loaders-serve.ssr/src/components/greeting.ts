@@ -5,7 +5,7 @@ interface User {
 export default class Greeting extends HTMLElement {
   connectedCallback() {
     const user: User = {
-      name: this.getAttribute('name') || 'World'
+      name: this.getAttribute("name") || "World",
     };
 
     this.innerHTML = `
@@ -14,4 +14,4 @@ export default class Greeting extends HTMLElement {
   }
 }
 
-customElements.define('x-greeting', Greeting);
+customElements.define("x-greeting", Greeting);

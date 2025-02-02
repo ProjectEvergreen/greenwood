@@ -1,1 +1,1 @@
-export default 'app layout two';
+export default "app layout two";

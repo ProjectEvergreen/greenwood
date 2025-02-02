@@ -1,7 +1,5 @@
-import { greenwoodPluginTypeScript } from '../../../src/index.js';
+import { greenwoodPluginTypeScript } from "../../../src/index.js";
 
 export default {
-  plugins: [
-    greenwoodPluginTypeScript()
-  ]
+  plugins: [greenwoodPluginTypeScript()],
 };

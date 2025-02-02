@@ -1,10 +1,10 @@
-import fs from 'fs/promises';
+import fs from "fs/promises";
 
 const ejectConfiguration = async (compilation) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
-      const configFileDirUrl = new URL('../config/', import.meta.url);
+      const configFileDirUrl = new URL("../config/", import.meta.url);
       const configFiles = await fs.readdir(configFileDirUrl);
 
       for (const file of configFiles) {
@@ -16,7 +16,7 @@ const ejectConfiguration = async (compilation) => {
         console.log(`Ejected ${file} successfully.`);
       }
 
-      console.debug('all configuration files ejected.');
+      console.debug("all configuration files ejected.");
 
       resolve();
     } catch (err) {

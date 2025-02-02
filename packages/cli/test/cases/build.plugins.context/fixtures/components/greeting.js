@@ -1,4 +1,4 @@
-const template = document.createElement('template');
+const template = document.createElement("template");
 
 template.innerHTML = `
   <p>Hello from the greeting component!</p>
@@ -7,7 +7,7 @@ template.innerHTML = `
 class GreetingComponent extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
+    this.attachShadow({ mode: "open" });
   }
 
   async connectedCallback() {
@@ -15,4 +15,4 @@ class GreetingComponent extends HTMLElement {
   }
 }
 
-customElements.define('x-greeting', GreetingComponent);
+customElements.define("x-greeting", GreetingComponent);

@@ -1,9 +1,9 @@
 // intentionally break formatting to validate our AST parsing is not impacted / naive
-import sheet from './hero.css' with { type: 'css' };
-import theme from '../theme.css' with { type: 'css' };
-import data from './hero.json' with { type: 'json' };
+import sheet from "./hero.css" with { type: "css" };
+import theme from "../theme.css" with { type: "css" };
+import data from "./hero.json" with { type: "json" };
 
-const template = document.createElement('template');
+const template = document.createElement("template");
 
 export default class HeroBanner extends HTMLElement {
   connectedCallback() {
@@ -22,7 +22,7 @@ export default class HeroBanner extends HTMLElement {
         </div>
       `;
 
-      this.attachShadow({ mode: 'open' });
+      this.attachShadow({ mode: "open" });
       this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
 
@@ -30,4 +30,4 @@ export default class HeroBanner extends HTMLElement {
   }
 }
 
-customElements.define('app-hero', HeroBanner);
+customElements.define("app-hero", HeroBanner);

@@ -1,4 +1,4 @@
-@import url('../assets/fonts/source-sans-pro.css');
+@import url("../assets/fonts/source-sans-pro.css");
 
 * {
   margin: 0;
@@ -11,7 +11,7 @@ html {
 }
 
 body {
-  font-family: 'Source Sans Pro', sans-serif;
+  font-family: "Source Sans Pro", sans-serif;
   line-height: 1.4;
 }
 

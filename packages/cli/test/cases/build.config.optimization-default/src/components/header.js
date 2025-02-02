@@ -2,7 +2,7 @@ class HeaderComponent extends HTMLElement {
   constructor() {
     super();
 
-    this.root = this.attachShadow({ mode: 'open' });
+    this.root = this.attachShadow({ mode: "open" });
   }
 
   connectedCallback() {
@@ -16,4 +16,4 @@ class HeaderComponent extends HTMLElement {
   }
 }
 
-customElements.define('app-header', HeaderComponent);
+customElements.define("app-header", HeaderComponent);

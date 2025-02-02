@@ -24,7 +24,4 @@ async function asyncMap(items, mapper) {
   return mappedItems;
 }
 
-export {
-  asyncFilter,
-  asyncMap
-};
+export { asyncFilter, asyncMap };

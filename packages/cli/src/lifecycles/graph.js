@@ -1,36 +1,35 @@
-import fs from 'fs/promises';
-import fm from 'front-matter';
-import { checkResourceExists, requestAsObject } from '../lib/resource-utils.js';
-import { activeFrontmatterKeys } from '../lib/content-utils.js';
-import toc from 'markdown-toc';
-import { Worker } from 'worker_threads';
+import fs from "fs/promises";
+import fm from "front-matter";
+import { checkResourceExists, requestAsObject } from "../lib/resource-utils.js";
+import { activeFrontmatterKeys } from "../lib/content-utils.js";
+import toc from "markdown-toc";
+import { Worker } from "worker_threads";
 
 function getLabelFromRoute(_route) {
   let route = _route;
 
-  if (route === '/index/') {
-    return 'Home';
-  } else if (route.endsWith('/index/')) {
-    route = route.replace('index/', '');
+  if (route === "/index/") {
+    return "Home";
+  } else if (route.endsWith("/index/")) {
+    route = route.replace("index/", "");
   }
 
   return route
-    .split('/')
-    .filter(part => part !== '')
+    .split("/")
+    .filter((part) => part !== "")
     .pop()
-    .split('-')
+    .split("-")
     .map((routePart) => {
       return `${routePart.charAt(0).toUpperCase()}${routePart.substring(1)}`;
     })
-    .join(' ');
+    .join(" ");
 }
 
 function getIdFromRelativePathPath(relativePathPath, extension) {
-  return relativePathPath.replace(extension, '').replace('./', '').replace(/\//g, '-');
+  return relativePathPath.replace(extension, "").replace("./", "").replace(/\//g, "-");
 }
 
 const generateGraph = async (compilation) => {
-
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
@@ -39,30 +38,34 @@ const generateGraph = async (compilation) => {
       const { pagesDir, userWorkspace, outputDir } = context;
       const collections = {};
       const customPageFormatPlugins = config.plugins
-        .filter(plugin => plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin)
-        .map(plugin => plugin.provider(compilation));
+        .filter((plugin) => plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin)
+        .map((plugin) => plugin.provider(compilation));
 
       let apis = new Map();
-      let graph = [{
-        id: 'index',
-        outputHref: new URL('./index.html', outputDir).href,
-        route: `${basePath}/`,
-        label: 'Home',
-        title: null,
-        data: {},
-        imports: [],
-        resources: [],
-        prerender: true,
-        isolation: false
-      }];
+      let graph = [
+        {
+          id: "index",
+          outputHref: new URL("./index.html", outputDir).href,
+          route: `${basePath}/`,
+          label: "Home",
+          title: null,
+          data: {},
+          imports: [],
+          resources: [],
+          prerender: true,
+          isolation: false,
+        },
+      ];
 
-      const walkDirectoryForPages = async function(directory, pages = [], apiRoutes = new Map()) {
-        const files = (await fs.readdir(directory)).filter(file => !file.startsWith('.'));
+      const walkDirectoryForPages = async function (directory, pages = [], apiRoutes = new Map()) {
+        const files = (await fs.readdir(directory)).filter((file) => !file.startsWith("."));
 
         for (const filename of files) {
           const filenameUrl = new URL(`./${filename}`, directory);
           const filenameUrlAsDir = new URL(`./${filename}/`, directory);
-          const isDirectory = await checkResourceExists(filenameUrlAsDir) && (await fs.stat(filenameUrlAsDir)).isDirectory();
+          const isDirectory =
+            (await checkResourceExists(filenameUrlAsDir)) &&
+            (await fs.stat(filenameUrlAsDir)).isDirectory();
 
           if (isDirectory) {
             const nextPages = await walkDirectoryForPages(filenameUrlAsDir, pages, apiRoutes);
@@ -70,58 +73,61 @@ const generateGraph = async (compilation) => {
             pages = nextPages.pages;
             apiRoutes = nextPages.apiRoutes;
           } else {
-            const extension = `.${filenameUrl.pathname.split('.').pop()}`;
-            const relativePagePath = filenameUrl.pathname.replace(pagesDir.pathname, './');
-            const isApiRoute = relativePagePath.startsWith('./api');
+            const extension = `.${filenameUrl.pathname.split(".").pop()}`;
+            const relativePagePath = filenameUrl.pathname.replace(pagesDir.pathname, "./");
+            const isApiRoute = relativePagePath.startsWith("./api");
             const req = isApiRoute
-              ? new Request(filenameUrl, { headers: { 'Accept': 'text/javascript' } })
-              : new Request(filenameUrl, { headers: { 'Accept': 'text/html' } });
+              ? new Request(filenameUrl, { headers: { Accept: "text/javascript" } })
+              : new Request(filenameUrl, { headers: { Accept: "text/html" } });
             let isCustom = null;
 
             for (const plugin of customPageFormatPlugins) {
-              if (plugin.shouldServe && await plugin.shouldServe(filenameUrl, req)) {
+              if (plugin.shouldServe && (await plugin.shouldServe(filenameUrl, req))) {
                 isCustom = plugin.servePage;
                 break;
               }
             }
 
-            const isStatic = isCustom === 'static' || extension === '.md' || extension === '.html';
-            const isDynamic = isCustom === 'dynamic' || extension === '.js';
+            const isStatic = isCustom === "static" || extension === ".md" || extension === ".html";
+            const isDynamic = isCustom === "dynamic" || extension === ".js";
             const isPage = isStatic || isDynamic;
-            let route = `${relativePagePath.replace('.', '').replace(`${extension}`, '')}`;
+            let route = `${relativePagePath.replace(".", "").replace(`${extension}`, "")}`;
             let fileContents;
 
             if (isApiRoute) {
-              const extension = filenameUrl.pathname.split('.').pop();
+              const extension = filenameUrl.pathname.split(".").pop();
 
-              if (extension !== 'js' && !isCustom) {
+              if (extension !== "js" && !isCustom) {
                 console.warn(`${filenameUrl} is not a supported API file extension, skipping...`);
                 return;
               }
 
               // should this be run in isolation like SSR pages?
               // https://github.com/ProjectEvergreen/greenwood/issues/991
-              const { isolation } = await import(filenameUrl).then(module => module);
+              const { isolation } = await import(filenameUrl).then((module) => module);
 
               /*
-              * API Properties (per route)
-              *----------------------
-              * id: unique hyphen delimited string of the filename, relative to the page/api directory
-              * pageHref: href to the page's filesystem file
-              * outputHref: href of the filename to write to when generating a build
-              * route: URL route for a given page on outputFilePath
-              * isolation: if this should be run in isolated mode
-              */
+               * API Properties (per route)
+               *----------------------
+               * id: unique hyphen delimited string of the filename, relative to the page/api directory
+               * pageHref: href to the page's filesystem file
+               * outputHref: href of the filename to write to when generating a build
+               * route: URL route for a given page on outputFilePath
+               * isolation: if this should be run in isolated mode
+               */
               apiRoutes.set(`${basePath}${route}`, {
-                id: getIdFromRelativePathPath(relativePagePath, `.${extension}`).replace('api-', ''),
+                id: getIdFromRelativePathPath(relativePagePath, `.${extension}`).replace(
+                  "api-",
+                  "",
+                ),
                 pageHref: new URL(relativePagePath, pagesDir).href,
                 outputHref: new URL(relativePagePath, outputDir).href,
                 route: `${basePath}${route}`,
-                isolation
+                isolation,
               });
             } else if (isPage) {
-              let root = filename.split('/')[filename.split('/').length - 1].replace(extension, '');
-              let layout = extension === '.html' ? null : 'page';
+              let root = filename.split("/")[filename.split("/").length - 1].replace(extension, "");
+              let layout = extension === ".html" ? null : "page";
               let title = null;
               let label = getLabelFromRoute(`${route}/`);
               let imports = [];
@@ -131,26 +137,25 @@ const generateGraph = async (compilation) => {
               let hydration = false;
 
               /*
-              * check if additional nested directories exist to correctly determine route (minus filename)
-              * examples:
-              * - pages/index.{html,md,js} -> /
-              * - pages/about.{html,md,js} -> /about/
-              * - pages/blog/index.{html,md,js} -> /blog/
-              * - pages/blog/some-post.{html,md,js} -> /blog/some-post/
-              */
-              if (relativePagePath.lastIndexOf('/index') > 0) {
+               * check if additional nested directories exist to correctly determine route (minus filename)
+               * examples:
+               * - pages/index.{html,md,js} -> /
+               * - pages/about.{html,md,js} -> /about/
+               * - pages/blog/index.{html,md,js} -> /blog/
+               * - pages/blog/some-post.{html,md,js} -> /blog/some-post/
+               */
+              if (relativePagePath.lastIndexOf("/index") > 0) {
                 // https://github.com/ProjectEvergreen/greenwood/issues/455
-                route = root === 'index' || route.replace('/index', '') === `/${root}`
-                  ? route.replace('index', '')
-                  : `${route}/`;
+                route =
+                  root === "index" || route.replace("/index", "") === `/${root}`
+                    ? route.replace("index", "")
+                    : `${route}/`;
               } else {
-                route = route === '/index'
-                  ? '/'
-                  : `${route}/`;
+                route = route === "/index" ? "/" : `${route}/`;
               }
 
               if (isStatic) {
-                fileContents = await fs.readFile(filenameUrl, 'utf8');
+                fileContents = await fs.readFile(filenameUrl, "utf8");
                 const { attributes } = fm(fileContents);
 
                 layout = attributes.layout || layout;
@@ -160,15 +165,17 @@ const generateGraph = async (compilation) => {
 
                 customData = attributes;
               } else if (isDynamic) {
-                const routeWorkerUrl = compilation.config.plugins.filter(plugin => plugin.type === 'renderer')[0].provider(compilation).executeModuleUrl;
+                const routeWorkerUrl = compilation.config.plugins
+                  .filter((plugin) => plugin.type === "renderer")[0]
+                  .provider(compilation).executeModuleUrl;
                 let ssrFrontmatter;
 
                 // eslint-disable-next-line no-async-promise-executor
                 await new Promise(async (resolve, reject) => {
-                  const worker = new Worker(new URL('../lib/ssr-route-worker.js', import.meta.url));
+                  const worker = new Worker(new URL("../lib/ssr-route-worker.js", import.meta.url));
                   const request = await requestAsObject(new Request(filenameUrl));
 
-                  worker.on('message', async (result) => {
+                  worker.on("message", async (result) => {
                     prerender = result.prerender ?? false;
                     isolation = result.isolation ?? isolation;
                     hydration = result.hydration ?? hydration;
@@ -180,8 +187,8 @@ const generateGraph = async (compilation) => {
 
                     resolve();
                   });
-                  worker.on('error', reject);
-                  worker.on('exit', (code) => {
+                  worker.on("error", reject);
+                  worker.on("exit", (code) => {
                     if (code !== 0) {
                       reject(new Error(`Worker stopped with exit code ${code}`));
                     }
@@ -195,9 +202,9 @@ const generateGraph = async (compilation) => {
                       servePage: isCustom,
                       route,
                       root,
-                      label
+                      label,
                     }),
-                    request
+                    request,
                   });
                 });
 
@@ -220,7 +227,7 @@ const generateGraph = async (compilation) => {
                */
 
               // prune "reserved" attributes that are supported by Greenwood
-              [...activeFrontmatterKeys, 'layout'].forEach((key) => {
+              [...activeFrontmatterKeys, "layout"].forEach((key) => {
                 delete customData[key];
               });
 
@@ -234,8 +241,9 @@ const generateGraph = async (compilation) => {
 
                 // parse table of contents for only the pages user wants linked
                 if (customData.tableOfContents.length > 0 && customData.tocHeading > 0) {
-                  customData.tableOfContents = customData.tableOfContents
-                    .filter((item) => item.lvl === customData.tocHeading);
+                  customData.tableOfContents = customData.tableOfContents.filter(
+                    (item) => item.lvl === customData.tocHeading,
+                  );
                 }
               }
 
@@ -268,14 +276,15 @@ const generateGraph = async (compilation) => {
                 imports,
                 resources: [],
                 pageHref: new URL(relativePagePath, pagesDir).href,
-                outputHref: route === '/404/'
-                  ? new URL('./404.html', outputDir).href
-                  : new URL(`.${route}index.html`, outputDir).href,
+                outputHref:
+                  route === "/404/"
+                    ? new URL("./404.html", outputDir).href
+                    : new URL(`.${route}index.html`, outputDir).href,
                 isSSR: !isStatic,
                 prerender,
                 isolation,
                 hydration,
-                servePage: isCustom
+                servePage: isCustom,
               };
 
               pages.push(page);
@@ -301,58 +310,59 @@ const generateGraph = async (compilation) => {
         return { pages, apiRoutes };
       };
 
-      console.debug('building from local sources...');
+      console.debug("building from local sources...");
 
       // test for SPA
-      if (await checkResourceExists(new URL('./index.html', userWorkspace))) {
-        graph = [{
-          ...graph[0],
-          pageHref: new URL('./index.html', userWorkspace).href,
-          isSPA: true
-        }];
+      if (await checkResourceExists(new URL("./index.html", userWorkspace))) {
+        graph = [
+          {
+            ...graph[0],
+            pageHref: new URL("./index.html", userWorkspace).href,
+            isSPA: true,
+          },
+        ];
       } else {
         const oldGraph = graph[0];
-        const pages = await checkResourceExists(pagesDir) ? await walkDirectoryForPages(pagesDir) : { pages: graph, apiRoutes: apis };
+        const pages = (await checkResourceExists(pagesDir))
+          ? await walkDirectoryForPages(pagesDir)
+          : { pages: graph, apiRoutes: apis };
 
         graph = pages.pages;
         apis = pages.apiRoutes;
 
-        const has404Page = graph.find(page => page.route.endsWith('/404/'));
+        const has404Page = graph.find((page) => page.route.endsWith("/404/"));
 
         // if the _only_ page is a 404 page, still provide a default index.html
         if (has404Page && graph.length === 1) {
-          graph = [
-            oldGraph,
-            ...graph
-          ];
+          graph = [oldGraph, ...graph];
         } else if (!has404Page) {
           graph = [
             ...graph,
             {
               ...oldGraph,
-              id: '404',
-              outputHref: new URL('./404.html', outputDir).href,
-              pageHref: new URL('./404.html', pagesDir).href,
+              id: "404",
+              outputHref: new URL("./404.html", outputDir).href,
+              pageHref: new URL("./404.html", pagesDir).href,
               route: `${basePath}/404/`,
-              path: '404.html',
-              label: 'Not Found',
-              title: 'Page Not Found'
-            }
+              path: "404.html",
+              label: "Not Found",
+              title: "Page Not Found",
+            },
           ];
         }
       }
 
-      const sourcePlugins = compilation.config.plugins.filter(plugin => plugin.type === 'source');
+      const sourcePlugins = compilation.config.plugins.filter((plugin) => plugin.type === "source");
 
       if (sourcePlugins.length > 0) {
-        console.debug('building from external sources...');
+        console.debug("building from external sources...");
         for (const plugin of sourcePlugins) {
           const instance = plugin.provider(compilation);
           const data = await instance();
 
           for (const node of data) {
             if (!node.body || !node.route) {
-              const missingKey = !node.body ? 'body' : 'route';
+              const missingKey = !node.body ? "body" : "route";
 
               reject(`ERROR: provided node does not provide a ${missingKey} property.`);
             }
@@ -364,7 +374,7 @@ const generateGraph = async (compilation) => {
               resources: [],
               outputHref: new URL(`.${node.route}index.html`, outputDir).href,
               ...node,
-              external: true
+              external: true,
             });
           }
         }
@@ -377,7 +387,6 @@ const generateGraph = async (compilation) => {
     } catch (err) {
       reject(err);
     }
-
   });
 };
 

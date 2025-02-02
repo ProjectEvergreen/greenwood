@@ -22,58 +22,56 @@
  * User Workspace
  * Greenwood default
  */
-import chai from 'chai';
-import fs from 'fs';
-import { JSDOM } from 'jsdom';
-import path from 'path';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import fs from "fs";
+import { JSDOM } from "jsdom";
+import path from "path";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Lit Polyfill Plugin with default options and Default Workspace';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+describe("Build Greenwood With: ", function () {
+  const LABEL = "Lit Polyfill Plugin with default options and Default Workspace";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-    before(function() {
+  describe(LABEL, function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(['public', 'index'], LABEL);
+    runSmokeTest(["public", "index"], LABEL);
 
-    describe('Script tag in the <head> tag', function() {
+    describe("Script tag in the <head> tag", function () {
       let dom;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
       });
 
-      it('should have one <script> tag for lit polyfills loaded in the <head> tag', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head > script');
-        const polyfillScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.src.indexOf('polyfill-support') >= 0;
+      it("should have one <script> tag for lit polyfills loaded in the <head> tag", function () {
+        const scriptTags = dom.window.document.querySelectorAll("head > script");
+        const polyfillScriptTags = Array.prototype.slice.call(scriptTags).filter((script) => {
+          return script.src.indexOf("polyfill-support") >= 0;
         });
 
         expect(polyfillScriptTags.length).to.be.equal(1);
       });
 
-      it('should have the expected lit polyfill files in the output directory', function() {
-        const expectedLitPolyfillFiles = [
-          'polyfill-support.js'
-        ];
+      it("should have the expected lit polyfill files in the output directory", function () {
+        const expectedLitPolyfillFiles = ["polyfill-support.js"];
 
         expectedLitPolyfillFiles.forEach((file) => {
           expect(fs.existsSync(path.join(this.context.publicDir, file))).to.be.equal(true);
@@ -82,8 +80,7 @@ describe('Build Greenwood With: ', function() {
     });
   });
 
-  after(function() {
+  after(function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
-
 });

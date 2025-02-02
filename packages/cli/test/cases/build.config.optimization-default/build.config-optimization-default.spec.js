@@ -26,191 +26,211 @@
  *   system
  *     variables.css
  */
-import chai from 'chai';
-import fs from 'fs';
-import glob from 'glob-promise';
-import { JSDOM } from 'jsdom';
-import path from 'path';
-import { getDependencyFiles, getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import fs from "fs";
+import glob from "glob-promise";
+import { JSDOM } from "jsdom";
+import path from "path";
+import { getDependencyFiles, getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Optimization Configuration';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const expectedCss = fs.readFileSync(path.join(outputPath, './fixtures/expected.css'), 'utf-8').replace(/\n/g, '');
+describe("Build Greenwood With: ", function () {
+  const LABEL = "Default Optimization Configuration";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const expectedCss = fs
+    .readFileSync(path.join(outputPath, "./fixtures/expected.css"), "utf-8")
+    .replace(/\n/g, "");
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-
-    before(async function() {
+  describe(LABEL, function () {
+    before(async function () {
       // this package has a known issue with import.meta.resolve
       // if this gets fixed, we can remove the need for this setup
       // https://github.com/vercel/geist-font/issues/150
       const geistPackageJson = await getDependencyFiles(
         `${process.cwd()}/node_modules/geist/package.json`,
-        `${outputPath}/node_modules/geist/`
+        `${outputPath}/node_modules/geist/`,
       );
       const geistFonts = await getDependencyFiles(
         `${process.cwd()}/node_modules/geist/dist/fonts/geist-sans/*`,
-        `${outputPath}/node_modules/geist/dist/fonts/geist-sans/`
+        `${outputPath}/node_modules/geist/dist/fonts/geist-sans/`,
       );
 
-      runner.setup(outputPath, [
-        ...geistPackageJson,
-        ...geistFonts
-      ]);
-      runner.runCommand(cliPath, 'build');
+      runner.setup(outputPath, [...geistPackageJson, ...geistFonts]);
+      runner.runCommand(cliPath, "build");
     });
 
-    describe('Output for JavaScript / CSS tags and files', function() {
+    describe("Output for JavaScript / CSS tags and files", function () {
       let dom;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
       });
 
-      describe('<script> tag and preloading', function() {
-        it('should contain one javascript file in the output directory', async function() {
-          expect(await glob.promise(path.join(this.context.publicDir, '*.js'))).to.have.lengthOf(1);
+      describe("<script> tag and preloading", function () {
+        it("should contain one javascript file in the output directory", async function () {
+          expect(await glob.promise(path.join(this.context.publicDir, "*.js"))).to.have.lengthOf(1);
         });
 
-        it('should have the expected <script> tag in the <head>', function() {
-          const scriptTags = Array.from(dom.window.document.querySelectorAll('head script[type="module"]')).filter(tag => !tag.getAttribute('data-gwd'));
+        it("should have the expected <script> tag in the <head>", function () {
+          const scriptTags = Array.from(
+            dom.window.document.querySelectorAll('head script[type="module"]'),
+          ).filter((tag) => !tag.getAttribute("data-gwd"));
 
           expect(scriptTags.length).to.be.equal(1);
         });
 
-        it('should have the expect modulepreload <link> tag for the same <script> tag src in the <head>', function() {
-          const preloadScriptTags = Array
-            .from(dom.window.document.querySelectorAll('head link[rel="modulepreload"]'))
-            .filter(link => link.getAttribute('as') === 'script');
+        it("should have the expect modulepreload <link> tag for the same <script> tag src in the <head>", function () {
+          const preloadScriptTags = Array.from(
+            dom.window.document.querySelectorAll('head link[rel="modulepreload"]'),
+          ).filter((link) => link.getAttribute("as") === "script");
 
           expect(preloadScriptTags.length).to.be.equal(1);
           expect(preloadScriptTags[0].href).to.match(/header.*.js/);
         });
       });
 
-      describe('<link> tag and preloading', function() {
-        it('should contain one style.css in the output directory', async function() {
-          expect(await glob.promise(`${path.join(this.context.publicDir, 'styles')}/main.*.css`)).to.have.lengthOf(1);
+      describe("<link> tag and preloading", function () {
+        it("should contain one style.css in the output directory", async function () {
+          expect(
+            await glob.promise(`${path.join(this.context.publicDir, "styles")}/main.*.css`),
+          ).to.have.lengthOf(1);
         });
 
-        it('should have the expected <link> tag in the <head>', function() {
-          const linkTags = Array
-            .from(dom.window.document.querySelectorAll('head link[rel="preload"]'))
-            .filter(tag => tag.getAttribute('as') === 'style');
+        it("should have the expected <link> tag in the <head>", function () {
+          const linkTags = Array.from(
+            dom.window.document.querySelectorAll('head link[rel="preload"]'),
+          ).filter((tag) => tag.getAttribute("as") === "style");
 
           expect(linkTags.length).to.be.equal(1);
         });
 
-        it('should have the expect preload <link> tag for the same <link> tag href in the <head>', function() {
-          const preloadLinkTags = Array
-            .from(dom.window.document.querySelectorAll('head link[rel="preload"]'))
-            .filter(link => link.getAttribute('as') === 'style');
+        it("should have the expect preload <link> tag for the same <link> tag href in the <head>", function () {
+          const preloadLinkTags = Array.from(
+            dom.window.document.querySelectorAll('head link[rel="preload"]'),
+          ).filter((link) => link.getAttribute("as") === "style");
 
           expect(preloadLinkTags.length).to.be.equal(1);
           expect(preloadLinkTags[0].href).to.match(/\/styles\/main.*.css/);
-          expect(preloadLinkTags[0].getAttribute('crossorigin')).to.equal('anonymous');
+          expect(preloadLinkTags[0].getAttribute("crossorigin")).to.equal("anonymous");
         });
 
         // test custom CSS bundling
-        it('should have the expect preload CSS content in the file', async function() {
-          const cssFiles = await glob.promise(path.join(this.context.publicDir, 'styles/*.css'));
-          const customCss = await fs.promises.readFile(cssFiles[0], 'utf-8');
+        it("should have the expect preload CSS content in the file", async function () {
+          const cssFiles = await glob.promise(path.join(this.context.publicDir, "styles/*.css"));
+          const customCss = await fs.promises.readFile(cssFiles[0], "utf-8");
 
           expect(cssFiles.length).to.be.equal(1);
           expect(customCss).to.be.equal(expectedCss);
         });
       });
 
-      describe('<style> tags on the page', function() {
-        it('should have the expected inline content for prism.css @import in the <style> tag in the <head>', function() {
-          const headStyleTags = Array.from(dom.window.document.querySelectorAll('head style'));
+      describe("<style> tags on the page", function () {
+        it("should have the expected inline content for prism.css @import in the <style> tag in the <head>", function () {
+          const headStyleTags = Array.from(dom.window.document.querySelectorAll("head style"));
 
           expect(headStyleTags.length).to.be.equal(1);
-          expect(headStyleTags[0].textContent.indexOf('code[class*=\'language-\']')).to.equal(0);
+          expect(headStyleTags[0].textContent.indexOf("code[class*='language-']")).to.equal(0);
         });
 
-        it('should have the expected contents of the <style> tag in the <body>', async function() {
-          const styleTags = Array.from(dom.window.document.querySelectorAll('body style'));
+        it("should have the expected contents of the <style> tag in the <body>", async function () {
+          const styleTags = Array.from(dom.window.document.querySelectorAll("body style"));
 
           expect(styleTags.length).to.equal(1);
-          expect(styleTags[0].textContent.replace(/\n/g, '')).to.equal('*{color:red;font-size:blue;}');
+          expect(styleTags[0].textContent.replace(/\n/g, "")).to.equal(
+            "*{color:red;font-size:blue;}",
+          );
         });
       });
 
-      describe('bundled URL references in CSS files', function() {
-        describe('node modules reference', () => {
-          const fontPath = 'node_modules/geist/dist/fonts/geist-sans';
+      describe("bundled URL references in CSS files", function () {
+        describe("node modules reference", () => {
+          const fontPath = "node_modules/geist/dist/fonts/geist-sans";
           let dom;
 
-          before(async function() {
-            dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+          before(async function () {
+            dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
           });
 
-          it('should have the expected @font-face file from node_modules copied into the output directory', async function() {
-            expect(await glob.promise(path.join(this.context.publicDir, `${fontPath}/*.woff2`))).to.have.lengthOf(1);
+          it("should have the expected @font-face file from node_modules copied into the output directory", async function () {
+            expect(
+              await glob.promise(path.join(this.context.publicDir, `${fontPath}/*.woff2`)),
+            ).to.have.lengthOf(1);
           });
 
-          it('should have the expected @font-face file bundle path in the referenced <style> tag in index.html', async function() {
-            const styleTag = Array.from(dom.window.document.querySelectorAll('head style'));
+          it("should have the expected @font-face file bundle path in the referenced <style> tag in index.html", async function () {
+            const styleTag = Array.from(dom.window.document.querySelectorAll("head style"));
 
-            expect(styleTag[0].textContent).to.contain(`src:url('/${fontPath}/Geist-Regular.965782360.woff2')`);
-          });
-        });
-
-        describe('user workspace reference', () => {
-          const imagePath = 'images/webcomponents.1079385342.jpg';
-
-          it('should have the expected background image from the user\'s workspace the output directory', async function() {
-            expect(await glob.promise(path.join(this.context.publicDir, imagePath))).to.have.lengthOf(1);
-          });
-
-          it('should have the expected @font-face file bundle path in the referenced <style> tag in index.html', async function() {
-            const mainCss = await glob.promise(`${path.join(this.context.publicDir, 'styles')}/main.*.css`);
-            const contents = await fs.promises.readFile(mainCss[0], 'utf-8');
-
-            expect(contents).to.contain(`body{background-color:green;background-image:url('/${imagePath}');}`);
+            expect(styleTag[0].textContent).to.contain(
+              `src:url('/${fontPath}/Geist-Regular.965782360.woff2')`,
+            );
           });
         });
 
-        describe('inline scratch dir workspace reference', () => {
-          const imagePath = 'images/link.1200825667.png';
+        describe("user workspace reference", () => {
+          const imagePath = "images/webcomponents.1079385342.jpg";
 
-          it('should have the expected background image from the user\'s workspace the output directory', async function() {
-            expect(await glob.promise(path.join(this.context.publicDir, imagePath))).to.have.lengthOf(1);
+          it("should have the expected background image from the user's workspace the output directory", async function () {
+            expect(
+              await glob.promise(path.join(this.context.publicDir, imagePath)),
+            ).to.have.lengthOf(1);
           });
 
-          it('should have the expected background-image url file bundle path in the referenced <style> tag in index.html', async function() {
-            const styleTag = Array.from(dom.window.document.querySelectorAll('head style'));
+          it("should have the expected @font-face file bundle path in the referenced <style> tag in index.html", async function () {
+            const mainCss = await glob.promise(
+              `${path.join(this.context.publicDir, "styles")}/main.*.css`,
+            );
+            const contents = await fs.promises.readFile(mainCss[0], "utf-8");
 
-            expect(styleTag[0].textContent).to.contain(`html{background-image:url('/${imagePath}')}`);
+            expect(contents).to.contain(
+              `body{background-color:green;background-image:url('/${imagePath}');}`,
+            );
           });
         });
 
-        describe('absolute user workspace reference', () => {
-          const resourcePath = 'foo/bar.642520792.baz';
+        describe("inline scratch dir workspace reference", () => {
+          const imagePath = "images/link.1200825667.png";
 
-          it('should have the expected resource reference from the user\'s workspace in the output directory', async function() {
-            expect(await glob.promise(path.join(this.context.publicDir, resourcePath))).to.have.lengthOf(1);
+          it("should have the expected background image from the user's workspace the output directory", async function () {
+            expect(
+              await glob.promise(path.join(this.context.publicDir, imagePath)),
+            ).to.have.lengthOf(1);
+          });
+
+          it("should have the expected background-image url file bundle path in the referenced <style> tag in index.html", async function () {
+            const styleTag = Array.from(dom.window.document.querySelectorAll("head style"));
+
+            expect(styleTag[0].textContent).to.contain(
+              `html{background-image:url('/${imagePath}')}`,
+            );
+          });
+        });
+
+        describe("absolute user workspace reference", () => {
+          const resourcePath = "foo/bar.642520792.baz";
+
+          it("should have the expected resource reference from the user's workspace in the output directory", async function () {
+            expect(
+              await glob.promise(path.join(this.context.publicDir, resourcePath)),
+            ).to.have.lengthOf(1);
           });
         });
       });
     });
   });
 
-  after(function() {
+  after(function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

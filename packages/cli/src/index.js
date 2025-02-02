@@ -1,47 +1,49 @@
 #!/usr/bin/env node
 
-import { generateCompilation } from './lifecycles/compile.js';
-import fs from 'fs/promises';
-import program from 'commander';
+import { generateCompilation } from "./lifecycles/compile.js";
+import fs from "fs/promises";
+import program from "commander";
 
-const greenwoodPackageJson = JSON.parse(await fs.readFile(new URL('../package.json', import.meta.url), 'utf-8'));
+const greenwoodPackageJson = JSON.parse(
+  await fs.readFile(new URL("../package.json", import.meta.url), "utf-8"),
+);
 let cmdOption = {};
-let command = '';
+let command = "";
 
-console.info('-------------------------------------------------------');
+console.info("-------------------------------------------------------");
 console.info(`Welcome to Greenwood (v${greenwoodPackageJson.version}) ♻️`);
-console.info('-------------------------------------------------------');
+console.info("-------------------------------------------------------");
 
 program
   .version(greenwoodPackageJson.version)
-  .arguments('<script-mode>')
-  .usage('<script-mode> [options]');
+  .arguments("<script-mode>")
+  .usage("<script-mode> [options]");
 
 program
-  .command('build')
-  .description('Build a static site for production.')
+  .command("build")
+  .description("Build a static site for production.")
   .action((cmd) => {
     command = cmd._name;
   });
 
 program
-  .command('develop')
-  .description('Start a local development server.')
+  .command("develop")
+  .description("Start a local development server.")
   .action((cmd) => {
     command = cmd._name;
   });
 
 program
-  .command('serve')
-  .description('View a production build locally with a basic web server.')
+  .command("serve")
+  .description("View a production build locally with a basic web server.")
   .action((cmd) => {
     command = cmd._name;
   });
 
 program
-  .command('eject')
-  .option('-a, --all', 'eject all configurations including babel, postcss, browserslistrc')
-  .description('Eject greenwood configurations.')
+  .command("eject")
+  .option("-a, --all", "eject all configurations including babel, postcss, browserslistrc")
+  .description("Eject greenwood configurations.")
   .action((cmd) => {
     command = cmd._name;
     cmdOption.all = cmd.all;
@@ -53,7 +55,7 @@ if (program.parse.length === 0) {
   program.help();
 }
 
-const run = async() => {
+const run = async () => {
   process.env.__GWD_COMMAND__ = command;
   const compilation = await generateCompilation();
 
@@ -61,21 +63,20 @@ const run = async() => {
     console.info(`Running Greenwood with the ${command} command.`);
 
     switch (command) {
-
-      case 'build':
-        await (await import('./commands/build.js')).runProductionBuild(compilation);
-
-        break;
-      case 'develop':
-        await (await import('./commands/develop.js')).runDevServer(compilation);
+      case "build":
+        await (await import("./commands/build.js")).runProductionBuild(compilation);
 
         break;
-      case 'serve':
-        await (await import('./commands/serve.js')).runProdServer(compilation);
+      case "develop":
+        await (await import("./commands/develop.js")).runDevServer(compilation);
 
         break;
-      case 'eject':
-        await (await import('./commands/eject.js')).ejectConfiguration(compilation);
+      case "serve":
+        await (await import("./commands/serve.js")).runProdServer(compilation);
+
+        break;
+      case "eject":
+        await (await import("./commands/eject.js")).ejectConfiguration(compilation);
 
         break;
       default:
@@ -85,7 +86,6 @@ const run = async() => {
           info at https://www.greenwoodjs.dev/.
         `);
         break;
-
     }
     process.exit(0);
   } catch (err) {

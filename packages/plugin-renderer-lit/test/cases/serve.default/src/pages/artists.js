@@ -1,13 +1,13 @@
-import fs from 'fs';
-import { html } from 'lit';
-import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
-import '../components/greeting.js';
+import fs from "fs";
+import { html } from "lit";
+import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
+import "../components/greeting.js";
 
 async function getLayout(compilation, { route }) {
   return html`
     <html>
       <head>
-        <meta name="description" content="${route} (this was generated server side!!!)"/>
+        <meta name="description" content="${route} (this was generated server side!!!)" />
         <style>
           * {
             color: blue;
@@ -30,7 +30,9 @@ async function getLayout(compilation, { route }) {
 }
 
 async function getBody() {
-  const artists = JSON.parse(await fs.promises.readFile(new URL('../../artists.json', import.meta.url), 'utf-8'));
+  const artists = JSON.parse(
+    await fs.promises.readFile(new URL("../../artists.json", import.meta.url), "utf-8"),
+  );
 
   return html`
     <h1>Lit SSR response</h1>
@@ -42,42 +44,36 @@ async function getBody() {
         <th>Message</th>
         <th>Picture</th>
       </tr>
-      ${
-        artists.map((artist) => {
-          const { id, name, bio, imageUrl } = artist;
+      ${artists.map((artist) => {
+        const { id, name, bio, imageUrl } = artist;
 
-          return html`
-            <tr>
-              <td>${id}</td>
-              <td>${name}</td>
-              <td>${unsafeHTML(bio)}</td>
-              <td>
-                <a href="http://www.analogstudios.net/artists/${id}" target="_blank">
-                  <simple-greeting .name="${name}"></simple-greeting>
-                </a>
-              </td>
-              <td><img src="${imageUrl}"/></td>
-            </tr>
-          `;
-        })
-      }
+        return html`
+          <tr>
+            <td>${id}</td>
+            <td>${name}</td>
+            <td>${unsafeHTML(bio)}</td>
+            <td>
+              <a href="http://www.analogstudios.net/artists/${id}" target="_blank">
+                <simple-greeting .name="${name}"></simple-greeting>
+              </a>
+            </td>
+            <td><img src="${imageUrl}" /></td>
+          </tr>
+        `;
+      })}
     </table>
   `;
 }
 
 async function getFrontmatter(compilation, { route }) {
   return {
-    collection: 'navigation',
+    collection: "navigation",
     order: 7,
     title: `My App - ${route}`,
-    author: 'Project Evergreen',
-    date: '01-01-2021'
+    author: "Project Evergreen",
+    date: "01-01-2021",
   };
 }
 
 export const hydration = false;
-export {
-  getLayout,
-  getBody,
-  getFrontmatter
-};
+export { getLayout, getBody, getFrontmatter };

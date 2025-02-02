@@ -20,66 +20,69 @@
  * User Workspace
  * Greenwood default
  */
-import chai from 'chai';
-import { JSDOM } from 'jsdom';
-import path from 'path';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import { JSDOM } from "jsdom";
+import path from "path";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Declarative Shadow DOM Polyfill Plugin with default options and Default Workspace';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+describe("Build Greenwood With: ", function () {
+  const LABEL = "Declarative Shadow DOM Polyfill Plugin with default options and Default Workspace";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-    before(function() {
+  describe(LABEL, function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(['public'], LABEL);
+    runSmokeTest(["public"], LABEL);
 
-    describe('Script tag in the <head> tag', function() {
+    describe("Script tag in the <head> tag", function () {
       let dom;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
       });
 
-      it('should have one <script> tag for DSD polyfill loaded in the <body> tag', function() {
-        const scriptTags = Array.from(dom.window.document.querySelectorAll('head > script')).filter(tag => !tag.getAttribute('data-gwd'));
+      it("should have one <script> tag for DSD polyfill loaded in the <body> tag", function () {
+        const scriptTags = Array.from(dom.window.document.querySelectorAll("head > script")).filter(
+          (tag) => !tag.getAttribute("data-gwd"),
+        );
 
         expect(scriptTags.length).to.be.equal(0);
       });
 
-      it('should have one <script> tag for DSD polyfill loaded in the <body> tag', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body > script');
+      it("should have one <script> tag for DSD polyfill loaded in the <body> tag", function () {
+        const scriptTags = dom.window.document.querySelectorAll("body > script");
 
         expect(scriptTags.length).to.be.equal(1);
       });
 
-      it('should have the expected DSD polyfill content in the polyfill <script> tag', function() {
-        const scriptTags = dom.window.document.querySelectorAll('body > script');
+      it("should have the expected DSD polyfill content in the polyfill <script> tag", function () {
+        const scriptTags = dom.window.document.querySelectorAll("body > script");
 
-        expect(scriptTags[0].textContent).to.contain('HTMLTemplateElement.prototype.hasOwnProperty("shadowRoot")||function t(o){o.querySelectorAll("template[shadowroot]")');
+        expect(scriptTags[0].textContent).to.contain(
+          'HTMLTemplateElement.prototype.hasOwnProperty("shadowRoot")||function t(o){o.querySelectorAll("template[shadowroot]")',
+        );
       });
     });
   });
 
-  after(function() {
+  after(function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
-
 });

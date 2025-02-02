@@ -1,5 +1,5 @@
-import header from './header.module.css';
-import '../logo/logo.ts';
+import header from "./header.module.css";
+import "../logo/logo.ts";
 
 export default class Header extends HTMLElement {
   connectedCallback() {
@@ -19,4 +19,4 @@ export default class Header extends HTMLElement {
   }
 }
 
-customElements.define('app-header', Header);
+customElements.define("app-header", Header);

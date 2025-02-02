@@ -21,75 +21,73 @@
  *     artists.js
  *     index.md
  */
-import chai from 'chai';
-import path from 'path';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import path from "path";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Serve Greenwood With: ', function() {
-  const LABEL = 'Static Router Configuration and Hybrid Workspace';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const hostname = 'http://127.0.0.1:8080';
+describe("Serve Greenwood With: ", function () {
+  const LABEL = "Static Router Configuration and Hybrid Workspace";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const hostname = "http://127.0.0.1:8080";
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      hostname
+      hostname,
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-
-    before(async function() {
+  describe(LABEL, function () {
+    before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
 
       return new Promise((resolve) => {
         setTimeout(async () => {
           resolve();
         }, 10000);
 
-        runner.runCommand(cliPath, 'serve', { async: true });
+        runner.runCommand(cliPath, "serve", { async: true });
       });
     });
 
-    runSmokeTest(['serve'], LABEL);
+    runSmokeTest(["serve"], LABEL);
 
-    describe('Serve command with SSR route with staticRouter config set', function() {
+    describe("Serve command with SSR route with staticRouter config set", function () {
       let response = {};
       let body;
 
-      before(async function() {
+      before(async function () {
         response = await fetch(`${hostname}/artists/`);
         body = await response.clone().text();
       });
 
-      it('should return a 200 status', function(done) {
+      it("should return a 200 status", function (done) {
         expect(response.status).to.equal(200);
         done();
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers.get('content-type')).to.equal('text/html');
+      it("should return the correct content type", function (done) {
+        expect(response.headers.get("content-type")).to.equal("text/html");
         done();
       });
 
-      it('should return the correct response body', function(done) {
-        expect(body).to.contain('<h2>Analog</h2>');
+      it("should return the correct response body", function (done) {
+        expect(body).to.contain("<h2>Analog</h2>");
         expect(body).to.contain('<img src="/assets/analog.png" alt="Analog"/>');
         done();
       });
     });
-
   });
 
-  after(function() {
+  after(function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
     runner.stopCommand();
   });
