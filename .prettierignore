@@ -1,4 +1,4 @@
 *.md
-./packages/cli/test/cases/develop.plugins.context/fixtures/my-layouts/app.html
-./packages/cli/test/cases/develop.default.hud-disabled/src/pages/index.html
-./packages/cli/test/cases/develop.default.hud/src/pages/index.html
+packages/cli/test/cases/develop.plugins.context/fixtures/my-layouts/app.html
+packages/cli/test/cases/develop.default.hud-disabled/src/pages/index.html
+packages/cli/test/cases/develop.default.hud/src/pages/index.html
