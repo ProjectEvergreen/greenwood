@@ -156,7 +156,7 @@ describe("Develop Greenwood With: ", function () {
       });
 
       it("should correctly return JavaScript from the developers local files", function (done) {
-        expect(body).to.contain("customElements.define(\"x-greeting\", GreetingComponent);");
+        expect(body).to.contain('customElements.define("x-greeting", GreetingComponent);');
 
         done();
       });

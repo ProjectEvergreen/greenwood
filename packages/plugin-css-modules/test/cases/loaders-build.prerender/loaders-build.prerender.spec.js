@@ -378,8 +378,7 @@ describe("Build Greenwood With: ", function () {
         it("should have the expected logo CSS inlined into the style tag", () => {
           const styles = dom.window.document.querySelectorAll("head style");
           const styleText = styles[0].textContent;
-          const expectedStyles =
-            `.logo-${scopedHash}-container{display:flex}.logo-${scopedHash}-logo{display:inline-block;width:100%;}`;
+          const expectedStyles = `.logo-${scopedHash}-container{display:flex}.logo-${scopedHash}-logo{display:inline-block;width:100%;}`;
 
           expect(styleText).to.contain(expectedStyles);
         });

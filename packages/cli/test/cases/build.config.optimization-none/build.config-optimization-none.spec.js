@@ -72,7 +72,7 @@ describe("Build Greenwood With: ", function () {
           const js = fs.readFileSync(jsFiles[0], "utf-8");
 
           expect(js).to.contain(
-            "class HeaderComponent extends HTMLElement {\n  constructor() {\n    super();\n\n    this.root = this.attachShadow({ mode: \"open\" });\n    this.root.innerHTML = `\n      <header>This is the header component.</header>\n    `;\n  }\n}\n\ncustomElements.define(\"app-header\", HeaderComponent);",
+            'class HeaderComponent extends HTMLElement {\n  constructor() {\n    super();\n\n    this.root = this.attachShadow({ mode: "open" });\n    this.root.innerHTML = `\n      <header>This is the header component.</header>\n    `;\n  }\n}\n\ncustomElements.define("app-header", HeaderComponent);',
           );
         });
 
@@ -111,7 +111,7 @@ describe("Build Greenwood With: ", function () {
           const css = fs.readFileSync(cssFiles[0], "utf-8");
 
           expect(css).to.contain(
-            "{\n  margin: 0;\n  padding: 0;\n  font-family: \"Comic Sans\", sans-serif;\n}",
+            '{\n  margin: 0;\n  padding: 0;\n  font-family: "Comic Sans", sans-serif;\n}',
           );
         });
 

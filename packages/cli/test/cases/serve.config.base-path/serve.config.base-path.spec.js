@@ -353,7 +353,9 @@ describe("Serve Greenwood With: ", function () {
         const homePartial = fs.readFileSync(path.join(publicPath, "_routes/index.html"), "utf-8");
         const homeRouterOutlet = dom.window.document.querySelectorAll("body > router-outlet")[0];
 
-        expect(homeRouterOutlet.innerHTML.replace(/\n/g, '').replace(/ /g, '')).to.contain(homePartial.replace(/\n/g, '').replace(/ /g, ''));
+        expect(homeRouterOutlet.innerHTML.replace(/\n/g, "").replace(/ /g, "")).to.contain(
+          homePartial.replace(/\n/g, "").replace(/ /g, ""),
+        );
       });
     });
 
