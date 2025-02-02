@@ -1,14 +1,13 @@
 export default class Card extends HTMLElement {
-
   selectItem() {
-    alert(`selected item is => ${this.getAttribute('title')}!`);
+    alert(`selected item is => ${this.getAttribute("title")}!`);
   }
 
   connectedCallback() {
     if (!this.shadowRoot) {
-      const thumbnail = this.getAttribute('thumbnail');
-      const title = this.getAttribute('title');
-      const template = document.createElement('template');
+      const thumbnail = this.getAttribute("thumbnail");
+      const title = this.getAttribute("title");
+      const template = document.createElement("template");
 
       template.innerHTML = `
         <div>
@@ -17,10 +16,10 @@ export default class Card extends HTMLElement {
           <button onclick="this.parentNode.parentNode.host.selectItem()">View Item Details</button>
         </div>
       `;
-      this.attachShadow({ mode: 'open' });
+      this.attachShadow({ mode: "open" });
       this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
   }
 }
 
-customElements.define('app-card', Card);
+customElements.define("app-card", Card);

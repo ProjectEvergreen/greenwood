@@ -1,4 +1,4 @@
-import '../components/social-links.js';
+import "../components/social-links.js";
 
 export default class HomePage extends HTMLElement {
   connectedCallback() {

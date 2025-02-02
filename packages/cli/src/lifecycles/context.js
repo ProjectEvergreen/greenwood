@@ -1,21 +1,20 @@
-import fs from 'fs/promises';
-import { checkResourceExists } from '../lib/resource-utils.js';
+import fs from "fs/promises";
+import { checkResourceExists } from "../lib/resource-utils.js";
 
-const initContext = async({ config }) => {
-
+const initContext = async ({ config }) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
       const { workspace, pagesDirectory, layoutsDirectory } = config;
 
       const projectDirectory = new URL(`file://${process.cwd()}/`);
-      const scratchDir = new URL('./.greenwood/', projectDirectory);
-      const outputDir = new URL('./public/', projectDirectory);
-      const dataDir = new URL('../data/', import.meta.url);
-      const layoutsDir = new URL('../layouts/', import.meta.url);
+      const scratchDir = new URL("./.greenwood/", projectDirectory);
+      const outputDir = new URL("./public/", projectDirectory);
+      const dataDir = new URL("../data/", import.meta.url);
+      const layoutsDir = new URL("../layouts/", import.meta.url);
       const userWorkspace = workspace;
       const pagesDir = new URL(`./${pagesDirectory}/`, userWorkspace);
-      const apisDir = new URL('./api/', pagesDir);
+      const apisDir = new URL("./api/", pagesDir);
       const userLayoutsDir = new URL(`./${layoutsDirectory}/`, userWorkspace);
 
       const context = {
@@ -27,12 +26,12 @@ const initContext = async({ config }) => {
         userLayoutsDir,
         scratchDir,
         projectDirectory,
-        layoutsDir
+        layoutsDir,
       };
 
-      if (!await checkResourceExists(scratchDir)) {
+      if (!(await checkResourceExists(scratchDir))) {
         await fs.mkdir(scratchDir, {
-          recursive: true
+          recursive: true,
         });
       }
 

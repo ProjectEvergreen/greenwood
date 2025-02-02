@@ -1,1 +1,1 @@
-export default 'page layout one';
+export default "page layout one";

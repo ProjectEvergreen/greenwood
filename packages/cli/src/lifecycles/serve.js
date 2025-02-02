@@ -1,35 +1,46 @@
-import fs from 'fs/promises';
-import { hashString } from '../lib/hashing-utils.js';
-import Koa from 'koa';
-import { koaBody } from 'koa-body';
-import { checkResourceExists, mergeResponse, transformKoaRequestIntoStandardRequest, requestAsObject } from '../lib/resource-utils.js';
-import { Readable } from 'stream';
-import { ResourceInterface } from '../lib/resource-interface.js';
-import { Worker } from 'worker_threads';
+import fs from "fs/promises";
+import { hashString } from "../lib/hashing-utils.js";
+import Koa from "koa";
+import { koaBody } from "koa-body";
+import {
+  checkResourceExists,
+  mergeResponse,
+  transformKoaRequestIntoStandardRequest,
+  requestAsObject,
+} from "../lib/resource-utils.js";
+import { Readable } from "stream";
+import { ResourceInterface } from "../lib/resource-interface.js";
+import { Worker } from "worker_threads";
 
 async function getDevServer(compilation) {
   const app = new Koa();
   const compilationCopy = Object.assign({}, compilation);
   const resourcePlugins = [
     // Greenwood default standard resource and import plugins
-    ...compilation.config.plugins.filter((plugin) => {
-      return plugin.type === 'resource' && plugin.isGreenwoodDefaultPlugin;
-    }).map((plugin) => {
-      return plugin.provider(compilationCopy);
-    }),
+    ...compilation.config.plugins
+      .filter((plugin) => {
+        return plugin.type === "resource" && plugin.isGreenwoodDefaultPlugin;
+      })
+      .map((plugin) => {
+        return plugin.provider(compilationCopy);
+      }),
 
     // custom user resource plugins
-    ...compilation.config.plugins.filter((plugin) => {
-      return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
-    }).map((plugin) => {
-      const provider = plugin.provider(compilationCopy);
+    ...compilation.config.plugins
+      .filter((plugin) => {
+        return plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin;
+      })
+      .map((plugin) => {
+        const provider = plugin.provider(compilationCopy);
 
-      if (!(provider instanceof ResourceInterface)) {
-        console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ResourceInterface.`);
-      }
+        if (!(provider instanceof ResourceInterface)) {
+          console.warn(
+            `WARNING: ${plugin.name}'s provider is not an instance of ResourceInterface.`,
+          );
+        }
 
-      return provider;
-    })
+        return provider;
+      }),
   ];
 
   app.use(koaBody());
@@ -41,7 +52,8 @@ async function getDevServer(compilation) {
       const initRequest = transformKoaRequestIntoStandardRequest(url, ctx.request);
       const request = await resourcePlugins.reduce(async (requestPromise, plugin) => {
         const intermediateRequest = await requestPromise;
-        return plugin.shouldResolve && await plugin.shouldResolve(url, intermediateRequest.clone())
+        return plugin.shouldResolve &&
+          (await plugin.shouldResolve(url, intermediateRequest.clone()))
           ? Promise.resolve(await plugin.resolve(url, intermediateRequest.clone()))
           : Promise.resolve(await requestPromise);
       }, Promise.resolve(initRequest));
@@ -65,7 +77,7 @@ async function getDevServer(compilation) {
       let response = new Response(null, { status });
 
       for (const plugin of resourcePlugins) {
-        if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
+        if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {
           const current = await plugin.serve(url, request);
           const merged = mergeResponse(response.clone(), current.clone());
 
@@ -73,7 +85,7 @@ async function getDevServer(compilation) {
         }
       }
 
-      ctx.body = response.body ? Readable.from(response.body) : '';
+      ctx.body = response.body ? Readable.from(response.body) : "";
       ctx.status = response.status;
       ctx.message = response.statusText;
       response.headers.forEach((value, key) => {
@@ -96,12 +108,19 @@ async function getDevServer(compilation) {
       const initResponse = new Response(status === 204 ? null : ctx.body, {
         statusText: message,
         status,
-        headers: new Headers(header)
+        headers: new Headers(header),
       });
       const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
         const intermediateResponse = await responsePromise;
-        if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, intermediateResponse.clone())) {
-          const current = await plugin.preIntercept(url, request, await intermediateResponse.clone());
+        if (
+          plugin.shouldPreIntercept &&
+          (await plugin.shouldPreIntercept(url, request, intermediateResponse.clone()))
+        ) {
+          const current = await plugin.preIntercept(
+            url,
+            request,
+            await intermediateResponse.clone(),
+          );
           const merged = mergeResponse(intermediateResponse.clone(), current);
 
           return Promise.resolve(merged);
@@ -110,7 +129,7 @@ async function getDevServer(compilation) {
         }
       }, Promise.resolve(initResponse.clone()));
 
-      ctx.body = response.body ? Readable.from(response.body) : '';
+      ctx.body = response.body ? Readable.from(response.body) : "";
       ctx.message = response.statusText;
       response.headers.forEach((value, key) => {
         ctx.set(key, value);
@@ -132,11 +151,14 @@ async function getDevServer(compilation) {
       const initResponse = new Response(status === 204 ? null : ctx.body, {
         statusText: message,
         status,
-        headers: new Headers(header)
+        headers: new Headers(header),
       });
       const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
         const intermediateResponse = await responsePromise;
-        if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, intermediateResponse.clone())) {
+        if (
+          plugin.shouldIntercept &&
+          (await plugin.shouldIntercept(url, request, intermediateResponse.clone()))
+        ) {
           const current = await plugin.intercept(url, request, await intermediateResponse.clone());
           const merged = mergeResponse(intermediateResponse.clone(), current);
 
@@ -146,7 +168,7 @@ async function getDevServer(compilation) {
         }
       }, Promise.resolve(initResponse.clone()));
 
-      ctx.body = response.body ? Readable.from(response.body) : '';
+      ctx.body = response.body ? Readable.from(response.body) : "";
       ctx.message = response.statusText;
       response.headers.forEach((value, key) => {
         ctx.set(key, value);
@@ -166,29 +188,30 @@ async function getDevServer(compilation) {
 
     // don't interfere with external requests or API calls, only files
     // and only run in development
-    if (process.env.__GWD_COMMAND__ === 'develop' && url.protocol === 'file:') {
+    if (process.env.__GWD_COMMAND__ === "develop" && url.protocol === "file:") {
       // there's probably a better way to do this with tee-ing streams but this works for now
       const { header, status, message } = ctx.response;
       const response = new Response(ctx.body, {
         statusText: message,
         status,
-        headers: new Headers(header)
+        headers: new Headers(header),
       }).clone();
       const splitResponse = response.clone();
       const contents = await splitResponse.text();
-      const inm = ctx.headers['if-none-match'];
-      const etagHash = url.pathname.split('.').pop() === 'json'
-        ? hashString(JSON.stringify(contents))
-        : hashString(contents);
+      const inm = ctx.headers["if-none-match"];
+      const etagHash =
+        url.pathname.split(".").pop() === "json"
+          ? hashString(JSON.stringify(contents))
+          : hashString(contents);
 
       if (inm && inm === etagHash) {
         ctx.status = 304;
         ctx.body = null;
-        ctx.set('Etag', etagHash);
-        ctx.set('Cache-Control', 'no-cache');
+        ctx.set("Etag", etagHash);
+        ctx.set("Cache-Control", "no-cache");
       } else if (!inm || inm !== etagHash) {
         ctx.body = Readable.from(response.body);
-        ctx.set('Etag', etagHash);
+        ctx.set("Etag", etagHash);
         ctx.message = response.statusText;
         response.headers.forEach((value, key) => {
           ctx.set(key, value);
@@ -205,26 +228,29 @@ async function getStaticServer(compilation, composable) {
   const { outputDir } = compilation.context;
   const { port, basePath } = compilation.config;
   const standardResourcePlugins = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'resource' && plugin.isGreenwoodDefaultPlugin;
+    return plugin.type === "resource" && plugin.isGreenwoodDefaultPlugin;
   });
 
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`http://localhost:${port}${ctx.url}`);
-      const matchingRoute = compilation.graph.find(page => page.route === url.pathname);
-      const isSPA = compilation.graph.find(page => page.isSPA);
+      const matchingRoute = compilation.graph.find((page) => page.route === url.pathname);
+      const isSPA = compilation.graph.find((page) => page.isSPA);
       const { isSSR } = matchingRoute || {};
-      const isStatic = matchingRoute && !isSSR || isSSR && compilation.config.prerender || isSSR && matchingRoute.prerender;
+      const isStatic =
+        (matchingRoute && !isSSR) ||
+        (isSSR && compilation.config.prerender) ||
+        (isSSR && matchingRoute.prerender);
 
-      if (isSPA || (matchingRoute && isStatic) || url.pathname.split('.').pop() === 'html') {
+      if (isSPA || (matchingRoute && isStatic) || url.pathname.split(".").pop() === "html") {
         const outputHref = isSPA
           ? isSPA.outputHref
           : isStatic
             ? matchingRoute.outputHref
-            : new URL(`.${url.pathname.replace(basePath, '')}`, outputDir).href;
-        const body = await fs.readFile(new URL(outputHref), 'utf-8');
+            : new URL(`.${url.pathname.replace(basePath, "")}`, outputDir).href;
+        const body = await fs.readFile(new URL(outputHref), "utf-8");
 
-        ctx.set('Content-Type', 'text/html');
+        ctx.set("Content-Type", "text/html");
         ctx.body = body;
       }
     } catch (e) {
@@ -242,12 +268,12 @@ async function getStaticServer(compilation, composable) {
       const url = new URL(`http://localhost:${port}${ctx.url}`);
       const request = new Request(url, {
         method: ctx.request.method,
-        headers: ctx.request.header
+        headers: ctx.request.header,
       });
 
       if (compilation.config.devServer.proxy) {
         const proxyPlugin = standardResourcePlugins
-          .find((plugin) => plugin.name === 'plugin-dev-proxy')
+          .find((plugin) => plugin.name === "plugin-dev-proxy")
           .provider(compilation);
 
         if (await proxyPlugin.shouldServe(url, request)) {
@@ -270,7 +296,7 @@ async function getStaticServer(compilation, composable) {
 
   app.use(async (ctx, next) => {
     try {
-      const url = new URL(`.${ctx.url.replace(basePath, '')}`, outputDir.href);
+      const url = new URL(`.${ctx.url.replace(basePath, "")}`, outputDir.href);
 
       if (await checkResourceExists(url)) {
         const resourcePlugins = standardResourcePlugins
@@ -280,14 +306,14 @@ async function getStaticServer(compilation, composable) {
           });
 
         const request = new Request(url.href, {
-          headers: new Headers(ctx.request.header)
+          headers: new Headers(ctx.request.header),
         });
         const initResponse = new Response(ctx.body, {
           status: ctx.response.status,
-          headers: new Headers(ctx.response.header)
+          headers: new Headers(ctx.response.header),
         });
         const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-          return plugin.shouldServe && await plugin.shouldServe(url, request)
+          return plugin.shouldServe && (await plugin.shouldServe(url, request))
             ? Promise.resolve(await plugin.serve(url, request))
             : responsePromise;
         }, Promise.resolve(initResponse));
@@ -335,17 +361,19 @@ async function getHybridServer(compilation) {
         if (matchingRoute.isolation || isolationMode) {
           // eslint-disable-next-line no-async-promise-executor
           await new Promise(async (resolve, reject) => {
-            const worker = new Worker(new URL('../lib/ssr-route-worker-isolation-mode.js', import.meta.url));
+            const worker = new Worker(
+              new URL("../lib/ssr-route-worker-isolation-mode.js", import.meta.url),
+            );
             // "faux" new Request here, a better way?
             const request = await requestAsObject(new Request(url));
 
-            worker.on('message', async (result) => {
+            worker.on("message", async (result) => {
               html = result;
 
               resolve();
             });
-            worker.on('error', reject);
-            worker.on('exit', (code) => {
+            worker.on("error", reject);
+            worker.on("exit", (code) => {
               if (code !== 0) {
                 reject(new Error(`Worker stopped with exit code ${code}`));
               }
@@ -354,7 +382,7 @@ async function getHybridServer(compilation) {
             worker.postMessage({
               routeModuleUrl: entryPointUrl.href,
               request,
-              compilation: JSON.stringify(compilation)
+              compilation: JSON.stringify(compilation),
             });
           });
         } else {
@@ -365,7 +393,7 @@ async function getHybridServer(compilation) {
         }
 
         ctx.body = html;
-        ctx.set('Content-Type', 'text/html');
+        ctx.set("Content-Type", "text/html");
         ctx.status = 200;
       } else if (isApiRoute) {
         const apiRoute = manifest.apis.get(url.pathname);
@@ -375,11 +403,11 @@ async function getHybridServer(compilation) {
         if (apiRoute.isolation || isolationMode) {
           // eslint-disable-next-line no-async-promise-executor
           await new Promise(async (resolve, reject) => {
-            const worker = new Worker(new URL('../lib/api-route-worker.js', import.meta.url));
+            const worker = new Worker(new URL("../lib/api-route-worker.js", import.meta.url));
             // "faux" new Request here, a better way?
             const req = await requestAsObject(request);
 
-            worker.on('message', async (result) => {
+            worker.on("message", async (result) => {
               const responseAsObject = result;
 
               body = responseAsObject.body;
@@ -389,8 +417,8 @@ async function getHybridServer(compilation) {
 
               resolve();
             });
-            worker.on('error', reject);
-            worker.on('exit', (code) => {
+            worker.on("error", reject);
+            worker.on("exit", (code) => {
               if (code !== 0) {
                 reject(new Error(`Worker stopped with exit code ${code}`));
               }
@@ -398,7 +426,7 @@ async function getHybridServer(compilation) {
 
             worker.postMessage({
               href: entryPointUrl.href,
-              request: req
+              request: req,
             });
           });
         } else {
@@ -428,8 +456,4 @@ async function getHybridServer(compilation) {
   return app;
 }
 
-export {
-  getDevServer,
-  getStaticServer,
-  getHybridServer
-};
+export { getDevServer, getStaticServer, getHybridServer };

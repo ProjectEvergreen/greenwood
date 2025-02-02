@@ -1,14 +1,14 @@
 // https://amagiacademy.com/blog/posts/2021-04-09/node-worker-threads-pool
-import { AsyncResource } from 'async_hooks';
-import { EventEmitter } from 'events';
-import { Worker } from 'worker_threads';
+import { AsyncResource } from "async_hooks";
+import { EventEmitter } from "events";
+import { Worker } from "worker_threads";
 
-const kTaskInfo = Symbol('kTaskInfo');
-const kWorkerFreedEvent = Symbol('kWorkerFreedEvent');
+const kTaskInfo = Symbol("kTaskInfo");
+const kWorkerFreedEvent = Symbol("kWorkerFreedEvent");
 
 class WorkerPoolTaskInfo extends AsyncResource {
   constructor(callback) {
-    super('WorkerPoolTaskInfo');
+    super("WorkerPoolTaskInfo");
     this.callback = callback;
   }
 
@@ -34,7 +34,7 @@ class WorkerPool extends EventEmitter {
   addNewWorker() {
     const worker = new Worker(this.workerFile);
 
-    worker.on('message', (result) => {
+    worker.on("message", (result) => {
       worker[kTaskInfo].done(null, result);
       worker[kTaskInfo] = null;
 
@@ -42,11 +42,11 @@ class WorkerPool extends EventEmitter {
       this.emit(kWorkerFreedEvent);
     });
 
-    worker.on('error', (err) => {
+    worker.on("error", (err) => {
       if (worker[kTaskInfo]) {
         worker[kTaskInfo].done(err, null);
       } else {
-        this.emit('error', err);
+        this.emit("error", err);
       }
       this.workers.splice(this.workers.indexOf(worker), 1);
       this.addNewWorker();

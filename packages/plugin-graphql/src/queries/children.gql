@@ -1,12 +1,12 @@
-query($parent: String!) {
+query ($parent: String!) {
   children(parent: $parent) {
-    id,
-    label,
-    title,
-    route,
-    layout,
+    id
+    label
+    title
+    route
+    layout
     tableOfContents {
-      label,
+      label
       route
     }
   }

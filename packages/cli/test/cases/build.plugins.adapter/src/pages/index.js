@@ -1,19 +1,23 @@
-import '../components/card.js';
+import "../components/card.js";
 
 export default class ArtistsPage extends HTMLElement {
   async connectedCallback() {
-    const artists = [{ name: 'Analog', imageUrl: 'https://www.analogstudios.net/images/analog.png' }];
-    const html = artists.map(artist => {
-      const { name, imageUrl } = artist;
+    const artists = [
+      { name: "Analog", imageUrl: "https://www.analogstudios.net/images/analog.png" },
+    ];
+    const html = artists
+      .map((artist) => {
+        const { name, imageUrl } = artist;
 
-      return `
+        return `
         <app-card
           title="${name}"
           thumbnail="${imageUrl}"
         >
         </app-card>
       `;
-    }).join('');
+      })
+      .join("");
 
     this.innerHTML = `
       <a href="/">&lt; Back</a>

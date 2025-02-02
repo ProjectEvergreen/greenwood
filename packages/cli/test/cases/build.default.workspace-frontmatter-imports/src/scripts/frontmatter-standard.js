@@ -1,3 +1,3 @@
-const message = 'Hello from frontmatter standard';
+const message = "Hello from frontmatter standard";
 
 console.log({ message });

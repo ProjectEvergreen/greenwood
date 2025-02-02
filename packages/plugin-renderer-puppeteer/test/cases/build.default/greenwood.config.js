@@ -1,8 +1,6 @@
-import { greenwoodPluginRendererPuppeteer } from '../../../src/index.js';
+import { greenwoodPluginRendererPuppeteer } from "../../../src/index.js";
 
 export default {
   prerender: true,
-  plugins: [
-    greenwoodPluginRendererPuppeteer()
-  ]
+  plugins: [greenwoodPluginRendererPuppeteer()],
 };

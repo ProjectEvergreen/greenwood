@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit';
+import { html, LitElement } from "lit";
 
 class scroll extends LitElement {
   constructor() {
@@ -7,13 +7,13 @@ class scroll extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    window.addEventListener('hashchange', this.handleHashChange.bind(this), false);
-    window.addEventListener('load', this.handleHashChange.bind(this), false);
+    window.addEventListener("hashchange", this.handleHashChange.bind(this), false);
+    window.addEventListener("load", this.handleHashChange.bind(this), false);
   }
 
   disconnectedCallback() {
-    window.removeEventListener('hashchange', this.handleHashChange.bind(this), false);
-    window.removeEventListener('load', this.handleHashChange.bind(this), false);
+    window.removeEventListener("hashchange", this.handleHashChange.bind(this), false);
+    window.removeEventListener("load", this.handleHashChange.bind(this), false);
     super.disconnectedCallback();
   }
 
@@ -23,9 +23,14 @@ class scroll extends LitElement {
       const elements = this.querySelectorAll(selector);
 
       return Array.from(elements).filter((element) => {
-        let el = RegExp(text, 'gmi').test(element.href);
+        let el = RegExp(text, "gmi").test(element.href);
         let href = element.href;
-        if (el && href.substr(href.length - text.length, href.length) === text && (el.tagName && el.tagName.toLowerCase() === 'h3')) {
+        if (
+          el &&
+          href.substr(href.length - text.length, href.length) === text &&
+          el.tagName &&
+          el.tagName.toLowerCase() === "h3"
+        ) {
           return el;
         }
       });
@@ -34,7 +39,7 @@ class scroll extends LitElement {
     let { hash } = window.location;
 
     // query hash text
-    const heading = contains('a', hash)[0];
+    const heading = contains("a", hash)[0];
 
     if (heading) {
       heading.scrollIntoView(true);
@@ -42,10 +47,8 @@ class scroll extends LitElement {
   }
 
   render() {
-    return html`
-      <slot></slot>
-    `;
+    return html` <slot></slot> `;
   }
 }
 
-customElements.define('app-scroll', scroll);
+customElements.define("app-scroll", scroll);

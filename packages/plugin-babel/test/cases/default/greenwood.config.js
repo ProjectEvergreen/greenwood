@@ -1,7 +1,5 @@
-import { greenwoodPluginBabel } from '../../../src/index.js';
+import { greenwoodPluginBabel } from "../../../src/index.js";
 
 export default {
-  plugins: [
-    ...greenwoodPluginBabel()
-  ]
+  plugins: [...greenwoodPluginBabel()],
 };

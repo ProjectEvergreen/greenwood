@@ -1,13 +1,13 @@
-import client from '@greenwood/plugin-graphql/src/core/client.js';
-import ChildrenQuery from '@greenwood/plugin-graphql/src/queries/children.gql' with { type: 'gql' };
+import client from "@greenwood/plugin-graphql/src/core/client.js";
+import ChildrenQuery from "@greenwood/plugin-graphql/src/queries/children.gql" with { type: "gql" };
 
 export default class PostsList extends HTMLElement {
   async connectedCallback() {
     const response = await client.query({
       query: ChildrenQuery,
       variables: {
-        parent: '/blog'
-      }
+        parent: "/blog",
+      },
     });
     const posts = response.data.children;
 
@@ -16,17 +16,19 @@ export default class PostsList extends HTMLElement {
 
       <div class="posts">          
         <ul>
-          ${posts.map((post) => {
-            return `
+          ${posts
+            .map((post) => {
+              return `
               <li>
                 <a href="${post.route}" title="Click to read my ${post.title} blog post">${post.title} Post</a>
               </li>
             `;
-          }).join('')}
+            })
+            .join("")}
         </ul>
       </div>
     `;
   }
 }
 
-customElements.define('posts-list', PostsList);
+customElements.define("posts-list", PostsList);

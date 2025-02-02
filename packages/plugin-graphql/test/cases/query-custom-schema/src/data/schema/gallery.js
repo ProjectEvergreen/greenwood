@@ -1,18 +1,24 @@
-import gql from 'graphql-tag';
+import gql from "graphql-tag";
 
 const getGallery = async (root, query) => {
-  if (query.name === 'logos') {
-    return [{
-      name: 'logos',
-      title: 'Home Page Logos',
-      images: [{
-        path: '/assets/logo1.png'
-      }, {
-        path: '/assets/logo2.png'
-      }, {
-        path: '/assets/logo3.png'
-      }]
-    }];
+  if (query.name === "logos") {
+    return [
+      {
+        name: "logos",
+        title: "Home Page Logos",
+        images: [
+          {
+            path: "/assets/logo1.png",
+          },
+          {
+            path: "/assets/logo2.png",
+          },
+          {
+            path: "/assets/logo3.png",
+          },
+        ],
+      },
+    ];
   }
 };
 
@@ -22,8 +28,8 @@ const galleryTypeDefs = gql`
   }
 
   type Gallery {
-    name: String,
-    title: String,
+    name: String
+    title: String
     images: [Image]
   }
 
@@ -34,11 +40,8 @@ const galleryTypeDefs = gql`
 
 const galleryResolvers = {
   Query: {
-    gallery: getGallery
-  }
+    gallery: getGallery,
+  },
 };
 
-export {
-  galleryTypeDefs as customTypeDefs,
-  galleryResolvers as customResolvers
-};
+export { galleryTypeDefs as customTypeDefs, galleryResolvers as customResolvers };

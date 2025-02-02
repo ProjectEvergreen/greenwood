@@ -1,6 +1,6 @@
 * {
   background-image: url("/assets/background.jpg");
-  font-family: 'Arial'
+  font-family: "Arial";
 }
 
 .blockquote-footer::before {

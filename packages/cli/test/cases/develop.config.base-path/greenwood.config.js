@@ -1,8 +1,8 @@
 export default {
-  basePath: '/my-path',
+  basePath: "/my-path",
   devServer: {
     proxy: {
-      '/posts': 'https://jsonplaceholder.typicode.com'
-    }
-  }
+      "/posts": "https://jsonplaceholder.typicode.com",
+    },
+  },
 };

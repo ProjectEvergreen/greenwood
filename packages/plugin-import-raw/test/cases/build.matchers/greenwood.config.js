@@ -1,12 +1,9 @@
-import { greenwoodPluginImportRaw } from '../../../src/index.js';
+import { greenwoodPluginImportRaw } from "../../../src/index.js";
 
 export default {
-
   plugins: [
     greenwoodPluginImportRaw({
-      matches: [
-        'eve-container.css'
-      ]
-    })
-  ]
+      matches: ["eve-container.css"],
+    }),
+  ],
 };

@@ -1,19 +1,18 @@
-import gql from 'graphql-tag';
+import gql from "graphql-tag";
 
 const getCollection = (root, { name, orderBy }, context) => {
   const { graph } = context;
   let items = [];
 
-  graph
-    .forEach((page) => {
-      const { data, label, title } = page;
-      const { collection, tableOfContents, tocHeading } = data;
-      const toc = getParsedHeadingsFromPage(tableOfContents, tocHeading);
+  graph.forEach((page) => {
+    const { data, label, title } = page;
+    const { collection, tableOfContents, tocHeading } = data;
+    const toc = getParsedHeadingsFromPage(tableOfContents, tocHeading);
 
-      if (collection === name) {
-        items.push({ ...page, title: title || label, tableOfContents: toc });
-      }
-    });
+    if (collection === name) {
+      items.push({ ...page, title: title || label, tableOfContents: toc });
+    }
+  });
 
   if (orderBy) {
     items = sortCollection(items, orderBy);
@@ -24,20 +23,20 @@ const getCollection = (root, { name, orderBy }, context) => {
 
 const sortCollection = (collection, orderBy) => {
   const compare = (a, b) => {
-    if (orderBy === 'title_asc' || orderBy === 'title_desc') {
-      a = a?.title, b = b?.title;
+    if (orderBy === "title_asc" || orderBy === "title_desc") {
+      (a = a?.title), (b = b?.title);
     }
-    if (orderBy === 'order_asc' || orderBy === 'order_desc') {
-      a = a?.data.order, b = b?.data?.order;
+    if (orderBy === "order_asc" || orderBy === "order_desc") {
+      (a = a?.data.order), (b = b?.data?.order);
     }
-    if (orderBy === 'title_asc' || orderBy === 'order_asc') {
+    if (orderBy === "title_asc" || orderBy === "order_asc") {
       if (a < b) {
         return -1;
       }
       if (a > b) {
         return 1;
       }
-    } else if (orderBy === 'title_desc' || orderBy === 'order_desc') {
+    } else if (orderBy === "title_desc" || orderBy === "order_desc") {
       if (a > b) {
         return -1;
       }
@@ -58,7 +57,7 @@ const getParsedHeadingsFromPage = (tableOfContents = [], headingLevel) => {
     tableOfContents.forEach(({ content, slug, lvl }) => {
       // make sure we only add heading elements of the same level (h1, h2, h3)
       if (lvl === headingLevel) {
-        children.push({ label: content, route: '#' + slug });
+        children.push({ label: content, route: "#" + slug });
       }
     });
   }
@@ -77,38 +76,37 @@ const getChildrenFromParentRoute = async (root, query, context) => {
   // TODO handle base path
   // const { basePath } = context.config;
 
-  graph
-    .forEach((page) => {
-      const { route } = page;
+  graph.forEach((page) => {
+    const { route } = page;
 
-      if (`${parent}/` !== route && route.startsWith(parent)) {
-        pages.push(page);
-      }
-    });
+    if (`${parent}/` !== route && route.startsWith(parent)) {
+      pages.push(page);
+    }
+  });
 
   return Promise.resolve(pages);
 };
 
 const graphTypeDefs = gql`
   type TocItem {
-    label: String,
-    route: String,
+    label: String
+    route: String
   }
 
   type Page {
-    id: String,
-    label: String,
-    title: String,
-    route: String,
-    layout: String,
-    data: Data,
+    id: String
+    label: String
+    title: String
+    route: String
+    layout: String
+    data: Data
     tableOfContents: [TocItem]
   }
 
   enum CollectionOrderBy {
-    title_asc,
+    title_asc
     title_desc
-    order_asc,
+    order_asc
     order_desc
   }
 
@@ -123,11 +121,8 @@ const graphResolvers = {
   Query: {
     graph: getPagesFromGraph,
     collection: getCollection,
-    children: getChildrenFromParentRoute
-  }
+    children: getChildrenFromParentRoute,
+  },
 };
 
-export {
-  graphTypeDefs,
-  graphResolvers
-};
+export { graphTypeDefs, graphResolvers };

@@ -3,7 +3,7 @@ export default class HeaderComponent extends HTMLElement {
     super();
 
     // create a Shadow DOM
-    this.root = this.attachShadow({ mode: 'open' });
+    this.root = this.attachShadow({ mode: "open" });
   }
 
   // run some code when the component is ready
@@ -19,4 +19,4 @@ export default class HeaderComponent extends HTMLElement {
   }
 }
 
-customElements.define('app-header', HeaderComponent);
+customElements.define("app-header", HeaderComponent);

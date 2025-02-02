@@ -1,21 +1,35 @@
-import { renderToString, renderFromHTML } from 'wc-compiler';
+import { renderToString, renderFromHTML } from "wc-compiler";
 
-async function executeRouteModule({ moduleUrl, compilation, page = {}, prerender = false, htmlContents = null, scripts = [], request }) {
+async function executeRouteModule({
+  moduleUrl,
+  compilation,
+  page = {},
+  prerender = false,
+  htmlContents = null,
+  scripts = [],
+  request,
+}) {
   const data = {
     layout: null,
     body: null,
     frontmatter: null,
-    html: null
+    html: null,
   };
 
   if (prerender) {
-    const scriptURLs = scripts.map(scriptFile => new URL(scriptFile));
+    const scriptURLs = scripts.map((scriptFile) => new URL(scriptFile));
     const { html } = await renderFromHTML(htmlContents, scriptURLs);
 
     data.html = html;
   } else {
-    const module = await import(moduleUrl).then(module => module);
-    const { prerender = false, getLayout = null, getBody = null, getFrontmatter = null, isolation } = module;
+    const module = await import(moduleUrl).then((module) => module);
+    const {
+      prerender = false,
+      getLayout = null,
+      getBody = null,
+      getFrontmatter = null,
+      isolation,
+    } = module;
 
     if (module.default) {
       const { html } = await renderToString(new URL(moduleUrl), false, request);

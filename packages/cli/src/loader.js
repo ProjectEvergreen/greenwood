@@ -1,31 +1,40 @@
-import { readAndMergeConfig } from './lifecycles/config.js';
-import { initContext } from './lifecycles/context.js';
-import { mergeResponse } from './lib/resource-utils.js';
+import { readAndMergeConfig } from "./lifecycles/config.js";
+import { initContext } from "./lifecycles/context.js";
+import { mergeResponse } from "./lib/resource-utils.js";
 
 const config = await readAndMergeConfig();
 const context = await initContext({ config });
 
 const resourcePlugins = config.plugins
-  .filter(plugin => plugin.type === 'resource')
-  .filter(plugin => plugin.name !== 'plugin-node-modules:resource' && plugin.name !== 'plugin-user-workspace')
-  .map(plugin => plugin.provider({
-    context,
-    config,
-    graph: []
-  }));
+  .filter((plugin) => plugin.type === "resource")
+  .filter(
+    (plugin) =>
+      plugin.name !== "plugin-node-modules:resource" && plugin.name !== "plugin-user-workspace",
+  )
+  .map((plugin) =>
+    plugin.provider({
+      context,
+      config,
+      graph: [],
+    }),
+  );
 
 async function getCustomLoaderResponse(initUrl, checkOnly = false) {
   const headers = {
-    'Accept': 'text/javascript'
+    Accept: "text/javascript",
   };
-  const initResponse = new Response('');
+  const initResponse = new Response("");
   let request = new Request(initUrl, { headers });
   let url = initUrl;
   let response = initResponse.clone();
   let shouldHandle = false;
 
   for (const plugin of resourcePlugins) {
-    if (initUrl.protocol === 'file:' && plugin.shouldResolve && await plugin.shouldResolve(initUrl, request)) {
+    if (
+      initUrl.protocol === "file:" &&
+      plugin.shouldResolve &&
+      (await plugin.shouldResolve(initUrl, request))
+    ) {
       shouldHandle = true;
 
       if (!checkOnly) {
@@ -35,7 +44,7 @@ async function getCustomLoaderResponse(initUrl, checkOnly = false) {
   }
 
   for (const plugin of resourcePlugins) {
-    if (plugin.shouldServe && await plugin.shouldServe(initUrl, request)) {
+    if (plugin.shouldServe && (await plugin.shouldServe(initUrl, request))) {
       shouldHandle = true;
 
       if (!checkOnly) {
@@ -45,15 +54,21 @@ async function getCustomLoaderResponse(initUrl, checkOnly = false) {
   }
 
   for (const plugin of resourcePlugins) {
-    if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(url, request, response.clone())) {
+    if (
+      plugin.shouldPreIntercept &&
+      (await plugin.shouldPreIntercept(url, request, response.clone()))
+    ) {
       shouldHandle = true;
 
       if (!checkOnly) {
-        response = mergeResponse(response, await plugin.preIntercept(url, request, response.clone()));
+        response = mergeResponse(
+          response,
+          await plugin.preIntercept(url, request, response.clone()),
+        );
       }
     }
 
-    if (plugin.shouldIntercept && await plugin.shouldIntercept(url, request, response.clone())) {
+    if (plugin.shouldIntercept && (await plugin.shouldIntercept(url, request, response.clone()))) {
       shouldHandle = true;
 
       if (!checkOnly) {
@@ -64,16 +79,16 @@ async function getCustomLoaderResponse(initUrl, checkOnly = false) {
 
   return {
     shouldHandle,
-    response
+    response,
   };
 }
 
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#resolvespecifier-context-nextresolve
 export async function resolve(specifier, context, defaultResolve) {
   const { parentURL } = context;
-  const url = specifier.startsWith('file://')
+  const url = specifier.startsWith("file://")
     ? new URL(specifier)
-    : specifier.startsWith('.')
+    : specifier.startsWith(".")
       ? new URL(specifier, parentURL)
       : undefined;
 
@@ -83,7 +98,7 @@ export async function resolve(specifier, context, defaultResolve) {
     if (shouldHandle) {
       return {
         url: url.href,
-        shortCircuit: true
+        shortCircuit: true,
       };
     }
   }
@@ -93,18 +108,18 @@ export async function resolve(specifier, context, defaultResolve) {
 
 // https://nodejs.org/docs/latest-v18.x/api/esm.html#loadurl-context-nextload
 export async function load(source, context, defaultLoad) {
-  const extension = source.split('.').pop();
+  const extension = source.split(".").pop();
   const url = new URL(source);
   const { shouldHandle } = await getCustomLoaderResponse(url, true);
 
-  if (shouldHandle && extension !== 'js') {
+  if (shouldHandle && extension !== "js") {
     const { response } = await getCustomLoaderResponse(url);
     const contents = await response.text();
 
     return {
-      format: 'module',
+      format: "module",
       source: contents,
-      shortCircuit: true
+      shortCircuit: true,
     };
   }
 

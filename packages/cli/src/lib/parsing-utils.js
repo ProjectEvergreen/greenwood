@@ -1,8 +1,6 @@
 const ACORN_OPTIONS = {
-  ecmaVersion: 'latest',
-  sourceType: 'module'
+  ecmaVersion: "latest",
+  sourceType: "module",
 };
 
-export {
-  ACORN_OPTIONS
-};
+export { ACORN_OPTIONS };

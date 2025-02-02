@@ -1,22 +1,26 @@
-import '../components/card.js';
+import "../components/card.js";
 
 export default class UsersPage extends HTMLElement {
   async connectedCallback() {
-    const users = [{
-      name: 'Foo',
-      thumbnail: 'foo.jpg'
-    }];
-    const html = users.map(user => {
-      const { name, imageUrl } = user;
+    const users = [
+      {
+        name: "Foo",
+        thumbnail: "foo.jpg",
+      },
+    ];
+    const html = users
+      .map((user) => {
+        const { name, imageUrl } = user;
 
-      return `
+        return `
         <app-card
           title="${name}"
           thumbnail="${imageUrl}"
         >
         </app-card>
       `;
-    }).join('');
+      })
+      .join("");
 
     this.innerHTML = `
       <a href="/">&lt; Back</a>

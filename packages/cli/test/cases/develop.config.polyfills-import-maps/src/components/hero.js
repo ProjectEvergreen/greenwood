@@ -1,4 +1,4 @@
-const template = document.createElement('template');
+const template = document.createElement("template");
 
 template.innerHTML = `
   <style>
@@ -37,28 +37,27 @@ template.innerHTML = `
 export default class HeroBanner extends HTMLElement {
   clickButton(el) {
     const content = el.textContent;
-    const buttonClickedEvent = new CustomEvent('update-modal', {
+    const buttonClickedEvent = new CustomEvent("update-modal", {
       detail: {
-        content: `You selected "${content}"`
-      }
+        content: `You selected "${content}"`,
+      },
     });
 
-    console.log('clicked button =>', content);
+    console.log("clicked button =>", content);
 
     window.dispatchEvent(buttonClickedEvent);
   }
 
   connectedCallback() {
     if (!this.shadowRoot) {
-      this.attachShadow({ mode: 'open' });
+      this.attachShadow({ mode: "open" });
       this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
 
-    this.shadowRoot.querySelectorAll('button')
-      .forEach(button => {
-        button.addEventListener('click', () => this.clickButton(button));
-      });
+    this.shadowRoot.querySelectorAll("button").forEach((button) => {
+      button.addEventListener("click", () => this.clickButton(button));
+    });
   }
 }
 
-customElements.define('app-hero', HeroBanner);
+customElements.define("app-hero", HeroBanner);

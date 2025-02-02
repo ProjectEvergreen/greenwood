@@ -4,6 +4,4 @@ async function getBody() {
   `;
 }
 
-export {
-  getBody
-};
+export { getBody };

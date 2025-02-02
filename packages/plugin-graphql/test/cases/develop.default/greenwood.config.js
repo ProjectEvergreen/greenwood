@@ -1,9 +1,5 @@
-import { greenwoodPluginGraphQL } from '../../../src/index.js';
+import { greenwoodPluginGraphQL } from "../../../src/index.js";
 
 export default {
-
-  plugins: [
-    ...greenwoodPluginGraphQL()
-  ]
-
+  plugins: [...greenwoodPluginGraphQL()],
 };

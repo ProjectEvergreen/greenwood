@@ -1,55 +1,61 @@
-import fs from 'fs';
-import path from 'path';
-import { checkResourceExists, normalizePathnameForWindows } from '../lib/resource-utils.js';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import * as walk from 'acorn-walk';
+import fs from "fs";
+import path from "path";
+import { checkResourceExists, normalizePathnameForWindows } from "../lib/resource-utils.js";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import * as walk from "acorn-walk";
 
 // https://github.com/rollup/rollup/issues/2121
 // would be nice to get rid of this
-function cleanRollupId(id = '') {
-  return id.replace('\x00', '').replace('?commonjs-proxy', '');
+function cleanRollupId(id = "") {
+  return id.replace("\x00", "").replace("?commonjs-proxy", "");
 }
 
 // ConstructableStylesheets, JSON Modules
-const externalizedResources = ['css', 'json'];
+const externalizedResources = ["css", "json"];
 
-function greenwoodResourceLoader (compilation, browser = false) {
-  const { importAttributes  } = compilation.config?.polyfills || [];
-  const resourcePlugins = compilation.config.plugins.filter((plugin) => {
-    return plugin.type === 'resource';
-  }).map((plugin) => {
-    return plugin.provider(compilation);
-  });
+function greenwoodResourceLoader(compilation, browser = false) {
+  const { importAttributes } = compilation.config?.polyfills || [];
+  const resourcePlugins = compilation.config.plugins
+    .filter((plugin) => {
+      return plugin.type === "resource";
+    })
+    .map((plugin) => {
+      return plugin.provider(compilation);
+    });
 
   return {
-    name: 'greenwood-resource-loader',
+    name: "greenwood-resource-loader",
     async resolveId(id, importer, options) {
       const { userWorkspace, scratchDir } = compilation.context;
       const normalizedId = cleanRollupId(id);
-      const importerUrl = new URL(`file://${cleanRollupId(importer) ?? ''}`);
+      const importerUrl = new URL(`file://${cleanRollupId(importer) ?? ""}`);
       const isUserWorkspaceImporter = importerUrl?.pathname?.startsWith(userWorkspace.pathname);
       const isScratchDirImporter = importerUrl?.pathname?.startsWith(scratchDir.pathname);
 
       // check for relative paths and resolve them to the user's workspace or Greenwood's scratch dir
       // like when bundling inline <script> tags with relative paths
-      if (id.startsWith('.') && (isUserWorkspaceImporter || isScratchDirImporter)) {
-        const normalizedIdImporterUrl = new URL(normalizedId,  importerUrl);
-        const type = options.attributes?.type ?? '';
+      if (id.startsWith(".") && (isUserWorkspaceImporter || isScratchDirImporter)) {
+        const normalizedIdImporterUrl = new URL(normalizedId, importerUrl);
+        const type = options.attributes?.type ?? "";
         // if we are polyfilling import attributes for the browser we will want Rollup to bundles these as JS files
         // instead of externalizing as their native content-type
         const shouldPolyfill = browser && (importAttributes || []).includes(type);
-        const external = !shouldPolyfill && externalizedResources.includes(type) && browser && !normalizedIdImporterUrl.searchParams.has('type');
-        const prefix = normalizedId.startsWith('..') ? './' : '';
+        const external =
+          !shouldPolyfill &&
+          externalizedResources.includes(type) &&
+          browser &&
+          !normalizedIdImporterUrl.searchParams.has("type");
+        const prefix = normalizedId.startsWith("..") ? "./" : "";
         // if its not in the users workspace, we clean up the dot-dots and check that against the user's workspace
         const resolvedUrl = isUserWorkspaceImporter
           ? normalizedIdImporterUrl
-          : new URL(`${prefix}${normalizedId.replace(/\.\.\//g, '')}`, userWorkspace);
+          : new URL(`${prefix}${normalizedId.replace(/\.\.\//g, "")}`, userWorkspace);
 
         if (await checkResourceExists(resolvedUrl)) {
           return {
             id: normalizePathnameForWindows(resolvedUrl),
-            external
+            external,
           };
         } else {
           console.warn(`unable to resolve \`${id}\` as imported by => ${importer}`);
@@ -59,59 +65,65 @@ function greenwoodResourceLoader (compilation, browser = false) {
     async load(id) {
       let idUrl = new URL(`file://${cleanRollupId(id)}`);
       const { pathname } = idUrl;
-      const extension = pathname.split('.').pop();
+      const extension = pathname.split(".").pop();
       const headers = {
-        'Accept': 'text/javascript'
+        Accept: "text/javascript",
       };
 
       // filter first for any bare specifiers
-      if (await checkResourceExists(idUrl) && !id.startsWith('\x00')) {
-        if (extension !== 'js') {
+      if ((await checkResourceExists(idUrl)) && !id.startsWith("\x00")) {
+        if (extension !== "js") {
           for (const plugin of resourcePlugins) {
-            if (plugin.shouldResolve && await plugin.shouldResolve(idUrl)) {
+            if (plugin.shouldResolve && (await plugin.shouldResolve(idUrl))) {
               idUrl = new URL((await plugin.resolve(idUrl)).url);
             }
           }
         }
 
         const request = new Request(idUrl, {
-          headers
+          headers,
         });
-        let response = new Response('', { headers: { 'Content-Type': 'text/javascript' } });
+        let response = new Response("", { headers: { "Content-Type": "text/javascript" } });
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldServe && await plugin.shouldServe(idUrl, request)) {
+          if (plugin.shouldServe && (await plugin.shouldServe(idUrl, request))) {
             response = await plugin.serve(idUrl, request);
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(idUrl, request, response.clone())) {
+          if (
+            plugin.shouldPreIntercept &&
+            (await plugin.shouldPreIntercept(idUrl, request, response.clone()))
+          ) {
             response = await plugin.preIntercept(idUrl, request, response.clone());
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldIntercept && await plugin.shouldIntercept(idUrl, request, response.clone())) {
+          if (
+            plugin.shouldIntercept &&
+            (await plugin.shouldIntercept(idUrl, request, response.clone()))
+          ) {
             response = await plugin.intercept(idUrl, request, response.clone());
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldOptimize && await plugin.shouldOptimize(idUrl, response.clone())) {
+          if (plugin.shouldOptimize && (await plugin.shouldOptimize(idUrl, response.clone()))) {
             response = await plugin.optimize(idUrl, response.clone());
           }
         }
 
         return await response.text();
       }
-    }
+    },
   };
 }
 
 function greenwoodSyncPageResourceBundlesPlugin(compilation) {
   return {
-    name: 'greenwood-sync-page-resource-bundles-plugin',
+    name: "greenwood-sync-page-resource-bundles-plugin",
     async writeBundle(outputOptions, bundles) {
       const { outputDir } = compilation.context;
 
@@ -119,7 +131,7 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
         const resourceKey = normalizePathnameForWindows(resource.sourcePathURL);
 
         for (const bundle in bundles) {
-          const facadeModuleId = (bundles[bundle].facadeModuleId || '').replace(/\\/g, '/');
+          const facadeModuleId = (bundles[bundle].facadeModuleId || "").replace(/\\/g, "/");
 
           if (resourceKey === facadeModuleId) {
             const { fileName } = bundles[bundle];
@@ -129,29 +141,32 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
             compilation.resources.set(resource.sourcePathURL.pathname, {
               ...compilation.resources.get(resource.sourcePathURL.pathname),
               optimizedFileName: fileName,
-              optimizedFileContents: await fs.promises.readFile(outputPath, 'utf-8'),
-              contents
+              optimizedFileContents: await fs.promises.readFile(outputPath, "utf-8"),
+              contents,
             });
           }
         }
       }
-    }
+    },
   };
 }
 
 function greenwoodSyncSsrEntryPointsOutputPaths(compilation) {
   return {
-    name: 'greenwood-sync-ssr-pages-entry-point-output-paths',
+    name: "greenwood-sync-ssr-pages-entry-point-output-paths",
     generateBundle(options, bundle) {
       const { basePath } = compilation.config;
       const { scratchDir, outputDir } = compilation.context;
 
       // map rollup bundle names back to original SSR pages for syncing input <> output bundle names
       Object.keys(bundle).forEach((key) => {
-        if (bundle[key].exports?.find(exp => exp === 'handler')) {
-          const ext = bundle[key].facadeModuleId.split('.').pop();
+        if (bundle[key].exports?.find((exp) => exp === "handler")) {
+          const ext = bundle[key].facadeModuleId.split(".").pop();
           // account for windows pathname shenanigans by "casting" facadeModuleId to a URL first
-          const route = new URL(`file://${bundle[key].facadeModuleId}`).pathname.replace(scratchDir.pathname, `${basePath}/`).replace(`.${ext}`, '/').replace('/index/', '/');
+          const route = new URL(`file://${bundle[key].facadeModuleId}`).pathname
+            .replace(scratchDir.pathname, `${basePath}/`)
+            .replace(`.${ext}`, "/")
+            .replace("/index/", "/");
 
           compilation.graph.forEach((page, idx) => {
             if (page.route === route) {
@@ -160,22 +175,24 @@ function greenwoodSyncSsrEntryPointsOutputPaths(compilation) {
           });
         }
       });
-    }
+    },
   };
 }
 
 function greenwoodSyncApiRoutesOutputPath(compilation) {
   return {
-    name: 'greenwood-sync-api-routes-output-paths',
+    name: "greenwood-sync-api-routes-output-paths",
     generateBundle(options, bundle) {
       const { basePath } = compilation.config;
       const { apisDir, outputDir } = compilation.context;
 
       // map rollup bundle names back to original API routes for syncing input <> output bundle names in the manifest
       Object.keys(bundle).forEach((key) => {
-        if (bundle[key].exports?.find(exp => exp === 'handler')) {
-          const ext = bundle[key].facadeModuleId.split('.').pop();
-          const relativeFacade = new URL(`file://${bundle[key].facadeModuleId}`).pathname.replace(apisDir.pathname, `${basePath}/`).replace(`.${ext}`, '');
+        if (bundle[key].exports?.find((exp) => exp === "handler")) {
+          const ext = bundle[key].facadeModuleId.split(".").pop();
+          const relativeFacade = new URL(`file://${bundle[key].facadeModuleId}`).pathname
+            .replace(apisDir.pathname, `${basePath}/`)
+            .replace(`.${ext}`, "");
           const route = `/api${relativeFacade}`;
 
           if (compilation.manifest.apis.has(route)) {
@@ -183,61 +200,63 @@ function greenwoodSyncApiRoutesOutputPath(compilation) {
 
             compilation.manifest.apis.set(route, {
               ...api,
-              outputHref: new URL(`./api/${key}`, outputDir).href
+              outputHref: new URL(`./api/${key}`, outputDir).href,
             });
           }
         }
       });
-    }
+    },
   };
 }
 
 function getMetaImportPath(node) {
-  return node.arguments[0].value.split('/').join(path.sep)
-    .replace(/\\/g, '/'); // handle Windows style paths
+  return node.arguments[0].value.split("/").join(path.sep).replace(/\\/g, "/"); // handle Windows style paths
 }
 
 function isNewUrlImportMetaUrl(node) {
   return (
-    node.type === 'NewExpression' &&
-    node.callee.type === 'Identifier' &&
-    node.callee.name === 'URL' &&
+    node.type === "NewExpression" &&
+    node.callee.type === "Identifier" &&
+    node.callee.name === "URL" &&
     node.arguments.length === 2 &&
-    node.arguments[0].type === 'Literal' &&
-    typeof getMetaImportPath(node) === 'string' &&
-    node.arguments[1].type === 'MemberExpression' &&
-    node.arguments[1].object.type === 'MetaProperty' &&
-    node.arguments[1].property.type === 'Identifier' &&
-    node.arguments[1].property.name === 'url'
+    node.arguments[0].type === "Literal" &&
+    typeof getMetaImportPath(node) === "string" &&
+    node.arguments[1].type === "MemberExpression" &&
+    node.arguments[1].object.type === "MetaProperty" &&
+    node.arguments[1].property.type === "Identifier" &&
+    node.arguments[1].property.name === "url"
   );
 }
 
 // adapted from, and with credit to @web/rollup-plugin-import-meta-assets
 // https://modern-web.dev/docs/building/rollup-plugin-import-meta-assets/
 function greenwoodImportMetaUrl(compilation) {
-
   return {
-    name: 'greenwood-import-meta-url',
+    name: "greenwood-import-meta-url",
 
     async transform(code, id) {
-      const resourcePlugins = compilation.config.plugins.filter((plugin) => {
-        return plugin.type === 'resource';
-      }).map((plugin) => {
-        return plugin.provider(compilation);
-      });
-      const customResourcePlugins = compilation.config.plugins.filter((plugin) => {
-        return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
-      }).map((plugin) => {
-        return plugin.provider(compilation);
-      });
+      const resourcePlugins = compilation.config.plugins
+        .filter((plugin) => {
+          return plugin.type === "resource";
+        })
+        .map((plugin) => {
+          return plugin.provider(compilation);
+        });
+      const customResourcePlugins = compilation.config.plugins
+        .filter((plugin) => {
+          return plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin;
+        })
+        .map((plugin) => {
+          return plugin.provider(compilation);
+        });
       const idAssetName = path.basename(id);
-      const normalizedId = id.replace(/\\\\/g, '/').replace(/\\/g, '/'); // windows shenanigans...
+      const normalizedId = id.replace(/\\\\/g, "/").replace(/\\/g, "/"); // windows shenanigans...
       let idUrl = new URL(`file://${cleanRollupId(id)}`);
       const headers = {
-        'Accept': 'text/javascript'
+        Accept: "text/javascript",
       };
       const request = new Request(idUrl, {
-        headers
+        headers,
       });
       let canTransform = false;
       let response = new Response(code);
@@ -245,27 +264,33 @@ function greenwoodImportMetaUrl(compilation) {
       // handle any custom imports or pre-processing first to ensure valid JavaScript for parsing
       if (await checkResourceExists(idUrl)) {
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldResolve && await plugin.shouldResolve(idUrl)) {
+          if (plugin.shouldResolve && (await plugin.shouldResolve(idUrl))) {
             idUrl = new URL((await plugin.resolve(idUrl)).url);
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldServe && await plugin.shouldServe(idUrl, request)) {
+          if (plugin.shouldServe && (await plugin.shouldServe(idUrl, request))) {
             response = await plugin.serve(idUrl, request);
             canTransform = true;
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(idUrl, request, response)) {
+          if (
+            plugin.shouldPreIntercept &&
+            (await plugin.shouldPreIntercept(idUrl, request, response))
+          ) {
             response = await plugin.preIntercept(idUrl, request, response);
             canTransform = true;
           }
         }
 
         for (const plugin of resourcePlugins) {
-          if (plugin.shouldIntercept && await plugin.shouldIntercept(idUrl, request, response.clone())) {
+          if (
+            plugin.shouldIntercept &&
+            (await plugin.shouldIntercept(idUrl, request, response.clone()))
+          ) {
             response = await plugin.intercept(idUrl, request, response.clone());
             canTransform = true;
           }
@@ -293,10 +318,10 @@ function greenwoodImportMetaUrl(compilation) {
 
             assetUrls.push({
               url: new URL(`file://${absoluteAssetPath}`),
-              relativeAssetPath
+              relativeAssetPath,
             });
           }
-        }
+        },
       });
 
       for (const assetUrl of assetUrls) {
@@ -304,28 +329,27 @@ function greenwoodImportMetaUrl(compilation) {
         const { pathname } = url;
         const { relativeAssetPath } = assetUrl;
         const assetName = path.basename(pathname);
-        const assetExtension = assetName.split('.').pop();
-        const assetContents = await fs.promises.readFile(url, 'utf-8');
-        const name = assetName.replace(`.${assetExtension}`, '');
-        const request = new Request(url, { headers: { 'Accept': 'text/javascript' } });
-        let bundleExtensions = ['js'];
+        const assetExtension = assetName.split(".").pop();
+        const assetContents = await fs.promises.readFile(url, "utf-8");
+        const name = assetName.replace(`.${assetExtension}`, "");
+        const request = new Request(url, { headers: { Accept: "text/javascript" } });
+        let bundleExtensions = ["js"];
 
         for (const plugin of customResourcePlugins) {
-          if (plugin.shouldServe && await plugin.shouldServe(url, request)) {
+          if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {
             const response = await plugin.serve(url, request);
 
-            if (response?.headers?.get('content-type') || ''.indexOf('text/javascript') >= 0) {
+            if (response?.headers?.get("content-type") || "".indexOf("text/javascript") >= 0) {
               bundleExtensions = [...bundleExtensions, ...plugin.extensions];
             }
           }
         }
 
-        const type = bundleExtensions.indexOf(assetExtension) >= 0
-          ? 'chunk'
-          : 'asset';
-        const emitConfig = type === 'chunk'
-          ? { type, id: normalizePathnameForWindows(url), name }
-          : { type, name: assetName, source: assetContents };
+        const type = bundleExtensions.indexOf(assetExtension) >= 0 ? "chunk" : "asset";
+        const emitConfig =
+          type === "chunk"
+            ? { type, id: normalizePathnameForWindows(url), name }
+            : { type, name: assetName, source: assetContents };
         const ref = this.emitFile(emitConfig);
         const importRef = `import.meta.ROLLUP_FILE_URL_${ref}`;
 
@@ -334,7 +358,7 @@ function greenwoodImportMetaUrl(compilation) {
         if (`${compilation.context.apisDir.pathname}${idAssetName}`.indexOf(normalizedId) >= 0) {
           for (const entry of compilation.manifest.apis.keys()) {
             const apiRoute = compilation.manifest.apis.get(entry);
-            const pagePath = apiRoute.pageHref.replace(`${compilation.context.pagesDir}api/`, '');
+            const pagePath = apiRoute.pageHref.replace(`${compilation.context.pagesDir}api/`, "");
 
             if (normalizedId.endsWith(pagePath)) {
               const assets = apiRoute.assets || [];
@@ -343,7 +367,7 @@ function greenwoodImportMetaUrl(compilation) {
 
               compilation.manifest.apis.set(entry, {
                 ...apiRoute,
-                assets
+                assets,
               });
             }
           }
@@ -359,15 +383,15 @@ function greenwoodImportMetaUrl(compilation) {
 
       return {
         code: modifiedCode ? modifiedCode : code,
-        map: null
+        map: null,
       };
     },
 
     // sync bundles from API routes to the corresponding API route's entry in the manifest (useful for adapters)
     generateBundle(options, bundles) {
       for (const bundle in bundles) {
-        const bundleExtension = bundle.split('.').pop();
-        const apiKey = `/api/${bundle.replace(`.${bundleExtension}`, '')}`;
+        const bundleExtension = bundle.split(".").pop();
+        const apiKey = `/api/${bundle.replace(`.${bundleExtension}`, "")}`;
 
         if (compilation.manifest.apis.has(apiKey)) {
           const apiManifestDetails = compilation.manifest.apis.get(apiKey);
@@ -379,7 +403,7 @@ function greenwoodImportMetaUrl(compilation) {
 
               assets.forEach((asset, idx) => {
                 // more windows shenanigans...)
-                if (asset.indexOf(bundles[reference]?.facadeModuleId?.replace(/\\/g, '/'))) {
+                if (asset.indexOf(bundles[reference]?.facadeModuleId?.replace(/\\/g, "/"))) {
                   assetIdx = idx;
                 }
               });
@@ -388,13 +412,13 @@ function greenwoodImportMetaUrl(compilation) {
 
               compilation.manifest.apis.set(apiKey, {
                 ...apiManifestDetails,
-                assets
+                assets,
               });
             }
           }
         }
       }
-    }
+    },
   };
 }
 
@@ -412,13 +436,13 @@ function greenwoodSyncImportAttributes(compilation) {
   const { importAttributes } = polyfills;
 
   return {
-    name: 'greenwood-sync-import-attributes',
+    name: "greenwood-sync-import-attributes",
 
     generateBundle(options, bundles) {
       const that = this;
 
       for (const bundle in bundles) {
-        if (bundle.endsWith('.map')) {
+        if (bundle.endsWith(".map")) {
           return;
         }
 
@@ -439,7 +463,7 @@ function greenwoodSyncImportAttributes(compilation) {
           // https://github.com/ProjectEvergreen/greenwood/issues/1218
           ImportDeclaration(node) {
             const { value } = node.source;
-            const extension = value.split('.').pop();
+            const extension = value.split(".").pop();
 
             if (externalizedResources.includes(extension)) {
               let preBundled = false;
@@ -448,21 +472,33 @@ function greenwoodSyncImportAttributes(compilation) {
               if (importAttributes && importAttributes.includes(extension)) {
                 importAttributes.forEach((attribute) => {
                   if (attribute === extension) {
-                    bundles[bundle].code = bundles[bundle].code.replace(new RegExp(`"assert{type:"${attribute}"}`, 'g'), `?polyfill=type-${extension}"`);
+                    bundles[bundle].code = bundles[bundle].code.replace(
+                      new RegExp(`"assert{type:"${attribute}"}`, "g"),
+                      `?polyfill=type-${extension}"`,
+                    );
                   }
                 });
               } else {
                 // waiting on Rollup to formally support `with`
                 // https://github.com/rollup/rollup/issues/5685
-                bundles[bundle].code = bundles[bundle].code.replace(/assert{/g, 'with{');
+                bundles[bundle].code = bundles[bundle].code.replace(/assert{/g, "with{");
               }
 
               // check for app level assets, like say a shared theme.css
               compilation.resources.forEach((resource) => {
-                inlineOptimization = resource.optimizationAttr === 'inline' || compilation.config.optimization === 'inline';
+                inlineOptimization =
+                  resource.optimizationAttr === "inline" ||
+                  compilation.config.optimization === "inline";
 
-                if (resource.sourcePathURL.pathname === new URL(value, compilation.context.projectDirectory).pathname && !inlineOptimization) {
-                  bundles[bundle].code = bundles[bundle].code.replace(value, `/${resource.optimizedFileName}`);
+                if (
+                  resource.sourcePathURL.pathname ===
+                    new URL(value, compilation.context.projectDirectory).pathname &&
+                  !inlineOptimization
+                ) {
+                  bundles[bundle].code = bundles[bundle].code.replace(
+                    value,
+                    `/${resource.optimizedFileName}`,
+                  );
                   preBundled = true;
                 }
               });
@@ -473,19 +509,27 @@ function greenwoodSyncImportAttributes(compilation) {
                 // inline global assets may already be optimized, check for those first
                 const source = compilation.resources.get(sourceURL.pathname)?.optimizedFileContents
                   ? compilation.resources.get(sourceURL.pathname).optimizedFileContents
-                  : fs.readFileSync(sourceURL, 'utf-8');
+                  : fs.readFileSync(sourceURL, "utf-8");
 
-                const type = 'asset';
-                const emitConfig = { type, name: value.split('/').pop(), source, needsCodeReference: true };
+                const type = "asset";
+                const emitConfig = {
+                  type,
+                  name: value.split("/").pop(),
+                  source,
+                  needsCodeReference: true,
+                };
                 const ref = that.emitFile(emitConfig);
                 const importRef = `import.meta.ROLLUP_ASSET_URL_${ref}`;
 
-                bundles[bundle].code = bundles[bundle].code.replace(value, `${basePath}/${importRef}`);
+                bundles[bundle].code = bundles[bundle].code.replace(
+                  value,
+                  `${basePath}/${importRef}`,
+                );
 
                 if (!unbundledAssetsRefMapper[emitConfig.name]) {
                   unbundledAssetsRefMapper[emitConfig.name] = {
                     importers: [],
-                    importRefs: []
+                    importRefs: [],
                   };
                 }
 
@@ -494,11 +538,11 @@ function greenwoodSyncImportAttributes(compilation) {
                   importRefs: [...unbundledAssetsRefMapper[emitConfig.name].importRefs, importRef],
                   preBundled,
                   source,
-                  sourceURL
+                  sourceURL,
                 };
               }
             }
-          }
+          },
         });
       }
     },
@@ -507,25 +551,33 @@ function greenwoodSyncImportAttributes(compilation) {
     // since it seems that Rollup will not do it after the bundling hook
     // https://github.com/rollup/rollup/blob/v3.29.4/docs/plugin-development/index.md#generatebundle
     async writeBundle(options, bundles) {
-      const resourcePlugins = compilation.config.plugins.filter((plugin) => {
-        return plugin.type === 'resource';
-      }).map((plugin) => {
-        return plugin.provider(compilation);
-      });
+      const resourcePlugins = compilation.config.plugins
+        .filter((plugin) => {
+          return plugin.type === "resource";
+        })
+        .map((plugin) => {
+          return plugin.provider(compilation);
+        });
 
       for (const asset in unbundledAssetsRefMapper) {
         for (const bundle in bundles) {
           const { fileName } = bundles[bundle];
-          const ext = fileName.split('.').pop();
+          const ext = fileName.split(".").pop();
 
           if (externalizedResources.includes(ext)) {
-            const hash = fileName.split('.')[fileName.split('.').length - 2];
+            const hash = fileName.split(".")[fileName.split(".").length - 2];
 
-            if (fileName.replace(`.${hash}`, '') === asset) {
+            if (fileName.replace(`.${hash}`, "") === asset) {
               unbundledAssetsRefMapper[asset].importers.forEach((importer, idx) => {
-                let contents = fs.readFileSync(new URL(`./${importer}`, compilation.context.outputDir), 'utf-8');
+                let contents = fs.readFileSync(
+                  new URL(`./${importer}`, compilation.context.outputDir),
+                  "utf-8",
+                );
 
-                contents = contents.replace(unbundledAssetsRefMapper[asset].importRefs[idx], fileName);
+                contents = contents.replace(
+                  unbundledAssetsRefMapper[asset].importRefs[idx],
+                  fileName,
+                );
 
                 fs.writeFileSync(new URL(`./${importer}`, compilation.context.outputDir), contents);
               });
@@ -533,105 +585,120 @@ function greenwoodSyncImportAttributes(compilation) {
               // have to apply Greenwood's optimizing here instead of in generateBundle
               // since we can't do async work inside a sync AST operation
               if (!asset.preBundled) {
-                const type = ext === 'css'
-                  ? 'text/css'
-                  : ext === 'css'
-                    ? 'application/json'
-                    : '';
-                const assetUrl = importAttributes && importAttributes.includes(ext)
-                  ? new URL(`${unbundledAssetsRefMapper[asset].sourceURL.href}?polyfill=type-${ext}`)
-                  : unbundledAssetsRefMapper[asset].sourceURL;
+                const type = ext === "css" ? "text/css" : ext === "css" ? "application/json" : "";
+                const assetUrl =
+                  importAttributes && importAttributes.includes(ext)
+                    ? new URL(
+                        `${unbundledAssetsRefMapper[asset].sourceURL.href}?polyfill=type-${ext}`,
+                      )
+                    : unbundledAssetsRefMapper[asset].sourceURL;
 
-                const request = new Request(assetUrl, { headers: { 'Accept': type } });
-                let response = new Response(unbundledAssetsRefMapper[asset].source, { headers: { 'Content-Type': type } });
+                const request = new Request(assetUrl, { headers: { Accept: type } });
+                let response = new Response(unbundledAssetsRefMapper[asset].source, {
+                  headers: { "Content-Type": type },
+                });
 
                 for (const plugin of resourcePlugins) {
-                  if (plugin.shouldPreIntercept && await plugin.shouldPreIntercept(assetUrl, request, response.clone())) {
+                  if (
+                    plugin.shouldPreIntercept &&
+                    (await plugin.shouldPreIntercept(assetUrl, request, response.clone()))
+                  ) {
                     response = await plugin.preIntercept(assetUrl, request, response.clone());
                   }
                 }
 
                 for (const plugin of resourcePlugins) {
-                  if (plugin.shouldIntercept && await plugin.shouldIntercept(assetUrl, request, response.clone())) {
+                  if (
+                    plugin.shouldIntercept &&
+                    (await plugin.shouldIntercept(assetUrl, request, response.clone()))
+                  ) {
                     response = await plugin.intercept(assetUrl, request, response.clone());
                   }
                 }
 
                 for (const plugin of resourcePlugins) {
-                  if (plugin.shouldOptimize && await plugin.shouldOptimize(assetUrl, response.clone())) {
+                  if (
+                    plugin.shouldOptimize &&
+                    (await plugin.shouldOptimize(assetUrl, response.clone()))
+                  ) {
                     response = await plugin.optimize(assetUrl, response.clone());
                   }
                 }
 
-                fs.writeFileSync(new URL(`./${fileName}`, compilation.context.outputDir), await response.text());
+                fs.writeFileSync(
+                  new URL(`./${fileName}`, compilation.context.outputDir),
+                  await response.text(),
+                );
               }
             }
           }
         }
       }
-    }
+    },
   };
-
 }
 
 const getRollupConfigForBrowserScripts = async (compilation) => {
   const { outputDir } = compilation.context;
   const input = [...compilation.resources.values()]
-    .filter(resource => resource.type === 'script')
-    .map(resource => normalizePathnameForWindows(resource.sourcePathURL));
-  const customRollupPlugins = compilation.config.plugins.filter(plugin => {
-    return plugin.type === 'rollup';
-  }).map(plugin => {
-    return plugin.provider(compilation);
-  }).flat();
+    .filter((resource) => resource.type === "script")
+    .map((resource) => normalizePathnameForWindows(resource.sourcePathURL));
+  const customRollupPlugins = compilation.config.plugins
+    .filter((plugin) => {
+      return plugin.type === "rollup";
+    })
+    .map((plugin) => {
+      return plugin.provider(compilation);
+    })
+    .flat();
 
-  return [{
-    preserveEntrySignatures: 'strict', // https://github.com/ProjectEvergreen/greenwood/pull/990
-    input,
-    output: {
-      dir: normalizePathnameForWindows(outputDir),
-      entryFileNames: '[name].[hash].js',
-      chunkFileNames: '[name].[hash].js',
-      assetFileNames: '[name].[hash].[ext]',
-      sourcemap: true
-    },
-    plugins: [
-      greenwoodResourceLoader(compilation, true),
-      greenwoodSyncPageResourceBundlesPlugin(compilation),
-      greenwoodSyncImportAttributes(compilation),
-      greenwoodImportMetaUrl(compilation),
-      ...customRollupPlugins
-    ],
-    context: 'window',
-    onwarn: (errorObj) => {
-      const { code, message } = errorObj;
+  return [
+    {
+      preserveEntrySignatures: "strict", // https://github.com/ProjectEvergreen/greenwood/pull/990
+      input,
+      output: {
+        dir: normalizePathnameForWindows(outputDir),
+        entryFileNames: "[name].[hash].js",
+        chunkFileNames: "[name].[hash].js",
+        assetFileNames: "[name].[hash].[ext]",
+        sourcemap: true,
+      },
+      plugins: [
+        greenwoodResourceLoader(compilation, true),
+        greenwoodSyncPageResourceBundlesPlugin(compilation),
+        greenwoodSyncImportAttributes(compilation),
+        greenwoodImportMetaUrl(compilation),
+        ...customRollupPlugins,
+      ],
+      context: "window",
+      onwarn: (errorObj) => {
+        const { code, message } = errorObj;
 
-      switch (code) {
-
-        case 'EMPTY_BUNDLE':
-          // since we use .html files as entry points
-          // we "ignore" them as bundles (see greenwoodHtmlPlugin#load hook)
-          // but don't want the logs to be noisy, so this suppresses those warnings
-          break;
-        case 'UNRESOLVED_IMPORT':
-          // this could be a legit warning for users, but...
-          if (process.env.__GWD_ROLLUP_MODE__ === 'strict') {
-            // if we see it happening in our tests / website build
-            // treat it as an error for us since it usually is...
-            // https://github.com/ProjectEvergreen/greenwood/issues/620
-            throw new Error(message);
-          } else {
-            // we should still log it so the user knows at least
+        switch (code) {
+          case "EMPTY_BUNDLE":
+            // since we use .html files as entry points
+            // we "ignore" them as bundles (see greenwoodHtmlPlugin#load hook)
+            // but don't want the logs to be noisy, so this suppresses those warnings
+            break;
+          case "UNRESOLVED_IMPORT":
+            // this could be a legit warning for users, but...
+            if (process.env.__GWD_ROLLUP_MODE__ === "strict") {
+              // if we see it happening in our tests / website build
+              // treat it as an error for us since it usually is...
+              // https://github.com/ProjectEvergreen/greenwood/issues/620
+              throw new Error(message);
+            } else {
+              // we should still log it so the user knows at least
+              console.debug(message);
+            }
+            break;
+          default:
+            // otherwise, log all warnings from rollup
             console.debug(message);
-          }
-          break;
-        default:
-          // otherwise, log all warnings from rollup
-          console.debug(message);
-
-      }
-    }
-  }];
+        }
+      },
+    },
+  ];
 };
 
 const getRollupConfigForApiRoutes = async (compilation) => {
@@ -650,7 +717,7 @@ const getRollupConfigForApiRoutes = async (compilation) => {
         output: {
           dir: `${normalizePathnameForWindows(outputDir)}/api`,
           entryFileNames: `${id}.js`,
-          chunkFileNames: `${id}.[hash].js`
+          chunkFileNames: `${id}.[hash].js`,
         },
         plugins: [
           greenwoodResourceLoader(compilation),
@@ -658,19 +725,18 @@ const getRollupConfigForApiRoutes = async (compilation) => {
           // https://github.com/ProjectEvergreen/greenwood/issues/1118
           // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
           nodeResolve({
-            exportConditions: ['node'],
-            preferBuiltins: true
+            exportConditions: ["node"],
+            preferBuiltins: true,
           }),
           commonjs(),
           greenwoodImportMetaUrl(compilation),
-          greenwoodSyncApiRoutesOutputPath(compilation)
+          greenwoodSyncApiRoutesOutputPath(compilation),
         ],
         onwarn: (errorObj) => {
           const { code, message } = errorObj;
 
           switch (code) {
-
-            case 'CIRCULAR_DEPENDENCY':
+            case "CIRCULAR_DEPENDENCY":
               // let this through for WCC + sucrase
               // Circular dependency: ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js ->
               //   ../../../../../node_modules/sucrase/dist/esm/parser/traverser/util.js -> ../../../../../node_modules/sucrase/dist/esm/parser/tokenizer/index.js
@@ -682,9 +748,8 @@ const getRollupConfigForApiRoutes = async (compilation) => {
             default:
               // otherwise, log all warnings from rollup
               console.debug(message);
-
           }
-        }
+        },
       };
     });
 };
@@ -698,7 +763,7 @@ const getRollupConfigForSsrPages = async (compilation, inputs) => {
       output: {
         dir: normalizePathnameForWindows(outputDir),
         entryFileNames: `${id}.route.js`,
-        chunkFileNames: `${id}.route.chunk.[hash].js`
+        chunkFileNames: `${id}.route.chunk.[hash].js`,
       },
       plugins: [
         greenwoodResourceLoader(compilation),
@@ -706,19 +771,18 @@ const getRollupConfigForSsrPages = async (compilation, inputs) => {
         // https://github.com/ProjectEvergreen/greenwood/issues/1118
         // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
         nodeResolve({
-          exportConditions: ['node'],
-          preferBuiltins: true
+          exportConditions: ["node"],
+          preferBuiltins: true,
         }),
         commonjs(),
         greenwoodImportMetaUrl(compilation),
-        greenwoodSyncSsrEntryPointsOutputPaths(compilation)
+        greenwoodSyncSsrEntryPointsOutputPaths(compilation),
       ],
       onwarn: (errorObj) => {
         const { code, message } = errorObj;
 
         switch (code) {
-
-          case 'CIRCULAR_DEPENDENCY':
+          case "CIRCULAR_DEPENDENCY":
             // let this through for lit
             // Error: the string "Circular dependency: ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js ->
             // ../../../../../node_modules/@lit-labs/ssr/lib/lit-element-renderer.js -> ../../../../../node_modules/@lit-labs/ssr/lib/render-lit-html.js\n" was thrown, throw an Error :)
@@ -729,9 +793,8 @@ const getRollupConfigForSsrPages = async (compilation, inputs) => {
           default:
             // otherwise, log all warnings from rollup
             console.debug(message);
-
         }
-      }
+      },
     };
   });
 };
@@ -739,5 +802,5 @@ const getRollupConfigForSsrPages = async (compilation, inputs) => {
 export {
   getRollupConfigForApiRoutes,
   getRollupConfigForBrowserScripts,
-  getRollupConfigForSsrPages
+  getRollupConfigForSsrPages,
 };

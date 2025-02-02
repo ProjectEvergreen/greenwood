@@ -1,4 +1,4 @@
-import '../components/greeting.ts';
+import "../components/greeting.ts";
 
 export default class ContactPage extends HTMLElement {
   connectedCallback() {

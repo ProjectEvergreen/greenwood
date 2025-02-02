@@ -1,15 +1,13 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { checkResourceExists } from '@greenwood/cli/src/lib/resource-utils.js';
+import fs from "fs/promises";
+import path from "path";
+import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
 
-const DEFAULT_RUNTIME = 'nodejs20.x';
+const DEFAULT_RUNTIME = "nodejs20.x";
 
 // https://vercel.com/docs/functions/serverless-functions/runtimes/node-js#node.js-helpers
 function generateOutputFormat(id, type) {
-  const handlerAlias = '$handler';
-  const path = type === 'page'
-    ? `${id}.route`
-    : id;
+  const handlerAlias = "$handler";
+  const path = type === "page" ? `${id}.route` : id;
 
   return `
     import { handler as ${handlerAlias} } from './${path}.js';
@@ -57,103 +55,101 @@ async function setupFunctionBuildFolder(id, outputType, outputRoot, runtime) {
   const outputFormat = generateOutputFormat(id, outputType);
 
   await fs.mkdir(outputRoot, { recursive: true });
-  await fs.writeFile(new URL('./index.js', outputRoot), outputFormat);
-  await fs.writeFile(new URL('./package.json', outputRoot), JSON.stringify({
-    type: 'module'
-  }));
-  await fs.writeFile(new URL('./.vc-config.json', outputRoot), JSON.stringify({
-    runtime,
-    handler: 'index.js',
-    launcherType: 'Nodejs',
-    shouldAddHelpers: true
-  }));
+  await fs.writeFile(new URL("./index.js", outputRoot), outputFormat);
+  await fs.writeFile(
+    new URL("./package.json", outputRoot),
+    JSON.stringify({
+      type: "module",
+    }),
+  );
+  await fs.writeFile(
+    new URL("./.vc-config.json", outputRoot),
+    JSON.stringify({
+      runtime,
+      handler: "index.js",
+      launcherType: "Nodejs",
+      shouldAddHelpers: true,
+    }),
+  );
 }
 
 async function vercelAdapter(compilation, options) {
   const { runtime = DEFAULT_RUNTIME } = options;
   const { outputDir, projectDirectory } = compilation.context;
   const { basePath } = compilation.config;
-  const adapterOutputUrl = new URL('./.vercel/output/functions/', projectDirectory);
-  const ssrPages = compilation.graph.filter(page => page.isSSR);
+  const adapterOutputUrl = new URL("./.vercel/output/functions/", projectDirectory);
+  const ssrPages = compilation.graph.filter((page) => page.isSSR);
   const apiRoutes = compilation.manifest.apis;
 
-  if (!await checkResourceExists(adapterOutputUrl)) {
+  if (!(await checkResourceExists(adapterOutputUrl))) {
     await fs.mkdir(adapterOutputUrl, { recursive: true });
   }
 
-  await fs.writeFile(new URL('./.vercel/output/config.json', projectDirectory), JSON.stringify({
-    'version': 3
-  }));
+  await fs.writeFile(
+    new URL("./.vercel/output/config.json", projectDirectory),
+    JSON.stringify({
+      version: 3,
+    }),
+  );
 
   for (const page of ssrPages) {
-    const outputType = 'page';
+    const outputType = "page";
     const { id, outputHref } = page;
     const outputRoot = new URL(`./${basePath}/${id}.func/`, adapterOutputUrl);
-    const chunks = (await fs.readdir(outputDir))
-      .filter(file => file.startsWith(`${id}.route.chunk`) && file.endsWith('.js'));
+    const chunks = (await fs.readdir(outputDir)).filter(
+      (file) => file.startsWith(`${id}.route.chunk`) && file.endsWith(".js"),
+    );
 
     await setupFunctionBuildFolder(id, outputType, outputRoot, runtime);
 
     // handle user's actual route entry file
     await fs.cp(
       new URL(outputHref),
-      new URL(`./${outputHref.replace(outputDir.href, '')}`, outputRoot),
-      { recursive: true }
+      new URL(`./${outputHref.replace(outputDir.href, "")}`, outputRoot),
+      { recursive: true },
     );
 
     // and any (URL) chunks for the page
     for (const chunk of chunks) {
-      await fs.cp(
-        new URL(`./${chunk}`, outputDir),
-        new URL(`./${chunk}`, outputRoot),
-        { recursive: true }
-      );
+      await fs.cp(new URL(`./${chunk}`, outputDir), new URL(`./${chunk}`, outputRoot), {
+        recursive: true,
+      });
     }
   }
 
   for (const [key, value] of apiRoutes.entries()) {
-    const outputType = 'api';
+    const outputType = "api";
     const { id, outputHref } = apiRoutes.get(key);
     const outputRoot = new URL(`.${basePath}/api/${id}.func/`, adapterOutputUrl);
     const { assets = [] } = value;
 
     await setupFunctionBuildFolder(id, outputType, outputRoot, runtime);
 
-    await fs.cp(
-      new URL(outputHref),
-      new URL(`./${id}.js`, outputRoot),
-      { recursive: true }
-    );
+    await fs.cp(new URL(outputHref), new URL(`./${id}.js`, outputRoot), { recursive: true });
 
     for (const asset of assets) {
       const name = path.basename(asset);
 
-      await fs.cp(
-        new URL(asset),
-        new URL(`./${name}`, outputRoot),
-        { recursive: true }
-      );
+      await fs.cp(new URL(asset), new URL(`./${name}`, outputRoot), { recursive: true });
     }
   }
 
   // static assets / build
-  await fs.cp(
-    outputDir,
-    new URL('./.vercel/output/static/', projectDirectory),
-    {
-      recursive: true
-    }
-  );
+  await fs.cp(outputDir, new URL("./.vercel/output/static/", projectDirectory), {
+    recursive: true,
+  });
 }
 
-const greenwoodPluginAdapterVercel = (options = {}) => [{
-  type: 'adapter',
-  name: 'plugin-adapter-vercel',
-  provider: (compilation) => {
-    return async () => {
-      await vercelAdapter(compilation, options);
-    };
-  }
-}];
+const greenwoodPluginAdapterVercel = (options = {}) => [
+  {
+    type: "adapter",
+    name: "plugin-adapter-vercel",
+    provider: (compilation) => {
+      return async () => {
+        await vercelAdapter(compilation, options);
+      };
+    },
+  },
+];
 
 export { greenwoodPluginAdapterVercel };

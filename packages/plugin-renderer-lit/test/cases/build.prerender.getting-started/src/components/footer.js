@@ -1,9 +1,8 @@
-import { html, LitElement } from 'lit';
+import { html, LitElement } from "lit";
 
 class FooterComponent extends LitElement {
-
   render() {
-    const year = '2022';
+    const year = "2022";
 
     return html`
       <footer>
@@ -13,4 +12,4 @@ class FooterComponent extends LitElement {
   }
 }
 
-customElements.define('app-footer', FooterComponent);
+customElements.define("app-footer", FooterComponent);

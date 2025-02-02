@@ -1,8 +1,6 @@
-import { greenwoodPluginPostCss } from '../../../src/index.js';
+import { greenwoodPluginPostCss } from "../../../src/index.js";
 
 export default {
   prerender: true,
-  plugins: [
-    greenwoodPluginPostCss()
-  ]
+  plugins: [greenwoodPluginPostCss()],
 };
