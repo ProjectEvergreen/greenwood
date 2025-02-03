@@ -1,22 +1,21 @@
-import { css, html, LitElement, unsafeCSS } from 'lit';
-import eveButtonCss from './eve-button.css?type=raw';
+import { css, html, LitElement, unsafeCSS } from "lit";
+import eveButtonCss from "./eve-button.css?type=raw";
 
 class Button extends LitElement {
-
   static get properties() {
     return {
       href: {
-        type: String
+        type: String,
       },
       onClick: {
-        type: Function
+        type: Function,
       },
       size: {
-        type: String
+        type: String,
       },
       style: {
-        type: String
-      }
+        type: String,
+      },
     };
   }
 
@@ -30,10 +29,10 @@ class Button extends LitElement {
     const shadow = this.shadowRoot;
     const childNodes = Array.from(shadow.childNodes);
 
-    childNodes.forEach(childNode => {
-      if (childNode.nodeName === 'STYLE') {
+    childNodes.forEach((childNode) => {
+      if (childNode.nodeName === "STYLE") {
         childNode.textContent += this.style;
-      } else if (childNode.nodeName === 'A') {
+      } else if (childNode.nodeName === "A") {
         childNode.style = this.style;
       }
     });
@@ -44,21 +43,20 @@ class Button extends LitElement {
     const { size, href, onClick } = this;
 
     return html`
-      <style>
-      </style>
+      <style></style>
       ${href
         ? html`
-          <a class="btn btn-${size}" href="${href}">
-            <slot></slot>
-          </a>
+            <a class="btn btn-${size}" href="${href}">
+              <slot></slot>
+            </a>
           `
-        : html `
-          <a class="btn btn-${size}" href="#" @click="${onClick}">
-            <slot></slot>
-          </a>
-        `}
+        : html`
+            <a class="btn btn-${size}" href="#" @click="${onClick}">
+              <slot></slot>
+            </a>
+          `}
     `;
   }
 }
 
-customElements.define('eve-button', Button);
+customElements.define("eve-button", Button);

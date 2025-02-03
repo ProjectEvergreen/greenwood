@@ -1,3 +1,3 @@
 export default {
-  layoutsDirectory: 'my-layouts'
+  layoutsDirectory: "my-layouts",
 };

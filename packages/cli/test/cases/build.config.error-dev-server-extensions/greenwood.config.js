@@ -1,5 +1,5 @@
 export default {
   devServer: {
-    extensions: true
-  }
+    extensions: true,
+  },
 };

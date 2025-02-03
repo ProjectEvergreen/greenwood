@@ -10,4 +10,4 @@ export default class SocialLinksComponent extends HTMLElement {
   }
 }
 
-customElements.define('app-social-links', SocialLinksComponent);
+customElements.define("app-social-links", SocialLinksComponent);

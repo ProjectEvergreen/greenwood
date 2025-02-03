@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import fs from "fs/promises";
 
 const getTemplate = async (data) => {
   return `
@@ -39,12 +39,11 @@ const getTemplate = async (data) => {
 };
 
 const getData = async () => {
-  const version = JSON.parse(await fs.readFile(new URL('../package.json', import.meta.url), 'utf-8')).version;
+  const version = JSON.parse(
+    await fs.readFile(new URL("../package.json", import.meta.url), "utf-8"),
+  ).version;
 
   return { version };
 };
 
-export {
-  getTemplate,
-  getData
-};
+export { getTemplate, getData };

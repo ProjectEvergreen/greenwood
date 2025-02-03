@@ -1,4 +1,4 @@
-const template = document.createElement('template');
+const template = document.createElement("template");
 
 template.innerHTML = `
   <style>
@@ -20,7 +20,7 @@ export default class MyCounter extends HTMLElement {
 
   async connectedCallback() {
     if (!this.shadowRoot) {
-      this.attachShadow({ mode: 'open' });
+      this.attachShadow({ mode: "open" });
       this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
   }
@@ -34,8 +34,8 @@ export default class MyCounter extends HTMLElement {
   }
 
   update(count) {
-    this.shadowRoot.getElementById('count').innerHTML = count || this.count;
+    this.shadowRoot.getElementById("count").innerHTML = count || this.count;
   }
 }
 
-customElements.define('x-counter', MyCounter);
+customElements.define("x-counter", MyCounter);

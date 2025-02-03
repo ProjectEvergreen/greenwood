@@ -1,7 +1,5 @@
-import { greenwoodPluginAdapterGeneric } from './generic-adapter.js';
+import { greenwoodPluginAdapterGeneric } from "./generic-adapter.js";
 
 export default {
-  plugins: [
-    greenwoodPluginAdapterGeneric()
-  ]
+  plugins: [greenwoodPluginAdapterGeneric()],
 };

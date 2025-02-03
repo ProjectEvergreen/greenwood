@@ -1,4 +1,4 @@
-import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
+import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 
 class LitHydrationResource extends ResourceInterface {
   constructor(compilation, options) {
@@ -14,15 +14,12 @@ class LitHydrationResource extends ResourceInterface {
 
   async intercept(url, request, response) {
     const { importMaps } = this.compilation.config.polyfills;
-    const isDevelopment = process.env.__GWD_COMMAND__ === 'develop';
-    const importType = isDevelopment && importMaps
-      ? 'module-shim'
-      : 'module';
-    const importMapType = isDevelopment && importMaps
-      ? 'importmap-shim'
-      : 'importmap';
-    const headSelector = isDevelopment ? `<script type="${importMapType}">` : '<head>';
-    const hydrationSupportScriptPath = '/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js';
+    const isDevelopment = process.env.__GWD_COMMAND__ === "develop";
+    const importType = isDevelopment && importMaps ? "module-shim" : "module";
+    const importMapType = isDevelopment && importMaps ? "importmap-shim" : "importmap";
+    const headSelector = isDevelopment ? `<script type="${importMapType}">` : "<head>";
+    const hydrationSupportScriptPath =
+      "/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js";
     let body = await response.text();
 
     // this needs to come first before any userland code, but before any import maps
@@ -31,7 +28,7 @@ class LitHydrationResource extends ResourceInterface {
       // quick way to find the ending position of the importmap <script> tag
       // and append the hydration support <script> right after it
       const scriptEndPattern = /<\/script>/g;
-      const importMapStartPos = body.indexOf(headSelector) ?? '';
+      const importMapStartPos = body.indexOf(headSelector) ?? "";
       let importMapEndPos = 0;
       let match;
 
@@ -50,10 +47,13 @@ class LitHydrationResource extends ResourceInterface {
         ${body.slice(importMapEndPos + 9)}
       `;
     } else {
-      body = body.replace(headSelector, `
+      body = body.replace(
+        headSelector,
+        `
         ${headSelector}
           <script type="${importType}" src="${hydrationSupportScriptPath}"></script>
-      `);
+      `,
+      );
     }
 
     return new Response(body);
@@ -61,21 +61,22 @@ class LitHydrationResource extends ResourceInterface {
 }
 
 const greenwoodPluginRendererLit = () => {
-  return [{
-    type: 'renderer',
-    name: 'plugin-renderer-lit:renderer',
-    provider: () => {
-      return {
-        executeModuleUrl: new URL('./execute-route-module.js', import.meta.url)
-      };
-    }
-  }, {
-    type: 'resource',
-    name: 'plugin-renderer-lit:resource',
-    provider: (compilation, options) => new LitHydrationResource(compilation, options)
-  }];
+  return [
+    {
+      type: "renderer",
+      name: "plugin-renderer-lit:renderer",
+      provider: () => {
+        return {
+          executeModuleUrl: new URL("./execute-route-module.js", import.meta.url),
+        };
+      },
+    },
+    {
+      type: "resource",
+      name: "plugin-renderer-lit:resource",
+      provider: (compilation, options) => new LitHydrationResource(compilation, options),
+    },
+  ];
 };
 
-export {
-  greenwoodPluginRendererLit
-};
+export { greenwoodPluginRendererLit };

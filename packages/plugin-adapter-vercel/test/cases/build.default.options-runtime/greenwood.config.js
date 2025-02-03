@@ -1,9 +1,9 @@
-import { greenwoodPluginAdapterVercel } from '../../../src/index.js';
+import { greenwoodPluginAdapterVercel } from "../../../src/index.js";
 
 export default {
   plugins: [
     greenwoodPluginAdapterVercel({
-      runtime: 'nodejs22.x'
-    })
-  ]
+      runtime: "nodejs22.x",
+    }),
+  ],
 };

@@ -22,36 +22,46 @@
  *
  */
 
-import chai from 'chai';
-import path from 'path';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import path from "path";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+describe("Build Greenwood With: ", function () {
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe('Custom Configuration with a bad value for plugin type', function() {
-    it('should throw an error that plugin.type is not a valid value', function() {
-      const pluginTypes = ['copy', 'context', 'resource', 'rollup', 'server', 'source', 'renderer', 'adapter'];
+  describe("Custom Configuration with a bad value for plugin type", function () {
+    it("should throw an error that plugin.type is not a valid value", function () {
+      const pluginTypes = [
+        "copy",
+        "context",
+        "resource",
+        "rollup",
+        "server",
+        "source",
+        "renderer",
+        "adapter",
+      ];
 
       try {
         runner.setup(outputPath);
-        runner.runCommand(cliPath, 'build');
+        runner.runCommand(cliPath, "build");
       } catch (err) {
-        expect(err).to.contain(`Error: greenwood.config.js plugins must be one of type "${pluginTypes.join(', ')}". got "indexxx" instead.`);
+        expect(err).to.contain(
+          `Error: greenwood.config.js plugins must be one of type "${pluginTypes.join(", ")}". got "indexxx" instead.`,
+        );
       }
     });
   });
-
 });

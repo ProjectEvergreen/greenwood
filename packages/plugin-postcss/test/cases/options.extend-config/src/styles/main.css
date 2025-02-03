@@ -1,4 +1,4 @@
-@import './theme.css';
+@import "./theme.css";
 
 body {
   color: red;
@@ -6,5 +6,4 @@ body {
   & h1 {
     color: blue;
   }
-
 }

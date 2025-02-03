@@ -1,5 +1,5 @@
 export default {
   polyfills: {
-    importAttributes: ['css', 'json']
-  }
+    importAttributes: ["css", "json"],
+  },
 };

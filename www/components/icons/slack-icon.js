@@ -1,4 +1,4 @@
-import { svg } from 'lit';
+import { svg } from "lit";
 
 const slackIcon = svg`<svg
   width="35"

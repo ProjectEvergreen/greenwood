@@ -28,38 +28,37 @@
  *       logo.module.css
  *   index.html
  */
-import chai from 'chai';
-import { JSDOM } from 'jsdom';
-import fs from 'fs';
-import path from 'path';
-import { parse, walk } from 'css-tree';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
-import { implementation } from 'jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js';
+import chai from "chai";
+import { JSDOM } from "jsdom";
+import fs from "fs";
+import path from "path";
+import { parse, walk } from "css-tree";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
+import { implementation } from "jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js";
 
 const expect = chai.expect;
 
-describe('Develop Greenwood With: ', function() {
-  const LABEL = 'Default Configuration for CSS Modules';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const hostname = 'http://localhost';
+describe("Develop Greenwood With: ", function () {
+  const LABEL = "Default Configuration for CSS Modules";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const hostname = "http://localhost";
   const port = 1984;
   let runner;
   let updateAStyleBlockRef;
 
-  before(function() {
+  before(function () {
     this.context = {
-      hostname: `${hostname}:${port}`
+      hostname: `${hostname}:${port}`,
     };
     runner = new Runner(false, true);
   });
 
-  describe(LABEL, function() {
-
-    before(function() {
+  describe(LABEL, function () {
+    before(function () {
       // JSDOM doesn't support CSS nesting and kind of blows up in the console as it tries to parse it automatically
       // https://github.com/jsdom/jsdom/issues/2005#issuecomment-2397495853
       updateAStyleBlockRef = implementation.prototype._updateAStyleBlock;
@@ -72,29 +71,35 @@ describe('Develop Greenwood With: ', function() {
           resolve();
         }, 5000);
 
-        runner.runCommand(cliPath, 'develop', { async: true });
+        runner.runCommand(cliPath, "develop", { async: true });
       });
     });
 
-    runSmokeTest(['serve'], LABEL);
+    runSmokeTest(["serve"], LABEL);
 
-    describe('index.html with expected CSS and SSR contents', function() {
+    describe("index.html with expected CSS and SSR contents", function () {
       const EXPECTED_HEADER_CLASS_NAMES = 8;
       let dom;
       let headerSourceCss;
       let expectedHeaderCss;
 
-      before(async function() {
+      before(async function () {
         const response = await fetch(`http://127.0.0.1:${port}/`);
 
         dom = new JSDOM(await response.text());
-        headerSourceCss = await fs.promises.readFile(new URL('./src/components/header/header.module.css', import.meta.url), 'utf-8');
-        expectedHeaderCss = await fs.promises.readFile(new URL('./expected.header.css', import.meta.url), 'utf-8');
+        headerSourceCss = await fs.promises.readFile(
+          new URL("./src/components/header/header.module.css", import.meta.url),
+          "utf-8",
+        );
+        expectedHeaderCss = await fs.promises.readFile(
+          new URL("./expected.header.css", import.meta.url),
+          "utf-8",
+        );
       });
 
-      describe('Header component with CSS Modules', () => {
-        it('should have the expected scoped CSS inlined in a <style> tag', () => {
-          const styles = dom.window.document.querySelectorAll('head style');
+      describe("Header component with CSS Modules", () => {
+        it("should have the expected scoped CSS inlined in a <style> tag", () => {
+          const styles = dom.window.document.querySelectorAll("head style");
           const styleText = styles[0].textContent;
           let scopedHash;
 
@@ -103,108 +108,124 @@ describe('Develop Greenwood With: ', function() {
           const ast = parse(styleText, {
             onParseError(error) {
               console.log(error.formattedMessage);
-            }
+            },
           });
 
           walk(ast, {
             enter: function (node) {
               const { type, name } = node;
 
-              if (type === 'ClassSelector' && name.startsWith('header') && !scopedHash) {
-                scopedHash = name.split('-')[1];
+              if (type === "ClassSelector" && name.startsWith("header") && !scopedHash) {
+                scopedHash = name.split("-")[1];
               }
-            }
+            },
           });
 
           expect(styleText).to.contain(expectedHeaderCss.replace(/\[placeholder\]/g, scopedHash));
         });
 
-        it('should have the source <app-header> CSS class names as scoped class names inlined in a <style> tag', () => {
-          const styles = dom.window.document.querySelectorAll('head style');
+        it("should have the source <app-header> CSS class names as scoped class names inlined in a <style> tag", () => {
+          const styles = dom.window.document.querySelectorAll("head style");
           const styleText = styles[0].textContent;
           let classes = [];
 
           const ast = parse(headerSourceCss, {
             onParseError(error) {
               console.log(error.formattedMessage);
-            }
+            },
           });
 
           walk(ast, {
             enter: function (node, item) {
               const { type, name } = node;
-              if (type === 'ClassSelector' && item.prev === null) {
-                const scopedClassNameRegex = new RegExp(String.raw`.header-\d+-${name}`, 'g');
+              if (type === "ClassSelector" && item.prev === null) {
+                const scopedClassNameRegex = new RegExp(String.raw`.header-\d+-${name}`, "g");
 
                 classes.push(name);
                 expect(styleText).to.match(scopedClassNameRegex);
               }
-            }
+            },
           });
 
           expect(classes.length).to.equal(EXPECTED_HEADER_CLASS_NAMES);
-          expect(styleText).not.to.contain('undefined');
+          expect(styleText).not.to.contain("undefined");
         });
 
-        describe('JavaScript bundling referencing a CSS Module', function() {
+        describe("JavaScript bundling referencing a CSS Module", function () {
           let contents;
 
-          before(async function() {
+          before(async function () {
             const response = await fetch(`http://127.0.0.1:${port}/components/header/header.js`);
 
             contents = await response.text();
-            headerSourceCss = await fs.promises.readFile(new URL('./src/components/header/header.module.css', import.meta.url), 'utf-8');
-            expectedHeaderCss = await fs.promises.readFile(new URL('./expected.header.css', import.meta.url), 'utf-8');
+            headerSourceCss = await fs.promises.readFile(
+              new URL("./src/components/header/header.module.css", import.meta.url),
+              "utf-8",
+            );
+            expectedHeaderCss = await fs.promises.readFile(
+              new URL("./expected.header.css", import.meta.url),
+              "utf-8",
+            );
           });
 
-          it('should not have any references to CSS modules in the JavaScript bundle', function() {
+          it("should not have any references to CSS modules in the JavaScript bundle", function () {
             expect(contents).to.not.contain('from"/header.module');
           });
 
-          it('should have transformed class names in the JavaScript bundle', function() {
-            const styles = dom.window.document.querySelectorAll('head style');
+          it("should have transformed class names in the JavaScript bundle", function () {
+            const styles = dom.window.document.querySelectorAll("head style");
             const styleText = styles[0].textContent;
             let classes = [];
 
             const ast = parse(styleText, {
               onParseError(error) {
                 console.log(error.formattedMessage);
-              }
+              },
             });
 
             walk(ast, {
               enter: function (node) {
                 const { type, name } = node;
-                if (type === 'ClassSelector' && name.startsWith('header')) {
-                  const scopedClassNameRegex = new RegExp(String.raw`class="${name}"`, 'g');
+                if (type === "ClassSelector" && name.startsWith("header")) {
+                  const scopedClassNameRegex = new RegExp(String.raw`class="${name}"`, "g");
 
                   classes.push(name);
                   expect(contents).to.match(scopedClassNameRegex);
                 }
-              }
+              },
             });
 
             expect(classes.length).to.equal(EXPECTED_HEADER_CLASS_NAMES);
           });
 
-          it('should not have any references to \'undefined\' in the JavaScript bundle', function() {
-            expect(contents).to.not.contain('undefined');
+          it("should not have any references to 'undefined' in the JavaScript bundle", function () {
+            expect(contents).to.not.contain("undefined");
           });
         });
 
-        describe('CSS module should be processed as ESM', function() {
+        describe("CSS module should be processed as ESM", function () {
           let headerModuleText;
           let modulesMap;
 
-          before(async function() {
-            const response = await fetch(`http://127.0.0.1:${port}/components/header/header.module.css`);
+          before(async function () {
+            const response = await fetch(
+              `http://127.0.0.1:${port}/components/header/header.module.css`,
+            );
 
             headerModuleText = await response.text();
-            modulesMap = JSON.parse(await fs.promises.readFile(new URL('./.greenwood/__css-modules-map.json', import.meta.url), 'utf-8'));
+            modulesMap = JSON.parse(
+              await fs.promises.readFile(
+                new URL("./.greenwood/__css-modules-map.json", import.meta.url),
+                "utf-8",
+              ),
+            );
           });
 
-          it('the served content should be untouched', function() {
-            const headerModule = modulesMap[new URL('./src/components/header/header.module.css', import.meta.url).href];
+          it("the served content should be untouched", function () {
+            const headerModule =
+              modulesMap[
+                new URL("./src/components/header/header.module.css", import.meta.url).href
+              ];
             const expected = `export default ${JSON.stringify(headerModule.module)}`;
 
             expect(headerModuleText).to.equal(expected);
@@ -212,24 +233,25 @@ describe('Develop Greenwood With: ', function() {
         });
       });
 
-      describe('Logo component nested in <app-header> component', () => {
-        it('should have the expected logo CSS inlined into the style tag', () => {
-          const styles = dom.window.document.querySelectorAll('head style');
+      describe("Logo component nested in <app-header> component", () => {
+        it("should have the expected logo CSS inlined into the style tag", () => {
+          const styles = dom.window.document.querySelectorAll("head style");
           const styleText = styles[0].textContent;
-          const expectedStyles = '.logo-1501575137-container{display:flex}.logo-1501575137-logo{display:inline-block;width:100%;}';
+          const expectedStyles =
+            ".logo-695811019-container{display:flex}.logo-695811019-logo{display:inline-block;width:100%;}";
 
-          expect(styleText.replace(/ /g, '').replace(/\n/g, '').replace(/;/g, ''))
-            .to.contain(expectedStyles.replace(/;/g, ''));
+          expect(styleText.replace(/ /g, "").replace(/\n/g, "").replace(/;/g, "")).to.contain(
+            expectedStyles.replace(/;/g, ""),
+          );
         });
       });
     });
   });
 
-  after(function() {
+  after(function () {
     implementation.prototype._updateAStyleBlock = updateAStyleBlockRef;
 
     runner.stopCommand();
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
-
 });

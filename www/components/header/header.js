@@ -1,16 +1,15 @@
-import { css, html, LitElement, unsafeCSS } from 'lit';
-import client from '@greenwood/plugin-graphql/src/core/client.js';
-import CollectionQuery from '@greenwood/plugin-graphql/src/queries/collection.gql';
-import headerCss from './header.css?type=raw';
-import '../social-icons/social-icons.js';
+import { css, html, LitElement, unsafeCSS } from "lit";
+import client from "@greenwood/plugin-graphql/src/core/client.js";
+import CollectionQuery from "@greenwood/plugin-graphql/src/queries/collection.gql";
+import headerCss from "./header.css?type=raw";
+import "../social-icons/social-icons.js";
 
 class HeaderComponent extends LitElement {
-
   static get properties() {
     return {
       navigation: {
-        type: Array
-      }
+        type: Array,
+      },
     };
   }
 
@@ -31,9 +30,9 @@ class HeaderComponent extends LitElement {
     const response = await client.query({
       query: CollectionQuery,
       variables: {
-        name: 'navigation',
-        orderBy: 'order_asc'
-      }
+        name: "navigation",
+        orderBy: "order_asc",
+      },
     });
 
     this.navigation = response.data.collection;
@@ -48,10 +47,13 @@ class HeaderComponent extends LitElement {
       <header class="header">
         <eve-container fluid>
           <div class="head-wrap">
-
             <div class="brand">
-              <a href="https://projectevergreen.github.io" target="_blank" rel="noopener noreferrer">
-                <img src="/assets/evergreen.svg" alt="Greenwood logo"/>
+              <a
+                href="https://projectevergreen.github.io"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img src="/assets/evergreen.svg" alt="Greenwood logo" />
               </a>
               <div class="project-name">
                 <a href="/">Greenwood</a>
@@ -62,11 +64,16 @@ class HeaderComponent extends LitElement {
               <ul>
                 ${navigation.map((item) => {
                   const isCurrentPageLink = activeRoute.indexOf(item.route) >= 0;
-                  const activeClassName = isCurrentPageLink ? 'active' : '';
+                  const activeClassName = isCurrentPageLink ? "active" : "";
 
                   return html`
                     <li>
-                      <a href="${item.route}" title="Click to visit the ${item.label} page" class="${activeClassName}">${item.label}</a>
+                      <a
+                        href="${item.route}"
+                        title="Click to visit the ${item.label} page"
+                        class="${activeClassName}"
+                        >${item.label}</a
+                      >
                     </li>
                   `;
                 })}
@@ -74,7 +81,6 @@ class HeaderComponent extends LitElement {
             </nav>
 
             <app-social-icons></app-social-icons>
-
           </div>
         </eve-container>
       </header>
@@ -83,4 +89,4 @@ class HeaderComponent extends LitElement {
   }
 }
 
-customElements.define('app-header', HeaderComponent);
+customElements.define("app-header", HeaderComponent);

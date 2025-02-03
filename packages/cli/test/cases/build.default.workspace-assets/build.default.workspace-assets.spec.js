@@ -12,50 +12,50 @@
  *
  * Default Workspace
  */
-import chai from 'chai';
-import fs from 'fs';
-import path from 'path';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import fs from "fs";
+import path from "path";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'A Custom Assets Folder';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+describe("Build Greenwood With: ", function () {
+  const LABEL = "A Custom Assets Folder";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-    before(function() {
+  describe(LABEL, function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(['public', 'index'], LABEL);
+    runSmokeTest(["public", "index"], LABEL);
 
-    describe('Assets folder', function() {
-
-      it('should create a new assets directory', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, 'assets'))).to.be.true;
+    describe("Assets folder", function () {
+      it("should create a new assets directory", function () {
+        expect(fs.existsSync(path.join(this.context.publicDir, "assets"))).to.be.true;
       });
 
-      it('should contain files from the asset directory', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, 'assets', './brand.png'))).to.be.true;
+      it("should contain files from the asset directory", function () {
+        expect(fs.existsSync(path.join(this.context.publicDir, "assets", "./brand.png"))).to.be
+          .true;
       });
     });
   });
 
-  after(function() {
+  after(function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

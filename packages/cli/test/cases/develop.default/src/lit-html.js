@@ -1,1 +1,1 @@
-console.debug('its just a prank bro!');
+console.debug("its just a prank bro!");

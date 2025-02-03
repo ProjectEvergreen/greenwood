@@ -3,7 +3,7 @@ class FooterComponent extends HTMLElement {
     super();
 
     // create a Shadow DOM
-    this.root = this.attachShadow({ mode: 'open' });
+    this.root = this.attachShadow({ mode: "open" });
   }
 
   // run some code when the component is ready
@@ -21,4 +21,4 @@ class FooterComponent extends HTMLElement {
   }
 }
 
-customElements.define('app-footer', FooterComponent);
+customElements.define("app-footer", FooterComponent);

@@ -1,10 +1,9 @@
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement } from "lit";
 
 class FooterComponent extends LitElement {
-
   constructor() {
     super();
-    this.version = '0.11.1';
+    this.version = "0.11.1";
   }
 
   static get styles() {
@@ -46,4 +45,4 @@ class FooterComponent extends LitElement {
   }
 }
 
-customElements.define('app-footer', FooterComponent);
+customElements.define("app-footer", FooterComponent);

@@ -22,34 +22,35 @@
  *
  */
 
-import chai from 'chai';
-import path from 'path';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import path from "path";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+describe("Build Greenwood With: ", function () {
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe('Custom Configuration with a bad provider value for a plugin', function() {
-    it('should throw an error that plugin.provider is not a function', function() {
+  describe("Custom Configuration with a bad provider value for a plugin", function () {
+    it("should throw an error that plugin.provider is not a function", function () {
       try {
         runner.setup(outputPath);
-        runner.runCommand(cliPath, 'build');
+        runner.runCommand(cliPath, "build");
       } catch (err) {
-        expect(err).to.contain('Error: greenwood.config.js plugins provider must be a function. got object instead.');
+        expect(err).to.contain(
+          "Error: greenwood.config.js plugins provider must be a function. got object instead.",
+        );
       }
     });
   });
-
 });

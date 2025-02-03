@@ -1,8 +1,6 @@
-import { greenwoodPluginRendererLit } from '../../../src/index.js';
+import { greenwoodPluginRendererLit } from "../../../src/index.js";
 
 export default {
   prerender: true,
-  plugins: [
-    greenwoodPluginRendererLit()
-  ]
+  plugins: [greenwoodPluginRendererLit()],
 };

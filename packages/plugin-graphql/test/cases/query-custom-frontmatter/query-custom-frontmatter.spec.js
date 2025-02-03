@@ -26,52 +26,51 @@
  *         index.md
  *     index.html
  */
-import chai from 'chai';
-import fs from 'fs';
-import glob from 'glob-promise';
-import { JSDOM } from 'jsdom';
-import path from 'path';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import fs from "fs";
+import glob from "glob-promise";
+import { JSDOM } from "jsdom";
+import path from "path";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom GraphQuery for Front Matter from GraphQL';
+describe("Build Greenwood With: ", function () {
+  const LABEL = "Custom GraphQuery for Front Matter from GraphQL";
   const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-
-    before(function() {
+  describe(LABEL, function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(['public', 'index'], LABEL);
+    runSmokeTest(["public", "index"], LABEL);
 
-    describe('Home Page <posts-list> w/ custom Graph query', function() {
+    describe("Home Page <posts-list> w/ custom Graph query", function () {
       let dom;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
       });
 
-      it('should have one window.__APOLLO_STATE__ <script> with (approximated) expected state', function() {
-        const scriptTags = dom.window.document.querySelectorAll('head script');
-        const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter(script => {
-          return script.getAttribute('data-state') === 'apollo';
+      it("should have one window.__APOLLO_STATE__ <script> with (approximated) expected state", function () {
+        const scriptTags = dom.window.document.querySelectorAll("head script");
+        const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter((script) => {
+          return script.getAttribute("data-state") === "apollo";
         });
         const innerHTML = apolloScriptTags[0].innerHTML;
 
@@ -79,47 +78,51 @@ describe('Build Greenwood With: ', function() {
         expect(innerHTML).to.match(apolloStateRegex);
       });
 
-      it('should output a single (partial) *-cache.json file, one per each query made', async function() {
-        const cacheFiles = await glob.promise(path.join(this.context.publicDir, './*-cache.json'));
+      it("should output a single (partial) *-cache.json file, one per each query made", async function () {
+        const cacheFiles = await glob.promise(path.join(this.context.publicDir, "./*-cache.json"));
 
         expect(cacheFiles).to.have.lengthOf(1);
       });
 
-      it('should output a (partial) *-cache.json files, one per each query made, that are all defined', async function() {
-        const cacheFiles = await glob.promise(path.join(this.context.publicDir, './*-cache.json'));
+      it("should output a (partial) *-cache.json files, one per each query made, that are all defined", async function () {
+        const cacheFiles = await glob.promise(path.join(this.context.publicDir, "./*-cache.json"));
 
-        cacheFiles.forEach(file => {
-          const cache = JSON.parse(fs.readFileSync(file, 'utf-8'));
+        cacheFiles.forEach((file) => {
+          const cache = JSON.parse(fs.readFileSync(file, "utf-8"));
 
           expect(cache).to.not.be.undefined;
         });
       });
 
-      it('should have a <ul> in the <body>', function() {
-        const lists = dom.window.document.querySelectorAll('body ul');
+      it("should have a <ul> in the <body>", function () {
+        const lists = dom.window.document.querySelectorAll("body ul");
 
         expect(lists.length).to.be.equal(1);
       });
 
-      it('should have a expected Query output in the <body> tag for posts list links', function() {
-        const listItems = dom.window.document.querySelectorAll('body ul li');
-        const link1 = listItems[0].querySelector('a');
-        const link2 = listItems[1].querySelector('a');
+      it("should have a expected Query output in the <body> tag for posts list links", function () {
+        const listItems = dom.window.document.querySelectorAll("body ul li");
+        const link1 = listItems[0].querySelector("a");
+        const link2 = listItems[1].querySelector("a");
 
         expect(listItems.length).to.be.equal(2);
 
-        expect(link1.href.replace('file://', '').replace(/\/[A-Z]:/, '')).to.be.equal('/blog/first-post/');
-        expect(link1.title).to.be.equal('Click to read my First blog post');
-        expect(link1.innerHTML).to.contain('First');
+        expect(link1.href.replace("file://", "").replace(/\/[A-Z]:/, "")).to.be.equal(
+          "/blog/first-post/",
+        );
+        expect(link1.title).to.be.equal("Click to read my First blog post");
+        expect(link1.innerHTML).to.contain("First");
 
-        expect(link2.href.replace('file://', '').replace(/\/[A-Z]:/, '')).to.be.equal('/blog/second-post/');
-        expect(link2.title).to.be.equal('Click to read my Second blog post');
-        expect(link2.innerHTML).to.contain('Second');
+        expect(link2.href.replace("file://", "").replace(/\/[A-Z]:/, "")).to.be.equal(
+          "/blog/second-post/",
+        );
+        expect(link2.title).to.be.equal("Click to read my Second blog post");
+        expect(link2.innerHTML).to.contain("Second");
       });
 
-      it('should have a expected Query output in the <body> tag for posts list authors and dates from custom frontmatter', function() {
-        const authors = dom.window.document.querySelectorAll('body ul li span.author');
-        const dates = dom.window.document.querySelectorAll('body ul li span.date');
+      it("should have a expected Query output in the <body> tag for posts list authors and dates from custom frontmatter", function () {
+        const authors = dom.window.document.querySelectorAll("body ul li span.author");
+        const dates = dom.window.document.querySelectorAll("body ul li span.date");
 
         expect(authors.length).to.be.equal(2);
         expect(dates.length).to.be.equal(2);
@@ -132,11 +135,9 @@ describe('Build Greenwood With: ', function() {
         expect(dates[1].innerHTML).to.match(/On:(.*.)07.09.2020/);
       });
     });
-
   });
 
-  after(function() {
+  after(function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
-
 });

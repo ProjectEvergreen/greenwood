@@ -5,8 +5,8 @@ export async function handler(request) {
 
   return new Response(JSON.stringify(body), {
     headers: new Headers({
-      'Content-Type': 'application/json',
-      'x-secret': 1234
-    })
+      "Content-Type": "application/json",
+      "x-secret": 1234,
+    }),
   });
 }

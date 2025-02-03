@@ -1,7 +1,5 @@
-import { greenwoodPluginImportRaw } from '../../../src/index.js';
+import { greenwoodPluginImportRaw } from "../../../src/index.js";
 
 export default {
-  plugins: [
-    greenwoodPluginImportRaw()
-  ]
+  plugins: [greenwoodPluginImportRaw()],
 };

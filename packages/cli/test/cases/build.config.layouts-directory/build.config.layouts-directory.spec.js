@@ -21,71 +21,70 @@
  *   layouts/
  *     page.html
  */
-import fs from 'fs';
-import { JSDOM } from 'jsdom';
-import path from 'path';
-import chai from 'chai';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import fs from "fs";
+import { JSDOM } from "jsdom";
+import path from "path";
+import chai from "chai";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom Pages Directory from Configuration';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+describe("Build Greenwood With: ", function () {
+  const LABEL = "Custom Pages Directory from Configuration";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-
-    before(function() {
+  describe(LABEL, function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(['public', 'index'], LABEL);
+    runSmokeTest(["public", "index"], LABEL);
 
-    describe('Page Content', function() {
+    describe("Page Content", function () {
       let dom;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
       });
 
-      it('should output an index.html file for the home page', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
+      it("should output an index.html file for the home page", function () {
+        expect(fs.existsSync(path.join(this.context.publicDir, "./index.html"))).to.be.true;
       });
 
-      it('should have the correct page heading', function() {
-        const heading = dom.window.document.querySelectorAll('head title')[0].textContent;
+      it("should have the correct page heading", function () {
+        const heading = dom.window.document.querySelectorAll("head title")[0].textContent;
 
-        expect(heading).to.be.equal('Custom Layout Page Layout');
+        expect(heading).to.be.equal("Custom Layout Page Layout");
       });
 
-      it('should have the correct page heading', function() {
-        const heading = dom.window.document.querySelectorAll('body h1')[0].textContent;
+      it("should have the correct page heading", function () {
+        const heading = dom.window.document.querySelectorAll("body h1")[0].textContent;
 
-        expect(heading).to.be.equal('Home Page');
+        expect(heading).to.be.equal("Home Page");
       });
 
-      it('should have the correct page heading', function() {
-        const paragraph = dom.window.document.querySelectorAll('body p')[0].textContent;
+      it("should have the correct page heading", function () {
+        const paragraph = dom.window.document.querySelectorAll("body p")[0].textContent;
 
-        expect(paragraph).to.be.equal('A page using a page layout from a custom layout directory.');
+        expect(paragraph).to.be.equal("A page using a page layout from a custom layout directory.");
       });
     });
   });
 
-  after(function() {
+  after(function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

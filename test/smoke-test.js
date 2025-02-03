@@ -6,156 +6,170 @@
  * There are a number of examples in the CLI package you can use as a reference.
  *
  */
-import chai from 'chai';
-import fs from 'fs';
-import glob from 'glob-promise';
-import http from 'http';
-import { JSDOM } from 'jsdom';
-import path from 'path';
-import { tagsMatch } from './utils.js';
+import chai from "chai";
+import fs from "fs";
+import glob from "glob-promise";
+import http from "http";
+import { JSDOM } from "jsdom";
+import path from "path";
+import { tagsMatch } from "./utils.js";
 
 const expect = chai.expect;
 
 function commonIndexSpecs(dom, html, label) {
-  describe(`Running Common Index Smoke Tests for ${label}`, function() {
+  describe(`Running Common Index Smoke Tests for ${label}`, function () {
+    describe("document <html>", function () {
+      it("should have an <doctype> tag with the html attribute", function () {
+        const trimmedHtml = html.replace(/<!--*.*-->/, "");
 
-    describe('document <html>', function() {
-      it('should have an <html> tag with the DOCTYPE attribute', function() {
-        expect(html.replace(/<!--*.*-->/, '').indexOf('<!DOCTYPE html>')).to.be.equal(0);
+        expect(trimmedHtml).to.satisfy(function () {
+          return (
+            trimmedHtml.indexOf("<!doctype html>") === 0 ||
+            trimmedHtml.indexOf("<!DOCTYPE html>") === 0
+          );
+        });
       });
 
-      it('should have a <head> tag with the lang attribute on it', function() {
-        const htmlTag = dom.window.document.querySelectorAll('html');
+      it("should have a <head> tag with the lang attribute on it", function () {
+        const htmlTag = dom.window.document.querySelectorAll("html");
 
         expect(htmlTag.length).to.equal(1);
-        expect(htmlTag[0].getAttribute('lang')).to.be.equal('en');
-        expect(htmlTag[0].getAttribute('prefix')).to.be.equal('og:http://ogp.me/ns#');
+        expect(htmlTag[0].getAttribute("lang")).to.be.equal("en");
+        expect(htmlTag[0].getAttribute("prefix")).to.be.equal("og:http://ogp.me/ns#");
       });
 
-      it('should have matching opening and closing <html> tags', function() {
-        expect(tagsMatch('html', html, 1)).to.be.equal(true);
+      it("should have matching opening and closing <html> tags", function () {
+        expect(tagsMatch("html", html, 1)).to.be.equal(true);
       });
     });
 
-    describe('document <head>', function() {
+    describe("document <head>", function () {
       let metaTags;
 
-      before(function() {
-        metaTags = dom.window.document.querySelectorAll('head > meta');
+      before(function () {
+        metaTags = dom.window.document.querySelectorAll("head > meta");
       });
 
-      it('should have matching opening and closing <head> tags in the <head>', function() {
+      it("should have matching opening and closing <head> tags in the <head>", function () {
         // add an explicit > here to avoid conflicting with <header>
         // which is used in a lot of test case scaffolding
-        expect(tagsMatch('head>', html, 1)).to.be.equal(true);
+        expect(tagsMatch("head>", html, 1)).to.be.equal(true);
       });
 
-      it('should have a <title> tag in the <head>', function() {
-        const title = dom.window.document.querySelector('head title').textContent;
+      it("should have a <title> tag in the <head>", function () {
+        const title = dom.window.document.querySelector("head title").textContent;
 
         expect(title).to.not.be.undefined;
       });
 
-      it('should have matching opening and closing <script> tags in the <head>', function() {
-        expect(tagsMatch('script', html)).to.be.equal(true);
+      it("should have matching opening and closing <script> tags in the <head>", function () {
+        expect(tagsMatch("script", html)).to.be.equal(true);
       });
 
-      it('should not have nested <script> tags in the <head>', function() {
-        const scripts = dom.window.document.querySelectorAll('head script > script');
+      it("should not have nested <script> tags in the <head>", function () {
+        const scripts = dom.window.document.querySelectorAll("head script > script");
 
         expect(scripts.length).to.be.equal(0);
       });
 
-      it('should have matching opening and closing <link> tags in the <head>', function() {
-        const html = dom.window.document.querySelector('html').textContent;
+      it("should have matching opening and closing <link> tags in the <head>", function () {
+        const html = dom.window.document.querySelector("html").textContent;
 
-        expect(tagsMatch('link', html)).to.be.equal(true);
+        expect(tagsMatch("link", html)).to.be.equal(true);
       });
 
-      it('should not have nested <link> tags in the <head>', function() {
-        const link = dom.window.document.querySelectorAll('head link > link');
+      it("should not have nested <link> tags in the <head>", function () {
+        const link = dom.window.document.querySelectorAll("head link > link");
 
         expect(link.length).to.be.equal(0);
       });
 
-      it('should have matching opening and closing <style> tags in the <head>', function() {
-        expect(tagsMatch('style', html)).to.be.equal(true);
+      it("should have matching opening and closing <style> tags in the <head>", function () {
+        expect(tagsMatch("style", html)).to.be.equal(true);
       });
 
-      it('should not have nested <style> tags in the <head>', function() {
-        const style = dom.window.document.querySelectorAll('head style > style');
+      it("should not have nested <style> tags in the <head>", function () {
+        const style = dom.window.document.querySelectorAll("head style > style");
 
         expect(style.length).to.be.equal(0);
       });
 
-      it('should have default viewport <meta> tag', function() {
-        const viewportMeta = Array.from(metaTags).filter(meta => meta.getAttribute('name') === 'viewport');
+      it("should have default viewport <meta> tag", function () {
+        const viewportMeta = Array.from(metaTags).filter(
+          (meta) => meta.getAttribute("name") === "viewport",
+        );
 
         expect(viewportMeta.length).to.be.equal(1);
-        expect(viewportMeta[0].getAttribute('name')).to.be.equal('viewport');
-        expect(viewportMeta[0].getAttribute('content')).to.be.equal('width=device-width, initial-scale=1');
+        expect(viewportMeta[0].getAttribute("name")).to.be.equal("viewport");
+        expect(viewportMeta[0].getAttribute("content")).to.be.equal(
+          "width=device-width, initial-scale=1",
+        );
       });
 
-      it('should have default charset <meta> tag', function() {
-        const charsetMeta = Array.from(metaTags).filter(meta => meta.getAttribute('charset') === 'utf-8');
+      it("should have default charset <meta> tag", function () {
+        const charsetMeta = Array.from(metaTags).filter(
+          (meta) => meta.getAttribute("charset") === "utf-8",
+        );
 
         expect(charsetMeta.length).to.be.equal(1);
-        expect(charsetMeta[0].getAttribute('charset')).to.be.equal('utf-8');
+        expect(charsetMeta[0].getAttribute("charset")).to.be.equal("utf-8");
       });
 
-      it('should not have any optimization markers left in the HTML', function() {
+      it("should not have any optimization markers left in the HTML", function () {
         expect(html.match(/data-gwd-opt=".*[a-z]"/)).to.be.equal(null);
       });
 
-      it('should not have any module based <script> tags that come _before_ any importmaps in the <head>', function() {
-        const scripts = Array.from(dom.window.document.querySelectorAll('script[type="module"] + script[type*="importmap"]'));
+      it("should not have any module based <script> tags that come _before_ any importmaps in the <head>", function () {
+        const scripts = Array.from(
+          dom.window.document.querySelectorAll('script[type="module"] + script[type*="importmap"]'),
+        );
 
         expect(scripts.length).to.equal(0);
       });
     });
 
-    describe('document <body>', function() {
-      it('should have matching opening and closing <body> tags', function() {
-        expect(tagsMatch('body', html, 1)).to.be.equal(true);
+    describe("document <body>", function () {
+      it("should have matching opening and closing <body> tags", function () {
+        expect(tagsMatch("body", html, 1)).to.be.equal(true);
       });
 
-      it('should have no <script> tags in the <body>', function() {
-        const bodyScripts = dom.window.document.querySelectorAll('body script');
+      it("should have no <script> tags in the <body>", function () {
+        const bodyScripts = dom.window.document.querySelectorAll("body script");
 
         expect(bodyScripts.length).to.be.equal(0);
       });
 
-      it('should have no <link> tags in the <body>', function() {
-        const bodyLinks = dom.window.document.querySelectorAll('body link');
+      it("should have no <link> tags in the <body>", function () {
+        const bodyLinks = dom.window.document.querySelectorAll("body link");
 
         expect(bodyLinks.length).to.be.equal(0);
       });
 
-      it('should have no <style> tags in the <body>', function() {
-        const bodyStyles = dom.window.document.querySelectorAll('body style');
+      it("should have no <style> tags in the <body>", function () {
+        const bodyStyles = dom.window.document.querySelectorAll("body style");
 
         expect(bodyStyles.length).to.be.equal(0);
       });
 
-      it('should have no <meta> tags in the <body>', function() {
-        const bodyMetas = dom.window.document.querySelectorAll('body meta');
+      it("should have no <meta> tags in the <body>", function () {
+        const bodyMetas = dom.window.document.querySelectorAll("body meta");
 
         expect(bodyMetas.length).to.be.equal(0);
       });
 
-      it('should have no <content-outlet> tags in the <body>', function() {
-        const contentOutlet = dom.window.document.querySelectorAll('body content-outlet');
+      it("should have no <content-outlet> tags in the <body>", function () {
+        const contentOutlet = dom.window.document.querySelectorAll("body content-outlet");
 
         expect(contentOutlet.length).to.be.equal(0);
       });
 
-      it('should have no <page-outlet> tags in the <body>', function() {
-        const pageOutlet = dom.window.document.querySelectorAll('body page-outlet');
+      it("should have no <page-outlet> tags in the <body>", function () {
+        const pageOutlet = dom.window.document.querySelectorAll("body page-outlet");
 
         expect(pageOutlet.length).to.be.equal(0);
       });
 
-      it('should not have any sourcemap inlining for Rollup HTML entry points', function() {
+      it("should not have any sourcemap inlining for Rollup HTML entry points", function () {
         expect(html).not.to.contain(/\/\/# sourceMappingURL=(.*)\.html\.map/);
       });
     });
@@ -163,41 +177,45 @@ function commonIndexSpecs(dom, html, label) {
 }
 
 function publicDirectory(label) {
-  describe(`Running Smoke Tests: ${label}`, function() {
-    describe('Public Directory Generated Output', function() {
-      it('should create a public directory', function() {
+  describe(`Running Smoke Tests: ${label}`, function () {
+    describe("Public Directory Generated Output", function () {
+      it("should create a public directory", function () {
         expect(fs.existsSync(this.context.publicDir)).to.be.true;
       });
 
-      it('should output a single index.html file (home page)', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, './index.html'))).to.be.true;
+      it("should output a single index.html file (home page)", function () {
+        expect(fs.existsSync(path.join(this.context.publicDir, "./index.html"))).to.be.true;
       });
 
-      it('should output one graph.json file', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, 'graph.json'))).to.have.lengthOf(1);
+      it("should output one graph.json file", async function () {
+        expect(
+          await glob.promise(path.join(this.context.publicDir, "graph.json")),
+        ).to.have.lengthOf(1);
       });
 
-      it('should not output any map files for HTML pages', async function() {
-        expect(await glob.promise(path.join(this.context.publicDir, '**/**/*.html.map'))).to.have.lengthOf(0);
+      it("should not output any map files for HTML pages", async function () {
+        expect(
+          await glob.promise(path.join(this.context.publicDir, "**/**/*.html.map")),
+        ).to.have.lengthOf(0);
       });
     });
   });
 }
 
 function defaultIndex(label) {
-  describe(`Running Smoke Tests: ${label}`, function() {
-    describe('Index (Home) page', function() {
+  describe(`Running Smoke Tests: ${label}`, function () {
+    describe("Index (Home) page", function () {
       let dom;
       let html;
 
-      before(async function() {
-        const htmlPath = path.resolve(this.context.publicDir, 'index.html');
+      before(async function () {
+        const htmlPath = path.resolve(this.context.publicDir, "index.html");
 
         dom = await JSDOM.fromFile(htmlPath);
-        html = await fs.promises.readFile(htmlPath, 'utf-8');
+        html = await fs.promises.readFile(htmlPath, "utf-8");
       });
 
-      it('should do all the common checks for an HTML page', function(done) {
+      it("should do all the common checks for an HTML page", function (done) {
         commonIndexSpecs(dom, html, label);
         done();
       });
@@ -206,72 +224,67 @@ function defaultIndex(label) {
 }
 
 function serve(label) {
-  describe(`Running Smoke Tests: ${label}`, function() {
-
-    describe('Serving Index (Home) page', function() {
+  describe(`Running Smoke Tests: ${label}`, function () {
+    describe("Serving Index (Home) page", function () {
       let dom;
       let response = {
-        body: '',
-        code: 0
+        body: "",
+        code: 0,
       };
 
-      before(async function() {
+      before(async function () {
         return new Promise((resolve, reject) => {
-          http.get(this.context.hostname, (res) => {
-            res.setEncoding('utf8');
-            response.status = res.statusCode;
-            response.headers = res.headers;
+          http
+            .get(this.context.hostname, (res) => {
+              res.setEncoding("utf8");
+              response.status = res.statusCode;
+              response.headers = res.headers;
 
-            res.on('data', chunk => response.body += chunk);
-            res.on('end', () => {
-              dom = new JSDOM(response.body);
-              resolve(response);
-            });
-          }).on('error', reject);
+              res.on("data", (chunk) => (response.body += chunk));
+              res.on("end", () => {
+                dom = new JSDOM(response.body);
+                resolve(response);
+              });
+            })
+            .on("error", reject);
         });
       });
 
-      it('should start the server and return 200 status', function(done) {
+      it("should start the server and return 200 status", function (done) {
         expect(response.status).to.equal(200);
         done();
       });
 
-      it('should return the correct content type', function(done) {
-        expect(response.headers['content-type']).to.contain('text/html');
+      it("should return the correct content type", function (done) {
+        expect(response.headers["content-type"]).to.contain("text/html");
         done();
       });
 
-      it('should do all the common checks for an HTML page', function(done) {
+      it("should do all the common checks for an HTML page", function (done) {
         commonIndexSpecs(dom, response.body, label);
         done();
       });
     });
-
   });
 }
 
 async function runSmokeTest(testCases, label) {
-
   testCases.forEach(async (testCase) => {
     switch (testCase) {
-
-      case 'index':
+      case "index":
         defaultIndex(label);
         break;
-      case 'public':
+      case "public":
         publicDirectory(label);
         break;
-      case 'serve':
+      case "serve":
         serve(label);
         break;
       default:
         console.warn(`unknown case ${testCase}`);
         break;
-
     }
   });
 }
 
-export {
-  runSmokeTest
-};
+export { runSmokeTest };

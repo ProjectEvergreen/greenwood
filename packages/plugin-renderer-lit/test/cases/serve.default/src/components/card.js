@@ -1,4 +1,4 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css } from "lit";
 
 export default class Card extends LitElement {
   static styles = css`
@@ -33,7 +33,7 @@ export default class Card extends LitElement {
   }
 
   render() {
-    const { title = 'Foo', thumbnail = 'bar.png' } = this;
+    const { title = "Foo", thumbnail = "bar.png" } = this;
 
     if (!title && !thumbnail) {
       return;
@@ -42,11 +42,11 @@ export default class Card extends LitElement {
     return html`
       <div>
         <h3>${title}</h3>
-        <img src="${thumbnail}" alt="${title}" loading="lazy" width="100%">
+        <img src="${thumbnail}" alt="${title}" loading="lazy" width="100%" />
         <button @click="${this.selectItem}">View Item Details</button>
       </div>
     `;
   }
 }
 
-customElements.define('app-card', Card);
+customElements.define("app-card", Card);

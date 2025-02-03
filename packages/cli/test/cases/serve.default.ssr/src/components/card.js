@@ -1,5 +1,5 @@
-const logo = new URL('../images/logo.svg', import.meta.url);
-const template = document.createElement('template');
+const logo = new URL("../images/logo.svg", import.meta.url);
+const template = document.createElement("template");
 
 template.innerHTML = `
   <style>
@@ -34,7 +34,7 @@ template.innerHTML = `
 class Card extends HTMLElement {
   connectedCallback() {
     if (!this.shadowRoot) {
-      this.attachShadow({ mode: 'open' });
+      this.attachShadow({ mode: "open" });
       this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
   }
@@ -42,4 +42,4 @@ class Card extends HTMLElement {
 
 export default Card;
 
-customElements.define('wc-card', Card);
+customElements.define("wc-card", Card);

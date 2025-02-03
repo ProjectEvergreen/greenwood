@@ -16,32 +16,31 @@
  *   main.ts
  *
  */
-import chai from 'chai';
-import path from 'path';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
+import chai from "chai";
+import path from "path";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
 
 const expect = chai.expect;
 
-describe('Develop Greenwood With: ', function() {
-  const LABEL = 'TypeScript plugin for resolving .ts files';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const hostname = 'http://localhost';
+describe("Develop Greenwood With: ", function () {
+  const LABEL = "TypeScript plugin for resolving .ts files";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const hostname = "http://localhost";
   const port = 1984;
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      hostname: `${hostname}:${port}`
+      hostname: `${hostname}:${port}`,
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-
-    before(async function() {
+  describe(LABEL, function () {
+    before(async function () {
       runner.setup(outputPath);
 
       return new Promise((resolve) => {
@@ -49,41 +48,41 @@ describe('Develop Greenwood With: ', function() {
           resolve();
         }, 5000);
 
-        runner.runCommand(cliPath, 'develop', { async: true });
+        runner.runCommand(cliPath, "develop", { async: true });
       });
     });
 
-    runSmokeTest(['serve'], LABEL);
+    runSmokeTest(["serve"], LABEL);
 
-    describe('Develop command specific .ts behaviors', function() {
+    describe("Develop command specific .ts behaviors", function () {
       let response = {};
       let data;
 
-      before(async function() {
-        response = await fetch(`${hostname}:${port}/main.ts`, { headers: {
-          'Accept': 'text/javascript'
-        } });
+      before(async function () {
+        response = await fetch(`${hostname}:${port}/main.ts`, {
+          headers: {
+            Accept: "text/javascript",
+          },
+        });
         data = await response.text();
       });
 
-      it('should return a 200', function() {
+      it("should return a 200", function () {
         expect(response.status).to.equal(200);
       });
 
-      it('should return the correct content type', function() {
-        expect(response.headers.get('content-type')).to.contain('text/javascript');
+      it("should return the correct content type", function () {
+        expect(response.headers.get("content-type")).to.contain("text/javascript");
       });
 
-      it('should return an ECMAScript module', function() {
-        expect(data.trim().indexOf('const user')).to.equal(0);
+      it("should return an ECMAScript module", function () {
+        expect(data.trim().indexOf("const user")).to.equal(0);
       });
     });
   });
 
-  after(function() {
+  after(function () {
     runner.stopCommand();
-    runner.teardown([
-      path.join(outputPath, '.greenwood')
-    ]);
+    runner.teardown([path.join(outputPath, ".greenwood")]);
   });
 });

@@ -3,12 +3,10 @@ function hashString(inputString) {
   let h = 0;
 
   for (let i = 0; i < inputString.length; i += 1) {
-    h = Math.imul(31, h) + inputString.charCodeAt(i) | 0;
+    h = (Math.imul(31, h) + inputString.charCodeAt(i)) | 0;
   }
 
   return Math.abs(h).toString();
 }
 
-export {
-  hashString
-};
+export { hashString };

@@ -1,7 +1,7 @@
 export default {
   devServer: {
     proxy: {
-      '/posts': 'https://jsonplaceholder.typicode.com'
-    }
-  }
+      "/posts": "https://jsonplaceholder.typicode.com",
+    },
+  },
 };

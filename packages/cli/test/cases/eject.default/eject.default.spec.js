@@ -8,68 +8,68 @@
  * User Command
  * greenwood eject
  */
-import fs from 'fs';
-import path from 'path';
-import chai from 'chai';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import fs from "fs";
+import path from "path";
+import chai from "chai";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Eject Greenwood', function() {
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+describe("Eject Greenwood", function () {
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
   let configFiles;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe('Default Eject', function() {
-
-    before(function() {
+  describe("Default Eject", function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'eject');
+      runner.runCommand(cliPath, "eject");
 
-      configFiles = fs.readdirSync(fileURLToPath(new URL('.', import.meta.url)))
-        .filter((file) => path.extname(file) === '.js' && file.indexOf('spec.js') < 0);
+      configFiles = fs
+        .readdirSync(fileURLToPath(new URL(".", import.meta.url)))
+        .filter((file) => path.extname(file) === ".js" && file.indexOf("spec.js") < 0);
     });
 
-    it('should output one config files to users project working directory', function() {
+    it("should output one config files to users project working directory", function () {
       expect(configFiles.length).to.equal(1);
     });
 
-    it('should output rollup config file', function() {
-      expect(fs.existsSync(fileURLToPath(new URL('./rollup.config.js', import.meta.url)))).to.be.true;
+    it("should output rollup config file", function () {
+      expect(fs.existsSync(fileURLToPath(new URL("./rollup.config.js", import.meta.url)))).to.be
+        .true;
     });
 
-    after(function() {
+    after(function () {
       // remove test files
-      configFiles.forEach(file => {
+      configFiles.forEach((file) => {
         fs.unlinkSync(fileURLToPath(new URL(`./${file}`, import.meta.url)));
       });
     });
   });
 
-  describe('Eject and Build Ejected Config', function() {
-
-    before(function() {
-      runner.runCommand(cliPath, 'build');
-      runner.runCommand(cliPath, 'eject');
+  describe("Eject and Build Ejected Config", function () {
+    before(function () {
+      runner.runCommand(cliPath, "build");
+      runner.runCommand(cliPath, "eject");
     });
 
-    runSmokeTest(['public', 'index'], 'Eject and Build Ejected Config');
+    runSmokeTest(["public", "index"], "Eject and Build Ejected Config");
   });
 
-  after(function() {
+  after(function () {
     // remove test files
-    configFiles.forEach(file => {
+    configFiles.forEach((file) => {
       fs.unlinkSync(fileURLToPath(new URL(`./${file}`, import.meta.url)));
     });
 

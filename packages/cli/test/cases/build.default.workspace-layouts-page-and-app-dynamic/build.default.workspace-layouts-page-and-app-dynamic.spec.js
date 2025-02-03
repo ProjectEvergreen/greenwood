@@ -20,126 +20,127 @@
  *     app.js
  *     page.js
  */
-import chai from 'chai';
-import { JSDOM } from 'jsdom';
-import path from 'path';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import { JSDOM } from "jsdom";
+import path from "path";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Greenwood Configuration and Workspace w/Custom Dynamic App and Page Layouts using JavaScript';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+describe("Build Greenwood With: ", function () {
+  const LABEL =
+    "Default Greenwood Configuration and Workspace w/Custom Dynamic App and Page Layouts using JavaScript";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-    before(function() {
+  describe(LABEL, function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(['public'], LABEL);
+    runSmokeTest(["public"], LABEL);
 
-    describe('Custom App and page with no <html> wrapping element', function() {
+    describe("Custom App and page with no <html> wrapping element", function () {
       let dom;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
       });
 
-      it('should have the expected <title> tag from the dynamic app layout', function() {
-        const title = dom.window.document.querySelectorAll('head title');
+      it("should have the expected <title> tag from the dynamic app layout", function () {
+        const title = dom.window.document.querySelectorAll("head title");
 
         expect(title.length).to.equal(1);
-        expect(title[0].textContent).to.equal('App Layout');
+        expect(title[0].textContent).to.equal("App Layout");
       });
 
-      it('should have the expected <h1> tag from the dynamic app layout', function() {
-        const heading = dom.window.document.querySelectorAll('h1');
+      it("should have the expected <h1> tag from the dynamic app layout", function () {
+        const heading = dom.window.document.querySelectorAll("h1");
 
         expect(heading.length).to.equal(1);
-        expect(heading[0].textContent).to.equal('App Layout');
+        expect(heading[0].textContent).to.equal("App Layout");
       });
 
-      it('should not have the expected <h2> tag from the dynamic page layout', function() {
-        const heading = dom.window.document.querySelectorAll('h2');
+      it("should not have the expected <h2> tag from the dynamic page layout", function () {
+        const heading = dom.window.document.querySelectorAll("h2");
 
         expect(heading.length).to.equal(0);
       });
 
-      it('should have the expected content from the index.md', function() {
-        const heading = dom.window.document.querySelectorAll('h3');
-        const paragraph = dom.window.document.querySelectorAll('p');
+      it("should have the expected content from the index.md", function () {
+        const heading = dom.window.document.querySelectorAll("h3");
+        const paragraph = dom.window.document.querySelectorAll("p");
 
         expect(heading.length).to.equal(1);
-        expect(heading[0].textContent).to.equal('Home Page');
+        expect(heading[0].textContent).to.equal("Home Page");
 
         expect(paragraph.length).to.equal(1);
-        expect(paragraph[0].textContent).to.equal('Coffey was here');
+        expect(paragraph[0].textContent).to.equal("Coffey was here");
       });
 
-      it('should have the expected <footer> tag from the dynamic app layout', function() {
+      it("should have the expected <footer> tag from the dynamic app layout", function () {
         const year = new Date().getFullYear();
-        const footer = dom.window.document.querySelectorAll('footer');
+        const footer = dom.window.document.querySelectorAll("footer");
 
         expect(footer.length).to.equal(1);
         expect(footer[0].textContent).to.equal(`${year}`);
       });
     });
 
-    describe('Custom App and Page Layout', function() {
+    describe("Custom App and Page Layout", function () {
       let dom;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'about/index.html'));
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "about/index.html"));
       });
 
-      it('should have the expected <title> tag from the dynamic app layout', function() {
-        const title = dom.window.document.querySelectorAll('head title');
+      it("should have the expected <title> tag from the dynamic app layout", function () {
+        const title = dom.window.document.querySelectorAll("head title");
 
         expect(title.length).to.equal(1);
-        expect(title[0].textContent).to.equal('App Layout');
+        expect(title[0].textContent).to.equal("App Layout");
       });
 
-      it('should have the expected <h1> tag from the dynamic app layout', function() {
-        const heading = dom.window.document.querySelectorAll('h1');
+      it("should have the expected <h1> tag from the dynamic app layout", function () {
+        const heading = dom.window.document.querySelectorAll("h1");
 
         expect(heading.length).to.equal(1);
-        expect(heading[0].textContent).to.equal('App Layout');
+        expect(heading[0].textContent).to.equal("App Layout");
       });
 
-      it('should have the expected <h2> tag from the dynamic page layout', function() {
-        const heading = dom.window.document.querySelectorAll('h2');
+      it("should have the expected <h2> tag from the dynamic page layout", function () {
+        const heading = dom.window.document.querySelectorAll("h2");
 
         expect(heading.length).to.equal(1);
-        expect(heading[0].textContent).to.equal('Page Layout');
+        expect(heading[0].textContent).to.equal("Page Layout");
       });
 
-      it('should have the expected content from the index.md', function() {
-        const heading = dom.window.document.querySelectorAll('h3');
-        const paragraph = dom.window.document.querySelectorAll('p');
+      it("should have the expected content from the index.md", function () {
+        const heading = dom.window.document.querySelectorAll("h3");
+        const paragraph = dom.window.document.querySelectorAll("p");
 
         expect(heading.length).to.equal(1);
-        expect(heading[0].textContent).to.equal('About Page');
+        expect(heading[0].textContent).to.equal("About Page");
 
         expect(paragraph.length).to.equal(1);
-        expect(paragraph[0].textContent).to.equal('Learn more about us');
+        expect(paragraph[0].textContent).to.equal("Learn more about us");
       });
 
-      it('should have the expected <footer> tag from the dynamic app layout', function() {
+      it("should have the expected <footer> tag from the dynamic app layout", function () {
         const year = new Date().getFullYear();
-        const footer = dom.window.document.querySelectorAll('footer');
+        const footer = dom.window.document.querySelectorAll("footer");
 
         expect(footer.length).to.equal(1);
         expect(footer[0].textContent).to.equal(`${year}`);
@@ -147,7 +148,7 @@ describe('Build Greenwood With: ', function() {
     });
   });
 
-  after(function() {
+  after(function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

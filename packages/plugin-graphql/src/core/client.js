@@ -1,21 +1,21 @@
-import { getQueryHash } from './common.js';
+import { getQueryHash } from "./common.js";
 
 const client = {
   query: (params) => {
     const { query, variables = {} } = params;
 
-    return fetch('http://localhost:4000/graphql', {
-      method: 'POST',
+    return fetch("http://localhost:4000/graphql", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify({
         query,
-        variables
-      })
+        variables,
+      }),
     }).then((response) => response.json());
-  }
+  },
 };
 
 const APOLLO_STATE = globalThis.__APOLLO_STATE__;
@@ -29,10 +29,10 @@ client.query = (params) => {
     const cachePath = `${BASE_PATH}/${queryHash}-cache.json`;
 
     return fetch(cachePath)
-      .then(response => response.json())
+      .then((response) => response.json())
       .then((response) => {
         return {
-          data: response
+          data: response,
         };
       });
   } else {

@@ -1,3 +1,3 @@
-import stylesCss from './styles.css?type=raw';
+import stylesCss from "./styles.css?type=raw";
 
-document.getElementsByTagName('span')[0].innerHTML = `import from styles.css: ${stylesCss}`;
+document.getElementsByTagName("span")[0].innerHTML = `import from styles.css: ${stylesCss}`;
