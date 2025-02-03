@@ -1,7 +1,9 @@
 # Greenwood
-[![Netlify Status](https://api.netlify.com/api/v1/badges/6758148c-5c38-44d8-b908-ca0a1dad0f7c/deploy-status)](https://app.netlify.com/sites/elastic-blackwell-3aef44/deploys)
-[![GitHub release](https://img.shields.io/github/tag/ProjectEvergreen/greenwood.svg)](https://github.com/ProjectEvergreen/greenwood/tags)
+
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ProjectEvergreen/greenwood/master/LICENSE.md)
+[![GitHub release](https://img.shields.io/github/tag/ProjectEvergreen/greenwood.svg)](https://github.com/ProjectEvergreen/greenwood/tags)
+[![NodeJS compatibility](https://img.shields.io/node/v/@greenwood/cli.svg)](https://nodejs.org/en/about/previous-releases")
+[![Discord Chat](https://img.shields.io/badge/chat-discord-blue?style=flat&logo=discord)](https://www.greenwoodjs.dev/discord/)
 
 ## Overview
 
