@@ -4,9 +4,9 @@ import type { Page } from "./content.d.ts";
 // https://greenwoodjs.dev/docs/reference/plugins-api/#overview
 
 // TODO why wont this work on the interface?
-// type PLUGIN_TYPES = 'adapter' | 'context' | 'copy' | 'renderer' | 'resource' | 'rollup' | 'server' | 'source';
+type PLUGIN_TYPES = 'adapter' | 'context' | 'copy' | 'renderer' | 'resource' | 'rollup' | 'server' | 'source';
 
-export type PLUGIN_TYPES = AdapterPlugin | ContextPlugin | CopyPlugin | RendererPlugin | ResourcePlugin | RollupPlugin | ServerPlugin | SourcePlugin;
+export type PLUGINS = AdapterPlugin | ContextPlugin | CopyPlugin | RendererPlugin | ResourcePlugin | RollupPlugin | ServerPlugin | SourcePlugin;
 
 interface Plugin {
   name: string;
