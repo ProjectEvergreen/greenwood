@@ -4,7 +4,7 @@ import { copyAssets } from '../lifecycles/copy.js';
 import { getDevServer } from '../lifecycles/serve.js';
 import fs from 'fs/promises';
 import { preRenderCompilationWorker, preRenderCompilationCustom, staticRenderCompilation } from '../lifecycles/prerender.js';
-import { ServerInterface } from '../lib/server-interface.js';
+// import { ServerInterface } from '../lib/server-interface.js';
 
 const runProductionBuild = async (compilation) => {
 
@@ -34,9 +34,10 @@ const runProductionBuild = async (compilation) => {
         }).map((plugin) => {
           const provider = plugin.provider(compilation);
 
-          if (!(provider instanceof ServerInterface)) {
-            console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`);
-          }
+          // TODO
+          // if (!(provider instanceof ServerInterface)) {
+          //   console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`);
+          // }
 
           return provider;
         })];

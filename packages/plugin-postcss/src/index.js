@@ -5,15 +5,14 @@
  */
 import { checkResourceExists, normalizePathnameForWindows } from '@greenwood/cli/src/lib/resource-utils.js';
 import postcss from 'postcss';
-import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
 async function getConfig (compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = 'postcss.config';
-  const defaultConfig = (await import(new URL(`./${configFile}.js`, import.meta.url))).default;
+  const defaultConfig = (await import(new URL(`./${configFile}.js`, import.meta.url).href)).default;
   const userConfigUrl = new URL(`./${configFile}.js`, projectDirectory);
   const userConfig = await checkResourceExists(userConfigUrl)
-    ? (await import(userConfigUrl)).default
+    ? (await import(userConfigUrl.href)).default
     : {};
   const finalConfig = Object.assign({}, userConfig);
 
@@ -26,9 +25,10 @@ async function getConfig (compilation, extendConfig = false) {
   return finalConfig;
 }
 
-class PostCssResource extends ResourceInterface {
+class PostCssResource {
   constructor(compilation, options) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
     this.extensions = ['css'];
     this.contentType = ['text/css'];
   }

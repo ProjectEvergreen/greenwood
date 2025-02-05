@@ -4,7 +4,6 @@ import Koa from 'koa';
 import { koaBody } from 'koa-body';
 import { checkResourceExists, mergeResponse, transformKoaRequestIntoStandardRequest, requestAsObject } from '../lib/resource-utils.js';
 import { Readable } from 'stream';
-import { ResourceInterface } from '../lib/resource-interface.js';
 import { Worker } from 'worker_threads';
 
 async function getDevServer(compilation) {
@@ -23,10 +22,6 @@ async function getDevServer(compilation) {
       return plugin.type === 'resource' && !plugin.isGreenwoodDefaultPlugin;
     }).map((plugin) => {
       const provider = plugin.provider(compilationCopy);
-
-      if (!(provider instanceof ResourceInterface)) {
-        console.warn(`WARNING: ${plugin.name}'s provider is not an instance of ResourceInterface.`);
-      }
 
       return provider;
     })

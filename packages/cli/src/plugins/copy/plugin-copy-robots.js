@@ -1,5 +1,6 @@
 import { checkResourceExists } from '../../lib/resource-utils.js';
 
+/** @type {import('../../types/index.d.ts').CopyPlugin} */
 const greenwoodPluginCopyRobots = [{
   type: 'copy',
   name: 'plugin-copy-robots',

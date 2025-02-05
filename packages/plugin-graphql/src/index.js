@@ -1,8 +1,6 @@
 import fs from 'fs/promises';
 import { graphqlServer } from './core/server.js';
 import { mergeImportMap } from '@greenwood/cli/src/lib/node-modules-utils.js';
-import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
-import { ServerInterface } from '@greenwood/cli/src/lib/server-interface.js';
 
 const importMap = {
   '@greenwood/cli/src/lib/hashing-utils.js': '/node_modules/@greenwood/cli/src/lib/hashing-utils.js',
@@ -13,9 +11,10 @@ const importMap = {
   '@greenwood/plugin-graphql/src/queries/collection.gql': '/node_modules/@greenwood/plugin-graphql/src/queries/collection.gql'
 };
 
-class GraphQLResource extends ResourceInterface {
-  constructor(compilation, options = {}) {
-    super(compilation, options);
+class GraphQLResource {
+  constructor(compilation, options) {
+    this.compilation = compilation;
+    this.options = options;
     this.extensions = ['gql'];
     this.contentType = ['text/javascript', 'text/html'];
   }
@@ -66,9 +65,10 @@ class GraphQLResource extends ResourceInterface {
   }
 }
 
-class GraphQLServer extends ServerInterface {
+class GraphQLServer {
   constructor(compilation, options = {}) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
   }
 
   async start() {

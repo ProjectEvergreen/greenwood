@@ -1,9 +1,9 @@
 import fs from 'fs/promises';
-import { ResourceInterface } from '@greenwood/cli/src/lib/resource-interface.js';
 
-class IncludeHtmlResource extends ResourceInterface {
+class IncludeHtmlResource {
   constructor(compilation, options) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
     this.extensions = ['.html'];
     this.contentType = 'text/html';
   }
@@ -35,7 +35,7 @@ class IncludeHtmlResource extends ResourceInterface {
       for (const tag of customElementTags) {
         const src = tag.match(/src="(.*)"/)[1];
         const srcUrl = new URL(`./${src.replace(/\.\.\//g, '')}`, this.compilation.context.userWorkspace);
-        const { getData, getTemplate } = await import(srcUrl);
+        const { getData, getTemplate } = await import(srcUrl.href);
         const includeContents = await getTemplate(await getData());
 
         body = body.replace(tag, includeContents);

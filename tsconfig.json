@@ -3,6 +3,10 @@
     "allowImportingTsExtensions": true,
     "experimentalDecorators": true,
     "module": "NodeNext",
-    "noEmit": true
+    "noEmit": true,
+    "checkJs": true,
+    "types": [
+      "./packages/cli/src/types/index.d.ts"
+    ]
   }
 }

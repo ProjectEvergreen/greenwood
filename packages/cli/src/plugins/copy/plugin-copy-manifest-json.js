@@ -1,3 +1,4 @@
+/** @type {import('../../types/index.d.ts').CopyPlugin} */
 const greenwoodPluginCopyManifestJson = [{
   type: 'copy',
   name: 'plugin-copy-manifest-json',
