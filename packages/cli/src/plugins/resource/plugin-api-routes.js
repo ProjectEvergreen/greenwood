@@ -3,13 +3,13 @@
  * Manages routing to API routes.
  *
  */
-import { ResourceInterface } from "../../lib/resource-interface.js";
 import { requestAsObject } from "../../lib/resource-utils.js";
 import { Worker } from "worker_threads";
 
-class ApiRoutesResource extends ResourceInterface {
+class ApiRoutesResource {
   constructor(compilation, options) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
   }
 
   async shouldServe(url) {
@@ -59,9 +59,9 @@ class ApiRoutesResource extends ResourceInterface {
 }
 
 const greenwoodApiRoutesPlugin = {
-  type: "resource",
-  name: "plugin-api-routes",
-  provider: (compilation, options) => new ApiRoutesResource(compilation, options),
+  type: 'resource',
+  name: 'plugin-api-routes',
+  provider: (compilation) => new ApiRoutesResource(compilation)
 };
 
 export { greenwoodApiRoutesPlugin };

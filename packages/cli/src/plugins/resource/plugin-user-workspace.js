@@ -5,12 +5,11 @@
  *
  */
 import { resolveForRelativeUrl } from "../../lib/resource-utils.js";
-import { ResourceInterface } from "../../lib/resource-interface.js";
 import { IMPORT_MAP_RESOLVED_PREFIX } from "../../lib/walker-package-ranger.js";
 
-class UserWorkspaceResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class UserWorkspaceResource {
+  constructor(compilation) {
+    this.compilation = compilation;
   }
 
   async shouldResolve(url) {
@@ -38,7 +37,7 @@ class UserWorkspaceResource extends ResourceInterface {
 const greenwoodPluginUserWorkspace = {
   type: "resource",
   name: "plugin-user-workspace",
-  provider: (compilation, options) => new UserWorkspaceResource(compilation, options),
+  provider: (compilation) => new UserWorkspaceResource(compilation),
 };
 
 export { greenwoodPluginUserWorkspace };

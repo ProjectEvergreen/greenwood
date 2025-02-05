@@ -1,4 +1,3 @@
-/** @type {import('../../types/index.d.ts').RendererPlugin} */
 const greenwoodPluginRendererDefault = {
   type: "renderer",
   name: "plugin-renderer-default",

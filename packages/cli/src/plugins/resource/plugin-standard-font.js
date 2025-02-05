@@ -5,11 +5,10 @@
  *
  */
 import fs from "fs/promises";
-import { ResourceInterface } from "../../lib/resource-interface.js";
 
-class StandardFontResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class StandardFontResource {
+  constructor(compilation) {
+    this.compilation = compilation;
 
     // https://developer.mozilla.org/en-US/docs/Learn/CSS/Styling_text/Web_fonts
     this.extensions = ["woff2", "woff", "ttf", "eot"];
@@ -37,7 +36,7 @@ class StandardFontResource extends ResourceInterface {
 const pluginGreenwoodStandardFont = {
   type: "resource",
   name: "plugin-standard-font",
-  provider: (compilation, options) => new StandardFontResource(compilation, options),
+  provider: (compilation) => new StandardFontResource(compilation),
 };
 
 export { pluginGreenwoodStandardFont };

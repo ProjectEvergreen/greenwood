@@ -1,7 +1,5 @@
 import fs from "fs/promises";
 import livereload from "livereload";
-// import { ResourceInterface } from "../../lib/resource-interface.js";
-// import { ServerInterface } from "../../lib/server-interface.js";
 
 class LiveReloadServer {
   constructor(compilation, options = {}) {
@@ -18,7 +16,7 @@ class LiveReloadServer {
     const standardPluginsExtensions = (
       await Promise.all(
         standardPluginsNames.map(async (filename) => {
-          const pluginImport = await import(new URL(`./${filename}`, standardPluginsDirectoryPath));
+          const pluginImport = await import(new URL(`./${filename}`, standardPluginsDirectoryPath).href);
           const plugin = pluginImport[Object.keys(pluginImport)[0]];
 
           return plugin;
@@ -66,13 +64,8 @@ class LiveReloadServer {
   }
 }
 
-<<<<<<< HEAD
-class LiveReloadResource extends ResourceInterface {
-=======
-/** @type {import('../../types/index.d.ts').ResourcePlugin} */
-class LiveReloadResource {
 
->>>>>>> d74799f4 (WIP)
+class LiveReloadResource {
   async shouldIntercept(url, request, response) {
     const contentType = response.headers.get("Content-Type");
 
@@ -103,7 +96,7 @@ const greenwoodPluginLivereload = [
   {
     type: "resource",
     name: "plugin-live-reload:resource",
-    provider: (compilation) => new LiveReloadResource(compilation),
+    provider: () => new LiveReloadResource(),
   },
 ];
 
