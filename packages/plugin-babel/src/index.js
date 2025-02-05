@@ -5,14 +5,13 @@
  */
 import babel from "@babel/core";
 import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 import rollupBabelPlugin from "@rollup/plugin-babel";
 
 async function getConfig(compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = "babel.config.mjs";
-  const defaultConfig = (await import(new URL(`./${configFile}`, import.meta.url))).default;
-  const userConfig = (await checkResourceExists(new URL(`./${configFile}`, projectDirectory)))
+  const defaultConfig = (await import(new URL(`./${configFile}`, import.meta.url).href)).default;
+  const userConfig = await checkResourceExists(new URL(`./${configFile}`, projectDirectory))
     ? (await import(`${projectDirectory}/${configFile}`)).default
     : {};
   const finalConfig = Object.assign({}, userConfig);
@@ -30,9 +29,10 @@ async function getConfig(compilation, extendConfig = false) {
   return finalConfig;
 }
 
-class BabelResource extends ResourceInterface {
+class BabelResource {
   constructor(compilation, options) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
     this.extensions = ["js"];
     this.contentType = ["text/javascript"];
   }
@@ -69,6 +69,7 @@ const greenwoodPluginBabel = (options = {}) => {
       type: "rollup",
       name: "plugin-babel:rollup",
       provider: (compilation) => [
+        // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
         rollupBabelPlugin({
           // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
           babelHelpers: "bundled",

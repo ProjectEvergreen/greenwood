@@ -1,13 +1,12 @@
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 import {
   derivePackageRoot,
   resolveBareSpecifier,
 } from "@greenwood/cli/src/lib/walker-package-ranger.js";
 
-class PolyfillsResource extends ResourceInterface {
+class PolyfillsResource {
   constructor(compilation, options = {}) {
-    super(compilation, options);
-
+    this.compilation = compilation;
+    this.options = options;
     this.contentType = "text/html";
     this.options = {
       wc: true,
