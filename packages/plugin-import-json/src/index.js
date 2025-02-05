@@ -4,11 +4,9 @@
  * This is a Greenwood default plugin.
  *
  */
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
-
-class ImportJsonResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class ImportJsonResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ["json"];
     this.contentType = "text/javascript";
   }
@@ -35,11 +33,11 @@ class ImportJsonResource extends ResourceInterface {
   }
 }
 
-const greenwoodPluginImportJson = (options = {}) => [
+const greenwoodPluginImportJson = () => [
   {
     type: "resource",
     name: "plugin-import-json:resource",
-    provider: (compilation) => new ImportJsonResource(compilation, options),
+    provider: (compilation) => new ImportJsonResource(compilation),
   },
 ];
 
