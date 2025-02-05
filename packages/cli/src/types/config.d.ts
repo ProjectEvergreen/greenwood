@@ -1,4 +1,4 @@
-import type { PLUGIN_TYPES } from "./plugins.d.ts";
+import type { PLUGINS } from "./plugins.d.ts";
 
 // https://greenwoodjs.dev/docs/reference/configuration/
 export type Config = {
@@ -17,7 +17,7 @@ export type Config = {
     plugins?: string[]
   },
   pagesDirectory?: string,
-  plugins?: Array<PLUGIN_TYPES | Array<PLUGIN_TYPES>>,
+  plugins?: Array<PLUGINS | Array<PLUGINS>>,
   polyfills?: {
     importAttributes?: null | Array<'css' | 'json'>,
     importMaps?: boolean
