@@ -27,6 +27,7 @@
     "lint": "yarn run lint:ls && yarn run lint:js",
     "lint:js": "eslint",
     "lint:ls": "ls-lint",
+    "lint:types": "tsc --project ./tsconfig.json",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "prepare": "husky"

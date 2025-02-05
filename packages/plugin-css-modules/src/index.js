@@ -6,7 +6,6 @@
 import fs from "fs";
 import htmlparser from "node-html-parser";
 import { parse, walk } from "css-tree";
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 import * as acornWalk from "acorn-walk";
 import * as acorn from "acorn";
 import { hashString } from "@greenwood/cli/src/lib/hashing-utils.js";
@@ -26,7 +25,7 @@ function getCssModulesMap(compilation) {
   let cssModulesMap = {};
 
   if (fs.existsSync(locationUrl)) {
-    cssModulesMap = JSON.parse(fs.readFileSync(locationUrl));
+    cssModulesMap = JSON.parse(fs.readFileSync(locationUrl, 'utf-8'));
   }
 
   return cssModulesMap;
@@ -130,10 +129,10 @@ function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
 
 // this happens 'first' as the HTML is returned, to find viable references to CSS Modules
 // and inline those into a <style> tag on the page
-class ScanForCssModulesResource extends ResourceInterface {
+class ScanForCssModulesResource {
   constructor(compilation, options) {
-    super(compilation, options);
-
+    this.compilation = compilation;
+    this.options = options;
     this.extensions = ["module.css"];
     this.contentType = "text/javascript";
 
@@ -218,10 +217,10 @@ class ScanForCssModulesResource extends ResourceInterface {
 
 // this process all files that have CssModules content used
 // and strip out the `import` and replace all the references in class attributes with static values
-class StripCssModulesResource extends ResourceInterface {
+class StripCssModulesResource {
   constructor(compilation, options) {
-    super(compilation, options);
-
+    this.compilation = compilation;
+    this.options = options;
     this.extensions = ["module.css"];
     this.contentType = "text/javascript";
   }

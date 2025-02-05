@@ -1,11 +1,12 @@
 import fs from "fs/promises";
 import livereload from "livereload";
-import { ResourceInterface } from "../../lib/resource-interface.js";
-import { ServerInterface } from "../../lib/server-interface.js";
+// import { ResourceInterface } from "../../lib/resource-interface.js";
+// import { ServerInterface } from "../../lib/server-interface.js";
 
-class LiveReloadServer extends ServerInterface {
+class LiveReloadServer {
   constructor(compilation, options = {}) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
   }
 
   async start() {
@@ -65,7 +66,13 @@ class LiveReloadServer extends ServerInterface {
   }
 }
 
+<<<<<<< HEAD
 class LiveReloadResource extends ResourceInterface {
+=======
+/** @type {import('../../types/index.d.ts').ResourcePlugin} */
+class LiveReloadResource {
+
+>>>>>>> d74799f4 (WIP)
   async shouldIntercept(url, request, response) {
     const contentType = response.headers.get("Content-Type");
 

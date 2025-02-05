@@ -3,13 +3,12 @@
  * Enables using JavaScript to import any type of file as a string using ESM syntax.
  *
  */
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 import { IMPORT_MAP_RESOLVED_PREFIX } from "@greenwood/cli/src/lib/walker-package-ranger.js";
 
-class ImportRawResource extends ResourceInterface {
+class ImportRawResource {
   constructor(compilation, options) {
-    super(compilation, options);
-
+    this.compilation = compilation;
+    this.options = options;
     this.contentType = "text/javascript";
   }
 

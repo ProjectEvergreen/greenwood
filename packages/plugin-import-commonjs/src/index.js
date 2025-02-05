@@ -3,11 +3,18 @@
  * Detects and fully resolves import requests for CommonJS files in node_modules.
  *
  */
+<<<<<<< HEAD
 import commonjs from "@rollup/plugin-commonjs";
 import fs from "fs/promises";
 import { parse, init } from "cjs-module-lexer";
 import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 import rollupStream from "@rollup/stream";
+=======
+import commonjs from '@rollup/plugin-commonjs';
+import fs from 'fs/promises';
+import { parse, init } from 'cjs-module-lexer';
+import rollupStream from '@rollup/stream';
+>>>>>>> d74799f4 (WIP)
 
 // bit of a workaround for now, but maybe this could be supported by cjs-module-lexar natively?
 // https://github.com/guybedford/cjs-module-lexer/issues/35
@@ -42,9 +49,10 @@ const testForCjsModule = async (url) => {
   return isCommonJs;
 };
 
-class ImportCommonJsResource extends ResourceInterface {
+class ImportCommonJsResource {
   constructor(compilation, options) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
   }
 
   async shouldIntercept(url) {
@@ -59,9 +67,18 @@ class ImportCommonJsResource extends ResourceInterface {
       try {
         const options = {
           input: pathname,
+<<<<<<< HEAD
           output: { format: "esm" },
           plugins: [commonjs()],
+=======
+          output: { format: 'esm' },
+          plugins: [
+            // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
+            commonjs()
+          ]
+>>>>>>> d74799f4 (WIP)
         };
+        // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
         const stream = rollupStream(options);
         let bundle = "";
 
@@ -82,6 +99,7 @@ class ImportCommonJsResource extends ResourceInterface {
 }
 
 const greenwoodPluginImportCommonJs = (options = {}) => {
+<<<<<<< HEAD
   return [
     {
       type: "resource",
@@ -94,6 +112,20 @@ const greenwoodPluginImportCommonJs = (options = {}) => {
       provider: () => [commonjs()],
     },
   ];
+=======
+  return [{
+    type: 'resource',
+    name: 'plugin-import-commonjs:resource',
+    provider: (compilation) => new ImportCommonJsResource(compilation, options)
+  }, {
+    type: 'rollup',
+    name: 'plugin-import-commonjs:rollup',
+    provider: () => [
+      // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
+      commonjs()
+    ]
+  }];
+>>>>>>> d74799f4 (WIP)
 };
 
 export { greenwoodPluginImportCommonJs };

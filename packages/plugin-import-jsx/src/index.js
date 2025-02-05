@@ -5,11 +5,11 @@
  */
 import escodegen from "escodegen";
 import { parseJsx } from "wc-compiler/src/jsx-loader.js";
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 
-class ImportJsxResource extends ResourceInterface {
+class ImportJsxResource {
   constructor(compilation, options) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
     this.extensions = ["jsx"];
     this.contentType = "text/javascript";
   }

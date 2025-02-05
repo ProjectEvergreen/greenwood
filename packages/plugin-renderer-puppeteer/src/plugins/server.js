@@ -1,9 +1,9 @@
-import { ServerInterface } from "@greenwood/cli/src/lib/server-interface.js";
 import { getDevServer } from "@greenwood/cli/src/lifecycles/serve.js";
 
-class PuppeteerServer extends ServerInterface {
+class PuppeteerServer {
   constructor(compilation, options = {}) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
   }
 
   // only need this running for production builds when prerendering

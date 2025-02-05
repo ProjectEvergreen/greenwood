@@ -1,8 +1,7 @@
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
-
-class GoogleAnalyticsResource extends ResourceInterface {
+class GoogleAnalyticsResource {
   constructor(compilation, options = {}) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
 
     const { analyticsId } = options;
 
