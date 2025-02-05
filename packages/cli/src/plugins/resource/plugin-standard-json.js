@@ -6,11 +6,10 @@
  */
 import { checkResourceExists } from '../../lib/resource-utils.js';
 import fs from 'fs/promises';
-import { ResourceInterface } from '../../lib/resource-interface.js';
 
-class StandardJsonResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class StandardJsonResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ['json'];
     this.contentType = 'application/json';
   }
@@ -58,7 +57,7 @@ class StandardJsonResource extends ResourceInterface {
 const pluginGreenwoodStandardJson = [{
   type: 'resource',
   name: 'plugin-standard-json:resource',
-  provider: (compilation, options) => new StandardJsonResource(compilation, options)
+  provider: (compilation) => new StandardJsonResource(compilation)
 }];
 
 export { pluginGreenwoodStandardJson };

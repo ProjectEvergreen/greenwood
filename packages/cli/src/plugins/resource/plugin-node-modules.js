@@ -7,14 +7,13 @@ import { checkResourceExists } from '../../lib/resource-utils.js';
 import fs from 'fs/promises';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { getPackageJsonForProject, getResolvedHrefFromPathnameShortcut, mergeImportMap } from '../../lib/node-modules-utils.js';
-import { ResourceInterface } from '../../lib/resource-interface.js';
 import { walkPackageJson, IMPORT_MAP_RESOLVED_PREFIX } from '../../lib/walker-package-ranger.js';
 
 let generatedImportMap;
 
-class NodeModulesResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class NodeModulesResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ['js', 'mjs'];
     this.contentType = 'text/javascript';
   }
@@ -109,7 +108,7 @@ class NodeModulesResource extends ResourceInterface {
 const greenwoodPluginNodeModules = [{
   type: 'resource',
   name: 'plugin-node-modules:resource',
-  provider: (compilation, options) => new NodeModulesResource(compilation, options)
+  provider: (compilation) => new NodeModulesResource(compilation)
 }, {
   type: 'rollup',
   name: 'plugin-node-modules:rollup',

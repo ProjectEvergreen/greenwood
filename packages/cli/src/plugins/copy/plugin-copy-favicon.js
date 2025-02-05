@@ -1,6 +1,5 @@
 import { checkResourceExists } from '../../lib/resource-utils.js';
 
-/** @type {import('../../types/index.d.ts').CopyPlugin} */
 const greenwoodPluginCopyFavicon = [{
   type: 'copy',
   name: 'plugin-copy-favicon',
