@@ -1,0 +1,17 @@
+name: ⚙️ Chore
+description: Technical tasks not related to Greenwood
+title: "Update repo configuration, maintaining dependencies, etc"
+labels: ["chore"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping out!
+  - type: textarea
+    id: task
+    attributes:
+      label: Task
+      description: Description of the task at hand
+      placeholder: Update ESLint config, change test runner, etc...
+    validations:
+      required: true

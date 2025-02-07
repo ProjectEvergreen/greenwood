@@ -1,0 +1,32 @@
+name: ✨ Enhancement
+description: Improve an existing feature in Greenwood
+title: "Refactor Feature x to use..."
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for wanting to improve Greenwood!
+  - type: textarea
+    id: current-state
+    attributes:
+      label: Current State
+      description: Please provide a summary of the current state of a feature or capability of Greenwood.
+      placeholder: Currently feature x works like this...
+    validations:
+      required: true
+  - type: textarea
+    id: desired-state
+    attributes:
+      label: Desired State
+      description: Describe what the desired state could look like. 
+      placeholder: Feature x could work like this instead...
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Please provide any additional details, links, or resources that may be helpful for consideration of this enhancement.
+    validations:
+      required: false

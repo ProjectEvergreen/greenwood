@@ -1,0 +1,43 @@
+name: 🐛 Bug Report
+description: File a bug report.
+title: "Description of the issue"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Please provide a summary of the issue or error you are seeing.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to reproduce
+      description: Please provide a set of steps to reproduce the issue and ideally a link to a minimal reproduction.
+      placeholder: |
+        1. I installed x
+        2. I added y
+        3. I ran z
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Please provide details of the environment your running in.
+      placeholder: Greenwood version, operating system, runtime version, browser, etc
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Please provide any additional relevant details, screenshots, links, or resources that would be helpful.
+    validations:
+      required: false
