@@ -19,7 +19,7 @@ body:
     id: Motivation
     attributes:
       label: Technical Design
-      description: Detail usage within a Greenwood project and the API design you have in mind. 
+      description: Detail usage within a Greenwood project and the API design you have in mind.
       placeholder: I want to use the feature like this...
     validations:
       required: true
