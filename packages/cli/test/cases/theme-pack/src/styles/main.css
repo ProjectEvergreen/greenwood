@@ -1,4 +1,4 @@
-@import './theme.css';
+@import "./theme.css";
 
 :root {
   color: var(--color-text-primary);

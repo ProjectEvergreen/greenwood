@@ -1,3 +1,3 @@
 export default {
-  optimization: 'loremipsum'
+  optimization: "loremipsum",
 };

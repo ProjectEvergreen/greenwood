@@ -42,441 +42,534 @@
  *     artists.js
  *     greeting.js
  */
-import chai from 'chai';
-import fs from 'fs/promises';
-import glob from 'glob-promise';
-import { JSDOM } from 'jsdom';
-import path from 'path';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath } from 'url';
-import { normalizePathnameForWindows } from '../../../../cli/src/lib/resource-utils.js';
-import extract from 'extract-zip';
+import chai from "chai";
+import fs from "fs/promises";
+import glob from "glob-promise";
+import { JSDOM } from "jsdom";
+import path from "path";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath } from "url";
+import { normalizePathnameForWindows } from "../../../../cli/src/lib/resource-utils.js";
+import extract from "extract-zip";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Netlify Adapter plugin output';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
-  const netlifyFunctionsOutputUrl = new URL('./netlify/functions/', import.meta.url);
-  const hostname = 'http://www.example.com';
+describe("Build Greenwood With: ", function () {
+  const LABEL = "Netlify Adapter plugin output";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const netlifyFunctionsOutputUrl = new URL("./netlify/functions/", import.meta.url);
+  const hostname = "http://www.example.com";
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-    before(function() {
+  describe(LABEL, function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
     });
 
-    describe('Default Output', function() {
+    describe("Default Output", function () {
       let zipFiles;
       let redirectsFile;
 
-      before(async function() {
-        zipFiles = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip'));
-        redirectsFile = await glob.promise(path.join(outputPath, 'public/_redirects'));
+      before(async function () {
+        zipFiles = await glob.promise(
+          path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "*.zip"),
+        );
+        redirectsFile = await glob.promise(path.join(outputPath, "public/_redirects"));
       });
 
-      it('', function() {
+      it("", function () {
         expect(zipFiles.length).to.be.equal(12);
       });
 
-      it('should output the expected number of serverless function API zip files', function() {
-        expect(zipFiles.filter(file => path.basename(file).startsWith('api-')).length).to.be.equal(6);
+      it("should output the expected number of serverless function API zip files", function () {
+        expect(
+          zipFiles.filter((file) => path.basename(file).startsWith("api-")).length,
+        ).to.be.equal(6);
       });
 
-      it('should output the expected number of serverless function SSR page zip files', function() {
-        expect(zipFiles.filter(file => !path.basename(file).includes('api-')).length).to.be.equal(6);
+      it("should output the expected number of serverless function SSR page zip files", function () {
+        expect(zipFiles.filter((file) => !path.basename(file).includes("api-")).length).to.be.equal(
+          6,
+        );
       });
 
-      it('should output a _redirects file', function() {
+      it("should output a _redirects file", function () {
         expect(redirectsFile.length).to.be.equal(1);
       });
     });
 
-    describe('Greeting API Route adapter', function() {
+    describe("Greeting API Route adapter", function () {
       let apiFunctions;
 
-      before(async function() {
-        apiFunctions = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), 'api-greeting.zip'));
+      before(async function () {
+        apiFunctions = await glob.promise(
+          path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "api-greeting.zip"),
+        );
       });
 
-      it('should output one API route as a serverless function zip file', function() {
+      it("should output one API route as a serverless function zip file", function () {
         expect(apiFunctions.length).to.be.equal(1);
       });
 
-      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const param = 'Greenwood';
-        const name = path.basename(apiFunctions[0]).replace('.zip', '');
+      it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
+        const param = "Greenwood";
+        const name = path.basename(apiFunctions[0]).replace(".zip", "");
 
         await extract(apiFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `${hostname}/api/greeting?name=${param}`,
-          httpMethod: 'GET'
-        }, {});
+        const { handler } = await import(
+          new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
+        );
+        const response = await handler(
+          {
+            rawUrl: `${hostname}/api/greeting?name=${param}`,
+            httpMethod: "GET",
+          },
+          {},
+        );
         const { statusCode, body, headers } = response;
 
         expect(statusCode).to.be.equal(200);
-        expect(headers.get('content-type')).to.be.equal('application/json');
+        expect(headers.get("content-type")).to.be.equal("application/json");
         expect(JSON.parse(body).message).to.be.equal(`Hello ${param}!`);
       });
 
-      it('should not have a shared asset for the card component', async () => {
-        const name = path.basename(apiFunctions[0]).replace('.zip', '');
+      it("should not have a shared asset for the card component", async () => {
+        const name = path.basename(apiFunctions[0]).replace(".zip", "");
 
         await extract(apiFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
 
-        const assets = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), `/${name}/*`));
+        const assets = await glob.promise(
+          path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), `/${name}/*`),
+        );
         const exists = assets.find((asset) => {
-          const name = asset.split('/').pop();
-          return name.startsWith('card') && name.endsWith('.js');
+          const name = asset.split("/").pop();
+          return name.startsWith("card") && name.endsWith(".js");
         });
 
         expect(!!exists).to.equal(false);
       });
     });
 
-    describe('Fragments API Route adapter', function() {
+    describe("Fragments API Route adapter", function () {
       let apiFunctions;
 
-      before(async function() {
-        apiFunctions = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), 'api-fragment.zip'));
+      before(async function () {
+        apiFunctions = await glob.promise(
+          path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "api-fragment.zip"),
+        );
       });
 
-      it('should output one API route as a serverless function zip file', function() {
+      it("should output one API route as a serverless function zip file", function () {
         expect(apiFunctions.length).to.be.equal(1);
       });
 
-      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const param = 'Greenwood';
-        const name = path.basename(apiFunctions[0]).replace('.zip', '');
+      it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
+        const param = "Greenwood";
+        const name = path.basename(apiFunctions[0]).replace(".zip", "");
 
         await extract(apiFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `${hostname}/api/greeting?name=${param}`,
-          httpMethod: 'GET'
-        }, {});
+        const { handler } = await import(
+          new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
+        );
+        const response = await handler(
+          {
+            rawUrl: `${hostname}/api/greeting?name=${param}`,
+            httpMethod: "GET",
+          },
+          {},
+        );
         const { statusCode, body, headers } = response;
         const dom = new JSDOM(body);
-        const cardTags = dom.window.document.querySelectorAll('app-card');
+        const cardTags = dom.window.document.querySelectorAll("app-card");
 
         expect(statusCode).to.be.equal(200);
         expect(cardTags.length).to.be.equal(2);
-        expect(headers.get('content-type')).to.be.equal('text/html');
+        expect(headers.get("content-type")).to.be.equal("text/html");
       });
 
-      it('should have a route chunk', async () => {
-        const name = path.basename(apiFunctions[0]).replace('.zip', '');
+      it("should have a route chunk", async () => {
+        const name = path.basename(apiFunctions[0]).replace(".zip", "");
 
         await extract(apiFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
 
-        const chunks = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), `/${name}/${name.replace('api-', '')}.*.js`));
+        const chunks = await glob.promise(
+          path.join(
+            normalizePathnameForWindows(netlifyFunctionsOutputUrl),
+            `/${name}/${name.replace("api-", "")}.*.js`,
+          ),
+        );
 
         expect(chunks.length).to.equal(1);
       });
     });
 
-    describe('Submit JSON API Route adapter', function() {
+    describe("Submit JSON API Route adapter", function () {
       let apiFunctions;
 
-      before(async function() {
-        apiFunctions = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), 'api-submit-json.zip'));
+      before(async function () {
+        apiFunctions = await glob.promise(
+          path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "api-submit-json.zip"),
+        );
       });
 
-      it('should output one API route as a serverless function zip file', function() {
+      it("should output one API route as a serverless function zip file", function () {
         expect(apiFunctions.length).to.be.equal(1);
       });
 
-      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const param = 'Greenwood';
-        const name = path.basename(apiFunctions[0]).replace('.zip', '');
+      it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
+        const param = "Greenwood";
+        const name = path.basename(apiFunctions[0]).replace(".zip", "");
 
         await extract(apiFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `${hostname}/api/submit-json`,
-          body: { name: param },
-          httpMethod: 'POST',
-          headers: {
-            'content-type': 'application/json'
-          }
-        }, {});
+        const { handler } = await import(
+          new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
+        );
+        const response = await handler(
+          {
+            rawUrl: `${hostname}/api/submit-json`,
+            body: { name: param },
+            httpMethod: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+          },
+          {},
+        );
         const { statusCode, body, headers } = response;
 
         expect(statusCode).to.be.equal(200);
         expect(JSON.parse(body).message).to.be.equal(`Thank you ${param} for your submission!`);
-        expect(headers.get('Content-Type')).to.be.equal('application/json');
-        expect(headers.get('x-secret')).to.be.equal('1234');
+        expect(headers.get("Content-Type")).to.be.equal("application/json");
+        expect(headers.get("x-secret")).to.be.equal("1234");
       });
     });
 
-    describe('Submit FormData API Route adapter', function() {
+    describe("Submit FormData API Route adapter", function () {
       let apiFunctions;
 
-      before(async function() {
-        apiFunctions = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), 'api-submit-form-data.zip'));
+      before(async function () {
+        apiFunctions = await glob.promise(
+          path.join(
+            normalizePathnameForWindows(netlifyFunctionsOutputUrl),
+            "api-submit-form-data.zip",
+          ),
+        );
       });
 
-      it('should output one API route as a serverless function zip file', function() {
+      it("should output one API route as a serverless function zip file", function () {
         expect(apiFunctions.length).to.be.equal(1);
       });
 
-      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const param = 'Greenwood';
-        const name = path.basename(apiFunctions[0]).replace('.zip', '');
+      it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
+        const param = "Greenwood";
+        const name = path.basename(apiFunctions[0]).replace(".zip", "");
 
         await extract(apiFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `${hostname}/api/submit-form-data`,
-          body: `name=${param}`,
-          httpMethod: 'POST',
-          headers: {
-            'content-type': 'application/x-www-form-urlencoded'
-          }
-        }, {});
+        const { handler } = await import(
+          new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
+        );
+        const response = await handler(
+          {
+            rawUrl: `${hostname}/api/submit-form-data`,
+            body: `name=${param}`,
+            httpMethod: "POST",
+            headers: {
+              "content-type": "application/x-www-form-urlencoded",
+            },
+          },
+          {},
+        );
         const { statusCode, body, headers } = response;
 
         expect(statusCode).to.be.equal(200);
         expect(body).to.be.equal(`Thank you ${param} for your submission!`);
-        expect(headers.get('Content-Type')).to.be.equal('text/html');
+        expect(headers.get("Content-Type")).to.be.equal("text/html");
       });
     });
 
-    describe('Search API Route adapter', function() {
+    describe("Search API Route adapter", function () {
       let apiFunctions;
 
-      before(async function() {
-        apiFunctions = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), 'api-search.zip'));
+      before(async function () {
+        apiFunctions = await glob.promise(
+          path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "api-search.zip"),
+        );
       });
 
-      it('should output one API route as a serverless function zip file', function() {
+      it("should output one API route as a serverless function zip file", function () {
         expect(apiFunctions.length).to.be.equal(1);
       });
 
-      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const param = 'Analog';
-        const name = path.basename(apiFunctions[0]).replace('.zip', '');
+      it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
+        const param = "Analog";
+        const name = path.basename(apiFunctions[0]).replace(".zip", "");
 
         await extract(apiFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `${hostname}/api/search`,
-          body: `term=${param}`,
-          httpMethod: 'POST',
-          headers: {
-            'content-type': 'application/x-www-form-urlencoded'
-          }
-        }, {});
+        const { handler } = await import(
+          new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
+        );
+        const response = await handler(
+          {
+            rawUrl: `${hostname}/api/search`,
+            body: `term=${param}`,
+            httpMethod: "POST",
+            headers: {
+              "content-type": "application/x-www-form-urlencoded",
+            },
+          },
+          {},
+        );
         const { statusCode, body, headers } = response;
         const dom = new JSDOM(body);
-        const cardTags = dom.window.document.querySelectorAll('app-card');
+        const cardTags = dom.window.document.querySelectorAll("app-card");
 
         expect(statusCode).to.be.equal(200);
-        expect(headers.get('content-type')).to.be.equal('text/html');
+        expect(headers.get("content-type")).to.be.equal("text/html");
 
         expect(cardTags.length).to.be.equal(1);
       });
     });
 
-    describe('Nested API Route adapter', function() {
+    describe("Nested API Route adapter", function () {
       let apiFunctions;
 
-      before(async function() {
-        apiFunctions = await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), 'api-nested-endpoint.zip'));
+      before(async function () {
+        apiFunctions = await glob.promise(
+          path.join(
+            normalizePathnameForWindows(netlifyFunctionsOutputUrl),
+            "api-nested-endpoint.zip",
+          ),
+        );
       });
 
-      it('should output one API route as a serverless function zip file', function() {
+      it("should output one API route as a serverless function zip file", function () {
         expect(apiFunctions.length).to.be.equal(1);
       });
 
-      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const name = path.basename(apiFunctions[0]).replace('.zip', '');
+      it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
+        const name = path.basename(apiFunctions[0]).replace(".zip", "");
 
         await extract(apiFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `${hostname}/api/nested/endpoint`,
-          httpMethod: 'GET'
-        }, {});
+        const { handler } = await import(
+          new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
+        );
+        const response = await handler(
+          {
+            rawUrl: `${hostname}/api/nested/endpoint`,
+            httpMethod: "GET",
+          },
+          {},
+        );
         const { statusCode, body, headers } = response;
 
         expect(statusCode).to.be.equal(200);
-        expect(headers.get('content-type')).to.be.equal('text/html');
+        expect(headers.get("content-type")).to.be.equal("text/html");
 
-        expect(body).to.be.equal('I am a nested API route!');
+        expect(body).to.be.equal("I am a nested API route!");
       });
     });
 
-    describe('Index (collision testing) SSR Page adapter', function() {
+    describe("Index (collision testing) SSR Page adapter", function () {
       let pageFunctions;
 
-      before(async function() {
-        pageFunctions = (await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip')))
-          .filter(zipFile => path.basename(zipFile) === 'index.zip');
+      before(async function () {
+        pageFunctions = (
+          await glob.promise(
+            path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "*.zip"),
+          )
+        ).filter((zipFile) => path.basename(zipFile) === "index.zip");
       });
 
-      it('should output one SSR page as a serverless function zip file', function() {
+      it("should output one SSR page as a serverless function zip file", function () {
         expect(pageFunctions.length).to.be.equal(1);
       });
 
-      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const name = path.basename(pageFunctions[0]).replace('.zip', '');
+      it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
+        const name = path.basename(pageFunctions[0]).replace(".zip", "");
 
         await extract(pageFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `${hostname}/`,
-          httpMethod: 'GET'
-        }, {});
+        const { handler } = await import(
+          new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
+        );
+        const response = await handler(
+          {
+            rawUrl: `${hostname}/`,
+            httpMethod: "GET",
+          },
+          {},
+        );
         const { statusCode, body, headers } = response;
         const dom = new JSDOM(body);
 
-        const headings = dom.window.document.querySelectorAll('body > h1');
+        const headings = dom.window.document.querySelectorAll("body > h1");
 
         expect(statusCode).to.be.equal(200);
-        expect(headers.get('content-type')).to.be.equal('text/html');
+        expect(headers.get("content-type")).to.be.equal("text/html");
 
         expect(headings.length).to.be.equal(1);
-        expect(headings[0].textContent).to.be.equal('Just here causing trouble! :D');
+        expect(headings[0].textContent).to.be.equal("Just here causing trouble! :D");
       });
     });
 
-    describe('Artists SSR Page adapter', function() {
+    describe("Artists SSR Page adapter", function () {
       const count = 2;
       let pageFunctions;
 
-      before(async function() {
-        pageFunctions = (await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip')))
-          .filter(zipFile => path.basename(zipFile).startsWith('artists'));
+      before(async function () {
+        pageFunctions = (
+          await glob.promise(
+            path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "*.zip"),
+          )
+        ).filter((zipFile) => path.basename(zipFile).startsWith("artists"));
       });
 
-      it('should output one SSR page as a serverless function zip file', function() {
+      it("should output one SSR page as a serverless function zip file", function () {
         expect(pageFunctions.length).to.be.equal(1);
       });
 
-      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const name = path.basename(pageFunctions[0]).replace('.zip', '');
+      it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
+        const name = path.basename(pageFunctions[0]).replace(".zip", "");
 
         await extract(pageFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `${hostname}/artists/`,
-          httpMethod: 'GET'
-        }, {});
+        const { handler } = await import(
+          new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
+        );
+        const response = await handler(
+          {
+            rawUrl: `${hostname}/artists/`,
+            httpMethod: "GET",
+          },
+          {},
+        );
         const { statusCode, body, headers } = response;
         const dom = new JSDOM(body);
-        const cardTags = dom.window.document.querySelectorAll('body > app-card');
-        const headings = dom.window.document.querySelectorAll('body > h1');
+        const cardTags = dom.window.document.querySelectorAll("body > app-card");
+        const headings = dom.window.document.querySelectorAll("body > h1");
 
         expect(statusCode).to.be.equal(200);
-        expect(headers.get('content-type')).to.be.equal('text/html');
+        expect(headers.get("content-type")).to.be.equal("text/html");
         expect(cardTags.length).to.be.equal(count);
         expect(headings.length).to.be.equal(1);
         expect(headings[0].textContent).to.be.equal(`List of Artists: ${count}`);
       });
     });
 
-    describe('Users SSR Page adapter', function() {
+    describe("Users SSR Page adapter", function () {
       let pageFunctions;
 
-      before(async function() {
-        pageFunctions = (await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip')))
-          .filter(zipFile => path.basename(zipFile).startsWith('users'));
+      before(async function () {
+        pageFunctions = (
+          await glob.promise(
+            path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "*.zip"),
+          )
+        ).filter((zipFile) => path.basename(zipFile).startsWith("users"));
       });
 
-      it('should output one SSR page as a serverless function zip file', function() {
+      it("should output one SSR page as a serverless function zip file", function () {
         expect(pageFunctions.length).to.be.equal(1);
       });
 
-      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const name = path.basename(pageFunctions[0]).replace('.zip', '');
+      it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
+        const name = path.basename(pageFunctions[0]).replace(".zip", "");
         const count = 1;
 
         await extract(pageFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `${hostname}/users/`,
-          httpMethod: 'GET'
-        }, {});
+        const { handler } = await import(
+          new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
+        );
+        const response = await handler(
+          {
+            rawUrl: `${hostname}/users/`,
+            httpMethod: "GET",
+          },
+          {},
+        );
         const { statusCode, body, headers } = response;
         const dom = new JSDOM(body);
-        const cardTags = dom.window.document.querySelectorAll('body > app-card');
-        const headings = dom.window.document.querySelectorAll('body > h1');
+        const cardTags = dom.window.document.querySelectorAll("body > app-card");
+        const headings = dom.window.document.querySelectorAll("body > h1");
 
         expect(statusCode).to.be.equal(200);
-        expect(headers.get('content-type')).to.be.equal('text/html');
+        expect(headers.get("content-type")).to.be.equal("text/html");
         expect(cardTags.length).to.be.equal(count);
         expect(headings.length).to.be.equal(1);
         expect(headings[0].textContent).to.be.equal(`List of Users: ${count}`);
       });
     });
 
-    describe('Post SSR Page adapter', function() {
+    describe("Post SSR Page adapter", function () {
       let pageFunctions;
 
-      before(async function() {
-        pageFunctions = (await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip')))
-          .filter(zipFile => path.basename(zipFile).startsWith('post'));
+      before(async function () {
+        pageFunctions = (
+          await glob.promise(
+            path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "*.zip"),
+          )
+        ).filter((zipFile) => path.basename(zipFile).startsWith("post"));
       });
 
-      it('should output one SSR page as a serverless function zip file', function() {
+      it("should output one SSR page as a serverless function zip file", function () {
         expect(pageFunctions.length).to.be.equal(1);
       });
 
-      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const name = path.basename(pageFunctions[0]).replace('.zip', '');
+      it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
+        const name = path.basename(pageFunctions[0]).replace(".zip", "");
         const postId = 1;
 
         await extract(pageFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `${hostname}/post/?id=${postId}`,
-          httpMethod: 'GET'
-        }, {});
+        const { handler } = await import(
+          new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
+        );
+        const response = await handler(
+          {
+            rawUrl: `${hostname}/post/?id=${postId}`,
+            httpMethod: "GET",
+          },
+          {},
+        );
 
         const { statusCode, body, headers } = response;
         const dom = new JSDOM(body);
-        const headingOne = dom.window.document.querySelectorAll('body > h1');
-        const headingTwo = dom.window.document.querySelectorAll('body > h2');
-        const paragraph = dom.window.document.querySelectorAll('body > p');
+        const headingOne = dom.window.document.querySelectorAll("body > h1");
+        const headingTwo = dom.window.document.querySelectorAll("body > h2");
+        const paragraph = dom.window.document.querySelectorAll("body > p");
 
         expect(statusCode).to.be.equal(200);
-        expect(headers.get('content-type')).to.be.equal('text/html');
+        expect(headers.get("content-type")).to.be.equal("text/html");
 
         expect(headingOne.length).to.be.equal(1);
         expect(headingTwo.length).to.be.equal(1);
@@ -488,106 +581,121 @@ describe('Build Greenwood With: ', function() {
       });
     });
 
-    describe('Blog Index (collision test) SSR Page adapter', function() {
+    describe("Blog Index (collision test) SSR Page adapter", function () {
       let pageFunctions;
 
-      before(async function() {
-        pageFunctions = (await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip')))
-          .filter(zipFile => path.basename(zipFile).startsWith('blog-index'));
+      before(async function () {
+        pageFunctions = (
+          await glob.promise(
+            path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "*.zip"),
+          )
+        ).filter((zipFile) => path.basename(zipFile).startsWith("blog-index"));
       });
 
-      it('should output one SSR page as a serverless function zip file', function() {
+      it("should output one SSR page as a serverless function zip file", function () {
         expect(pageFunctions.length).to.be.equal(1);
       });
 
-      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const name = path.basename(pageFunctions[0]).replace('.zip', '');
+      it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
+        const name = path.basename(pageFunctions[0]).replace(".zip", "");
 
         await extract(pageFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `${hostname}/blog/`,
-          httpMethod: 'GET'
-        }, {});
+        const { handler } = await import(
+          new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
+        );
+        const response = await handler(
+          {
+            rawUrl: `${hostname}/blog/`,
+            httpMethod: "GET",
+          },
+          {},
+        );
 
         const { statusCode, body, headers } = response;
         const dom = new JSDOM(body);
-        const headingOne = dom.window.document.querySelectorAll('body > h1');
+        const headingOne = dom.window.document.querySelectorAll("body > h1");
 
         expect(statusCode).to.be.equal(200);
-        expect(headers.get('content-type')).to.be.equal('text/html');
+        expect(headers.get("content-type")).to.be.equal("text/html");
 
         expect(headingOne.length).to.be.equal(1);
 
-        expect(headingOne[0].textContent).to.be.equal('nested SSR page should work!');
+        expect(headingOne[0].textContent).to.be.equal("nested SSR page should work!");
       });
     });
 
-    describe('Blog First Post (nested page) SSR Page adapter', function() {
+    describe("Blog First Post (nested page) SSR Page adapter", function () {
       let pageFunctions;
 
-      before(async function() {
-        pageFunctions = (await glob.promise(path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), '*.zip')))
-          .filter(zipFile => path.basename(zipFile).startsWith('blog-first-post'));
+      before(async function () {
+        pageFunctions = (
+          await glob.promise(
+            path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "*.zip"),
+          )
+        ).filter((zipFile) => path.basename(zipFile).startsWith("blog-first-post"));
       });
 
-      it('should output one SSR page as a serverless function zip file', function() {
+      it("should output one SSR page as a serverless function zip file", function () {
         expect(pageFunctions.length).to.be.equal(1);
       });
 
-      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
-        const name = path.basename(pageFunctions[0]).replace('.zip', '');
+      it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
+        const name = path.basename(pageFunctions[0]).replace(".zip", "");
 
         await extract(pageFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name)
+          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
         });
-        const { handler } = await import(new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl));
-        const response = await handler({
-          rawUrl: `${hostname}/blog/first-post/`,
-          httpMethod: 'GET'
-        }, {});
+        const { handler } = await import(
+          new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
+        );
+        const response = await handler(
+          {
+            rawUrl: `${hostname}/blog/first-post/`,
+            httpMethod: "GET",
+          },
+          {},
+        );
 
         const { statusCode, body, headers } = response;
         const dom = new JSDOM(body);
-        const headingOne = dom.window.document.querySelectorAll('body > h1');
+        const headingOne = dom.window.document.querySelectorAll("body > h1");
 
         expect(statusCode).to.be.equal(200);
-        expect(headers.get('content-type')).to.be.equal('text/html');
+        expect(headers.get("content-type")).to.be.equal("text/html");
 
         expect(headingOne.length).to.be.equal(1);
 
-        expect(headingOne[0].textContent).to.be.equal('Nested SSR First Post page should work!');
+        expect(headingOne[0].textContent).to.be.equal("Nested SSR First Post page should work!");
       });
     });
 
-    describe('_redirects file contents', function() {
+    describe("_redirects file contents", function () {
       let redirectsFileContents;
 
-      before(async function() {
-        redirectsFileContents = await fs.readFile(path.join(outputPath, 'public/_redirects'), 'utf-8');
+      before(async function () {
+        redirectsFileContents = await fs.readFile(
+          path.join(outputPath, "public/_redirects"),
+          "utf-8",
+        );
       });
 
-      it('should return the expected response when the serverless adapter entry point handler is invoked', async function() {
+      it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         expect(redirectsFileContents).to.be.equal(
-`/artists/ /.netlify/functions/artists 200
+          `/artists/ /.netlify/functions/artists 200
 /blog/first-post/ /.netlify/functions/blog-first-post 200
 /blog/ /.netlify/functions/blog-index 200
 / /.netlify/functions/index 200
 /post/ /.netlify/functions/post 200
 /users/ /.netlify/functions/users 200
-/api/* /.netlify/functions/api-:splat 200`
+/api/* /.netlify/functions/api-:splat 200`,
         );
       });
     });
   });
 
-  after(function() {
-    runner.teardown([
-      path.join(outputPath, 'netlify'),
-      ...getOutputTeardownFiles(outputPath)
-    ]);
+  after(function () {
+    runner.teardown([path.join(outputPath, "netlify"), ...getOutputTeardownFiles(outputPath)]);
   });
-
 });

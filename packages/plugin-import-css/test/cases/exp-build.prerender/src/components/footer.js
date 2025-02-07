@@ -1,4 +1,4 @@
-import css from './footer.css';
+import css from "./footer.css";
 
 export default class FooterComponent extends HTMLElement {
   connectedCallback() {
@@ -22,4 +22,4 @@ export default class FooterComponent extends HTMLElement {
   }
 }
 
-customElements.define('app-footer', FooterComponent);
+customElements.define("app-footer", FooterComponent);

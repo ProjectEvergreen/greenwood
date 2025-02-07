@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 // https://stackoverflow.com/a/26038979
 function copyFileSync(source, target) {
@@ -40,6 +40,4 @@ function copyFolderRecursiveSync(source, target) {
   }
 }
 
-export {
-  copyFolderRecursiveSync as copyFolder
-};
+export { copyFolderRecursiveSync as copyFolder };

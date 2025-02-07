@@ -23,146 +23,149 @@
  *     app.html
  *     page.html
  */
-import fs from 'fs';
-import { JSDOM } from 'jsdom';
-import path from 'path';
-import chai from 'chai';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import fs from "fs";
+import { JSDOM } from "jsdom";
+import path from "path";
+import chai from "chai";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Custom Meta Tags and Nested Workspace';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+describe("Build Greenwood With: ", function () {
+  const LABEL = "Custom Meta Tags and Nested Workspace";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-    before(function() {
+  describe(LABEL, function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(['public', 'index'], LABEL);
+    runSmokeTest(["public", "index"], LABEL);
 
-    describe('Index (home) page with custom meta data', function() {
+    describe("Index (home) page with custom meta data", function () {
       let dom;
       let graph;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
-        graph = JSON.parse(await fs.promises.readFile(path.join(this.context.publicDir, 'graph.json'), 'utf-8'));
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+        graph = JSON.parse(
+          await fs.promises.readFile(path.join(this.context.publicDir, "graph.json"), "utf-8"),
+        );
       });
 
-      it('should have the correct custom label from frontmatter for an index page in the graph', function() {
-        const home = graph.filter(page => page.route === '/');
+      it("should have the correct custom label from frontmatter for an index page in the graph", function () {
+        const home = graph.filter((page) => page.route === "/");
 
         expect(home.length).to.be.equal(1);
-        expect(home[0].label).to.be.equal('Home');
+        expect(home[0].label).to.be.equal("Home");
       });
 
-      it('should have a <title> tag in the <head>', function() {
-        const title = dom.window.document.querySelector('head title').textContent;
+      it("should have a <title> tag in the <head>", function () {
+        const title = dom.window.document.querySelector("head title").textContent;
 
-        expect(title).to.be.equal('My Custom Greenwood App');
+        expect(title).to.be.equal("My Custom Greenwood App");
       });
 
-      it('should have the expected heading text within the index page in the public directory', function() {
-        const indexPageHeading = 'Greenwood';
-        const heading = dom.window.document.querySelector('h3').textContent;
+      it("should have the expected heading text within the index page in the public directory", function () {
+        const indexPageHeading = "Greenwood";
+        const heading = dom.window.document.querySelector("h3").textContent;
 
         expect(heading).to.equal(indexPageHeading);
       });
 
-      it('should have the expected paragraph text within the index page in the public directory', function() {
-        const indexPageBody = 'This is the home page built by Greenwood. Make your own pages in src/pages/index.js!';
-        const paragraph = dom.window.document.querySelector('p').textContent;
+      it("should have the expected paragraph text within the index page in the public directory", function () {
+        const indexPageBody =
+          "This is the home page built by Greenwood. Make your own pages in src/pages/index.js!";
+        const paragraph = dom.window.document.querySelector("p").textContent;
 
         expect(paragraph).to.equal(indexPageBody);
       });
 
-      it('should have a <meta> tag with custom og:site content in the <head>', function() {
+      it("should have a <meta> tag with custom og:site content in the <head>", function () {
         const metaElement = dom.window.document.querySelector('head meta[property="og:site"');
 
-        expect(metaElement.getAttribute('content')).to.be.equal('The Greenhouse I/O');
+        expect(metaElement.getAttribute("content")).to.be.equal("The Greenhouse I/O");
       });
 
-      it('should have a <meta> tag with custom og:url content in the <head>', function() {
+      it("should have a <meta> tag with custom og:url content in the <head>", function () {
         const metaElement = dom.window.document.querySelector('head meta[property="og:url"]');
 
-        expect(metaElement.getAttribute('content')).to.be.equal('https://www.thegreenhouse.io');
+        expect(metaElement.getAttribute("content")).to.be.equal("https://www.thegreenhouse.io");
       });
 
-      it('should have a <meta> tag with custom twitter:site content in the <head>', function() {
+      it("should have a <meta> tag with custom twitter:site content in the <head>", function () {
         const metaElement = dom.window.document.querySelector('head meta[property="twitter:site"]');
 
-        expect(metaElement.getAttribute('content')).to.be.equal('@thegreenhouseio');
+        expect(metaElement.getAttribute("content")).to.be.equal("@thegreenhouseio");
       });
     });
 
-    describe('Nested About page meta data', function() {
+    describe("Nested About page meta data", function () {
       let dom;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'about', './index.html'));
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "about", "./index.html"));
       });
 
-      it('should output an index.html file within the about page directory', function() {
-        expect(fs.existsSync(path.join(this.context.publicDir, 'about', './index.html'))).to.be.true;
+      it("should output an index.html file within the about page directory", function () {
+        expect(fs.existsSync(path.join(this.context.publicDir, "about", "./index.html"))).to.be
+          .true;
       });
 
-      it('should have a <meta> tag with custom og:site content in the <head>', function() {
+      it("should have a <meta> tag with custom og:site content in the <head>", function () {
         const metaElement = dom.window.document.querySelector('head meta[property="og:site"');
 
-        expect(metaElement.getAttribute('content')).to.be.equal('The Greenhouse I/O');
+        expect(metaElement.getAttribute("content")).to.be.equal("The Greenhouse I/O");
       });
 
-      it('should have a <meta> tag with custom og:url content in the <head>', function() {
+      it("should have a <meta> tag with custom og:url content in the <head>", function () {
         const metaElement = dom.window.document.querySelector('head meta[property="og:url"]');
 
-        expect(metaElement.getAttribute('content')).to.be.equal('https://www.thegreenhouse.io');
+        expect(metaElement.getAttribute("content")).to.be.equal("https://www.thegreenhouse.io");
       });
 
-      it('should have a <meta> tag with custom twitter:site content in the <head>', function() {
+      it("should have a <meta> tag with custom twitter:site content in the <head>", function () {
         const metaElement = dom.window.document.querySelector('head meta[property="twitter:site"]');
 
-        expect(metaElement.getAttribute('content')).to.be.equal('@thegreenhouseio');
+        expect(metaElement.getAttribute("content")).to.be.equal("@thegreenhouseio");
       });
     });
 
-    describe('favicon', function() {
+    describe("favicon", function () {
       let dom;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
       });
 
-      it('should have our custom config <link> tag with shortcut icon in the <head> for the index page', function() {
+      it("should have our custom config <link> tag with shortcut icon in the <head> for the index page", function () {
         const linkElement = dom.window.document.querySelector('head link[rel="shortcut icon"]');
 
-        expect(linkElement.getAttribute('href')).to.be.equal('/assets/images/favicon.ico');
+        expect(linkElement.getAttribute("href")).to.be.equal("/assets/images/favicon.ico");
       });
 
-      it('should have our custom config <link> tag with icon in the <head> for the index page', function() {
+      it("should have our custom config <link> tag with icon in the <head> for the index page", function () {
         const linkElement = dom.window.document.querySelector('head link[rel="icon"]');
 
-        expect(linkElement.getAttribute('href')).to.be.equal('/assets/images/favicon.ico');
+        expect(linkElement.getAttribute("href")).to.be.equal("/assets/images/favicon.ico");
       });
     });
   });
 
-  after(function() {
+  after(function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
-
 });

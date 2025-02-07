@@ -1,21 +1,21 @@
-import { css, html, LitElement, unsafeCSS } from 'lit';
-import bannerCss from './banner.css?type=raw';
-import buttonCss from './button.css?type=raw';
-import './eve-button.js';
+import { css, html, LitElement, unsafeCSS } from "lit";
+import bannerCss from "./banner.css?type=raw";
+import buttonCss from "./button.css?type=raw";
+import "./eve-button.js";
 
 class Banner extends LitElement {
   constructor() {
     super();
 
     this.currentProjectIndex = 0;
-    this.animateState = 'on';
+    this.animateState = "on";
     this.projectTypes = [
-      'blog',
-      'portfolio',
-      'website',
-      'web app',
-      'marketing site',
-      'small business'
+      "blog",
+      "portfolio",
+      "website",
+      "web app",
+      "marketing site",
+      "small business",
     ];
   }
 
@@ -35,12 +35,12 @@ class Banner extends LitElement {
 
   firstUpdated() {
     setInterval(() => {
-      this.animateState = 'off';
+      this.animateState = "off";
       this.update();
 
       setTimeout(() => {
         this.cycleProjectTypes();
-        this.animateState = 'on';
+        this.animateState = "on";
         this.update();
       }, 500);
     }, 5000);
@@ -50,21 +50,30 @@ class Banner extends LitElement {
     const currentProjectType = this.projectTypes[this.currentProjectIndex];
 
     return html`
-      <div class='banner'>
+      <div class="banner">
         <eve-container>
-          <div class='content'>
+          <div class="content">
             <img
               src="/assets/greenwood-logo-300w.webp"
               alt="Greenwood Logo"
-              srcset="/assets/greenwood-logo-300w.webp 350w,
-                      /assets/greenwood-logo-500w.webp 500w,
-                      /assets/greenwood-logo-750w.webp 750w,
-                      /assets/greenwood-logo-1000w.webp 1000w,
-                      /assets/greenwood-logo-1500w.webp 1500w"/>
-            
-            <h3>Your full stack <span class="emphasis-text">workbench for the web</span>.  Ready to help you build your next. . . <span class="${this.animateState}">${currentProjectType}.</span></h3>
+              srcset="
+                /assets/greenwood-logo-300w.webp   350w,
+                /assets/greenwood-logo-500w.webp   500w,
+                /assets/greenwood-logo-750w.webp   750w,
+                /assets/greenwood-logo-1000w.webp 1000w,
+                /assets/greenwood-logo-1500w.webp 1500w
+              "
+            />
 
-            <eve-button size="md" href="/getting-started/" style="${buttonCss}">Get Started</eve-button>
+            <h3>
+              Your full stack <span class="emphasis-text">workbench for the web</span>. Ready to
+              help you build your next. . .
+              <span class="${this.animateState}">${currentProjectType}.</span>
+            </h3>
+
+            <eve-button size="md" href="/getting-started/" style="${buttonCss}"
+              >Get Started</eve-button
+            >
           </div>
         </eve-container>
       </div>
@@ -72,4 +81,4 @@ class Banner extends LitElement {
   }
 }
 
-customElements.define('app-banner', Banner);
+customElements.define("app-banner", Banner);

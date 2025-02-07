@@ -1,5 +1,3 @@
-export default class CopyToClipboardBlock extends HTMLElement {
+export default class CopyToClipboardBlock extends HTMLElement {}
 
-}
-
-customElements.define('x-ctc', CopyToClipboardBlock);
+customElements.define("x-ctc", CopyToClipboardBlock);

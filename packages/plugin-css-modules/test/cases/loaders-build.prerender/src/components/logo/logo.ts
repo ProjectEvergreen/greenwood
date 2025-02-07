@@ -1,6 +1,8 @@
-import styles from './logo.module.css';
+import styles from "./logo.module.css";
 
-interface Props { title: string }
+interface Props {
+  title: string;
+}
 
 export default class Logo extends HTMLElement {
   connectedCallback() {
@@ -12,4 +14,4 @@ export default class Logo extends HTMLElement {
   }
 }
 
-customElements.define('app-logo', Logo);
+customElements.define("app-logo", Logo);

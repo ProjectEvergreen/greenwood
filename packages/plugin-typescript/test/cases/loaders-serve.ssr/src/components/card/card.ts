@@ -1,18 +1,17 @@
-import { styles } from './styles.ts';
+import { styles } from "./styles.ts";
 
-const fallbackImage = new URL('./logo.png', import.meta.url);
+const fallbackImage = new URL("./logo.png", import.meta.url);
 
 export default class Card extends HTMLElement {
-
   selectItem() {
-    alert(`selected item is => ${this.getAttribute('title')}!`);
+    alert(`selected item is => ${this.getAttribute("title")}!`);
   }
 
   connectedCallback() {
     if (!this.shadowRoot) {
-      const thumbnail: String = this.getAttribute('thumbnail') || fallbackImage.href;
-      const title: String = this.getAttribute('title');
-      const template: any = document.createElement('template');
+      const thumbnail: String = this.getAttribute("thumbnail") || fallbackImage.href;
+      const title: String = this.getAttribute("title");
+      const template: any = document.createElement("template");
 
       template.innerHTML = `
         <style>
@@ -24,10 +23,10 @@ export default class Card extends HTMLElement {
           <button onclick="this.parentNode.parentNode.host.selectItem()">View Item Details</button>
         </div>
       `;
-      this.attachShadow({ mode: 'open' });
+      this.attachShadow({ mode: "open" });
       this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
   }
 }
 
-customElements.define('app-card', Card);
+customElements.define("app-card", Card);

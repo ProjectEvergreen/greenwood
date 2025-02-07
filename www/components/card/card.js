@@ -1,8 +1,7 @@
-import { css, html, LitElement, unsafeCSS } from 'lit';
-import cardCss from './card.css?type=raw';
+import { css, html, LitElement, unsafeCSS } from "lit";
+import cardCss from "./card.css?type=raw";
 
 class Card extends LitElement {
-
   static get styles() {
     return css`
       ${unsafeCSS(cardCss)}
@@ -12,14 +11,14 @@ class Card extends LitElement {
   static get properties() {
     return {
       img: {
-        type: String
+        type: String,
       },
       title: {
-        type: String
+        type: String,
       },
       size: {
-        type: String
-      }
+        type: String,
+      },
     };
   }
 
@@ -27,7 +26,7 @@ class Card extends LitElement {
     if (this.img) {
       return html`
         <div class="card-img-top">
-          <img src="${this.img}" alt="${this.title}" loading="lazy"/>
+          <img src="${this.img}" alt="${this.title}" loading="lazy" />
         </div>
       `;
     }
@@ -35,19 +34,16 @@ class Card extends LitElement {
 
   renderTitle() {
     if (this.title) {
-      return html`
-        <h3>${this.title}</h3>
-      `;
+      return html` <h3>${this.title}</h3> `;
     }
   }
 
   render() {
     return html`
-      ${this.renderImage()}
-      ${this.renderTitle()}
+      ${this.renderImage()} ${this.renderTitle()}
       <slot name="cardcontent"></slot>
     `;
   }
 }
 
-customElements.define('app-card', Card);
+customElements.define("app-card", Card);

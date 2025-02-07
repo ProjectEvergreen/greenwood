@@ -13,8 +13,7 @@ const MOCK_GRAPH = {
       label: "order",
       route: "/",
       layout: "home",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/order.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/order.md",
       title: "",
       meta: [
         {
@@ -40,8 +39,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -74,8 +72,7 @@ const MOCK_GRAPH = {
       label: "Community",
       route: "/about/community",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/community.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/community.md",
       title: "Community",
       meta: [
         {
@@ -101,8 +98,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -135,8 +131,7 @@ const MOCK_GRAPH = {
       label: "Features",
       route: "/about/features",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/features.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/features.md",
       title: "Features",
       meta: [
         {
@@ -162,8 +157,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -196,8 +190,7 @@ const MOCK_GRAPH = {
       label: "Goals",
       route: "/about/goals",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/goals.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/goals.md",
       title: "Goals",
       meta: [
         {
@@ -223,8 +216,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -286,8 +278,7 @@ const MOCK_GRAPH = {
       label: "How It Works",
       route: "/about/how-it-works",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/how-it-works.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/how-it-works.md",
       title: "How It Works",
       meta: [
         {
@@ -313,8 +304,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -347,8 +337,7 @@ const MOCK_GRAPH = {
       label: "About",
       route: "/about/",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/order.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/about/order.md",
       title: "About",
       meta: [
         {
@@ -374,8 +363,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -408,8 +396,7 @@ const MOCK_GRAPH = {
       label: "Component Model",
       route: "/docs/component-model",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/component-model.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/component-model.md",
       title: "Component Model",
       meta: [
         {
@@ -435,8 +422,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -540,8 +526,7 @@ const MOCK_GRAPH = {
       label: "Configuration",
       route: "/docs/configuration",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/configuration.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/configuration.md",
       title: "Configuration",
       meta: [
         {
@@ -567,8 +552,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -644,8 +628,7 @@ const MOCK_GRAPH = {
       label: "CSS and Images",
       route: "/docs/css-and-images",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/css-and-images.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/css-and-images.md",
       title: "Styles and Assets",
       meta: [
         {
@@ -671,8 +654,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -846,8 +828,7 @@ const MOCK_GRAPH = {
       label: "Data Sources",
       route: "/docs/data",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/data.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/data.md",
       workspacePath: "data",
       relativeExpectedPath: "'../docs/data/data.js'",
       title: "Data Sources",
@@ -875,8 +856,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -980,8 +960,7 @@ const MOCK_GRAPH = {
       label: "Front Matter",
       route: "/docs/front-matter",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/front-matter.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/front-matter.md",
       title: "Front Matter",
       meta: [
         {
@@ -1007,8 +986,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -1041,8 +1019,7 @@ const MOCK_GRAPH = {
       label: "Docs",
       route: "/docs/",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/order.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/order.md",
       title: "Docs",
       meta: [
         {
@@ -1068,8 +1045,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -1131,8 +1107,7 @@ const MOCK_GRAPH = {
       label: "Layouts",
       route: "/docs/layouts",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/layouts.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/layouts.md",
       title: "Layouts and Pages",
       meta: [
         {
@@ -1158,8 +1133,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -1214,8 +1188,7 @@ const MOCK_GRAPH = {
       label: "Markdown",
       route: "/docs/markdown",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/markdown.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/markdown.md",
       title: "Markdown",
       meta: [
         {
@@ -1241,8 +1214,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -1304,8 +1276,7 @@ const MOCK_GRAPH = {
       label: "collections",
       route: "/docs/collections",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/collections.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/collections.md",
       title: "collections",
       meta: [
         {
@@ -1331,8 +1302,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -1394,8 +1364,7 @@ const MOCK_GRAPH = {
       label: "Tech Stack",
       route: "/docs/tech-stack",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/tech-stack.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/docs/tech-stack.md",
       title: "Tech Stack",
       meta: [
         {
@@ -1421,8 +1390,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -1470,8 +1438,7 @@ const MOCK_GRAPH = {
       label: "Branding",
       route: "/getting-started/branding",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/branding.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/branding.md",
       title: "Styles and Web Components",
       meta: [
         {
@@ -1497,8 +1464,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -1531,8 +1497,7 @@ const MOCK_GRAPH = {
       label: "Build And Deploy",
       route: "/getting-started/build-and-deploy",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/build-and-deploy.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/build-and-deploy.md",
       title: "Build and Deploy",
       meta: [
         {
@@ -1558,8 +1523,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -1628,8 +1592,7 @@ const MOCK_GRAPH = {
       label: "Creating Content",
       route: "/getting-started/creating-content",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/creating-content.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/creating-content.md",
       title: "Creating Content",
       meta: [
         {
@@ -1655,8 +1618,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -1689,8 +1651,7 @@ const MOCK_GRAPH = {
       label: "Getting Started",
       route: "/getting-started/",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/order.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/order.md",
       title: "Getting Started",
       meta: [
         {
@@ -1716,8 +1677,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -1772,8 +1732,7 @@ const MOCK_GRAPH = {
       label: "Key Concepts",
       route: "/getting-started/key-concepts",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/key-concepts.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/key-concepts.md",
       title: "Key Concepts",
       meta: [
         {
@@ -1799,8 +1758,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -1833,8 +1791,7 @@ const MOCK_GRAPH = {
       label: "Next Steps",
       route: "/getting-started/next-steps",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/next-steps.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/next-steps.md",
       title: "Next Steps",
       meta: [
         {
@@ -1860,8 +1817,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -1916,8 +1872,7 @@ const MOCK_GRAPH = {
       label: "Project Setup",
       route: "/getting-started/project-setup",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/project-setup.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/project-setup.md",
       title: "Project Setup",
       meta: [
         {
@@ -1943,8 +1898,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -1977,8 +1931,7 @@ const MOCK_GRAPH = {
       label: "Quick Start",
       route: "/getting-started/quick-start",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/quick-start.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/getting-started/quick-start.md",
       title: "Quick Start",
       meta: [
         {
@@ -2004,8 +1957,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -2038,8 +1990,7 @@ const MOCK_GRAPH = {
       label: "Composite Plugins",
       route: "/plugins/composite-plugins",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/composite-plugins.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/composite-plugins.md",
       title: "Composite Plugins",
       meta: [
         {
@@ -2065,8 +2016,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -2099,8 +2049,7 @@ const MOCK_GRAPH = {
       label: "order Hooks",
       route: "/plugins/order-hooks",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/order-hooks.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/order-hooks.md",
       title: "order Hooks",
       meta: [
         {
@@ -2126,8 +2075,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -2160,8 +2108,7 @@ const MOCK_GRAPH = {
       label: "Plugins",
       route: "/plugins/",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/order.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/order.md",
       title: "Plugins",
       meta: [
         {
@@ -2187,8 +2134,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -2221,8 +2167,7 @@ const MOCK_GRAPH = {
       label: "Webpack",
       route: "/plugins/webpack",
       layout: "page",
-      path:
-        "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/webpack.md",
+      path: "/media/skynet/DATA/workspace/evergreen/greenwood/www/pages/plugins/webpack.md",
       title: "Webpack Plugins",
       meta: [
         {
@@ -2248,8 +2193,7 @@ const MOCK_GRAPH = {
         },
         {
           property: "og:image",
-          content:
-            "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
+          content: "https://s3.amazonaws.com/hosted.greenwoodjs.io/greenwood-logo.png",
         },
         {
           property: "og:description",
@@ -2273,6 +2217,4 @@ const MOCK_GRAPH = {
   ],
 };
 
-export {
-  MOCK_GRAPH
-};
+export { MOCK_GRAPH };

@@ -1,4 +1,4 @@
-const template = document.createElement('template');
+const template = document.createElement("template");
 
 template.innerHTML = `
   <div class="card">
@@ -11,12 +11,12 @@ template.innerHTML = `
 class Card extends HTMLElement {
   connectedCallback() {
     if (!this.shadowRoot) {
-      this.attachShadow({ mode: 'open' });
+      this.attachShadow({ mode: "open" });
       this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
   }
 }
 
-customElements.define('app-card', Card);
+customElements.define("app-card", Card);
 
 export default Card;

@@ -1,7 +1,6 @@
-import { html, LitElement } from 'lit';
+import { html, LitElement } from "lit";
 
 class HeaderComponent extends LitElement {
-
   render() {
     return html`
       <header>
@@ -9,7 +8,6 @@ class HeaderComponent extends LitElement {
       </header>
     `;
   }
-
 }
 
-customElements.define('app-header', HeaderComponent);
+customElements.define("app-header", HeaderComponent);

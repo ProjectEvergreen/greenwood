@@ -1,3 +1,3 @@
 export default {
-  activeContent: true
+  activeContent: true,
 };

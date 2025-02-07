@@ -1,3 +1,3 @@
 export default {
-  pagesDirectory: 'docs'
+  pagesDirectory: "docs",
 };

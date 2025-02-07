@@ -1,12 +1,11 @@
-import sheet from './card.css' with { type: 'css' };
-import data from './card.json' with { type: 'json' };
+import sheet from "./card.css" with { type: "css" };
+import data from "./card.json" with { type: "json" };
 
 export default class Card extends HTMLElement {
-
   connectedCallback() {
     if (!this.shadowRoot) {
-      const name = this.getAttribute('name') || 'World';
-      const template = document.createElement('template');
+      const name = this.getAttribute("name") || "World";
+      const template = document.createElement("template");
 
       template.innerHTML = `
         <div class="card">
@@ -16,7 +15,7 @@ export default class Card extends HTMLElement {
         <hr/>
       `;
 
-      this.attachShadow({ mode: 'open' });
+      this.attachShadow({ mode: "open" });
       this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
 
@@ -24,4 +23,4 @@ export default class Card extends HTMLElement {
   }
 }
 
-customElements.define('app-card', Card);
+customElements.define("app-card", Card);

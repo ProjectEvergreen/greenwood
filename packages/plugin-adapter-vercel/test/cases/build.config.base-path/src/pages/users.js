@@ -1,19 +1,23 @@
 export default class UsersPage extends HTMLElement {
   async connectedCallback() {
-    const users = [{
-      name: 'Foo',
-      thumbnail: 'foo.jpg'
-    }];
-    const html = users.map(user => {
-      const { name, imageUrl } = user;
+    const users = [
+      {
+        name: "Foo",
+        thumbnail: "foo.jpg",
+      },
+    ];
+    const html = users
+      .map((user) => {
+        const { name, imageUrl } = user;
 
-      return `
+        return `
         <article>
           <h2>${name}</h2>
           <img src="${imageUrl}"/>
         </article>
       `;
-    }).join('');
+      })
+      .join("");
 
     this.innerHTML = `
       <a href="/">&lt; Back</a>

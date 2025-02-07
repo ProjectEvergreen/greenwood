@@ -1,7 +1,7 @@
-query($name: String!) {
-  gallery(name: $name)  {
-    name,
-    title,
+query ($name: String!) {
+  gallery(name: $name) {
+    name
+    title
     images {
       path
     }

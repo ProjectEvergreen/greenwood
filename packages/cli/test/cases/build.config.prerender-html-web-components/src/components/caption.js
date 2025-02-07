@@ -8,4 +8,4 @@ export default class Caption extends HTMLElement {
   }
 }
 
-customElements.define('wcc-caption', Caption);
+customElements.define("wcc-caption", Caption);

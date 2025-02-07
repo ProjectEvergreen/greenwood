@@ -1,3 +1,3 @@
 export default {
-  optimization: 'inline'
+  optimization: "inline",
 };

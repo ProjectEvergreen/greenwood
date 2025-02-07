@@ -1,11 +1,14 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { checkResourceExists, normalizePathnameForWindows } from '@greenwood/cli/src/lib/resource-utils.js';
-import { zip } from 'zip-a-folder';
+import fs from "fs/promises";
+import path from "path";
+import {
+  checkResourceExists,
+  normalizePathnameForWindows,
+} from "@greenwood/cli/src/lib/resource-utils.js";
+import { zip } from "zip-a-folder";
 
 // https://docs.netlify.com/functions/create/?fn-language=js
 function generateOutputFormat(id) {
-  const handlerAlias = '$handler';
+  const handlerAlias = "$handler";
 
   return `
     import { handler as ${handlerAlias} } from './${id}.js';
@@ -52,52 +55,54 @@ function generateOutputFormat(id) {
 }
 
 async function setupOutputDirectory(id, outputRoot, outputType) {
-  const entryPoint = outputType === 'api' ? id : `${id}.route`;
-  const filename = outputType === 'api' ? `api-${id}` : id;
+  const entryPoint = outputType === "api" ? id : `${id}.route`;
+  const filename = outputType === "api" ? `api-${id}` : id;
   const outputFormat = generateOutputFormat(entryPoint, outputType);
 
   await fs.mkdir(outputRoot, { recursive: true });
   await fs.writeFile(new URL(`./${filename}.js`, outputRoot), outputFormat);
-  await fs.writeFile(new URL('./package.json', outputRoot), JSON.stringify({
-    type: 'module'
-  }));
+  await fs.writeFile(
+    new URL("./package.json", outputRoot),
+    JSON.stringify({
+      type: "module",
+    }),
+  );
 }
 
 // TODO do we need more manifest options, like node version?
 // https://github.com/netlify/zip-it-and-ship-it#options
 async function createOutputZip(id, outputType, outputRootUrl, projectDirectory) {
-  const filename = outputType === 'api'
-    ? `api-${id}`
-    : id;
+  const filename = outputType === "api" ? `api-${id}` : id;
 
   await zip(
     normalizePathnameForWindows(outputRootUrl),
-    normalizePathnameForWindows(new URL(`./netlify/functions/${filename}.zip`, projectDirectory))
+    normalizePathnameForWindows(new URL(`./netlify/functions/${filename}.zip`, projectDirectory)),
   );
 }
 
 async function netlifyAdapter(compilation) {
   const { outputDir, projectDirectory, scratchDir } = compilation.context;
   const { basePath } = compilation.config;
-  const adapterOutputUrl = new URL('./netlify/functions/', scratchDir);
-  const ssrPages = compilation.graph.filter(page => page.isSSR);
+  const adapterOutputUrl = new URL("./netlify/functions/", scratchDir);
+  const ssrPages = compilation.graph.filter((page) => page.isSSR);
   const apiRoutes = compilation.manifest.apis;
   // https://docs.netlify.com/routing/redirects/
   // https://docs.netlify.com/routing/redirects/rewrites-proxies/
   // When you assign an HTTP status code of 200 to a redirect rule, it becomes a rewrite.
-  let redirects = '';
+  let redirects = "";
 
-  if (!await checkResourceExists(adapterOutputUrl)) {
+  if (!(await checkResourceExists(adapterOutputUrl))) {
     await fs.mkdir(adapterOutputUrl, { recursive: true });
   }
 
-  await fs.mkdir(new URL('./netlify/functions/', projectDirectory), { recursive: true });
+  await fs.mkdir(new URL("./netlify/functions/", projectDirectory), { recursive: true });
 
   for (const page of ssrPages) {
     const { id, outputHref, route } = page;
-    const outputType = 'page';
-    const chunks = (await fs.readdir(outputDir))
-      .filter(file => file.startsWith(`${id}.route.chunk`) && file.endsWith('.js'));
+    const outputType = "page";
+    const chunks = (await fs.readdir(outputDir)).filter(
+      (file) => file.startsWith(`${id}.route.chunk`) && file.endsWith(".js"),
+    );
     const outputRoot = new URL(`./${id}/`, adapterOutputUrl);
 
     await setupOutputDirectory(id, outputRoot, outputType);
@@ -105,17 +110,15 @@ async function netlifyAdapter(compilation) {
     // handle user's actual route entry file
     await fs.cp(
       new URL(outputHref),
-      new URL(`./${outputHref.replace(outputDir.href, '')}`, outputRoot),
-      { recursive: true }
+      new URL(`./${outputHref.replace(outputDir.href, "")}`, outputRoot),
+      { recursive: true },
     );
 
     // and any (URL) chunks for the page
     for (const chunk of chunks) {
-      await fs.cp(
-        new URL(`./${chunk}`, outputDir),
-        new URL(`./${chunk}`, outputRoot),
-        { recursive: true }
-      );
+      await fs.cp(new URL(`./${chunk}`, outputDir), new URL(`./${chunk}`, outputRoot), {
+        recursive: true,
+      });
     }
 
     await createOutputZip(id, outputType, new URL(`./${id}/`, adapterOutputUrl), projectDirectory);
@@ -129,27 +132,19 @@ async function netlifyAdapter(compilation) {
   }
 
   for (const [key, value] of apiRoutes.entries()) {
-    const outputType = 'api';
+    const outputType = "api";
     const { id, outputHref } = apiRoutes.get(key);
     const outputRoot = new URL(`./api/${id}/`, adapterOutputUrl);
     const { assets = [] } = value;
 
     await setupOutputDirectory(id, outputRoot, outputType);
 
-    await fs.cp(
-      new URL(outputHref),
-      new URL(`./${id}.js`, outputRoot),
-      { recursive: true }
-    );
+    await fs.cp(new URL(outputHref), new URL(`./${id}.js`, outputRoot), { recursive: true });
 
     for (const asset of assets) {
       const name = path.basename(asset);
 
-      await fs.cp(
-        new URL(asset),
-        new URL(`./${name}`, outputRoot),
-        { recursive: true }
-      );
+      await fs.cp(new URL(asset), new URL(`./${name}`, outputRoot), { recursive: true });
     }
 
     // NOTE: All functions must live at the top level
@@ -157,19 +152,21 @@ async function netlifyAdapter(compilation) {
     await createOutputZip(id, outputType, outputRoot, projectDirectory);
   }
 
-  if (redirects !== '') {
-    await fs.writeFile(new URL('./_redirects', outputDir), redirects);
+  if (redirects !== "") {
+    await fs.writeFile(new URL("./_redirects", outputDir), redirects);
   }
 }
 
-const greenwoodPluginAdapterNetlify = (options = {}) => [{
-  type: 'adapter',
-  name: 'plugin-adapter-netlify',
-  provider: (compilation) => {
-    return async () => {
-      await netlifyAdapter(compilation, options);
-    };
-  }
-}];
+const greenwoodPluginAdapterNetlify = (options = {}) => [
+  {
+    type: "adapter",
+    name: "plugin-adapter-netlify",
+    provider: (compilation) => {
+      return async () => {
+        await netlifyAdapter(compilation, options);
+      };
+    },
+  },
+];
 
 export { greenwoodPluginAdapterNetlify };

@@ -1,7 +1,5 @@
-import { greenwoodPluginImportJsx } from '../../../src/index.js';
+import { greenwoodPluginImportJsx } from "../../../src/index.js";
 
 export default {
-  plugins: [
-    ...greenwoodPluginImportJsx()
-  ]
+  plugins: [...greenwoodPluginImportJsx()],
 };

@@ -113,6 +113,11 @@ Below are some tips to help with running / debugging tests:
 
 > **PLEASE DO NOT COMMIT ANY OF THESE ABOVE CHANGES THOUGH**
 
+### Code Content Testing
+
+In some cases test may actually check for specific build output contents to confirm certain operations like custom bundling or linking operations within the Greenwood build process worked as expected.  Keep in mind that if you change these contents as part of a test, that when Prettier formatting is run, the results may change and the test cases may fail, so just make sure to double check these contents with formatting applied first.
+
+
 ### Writing Tests
 
 Test cases follow a convention starting with the command (e.g. `build`) and and the capability and features being tested, like configuration with a particular option (e.g. `port`):
@@ -167,7 +172,7 @@ Yarn workspaces will automatically handle installing _node_modules_ in the appro
 
 ### Continuous Integration
 
-Greenwood makes active use [GitHub Actions](https://github.com/features/actions) and [Netlify deploy previews](https://www.netlify.com/blog/2016/07/20/introducing-deploy-previews-in-netlify/) as part of the workflow.  Each time a PR is opened, a sequence of build steps defined _.github/workflows/_ are run for Linux and Windows.
+Greenwood makes active use [GitHub Actions](https://github.com/features/actions) and [Netlify deploy previews](https://www.netlify.com/blog/2016/07/20/introducing-deploy-previews-in-netlify/) as part of the workflow.  Each time a PR is opened, a sequence of build steps defined _.github/workflows/ci.yml_ are run for Linux and Windows including running tests, linting, and formatting.
 
 A deploy preview is also made available within the status checks section of the PR in GitHub and can be used to validate work in a live environment before having to merge.
 
@@ -240,10 +245,10 @@ Our standard issue template requests some of the following information to be pre
 
 Pull requests are the best!  To best help facilitate contributions to the project, here are some requests:
 
-- We generally prefer an issue be opened first, to help facilitate general discussion outside of the code review process itself and align on the ask and any expectations.  However, for typos in docs and minor "chore" like tasks a PR is usually sufficient.  When in doubt, open an issue.
+- We generally prefer an issue be opened first, to help facilitate general discussion outside of the code review process itself and align on the ask and any expectations.  However, for typos in docs and minor "chore" like tasks a PR is usually sufficient.
 - For bugs, please consider reviewing the issue tracker first.
 - For branching, we generally follow the convention `<issue-label>/issue-<number>-<issue-title>`, e.g. _bug/issue-12-fixed-bug-with-yada-yada-yada_
-- To test the CI build scripts locally, run the `yarn` commands mentioned in the below section on CI.
+- To test the CI build scripts locally, run the `yarn` commands mentioned in the section in the Continuous Integration section of this document.  (basically just make sure linting, formatting, and test tasks are all passing)
 
 
 ## Release Management

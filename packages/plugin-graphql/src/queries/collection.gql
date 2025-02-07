@@ -1,12 +1,12 @@
-query($name: String!, $orderBy: CollectionOrderBy) {
+query ($name: String!, $orderBy: CollectionOrderBy) {
   collection(name: $name, orderBy: $orderBy) {
-    id,
-    label,
-    title,
-    route,
-    layout,
+    id
+    label
+    title
+    route
+    layout
     tableOfContents {
-      label,
+      label
       route
     }
   }

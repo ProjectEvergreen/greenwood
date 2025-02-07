@@ -1,14 +1,14 @@
-import sheet from './hero.css' with { type: 'css' };
-import data from './hero.json' with { type: 'json' };
+import sheet from "./hero.css" with { type: "css" };
+import data from "./hero.json" with { type: "json" };
 
 export default class HeroBanner extends HTMLElement {
   clickButton(el) {
-    console.log('clicked button =>', el.textContent);
+    console.log("clicked button =>", el.textContent);
   }
 
   connectedCallback() {
     if (!this.shadowRoot) {
-      const template = document.createElement('template');
+      const template = document.createElement("template");
 
       template.innerHTML = `
         <div class="hero">
@@ -24,7 +24,7 @@ export default class HeroBanner extends HTMLElement {
         </div>
       `;
 
-      this.attachShadow({ mode: 'open' });
+      this.attachShadow({ mode: "open" });
       this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
 
@@ -32,4 +32,4 @@ export default class HeroBanner extends HTMLElement {
   }
 }
 
-customElements.define('app-hero', HeroBanner);
+customElements.define("app-hero", HeroBanner);

@@ -19,7 +19,7 @@ body:
     id: desired-state
     attributes:
       label: Desired State
-      description: Describe what the desired state could look like. 
+      description: Describe what the desired state could look like.
       placeholder: Feature x could work like this instead...
     validations:
       required: true

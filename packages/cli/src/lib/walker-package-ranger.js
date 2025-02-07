@@ -1,16 +1,16 @@
-import fs from 'fs';
-import { isBuiltin } from 'node:module';
+import fs from "fs";
+import { isBuiltin } from "node:module";
 
 // priority if from L -> R
-const SUPPORTED_EXPORT_CONDITIONS = ['import', 'module-sync', 'default'];
-const IMPORT_MAP_RESOLVED_PREFIX = '/~';
+const SUPPORTED_EXPORT_CONDITIONS = ["import", "module-sync", "default"];
+const IMPORT_MAP_RESOLVED_PREFIX = "/~";
 const importMap = new Map();
 const diagnostics = new Map();
 
 function updateImportMap(key, value, resolvedRoot) {
   importMap.set(
-    key.replace('./', ''),
-    `${IMPORT_MAP_RESOLVED_PREFIX}${resolvedRoot.replace('file://', '')}${value.replace('./', '')}`
+    key.replace("./", ""),
+    `${IMPORT_MAP_RESOLVED_PREFIX}${resolvedRoot.replace("file://", "")}${value.replace("./", "")}`,
   );
 }
 
@@ -24,7 +24,10 @@ function resolveBareSpecifier(specifier) {
   try {
     resolvedPath = import.meta.resolve(specifier);
   } catch (e) {
-    diagnostics.set(specifier, `ERROR (${e.code}): unable to resolve specifier => \`${specifier}\`\n${e.message}`);
+    diagnostics.set(
+      specifier,
+      `ERROR (${e.code}): unable to resolve specifier => \`${specifier}\`\n${e.message}`,
+    );
   }
 
   return resolvedPath;
@@ -45,18 +48,20 @@ function derivePackageRoot(resolved) {
   // e.g. packages/some-namespace/package.json
   // so we walk backwards looking for nearest package.json
   const segments = resolved
-    .replace('file://', '')
-    .split('/')
-    .filter(segment => segment !== '')
+    .replace("file://", "")
+    .split("/")
+    .filter((segment) => segment !== "")
     .reverse();
-  let root = resolved.replace(segments[0], '');
+  let root = resolved.replace(segments[0], "");
 
   for (const segment of segments.slice(1)) {
-    if (fs.existsSync(new URL('./package.json', root))) {
+    if (fs.existsSync(new URL("./package.json", root))) {
       // we have to check that this package.json actually has as a name AND version
       // https://github.com/moment/luxon/issues/1543#issuecomment-2546858540
       // https://github.com/ProjectEvergreen/greenwood/issues/1349
-      const resolvedPackageJson = JSON.parse(fs.readFileSync(new URL('./package.json', root), 'utf-8'));
+      const resolvedPackageJson = JSON.parse(
+        fs.readFileSync(new URL("./package.json", root), "utf-8"),
+      );
       const { name, version } = resolvedPackageJson;
 
       if (name && version) {
@@ -69,36 +74,34 @@ function derivePackageRoot(resolved) {
     root = root.substring(0, root.lastIndexOf(segment));
   }
 
-  return root !== ''
-    ? root
-    : null;
+  return root !== "" ? root : null;
 }
 
 // helper function to convert export patterns to a regex (thanks ChatGPT :D)
 function globToRegex(pattern) {
   // Escape special regex characters
-  pattern = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+  pattern = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&");
 
   // Replace glob `*` with regex `[^/]*` (any characters except slashes)
-  pattern = pattern.replace(/\*/g, '[^/]*');
+  pattern = pattern.replace(/\*/g, "[^/]*");
 
   // Replace glob `**` with regex `(.*)` (zero or more directories or files)
   // pattern = pattern.replace(/\*\*/g, '(.*)');
 
   // Return the final regex
-  return new RegExp('^' + pattern + '$');
+  return new RegExp("^" + pattern + "$");
 }
 
 // helper function to convert path to its lowest common root
 // e.g. ./img/path/*/index.js -> /img/path
 // https://unpkg.com/browse/@uswds/uswds@3.10.0/package.json
 function patternRoot(pattern) {
-  const segments = pattern.split('/').filter((segment) => segment !== '.');
-  let root = '';
+  const segments = pattern.split("/").filter((segment) => segment !== ".");
+  let root = "";
 
   for (const segment of segments) {
     // is there a better way to fuzzy test for a filename other than checking for a dot?
-    if (segment.indexOf('*') < 0 && segment.indexOf('.') < 0) {
+    if (segment.indexOf("*") < 0 && segment.indexOf(".") < 0) {
       root += `/${segment}`;
     } else {
       break;
@@ -127,23 +130,29 @@ async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
   function walkDirectoryForExportPatterns(directoryUrl) {
     const filesInDir = fs.readdirSync(directoryUrl);
 
-    filesInDir.forEach(file => {
+    filesInDir.forEach((file) => {
       const filePathUrl = new URL(`./${file}`, directoryUrl);
       const stat = fs.statSync(filePathUrl);
-      const pattern = `${resolvedRoot}${subValue.replace('./', '')}`;
+      const pattern = `${resolvedRoot}${subValue.replace("./", "")}`;
       const regexPattern = globToRegex(pattern);
 
       if (stat.isDirectory()) {
         walkDirectoryForExportPatterns(new URL(`./${file}/`, directoryUrl));
       } else if (regexPattern.test(filePathUrl.href)) {
-        const relativePath = filePathUrl.href.replace(resolvedRoot, '');
+        const relativePath = filePathUrl.href.replace(resolvedRoot, "");
         // naive way to offset a subValue pattern to the sub pattern when dealing with wildcards
         // ex. "./js/*": "./packages/*/src/index.js" -> /js/<package-name>/src/index.js
-        const rootSubRelativePath = sub.endsWith('*')
-          ? `./${relativePath}`.replace(subValue.split('*')[0], '').replace(subValue.split('*')[1], '')
-          : relativePath.replace(rootSubValueOffset, '');
+        const rootSubRelativePath = sub.endsWith("*")
+          ? `./${relativePath}`
+              .replace(subValue.split("*")[0], "")
+              .replace(subValue.split("*")[1], "")
+          : relativePath.replace(rootSubValueOffset, "");
 
-        updateImportMap(`${dependency}${rootSubOffset}/${rootSubRelativePath}`, relativePath, resolvedRoot);
+        updateImportMap(
+          `${dependency}${rootSubOffset}/${rootSubRelativePath}`,
+          relativePath,
+          resolvedRoot,
+        );
       }
     });
   }
@@ -152,13 +161,21 @@ async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
 }
 
 function trackExportConditions(dependency, exports, sub, condition, resolvedRoot) {
-  if (typeof exports[sub] === 'object') {
+  if (typeof exports[sub] === "object") {
     // also check for nested conditions of conditions, default to default for now
     // https://unpkg.com/browse/@floating-ui/dom@1.6.12/package.json
-    if (sub === '.') {
-      updateImportMap(dependency, `${exports[sub][condition].default ?? exports[sub][condition]}`, resolvedRoot);
+    if (sub === ".") {
+      updateImportMap(
+        dependency,
+        `${exports[sub][condition].default ?? exports[sub][condition]}`,
+        resolvedRoot,
+      );
     } else {
-      updateImportMap(`${dependency}/${sub}`, `${exports[sub][condition].default ?? exports[sub][condition]}`, resolvedRoot);
+      updateImportMap(
+        `${dependency}/${sub}`,
+        `${exports[sub][condition].default ?? exports[sub][condition]}`,
+        resolvedRoot,
+      );
     }
   } else {
     // https://unpkg.com/browse/redux@5.0.1/package.json
@@ -179,13 +196,13 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
        * 2. module-sync
        * 3. default
        */
-      if (typeof exports[sub] === 'object') {
+      if (typeof exports[sub] === "object") {
         let matched = false;
 
         for (const condition of SUPPORTED_EXPORT_CONDITIONS) {
           if (exports[sub][condition]) {
             matched = true;
-            if (sub.indexOf('*') >= 0) {
+            if (sub.indexOf("*") >= 0) {
               await walkExportPatterns(dependency, sub, exports[sub][condition], resolvedRoot);
             } else {
               trackExportConditions(dependency, exports, sub, condition, resolvedRoot);
@@ -196,13 +213,16 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
 
         if (!matched) {
           // ex. https://unpkg.com/browse/matches-selector@1.2.0/package.json
-          diagnostics.set(dependency, `no supported export conditions (\`${SUPPORTED_EXPORT_CONDITIONS.join(', ')}\`) for dependency => \`${dependency}\``);
+          diagnostics.set(
+            dependency,
+            `no supported export conditions (\`${SUPPORTED_EXPORT_CONDITIONS.join(", ")}\`) for dependency => \`${dependency}\``,
+          );
         }
       } else {
         // handle (unconditional) subpath exports
-        if (sub === '.') {
+        if (sub === ".") {
           updateImportMap(dependency, `${exports[sub]}`, resolvedRoot);
-        } else if (sub.indexOf('*') >= 0) {
+        } else if (sub.indexOf("*") >= 0) {
           await walkExportPatterns(dependency, sub, exports[sub], resolvedRoot);
         } else {
           updateImportMap(`${dependency}/${sub}`, `${exports[sub]}`, resolvedRoot);
@@ -211,20 +231,22 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
     }
   } else if (module || main) {
     updateImportMap(dependency, `${module ?? main}`, resolvedRoot);
-  } else if (fs.existsSync(new URL('./index.js', resolvedRoot))) {
+  } else if (fs.existsSync(new URL("./index.js", resolvedRoot))) {
     // if an index.js file exists but with no main entry point, then it should count as a main entry point
     // https://docs.npmjs.com/cli/v7/configuring-npm/package-json#main
     // https://unpkg.com/browse/object-assign@4.1.1/package.json
-    updateImportMap(dependency, 'index.js', resolvedRoot);
+    updateImportMap(dependency, "index.js", resolvedRoot);
   } else {
     // ex: https://unpkg.com/browse/uuid@3.4.0/package.json
-    diagnostics.set(dependency, `WARNING: No supported entry point detected for => \`${dependency}\``);
+    diagnostics.set(
+      dependency,
+      `WARNING: No supported entry point detected for => \`${dependency}\``,
+    );
   }
 }
 
 // we recursively cache / memoize walkedPackages to account for scenarios where Greenwood can (pre)render concurrently
 async function walkPackageJson(packageJson = {}, walkedPackages = new Set()) {
-
   try {
     const dependencies = Object.keys(packageJson.dependencies || {});
 
@@ -235,7 +257,9 @@ async function walkPackageJson(packageJson = {}, walkedPackages = new Set()) {
         const resolvedRoot = derivePackageRoot(resolved);
 
         if (resolvedRoot) {
-          const resolvedPackageJson = (await import(new URL('./package.json', resolvedRoot), { with: { type: 'json' } })).default;
+          const resolvedPackageJson = (
+            await import(new URL("./package.json", resolvedRoot), { with: { type: "json" } })
+          ).default;
           const { name } = resolvedPackageJson;
 
           walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
@@ -250,21 +274,19 @@ async function walkPackageJson(packageJson = {}, walkedPackages = new Set()) {
           // https://github.com/nodejs/node/issues/56652
           // https://nodejs.org/api/modules.html#built-in-modules
           if (!isBuiltin(resolved)) {
-            diagnostics.set(dependency, `WARNING: No package.json resolved for => \`${dependency}\`, resolved to \`${resolved}\``);
+            diagnostics.set(
+              dependency,
+              `WARNING: No package.json resolved for => \`${dependency}\`, resolved to \`${resolved}\``,
+            );
           }
         }
       }
     }
   } catch (e) {
-    console.error('Error building up import map', e);
+    console.error("Error building up import map", e);
   }
 
   return { importMap, diagnostics };
 }
 
-export {
-  walkPackageJson,
-  resolveBareSpecifier,
-  derivePackageRoot,
-  IMPORT_MAP_RESOLVED_PREFIX
-};
+export { walkPackageJson, resolveBareSpecifier, derivePackageRoot, IMPORT_MAP_RESOLVED_PREFIX };

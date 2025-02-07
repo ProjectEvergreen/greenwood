@@ -1,15 +1,22 @@
-import { render } from '@lit-labs/ssr';
-import { collectResult } from '@lit-labs/ssr/lib/render-result.js';
-import { html } from 'lit';
-import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
+import { render } from "@lit-labs/ssr";
+import { collectResult } from "@lit-labs/ssr/lib/render-result.js";
+import { html } from "lit";
+import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
 
-async function executeRouteModule({ moduleUrl, compilation, page, prerender, htmlContents, scripts }) {
+async function executeRouteModule({
+  moduleUrl,
+  compilation,
+  page,
+  prerender,
+  htmlContents,
+  scripts,
+}) {
   const data = {
     layout: null,
     body: null,
     frontmatter: null,
     html: null,
-    hydration: false
+    hydration: false,
   };
 
   // prerender static content
@@ -22,8 +29,14 @@ async function executeRouteModule({ moduleUrl, compilation, page, prerender, htm
 
     data.html = await collectResult(render(templateResult));
   } else {
-    const module = await import(moduleUrl).then(module => module);
-    const { getLayout = null, getBody = null, getFrontmatter = null, isolation = true, hydration = true } = module;
+    const module = await import(moduleUrl).then((module) => module);
+    const {
+      getLayout = null,
+      getBody = null,
+      getFrontmatter = null,
+      isolation = true,
+      hydration = true,
+    } = module;
 
     // TODO cant we get these from just pulling from the file during the graph phase?
     // https://github.com/ProjectEvergreen/greenwood/issues/991

@@ -29,179 +29,181 @@
  *     toc.html
  */
 
-import chai from 'chai';
-import { JSDOM } from 'jsdom';
-import path from 'path';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import { JSDOM } from "jsdom";
+import path from "path";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Prerender Configuration turned on using Content As Data collections';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+describe("Build Greenwood With: ", function () {
+  const LABEL = "Prerender Configuration turned on using Content As Data collections";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-
-    before(function() {
+  describe(LABEL, function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(['public', 'index'], LABEL);
+    runSmokeTest(["public", "index"], LABEL);
 
-    describe('Default output for index.html with header nav collection content', function() {
+    describe("Default output for index.html with header nav collection content", function () {
       let dom;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './index.html'));
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
       });
 
-      describe('Data Client Import Map', () => {
+      describe("Data Client Import Map", () => {
         let map;
 
-        before(function() {
+        before(function () {
           map = dom.window.document.querySelectorAll('script[type="importmap"]');
         });
 
-        it('should not have a <script> tag of type importmap', async () => {
+        it("should not have a <script> tag of type importmap", async () => {
           expect(map.length).to.equal(0);
         });
       });
 
-      describe('<script> tag setup for active content', function() {
+      describe("<script> tag setup for active content", function () {
         let stateScripts;
         let optionsScript;
 
-        before(function() {
-          stateScripts = dom.window.document.querySelectorAll('script#content-as-data-state');
-          optionsScript = dom.window.document.querySelectorAll('script#data-client-options');
+        before(function () {
+          stateScripts = dom.window.document.querySelectorAll("script#content-as-data-state");
+          optionsScript = dom.window.document.querySelectorAll("script#data-client-options");
         });
 
-        it('should have a <script> tag that confirms content as data is set', function() {
+        it("should have a <script> tag that confirms content as data is set", function () {
           expect(stateScripts.length).to.equal(1);
-          expect(stateScripts[0].textContent).to.contain('globalThis.__CONTENT_AS_DATA_STATE__ = true;');
+          expect(stateScripts[0].textContent).to.contain(
+            "globalThis.__CONTENT_AS_DATA_STATE__ = true;",
+          );
         });
 
-        it('should have a <script> tag that captures content as data related options', function() {
+        it("should have a <script> tag that captures content as data related options", function () {
           expect(optionsScript.length).to.equal(1);
 
-          expect(optionsScript[0].textContent).to.contain('PORT:1984');
+          expect(optionsScript[0].textContent).to.contain("PORT:1984");
           expect(optionsScript[0].textContent).to.contain('PRERENDER:"true"');
         });
       });
 
-      describe('navigation links from getContentByCollection', function() {
+      describe("navigation links from getContentByCollection", function () {
         let navLinks;
 
-        before(function() {
-          navLinks = dom.window.document.querySelectorAll('header nav ul li a');
+        before(function () {
+          navLinks = dom.window.document.querySelectorAll("header nav ul li a");
         });
 
-        it('should have the expected number of nav links from all pages in the collection', function() {
+        it("should have the expected number of nav links from all pages in the collection", function () {
           expect(navLinks.length).to.equal(3);
         });
 
-        it('should have the expected link content from all pages in the collection', function() {
-          expect(navLinks[0].getAttribute('href')).to.equal('/');
-          expect(navLinks[0].getAttribute('title')).to.equal('Home');
-          expect(navLinks[0].textContent).to.equal('Home');
+        it("should have the expected link content from all pages in the collection", function () {
+          expect(navLinks[0].getAttribute("href")).to.equal("/");
+          expect(navLinks[0].getAttribute("title")).to.equal("Home");
+          expect(navLinks[0].textContent).to.equal("Home");
 
-          expect(navLinks[1].getAttribute('href')).to.equal('/blog/');
-          expect(navLinks[1].getAttribute('title')).to.equal('Blog');
-          expect(navLinks[1].textContent).to.equal('Blog');
+          expect(navLinks[1].getAttribute("href")).to.equal("/blog/");
+          expect(navLinks[1].getAttribute("title")).to.equal("Blog");
+          expect(navLinks[1].textContent).to.equal("Blog");
 
-          expect(navLinks[2].getAttribute('href')).to.equal('/toc/');
-          expect(navLinks[2].getAttribute('title')).to.equal('Table of Contents');
-          expect(navLinks[2].textContent).to.equal('Table of Contents');
+          expect(navLinks[2].getAttribute("href")).to.equal("/toc/");
+          expect(navLinks[2].getAttribute("title")).to.equal("Table of Contents");
+          expect(navLinks[2].textContent).to.equal("Table of Contents");
         });
 
-        it('should have the expected inline active frontmatter collection data', function() {
-          const collection = JSON.parse(dom.window.document.querySelector('body span').textContent)
-            .sort((a, b) => a.data.order > b.data.order ? 1 : -1);
+        it("should have the expected inline active frontmatter collection data", function () {
+          const collection = JSON.parse(
+            dom.window.document.querySelector("body span").textContent,
+          ).sort((a, b) => (a.data.order > b.data.order ? 1 : -1));
 
-          expect(collection[0].route).to.equal('/');
-          expect(collection[0].title).to.equal('Home');
+          expect(collection[0].route).to.equal("/");
+          expect(collection[0].title).to.equal("Home");
           expect(collection[0].label).to.equal(collection[0].title);
-          expect(collection[0].id).to.equal('index');
+          expect(collection[0].id).to.equal("index");
 
-          expect(collection[1].route).to.equal('/blog/');
-          expect(collection[1].title).to.equal('Blog');
+          expect(collection[1].route).to.equal("/blog/");
+          expect(collection[1].title).to.equal("Blog");
           expect(collection[1].label).to.equal(collection[1].title);
-          expect(collection[1].id).to.equal('blog-index');
+          expect(collection[1].id).to.equal("blog-index");
 
-          expect(collection[2].route).to.equal('/toc/');
-          expect(collection[2].title).to.equal('Table of Contents');
+          expect(collection[2].route).to.equal("/toc/");
+          expect(collection[2].title).to.equal("Table of Contents");
           expect(collection[2].label).to.equal(collection[2].title);
-          expect(collection[2].id).to.equal('toc');
+          expect(collection[2].id).to.equal("toc");
         });
       });
     });
 
-    describe('Default output for blog/index.html with routes based collection content', function() {
+    describe("Default output for blog/index.html with routes based collection content", function () {
       let dom;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './blog/index.html'));
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./blog/index.html"));
       });
 
-      describe('navigation links from getContentByCollection', function() {
+      describe("navigation links from getContentByCollection", function () {
         let postLinks;
 
-        before(function() {
-          postLinks = dom.window.document.querySelectorAll('ol li a');
+        before(function () {
+          postLinks = dom.window.document.querySelectorAll("ol li a");
         });
 
-        it('should have the expected number of post links from all blog pages in the collection (minus the index route)', function() {
+        it("should have the expected number of post links from all blog pages in the collection (minus the index route)", function () {
           expect(postLinks.length).to.equal(2);
         });
 
-        it('should have the expected link content from all pages in the collection', function() {
-          expect(postLinks[0].getAttribute('href')).to.equal('/blog/first-post/');
-          expect(postLinks[0].getAttribute('title')).to.equal('First Post');
-          expect(postLinks[0].textContent).to.equal('First Post');
+        it("should have the expected link content from all pages in the collection", function () {
+          expect(postLinks[0].getAttribute("href")).to.equal("/blog/first-post/");
+          expect(postLinks[0].getAttribute("title")).to.equal("First Post");
+          expect(postLinks[0].textContent).to.equal("First Post");
 
-          expect(postLinks[1].getAttribute('href')).to.equal('/blog/second-post/');
-          expect(postLinks[1].getAttribute('title')).to.equal('Second Post');
-          expect(postLinks[1].textContent).to.equal('Second Post');
+          expect(postLinks[1].getAttribute("href")).to.equal("/blog/second-post/");
+          expect(postLinks[1].getAttribute("title")).to.equal("Second Post");
+          expect(postLinks[1].textContent).to.equal("Second Post");
         });
       });
     });
 
-    describe('Default output for toc.html with all content in a list', function() {
+    describe("Default output for toc.html with all content in a list", function () {
       let dom;
 
-      before(async function() {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, './toc/index.html'));
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./toc/index.html"));
       });
 
-      describe('navigation links from getContentByCollection', function() {
+      describe("navigation links from getContentByCollection", function () {
         let pageLinks;
 
-        before(function() {
-          pageLinks = dom.window.document.querySelectorAll('ol li a');
+        before(function () {
+          pageLinks = dom.window.document.querySelectorAll("ol li a");
         });
 
         // includes 404 page
-        it('should have the expected number of post links from all blog pages in the collection (minus the index route)', function() {
+        it("should have the expected number of post links from all blog pages in the collection (minus the index route)", function () {
           expect(pageLinks.length).to.equal(6);
         });
       });
     });
   });
 
-  after(async function() {
+  after(async function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

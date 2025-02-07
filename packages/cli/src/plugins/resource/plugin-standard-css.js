@@ -4,46 +4,48 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from 'fs';
-import path from 'path';
-import { parse, walk } from 'css-tree';
-import { ResourceInterface } from '../../lib/resource-interface.js';
-import { hashString } from '../../lib/hashing-utils.js';
-import { getResolvedHrefFromPathnameShortcut } from '../../lib/node-modules-utils.js';
-import { isLocalLink } from '../../lib/resource-utils.js';
-import { derivePackageRoot } from '../../lib/walker-package-ranger.js';
+import fs from "fs";
+import path from "path";
+import { parse, walk } from "css-tree";
+import { ResourceInterface } from "../../lib/resource-interface.js";
+import { hashString } from "../../lib/hashing-utils.js";
+import { getResolvedHrefFromPathnameShortcut } from "../../lib/node-modules-utils.js";
+import { isLocalLink } from "../../lib/resource-utils.js";
+import { derivePackageRoot } from "../../lib/walker-package-ranger.js";
 
 function bundleCss(body, sourceUrl, compilation, workingUrl) {
   const { projectDirectory, outputDir, userWorkspace, scratchDir } = compilation.context;
   const ast = parse(body, {
     onParseError(error) {
       console.log(error.formattedMessage);
-    }
+    },
   });
-  let optimizedCss = '';
+  let optimizedCss = "";
 
   walk(ast, {
     enter: function (node, item) {
       const { type, name, value, children } = node;
 
-      if ((type === 'String' || type === 'Url') && this.atrulePrelude && this.atrule.name === 'import') {
+      if (
+        (type === "String" || type === "Url") &&
+        this.atrulePrelude &&
+        this.atrule.name === "import"
+      ) {
         const { value } = node;
 
         if (isLocalLink(value)) {
-          if (value.startsWith('.') || value.indexOf('/node_modules') === 0) {
-            const resolvedUrl = value.startsWith('/node_modules')
+          if (value.startsWith(".") || value.indexOf("/node_modules") === 0) {
+            const resolvedUrl = value.startsWith("/node_modules")
               ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
               : new URL(value, sourceUrl);
 
-            const importContents = fs.readFileSync(resolvedUrl, 'utf-8');
+            const importContents = fs.readFileSync(resolvedUrl, "utf-8");
 
             optimizedCss += bundleCss(importContents, sourceUrl, compilation, resolvedUrl);
           } else if (workingUrl) {
-            const urlPrefix = value.startsWith('.')
-              ? ''
-              : './';
+            const urlPrefix = value.startsWith(".") ? "" : "./";
             const resolvedUrl = new URL(`${urlPrefix}${value}`, workingUrl);
-            const importContents = fs.readFileSync(resolvedUrl, 'utf-8');
+            const importContents = fs.readFileSync(resolvedUrl, "utf-8");
 
             optimizedCss += bundleCss(importContents, workingUrl, compilation);
           } else {
@@ -52,8 +54,8 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
         } else {
           optimizedCss += `@import url('${value}');`;
         }
-      } else if (type === 'Url' && this.atrule?.name !== 'import') {
-        if (!isLocalLink(value) || value.startsWith('data:')) {
+      } else if (type === "Url" && this.atrule?.name !== "import") {
+        if (!isLocalLink(value) || value.startsWith("data:")) {
           optimizedCss += `url('${value}')`;
           return;
         }
@@ -68,147 +70,144 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
          * 4. If the starting file is in the scratch directory, likely means it is just an extracted inline <style> tag, so resolve to user workspace
          * 5. Lastly, match the current value with the current source file
          */
-        const urlPrefix = value.startsWith('.')
-          ? ''
-          : './';
-        const resolvedUrl = value.startsWith('/node_modules/')
+        const urlPrefix = value.startsWith(".") ? "" : "./";
+        const resolvedUrl = value.startsWith("/node_modules/")
           ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
-          : value.startsWith('/')
+          : value.startsWith("/")
             ? new URL(`.${value}`, userWorkspace)
             : workingUrl
               ? new URL(`${urlPrefix}${value}`, workingUrl)
               : sourceUrl.href.startsWith(scratchDir.href)
-                ? new URL(`./${value.replace(/\.\.\//g, '').replace('./', '')}`, userWorkspace)
+                ? new URL(`./${value.replace(/\.\.\//g, "").replace("./", "")}`, userWorkspace)
                 : new URL(`${urlPrefix}${value}`, sourceUrl);
 
         if (fs.existsSync(resolvedUrl)) {
-          const isDev = process.env.__GWD_COMMAND__ === 'develop';
-          let finalValue = '';
+          const isDev = process.env.__GWD_COMMAND__ === "develop";
+          let finalValue = "";
 
           if (resolvedUrl.href.startsWith(userWorkspace.href)) {
             // truncate to just get /path/in/users/workspace.png
-            finalValue = resolvedUrl.href.replace(userWorkspace.href, '/');
-          } else if (value.startsWith('/node_modules/')) {
+            finalValue = resolvedUrl.href.replace(userWorkspace.href, "/");
+          } else if (value.startsWith("/node_modules/")) {
             // if it's a node modules shortcut alias, just use that
             finalValue = value;
-          } else if (value.indexOf('../node_modules/') >= 0) {
+          } else if (value.indexOf("../node_modules/") >= 0) {
             // if it's a relative node_modules path, convert it to a shortcut alias
-            finalValue = `/${value.replace(/\.\.\//g, '')}`;
-          } else if (resolvedUrl.href.indexOf('/node_modules/') >= 0) {
+            finalValue = `/${value.replace(/\.\.\//g, "")}`;
+          } else if (resolvedUrl.href.indexOf("/node_modules/") >= 0) {
             // if we are deep in node_modules land, use resolution logic to figure out the specifier
             const resolvedRoot = derivePackageRoot(resolvedUrl.href);
-            const resolvedRootSegments = resolvedRoot.split('/').reverse().filter(segment => segment !== '');
-            const specifier = resolvedRootSegments[1].startsWith('@') ? `${resolvedRootSegments[0]}/${resolvedRootSegments[1]}` : resolvedRootSegments[0];
+            const resolvedRootSegments = resolvedRoot
+              .split("/")
+              .reverse()
+              .filter((segment) => segment !== "");
+            const specifier = resolvedRootSegments[1].startsWith("@")
+              ? `${resolvedRootSegments[0]}/${resolvedRootSegments[1]}`
+              : resolvedRootSegments[0];
 
-            finalValue = `/node_modules/${specifier}/${value.replace(/\.\.\//g, '').replace('./', '')}`;
+            finalValue = `/node_modules/${specifier}/${value.replace(/\.\.\//g, "").replace("./", "")}`;
           }
 
           if (!isDev) {
-            const hash = hashString(fs.readFileSync(resolvedUrl, 'utf-8'));
-            const ext = resolvedUrl.pathname.split('.').pop();
+            const hash = hashString(fs.readFileSync(resolvedUrl, "utf-8"));
+            const ext = resolvedUrl.pathname.split(".").pop();
 
             finalValue = finalValue.replace(`.${ext}`, `.${hash}.${ext}`);
 
             fs.mkdirSync(new URL(`.${path.dirname(finalValue)}/`, outputDir), {
-              recursive: true
+              recursive: true,
             });
 
-            fs.promises.copyFile(
-              resolvedUrl,
-              new URL(`.${finalValue}`, outputDir)
-            );
+            fs.promises.copyFile(resolvedUrl, new URL(`.${finalValue}`, outputDir));
           }
 
           optimizedCss += `url('${basePath}${finalValue}')`;
         } else {
-          console.warn(`Unable to locate ${value}.  You may need to manually copy this file from its source location to the build output directory.`);
+          console.warn(
+            `Unable to locate ${value}.  You may need to manually copy this file from its source location to the build output directory.`,
+          );
           optimizedCss += `url('${value}')`;
         }
-      } else if (type === 'Atrule' && name !== 'import') {
+      } else if (type === "Atrule" && name !== "import") {
         optimizedCss += `@${name} `;
-      } else if (type === 'TypeSelector') {
+      } else if (type === "TypeSelector") {
         optimizedCss += name;
-      } else if (type === 'IdSelector') {
+      } else if (type === "IdSelector") {
         optimizedCss += `#${name}`;
-      } else if (type === 'ClassSelector') {
+      } else if (type === "ClassSelector") {
         optimizedCss += `.${name}`;
-      } else if (type === 'NestingSelector') {
-        optimizedCss += '&';
-      } else if (type === 'PseudoClassSelector') {
+      } else if (type === "NestingSelector") {
+        optimizedCss += "&";
+      } else if (type === "PseudoClassSelector") {
         optimizedCss += `:${name}`;
 
         if (children) {
           switch (name) {
-
-            case 'dir':
-            case 'host':
-            case 'is':
-            case 'has':
-            case 'lang':
-            case 'not':
-            case 'nth-child':
-            case 'nth-last-child':
-            case 'nth-of-type':
-            case 'nth-last-of-type':
-            case 'where':
-              optimizedCss += '(';
+            case "dir":
+            case "host":
+            case "is":
+            case "has":
+            case "lang":
+            case "not":
+            case "nth-child":
+            case "nth-last-child":
+            case "nth-of-type":
+            case "nth-last-of-type":
+            case "where":
+              optimizedCss += "(";
               break;
             default:
               break;
-
           }
         }
-      } else if (type === 'PseudoElementSelector') {
+      } else if (type === "PseudoElementSelector") {
         optimizedCss += `::${name}`;
 
         switch (name) {
-
-          case 'highlight':
-          case 'part':
-          case 'slotted':
-            optimizedCss += '(';
+          case "highlight":
+          case "part":
+          case "slotted":
+            optimizedCss += "(";
             break;
           default:
             break;
-
         }
-      } else if (type === 'Function') {
+      } else if (type === "Function") {
         /* ex: border-left: 3px solid var(--color-secondary); */
-        if (this.declaration && item.prev && (item.prev.data.type !== 'Operator' && item.prev.data.type !== 'Url')) {
-          optimizedCss += ' ';
+        if (
+          this.declaration &&
+          item.prev &&
+          item.prev.data.type !== "Operator" &&
+          item.prev.data.type !== "Url"
+        ) {
+          optimizedCss += " ";
         }
         optimizedCss += `${name}(`;
-      } else if (type === 'Feature') {
+      } else if (type === "Feature") {
         optimizedCss += ` (${name}:`;
-      } else if (type === 'Parentheses' || type === 'SupportsDeclaration') {
-        optimizedCss += '(';
-      } else if (type === 'MediaQuery') {
+      } else if (type === "Parentheses" || type === "SupportsDeclaration") {
+        optimizedCss += "(";
+      } else if (type === "MediaQuery") {
         // https://github.com/csstree/csstree/issues/285#issuecomment-2350230333
         const { mediaType, modifier } = node;
-        const type = mediaType !== null
-          ? mediaType
-          : '';
-        const operator = mediaType && node.condition
-          ? ' and'
-          : modifier !== null
-            ? ` ${modifier}`
-            : '';
+        const type = mediaType !== null ? mediaType : "";
+        const operator =
+          mediaType && node.condition ? " and" : modifier !== null ? ` ${modifier}` : "";
 
         optimizedCss += `${type}${operator}`;
-      } else if (type === 'Block') {
-        optimizedCss += '{';
-      } else if (type === 'AttributeSelector') {
-        optimizedCss += '[';
-      } else if (type === 'Combinator') {
+      } else if (type === "Block") {
+        optimizedCss += "{";
+      } else if (type === "AttributeSelector") {
+        optimizedCss += "[";
+      } else if (type === "Combinator") {
         optimizedCss += name;
-      } else if (type === 'Nth') {
+      } else if (type === "Nth") {
         const { nth } = node;
 
         switch (nth.type) {
-
-          case 'AnPlusB':
+          case "AnPlusB":
             if (nth.a) {
-              optimizedCss += nth.a === '-1' ? '-n' : `${nth.a}n`;
+              optimizedCss += nth.a === "-1" ? "-n" : `${nth.a}n`;
             }
             if (nth.b) {
               optimizedCss += nth.a ? `+${nth.b}` : nth.b;
@@ -216,133 +215,137 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
             break;
           default:
             break;
-
         }
-      } else if (type === 'Declaration') {
+      } else if (type === "Declaration") {
         optimizedCss += `${node.property}:`;
-      } else if (type === 'Identifier' || type === 'Hash' || type === 'Dimension' || type === 'Number' || (type === 'String' && (this.atrule?.type !== 'import')) || type === 'Operator' || type === 'Raw' || type === 'Percentage') {
-        if (item && item.prev && type !== 'Operator' && item.prev.data.type !== 'Operator') {
-          optimizedCss += ' ';
+      } else if (
+        type === "Identifier" ||
+        type === "Hash" ||
+        type === "Dimension" ||
+        type === "Number" ||
+        (type === "String" && this.atrule?.type !== "import") ||
+        type === "Operator" ||
+        type === "Raw" ||
+        type === "Percentage"
+      ) {
+        if (item && item.prev && type !== "Operator" && item.prev.data.type !== "Operator") {
+          optimizedCss += " ";
         }
 
         switch (type) {
-
-          case 'Dimension':
+          case "Dimension":
             optimizedCss += `${value}${node.unit}`;
             break;
-          case 'Percentage':
+          case "Percentage":
             optimizedCss += `${value}%`;
             break;
-          case 'Hash':
+          case "Hash":
             optimizedCss += `#${value}`;
             break;
-          case 'Identifier':
+          case "Identifier":
             optimizedCss += name;
             break;
-          case 'Number':
+          case "Number":
             optimizedCss += value;
             break;
-          case 'Operator':
+          case "Operator":
             optimizedCss += value;
             break;
-          case 'String':
+          case "String":
             optimizedCss += `'${value}'`;
             break;
-          case 'Raw':
+          case "Raw":
             optimizedCss += `${value.trim()}`;
             break;
           default:
             break;
-
         }
       }
     },
-    leave: function(node, item) {
+    leave: function (node, item) {
       switch (node.type) {
-
-        case 'Atrule':
-          if (!node.block && node.name !== 'import') {
-            optimizedCss += ';';
+        case "Atrule":
+          if (!node.block && node.name !== "import") {
+            optimizedCss += ";";
           }
           break;
-        case 'Block':
-          optimizedCss += '}';
+        case "Block":
+          optimizedCss += "}";
           break;
-        case 'Function':
-        case 'Parentheses':
-        case 'SupportsDeclaration':
-          optimizedCss += ')';
+        case "Function":
+        case "Parentheses":
+        case "SupportsDeclaration":
+          optimizedCss += ")";
           break;
-        case 'PseudoClassSelector':
+        case "PseudoClassSelector":
           if (node.children) {
             switch (node.name) {
-
-              case 'dir':
-              case 'host':
-              case 'is':
-              case 'has':
-              case 'lang':
-              case 'not':
-              case 'nth-child':
-              case 'nth-last-child':
-              case 'nth-last-of-type':
-              case 'nth-of-type':
-              case 'where':
-                optimizedCss += ')';
+              case "dir":
+              case "host":
+              case "is":
+              case "has":
+              case "lang":
+              case "not":
+              case "nth-child":
+              case "nth-last-child":
+              case "nth-last-of-type":
+              case "nth-of-type":
+              case "where":
+                optimizedCss += ")";
                 break;
               default:
                 break;
-
             }
           }
           break;
-        case 'PseudoElementSelector':
+        case "PseudoElementSelector":
           switch (node.name) {
-
-            case 'highlight':
-            case 'part':
-            case 'slotted':
-              optimizedCss += ')';
+            case "highlight":
+            case "part":
+            case "slotted":
+              optimizedCss += ")";
               break;
             default:
               break;
-
           }
           break;
-        case 'Declaration':
+        case "Declaration":
           if (node.important) {
-            optimizedCss += '!important';
+            optimizedCss += "!important";
           }
 
           if (item?.next || (item?.prev && !item?.next)) {
-            optimizedCss += ';';
+            optimizedCss += ";";
           }
 
           break;
-        case 'Selector':
+        case "Selector":
           if (item.next) {
-            optimizedCss += ',';
+            optimizedCss += ",";
           }
           break;
-        case 'AttributeSelector':
+        case "AttributeSelector":
           if (node.matcher) {
             // TODO better way to do this?
             // https://github.com/csstree/csstree/issues/207
             const name = node.name.name;
-            const value = node.value.type === 'Identifier' ? node.value.name : `'${node.value.value}'`;
+            const value =
+              node.value.type === "Identifier" ? node.value.name : `'${node.value.value}'`;
 
-            optimizedCss = optimizedCss.replace(`${name}${value}`, `${name}${node.matcher}${value}`);
+            optimizedCss = optimizedCss.replace(
+              `${name}${value}`,
+              `${name}${node.matcher}${value}`,
+            );
           }
-          optimizedCss += ']';
+          optimizedCss += "]";
           break;
-        case 'MediaQuery':
-          optimizedCss += ')';
+        case "MediaQuery":
+          optimizedCss += ")";
           break;
         default:
           break;
-
       }
-    }
+    },
   });
 
   return optimizedCss;
@@ -351,41 +354,50 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
 class StandardCssResource extends ResourceInterface {
   constructor(compilation, options) {
     super(compilation, options);
-    this.extensions = ['css'];
-    this.contentType = 'text/css';
+    this.extensions = ["css"];
+    this.contentType = "text/css";
   }
 
   async shouldServe(url) {
-    return url.protocol === 'file:' && this.extensions.indexOf(url.pathname.split('.').pop()) >= 0;
+    return url.protocol === "file:" && this.extensions.indexOf(url.pathname.split(".").pop()) >= 0;
   }
 
   async serve(url) {
-    const body = await fs.promises.readFile(url, 'utf-8');
+    const body = await fs.promises.readFile(url, "utf-8");
 
     return new Response(body, {
       headers: {
-        'Content-Type': this.contentType
-      }
+        "Content-Type": this.contentType,
+      },
     });
   }
 
   async shouldIntercept(url, request, response) {
-    return url.protocol === 'file:'
-      && (response.headers.get('Content-Type')?.indexOf(this.contentType) >= 0 || request.headers.get('Accept')?.indexOf(this.contentType) >= 0)
-      || (request.headers.get('Accept')?.indexOf('text/javascript') > 0 || url.searchParams?.get('polyfill') === 'type-css');
+    return (
+      (url.protocol === "file:" &&
+        (response.headers.get("Content-Type")?.indexOf(this.contentType) >= 0 ||
+          request.headers.get("Accept")?.indexOf(this.contentType) >= 0)) ||
+      request.headers.get("Accept")?.indexOf("text/javascript") > 0 ||
+      url.searchParams?.get("polyfill") === "type-css"
+    );
   }
 
   async intercept(url, request, response) {
-    let body = this.compilation.config.optimization !== 'none'
-      ? bundleCss(await response.text(), url, this.compilation)
-      : await response.text();
+    let body =
+      this.compilation.config.optimization !== "none"
+        ? bundleCss(await response.text(), url, this.compilation)
+        : await response.text();
     let headers = {};
 
-    if ((request.headers.get('Accept')?.indexOf('text/javascript') >= 0 || url.searchParams?.get('polyfill') === 'type-css') && !url.searchParams.has('type')) {
-      const contents = body.replace(/\r?\n|\r/g, ' ').replace(/\\/g, '\\\\');
+    if (
+      (request.headers.get("Accept")?.indexOf("text/javascript") >= 0 ||
+        url.searchParams?.get("polyfill") === "type-css") &&
+      !url.searchParams.has("type")
+    ) {
+      const contents = body.replace(/\r?\n|\r/g, " ").replace(/\\/g, "\\\\");
 
       body = `const sheet = new CSSStyleSheet();sheet.replaceSync(\`${contents}\`);export default sheet;`;
-      headers['Content-Type'] = 'text/javascript';
+      headers["Content-Type"] = "text/javascript";
     }
 
     return new Response(body, { headers });
@@ -393,9 +405,9 @@ class StandardCssResource extends ResourceInterface {
 }
 
 const greenwoodPluginStandardCss = {
-  type: 'resource',
-  name: 'plugin-standard-css',
-  provider: (compilation, options) => new StandardCssResource(compilation, options)
+  type: "resource",
+  name: "plugin-standard-css",
+  provider: (compilation, options) => new StandardCssResource(compilation, options),
 };
 
 export { greenwoodPluginStandardCss };

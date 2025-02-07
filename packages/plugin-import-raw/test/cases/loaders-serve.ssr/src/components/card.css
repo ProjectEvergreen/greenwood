@@ -33,7 +33,7 @@ h3 {
   font-size: 1.85rem;
 }
 
-@media(max-width: 768px) {
+@media (max-width: 768px) {
   img {
     max-width: 300px;
     min-width: 300px;

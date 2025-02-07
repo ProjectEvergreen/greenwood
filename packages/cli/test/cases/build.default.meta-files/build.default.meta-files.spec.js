@@ -16,76 +16,75 @@
  *   favicon.ico
  *   robots.txt
  */
-import chai from 'chai';
-import glob from 'glob-promise';
-import path from 'path';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import glob from "glob-promise";
+import path from "path";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Default Greenwood Configuration and Workspace with common meta file';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+describe("Build Greenwood With: ", function () {
+  const LABEL = "Default Greenwood Configuration and Workspace with common meta file";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-
-    before(function() {
+  describe(LABEL, function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(['public', 'index'], LABEL);
+    runSmokeTest(["public", "index"], LABEL);
 
-    describe('Default output for project level favicon.ico', function() {
+    describe("Default output for project level favicon.ico", function () {
       let favicons;
 
-      before(async function() {
+      before(async function () {
         favicons = await glob(`${this.context.publicDir}/*.ico`);
       });
 
-      it('should have one favicon file in the output directory', function() {
+      it("should have one favicon file in the output directory", function () {
         expect(favicons.length).to.equal(1);
       });
     });
 
-    describe('Default output for project level robots.txt', function() {
+    describe("Default output for project level robots.txt", function () {
       let robots;
 
-      before(async function() {
+      before(async function () {
         robots = await glob(`${this.context.publicDir}/*.txt`);
       });
 
-      it('should have one robots file in the output directory', function() {
+      it("should have one robots file in the output directory", function () {
         expect(robots.length).to.equal(1);
       });
     });
 
-    describe('Default output for project level sitemap.xml', function() {
+    describe("Default output for project level sitemap.xml", function () {
       let sitemaps;
 
-      before(async function() {
+      before(async function () {
         sitemaps = await glob(`${this.context.publicDir}/sitemap.xml`);
       });
 
-      it('should have one sitemap.xml file in the output directory', function() {
+      it("should have one sitemap.xml file in the output directory", function () {
         expect(sitemaps.length).to.equal(1);
       });
     });
   });
 
-  after(function() {
+  after(function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

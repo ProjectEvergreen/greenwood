@@ -1,4 +1,4 @@
-const template = document.createElement('template');
+const template = document.createElement("template");
 
 template.innerHTML = `
   <header>Welcome to my blog!</header>
@@ -7,7 +7,7 @@ template.innerHTML = `
 class HeaderComponent extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
+    this.attachShadow({ mode: "open" });
   }
 
   async connectedCallback() {
@@ -15,4 +15,4 @@ class HeaderComponent extends HTMLElement {
   }
 }
 
-customElements.define('x-header', HeaderComponent);
+customElements.define("x-header", HeaderComponent);

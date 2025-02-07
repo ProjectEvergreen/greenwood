@@ -1,20 +1,11 @@
 {
   "all": true,
 
-  "include": [
-    "packages/*/src/**/**/*.js"
-  ],
+  "include": ["packages/*/src/**/**/*.js"],
 
-  "exclude": [
-    "packages/cli/src/lib/*-interface.js"
-  ],
+  "exclude": ["packages/cli/src/lib/*-interface.js"],
 
-  "reporter": [
-    "cobertura",
-    "html",
-    "text",
-    "text-summary"
-  ],
+  "reporter": ["cobertura", "html", "text", "text-summary"],
 
   "checkCoverage": true,
 

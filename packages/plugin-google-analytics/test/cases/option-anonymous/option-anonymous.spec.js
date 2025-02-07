@@ -24,56 +24,58 @@
  * User Workspace
  * Greenwood default (src/)
  */
-import chai from 'chai';
-import { JSDOM } from 'jsdom';
-import path from 'path';
-import { runSmokeTest } from '../../../../../test/smoke-test.js';
-import { getOutputTeardownFiles } from '../../../../../test/utils.js';
-import { Runner } from 'gallinago';
-import { fileURLToPath, URL } from 'url';
+import chai from "chai";
+import { JSDOM } from "jsdom";
+import path from "path";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe('Build Greenwood With: ', function() {
-  const LABEL = 'Google Analytics Plugin with IP Anonymization tracking set to false and Default Workspace';
-  const mockAnalyticsId = 'UA-123456-1';
-  const cliPath = path.join(process.cwd(), 'packages/cli/src/index.js');
-  const outputPath = fileURLToPath(new URL('.', import.meta.url));
+describe("Build Greenwood With: ", function () {
+  const LABEL =
+    "Google Analytics Plugin with IP Anonymization tracking set to false and Default Workspace";
+  const mockAnalyticsId = "UA-123456-1";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 
-  before(function() {
+  before(function () {
     this.context = {
-      publicDir: path.join(outputPath, 'public')
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe(LABEL, function() {
-    before(function() {
+  describe(LABEL, function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, 'build');
+      runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(['public', 'index'], LABEL);
+    runSmokeTest(["public", "index"], LABEL);
 
-    describe('Initialization script', function() {
+    describe("Initialization script", function () {
       let inlineScript;
 
-      before(async function() {
-        const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-        const scriptTags = Array.from(dom.window.document.querySelectorAll('head script')).filter(tag => !tag.getAttribute('data-gwd'));
+      before(async function () {
+        const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+        const scriptTags = Array.from(dom.window.document.querySelectorAll("head script")).filter(
+          (tag) => !tag.getAttribute("data-gwd"),
+        );
 
-        inlineScript = Array.prototype.slice.call(scriptTags).filter(script => {
-          return !script.src && !script.getAttribute('data-state');
+        inlineScript = Array.prototype.slice.call(scriptTags).filter((script) => {
+          return !script.src && !script.getAttribute("data-state");
         });
-
       });
 
-      it('should be one inline <script> tag', function() {
+      it("should be one inline <script> tag", function () {
         expect(inlineScript.length).to.be.equal(1);
       });
 
-      it('should have the expected code with users analyticsId', function() {
+      it("should have the expected code with users analyticsId", function () {
         const expectedContent = `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -81,27 +83,29 @@ describe('Build Greenwood With: ', function() {
             gtag('config', '${mockAnalyticsId}', { 'anonymize_ip': false });
         `;
 
-        expect(inlineScript[0].textContent.trim().replace(/\n/g, '').replace(/ /g, '')).to.contain(expectedContent.trim().replace(/\n/g, '').replace(/ /g, ''));
+        expect(inlineScript[0].textContent.trim().replace(/\n/g, "").replace(/ /g, "")).to.contain(
+          expectedContent.trim().replace(/\n/g, "").replace(/ /g, ""),
+        );
       });
     });
 
-    describe('Tracking script', function() {
+    describe("Tracking script", function () {
       let trackingScript;
 
-      before(async function() {
-        const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, 'index.html'));
-        const scriptTags = dom.window.document.querySelectorAll('head script');
+      before(async function () {
+        const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+        const scriptTags = dom.window.document.querySelectorAll("head script");
 
-        trackingScript = Array.prototype.slice.call(scriptTags).filter(script => {
+        trackingScript = Array.prototype.slice.call(scriptTags).filter((script) => {
           return script.src === `https://www.googletagmanager.com/gtag/js?id=${mockAnalyticsId}`;
         });
       });
 
-      it('should have one <script> tag for loading the Google Analytics tracker', function() {
+      it("should have one <script> tag for loading the Google Analytics tracker", function () {
         expect(trackingScript.length).to.be.equal(1);
       });
 
-      it('should be an async <script> tag for loading the Google Analytics tracker', function() {
+      it("should be an async <script> tag for loading the Google Analytics tracker", function () {
         const isAsync = trackingScript[0].async !== null;
 
         expect(isAsync).to.be.equal(true);
@@ -109,8 +113,7 @@ describe('Build Greenwood With: ', function() {
     });
   });
 
-  after(function() {
+  after(function () {
     runner.teardown(getOutputTeardownFiles(outputPath));
   });
-
 });

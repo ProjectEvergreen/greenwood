@@ -1,7 +1,5 @@
-import { greenwoodPluginImportJson } from '../../../src/index.js';
+import { greenwoodPluginImportJson } from "../../../src/index.js";
 
 export default {
-  plugins: [
-    ...greenwoodPluginImportJson()
-  ]
+  plugins: [...greenwoodPluginImportJson()],
 };

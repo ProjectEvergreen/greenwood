@@ -1,5 +1,5 @@
 export default {
   devServer: {
-    hud: 1234
-  }
+    hud: 1234,
+  },
 };

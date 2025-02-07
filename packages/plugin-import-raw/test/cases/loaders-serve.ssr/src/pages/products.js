@@ -1,21 +1,23 @@
-import '../components/card.js';
-import { getProducts } from '../services/products.js';
-import styles from '../styles/some.css?type=raw';
+import "../components/card.js";
+import { getProducts } from "../services/products.js";
+import styles from "../styles/some.css?type=raw";
 
 export default class ProductsPage extends HTMLElement {
   async connectedCallback() {
     const products = await getProducts();
-    const html = products.map(product => {
-      const { name, thumbnail } = product;
+    const html = products
+      .map((product) => {
+        const { name, thumbnail } = product;
 
-      return `
+        return `
         <app-card
           title="${name}"
           thumbnail="${thumbnail}"
         >
         </app-card>
       `;
-    }).join('');
+      })
+      .join("");
 
     this.innerHTML = `
       <h2>SSR Page (w/ WCC)</h2>

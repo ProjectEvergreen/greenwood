@@ -1,6 +1,6 @@
 export default class Card extends HTMLElement {
   connectedCallback() {
-    const name = this.getAttribute('name');
+    const name = this.getAttribute("name");
 
     this.innerHTML = `
       <h1>Hello ${name}!!!</h1>
@@ -8,4 +8,4 @@ export default class Card extends HTMLElement {
   }
 }
 
-customElements.define('x-card', Card);
+customElements.define("x-card", Card);
