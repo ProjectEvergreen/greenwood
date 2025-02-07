@@ -113,6 +113,11 @@ Below are some tips to help with running / debugging tests:
 
 > **PLEASE DO NOT COMMIT ANY OF THESE ABOVE CHANGES THOUGH**
 
+### Code Content Testing
+
+In some cases test may actually check for specific build output contents to confirm certain operations like custom bundling or linking operations within the Greenwood build process worked as expected.  Keep in mind that if you change these contents as part of a test, that when Prettier formatting is run, the results may change and the test cases may fail, so just make sure to double check these contents with formatting applied first.
+
+
 ### Writing Tests
 
 Test cases follow a convention starting with the command (e.g. `build`) and and the capability and features being tested, like configuration with a particular option (e.g. `port`):
