@@ -30,7 +30,7 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: Please provide details of the environment your running in.
+      description: Please provide details of the environment you're running in.
       placeholder: Greenwood version, operating system, runtime version, browser, etc
     validations:
       required: true
