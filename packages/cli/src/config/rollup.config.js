@@ -334,7 +334,7 @@ function greenwoodImportMetaUrl(compilation) {
         const { relativeAssetPath } = assetUrl;
         const assetName = path.basename(pathname);
         const assetExtension = assetName.split(".").pop();
-        const assetContents = await fs.promises.readFile(url, "utf-8");
+        const assetContents = await fs.promises.readFile(url);
         const name = assetName.replace(`.${assetExtension}`, "");
         const request = new Request(url, { headers: { Accept: "text/javascript" } });
         let bundleExtensions = ["js"];
