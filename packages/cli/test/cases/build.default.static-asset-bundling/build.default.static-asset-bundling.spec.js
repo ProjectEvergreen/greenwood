@@ -42,7 +42,7 @@ describe("Build Greenwood With: ", function () {
     this.context = {
       publicDir: path.join(outputPath, "public"),
     };
-    runner = new Runner(false);
+    runner = new Runner();
   });
 
   describe(LABEL, function () {
