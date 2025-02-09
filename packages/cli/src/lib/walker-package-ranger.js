@@ -188,7 +188,11 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
   const { exports, module, main } = packageJson;
 
   // favor exports over main / module
-  if (exports) {
+  // favor exports over main / module
+  if (typeof exports === "string") {
+    // https://unpkg.com/browse/robust-predicates@3.0.2/package.json
+    updateImportMap(dependency, exports, resolvedRoot);
+  } else if (typeof exports === "object") {
     for (const sub in exports) {
       /*
        * test for conditional subpath exports
@@ -224,6 +228,10 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
           updateImportMap(dependency, `${exports[sub]}`, resolvedRoot);
         } else if (sub.indexOf("*") >= 0) {
           await walkExportPatterns(dependency, sub, exports[sub], resolvedRoot);
+        } else if (SUPPORTED_EXPORT_CONDITIONS.includes(sub)) {
+          // filter out for just supported top level conditions
+          // https://unpkg.com/browse/d3@7.9.0/package.json
+          updateImportMap(dependency, `${exports[sub]}`, resolvedRoot);
         } else {
           updateImportMap(`${dependency}/${sub}`, `${exports[sub]}`, resolvedRoot);
         }
