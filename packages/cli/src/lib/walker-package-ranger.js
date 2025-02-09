@@ -233,6 +233,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
           // https://unpkg.com/browse/d3@7.9.0/package.json
           updateImportMap(dependency, `${exports[sub]}`, resolvedRoot);
         } else {
+          // let all other conditions "pass through" as is
           updateImportMap(`${dependency}/${sub}`, `${exports[sub]}`, resolvedRoot);
         }
       }
