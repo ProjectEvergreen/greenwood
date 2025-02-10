@@ -16,7 +16,9 @@ class LiveReloadServer {
     const standardPluginsExtensions = (
       await Promise.all(
         standardPluginsNames.map(async (filename) => {
-          const pluginImport = await import(new URL(`./${filename}`, standardPluginsDirectoryPath).href);
+          const pluginImport = await import(
+            new URL(`./${filename}`, standardPluginsDirectoryPath).href
+          );
           const plugin = pluginImport[Object.keys(pluginImport)[0]];
 
           return plugin;
@@ -63,7 +65,6 @@ class LiveReloadServer {
     liveReloadServer.watch(userWorkspace.pathname);
   }
 }
-
 
 class LiveReloadResource {
   async shouldIntercept(url, request, response) {

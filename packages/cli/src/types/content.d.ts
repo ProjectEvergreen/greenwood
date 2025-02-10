@@ -5,7 +5,7 @@ export type Page = {
   label: string;
   route: string;
   data?: object;
-}
+};
 
 export type Collection = Page[];
 

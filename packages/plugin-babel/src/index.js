@@ -11,7 +11,7 @@ async function getConfig(compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = "babel.config.mjs";
   const defaultConfig = (await import(new URL(`./${configFile}`, import.meta.url).href)).default;
-  const userConfig = await checkResourceExists(new URL(`./${configFile}`, projectDirectory))
+  const userConfig = (await checkResourceExists(new URL(`./${configFile}`, projectDirectory)))
     ? (await import(`${projectDirectory}/${configFile}`)).default
     : {};
   const finalConfig = Object.assign({}, userConfig);

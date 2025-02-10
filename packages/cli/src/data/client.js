@@ -43,7 +43,7 @@ async function getContent() {
 
 /**
  * @param {string} collection - The name of the collection.
- * 
+ *
  * @returns {Promise<import("../types/content.d.ts").Collection>} - All pages in the collection
  */
 async function getContentByCollection(collection = "") {
@@ -52,7 +52,7 @@ async function getContentByCollection(collection = "") {
 
 /**
  * @param {string} route - The name of the route.
- * 
+ *
  * @returns {Promise<import("../types/content.d.ts").Collection>} - All pages under this route
  */
 async function getContentByRoute(route = "") {
