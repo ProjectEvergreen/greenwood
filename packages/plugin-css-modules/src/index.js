@@ -25,7 +25,7 @@ function getCssModulesMap(compilation) {
   let cssModulesMap = {};
 
   if (fs.existsSync(locationUrl)) {
-    cssModulesMap = JSON.parse(fs.readFileSync(locationUrl, 'utf-8'));
+    cssModulesMap = JSON.parse(fs.readFileSync(locationUrl, "utf-8"));
   }
 
   return cssModulesMap;

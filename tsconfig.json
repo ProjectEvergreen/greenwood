@@ -5,9 +5,6 @@
     "module": "NodeNext",
     "noEmit": true,
     "checkJs": true,
-    "types": [
-      "mocha",
-      "./packages/cli/src/types/index.d.ts"
-    ]
+    "types": ["mocha", "./packages/cli/src/types/index.d.ts"]
   }
 }

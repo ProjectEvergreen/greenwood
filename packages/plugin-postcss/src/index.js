@@ -14,7 +14,7 @@ async function getConfig(compilation, extendConfig = false) {
   const configFile = "postcss.config";
   const defaultConfig = (await import(new URL(`./${configFile}.js`, import.meta.url).href)).default;
   const userConfigUrl = new URL(`./${configFile}.js`, projectDirectory);
-  const userConfig = await checkResourceExists(userConfigUrl)
+  const userConfig = (await checkResourceExists(userConfigUrl))
     ? (await import(userConfigUrl.href)).default
     : {};
   const finalConfig = Object.assign({}, userConfig);

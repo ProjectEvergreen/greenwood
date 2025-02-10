@@ -59,9 +59,9 @@ class ApiRoutesResource {
 }
 
 const greenwoodApiRoutesPlugin = {
-  type: 'resource',
-  name: 'plugin-api-routes',
-  provider: (compilation) => new ApiRoutesResource(compilation)
+  type: "resource",
+  name: "plugin-api-routes",
+  provider: (compilation) => new ApiRoutesResource(compilation),
 };
 
 export { greenwoodApiRoutesPlugin };
