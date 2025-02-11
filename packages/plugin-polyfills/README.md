@@ -65,7 +65,7 @@ export default {
 
   // default values shown here
   plugins: [
-    ...greenwoodPluginPolyfills({
+    greenwoodPluginPolyfills({
       wc: true,
       dsd: false,
       lit: false

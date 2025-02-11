@@ -81,6 +81,7 @@ class PolyfillsResource {
   }
 }
 
+/** @type {import('./types/index.d.ts').PolyfillsPlugin} */
 const greenwoodPluginPolyfills = (options = {}) => {
   return [
     {

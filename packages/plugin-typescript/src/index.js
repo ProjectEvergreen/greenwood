@@ -66,6 +66,7 @@ class TypeScriptResource {
   }
 }
 
+/** @type {import('./types/index.d.ts').TypeScriptPlugin} */
 const greenwoodPluginTypeScript = (options = {}) => {
   return [
     {

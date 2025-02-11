@@ -51,12 +51,15 @@ class GoogleAnalyticsResource {
   }
 }
 
+/** @type {import('./types/index.d.ts').GoogleAnalyticsPlugin} */
 const greenwoodPluginGoogleAnalytics = (options = {}) => {
-  return {
-    type: "resource",
-    name: "plugin-google-analytics",
-    provider: (compilation) => new GoogleAnalyticsResource(compilation, options),
-  };
+  return [
+    {
+      type: "resource",
+      name: "plugin-google-analytics",
+      provider: (compilation) => new GoogleAnalyticsResource(compilation, options),
+    },
+  ];
 };
 
 export { greenwoodPluginGoogleAnalytics };

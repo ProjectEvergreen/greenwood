@@ -1,9 +1,8 @@
 import fs from "fs/promises";
 
 class IncludeHtmlResource {
-  constructor(compilation, options) {
+  constructor(compilation) {
     this.compilation = compilation;
-    this.options = options;
     this.extensions = [".html"];
     this.contentType = "text/html";
   }
@@ -47,7 +46,8 @@ class IncludeHtmlResource {
           `./${src.replace(/\.\.\//g, "")}`,
           this.compilation.context.userWorkspace,
         );
-        const { getData, getTemplate } = await import(srcUrl.href);
+        // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
+        const { getData, getTemplate } = await import(srcUrl);
         const includeContents = await getTemplate(await getData());
 
         body = body.replace(tag, includeContents);
@@ -60,11 +60,12 @@ class IncludeHtmlResource {
   }
 }
 
-const greenwoodPluginIncludeHTML = (options = {}) => [
+/** @type {import('./types/index.d.ts').IncludeHtmlPlugin} */
+const greenwoodPluginIncludeHTML = () => [
   {
     type: "resource",
     name: "plugin-include-html",
-    provider: (compilation) => new IncludeHtmlResource(compilation, options),
+    provider: (compilation) => new IncludeHtmlResource(compilation),
   },
 ];
 

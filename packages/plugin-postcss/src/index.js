@@ -12,10 +12,12 @@ import postcss from "postcss";
 async function getConfig(compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = "postcss.config";
-  const defaultConfig = (await import(new URL(`./${configFile}.js`, import.meta.url).href)).default;
+  // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
+  const defaultConfig = (await import(new URL(`./${configFile}.js`, import.meta.url))).default;
   const userConfigUrl = new URL(`./${configFile}.js`, projectDirectory);
   const userConfig = (await checkResourceExists(userConfigUrl))
-    ? (await import(userConfigUrl.href)).default
+    ? // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
+      (await import(userConfigUrl)).default
     : {};
   const finalConfig = Object.assign({}, userConfig);
 
@@ -61,12 +63,15 @@ class PostCssResource {
   }
 }
 
+/** @type {import('./types/index.d.ts').PostCssPlugin} */
 const greenwoodPluginPostCss = (options = {}) => {
-  return {
-    type: "resource",
-    name: "plugin-postcss",
-    provider: (compilation) => new PostCssResource(compilation, options),
-  };
+  return [
+    {
+      type: "resource",
+      name: "plugin-postcss",
+      provider: (compilation) => new PostCssResource(compilation, options),
+    },
+  ];
 };
 
 export { greenwoodPluginPostCss };

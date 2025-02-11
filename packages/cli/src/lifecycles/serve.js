@@ -385,6 +385,7 @@ async function getHybridServer(compilation) {
             });
           });
         } else {
+          // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const { handler } = await import(entryPointUrl);
           const response = await handler(request, compilation);
 
@@ -429,6 +430,7 @@ async function getHybridServer(compilation) {
             });
           });
         } else {
+          // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const { handler } = await import(entryPointUrl);
           const response = await handler(request);
 

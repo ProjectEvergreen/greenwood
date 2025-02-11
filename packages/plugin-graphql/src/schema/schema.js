@@ -41,6 +41,7 @@ const createSchema = async (compilation) => {
 
       for (const schemaPath of schemaPaths) {
         const { customTypeDefs, customResolvers } = await import(
+          // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           new URL(`./${schemaPath}`, customSchemasUrl)
         );
 

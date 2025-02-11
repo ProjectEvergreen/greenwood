@@ -20,6 +20,7 @@ const greenwoodPlugins = (
       return await Promise.all(
         files.map(async (file) => {
           const importUrl = new URL(`./${file}`, pluginDirectoryUrl);
+          // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const pluginImport = await import(importUrl);
           const plugin = pluginImport[Object.keys(pluginImport)[0]];
 

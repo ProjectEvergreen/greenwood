@@ -140,6 +140,7 @@ async function vercelAdapter(compilation, options) {
   });
 }
 
+/** @type {import('./types/index.d.ts').VercelAdapter} */
 const greenwoodPluginAdapterVercel = (options = {}) => [
   {
     type: "adapter",

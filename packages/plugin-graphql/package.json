@@ -16,8 +16,15 @@
     "GraphQL",
     "Apollo"
   ],
-  "main": "src/index.js",
   "type": "module",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./src/core/*": "./src/core/*",
+    "./src/queries/*": "./src/queries/*",
+    "./types": "./src/types/index.d.ts"
+  },
   "files": [
     "src/"
   ],
