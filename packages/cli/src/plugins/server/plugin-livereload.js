@@ -17,7 +17,8 @@ class LiveReloadServer {
       await Promise.all(
         standardPluginsNames.map(async (filename) => {
           const pluginImport = await import(
-            new URL(`./${filename}`, standardPluginsDirectoryPath).href
+            // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
+            new URL(`./${filename}`, standardPluginsDirectoryPath)
           );
           const plugin = pluginImport[Object.keys(pluginImport)[0]];
 

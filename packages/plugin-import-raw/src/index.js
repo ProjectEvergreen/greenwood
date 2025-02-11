@@ -54,6 +54,7 @@ class ImportRawResource {
   }
 }
 
+/** @type {import('./types/index.d.ts').ImportRawPlugin} */
 const greenwoodPluginImportRaw = (options = {}) => {
   return [
     {

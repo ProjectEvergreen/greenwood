@@ -10,7 +10,8 @@ import rollupBabelPlugin from "@rollup/plugin-babel";
 async function getConfig(compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = "babel.config.mjs";
-  const defaultConfig = (await import(new URL(`./${configFile}`, import.meta.url).href)).default;
+  // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
+  const defaultConfig = (await import(new URL(`./${configFile}`, import.meta.url))).default;
   const userConfig = (await checkResourceExists(new URL(`./${configFile}`, projectDirectory)))
     ? (await import(`${projectDirectory}/${configFile}`)).default
     : {};
@@ -58,6 +59,7 @@ class BabelResource {
   }
 }
 
+/** @type {import('./types/index.d.ts').BabelPlugin} */
 const greenwoodPluginBabel = (options = {}) => {
   return [
     {

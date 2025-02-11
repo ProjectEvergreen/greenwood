@@ -24,7 +24,7 @@ export type PLUGINS =
   | ServerPlugin
   | SourcePlugin;
 
-interface Plugin {
+export interface Plugin {
   name: string;
   type: string;
   provider: (compilation: Compilation) => unknown; // TODO could we narrow this further?
@@ -51,9 +51,11 @@ export interface RendererPlugin extends Plugin {
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#resource
+export type SERVE_PAGE_OPTIONS = "static" | "dynamic";
+
 type Resource = {
   extensions?: string[];
-  servePage?: "static" | "dynamic";
+  servePage?: SERVE_PAGE_OPTIONS;
   shouldResolve?: (url: URL) => Promise<boolean>;
   resolve?: (url: URL) => Promise<Request>;
   shouldServe?: (url: URL) => Promise<boolean>;

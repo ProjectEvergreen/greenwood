@@ -7,9 +7,8 @@ import escodegen from "escodegen";
 import { parseJsx } from "wc-compiler/src/jsx-loader.js";
 
 class ImportJsxResource {
-  constructor(compilation, options) {
+  constructor(compilation) {
     this.compilation = compilation;
-    this.options = options;
     this.extensions = ["jsx"];
     this.contentType = "text/javascript";
   }
@@ -35,11 +34,12 @@ class ImportJsxResource {
   }
 }
 
-const greenwoodPluginImportJsx = (options = {}) => [
+/** @type {import('./types/index.d.ts').ImportJsxPlugin} */
+const greenwoodPluginImportJsx = () => [
   {
     type: "resource",
     name: "plugin-import-jsx:resource",
-    provider: (compilation) => new ImportJsxResource(compilation, options),
+    provider: (compilation) => new ImportJsxResource(compilation),
   },
 ];
 

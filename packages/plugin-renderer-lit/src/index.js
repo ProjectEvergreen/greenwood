@@ -59,6 +59,7 @@ class LitHydrationResource {
   }
 }
 
+/** @type {import('./types/index.d.ts').LitRendererPlugin} */
 const greenwoodPluginRendererLit = () => {
   return [
     {

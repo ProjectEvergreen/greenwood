@@ -130,9 +130,8 @@ function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
 // this happens 'first' as the HTML is returned, to find viable references to CSS Modules
 // and inline those into a <style> tag on the page
 class ScanForCssModulesResource {
-  constructor(compilation, options) {
+  constructor(compilation) {
     this.compilation = compilation;
-    this.options = options;
     this.extensions = ["module.css"];
     this.contentType = "text/javascript";
 
@@ -218,9 +217,8 @@ class ScanForCssModulesResource {
 // this process all files that have CssModules content used
 // and strip out the `import` and replace all the references in class attributes with static values
 class StripCssModulesResource {
-  constructor(compilation, options) {
+  constructor(compilation) {
     this.compilation = compilation;
-    this.options = options;
     this.extensions = ["module.css"];
     this.contentType = "text/javascript";
   }
@@ -276,17 +274,18 @@ class StripCssModulesResource {
   }
 }
 
+/** @type {import('./types/index.d.ts').CssModulesPlugin} */
 const greenwoodPluginCssModules = () => {
   return [
     {
       type: "resource",
       name: "plugin-css-modules:scan",
-      provider: (compilation, options) => new ScanForCssModulesResource(compilation, options),
+      provider: (compilation) => new ScanForCssModulesResource(compilation),
     },
     {
       type: "resource",
       name: "plugin-css-modules-strip-modules",
-      provider: (compilation, options) => new StripCssModulesResource(compilation, options),
+      provider: (compilation) => new StripCssModulesResource(compilation),
     },
   ];
 };

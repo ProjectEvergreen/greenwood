@@ -15,8 +15,13 @@
     "Web Components",
     "ESM"
   ],
-  "main": "src/index.js",
   "type": "module",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./types": "./src/types/index.d.ts"
+  },
   "files": [
     "src/"
   ],

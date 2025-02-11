@@ -18,9 +18,8 @@ const importMap = {
 };
 
 class GraphQLResource {
-  constructor(compilation, options) {
+  constructor(compilation) {
     this.compilation = compilation;
-    this.options = options;
     this.extensions = ["gql"];
     this.contentType = ["text/javascript", "text/html"];
   }
@@ -79,9 +78,8 @@ class GraphQLResource {
 }
 
 class GraphQLServer {
-  constructor(compilation, options = {}) {
+  constructor(compilation) {
     this.compilation = compilation;
-    this.options = options;
   }
 
   async start() {
@@ -91,17 +89,18 @@ class GraphQLServer {
   }
 }
 
-const greenwoodPluginGraphQL = (options = {}) => {
+/** @type {import('./types/index.d.ts').GraphQLPlugin} */
+const greenwoodPluginGraphQL = () => {
   return [
     {
       type: "server",
       name: "plugin-graphql:server",
-      provider: (compilation) => new GraphQLServer(compilation, options),
+      provider: (compilation) => new GraphQLServer(compilation),
     },
     {
       type: "resource",
       name: "plugin-graphql:resource",
-      provider: (compilation) => new GraphQLResource(compilation, options),
+      provider: (compilation) => new GraphQLResource(compilation),
     },
   ];
 };

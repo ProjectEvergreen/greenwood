@@ -42,9 +42,8 @@ const testForCjsModule = async (url) => {
 };
 
 class ImportCommonJsResource {
-  constructor(compilation, options) {
+  constructor(compilation) {
     this.compilation = compilation;
-    this.options = options;
   }
 
   async shouldIntercept(url) {
@@ -83,12 +82,13 @@ class ImportCommonJsResource {
   }
 }
 
-const greenwoodPluginImportCommonJs = (options = {}) => {
+/** @type {import('./types/index.d.ts').ImportCommonJSPlugin} */
+const greenwoodPluginImportCommonJs = () => {
   return [
     {
       type: "resource",
       name: "plugin-import-commonjs:resource",
-      provider: (compilation) => new ImportCommonJsResource(compilation, options),
+      provider: (compilation) => new ImportCommonJsResource(compilation),
     },
     {
       type: "rollup",

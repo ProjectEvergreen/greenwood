@@ -2,6 +2,8 @@ import type { Config } from "./config.d.ts";
 import type { Page, Collection, Graph } from "./content.d.ts";
 import type { Compilation } from "./compilation.d.ts";
 import type {
+  SERVE_PAGE_OPTIONS,
+  Plugin,
   AdapterPlugin,
   ContextPlugin,
   CopyPlugin,
@@ -18,6 +20,8 @@ export type {
   Graph,
   Page,
   Compilation,
+  SERVE_PAGE_OPTIONS,
+  Plugin,
   AdapterPlugin,
   ContextPlugin,
   CopyPlugin,
