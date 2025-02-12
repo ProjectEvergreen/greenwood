@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  *
  * Manages web standard resource related operations for HTML and markdown.
@@ -14,7 +15,7 @@ import { getUserScripts, getPageLayout, getAppLayout } from "../../lib/layout-ut
 import { requestAsObject } from "../../lib/resource-utils.js";
 import { unified } from "unified";
 import { Worker } from "worker_threads";
-import htmlparser from "node-html-parser";
+import { parse as htmlparser } from "node-html-parser";
 
 class StandardHtmlResource {
   constructor(compilation) {
@@ -180,9 +181,11 @@ class StandardHtmlResource {
     const pageResources = this.compilation.graph.find((page) => page.route === pathname).resources;
     let body = await response.text();
 
-    const root = htmlparser.parse(body, {
-      script: true,
-      style: true,
+    const root = htmlparser(body, {
+      blockTextElements: {
+        script: true,
+        style: true,
+      },
     });
 
     for (const pageResource of pageResources) {

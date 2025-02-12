@@ -1,3 +1,4 @@
+// @ts-nocheck
 import fs from "fs/promises";
 import { hashString } from "../lib/hashing-utils.js";
 import Koa from "koa";
