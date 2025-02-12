@@ -1,4 +1,3 @@
-// import { ServerInterface } from "../lib/server-interface.js";
 import { getDevServer } from "../lifecycles/serve.js";
 
 const runDevServer = async (compilation) => {
@@ -19,17 +18,7 @@ const runDevServer = async (compilation) => {
             .filter((plugin) => {
               return plugin.type === "server";
             })
-            .map((plugin) => {
-              const provider = plugin.provider(compilation);
-
-              // if (!(provider instanceof ServerInterface)) {
-              //   console.warn(
-              //     `WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`,
-              //   );
-              // }
-
-              return provider;
-            }),
+            .map((plugin) => plugin.provider(compilation)),
         ];
 
         return Promise.all(

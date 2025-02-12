@@ -9,11 +9,11 @@
  * greenwood build
  *
  * User Config
- * class FooResource extends ResourceInterface {
+ * class FooResource {
  *   // see complete implementation in the greenwood.config.js file used for this spec
  * }
  *
- * class BarResource extends ResourceInterface {
+ * class BarResource {
  *   // see complete implementation in the greenwood.config.js file used for this spec
  * }
  *

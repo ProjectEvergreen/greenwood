@@ -8,7 +8,6 @@ import {
   preRenderCompilationCustom,
   staticRenderCompilation,
 } from "../lifecycles/prerender.js";
-// import { ServerInterface } from "../lib/server-interface.js";
 
 const runProductionBuild = async (compilation) => {
   // eslint-disable-next-line no-async-promise-executor
@@ -42,17 +41,7 @@ const runProductionBuild = async (compilation) => {
             .filter((plugin) => {
               return plugin.type === "server" && !plugin.isGreenwoodDefaultPlugin;
             })
-            .map((plugin) => {
-              const provider = plugin.provider(compilation);
-
-              // if (!(provider instanceof ServerInterface)) {
-              //   console.warn(
-              //     `WARNING: ${plugin.name}'s provider is not an instance of ServerInterface.`,
-              //   );
-              // }
-
-              return provider;
-            }),
+            .map((plugin) => plugin.provider(compilation)),
         ];
 
         if (activeContent) {
