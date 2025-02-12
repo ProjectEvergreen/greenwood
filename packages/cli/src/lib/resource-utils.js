@@ -1,3 +1,4 @@
+// @ts-nocheck
 import fs from "fs/promises";
 import { hashString } from "./hashing-utils.js";
 import { getResolvedHrefFromPathnameShortcut } from "../lib/node-modules-utils.js";

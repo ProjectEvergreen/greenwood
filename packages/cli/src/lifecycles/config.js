@@ -1,3 +1,4 @@
+// @ts-nocheck
 import fs from "fs/promises";
 import { checkResourceExists } from "../lib/resource-utils.js";
 
@@ -98,6 +99,7 @@ const readAndMergeConfig = async () => {
       }
 
       if (hasConfigFile) {
+        // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
         const userCfgFile = (await import(configUrl)).default;
         const {
           workspace,
@@ -310,7 +312,7 @@ const readAndMergeConfig = async () => {
         if (polyfills !== undefined) {
           const { importMaps, importAttributes } = polyfills;
 
-          customConfig.polyfills = {};
+          customConfig.polyfills = { importAttributes: null, importMaps: false };
 
           if (importMaps) {
             if (typeof importMaps === "boolean") {

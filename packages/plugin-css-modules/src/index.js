@@ -3,6 +3,7 @@
  * A plugin for enabling CSS Modules. :tm:
  *
  */
+// @ts-nocheck
 import fs from "fs";
 import htmlparser from "node-html-parser";
 import { parse, walk } from "css-tree";

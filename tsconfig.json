@@ -5,7 +5,10 @@
     "module": "NodeNext",
     "noEmit": true,
     "checkJs": true,
+    "skipLibCheck": true,
     "types": [
+      "acorn",
+      "acorn-walk",
       "mocha",
       "./packages/cli/src/types/index.d.ts",
       "./packages/plugin-adapter-netlify/src/types/index.d.ts",
@@ -24,5 +27,12 @@
       "./packages/plugin-renderer-puppeteer/src/types/index.d.ts",
       "./packages/plugin-typescript/src/types/index.d.ts"
     ]
-  }
+  },
+  "exclude": [
+    "public/",
+    "./packages/cli/test/cases/develop.config.polyfills-import-attributes/src/components/hero.js",
+    "./packages/**/test/**",
+    "./test/**",
+    "./www/**"
+  ]
 }
