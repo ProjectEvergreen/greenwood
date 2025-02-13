@@ -63,7 +63,7 @@ describe("Build Greenwood With: ", function () {
       });
 
       it("should have the expected bundle path for the first static asset", function () {
-        const bundleName = "greenwood-logo.BBDNkm3l.png";
+        const bundleName = "greenwood-logo.DiicYFep.png";
 
         expect(headerContents).to.contain(bundleName);
       });
