@@ -324,6 +324,10 @@ function greenwoodImportMetaUrl(compilation) {
         },
       });
 
+      // have to replacements synchronously otherwise out of order mappings will "erase" previous works
+      // and thus only the last modification wins
+      const replacements = [];
+
       for (const assetUrl of assetUrls) {
         const { url } = assetUrl;
         const { pathname } = url;
@@ -376,9 +380,18 @@ function greenwoodImportMetaUrl(compilation) {
           // https://github.com/ProjectEvergreen/greenwood/issues/1163
         }
 
-        modifiedCode = code
-          .replace(`'${relativeAssetPath}'`, importRef)
-          .replace(`"${relativeAssetPath}"`, importRef);
+        replacements.push({ relativeAssetPath, importRef });
+      }
+
+      if (replacements.length > 0) {
+        modifiedCode = code;
+
+        for (const replacement of replacements) {
+          const { relativeAssetPath, importRef } = replacement;
+
+          modifiedCode = modifiedCode.replace(`'${relativeAssetPath}'`, importRef);
+          modifiedCode = modifiedCode.replace(`"${relativeAssetPath}"`, importRef);
+        }
       }
 
       return {
