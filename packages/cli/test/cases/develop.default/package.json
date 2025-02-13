@@ -6,6 +6,7 @@
     "@spectrum-css/card": "^9.3.0",
     "@spectrum-web-components/action-menu": "^1.0.1",
     "@uswds/web-components": "^0.0.1-alpha",
+    "d3": "^7.9.0",
     "lit": "^3.1.0",
     "luxon": "^3.5.0",
     "signal-utils": "^0.21.1",
