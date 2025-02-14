@@ -58,9 +58,9 @@ describe("Build Greenwood With: ", function () {
   const LABEL = "AWS Adapter plugin output";
   const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const vercelOutputFolder = new URL("./.aws-output/", import.meta.url);
-  const vercelApiFunctionsOutputUrl = new URL("./api/", vercelOutputFolder);
-  const vercelRouteFunctionsOutputUrl = new URL("./routes/", vercelOutputFolder);
+  const awsOutputFolder = new URL("./.aws-output/", import.meta.url);
+  const awsApiFunctionsOutputUrl = new URL("./api/", awsOutputFolder);
+  const awsRouteFunctionsOutputUrl = new URL("./routes/", awsOutputFolder);
   const hostname = "http://www.example.com";
   let runner;
 
@@ -83,10 +83,10 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         functionFolders = await glob.promise(
-          path.join(normalizePathnameForWindows(vercelOutputFolder), "api/*"),
+          path.join(normalizePathnameForWindows(awsOutputFolder), "api/*"),
         );
         routeFolders = await glob.promise(
-          path.join(normalizePathnameForWindows(vercelOutputFolder), "routes/*"),
+          path.join(normalizePathnameForWindows(awsOutputFolder), "routes/*"),
         );
       });
 
@@ -112,9 +112,7 @@ describe("Build Greenwood With: ", function () {
 
     describe("Greeting API Route adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
-        const { handler } = await import(
-          new URL("./greeting/index.js", vercelApiFunctionsOutputUrl)
-        );
+        const { handler } = await import(new URL("./greeting/index.js", awsApiFunctionsOutputUrl));
         const param = "Greenwood";
         const { statusCode, body, headers } = await handler({
           rawPath: `${hostname}/api/greeting`,
@@ -132,7 +130,7 @@ describe("Build Greenwood With: ", function () {
 
       it("should not have a shared asset for the card component", async () => {
         const assets = await glob.promise(
-          path.join(normalizePathnameForWindows(vercelApiFunctionsOutputUrl), "/greeting/*"),
+          path.join(normalizePathnameForWindows(awsApiFunctionsOutputUrl), "/greeting/*"),
         );
         const exists = assets.find((asset) => {
           const name = asset.split("/").pop();
@@ -145,9 +143,7 @@ describe("Build Greenwood With: ", function () {
 
     describe("Fragments API Route adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
-        const { handler } = await import(
-          new URL("./fragment/index.js", vercelApiFunctionsOutputUrl)
-        );
+        const { handler } = await import(new URL("./fragment/index.js", awsApiFunctionsOutputUrl));
         const { statusCode, body, headers } = await handler({
           rawPath: `${hostname}/api/fragment`,
           headers: {
@@ -167,7 +163,7 @@ describe("Build Greenwood With: ", function () {
       it("should have a route chunk", async () => {
         const chunks = await glob.promise(
           path.join(
-            normalizePathnameForWindows(vercelApiFunctionsOutputUrl),
+            normalizePathnameForWindows(awsApiFunctionsOutputUrl),
             "/fragment/fragment.*.js",
           ),
         );
@@ -180,7 +176,7 @@ describe("Build Greenwood With: ", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         const name = "Greenwood";
         const { handler } = await import(
-          new URL("./submit-json/index.js", vercelApiFunctionsOutputUrl)
+          new URL("./submit-json/index.js", awsApiFunctionsOutputUrl)
         );
         const { statusCode, body, headers } = await handler({
           rawPath: `${hostname}/api/submit-json`,
@@ -203,7 +199,7 @@ describe("Build Greenwood With: ", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         const name = "Greenwood";
         const { handler } = await import(
-          new URL("./submit-form-data/index.js", vercelApiFunctionsOutputUrl)
+          new URL("./submit-form-data/index.js", awsApiFunctionsOutputUrl)
         );
         const { statusCode, body, headers } = await handler({
           rawPath: `${hostname}/api/submit-form-data`,
@@ -225,7 +221,7 @@ describe("Build Greenwood With: ", function () {
     describe("Search API Route adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         const term = "Analog";
-        const { handler } = await import(new URL("./search/index.js", vercelApiFunctionsOutputUrl));
+        const { handler } = await import(new URL("./search/index.js", awsApiFunctionsOutputUrl));
         const { statusCode, body, headers } = await handler({
           rawPath: `${hostname}/api/search`,
           headers: {
@@ -249,7 +245,7 @@ describe("Build Greenwood With: ", function () {
     describe("Nested API Route adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         const { handler } = await import(
-          new URL("./nested-endpoint/index.js", vercelApiFunctionsOutputUrl)
+          new URL("./nested-endpoint/index.js", awsApiFunctionsOutputUrl)
         );
         const { statusCode, body, headers } = await handler({
           rawPath: `${hostname}/api/nested/endpoint`,
@@ -264,9 +260,7 @@ describe("Build Greenwood With: ", function () {
 
     describe("Artists SSR Page adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
-        const { handler } = await import(
-          new URL("./artists/index.js", vercelRouteFunctionsOutputUrl)
-        );
+        const { handler } = await import(new URL("./artists/index.js", awsRouteFunctionsOutputUrl));
         const count = 2;
         const { statusCode, body, headers } = await handler({
           rawPath: `${hostname}/artists/`,
@@ -288,7 +282,7 @@ describe("Build Greenwood With: ", function () {
     describe("Blog Index (collision test) SSR Page adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         const { handler } = await import(
-          new URL("./blog-index/index.js", vercelRouteFunctionsOutputUrl)
+          new URL("./blog-index/index.js", awsRouteFunctionsOutputUrl)
         );
         const { statusCode, body, headers } = await handler({
           rawPath: `${hostname}/blog/`,
@@ -308,7 +302,7 @@ describe("Build Greenwood With: ", function () {
     describe("Blog First Post (nested) SSR Page adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         const { handler } = await import(
-          new URL("./blog-first-post/index.js", vercelRouteFunctionsOutputUrl)
+          new URL("./blog-first-post/index.js", awsRouteFunctionsOutputUrl)
         );
         const { statusCode, body, headers } = await handler({
           rawPath: `${hostname}/blog/first-post/`,
@@ -327,9 +321,7 @@ describe("Build Greenwood With: ", function () {
 
     describe("Index (collision test) SSR Page adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
-        const { handler } = await import(
-          new URL("./index/index.js", vercelRouteFunctionsOutputUrl)
-        );
+        const { handler } = await import(new URL("./index/index.js", awsRouteFunctionsOutputUrl));
         const { statusCode, body, headers } = await handler({
           rawPath: `${hostname}/`,
           routeKey: "GET /",
@@ -347,9 +339,7 @@ describe("Build Greenwood With: ", function () {
 
     describe("Users SSR Page adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
-        const { handler } = await import(
-          new URL("./users/index.js", vercelRouteFunctionsOutputUrl)
-        );
+        const { handler } = await import(new URL("./users/index.js", awsRouteFunctionsOutputUrl));
         const count = 1;
         const { statusCode, body, headers } = await handler({
           rawPath: `${hostname}/users/`,
@@ -371,7 +361,7 @@ describe("Build Greenwood With: ", function () {
     describe("Post SSR Page adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         const postId = 1;
-        const { handler } = await import(new URL("./post/index.js", vercelRouteFunctionsOutputUrl));
+        const { handler } = await import(new URL("./post/index.js", awsRouteFunctionsOutputUrl));
         const { statusCode, body, headers } = await handler({
           rawPath: `${hostname}/post/`,
           rawQueryString: `id=${postId}`,

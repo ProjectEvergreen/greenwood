@@ -2,7 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
 
-// https://vercel.com/docs/functions/serverless-functions/runtimes/node-js#node.js-helpers
+// https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#apigateway-example-event
 function generateOutputFormat(id, type) {
   const handlerAlias = "$handler";
   const path = type === "page" ? `${id}.route` : id;
@@ -41,7 +41,6 @@ function generateOutputFormat(id, type) {
         method
       });
 
-      // https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#apigateway-example-event
       const res = await $handler(req);
       return {
         "body": await res.text(),
