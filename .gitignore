@@ -14,3 +14,4 @@ packages/**/test/**/.netlify
 packages/**/test/**/.vercel
 public/
 adapter-output/
+.aws-output/
