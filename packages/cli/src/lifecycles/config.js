@@ -1,3 +1,4 @@
+// @ts-nocheck
 import fs from "fs/promises";
 import { checkResourceExists } from "../lib/resource-utils.js";
 
@@ -20,6 +21,7 @@ const greenwoodPlugins = (
       return await Promise.all(
         files.map(async (file) => {
           const importUrl = new URL(`./${file}`, pluginDirectoryUrl);
+          // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const pluginImport = await import(importUrl);
           const plugin = pluginImport[Object.keys(pluginImport)[0]];
 
@@ -97,6 +99,7 @@ const readAndMergeConfig = async () => {
       }
 
       if (hasConfigFile) {
+        // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
         const userCfgFile = (await import(configUrl)).default;
         const {
           workspace,
@@ -309,7 +312,7 @@ const readAndMergeConfig = async () => {
         if (polyfills !== undefined) {
           const { importMaps, importAttributes } = polyfills;
 
-          customConfig.polyfills = {};
+          customConfig.polyfills = { importAttributes: null, importMaps: false };
 
           if (importMaps) {
             if (typeof importMaps === "boolean") {

@@ -2,7 +2,6 @@
   "name": "@greenwood/plugin-renderer-lit",
   "version": "0.31.1",
   "description": "A server-side rendering plugin for Lit based Greenwood projects.",
-  "type": "module",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-lit",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
@@ -17,7 +16,13 @@
     "Lit",
     "SSR"
   ],
+  "type": "module",
   "main": "./src/index.js",
+  "module": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./types": "./src/types/index.d.ts"
+  },
   "files": [
     "src/"
   ],

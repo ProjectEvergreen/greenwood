@@ -34,14 +34,27 @@ async function getContentAsData(key = "") {
   }
 }
 
+/**
+ * @returns {Promise<import("../types/content.d.ts").Graph>} - The entire set of pages in the project.
+ */
 async function getContent() {
   return await getContentAsData("graph");
 }
 
+/**
+ * @param {string} collection - The name of the collection.
+ *
+ * @returns {Promise<import("../types/content.d.ts").Collection>} - All pages in the collection
+ */
 async function getContentByCollection(collection = "") {
   return await getContentAsData(`collection-${collection}`);
 }
 
+/**
+ * @param {string} route - The name of the route.
+ *
+ * @returns {Promise<import("../types/content.d.ts").Collection>} - All pages under this route
+ */
 async function getContentByRoute(route = "") {
   return await getContentAsData(`route-${route}`);
 }

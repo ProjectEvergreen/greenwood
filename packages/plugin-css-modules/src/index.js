@@ -3,10 +3,10 @@
  * A plugin for enabling CSS Modules. :tm:
  *
  */
+// @ts-nocheck
 import fs from "fs";
 import htmlparser from "node-html-parser";
 import { parse, walk } from "css-tree";
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 import * as acornWalk from "acorn-walk";
 import * as acorn from "acorn";
 import { hashString } from "@greenwood/cli/src/lib/hashing-utils.js";
@@ -26,7 +26,7 @@ function getCssModulesMap(compilation) {
   let cssModulesMap = {};
 
   if (fs.existsSync(locationUrl)) {
-    cssModulesMap = JSON.parse(fs.readFileSync(locationUrl));
+    cssModulesMap = JSON.parse(fs.readFileSync(locationUrl, "utf-8"));
   }
 
   return cssModulesMap;
@@ -130,10 +130,9 @@ function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
 
 // this happens 'first' as the HTML is returned, to find viable references to CSS Modules
 // and inline those into a <style> tag on the page
-class ScanForCssModulesResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
-
+class ScanForCssModulesResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ["module.css"];
     this.contentType = "text/javascript";
 
@@ -218,10 +217,9 @@ class ScanForCssModulesResource extends ResourceInterface {
 
 // this process all files that have CssModules content used
 // and strip out the `import` and replace all the references in class attributes with static values
-class StripCssModulesResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
-
+class StripCssModulesResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ["module.css"];
     this.contentType = "text/javascript";
   }
@@ -277,17 +275,18 @@ class StripCssModulesResource extends ResourceInterface {
   }
 }
 
+/** @type {import('./types/index.d.ts').CssModulesPlugin} */
 const greenwoodPluginCssModules = () => {
   return [
     {
       type: "resource",
       name: "plugin-css-modules:scan",
-      provider: (compilation, options) => new ScanForCssModulesResource(compilation, options),
+      provider: (compilation) => new ScanForCssModulesResource(compilation),
     },
     {
       type: "resource",
       name: "plugin-css-modules-strip-modules",
-      provider: (compilation, options) => new StripCssModulesResource(compilation, options),
+      provider: (compilation) => new StripCssModulesResource(compilation),
     },
   ];
 };

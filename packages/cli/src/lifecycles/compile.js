@@ -47,6 +47,7 @@ const generateCompilation = () => {
           console.info("Loading manifest from build output...");
           // TODO put reviver into a utility?
           const manifest = JSON.parse(
+            // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
             await fs.readFile(new URL("./manifest.json", outputDir)),
             function reviver(key, value) {
               if (typeof value === "object" && value !== null) {
@@ -65,6 +66,7 @@ const generateCompilation = () => {
           console.info("Loading resources from build output...");
           // TODO put reviver into a utility?
           const resources = JSON.parse(
+            // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
             await fs.readFile(new URL("./resources.json", outputDir)),
             function reviver(key, value) {
               if (typeof value === "object" && value !== null) {

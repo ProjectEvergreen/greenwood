@@ -5,11 +5,10 @@
  */
 import { checkResourceExists } from "../../lib/resource-utils.js";
 import fs from "fs/promises";
-import { ResourceInterface } from "../../lib/resource-interface.js";
 
-class SourceMapsResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class SourceMapsResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ["map"];
     this.contentType = "application/json";
   }
@@ -32,7 +31,7 @@ class SourceMapsResource extends ResourceInterface {
 const greenwoodPluginSourceMaps = {
   type: "resource",
   name: "plugin-source-maps",
-  provider: (compilation, options) => new SourceMapsResource(compilation, options),
+  provider: (compilation) => new SourceMapsResource(compilation),
 };
 
 export { greenwoodPluginSourceMaps };

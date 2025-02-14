@@ -1,8 +1,7 @@
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
-
-class LitHydrationResource extends ResourceInterface {
+class LitHydrationResource {
   constructor(compilation, options) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
   }
 
   async shouldIntercept(url) {
@@ -60,6 +59,7 @@ class LitHydrationResource extends ResourceInterface {
   }
 }
 
+/** @type {import('./types/index.d.ts').LitRendererPlugin} */
 const greenwoodPluginRendererLit = () => {
   return [
     {

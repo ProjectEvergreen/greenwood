@@ -1,9 +1,8 @@
 import fs from "fs/promises";
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 
-class IncludeHtmlResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class IncludeHtmlResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = [".html"];
     this.contentType = "text/html";
   }
@@ -47,6 +46,7 @@ class IncludeHtmlResource extends ResourceInterface {
           `./${src.replace(/\.\.\//g, "")}`,
           this.compilation.context.userWorkspace,
         );
+        // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
         const { getData, getTemplate } = await import(srcUrl);
         const includeContents = await getTemplate(await getData());
 
@@ -60,11 +60,12 @@ class IncludeHtmlResource extends ResourceInterface {
   }
 }
 
-const greenwoodPluginIncludeHTML = (options = {}) => [
+/** @type {import('./types/index.d.ts').IncludeHtmlPlugin} */
+const greenwoodPluginIncludeHTML = () => [
   {
     type: "resource",
     name: "plugin-include-html",
-    provider: (compilation) => new IncludeHtmlResource(compilation, options),
+    provider: (compilation) => new IncludeHtmlResource(compilation),
   },
 ];
 

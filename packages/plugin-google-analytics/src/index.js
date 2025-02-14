@@ -1,8 +1,7 @@
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
-
-class GoogleAnalyticsResource extends ResourceInterface {
+class GoogleAnalyticsResource {
   constructor(compilation, options = {}) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
 
     const { analyticsId } = options;
 
@@ -52,12 +51,15 @@ class GoogleAnalyticsResource extends ResourceInterface {
   }
 }
 
+/** @type {import('./types/index.d.ts').GoogleAnalyticsPlugin} */
 const greenwoodPluginGoogleAnalytics = (options = {}) => {
-  return {
-    type: "resource",
-    name: "plugin-google-analytics",
-    provider: (compilation) => new GoogleAnalyticsResource(compilation, options),
-  };
+  return [
+    {
+      type: "resource",
+      name: "plugin-google-analytics",
+      provider: (compilation) => new GoogleAnalyticsResource(compilation, options),
+    },
+  ];
 };
 
 export { greenwoodPluginGoogleAnalytics };

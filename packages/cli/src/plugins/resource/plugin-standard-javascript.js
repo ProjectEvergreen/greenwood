@@ -5,15 +5,14 @@
  *
  */
 import fs from "fs/promises";
-import { ResourceInterface } from "../../lib/resource-interface.js";
 import terser from "@rollup/plugin-terser";
 import * as acorn from "acorn";
 import * as walk from "acorn-walk";
 import { ACORN_OPTIONS } from "../../lib/parsing-utils.js";
 
-class StandardJavaScriptResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class StandardJavaScriptResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ["js"];
     this.contentType = "text/javascript";
   }
@@ -73,12 +72,13 @@ const greenwoodPluginStandardJavascript = [
   {
     type: "resource",
     name: "plugin-standard-javascript:resource",
-    provider: (compilation, options) => new StandardJavaScriptResource(compilation, options),
+    provider: (compilation) => new StandardJavaScriptResource(compilation),
   },
   {
     type: "rollup",
     name: "plugin-standard-javascript:rollup",
     provider: (compilation) => {
+      // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
       return compilation.config.optimization !== "none" ? [terser()] : [];
     },
   },

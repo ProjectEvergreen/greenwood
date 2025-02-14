@@ -1,3 +1,4 @@
+// @ts-nocheck
 import fs from "fs/promises";
 import fm from "front-matter";
 import { checkResourceExists, requestAsObject } from "../lib/resource-utils.js";

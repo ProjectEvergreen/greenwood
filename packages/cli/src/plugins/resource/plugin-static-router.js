@@ -7,11 +7,10 @@
  */
 import { checkResourceExists } from "../../lib/resource-utils.js";
 import fs from "fs/promises";
-import { ResourceInterface } from "../../lib/resource-interface.js";
 
-class StaticRouterResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class StaticRouterResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ["html"];
     this.contentType = "text/html";
     this.libPath = "@greenwood/router/router.js";
@@ -146,7 +145,7 @@ class StaticRouterResource extends ResourceInterface {
 const greenwoodPluginStaticRouter = {
   type: "resource",
   name: "plugin-static-router",
-  provider: (compilation, options) => new StaticRouterResource(compilation, options),
+  provider: (compilation) => new StaticRouterResource(compilation),
 };
 
 export { greenwoodPluginStaticRouter };

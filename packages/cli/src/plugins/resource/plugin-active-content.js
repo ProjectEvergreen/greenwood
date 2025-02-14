@@ -1,5 +1,4 @@
 import { mergeImportMap } from "../../lib/node-modules-utils.js";
-import { ResourceInterface } from "../../lib/resource-interface.js";
 import { checkResourceExists } from "../../lib/resource-utils.js";
 import {
   activeFrontmatterKeys,
@@ -16,10 +15,9 @@ const importMap = {
     "/node_modules/@greenwood/cli/src/lib/content-utils.js",
 };
 
-class ContentAsDataResource extends ResourceInterface {
-  constructor(compilation, options = {}) {
-    super(compilation, options);
-
+class ContentAsDataResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.contentType = ["text/html"];
   }
 
@@ -35,7 +33,7 @@ class ContentAsDataResource extends ResourceInterface {
     const contentKey = request.headers.get("x-content-key") ?? "";
     const keyPieces = contentKey.split("-");
     let status;
-    let body = [];
+    let body;
 
     if (contentKey === "") {
       status = 403;

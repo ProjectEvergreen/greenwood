@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  *
  * Manages web standard resource related operations for HTML and markdown.
@@ -10,17 +11,15 @@ import rehypeRaw from "rehype-raw";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
-import { ResourceInterface } from "../../lib/resource-interface.js";
 import { getUserScripts, getPageLayout, getAppLayout } from "../../lib/layout-utils.js";
 import { requestAsObject } from "../../lib/resource-utils.js";
 import { unified } from "unified";
 import { Worker } from "worker_threads";
-import htmlparser from "node-html-parser";
+import { parse as htmlparser } from "node-html-parser";
 
-class StandardHtmlResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
-
+class StandardHtmlResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = [".html", ".md"];
     this.contentType = "text/html";
   }
@@ -182,9 +181,11 @@ class StandardHtmlResource extends ResourceInterface {
     const pageResources = this.compilation.graph.find((page) => page.route === pathname).resources;
     let body = await response.text();
 
-    const root = htmlparser.parse(body, {
-      script: true,
-      style: true,
+    const root = htmlparser(body, {
+      blockTextElements: {
+        script: true,
+        style: true,
+      },
     });
 
     for (const pageResource of pageResources) {
@@ -298,7 +299,7 @@ class StandardHtmlResource extends ResourceInterface {
 const greenwoodPluginStandardHtml = {
   type: "resource",
   name: "plugin-standard-html",
-  provider: (compilation, options) => new StandardHtmlResource(compilation, options),
+  provider: (compilation) => new StandardHtmlResource(compilation),
 };
 
 export { greenwoodPluginStandardHtml };

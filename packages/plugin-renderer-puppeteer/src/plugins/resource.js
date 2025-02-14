@@ -1,9 +1,7 @@
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
-
-class PuppeteerResource extends ResourceInterface {
+class PuppeteerResource {
   constructor(compilation, options) {
-    super(compilation, options);
-
+    this.compilation = compilation;
+    this.options = options;
     this.extensions = [".html"];
     this.contentType = "text/html";
   }

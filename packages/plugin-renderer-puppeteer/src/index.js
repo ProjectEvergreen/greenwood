@@ -1,6 +1,7 @@
 import { PuppeteerResource } from "./plugins/resource.js";
 import { PuppeteerServer } from "./plugins/server.js";
 
+/** @type {import('./types/index.d.ts').PuppeteerRendererPlugin} */
 const greenwoodPluginRendererPuppeteer = (options = {}) => {
   return [
     {

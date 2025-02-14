@@ -1,3 +1,4 @@
+// @ts-nocheck
 import fs from "fs/promises";
 import { hashString } from "../lib/hashing-utils.js";
 import Koa from "koa";
@@ -9,7 +10,6 @@ import {
   requestAsObject,
 } from "../lib/resource-utils.js";
 import { Readable } from "stream";
-import { ResourceInterface } from "../lib/resource-interface.js";
 import { Worker } from "worker_threads";
 
 async function getDevServer(compilation) {
@@ -30,17 +30,7 @@ async function getDevServer(compilation) {
       .filter((plugin) => {
         return plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin;
       })
-      .map((plugin) => {
-        const provider = plugin.provider(compilationCopy);
-
-        if (!(provider instanceof ResourceInterface)) {
-          console.warn(
-            `WARNING: ${plugin.name}'s provider is not an instance of ResourceInterface.`,
-          );
-        }
-
-        return provider;
-      }),
+      .map((plugin) => plugin.provider(compilationCopy)),
   ];
 
   app.use(koaBody());
@@ -386,6 +376,7 @@ async function getHybridServer(compilation) {
             });
           });
         } else {
+          // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const { handler } = await import(entryPointUrl);
           const response = await handler(request, compilation);
 
@@ -430,6 +421,7 @@ async function getHybridServer(compilation) {
             });
           });
         } else {
+          // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const { handler } = await import(entryPointUrl);
           const response = await handler(request);
 

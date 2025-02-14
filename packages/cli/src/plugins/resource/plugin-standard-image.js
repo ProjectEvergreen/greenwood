@@ -5,11 +5,10 @@
  *
  */
 import fs from "fs/promises";
-import { ResourceInterface } from "../../lib/resource-interface.js";
 
-class StandardImageResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class StandardImageResource {
+  constructor(compilation) {
+    this.compilation = compilation;
 
     // https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Image_types
     this.extensions = ["avif", "webp", "jpg", "jpeg", "png", "gif", "svg", "ico"];
@@ -36,7 +35,7 @@ class StandardImageResource extends ResourceInterface {
 const greenwoodPluginStandardImage = {
   type: "resource",
   name: "plugin-standard-image",
-  provider: (compilation, options) => new StandardImageResource(compilation, options),
+  provider: (compilation) => new StandardImageResource(compilation),
 };
 
 export { greenwoodPluginStandardImage };
