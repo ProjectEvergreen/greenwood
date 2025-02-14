@@ -1,6 +1,9 @@
 import type { Config } from "./config.d.ts";
 import type { Page, Collection, Graph } from "./content.d.ts";
-import type { Compilation } from "./compilation.d.ts";
+import type { Compilation, Frontmatter } from "./compilation.d.ts";
+import type { ApiRouteHandler } from "./api.d.ts";
+import type { SsrRouteHandler, GetBody, GetLayout, GetFrontmatter } from "./ssr.d.ts";
+
 import type {
   SERVE_PAGE_OPTIONS,
   Plugin,
@@ -20,6 +23,7 @@ export type {
   Graph,
   Page,
   Compilation,
+  Frontmatter,
   SERVE_PAGE_OPTIONS,
   Plugin,
   AdapterPlugin,
@@ -30,4 +34,9 @@ export type {
   RollupPlugin,
   ServerPlugin,
   SourcePlugin,
+  ApiRouteHandler,
+  SsrRouteHandler,
+  GetBody,
+  GetLayout,
+  GetFrontmatter,
 };

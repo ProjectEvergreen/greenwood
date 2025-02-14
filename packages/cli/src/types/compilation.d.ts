@@ -17,3 +17,14 @@ export type Compilation = {
   graph: Page[];
   config: Config;
 };
+
+export type Frontmatter = {
+  collection?: string;
+  label?: string;
+  layout?: string;
+  title?: string;
+  imports?: string[];
+  data: {
+    [key: string]: string;
+  };
+};
