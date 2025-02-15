@@ -4,7 +4,7 @@
 
 A Greenwood plugin for writing [**TypeScript**](https://www.typescriptlang.org/). For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
-> This package assumes you already have `@greenwood/cli` installed.
+> This package assumes you already have `@greenwood/cli` and `typescript` >= 5.3.x installed.
 
 ## Installation
 
@@ -70,8 +70,10 @@ This plugin provides the following default `compilerOptions`.
   "compilerOptions": {
     "target": "es2020",
     "module": "es2020",
-    "moduleResolution": "node",
-    "sourceMap": true
+    "moduleResolution": "NodeNext",
+    "lib": ["es2022", "DOM", "DOM.Iterable", "esnext"],
+    "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true
   }
 }
 ```

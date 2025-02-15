@@ -8,10 +8,12 @@ import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js"
 import tsc from "typescript";
 
 const defaultCompilerOptions = {
-  target: "es2020",
-  module: "es2020",
-  moduleResolution: "node",
-  sourceMap: true,
+  target: "es2022",
+  module: "es2022",
+  moduleResolution: "NodeNext",
+  lib: ["es2022", "DOM", "DOM.Iterable", "esnext"],
+  allowImportingTsExtensions: true,
+  allowSyntheticDefaultImports: true,
 };
 
 async function getCompilerOptions(projectDirectory, extendConfig) {
