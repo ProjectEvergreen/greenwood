@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import { hashString } from "./hashing-utils.js";
 import { getResolvedHrefFromPathnameShortcut } from "../lib/node-modules-utils.js";
-import htmlparser from "node-html-parser";
+import * as htmlparser from "node-html-parser";
 import { asyncMap } from "./async-utils.js";
 
 async function modelResource(
@@ -84,6 +84,10 @@ function normalizePathnameForWindows(url) {
 }
 
 async function checkResourceExists(url) {
+  if (url.pathname === "/") {
+    return false;
+  }
+
   try {
     await fs.access(url);
     return true;

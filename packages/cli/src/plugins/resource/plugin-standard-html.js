@@ -15,7 +15,7 @@ import { getUserScripts, getPageLayout, getAppLayout } from "../../lib/layout-ut
 import { requestAsObject } from "../../lib/resource-utils.js";
 import { unified } from "unified";
 import { Worker } from "worker_threads";
-import htmlparser from "node-html-parser";
+import * as htmlparser from "node-html-parser";
 
 class StandardHtmlResource extends ResourceInterface {
   constructor(compilation, options) {

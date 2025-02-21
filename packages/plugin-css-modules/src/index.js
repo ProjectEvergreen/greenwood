@@ -4,7 +4,7 @@
  *
  */
 import fs from "fs";
-import htmlparser from "node-html-parser";
+import * as htmlparser from "node-html-parser";
 import { parse, walk } from "css-tree";
 import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 import * as acornWalk from "acorn-walk";
