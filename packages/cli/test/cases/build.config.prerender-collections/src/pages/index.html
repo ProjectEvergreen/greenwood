@@ -6,11 +6,14 @@ order: 1
 <html>
   <head>
     <script type="module" src="../components/header.js" data-gwd-opt="static"></script>
+    <script type="module" src="../components/footer.js" data-gwd-opt="static"></script>
   </head>
 
   <body>
     <x-header></x-header>
-    <span>${globalThis.collection.nav}</span>
+    <span id="nav">${globalThis.collection.nav}</span>
+    <span id="footer">${globalThis.collection.footer}</span>
     <h1>Home Page</h1>
+    <x-footer></x-footer>
   </body>
 </html>
