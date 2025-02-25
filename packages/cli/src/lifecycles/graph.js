@@ -216,7 +216,7 @@ const generateGraph = async (compilation) => {
               /*
                * Custom front matter - Variable Definitions
                * --------------------------------------------------
-               * collection: the name of the collection for the page
+               * collection: the name of the collection for the page (as a string or array)
                * order: the order of this item within the collection
                * tocHeading: heading size to use a Table of Contents for a page
                * tableOfContents: json object containing page's table of contents (list of headings)
@@ -289,11 +289,21 @@ const generateGraph = async (compilation) => {
               const pageCollection = customData.collection;
 
               if (pageCollection) {
-                if (!collections[pageCollection]) {
-                  collections[pageCollection] = [];
-                }
+                if (typeof pageCollection === "string") {
+                  if (!collections[pageCollection]) {
+                    collections[pageCollection] = [];
+                  }
 
-                collections[pageCollection].push(page);
+                  collections[pageCollection].push(page);
+                } else if (Array.isArray(pageCollection)) {
+                  pageCollection.forEach((collection) => {
+                    if (!collections[collection]) {
+                      collections[collection] = [];
+                    }
+
+                    collections[collection].push(page);
+                  });
+                }
               }
 
               compilation.collections = collections;
