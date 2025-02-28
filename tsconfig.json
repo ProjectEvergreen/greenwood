@@ -3,30 +3,12 @@
     "allowImportingTsExtensions": true,
     "experimentalDecorators": true,
     "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "verbatimModuleSyntax": true,
     "noEmit": true,
     "checkJs": true,
     "skipLibCheck": true,
-    "types": [
-      "acorn",
-      "acorn-walk",
-      "mocha",
-      "./packages/cli/src/types/index.d.ts",
-      "./packages/plugin-adapter-netlify/src/types/index.d.ts",
-      "./packages/plugin-adapter-vercel/src/types/index.d.ts",
-      "./packages/plugin-babel/src/types/index.d.ts",
-      "./packages/plugin-css-modules/src/types/index.d.ts",
-      "./packages/plugin-google-analytics/src/types/index.d.ts",
-      "./packages/plugin-graphql/src/types/index.d.ts",
-      "./packages/plugin-import-commonjs/src/types/index.d.ts",
-      "./packages/plugin-import-jsx/src/types/index.d.ts",
-      "./packages/plugin-import-raw/src/types/index.d.ts",
-      "./packages/plugin-include-html/src/types/index.d.ts",
-      "./packages/plugin-polyfills/src/types/index.d.ts",
-      "./packages/plugin-postcss/src/types/index.d.ts",
-      "./packages/plugin-renderer-lit/src/types/index.d.ts",
-      "./packages/plugin-renderer-puppeteer/src/types/index.d.ts",
-      "./packages/plugin-typescript/src/types/index.d.ts"
-    ]
+    "types": ["acorn", "acorn-walk", "mocha"]
   },
   "exclude": [
     "public/",

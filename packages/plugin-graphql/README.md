@@ -44,6 +44,18 @@ export default {
 }
 ```
 
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-graphql').GraphQLPlugin} */
+```
+
+```ts
+import type { GraphQLPlugin } from '@greenwood/plugin-graphql';
+```
+
 ## Example
 
 This will then allow you to use GraphQL to query your content from your client side.  At build time, it will generate JSON files so that the data is still accessible through hydration techniques.

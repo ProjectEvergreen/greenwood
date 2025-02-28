@@ -61,6 +61,18 @@ export default {
 }
 ```
 
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-adapter-vercel').VercelAdapter} */
+```
+
+```ts
+import type { VercelAdapter } from '@greenwood/plugin-adapter-vercel';
+```
+
 ## Options
 
 ### Runtime

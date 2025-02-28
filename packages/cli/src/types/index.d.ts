@@ -3,7 +3,6 @@ import type { Page, Collection, Graph } from "./content.d.ts";
 import type { Compilation, Frontmatter } from "./compilation.d.ts";
 import type { ApiRouteHandler } from "./api.d.ts";
 import type { SsrRouteHandler, GetBody, GetLayout, GetFrontmatter } from "./ssr.d.ts";
-
 import type {
   SERVE_PAGE_OPTIONS,
   Plugin,

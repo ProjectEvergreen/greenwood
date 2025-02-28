@@ -50,6 +50,18 @@ export default {
 
 > Note: Greenwood provides the behavior of postcss-import out of the box.
 
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDocs) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-postcss').PostCssPlugin} */
+```
+
+```ts
+import type { PostCssPlugin } from '@greenwood/plugin-postcss';
+```
+
 ## Options
 
 ### Configuration

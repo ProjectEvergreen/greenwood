@@ -1,5 +1,5 @@
 // https://greenwoodjs.dev/docs/pages/server-rendering/
-import type { Compilation } from "./compilation.js";
+import type { Compilation, Frontmatter } from "./compilation.js";
 import type { Page } from "./content.js";
 
 // would be nice if we could enforce the user is using `extends HTMLElement`

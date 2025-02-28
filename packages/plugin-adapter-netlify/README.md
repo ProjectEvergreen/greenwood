@@ -75,6 +75,18 @@ export async function handler(request, context = {}) {
 
 > _Please see caveats section for more information on this feature. 👇_
 
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-adapter-netlify').NetlifyAdapter} */
+```
+
+```ts
+import type { NetlifyAdapter } from '@greenwood/plugin-adapter-netlify';
+```
+
 ## Netlify CLI / Local Development
 
 This plugin comes with the Netlify CLI as a dependency to support some local development testing for previewing a Netlify build locally.  Simply add a script like this to your _package.json_

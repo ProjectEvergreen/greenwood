@@ -52,6 +52,18 @@ This will then process your JavaScript with Babel using the configured plugins a
 
 > _For now Babel configuration needs to be in CJS.  Will we be adding ESM support soon!_
 
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-babel').BabelPlugin} */
+```
+
+```ts
+import type { BabelPlugin } from '@greenwood/plugin-babel';
+```
+
 ## Options
 
 This plugin provides a default _babel.config.js_ that includes support for [**@babel/preset-env**](https://babeljs.io/docs/en/babel-preset-env) using [**browserslist**](https://github.com/browserslist/browserslist) with reasonable [default configs](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-babel/src/) for each.

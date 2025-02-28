@@ -48,6 +48,18 @@ Now when your project builds for production, you will see a _bundles/_ directory
 
 > Note: we would like to add support for [differential loading](https://github.com/ProjectEvergreen/greenwood/issues/224) to avoid the cost of this for newer browsers.
 
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-polyfills').PolyfillsPlugin} */
+```
+
+```ts
+import type { PolyfillsPlugin } from '@greenwood/plugin-polyfills';
+```
+
 ## Options
 
 This plugin supports the following polyfills and configuration options:

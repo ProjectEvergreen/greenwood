@@ -56,6 +56,18 @@ export default class FooterComponent extends HTMLElement {
 customElements.define('app-footer', FooterComponent);
 ```
 
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-import-jsx').ImportJsxPlugin} */
+```
+
+```ts
+import type { ImportJsxPlugin } from '@greenwood/plugin-import-jsx';
+```
+
 ### Notes
 
 - For SSR and `prerender` use cases, [follow these steps](/docs/server-rendering/#custom-imports-experimental)

@@ -1,4 +1,4 @@
-import type { Plugin } from "@greenwood/cli/src/types/index.d.ts";
+import type { Plugin } from "@greenwood/cli";
 
 export type GraphQLPlugin = () => Array<Plugin>;
 
@@ -20,3 +20,7 @@ export type Params = {
 export type Client = () => {
   query(params: Params);
 };
+
+declare module "@greenwood/plugin-graphql" {
+  export const greenwoodPluginGraphQL: GraphQLPlugin;
+}

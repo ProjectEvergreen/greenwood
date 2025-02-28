@@ -1,3 +1,7 @@
-import type { Plugin } from "@greenwood/cli/src/types/index.d.ts";
+import type { Plugin } from "@greenwood/cli";
 
 export type ImportCommonJSPlugin = () => Array<Plugin>;
+
+declare module "@greenwood/plugin-import-commonjs" {
+  export const greenwoodPluginImportCommonJs: ImportCommonJSPlugin;
+}

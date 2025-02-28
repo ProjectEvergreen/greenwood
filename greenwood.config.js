@@ -6,7 +6,7 @@ import { greenwoodPluginImportRaw } from "@greenwood/plugin-import-raw";
 import { greenwoodPluginRendererPuppeteer } from "@greenwood/plugin-renderer-puppeteer";
 import rollupPluginAnalyzer from "rollup-plugin-analyzer";
 
-/** @type {import('@greenwood/cli/src/types/index.d.ts').Config} */
+/** @type {import('@greenwood/cli').Config} */
 export default {
   workspace: new URL("./www/", import.meta.url),
   optimization: "inline",

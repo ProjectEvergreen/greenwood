@@ -89,6 +89,15 @@ export interface ServerPlugin extends Plugin {
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#source
+type ExternalPage = {
+  id: string;
+  body: string;
+  title: string;
+  label?: string;
+  route: string;
+  data?: object;
+};
+
 export interface SourcePlugin extends Plugin {
-  provider: (compilation: Compilation) => Page[];
+  provider: (compilation: Compilation) => () => Promise<ExternalPage[]>;
 }

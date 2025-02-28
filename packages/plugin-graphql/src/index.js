@@ -89,7 +89,7 @@ class GraphQLServer {
   }
 }
 
-/** @type {import('./types/index.d.ts').GraphQLPlugin} */
+/** @type {import('./types/index.js').GraphQLPlugin} */
 const greenwoodPluginGraphQL = () => {
   return [
     {
