@@ -5,11 +5,10 @@
  */
 import escodegen from "escodegen";
 import { parseJsx } from "wc-compiler/src/jsx-loader.js";
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 
-class ImportJsxResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class ImportJsxResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ["jsx"];
     this.contentType = "text/javascript";
   }
@@ -35,11 +34,12 @@ class ImportJsxResource extends ResourceInterface {
   }
 }
 
-const greenwoodPluginImportJsx = (options = {}) => [
+/** @type {import('./types/index.d.ts').ImportJsxPlugin} */
+const greenwoodPluginImportJsx = () => [
   {
     type: "resource",
     name: "plugin-import-jsx:resource",
-    provider: (compilation) => new ImportJsxResource(compilation, options),
+    provider: (compilation) => new ImportJsxResource(compilation),
   },
 ];
 

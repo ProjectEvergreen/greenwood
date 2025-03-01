@@ -1,6 +1,5 @@
 import fs from "fs/promises";
 
-// intentionally omitting `extends ResourceInterface` since it should still work the same
 class FooResource {
   constructor(compilation, options) {
     this.compilation = compilation;

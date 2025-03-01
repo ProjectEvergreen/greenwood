@@ -39,6 +39,18 @@ export default {
 
 Now, when running `greenwood build`, all your pages will get run through Puppeteer and any JavaScript / Web Components that you author will get a one time pass execution and the resulting HTML generated from that process will be captured and further optimized through Greenwood's build pipeline.
 
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-renderer-puppeteer').PuppeteerRendererPlugin} */
+```
+
+```ts
+import type { PuppeteerRendererPlugin } from '@greenwood/plugin-renderer-puppeteer';
+```
+
 ## Caveats
 
 ### Limitations

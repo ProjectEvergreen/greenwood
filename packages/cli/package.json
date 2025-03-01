@@ -24,7 +24,10 @@
   },
   "main": "./src/index.js",
   "exports": {
-    ".": "./src/index.js",
+    ".": {
+      "types": "./src/types/index.d.ts",
+      "import": "./src/index.js"
+    },
     "./register": "./src/register.js",
     "./src/*": "./src/*"
   },

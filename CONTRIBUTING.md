@@ -91,7 +91,7 @@ describe('Build Greenwood With: ', function() {
 });
 ```
 
-### Running Tests
+#### Running Tests
 
 To run tests in watch mode, use:
 
@@ -113,12 +113,11 @@ Below are some tips to help with running / debugging tests:
 
 > **PLEASE DO NOT COMMIT ANY OF THESE ABOVE CHANGES THOUGH**
 
-### Code Content Testing
+#### Code Content Testing
 
-In some cases test may actually check for specific build output contents to confirm certain operations like custom bundling or linking operations within the Greenwood build process worked as expected.  Keep in mind that if you change these contents as part of a test, that when Prettier formatting is run, the results may change and the test cases may fail, so just make sure to double check these contents with formatting applied first.
+In some cases tests may actually check for specific build output contents to confirm certain operations like custom bundling or linking operations within the Greenwood build process worked as expected.  Keep in mind that if you change these contents as part of a test, and then Prettier formatting is run, the results may change and the test cases may fail, so just make sure to double check these contents with formatting applied first.
 
-
-### Writing Tests
+#### Writing Tests
 
 Test cases follow a convention starting with the command (e.g. `build`) and and the capability and features being tested, like configuration with a particular option (e.g. `port`):
 
@@ -175,6 +174,43 @@ Yarn workspaces will automatically handle installing _node_modules_ in the appro
 Greenwood makes active use [GitHub Actions](https://github.com/features/actions) and [Netlify deploy previews](https://www.netlify.com/blog/2016/07/20/introducing-deploy-previews-in-netlify/) as part of the workflow.  Each time a PR is opened, a sequence of build steps defined _.github/workflows/ci.yml_ are run for Linux and Windows including running tests, linting, and formatting.
 
 A deploy preview is also made available within the status checks section of the PR in GitHub and can be used to validate work in a live environment before having to merge.
+
+## Types
+
+Greenwood [provides types](https://greenwoodjs.dev/docs/reference/) for a number of its key primitives (configuration, plugins, content as data) as well as for all plugins as well as JSDoc annotations where applicable.  It is important to keep in mind to updates these as features are developed and iterated upon.
+
+Additionally, Greenwood leverages [exports maps](https://nodejs.org/api/packages.html#exports) as part of its distribution through NPM, which means (generally) every plugin should only have `main` and `exports` defined, in this convention:
+
+```json
+{
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": {
+      "types": "./src/types/index.d.ts",
+      "import": "./src/index.js"
+    }
+  }
+}
+```
+
+Each plugin will also need to have an _index.d.ts_ file that exports types and a module definition for itself, like so:
+
+```ts
+import type { Plugin } from "@greenwood/cli";
+
+type SUPPORTED_THING = "A" | "B" | "C";
+
+type FooPluginOptions = {
+  bar?: SUPPORTED_THING
+};
+
+export type FooPlugin = (options?: FooPluginOptions) => Array<Plugin>;
+
+declare module "@greenwood/plugin-foo" {
+  export const greenwoodPluginFoo: FooPlugin;
+}
+```
 
 ## Technical Design
 

@@ -48,3 +48,15 @@ import _ from 'lodash';
 
 console.log(_.defaults({ 'a': 1 }, { 'a': 3, 'b': 2 }));  // { 'a': 1, 'b': 2 }
 ```
+
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-import-commonjs').ImportCommonJSPlugin} */
+```
+
+```ts
+import type { ImportCommonJSPlugin } from '@greenwood/plugin-import-commonjs';
+```

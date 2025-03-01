@@ -16,8 +16,14 @@
     "Netlify",
     "Edge"
   ],
-  "main": "src/index.js",
   "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": {
+      "types": "./src/types/index.d.ts",
+      "import": "./src/index.js"
+    }
+  },
   "files": [
     "src/"
   ],

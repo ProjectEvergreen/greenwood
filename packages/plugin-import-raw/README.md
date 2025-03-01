@@ -46,6 +46,27 @@ console.log(css); // h1 { color: red }
 
 > For libraries like Material Web Components, this plugin will [resolve references to _some-file.css_ if the equivalent exists that ends in _.js_ (e.g. _styles.css.js_)](https://github.com/ProjectEvergreen/greenwood/issues/700).
 
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-import-raw').ImportRawPlugin} */
+```
+
+```ts
+import type { ImportRawPlugin } from '@greenwood/plugin-import-raw';
+```
+
+To support typing of `?type=raw` imports, you can add this type definition to your project:
+
+```ts
+declare module "*?type=raw" {
+  const content: string;
+  export default content;
+}
+```
+
 ## Options
 
 ### Matches

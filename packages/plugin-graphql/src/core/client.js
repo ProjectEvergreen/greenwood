@@ -1,5 +1,8 @@
 import { getQueryHash } from "./common.js";
 
+/**
+ * @returns {import("../types/index.d.ts").Client} - Greenwood's read-only Apollo client
+ */
 const client = {
   query: (params) => {
     const { query, variables = {} } = params;

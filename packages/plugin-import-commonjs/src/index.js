@@ -6,7 +6,6 @@
 import commonjs from "@rollup/plugin-commonjs";
 import fs from "fs/promises";
 import { parse, init } from "cjs-module-lexer";
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 import rollupStream from "@rollup/stream";
 
 // bit of a workaround for now, but maybe this could be supported by cjs-module-lexar natively?
@@ -42,9 +41,9 @@ const testForCjsModule = async (url) => {
   return isCommonJs;
 };
 
-class ImportCommonJsResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class ImportCommonJsResource {
+  constructor(compilation) {
+    this.compilation = compilation;
   }
 
   async shouldIntercept(url) {
@@ -60,8 +59,10 @@ class ImportCommonJsResource extends ResourceInterface {
         const options = {
           input: pathname,
           output: { format: "esm" },
+          // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
           plugins: [commonjs()],
         };
+        // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
         const stream = rollupStream(options);
         let bundle = "";
 
@@ -81,16 +82,18 @@ class ImportCommonJsResource extends ResourceInterface {
   }
 }
 
-const greenwoodPluginImportCommonJs = (options = {}) => {
+/** @type {import('./types/index.d.ts').ImportCommonJSPlugin} */
+const greenwoodPluginImportCommonJs = () => {
   return [
     {
       type: "resource",
       name: "plugin-import-commonjs:resource",
-      provider: (compilation) => new ImportCommonJsResource(compilation, options),
+      provider: (compilation) => new ImportCommonJsResource(compilation),
     },
     {
       type: "rollup",
       name: "plugin-import-commonjs:rollup",
+      // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
       provider: () => [commonjs()],
     },
   ];

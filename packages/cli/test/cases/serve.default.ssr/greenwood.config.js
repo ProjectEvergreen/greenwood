@@ -1,10 +1,7 @@
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
-
 // here to test for https://github.com/ProjectEvergreen/greenwood/issues/1363
-class BannerPluginResource extends ResourceInterface {
-  constructor(compilation, options = {}) {
-    super(compilation, options);
-
+class BannerPluginResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.contentType = ["text/html"];
   }
 

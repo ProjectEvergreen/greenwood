@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 /* eslint no-console: 0 */
+// @ts-nocheck
 /*
  * **Note**
  * For the time being, there is an issue that prevents us from running the install based specs for this package as part of CI.

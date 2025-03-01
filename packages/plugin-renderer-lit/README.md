@@ -2,7 +2,7 @@
 
 ## Overview
 
-A Greenwood plugin for using [**Lit**'s SSR capabilities](https://github.com/lit/lit/tree/main/packages/labs/ssr) as a custom server-side renderer instead of Greenwood's default renderer (WCC). This plugin also gives the ability to statically render entire pages and layouts to output completely static sites. For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
+A Greenwood plugin for using [**Lit**'s SSR capabilities](https://github.com/lit/lit/tree/main/packages/labs/ssr) as a custom server-side renderer instead of Greenwood's default renderer (WCC). This plugin also gives the ability to statically [(pre) render entire pages and layouts](https://greenwoodjs.dev/docs/reference/rendering-strategies/#prerendering) to output completely static sites. For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
 > This package assumes you already have `@greenwood/cli` installed.
 
@@ -40,6 +40,35 @@ For **pnpm**, you will also want to add this to your _.npmrc_ file
 ```sh
 public-hoist-pattern[]=@lit-labs/*
 ```
+
+## Usage
+
+Add this plugin to your _greenwood.config.js_:
+
+```javascript
+import { greenwoodPluginRendererLit } from '@greenwood/plugin-renderer-lit';
+
+export default {
+  prerender: true, // enable this flag for SSG
+
+  plugins: [
+    greenwoodPluginRendererLit()
+  ]
+}
+```
+
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-renderer-lit').LitRendererPlugin} */
+```
+
+```ts
+import type { LitRendererPlugin } from '@greenwood/plugin-renderer-lit';
+```
+
 
 ## Caveats
 
