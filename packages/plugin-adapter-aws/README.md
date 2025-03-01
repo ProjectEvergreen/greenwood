@@ -8,7 +8,7 @@ Enables usage of [AWS](https://aws.amazon.com/) hosting for API routes and SSR p
 
 ## Features
 
-This plugin "adapts" SSR pages and API routes to be compatible with AWS Lambda and ready to use with IaC (Infrastructure as Code) tools like [SST](https://sst.dev/) and [Architect](https://arc.codes/).
+This plugin "adapts" SSR pages and API routes to be compatible with AWS Lambda and ready to use with IaC (Infrastructure as Code) tools like [**SST**](https://sst.dev/) and [**Architect**](https://arc.codes/).
 
 > _**Note:** You can see a working example of this plugin [here](https://github.com/ProjectEvergreen/greenwood-demo-adapter-aws)_.
 
@@ -44,10 +44,14 @@ export default {
 }
 ```
 
-## Options
+## Types
 
-TODO
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
 
-## Caveats
+```js
+/** @type {import('@greenwood/plugin-adapter-aws').AwsAdapter} */
+```
 
-TODO
+```ts
+import type { AwsAdapter } from '@greenwood/plugin-adapter-aws';
+```

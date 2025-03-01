@@ -3,6 +3,7 @@ import path from "path";
 import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
 
 // https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#apigateway-example-event
+// https://docs.aws.amazon.com/lambda/latest/dg/urls-invocation.html
 function generateOutputFormat(id, type) {
   const handlerAlias = "$handler";
   const path = type === "page" ? `${id}.route` : id;
@@ -10,8 +11,8 @@ function generateOutputFormat(id, type) {
   return `
     import { handler as ${handlerAlias} } from './${path}.js';
     export async function handler (event, context) {
-      const { body, headers = {}, rawPath = '', rawQueryString = '', routeKey = '' } = event;
-      const method = routeKey.split(' ')[0];
+      const { body, headers = {}, rawPath = '', rawQueryString = ''} = event;
+      const { method = '' } = event?.requestContext?.http;
       const queryParams = rawQueryString === '' ? '' : \`?\${rawQueryString}\`;
       const contentType = headers['content-type'] || '';
       let format = body;
@@ -42,6 +43,7 @@ function generateOutputFormat(id, type) {
       });
 
       const res = await $handler(req);
+
       return {
         "body": await res.text(),
         "statusCode": res.status,
@@ -118,6 +120,7 @@ async function awsAdapter(compilation) {
   }
 }
 
+/** @type {import('./types/index.d.ts').AwsAdapter} */
 const greenwoodPluginAdapterAws = () => [
   {
     type: "adapter",

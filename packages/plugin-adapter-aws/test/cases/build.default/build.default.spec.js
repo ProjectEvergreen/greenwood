@@ -115,12 +115,16 @@ describe("Build Greenwood With: ", function () {
         const { handler } = await import(new URL("./greeting/index.js", awsApiFunctionsOutputUrl));
         const param = "Greenwood";
         const { statusCode, body, headers } = await handler({
-          rawPath: `${hostname}/api/greeting`,
+          rawPath: `/api/greeting`,
           rawQueryString: `name=${param}`,
           headers: {
             host: hostname,
           },
-          routeKey: "GET /api/greeting",
+          requestContext: {
+            http: {
+              method: "GET",
+            },
+          },
         });
 
         expect(statusCode).to.be.equal(200);
@@ -145,11 +149,15 @@ describe("Build Greenwood With: ", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         const { handler } = await import(new URL("./fragment/index.js", awsApiFunctionsOutputUrl));
         const { statusCode, body, headers } = await handler({
-          rawPath: `${hostname}/api/fragment`,
+          rawPath: `/api/fragment`,
           headers: {
             host: hostname,
           },
-          routeKey: "GET /api/fragment",
+          requestContext: {
+            http: {
+              method: "GET",
+            },
+          },
         });
 
         const dom = new JSDOM(body);
@@ -179,13 +187,17 @@ describe("Build Greenwood With: ", function () {
           new URL("./submit-json/index.js", awsApiFunctionsOutputUrl)
         );
         const { statusCode, body, headers } = await handler({
-          rawPath: `${hostname}/api/submit-json`,
+          rawPath: `/api/submit-json`,
           headers: {
             host: hostname,
             "content-type": "application/json",
           },
           body: { name },
-          routeKey: "POST /api/submit-json",
+          requestContext: {
+            http: {
+              method: "POST",
+            },
+          },
         });
 
         expect(statusCode).to.be.equal(200);
@@ -202,14 +214,18 @@ describe("Build Greenwood With: ", function () {
           new URL("./submit-form-data/index.js", awsApiFunctionsOutputUrl)
         );
         const { statusCode, body, headers } = await handler({
-          rawPath: `${hostname}/api/submit-form-data`,
+          rawPath: `/api/submit-form-data`,
           headers: {
             host: hostname,
             "content-type": "application/x-www-form-urlencoded",
           },
           isBase64Encoded: true,
           body: btoa(`name=${name}`),
-          routeKey: "POST /api/submit-form-data",
+          requestContext: {
+            http: {
+              method: "POST",
+            },
+          },
         });
 
         expect(statusCode).to.be.equal(200);
@@ -223,14 +239,18 @@ describe("Build Greenwood With: ", function () {
         const term = "Analog";
         const { handler } = await import(new URL("./search/index.js", awsApiFunctionsOutputUrl));
         const { statusCode, body, headers } = await handler({
-          rawPath: `${hostname}/api/search`,
+          rawPath: `/api/search`,
           headers: {
             host: hostname,
             "content-type": "application/x-www-form-urlencoded",
           },
           isBase64Encoded: true,
           body: btoa(`term=${term}`),
-          routeKey: "POST /api/search",
+          requestContext: {
+            http: {
+              method: "POST",
+            },
+          },
         });
 
         const dom = new JSDOM(body);
@@ -248,8 +268,12 @@ describe("Build Greenwood With: ", function () {
           new URL("./nested-endpoint/index.js", awsApiFunctionsOutputUrl)
         );
         const { statusCode, body, headers } = await handler({
-          rawPath: `${hostname}/api/nested/endpoint`,
-          routeKey: "GET /api/nested/endpoint",
+          rawPath: `/api/nested/endpoint`,
+          requestContext: {
+            http: {
+              method: "GET",
+            },
+          },
         });
 
         expect(statusCode).to.be.equal(200);
@@ -263,8 +287,12 @@ describe("Build Greenwood With: ", function () {
         const { handler } = await import(new URL("./artists/index.js", awsRouteFunctionsOutputUrl));
         const count = 2;
         const { statusCode, body, headers } = await handler({
-          rawPath: `${hostname}/artists/`,
-          routeKey: "GET /artists/",
+          rawPath: `/artists/`,
+          requestContext: {
+            http: {
+              method: "GET",
+            },
+          },
         });
 
         const dom = new JSDOM(body);
@@ -285,8 +313,12 @@ describe("Build Greenwood With: ", function () {
           new URL("./blog-index/index.js", awsRouteFunctionsOutputUrl)
         );
         const { statusCode, body, headers } = await handler({
-          rawPath: `${hostname}/blog/`,
-          routeKey: "GET /blog/",
+          rawPath: `/blog/`,
+          requestContext: {
+            http: {
+              method: "GET",
+            },
+          },
         });
 
         const dom = new JSDOM(body);
@@ -305,8 +337,12 @@ describe("Build Greenwood With: ", function () {
           new URL("./blog-first-post/index.js", awsRouteFunctionsOutputUrl)
         );
         const { statusCode, body, headers } = await handler({
-          rawPath: `${hostname}/blog/first-post/`,
-          routeKey: "GET /blog/first-post/",
+          rawPath: `/blog/first-post/`,
+          requestContext: {
+            http: {
+              method: "GET",
+            },
+          },
         });
 
         const dom = new JSDOM(body);
@@ -323,8 +359,12 @@ describe("Build Greenwood With: ", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         const { handler } = await import(new URL("./index/index.js", awsRouteFunctionsOutputUrl));
         const { statusCode, body, headers } = await handler({
-          rawPath: `${hostname}/`,
-          routeKey: "GET /",
+          rawPath: `/`,
+          requestContext: {
+            http: {
+              method: "GET",
+            },
+          },
         });
 
         const dom = new JSDOM(body);
@@ -342,8 +382,12 @@ describe("Build Greenwood With: ", function () {
         const { handler } = await import(new URL("./users/index.js", awsRouteFunctionsOutputUrl));
         const count = 1;
         const { statusCode, body, headers } = await handler({
-          rawPath: `${hostname}/users/`,
-          routeKey: "GET /users/",
+          rawPath: `/users/`,
+          requestContext: {
+            http: {
+              method: "GET",
+            },
+          },
         });
 
         const dom = new JSDOM(body);
@@ -363,9 +407,13 @@ describe("Build Greenwood With: ", function () {
         const postId = 1;
         const { handler } = await import(new URL("./post/index.js", awsRouteFunctionsOutputUrl));
         const { statusCode, body, headers } = await handler({
-          rawPath: `${hostname}/post/`,
+          rawPath: `/post/`,
           rawQueryString: `id=${postId}`,
-          routeKey: "GET /users/post/",
+          requestContext: {
+            http: {
+              method: "GET",
+            },
+          },
         });
 
         const dom = new JSDOM(body);
