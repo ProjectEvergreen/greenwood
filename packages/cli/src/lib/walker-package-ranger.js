@@ -271,7 +271,7 @@ async function walkPackageJson(packageJson = {}, walkedPackages = new Set()) {
           ).default;
           const { name } = resolvedPackageJson;
 
-          walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
+          await walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
 
           if (!walkedPackages.has(name)) {
             walkedPackages.add(name);
