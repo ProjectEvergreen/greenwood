@@ -2,7 +2,7 @@
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ProjectEvergreen/greenwood/master/LICENSE.md)
 [![GitHub release](https://img.shields.io/github/tag/ProjectEvergreen/greenwood.svg)](https://github.com/ProjectEvergreen/greenwood/tags)
-[![NodeJS compatibility](https://img.shields.io/node/v/@greenwood/cli.svg)](https://nodejs.org/en/about/previous-releases")
+[![NodeJS compatibility](https://img.shields.io/node/v/@greenwood/cli.svg)](https://nodejs.org/en/about/previous-releases)
 [![Discord Chat](https://img.shields.io/badge/chat-discord-blue?style=flat&logo=discord)](https://www.greenwoodjs.dev/discord/)
 
 ## Overview
