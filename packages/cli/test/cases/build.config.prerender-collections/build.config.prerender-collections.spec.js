@@ -18,6 +18,7 @@
  *  src/
  *   components/
  *    blog-posts-lists.js
+ *    footer.js
  *    header.js
  *    toc.js
  *   pages/
@@ -130,7 +131,7 @@ describe("Build Greenwood With: ", function () {
 
         it("should have the expected inline active frontmatter collection data", function () {
           const collection = JSON.parse(
-            dom.window.document.querySelector("body span").textContent,
+            dom.window.document.querySelector("body span#nav").textContent,
           ).sort((a, b) => (a.data.order > b.data.order ? 1 : -1));
 
           expect(collection[0].route).to.equal("/");
@@ -147,6 +148,44 @@ describe("Build Greenwood With: ", function () {
           expect(collection[2].title).to.equal("Table of Contents");
           expect(collection[2].label).to.equal(collection[2].title);
           expect(collection[2].id).to.equal("toc");
+        });
+      });
+
+      describe("footer links from getContentByCollection array items", function () {
+        let linkItems;
+
+        before(function () {
+          linkItems = dom.window.document.querySelectorAll("footer ul li a");
+        });
+
+        it("should have the expected number of nav links from all pages in the collection", function () {
+          expect(linkItems.length).to.equal(2);
+        });
+
+        it("should have the expected link content from all pages in the collection", function () {
+          expect(linkItems[0].getAttribute("href")).to.equal("/blog/");
+          expect(linkItems[0].getAttribute("title")).to.equal("Blog");
+          expect(linkItems[0].textContent).to.equal("Blog");
+
+          expect(linkItems[1].getAttribute("href")).to.equal("/toc/");
+          expect(linkItems[1].getAttribute("title")).to.equal("Table of Contents");
+          expect(linkItems[1].textContent).to.equal("Table of Contents");
+        });
+
+        it("should have the expected inline active frontmatter collection data", function () {
+          const collection = JSON.parse(
+            dom.window.document.querySelector("body span#footer").textContent,
+          );
+
+          expect(collection[0].route).to.equal("/blog/");
+          expect(collection[0].title).to.equal("Blog");
+          expect(collection[0].label).to.equal(collection[0].title);
+          expect(collection[0].id).to.equal("blog-index");
+
+          expect(collection[1].route).to.equal("/toc/");
+          expect(collection[1].title).to.equal("Table of Contents");
+          expect(collection[1].label).to.equal(collection[1].title);
+          expect(collection[1].id).to.equal("toc");
         });
       });
     });
