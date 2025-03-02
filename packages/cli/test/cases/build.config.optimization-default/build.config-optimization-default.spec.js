@@ -156,7 +156,7 @@ describe("Build Greenwood With: ", function () {
 
       describe("bundled URL references in CSS files", function () {
         describe("node modules reference", () => {
-          const fontPath = "node_modules/geist/dist/fonts/geist-sans";
+          const fontPath = "node-modules/geist/dist/fonts/geist-sans";
           let dom;
 
           before(async function () {

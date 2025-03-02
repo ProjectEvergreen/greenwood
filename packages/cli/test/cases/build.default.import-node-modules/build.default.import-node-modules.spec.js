@@ -187,7 +187,7 @@ describe("Build Greenwood With: ", function () {
       it("should have the expected number of font files referenced in vendor CSS file in the output directory", async function () {
         expect(
           await glob.promise(
-            path.join(this.context.publicDir, "node_modules/font-awesome/fonts/*"),
+            path.join(this.context.publicDir, "node-modules/font-awesome/fonts/*"),
           ),
         ).to.have.lengthOf(5);
       });
@@ -200,7 +200,7 @@ describe("Build Greenwood With: ", function () {
 
         expect(
           contents.indexOf(
-            "@font-face {font-family:'FontAwesome';src:url('/node_modules/font-awesome/fonts/fontawesome-webfont.139345087.eot?v=4.7.0');",
+            "@font-face {font-family:'FontAwesome';src:url('/node-modules/font-awesome/fonts/fontawesome-webfont.139345087.eot?v=4.7.0');",
           ) > 0,
         ).to.equal(true);
       });

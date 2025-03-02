@@ -112,6 +112,9 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
             const ext = resolvedUrl.pathname.split(".").pop();
 
             finalValue = finalValue.replace(`.${ext}`, `.${hash}.${ext}`);
+            // "obfuscate" these file names since some hosting platforms may ignore node_modules within the build folder
+            // https://github.com/ProjectEvergreen/greenwood/issues/1431
+            finalValue = finalValue.replace("/node_modules/", "/node-modules/");
 
             fs.mkdirSync(new URL(`.${path.dirname(finalValue)}/`, outputDir), {
               recursive: true,
