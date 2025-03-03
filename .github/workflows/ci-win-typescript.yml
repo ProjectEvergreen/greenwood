@@ -1,27 +1,24 @@
-name: Continuous Integration (Loaders)
+name: Continuous Integration Windows (TypeScript)
 
 on: [pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     strategy:
       matrix:
-        node: [20, 22]
+        node: [22]
 
     steps:
       - uses: actions/checkout@v4
-      - name: Install Chromium Library Dependencies
-        run: |
-          sh ./.github/workflows/chromium-lib-install.sh
       - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
       - name: Installing project dependencies
         run: |
-          yarn install --frozen-lockfile && yarn lerna bootstrap
+          yarn install --frozen-lockfile --network-timeout 1000000 && yarn lerna bootstrap
       - name: Test
         run: |
-          yarn test:loaders
+          yarn test:typescript:win
