@@ -19,12 +19,12 @@ export type Compilation = {
 };
 
 export type Frontmatter = {
-  collection?: string;
+  collection?: string | string[];
   label?: string;
   layout?: string;
   title?: string;
   imports?: string[];
-  data: {
+  data?: {
     [key: string]: string;
   };
 };
