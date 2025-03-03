@@ -7,7 +7,7 @@ export async function handler(request: Request) {
     `
     <x-greeting name="${name}"></x-greeting>
   `,
-    [new URL("../../components/greeting.ts", import.meta.url)],
+    [new URL("../../components/greeting/greeting.ts", import.meta.url)],
   );
 
   return new Response(html, {

@@ -18,7 +18,9 @@
  *       card.ts
  *       logo.png
  *       styles.ts
- *     greeting.ts
+ *     greeting/
+ *       greeting.css
+ *       greeting.ts
  *   pages/
  *     api/
  *       fragment.ts

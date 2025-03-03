@@ -14,6 +14,7 @@
  * User Workspace
  *  src/
  *   components/
+ *     greeting.css
  *     greeting.ts
  *   pages/
  *     api/
