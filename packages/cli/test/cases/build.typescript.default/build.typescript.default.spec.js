@@ -9,13 +9,7 @@
  * greenwood build
  *
  * User Config
- * const pluginTypeScript = require('@greenwood/plugin-typescript);
- *
- * {
- *   plugins: [
- *     ...pluginTypeScript()
- *  ]
- * }
+ * N / A
  *
  * User Workspace
  *  src/
@@ -46,8 +40,8 @@ import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-xdescribe("Build Greenwood With: ", function () {
-  const LABEL = "Default TypeScript configuration";
+describe("Build Greenwood With: ", function () {
+  const LABEL = "Default TypeScript type-stripping";
   const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
@@ -56,7 +50,7 @@ xdescribe("Build Greenwood With: ", function () {
     this.context = {
       publicDir: path.join(outputPath, "public"),
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function () {

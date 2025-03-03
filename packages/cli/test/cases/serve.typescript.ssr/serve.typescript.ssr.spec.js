@@ -9,22 +9,19 @@
  * greenwood build
  *
  * User Config
- * {
- *   plugins: [
- *      greenwoodPluginTypeScript({
- *        servePages: 'dynamic'
- *      })
- *   ]
- * }
+ * N / A
  *
  * User Workspace
  *  src/
  *   components/
- *     card.ts
+ *     card/
+ *       card.ts
+ *       logo.png
+ *       styles.ts
  *     greeting.ts
  *   pages/
  *     api/
- *       fragment.js
+ *       fragment.ts
  *       greeting.ts
  *     index.html
  */
@@ -37,7 +34,7 @@ import { fileURLToPath } from "url";
 
 const expect = chai.expect;
 
-xdescribe("Serve Greenwood With: ", function () {
+describe("Serve Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) with API Routes in TypeScript";
   const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));

@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with a prerender HTML page that imports TypeScript.
+ * Run Greenwood with a pre-rendered HTML page that imports TypeScript.
  *
  * User Result
  * Should generate a Greenwood build that correctly builds and bundles all assets.
@@ -11,9 +11,6 @@
  * User Config
  * {
  *   prerender: true,
- *   plugins: [
- *      greenwoodPluginTypeScript()
- *   ]
  * }
  *
  * User Workspace
@@ -32,7 +29,7 @@ import { fileURLToPath } from "url";
 
 const expect = chai.expect;
 
-xdescribe("Serve Greenwood With: ", function () {
+describe("Serve Greenwood With: ", function () {
   const LABEL =
     "A Prerendered Application (SSR) with an HTML page importing a TypeScript component";
   const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");

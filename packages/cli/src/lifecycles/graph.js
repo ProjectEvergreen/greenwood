@@ -90,15 +90,13 @@ const generateGraph = async (compilation) => {
             }
 
             const isStatic = isCustom === "static" || extension === ".md" || extension === ".html";
-            const isDynamic = isCustom === "dynamic" || extension === ".js";
+            const isDynamic = isCustom === "dynamic" || extension === ".js" || extension === ".ts";
             const isPage = isStatic || isDynamic;
             let route = `${relativePagePath.replace(".", "").replace(`${extension}`, "")}`;
             let fileContents;
 
             if (isApiRoute) {
-              const extension = filenameUrl.pathname.split(".").pop();
-
-              if (extension !== "js" && !isCustom) {
+              if (extension !== ".js" && extension !== ".ts" && !isCustom) {
                 console.warn(`${filenameUrl} is not a supported API file extension, skipping...`);
                 return;
               }
@@ -117,10 +115,7 @@ const generateGraph = async (compilation) => {
                * isolation: if this should be run in isolated mode
                */
               apiRoutes.set(`${basePath}${route}`, {
-                id: getIdFromRelativePathPath(relativePagePath, `.${extension}`).replace(
-                  "api-",
-                  "",
-                ),
+                id: getIdFromRelativePathPath(relativePagePath, extension).replace("api-", ""),
                 pageHref: new URL(relativePagePath, pagesDir).href,
                 outputHref: new URL(relativePagePath, outputDir).href,
                 route: `${basePath}${route}`,

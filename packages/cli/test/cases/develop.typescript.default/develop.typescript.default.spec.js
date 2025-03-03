@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood develop command with no config and TypeScript handling.
+ * Run Greenwood develop command with no config and TypeScript processing.
  *
  * User Result
  * Should start the development server and render a bare bones Greenwood build and process TypeScript (.ts) files.
@@ -9,7 +9,7 @@
  * greenwood develop
  *
  * User Config
- * {}
+ * N / A
  *
  * User Workspace
  * src/
@@ -24,8 +24,8 @@ import { runSmokeTest } from "../../../../../test/smoke-test.js";
 
 const expect = chai.expect;
 
-xdescribe("Develop Greenwood With: ", function () {
-  const LABEL = "TypeScript plugin for resolving .ts files";
+describe("Develop Greenwood With: ", function () {
+  const LABEL = "TypeScript support for resolving .ts files";
   const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const hostname = "http://localhost";
