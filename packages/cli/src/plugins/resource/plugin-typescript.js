@@ -7,6 +7,31 @@
  */
 import amaro from "amaro";
 import fs from "fs/promises";
+import { checkResourceExists } from "../../lib/resource-utils.js";
+
+const defaultCompilerOptions = {
+  target: "ES2020",
+  module: "preserve",
+  moduleResolution: "bundler",
+  allowImportingTsExtensions: true,
+  noEmit: true,
+  allowJs: true,
+  erasableSyntaxOnly: true,
+};
+
+async function getCompilerOptions(projectDirectory) {
+  const userConfigUrl = new URL("./tsconfig.json", projectDirectory);
+  let options = defaultCompilerOptions;
+
+  if (await checkResourceExists(userConfigUrl)) {
+    // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
+    const userConfig = (await import(userConfigUrl, { with: { type: "json" } })).default;
+
+    options = userConfig.compilerOptions;
+  }
+
+  return options;
+}
 
 class StandardTypeScriptResource {
   constructor(compilation) {
@@ -20,8 +45,18 @@ class StandardTypeScriptResource {
   }
 
   async serve(url) {
+    const { useTsc } = this.compilation.config;
     const body = await fs.readFile(url, "utf-8");
-    const { code } = amaro.transformSync(body);
+    let code = "";
+
+    if (useTsc) {
+      const compilerOptions = await getCompilerOptions(this.compilation.context.projectDirectory);
+      const tsc = (await import("typescript").then((mod) => mod)).default;
+
+      code = tsc.transpileModule(body, { compilerOptions }).outputText;
+    } else {
+      code = amaro.transformSync(body).code;
+    }
 
     return new Response(code, {
       headers: {

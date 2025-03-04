@@ -117,7 +117,7 @@ const generateGraph = async (compilation) => {
               apiRoutes.set(`${basePath}${route}`, {
                 id: getIdFromRelativePathPath(relativePagePath, extension).replace("api-", ""),
                 pageHref: new URL(relativePagePath, pagesDir).href,
-                outputHref: new URL(relativePagePath, outputDir).href,
+                outputHref: new URL(relativePagePath, outputDir).href.replace(extension, ".js"),
                 route: `${basePath}${route}`,
                 isolation,
               });

@@ -112,7 +112,7 @@ export async function load(source, context, defaultLoad) {
   const url = new URL(source);
   const { shouldHandle } = await getCustomLoaderResponse(url, true);
 
-  if (shouldHandle && extension !== "js") {
+  if (shouldHandle && extension !== "js" && extension !== "ts") {
     const { response } = await getCustomLoaderResponse(url);
     const contents = await response.text();
 

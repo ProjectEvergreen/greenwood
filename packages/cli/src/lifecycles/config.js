@@ -76,6 +76,7 @@ const defaultConfig = {
     importAttributes: null, // or ['css', 'json']
     importMaps: false,
   },
+  useTsc: false,
 };
 
 const readAndMergeConfig = async () => {
@@ -119,6 +120,7 @@ const readAndMergeConfig = async () => {
           activeContent,
           isolation,
           polyfills,
+          useTsc,
         } = userCfgFile;
 
         // workspace validation
@@ -331,6 +333,16 @@ const readAndMergeConfig = async () => {
                 `Configuration error: polyfills.importAttributes must be an array of types; ['css', 'json'].  Passed value was typeof: ${typeof importAttributes}`,
               );
             }
+          }
+        }
+
+        if (useTsc !== undefined) {
+          if (typeof useTsc === "boolean") {
+            customConfig.useTsc = useTsc;
+          } else {
+            reject(
+              `Configuration error: useTsc must be a boolean; true or false.  Passed value was typeof: ${typeof useTsc}`,
+            );
           }
         }
       } else {
