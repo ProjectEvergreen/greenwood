@@ -15,14 +15,15 @@
     "Web Components",
     "TypeScript"
   ],
+  "type": "module",
   "main": "./src/index.js",
+  "types": "./src/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./src/types/index.d.ts",
       "import": "./src/index.js"
     }
   },
-  "type": "module",
   "files": [
     "src/"
   ],
