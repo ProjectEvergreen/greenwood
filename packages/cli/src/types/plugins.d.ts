@@ -3,9 +3,7 @@ import type { Page } from "./content.d.ts";
 import type { Plugin as RollupPlugin } from "rollup";
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#overview
-
-// TODO why wont this work on the interface?
-type PLUGIN_TYPES =
+export type PLUGIN_TYPES =
   | "adapter"
   | "context"
   | "copy"
@@ -26,35 +24,39 @@ export type PLUGINS =
   | SourcePlugin;
 
 export interface Plugin {
-  name: string;
-  type: string;
-  provider: (compilation: Compilation) => unknown; // TODO could we narrow this further?
+  name?: string;
+  type: PLUGIN_TYPES;
+  provider: (compilation: Compilation) => PLUGINS;
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#adapter
 export interface AdapterPlugin extends Plugin {
+  type: Extract<PLUGIN_TYPES, "adapter">;
   provider: (compilation: Compilation) => Promise<Function>;
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#context
 export interface ContextPlugin extends Plugin {
+  type: Extract<PLUGIN_TYPES, "context">;
   provider: (compilation: Compilation) => { layouts: URL[] };
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#copy
 export interface CopyPlugin extends Plugin {
+  type: Pick<PLUGIN_TYPES, "copy">;
   provider: (compilation: Compilation) => Promise<{ from: URL; to: URL }[]>;
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#renderer
 export interface RendererPlugin extends Plugin {
+  type: Extract<PLUGIN_TYPES, "renderer">;
   provider: (compilation: Compilation) => { executeModuleUrl: URL } | { customUrl: URL };
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#resource
 export type SERVE_PAGE_OPTIONS = "static" | "dynamic";
 
-type Resource = {
+export type Resource = {
   extensions?: string[];
   servePage?: SERVE_PAGE_OPTIONS;
   shouldResolve?: (url: URL) => Promise<boolean>;
@@ -70,34 +72,33 @@ type Resource = {
 };
 
 export interface ResourcePlugin extends Plugin {
+  type: Extract<PLUGIN_TYPES, "resource">;
   provider: (compilation: Compilation) => Resource;
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#rollup
 export interface RollupPlugin extends Plugin {
+  type: Extract<PLUGIN_TYPES, "rollup">;
   provider: (compilation: Compilation) => RollupPlugin[];
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#server
-type Server = {
+export type Server = {
   start: () => Promise<any>;
   stop?: () => Promise<any>;
 };
 
 export interface ServerPlugin extends Plugin {
+  type: Extract<PLUGIN_TYPES, "server">;
   provider: (compilation: Compilation) => Server;
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#source
-type ExternalPage = {
-  id: string;
+export type ExternalSourcePage = Page & {
   body: string;
-  title: string;
-  label?: string;
-  route: string;
-  data?: object;
 };
 
 export interface SourcePlugin extends Plugin {
-  provider: (compilation: Compilation) => () => Promise<ExternalPage[]>;
+  type: Extract<PLUGIN_TYPES, "source">;
+  provider: (compilation: Compilation) => () => Promise<ExternalSourcePage[]>;
 }
