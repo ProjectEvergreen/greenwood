@@ -8,5 +8,9 @@ export type Page = {
 };
 
 export type Collection = Page[];
-
 export type Graph = Page[];
+
+// https://greenwoodjs.dev/docs/content-as-data/data-client/
+export type GetContent = () => Promise<Graph>;
+export type GetContentByCollection = (collection: string) => Promise<Graph>;
+export type GetContentByRoute = (route: string) => Promise<Graph>;
