@@ -1,5 +1,6 @@
 import type { Compilation } from "./compilation.d.ts";
 import type { Page } from "./content.d.ts";
+import type { Plugin as RollupPlugin } from "rollup";
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#overview
 
@@ -74,8 +75,7 @@ export interface ResourcePlugin extends Plugin {
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#rollup
 export interface RollupPlugin extends Plugin {
-  /** @type {import('rollup').Plugin} */
-  provider: (compilation: Compilation) => Plugin[];
+  provider: (compilation: Compilation) => RollupPlugin[];
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#server

@@ -14,9 +14,9 @@ const defaultCompilerOptions = {
   module: "preserve",
   moduleResolution: "bundler",
   allowImportingTsExtensions: true,
-  noEmit: true,
-  allowJs: true,
   erasableSyntaxOnly: true,
+  noEmit: true,
+  verbatimModuleSyntax: false,
 };
 
 async function getCompilerOptions(projectDirectory) {

@@ -742,7 +742,6 @@ const getRollupConfigForApiRoutes = async (compilation) => {
             exportConditions: ["node"],
             preferBuiltins: true,
           }),
-          // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
           commonjs(),
           greenwoodImportMetaUrl(compilation),
           greenwoodSyncApiRoutesOutputPath(compilation),
@@ -789,7 +788,6 @@ const getRollupConfigForSsrPages = async (compilation, inputs) => {
           exportConditions: ["node"],
           preferBuiltins: true,
         }),
-        // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
         commonjs(),
         greenwoodImportMetaUrl(compilation),
         greenwoodSyncSsrEntryPointsOutputPaths(compilation),

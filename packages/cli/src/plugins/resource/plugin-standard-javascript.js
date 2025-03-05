@@ -78,7 +78,6 @@ const greenwoodPluginStandardJavascript = [
     type: "rollup",
     name: "plugin-standard-javascript:rollup",
     provider: (compilation) => {
-      // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
       return compilation.config.optimization !== "none" ? [terser()] : [];
     },
   },

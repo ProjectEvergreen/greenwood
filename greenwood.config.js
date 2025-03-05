@@ -29,7 +29,6 @@ export default {
       name: "rollup-plugin-analyzer",
       provider: () => {
         return [
-          // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
           rollupPluginAnalyzer({
             summaryOnly: true,
             filter: (module) => {
