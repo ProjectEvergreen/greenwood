@@ -3,14 +3,12 @@
  * A plugin for enabling CSS Modules. :tm:
  *
  */
-// @ts-nocheck
 import fs from "fs";
 import htmlparser from "node-html-parser";
 import { parse, walk } from "css-tree";
 import * as acornWalk from "acorn-walk";
 import * as acorn from "acorn";
 import { hashString } from "@greenwood/cli/src/lib/hashing-utils.js";
-import { transform } from "sucrase";
 import { ACORN_OPTIONS } from "@greenwood/cli/src/lib/parsing-utils.js";
 
 const MODULES_MAP_FILENAME = "__css-modules-map.json";
@@ -32,14 +30,50 @@ function getCssModulesMap(compilation) {
   return cssModulesMap;
 }
 
-function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
-  const scriptContents = fs.readFileSync(scriptUrl, "utf-8");
-  const result = transform(scriptContents, {
-    transforms: ["typescript", "jsx"],
-    jsxRuntime: "preserve",
-  });
+async function getTransformedScriptContents(scriptUrl, compilation) {
+  const resourcePlugins = compilation.config.plugins
+    .filter((plugin) => {
+      return plugin.type === "resource";
+    })
+    .map((plugin) => {
+      return plugin.provider(compilation);
+    });
 
-  acornWalk.simple(acorn.parse(result.code, ACORN_OPTIONS), {
+  const request = new Request(scriptUrl, { headers: { Accept: "text/javascript" } });
+  let response = new Response("", { headers: { "Content-Type": "text/javascript" } });
+
+  for (const plugin of resourcePlugins) {
+    if (plugin.shouldServe && (await plugin.shouldServe(scriptUrl, request))) {
+      response = await plugin.serve(scriptUrl, request);
+    }
+  }
+
+  for (const plugin of resourcePlugins) {
+    if (
+      plugin.shouldPreIntercept &&
+      (await plugin.shouldPreIntercept(scriptUrl, request, response.clone()))
+    ) {
+      response = await plugin.preIntercept(scriptUrl, request, response.clone());
+    }
+  }
+
+  for (const plugin of resourcePlugins) {
+    if (
+      plugin.shouldIntercept &&
+      (await plugin.shouldIntercept(scriptUrl, request, response.clone()))
+    ) {
+      response = await plugin.intercept(scriptUrl, request, response.clone());
+    }
+  }
+
+  return await response.text();
+}
+
+async function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
+  const scriptContents = await getTransformedScriptContents(scriptUrl, compilation);
+  const additionalScripts = [];
+
+  acornWalk.simple(acorn.parse(scriptContents, ACORN_OPTIONS), {
     ImportDeclaration(node) {
       const { specifiers = [], source = {} } = node;
       const { value = "" } = source;
@@ -115,17 +149,19 @@ function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
             },
           }),
         );
-      } else if (value.endsWith(".js") || value.endsWith(".jsx") || value.endsWith(".ts")) {
-        // no good way to get at async plugin processing so right now
-        // we can only support what we can provide to acorn
+      } else {
         const recursiveScriptUrl = new URL(value, scriptUrl);
 
         if (fs.existsSync(recursiveScriptUrl)) {
-          walkAllImportsForCssModules(recursiveScriptUrl, sheets, compilation);
+          additionalScripts.push(recursiveScriptUrl);
         }
       }
     },
   });
+
+  for (const script of additionalScripts) {
+    await walkAllImportsForCssModules(script, sheets, compilation);
+  }
 }
 
 // this happens 'first' as the HTML is returned, to find viable references to CSS Modules
@@ -177,7 +213,8 @@ class ScanForCssModulesResource {
             `./${src.replace(/\.\.\//g, "").replace(/\.\//g, "")}`,
             this.compilation.context.userWorkspace,
           );
-          walkAllImportsForCssModules(scriptUrl, sheets, this.compilation);
+
+          await walkAllImportsForCssModules(scriptUrl, sheets, this.compilation);
         }
       }
 
