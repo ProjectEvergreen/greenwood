@@ -7,6 +7,6 @@ export type SsrRouteHandler = {
   constructor?(compilation: Compilation, request: Request): string;
 };
 
-export type GetBody = (compilation: Compilation, page: Page, request: Request) => string;
-export type GetLayout = (compilation: Compilation, route: string) => string;
-export type GetFrontmatter = (compilation: Compilation, route: string) => Frontmatter;
+export type GetBody = (compilation: Compilation, page: Page, request: Request) => Promise<string>;
+export type GetLayout = (compilation: Compilation, route: string) => Promise<string>;
+export type GetFrontmatter = (compilation: Compilation, route: string) => Promise<Frontmatter>;

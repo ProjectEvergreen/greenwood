@@ -25,5 +25,6 @@ export type Config = {
   port?: number;
   prerender?: boolean;
   staticRouter?: boolean;
+  useTsc?: boolean;
   workspace?: URL | string;
 };

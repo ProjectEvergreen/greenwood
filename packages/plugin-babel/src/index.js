@@ -71,7 +71,6 @@ const greenwoodPluginBabel = (options = {}) => {
       type: "rollup",
       name: "plugin-babel:rollup",
       provider: (compilation) => [
-        // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
         rollupBabelPlugin({
           // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
           babelHelpers: "bundled",

@@ -18,6 +18,7 @@
   ],
   "type": "module",
   "main": "./src/index.js",
+  "types": "./src/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./src/types/index.d.ts",

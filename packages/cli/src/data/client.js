@@ -8,6 +8,7 @@ const PRERENDER = globalThis.__CONTENT_OPTIONS__?.PRERENDER === "true";
 const PORT = globalThis?.__CONTENT_OPTIONS__?.PORT ?? 1984;
 const BASE_PATH = globalThis?.__GWD_BASE_PATH__ ?? "";
 
+/** @type {import('../types/content.d.ts').Graph} */
 async function getContentAsData(key = "") {
   if (CONTENT_STATE && PRERENDER) {
     // fetch customized query files when a user has opted-in for prerendering with active content
@@ -34,27 +35,17 @@ async function getContentAsData(key = "") {
   }
 }
 
-/**
- * @returns {Promise<import("../types/content.d.ts").Graph>} - The entire set of pages in the project.
- */
+/** @type {import('../types/content.d.ts').GetContent} */
 async function getContent() {
   return await getContentAsData("graph");
 }
 
-/**
- * @param {string} collection - The name of the collection.
- *
- * @returns {Promise<import("../types/content.d.ts").Collection>} - All pages in the collection
- */
+/** @type {import('../types/content.d.ts').GetContentByCollection} */
 async function getContentByCollection(collection = "") {
   return await getContentAsData(`collection-${collection}`);
 }
 
-/**
- * @param {string} route - The name of the route.
- *
- * @returns {Promise<import("../types/content.d.ts").Collection>} - All pages under this route
- */
+/** @type {import('../types/content.d.ts').GetContentByRoute} */
 async function getContentByRoute(route = "") {
   return await getContentAsData(`route-${route}`);
 }

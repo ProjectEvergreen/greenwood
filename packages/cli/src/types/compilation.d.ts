@@ -1,5 +1,5 @@
 import type { Config } from "./config.d.ts";
-import type { Page } from "./content.d.ts";
+import type { Page, Graph } from "./content.d.ts";
 
 // https://greenwoodjs.dev/docs/reference/appendix/#compilation
 export type Compilation = {
@@ -14,7 +14,7 @@ export type Compilation = {
     projectDirectory: URL;
     layoutsDir: URL;
   };
-  graph: Page[];
+  graph: Graph;
   config: Config;
 };
 

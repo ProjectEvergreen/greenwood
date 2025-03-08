@@ -1,10 +1,22 @@
 import type { Config } from "./config.d.ts";
-import type { Page, Collection, Graph } from "./content.d.ts";
+import type {
+  Page,
+  Collection,
+  Graph,
+  GetContent,
+  GetContentByCollection,
+  GetContentByRoute,
+} from "./content.d.ts";
 import type { Compilation, Frontmatter } from "./compilation.d.ts";
 import type { ApiRouteHandler } from "./api.d.ts";
 import type { SsrRouteHandler, GetBody, GetLayout, GetFrontmatter } from "./ssr.d.ts";
 import type {
+  PLUGINS,
+  PLUGIN_TYPES,
   SERVE_PAGE_OPTIONS,
+  ExternalSourcePage,
+  Server,
+  Resource,
   Plugin,
   AdapterPlugin,
   ContextPlugin,
@@ -21,9 +33,15 @@ export type {
   Config,
   Graph,
   Page,
+  GetContent,
+  GetContentByCollection,
+  GetContentByRoute,
   Compilation,
   Frontmatter,
   SERVE_PAGE_OPTIONS,
+  ExternalSourcePage,
+  Server,
+  Resource,
   Plugin,
   AdapterPlugin,
   ContextPlugin,

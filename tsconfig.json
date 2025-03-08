@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
+    "target": "ES2020",
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "experimentalDecorators": true,
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "noEmit": true,
     "checkJs": true,
+    "experimentalDecorators": true,
     "skipLibCheck": true,
     "types": ["acorn", "acorn-walk", "mocha"]
   },
+  "include": ["./packages/*/src/types/*.d.ts"],
   "exclude": [
     "public/",
     "./packages/cli/test/cases/develop.config.polyfills-import-attributes/src/components/hero.js",

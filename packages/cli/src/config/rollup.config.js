@@ -338,7 +338,7 @@ function greenwoodImportMetaUrl(compilation) {
         const assetContents = await fs.promises.readFile(url);
         const name = assetName.replace(`.${assetExtension}`, "");
         const request = new Request(url, { headers: { Accept: "text/javascript" } });
-        let bundleExtensions = ["js"];
+        let bundleExtensions = ["js", "ts"];
 
         for (const plugin of customResourcePlugins) {
           if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {
@@ -742,7 +742,6 @@ const getRollupConfigForApiRoutes = async (compilation) => {
             exportConditions: ["node"],
             preferBuiltins: true,
           }),
-          // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
           commonjs(),
           greenwoodImportMetaUrl(compilation),
           greenwoodSyncApiRoutesOutputPath(compilation),
@@ -789,7 +788,6 @@ const getRollupConfigForSsrPages = async (compilation, inputs) => {
           exportConditions: ["node"],
           preferBuiltins: true,
         }),
-        // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
         commonjs(),
         greenwoodImportMetaUrl(compilation),
         greenwoodSyncSsrEntryPointsOutputPaths(compilation),

@@ -59,10 +59,8 @@ class ImportCommonJsResource {
         const options = {
           input: pathname,
           output: { format: "esm" },
-          // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
           plugins: [commonjs()],
         };
-        // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
         const stream = rollupStream(options);
         let bundle = "";
 
@@ -93,7 +91,6 @@ const greenwoodPluginImportCommonJs = () => {
     {
       type: "rollup",
       name: "plugin-import-commonjs:rollup",
-      // @ts-expect-error see https://github.com/rollup/plugins/issues/1662
       provider: () => [commonjs()],
     },
   ];
