@@ -1,6 +1,13 @@
-import type { Plugin } from "@greenwood/cli";
+import type { ResourcePlugin } from "@greenwood/cli";
 
-export type GoogleAnalyticsPlugin = () => Array<Plugin>;
+export type GoogleAnalyticsPluginOptions = {
+  analyticsId: string;
+  anonymous?: boolean;
+};
+
+export type GoogleAnalyticsPlugin = (
+  options: GoogleAnalyticsPluginOptions,
+) => Array<ResourcePlugin>;
 
 declare module "@greenwood/plugin-google-analytics" {
   export const greenwoodPluginGoogleAnalytics: GoogleAnalyticsPlugin;

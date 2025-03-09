@@ -1,6 +1,6 @@
-import type { Plugin } from "@greenwood/cli";
+import type { ResourcePlugin, ServerPlugin } from "@greenwood/cli";
 
-export type GraphQLPlugin = () => Array<Plugin>;
+export type GraphQLPlugin = () => Array<ResourcePlugin, ServerPlugin>;
 
 export type CollectionVariables = {
   name: string;

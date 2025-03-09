@@ -8,7 +8,9 @@ export type Config = {
     extensions?: string[];
     hud?: boolean;
     port?: number;
-    host?: string;
+    proxy: {
+      [key: string]: string;
+    };
   };
   isolation?: boolean;
   layoutsDirectory?: string;
