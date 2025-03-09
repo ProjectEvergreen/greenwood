@@ -1,6 +1,6 @@
-import type { Plugin } from "@greenwood/cli";
+import type { AdapterPlugin } from "@greenwood/cli";
 
-export type NetlifyAdapter = () => Array<Plugin>;
+export type NetlifyAdapter = () => Array<AdapterPlugin>;
 
 declare module "@greenwood/plugin-adapter-netlify" {
   export const greenwoodPluginAdapterNetlify: NetlifyAdapter;

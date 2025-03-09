@@ -26,7 +26,7 @@ export type PLUGINS =
 export interface Plugin {
   name?: string;
   type: PLUGIN_TYPES;
-  provider: (compilation: Compilation) => PLUGINS;
+  provider: (compilation: Compilation) => unknown;
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#adapter

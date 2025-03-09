@@ -1,4 +1,4 @@
-import type { Plugin } from "@greenwood/cli";
+import type { CopyPlugin, ResourcePlugin } from "@greenwood/cli";
 
 type PolyfillsPluginOptions = {
   wc?: boolean;
@@ -6,7 +6,9 @@ type PolyfillsPluginOptions = {
   lit?: boolean;
 };
 
-export type PolyfillsPlugin = (options: PolyfillsPluginOptions) => Array<Plugin>;
+export type PolyfillsPlugin = (
+  options?: PolyfillsPluginOptions,
+) => Array<ResourcePlugin, CopyPlugin>;
 
 declare module "@greenwood/plugin-polyfills" {
   export const greenwoodPluginPolyfills: PolyfillsPlugin;

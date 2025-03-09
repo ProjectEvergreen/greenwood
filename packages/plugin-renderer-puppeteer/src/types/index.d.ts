@@ -1,6 +1,6 @@
-import type { Plugin } from "@greenwood/cli";
+import type { ResourcePlugin, RendererPlugin, ServerPlugin } from "@greenwood/cli";
 
-export type PuppeteerRendererPlugin = () => Array<Plugin>;
+export type PuppeteerRendererPlugin = () => Array<ResourcePlugin, ServerPlugin, RendererPlugin>;
 
 declare module "@greenwood/plugin-renderer-puppeteer" {
   export const greenwoodPluginRendererPuppeteer: PuppeteerRendererPlugin;

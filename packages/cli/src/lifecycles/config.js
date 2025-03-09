@@ -56,27 +56,28 @@ const pluginTypes = [
   "adapter",
 ];
 const defaultConfig = {
-  workspace: new URL("./src/", cwd),
+  activeContent: false,
+  basePath: "",
   devServer: {
     hud: true,
     port: 1984,
     extensions: [],
+    proxy: {},
   },
-  port: 8080,
-  basePath: "",
-  optimization: optimizations[0],
-  activeContent: false,
-  plugins: greenwoodPlugins,
-  markdown: { plugins: [] },
-  prerender: false,
   isolation: false,
-  pagesDirectory: "pages",
   layoutsDirectory: "layouts",
+  markdown: { plugins: [] },
+  optimization: optimizations[0],
+  pagesDirectory: "pages",
+  plugins: greenwoodPlugins,
   polyfills: {
     importAttributes: null, // or ['css', 'json']
     importMaps: false,
   },
+  port: 8080,
+  prerender: false,
   useTsc: false,
+  workspace: new URL("./src/", cwd),
 };
 
 const readAndMergeConfig = async () => {
@@ -101,7 +102,8 @@ const readAndMergeConfig = async () => {
       }
 
       if (configUrl) {
-        console.log(`Configuration file detected... loading => ${configUrl.href}`);
+        // should try and figure this out - https://github.com/ProjectEvergreen/greenwood/issues/1439
+        // console.log(`Configuration file detected... loading => ${configUrl.href}`);
 
         // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
         const userCfgFile = (await import(configUrl)).default;
