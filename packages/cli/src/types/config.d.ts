@@ -8,7 +8,7 @@ export type Config = {
     extensions?: string[];
     hud?: boolean;
     port?: number;
-    proxy: {
+    proxy?: {
       [key: string]: string;
     };
   };
