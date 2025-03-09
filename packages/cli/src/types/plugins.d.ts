@@ -43,7 +43,7 @@ export interface ContextPlugin extends Plugin {
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#copy
 export interface CopyPlugin extends Plugin {
-  type: Pick<PLUGIN_TYPES, "copy">;
+  type: Extract<PLUGIN_TYPES, "copy">;
   provider: (compilation: Compilation) => Promise<{ from: URL; to: URL }[]>;
 }
 
