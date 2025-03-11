@@ -1,4 +1,6 @@
 import type { ResourcePlugin, ServerPlugin } from "@greenwood/cli";
+import "../queries/queries.d.ts";
+import "../core/client.d.ts";
 
 export type GraphQLPlugin = () => Array<ResourcePlugin, ServerPlugin>;
 

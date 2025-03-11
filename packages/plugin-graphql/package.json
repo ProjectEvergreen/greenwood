@@ -24,6 +24,9 @@
       "types": "./src/types/index.d.ts",
       "import": "./src/index.js"
     },
+    "./src/queries/children.gql": "./src/queries/children.gql",
+    "./src/queries/collection.gql": "./src/queries/collection.gql",
+    "./src/queries/graph.gql": "./src/queries/graph.gql",
     "./src/core/*": "./src/core/*",
     "./src/queries/*": "./src/queries/*"
   },
