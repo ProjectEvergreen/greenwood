@@ -81,6 +81,14 @@ describe("Build Greenwood With Custom Lit Renderer for SSG prerendering: ", func
 
         expect(scripTags.length).to.be.equal(0);
       });
+
+      it("should have the expected lit hydration script in the <head>", function () {
+        const scripts = Array.from(dom.window.document.querySelectorAll("head script")).filter(
+          (script) => script.getAttribute("src")?.indexOf("lit-element-hydrate-support") >= 0,
+        );
+
+        expect(scripts.length).to.equal(1);
+      });
     });
 
     describe("LitElement <app-header> statically rendered into index.html", function () {
