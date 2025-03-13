@@ -294,9 +294,9 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
       ...(
         await asyncFilter(customImports, async (resource) => {
           const [src] = resource.split(" ");
-          const isJavaScriptFile = src.split(" ")[0].split(".").pop() === "js";
+          const isSupportedScript = ["js", "ts"].includes(src.split(" ")[0].split(".").pop());
 
-          if (isJavaScriptFile) {
+          if (isSupportedScript) {
             return true;
           }
 
