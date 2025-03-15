@@ -12,9 +12,9 @@ const BASE_PATH = globalThis?.__GWD_BASE_PATH__ ?? "";
 async function getContentAsData(key = "") {
   if (CONTENT_STATE && PRERENDER) {
     // fetch customized query files when a user has opted-in for prerendering with active content
-    await fetch(`${window.location.origin}${BASE_PATH}/data-${key.replace(/\//g, "_")}.json`).then(
-      (resp) => resp.json(),
-    );
+    return await fetch(
+      `${window.location.origin}${BASE_PATH}/data-${key.replace(/\//g, "_")}.json`,
+    ).then((resp) => resp.json());
   } else if (CONTENT_STATE && !PRERENDER) {
     // if user is not prerendering, just fetch the entire graph but apply the same filtering
     const graph = await fetch("/graph.json").then((resp) => resp.json());
