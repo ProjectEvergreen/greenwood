@@ -77,19 +77,16 @@ const generateGraph = async (compilation) => {
             const extension = `.${filenameUrl.pathname.split(".").pop()}`;
             const relativePagePath = filenameUrl.pathname.replace(pagesDir.pathname, "./");
             const isApiRoute = relativePagePath.startsWith("./api");
-            const req = isApiRoute
-              ? new Request(filenameUrl, { headers: { Accept: "text/javascript" } })
-              : new Request(filenameUrl, { headers: { Accept: "text/html" } });
             let isCustom = null;
 
             for (const plugin of customPageFormatPlugins) {
-              if (plugin.shouldServe && (await plugin.shouldServe(filenameUrl, req))) {
+              if (plugin.servePage) {
                 isCustom = plugin.servePage;
                 break;
               }
             }
 
-            const isStatic = isCustom === "static" || extension === ".md" || extension === ".html";
+            const isStatic = isCustom === "static" || extension === ".html";
             const isDynamic = isCustom === "dynamic" || extension === ".js" || extension === ".ts";
             const isPage = isStatic || isDynamic;
             let route = `${relativePagePath.replace(".", "").replace(`${extension}`, "")}`;
