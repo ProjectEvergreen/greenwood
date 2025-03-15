@@ -25,6 +25,7 @@ async function getDevServer(compilation) {
         return plugin.provider(compilationCopy);
       }),
 
+    // TODO with pre lifecycles, do we even need this distinction
     // custom user resource plugins
     ...compilation.config.plugins
       .filter((plugin) => {
@@ -57,18 +58,61 @@ async function getDevServer(compilation) {
     await next();
   });
 
-  // handle creating responses from urls
+  // allow pre-serving of userland plugins _before_ Greenwood "standardizes" it
   app.use(async (ctx, next) => {
     try {
       const url = new URL(ctx.url);
-      const { status } = ctx.response;
+      const { header, status, message } = ctx.response;
+      const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
+      const initResponse = new Response(ctx.body, {
+        statusText: message,
+        status,
+        headers: new Headers(header),
+      });
+      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        const intermediateResponse = await responsePromise;
+        if (
+          plugin.shouldPreServe &&
+          (await plugin.shouldPreServe(url, request, intermediateResponse.clone()))
+        ) {
+          const current = await plugin.preServe(url, request, await intermediateResponse.clone());
+          const merged = mergeResponse(intermediateResponse.clone(), current.clone());
+
+          return Promise.resolve(merged);
+        } else {
+          return Promise.resolve(await responsePromise);
+        }
+      }, Promise.resolve(initResponse.clone()));
+
+      ctx.body = response.body ? Readable.from(response.body) : initResponse;
+      ctx.message = response.statusText;
+      response.headers.forEach((value, key) => {
+        ctx.set(key, value);
+      });
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
+    }
+
+    await next();
+  });
+
+  // handle serving responses from urls
+  app.use(async (ctx, next) => {
+    try {
+      const url = new URL(ctx.url);
+      const { header, status, message } = ctx.response;
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
       // intentionally ignore initial statusText to avoid false positives from 404s
-      let response = new Response(null, { status });
+      let response = new Response(status === 204 ? null : ctx.body, {
+        statusText: message,
+        status,
+        headers: new Headers(header),
+      }).clone();
 
       for (const plugin of resourcePlugins) {
-        if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {
-          const current = await plugin.serve(url, request);
+        if (plugin.shouldServe && (await plugin.shouldServe(url, request, response.clone()))) {
+          const current = await plugin.serve(url, request, response.clone());
           const merged = mergeResponse(response.clone(), current.clone());
 
           response = merged.clone();
