@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import toc from "markdown-toc";
 import rehypeStringify from "rehype-stringify";
 import rehypeRaw from "rehype-raw";
 import remarkFrontmatter from "remark-frontmatter";
@@ -19,7 +20,6 @@ class MarkdownResource {
     const { protocol, pathname } = url;
     const hasMatchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
 
-    // console.log('shouldServe', { hasMatchingPageRoute, protocol, pathname });
     return (
       protocol.startsWith("http") &&
       hasMatchingPageRoute &&
@@ -31,6 +31,8 @@ class MarkdownResource {
     const { pathname } = url;
     const matchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
     const markdownContents = await fs.readFile(new URL(matchingPageRoute.pageHref), "utf-8");
+    const pageData = matchingPageRoute.data;
+    const tocData = {};
     const rehypePlugins = [];
     const remarkPlugins = [];
     let processedMarkdown = "";
@@ -54,6 +56,30 @@ class MarkdownResource {
       .use(rehypePlugins) // apply userland rehype plugins
       .use(rehypeStringify) // convert AST to HTML string
       .process(markdownContents);
+
+    // support table of contents metadata
+    tocData.tocHeading = tocData.tocHeading || 0;
+    tocData.tableOfContents = [];
+
+    if (pageData.tocHeading > 0 && pageData.tocHeading <= 6) {
+      tocData.tableOfContents = toc(markdownContents).json;
+
+      // parse table of contents for only the headings user wants linked
+      if (tocData.tableOfContents.length > 0 && tocData.tocHeading > 0) {
+        tocData.tableOfContents = tocData.tableOfContents.filter(
+          (item) => item.lvl === tocData.tocHeading,
+        );
+      }
+
+      this.compilation.graph.forEach((page, idx) => {
+        if (page.route === matchingPageRoute.route) {
+          this.compilation.graph[idx].data = {
+            ...matchingPageRoute.data,
+            ...tocData,
+          };
+        }
+      });
+    }
 
     // TODO
     // if (processedMarkdown) {
