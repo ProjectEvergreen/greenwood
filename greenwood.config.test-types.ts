@@ -15,6 +15,20 @@ import { greenwoodPluginPostCss } from "@greenwood/plugin-postcss";
 import { greenwoodPluginRendererLit } from "@greenwood/plugin-renderer-lit";
 import { greenwoodPluginRendererPuppeteer } from "@greenwood/plugin-renderer-puppeteer";
 
+import { getContentByRoute } from "@greenwood/cli/src/data/client.js";
+
+const foo = await getContentByRoute("foo");
+console.log(foo);
+
+import ChildrenQuery from "@greenwood/plugin-graphql/src/queries/children.gql";
+import CollectionQuery from "@greenwood/plugin-graphql/src/queries/collection.gql";
+import GraphQuery from "@greenwood/plugin-graphql/src/queries/graph.gql";
+
+console.log({ ChildrenQuery, CollectionQuery, GraphQuery });
+
+import client from "@greenwood/plugin-graphql/src/core/client.js";
+console.log({ client });
+
 const port: number = 8080;
 
 const config: Config = {

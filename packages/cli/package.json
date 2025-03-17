@@ -30,6 +30,7 @@
       "import": "./src/index.js"
     },
     "./register": "./src/register.js",
+    "./src/data/client": "./src/data/client.js",
     "./src/*": "./src/*"
   },
   "bin": {
