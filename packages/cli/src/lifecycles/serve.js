@@ -68,7 +68,7 @@ async function getDevServer(compilation) {
         statusText: message,
         status,
         headers: new Headers(header),
-      });
+      }).clone();
       const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
         const intermediateResponse = await responsePromise;
         if (
