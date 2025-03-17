@@ -1,11 +1,11 @@
 import fs from "fs/promises";
 
-class NaiveTypeScriptResource {
+class NaiveFooResource {
   constructor(compilation, options) {
     this.compilation = compilation;
     this.options = options;
 
-    this.extensions = ["ts"];
+    this.extensions = ["foo"];
     this.contentType = "text/javascript";
   }
 
@@ -64,8 +64,8 @@ export default {
   plugins: [
     {
       type: "resource",
-      name: "plugin-naive-ts",
-      provider: (compilation) => new NaiveTypeScriptResource(compilation),
+      name: "plugin-naive-foo",
+      provider: (compilation) => new NaiveFooResource(compilation),
     },
     {
       type: "resource",
