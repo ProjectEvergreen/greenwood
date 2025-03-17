@@ -3,7 +3,6 @@ import fs from "fs/promises";
 import fm from "front-matter";
 import { checkResourceExists, requestAsObject } from "../lib/resource-utils.js";
 import { activeFrontmatterKeys } from "../lib/content-utils.js";
-import toc from "markdown-toc";
 import { Worker } from "worker_threads";
 
 function getLabelFromRoute(_route) {
@@ -210,35 +209,10 @@ const generateGraph = async (compilation) => {
                 }
               }
 
-              /*
-               * Custom front matter - Variable Definitions
-               * --------------------------------------------------
-               * collection: the name of the collection for the page (as a string or array)
-               * order: the order of this item within the collection
-               * tocHeading: heading size to use a Table of Contents for a page
-               * tableOfContents: json object containing page's table of contents (list of headings)
-               */
-
-              // prune "reserved" attributes that are supported by Greenwood
+              // prune "reserved" frontmatter that are supported by Greenwood
               [...activeFrontmatterKeys, "layout"].forEach((key) => {
                 delete customData[key];
               });
-
-              // set flag whether to gather a list of headings on a page as menu items
-              customData.tocHeading = customData.tocHeading || 0;
-              customData.tableOfContents = [];
-
-              if (fileContents && customData.tocHeading > 0 && customData.tocHeading <= 6) {
-                // parse markdown for table of contents and output to json
-                customData.tableOfContents = toc(fileContents).json;
-
-                // parse table of contents for only the pages user wants linked
-                if (customData.tableOfContents.length > 0 && customData.tocHeading > 0) {
-                  customData.tableOfContents = customData.tableOfContents.filter(
-                    (item) => item.lvl === customData.tocHeading,
-                  );
-                }
-              }
 
               /*
                * Page Properties
