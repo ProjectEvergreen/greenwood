@@ -15,9 +15,6 @@ export type Config = {
   isolation?: boolean;
   layoutsDirectory?: string;
   optimization?: "default" | "inline" | "none" | "static";
-  markdown?: {
-    plugins?: string[];
-  };
   pagesDirectory?: string;
   plugins?: Array<PLUGINS | Array<PLUGINS>>;
   polyfills?: {

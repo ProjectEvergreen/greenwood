@@ -66,7 +66,6 @@ const defaultConfig = {
   },
   isolation: false,
   layoutsDirectory: "layouts",
-  markdown: { plugins: [] },
   optimization: optimizations[0],
   pagesDirectory: "pages",
   plugins: greenwoodPlugins,
