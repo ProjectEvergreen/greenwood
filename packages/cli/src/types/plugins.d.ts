@@ -1,4 +1,4 @@
-import type { Compilation } from "./compilation.d.ts";
+import type { Compilation, Frontmatter } from "./compilation.d.ts";
 import type { Page } from "./content.d.ts";
 import type { Plugin as TRollupPlugin } from "rollup";
 
@@ -94,8 +94,10 @@ export interface ServerPlugin extends Plugin {
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#source
-export type ExternalSourcePage = Page & {
+export type ExternalSourcePage = Frontmatter & {
   body: string;
+  route: string;
+  id?: string;
 };
 
 export interface SourcePlugin extends Plugin {
