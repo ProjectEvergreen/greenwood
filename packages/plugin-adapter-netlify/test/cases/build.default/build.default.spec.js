@@ -247,7 +247,7 @@ describe("Build Greenwood With: ", function () {
         const response = await handler(
           {
             rawUrl: `${hostname}/api/submit-json`,
-            body: { name: param },
+            body: JSON.stringify({ name: param }),
             httpMethod: "POST",
             headers: {
               "content-type": "application/json",
