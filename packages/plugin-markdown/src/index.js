@@ -7,6 +7,43 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 
+// unless we want to support hot reloading?
+// https://github.com/ProjectEvergreen/greenwood/issues/1278
+let allHeadingsTracked = false;
+
+async function trackAllTocHeadings(compilation) {
+  for (const idx in compilation.graph) {
+    const page = compilation.graph[idx];
+
+    if (page.pageHref.endsWith(".md")) {
+      const markdownContents = await fs.readFile(new URL(page.pageHref), "utf-8");
+
+      let tocData = {};
+
+      tocData.tocHeading = page.data.tocHeading || 0;
+      tocData.tableOfContents = [];
+
+      if (page.data.tocHeading > 0 && page.data.tocHeading <= 6) {
+        tocData.tableOfContents = toc(markdownContents).json;
+
+        // parse table of contents for only the headings user wants linked
+        if (tocData.tableOfContents.length > 0 && tocData.tocHeading > 0) {
+          tocData.tableOfContents = tocData.tableOfContents.filter(
+            (item) => item.lvl === tocData.tocHeading,
+          );
+
+          compilation.graph[idx].data = {
+            ...page.data,
+            ...tocData,
+          };
+        }
+      }
+    }
+  }
+
+  allHeadingsTracked = true;
+}
+
 class MarkdownResource {
   constructor(compilation, options = {}) {
     this.compilation = compilation;
@@ -31,8 +68,6 @@ class MarkdownResource {
     const { pathname } = url;
     const matchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
     const markdownContents = await fs.readFile(new URL(matchingPageRoute.pageHref), "utf-8");
-    const pageData = matchingPageRoute.data;
-    const tocData = {};
     const rehypePlugins = [];
     const remarkPlugins = [];
     let processedMarkdown = "";
@@ -57,28 +92,9 @@ class MarkdownResource {
       .use(rehypeStringify) // convert AST to HTML string
       .process(markdownContents);
 
-    // support table of contents metadata
-    tocData.tocHeading = tocData.tocHeading || 0;
-    tocData.tableOfContents = [];
-
-    if (pageData.tocHeading > 0 && pageData.tocHeading <= 6) {
-      tocData.tableOfContents = toc(markdownContents).json;
-
-      // parse table of contents for only the headings user wants linked
-      if (tocData.tableOfContents.length > 0 && tocData.tocHeading > 0) {
-        tocData.tableOfContents = tocData.tableOfContents.filter(
-          (item) => item.lvl === tocData.tocHeading,
-        );
-      }
-
-      this.compilation.graph.forEach((page, idx) => {
-        if (page.route === matchingPageRoute.route) {
-          this.compilation.graph[idx].data = {
-            ...matchingPageRoute.data,
-            ...tocData,
-          };
-        }
-      });
+    // would be nice if there was a cleaner way to hook into Greenwood's "graph" lifecycle
+    if (!allHeadingsTracked) {
+      await trackAllTocHeadings(this.compilation);
     }
 
     // TODO
