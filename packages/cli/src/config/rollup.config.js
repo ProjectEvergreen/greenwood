@@ -180,6 +180,21 @@ function greenwoodSyncSsrEntryPointsOutputPaths(compilation) {
   };
 }
 
+// https://github.com/ProjectEvergreen/greenwood/issues/1465
+// https://github.com/ProjectEvergreen/greenwood/discussions/1204#discussioncomment-12582424
+function getAllBundleChunks(key, bundles) {
+  const chunks = [];
+
+  for (const bundle in bundles) {
+    const { fileName } = bundles[bundle];
+    if (fileName !== key && fileName.startsWith(key.replace(".js", ""))) {
+      chunks.push(bundles[bundle].fileName);
+    }
+  }
+
+  return chunks;
+}
+
 function greenwoodSyncApiRoutesOutputPath(compilation) {
   return {
     name: "greenwood-sync-api-routes-output-paths",
@@ -198,10 +213,14 @@ function greenwoodSyncApiRoutesOutputPath(compilation) {
 
           if (compilation.manifest.apis.has(route)) {
             const api = compilation.manifest.apis.get(route);
+            const linkedAssets = getAllBundleChunks(key, bundle).map(
+              (chunk) => new URL(`./api/${chunk}`, outputDir).href,
+            );
 
             compilation.manifest.apis.set(route, {
               ...api,
               outputHref: new URL(`./api/${key}`, outputDir).href,
+              assets: api.assets ? [...api.assets, ...linkedAssets] : linkedAssets,
             });
           }
         }
@@ -716,7 +735,6 @@ const getRollupConfigForBrowserScripts = async (compilation) => {
 };
 
 const getRollupConfigForApiRoutes = async (compilation) => {
-  // console.log('getRollupConfigForApiRoutes', compilation.manifest.apis.values())
   const { outputDir } = compilation.context;
 
   return [...compilation.manifest.apis.values()]
