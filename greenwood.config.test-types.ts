@@ -1,4 +1,4 @@
-import type { Config } from "@greenwood/cli";
+import type { Config, ExternalSourcePage } from "@greenwood/cli";
 import { greenwoodPluginAdapterAws } from "@greenwood/plugin-adapter-aws";
 import { greenwoodPluginAdapterVercel } from "@greenwood/plugin-adapter-vercel";
 import { greenwoodPluginAdapterNetlify } from "@greenwood/plugin-adapter-netlify";
@@ -65,6 +65,19 @@ const config: Config = {
     greenwoodPluginPostCss(),
     greenwoodPluginRendererLit(),
     greenwoodPluginRendererPuppeteer(),
+    {
+      type: "source",
+      provider: (): (() => Promise<ExternalSourcePage[]>) => {
+        return async function () {
+          return [
+            {
+              body: "<h1>Hello World</h1>",
+              route: "/hello-world",
+            },
+          ];
+        };
+      },
+    },
   ],
   polyfills: {
     importAttributes: ["css", "json"],
