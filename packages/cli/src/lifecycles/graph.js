@@ -62,6 +62,7 @@ const generateGraph = async (compilation) => {
         const files = (await fs.readdir(directory)).filter((file) => !file.startsWith("."));
 
         for (const filename of files) {
+          console.log({ filename });
           const filenameUrl = new URL(`./${filename}`, directory);
           const filenameUrlAsDir = new URL(`./${filename}/`, directory);
           const isDirectory =
@@ -115,7 +116,9 @@ const generateGraph = async (compilation) => {
                * isolation: if this should be run in isolated mode
                */
               apiRoutes.set(`${basePath}${route}`, {
-                id: getIdFromRelativePathPath(relativePagePath, extension).replace("api-", ""),
+                id: decodeURIComponent(
+                  getIdFromRelativePathPath(relativePagePath, extension).replace("api-", ""),
+                ),
                 pageHref: new URL(relativePagePath, pagesDir).href,
                 outputHref: new URL(relativePagePath, outputDir).href.replace(extension, ".js"),
                 route: `${basePath}${route}`,
@@ -263,9 +266,9 @@ const generateGraph = async (compilation) => {
                * servePage: signal that this is a custom page file type (static | dynamic)
                */
               const page = {
-                id: getIdFromRelativePathPath(relativePagePath, extension),
-                label,
-                title,
+                id: decodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
+                label: decodeURIComponent(label),
+                title: title ? decodeURIComponent(title) : title,
                 route: `${basePath}${route}`,
                 layout,
                 data: customData || {},
