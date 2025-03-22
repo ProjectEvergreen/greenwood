@@ -39,6 +39,7 @@ $ pnpm add -D @greenwood/plugin-renderer-lit
 For **pnpm**, you will also want to add this to your _.npmrc_ file
 ```sh
 public-hoist-pattern[]=@lit-labs/*
+public-hoist-pattern[]=lit-html
 ```
 
 ## Usage
