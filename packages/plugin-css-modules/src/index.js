@@ -33,7 +33,12 @@ function getCssModulesMap(compilation) {
 async function getTransformedScriptContents(scriptUrl, compilation) {
   const resourcePlugins = compilation.config.plugins
     .filter((plugin) => {
-      return plugin.type === "resource";
+      // exclude the CSS Module related plugins, which would strip imports before scanning happens
+      return (
+        plugin.type === "resource" &&
+        plugin.name !== "plugin-css-modules-strip-modules" &&
+        plugin.name !== "plugin-css-modules:scan"
+      );
     })
     .map((plugin) => {
       return plugin.provider(compilation);
