@@ -34,8 +34,6 @@ function generateOutputFormat(id) {
         // https://stackoverflow.com/a/43521052/417806
         format = formData;
         delete headers['content-type'];
-      } else if(contentType.includes('application/json')) {
-        format = JSON.stringify(body);
       }
 
       const request = new Request(rawUrl, {

@@ -192,7 +192,7 @@ describe("Build Greenwood With: ", function () {
             host: hostname,
             "content-type": "application/json",
           },
-          body: { name },
+          body: JSON.stringify({ name }),
           requestContext: {
             http: {
               method: "POST",
