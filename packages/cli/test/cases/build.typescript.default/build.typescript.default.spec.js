@@ -1,9 +1,9 @@
 /*
  * Use Case
- * Run Greenwood with TypeScript processing.
+ * Run Greenwood with TypeScript processing for pages, layouts and scripts.
  *
  * User Result
- * Should generate a bare bones Greenwood build with the user's JavaScript files processed based on the pluygins default config.
+ * Should generate a Greenwood build using Greenwood's built-in TypeScript support.
  *
  * User Command
  * greenwood build
@@ -13,25 +13,20 @@
  *
  * User Workspace
  *  src/
+ *   layouts/
+ *     app.ts
  *   pages/
  *     index.html
  *   scripts/
  *     main.ts
  *
  * Default Config
- * {
- *   "compilerOptions": {
- *      "target": "es2020",
- *      "module": "es2020",
- *      "moduleResolution": "node",
- *      "sourceMap": true
- *   }
- * }
  *
  */
 import chai from "chai";
 import fs from "fs";
 import glob from "glob-promise";
+import { JSDOM } from "jsdom";
 import path from "path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
@@ -59,9 +54,38 @@ describe("Build Greenwood With: ", function () {
       runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(["public", "index"], LABEL);
+    runSmokeTest(["public"], LABEL);
 
-    describe("TypeScript should process JavaScript that uses an interface", function () {
+    describe("TypeScript based App Layout should be processed JavaScript and output HTML", function () {
+      const text = "TypeScript App Layout";
+      let dom;
+
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+      });
+
+      it("should the correct app.ts layout <title> tag contents", function () {
+        const title = dom.window.document.querySelector("head title").textContent;
+
+        expect(title).to.be.equal(text);
+      });
+
+      it("should the correct app.ts layout <h1> tag contents", function () {
+        const heading = dom.window.document.querySelector("h1").textContent;
+
+        expect(heading).to.be.equal(text);
+      });
+
+      it("should the correct index.html page <h2> tag contents", function () {
+        const heading = dom.window.document.querySelector("h2").textContent;
+
+        expect(heading).to.be.equal("Hello World!");
+      });
+    });
+
+    xdescribe("TypeScript based Page Layout leveraging custom format support", function () {});
+
+    describe("TypeScript in a <script> tag should get correctly processed as JavaScript", function () {
       it("should output correctly processed JavaScript without the interface", function () {
         const jsFiles = glob.sync(path.join(this.context.publicDir, "*.js"));
         const javascript = fs.readFileSync(jsFiles[0], "utf-8");

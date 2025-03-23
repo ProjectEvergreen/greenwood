@@ -122,12 +122,16 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
   const { layoutsDir, userLayoutsDir } = compilation.context;
   const userStaticAppLayoutUrl = new URL("./app.html", userLayoutsDir);
   const userDynamicAppLayoutUrl = new URL("./app.js", userLayoutsDir);
+  const userDynamicAppLayoutTypeScriptUrl = new URL("./app.ts", userLayoutsDir);
   const userHasStaticAppLayout = await checkResourceExists(userStaticAppLayoutUrl);
   const userHasDynamicAppLayout = await checkResourceExists(userDynamicAppLayoutUrl);
+  const userHasDynamicAppTypeScriptLayout = await checkResourceExists(
+    userDynamicAppLayoutTypeScriptUrl,
+  );
   const customAppLayoutsFromPlugins = await getCustomPageLayoutsFromPlugins(compilation, "app");
   let dynamicAppLayoutContents;
 
-  if (userHasDynamicAppLayout) {
+  if (userHasDynamicAppLayout || userHasDynamicAppTypeScriptLayout) {
     const routeWorkerUrl = compilation.config.plugins
       .find((plugin) => plugin.type === "renderer")
       .provider().executeModuleUrl;
@@ -151,7 +155,9 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
 
       worker.postMessage({
         executeModuleUrl: routeWorkerUrl.href,
-        moduleUrl: userDynamicAppLayoutUrl.href,
+        moduleUrl: userHasDynamicAppLayout
+          ? userDynamicAppLayoutUrl.href
+          : userDynamicAppLayoutTypeScriptUrl.href,
         compilation: JSON.stringify(compilation),
       });
     });
@@ -162,7 +168,7 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
       ? await fs.readFile(new URL("./app.html", customAppLayoutsFromPlugins[0]), "utf-8")
       : userHasStaticAppLayout
         ? await fs.readFile(userStaticAppLayoutUrl, "utf-8")
-        : userHasDynamicAppLayout
+        : userHasDynamicAppLayout || userHasDynamicAppTypeScriptLayout
           ? dynamicAppLayoutContents
           : await fs.readFile(new URL("./app.html", layoutsDir), "utf-8");
   let mergedLayoutContents = "";
@@ -178,6 +184,8 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
   const appRoot = htmlparser.parse(appLayoutContents, {
     script: true,
     style: true,
+    noscript: true,
+    pre: true,
   });
 
   if ((pageLayoutContents && !pageRoot.valid) || !appRoot.valid) {
