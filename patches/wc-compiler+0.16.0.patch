@@ -1,0 +1,125 @@
+diff --git a/node_modules/wc-compiler/package.json b/node_modules/wc-compiler/package.json
+index 4c818d9..4ca59fc 100644
+--- a/node_modules/wc-compiler/package.json
++++ b/node_modules/wc-compiler/package.json
+@@ -7,7 +7,14 @@
+     "url": "https://github.com/ProjectEvergreen/wcc.git"
+   },
+   "main": "src/wcc.js",
++  "types": "./src/index.d.ts",
+   "type": "module",
++  "exports": {
++    ".": "./src/wcc.js",
++    "./types": "./src/index.d.ts",
++    "./register": "./src/register.js",
++    "./src/jsx-loader.js": "./src/jsx-loader.js"
++  },
+   "author": "Owen Buckley <owen@thegreenhouse.io>",
+   "keywords": [
+     "Web Components",
+diff --git a/node_modules/wc-compiler/src/index.d.ts b/node_modules/wc-compiler/src/index.d.ts
+new file mode 100644
+index 0000000..5bda69b
+--- /dev/null
++++ b/node_modules/wc-compiler/src/index.d.ts
+@@ -0,0 +1,17 @@
++export type Metadata = object[{
++  [key: string]: {
++    instanceName: string;
++    moduleURL: URL;
++    isEntry: boolean
++  }
++}]
++
++export type renderToString = (elementURL: URL, wrappingEntryTag?: boolean, props?: any) => Promise<{
++  html: string;
++  metadata: Metadata
++}>
++
++export type renderFromHTML = (html: string, elementURLs: URL[]) => Promise<{
++  html: string;
++  metadata: Metadata
++}>
+diff --git a/node_modules/wc-compiler/src/wcc.js b/node_modules/wc-compiler/src/wcc.js
+index d394f17..999924b 100644
+--- a/node_modules/wc-compiler/src/wcc.js
++++ b/node_modules/wc-compiler/src/wcc.js
+@@ -1,4 +1,3 @@
+-/* eslint-disable max-depth */
+ // this must come first
+ import { getParse } from './dom-shim.js';
+ 
+@@ -84,19 +83,23 @@ function registerDependencies(moduleURL, definitions, depth = 0) {
+   }), {
+     ImportDeclaration(node) {
+       const specifier = node.source.value;
+-      const isBareSpecifier = specifier.indexOf('.') !== 0 && specifier.indexOf('/') !== 0;
+-      const extension = specifier.split('.').pop();
+ 
+-      // would like to decouple .jsx from the core, ideally
+-      // https://github.com/ProjectEvergreen/wcc/issues/122
+-      if (!isBareSpecifier && ['js', 'jsx', 'ts'].includes(extension)) {
+-        const dependencyModuleURL = new URL(node.source.value, moduleURL);
++      if (typeof specifier === 'string') {
++        const isBareSpecifier = specifier.indexOf('.') !== 0 && specifier.indexOf('/') !== 0;
++        const extension = typeof specifier === "string" ? specifier.split('.').pop() : "";
+ 
+-        registerDependencies(dependencyModuleURL, definitions, nextDepth);
++        // would like to decouple .jsx from the core, ideally
++        // https://github.com/ProjectEvergreen/wcc/issues/122
++        if (!isBareSpecifier && ['js', 'jsx', 'ts'].includes(extension)) {
++          const dependencyModuleURL = new URL(specifier, moduleURL);
++
++          registerDependencies(dependencyModuleURL, definitions, nextDepth);
++        }
+       }
+     },
+     ExpressionStatement(node) {
+       if (isCustomElementDefinitionNode(node)) {
++        // @ts-ignore
+         const { arguments: args } = node.expression;
+         const tagName = args[0].type === 'Literal'
+           ? args[0].value // single and double quotes
+@@ -135,6 +138,7 @@ async function getTagName(moduleURL) {
+   }), {
+     ExpressionStatement(node) {
+       if (isCustomElementDefinitionNode(node)) {
++        // @ts-ignore
+         tagName = node.expression.arguments[0].value;
+       }
+     }
+@@ -150,15 +154,12 @@ async function initializeCustomElement(elementURL, tagName, node = {}, definitio
+     registerDependencies(elementURL, definitions, depth);
+   }
+ 
+-  // https://github.com/ProjectEvergreen/wcc/pull/67/files#r902061804
+-  // https://github.com/ProjectEvergreen/wcc/pull/159
+-  const { href } = elementURL;
+-  const element = customElements.get(tagName) ?? (await import(href)).default;
+-  const dataLoader = (await import(href)).getData;
++  const element = customElements.get(tagName) ?? (await import(elementURL)).default;
++  const dataLoader = (await import(elementURL)).getData;
+   const data = props ? props : dataLoader ? await dataLoader(props) : {};
+ 
+   if (element) {
+-    const elementInstance = new element(data); // eslint-disable-line new-cap
++    const elementInstance = new element(data);
+ 
+     Object.assign(elementInstance, node);
+ 
+@@ -168,6 +169,7 @@ async function initializeCustomElement(elementURL, tagName, node = {}, definitio
+   }
+ }
+ 
++/** @type {import('./index.d.ts').renderToString} */
+ async function renderToString(elementURL, wrappingEntryTag = true, props = {}) {
+   const definitions = [];
+   const elementTagName = wrappingEntryTag && await getTagName(elementURL);
+@@ -208,6 +210,7 @@ async function renderToString(elementURL, wrappingEntryTag = true, props = {}) {
+   };
+ }
+ 
++/** @type {import('./index.d.ts').renderFromHTML} */
+ async function renderFromHTML(html, elements = []) {
+   const definitions = [];
+ 
