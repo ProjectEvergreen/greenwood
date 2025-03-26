@@ -360,6 +360,9 @@ const generateGraph = async (compilation) => {
 
       const sourcePlugins = compilation.config.plugins.filter((plugin) => plugin.type === "source");
 
+      compilation.graph = graph;
+      compilation.manifest = { apis };
+
       if (sourcePlugins.length > 0) {
         console.debug("building from external sources...");
         for (const plugin of sourcePlugins) {
@@ -385,9 +388,6 @@ const generateGraph = async (compilation) => {
           }
         }
       }
-
-      compilation.graph = graph;
-      compilation.manifest = { apis };
 
       resolve(compilation);
     } catch (err) {
