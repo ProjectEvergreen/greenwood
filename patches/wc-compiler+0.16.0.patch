@@ -1,16 +1,18 @@
 diff --git a/node_modules/wc-compiler/package.json b/node_modules/wc-compiler/package.json
-index 4c818d9..4ca59fc 100644
+index 4c818d9..8fbfbae 100644
 --- a/node_modules/wc-compiler/package.json
 +++ b/node_modules/wc-compiler/package.json
-@@ -7,7 +7,14 @@
+@@ -7,7 +7,16 @@
      "url": "https://github.com/ProjectEvergreen/wcc.git"
    },
    "main": "src/wcc.js",
 +  "types": "./src/index.d.ts",
    "type": "module",
 +  "exports": {
-+    ".": "./src/wcc.js",
-+    "./types": "./src/index.d.ts",
++    ".": {
++      "import": "./src/wcc.js",
++      "types": "./src/index.d.ts"
++    },
 +    "./register": "./src/register.js",
 +    "./src/jsx-loader.js": "./src/jsx-loader.js"
 +  },
@@ -19,17 +21,17 @@ index 4c818d9..4ca59fc 100644
      "Web Components",
 diff --git a/node_modules/wc-compiler/src/index.d.ts b/node_modules/wc-compiler/src/index.d.ts
 new file mode 100644
-index 0000000..5bda69b
+index 0000000..3c32133
 --- /dev/null
 +++ b/node_modules/wc-compiler/src/index.d.ts
-@@ -0,0 +1,17 @@
-+export type Metadata = object[{
+@@ -0,0 +1,19 @@
++export type Metadata = {
 +  [key: string]: {
 +    instanceName: string;
 +    moduleURL: URL;
 +    isEntry: boolean
 +  }
-+}]
++}
 +
 +export type renderToString = (elementURL: URL, wrappingEntryTag?: boolean, props?: any) => Promise<{
 +  html: string;
@@ -40,8 +42,11 @@ index 0000000..5bda69b
 +  html: string;
 +  metadata: Metadata
 +}>
++
++declare module "wc-compiler" { }
+\ No newline at end of file
 diff --git a/node_modules/wc-compiler/src/wcc.js b/node_modules/wc-compiler/src/wcc.js
-index d394f17..999924b 100644
+index d394f17..b1217dd 100644
 --- a/node_modules/wc-compiler/src/wcc.js
 +++ b/node_modules/wc-compiler/src/wcc.js
 @@ -1,4 +1,3 @@
@@ -88,7 +93,15 @@ index d394f17..999924b 100644
          tagName = node.expression.arguments[0].value;
        }
      }
-@@ -150,15 +154,12 @@ async function initializeCustomElement(elementURL, tagName, node = {}, definitio
+@@ -143,22 +147,19 @@ async function getTagName(moduleURL) {
+   return tagName;
+ }
+ 
+-async function initializeCustomElement(elementURL, tagName, node = {}, definitions = [], isEntry, props = {}) {
++async function initializeCustomElement(elementURL, tagName, node = {}, definitions = {}, isEntry, props = {}) {
+ 
+   if (!tagName) {
+     const depth = isEntry ? 1 : 0;
      registerDependencies(elementURL, definitions, depth);
    }
  
@@ -107,19 +120,27 @@ index d394f17..999924b 100644
  
      Object.assign(elementInstance, node);
  
-@@ -168,6 +169,7 @@ async function initializeCustomElement(elementURL, tagName, node = {}, definitio
+@@ -168,8 +169,10 @@ async function initializeCustomElement(elementURL, tagName, node = {}, definitio
    }
  }
  
 +/** @type {import('./index.d.ts').renderToString} */
  async function renderToString(elementURL, wrappingEntryTag = true, props = {}) {
-   const definitions = [];
+-  const definitions = [];
++  /** @type {import('./index.d.ts').Metadata} */
++  const definitions = {};
    const elementTagName = wrappingEntryTag && await getTagName(elementURL);
-@@ -208,6 +210,7 @@ async function renderToString(elementURL, wrappingEntryTag = true, props = {}) {
+   const isEntry = !!elementTagName;
+   const elementInstance = await initializeCustomElement(elementURL, undefined, undefined, definitions, isEntry, props);
+@@ -208,8 +211,10 @@ async function renderToString(elementURL, wrappingEntryTag = true, props = {}) {
    };
  }
  
 +/** @type {import('./index.d.ts').renderFromHTML} */
  async function renderFromHTML(html, elements = []) {
-   const definitions = [];
+-  const definitions = [];
++  /** @type {import('./index.d.ts').Metadata} */
++  const definitions = {};
  
+   for (const url of elements) {
+     registerDependencies(url, definitions, 1);
