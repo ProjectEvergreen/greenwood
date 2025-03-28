@@ -5,7 +5,7 @@ import { Worker } from "worker_threads";
 import { asyncFilter } from "./async-utils.js";
 
 async function checkIfLayoutExists(layoutName, userLayoutsDir) {
-  const extensions = [".ts", ".mts", ".cts", ".js", ".mjs", ".cjs"];
+  const extensions = [".ts", ".mts", ".js", ".mjs"];
   for (const extension of extensions) {
     if (await checkResourceExists(new URL(`./${layoutName}${extension}`, userLayoutsDir))) {
       return extension;
