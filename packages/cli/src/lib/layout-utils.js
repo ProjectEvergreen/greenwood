@@ -52,6 +52,9 @@ async function getPageLayout(pageHref = "", compilation, layout) {
   const hasCustomDynamicLayout = await checkResourceExists(
     new URL(`./${layout}.js`, userLayoutsDir),
   );
+  const hasCustomDynamicTypeScriptLayout = await checkResourceExists(
+    new URL(`./${layout}.ts`, userLayoutsDir),
+  );
   const hasPageLayout = await checkResourceExists(new URL("./page.html", userLayoutsDir));
   const hasCustom404Page = await checkResourceExists(new URL("./404.html", pagesDir));
   const isHtmlPage = extension === "html" && (await checkResourceExists(new URL(pageHref)));
@@ -77,8 +80,10 @@ async function getPageLayout(pageHref = "", compilation, layout) {
       customPluginDefaultPageLayouts.length > 0
         ? await fs.readFile(new URL("./page.html", customPluginDefaultPageLayouts[0]), "utf-8")
         : await fs.readFile(new URL("./page.html", userLayoutsDir), "utf-8");
-  } else if (hasCustomDynamicLayout && !is404Page) {
-    const routeModuleLocationUrl = new URL(`./${layout}.js`, userLayoutsDir);
+  } else if ((hasCustomDynamicLayout || hasCustomDynamicTypeScriptLayout) && !is404Page) {
+    const routeModuleLocationUrl = hasCustomDynamicLayout
+      ? new URL(`./${layout}.js`, userLayoutsDir)
+      : new URL(`./${layout}.ts`, userLayoutsDir);
     const routeWorkerUrl = compilation.config.plugins
       .find((plugin) => plugin.type === "renderer")
       .provider().executeModuleUrl;
