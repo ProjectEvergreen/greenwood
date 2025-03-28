@@ -32,7 +32,15 @@ function cleanContentCollection(collection = []) {
 }
 
 function filterContentByCollection(graph, collection) {
-  return graph.filter((page) => page?.data?.collection === collection);
+  return graph.filter((page) => {
+    const pageCollection = page?.data?.collection;
+
+    if (typeof pageCollection === "string") {
+      return pageCollection === collection;
+    } else if (Array.isArray(pageCollection)) {
+      return pageCollection.includes(collection);
+    }
+  });
 }
 
 function filterContentByRoute(graph, route) {

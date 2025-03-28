@@ -5,11 +5,10 @@
  *
  */
 import fs from "fs/promises";
-import { ResourceInterface } from "../../lib/resource-interface.js";
 
-class StandardAudioResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class StandardAudioResource {
+  constructor(compilation) {
+    this.compilation = compilation;
 
     // https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Audio_codecs
     // https://www.thoughtco.com/audio-file-mime-types-3469485
@@ -68,7 +67,7 @@ class StandardAudioResource extends ResourceInterface {
 const greenwoodPluginStandardAudio = {
   type: "resource",
   name: "plugin-standard-audio",
-  provider: (compilation, options) => new StandardAudioResource(compilation, options),
+  provider: (compilation) => new StandardAudioResource(compilation),
 };
 
 export { greenwoodPluginStandardAudio };

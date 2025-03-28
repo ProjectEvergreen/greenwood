@@ -266,12 +266,13 @@ async function walkPackageJson(packageJson = {}, walkedPackages = new Set()) {
         const resolvedRoot = derivePackageRoot(resolved);
 
         if (resolvedRoot) {
-          const resolvedPackageJson = (
-            await import(new URL("./package.json", resolvedRoot), { with: { type: "json" } })
-          ).default;
+          const resolvedPackageJson =
+            // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
+            (await import(new URL("./package.json", resolvedRoot), { with: { type: "json" } }))
+              .default;
           const { name } = resolvedPackageJson;
 
-          walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
+          await walkPackageForExports(dependency, resolvedPackageJson, resolvedRoot);
 
           if (!walkedPackages.has(name)) {
             walkedPackages.add(name);

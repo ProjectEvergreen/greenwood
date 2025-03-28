@@ -3,11 +3,10 @@
  * Manages routing devServer.proxy entries to their destination.
  *
  */
-import { ResourceInterface } from "../../lib/resource-interface.js";
 
-class DevProxyResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class DevProxyResource {
+  constructor(compilation) {
+    this.compilation = compilation;
   }
 
   async shouldServe(url) {
@@ -51,7 +50,7 @@ class DevProxyResource extends ResourceInterface {
 const greenwoodPluginDevProxy = {
   type: "resource",
   name: "plugin-dev-proxy",
-  provider: (compilation, options) => new DevProxyResource(compilation, options),
+  provider: (compilation) => new DevProxyResource(compilation),
 };
 
 export { greenwoodPluginDevProxy };

@@ -5,12 +5,12 @@
  */
 import babel from "@babel/core";
 import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 import rollupBabelPlugin from "@rollup/plugin-babel";
 
 async function getConfig(compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
   const configFile = "babel.config.mjs";
+  // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
   const defaultConfig = (await import(new URL(`./${configFile}`, import.meta.url))).default;
   const userConfig = (await checkResourceExists(new URL(`./${configFile}`, projectDirectory)))
     ? (await import(`${projectDirectory}/${configFile}`)).default
@@ -30,9 +30,10 @@ async function getConfig(compilation, extendConfig = false) {
   return finalConfig;
 }
 
-class BabelResource extends ResourceInterface {
+class BabelResource {
   constructor(compilation, options) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
     this.extensions = ["js"];
     this.contentType = ["text/javascript"];
   }
@@ -58,6 +59,7 @@ class BabelResource extends ResourceInterface {
   }
 }
 
+/** @type {import('./types/index.d.ts').BabelPlugin} */
 const greenwoodPluginBabel = (options = {}) => {
   return [
     {

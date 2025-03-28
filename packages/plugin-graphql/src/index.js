@@ -1,8 +1,6 @@
 import fs from "fs/promises";
 import { graphqlServer } from "./core/server.js";
 import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
-import { ServerInterface } from "@greenwood/cli/src/lib/server-interface.js";
 
 const importMap = {
   "@greenwood/cli/src/lib/hashing-utils.js":
@@ -19,9 +17,9 @@ const importMap = {
     "/node_modules/@greenwood/plugin-graphql/src/queries/collection.gql",
 };
 
-class GraphQLResource extends ResourceInterface {
-  constructor(compilation, options = {}) {
-    super(compilation, options);
+class GraphQLResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ["gql"];
     this.contentType = ["text/javascript", "text/html"];
   }
@@ -79,9 +77,9 @@ class GraphQLResource extends ResourceInterface {
   }
 }
 
-class GraphQLServer extends ServerInterface {
-  constructor(compilation, options = {}) {
-    super(compilation, options);
+class GraphQLServer {
+  constructor(compilation) {
+    this.compilation = compilation;
   }
 
   async start() {
@@ -91,17 +89,18 @@ class GraphQLServer extends ServerInterface {
   }
 }
 
-const greenwoodPluginGraphQL = (options = {}) => {
+/** @type {import('./types/index.js').GraphQLPlugin} */
+const greenwoodPluginGraphQL = () => {
   return [
     {
       type: "server",
       name: "plugin-graphql:server",
-      provider: (compilation) => new GraphQLServer(compilation, options),
+      provider: (compilation) => new GraphQLServer(compilation),
     },
     {
       type: "resource",
       name: "plugin-graphql:resource",
-      provider: (compilation) => new GraphQLResource(compilation, options),
+      provider: (compilation) => new GraphQLResource(compilation),
     },
   ];
 };

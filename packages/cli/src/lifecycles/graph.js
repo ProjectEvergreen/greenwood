@@ -1,3 +1,4 @@
+// @ts-nocheck
 import fs from "fs/promises";
 import fm from "front-matter";
 import { checkResourceExists, requestAsObject } from "../lib/resource-utils.js";
@@ -89,15 +90,13 @@ const generateGraph = async (compilation) => {
             }
 
             const isStatic = isCustom === "static" || extension === ".md" || extension === ".html";
-            const isDynamic = isCustom === "dynamic" || extension === ".js";
+            const isDynamic = isCustom === "dynamic" || extension === ".js" || extension === ".ts";
             const isPage = isStatic || isDynamic;
             let route = `${relativePagePath.replace(".", "").replace(`${extension}`, "")}`;
             let fileContents;
 
             if (isApiRoute) {
-              const extension = filenameUrl.pathname.split(".").pop();
-
-              if (extension !== "js" && !isCustom) {
+              if (extension !== ".js" && extension !== ".ts" && !isCustom) {
                 console.warn(`${filenameUrl} is not a supported API file extension, skipping...`);
                 return;
               }
@@ -116,12 +115,9 @@ const generateGraph = async (compilation) => {
                * isolation: if this should be run in isolated mode
                */
               apiRoutes.set(`${basePath}${route}`, {
-                id: getIdFromRelativePathPath(relativePagePath, `.${extension}`).replace(
-                  "api-",
-                  "",
-                ),
+                id: getIdFromRelativePathPath(relativePagePath, extension).replace("api-", ""),
                 pageHref: new URL(relativePagePath, pagesDir).href,
-                outputHref: new URL(relativePagePath, outputDir).href,
+                outputHref: new URL(relativePagePath, outputDir).href.replace(extension, ".js"),
                 route: `${basePath}${route}`,
                 isolation,
               });
@@ -220,7 +216,7 @@ const generateGraph = async (compilation) => {
               /*
                * Custom front matter - Variable Definitions
                * --------------------------------------------------
-               * collection: the name of the collection for the page
+               * collection: the name of the collection for the page (as a string or array)
                * order: the order of this item within the collection
                * tocHeading: heading size to use a Table of Contents for a page
                * tableOfContents: json object containing page's table of contents (list of headings)
@@ -293,11 +289,21 @@ const generateGraph = async (compilation) => {
               const pageCollection = customData.collection;
 
               if (pageCollection) {
-                if (!collections[pageCollection]) {
-                  collections[pageCollection] = [];
-                }
+                if (typeof pageCollection === "string") {
+                  if (!collections[pageCollection]) {
+                    collections[pageCollection] = [];
+                  }
 
-                collections[pageCollection].push(page);
+                  collections[pageCollection].push(page);
+                } else if (Array.isArray(pageCollection)) {
+                  pageCollection.forEach((collection) => {
+                    if (!collections[collection]) {
+                      collections[collection] = [];
+                    }
+
+                    collections[collection].push(page);
+                  });
+                }
               }
 
               compilation.collections = collections;

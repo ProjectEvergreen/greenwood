@@ -44,6 +44,18 @@ This will then add the Google Analytics [JavaScript tracker snippet](https://dev
 
 > _Learn more about [Measurement and Tracking IDs](https://support.google.com/analytics/answer/9539598)_.
 
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-google-analytics').GoogleAnalyticsPlugin} */
+```
+
+```ts
+import type { GoogleAnalyticsPlugin } from '@greenwood/plugin-google-analytics';
+```
+
 ## Options
 
 - `analyticsId` (required) - Your Google Analytics ID

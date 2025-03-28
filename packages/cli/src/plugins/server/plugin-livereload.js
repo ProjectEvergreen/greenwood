@@ -1,11 +1,10 @@
 import fs from "fs/promises";
 import livereload from "livereload";
-import { ResourceInterface } from "../../lib/resource-interface.js";
-import { ServerInterface } from "../../lib/server-interface.js";
 
-class LiveReloadServer extends ServerInterface {
+class LiveReloadServer {
   constructor(compilation, options = {}) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
   }
 
   async start() {
@@ -17,7 +16,10 @@ class LiveReloadServer extends ServerInterface {
     const standardPluginsExtensions = (
       await Promise.all(
         standardPluginsNames.map(async (filename) => {
-          const pluginImport = await import(new URL(`./${filename}`, standardPluginsDirectoryPath));
+          const pluginImport = await import(
+            // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
+            new URL(`./${filename}`, standardPluginsDirectoryPath)
+          );
           const plugin = pluginImport[Object.keys(pluginImport)[0]];
 
           return plugin;
@@ -65,7 +67,7 @@ class LiveReloadServer extends ServerInterface {
   }
 }
 
-class LiveReloadResource extends ResourceInterface {
+class LiveReloadResource {
   async shouldIntercept(url, request, response) {
     const contentType = response.headers.get("Content-Type");
 
@@ -96,7 +98,7 @@ const greenwoodPluginLivereload = [
   {
     type: "resource",
     name: "plugin-live-reload:resource",
-    provider: (compilation) => new LiveReloadResource(compilation),
+    provider: () => new LiveReloadResource(),
   },
 ];
 

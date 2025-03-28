@@ -1,15 +1,17 @@
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
-
-class LitHydrationResource extends ResourceInterface {
+class LitHydrationResource {
   constructor(compilation, options) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
   }
 
   async shouldIntercept(url) {
     const { pathname } = url;
-    const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
+    const matchingRoute = this.compilation.graph.find((node) => node.route === pathname);
 
-    return matchingRoute.isSSR && matchingRoute.hydration;
+    return (
+      matchingRoute &&
+      ((matchingRoute.isSSR && matchingRoute.hydration) || this.compilation.config.prerender)
+    );
   }
 
   async intercept(url, request, response) {
@@ -60,6 +62,7 @@ class LitHydrationResource extends ResourceInterface {
   }
 }
 
+/** @type {import('./types/index.d.ts').LitRendererPlugin} */
 const greenwoodPluginRendererLit = () => {
   return [
     {

@@ -1,0 +1,27 @@
+name: Continuous Integration (TypeScript)
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        node: [22]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Chromium Library Dependencies
+        run: |
+          sh ./.github/workflows/chromium-lib-install.sh
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Installing project dependencies
+        run: |
+          yarn install --frozen-lockfile && yarn lerna bootstrap
+      - name: Test
+        run: |
+          yarn test:typescript

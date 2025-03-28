@@ -7,7 +7,6 @@
 import fs from "fs";
 import path from "path";
 import { parse, walk } from "css-tree";
-import { ResourceInterface } from "../../lib/resource-interface.js";
 import { hashString } from "../../lib/hashing-utils.js";
 import { getResolvedHrefFromPathnameShortcut } from "../../lib/node-modules-utils.js";
 import { isLocalLink } from "../../lib/resource-utils.js";
@@ -113,6 +112,9 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
             const ext = resolvedUrl.pathname.split(".").pop();
 
             finalValue = finalValue.replace(`.${ext}`, `.${hash}.${ext}`);
+            // "obfuscate" these file names since some hosting platforms may ignore node_modules within the build folder
+            // https://github.com/ProjectEvergreen/greenwood/issues/1431
+            finalValue = finalValue.replace("/node_modules/", "/node-modules/");
 
             fs.mkdirSync(new URL(`.${path.dirname(finalValue)}/`, outputDir), {
               recursive: true,
@@ -351,9 +353,9 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
   return optimizedCss;
 }
 
-class StandardCssResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class StandardCssResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ["css"];
     this.contentType = "text/css";
   }
@@ -387,7 +389,7 @@ class StandardCssResource extends ResourceInterface {
       this.compilation.config.optimization !== "none"
         ? bundleCss(await response.text(), url, this.compilation)
         : await response.text();
-    let headers = {};
+    let headers = new Headers();
 
     if (
       (request.headers.get("Accept")?.indexOf("text/javascript") >= 0 ||
@@ -397,7 +399,7 @@ class StandardCssResource extends ResourceInterface {
       const contents = body.replace(/\r?\n|\r/g, " ").replace(/\\/g, "\\\\");
 
       body = `const sheet = new CSSStyleSheet();sheet.replaceSync(\`${contents}\`);export default sheet;`;
-      headers["Content-Type"] = "text/javascript";
+      headers.set("Content-Type", "text/javascript");
     }
 
     return new Response(body, { headers });
@@ -407,7 +409,7 @@ class StandardCssResource extends ResourceInterface {
 const greenwoodPluginStandardCss = {
   type: "resource",
   name: "plugin-standard-css",
-  provider: (compilation, options) => new StandardCssResource(compilation, options),
+  provider: (compilation) => new StandardCssResource(compilation),
 };
 
 export { greenwoodPluginStandardCss };

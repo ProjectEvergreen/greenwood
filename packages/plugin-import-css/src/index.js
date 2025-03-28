@@ -4,11 +4,10 @@
  *
  */
 import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 
-class ImportCssResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class ImportCssResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ["css"];
     this.contentType = "text/javascript";
   }
@@ -50,12 +49,12 @@ class ImportCssResource extends ResourceInterface {
   }
 }
 
-const greenwoodPluginImportCss = (options = {}) => {
+const greenwoodPluginImportCss = () => {
   return [
     {
       type: "resource",
       name: "plugin-import-css:resource",
-      provider: (compilation) => new ImportCssResource(compilation, options),
+      provider: (compilation) => new ImportCssResource(compilation),
     },
   ];
 };

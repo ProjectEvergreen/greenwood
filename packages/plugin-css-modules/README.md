@@ -95,6 +95,26 @@ customElements.define('app-header', Header);
 
 From there, Greenwood will scope your CSS by prefixing with the filename and a hash, and inline that into a `<style>` tag in the HTML and strip the reference to the _module.css_ file from your JavaScript file.
 
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-css-modules').CssModulesPlugin} */
+```
+
+```ts
+import type { CssModulesPlugin } from '@greenwood/plugin-css-modules';
+```
+
+To support typing of `.module.css` imports, you can add this type definition to your project:
+
+```ts
+declare module "*.module.css" {
+  const styles: { [className: string]: string }
+  export default styles
+}
+```
 
 ## Caveats
 

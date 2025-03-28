@@ -4,7 +4,6 @@
  *
  */
 import fs from "fs/promises";
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 import tsc from "typescript";
 
 const defaultCompilerOptions = {
@@ -25,9 +24,10 @@ async function getCompilerOptions(projectDirectory, extendConfig) {
   };
 }
 
-class TypeScriptResource extends ResourceInterface {
+class TypeScriptResource {
   constructor(compilation, options) {
-    super(compilation, options);
+    this.compilation = compilation;
+    this.options = options;
     this.extensions = ["ts"];
     this.servePage = options.servePage;
     this.contentType = "text/javascript";
@@ -66,6 +66,7 @@ class TypeScriptResource extends ResourceInterface {
   }
 }
 
+/** @type {import('./types/index.d.ts').TypeScriptPlugin} */
 const greenwoodPluginTypeScript = (options = {}) => {
   return [
     {

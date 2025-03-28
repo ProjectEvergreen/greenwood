@@ -177,3 +177,15 @@ And Greenwood would statically generate this
 ```
 
 > We think the JS flavor will really come to shine more when Greenwood adds support for [SSR](https://github.com/ProjectEvergreen/greenwood/issues/708), and then you could use this TECHNIQUE for displaying user / session data, or serverless at the edge!
+
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-include-html').IncludeHtmlPlugin} */
+```
+
+```ts
+import type { IncludeHtmlPlugin } from '@greenwood/plugin-include-html';
+```

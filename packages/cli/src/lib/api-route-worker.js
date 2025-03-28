@@ -32,6 +32,7 @@ async function responseAsObject(response) {
 async function executeRouteModule({ href, request }) {
   const { body, headers = {}, method, url } = request;
   const contentType = headers["content-type"] || "";
+  // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
   const { handler } = await import(new URL(href));
   const format = contentType.startsWith("application/json") ? JSON.parse(body) : body;
 

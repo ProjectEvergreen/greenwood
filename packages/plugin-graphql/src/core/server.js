@@ -13,11 +13,9 @@ const graphqlServer = async (compilation) => {
           "editor.theme": "light",
         },
       }
-    : {};
-
-  const server = new ApolloServer({
+    : null;
+  let serverConfig = {
     schema: await createSchema(compilation),
-    playground,
     introspection: isDev,
     context: async (integrationContext) => {
       const { req } = integrationContext;
@@ -33,7 +31,16 @@ const graphqlServer = async (compilation) => {
         graph,
       };
     },
-  });
+  };
+
+  if (playground) {
+    serverConfig = {
+      ...serverConfig,
+      playground,
+    };
+  }
+
+  const server = new ApolloServer(serverConfig);
 
   return server;
 };

@@ -25,7 +25,8 @@
  *       counter.css
  *   scripts/
  *     frontmatter-standard.js
- *      frontmatter-custom.ts
+ *     frontmatter-typescript.ts
+ *     frontmatter-custom.foo
  *   styles/
  *     frontmatter-custom.scss
  *   pages/
@@ -75,6 +76,12 @@ describe("Build Greenwood With: ", function () {
 
         dom = await JSDOM.fromFile(path.resolve(htmlPath));
         html = await fs.promises.readFile(htmlPath, "utf-8");
+      });
+
+      it("should output the expected number of JS files from frontmatter imports", async function () {
+        const jsFiles = await glob.promise(`${this.context.publicDir}**/**/*.js`);
+
+        expect(jsFiles).to.have.lengthOf(5);
       });
 
       it("should output an unoptimized counter.css file from frontmatter import", async function () {
@@ -178,9 +185,9 @@ describe("Build Greenwood With: ", function () {
       });
 
       describe("Custom Frontmatter JavaScript import format with expected contents transformed", () => {
-        it("should output a transformed frontmatter-custom.js file from custom frontmatter import", async function () {
+        it("should output a transformed frontmatter-typescript.js file from custom frontmatter import", async function () {
           const jsFiles = await glob.promise(
-            `${this.context.publicDir}**/**/frontmatter-custom.*.js`,
+            `${this.context.publicDir}**/**/frontmatter-typescript.*.js`,
           );
           const contents = await fs.promises.readFile(jsFiles[0], "utf-8");
 
@@ -190,7 +197,8 @@ describe("Build Greenwood With: ", function () {
 
         it("should have expected attributes on the `<script>` tag from frontmatter imports", function () {
           const script = Array.from(dom.window.document.querySelectorAll("head script")).find(
-            (script) => script.getAttribute("src")?.startsWith("/frontmatter-custom.CqVHikqT.js"),
+            (script) =>
+              script.getAttribute("src")?.startsWith("/frontmatter-typescript.CqVHikqT.js"),
           );
 
           expect(script.getAttribute("type")).to.equal("module");

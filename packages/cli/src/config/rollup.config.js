@@ -1,3 +1,4 @@
+// @ts-nocheck
 import fs from "fs";
 import path from "path";
 import { checkResourceExists, normalizePathnameForWindows } from "../lib/resource-utils.js";
@@ -337,7 +338,7 @@ function greenwoodImportMetaUrl(compilation) {
         const assetContents = await fs.promises.readFile(url);
         const name = assetName.replace(`.${assetExtension}`, "");
         const request = new Request(url, { headers: { Accept: "text/javascript" } });
-        let bundleExtensions = ["js"];
+        let bundleExtensions = ["js", "ts"];
 
         for (const plugin of customResourcePlugins) {
           if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {

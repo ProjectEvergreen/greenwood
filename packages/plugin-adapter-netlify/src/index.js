@@ -34,8 +34,6 @@ function generateOutputFormat(id) {
         // https://stackoverflow.com/a/43521052/417806
         format = formData;
         delete headers['content-type'];
-      } else if(contentType.includes('application/json')) {
-        format = JSON.stringify(body);
       }
 
       const request = new Request(rawUrl, {
@@ -57,7 +55,7 @@ function generateOutputFormat(id) {
 async function setupOutputDirectory(id, outputRoot, outputType) {
   const entryPoint = outputType === "api" ? id : `${id}.route`;
   const filename = outputType === "api" ? `api-${id}` : id;
-  const outputFormat = generateOutputFormat(entryPoint, outputType);
+  const outputFormat = generateOutputFormat(entryPoint);
 
   await fs.mkdir(outputRoot, { recursive: true });
   await fs.writeFile(new URL(`./${filename}.js`, outputRoot), outputFormat);
@@ -157,13 +155,14 @@ async function netlifyAdapter(compilation) {
   }
 }
 
-const greenwoodPluginAdapterNetlify = (options = {}) => [
+/** @type {import('./types/index.d.ts').NetlifyAdapter} */
+const greenwoodPluginAdapterNetlify = () => [
   {
     type: "adapter",
     name: "plugin-adapter-netlify",
     provider: (compilation) => {
       return async () => {
-        await netlifyAdapter(compilation, options);
+        await netlifyAdapter(compilation);
       };
     },
   },

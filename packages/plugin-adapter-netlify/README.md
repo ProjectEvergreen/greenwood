@@ -8,7 +8,7 @@ This plugin enables usage of the [Netlify](https://www.netlify.com/) platform fo
 
 ## Features
 
-In addition to publishing a project's static assets to the Netlify CDN, this plugin adapts Greenwood [API routes](https://www.greenwoodjs.dev/docs/pages/api-routes/) and [SSR pages](https://www.greenwoodjs.dev/docs/docs/pages/server-rendering/) into Netlify [Serverless functions](https://docs.netlify.com/functions/overview/) using their [custom build](https://docs.netlify.com/functions/deploy/?fn-language=js#custom-build-2) approach.
+In addition to publishing a project's static assets to the Netlify CDN, this plugin adapts Greenwood [API routes](https://www.greenwoodjs.dev/docs/pages/api-routes/) and [SSR pages](https://www.greenwoodjs.dev/docs/pages/server-rendering/) into Netlify [Serverless functions](https://docs.netlify.com/functions/overview/) using their [custom build](https://docs.netlify.com/functions/deploy/?fn-language=js#custom-build-2) approach.
 
 This plugin will automatically generate a custom [__redirects_](https://docs.netlify.com/routing/redirects/) file to correctly map your SSR page and API route URLs to the corresponding Netlify function endpoint (as a rewrite).  You can continue to customize your Netlify project using your _netlify.toml_ file as needed.
 
@@ -74,6 +74,18 @@ export async function handler(request, context = {}) {
 ```
 
 > _Please see caveats section for more information on this feature. 👇_
+
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-adapter-netlify').NetlifyAdapter} */
+```
+
+```ts
+import type { NetlifyAdapter } from '@greenwood/plugin-adapter-netlify';
+```
 
 ## Netlify CLI / Local Development
 

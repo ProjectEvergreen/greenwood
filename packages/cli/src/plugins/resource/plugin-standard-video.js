@@ -5,11 +5,10 @@
  *
  */
 import fs from "fs/promises";
-import { ResourceInterface } from "../../lib/resource-interface.js";
 
-class StandardVideoResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
+class StandardVideoResource {
+  constructor(compilation) {
+    this.compilation = compilation;
 
     // https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Video_codecs
     // https://help.encoding.com/knowledge-base/article/correct-mime-types-for-serving-video-files/
@@ -70,7 +69,7 @@ class StandardVideoResource extends ResourceInterface {
 const greenwoodPluginStandardVideo = {
   type: "resource",
   name: "plugin-standard-video",
-  provider: (compilation, options) => new StandardVideoResource(compilation, options),
+  provider: (compilation) => new StandardVideoResource(compilation),
 };
 
 export { greenwoodPluginStandardVideo };

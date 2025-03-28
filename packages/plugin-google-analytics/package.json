@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-google-analytics",
-  "version": "0.31.1",
+  "version": "0.32.0-alpha.7",
   "description": "A Greenwood plugin adding support for Google Analytics JavaScript tracker.",
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-google-analytics",
@@ -15,8 +15,15 @@
     "Web Components",
     "Google Analytics"
   ],
-  "main": "src/index.js",
   "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/types/index.d.ts",
+      "import": "./src/index.js"
+    }
+  },
   "files": [
     "src/"
   ],
@@ -27,6 +34,6 @@
     "@greenwood/cli": "^0.31.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.31.1"
+    "@greenwood/cli": "^0.32.0-alpha.7"
   }
 }

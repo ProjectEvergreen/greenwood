@@ -1,3 +1,4 @@
+// @ts-nocheck
 import fs from "fs/promises";
 import { checkResourceExists } from "../lib/resource-utils.js";
 
@@ -20,6 +21,7 @@ const greenwoodPlugins = (
       return await Promise.all(
         files.map(async (file) => {
           const importUrl = new URL(`./${file}`, pluginDirectoryUrl);
+          // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const pluginImport = await import(importUrl);
           const plugin = pluginImport[Object.keys(pluginImport)[0]];
 
@@ -54,49 +56,56 @@ const pluginTypes = [
   "adapter",
 ];
 const defaultConfig = {
-  workspace: new URL("./src/", cwd),
+  activeContent: false,
+  basePath: "",
   devServer: {
     hud: true,
     port: 1984,
     extensions: [],
+    proxy: {},
   },
-  port: 8080,
-  basePath: "",
-  optimization: optimizations[0],
-  activeContent: false,
-  plugins: greenwoodPlugins,
-  markdown: { plugins: [] },
-  prerender: false,
   isolation: false,
-  pagesDirectory: "pages",
   layoutsDirectory: "layouts",
+  markdown: { plugins: [] },
+  optimization: optimizations[0],
+  pagesDirectory: "pages",
+  plugins: greenwoodPlugins,
   polyfills: {
     importAttributes: null, // or ['css', 'json']
     importMaps: false,
   },
+  port: 8080,
+  prerender: false,
+  useTsc: false,
+  workspace: new URL("./src/", cwd),
 };
 
 const readAndMergeConfig = async () => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
+      // check for greenwood.config.ts or greenwood.config.js
+      const jsConfigUrl = new URL("./greenwood.config.js", cwd);
+      const tsConfigUrl = new URL("./greenwood.config.ts", cwd);
+      const configUrl = (await checkResourceExists(tsConfigUrl))
+        ? tsConfigUrl
+        : (await checkResourceExists(jsConfigUrl))
+          ? jsConfigUrl
+          : null;
       // deep clone of default config
-      const configUrl = new URL("./greenwood.config.js", cwd);
       let customConfig = Object.assign({}, defaultConfig);
-      let hasConfigFile;
       let isSPA;
-
-      // check for greenwood.config.js
-      if (await checkResourceExists(configUrl)) {
-        hasConfigFile = true;
-      }
 
       // check for SPA
       if (await checkResourceExists(new URL("./index.html", customConfig.workspace))) {
         isSPA = true;
       }
 
-      if (hasConfigFile) {
+      if (configUrl) {
+        // should try and figure this out - https://github.com/ProjectEvergreen/greenwood/issues/1439
+        // console.log(`Configuration file detected... loading => ${configUrl.href}`);
+
+        // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
         const userCfgFile = (await import(configUrl)).default;
         const {
           workspace,
@@ -113,19 +122,20 @@ const readAndMergeConfig = async () => {
           activeContent,
           isolation,
           polyfills,
+          useTsc,
         } = userCfgFile;
 
         // workspace validation
         if (workspace) {
           if (!(workspace instanceof URL)) {
-            reject("Error: greenwood.config.js workspace must be an instance of URL");
+            reject("Configuration error: workspace must be an instance of URL");
           }
 
           if (await checkResourceExists(workspace)) {
             customConfig.workspace = workspace;
           } else {
             reject(
-              "Error: greenwood.config.js workspace doesn't exist! Please double check your configuration.",
+              "Configuration error: Workspace doesn't exist! Please double check your configuration.",
             );
           }
         }
@@ -137,13 +147,13 @@ const readAndMergeConfig = async () => {
           customConfig.optimization = optimization;
         } else if (optimization) {
           reject(
-            `Error: provided optimization "${optimization}" is not supported.  Please use one of: ${optimizations.join(", ")}.`,
+            `Configuration error: provided optimization "${optimization}" is not supported.  Please use one of: ${optimizations.join(", ")}.`,
           );
         }
 
         if (activeContent) {
           if (typeof activeContent !== "boolean") {
-            reject("Error: greenwood.config.js activeContent must be a boolean");
+            reject("Configuration error: activeContent must be a boolean");
           }
           customConfig.activeContent = activeContent;
         }
@@ -154,7 +164,7 @@ const readAndMergeConfig = async () => {
           flattened.forEach((plugin) => {
             if (!plugin.type || pluginTypes.indexOf(plugin.type) < 0) {
               reject(
-                `Error: greenwood.config.js plugins must be one of type "${pluginTypes.join(", ")}". got "${plugin.type}" instead.`,
+                `Configuration error: plugins must be one of type "${pluginTypes.join(", ")}". got "${plugin.type}" instead.`,
               );
             }
 
@@ -162,16 +172,14 @@ const readAndMergeConfig = async () => {
               const providerTypeof = typeof plugin.provider;
 
               reject(
-                `Error: greenwood.config.js plugins provider must be a function. got ${providerTypeof} instead.`,
+                `Configuration error: plugins provider must be a function. got ${providerTypeof} instead.`,
               );
             }
 
             if (!plugin.name || typeof plugin.name !== "string") {
               const nameTypeof = typeof plugin.name;
 
-              reject(
-                `Error: greenwood.config.js plugins must have a name. got ${nameTypeof} instead.`,
-              );
+              reject(`Configuration error: plugins must have a name. got ${nameTypeof} instead.`);
             }
           });
 
@@ -186,7 +194,7 @@ const readAndMergeConfig = async () => {
             });
           } else if (customRendererPlugins > 1) {
             console.warn(
-              "More than one custom renderer plugin detected.  Please make sure you are only loading one.",
+              "Configuration warning: more than one custom renderer plugin detected.  Please make sure you are only loading one.",
             );
             console.debug(plugins.filter((plugin) => plugin.type === "renderer"));
           }
@@ -200,7 +208,7 @@ const readAndMergeConfig = async () => {
               customConfig.devServer.hud = devServer.hud;
             } else {
               reject(
-                `Error: greenwood.config.js devServer hud options must be a boolean.  Passed value was: ${devServer.hud}`,
+                `Configuration error: devServer hud options must be a boolean.  Passed value was: ${devServer.hud}`,
               );
             }
           }
@@ -208,7 +216,7 @@ const readAndMergeConfig = async () => {
           if (devServer.port) {
             if (!Number.isInteger(devServer.port)) {
               reject(
-                `Error: greenwood.config.js devServer port must be an integer.  Passed value was: ${devServer.port}`,
+                `Configuration error: devServer port must be an integer.  Passed value was: ${devServer.port}`,
               );
             } else {
               customConfig.devServer.port = devServer.port;
@@ -224,7 +232,7 @@ const readAndMergeConfig = async () => {
               customConfig.devServer.extensions = devServer.extensions;
             } else {
               reject(
-                "Error: provided extensions is not an array.  Please provide an array like ['.txt', '.foo']",
+                "Configuration error: provided extensions is not an array.  Please provide an array like ['txt', 'foo']",
               );
             }
           }
@@ -237,9 +245,7 @@ const readAndMergeConfig = async () => {
 
         if (port) {
           if (!Number.isInteger(port)) {
-            reject(
-              `Error: greenwood.config.js port must be an integer.  Passed value was: ${port}`,
-            );
+            reject(`Configuration error: port must be an integer.  Passed value was: ${port}`);
           } else {
             customConfig.port = port;
           }
@@ -248,7 +254,7 @@ const readAndMergeConfig = async () => {
         if (basePath) {
           if (typeof basePath !== "string") {
             reject(
-              `Error: greenwood.config.js basePath must be a string.  Passed value was: ${basePath}`,
+              `Configuration error: basePath must be a string.  Passed value was: ${basePath}`,
             );
           } else {
             customConfig.basePath = basePath;
@@ -259,7 +265,7 @@ const readAndMergeConfig = async () => {
           customConfig.pagesDirectory = pagesDirectory;
         } else if (pagesDirectory) {
           reject(
-            `Error: provided pagesDirectory "${pagesDirectory}" is not supported.  Please make sure to pass something like 'docs/'`,
+            `Configuration error: provided pagesDirectory "${pagesDirectory}" is not supported.  Please make sure to pass something like 'docs/'`,
           );
         }
 
@@ -267,7 +273,7 @@ const readAndMergeConfig = async () => {
           customConfig.layoutsDirectory = layoutsDirectory;
         } else if (layoutsDirectory) {
           reject(
-            `Error: provided layoutsDirectory "${layoutsDirectory}" is not supported.  Please make sure to pass something like 'layouts/'`,
+            `Configuration error: provided layoutsDirectory "${layoutsDirectory}" is not supported.  Please make sure to pass something like 'layouts/'`,
           );
         }
 
@@ -276,7 +282,7 @@ const readAndMergeConfig = async () => {
             customConfig.prerender = prerender;
           } else {
             reject(
-              `Error: greenwood.config.js prerender must be a boolean; true or false.  Passed value was typeof: ${typeof prerender}`,
+              `Configuration error: prerender must be a boolean; true or false.  Passed value was typeof: ${typeof prerender}`,
             );
           }
         }
@@ -291,7 +297,7 @@ const readAndMergeConfig = async () => {
             customConfig.isolation = isolation;
           } else {
             reject(
-              `Error: greenwood.config.js isolation must be a boolean; true or false.  Passed value was typeof: ${typeof staticRouter}`,
+              `Configuration error: isolation must be a boolean; true or false.  Passed value was typeof: ${typeof staticRouter}`,
             );
           }
         }
@@ -301,7 +307,7 @@ const readAndMergeConfig = async () => {
             customConfig.staticRouter = staticRouter;
           } else {
             reject(
-              `Error: greenwood.config.js staticRouter must be a boolean; true or false.  Passed value was typeof: ${typeof staticRouter}`,
+              `Configuration error: staticRouter must be a boolean; true or false.  Passed value was typeof: ${typeof staticRouter}`,
             );
           }
         }
@@ -309,14 +315,14 @@ const readAndMergeConfig = async () => {
         if (polyfills !== undefined) {
           const { importMaps, importAttributes } = polyfills;
 
-          customConfig.polyfills = {};
+          customConfig.polyfills = { importAttributes: null, importMaps: false };
 
           if (importMaps) {
             if (typeof importMaps === "boolean") {
               customConfig.polyfills.importMaps = true;
             } else {
               reject(
-                `Error: greenwood.config.js polyfills.importMaps must be a boolean; true or false.  Passed value was typeof: ${typeof importMaps}`,
+                `Configuration error: polyfills.importMaps must be a boolean; true or false.  Passed value was typeof: ${typeof importMaps}`,
               );
             }
           }
@@ -326,9 +332,19 @@ const readAndMergeConfig = async () => {
               customConfig.polyfills.importAttributes = importAttributes;
             } else {
               reject(
-                `Error: greenwood.config.js polyfills.importAttributes must be an array of types; ['css', 'json'].  Passed value was typeof: ${typeof importAttributes}`,
+                `Configuration error: polyfills.importAttributes must be an array of types; ['css', 'json'].  Passed value was typeof: ${typeof importAttributes}`,
               );
             }
+          }
+        }
+
+        if (useTsc !== undefined) {
+          if (typeof useTsc === "boolean") {
+            customConfig.useTsc = useTsc;
+          } else {
+            reject(
+              `Configuration error: useTsc must be a boolean; true or false.  Passed value was typeof: ${typeof useTsc}`,
+            );
           }
         }
       } else {

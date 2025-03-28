@@ -59,6 +59,18 @@ And use it in your project like you would use a _.js_ file!
 <script type="module" src="/components/greeting.ts"></script>
 ```
 
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-typescript').TypeScriptPlugin} */
+```
+
+```ts
+import type { TypeScriptPlugin } from '@greenwood/plugin-typescript';
+```
+
 ## Options
 
 ### Configuration

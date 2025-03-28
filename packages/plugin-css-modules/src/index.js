@@ -6,11 +6,9 @@
 import fs from "fs";
 import htmlparser from "node-html-parser";
 import { parse, walk } from "css-tree";
-import { ResourceInterface } from "@greenwood/cli/src/lib/resource-interface.js";
 import * as acornWalk from "acorn-walk";
 import * as acorn from "acorn";
 import { hashString } from "@greenwood/cli/src/lib/hashing-utils.js";
-import { transform } from "sucrase";
 import { ACORN_OPTIONS } from "@greenwood/cli/src/lib/parsing-utils.js";
 
 const MODULES_MAP_FILENAME = "__css-modules-map.json";
@@ -26,20 +24,61 @@ function getCssModulesMap(compilation) {
   let cssModulesMap = {};
 
   if (fs.existsSync(locationUrl)) {
-    cssModulesMap = JSON.parse(fs.readFileSync(locationUrl));
+    cssModulesMap = JSON.parse(fs.readFileSync(locationUrl, "utf-8"));
   }
 
   return cssModulesMap;
 }
 
-function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
-  const scriptContents = fs.readFileSync(scriptUrl, "utf-8");
-  const result = transform(scriptContents, {
-    transforms: ["typescript", "jsx"],
-    jsxRuntime: "preserve",
-  });
+async function getTransformedScriptContents(scriptUrl, compilation) {
+  const resourcePlugins = compilation.config.plugins
+    .filter((plugin) => {
+      // exclude the CSS Module related plugins, which would strip imports before scanning happens
+      return (
+        plugin.type === "resource" &&
+        plugin.name !== "plugin-css-modules-strip-modules" &&
+        plugin.name !== "plugin-css-modules:scan"
+      );
+    })
+    .map((plugin) => {
+      return plugin.provider(compilation);
+    });
 
-  acornWalk.simple(acorn.parse(result.code, ACORN_OPTIONS), {
+  const request = new Request(scriptUrl, { headers: { Accept: "text/javascript" } });
+  let response = new Response("", { headers: { "Content-Type": "text/javascript" } });
+
+  for (const plugin of resourcePlugins) {
+    if (plugin.shouldServe && (await plugin.shouldServe(scriptUrl, request))) {
+      response = await plugin.serve(scriptUrl, request);
+    }
+  }
+
+  for (const plugin of resourcePlugins) {
+    if (
+      plugin.shouldPreIntercept &&
+      (await plugin.shouldPreIntercept(scriptUrl, request, response.clone()))
+    ) {
+      response = await plugin.preIntercept(scriptUrl, request, response.clone());
+    }
+  }
+
+  for (const plugin of resourcePlugins) {
+    if (
+      plugin.shouldIntercept &&
+      (await plugin.shouldIntercept(scriptUrl, request, response.clone()))
+    ) {
+      response = await plugin.intercept(scriptUrl, request, response.clone());
+    }
+  }
+
+  return await response.text();
+}
+
+async function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
+  const scriptContents = await getTransformedScriptContents(scriptUrl, compilation);
+  const additionalScripts = [];
+
+  acornWalk.simple(acorn.parse(scriptContents, ACORN_OPTIONS), {
     ImportDeclaration(node) {
       const { specifiers = [], source = {} } = node;
       const { value = "" } = source;
@@ -115,25 +154,26 @@ function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
             },
           }),
         );
-      } else if (value.endsWith(".js") || value.endsWith(".jsx") || value.endsWith(".ts")) {
-        // no good way to get at async plugin processing so right now
-        // we can only support what we can provide to acorn
+      } else {
         const recursiveScriptUrl = new URL(value, scriptUrl);
 
         if (fs.existsSync(recursiveScriptUrl)) {
-          walkAllImportsForCssModules(recursiveScriptUrl, sheets, compilation);
+          additionalScripts.push(recursiveScriptUrl);
         }
       }
     },
   });
+
+  for (const script of additionalScripts) {
+    await walkAllImportsForCssModules(script, sheets, compilation);
+  }
 }
 
 // this happens 'first' as the HTML is returned, to find viable references to CSS Modules
 // and inline those into a <style> tag on the page
-class ScanForCssModulesResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
-
+class ScanForCssModulesResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ["module.css"];
     this.contentType = "text/javascript";
 
@@ -178,7 +218,8 @@ class ScanForCssModulesResource extends ResourceInterface {
             `./${src.replace(/\.\.\//g, "").replace(/\.\//g, "")}`,
             this.compilation.context.userWorkspace,
           );
-          walkAllImportsForCssModules(scriptUrl, sheets, this.compilation);
+
+          await walkAllImportsForCssModules(scriptUrl, sheets, this.compilation);
         }
       }
 
@@ -218,10 +259,9 @@ class ScanForCssModulesResource extends ResourceInterface {
 
 // this process all files that have CssModules content used
 // and strip out the `import` and replace all the references in class attributes with static values
-class StripCssModulesResource extends ResourceInterface {
-  constructor(compilation, options) {
-    super(compilation, options);
-
+class StripCssModulesResource {
+  constructor(compilation) {
+    this.compilation = compilation;
     this.extensions = ["module.css"];
     this.contentType = "text/javascript";
   }
@@ -277,17 +317,18 @@ class StripCssModulesResource extends ResourceInterface {
   }
 }
 
+/** @type {import('./types/index.d.ts').CssModulesPlugin} */
 const greenwoodPluginCssModules = () => {
   return [
     {
       type: "resource",
       name: "plugin-css-modules:scan",
-      provider: (compilation, options) => new ScanForCssModulesResource(compilation, options),
+      provider: (compilation) => new ScanForCssModulesResource(compilation),
     },
     {
       type: "resource",
       name: "plugin-css-modules-strip-modules",
-      provider: (compilation, options) => new StripCssModulesResource(compilation, options),
+      provider: (compilation) => new StripCssModulesResource(compilation),
     },
   ];
 };
