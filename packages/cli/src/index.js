@@ -81,8 +81,8 @@ const run = async () => {
         break;
       default:
         console.warn(`
-          Error: not able to detect command. try using the --help flag if 
-          you're encountering issues running Greenwood.  Visit our docs for more 
+          Error: not able to detect command. try using the --help flag if
+          you're encountering issues running Greenwood.  Visit our docs for more
           info at https://www.greenwoodjs.dev/.
         `);
         break;
