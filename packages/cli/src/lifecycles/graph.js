@@ -62,7 +62,6 @@ const generateGraph = async (compilation) => {
         const files = (await fs.readdir(directory)).filter((file) => !file.startsWith("."));
 
         for (const filename of files) {
-          console.log({ filename });
           const filenameUrl = new URL(`./${filename}`, directory);
           const filenameUrlAsDir = new URL(`./${filename}/`, directory);
           const isDirectory =
@@ -370,8 +369,10 @@ const generateGraph = async (compilation) => {
           const data = await instance();
 
           for (const node of data) {
-            if (!node.body || !node.route) {
-              const missingKey = !node.body ? "body" : "route";
+            const { body, route } = node;
+
+            if (!body || !route) {
+              const missingKey = !body ? "body" : "route";
 
               reject(`ERROR: provided node does not provide a ${missingKey} property.`);
             }
@@ -381,8 +382,9 @@ const generateGraph = async (compilation) => {
               data: {},
               imports: [],
               resources: [],
-              outputHref: new URL(`.${node.route}index.html`, outputDir).href,
+              outputHref: new URL(`.${route}index.html`, outputDir).href,
               ...node,
+              route: encodeURIComponent(route).replace(/%2F/g, "/"),
               external: true,
             });
           }

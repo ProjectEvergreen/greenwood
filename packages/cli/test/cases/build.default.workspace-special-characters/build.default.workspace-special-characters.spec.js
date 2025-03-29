@@ -14,7 +14,9 @@
  * User Workspace
  * src/
  *   pages/
+ *     First Post.html
  *     index.html
+ *     Lügner2.html
  */
 import chai from "chai";
 import { JSDOM } from "jsdom";
