@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import path from "path";
 import { checkResourceExists } from "../../../../cli/src/lib/resource-utils.js";
 
 function generateOutputFormat(id, type) {
@@ -20,6 +21,7 @@ function generateOutputFormat(id, type) {
 }
 
 async function genericAdapter(compilation) {
+  const { outputDir } = compilation.context;
   const adapterOutputUrl = new URL("./adapter-output/", compilation.context.projectDirectory);
   const ssrPages = compilation.graph.filter((page) => page.isSSR);
   const apiRoutes = compilation.manifest.apis;
@@ -31,15 +33,32 @@ async function genericAdapter(compilation) {
   for (const page of ssrPages) {
     const { id } = page;
     const outputFormat = generateOutputFormat(id, "page");
+    const chunks = (await fs.readdir(outputDir)).filter(
+      (file) => file.startsWith(`${id}.route.chunk`) && file.endsWith(".js"),
+    );
 
     await fs.writeFile(new URL(`./${id}.js`, adapterOutputUrl), outputFormat);
+
+    for (const chunk of chunks) {
+      await fs.cp(new URL(`./${chunk}`, outputDir), new URL(`./${chunk}`, adapterOutputUrl), {
+        recursive: true,
+      });
+    }
   }
 
   for (const [key] of apiRoutes) {
-    const { id } = apiRoutes.get(key);
+    const { id, assets } = apiRoutes.get(key);
     const outputFormat = generateOutputFormat(id, "api");
 
     await fs.writeFile(new URL(`./api-${id}.js`, adapterOutputUrl), outputFormat);
+
+    for (const asset of assets) {
+      const name = path.basename(asset);
+
+      await fs.cp(new URL(`./api/${name}`, outputDir), new URL(`./${name}`, adapterOutputUrl), {
+        recursive: true,
+      });
+    }
   }
 }
 
