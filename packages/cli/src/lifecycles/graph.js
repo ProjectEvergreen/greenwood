@@ -362,6 +362,11 @@ const generateGraph = async (compilation) => {
 
       const sourcePlugins = compilation.config.plugins.filter((plugin) => plugin.type === "source");
 
+      // make sure this assignment happens before plugins run
+      // to allow plugins access to current graph
+      compilation.graph = graph;
+      compilation.manifest = { apis };
+
       if (sourcePlugins.length > 0) {
         console.debug("building from external sources...");
         for (const plugin of sourcePlugins) {
@@ -390,9 +395,6 @@ const generateGraph = async (compilation) => {
           }
         }
       }
-
-      compilation.graph = graph;
-      compilation.manifest = { apis };
 
       resolve(compilation);
     } catch (err) {

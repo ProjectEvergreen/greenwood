@@ -3,7 +3,7 @@ import fs from "fs/promises";
 const customExternalSourcesPlugin = {
   type: "source",
   name: "source-plugin-analogstudios",
-  provider: () => {
+  provider: (compilation) => {
     return async function () {
       const artists = JSON.parse(
         await fs.readFile(new URL("./data.json", import.meta.url), "utf-8"),
@@ -40,6 +40,22 @@ const customExternalSourcesPlugin = {
           label: "First Post",
           route: "/First Post/",
           body: `<h1>First Post Page</h1>`,
+        },
+        {
+          title: "Sitemap",
+          body: `
+            <ul>
+              ${compilation.graph
+                .map((page) => {
+                  const { label, route } = page;
+
+                  return `<li><a href="${route}">${label}</a></li>`;
+                })
+                .join("")}
+            </ul>
+          `,
+          route: "/sitemap/",
+          label: "Sitemap",
         },
       ];
     };
