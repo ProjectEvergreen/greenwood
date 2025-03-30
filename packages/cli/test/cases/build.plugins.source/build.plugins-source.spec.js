@@ -4,6 +4,7 @@
  *
  * User Result
  * Should generate a bare bones Greenwood build with expected artists data as static files using a custom layout.
+ * Should also have a sitemap page.
  *
  * User Command
  * greenwood build
@@ -167,6 +168,25 @@ describe("Build Greenwood With: ", function () {
         const heading = dom.window.document.querySelector("body h1").textContent;
 
         expect(heading).to.be.equal("First Post Page");
+      });
+    });
+
+    describe("Sitemap Page", function () {
+      let dom;
+
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "sitemap/index.html"));
+      });
+
+      it("should have links to known pages", function () {
+        const links = dom.window.document.querySelectorAll("body ul li a");
+
+        expect(links.length).to.equal(3);
+        const linkHrefs = Array.from(links).map((link) => link.getAttribute("href"));
+
+        expect(linkHrefs).to.include("/about/");
+        expect(linkHrefs).to.include("/");
+        expect(linkHrefs).to.include("/404/");
       });
     });
   });
