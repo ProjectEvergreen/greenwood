@@ -13,12 +13,17 @@
  *   plugins: [
  *     '@mapbox/rehype-prism',
  *     'rehype-slug',
- *     'rehype-autolink-headings'
+ *     {
+ *       name: "rehype-autolink-headings",
+ *       options: { behavior: 'append'}
+ *     },
  *   ]
  * }
  *
  * User Workspace
- * Greenwood default
+ * src/
+ *   pages/
+ *     index.md
  */
 import { JSDOM } from "jsdom";
 import path from "path";
@@ -69,18 +74,22 @@ describe("Build Greenwood With: ", function () {
         expect(code[0].getAttribute("class")).to.equal("language-js");
       });
 
-      it("should use our custom markdown preset rehype-autolink-headings and rehype-slug plugins", function () {
-        let heading = dom.window.document.querySelector("h1 > a");
+      it("should have the expected heading ID output for the custom rehype-autolink-headings plugin", function () {
+        const heading = dom.window.document.querySelector("h1 > a");
 
         expect(heading.getAttribute("href")).to.equal(
           "#greenwood-markdown-syntax-highlighting-test",
         );
       });
 
-      it("should use our custom markdown preset rremark-TBD plugins", function () {
-        let heading = dom.window.document.querySelector("h3 > a");
+      it("should have the expected append heading link icon behavior for the custom rehype-autolink-headings plugin", function () {
+        const heading = dom.window.document.querySelector("h1");
 
-        expect(heading.getAttribute("href")).to.equal("#lower-heading-test");
+        expect(
+          heading.innerHTML.startsWith(
+            'Greenwood Markdown Syntax Highlighting Test<a aria-hidden="true"',
+          ),
+        ).to.equal(true);
       });
     });
   });
