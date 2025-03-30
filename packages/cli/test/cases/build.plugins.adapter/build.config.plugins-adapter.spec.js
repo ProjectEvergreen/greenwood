@@ -28,12 +28,15 @@
  *       nested/
  *         endpoint.js
  *       greeting.js
+ *       webhook.js
  *     blog/
  *       first-post.js
  *       index.js
+ *     about.js
  *     index.js
  */
 import chai from "chai";
+import glob from "glob-promise";
 import path from "path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
@@ -199,6 +202,32 @@ describe("Build Greenwood With: ", function () {
 
         expect(heading).to.have.lengthOf(1);
         expect(heading[0].textContent).to.equal("Nested SSR First Post page should work!");
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1465
+    describe("Adapting of an API route with lots of dynamic chunk bundles", function () {
+      let chunks;
+
+      before(async function () {
+        chunks = await glob.promise(path.join(outputPath, "adapter-output/webhook.*.js"));
+      });
+
+      it("should contain one javascript file in the output directory", async function () {
+        expect(chunks.length).to.equal(15);
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1465
+    describe("Adapting of a SSR page function with lots of dynamic chunk bundles", function () {
+      let chunks;
+
+      before(async function () {
+        chunks = await glob.promise(path.join(outputPath, "adapter-output/about.route.chunk.*.js"));
+      });
+
+      it("should contain one javascript file in the output directory", async function () {
+        expect(chunks.length).to.equal(16);
       });
     });
   });
