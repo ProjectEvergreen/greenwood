@@ -115,7 +115,9 @@ const generateGraph = async (compilation) => {
                * isolation: if this should be run in isolated mode
                */
               apiRoutes.set(`${basePath}${route}`, {
-                id: getIdFromRelativePathPath(relativePagePath, extension).replace("api-", ""),
+                id: decodeURIComponent(
+                  getIdFromRelativePathPath(relativePagePath, extension).replace("api-", ""),
+                ),
                 pageHref: new URL(relativePagePath, pagesDir).href,
                 outputHref: new URL(relativePagePath, outputDir).href.replace(extension, ".js"),
                 route: `${basePath}${route}`,
@@ -263,9 +265,9 @@ const generateGraph = async (compilation) => {
                * servePage: signal that this is a custom page file type (static | dynamic)
                */
               const page = {
-                id: getIdFromRelativePathPath(relativePagePath, extension),
-                label,
-                title,
+                id: decodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
+                label: decodeURIComponent(label),
+                title: title ? decodeURIComponent(title) : title,
                 route: `${basePath}${route}`,
                 layout,
                 data: customData || {},
@@ -367,8 +369,10 @@ const generateGraph = async (compilation) => {
           const data = await instance();
 
           for (const node of data) {
-            if (!node.body || !node.route) {
-              const missingKey = !node.body ? "body" : "route";
+            const { body, route } = node;
+
+            if (!body || !route) {
+              const missingKey = !body ? "body" : "route";
 
               reject(`ERROR: provided node does not provide a ${missingKey} property.`);
             }
@@ -378,8 +382,9 @@ const generateGraph = async (compilation) => {
               data: {},
               imports: [],
               resources: [],
-              outputHref: new URL(`.${node.route}index.html`, outputDir).href,
+              outputHref: new URL(`.${route}index.html`, outputDir).href,
               ...node,
+              route: encodeURIComponent(route).replace(/%2F/g, "/"),
               external: true,
             });
           }

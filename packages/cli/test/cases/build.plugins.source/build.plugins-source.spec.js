@@ -141,6 +141,34 @@ describe("Build Greenwood With: ", function () {
         });
       });
     });
+
+    describe("Default output for Lügner2.html", function () {
+      let dom;
+
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./Lügner2/index.html"));
+      });
+
+      it("should have a the expected heading text", function () {
+        const heading = dom.window.document.querySelector("body h1").textContent;
+
+        expect(heading).to.be.equal("Lügner2 Page");
+      });
+    });
+
+    describe("Default output for First Post.html", function () {
+      let dom;
+
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./First Post/index.html"));
+      });
+
+      it("should have a the expected heading text", function () {
+        const heading = dom.window.document.querySelector("body h1").textContent;
+
+        expect(heading).to.be.equal("First Post Page");
+      });
+    });
   });
 
   after(function () {
