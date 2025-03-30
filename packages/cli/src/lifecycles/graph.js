@@ -362,6 +362,8 @@ const generateGraph = async (compilation) => {
 
       const sourcePlugins = compilation.config.plugins.filter((plugin) => plugin.type === "source");
 
+      // make sure this assignment happens before plugins run
+      // to allow plugins access to current graph
       compilation.graph = graph;
       compilation.manifest = { apis };
 
