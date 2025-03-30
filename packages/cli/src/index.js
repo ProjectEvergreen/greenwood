@@ -57,10 +57,10 @@ if (program.parse.length === 0) {
 
 const run = async () => {
   process.env.__GWD_COMMAND__ = command;
-  const compilation = await generateCompilation();
 
   try {
     console.info(`Running Greenwood with the ${command} command.`);
+    const compilation = await generateCompilation();
 
     switch (command) {
       case "build":
