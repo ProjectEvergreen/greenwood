@@ -1,6 +1,12 @@
 export default {
   markdown: {
-    settings: {},
-    plugins: ["@mapbox/rehype-prism", "rehype-slug", "rehype-autolink-headings"],
+    plugins: [
+      "@mapbox/rehype-prism",
+      "rehype-slug",
+      {
+        name: "rehype-autolink-headings",
+        options: { behavior: "append" },
+      },
+    ],
   },
 };
