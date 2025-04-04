@@ -81,7 +81,8 @@ async function createOutputZip(id, outputType, outputRootUrl, projectDirectory) 
 async function netlifyAdapter(compilation) {
   const { outputDir, projectDirectory, scratchDir } = compilation.context;
   const { basePath } = compilation.config;
-  const adapterOutputUrl = new URL("./netlify/functions/", scratchDir);
+  const adapterOutputUrl = new URL("./netlify/functions/", projectDirectory);
+  const adapterOutputScratchUrl = new URL("./netlify/functions/", scratchDir);
   const ssrPages = compilation.graph.filter((page) => page.isSSR);
   const apiRoutes = compilation.manifest.apis;
   // https://docs.netlify.com/routing/redirects/
@@ -89,11 +90,16 @@ async function netlifyAdapter(compilation) {
   // When you assign an HTTP status code of 200 to a redirect rule, it becomes a rewrite.
   let redirects = "";
 
-  if (!(await checkResourceExists(adapterOutputUrl))) {
-    await fs.mkdir(adapterOutputUrl, { recursive: true });
+  if (await checkResourceExists(adapterOutputScratchUrl)) {
+    await fs.rm(adapterOutputScratchUrl, { recursive: true });
   }
 
-  await fs.mkdir(new URL("./netlify/functions/", projectDirectory), { recursive: true });
+  if (await checkResourceExists(adapterOutputUrl)) {
+    await fs.rm(adapterOutputUrl, { recursive: true });
+  }
+
+  await fs.mkdir(adapterOutputScratchUrl, { recursive: true });
+  await fs.mkdir(adapterOutputUrl, { recursive: true });
 
   for (const page of ssrPages) {
     const { id, outputHref, route } = page;
@@ -101,7 +107,7 @@ async function netlifyAdapter(compilation) {
     const chunks = (await fs.readdir(outputDir)).filter(
       (file) => file.startsWith(`${id}.route.chunk`) && file.endsWith(".js"),
     );
-    const outputRoot = new URL(`./${id}/`, adapterOutputUrl);
+    const outputRoot = new URL(`./${id}/`, adapterOutputScratchUrl);
 
     await setupOutputDirectory(id, outputRoot, outputType);
 
@@ -119,7 +125,12 @@ async function netlifyAdapter(compilation) {
       });
     }
 
-    await createOutputZip(id, outputType, new URL(`./${id}/`, adapterOutputUrl), projectDirectory);
+    await createOutputZip(
+      id,
+      outputType,
+      new URL(`./${id}/`, adapterOutputScratchUrl),
+      projectDirectory,
+    );
 
     redirects += `${route} /.netlify/functions/${id} 200
 `;
@@ -132,7 +143,7 @@ async function netlifyAdapter(compilation) {
   for (const [key, value] of apiRoutes.entries()) {
     const outputType = "api";
     const { id, outputHref } = apiRoutes.get(key);
-    const outputRoot = new URL(`./api/${id}/`, adapterOutputUrl);
+    const outputRoot = new URL(`./api/${id}/`, adapterOutputScratchUrl);
     const { assets = [] } = value;
 
     await setupOutputDirectory(id, outputRoot, outputType);
