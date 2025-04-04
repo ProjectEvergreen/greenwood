@@ -71,9 +71,11 @@ async function awsAdapter(compilation) {
   const ssrPages = compilation.graph.filter((page) => page.isSSR);
   const apiRoutes = compilation.manifest.apis;
 
-  if (!(await checkResourceExists(adapterOutputUrl))) {
-    await fs.mkdir(adapterOutputUrl, { recursive: true });
+  if (await checkResourceExists(adapterOutputUrl)) {
+    await fs.rm(adapterOutputUrl, { recursive: true });
   }
+
+  await fs.mkdir(adapterOutputUrl, { recursive: true });
 
   for (const page of ssrPages) {
     const outputType = "page";
