@@ -26,8 +26,32 @@ const generateCompilation = async () => {
 
   const { scratchDir, outputDir } = compilation.context;
 
-  if (!(await checkResourceExists(scratchDir))) {
-    await fs.mkdir(scratchDir);
+  if (process.env.__GWD_COMMAND__ !== "serve") {
+    // clear out the pre-build output dir first if it exists
+    if (await checkResourceExists(scratchDir)) {
+      await fs.rm(scratchDir, {
+        recursive: true,
+      });
+    }
+
+    // prep an empty directory for any pre-build output
+    await fs.mkdir(scratchDir, {
+      recursive: true,
+    });
+  }
+
+  if (process.env.__GWD_COMMAND__ === "build") {
+    // clear out the output dir first before we generate any build output
+    if (await checkResourceExists(outputDir)) {
+      await fs.rm(outputDir, {
+        recursive: true,
+      });
+    }
+
+    // prep an empty directory for the build output
+    await fs.mkdir(outputDir, {
+      recursive: true,
+    });
   }
 
   if (process.env.__GWD_COMMAND__ === "serve") {
