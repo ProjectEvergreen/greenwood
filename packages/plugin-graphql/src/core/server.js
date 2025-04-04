@@ -22,7 +22,11 @@ const graphqlServer = async (compilation) => {
 
       // make sure to ignore introspection requests from being generated as an output cache file
       // https://stackoverflow.com/a/58040379/417806
-      if (req.query.q !== "internal" && req.body.operationName !== "IntrospectionQuery") {
+      if (
+        process.env.__GWD_COMMAND__ === "build" &&
+        req.query.q !== "internal" &&
+        req.body.operationName !== "IntrospectionQuery"
+      ) {
         await createCache(req, context);
       }
 
