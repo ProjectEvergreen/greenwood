@@ -1,8 +1,6 @@
 import { bundleCompilation } from "../lifecycles/bundle.js";
-import { checkResourceExists } from "../lib/resource-utils.js";
 import { copyAssets } from "../lifecycles/copy.js";
 import { getDevServer } from "../lifecycles/serve.js";
-import fs from "fs/promises";
 import {
   preRenderCompilationWorker,
   preRenderCompilationCustom,
@@ -11,19 +9,12 @@ import {
 
 const runProductionBuild = async (compilation) => {
   const { prerender, activeContent, plugins } = compilation.config;
-  const outputDir = compilation.context.outputDir;
   const prerenderPlugin = compilation.config.plugins.find((plugin) => plugin.type === "renderer")
     ? compilation.config.plugins.find((plugin) => plugin.type === "renderer").provider(compilation)
     : {};
   const adapterPlugin = compilation.config.plugins.find((plugin) => plugin.type === "adapter")
     ? compilation.config.plugins.find((plugin) => plugin.type === "adapter").provider(compilation)
     : null;
-
-  if (!(await checkResourceExists(outputDir))) {
-    await fs.mkdir(outputDir, {
-      recursive: true,
-    });
-  }
 
   if (prerender) {
     // start any of the user's server plugins if needed
