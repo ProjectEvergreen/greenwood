@@ -1,6 +1,3 @@
-import fs from "fs/promises";
-import { checkResourceExists } from "../lib/resource-utils.js";
-
 const initContext = async ({ config }) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
@@ -28,12 +25,6 @@ const initContext = async ({ config }) => {
         projectDirectory,
         layoutsDir,
       };
-
-      if (!(await checkResourceExists(scratchDir))) {
-        await fs.mkdir(scratchDir, {
-          recursive: true,
-        });
-      }
 
       resolve(context);
     } catch (err) {
