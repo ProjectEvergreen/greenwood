@@ -46,7 +46,13 @@ const config: Config = {
   layoutsDirectory: "/my-layouts",
   optimization: "default",
   markdown: {
-    plugins: ["@mapbox/rehype-prism"],
+    plugins: [
+      "@mapbox/rehype-prism",
+      {
+        name: "rehype-autolink-headings",
+        options: { behavior: "append" },
+      },
+    ],
   },
   pagesDirectory: "/my-pages",
   plugins: [
