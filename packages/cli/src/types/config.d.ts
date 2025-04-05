@@ -16,7 +16,7 @@ export type Config = {
   layoutsDirectory?: string;
   optimization?: "default" | "inline" | "none" | "static";
   markdown?: {
-    plugins?: string[];
+    plugins?: Array<string | { name: string; options: object }>;
   };
   pagesDirectory?: string;
   plugins?: Array<PLUGINS | Array<PLUGINS>>;
