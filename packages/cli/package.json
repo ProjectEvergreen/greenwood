@@ -65,7 +65,7 @@
     "rollup": "^4.26.0",
     "sucrase": "^3.35.0",
     "unified": "^11.0.5",
-    "wc-compiler": "~0.16.0"
+    "wc-compiler": "~0.17.0"
   },
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.726.0",
