@@ -30,6 +30,28 @@ function getIdFromRelativePathPath(relativePathPath, extension) {
   return relativePathPath.replace(extension, "").replace("./", "").replace(/\//g, "-");
 }
 
+function trackCollectionsForPage(page, collections) {
+  const pageCollection = page.data?.collection ?? "";
+
+  if (pageCollection) {
+    if (typeof pageCollection === "string") {
+      if (!collections[pageCollection]) {
+        collections[pageCollection] = [];
+      }
+
+      collections[pageCollection].push(page);
+    } else if (Array.isArray(pageCollection)) {
+      pageCollection.forEach((collection) => {
+        if (!collections[collection]) {
+          collections[collection] = [];
+        }
+
+        collections[collection].push(page);
+      });
+    }
+  }
+}
+
 const generateGraph = async (compilation) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
@@ -37,7 +59,6 @@ const generateGraph = async (compilation) => {
       const { context, config } = compilation;
       const { basePath } = config;
       const { pagesDir, userWorkspace, outputDir } = context;
-      const collections = {};
       const customPageFormatPlugins = config.plugins
         .filter((plugin) => plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin)
         .map((plugin) => plugin.provider(compilation));
@@ -288,27 +309,7 @@ const generateGraph = async (compilation) => {
               pages.push(page);
 
               // handle collections
-              const pageCollection = customData.collection;
-
-              if (pageCollection) {
-                if (typeof pageCollection === "string") {
-                  if (!collections[pageCollection]) {
-                    collections[pageCollection] = [];
-                  }
-
-                  collections[pageCollection].push(page);
-                } else if (Array.isArray(pageCollection)) {
-                  pageCollection.forEach((collection) => {
-                    if (!collections[collection]) {
-                      collections[collection] = [];
-                    }
-
-                    collections[collection].push(page);
-                  });
-                }
-              }
-
-              compilation.collections = collections;
+              trackCollectionsForPage(page, compilation.collections); // collections;
             } else {
               console.warn(`Unsupported format detected for page => ${filename}`);
             }
@@ -382,16 +383,23 @@ const generateGraph = async (compilation) => {
               reject(`ERROR: provided node does not provide a ${missingKey} property.`);
             }
 
-            graph.push({
+            const page = {
               pageHref: null,
-              data: {},
               imports: [],
               resources: [],
               outputHref: new URL(`.${route}index.html`, outputDir).href,
               ...node,
               route: encodeURIComponent(route).replace(/%2F/g, "/"),
+              data: {
+                ...node.data,
+                collection: node.collection ?? "",
+              },
               external: true,
-            });
+            };
+
+            graph.push(page);
+
+            trackCollectionsForPage(page, compilation.collections);
           }
         }
       }
