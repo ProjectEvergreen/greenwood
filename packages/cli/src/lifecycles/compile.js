@@ -17,6 +17,7 @@ const generateCompilation = () => {
         manifest: {
           apis: new Map(),
         },
+        collections: {},
       };
 
       console.info("Initializing project config");

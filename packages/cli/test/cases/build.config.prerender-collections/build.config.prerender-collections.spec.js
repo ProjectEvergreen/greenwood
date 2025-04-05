@@ -112,7 +112,7 @@ describe("Build Greenwood With: ", function () {
         });
 
         it("should have the expected number of nav links from all pages in the collection", function () {
-          expect(navLinks.length).to.equal(3);
+          expect(navLinks.length).to.equal(4);
         });
 
         it("should have the expected link content from all pages in the collection", function () {
@@ -127,6 +127,10 @@ describe("Build Greenwood With: ", function () {
           expect(navLinks[2].getAttribute("href")).to.equal("/toc/");
           expect(navLinks[2].getAttribute("title")).to.equal("Table of Contents");
           expect(navLinks[2].textContent).to.equal("Table of Contents");
+
+          expect(navLinks[3].getAttribute("href")).to.equal("/external/");
+          expect(navLinks[3].getAttribute("title")).to.equal("External Page");
+          expect(navLinks[3].textContent).to.equal("External Page");
         });
 
         it("should have the expected inline active frontmatter collection data", function () {
@@ -235,8 +239,8 @@ describe("Build Greenwood With: ", function () {
         });
 
         // includes 404 page
-        it("should have the expected number of post links from all blog pages in the collection (minus the index route)", function () {
-          expect(pageLinks.length).to.equal(6);
+        it("should have the expected number of post links from all pages in the collection (minus the index route)", function () {
+          expect(pageLinks.length).to.equal(7);
         });
       });
     });
