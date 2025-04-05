@@ -31,7 +31,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.31.0"
+    "@greenwood/cli": "^0.32.0"
   },
   "dependencies": {
     "@rollup/plugin-commonjs": "^28.0.0",
