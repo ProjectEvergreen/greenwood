@@ -31,7 +31,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.31.0"
+    "@greenwood/cli": "^0.32.0"
   },
   "dependencies": {
     "@babel/core": "^7.10.4",
