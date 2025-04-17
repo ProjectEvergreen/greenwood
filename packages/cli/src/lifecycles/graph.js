@@ -124,14 +124,14 @@ const generateGraph = async (compilation) => {
           const { isolation } = await import(filenameUrl).then((module) => module);
 
           /*
-            * API Properties (per route)
-            *----------------------
-            * id: unique hyphen delimited string of the filename, relative to the page/api directory
-            * pageHref: href to the page's filesystem file
-            * outputHref: href of the filename to write to when generating a build
-            * route: URL route for a given page on outputFilePath
-            * isolation: if this should be run in isolated mode
-            */
+           * API Properties (per route)
+           *----------------------
+           * id: unique hyphen delimited string of the filename, relative to the page/api directory
+           * pageHref: href to the page's filesystem file
+           * outputHref: href of the filename to write to when generating a build
+           * route: URL route for a given page on outputFilePath
+           * isolation: if this should be run in isolated mode
+           */
           apiRoutes.set(`${basePath}${route}`, {
             id: decodeURIComponent(
               getIdFromRelativePathPath(relativePagePath, extension).replace("api-", ""),
@@ -153,13 +153,13 @@ const generateGraph = async (compilation) => {
           let hydration = false;
 
           /*
-            * check if additional nested directories exist to correctly determine route (minus filename)
-            * examples:
-            * - pages/index.{html,md,js} -> /
-            * - pages/about.{html,md,js} -> /about/
-            * - pages/blog/index.{html,md,js} -> /blog/
-            * - pages/blog/some-post.{html,md,js} -> /blog/some-post/
-            */
+           * check if additional nested directories exist to correctly determine route (minus filename)
+           * examples:
+           * - pages/index.{html,md,js} -> /
+           * - pages/about.{html,md,js} -> /about/
+           * - pages/blog/index.{html,md,js} -> /blog/
+           * - pages/blog/some-post.{html,md,js} -> /blog/some-post/
+           */
           if (relativePagePath.lastIndexOf("/index") > 0) {
             // https://github.com/ProjectEvergreen/greenwood/issues/455
             route =
@@ -234,13 +234,13 @@ const generateGraph = async (compilation) => {
           }
 
           /*
-            * Custom front matter - Variable Definitions
-            * --------------------------------------------------
-            * collection: the name of the collection for the page (as a string or array)
-            * order: the order of this item within the collection
-            * tocHeading: heading size to use a Table of Contents for a page
-            * tableOfContents: json object containing page's table of contents (list of headings)
-            */
+           * Custom front matter - Variable Definitions
+           * --------------------------------------------------
+           * collection: the name of the collection for the page (as a string or array)
+           * order: the order of this item within the collection
+           * tocHeading: heading size to use a Table of Contents for a page
+           * tableOfContents: json object containing page's table of contents (list of headings)
+           */
 
           // prune "reserved" attributes that are supported by Greenwood
           [...activeFrontmatterKeys, "layout"].forEach((key) => {
@@ -264,24 +264,24 @@ const generateGraph = async (compilation) => {
           }
 
           /*
-            * Page Properties
-            *----------------------
-            * id: unique hyphen delimited string of the filename, relative to the pages directory
-            * label: Display text for the page inferred, by default is the value of title
-            * title: used to customize the <title></title> tag of the page, inferred from the filename
-            * route: URL for accessing the page from the browser
-            * layout: the custom layout of the page
-            * data: custom page frontmatter
-            * imports: per page JS or CSS file imports specified from frontmatter
-            * resources: all script, style, etc resources for the entire page as URLs
-            * outputHref: href to the file in the output folder
-            * pageHref: href to the page's filesystem file
-            * isSSR: if this is a server side route
-            * prerender: if this page should be statically exported
-            * isolation: if this page should be run in isolated mode
-            * hydration: if this page needs hydration support
-            * servePage: signal that this is a custom page file type (static | dynamic)
-            */
+           * Page Properties
+           *----------------------
+           * id: unique hyphen delimited string of the filename, relative to the pages directory
+           * label: Display text for the page inferred, by default is the value of title
+           * title: used to customize the <title></title> tag of the page, inferred from the filename
+           * route: URL for accessing the page from the browser
+           * layout: the custom layout of the page
+           * data: custom page frontmatter
+           * imports: per page JS or CSS file imports specified from frontmatter
+           * resources: all script, style, etc resources for the entire page as URLs
+           * outputHref: href to the file in the output folder
+           * pageHref: href to the page's filesystem file
+           * isSSR: if this is a server side route
+           * prerender: if this page should be statically exported
+           * isolation: if this page should be run in isolated mode
+           * hydration: if this page needs hydration support
+           * servePage: signal that this is a custom page file type (static | dynamic)
+           */
           const page = {
             id: decodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
             label: decodeURIComponent(label),

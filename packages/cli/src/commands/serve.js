@@ -11,16 +11,12 @@ const runProdServer = async (compilation) => {
       ? getHybridServer
       : getStaticServer;
 
-  // we intentionally _don't_ want this promise to resolve to keep the server "hanging" for production
-  // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve, reject) => {
-    try {
-      (await server(compilation)).listen(port, () => {
-        console.info(`Started server at http://localhost:${port}${basePath}${postfixSlash}`);
-      });
-    } catch (err) {
-      reject(err);
-    }
+  (await server(compilation)).listen(port, () => {
+    console.info(`Started server at http://localhost:${port}${basePath}${postfixSlash}`);
   });
+
+  // we intentionally _don't_ want this promise to resolve to keep the server "hanging" for production
+  return new Promise(() => {});
 };
+
 export { runProdServer };
