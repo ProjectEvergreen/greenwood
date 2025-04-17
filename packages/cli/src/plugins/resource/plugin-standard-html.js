@@ -92,9 +92,9 @@ class StandardHtmlResource {
       const routeWorkerUrl = this.compilation.config.plugins
         .find((plugin) => plugin.type === "renderer")
         .provider().executeModuleUrl;
+      const req = await requestAsObject(request);
 
-      // eslint-disable-next-line no-async-promise-executor
-      await new Promise(async (resolve, reject) => {
+      await new Promise((resolve, reject) => {
         const worker = new Worker(new URL("../../lib/ssr-route-worker.js", import.meta.url));
 
         worker.on("message", (result) => {
@@ -119,7 +119,7 @@ class StandardHtmlResource {
           moduleUrl: routeModuleLocationUrl.href,
           compilation: JSON.stringify(this.compilation),
           page: JSON.stringify(matchingRoute),
-          request: await requestAsObject(request),
+          request: req,
         });
       });
     }

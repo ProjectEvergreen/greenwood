@@ -49,20 +49,11 @@ export default async function (compilation, callback) {
     return Promise.reject();
   }
 
-  // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve, reject) => {
-    try {
-      const pages = compilation.graph.filter((page) => !page.isSSR);
-      const port = compilation.config.devServer.port;
-      const offsetPort = port + 1; // don't try and start the dev server on the same port as the CLI
-      const serverAddress = `http://127.0.0.1:${offsetPort}`;
+  const pages = compilation.graph.filter((page) => !page.isSSR);
+  const port = compilation.config.devServer.port;
+  const offsetPort = port + 1; // don't try and start the dev server on the same port as the CLI
+  const serverAddress = `http://127.0.0.1:${offsetPort}`;
 
-      await runBrowser(serverAddress, pages);
-      browserRunner.close();
-
-      resolve();
-    } catch (err) {
-      reject(err);
-    }
-  });
+  await runBrowser(serverAddress, pages);
+  browserRunner.close();
 }

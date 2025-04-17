@@ -184,14 +184,13 @@ const generateGraph = async (compilation) => {
             const routeWorkerUrl = compilation.config.plugins
               .filter((plugin) => plugin.type === "renderer")[0]
               .provider(compilation).executeModuleUrl;
+            const request = await requestAsObject(new Request(filenameUrl));
             let ssrFrontmatter;
 
-            // eslint-disable-next-line no-async-promise-executor
-            await new Promise(async (resolve, reject) => {
+            await new Promise((resolve, reject) => {
               const worker = new Worker(new URL("../lib/ssr-route-worker.js", import.meta.url));
-              const request = await requestAsObject(new Request(filenameUrl));
 
-              worker.on("message", async (result) => {
+              worker.on("message", (result) => {
                 prerender = result.prerender ?? false;
                 isolation = result.isolation ?? isolation;
                 hydration = result.hydration ?? hydration;
