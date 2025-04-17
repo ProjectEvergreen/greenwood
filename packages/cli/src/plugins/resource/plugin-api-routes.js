@@ -27,8 +27,7 @@ class ApiRoutesResource {
       const workerUrl = new URL("../../lib/api-route-worker.js", import.meta.url);
       const req = await requestAsObject(request);
 
-      // eslint-disable-next-line no-async-promise-executor
-      const response = await new Promise(async (resolve, reject) => {
+      const response = await new Promise((resolve, reject) => {
         const worker = new Worker(workerUrl);
 
         worker.on("message", (result) => {
