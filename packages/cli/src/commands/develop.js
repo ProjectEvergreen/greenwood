@@ -1,14 +1,15 @@
 import { getDevServer } from "../lifecycles/serve.js";
 
 const runDevServer = async (compilation) => {
+  const { basePath, devServer } = compilation.config;
+  const { port } = devServer;
+  const postfixSlash = basePath === "" ? "" : "/";
+
+  // we intentionally _don't_ want this promise to resolve to keep the servers "hanging" for development
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
-      const { basePath, devServer } = compilation.config;
-      const { port } = devServer;
-      const postfixSlash = basePath === "" ? "" : "/";
-
-      (await getDevServer(compilation)).listen(port, () => {
+      (await getDevServer(compilation)).listen(port, async () => {
         console.info(
           `Started local development server at http://localhost:${port}${basePath}${postfixSlash}`,
         );
@@ -21,11 +22,9 @@ const runDevServer = async (compilation) => {
             .map((plugin) => plugin.provider(compilation)),
         ];
 
-        return Promise.all(
-          servers.map(async (server) => {
-            return await server.start();
-          }),
-        );
+        for (const server of servers) {
+          server.start();
+        }
       });
     } catch (err) {
       reject(err);
