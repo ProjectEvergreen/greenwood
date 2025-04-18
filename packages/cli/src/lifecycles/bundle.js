@@ -457,40 +457,28 @@ async function bundleScriptResources(compilation) {
 }
 
 const bundleCompilation = async (compilation) => {
-  // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve, reject) => {
-    try {
-      const optimizeResourcePlugins = compilation.config.plugins
-        .filter((plugin) => {
-          return plugin.type === "resource";
-        })
-        .map((plugin) => {
-          return plugin.provider(compilation);
-        });
+  const optimizeResourcePlugins = compilation.config.plugins
+    .filter((plugin) => {
+      return plugin.type === "resource";
+    })
+    .map((plugin) => {
+      return plugin.provider(compilation);
+    });
 
-      console.info("bundling static assets...");
+  console.info("bundling static assets...");
 
-      // need styles bundled first for usage with import attributes syncing in Rollup
-      await bundleStyleResources(compilation, optimizeResourcePlugins);
+  // need styles bundled first for usage with import attributes syncing in Rollup
+  await bundleStyleResources(compilation, optimizeResourcePlugins);
 
-      await Promise.all([
-        await bundleApiRoutes(compilation),
-        await bundleScriptResources(compilation),
-      ]);
+  await Promise.all([await bundleApiRoutes(compilation), await bundleScriptResources(compilation)]);
 
-      // bundleSsrPages depends on bundleScriptResources having run first
-      await bundleSsrPages(compilation, optimizeResourcePlugins);
+  // bundleSsrPages depends on bundleScriptResources having run first
+  await bundleSsrPages(compilation, optimizeResourcePlugins);
 
-      console.info("optimizing static pages....");
-      await optimizeStaticPages(compilation, optimizeResourcePlugins);
-      await cleanUpResources(compilation);
-      await emitResources(compilation);
-
-      resolve();
-    } catch (err) {
-      reject(err);
-    }
-  });
+  console.info("optimizing static pages....");
+  await optimizeStaticPages(compilation, optimizeResourcePlugins);
+  await cleanUpResources(compilation);
+  await emitResources(compilation);
 };
 
 export { bundleCompilation };

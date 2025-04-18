@@ -53,8 +53,7 @@ class ImportCommonJsResource {
   async intercept(url, request, response) {
     const { pathname } = url;
 
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       try {
         const options = {
           input: pathname,
