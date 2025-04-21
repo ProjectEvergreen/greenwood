@@ -2,7 +2,11 @@
   "name": "@greenwood/plugin-renderer-lit",
   "version": "0.32.0",
   "description": "A server-side rendering plugin for Lit based Greenwood projects.",
-  "repository": "https://github.com/ProjectEvergreen/greenwood",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProjectEvergreen/greenwood.git",
+    "directory": "packages/plugin-renderer-lit"
+  },
   "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-lit",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
