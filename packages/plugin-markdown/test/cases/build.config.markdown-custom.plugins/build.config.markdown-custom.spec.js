@@ -9,16 +9,14 @@
  * greenwood build
  *
  * User Config
- * markdown: {
- *   plugins: [
- *     '@mapbox/rehype-prism',
- *     'rehype-slug',
- *     {
- *       name: "rehype-autolink-headings",
- *       options: { behavior: 'append'}
- *     },
- *   ]
- * }
+ * plugins: [
+ *   '@mapbox/rehype-prism',
+ *   'rehype-slug',
+ *   {
+ *     name: "rehype-autolink-headings",
+ *     options: { behavior: 'append'}
+ *   },
+ * ]
  *
  * User Workspace
  * src/
