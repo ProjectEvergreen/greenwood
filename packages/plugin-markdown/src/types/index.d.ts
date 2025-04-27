@@ -1,7 +1,7 @@
 import type { ResourcePlugin } from "@greenwood/cli";
 
 type MarkdownPluginOptions = {
-  plugins?: string[];
+  plugins?: Array<string | { name: string; options: object }>;
 };
 
 export type MarkdownPlugin = (options?: MarkdownPluginOptions) => Array<ResourcePlugin>;

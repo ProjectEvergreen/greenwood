@@ -2039,7 +2039,7 @@
   resolved "https://registry.yarnpkg.com/@graphql-typed-document-node/core/-/core-3.2.0.tgz#5f3d96ec6b2354ad6d8a28bf216a1d97b5426861"
   integrity sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==
 
-"@greenwood/cli@^0.32.0-alpha.5":
+"@greenwood/cli@^0.32.0":
   version "0.32.0"
   resolved "https://registry.yarnpkg.com/@greenwood/cli/-/cli-0.32.0.tgz#7011a65553bf43dee28d364fa9a79f686cbb1ecb"
   integrity sha512-8n4ja1ZTDho29JTv+ZjCTOVlB36YT0Uo4XmN/zp/tleprE5/Y1olwWD2gi9zLMyPRIzez6X7wyNwPEj8Eu+rQA==
