@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-markdown",
-  "version": "0.32.0-alpha.5",
+  "version": "0.32.0",
   "description": "A Greenwood plugin for processing markdown files for pages using the Unified ecosystem.",
   "repository": {
     "type": "git",
@@ -36,7 +36,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.31.0"
+    "@greenwood/cli": "^0.32.0"
   },
   "dependencies": {
     "markdown-toc": "^1.2.0",
@@ -48,6 +48,6 @@
     "unified": "^11.0.5"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.32.0-alpha.5"
+    "@greenwood/cli": "^0.32.0"
   }
 }

@@ -84,6 +84,7 @@ class MarkdownResource {
 
     processedMarkdown = await unified()
       .use(remarkParse) // parse markdown into AST
+      // TODO do we even need this plugin anymore?
       .use(remarkFrontmatter) // extract frontmatter from AST
       .use(remarkPlugins) // apply userland remark plugins
       .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
