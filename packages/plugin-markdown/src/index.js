@@ -73,12 +73,15 @@ class MarkdownResource {
     let processedMarkdown = "";
 
     for (const plugin of this.options?.plugins || []) {
-      if (plugin.indexOf("rehype-") >= 0) {
-        rehypePlugins.push((await import(plugin)).default);
-      }
+      const name = typeof plugin === "string" ? plugin : plugin.name;
+      const options = plugin?.options ?? null;
+      const pluginTypeArray = name.indexOf("rehype-") >= 0 ? rehypePlugins : remarkPlugins;
+      const pluginImport = (await import(name)).default;
 
-      if (plugin.indexOf("remark-") >= 0) {
-        remarkPlugins.push((await import(plugin)).default);
+      if (options) {
+        pluginTypeArray.push([pluginImport, options]);
+      } else {
+        pluginTypeArray.push(pluginImport);
       }
     }
 
