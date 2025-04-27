@@ -11,11 +11,13 @@ import { unified } from "unified";
 // https://github.com/ProjectEvergreen/greenwood/issues/1278
 let allHeadingsTracked = false;
 
+const PLUGIN_EXTENSION = ".md";
+
 async function trackAllTocHeadings(compilation) {
   for (const idx in compilation.graph) {
     const page = compilation.graph[idx];
 
-    if (page.pageHref.endsWith(".md")) {
+    if (page?.pageHref?.endsWith(PLUGIN_EXTENSION)) {
       const markdownContents = await fs.readFile(new URL(page.pageHref), "utf-8");
 
       let tocData = {};
@@ -47,7 +49,7 @@ async function trackAllTocHeadings(compilation) {
 class MarkdownResource {
   constructor(compilation, options = {}) {
     this.compilation = compilation;
-    this.extensions = [".md"];
+    this.extensions = [PLUGIN_EXTENSION];
     this.contentType = "text/html";
     this.servePage = "static";
     this.options = options;
@@ -60,6 +62,7 @@ class MarkdownResource {
     return (
       protocol.startsWith("http") &&
       hasMatchingPageRoute &&
+      hasMatchingPageRoute.pageHref &&
       hasMatchingPageRoute.pageHref.endsWith(this.extensions[0])
     );
   }
