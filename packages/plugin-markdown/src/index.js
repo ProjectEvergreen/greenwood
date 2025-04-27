@@ -121,7 +121,7 @@ class MarkdownResource {
     //   );
     // }
 
-    return new Response(processedMarkdown, {
+    return new Response(String(processedMarkdown), {
       headers: new Headers({
         "Content-Type": this.contentType,
       }),
