@@ -2,7 +2,11 @@
   "name": "@greenwood/plugin-markdown",
   "version": "0.32.0-alpha.5",
   "description": "A Greenwood plugin for processing markdown files for pages using the Unified ecosystem.",
-  "repository": "https://github.com/ProjectEvergreen/greenwood",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProjectEvergreen/greenwood.git",
+    "directory": "packages/plugin-markdown"
+  },
   "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-markdown",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
@@ -13,7 +17,7 @@
     "Full Stack Web Development",
     "Markdown",
     "Unified",
-    "Rehpye",
+    "Rehype",
     "Remark"
   ],
   "type": "module",
