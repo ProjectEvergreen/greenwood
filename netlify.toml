@@ -217,3 +217,9 @@
   from = "/docs/data/#internal-sources"
   to = "/docs/data/#pages-data"
   status = 200
+
+[[redirects]]
+  from = "/docs/*"
+  to = "https://www.greenwoodjs.dev/docs/"
+  status = 301
+  force = true
