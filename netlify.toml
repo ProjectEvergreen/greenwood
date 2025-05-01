@@ -223,3 +223,15 @@
   to = "https://www.greenwoodjs.dev/docs/"
   status = 301
   force = true
+
+[[redirects]]
+  from = "/guides/*"
+  to = "https://www.greenwoodjs.dev/guides/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/blog/*"
+  to = "https://www.greenwoodjs.dev/blog/"
+  status = 301
+  force = true
