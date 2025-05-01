@@ -76,7 +76,7 @@
 
 [[redirects]]
   from = "/plugins/"
-  to = "https://www.greenwoodjs.dev/docs//plugins-api/"
+  to = "https://www.greenwoodjs.dev/docs/reference/plugins-api/"
   status = 301
   force = true
 
@@ -218,6 +218,7 @@
   to = "/docs/data/#pages-data"
   status = 200
 
+# keep these wildcards at the end to avoid any custom one-off URL redirects
 [[redirects]]
   from = "/docs/*"
   to = "https://www.greenwoodjs.dev/docs/"
