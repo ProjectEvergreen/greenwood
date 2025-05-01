@@ -76,7 +76,7 @@
 
 [[redirects]]
   from = "/plugins/"
-  to = "https://www.greenwoodjs.dev/docs/references/plugins-api/"
+  to = "https://www.greenwoodjs.dev/docs/reference/plugins-api/"
   status = 301
   force = true
 
@@ -217,3 +217,22 @@
   from = "/docs/data/#internal-sources"
   to = "/docs/data/#pages-data"
   status = 200
+
+# keep these wildcards at the end to avoid any custom one-off URL redirects
+[[redirects]]
+  from = "/docs/*"
+  to = "https://www.greenwoodjs.dev/docs/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/*"
+  to = "https://www.greenwoodjs.dev/guides/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/blog/*"
+  to = "https://www.greenwoodjs.dev/blog/"
+  status = 301
+  force = true
