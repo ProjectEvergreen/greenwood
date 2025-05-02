@@ -16,51 +16,52 @@ import fs from "fs";
 import path from "path";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
 // https://github.com/ProjectEvergreen/greenwood/issues/787
-xdescribe("Scaffold Greenwood and Run Build command: ", function () {
-  const LABEL = "Default Greenwood Configuration and Workspace";
+describe.only("Init Greenwood: ", function () {
+  const LABEL = "Scaffold Greenwood with default prompts";
+  const APP_NAME = "my-project";
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
-  const outputPath = fileURLToPath(new URL("./my-app", import.meta.url));
+  const outputPath = path.dirname(new URL(import.meta.url).pathname);
+  const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: path.join(initOutputPath, "public"),
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
-  describe("default minimal template", function () {
+  describe(LABEL, function () {
     before(function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, "--install");
+      runner.runCommand(initPath, ["--name", APP_NAME]);
     });
 
     describe(`should build ${LABEL}`, function () {
       const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
 
       before(function () {
-        runner.setup(outputPath);
-        runner.runCommand(cliPath, "build");
+        runner.setup(initOutputPath);
+        runner.runCommand(cliPath, ["build"]);
       });
 
       runSmokeTest(["public", "index"], LABEL);
 
       it("should generate a package-lock.json file", function () {
-        expect(fs.existsSync(path.join(outputPath, "package-lock.json"))).to.be.true;
+        expect(fs.existsSync(path.join(initOutputPath, "package-lock.json"))).to.be.true;
       });
 
       it("should not generate a yarn.lock file", function () {
-        expect(fs.existsSync(path.join(outputPath, "yarn.lock"))).to.be.false;
+        expect(fs.existsSync(path.join(initOutputPath, "yarn.lock"))).to.be.false;
       });
     });
   });
 
   after(function () {
-    runner.teardown([outputPath]);
+    // runner.teardown([initOutputPath]);
   });
 });
