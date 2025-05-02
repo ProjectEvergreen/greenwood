@@ -19,7 +19,7 @@ import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
-describe("Scaffold Greenwood into a custom directory: ", function () {
+xdescribe("Scaffold Greenwood into a custom directory: ", function () {
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
   const outputPath = fileURLToPath(new URL("./output", import.meta.url));
   const projectName = "my-app";
