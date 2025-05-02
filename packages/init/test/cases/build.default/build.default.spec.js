@@ -62,6 +62,6 @@ describe.only("Init Greenwood: ", function () {
   });
 
   after(function () {
-    // runner.teardown([initOutputPath]);
+    runner.teardown([initOutputPath]);
   });
 });
