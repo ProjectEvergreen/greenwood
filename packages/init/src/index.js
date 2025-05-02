@@ -1,25 +1,10 @@
 #!/usr/bin/env node
-/* eslint no-console: 0 */
-/*
- * **Note**
- * For the time being, there is an issue that prevents us from running the install based specs for this package as part of CI.
- * https://github.com/ProjectEvergreen/greenwood/issues/787
- *
- * When adding new features to this package, please enable the tests locally and validate that the scaffolding works
- * correctly.  This applies to the following test cases:
- * - build.default
- * - develop.default
- * - init.yarn
- *
- */
+
 import chalk from "chalk";
-// import simpleGit from "simple-git";
 import { program } from "commander";
 import fs from "fs";
-// // import os from "os";
-// import { spawn } from "child_process";
-import { checkbox, confirm, input } from "@inquirer/prompts";
-import { copyTemplate, setupPackageJson } from "./util.js";
+import { input } from "@inquirer/prompts";
+import { copyTemplate, setupGitIgnore, setupPackageJson } from "./util.js";
 
 const DEFAULTS = {
   name: "my-app",
@@ -94,7 +79,7 @@ async function init() {
     copyTemplate(templateDirUrl, outputDirUrl);
 
     // configure package.json (name, greenwood version, etc)
-    setupPackageJson(new URL(`./package.json`, outputDirUrl), {
+    setupPackageJson(outputDirUrl, {
       name: appName,
       version,
     });
@@ -102,7 +87,9 @@ async function init() {
     // TODO installDeps: .npmrc?
     // await confirm({ message: 'Would you like to install dependencies?' })
 
-    // TODO: .gitignore
+    // configure .gitignore file contents
+    setupGitIgnore(outputDirUrl);
+
     // TODO: next steps
   } catch (e) {
     console.log(

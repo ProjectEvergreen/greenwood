@@ -20,7 +20,7 @@ import { runSmokeTest } from "../../../../../test/smoke-test.js";
 const expect = chai.expect;
 
 // https://github.com/ProjectEvergreen/greenwood/issues/787
-describe.only("Init Greenwood: ", function () {
+xdescribe("Init Greenwood: ", function () {
   const LABEL = "Scaffold Greenwood with default prompts";
   const APP_NAME = "my-project";
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
@@ -32,7 +32,7 @@ describe.only("Init Greenwood: ", function () {
     this.context = {
       publicDir: path.join(initOutputPath, "public"),
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function () {
