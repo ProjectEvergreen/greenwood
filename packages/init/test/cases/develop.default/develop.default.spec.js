@@ -6,7 +6,7 @@
  * Should scaffold from template and start the development server and render the template.
  *
  * User Command
- * @greenwood/init --name=my-app && greenwood develop
+ * @greenwood/init --name my-app && greenwood develop
  *
  * User Workspace
  * N / A
@@ -66,7 +66,7 @@ describe("Initialize a new Greenwood project: ", function () {
         before(async function () {
           response = await fetch(`${hostname}:${port}/`);
           const data = await response.text();
-          console.log({ data });
+
           dom = new JSDOM(data);
         });
 

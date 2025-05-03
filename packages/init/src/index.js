@@ -3,14 +3,15 @@
 import chalk from "chalk";
 import { program } from "commander";
 import fs from "fs";
-import { input } from "@inquirer/prompts";
+import { input, select } from "@inquirer/prompts";
 import { copyTemplate, setupGitIgnore, setupPackageJson } from "./util.js";
 
 const DEFAULTS = {
   name: "my-app",
   template: "template-base",
   install: false,
-  pkgMgr: "npm", // package manager
+  pkgMgr: "npm", // package manager,
+  ts: "no",
 };
 
 async function init() {
@@ -21,16 +22,6 @@ async function init() {
     ).default;
     const { name, version } = packageJson;
 
-    program
-      .name(name)
-      .version(version)
-      // .usage(`${chalk.green("<application-directory>")} [options]`)
-      .option("--name <name>", "Name and directory location to scaffold your application with")
-      // .option("--install", "Install dependencies upon init")
-      // .option("--template [type]", "Select from list of Greenwood curated templates")
-      .parse(process.argv);
-    // .opts();
-
     console.log(
       `${chalk.rgb(175, 207, 71)("-------------------------------------------------------")}`,
     );
@@ -39,8 +30,16 @@ async function init() {
       `${chalk.rgb(175, 207, 71)("-------------------------------------------------------")}`,
     );
 
-    const options = program.opts();
+    const options = program
+      .name(name)
+      .version(version)
+      // TODO ? .usage(`${chalk.green("<application-directory>")} [options]`)
+      .option("--name <name>", "Name and directory location to scaffold your application with")
+      .option("--ts <choice>", "Configure the project for TypeScript (yes/no)")
+      .parse(process.argv)
+      .opts();
 
+    // prompt user for all options not passed in via the CLI
     const appName = options.name
       ? options.name
       : await input({
@@ -48,10 +47,28 @@ async function init() {
           default: DEFAULTS.name,
         });
 
-    const templateDirUrl = new URL(`./${DEFAULTS.template}/`, import.meta.url);
-    const outputDirUrl =
-      appName === "." ? new URL(`file://${CWD}/`) : new URL(`./${appName}/`, `file://${CWD}/`);
+    // if user is started providing options, favor the CLI, otherwise prompt
+    const isTS =
+      Object.keys(options).length > 0
+        ? options.ts
+          ? options.ts
+          : DEFAULTS.ts
+        : await select({
+            message: "Setup TypeScript?",
+            choices: [
+              {
+                name: "Yes",
+                value: "yes",
+              },
+              {
+                name: "No",
+                value: "no",
+              },
+            ],
+          });
 
+    // TODO installDeps: .npmrc?
+    // await confirm({ message: 'Would you like to install dependencies?' })
     // console.log({ templateDirUrl, outputDirUrl });
     // if (answers.installDeps) {
     //   answers.packageManager = await checkbox({
@@ -63,6 +80,15 @@ async function init() {
     //     ],
     //   });
     // }
+
+    // determine source (template) and output locations
+    const templateDirUrl =
+      isTS === "yes"
+        ? new URL(`./${DEFAULTS.template}-ts/`, import.meta.url)
+        : new URL(`./${DEFAULTS.template}/`, import.meta.url);
+
+    const outputDirUrl =
+      appName === "." ? new URL(`file://${CWD}/`) : new URL(`./${appName}/`, `file://${CWD}/`);
 
     // make output directory if an appName is specified
     if (appName !== ".") {
@@ -88,9 +114,6 @@ async function init() {
       name: appName,
       version,
     });
-
-    // TODO installDeps: .npmrc?
-    // await confirm({ message: 'Would you like to install dependencies?' })
 
     // configure .gitignore file contents
     setupGitIgnore(outputDirUrl);

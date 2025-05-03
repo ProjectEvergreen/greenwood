@@ -6,7 +6,7 @@
  * Should scaffold from template build.
  *
  * User Command
- * npx @greenwood/init --name=my-app
+ * npx @greenwood/init --name=my-app --ts
  *
  * User Workspace
  * N / A
@@ -15,7 +15,6 @@ import chai from "chai";
 import fs from "fs";
 import path from "path";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "url";
 
 const expect = chai.expect;
 
@@ -30,13 +29,13 @@ describe("Initialize a new Greenwood project: ", function () {
     this.context = {
       publicDir: outputPath,
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe("Scaffolding a new project with default options", function () {
     before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, ["--name", APP_NAME]);
+      runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "yes"]);
     });
 
     describe("project files and folders", () => {
@@ -50,6 +49,14 @@ describe("Initialize a new Greenwood project: ", function () {
 
       it("should generate a package.json file", function () {
         expect(fs.existsSync(path.join(initOutputPath, "package.json"))).to.be.true;
+      });
+
+      it("should generate a tsconfig.json file", function () {
+        expect(fs.existsSync(path.join(initOutputPath, "tsconfig.json"))).to.be.true;
+      });
+
+      it("should generate a greenwood.config.ts file", function () {
+        expect(fs.existsSync(path.join(initOutputPath, "greenwood.config.ts"))).to.be.true;
       });
 
       it("should not generate a package-lock.json file", function () {
@@ -87,10 +94,7 @@ describe("Initialize a new Greenwood project: ", function () {
 
       it("the should have the correct Greenwood devDependency", function () {
         const scriptPkg = JSON.parse(
-          fs.readFileSync(
-            fileURLToPath(new URL("../../../package.json", import.meta.url)),
-            "utf-8",
-          ),
+          fs.readFileSync(new URL("../../../package.json", import.meta.url), "utf-8"),
         );
 
         expect(pkgJson.devDependencies["@greenwood/cli"]).to.equal(`~${scriptPkg.version}`);
@@ -119,7 +123,7 @@ describe("Initialize a new Greenwood project: ", function () {
 
       it("should have a <script> tag to the logo component", function () {
         expect(pageContents).to.contain(
-          '<script type="module" src="../components/logo/logo.js"></script>',
+          '<script type="module" src="../components/logo/logo.ts"></script>',
         );
         expect(pageContents).to.contain("<x-logo></x-logo>");
       });
