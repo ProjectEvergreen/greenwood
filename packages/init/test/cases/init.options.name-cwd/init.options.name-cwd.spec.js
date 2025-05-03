@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Scaffold from minimal template with no flags.
+ * Scaffold from minimal template with the current working directory as the project name flag.
  *
  * User Result
  * Should scaffold from template build.

@@ -1,6 +1,7 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
+import { spawn } from "child_process";
 
 function copyTemplate(templateDirUrl, outputDirUrl) {
   console.log("copying project files to => ", outputDirUrl.pathname);
@@ -46,4 +47,17 @@ function setupGitIgnore(outputDirUrl, { patterns = [] } = {}) {
   fs.writeFileSync(new URL("./.gitignore", outputDirUrl), contents);
 }
 
-export { copyTemplate, setupPackageJson, setupGitIgnore };
+function installDependencies(outputDirUrl, packageManager) {
+  if (packageManager === "no") {
+    return;
+  }
+
+  console.log(`Installing dependencies using => ${packageManager}...`);
+
+  const command = os.platform() === "win32" ? `${packageManager}.cmd` : packageManager;
+  const args = ["install", "--loglevel", "error"];
+
+  spawn(command, args, { stdio: "inherit", cwd: outputDirUrl });
+}
+
+export { copyTemplate, installDependencies, setupPackageJson, setupGitIgnore };
