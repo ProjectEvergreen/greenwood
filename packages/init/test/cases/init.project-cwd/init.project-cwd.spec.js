@@ -6,7 +6,7 @@
  * Should scaffold from template build.
  *
  * User Command
- * npx @greenwood/init --name=my-app
+ * * npx @greenwood/init --name=.
  *
  * User Workspace
  * N / A
@@ -20,7 +20,7 @@ import { fileURLToPath, URL } from "url";
 const expect = chai.expect;
 
 describe("Initialize a new Greenwood project: ", function () {
-  const APP_NAME = "my-app";
+  const APP_NAME = ".";
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
   const outputPath = path.dirname(new URL(import.meta.url).pathname);
   const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
@@ -33,7 +33,7 @@ describe("Initialize a new Greenwood project: ", function () {
     runner = new Runner();
   });
 
-  describe("Scaffolding a new project with default options", function () {
+  describe("Scaffolding a new project in the current directory", function () {
     before(async function () {
       runner.setup(outputPath);
       runner.runCommand(initPath, ["--name", APP_NAME]);
@@ -127,6 +127,10 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   after(function () {
-    runner.teardown([initOutputPath]);
+    runner.teardown([
+      path.join(initOutputPath, ".gitignore"),
+      path.join(initOutputPath, "package.json"),
+      path.join(initOutputPath, "src/"),
+    ]);
   });
 });

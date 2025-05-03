@@ -9,6 +9,8 @@ import { copyTemplate, setupGitIgnore, setupPackageJson } from "./util.js";
 const DEFAULTS = {
   name: "my-app",
   template: "template-base",
+  install: false,
+  pkgMgr: "npm", // package manager
 };
 
 async function init() {
@@ -71,8 +73,11 @@ async function init() {
           `${chalk.rgb(175, 207, 71)("output directory detected, skipping creation...")}`,
         );
       } catch {
+        console.log(`creating output directory => ${appName}`);
         fs.mkdirSync(outputDirUrl);
       }
+    } else {
+      console.log("using current directory for the output directory");
     }
 
     // copy template files

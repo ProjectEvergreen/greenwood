@@ -6,23 +6,23 @@
  * Should scaffold from template and run the build.
  *
  * User Command
- * @greenwood/init --install && greenwood build
+ * npx @greenwood/init --name my-app && greenwood build
  *
  * User Workspace
  * N / A
  */
 import chai from "chai";
-import fs from "fs";
+import fs from "fs/promises";
+import { JSDOM } from "jsdom";
 import path from "path";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 
 const expect = chai.expect;
 
-// https://github.com/ProjectEvergreen/greenwood/issues/787
-xdescribe("Init Greenwood: ", function () {
-  const LABEL = "Scaffold Greenwood with default prompts";
-  const APP_NAME = "my-project";
+describe("Initialize a new Greenwood project: ", function () {
+  const LABEL = "Scaffold Greenwood with default options and run a build";
+  const APP_NAME = "my-app";
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
   const outputPath = path.dirname(new URL(import.meta.url).pathname);
   const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
@@ -41,7 +41,7 @@ xdescribe("Init Greenwood: ", function () {
       runner.runCommand(initPath, ["--name", APP_NAME]);
     });
 
-    describe(`should build ${LABEL}`, function () {
+    describe(`should build with the Greenwood CLI and have all standard build output files`, function () {
       const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
 
       before(function () {
@@ -51,12 +51,22 @@ xdescribe("Init Greenwood: ", function () {
 
       runSmokeTest(["public", "index"], LABEL);
 
-      it("should generate a package-lock.json file", function () {
-        expect(fs.existsSync(path.join(initOutputPath, "package-lock.json"))).to.be.true;
-      });
+      describe("Build command specific HTML behaviors", function () {
+        let dom;
 
-      it("should not generate a yarn.lock file", function () {
-        expect(fs.existsSync(path.join(initOutputPath, "yarn.lock"))).to.be.false;
+        before(async function () {
+          const html = await fs.readFile(path.join(initOutputPath, "public/index.html"), "utf-8");
+
+          dom = new JSDOM(html);
+        });
+
+        it("should display default project title", function (done) {
+          const title = dom.window.document.querySelector("head > title");
+
+          expect(title.textContent).to.equal("Greenwood");
+
+          done();
+        });
       });
     });
   });

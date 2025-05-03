@@ -3,6 +3,8 @@ import os from "os";
 import path from "path";
 
 function copyTemplate(templateDirUrl, outputDirUrl) {
+  console.log("copying project files to => ", outputDirUrl.pathname);
+
   const files = fs.readdirSync(templateDirUrl, { recursive: true });
 
   files.forEach((file) => {
@@ -19,10 +21,12 @@ function copyTemplate(templateDirUrl, outputDirUrl) {
 }
 
 function setupPackageJson(outputDirUrl, { name, version }) {
+  console.log("setting up package.json...");
+
   const packageJsonUrl = new URL("./package.json", outputDirUrl);
   const json = JSON.parse(fs.readFileSync(packageJsonUrl));
 
-  json.name = name === "." ? path.basename(packageJsonUrl) : name;
+  json.name = name === "." ? path.basename(packageJsonUrl.pathname) : name;
   json.version = version;
   json.devDependencies["@greenwood/cli"] = `~${version}`;
 
@@ -30,6 +34,8 @@ function setupPackageJson(outputDirUrl, { name, version }) {
 }
 
 function setupGitIgnore(outputDirUrl, { patterns = [] } = {}) {
+  console.log("creating a .gitignore file...");
+
   const ignorePatterns = ["*DS_Store", "*.log", "node_modules/", "public/", ".greenwood/"];
   let contents = "";
 
