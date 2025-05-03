@@ -52,7 +52,7 @@ function installDependencies(outputDirUrl, packageManager) {
     return;
   }
 
-  console.log(`Installing dependencies using => ${packageManager}...`);
+  console.log(`installing dependencies using => ${packageManager}...`);
 
   const command = os.platform() === "win32" ? `${packageManager}.cmd` : packageManager;
   const args = ["install", "--loglevel", "error"];
