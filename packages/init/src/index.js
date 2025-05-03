@@ -4,15 +4,29 @@ import chalk from "chalk";
 import { program } from "commander";
 import fs from "fs";
 import { input, select } from "@inquirer/prompts";
-import { copyTemplate, setupGitIgnore, setupPackageJson } from "./util.js";
+import { copyTemplate, installDependencies, setupGitIgnore, setupPackageJson } from "./util.js";
 
 const DEFAULTS = {
   name: "my-app",
   template: "template-base",
-  install: false,
-  pkgMgr: "npm", // package manager,
+  install: "no",
   ts: "no",
 };
+
+const PACKAGE_MANAGERS = [
+  {
+    name: "npm",
+    value: "npm",
+  },
+  {
+    name: "pnpm",
+    value: "pnpm",
+  },
+  {
+    name: "Yarn",
+    value: "yarn",
+  },
+];
 
 async function init() {
   try {
@@ -36,8 +50,13 @@ async function init() {
       // TODO ? .usage(`${chalk.green("<application-directory>")} [options]`)
       .option("--name <name>", "Name and directory location to scaffold your application with")
       .option("--ts <choice>", "Configure the project for TypeScript (yes/no)")
+      .option(
+        "--install <choice>",
+        "Install dependencies with the package manager of your choice (npm/pnpm/yarn)",
+      )
       .parse(process.argv)
       .opts();
+    const hasOptions = Object.keys(options).length > 0;
 
     // prompt user for all options not passed in via the CLI
     const appName = options.name
@@ -48,38 +67,40 @@ async function init() {
         });
 
     // if user is started providing options, favor the CLI, otherwise prompt
-    const isTS =
-      Object.keys(options).length > 0
+    const isTS = hasOptions
+      ? options.ts
         ? options.ts
-          ? options.ts
-          : DEFAULTS.ts
-        : await select({
-            message: "Setup TypeScript?",
-            choices: [
-              {
-                name: "Yes",
-                value: "yes",
-              },
-              {
-                name: "No",
-                value: "no",
-              },
-            ],
-          });
+        : DEFAULTS.ts
+      : await select({
+          message: "Setup TypeScript?",
+          choices: [
+            {
+              name: "Yes",
+              value: "yes",
+            },
+            {
+              name: "No",
+              value: "no",
+            },
+          ],
+        });
 
-    // TODO installDeps: .npmrc?
-    // await confirm({ message: 'Would you like to install dependencies?' })
-    // console.log({ templateDirUrl, outputDirUrl });
-    // if (answers.installDeps) {
-    //   answers.packageManager = await checkbox({
-    //     message: 'Select a package manager',
-    //     choices: [
-    //       { name: 'npm', value: 'npm' },
-    //       { name: 'yarn', value: 'yarn' },
-    //       { name: 'pnpm', value: 'pnpm' },
-    //     ],
-    //   });
-    // }
+    let packageManager;
+
+    if (hasOptions) {
+      packageManager = options.install ?? DEFAULTS.install;
+    } else {
+      packageManager = await select({
+        message: "Install Dependencies?",
+        choices: [
+          ...PACKAGE_MANAGERS,
+          {
+            name: "no",
+            value: "no",
+          },
+        ],
+      });
+    }
 
     // determine source (template) and output locations
     const templateDirUrl =
@@ -118,7 +139,9 @@ async function init() {
     // configure .gitignore file contents
     setupGitIgnore(outputDirUrl);
 
-    // TODO: next steps
+    installDependencies(outputDirUrl, packageManager);
+
+    // TODO: next steps / instructions
   } catch (e) {
     console.log(
       `${chalk.rgb(255, 0, 0)("Sorry, there was an error trying to initialize your project")}`,

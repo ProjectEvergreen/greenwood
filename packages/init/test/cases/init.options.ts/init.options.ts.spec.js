@@ -1,12 +1,12 @@
 /*
  * Use Case
- * Scaffold from minimal template with no flags.
+ * Scaffold from minimal template and using the TypeScript flag.
  *
  * User Result
  * Should scaffold from template build.
  *
  * User Command
- * npx @greenwood/init --name=my-app --ts
+ * npx @greenwood/init --name=my-app --ts yes
  *
  * User Workspace
  * N / A
@@ -29,7 +29,7 @@ describe("Initialize a new Greenwood project: ", function () {
     this.context = {
       publicDir: outputPath,
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe("Scaffolding a new project with default options", function () {

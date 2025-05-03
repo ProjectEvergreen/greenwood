@@ -6,7 +6,7 @@
  * Should scaffold from template build.
  *
  * User Command
- * npx @greenwood/init --name my-app --ts=no
+ * npx @greenwood/init --name my-app --ts no --install no
  *
  * User Workspace
  * N / A
@@ -35,7 +35,7 @@ describe("Initialize a new Greenwood project: ", function () {
   describe("Scaffolding a new project with default options", function () {
     before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, ["--name", APP_NAME, `--ts`, "no"]);
+      runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
     });
 
     describe("project files and folders", () => {
