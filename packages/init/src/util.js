@@ -56,6 +56,17 @@ function installDependencies(outputDirUrl, packageManager) {
 
   const command = os.platform() === "win32" ? `${packageManager}.cmd` : packageManager;
   const args = ["install", "--loglevel", "error"];
+  let npmrcContents = "";
+
+  if (packageManager === "npm") {
+    npmrcContents = npmrcContents.concat("legacy-peer-deps=true", os.EOL);
+  } else if (packageManager === "pnpm") {
+    npmrcContents = npmrcContents.concat("shamefully-hoist=true", os.EOL);
+  }
+
+  if (npmrcContents !== "") {
+    fs.writeFileSync(new URL("./.npmrc", outputDirUrl), npmrcContents);
+  }
 
   spawn(command, args, { stdio: "inherit", cwd: outputDirUrl, shell: true });
 }
