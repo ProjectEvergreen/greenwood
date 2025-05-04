@@ -52,6 +52,12 @@ describe("Initialize a new Greenwood project: ", function () {
         expect(fs.existsSync(path.join(initOutputPath, "package.json"))).to.be.true;
       });
 
+      it("should not generate a .npmrc file", function () {
+        const npmrcPath = path.join(initOutputPath, ".npmrc");
+
+        expect(fs.existsSync(npmrcPath)).to.be.false;
+      });
+
       it("should not generate a package-lock.json file", function () {
         expect(fs.existsSync(path.join(initOutputPath, "package-lock.json"))).to.be.false;
       });
