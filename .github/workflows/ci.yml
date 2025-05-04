@@ -19,6 +19,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
       - name: Installing project dependencies
         run: |
           yarn install --frozen-lockfile && yarn lerna bootstrap

@@ -40,7 +40,7 @@ describe("Initialize a new Greenwood project: ", function () {
       runner.runCommand(initPath, ["--name", APP_NAME, "--install", "pnpm"]);
     });
 
-    describe("should install with Yarn", function () {
+    describe("should install with pnpm", function () {
       const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
 
       before(function () {
