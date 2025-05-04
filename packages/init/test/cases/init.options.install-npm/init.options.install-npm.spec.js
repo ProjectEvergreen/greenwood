@@ -41,7 +41,7 @@ describe("Initialize a new Greenwood project: ", function () {
       runner.runCommand(initPath, ["--name", APP_NAME, "--install", "npm"]);
     });
 
-    describe("should install with Yarn", function () {
+    describe("should install with npm", function () {
       const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
 
       before(function () {
@@ -53,6 +53,14 @@ describe("Initialize a new Greenwood project: ", function () {
 
       it("should generate a package-lock.json file", function () {
         expect(fs.existsSync(path.join(initOutputPath, "package-lock.json"))).to.be.true;
+      });
+
+      it("should generate a .npmrc file with the expected contents", function () {
+        const npmrcPath = path.join(initOutputPath, ".npmrc");
+        const contents = fs.readFileSync(npmrcPath, "utf-8");
+
+        expect(fs.existsSync(npmrcPath)).to.be.true;
+        expect(contents).contains("legacy-peer-deps=true");
       });
     });
   });

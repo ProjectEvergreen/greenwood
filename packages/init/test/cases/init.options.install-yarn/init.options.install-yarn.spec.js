@@ -54,6 +54,12 @@ describe("Initialize a new Greenwood project: ", function () {
       it("should generate a yarn.lock file", function () {
         expect(fs.existsSync(path.join(initOutputPath, "yarn.lock"))).to.be.true;
       });
+
+      it("should not generate a .npmrc file", function () {
+        const npmrcPath = path.join(initOutputPath, ".npmrc");
+
+        expect(fs.existsSync(npmrcPath)).to.be.false;
+      });
     });
   });
 
