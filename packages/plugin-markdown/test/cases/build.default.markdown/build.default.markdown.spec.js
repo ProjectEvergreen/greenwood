@@ -9,7 +9,9 @@
  * greenwood build
  *
  * User Config
- * None
+ * {
+ *   plugins: [greenwoodPluginMarkdown()]
+ * }
  *
  * User Workspace
  * src/

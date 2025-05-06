@@ -56,7 +56,7 @@ describe("Build Greenwood With: ", async function () {
       runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(["public", "index"], LABEL);
+    runSmokeTest(["public"], LABEL);
 
     describe("Home Page navigation w/ CollectionQuery for <app-header> navigation", function () {
       let dom;

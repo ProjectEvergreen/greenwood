@@ -1,21 +1,24 @@
 import gql from "graphql-tag";
+import {
+  filterContentByCollection,
+  filterContentByRoute,
+} from "@greenwood/cli/src/lib/content-utils.js";
 
-const getCollection = (root, { name, orderBy }, context) => {
+const getCollection = async (root, { name, orderBy }, context) => {
   const { graph } = context;
+  const content = filterContentByCollection(graph, name);
   let items = [];
 
-  graph.forEach((page) => {
+  content.forEach((page) => {
     const { data, label, title } = page;
-    const { collection, tableOfContents, tocHeading } = data;
+    const { tableOfContents, tocHeading } = data;
     const toc = getParsedHeadingsFromPage(tableOfContents, tocHeading);
 
-    if (collection === name) {
-      items.push({ ...page, title: title || label, tableOfContents: toc });
-    }
+    items.push({ ...page, title: title || label, tableOfContents: toc });
   });
 
   if (orderBy) {
-    items = sortCollection(items, orderBy);
+    return sortCollection(items, orderBy);
   }
 
   return items;
@@ -50,41 +53,24 @@ const sortCollection = (collection, orderBy) => {
   return collection.sort(compare);
 };
 
-const getParsedHeadingsFromPage = (tableOfContents = [], headingLevel) => {
+const getParsedHeadingsFromPage = (tableOfContents = []) => {
   let children = [];
 
-  if (tableOfContents.length > 0 && headingLevel > 0) {
-    tableOfContents.forEach(({ content, slug, lvl }) => {
-      // make sure we only add heading elements of the same level (h1, h2, h3)
-      if (lvl === headingLevel) {
-        children.push({ label: content, route: "#" + slug });
-      }
-    });
-  }
+  tableOfContents.forEach(({ content, slug }) => {
+    children.push({ label: content, route: "#" + slug });
+  });
 
   return children;
 };
 
 const getPagesFromGraph = async (root, query, context) => {
-  return Promise.resolve(context.graph);
+  return context.graph;
 };
 
 const getChildrenFromParentRoute = async (root, query, context) => {
-  const pages = [];
   const { parent } = query;
-  const { graph } = context;
-  // TODO handle base path
-  // const { basePath } = context.config;
 
-  graph.forEach((page) => {
-    const { route } = page;
-
-    if (`${parent}/` !== route && route.startsWith(parent)) {
-      pages.push(page);
-    }
-  });
-
-  return Promise.resolve(pages);
+  return filterContentByRoute(context.graph, parent);
 };
 
 const graphTypeDefs = gql`

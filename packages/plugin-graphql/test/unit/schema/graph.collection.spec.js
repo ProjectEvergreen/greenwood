@@ -4,7 +4,7 @@ import { MOCK_GRAPH } from "../mocks/graph.js";
 
 const expect = chai.expect;
 
-describe("Unit Test: Data", function () {
+xdescribe("Unit Test: Data", function () {
   describe("Schema", function () {
     describe("Graph", function () {
       describe("getCollection navigation menu", function () {

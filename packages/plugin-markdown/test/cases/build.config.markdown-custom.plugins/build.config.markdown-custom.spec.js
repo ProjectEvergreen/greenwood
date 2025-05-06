@@ -9,7 +9,7 @@
  * greenwood build
  *
  * User Config
- * markdown: {
+ * plugins: [greenwoodPluginMarkdown({
  *   plugins: [
  *     '@mapbox/rehype-prism',
  *     'rehype-slug',
@@ -18,7 +18,7 @@
  *       options: { behavior: 'append'}
  *     },
  *   ]
- * }
+ * })]
  *
  * User Workspace
  * src/

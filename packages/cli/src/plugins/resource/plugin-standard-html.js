@@ -6,21 +6,15 @@
  *
  */
 import fs from "fs/promises";
-import rehypeStringify from "rehype-stringify";
-import rehypeRaw from "rehype-raw";
-import remarkFrontmatter from "remark-frontmatter";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
 import { getUserScripts, getPageLayout, getAppLayout } from "../../lib/layout-utils.js";
 import { requestAsObject } from "../../lib/resource-utils.js";
-import { unified } from "unified";
 import { Worker } from "worker_threads";
 import { parse as htmlparser } from "node-html-parser";
 
 class StandardHtmlResource {
   constructor(compilation) {
     this.compilation = compilation;
-    this.extensions = [".html", ".md"];
+    this.extensions = [".html"];
     this.contentType = "text/html";
   }
 
@@ -35,56 +29,20 @@ class StandardHtmlResource {
     );
   }
 
-  async serve(url, request) {
-    const { config, context } = this.compilation;
-    const { userWorkspace } = context;
+  async serve(url, request, response) {
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find((node) => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
     const { pageHref } = matchingRoute;
-    const filePath =
-      !matchingRoute.external && pageHref
-        ? new URL(pageHref).pathname.replace(userWorkspace.pathname, "./")
-        : "";
-    const isMarkdownContent = (filePath || "").split(".").pop() === "md";
+    const initContents = (await response?.text()) ?? "";
     let body = "";
     let layout = matchingRoute.layout || null;
     let customImports = matchingRoute.imports || [];
     let ssrBody;
     let ssrLayout;
-    let processedMarkdown = null;
 
     if (matchingRoute.external) {
       layout = matchingRoute.layout || layout;
-    }
-
-    if (isMarkdownContent) {
-      const markdownContents = await fs.readFile(new URL(pageHref), "utf-8");
-      const rehypePlugins = [];
-      const remarkPlugins = [];
-
-      for (const plugin of config.markdown.plugins) {
-        const name = typeof plugin === "string" ? plugin : plugin.name;
-        const options = plugin?.options ?? null;
-        const pluginTypeArray = name.indexOf("rehype-") >= 0 ? rehypePlugins : remarkPlugins;
-        const pluginImport = (await import(name)).default;
-
-        if (options) {
-          pluginTypeArray.push([pluginImport, options]);
-        } else {
-          pluginTypeArray.push(pluginImport);
-        }
-      }
-
-      processedMarkdown = await unified()
-        .use(remarkParse) // parse markdown into AST
-        .use(remarkFrontmatter) // extract frontmatter from AST
-        .use(remarkPlugins) // apply userland remark plugins
-        .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
-        .use(rehypeRaw) // support mixed HTML in markdown
-        .use(rehypePlugins) // apply userland rehype plugins
-        .use(rehypeStringify) // convert AST to HTML string
-        .process(markdownContents);
     }
 
     if (matchingRoute.isSSR) {
@@ -133,27 +91,7 @@ class StandardHtmlResource {
     body = await getAppLayout(body, this.compilation, customImports, matchingRoute);
     body = await getUserScripts(body, this.compilation);
 
-    if (processedMarkdown) {
-      const wrappedCustomElementRegex =
-        /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
-      const ceTest = wrappedCustomElementRegex.test(processedMarkdown.value);
-
-      if (ceTest) {
-        const ceMatches = processedMarkdown.value.match(wrappedCustomElementRegex);
-
-        ceMatches.forEach((match) => {
-          const stripWrappingTags = match.replace("<p>", "").replace("</p>", "");
-
-          processedMarkdown.value = processedMarkdown.value.replace(match, stripWrappingTags);
-        });
-      }
-
-      // https://github.com/ProjectEvergreen/greenwood/issues/1126
-      body = body.replace(
-        /<content-outlet>(.*)<\/content-outlet>/s,
-        processedMarkdown.value.replace(/\$/g, "$$$"),
-      );
-    } else if (matchingRoute.external) {
+    if (matchingRoute.external) {
       body = body.replace(/<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
     } else if (ssrBody) {
       body = body.replace(
@@ -162,9 +100,8 @@ class StandardHtmlResource {
       );
     }
 
-    // clean up any empty placeholder content-outlet
     if (body.indexOf("<content-outlet></content-outlet>") > 0) {
-      body = body.replace("<content-outlet></content-outlet>", "");
+      body = body.replace("<content-outlet></content-outlet>", initContents);
     }
 
     return new Response(body, {

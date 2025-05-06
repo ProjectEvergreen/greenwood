@@ -10,6 +10,7 @@
  *
  * User Config
  * {
+ *   plugins: [greenwoodPluginMarkdown()]
  *   prerender: true
  * }
  *
