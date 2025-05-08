@@ -349,15 +349,15 @@ async function getHybridServer(compilation) {
         let html;
 
         if (matchingRoute.isolation || isolationMode) {
-          // eslint-disable-next-line no-async-promise-executor
-          await new Promise(async (resolve, reject) => {
+          // "faux" new Request here, a better way?
+          const request = await requestAsObject(new Request(url));
+
+          await new Promise((resolve, reject) => {
             const worker = new Worker(
               new URL("../lib/ssr-route-worker-isolation-mode.js", import.meta.url),
             );
-            // "faux" new Request here, a better way?
-            const request = await requestAsObject(new Request(url));
 
-            worker.on("message", async (result) => {
+            worker.on("message", (result) => {
               html = result;
 
               resolve();
@@ -392,13 +392,13 @@ async function getHybridServer(compilation) {
         let body, status, headers, statusText;
 
         if (apiRoute.isolation || isolationMode) {
-          // eslint-disable-next-line no-async-promise-executor
-          await new Promise(async (resolve, reject) => {
-            const worker = new Worker(new URL("../lib/api-route-worker.js", import.meta.url));
-            // "faux" new Request here, a better way?
-            const req = await requestAsObject(request);
+          // "faux" new Request here, a better way?
+          const req = await requestAsObject(request);
 
-            worker.on("message", async (result) => {
+          await new Promise((resolve, reject) => {
+            const worker = new Worker(new URL("../lib/api-route-worker.js", import.meta.url));
+
+            worker.on("message", (result) => {
               const responseAsObject = result;
 
               body = responseAsObject.body;
