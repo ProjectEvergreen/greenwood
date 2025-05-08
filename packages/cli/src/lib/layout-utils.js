@@ -88,8 +88,7 @@ async function getPageLayout(pageHref = "", compilation, layout) {
       .find((plugin) => plugin.type === "renderer")
       .provider().executeModuleUrl;
 
-    // eslint-disable-next-line no-async-promise-executor
-    await new Promise(async (resolve, reject) => {
+    await new Promise((resolve, reject) => {
       const worker = new Worker(new URL("./ssr-route-worker.js", import.meta.url));
 
       worker.on("message", (result) => {
@@ -141,8 +140,7 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
       .find((plugin) => plugin.type === "renderer")
       .provider().executeModuleUrl;
 
-    // eslint-disable-next-line no-async-promise-executor
-    await new Promise(async (resolve, reject) => {
+    await new Promise((resolve, reject) => {
       const worker = new Worker(new URL("./ssr-route-worker.js", import.meta.url));
 
       worker.on("message", (result) => {

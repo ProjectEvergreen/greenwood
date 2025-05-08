@@ -1,28 +1,19 @@
 import fs from "fs/promises";
 
 const ejectConfiguration = async (compilation) => {
-  // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve, reject) => {
-    try {
-      const configFileDirUrl = new URL("../config/", import.meta.url);
-      const configFiles = await fs.readdir(configFileDirUrl);
+  const configFileDirUrl = new URL("../config/", import.meta.url);
+  const configFiles = await fs.readdir(configFileDirUrl);
 
-      for (const file of configFiles) {
-        const from = new URL(`./${file}`, configFileDirUrl);
-        const to = new URL(`./${file}`, compilation.context.projectDirectory);
+  for (const file of configFiles) {
+    const from = new URL(`./${file}`, configFileDirUrl);
+    const to = new URL(`./${file}`, compilation.context.projectDirectory);
 
-        await fs.copyFile(from, to);
+    await fs.copyFile(from, to);
 
-        console.log(`Ejected ${file} successfully.`);
-      }
+    console.log(`Ejected ${file} successfully.`);
+  }
 
-      console.debug("all configuration files ejected.");
-
-      resolve();
-    } catch (err) {
-      reject(err);
-    }
-  });
+  console.debug("all configuration files ejected.");
 };
 
 export { ejectConfiguration };
