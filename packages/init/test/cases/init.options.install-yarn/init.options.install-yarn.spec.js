@@ -16,6 +16,7 @@ import fs from "fs";
 import path from "path";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { fileURLToPath } from "url";
 
 const expect = chai.expect;
 
@@ -23,7 +24,7 @@ describe("Initialize a new Greenwood project: ", function () {
   const LABEL = "Scaffolding a new project with dependencies installed through Yarn";
   const APP_NAME = "my-app";
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
-  const outputPath = path.dirname(new URL(import.meta.url).pathname);
+  const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
   const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
   let runner;
 
@@ -35,7 +36,7 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   describe(LABEL, function () {
-    before(async function () {
+    before(function () {
       runner.setup(outputPath);
       runner.runCommand(initPath, ["--name", APP_NAME, "--install", "yarn"]);
     });

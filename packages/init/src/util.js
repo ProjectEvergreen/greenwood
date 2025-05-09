@@ -57,7 +57,7 @@ function installDependencies(outputDirUrl, packageManager) {
   const command = os.platform() === "win32" ? `${packageManager}.cmd` : packageManager;
   const args = ["install", "--loglevel", "error"];
 
-  spawn(command, args, { stdio: "inherit", cwd: outputDirUrl });
+  spawn(command, args, { stdio: "inherit", cwd: outputDirUrl, shell: true });
 }
 
 export { copyTemplate, installDependencies, setupPackageJson, setupGitIgnore };
