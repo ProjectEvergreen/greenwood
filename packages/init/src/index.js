@@ -95,7 +95,7 @@ async function init() {
         choices: [
           ...PACKAGE_MANAGERS,
           {
-            name: "no",
+            name: "no (I will install dependencies myself)",
             value: "no",
           },
         ],
