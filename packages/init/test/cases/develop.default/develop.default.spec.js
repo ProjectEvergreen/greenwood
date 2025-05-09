@@ -16,6 +16,7 @@ import { JSDOM } from "jsdom";
 import path from "path";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { fileURLToPath } from "url";
 
 const expect = chai.expect;
 
@@ -23,7 +24,7 @@ describe("Initialize a new Greenwood project: ", function () {
   const LABEL = "Scaffold Greenwood with default options and run the development server";
   const APP_NAME = "my-app";
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
-  const outputPath = path.dirname(new URL(import.meta.url).pathname);
+  const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
   const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
   const hostname = "http://localhost";
   const port = 1984;

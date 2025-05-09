@@ -15,13 +15,14 @@ import chai from "chai";
 import fs from "fs";
 import path from "path";
 import { Runner } from "gallinago";
+import { fileURLToPath } from "url";
 
 const expect = chai.expect;
 
 describe("Initialize a new Greenwood project: ", function () {
   const APP_NAME = "my-app";
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
-  const outputPath = path.dirname(new URL(import.meta.url).pathname);
+  const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
   const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
   let runner;
 
@@ -33,7 +34,7 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   describe("Scaffolding a new project with default options", function () {
-    before(async function () {
+    before(function () {
       runner.setup(outputPath);
       runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
     });
