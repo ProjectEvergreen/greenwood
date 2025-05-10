@@ -30,7 +30,7 @@ async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {
   return customLayoutLocations;
 }
 
-async function getPageLayout(pageHref = "", compilation, layout) {
+async function getPageLayout(pageHref = "", compilation, layout, pageContents = "") {
   const { config, context } = compilation;
   const { layoutsDir, userLayoutsDir, pagesDir } = context;
   const filePathUrl = pageHref && pageHref !== "" ? new URL(pageHref) : pageHref;
@@ -66,6 +66,14 @@ async function getPageLayout(pageHref = "", compilation, layout) {
       customPluginPageLayouts.length > 0
         ? await fs.readFile(new URL(`./${layout}.html`, customPluginPageLayouts[0]), "utf-8")
         : await fs.readFile(new URL(`./${layout}.html`, userLayoutsDir), "utf-8");
+
+    // handle HTML pages with a custom frontmatter layout
+    if (isHtmlPage && pageContents !== "") {
+      contents = contents.replace(
+        /<content-outlet>(.*)<\/content-outlet>/s,
+        pageContents.replace(/\$/g, "$$$"),
+      );
+    }
   } else if (isHtmlPage) {
     // if the page is already HTML, use that as the layout, NOT accounting for 404 pages
     contents = await fs.readFile(filePathUrl, "utf-8");
