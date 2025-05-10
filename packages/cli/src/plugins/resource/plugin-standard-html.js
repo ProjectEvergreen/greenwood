@@ -47,6 +47,7 @@ class StandardHtmlResource {
         ? new URL(pageHref).pathname.replace(userWorkspace.pathname, "./")
         : "";
     const isMarkdownContent = (filePath || "").split(".").pop() === "md";
+    const isHtmlContent = (filePath || "").split(".").pop() === "html";
     let body = "";
     let layout = matchingRoute.layout || null;
     let customImports = matchingRoute.imports || [];
@@ -85,9 +86,20 @@ class StandardHtmlResource {
         .use(rehypePlugins) // apply userland rehype plugins
         .use(rehypeStringify) // convert AST to HTML string
         .process(markdownContents);
-    }
+    } else if (isHtmlContent && matchingRoute.layout) {
+      // pre-process a page body with a custom layout to extract out the frontmatter
+      const pageContents = await fs.readFile(new URL(matchingRoute.pageHref), "utf-8");
 
-    if (matchingRoute.isSSR) {
+      body = String(
+        await unified()
+          .use(remarkParse) // parse markdown into AST
+          .use(remarkFrontmatter) // extract frontmatter from AST
+          .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
+          .use(rehypeRaw) // support mixed HTML in markdown
+          .use(rehypeStringify) // convert AST to HTML string
+          .process(pageContents),
+      );
+    } else if (matchingRoute.isSSR) {
       const routeModuleLocationUrl = new URL(pageHref);
       const routeWorkerUrl = this.compilation.config.plugins
         .find((plugin) => plugin.type === "renderer")
@@ -127,7 +139,7 @@ class StandardHtmlResource {
     if (isSpaRoute) {
       body = await fs.readFile(new URL(isSpaRoute.pageHref), "utf-8");
     } else {
-      body = ssrLayout ? ssrLayout : await getPageLayout(pageHref, this.compilation, layout);
+      body = ssrLayout ? ssrLayout : await getPageLayout(pageHref, this.compilation, layout, body);
     }
 
     body = await getAppLayout(body, this.compilation, customImports, matchingRoute);
