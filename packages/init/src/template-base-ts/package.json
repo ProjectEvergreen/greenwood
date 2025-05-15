@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "greenwood develop",
-    "start": "greenwood develop",
-    "build": "greenwood build",
+    "dev": "NODE_OPTIONS='--experimental-strip-types' greenwood develop",
+    "start": "NODE_OPTIONS='--experimental-strip-types' greenwood develop",
+    "build": "NODE_OPTIONS='--experimental-strip-types' greenwood build",
     "serve": "greenwood serve"
   },
   "devDependencies": {
