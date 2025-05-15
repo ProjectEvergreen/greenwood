@@ -40,7 +40,7 @@ describe("Initialize a new Greenwood project: ", function () {
   describe(LABEL, function () {
     before(function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, ["--name", APP_NAME]);
+      runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
     });
 
     describe("should run the Greenwood dev server", function () {

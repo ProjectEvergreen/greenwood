@@ -56,9 +56,7 @@ async function init() {
       )
       .parse(process.argv)
       .opts();
-    const hasOptions = Object.keys(options).length > 0;
 
-    // prompt user for all options not passed in via the CLI
     const appName = options.name
       ? options.name
       : await input({
@@ -66,11 +64,8 @@ async function init() {
           default: DEFAULTS.name,
         });
 
-    // if user is started providing options, favor the CLI, otherwise prompt
-    const isTS = hasOptions
-      ? options.ts
-        ? options.ts
-        : DEFAULTS.ts
+    const isTS = options?.ts
+      ? options.ts === "yes"
       : await select({
           message: "Setup TypeScript?",
           choices: [
@@ -85,22 +80,18 @@ async function init() {
           ],
         });
 
-    let packageManager;
-
-    if (hasOptions) {
-      packageManager = options.install ?? DEFAULTS.install;
-    } else {
-      packageManager = await select({
-        message: "Install Dependencies?",
-        choices: [
-          ...PACKAGE_MANAGERS,
-          {
-            name: "no (I will install dependencies myself)",
-            value: "no",
-          },
-        ],
-      });
-    }
+    const packageManager = options?.install
+      ? options.install
+      : await select({
+          message: "Install Dependencies?",
+          choices: [
+            ...PACKAGE_MANAGERS,
+            {
+              name: "no (I will install dependencies myself)",
+              value: "no",
+            },
+          ],
+        });
 
     // determine source (template) and output locations
     const templateDirUrl =

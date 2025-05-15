@@ -38,7 +38,7 @@ describe("Initialize a new Greenwood project: ", function () {
   describe(LABEL, function () {
     before(function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, ["--name", APP_NAME, "--install", "npm"]);
+      runner.runCommand(initPath, ["--name", APP_NAME, "--install", "npm", "--ts", "no"]);
     });
 
     describe("should install with npm", function () {
