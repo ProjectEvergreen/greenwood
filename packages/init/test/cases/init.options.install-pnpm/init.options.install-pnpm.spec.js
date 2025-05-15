@@ -32,13 +32,13 @@ describe("Initialize a new Greenwood project: ", function () {
     this.context = {
       publicDir: path.join(initOutputPath, "public"),
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, ["--name", APP_NAME, "--install", "pnpm"]);
+      runner.runCommand(initPath, ["--name", APP_NAME, "--install", "pnpm", "--ts", "no"]);
     });
 
     describe("should install with pnpm", function () {
