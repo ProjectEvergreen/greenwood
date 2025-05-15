@@ -30,13 +30,13 @@ describe("Initialize a new Greenwood project: ", function () {
     this.context = {
       publicDir: outputPath,
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
-  describe("Scaffolding a new project with default options", function () {
+  describe("Scaffolding a new project with TypeScript option", function () {
     before(function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "yes"]);
+      runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "yes", "--install", "no"]);
     });
 
     describe("project files and folders", () => {
@@ -80,8 +80,12 @@ describe("Initialize a new Greenwood project: ", function () {
     describe("initial package.json contents", function () {
       let pkgJson;
 
-      before(async function () {
+      before(function () {
         pkgJson = JSON.parse(fs.readFileSync(path.join(initOutputPath, "package.json"), "utf-8"));
+      });
+
+      it("the should have the correct name", function () {
+        expect(pkgJson.name).to.equal(APP_NAME);
       });
 
       it("the should have the correct Greenwood scripts", function () {
