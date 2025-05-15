@@ -138,7 +138,27 @@ async function init() {
 
     installDependencies(outputDirUrl, packageManager);
 
-    // TODO: next steps / instructions
+    // provide any next steps to the user
+    const instructions = [];
+
+    if (appName !== ".") {
+      instructions.push(`Run \`cd ${appName}\``);
+    }
+
+    if (packageManager === "no") {
+      instructions.push(`Install dependencies with your preferred package manager`);
+      instructions.push(`Run the dev script`);
+    } else {
+      instructions.push(`Run \`${packageManager} run dev\` to start the dev server`);
+    }
+
+    if (instructions.length > 0) {
+      console.log(`${chalk.rgb(175, 207, 71)("--- Next Steps ---")}`);
+
+      instructions.forEach((instruction, idx) => {
+        console.log(`${chalk.rgb(175, 207, 71)(`${idx + 1}) ${instruction}`)}`);
+      });
+    }
   } catch (e) {
     console.log(
       `${chalk.rgb(255, 0, 0)("Sorry, there was an error trying to initialize your project")}`,
