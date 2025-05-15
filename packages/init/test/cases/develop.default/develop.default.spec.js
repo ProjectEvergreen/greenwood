@@ -6,116 +6,95 @@
  * Should scaffold from template and start the development server and render the template.
  *
  * User Command
- * @greenwood/init --install && greenwood develop
+ * @greenwood/init --name my-app && greenwood develop
  *
  * User Workspace
  * N / A
  */
 import chai from "chai";
-import fs from "fs";
 import { JSDOM } from "jsdom";
 import path from "path";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath } from "url";
 
 const expect = chai.expect;
 
-// https://github.com/ProjectEvergreen/greenwood/issues/787
-xdescribe("Scaffold Greenwood and Run Develop command: ", function () {
+describe("Initialize a new Greenwood project: ", function () {
+  const LABEL = "Scaffold Greenwood with default options and run the development server";
+  const APP_NAME = "my-app";
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
-  const outputPath = fileURLToPath(new URL("./my-app", import.meta.url));
+  const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
+  const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
+  const hostname = "http://localhost";
+  const port = 1984;
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      hostname: `${hostname}:${port}`,
     };
     runner = new Runner();
   });
 
-  describe("default minimal template", function () {
+  describe(LABEL, function () {
     before(function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, "--install");
+      runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
     });
 
-    describe("Develop Greenwood With: ", function () {
-      const LABEL = "Default Greenwood Configuration and Workspace";
+    describe("should run the Greenwood dev server", function () {
       const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
-      const hostname = "http://localhost";
-      const port = 1984;
-      let runner;
 
-      before(function () {
-        this.context = {
-          hostname: `${hostname}:${port}`,
-        };
-        runner = new Runner();
+      before(async function () {
+        runner.setup(initOutputPath);
+
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve();
+          }, 5000);
+
+          runner.runCommand(cliPath, "develop", { async: true });
+        });
       });
 
-      describe(LABEL, function () {
+      runSmokeTest(["serve"], LABEL);
+
+      describe("Develop command specific HTML behaviors", function () {
+        let response = {};
+        let dom;
+
         before(async function () {
-          runner.setup(outputPath);
+          response = await fetch(`${hostname}:${port}/`);
+          const data = await response.text();
 
-          return new Promise((resolve) => {
-            setTimeout(() => {
-              resolve();
-            }, 5000);
-
-            runner.runCommand(cliPath, "develop", { async: true });
-          });
+          dom = new JSDOM(data);
         });
 
-        runSmokeTest(["serve"], LABEL);
-
-        it("should generate a package-lock.json file", function () {
-          expect(fs.existsSync(path.join(outputPath, "package-lock.json"))).to.be.true;
+        it("should return the correct content type", function (done) {
+          expect(response.headers.get("content-type")).to.equal("text/html");
+          done();
         });
 
-        it("should not generate a yarn.lock file", function () {
-          expect(fs.existsSync(path.join(outputPath, "yarn.lock"))).to.be.false;
+        it("should return a 200", function (done) {
+          expect(response.status).to.equal(200);
+
+          done();
         });
 
-        it("should not generate a public directory", function () {
-          expect(fs.existsSync(path.join(outputPath, "public"))).to.be.false;
-        });
+        it("should display default project title", function (done) {
+          const title = dom.window.document.querySelector("head > title");
 
-        describe("Develop command specific HTML behaviors", function () {
-          let response = {};
-          let dom;
+          expect(title.textContent).to.equal("Greenwood");
 
-          before(async function () {
-            response = await fetch(`${hostname}:${port}`);
-            const data = await response.text();
-            dom = new JSDOM(data);
-          });
-
-          it("should return the correct content type", function (done) {
-            expect(response.headers.get("content-type")).to.equal("text/html");
-            done();
-          });
-
-          it("should return a 200", function (done) {
-            expect(response.status).to.equal(200);
-
-            done();
-          });
-
-          it("should display default project title", function (done) {
-            const title = dom.window.document.querySelector("head > title");
-
-            expect(title.textContent).to.equal("Greenwood");
-
-            done();
-          });
-        });
-
-        after(function () {
-          runner.stopCommand();
-          runner.teardown([outputPath]);
+          done();
         });
       });
     });
+  });
+
+  after(function () {
+    runner.stopCommand();
+    runner.teardown([initOutputPath]);
   });
 });
