@@ -30,7 +30,7 @@ describe("Initialize a new Greenwood project: ", function () {
     this.context = {
       publicDir: outputPath,
     };
-    runner = new Runner(true);
+    runner = new Runner();
   });
 
   describe("Scaffolding a new project with TypeScript option", function () {
@@ -91,9 +91,9 @@ describe("Initialize a new Greenwood project: ", function () {
       it("the should have the correct Greenwood scripts", function () {
         const scripts = pkgJson.scripts;
 
-        expect(scripts.dev).to.equal("greenwood develop");
+        expect(scripts.dev).to.equal("NODE_OPTIONS='--experimental-strip-types' greenwood develop");
         expect(scripts.start).to.equal(scripts.dev);
-        expect(scripts.build).to.equal("greenwood build");
+        expect(scripts.build).to.equal("NODE_OPTIONS='--experimental-strip-types' greenwood build");
         expect(scripts.serve).to.equal("greenwood serve");
       });
 
