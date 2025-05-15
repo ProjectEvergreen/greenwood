@@ -1,12 +1,12 @@
 /*
  * Use Case
- * Scaffold from minimal template with the current working directory as the project name flag.
+ * Scaffold from minimal template accepting all default options.
  *
  * User Result
  * Should scaffold from template build.
  *
  * User Command
- * * npx @greenwood/init --name=.
+ * npx @greenwood/init --yes
  *
  * User Workspace
  * N / A
@@ -20,7 +20,7 @@ import { fileURLToPath } from "url";
 const expect = chai.expect;
 
 describe("Initialize a new Greenwood project: ", function () {
-  const APP_NAME = ".";
+  const APP_NAME = "my-app";
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
   const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
   const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
@@ -33,10 +33,10 @@ describe("Initialize a new Greenwood project: ", function () {
     runner = new Runner();
   });
 
-  describe("Scaffolding a new project in the current directory", function () {
-    before(async function () {
+  describe("Scaffolding a new project accepting all default options", function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
+      runner.runCommand(initPath, ["--yes"]);
     });
 
     describe("project files and folders", () => {
@@ -50,6 +50,12 @@ describe("Initialize a new Greenwood project: ", function () {
 
       it("should generate a package.json file", function () {
         expect(fs.existsSync(path.join(initOutputPath, "package.json"))).to.be.true;
+      });
+
+      it("should not generate a .npmrc file", function () {
+        const npmrcPath = path.join(initOutputPath, ".npmrc");
+
+        expect(fs.existsSync(npmrcPath)).to.be.false;
       });
 
       it("should not generate a package-lock.json file", function () {
@@ -77,7 +83,7 @@ describe("Initialize a new Greenwood project: ", function () {
       });
 
       it("the should have the correct name", function () {
-        expect(pkgJson.name).to.equal("init.options.name-cwd");
+        expect(pkgJson.name).to.equal(APP_NAME);
       });
 
       it("the should have the correct Greenwood scripts", function () {
@@ -128,10 +134,6 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   after(function () {
-    runner.teardown([
-      path.join(initOutputPath, ".gitignore"),
-      path.join(initOutputPath, "package.json"),
-      path.join(initOutputPath, "src/"),
-    ]);
+    runner.teardown([initOutputPath]);
   });
 });

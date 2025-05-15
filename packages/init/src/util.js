@@ -26,10 +26,18 @@ function setupPackageJson(outputDirUrl, { name, version }) {
 
   const packageJsonUrl = new URL("./package.json", outputDirUrl);
   const json = JSON.parse(fs.readFileSync(packageJsonUrl));
+  const devDeps = json.devDependencies;
 
-  json.name = name === "." ? path.basename(packageJsonUrl.pathname) : name;
+  json.name = name === "." ? path.basename(outputDirUrl.pathname) : name;
   json.version = version;
-  json.devDependencies["@greenwood/cli"] = `~${version}`;
+
+  // ensure all Greenwood deps have their version set to the version from the CLI's package.json
+  for (const dep in devDeps) {
+    if (dep.startsWith("@greenwood/")) {
+      // we should change this to a ^ once Greenwood reaches 1.0
+      json.devDependencies[dep] = `~${version}`;
+    }
+  }
 
   fs.writeFileSync(packageJsonUrl, JSON.stringify(json, null, 2));
 }

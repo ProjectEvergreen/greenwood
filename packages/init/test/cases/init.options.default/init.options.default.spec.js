@@ -78,8 +78,12 @@ describe("Initialize a new Greenwood project: ", function () {
     describe("initial package.json contents", function () {
       let pkgJson;
 
-      before(async function () {
+      before(function () {
         pkgJson = JSON.parse(fs.readFileSync(path.join(initOutputPath, "package.json"), "utf-8"));
+      });
+
+      it("the should have the correct name", function () {
+        expect(pkgJson.name).to.equal(APP_NAME);
       });
 
       it("the should have the correct Greenwood scripts", function () {

@@ -47,7 +47,7 @@ async function init() {
     const options = program
       .name(name)
       .version(version)
-      // TODO ? .usage(`${chalk.green("<application-directory>")} [options]`)
+      .option("--yes", "Accept all default options")
       .option("--name <name>", "Name and directory location to scaffold your application with")
       .option("--ts <choice>", "Configure the project for TypeScript (yes/no)")
       .option(
@@ -57,41 +57,47 @@ async function init() {
       .parse(process.argv)
       .opts();
 
-    const appName = options.name
-      ? options.name
-      : await input({
-          message: "What is the name of your app? (enter . to use the current directory)",
-          default: DEFAULTS.name,
-        });
+    const appName = options?.yes
+      ? DEFAULTS.name
+      : options.name
+        ? options.name
+        : await input({
+            message: "What is the name of your app? (enter . to use the current directory)",
+            default: DEFAULTS.name,
+          });
 
-    const isTS = options?.ts
-      ? options.ts === "yes"
-      : await select({
-          message: "Setup TypeScript?",
-          choices: [
-            {
-              name: "Yes",
-              value: "yes",
-            },
-            {
-              name: "No",
-              value: "no",
-            },
-          ],
-        });
+    const isTS = options?.yes
+      ? DEFAULTS.ts
+      : options?.ts
+        ? options.ts
+        : await select({
+            message: "Setup TypeScript?",
+            choices: [
+              {
+                name: "Yes",
+                value: "yes",
+              },
+              {
+                name: "No",
+                value: "no",
+              },
+            ],
+          });
 
-    const packageManager = options?.install
-      ? options.install
-      : await select({
-          message: "Install Dependencies?",
-          choices: [
-            ...PACKAGE_MANAGERS,
-            {
-              name: "no (I will install dependencies myself)",
-              value: "no",
-            },
-          ],
-        });
+    const packageManager = options.yes
+      ? DEFAULTS.install
+      : options?.install
+        ? options.install
+        : await select({
+            message: "Install Dependencies?",
+            choices: [
+              ...PACKAGE_MANAGERS,
+              {
+                name: "no (I will install dependencies myself)",
+                value: "no",
+              },
+            ],
+          });
 
     // determine source (template) and output locations
     const templateDirUrl =
