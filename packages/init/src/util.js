@@ -1,7 +1,7 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { spawn } from "child_process";
+import { spawnSync } from "child_process";
 
 function copyTemplate(templateDirUrl, outputDirUrl) {
   console.log("copying project files to => ", outputDirUrl.pathname);
@@ -76,7 +76,7 @@ function installDependencies(outputDirUrl, packageManager) {
     fs.writeFileSync(new URL("./.npmrc", outputDirUrl), npmrcContents);
   }
 
-  spawn(command, args, { stdio: "inherit", cwd: outputDirUrl, shell: true });
+  spawnSync(command, args, { stdio: "inherit", cwd: outputDirUrl, shell: true });
 }
 
 export { copyTemplate, installDependencies, setupPackageJson, setupGitIgnore };
