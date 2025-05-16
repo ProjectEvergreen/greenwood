@@ -32,7 +32,7 @@ async function executeRouteModule({
     } = module;
 
     if (module.default) {
-      const { html } = await renderToString(new URL(moduleUrl), false, request);
+      const { html } = await renderToString(new URL(moduleUrl), false, { request, compilation });
 
       data.body = html;
     } else {
