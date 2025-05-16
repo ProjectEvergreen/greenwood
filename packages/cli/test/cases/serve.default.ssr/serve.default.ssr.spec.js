@@ -460,11 +460,18 @@ describe("Serve Greenwood With: ", function () {
         expect(heading[0].textContent).to.not.be.undefined;
       });
 
-      it("should have the expected body as a <p> tag in the body", function () {
+      it("should have the expected content as a <p> tag in the body", function () {
         const paragraph = dom.window.document.querySelectorAll("body > p");
 
         expect(paragraph.length).to.equal(1);
         expect(paragraph[0].textContent).to.not.be.undefined;
+      });
+
+      it("should have the expected content as a <p> tag in the body", function () {
+        const span = dom.window.document.querySelectorAll("body > span");
+
+        expect(span.length).to.equal(1);
+        expect(span[0].textContent).to.equal("Number of Blog Pages: 2");
       });
     });
 

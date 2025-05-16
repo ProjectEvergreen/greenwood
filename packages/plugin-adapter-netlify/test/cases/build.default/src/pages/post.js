@@ -1,5 +1,5 @@
 export default class PostPage extends HTMLElement {
-  constructor(request) {
+  constructor({ request }) {
     super();
 
     const params = new URLSearchParams(request.url.slice(request.url.indexOf("?")));
