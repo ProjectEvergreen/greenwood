@@ -4,7 +4,7 @@ import type { Page } from "./content.js";
 
 // would be nice if we could enforce the user is using `extends HTMLElement`
 export type SsrRouteHandler = {
-  constructor?(compilation: Compilation, request: Request): string;
+  constructor?({ compilation: Compilation, request: Request }): void;
 };
 
 export type GetBody = (compilation: Compilation, page: Page, request: Request) => Promise<string>;
