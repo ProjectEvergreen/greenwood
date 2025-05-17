@@ -2,6 +2,7 @@
   "name": "test-develop-command-default",
   "type": "module",
   "dependencies": {
+    "@beforesemicolon/markup": "^1.14.1",
     "@shoelace-style/shoelace": "^2.18.0",
     "@spectrum-css/card": "^9.3.0",
     "@spectrum-web-components/action-menu": "^1.0.1",
