@@ -1,4 +1,6 @@
 {
+  "@beforesemicolon/markup": "/~/Users/owenbuckley/Workspace/github/greenwood-markup-todo-app/node_modules/@beforesemicolon/markup/dist/esm/index.js",
+  "@beforesemicolon/html-parser": "/~/Users/owenbuckley/Workspace/github/greenwood-markup-todo-app/node_modules/@beforesemicolon/html-parser/dist/esm/index.js",
   "@shoelace-style/shoelace": "/~/Users/owenbuckley/Workspace/project-evergreen/greenwood/node_modules/@shoelace-style/shoelace/dist/shoelace.js",
   "@shoelace-style/shoelace/dist/custom-elements.json": "/~/Users/owenbuckley/Workspace/project-evergreen/greenwood/node_modules/@shoelace-style/shoelace/dist/custom-elements.json",
   "@shoelace-style/shoelace/dist/shoelace.js": "/~/Users/owenbuckley/Workspace/project-evergreen/greenwood/node_modules/@shoelace-style/shoelace/dist/shoelace.js",
