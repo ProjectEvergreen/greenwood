@@ -232,6 +232,10 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
           // filter out for just supported top level conditions
           // https://unpkg.com/browse/d3@7.9.0/package.json
           updateImportMap(dependency, `${exports[sub]}`, resolvedRoot);
+
+          // make sure we bail out so a later condition (e.g. default) does not overwrite an earlier one (e.g. import)
+          // https://app.unpkg.com/@beforesemicolon/markup@1.14.1/files/package.json#L10
+          break;
         } else {
           // let all other conditions "pass through" as is
           updateImportMap(`${dependency}/${sub}`, `${exports[sub]}`, resolvedRoot);
