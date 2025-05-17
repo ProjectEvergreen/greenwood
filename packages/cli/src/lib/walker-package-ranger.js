@@ -9,7 +9,7 @@ const diagnostics = new Map();
 
 function updateImportMap(key, value, resolvedRoot) {
   importMap.set(
-    key.replace("./", ""),
+    key.replace("./", "").replace(/\/\//g, "/"),
     `${IMPORT_MAP_RESOLVED_PREFIX}${resolvedRoot.replace("file://", "")}${value.replace("./", "")}`,
   );
 }
@@ -77,40 +77,6 @@ function derivePackageRoot(resolved) {
   return root !== "" ? root : null;
 }
 
-// helper function to convert export patterns to a regex (thanks ChatGPT :D)
-function globToRegex(pattern) {
-  // Escape special regex characters
-  pattern = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&");
-
-  // Replace glob `*` with regex `[^/]*` (any characters except slashes)
-  pattern = pattern.replace(/\*/g, "[^/]*");
-
-  // Replace glob `**` with regex `(.*)` (zero or more directories or files)
-  // pattern = pattern.replace(/\*\*/g, '(.*)');
-
-  // Return the final regex
-  return new RegExp("^" + pattern + "$");
-}
-
-// helper function to convert path to its lowest common root
-// e.g. ./img/path/*/index.js -> /img/path
-// https://unpkg.com/browse/@uswds/uswds@3.10.0/package.json
-function patternRoot(pattern) {
-  const segments = pattern.split("/").filter((segment) => segment !== ".");
-  let root = "";
-
-  for (const segment of segments) {
-    // is there a better way to fuzzy test for a filename other than checking for a dot?
-    if (segment.indexOf("*") < 0 && segment.indexOf(".") < 0) {
-      root += `/${segment}`;
-    } else {
-      break;
-    }
-  }
-
-  return root;
-}
-
 /*
  * https://nodejs.org/api/packages.html#subpath-patterns
  *
@@ -121,43 +87,17 @@ function patternRoot(pattern) {
  *  "./*": { "default": "./dist/*.ts.js" } - https://unpkg.com/browse/signal-utils@0.21.1/package.json
  */
 async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
-  // find the "deepest" segment we can start from to avoid unnecessary file scanning / crawling
-  const rootSubOffset = patternRoot(sub);
-  const rootSubValueOffset = patternRoot(subValue);
+  const matches = fs.promises.glob(
+    subValue.startsWith("/") ? subValue.replace("/", "") : subValue,
+    { cwd: new URL(resolvedRoot).pathname },
+  );
 
-  // ideally we can use fs.glob when it comes out of experimental
-  // https://nodejs.org/docs/latest-v22.x/api/fs.html#fspromisesglobpattern-options
-  function walkDirectoryForExportPatterns(directoryUrl) {
-    const filesInDir = fs.readdirSync(directoryUrl);
+  for await (const match of matches) {
+    const filePathUrl = new URL(`./${match}`, resolvedRoot);
+    const relativePath = filePathUrl.href.replace(resolvedRoot, "");
 
-    filesInDir.forEach((file) => {
-      const filePathUrl = new URL(`./${file}`, directoryUrl);
-      const stat = fs.statSync(filePathUrl);
-      const pattern = `${resolvedRoot}${subValue.replace("./", "")}`;
-      const regexPattern = globToRegex(pattern);
-
-      if (stat.isDirectory()) {
-        walkDirectoryForExportPatterns(new URL(`./${file}/`, directoryUrl));
-      } else if (regexPattern.test(filePathUrl.href)) {
-        const relativePath = filePathUrl.href.replace(resolvedRoot, "");
-        // naive way to offset a subValue pattern to the sub pattern when dealing with wildcards
-        // ex. "./js/*": "./packages/*/src/index.js" -> /js/<package-name>/src/index.js
-        const rootSubRelativePath = sub.endsWith("*")
-          ? `./${relativePath}`
-              .replace(subValue.split("*")[0], "")
-              .replace(subValue.split("*")[1], "")
-          : relativePath.replace(rootSubValueOffset, "");
-
-        updateImportMap(
-          `${dependency}${rootSubOffset}/${rootSubRelativePath}`,
-          relativePath,
-          resolvedRoot,
-        );
-      }
-    });
+    updateImportMap(`${dependency}/${match}`, relativePath, resolvedRoot);
   }
-
-  walkDirectoryForExportPatterns(new URL(`.${rootSubValueOffset}/`, resolvedRoot));
 }
 
 function trackExportConditions(dependency, exports, sub, condition, resolvedRoot) {
