@@ -31,7 +31,7 @@ async function getLayout(compilation, { route }) {
 }
 
 async function getBody(compilation) {
-  const artists = await fetch("http://www.analogstudios.net/api/v2/artists").then((resp) =>
+  const artists = await fetch("https://www.analogstudios.net/api/artists").then((resp) =>
     resp.json(),
   );
   const timestamp = new Date().getTime();
