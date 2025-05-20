@@ -88,6 +88,10 @@ describe("Initialize a new Greenwood project: ", function () {
         expect(pkgJson.name).to.equal(APP_NAME);
       });
 
+      it("the should have the correct type", function () {
+        expect(pkgJson.type).to.equal("module");
+      });
+
       it("the should have the correct Greenwood scripts", function () {
         const scripts = pkgJson.scripts;
 

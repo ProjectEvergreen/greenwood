@@ -76,6 +76,10 @@ describe("Initialize a new Greenwood project: ", function () {
         pkgJson = JSON.parse(fs.readFileSync(path.join(initOutputPath, "package.json"), "utf-8"));
       });
 
+      it("the should have the correct type", function () {
+        expect(pkgJson.type).to.equal("module");
+      });
+
       it("the should have the correct name", function () {
         expect(pkgJson.name).to.equal(APP_NAME);
       });
