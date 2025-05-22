@@ -44,12 +44,14 @@ async function init() {
       `${chalk.rgb(175, 207, 71)("-------------------------------------------------------")}`,
     );
 
+    // add support for short commands, e.g. --yes, --i
+    // add --help
     const options = program
       .name(name)
       .version(version)
       .option("--yes", "Accept all default options")
       .option("--name <name>", "Name and directory location to scaffold your application with")
-      .option("--ts <choice>", "Configure the project for TypeScript (yes/no)")
+      .option("--ts [choice]", "Configure the project for TypeScript (yes/no)")
       .option(
         "--install <choice>",
         "Install dependencies with the package manager of your choice (npm/pnpm/yarn)",
@@ -69,7 +71,9 @@ async function init() {
     const isTS = options?.yes
       ? DEFAULTS.ts
       : options?.ts
-        ? options.ts
+        ? options?.ts === true
+          ? "yes"
+          : options.ts
         : await select({
             message: "Setup TypeScript?",
             choices: [
