@@ -1,12 +1,12 @@
 /*
  * Use Case
- * Scaffold from minimal template with no flags.
+ * Scaffold from minimal template with a custom project name flag.
  *
  * User Result
  * Should scaffold from template build.
  *
  * User Command
- * @greenwood/init
+ * * npx @greenwood/init --name my-project
  *
  * User Workspace
  * N / A
@@ -15,13 +15,15 @@ import chai from "chai";
 import fs from "fs";
 import path from "path";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath } from "url";
 
 const expect = chai.expect;
 
-describe("Scaffold Greenwood With Default Template: ", function () {
+describe("Initialize a new Greenwood project: ", function () {
+  const APP_NAME = "my-project";
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
-  const outputPath = fileURLToPath(new URL("./my-app", import.meta.url));
+  const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
+  const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
   let runner;
 
   before(function () {
@@ -31,49 +33,55 @@ describe("Scaffold Greenwood With Default Template: ", function () {
     runner = new Runner();
   });
 
-  describe("default minimal output", function () {
-    before(async function () {
-      await fs.promises.mkdir(outputPath);
-
+  describe("Scaffolding a new project with custom project name", function () {
+    before(function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath);
+      runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
     });
 
-    describe("should scaffold project files and folders", () => {
+    describe("project files and folders", () => {
       it("should create a src/pages directory", function () {
-        expect(fs.existsSync(path.join(outputPath, "src", "pages"))).to.be.true;
+        expect(fs.existsSync(path.join(initOutputPath, "src", "pages"))).to.be.true;
       });
 
       it("should generate a .gitignore file", function () {
-        expect(fs.existsSync(path.join(outputPath, ".gitignore"))).to.be.true;
+        expect(fs.existsSync(path.join(initOutputPath, ".gitignore"))).to.be.true;
       });
 
       it("should generate a package.json file", function () {
-        expect(fs.existsSync(path.join(outputPath, "package.json"))).to.be.true;
+        expect(fs.existsSync(path.join(initOutputPath, "package.json"))).to.be.true;
       });
 
       it("should not generate a package-lock.json file", function () {
-        expect(fs.existsSync(path.join(outputPath, "package-lock.json"))).to.be.false;
-      });
-
-      it("should generate a .npmrc file", function () {
-        expect(fs.existsSync(path.join(outputPath, ".npmrc"))).to.be.true;
+        expect(fs.existsSync(path.join(initOutputPath, "package-lock.json"))).to.be.false;
       });
 
       it("should not generate a yarn.lock file", function () {
-        expect(fs.existsSync(path.join(outputPath, "yarn.lock"))).to.be.false;
+        expect(fs.existsSync(path.join(initOutputPath, "yarn.lock"))).to.be.false;
+      });
+
+      it("should not generate a pnpm-lock.yaml file", function () {
+        expect(fs.existsSync(path.join(initOutputPath, "pnpm-lock.yaml"))).to.be.false;
       });
 
       it("should not generate a public directory", function () {
-        expect(fs.existsSync(path.join(outputPath, "public"))).to.be.false;
+        expect(fs.existsSync(path.join(initOutputPath, "public"))).to.be.false;
       });
     });
 
     describe("initial package.json contents", function () {
       let pkgJson;
 
-      before(async function () {
-        pkgJson = JSON.parse(fs.readFileSync(path.join(outputPath, "package.json"), "utf-8"));
+      before(function () {
+        pkgJson = JSON.parse(fs.readFileSync(path.join(initOutputPath, "package.json"), "utf-8"));
+      });
+
+      it("the should have the correct type", function () {
+        expect(pkgJson.type).to.equal("module");
+      });
+
+      it("the should have the correct name", function () {
+        expect(pkgJson.name).to.equal(APP_NAME);
       });
 
       it("the should have the correct Greenwood scripts", function () {
@@ -87,10 +95,7 @@ describe("Scaffold Greenwood With Default Template: ", function () {
 
       it("the should have the correct Greenwood devDependency", function () {
         const scriptPkg = JSON.parse(
-          fs.readFileSync(
-            fileURLToPath(new URL("../../../package.json", import.meta.url)),
-            "utf-8",
-          ),
+          fs.readFileSync(new URL("../../../package.json", import.meta.url), "utf-8"),
         );
 
         expect(pkgJson.devDependencies["@greenwood/cli"]).to.equal(`~${scriptPkg.version}`);
@@ -101,7 +106,7 @@ describe("Scaffold Greenwood With Default Template: ", function () {
       let pageContents;
 
       before(async function () {
-        pageContents = fs.readFileSync(path.join(outputPath, "src/pages/index.html"), "utf-8");
+        pageContents = fs.readFileSync(path.join(initOutputPath, "src/pages/index.html"), "utf-8");
       });
 
       it("should have the expected getting started prompt", function () {
@@ -127,6 +132,6 @@ describe("Scaffold Greenwood With Default Template: ", function () {
   });
 
   after(function () {
-    runner.teardown([outputPath]);
+    runner.teardown([initOutputPath]);
   });
 });

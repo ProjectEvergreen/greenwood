@@ -51,7 +51,7 @@
     "eslint": "^9.11.1",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-no-only-tests": "^2.6.0",
-    "gallinago": "^0.8.2",
+    "gallinago": "^0.9.0",
     "glob-promise": "^3.4.0",
     "globals": "^15.10.0",
     "husky": "^9.1.7",

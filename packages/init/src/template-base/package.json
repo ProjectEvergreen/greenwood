@@ -1,7 +1,6 @@
 {
-  "name": "my-project",
-  "version": "1.0.0",
-  "description": "",
+  "name": "template-base",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "greenwood develop",
@@ -11,6 +10,5 @@
   },
   "devDependencies": {
     "@greenwood/cli": "^0.20.0"
-  },
-  "license": "ISC"
+  }
 }

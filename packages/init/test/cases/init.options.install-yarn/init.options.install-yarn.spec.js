@@ -1,12 +1,12 @@
 /*
  * Use Case
- * Scaffold from minimal template using the --yarn flag.
+ * Scaffold from minimal template and install dependencies with Yarn.
  *
  * User Result
  * Should scaffold from template and with lockfile.
  *
  * User Command
- * @greenwood/init --yarn
+ * npx @greenwood/init --name=my-app --install yarn
  *
  * User Workspace
  * N / A
@@ -16,58 +16,54 @@ import fs from "fs";
 import path from "path";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath } from "url";
 
 const expect = chai.expect;
 
-// https://github.com/ProjectEvergreen/greenwood/issues/787
-xdescribe("Scaffold Greenwood With Yarn: ", function () {
-  const LABEL = "Default Greenwood Configuration and Workspace";
+describe("Initialize a new Greenwood project: ", function () {
+  const LABEL = "Scaffolding a new project with dependencies installed through Yarn";
+  const APP_NAME = "my-app";
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
-  const outputPath = fileURLToPath(new URL("./my-app", import.meta.url));
+  const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
+  const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: path.join(initOutputPath, "public"),
     };
     runner = new Runner();
   });
 
-  describe("default minimal template", function () {
+  describe(LABEL, function () {
     before(function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, "--yarn");
+      runner.runCommand(initPath, ["--name", APP_NAME, "--install", "yarn", "--ts", "no"]);
     });
 
     describe("should install with Yarn", function () {
       const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
 
       before(function () {
+        runner.setup(initOutputPath);
         runner.runCommand(cliPath, "build");
       });
 
       runSmokeTest(["public", "index"], LABEL);
 
       it("should generate a yarn.lock file", function () {
-        expect(fs.existsSync(path.join(outputPath, "yarn.lock"))).to.be.true;
-      });
-
-      it("should not generate a package-lock.json file", function () {
-        expect(fs.existsSync(path.join(outputPath, "package-lock.json"))).to.be.false;
+        expect(fs.existsSync(path.join(initOutputPath, "yarn.lock"))).to.be.true;
       });
 
       it("should not generate a .npmrc file", function () {
-        expect(fs.existsSync(path.join(outputPath, ".npmrc"))).to.be.false;
-      });
+        const npmrcPath = path.join(initOutputPath, ".npmrc");
 
-      it("should generate a public directory", function () {
-        expect(fs.existsSync(path.join(outputPath, "public"))).to.be.true;
+        expect(fs.existsSync(npmrcPath)).to.be.false;
       });
     });
   });
 
   after(function () {
-    runner.teardown([outputPath]);
+    runner.teardown([initOutputPath]);
   });
 });

@@ -1,19 +1,18 @@
 /*
  * Use Case
- * Scaffold from minimal template and run Greenwood build command.
+ * Scaffold from minimal template and install dependencies with npm.
  *
  * User Result
- * Should scaffold from template and run the build.
+ * Should scaffold from template and with lockfile.
  *
  * User Command
- * npx @greenwood/init --name my-app && greenwood build
+ * npx @greenwood/init --name=my-app --install npm
  *
  * User Workspace
  * N / A
  */
 import chai from "chai";
-import fs from "fs/promises";
-import { JSDOM } from "jsdom";
+import fs from "fs";
 import path from "path";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
@@ -22,7 +21,7 @@ import { fileURLToPath } from "url";
 const expect = chai.expect;
 
 describe("Initialize a new Greenwood project: ", function () {
-  const LABEL = "Scaffold Greenwood with default options and run a build";
+  const LABEL = "Scaffolding a new project with dependencies installed through NPM";
   const APP_NAME = "my-app";
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
   const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
@@ -39,35 +38,29 @@ describe("Initialize a new Greenwood project: ", function () {
   describe(LABEL, function () {
     before(function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
+      runner.runCommand(initPath, ["--name", APP_NAME, "-i", "npm", "--ts", "no"]);
     });
 
-    describe(`should build with the Greenwood CLI and have all standard build output files`, function () {
+    describe("should install with npm", function () {
       const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
 
       before(function () {
         runner.setup(initOutputPath);
-        runner.runCommand(cliPath, ["build"]);
+        runner.runCommand(cliPath, "build");
       });
 
       runSmokeTest(["public", "index"], LABEL);
 
-      describe("Build command specific HTML behaviors", function () {
-        let dom;
+      it("should generate a package-lock.json file", function () {
+        expect(fs.existsSync(path.join(initOutputPath, "package-lock.json"))).to.be.true;
+      });
 
-        before(async function () {
-          const html = await fs.readFile(path.join(initOutputPath, "public/index.html"), "utf-8");
+      it("should generate a .npmrc file with the expected contents", function () {
+        const npmrcPath = path.join(initOutputPath, ".npmrc");
+        const contents = fs.readFileSync(npmrcPath, "utf-8");
 
-          dom = new JSDOM(html);
-        });
-
-        it("should display default project title", function (done) {
-          const title = dom.window.document.querySelector("head > title");
-
-          expect(title.textContent).to.equal("Greenwood");
-
-          done();
-        });
+        expect(fs.existsSync(npmrcPath)).to.be.true;
+        expect(contents).contains("legacy-peer-deps=true");
       });
     });
   });
