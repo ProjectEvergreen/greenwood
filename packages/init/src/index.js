@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import chalk from "chalk";
-import { program } from "commander";
+import { program, Option } from "commander";
 import fs from "fs";
 import { input, select } from "@inquirer/prompts";
 import { copyTemplate, installDependencies, setupGitIgnore, setupPackageJson } from "./util.js";
@@ -44,17 +44,24 @@ async function init() {
       `${chalk.rgb(175, 207, 71)("-------------------------------------------------------")}`,
     );
 
-    // add support for short commands, e.g. --yes, --i
-    // add --help
     const options = program
       .name(name)
       .version(version)
-      .option("--yes", "Accept all default options")
+      .option("-y, --yes", "Accept all default options")
       .option("--name <name>", "Name and directory location to scaffold your application with")
-      .option("--ts [choice]", "Configure the project for TypeScript (yes/no)")
-      .option(
-        "--install <choice>",
-        "Install dependencies with the package manager of your choice (npm/pnpm/yarn)",
+      .addOption(
+        new Option(
+          "--ts [choice]",
+          "Optionally configure your project with TypeScript",
+          DEFAULTS.ts,
+        ).choices(["yes", "no"]),
+      )
+      .addOption(
+        new Option(
+          "-i, --install <choice>",
+          "Install dependencies with the package manager of your choice",
+          DEFAULTS.install,
+        ).choices(PACKAGE_MANAGERS.map((manager) => manager.name.toLowerCase()).concat("no")),
       )
       .parse(process.argv)
       .opts();
