@@ -1,6 +1,3 @@
-import fs from "fs/promises";
-import { checkResourceExists } from "../lib/resource-utils.js";
-
 const initContext = async ({ config }) => {
   const { workspace, pagesDirectory, layoutsDirectory } = config;
   const projectDirectory = new URL(`file://${process.cwd()}/`);
@@ -24,12 +21,6 @@ const initContext = async ({ config }) => {
     projectDirectory,
     layoutsDir,
   };
-
-  if (!(await checkResourceExists(scratchDir))) {
-    await fs.mkdir(scratchDir, {
-      recursive: true,
-    });
-  }
 
   return Promise.resolve(context);
 };
