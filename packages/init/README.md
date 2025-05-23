@@ -2,34 +2,44 @@
 
 ## Overview
 
-Init package for scaffolding out a new Greenwood project.  For more information and complete docs, please visit the [Greenwood website](https://www.greenwoodjs.dev).
+The init package is for scaffolding out a new Greenwood project.  For more information and complete docs about Greenwood, please visit the [Greenwood website](https://www.greenwoodjs.dev).
 
 ## Usage
 
-Run the `init` command to scaffold a minimal Greenwood project.
+Run the `init` package to scaffold a Greenwood project from prompts.
 
 ```bash
 $ npx @greenwood/init@latest
 ```
 
-This will then output your project files into a directory called _my-app_:
+This will then walk you through a few prompts to help get your project configured with a name and output location, if you want to use TypeScript, your package manager preference, and more (to come).
 
-```bash
-./
-  .gitignore
-  greenwood.config.js
-  package.json
-  src/
-    # ...
-```
+Once the installer has completed, follow the steps to get your new Greenwood project up and running!
 
 ## Options
 
-### Project Name
-
-By providing a name as the first argument, the `init` command will output the project files into a directory of the same name and configure the `name` property _package.json_.
+If you want to skip or pre-fill some of the prompts, below are some of the available options you can pass to the init CLI.  
 
 ```bash
-# example
-$ npx @greenwood/init@latest my-app
+$ npx @greenwood/init@latest --help
+
+-------------------------------------------------------
+Initialize a Greenwood Project (v0.32.0) ♻️
+-------------------------------------------------------
+Usage: @greenwood/init [options]
+
+Options:
+  -V, --version           output the version number
+  -y, --yes               Accept all default options
+  --name <name>           Name and directory location to scaffold your application with
+  --ts [choice]           Optionally configure your project with TypeScript (choices: "yes", "no")
+  -i, --install <choice>  Install dependencies with the package manager of your choice (choices: "npm", "pnpm",
+                          "yarn", "no")
+  -h, --help              display help for command
+```
+
+For example, to automatically create and name a project using TypeScript and PNPM, you could use this command
+
+```sh
+$ npx @greenwood/init@latest --name my-app --ts --install pnpm
 ```
