@@ -1694,6 +1694,18 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@beforesemicolon/html-parser@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@beforesemicolon/html-parser/-/html-parser-0.6.0.tgz#325846aeeb49fe6d87ebb7475084b976ebda1de0"
+  integrity sha512-mITtdgWjnt+PcVVOXT87RhUnJdDYWE6yFVFq7PtSEsY2vEXEm74lgYz90aw6UGDoLxRNUn+00XyX5/qJEBx1og==
+
+"@beforesemicolon/markup@^1.14.1":
+  version "1.14.1"
+  resolved "https://registry.yarnpkg.com/@beforesemicolon/markup/-/markup-1.14.1.tgz#738723fb9fafdae2b4dbb226c756901212ef0981"
+  integrity sha512-lszHFMNe2hdPdC8exJQuua7QBWNRtWpR+vynB8v7U/dBPzobobwDBBuOnhoDJ6YWDPY3mvKmRuFSSjhSGagTSw==
+  dependencies:
+    "@beforesemicolon/html-parser" "^0.6.0"
+
 "@bugsnag/browser@^7.20.2":
   version "7.20.2"
   resolved "https://registry.yarnpkg.com/@bugsnag/browser/-/browser-7.20.2.tgz#1db0c52fbe6b90217c4efd7ac79e16ccb7336b78"
