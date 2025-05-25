@@ -391,7 +391,9 @@ async function bundleSsrPages(compilation, optimizePlugins) {
         });
       }
 
-      // better way to write out this inline code?
+      // would be nice to find out a better way to write out / generate this inline code "facade"
+      // and how to calculate the relative path to the src/ page's entry point in the user's workspace
+      // https://github.com/ProjectEvergreen/greenwood/pull/1482#issuecomment-2905643391
       /* eslint-disable no-useless-escape */
       await fs.writeFile(
         entryFileOutputUrl,

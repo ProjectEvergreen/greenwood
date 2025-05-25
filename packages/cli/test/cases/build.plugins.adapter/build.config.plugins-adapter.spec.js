@@ -234,8 +234,8 @@ describe("Build Greenwood With: ", function () {
 
   after(function () {
     runner.teardown([
-      ...getOutputTeardownFiles(outputPath),
       path.join(outputPath, "adapter-output"),
+      ...getOutputTeardownFiles(outputPath),
     ]);
   });
 });

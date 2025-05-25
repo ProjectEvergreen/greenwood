@@ -176,13 +176,13 @@ class ScanForCssModulesResource {
     this.compilation = compilation;
     this.extensions = ["module.css"];
     this.contentType = "text/javascript";
+    const { scratchDir } = this.compilation.context;
 
-    if (!fs.existsSync(this.compilation.context.scratchDir)) {
-      fs.mkdirSync(this.compilation.context.scratchDir, { recursive: true });
-      fs.writeFileSync(
-        new URL(`./${MODULES_MAP_FILENAME}`, this.compilation.context.scratchDir),
-        JSON.stringify({}),
-      );
+    if (
+      fs.existsSync(scratchDir) &&
+      !fs.existsSync(new URL(`./${MODULES_MAP_FILENAME}`, scratchDir))
+    ) {
+      fs.writeFileSync(new URL(`./${MODULES_MAP_FILENAME}`, scratchDir), JSON.stringify({}));
     }
   }
 

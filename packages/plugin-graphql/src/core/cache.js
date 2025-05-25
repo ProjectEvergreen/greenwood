@@ -33,10 +33,6 @@ const createCache = async (req, context) => {
     const hashFilename = `${queryHash}-cache.json`;
     const cachePath = new URL(`./${hashFilename}`, outputDir);
 
-    if (!(await checkResourceExists(outputDir))) {
-      await fs.mkdir(outputDir);
-    }
-
     if (!(await checkResourceExists(cachePath))) {
       await fs.writeFile(cachePath, cache, "utf-8");
     }
