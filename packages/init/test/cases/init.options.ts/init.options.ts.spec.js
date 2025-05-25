@@ -98,7 +98,7 @@ describe("Initialize a new Greenwood project: ", function () {
         expect(scripts.dev).to.equal("NODE_OPTIONS='--experimental-strip-types' greenwood develop");
         expect(scripts.start).to.equal(scripts.dev);
         expect(scripts.build).to.equal("NODE_OPTIONS='--experimental-strip-types' greenwood build");
-        expect(scripts.serve).to.equal("greenwood serve");
+        expect(scripts.serve).to.equal("NODE_OPTIONS='--experimental-strip-types' greenwood serve");
       });
 
       it("the should have the correct Greenwood devDependency", function () {
