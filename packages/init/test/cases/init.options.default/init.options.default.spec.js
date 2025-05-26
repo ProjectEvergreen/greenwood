@@ -90,6 +90,10 @@ describe("Initialize a new Greenwood project: ", function () {
         expect(pkgJson.name).to.equal(APP_NAME);
       });
 
+      it("the should have the correct version", function () {
+        expect(pkgJson.version).to.equal("0.1.0");
+      });
+
       it("the should have the correct Greenwood scripts", function () {
         const scripts = pkgJson.scripts;
 
