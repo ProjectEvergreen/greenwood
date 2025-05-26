@@ -29,7 +29,7 @@ function setupPackageJson(outputDirUrl, { name, version }) {
   const devDeps = json.devDependencies;
 
   json.name = name === "." ? path.basename(outputDirUrl.pathname) : name;
-  json.version = version;
+  json.version = "0.1.0";
 
   // ensure all Greenwood deps have their version set to the version from the CLI's package.json
   for (const dep in devDeps) {
