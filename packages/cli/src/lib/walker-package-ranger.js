@@ -8,7 +8,7 @@ const importMap = new Map();
 const diagnostics = new Map();
 
 function updateImportMap(key, value, resolvedRoot) {
-  console.log("UPDATE IMPORT MAP", { key, value });
+  // console.log("UPDATE IMPORT MAP", { key, value, resolvedRoot });
   importMap.set(
     key.replace("./", ""),
     `${IMPORT_MAP_RESOLVED_PREFIX}${resolvedRoot.replace("file://", "")}${value.replace("./", "")}`,
@@ -161,45 +161,37 @@ async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
   walkDirectoryForExportPatterns(new URL(`.${rootSubValueOffset}/`, resolvedRoot));
 }
 
-// UPDATE IMPORT MAP { key: 'tslib', value: '[object Object]' }
-// UPDATE IMPORT MAP { key: 'tslib/CopyrightNotice.txt', value: 'CopyrightNotice.txt' }
-// UPDATE IMPORT MAP { key: 'tslib/LICENSE.txt', value: 'LICENSE.txt' }
-// UPDATE IMPORT MAP { key: 'tslib/README.md', value: 'README.md' }
-// UPDATE IMPORT MAP { key: 'tslib/SECURITY.md', value: 'SECURITY.md' }
-// UPDATE IMPORT MAP { key: 'tslib/package.json', value: 'package.json' }
-// UPDATE IMPORT MAP { key: 'tslib/tslib.d.ts', value: 'tslib.d.ts' }
-// UPDATE IMPORT MAP { key: 'tslib/tslib.es6.html', value: 'tslib.es6.html' }
-// UPDATE IMPORT MAP { key: 'tslib/tslib.es6.js', value: 'tslib.es6.js' }
-// UPDATE IMPORT MAP { key: 'tslib/tslib.es6.mjs', value: 'tslib.es6.mjs' }
-// UPDATE IMPORT MAP { key: 'tslib/tslib.html', value: 'tslib.html' }
-// UPDATE IMPORT MAP { key: 'tslib/tslib.js', value: 'tslib.js' }
-// UPDATE IMPORT MAP { key: 'tslib/./', value: './' }
 function trackExportConditions(dependency, exports, sub, condition, resolvedRoot) {
-  console.log("trackExportConditions", { dependency, exports, sub, condition, resolvedRoot });
+  // console.log("trackExportConditions", { dependency, exports, sub, condition, resolvedRoot });
   if (typeof exports[sub] === "object") {
     // also check for nested conditions of conditions, default to default for now
     // https://unpkg.com/browse/@floating-ui/dom@1.6.12/package.json
-
     if (typeof exports[sub][condition] === "object") {
       for (const subCondition in exports[sub][condition]) {
-        console.log({ subCondition });
         if (SUPPORTED_EXPORT_CONDITIONS.includes(subCondition)) {
-          console.log("go deepah!!!");
-          // TODO not seeing floatingui/dom
-          // trackExportConditions(dependency, exports, sub, subCondition, resolvedRoot);
-          trackExportConditions(dependency, exports[sub], condition, subCondition, resolvedRoot);
+          // console.log("go deeper!!!", { sub, condition, subCondition });
+          // trackExportConditions(dependency, exports[sub], condition, subCondition, resolvedRoot);
+          // trackExportConditions(dependency, exports[sub], condition, subCondition, resolvedRoot);
+          const segment = sub === "." ? "" : `/${sub}`;
+
+          updateImportMap(
+            `${dependency}${segment}`,
+            `${exports[sub][condition][subCondition].default ?? exports[sub][condition][subCondition]}`,
+            resolvedRoot,
+          );
+
           break;
         }
       }
     } else if (sub === ".") {
-      console.log("track Export conditions .", {
-        dependency,
-        exports,
-        sub,
-        condition,
-        resolvedRoot,
-      });
-      console.log();
+      // console.log("track Export conditions .", {
+      //   dependency,
+      //   exports,
+      //   sub,
+      //   condition,
+      //   resolvedRoot,
+      // });
+
       updateImportMap(
         dependency,
         `${exports[sub][condition].default ?? exports[sub][condition]}`,
@@ -208,14 +200,14 @@ function trackExportConditions(dependency, exports, sub, condition, resolvedRoot
     } else if (SUPPORTED_EXPORT_CONDITIONS.includes(sub)) {
       // for example, tslib
       // https://app.unpkg.com/tslib@2.8.1/files/package.json#L37
-      console.log("track SUPPORTED_EXPORT_CONDITIONS");
+      // console.log("track SUPPORTED_EXPORT_CONDITIONS");
       updateImportMap(
         dependency,
         `${exports[sub][condition].default ?? exports[sub][condition]}`,
         resolvedRoot,
       );
     } else {
-      console.log("track UNSUPPORTED Export conditions else");
+      // console.log("track UNSUPPORTED Export conditions else");
       // should this case be supported if its not a SUPPORTED_CONDITION?
       updateImportMap(
         `${dependency}/${sub}`,
