@@ -174,6 +174,7 @@ function trackExportConditions(dependency, exports, sub, condition, resolvedRoot
           // trackExportConditions(dependency, exports[sub], condition, subCondition, resolvedRoot);
           const segment = sub === "." ? "" : `/${sub}`;
 
+          // would this ever need to be recursive?
           updateImportMap(
             `${dependency}${segment}`,
             `${exports[sub][condition][subCondition].default ?? exports[sub][condition][subCondition]}`,
