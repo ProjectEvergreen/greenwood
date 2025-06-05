@@ -24,22 +24,23 @@ function copyTemplate(templateDirUrl, outputDirUrl) {
 function setupPackageJson(outputDirUrl, { name, version }) {
   console.log("setting up package.json...");
 
-  const packageJsonUrl = new URL("./package.json", outputDirUrl);
-  const json = JSON.parse(fs.readFileSync(packageJsonUrl));
-  const devDeps = json.devDependencies;
+  const packageJsonOutputUrl = new URL("./package.json", outputDirUrl);
+  const pkgJson = JSON.parse(fs.readFileSync(packageJsonOutputUrl));
+  const json = {};
 
+  // setup standard fields
   json.name = name === "." ? path.basename(outputDirUrl.pathname) : name;
   json.version = "0.1.0";
+  json.type = "module";
+  json.scripts = pkgJson.scripts;
 
-  // ensure all Greenwood deps have their version set to the version from the CLI's package.json
-  for (const dep in devDeps) {
-    if (dep.startsWith("@greenwood/")) {
-      // we should change this to a ^ once Greenwood reaches 1.0
-      json.devDependencies[dep] = `~${version}`;
-    }
-  }
+  // add / merge Greenwood dependencies (first)
+  json.devDependencies = {
+    "@greenwood/cli": `~${version}`,
+    ...(pkgJson.devDependencies ?? {}),
+  };
 
-  fs.writeFileSync(packageJsonUrl, JSON.stringify(json, null, 2));
+  fs.writeFileSync(packageJsonOutputUrl, JSON.stringify(json, null, 2));
 }
 
 function setupGitIgnore(outputDirUrl, { patterns = [] } = {}) {

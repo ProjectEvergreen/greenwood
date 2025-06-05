@@ -106,11 +106,24 @@ describe("Initialize a new Greenwood project: ", function () {
       });
 
       it("the should have the correct Greenwood devDependency", function () {
-        const scriptPkg = JSON.parse(
+        const initPkg = JSON.parse(
           fs.readFileSync(new URL("../../../package.json", import.meta.url), "utf-8"),
         );
 
-        expect(pkgJson.devDependencies["@greenwood/cli"]).to.equal(`~${scriptPkg.version}`);
+        expect(pkgJson.devDependencies["@greenwood/cli"]).to.equal(`~${initPkg.version}`);
+      });
+
+      it("the should have TypeScript as a dependency", function () {
+        const templatePkg = JSON.parse(
+          fs.readFileSync(
+            new URL("../../../src/template-base-ts/package.json", import.meta.url),
+            "utf-8",
+          ),
+        );
+
+        expect(pkgJson.devDependencies["typescript"].version).to.equal(
+          templatePkg.devDependencies["typescript"].version,
+        );
       });
     });
 
