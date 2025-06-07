@@ -92,6 +92,12 @@ describe("Build Greenwood With: ", function () {
         );
       });
 
+      it("should have the correct value for the <title> tag in the <head> for the first post page", function () {
+        const title = dom.window.document.querySelector("head title").textContent;
+
+        expect(title).to.be.equal("My First Post");
+      });
+
       it("should have the correct value for author <meta> tag in the <head>", function () {
         const authorMeta = dom.window.document
           .querySelector("head meta[name=author]")
@@ -120,6 +126,12 @@ describe("Build Greenwood With: ", function () {
         dom = await JSDOM.fromFile(
           path.resolve(this.context.publicDir, "./blog/second-post/index.html"),
         );
+      });
+
+      it("should have the correct value for the <title> tag in the <head> for second post page", function () {
+        const title = dom.window.document.querySelector("head title").textContent;
+
+        expect(title).to.be.equal("My Second Post");
       });
 
       it("should have the correct songs frontmatter data in the page output", function () {
