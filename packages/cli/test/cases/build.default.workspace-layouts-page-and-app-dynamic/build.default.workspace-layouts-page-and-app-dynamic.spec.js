@@ -73,10 +73,10 @@ describe("Build Greenwood With: ", function () {
         expect(heading[0].textContent).to.equal("App Layout");
       });
 
-      it("should not have the expected <h2> tag from the dynamic page layout", function () {
+      it("should have the expected <h2> tag from the dynamic page layout", function () {
         const heading = dom.window.document.querySelectorAll("h2");
 
-        expect(heading.length).to.equal(0);
+        expect(heading.length).to.equal(1);
       });
 
       it("should have the expected content from the index.md", function () {

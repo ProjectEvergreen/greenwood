@@ -11,7 +11,7 @@ import rehypeRaw from "rehype-raw";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
-import { getUserScripts, getPageLayout, getAppLayout } from "../../lib/layout-utils.js";
+import { getUserScripts, getPageLayout, getAppLayout, getPageLayoutContents, getAppLayoutContents } from "../../lib/layout-utils.js";
 import { requestAsObject } from "../../lib/resource-utils.js";
 import { unified } from "unified";
 import { Worker } from "worker_threads";
@@ -54,11 +54,13 @@ class StandardHtmlResource {
     let ssrBody;
     let ssrLayout;
     let processedMarkdown = null;
+    let html = "";
 
     if (matchingRoute.external) {
       layout = matchingRoute.layout || layout;
     }
 
+    // TODO get all _page_ contents up-front to _pass_ into layout utils
     if (isMarkdownContent) {
       const markdownContents = await fs.readFile(new URL(pageHref), "utf-8");
       const rehypePlugins = [];
@@ -86,19 +88,9 @@ class StandardHtmlResource {
         .use(rehypePlugins) // apply userland rehype plugins
         .use(rehypeStringify) // convert AST to HTML string
         .process(markdownContents);
-    } else if (isHtmlContent && matchingRoute.layout) {
-      // pre-process a page body with a custom layout to extract out the frontmatter
-      const pageContents = await fs.readFile(new URL(matchingRoute.pageHref), "utf-8");
-
-      body = String(
-        await unified()
-          .use(remarkParse) // parse markdown into AST
-          .use(remarkFrontmatter) // extract frontmatter from AST
-          .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
-          .use(rehypeRaw) // support mixed HTML in markdown
-          .use(rehypeStringify) // convert AST to HTML string
-          .process(pageContents),
-      );
+    } else if (isHtmlContent && !matchingRoute.route.endsWith('/404/')) {
+      // TODO better way to handle 404 graphing
+      body = await fs.readFile(new URL(matchingRoute.pageHref), "utf-8");
     } else if (matchingRoute.isSSR) {
       const routeModuleLocationUrl = new URL(pageHref);
       const routeWorkerUrl = this.compilation.config.plugins
@@ -136,15 +128,6 @@ class StandardHtmlResource {
       });
     }
 
-    if (isSpaRoute) {
-      body = await fs.readFile(new URL(isSpaRoute.pageHref), "utf-8");
-    } else {
-      body = ssrLayout ? ssrLayout : await getPageLayout(pageHref, this.compilation, layout, body);
-    }
-
-    body = await getAppLayout(body, this.compilation, customImports, matchingRoute);
-    body = await getUserScripts(body, this.compilation);
-
     if (processedMarkdown) {
       const wrappedCustomElementRegex =
         /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
@@ -161,25 +144,64 @@ class StandardHtmlResource {
       }
 
       // https://github.com/ProjectEvergreen/greenwood/issues/1126
-      body = body.replace(
-        /<content-outlet>(.*)<\/content-outlet>/s,
-        processedMarkdown.value.replace(/\$/g, "$$$"),
-      );
+      body = processedMarkdown.value.replace(/\$/g, "$$$")
+      //   /<content-outlet>(.*)<\/content-outlet>/s,
+      //   processedMarkdown.value.replace(/\$/g, "$$$"),
+      // );
     } else if (matchingRoute.external) {
-      body = body.replace(/<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
+      body = matchingRoute.body;
+      // body = body.replace(/<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
     } else if (ssrBody) {
-      body = body.replace(
-        /<content-outlet>(.*)<\/content-outlet>/s,
-        `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, "$$$")}<!-- greenwood-ssr-end -->`,
-      );
+      body = `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, "$$$")}<!-- greenwood-ssr-end -->`;
+      // body = body.replace(
+      //   /<content-outlet>(.*)<\/content-outlet>/s,
+      //   `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, "$$$")}<!-- greenwood-ssr-end -->`,
+      // );
     }
+
+    // console.log('111', { ssrBody, body });
+    if (isSpaRoute) {
+      html = await fs.readFile(new URL(isSpaRoute.pageHref), "utf-8");
+    } else {
+      // body = await getPageLayout(pageHref, this.compilation, layout, body, ssrLayout);
+      // TODO if SSR layout, use that instead for page layout
+
+      /*
+       * merging logic?
+       *
+       * page (with contents + html / head / body tags)
+       * page layout (with content-outlet)
+       * app layout (with page-outlet)
+       * active frontmatter...
+       * 
+       * who does the swapping...?
+       */
+
+      // TODO can we get away from passing in matching route?
+      const mergedPageLayoutContents = await getPageLayoutContents(body, this.compilation, matchingRoute, ssrLayout);
+      console.log({ mergedPageLayoutContents });
+      
+      const mergedAppLayoutContents = await getAppLayoutContents(mergedPageLayoutContents, this.compilation, matchingRoute);
+      console.log({ mergedAppLayoutContents });
+      
+      html = mergedAppLayoutContents;
+    }
+
+    // TODO should this get nested after getPageLayout?
+    // body = await getAppLayout(body, this.compilation, customImports, matchingRoute);
+    // body = await getUserScripts(body, this.compilation);
+
+    console.log('FINAL HTML', { body, html });
+    // console.log('222', { ssrBody, body });
 
     // clean up any empty placeholder content-outlet
-    if (body.indexOf("<content-outlet></content-outlet>") > 0) {
-      body = body.replace("<content-outlet></content-outlet>", "");
-    }
+    // TODO do we even want this?
+    // https://github.com/ProjectEvergreen/greenwood/issues/1271
+    // if (body.indexOf("<content-outlet></content-outlet>") > 0) {
+    //   body = body.replace("<content-outlet></content-outlet>", "");
+    // }
 
-    return new Response(body, {
+    return new Response(html, {
       headers: new Headers({
         "Content-Type": this.contentType,
       }),
