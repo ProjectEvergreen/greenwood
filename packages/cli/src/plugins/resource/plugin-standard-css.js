@@ -32,6 +32,9 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
       ) {
         const { value } = node;
         const segments = value.split("/") ?? "";
+        const isBareSpecifier =
+          segments[0].startsWith("@") ||
+          (!segments[0].startsWith(".") && !segments[0].startsWith("/"));
 
         if (isLocalLink(value)) {
           if (value.startsWith(".") || value.indexOf("/node_modules") === 0) {
@@ -48,26 +51,14 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
             const importContents = fs.readFileSync(resolvedUrl, "utf-8");
 
             optimizedCss += bundleCss(importContents, workingUrl, compilation);
-          } else if (
-            segments[0].startsWith("@") ||
-            (!segments[0].startsWith(".") && !segments[0].startsWith("/"))
-          ) {
-            console.log("maybe we have a bare specifier?!?!!?!", value, segments);
-
+          } else if (isBareSpecifier) {
             try {
-              // const specifier = segments[0].startsWith('@')
-              //   ? `${segments[0]}/${segments[1]}`
-              //   : segments[0];
-              // console.log({ specifier, value });
               const resolvedUrl = import.meta.resolve(value);
-              console.log({ resolvedUrl });
-
               const importContents = fs.readFileSync(new URL(resolvedUrl).pathname, "utf-8");
-              // console.log({ importContents });
 
               optimizedCss += bundleCss(importContents, sourceUrl, compilation, resolvedUrl);
             } catch (e) {
-              // TODO need to gaurd for `import.meta.resolve` not supported in custom loaders
+              // TODO need to guard for `import.meta.resolve` not supported in custom loaders
               // https://nodejs.org/api/esm.html#importmetaresolvespecifier
               console.error({ e });
             }

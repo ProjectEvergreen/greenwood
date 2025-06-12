@@ -88,6 +88,7 @@
     "lit-redux-router": "~0.20.0",
     "lodash-es": "^4.17.20",
     "luxon": "^3.5.0",
+    "open-props": "^1.7.4",
     "postcss-nested": "^4.1.2",
     "pwa-helpers": "^0.9.1",
     "redux": "^5.0.1",
