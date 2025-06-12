@@ -54,7 +54,7 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
           } else if (isBareSpecifier) {
             try {
               const resolvedUrl = import.meta.resolve(value);
-              const importContents = fs.readFileSync(new URL(resolvedUrl).pathname, "utf-8");
+              const importContents = fs.readFileSync(new URL(resolvedUrl), "utf-8");
 
               optimizedCss += bundleCss(importContents, sourceUrl, compilation, resolvedUrl);
             } catch (e) {
