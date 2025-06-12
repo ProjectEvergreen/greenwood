@@ -164,13 +164,38 @@ function trackExportConditions(dependency, exports, sub, condition, resolvedRoot
   if (typeof exports[sub] === "object") {
     // also check for nested conditions of conditions, default to default for now
     // https://unpkg.com/browse/@floating-ui/dom@1.6.12/package.json
-    if (sub === ".") {
+    if (typeof exports[sub][condition] === "object") {
+      for (const subCondition in exports[sub][condition]) {
+        if (SUPPORTED_EXPORT_CONDITIONS.includes(subCondition)) {
+          const segment = sub === "." ? "" : `/${sub}`;
+
+          // would this ever need to be recursive?
+          updateImportMap(
+            `${dependency}${segment}`,
+            `${exports[sub][condition][subCondition].default ?? exports[sub][condition][subCondition]}`,
+            resolvedRoot,
+          );
+
+          break;
+        }
+      }
+    } else if (sub === ".") {
+      updateImportMap(
+        dependency,
+        `${exports[sub][condition].default ?? exports[sub][condition]}`,
+        resolvedRoot,
+      );
+    } else if (SUPPORTED_EXPORT_CONDITIONS.includes(sub)) {
+      // for example, tslib
+      // https://app.unpkg.com/tslib@2.8.1/files/package.json#L37
       updateImportMap(
         dependency,
         `${exports[sub][condition].default ?? exports[sub][condition]}`,
         resolvedRoot,
       );
     } else {
+      // should this case be supported if its not a SUPPORTED_CONDITION though?
+      // cant hurt to leave it in for now I suppose...
       updateImportMap(
         `${dependency}/${sub}`,
         `${exports[sub][condition].default ?? exports[sub][condition]}`,
