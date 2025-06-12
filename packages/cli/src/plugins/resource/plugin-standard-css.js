@@ -31,6 +31,10 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
         this.atrule.name === "import"
       ) {
         const { value } = node;
+        const segments = value.split("/") ?? "";
+        const isBareSpecifier =
+          segments[0].startsWith("@") ||
+          (!segments[0].startsWith(".") && !segments[0].startsWith("/"));
 
         if (isLocalLink(value)) {
           if (value.startsWith(".") || value.indexOf("/node_modules") === 0) {
@@ -47,6 +51,17 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
             const importContents = fs.readFileSync(resolvedUrl, "utf-8");
 
             optimizedCss += bundleCss(importContents, workingUrl, compilation);
+          } else if (isBareSpecifier) {
+            try {
+              const resolvedUrl = import.meta.resolve(value);
+              const importContents = fs.readFileSync(new URL(resolvedUrl), "utf-8");
+
+              optimizedCss += bundleCss(importContents, sourceUrl, compilation, resolvedUrl);
+            } catch (e) {
+              // TODO need to guard for `import.meta.resolve` not supported in custom loaders
+              // https://nodejs.org/api/esm.html#importmetaresolvespecifier
+              console.error({ e });
+            }
           } else {
             console.warn(`Unable to resolve ${value} from file => ${sourceUrl}`);
           }
