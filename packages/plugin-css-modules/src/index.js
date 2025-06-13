@@ -4,7 +4,7 @@
  *
  */
 import fs from "node:fs";
-import htmlparser from "node-html-parser";
+import { parse as hparse } from "node-html-parser";
 import { parse, walk } from "css-tree";
 import * as acornWalk from "acorn-walk";
 import * as acorn from "acorn";
@@ -204,7 +204,7 @@ class ScanForCssModulesResource {
 
     if (url.pathname.endsWith("/")) {
       const body = await response.text();
-      const dom = htmlparser.parse(body, { script: true });
+      const dom = hparse(body);
       const scripts = dom.querySelectorAll("head script");
       const sheets = [];
 
