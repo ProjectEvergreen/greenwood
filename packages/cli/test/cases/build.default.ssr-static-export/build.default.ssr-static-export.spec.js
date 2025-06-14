@@ -70,13 +70,13 @@ describe("Build Greenwood With: ", function () {
         dom = new JSDOM(artistsHtml);
       });
 
-      it("should have one style tags", function () {
+      it("should have the expected number of style tags", function () {
         const styles = dom.window.document.querySelectorAll("head > style");
 
         expect(styles.length).to.equal(1);
       });
 
-      it("should have four script tags", function () {
+      it("should have the expected number of script tags", function () {
         const scripts = Array.from(dom.window.document.querySelectorAll("head > script")).filter(
           (tag) => !tag.getAttribute("data-gwd"),
         );
