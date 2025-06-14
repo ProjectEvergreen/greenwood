@@ -178,28 +178,27 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
   const pageRoot = pageLayoutContents && parse(pageLayoutContents);
   const appRoot = parse(appLayoutContents);
 
-  if (
-    process.env.__GWD_COMMAND__ === "develop" &&
-    enableHud &&
-    ((pageLayoutContents && !valid(pageLayoutContents)) || !valid(appLayoutContents))
-  ) {
-    console.debug("ERROR: Invalid HTML detected");
-    const invalidContents = !valid(pageLayoutContents) ? pageLayoutContents : appLayoutContents;
+  if (!valid(pageLayoutContents) || !valid(appLayoutContents)) {
+    console.error(`ERROR: Invalid HTML detected for route => ${matchingRoute.route}`);
 
-    appLayoutContents = appLayoutContents.replace(
-      "<body>",
-      `
-      <body>
-        <div style="position: absolute; width: auto; border: dotted 3px red; background-color: white; opacity: 0.75; padding: 1% 1% 0">
-          <p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="noreferrer">HTML formatter</a>.</p>
-          <details>
-            <pre>
-              ${invalidContents.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")}
-            </pre>
-          </details>
-        </div>
-    `,
-    );
+    if (process.env.__GWD_COMMAND__ === "develop" && enableHud) {
+      const invalidContents = !valid(pageLayoutContents) ? pageLayoutContents : appLayoutContents;
+
+      appLayoutContents = appLayoutContents.replace(
+        "<body>",
+        `
+        <body>
+          <div style="position: absolute; width: auto; border: dotted 3px red; background-color: white; opacity: 0.75; padding: 1% 1% 0">
+            <p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="noreferrer">HTML formatter</a>.</p>
+            <details>
+              <pre>
+                ${invalidContents.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")}
+              </pre>
+            </details>
+          </div>
+      `,
+      );
+    }
 
     mergedLayoutContents = appLayoutContents.replace(/<page-outlet><\/page-outlet>/, "");
   } else {
