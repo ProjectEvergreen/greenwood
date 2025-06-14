@@ -1,6 +1,5 @@
-// @ts-nocheck
 import fs from "fs/promises";
-import htmlparser from "node-html-parser";
+import { parse, valid } from "node-html-parser";
 import { checkResourceExists } from "./resource-utils.js";
 import { Worker } from "worker_threads";
 import { asyncFilter } from "./async-utils.js";
@@ -176,26 +175,15 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
           : await fs.readFile(new URL("./app.html", layoutsDir), "utf-8");
   let mergedLayoutContents = "";
 
-  const pageRoot =
-    pageLayoutContents &&
-    htmlparser.parse(pageLayoutContents, {
-      script: true,
-      style: true,
-      noscript: true,
-      pre: true,
-    });
-  const appRoot = htmlparser.parse(appLayoutContents, {
-    script: true,
-    style: true,
-    noscript: true,
-    pre: true,
-  });
+  const pageRoot = pageLayoutContents && parse(pageLayoutContents);
+  const appRoot = parse(appLayoutContents);
 
-  if ((pageLayoutContents && !pageRoot.valid) || !appRoot.valid) {
-    console.debug("ERROR: Invalid HTML detected");
-    const invalidContents = !pageRoot.valid ? pageLayoutContents : appLayoutContents;
+  if (!valid(pageLayoutContents) || !valid(appLayoutContents)) {
+    console.error(`ERROR: Invalid HTML detected for route => ${matchingRoute.route}`);
 
-    if (enableHud) {
+    if (process.env.__GWD_COMMAND__ === "develop" && enableHud) {
+      const invalidContents = !valid(pageLayoutContents) ? pageLayoutContents : appLayoutContents;
+
       appLayoutContents = appLayoutContents.replace(
         "<body>",
         `
