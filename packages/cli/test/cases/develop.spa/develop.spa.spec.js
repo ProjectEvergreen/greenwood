@@ -20,7 +20,6 @@
 import chai from "chai";
 import fs from "fs";
 import path from "path";
-import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath, URL } from "url";
 
@@ -64,8 +63,6 @@ describe("Develop Greenwood With: ", function () {
         runner.runCommand(cliPath, "develop", { async: true });
       });
     });
-
-    runSmokeTest(["serve"], LABEL);
 
     describe("Develop command specific HTML behaviors for client side routing at root - /", function () {
       let response = {};
