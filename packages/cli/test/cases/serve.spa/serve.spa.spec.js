@@ -49,6 +49,7 @@ describe("Serve Greenwood With: ", function () {
   before(function () {
     this.context = {
       hostname: `${hostname}:${port}`,
+      publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
   });
@@ -67,7 +68,7 @@ describe("Serve Greenwood With: ", function () {
       });
     });
 
-    runSmokeTest(["serve"], LABEL);
+    runSmokeTest(["public"], LABEL);
 
     describe("Serve command specific HTML behaviors for client side routing at root - /", function () {
       let response = {};

@@ -11,8 +11,8 @@ import rehypeRaw from "rehype-raw";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
-import { getUserScripts, getPageLayout, getAppLayout, getPageLayoutContents, getAppLayoutContents } from "../../lib/layout-utils.js";
-import { requestAsObject } from "../../lib/resource-utils.js";
+import { getPageLayout, getAppLayout, getPageLayoutContents, getAppLayoutContents, getGreenwoodScripts } from "../../lib/layout-utils.js";
+import { requestAsObject, checkResourceExists } from "../../lib/resource-utils.js";
 import { unified } from "unified";
 import { Worker } from "worker_threads";
 import { parse as htmlparser } from "node-html-parser";
@@ -37,7 +37,7 @@ class StandardHtmlResource {
 
   async serve(url, request) {
     const { config, context } = this.compilation;
-    const { userWorkspace } = context;
+    const { userWorkspace, pagesDir, layoutsDir } = context;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find((node) => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
@@ -91,6 +91,12 @@ class StandardHtmlResource {
     } else if (isHtmlContent && !matchingRoute.route.endsWith('/404/')) {
       // TODO better way to handle 404 graphing
       body = await fs.readFile(new URL(matchingRoute.pageHref), "utf-8");
+    } else if(isHtmlContent && matchingRoute.route.endsWith('/404/')) {
+      const pathUrl = await checkResourceExists(new URL("./404.html", pagesDir))
+        ? new URL("./404.html", pagesDir)
+        : new URL("./404.html", layoutsDir);
+      
+      body = await fs.readFile(pathUrl, "utf-8");
     } else if (matchingRoute.isSSR) {
       const routeModuleLocationUrl = new URL(pageHref);
       const routeWorkerUrl = this.compilation.config.plugins
@@ -189,17 +195,17 @@ class StandardHtmlResource {
 
     // TODO should this get nested after getPageLayout?
     // body = await getAppLayout(body, this.compilation, customImports, matchingRoute);
-    // body = await getUserScripts(body, this.compilation);
+    console.log('PRE HTML', { html })
+    html = await getGreenwoodScripts(html, this.compilation);
 
-    console.log('FINAL HTML', { body, html });
-    // console.log('222', { ssrBody, body });
-
-    // clean up any empty placeholder content-outlet
     // TODO do we even want this?
     // https://github.com/ProjectEvergreen/greenwood/issues/1271
-    // if (body.indexOf("<content-outlet></content-outlet>") > 0) {
-    //   body = body.replace("<content-outlet></content-outlet>", "");
-    // }
+    // clean up any empty placeholder content-outlet
+    if (html.indexOf("<content-outlet></content-outlet>") > 0) {
+      html = html.replace("<content-outlet></content-outlet>", "");
+    }
+
+    console.log('FINAL HTML', { html });
 
     return new Response(html, {
       headers: new Headers({
