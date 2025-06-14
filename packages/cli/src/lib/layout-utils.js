@@ -386,6 +386,8 @@ async function getAppLayout(pageLayoutContents, compilation, customImports = [],
 
 // TODO rename appRoot to parentRoot, and pageRoot to childRoot
 // TODO are we duplicating customImports processing logic?
+// TODO document this function and params
+// TODO do we absolutely need to pass matchingRoute?
 async function mergeContentIntoLayout(outletType, pageContents, layoutContents, compilation, matchingRoute) {
   // TODO active frontmatter handling
   console.log('MERGE LAYOUT CONTENTS @@@@', { pageContents, layoutContents });
@@ -556,11 +558,14 @@ async function mergeContentIntoLayout(outletType, pageContents, layoutContents, 
 }
 
 // merges provided page content into a page level layout
+// TODO document this function and params
+// TODO do we absolutely need to pass matchingRoute?
+// TODO better name for this?
 async function getPageLayoutContents(pageContents, compilation, matchingRoute, ssrLayout) {
   console.log('getPageLayoutContents ???', { pageContents, matchingRoute });
   const { config, context } = compilation;
   const { layoutsDir, userLayoutsDir, pagesDir } = context;
-  const { layout, pageHref } = matchingRoute;
+  const { layout, pageHref, route } = matchingRoute;
   const filePathUrl = pageHref && pageHref !== "" ? new URL(pageHref) : pageHref;
   const customPageFormatPlugins = config.plugins
     .filter((plugin) => plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin)
@@ -572,8 +577,8 @@ async function getPageLayoutContents(pageContents, compilation, matchingRoute, s
     (await customPageFormatPlugins[0].shouldServe(filePathUrl));
   const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, "page");
   const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, layout);
-  const extension = pageHref?.split(".")?.pop();
-  const is404Page = pageHref?.endsWith("404.html") && extension === "html";
+  // const extension = pageHref?.split(".")?.pop();
+  const is404Page = route.endsWith('/404/');
   const hasCustomStaticLayout = await checkResourceExists(
     new URL(`./${layout}.html`, userLayoutsDir),
   );
@@ -649,9 +654,15 @@ async function getPageLayoutContents(pageContents, compilation, matchingRoute, s
         compilation: JSON.stringify(compilation),
       });
     });
-  // } else if (is404Page && !hasCustom404Page) {
-  //   // TODO 404 page should come from html plugin
-  //   layoutContents = await fs.readFile(new URL("./404.html", layoutsDir), "utf-8");
+  // } else if (is404Page) {
+  //   // TODO treat 404 like any other page when no longer providing default content, not just HTML
+  //   // then 404 page content can just come from html plugin processing
+  //   console.log({ is404Page, hasCustom404Page })
+  //   const pathUrl = hasCustom404Page
+  //     ? new URL("./404.html", pagesDir)
+  //     : new URL("./404.html", layoutsDir);
+
+  //   layoutContents = await fs.readFile(pathUrl, "utf-8");
   } else if(!pageContents) {
     console.log('DEFAULT GWD page.html fallback');
     // fallback to using Greenwood's stock page layout
@@ -668,6 +679,9 @@ async function getPageLayoutContents(pageContents, compilation, matchingRoute, s
 }
 
 // merges provided page + layout contents into an app level layout
+// TODO document this function and params
+// TODO do we absolutely need to pass matchingRoute?
+// TODO better name for this?
 async function getAppLayoutContents(pageLayoutContents, compilation, matchingRoute) {
   const activeFrontmatterTitleKey = "${globalThis.page.title}";
   const enableHud = compilation.config.devServer.hud;
@@ -774,7 +788,7 @@ async function getAppLayoutContents(pageLayoutContents, compilation, matchingRou
 }
 
 
-async function getUserScripts(contents, compilation) {
+async function getGreenwoodScripts(contents, compilation) {
   const { config } = compilation;
 
   contents = contents.replace(
@@ -790,4 +804,4 @@ async function getUserScripts(contents, compilation) {
   return contents;
 }
 
-export { getAppLayout, getPageLayout, getUserScripts, getPageLayoutContents, getAppLayoutContents };
+export { getAppLayout, getPageLayout, getGreenwoodScripts, getPageLayoutContents, getAppLayoutContents };

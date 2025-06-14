@@ -5,7 +5,12 @@ import {
   getRollupConfigForBrowserScripts,
   getRollupConfigForSsrPages,
 } from "../config/rollup.config.js";
-import { getAppLayout, getPageLayout, getUserScripts } from "../lib/layout-utils.js";
+import {
+  getAppLayoutContents,
+  getPageLayoutContents,
+  getPageLayout,
+  getGreenwoodScripts,
+} from "../lib/layout-utils.js";
 import { hashString } from "../lib/hashing-utils.js";
 import {
   checkResourceExists,
@@ -340,11 +345,19 @@ async function bundleSsrPages(compilation, optimizePlugins) {
         scripts: [],
         request,
       });
-      let staticHtml = "";
+      let staticHtml = "<body><content-outlet></content-outlet></body>";
 
-      staticHtml = data.layout ? data.layout : await getPageLayout(pageHref, compilation, layout);
-      staticHtml = await getAppLayout(staticHtml, compilation, imports, page);
-      staticHtml = await getUserScripts(staticHtml, compilation);
+      console.log("!!!!!!!", { data });
+
+      staticHtml = await getPageLayoutContents(staticHtml, compilation, page, data.layout);
+      console.log({ staticHtml });
+
+      staticHtml = await getAppLayoutContents(staticHtml, compilation, page);
+      console.log({ staticHtml });
+
+      // staticHtml = data.layout ? data.layout : await getPageLayout(pageHref, compilation, layout);
+      // staticHtml = await getAppLayout(staticHtml, compilation, imports, page);
+      staticHtml = await getGreenwoodScripts(staticHtml, compilation);
       staticHtml = await (
         await interceptPage(
           new URL(`http://localhost:8080${route}`),

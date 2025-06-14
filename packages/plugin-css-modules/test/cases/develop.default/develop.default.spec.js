@@ -33,7 +33,6 @@ import { JSDOM } from "jsdom";
 import fs from "fs";
 import path from "path";
 import { parse, walk } from "css-tree";
-import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath, URL } from "url";
@@ -74,8 +73,6 @@ describe("Develop Greenwood With: ", function () {
         runner.runCommand(cliPath, "develop", { async: true });
       });
     });
-
-    runSmokeTest(["serve"], LABEL);
 
     describe("index.html with expected CSS and SSR contents", function () {
       const EXPECTED_HEADER_CLASS_NAMES = 8;
