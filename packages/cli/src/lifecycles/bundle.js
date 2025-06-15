@@ -345,7 +345,8 @@ async function bundleSsrPages(compilation, optimizePlugins) {
         scripts: [],
         request,
       });
-      let staticHtml = "<body><content-outlet></content-outlet></body>";
+      // TODO is this the correct starting content to use?
+      let staticHtml = "<content-outlet></content-outlet>";
 
       console.log("!!!!!!!", { data });
 

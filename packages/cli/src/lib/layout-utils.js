@@ -412,9 +412,9 @@ async function mergeContentIntoLayout(outletType, pageContents, layoutContents, 
   const customImports = outletType === 'content' ? matchingRoute?.imports ?? [] : []
 
   const appTitle = layoutRoot ? layoutRoot.querySelector("head title") : null;
-  const appBody = layoutRoot.querySelector("body") ? layoutRoot.querySelector("body").innerHTML : layoutContents ?? "";
+  const appBody = layoutRoot.querySelector("body") ? layoutRoot.querySelector("body").innerHTML : undefined;
   const pageBody =
-    pageRoot && pageRoot.querySelector("body") ? pageRoot.querySelector("body").innerHTML : pageContents ?? "";
+    pageRoot && pageRoot.querySelector("body") ? pageRoot.querySelector("body").innerHTML : undefined;
   const pageTitle = pageRoot && pageRoot.querySelector("head title");
   // const hasActiveFrontmatterTitle =
   //   compilation.config.activeContent &&
@@ -534,11 +534,18 @@ async function mergeContentIntoLayout(outletType, pageContents, layoutContents, 
   const outletRegex = outletType === 'content'
     ? /<content-outlet><\/content-outlet>/
     : /<page-outlet><\/page-outlet>/
-  const finalBody = appBody.match(outletRegex)
-    ? appBody.replace(outletRegex, pageBody)
-    : pageBody;
+  // TODO document this crazy thing too...
+  const finalBody = appBody && appBody.match(outletRegex)
+    ? appBody.replace(outletRegex, pageBody ?? pageContents)
+    : pageRoot.querySelector("html") && pageBody
+      ? pageBody
+      : !pageRoot.querySelector("html")
+        ? pageContents
+        : "";
+  // <html> with no body
+  // body (markdown)
 
-  console.log({ outletType, outletRegex, appBody, pageBody, finalBody })
+  console.log('FINAL MERGED CONTENTS ===>', { outletType, outletRegex, pageContents, appBody, pageBody, finalBody })
   mergedContents = `<!DOCTYPE html>
     ${mergedHtml}
       <head>
@@ -756,6 +763,7 @@ async function getAppLayoutContents(pageLayoutContents, compilation, matchingRou
     pre: true,
   });
 
+  // TODO move to merge layout contents function
   if ((pageLayoutContents && !pageRoot.valid) || !appRoot.valid) {
     console.debug("ERROR: Invalid HTML detected");
     const invalidContents = !pageRoot.valid ? pageLayoutContents : appLayoutContents;
