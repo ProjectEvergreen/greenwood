@@ -1,4 +1,5 @@
 ---
+layout: docs
 title: 'AWS S3 & CloudFront Deployment'
 collection: guides
 tocHeading: 3

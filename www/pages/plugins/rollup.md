@@ -1,4 +1,5 @@
 ---
+layout: docs
 collection: plugins
 order: 6
 ---

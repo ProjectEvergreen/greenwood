@@ -1,4 +1,5 @@
 ---
+layout: docs
 collection: docs
 title: Front Matter
 order: 3

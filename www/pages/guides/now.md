@@ -1,4 +1,5 @@
 ---
+layout: docs
 title: 'Deploy on Now'
 collection: guides
 tocHeading: 3

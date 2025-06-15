@@ -1,4 +1,5 @@
 ---
+layout: docs
 collection: getting-started
 title: Components and Styles
 label: Components and Styles

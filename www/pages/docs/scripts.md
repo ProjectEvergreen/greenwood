@@ -1,4 +1,5 @@
 ---
+layout: docs
 collection: docs
 title: Scripts and Imports
 label: Scripts and Imports
