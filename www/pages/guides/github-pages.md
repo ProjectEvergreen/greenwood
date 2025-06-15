@@ -1,4 +1,5 @@
 ---
+layout: docs
 title: 'Deploy with GitHub Pages'
 collection: guides
 tocHeading: 3

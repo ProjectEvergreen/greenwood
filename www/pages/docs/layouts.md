@@ -1,4 +1,5 @@
 ---
+layout: docs
 collection: docs
 title: Layouts and Pages
 label: Layouts and Pages

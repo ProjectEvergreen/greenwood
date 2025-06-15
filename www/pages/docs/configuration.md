@@ -1,4 +1,5 @@
 ---
+layout: docs
 collection: docs
 order: 2
 tocHeading: 3

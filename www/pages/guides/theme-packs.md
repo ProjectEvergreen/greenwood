@@ -1,4 +1,5 @@
 ---
+layout: docs
 title: 'Creating a Theme Pack'
 collection: guides
 tocHeading: 3

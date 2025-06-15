@@ -1,4 +1,5 @@
 ---
+layout: docs
 collection: docs
 title: API Routes
 label: API Routes
