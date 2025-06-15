@@ -34,10 +34,16 @@ async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {
 // TODO are we duplicating customImports processing logic?
 // TODO document this function and params
 // TODO do we absolutely need to pass matchingRoute?
-async function mergeContentIntoLayout(outletType, pageContents, layoutContents, compilation, matchingRoute) {
+async function mergeContentIntoLayout(
+  outletType,
+  pageContents,
+  layoutContents,
+  compilation,
+  matchingRoute,
+) {
+  console.log("MERGE LAYOUT CONTENTS @@@@", { pageContents, layoutContents });
   // TODO active frontmatter handling
-  console.log('MERGE LAYOUT CONTENTS @@@@', { pageContents, layoutContents });
-  const activeFrontmatterTitleKey = "${globalThis.page.title}";
+  // const activeFrontmatterTitleKey = "${globalThis.page.title}";
   const hasActiveFrontmatterTitle = false;
   const layoutRoot = htmlparser.parse(layoutContents, {
     comment: true,
@@ -55,12 +61,16 @@ async function mergeContentIntoLayout(outletType, pageContents, layoutContents, 
   });
   let mergedContents = "";
   // only merged custom imports if we are handling a page
-  const customImports = outletType === 'content' ? matchingRoute?.imports ?? [] : []
+  const customImports = outletType === "content" ? (matchingRoute?.imports ?? []) : [];
 
   const appTitle = layoutRoot ? layoutRoot.querySelector("head title") : null;
-  const appBody = layoutRoot.querySelector("body") ? layoutRoot.querySelector("body").innerHTML : undefined;
+  const appBody = layoutRoot.querySelector("body")
+    ? layoutRoot.querySelector("body").innerHTML
+    : undefined;
   const pageBody =
-    pageRoot && pageRoot.querySelector("body") ? pageRoot.querySelector("body").innerHTML : undefined;
+    pageRoot && pageRoot.querySelector("body")
+      ? pageRoot.querySelector("body").innerHTML
+      : undefined;
   const pageTitle = pageRoot && pageRoot.querySelector("head title");
   // const hasActiveFrontmatterTitle =
   //   compilation.config.activeContent &&
@@ -80,7 +90,6 @@ async function mergeContentIntoLayout(outletType, pageContents, layoutContents, 
     //   pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0
     //     ? pageTitle.rawText
     //     : appTitle.rawText;
-
     // title = text.replace(activeFrontmatterTitleKey, matchingRoute.title || matchingRoute.label);
   } else {
     title = matchingRoute.title
@@ -89,7 +98,7 @@ async function mergeContentIntoLayout(outletType, pageContents, layoutContents, 
         ? pageTitle.rawText
         : appTitle && appTitle.rawText
           ? appTitle.rawText
-          : '';
+          : "";
   }
 
   console.log({ matchingRoute, title, pageTitle, appTitle });
@@ -97,7 +106,9 @@ async function mergeContentIntoLayout(outletType, pageContents, layoutContents, 
   const mergedHtml =
     pageRoot && pageRoot.querySelector("html") && pageRoot.querySelector("html")?.rawAttrs !== ""
       ? `<html ${pageRoot.querySelector("html").rawAttrs}>`
-      : layoutRoot && layoutRoot.querySelector("html") && layoutRoot.querySelector("html")?.rawAttrs !== ""
+      : layoutRoot &&
+          layoutRoot.querySelector("html") &&
+          layoutRoot.querySelector("html")?.rawAttrs !== ""
         ? `<html ${layoutRoot.querySelector("html").rawAttrs}>`
         : "<html>";
 
@@ -177,21 +188,30 @@ async function mergeContentIntoLayout(outletType, pageContents, layoutContents, 
     }),
   ].join("\n");
 
-  const outletRegex = outletType === 'content'
-    ? /<content-outlet><\/content-outlet>/
-    : /<page-outlet><\/page-outlet>/
+  const outletRegex =
+    outletType === "content"
+      ? /<content-outlet><\/content-outlet>/
+      : /<page-outlet><\/page-outlet>/;
   // TODO document this crazy thing too...
-  const finalBody = appBody && appBody.match(outletRegex)
-    ? appBody.replace(outletRegex, pageBody ?? pageContents)
-    : pageRoot.querySelector("html") && pageBody
-      ? pageBody
-      : !pageRoot.querySelector("html")
-        ? pageContents
-        : "";
+  const finalBody =
+    appBody && appBody.match(outletRegex)
+      ? appBody.replace(outletRegex, pageBody ?? pageContents)
+      : pageRoot.querySelector("html") && pageBody
+        ? pageBody
+        : !pageRoot.querySelector("html")
+          ? pageContents
+          : "";
   // <html> with no body
   // body (markdown)
 
-  console.log('FINAL MERGED CONTENTS ===>', { outletType, outletRegex, pageContents, appBody, pageBody, finalBody })
+  console.log("FINAL MERGED CONTENTS ===>", {
+    outletType,
+    outletRegex,
+    pageContents,
+    appBody,
+    pageBody,
+    finalBody,
+  });
   mergedContents = `<!DOCTYPE html>
     ${mergedHtml}
       <head>
@@ -215,7 +235,7 @@ async function mergeContentIntoLayout(outletType, pageContents, layoutContents, 
 // TODO do we absolutely need to pass matchingRoute?
 // TODO better name for this?
 async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout) {
-  console.log('getPageLayout ???', { pageContents, matchingRoute });
+  console.log("getPageLayout ???", { pageContents, matchingRoute });
   const { config, context } = compilation;
   const { layoutsDir, userLayoutsDir, pagesDir } = context;
   const { layout, pageHref, route } = matchingRoute;
@@ -231,7 +251,7 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
   const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, "page");
   const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, layout);
   // const extension = pageHref?.split(".")?.pop();
-  const is404Page = route.endsWith('/404/');
+  const is404Page = route.endsWith("/404/");
   const hasCustomStaticLayout = await checkResourceExists(
     new URL(`./${layout}.html`, userLayoutsDir),
   );
@@ -246,36 +266,44 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
   // const isHtmlPage = extension === "html" && (await checkResourceExists(new URL(pageHref)));
   let layoutContents;
 
-  console.log({ is404Page, hasCustom404Page, pageHref, layout, hasCustomStaticLayout, hasCustomDynamicLayout, hasCustomDynamicTypeScriptLayout });
+  console.log({
+    is404Page,
+    hasCustom404Page,
+    pageHref,
+    layout,
+    hasCustomStaticLayout,
+    hasCustomDynamicLayout,
+    hasCustomDynamicTypeScriptLayout,
+  });
   // TODO document all these conditions
-  if(ssrLayout) {
-    console.log('EXISTING SSR LAYOUT ALREADY PROVIDED')
+  if (ssrLayout) {
+    console.log("EXISTING SSR LAYOUT ALREADY PROVIDED");
     layoutContents = ssrLayout;
   } else if (layout && (customPluginPageLayouts.length > 0 || hasCustomStaticLayout)) {
-    console.log('hasCustomStaticLayout / customPluginPageLayouts / layout', { pageHref, layout });
+    console.log("hasCustomStaticLayout / customPluginPageLayouts / layout", { pageHref, layout });
     // use a custom layout, usually from markdown frontmatter
     layoutContents =
       customPluginPageLayouts.length > 0
         ? await fs.readFile(new URL(`./${layout}.html`, customPluginPageLayouts[0]), "utf-8")
         : await fs.readFile(new URL(`./${layout}.html`, userLayoutsDir), "utf-8");
   } else if (isCustomStaticPage) {
-    console.log('isCustomStaticPage (e.g. context plugin', { pageHref, layout });
+    console.log("isCustomStaticPage (e.g. context plugin", { pageHref, layout });
     // transform, then use that as the layout, NOT accounting for 404 pages
     const transformed = await customPageFormatPlugins[0].serve(filePathUrl);
     layoutContents = await transformed.text();
   } else if (customPluginDefaultPageLayouts.length > 0 || (!is404Page && hasPageLayout)) {
-    console.log('HAS LAYOUT customPluginDefaultPageLayouts', { pageHref, layout });
+    console.log("HAS LAYOUT customPluginDefaultPageLayouts", { pageHref, layout });
     // else look for default page layout from the user
     // and 404 pages should be their own "top level" layout
     layoutContents =
       customPluginDefaultPageLayouts.length > 0
         ? await fs.readFile(new URL("./page.html", customPluginDefaultPageLayouts[0]), "utf-8")
         : await fs.readFile(new URL("./page.html", userLayoutsDir), "utf-8");
-  // } else if(layoutContents) {
-  //   // console.log('HAS LAYOUT CONTENTS', { pageHref, layout });
-  //   mergedContents = layoutContents;
+    // } else if(layoutContents) {
+    //   // console.log('HAS LAYOUT CONTENTS', { pageHref, layout });
+    //   mergedContents = layoutContents;
   } else if ((hasCustomDynamicLayout || hasCustomDynamicTypeScriptLayout) && !is404Page) {
-    console.log('CUSTOM DYNAMIC LAYOUT', { pageHref, layout });
+    console.log("CUSTOM DYNAMIC LAYOUT", { pageHref, layout });
     const routeModuleLocationUrl = hasCustomDynamicLayout
       ? new URL(`./${layout}.js`, userLayoutsDir)
       : new URL(`./${layout}.ts`, userLayoutsDir);
@@ -287,10 +315,10 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
       const worker = new Worker(new URL("./ssr-route-worker.js", import.meta.url));
 
       worker.on("message", (result) => {
-        console.log('???????????', { result });
+        console.log("???????????", { result });
         if (result.body) {
           layoutContents = result.body;
-          console.log('SSR layout', { pageHref, layoutContents });
+          console.log("SSR layout", { pageHref, layoutContents });
         }
         resolve();
       });
@@ -307,26 +335,32 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
         compilation: JSON.stringify(compilation),
       });
     });
-  // } else if (is404Page) {
-  //   // TODO treat 404 like any other page when no longer providing default content, not just HTML
-  //   // then 404 page content can just come from html plugin processing
-  //   console.log({ is404Page, hasCustom404Page })
-  //   const pathUrl = hasCustom404Page
-  //     ? new URL("./404.html", pagesDir)
-  //     : new URL("./404.html", layoutsDir);
+    // } else if (is404Page) {
+    //   // TODO treat 404 like any other page when no longer providing default content, not just HTML
+    //   // then 404 page content can just come from html plugin processing
+    //   console.log({ is404Page, hasCustom404Page })
+    //   const pathUrl = hasCustom404Page
+    //     ? new URL("./404.html", pagesDir)
+    //     : new URL("./404.html", layoutsDir);
 
-  //   layoutContents = await fs.readFile(pathUrl, "utf-8");
-  } else if(!pageContents) {
-    console.log('DEFAULT GWD page.html fallback');
+    //   layoutContents = await fs.readFile(pathUrl, "utf-8");
+  } else if (!pageContents) {
+    console.log("DEFAULT GWD page.html fallback");
     // fallback to using Greenwood's stock page layout
     // TODO do we even want this?
     // https://github.com/ProjectEvergreen/greenwood/issues/1271
     layoutContents = await fs.readFile(new URL("./page.html", layoutsDir), "utf-8");
   }
 
-  const mergedContents = await mergeContentIntoLayout('content', pageContents, layoutContents, compilation, matchingRoute);
+  const mergedContents = await mergeContentIntoLayout(
+    "content",
+    pageContents,
+    layoutContents,
+    compilation,
+    matchingRoute,
+  );
 
-  console.log('MERGED PAGE LAYOUT + CONTENTS', { layoutContents, mergedContents });
+  console.log("MERGED PAGE LAYOUT + CONTENTS", { layoutContents, mergedContents });
 
   return mergedContents;
 }
@@ -336,7 +370,8 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
 // TODO do we absolutely need to pass matchingRoute?
 // TODO better name for this?
 async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
-  const activeFrontmatterTitleKey = "${globalThis.page.title}";
+  // TODO active frontmatter handling
+  // const activeFrontmatterTitleKey = "${globalThis.page.title}";
   const enableHud = compilation.config.devServer.hud;
   const { layoutsDir, userLayoutsDir } = compilation.context;
   const userStaticAppLayoutUrl = new URL("./app.html", userLayoutsDir);
@@ -433,14 +468,19 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
 
     mergedLayoutContents = appLayoutContents.replace(/<page-outlet><\/page-outlet>/, "");
   } else {
-    mergedLayoutContents = await mergeContentIntoLayout('page', pageLayoutContents, appLayoutContents, compilation, matchingRoute);
+    mergedLayoutContents = await mergeContentIntoLayout(
+      "page",
+      pageLayoutContents,
+      appLayoutContents,
+      compilation,
+      matchingRoute,
+    );
 
-    console.log('MERGED APP LAYOUT + CONTENTS', { appLayoutContents, mergedLayoutContents });
+    console.log("MERGED APP LAYOUT + CONTENTS", { appLayoutContents, mergedLayoutContents });
   }
 
   return mergedLayoutContents;
 }
-
 
 async function getGreenwoodScripts(contents, compilation) {
   const { config } = compilation;
