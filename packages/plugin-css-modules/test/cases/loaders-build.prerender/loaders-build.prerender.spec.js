@@ -71,7 +71,7 @@ describe("Build Greenwood With: ", function () {
       runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(["public", "index"], LABEL);
+    runSmokeTest(["public"], LABEL);
 
     describe("index.html with expected CSS and SSR contents", function () {
       const EXPECTED_HEADER_CLASS_NAMES = 8;

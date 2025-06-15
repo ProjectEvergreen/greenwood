@@ -76,7 +76,7 @@ describe("Build Greenwood With: ", function () {
       });
 
       it("should have the correct index.html page <h2> tag contents", function () {
-        const heading = dom.window.document.querySelector("h2").textContent;
+        const heading = dom.window.document.querySelector("h3").textContent;
 
         expect(heading).to.be.equal("Hello World!");
       });
@@ -92,7 +92,7 @@ describe("Build Greenwood With: ", function () {
       it("should have the correct blog.ts layout <title> tag contents", function () {
         const title = dom.window.document.querySelector("head title").textContent;
 
-        expect(title).to.be.equal("Default Page Layout");
+        expect(title).to.be.equal("TypeScript App Layout");
       });
 
       it("should have the correct blog.ts layout <h1> tag contents", function () {

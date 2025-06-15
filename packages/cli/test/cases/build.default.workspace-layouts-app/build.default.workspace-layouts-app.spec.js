@@ -15,6 +15,9 @@
  * src/
  *   layouts/
  *     app.html
+ *   pages/
+ *     about.js
+ *     index.html
  */
 import chai from "chai";
 import fs from "fs";
@@ -50,7 +53,7 @@ describe("Build Greenwood With: ", function () {
 
     runSmokeTest(["public", "index"], LABEL);
 
-    describe("Custom App Layout", function () {
+    describe("Custom App Layout for index.html", function () {
       before(async function () {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
       });
@@ -59,10 +62,56 @@ describe("Build Greenwood With: ", function () {
         expect(fs.existsSync(path.join(this.context.publicDir, "./index.html"))).to.be.true;
       });
 
-      it("should have the specific element we added as part of our custom app layout", function () {
-        const customParagraph = dom.window.document.querySelector("body p").textContent;
+      it("should have the <title> tag element we added as part of our custom app layout", function () {
+        const appTitle = dom.window.document.querySelector("head title").textContent;
 
-        expect(customParagraph).to.equal("My Custom App Layout");
+        expect(appTitle).to.equal("My App");
+      });
+
+      it("should have the <p> tag element we added as part of our custom app layout", function () {
+        const appParagraph = dom.window.document.querySelector("body p").textContent;
+
+        expect(appParagraph).to.equal("My Custom App Layout");
+      });
+
+      it("should have the <h1> tag element we added as part of our index.html page", function () {
+        const pageHeading = dom.window.document.querySelector("body h1").textContent;
+
+        expect(pageHeading).to.equal("Welcome to Greenwood!");
+      });
+    });
+
+    describe("Custom App Layout for prerendered about.js page", function () {
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "about/index.html"));
+      });
+
+      it("should output a single index.html file using our page", function () {
+        expect(fs.existsSync(path.join(this.context.publicDir, "./about/index.html"))).to.be.true;
+      });
+
+      it("should have the <title> tag element we added as part of our page", function () {
+        const pageTitle = dom.window.document.querySelector("head title").textContent;
+
+        expect(pageTitle).to.equal("About Page");
+      });
+
+      it("should not have a <title> tag element we added as part of our page merged into the <body>", function () {
+        const pageTitle = dom.window.document.querySelectorAll("title");
+
+        expect(pageTitle.length).to.equal(1);
+      });
+
+      it("should have the <p> tag element we added as part of our custom app layout", function () {
+        const appParagraph = dom.window.document.querySelector("body p").textContent;
+
+        expect(appParagraph).to.equal("My Custom App Layout");
+      });
+
+      it("should have the <h1> tag element we added as part of our index.html page", function () {
+        const pageHeading = dom.window.document.querySelector("body h1").textContent;
+
+        expect(pageHeading).to.equal("About Page");
       });
     });
   });
