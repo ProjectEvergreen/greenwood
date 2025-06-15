@@ -42,9 +42,7 @@ async function mergeContentIntoLayout(
   matchingRoute,
 ) {
   console.log("MERGE LAYOUT CONTENTS @@@@", { pageContents, layoutContents });
-  // TODO active frontmatter handling
-  // const activeFrontmatterTitleKey = "${globalThis.page.title}";
-  const hasActiveFrontmatterTitle = false;
+  const activeFrontmatterTitleKey = "${globalThis.page.title}";
   const layoutRoot = htmlparser.parse(layoutContents, {
     comment: true,
     script: true,
@@ -72,10 +70,10 @@ async function mergeContentIntoLayout(
       ? pageRoot.querySelector("body").innerHTML
       : undefined;
   const pageTitle = pageRoot && pageRoot.querySelector("head title");
-  // const hasActiveFrontmatterTitle =
-  //   compilation.config.activeContent &&
-  //   ((pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0) ||
-  //     (appTitle && appTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0));
+  const hasActiveFrontmatterTitle =
+    compilation.config.activeContent &&
+    ((pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0) ||
+      (appTitle && appTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0));
   const resourcePlugins = compilation.config.plugins
     .filter((plugin) => {
       return plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin;
@@ -86,11 +84,11 @@ async function mergeContentIntoLayout(
   let title;
 
   if (hasActiveFrontmatterTitle) {
-    // const text =
-    //   pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0
-    //     ? pageTitle.rawText
-    //     : appTitle.rawText;
-    // title = text.replace(activeFrontmatterTitleKey, matchingRoute.title || matchingRoute.label);
+    const text =
+      pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0
+        ? pageTitle.rawText
+        : appTitle.rawText;
+    title = text.replace(activeFrontmatterTitleKey, matchingRoute.title || matchingRoute.label);
   } else {
     title = matchingRoute.title
       ? matchingRoute.title
@@ -101,7 +99,7 @@ async function mergeContentIntoLayout(
           : "";
   }
 
-  console.log({ matchingRoute, title, pageTitle, appTitle });
+  console.log("TITLE!!!!!", { matchingRoute, title, pageTitle, appTitle });
 
   const mergedHtml =
     pageRoot && pageRoot.querySelector("html") && pageRoot.querySelector("html")?.rawAttrs !== ""
@@ -201,8 +199,6 @@ async function mergeContentIntoLayout(
         : !pageRoot.querySelector("html")
           ? pageContents
           : "";
-  // <html> with no body
-  // body (markdown)
 
   console.log("FINAL MERGED CONTENTS ===>", {
     outletType,
@@ -211,6 +207,7 @@ async function mergeContentIntoLayout(
     appBody,
     pageBody,
     finalBody,
+    title,
   });
   mergedContents = `<!DOCTYPE html>
     ${mergedHtml}
@@ -236,18 +233,9 @@ async function mergeContentIntoLayout(
 // TODO better name for this?
 async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout) {
   console.log("getPageLayout ???", { pageContents, matchingRoute });
-  const { config, context } = compilation;
+  const { context } = compilation;
   const { layoutsDir, userLayoutsDir, pagesDir } = context;
   const { layout, pageHref, route } = matchingRoute;
-  const filePathUrl = pageHref && pageHref !== "" ? new URL(pageHref) : pageHref;
-  const customPageFormatPlugins = config.plugins
-    .filter((plugin) => plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin)
-    .map((plugin) => plugin.provider(compilation));
-  const isCustomStaticPage =
-    customPageFormatPlugins[0] &&
-    customPageFormatPlugins[0].servePage === "static" &&
-    customPageFormatPlugins[0].shouldServe &&
-    (await customPageFormatPlugins[0].shouldServe(filePathUrl));
   const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, "page");
   const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, layout);
   // const extension = pageHref?.split(".")?.pop();
@@ -286,11 +274,6 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
       customPluginPageLayouts.length > 0
         ? await fs.readFile(new URL(`./${layout}.html`, customPluginPageLayouts[0]), "utf-8")
         : await fs.readFile(new URL(`./${layout}.html`, userLayoutsDir), "utf-8");
-  } else if (isCustomStaticPage) {
-    console.log("isCustomStaticPage (e.g. context plugin", { pageHref, layout });
-    // transform, then use that as the layout, NOT accounting for 404 pages
-    const transformed = await customPageFormatPlugins[0].serve(filePathUrl);
-    layoutContents = await transformed.text();
   } else if (customPluginDefaultPageLayouts.length > 0 || (!is404Page && hasPageLayout)) {
     console.log("HAS LAYOUT customPluginDefaultPageLayouts", { pageHref, layout });
     // else look for default page layout from the user

@@ -54,6 +54,15 @@ class StandardHtmlResource {
     let processedMarkdown = null;
     let html = "";
 
+    const customPageFormatPlugins = config.plugins
+      .filter((plugin) => plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin)
+      .map((plugin) => plugin.provider(this.compilation));
+    const isCustomStaticPage =
+      customPageFormatPlugins[0] &&
+      customPageFormatPlugins[0].servePage === "static" &&
+      customPageFormatPlugins[0].shouldServe &&
+      (await customPageFormatPlugins[0].shouldServe(new URL(pageHref)));
+
     // TODO get all _page_ contents up-front to _pass_ into layout utils
     if (isMarkdownContent) {
       const markdownContents = await fs.readFile(new URL(pageHref), "utf-8");
@@ -91,6 +100,11 @@ class StandardHtmlResource {
         : new URL("./404.html", layoutsDir);
 
       body = await fs.readFile(pathUrl, "utf-8");
+    } else if (isCustomStaticPage) {
+      console.log("isCustomStaticPage (e.g. about.foo)", { pageHref });
+      // transform, then use that as the layout, NOT accounting for 404 pages
+      const transformed = await customPageFormatPlugins[0].serve(new URL(pageHref));
+      body = await transformed.text();
     } else if (matchingRoute.isSSR) {
       const routeModuleLocationUrl = new URL(pageHref);
       const routeWorkerUrl = this.compilation.config.plugins
@@ -178,6 +192,7 @@ class StandardHtmlResource {
        */
 
       // TODO can we get away from passing in matching route?
+      console.log("&&&&& body", { body });
       const mergedPageLayoutContents = await getPageLayout(
         body,
         this.compilation,
