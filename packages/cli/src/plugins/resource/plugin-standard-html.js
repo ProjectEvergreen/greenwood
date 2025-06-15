@@ -11,7 +11,7 @@ import rehypeRaw from "rehype-raw";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
-import { getPageLayout, getAppLayout, getPageLayoutContents, getAppLayoutContents, getGreenwoodScripts } from "../../lib/layout-utils.js";
+import { getPageLayout, getAppLayout, getGreenwoodScripts } from "../../lib/layout-utils.js";
 import { requestAsObject, checkResourceExists } from "../../lib/resource-utils.js";
 import { unified } from "unified";
 import { Worker } from "worker_threads";
@@ -184,10 +184,10 @@ class StandardHtmlResource {
        */
 
       // TODO can we get away from passing in matching route?
-      const mergedPageLayoutContents = await getPageLayoutContents(body, this.compilation, matchingRoute, ssrLayout);
+      const mergedPageLayoutContents = await getPageLayout(body, this.compilation, matchingRoute, ssrLayout);
       console.log({ mergedPageLayoutContents });
       
-      const mergedAppLayoutContents = await getAppLayoutContents(mergedPageLayoutContents, this.compilation, matchingRoute);
+      const mergedAppLayoutContents = await getAppLayout(mergedPageLayoutContents, this.compilation, matchingRoute);
       console.log({ mergedAppLayoutContents });
       
       html = mergedAppLayoutContents;

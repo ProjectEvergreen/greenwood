@@ -6,8 +6,7 @@ import {
   getRollupConfigForSsrPages,
 } from "../config/rollup.config.js";
 import {
-  getAppLayoutContents,
-  getPageLayoutContents,
+  getAppLayout,
   getPageLayout,
   getGreenwoodScripts,
 } from "../lib/layout-utils.js";
@@ -350,10 +349,10 @@ async function bundleSsrPages(compilation, optimizePlugins) {
 
       console.log("!!!!!!!", { data });
 
-      staticHtml = await getPageLayoutContents(staticHtml, compilation, page, data.layout);
+      staticHtml = await getPageLayout(staticHtml, compilation, page, data.layout);
       console.log({ staticHtml });
 
-      staticHtml = await getAppLayoutContents(staticHtml, compilation, page);
+      staticHtml = await getAppLayout(staticHtml, compilation, page);
       console.log({ staticHtml });
 
       // staticHtml = data.layout ? data.layout : await getPageLayout(pageHref, compilation, layout);
