@@ -9,7 +9,6 @@ const html = `
 </html>
 `;
 
-
 export default class AboutPage extends HTMLElement {
   connectedCallback() {
     this.innerHTML = html;
