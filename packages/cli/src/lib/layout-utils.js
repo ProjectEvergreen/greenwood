@@ -353,8 +353,6 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
 // TODO do we absolutely need to pass matchingRoute?
 // TODO better name for this?
 async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
-  // TODO active frontmatter handling
-  // const activeFrontmatterTitleKey = "${globalThis.page.title}";
   const enableHud = compilation.config.devServer.hud;
   const { layoutsDir, userLayoutsDir } = compilation.context;
   const userStaticAppLayoutUrl = new URL("./app.html", userLayoutsDir);
