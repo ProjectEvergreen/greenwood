@@ -5,7 +5,7 @@ import {
   getRollupConfigForBrowserScripts,
   getRollupConfigForSsrPages,
 } from "../config/rollup.config.js";
-import { getAppLayout, getPageLayout, getUserScripts } from "../lib/layout-utils.js";
+import { getAppLayout, getPageLayout, getGreenwoodScripts } from "../lib/layout-utils.js";
 import { hashString } from "../lib/hashing-utils.js";
 import {
   checkResourceExists,
@@ -328,7 +328,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     // and before we optimize so that all bundled assets can tracked up front
     // would be nice to see if this can be done in a single pass though...
     for (const page of ssrPages) {
-      const { imports, route, layout, pageHref } = page;
+      const { route, pageHref } = page;
       const moduleUrl = new URL(pageHref);
       const request = new Request(moduleUrl);
       const data = await executeRouteModule({
@@ -340,11 +340,20 @@ async function bundleSsrPages(compilation, optimizePlugins) {
         scripts: [],
         request,
       });
-      let staticHtml = "";
+      // TODO is this the correct starting content to use?
+      let staticHtml = "<content-outlet></content-outlet>";
 
-      staticHtml = data.layout ? data.layout : await getPageLayout(pageHref, compilation, layout);
-      staticHtml = await getAppLayout(staticHtml, compilation, imports, page);
-      staticHtml = await getUserScripts(staticHtml, compilation);
+      console.log("!!!!!!!", { data });
+
+      staticHtml = await getPageLayout(staticHtml, compilation, page, data.layout);
+      console.log({ staticHtml });
+
+      staticHtml = await getAppLayout(staticHtml, compilation, page);
+      console.log({ staticHtml });
+
+      // staticHtml = data.layout ? data.layout : await getPageLayout(pageHref, compilation, layout);
+      // staticHtml = await getAppLayout(staticHtml, compilation, imports, page);
+      staticHtml = await getGreenwoodScripts(staticHtml, compilation);
       staticHtml = await (
         await interceptPage(
           new URL(`http://localhost:8080${route}`),

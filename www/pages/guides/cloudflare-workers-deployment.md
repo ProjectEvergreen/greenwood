@@ -1,4 +1,5 @@
 ---
+layout: docs
 collection: guides
 tocHeading: 3
 order: 6

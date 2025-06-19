@@ -1,4 +1,5 @@
 ---
+layout: docs
 collection: navigation
 order: 4
 ---
