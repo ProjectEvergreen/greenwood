@@ -41,7 +41,7 @@ async function mergeContentIntoLayout(
   compilation,
   matchingRoute,
 ) {
-  console.log("MERGE LAYOUT CONTENTS @@@@", { pageContents, layoutContents });
+  console.log("MERGE LAYOUT CONTENTS @@@@", { outletType, pageContents, layoutContents });
   const activeFrontmatterTitleKey = "${globalThis.page.title}";
   const layoutRoot = htmlparser.parse(layoutContents, {
     comment: true,
@@ -58,171 +58,197 @@ async function mergeContentIntoLayout(
     pre: true,
   });
   let mergedContents = "";
-  // only merged custom imports if we are handling a page
-  const customImports = outletType === "content" ? (matchingRoute?.imports ?? []) : [];
 
-  const appTitle = layoutRoot ? layoutRoot.querySelector("head title") : null;
-  const appBody = layoutRoot.querySelector("body")
-    ? layoutRoot.querySelector("body").innerHTML
-    : undefined;
-  const pageBody =
-    pageRoot && pageRoot.querySelector("body")
-      ? pageRoot.querySelector("body").innerHTML
-      : undefined;
-  const pageTitle = pageRoot && pageRoot.querySelector("head title");
-  const hasActiveFrontmatterTitle =
-    compilation.config.activeContent &&
-    ((pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0) ||
-      (appTitle && appTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0));
-  const resourcePlugins = compilation.config.plugins
-    .filter((plugin) => {
-      return plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin;
-    })
-    .map((plugin) => {
-      return plugin.provider(compilation);
-    });
-  let title;
+  if (!layoutRoot.valid || !pageRoot.valid) {
+    const invalidContents = !pageRoot.valid ? pageContents : layoutContents;
+    const validContents = pageRoot.valid
+      ? pageContents
+      : (layoutContents ?? `<html><body></body></html>`);
+    const enableHud = compilation.config.devServer.hud;
 
-  if (hasActiveFrontmatterTitle) {
-    const text =
-      pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0
-        ? pageTitle.rawText
-        : appTitle.rawText;
-    title = text.replace(activeFrontmatterTitleKey, matchingRoute.title || matchingRoute.label);
+    if (enableHud) {
+      mergedContents = validContents.replace(
+        "<body>",
+        `
+        <body>
+          <div style="position: absolute; width: auto; border: dotted 3px red; background-color: white; opacity: 0.75; padding: 1% 1% 0">
+            <p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="noreferrer">HTML formatter</a>.</p>
+            <details>
+              <pre>
+                ${invalidContents.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")}
+              </pre>
+            </details>
+          </div>
+      `,
+      );
+    }
   } else {
-    title = matchingRoute.title
-      ? matchingRoute.title
-      : pageTitle && pageTitle.rawText
-        ? pageTitle.rawText
-        : appTitle && appTitle.rawText
-          ? appTitle.rawText
-          : "";
+    // only merged custom imports if we are handling a page
+    const customImports = outletType === "content" ? (matchingRoute?.imports ?? []) : [];
+
+    const appTitle = layoutRoot ? layoutRoot.querySelector("head title") : null;
+    const appBody = layoutRoot.querySelector("body")
+      ? layoutRoot.querySelector("body").innerHTML
+      : undefined;
+    const pageBody =
+      pageRoot && pageRoot.querySelector("body")
+        ? pageRoot.querySelector("body").innerHTML
+        : undefined;
+    const pageTitle = pageRoot && pageRoot.querySelector("head title");
+    const hasActiveFrontmatterTitle =
+      compilation.config.activeContent &&
+      ((pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0) ||
+        (appTitle && appTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0));
+    const resourcePlugins = compilation.config.plugins
+      .filter((plugin) => {
+        return plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin;
+      })
+      .map((plugin) => {
+        return plugin.provider(compilation);
+      });
+    let title;
+
+    if (hasActiveFrontmatterTitle) {
+      const text =
+        pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0
+          ? pageTitle.rawText
+          : appTitle.rawText;
+      title = text.replace(activeFrontmatterTitleKey, matchingRoute.title || matchingRoute.label);
+    } else {
+      title = matchingRoute.title
+        ? matchingRoute.title
+        : pageTitle && pageTitle.rawText
+          ? pageTitle.rawText
+          : appTitle && appTitle.rawText
+            ? appTitle.rawText
+            : "";
+    }
+
+    console.log("TITLE!!!!!", { matchingRoute, title, pageTitle, appTitle });
+
+    const mergedHtml =
+      pageRoot && pageRoot.querySelector("html") && pageRoot.querySelector("html")?.rawAttrs !== ""
+        ? `<html ${pageRoot.querySelector("html").rawAttrs}>`
+        : layoutRoot &&
+            layoutRoot.querySelector("html") &&
+            layoutRoot.querySelector("html")?.rawAttrs !== ""
+          ? `<html ${layoutRoot.querySelector("html").rawAttrs}>`
+          : "<html>";
+
+    const mergedMeta = [
+      ...layoutRoot.querySelectorAll("head meta"),
+      ...[...((pageRoot && pageRoot.querySelectorAll("head meta")) || [])],
+    ].join("\n");
+
+    const mergedLinks = [
+      ...layoutRoot.querySelectorAll("head link"),
+      ...[...((pageRoot && pageRoot.querySelectorAll("head link")) || [])],
+    ].join("\n");
+
+    const mergedStyles = [
+      ...layoutRoot.querySelectorAll("head style"),
+      ...[...((pageRoot && pageRoot.querySelectorAll("head style")) || [])],
+      ...(
+        await asyncFilter(customImports, async (resource) => {
+          const [href] = resource.split(" ");
+          const isCssFile = href.split(" ")[0].split(".").pop() === "css";
+
+          if (isCssFile) {
+            return true;
+          }
+
+          const resourceUrl = new URL(`file://${href}`);
+          const request = new Request(resourceUrl, { headers: { Accept: "text/css" } });
+          let isSupportedCustomFormat = false;
+
+          for (const plugin of resourcePlugins) {
+            if (plugin.shouldServe && (await plugin.shouldServe(resourceUrl, request))) {
+              isSupportedCustomFormat = true;
+              break;
+            }
+          }
+
+          return isSupportedCustomFormat;
+        })
+      ).map((resource) => {
+        const [href, ...attributes] = resource.split(" ");
+        const attrs = attributes?.length > 0 ? attributes.join(" ") : "";
+
+        return `<link rel="stylesheet" href="${href}" ${attrs}></link>`;
+      }),
+    ].join("\n");
+
+    const mergedScripts = [
+      ...layoutRoot.querySelectorAll("head script"),
+      ...[...((pageRoot && pageRoot.querySelectorAll("head script")) || [])],
+      ...(
+        await asyncFilter(customImports, async (resource) => {
+          const [src] = resource.split(" ");
+          const isSupportedScript = ["js", "ts"].includes(src.split(" ")[0].split(".").pop());
+
+          if (isSupportedScript) {
+            return true;
+          }
+
+          const resourceUrl = new URL(`file://${src}`);
+          const request = new Request(resourceUrl, { headers: { Accept: "text/javascript" } });
+          let isSupportedCustomFormat = false;
+
+          for (const plugin of resourcePlugins) {
+            if (plugin.shouldServe && (await plugin.shouldServe(resourceUrl, request))) {
+              isSupportedCustomFormat = true;
+              break;
+            }
+          }
+
+          return isSupportedCustomFormat;
+        })
+      ).map((resource) => {
+        const [src, ...attributes] = resource.split(" ");
+        const attrs = attributes?.length > 0 ? attributes.join(" ") : "";
+
+        return `<script src="${src}" ${attrs}></script>`;
+      }),
+    ].join("\n");
+
+    const outletRegex =
+      outletType === "content"
+        ? /<content-outlet><\/content-outlet>/
+        : /<page-outlet><\/page-outlet>/;
+    // TODO document this crazy thing too...
+    const finalBody =
+      appBody && appBody.match(outletRegex)
+        ? appBody.replace(outletRegex, pageBody ?? pageContents)
+        : pageRoot.querySelector("html") && pageBody
+          ? pageBody
+          : !pageRoot.querySelector("html")
+            ? pageContents
+            : "";
+
+    console.log("FINAL MERGED CONTENTS ===>", {
+      outletType,
+      outletRegex,
+      pageContents,
+      appBody,
+      pageBody,
+      finalBody,
+      title,
+    });
+    mergedContents = `<!DOCTYPE html>
+      ${mergedHtml}
+        <head>
+          <title>${title}</title>
+          ${mergedMeta}
+          ${mergedLinks}
+          ${mergedStyles}
+          ${mergedScripts}
+        </head>
+        <body>
+          ${finalBody}
+        </body>
+      </html>
+    `;
   }
-
-  console.log("TITLE!!!!!", { matchingRoute, title, pageTitle, appTitle });
-
-  const mergedHtml =
-    pageRoot && pageRoot.querySelector("html") && pageRoot.querySelector("html")?.rawAttrs !== ""
-      ? `<html ${pageRoot.querySelector("html").rawAttrs}>`
-      : layoutRoot &&
-          layoutRoot.querySelector("html") &&
-          layoutRoot.querySelector("html")?.rawAttrs !== ""
-        ? `<html ${layoutRoot.querySelector("html").rawAttrs}>`
-        : "<html>";
-
-  const mergedMeta = [
-    ...layoutRoot.querySelectorAll("head meta"),
-    ...[...((pageRoot && pageRoot.querySelectorAll("head meta")) || [])],
-  ].join("\n");
-
-  const mergedLinks = [
-    ...layoutRoot.querySelectorAll("head link"),
-    ...[...((pageRoot && pageRoot.querySelectorAll("head link")) || [])],
-  ].join("\n");
-
-  const mergedStyles = [
-    ...layoutRoot.querySelectorAll("head style"),
-    ...[...((pageRoot && pageRoot.querySelectorAll("head style")) || [])],
-    ...(
-      await asyncFilter(customImports, async (resource) => {
-        const [href] = resource.split(" ");
-        const isCssFile = href.split(" ")[0].split(".").pop() === "css";
-
-        if (isCssFile) {
-          return true;
-        }
-
-        const resourceUrl = new URL(`file://${href}`);
-        const request = new Request(resourceUrl, { headers: { Accept: "text/css" } });
-        let isSupportedCustomFormat = false;
-
-        for (const plugin of resourcePlugins) {
-          if (plugin.shouldServe && (await plugin.shouldServe(resourceUrl, request))) {
-            isSupportedCustomFormat = true;
-            break;
-          }
-        }
-
-        return isSupportedCustomFormat;
-      })
-    ).map((resource) => {
-      const [href, ...attributes] = resource.split(" ");
-      const attrs = attributes?.length > 0 ? attributes.join(" ") : "";
-
-      return `<link rel="stylesheet" href="${href}" ${attrs}></link>`;
-    }),
-  ].join("\n");
-
-  const mergedScripts = [
-    ...layoutRoot.querySelectorAll("head script"),
-    ...[...((pageRoot && pageRoot.querySelectorAll("head script")) || [])],
-    ...(
-      await asyncFilter(customImports, async (resource) => {
-        const [src] = resource.split(" ");
-        const isSupportedScript = ["js", "ts"].includes(src.split(" ")[0].split(".").pop());
-
-        if (isSupportedScript) {
-          return true;
-        }
-
-        const resourceUrl = new URL(`file://${src}`);
-        const request = new Request(resourceUrl, { headers: { Accept: "text/javascript" } });
-        let isSupportedCustomFormat = false;
-
-        for (const plugin of resourcePlugins) {
-          if (plugin.shouldServe && (await plugin.shouldServe(resourceUrl, request))) {
-            isSupportedCustomFormat = true;
-            break;
-          }
-        }
-
-        return isSupportedCustomFormat;
-      })
-    ).map((resource) => {
-      const [src, ...attributes] = resource.split(" ");
-      const attrs = attributes?.length > 0 ? attributes.join(" ") : "";
-
-      return `<script src="${src}" ${attrs}></script>`;
-    }),
-  ].join("\n");
-
-  const outletRegex =
-    outletType === "content"
-      ? /<content-outlet><\/content-outlet>/
-      : /<page-outlet><\/page-outlet>/;
-  // TODO document this crazy thing too...
-  const finalBody =
-    appBody && appBody.match(outletRegex)
-      ? appBody.replace(outletRegex, pageBody ?? pageContents)
-      : pageRoot.querySelector("html") && pageBody
-        ? pageBody
-        : !pageRoot.querySelector("html")
-          ? pageContents
-          : "";
-
-  console.log("FINAL MERGED CONTENTS ===>", {
-    outletType,
-    outletRegex,
-    pageContents,
-    appBody,
-    pageBody,
-    finalBody,
-    title,
-  });
-  mergedContents = `<!DOCTYPE html>
-    ${mergedHtml}
-      <head>
-        <title>${title}</title>
-        ${mergedMeta}
-        ${mergedLinks}
-        ${mergedStyles}
-        ${mergedScripts}
-      </head>
-      <body>
-        ${finalBody}
-      </body>
-    </html>
-  `;
 
   return mergedContents;
 }
@@ -353,7 +379,6 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
 // TODO do we absolutely need to pass matchingRoute?
 // TODO better name for this?
 async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
-  const enableHud = compilation.config.devServer.hud;
   const { layoutsDir, userLayoutsDir } = compilation.context;
   const userStaticAppLayoutUrl = new URL("./app.html", userLayoutsDir);
   const userDynamicAppLayoutUrl = new URL("./app.js", userLayoutsDir);
@@ -407,58 +432,15 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
           : await fs.readFile(new URL("./app.html", layoutsDir), "utf-8");
   let mergedLayoutContents = "";
 
-  // TODO rename these roots...
-  const pageRoot =
-    pageLayoutContents &&
-    htmlparser.parse(pageLayoutContents, {
-      comment: matchingRoute.isSSR,
-      script: true,
-      style: true,
-      noscript: true,
-      pre: true,
-    });
-  const appRoot = htmlparser.parse(appLayoutContents, {
-    comment: matchingRoute.isSSR,
-    script: true,
-    style: true,
-    noscript: true,
-    pre: true,
-  });
+  mergedLayoutContents = await mergeContentIntoLayout(
+    "page",
+    pageLayoutContents,
+    appLayoutContents,
+    compilation,
+    matchingRoute,
+  );
 
-  // TODO move to merge layout contents function
-  if ((pageLayoutContents && !pageRoot.valid) || !appRoot.valid) {
-    console.debug("ERROR: Invalid HTML detected");
-    const invalidContents = !pageRoot.valid ? pageLayoutContents : appLayoutContents;
-
-    if (enableHud) {
-      appLayoutContents = appLayoutContents.replace(
-        "<body>",
-        `
-        <body>
-          <div style="position: absolute; width: auto; border: dotted 3px red; background-color: white; opacity: 0.75; padding: 1% 1% 0">
-            <p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="noreferrer">HTML formatter</a>.</p>
-            <details>
-              <pre>
-                ${invalidContents.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")}
-              </pre>
-            </details>
-          </div>
-      `,
-      );
-    }
-
-    mergedLayoutContents = appLayoutContents.replace(/<page-outlet><\/page-outlet>/, "");
-  } else {
-    mergedLayoutContents = await mergeContentIntoLayout(
-      "page",
-      pageLayoutContents,
-      appLayoutContents,
-      compilation,
-      matchingRoute,
-    );
-
-    console.log("MERGED APP LAYOUT + CONTENTS", { appLayoutContents, mergedLayoutContents });
-  }
+  console.log("MERGED APP LAYOUT + CONTENTS", { appLayoutContents, mergedLayoutContents });
 
   return mergedLayoutContents;
 }
