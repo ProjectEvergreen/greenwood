@@ -1,10 +1,10 @@
 // @ts-nocheck
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import fm from "front-matter";
 import { checkResourceExists, requestAsObject } from "../lib/resource-utils.js";
 import { activeFrontmatterKeys } from "../lib/content-utils.js";
 import toc from "markdown-toc";
-import { Worker } from "worker_threads";
+import { Worker } from "node:worker_threads";
 
 function getLabelFromRoute(_route) {
   let route = _route;

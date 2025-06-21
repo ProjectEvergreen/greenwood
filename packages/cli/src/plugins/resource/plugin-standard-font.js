@@ -4,7 +4,7 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 
 class StandardFontResource {
   constructor(compilation) {

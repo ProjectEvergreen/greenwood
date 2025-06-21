@@ -1,5 +1,5 @@
 // @ts-nocheck
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import { hashString } from "../lib/hashing-utils.js";
 import Koa from "koa";
 import { koaBody } from "koa-body";
@@ -9,8 +9,8 @@ import {
   transformKoaRequestIntoStandardRequest,
   requestAsObject,
 } from "../lib/resource-utils.js";
-import { Readable } from "stream";
-import { Worker } from "worker_threads";
+import { Readable } from "node:stream";
+import { Worker } from "node:worker_threads";
 
 async function getDevServer(compilation) {
   const app = new Koa();

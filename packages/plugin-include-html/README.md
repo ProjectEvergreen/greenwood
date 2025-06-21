@@ -30,13 +30,13 @@ $ pnpm add -D @greenwood/plugin-include-html
 Add this plugin to your _greenwood.config.js_:
 
 ```javascript
-import { greenwoodPluginIncludeHtml } from '@greenwood/plugin-include-html';
+import { greenwoodPluginIncludeHTML } from '@greenwood/plugin-include-html';
 
 export default {
   // ...
 
   plugins: [
-    greenwoodPluginIncludeHtml()
+    greenwoodPluginIncludeHTML()
   ]
 }
 ```

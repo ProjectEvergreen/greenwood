@@ -34,13 +34,13 @@
  */
 import chai from "chai";
 import { JSDOM } from "jsdom";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import glob from "glob-promise";
-import path from "path";
+import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath, URL } from "node:url";
 
 const expect = chai.expect;
 

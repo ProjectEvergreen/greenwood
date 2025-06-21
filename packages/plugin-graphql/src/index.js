@@ -1,4 +1,4 @@
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import { graphqlServer } from "./core/server.js";
 import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
 

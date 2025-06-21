@@ -1,7 +1,7 @@
 // https://jestjs.io/docs/ecmascript-modules
 // https://github.com/nodejs/node/discussions/41711
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import {
   load as experimentalLoad,
   resolve as experimentalResolve,

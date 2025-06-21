@@ -1,4 +1,4 @@
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import { checkResourceExists } from "../lib/resource-utils.js";
 
 async function rreaddir(dir, allFiles = []) {

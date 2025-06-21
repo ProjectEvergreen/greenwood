@@ -2,7 +2,7 @@
 
 import chalk from "chalk";
 import { program, Option } from "commander";
-import fs from "fs";
+import fs from "node:fs";
 import { input, select } from "@inquirer/prompts";
 import { copyTemplate, installDependencies, setupGitIgnore, setupPackageJson } from "./util.js";
 

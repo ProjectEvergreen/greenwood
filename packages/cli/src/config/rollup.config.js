@@ -1,6 +1,6 @@
 // @ts-nocheck
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import { checkResourceExists, normalizePathnameForWindows } from "../lib/resource-utils.js";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";

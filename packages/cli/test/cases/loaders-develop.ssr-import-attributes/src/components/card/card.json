@@ -1,5 +1,5 @@
 {
   "image": {
-    "url": "/path/to/image.webp"
+    "node:url": "/path/to/image.webp"
   }
 }

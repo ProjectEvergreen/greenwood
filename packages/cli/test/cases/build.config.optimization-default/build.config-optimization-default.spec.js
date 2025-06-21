@@ -27,13 +27,13 @@
  *     variables.css
  */
 import chai from "chai";
-import fs from "fs";
+import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "path";
+import path from "node:path";
 import { getDependencyFiles, getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath, URL } from "node:url";
 
 const expect = chai.expect;
 
