@@ -42,7 +42,7 @@ describe("Initialize a new Greenwood project: ", function () {
     });
 
     describe("should install with Yarn", function () {
-      const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+      const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
 
       before(function () {
         runner.setup(initOutputPath);

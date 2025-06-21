@@ -33,7 +33,7 @@ const expect = chai.expect;
 // https://github.com/ProjectEvergreen/greenwood/issues/1375
 describe("Build Greenwood With: ", function () {
   const LABEL = "Markdown with prerendering and HTML entities";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 

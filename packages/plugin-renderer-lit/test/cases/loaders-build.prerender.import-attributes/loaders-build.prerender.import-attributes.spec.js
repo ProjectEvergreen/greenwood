@@ -42,7 +42,7 @@ const expect = chai.expect;
 // https://github.com/ProjectEvergreen/greenwood/issues/1463
 xdescribe("Build Greenwood With Custom Lit Renderer for SSG prerendering: ", function () {
   const LABEL = "For SSG prerendering of Getting Started example";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 

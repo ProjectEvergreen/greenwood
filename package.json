@@ -5,7 +5,6 @@
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
-  "main": "./packages/cli/src/index.js",
   "type": "module",
   "workspaces": {
     "packages": [
@@ -17,9 +16,9 @@
     "lerna": "lerna",
     "clean": "rimraf --glob ./packages/**/.greenwood/** ./packages/**/public/** ./coverage",
     "clean:deps": "rimraf **/node_modules/**",
-    "build": "cross-env __GWD_ROLLUP_MODE__=strict node . build",
-    "serve": "node . serve",
-    "develop": "node . develop",
+    "build": "cross-env __GWD_ROLLUP_MODE__=strict greenwood build",
+    "serve": "greenwood serve",
+    "develop": "greenwood develop",
     "test": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 c8 mocha --exclude \"./packages/**/test/cases/loaders-*/**\" --exclude \"./packages/**/test/cases/*.typescript*/**\" \"./packages/**/**/*.spec.js\"",
     "test:loaders": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --import $(pwd)/test/test-register.js ./node_modules/mocha/bin/mocha --exclude \"./packages/**/test/cases/*.typescript*/**\" \"./packages/**/**/*.spec.js\"",
     "test:loaders:win": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --import file:\\\\%cd%\\test\\test-register.js ./node_modules/mocha/bin/mocha --exclude \"./packages/init/test/cases/**\" --exclude \"./packages/**/test/cases/*.typescript*/**\" \"./packages/**/**/*.spec.js\"",

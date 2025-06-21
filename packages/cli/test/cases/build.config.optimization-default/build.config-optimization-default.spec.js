@@ -39,7 +39,7 @@ const expect = chai.expect;
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Default Optimization Configuration";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const expectedCss = fs
     .readFileSync(path.join(outputPath, "./fixtures/expected.css"), "utf-8")

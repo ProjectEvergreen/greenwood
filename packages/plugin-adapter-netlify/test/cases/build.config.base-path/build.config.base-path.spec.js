@@ -42,7 +42,7 @@ const expect = chai.expect;
 describe("Build Greenwood With: ", function () {
   const LABEL = "Netlify Adapter plugin output w/ base path configuration";
   const basePath = "/my-app";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const netlifyFunctionsOutputUrl = new URL("./netlify/functions/", import.meta.url);
   let runner;
