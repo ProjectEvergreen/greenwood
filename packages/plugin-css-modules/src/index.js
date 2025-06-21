@@ -3,7 +3,7 @@
  * A plugin for enabling CSS Modules. :tm:
  *
  */
-import fs from "fs";
+import fs from "node:fs";
 import htmlparser from "node-html-parser";
 import { parse, walk } from "css-tree";
 import * as acornWalk from "acorn-walk";

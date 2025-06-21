@@ -23,12 +23,12 @@
  * package.json
  */
 import chai from "chai";
-import fs from "fs";
+import fs from "node:fs";
 import glob from "glob-promise";
-import path from "path";
+import path from "node:path";
 import { Runner } from "gallinago";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath, URL } from "node:url";
 
 const expect = chai.expect;
 

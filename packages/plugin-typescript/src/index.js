@@ -3,7 +3,7 @@
  * Enables using JavaScript to import TypeScript files, using ESM syntax.
  *
  */
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import tsc from "typescript";
 
 const defaultCompilerOptions = {

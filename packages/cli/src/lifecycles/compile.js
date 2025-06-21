@@ -2,7 +2,7 @@ import { checkResourceExists } from "../lib/resource-utils.js";
 import { generateGraph } from "./graph.js";
 import { initContext } from "./context.js";
 import { readAndMergeConfig } from "./config.js";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 
 const generateCompilation = async () => {
   let compilation = {

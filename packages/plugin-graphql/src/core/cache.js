@@ -3,7 +3,7 @@
 // @ts-nocheck
 import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client/core/index.js";
 import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import { gql } from "apollo-server";
 import { getQueryHash } from "./common.js";
 

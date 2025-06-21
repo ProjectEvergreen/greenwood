@@ -1,10 +1,10 @@
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import {
   checkResourceExists,
   trackResourcesForRoute,
   mergeResponse,
 } from "../lib/resource-utils.js";
-import os from "os";
+import os from "node:os";
 import { WorkerPool } from "../lib/threadpool.js";
 
 async function createOutputDirectory(route, outputDir) {

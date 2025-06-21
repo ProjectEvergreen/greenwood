@@ -37,10 +37,10 @@
  */
 import chai from "chai";
 import glob from "glob-promise";
-import path from "path";
+import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath, pathToFileURL } from "url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { JSDOM } from "jsdom";
 
 const expect = chai.expect;

@@ -5,8 +5,10 @@ import json from "@eslint/json";
 import js from "@eslint/js";
 import globals from "globals";
 import noOnlyTests from "eslint-plugin-no-only-tests";
+import importPlugin from "eslint-plugin-import";
 
 export default [
+  importPlugin.flatConfigs.recommended,
   {
     // https://github.com/eslint/eslint/discussions/18304#discussioncomment-9069706
     ignores: [
@@ -35,6 +37,7 @@ export default [
         ...globals.mocha,
         ...globals.chai,
         ...globals.node,
+        globalThis: "writeable",
       },
     },
     rules: {
@@ -42,6 +45,8 @@ export default [
       // turn this off for Prettier
       "no-irregular-whitespace": "off",
       "no-only-tests/no-only-tests": "error",
+      "import/no-unresolved": "off",
+      "import/enforce-node-protocol-usage": ["error", "always"],
     },
     plugins: {
       "no-only-tests": noOnlyTests,

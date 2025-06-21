@@ -1,8 +1,8 @@
 // @ts-nocheck
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import htmlparser from "node-html-parser";
 import { checkResourceExists } from "./resource-utils.js";
-import { Worker } from "worker_threads";
+import { Worker } from "node:worker_threads";
 import { asyncFilter } from "./async-utils.js";
 
 async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {

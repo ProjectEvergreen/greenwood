@@ -1,5 +1,5 @@
 import glob from "glob-promise";
-import path from "path";
+import path from "node:path";
 
 function tagsMatch(tagName, html, expected = null) {
   const openTagRegex = new RegExp(`<${tagName}`, "g");
