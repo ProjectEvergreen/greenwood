@@ -33,7 +33,7 @@ const expect = chai.expect;
 
 xdescribe("Develop Greenwood With: ", function () {
   const LABEL = "Import JSON plugin for using ESM with .json files";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const hostname = "http://localhost";
   const port = 1984;

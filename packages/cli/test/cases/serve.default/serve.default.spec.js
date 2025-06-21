@@ -45,7 +45,7 @@ const expect = chai.expect;
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "Default Greenwood Configuration and Workspace";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const hostname = "http://localhost:8181";
   let runner;

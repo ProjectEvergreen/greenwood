@@ -39,7 +39,7 @@ const expect = chai.expect;
 
 xdescribe("Serve Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) with API Routes in TypeScript";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const hostname = "http://localhost:8080";
   let runner;

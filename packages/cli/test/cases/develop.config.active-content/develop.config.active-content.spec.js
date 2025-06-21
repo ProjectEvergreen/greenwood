@@ -40,7 +40,7 @@ const expect = chai.expect;
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Active Content";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const hostname = "http://localhost";
   const port = 1984;

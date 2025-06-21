@@ -43,7 +43,7 @@ describe("Initialize a new Greenwood project: ", function () {
     });
 
     describe(`should build with the Greenwood CLI and have all standard build output files`, function () {
-      const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+      const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
 
       before(function () {
         runner.setup(initOutputPath);
