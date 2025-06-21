@@ -15,10 +15,10 @@
  * Greenwood default
  */
 import chai from "chai";
-import path from "path";
+import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "url";
+import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 

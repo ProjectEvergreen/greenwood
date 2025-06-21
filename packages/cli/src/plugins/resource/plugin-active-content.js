@@ -7,7 +7,7 @@ import {
   filterContentByCollection,
   filterContentByRoute,
 } from "../../lib/content-utils.js";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 
 const importMap = {
   "@greenwood/cli/src/data/client.js": "/node_modules/@greenwood/cli/src/data/client.js",

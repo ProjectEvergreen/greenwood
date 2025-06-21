@@ -4,7 +4,7 @@
  *
  */
 import commonjs from "@rollup/plugin-commonjs";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import { parse, init } from "cjs-module-lexer";
 import rollupStream from "@rollup/stream";
 

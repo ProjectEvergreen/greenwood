@@ -1,6 +1,6 @@
 import { checkResourceExists } from "./resource-utils.js";
 import { resolveBareSpecifier, derivePackageRoot } from "./walker-package-ranger.js";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 
 // take a "shortcut" pathname, e.g. /node_modules/lit/lit-html.js
 // and resolve it using import.meta.resolve

@@ -4,8 +4,8 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import { parse, walk } from "css-tree";
 import { hashString } from "../../lib/hashing-utils.js";
 import { getResolvedHrefFromPathnameShortcut } from "../../lib/node-modules-utils.js";

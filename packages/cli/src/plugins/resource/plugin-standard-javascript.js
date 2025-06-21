@@ -4,7 +4,7 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import terser from "@rollup/plugin-terser";
 import * as acorn from "acorn";
 import * as walk from "acorn-walk";

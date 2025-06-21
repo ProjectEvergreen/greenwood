@@ -1,4 +1,4 @@
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import livereload from "livereload";
 
 class LiveReloadServer {

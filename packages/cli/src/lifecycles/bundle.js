@@ -1,5 +1,5 @@
 // @ts-nocheck
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import {
   getRollupConfigForApiRoutes,
   getRollupConfigForBrowserScripts,
@@ -13,7 +13,7 @@ import {
   normalizePathnameForWindows,
   trackResourcesForRoute,
 } from "../lib/resource-utils.js";
-import path from "path";
+import path from "node:path";
 import { rollup } from "rollup";
 import { pruneGraph } from "../lib/content-utils.js";
 

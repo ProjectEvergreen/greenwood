@@ -19,13 +19,13 @@
  *     index.html
  */
 import chai from "chai";
-import fs from "fs";
+import fs from "node:fs";
 import { JSDOM } from "jsdom";
-import path from "path";
+import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath, URL } from "node:url";
 
 const expect = chai.expect;
 

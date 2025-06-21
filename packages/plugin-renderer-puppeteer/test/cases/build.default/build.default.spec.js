@@ -25,14 +25,14 @@
  *     main.js
  */
 import chai from "chai";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "path";
+import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath, URL } from "node:url";
 
 const expect = chai.expect;
 

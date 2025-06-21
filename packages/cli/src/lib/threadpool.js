@@ -1,7 +1,7 @@
 // https://amagiacademy.com/blog/posts/2021-04-09/node-worker-threads-pool
-import { AsyncResource } from "async_hooks";
-import { EventEmitter } from "events";
-import { Worker } from "worker_threads";
+import { AsyncResource } from "node:async_hooks";
+import { EventEmitter } from "node:events";
+import { Worker } from "node:worker_threads";
 
 const kTaskInfo = Symbol("kTaskInfo");
 const kWorkerFreedEvent = Symbol("kWorkerFreedEvent");

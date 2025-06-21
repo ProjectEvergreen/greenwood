@@ -7,11 +7,11 @@
  *
  */
 import chai from "chai";
-import fs from "fs";
+import fs from "node:fs";
 import glob from "glob-promise";
-import http from "http";
+import http from "node:http";
 import { JSDOM } from "jsdom";
-import path from "path";
+import path from "node:path";
 import { tagsMatch } from "./utils.js";
 
 const expect = chai.expect;

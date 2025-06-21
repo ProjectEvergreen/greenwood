@@ -4,7 +4,7 @@
  *
  */
 import { requestAsObject } from "../../lib/resource-utils.js";
-import { Worker } from "worker_threads";
+import { Worker } from "node:worker_threads";
 
 class ApiRoutesResource {
   constructor(compilation, options) {

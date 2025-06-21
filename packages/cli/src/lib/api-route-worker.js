@@ -1,5 +1,5 @@
 // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
-import { parentPort } from "worker_threads";
+import { parentPort } from "node:worker_threads";
 import { transformKoaRequestIntoStandardRequest } from "./resource-utils.js";
 
 // based on https://stackoverflow.com/questions/57447685/how-can-i-convert-a-request-object-into-a-stringifiable-object-in-javascript

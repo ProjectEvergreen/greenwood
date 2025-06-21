@@ -14,11 +14,11 @@
  * User Workspace
  * Greenwood default (src/)
  */
-import path from "path";
+import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath, URL } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Empty Configuration and Default Workspace";

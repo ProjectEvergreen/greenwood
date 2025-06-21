@@ -12,10 +12,10 @@
  * N / A
  */
 import chai from "chai";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "url";
+import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 

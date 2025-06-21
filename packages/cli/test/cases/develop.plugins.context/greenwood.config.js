@@ -1,5 +1,5 @@
 // shared from another test
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import { myThemePackPlugin } from "../build.plugins.context/theme-pack-context-plugin.js";
 
 const packageName = JSON.parse(
