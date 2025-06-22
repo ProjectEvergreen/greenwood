@@ -57,3 +57,9 @@ export type {
   GetLayout,
   GetFrontmatter,
 };
+
+export type COMMANDS = "develop" | "build" | "serve";
+
+declare module "@greenwood/cli" {
+  export const run: (COMMANDS) => Promise<void>;
+}

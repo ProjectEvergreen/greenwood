@@ -1,4 +1,4 @@
-import type { Config, ExternalSourcePage } from "@greenwood/cli";
+import { type Config, type ExternalSourcePage, run } from "@greenwood/cli";
 import { greenwoodPluginAdapterAws } from "@greenwood/plugin-adapter-aws";
 import { greenwoodPluginAdapterVercel } from "@greenwood/plugin-adapter-vercel";
 import { greenwoodPluginAdapterNetlify } from "@greenwood/plugin-adapter-netlify";
@@ -18,7 +18,8 @@ import { greenwoodPluginRendererPuppeteer } from "@greenwood/plugin-renderer-pup
 import { getContentByRoute } from "@greenwood/cli/src/data/client.js";
 
 const foo = await getContentByRoute("foo");
-console.log(foo);
+
+console.log({ run, foo });
 
 import ChildrenQuery from "@greenwood/plugin-graphql/src/queries/children.gql";
 import CollectionQuery from "@greenwood/plugin-graphql/src/queries/collection.gql";

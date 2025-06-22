@@ -1,6 +1,6 @@
 import { generateCompilation } from "./lifecycles/compile.js";
 
-const run = async (command) => {
+async function run(command) {
   process.env.__GWD_COMMAND__ = command;
 
   try {
@@ -37,6 +37,6 @@ const run = async (command) => {
     console.error(err);
     process.exit(1);
   }
-};
+}
 
 export { run };
