@@ -58,8 +58,8 @@ export type {
   GetFrontmatter,
 };
 
-export type COMMANDS = "develop" | "build" | "serve";
+export type CLI_COMMAND = "develop" | "build" | "serve";
 
 declare module "@greenwood/cli" {
-  export const run: (COMMANDS) => Promise<void>;
+  export const run: (CLI_COMMAND) => Promise<void>;
 }
