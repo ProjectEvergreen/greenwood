@@ -71,7 +71,7 @@ function installDependencies(outputDirUrl, packageManager) {
     case "npm":
       // shouldn't be an issue in later Greenwood releases since we manually bump plugin peer deps manually
       // due to this issue in Lerna - https://github.com/lerna/lerna/issues/955
-      // s keeping it just to be safe and provide consistent behavior
+      // so keeping it just to be safe and provide consistent behavior
       // https://stackoverflow.com/a/66620869/417806
       npmrcContents = npmrcContents.concat("legacy-peer-deps=true", os.EOL);
       break;
