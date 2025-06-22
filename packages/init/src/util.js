@@ -67,10 +67,20 @@ function installDependencies(outputDirUrl, packageManager) {
   const args = ["install", "--loglevel", "error"];
   let npmrcContents = "";
 
-  if (packageManager === "npm") {
-    npmrcContents = npmrcContents.concat("legacy-peer-deps=true", os.EOL);
-  } else if (packageManager === "pnpm") {
-    npmrcContents = npmrcContents.concat("shamefully-hoist=true", os.EOL);
+  switch (npmrcContents) {
+    case "npm":
+      // shouldn't be an issue in later Greenwood releases since we manually bump plugin peer deps manually
+      // due to this issue in Lerna - https://github.com/lerna/lerna/issues/955
+      // s keeping it just to be safe and provide consistent behavior
+      // https://stackoverflow.com/a/66620869/417806
+      npmrcContents = npmrcContents.concat("legacy-peer-deps=true", os.EOL);
+      break;
+    case "pnpm":
+      // enable this since in some cases we need plugin dependencies installed "locally" to the project
+      // https://pnpm.io/settings#shamefullyhoist
+      // https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-lit#installation
+      npmrcContents = npmrcContents.concat("shamefully-hoist=true", os.EOL);
+      break;
   }
 
   if (npmrcContents !== "") {
