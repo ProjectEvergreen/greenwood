@@ -1,14 +1,11 @@
 #!/usr/bin/env node
 
-import fs from "fs/promises";
 import program from "commander";
 import { run } from "./index.js";
 
-const greenwoodPackageJson = JSON.parse(
-  // TODO should this be based on process.cwd like our context lifecycle is?
-  // TODO this could be JSON Module import
-  await fs.readFile(new URL("../package.json", import.meta.url), "utf-8"),
-);
+const greenwoodPackageJson = (
+  await import(new URL("../package.json", import.meta.url), { with: { type: "json" } })
+).default;
 
 let command = "";
 
