@@ -67,7 +67,7 @@ function installDependencies(outputDirUrl, packageManager) {
   const args = ["install", "--loglevel", "error"];
   let npmrcContents = "";
 
-  switch (npmrcContents) {
+  switch (packageManager) {
     case "npm":
       // shouldn't be an issue in later Greenwood releases since we manually bump plugin peer deps manually
       // due to this issue in Lerna - https://github.com/lerna/lerna/issues/955
