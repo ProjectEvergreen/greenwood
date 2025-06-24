@@ -1,3 +1,4 @@
+import theme from "../../styles/theme.css" with { type: "css" };
 import sheet from "./card.css" with { type: "css" };
 import data from "./card.json" with { type: "json" };
 import SpectrumCard from "@spectrum-css/card" with { type: "css" };
@@ -20,7 +21,7 @@ export default class Card extends HTMLElement {
       this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
 
-    this.shadowRoot.adoptedStyleSheets = [sheet, SpectrumCard];
+    this.shadowRoot.adoptedStyleSheets = [theme, sheet, SpectrumCard];
   }
 }
 

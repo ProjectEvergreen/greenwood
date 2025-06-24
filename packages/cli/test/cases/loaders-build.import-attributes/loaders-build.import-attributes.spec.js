@@ -54,6 +54,7 @@ describe("Build Greenwood With: ", function () {
 
     describe("Custom Element Importing CSS w/ Constructable Stylesheet", function () {
       const cssFileHash = "CQ-QfEA6";
+      const themeFileHash = "570235158";
       let scripts;
       let styles;
 
@@ -62,12 +63,21 @@ describe("Build Greenwood With: ", function () {
         styles = await glob.promise(path.join(outputPath, `public/card.${cssFileHash}.css`));
       });
 
+      it("should have the expected import attribute for importing theme.css as a Constructable Stylesheet in the card.js bundle", function () {
+        const scriptContents = fs.readFileSync(scripts[0], "utf-8");
+
+        expect(scripts.length).to.equal(1);
+        expect(scriptContents).to.contain(
+          `import r from"/styles/theme.${themeFileHash}.css"with{type:"css"};`,
+        );
+      });
+
       it("should have the expected import attribute for importing card.css as a Constructable Stylesheet in the card.js bundle", function () {
         const scriptContents = fs.readFileSync(scripts[0], "utf-8");
 
         expect(scripts.length).to.equal(1);
         expect(scriptContents).to.contain(
-          `import r from"/card.${cssFileHash}.css"with{type:"css"};`,
+          `import a from"/card.${cssFileHash}.css"with{type:"css"};`,
         );
       });
 
@@ -75,7 +85,7 @@ describe("Build Greenwood With: ", function () {
         const scriptContents = fs.readFileSync(scripts[0], "utf-8");
 
         expect(scriptContents).to.contain(
-          'const c=new CSSStyleSheet;c.replaceSync(".spectrum-Card{--spectrum-card-background-color',
+          'const e=new CSSStyleSheet;e.replaceSync(".spectrum-Card{--spectrum-card-background-color',
         );
       });
 
