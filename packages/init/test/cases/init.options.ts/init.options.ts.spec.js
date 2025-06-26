@@ -127,6 +127,43 @@ describe("Initialize a new Greenwood project: ", function () {
       });
     });
 
+    describe("initial tsconfig.json contents", function () {
+      let tsConfigJson;
+
+      before(function () {
+        tsConfigJson = JSON.parse(
+          fs.readFileSync(path.join(initOutputPath, "tsconfig.json"), "utf-8"),
+        );
+      });
+
+      it("should have the expected minimum required compiler options set", function () {
+        const { compilerOptions } = tsConfigJson;
+        const { target, module, moduleResolution, allowImportingTsExtensions, noEmit } =
+          compilerOptions;
+
+        expect(target).to.equal("es2020");
+        expect(module).to.equal("preserve");
+        expect(moduleResolution).to.equal("bundler");
+        expect(allowImportingTsExtensions).to.equal(true);
+        expect(noEmit).to.equal(true);
+      });
+
+      it("should have the expected recommended compiler options", function () {
+        const { compilerOptions } = tsConfigJson;
+        const { erasableSyntaxOnly, verbatimModuleSyntax } = compilerOptions;
+
+        expect(erasableSyntaxOnly).to.equal(true);
+        expect(verbatimModuleSyntax).to.equal(false);
+      });
+
+      it("should have the expected exclude configuration for Greenwood build output", function () {
+        const { exclude } = tsConfigJson;
+
+        expect(exclude).to.contain("./public/");
+        expect(exclude).to.contain("./greenwood/");
+      });
+    });
+
     describe("home page contents", function () {
       let pageContents;
 
