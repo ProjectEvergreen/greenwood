@@ -52,15 +52,14 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
 
             optimizedCss += bundleCss(importContents, workingUrl, compilation);
           } else if (isBareSpecifier) {
-            try {
+            // gracefully / silently account for `import.meta.resolve` caveat when using loader hooks
+            // https://nodejs.org/api/esm.html#importmetaresolvespecifier
+            // https://github.com/ProjectEvergreen/greenwood/pull/1511#discussion_r2122365577
+            if (import.meta?.resolve) {
               const resolvedUrl = import.meta.resolve(value);
               const importContents = fs.readFileSync(new URL(resolvedUrl), "utf-8");
 
               optimizedCss += bundleCss(importContents, sourceUrl, compilation, resolvedUrl);
-            } catch (e) {
-              // TODO need to guard for `import.meta.resolve` not supported in custom loaders
-              // https://nodejs.org/api/esm.html#importmetaresolvespecifier
-              console.error({ e });
             }
           } else {
             console.warn(`Unable to resolve ${value} from file => ${sourceUrl}`);
