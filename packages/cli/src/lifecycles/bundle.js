@@ -340,20 +340,12 @@ async function bundleSsrPages(compilation, optimizePlugins) {
         scripts: [],
         request,
       });
-      // TODO is this the correct starting content to use?
       let staticHtml = "<content-outlet></content-outlet>";
 
-      console.log("!!!!!!!", { data });
-
       staticHtml = await getPageLayout(staticHtml, compilation, page, data.layout);
-      console.log({ staticHtml });
-
       staticHtml = await getAppLayout(staticHtml, compilation, page);
-      console.log({ staticHtml });
-
-      // staticHtml = data.layout ? data.layout : await getPageLayout(pageHref, compilation, layout);
-      // staticHtml = await getAppLayout(staticHtml, compilation, imports, page);
       staticHtml = await getGreenwoodScripts(staticHtml, compilation);
+
       staticHtml = await (
         await interceptPage(
           new URL(`http://localhost:8080${route}`),

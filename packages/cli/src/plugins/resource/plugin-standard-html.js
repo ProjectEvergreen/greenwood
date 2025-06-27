@@ -41,7 +41,7 @@ class StandardHtmlResource {
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find((node) => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
-    const { pageHref } = matchingRoute;
+    const { pageHref, route } = matchingRoute;
     const filePath =
       !matchingRoute.external && pageHref
         ? new URL(pageHref).pathname.replace(userWorkspace.pathname, "./")
@@ -52,6 +52,7 @@ class StandardHtmlResource {
     let ssrBody;
     let ssrLayout;
     let processedMarkdown = null;
+    // final contents to return from the plugin
     let html = "";
 
     const customPageFormatPlugins = config.plugins
@@ -63,7 +64,6 @@ class StandardHtmlResource {
       customPageFormatPlugins[0].shouldServe &&
       (await customPageFormatPlugins[0].shouldServe(new URL(pageHref)));
 
-    // TODO get all _page_ contents up-front to _pass_ into layout utils
     if (isMarkdownContent) {
       const markdownContents = await fs.readFile(new URL(pageHref), "utf-8");
       const rehypePlugins = [];
@@ -91,19 +91,19 @@ class StandardHtmlResource {
         .use(rehypePlugins) // apply userland rehype plugins
         .use(rehypeStringify) // convert AST to HTML string
         .process(markdownContents);
-    } else if (isHtmlContent && !matchingRoute.route.endsWith("/404/")) {
-      // TODO better way to handle 404 graphing
-      body = await fs.readFile(new URL(matchingRoute.pageHref), "utf-8");
-    } else if (isHtmlContent && matchingRoute.route.endsWith("/404/")) {
-      const pathUrl = (await checkResourceExists(new URL("./404.html", pagesDir)))
-        ? new URL("./404.html", pagesDir)
-        : new URL("./404.html", layoutsDir);
+    } else if (isHtmlContent) {
+      if (route.endsWith("/404/")) {
+        const pathUrl = (await checkResourceExists(new URL("./404.html", pagesDir)))
+          ? new URL("./404.html", pagesDir)
+          : new URL("./404.html", layoutsDir);
 
-      body = await fs.readFile(pathUrl, "utf-8");
+        body = await fs.readFile(pathUrl, "utf-8");
+      } else {
+        body = await fs.readFile(new URL(pageHref), "utf-8");
+      }
     } else if (isCustomStaticPage) {
-      console.log("isCustomStaticPage (e.g. about.foo)", { pageHref });
-      // transform, then use that as the layout, NOT accounting for 404 pages
       const transformed = await customPageFormatPlugins[0].serve(new URL(pageHref));
+
       body = await transformed.text();
     } else if (matchingRoute.isSSR) {
       const routeModuleLocationUrl = new URL(pageHref);
@@ -159,61 +159,32 @@ class StandardHtmlResource {
 
       // https://github.com/ProjectEvergreen/greenwood/issues/1126
       body = processedMarkdown.value.replace(/\$/g, "$$$");
-      //   /<content-outlet>(.*)<\/content-outlet>/s,
-      //   processedMarkdown.value.replace(/\$/g, "$$$"),
-      // );
     } else if (matchingRoute.external) {
       body = matchingRoute.body;
-      // body = body.replace(/<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
     } else if (ssrBody) {
+      // we wrap SSR content in comments so we can extract it during prerendering to avoid double pre-rendering
       body = `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, "$$$")}<!-- greenwood-ssr-end -->`;
-      // body = body.replace(
-      //   /<content-outlet>(.*)<\/content-outlet>/s,
-      //   `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, "$$$")}<!-- greenwood-ssr-end -->`,
-      // );
     }
 
-    // console.log('111', { ssrBody, body });
     if (isSpaRoute) {
       html = await fs.readFile(new URL(isSpaRoute.pageHref), "utf-8");
     } else {
-      // body = await getPageLayout(pageHref, this.compilation, layout, body, ssrLayout);
-      // TODO if SSR layout, use that instead for page layout
-
-      /*
-       * merging logic?
-       *
-       * page (with contents + html / head / body tags)
-       * page layout (with content-outlet)
-       * app layout (with page-outlet)
-       * active frontmatter...
-       *
-       * who does the swapping...?
-       */
-
-      // TODO can we get away from passing in matching route?
-      console.log("&&&&& body", { body });
       const mergedPageLayoutContents = await getPageLayout(
         body,
         this.compilation,
         matchingRoute,
         ssrLayout,
       );
-      console.log({ mergedPageLayoutContents });
 
       const mergedAppLayoutContents = await getAppLayout(
         mergedPageLayoutContents,
         this.compilation,
         matchingRoute,
       );
-      console.log({ mergedAppLayoutContents });
 
       html = mergedAppLayoutContents;
     }
 
-    // TODO should this get nested after getPageLayout?
-    // body = await getAppLayout(body, this.compilation, customImports, matchingRoute);
-    console.log("PRE HTML", { html });
     html = await getGreenwoodScripts(html, this.compilation);
 
     // TODO do we even want this?
@@ -222,8 +193,6 @@ class StandardHtmlResource {
     if (html.indexOf("<content-outlet></content-outlet>") > 0) {
       html = html.replace("<content-outlet></content-outlet>", "");
     }
-
-    console.log("FINAL HTML", { html });
 
     return new Response(html, {
       headers: new Headers({

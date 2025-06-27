@@ -143,7 +143,9 @@ const generateGraph = async (compilation) => {
           });
         } else if (isPage) {
           let root = filename.split("/")[filename.split("/").length - 1].replace(extension, "");
-          let layout = "page"; // TODO should we even have a default page layout? (do we need to update docs?)
+          // should we even have a default page layout?
+          // https://github.com/ProjectEvergreen/greenwood/issues/1271
+          let layout = "page";
           let title = null;
           let label = getLabelFromRoute(`${route}/`);
           let imports = [];
@@ -198,7 +200,6 @@ const generateGraph = async (compilation) => {
                 if (result.frontmatter) {
                   result.frontmatter.imports = result.frontmatter.imports || [];
                   ssrFrontmatter = result.frontmatter;
-                  layout = result.frontmatter ?? layout;
                 }
 
                 resolve();

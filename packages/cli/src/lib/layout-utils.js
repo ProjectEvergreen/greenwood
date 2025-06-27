@@ -30,27 +30,32 @@ async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {
   return customLayoutLocations;
 }
 
-// TODO rename appRoot to parentRoot, and pageRoot to childRoot
-// TODO are we duplicating customImports processing logic?
-// TODO document this function and params
-// TODO do we absolutely need to pass matchingRoute?
+/*
+ *
+ * This function merges the contents of pages and page / app layouts,
+ * It favors the contents of the child over the parent, allowing content
+ * closer to the page to "bubble" up to the top.
+ *
+ * For example, a page title will be prioritized over a page layout title
+ * and a page template title would be prioritized over an app layout title
+ *
+ */
 async function mergeContentIntoLayout(
   outletType,
-  pageContents,
-  layoutContents,
+  parentContents,
+  childContents,
   compilation,
   matchingRoute,
 ) {
-  console.log("MERGE LAYOUT CONTENTS @@@@", { outletType, pageContents, layoutContents });
   const activeFrontmatterTitleKey = "${globalThis.page.title}";
-  const layoutRoot = htmlparser.parse(layoutContents, {
+  const parentRoot = htmlparser.parse(parentContents, {
     comment: true,
     script: true,
     style: true,
     noscript: true,
     pre: true,
   });
-  const pageRoot = htmlparser.parse(pageContents, {
+  const childRoot = htmlparser.parse(childContents, {
     comment: true,
     script: true,
     style: true,
@@ -59,11 +64,11 @@ async function mergeContentIntoLayout(
   });
   let mergedContents = "";
 
-  if (!layoutRoot.valid || !pageRoot.valid) {
-    const invalidContents = !pageRoot.valid ? pageContents : layoutContents;
-    const validContents = pageRoot.valid
-      ? pageContents
-      : (layoutContents ?? `<html><body></body></html>`);
+  if (!parentRoot.valid || !childRoot.valid) {
+    const invalidContents = !childRoot.valid ? childContents : parentContents;
+    const validContents = childRoot.valid
+      ? childContents
+      : (parentContents ?? `<html><body></body></html>`);
     const enableHud = compilation.config.devServer.hud;
 
     if (enableHud) {
@@ -83,22 +88,22 @@ async function mergeContentIntoLayout(
       );
     }
   } else {
-    // only merged custom imports if we are handling a page
+    // only merge custom page imports if we are handling a page into a layout to not duplication entries in the final HTML
     const customImports = outletType === "content" ? (matchingRoute?.imports ?? []) : [];
 
-    const appTitle = layoutRoot ? layoutRoot.querySelector("head title") : null;
-    const appBody = layoutRoot.querySelector("body")
-      ? layoutRoot.querySelector("body").innerHTML
+    const parentTitle = parentRoot ? parentRoot.querySelector("head title") : null;
+    const parentBody = parentRoot.querySelector("body")
+      ? parentRoot.querySelector("body").innerHTML
       : undefined;
-    const pageBody =
-      pageRoot && pageRoot.querySelector("body")
-        ? pageRoot.querySelector("body").innerHTML
+    const childBody =
+      childRoot && childRoot.querySelector("body")
+        ? childRoot.querySelector("body").innerHTML
         : undefined;
-    const pageTitle = pageRoot && pageRoot.querySelector("head title");
+    const childTitle = childRoot && childRoot.querySelector("head title");
     const hasActiveFrontmatterTitle =
       compilation.config.activeContent &&
-      ((pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0) ||
-        (appTitle && appTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0));
+      ((childTitle && childTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0) ||
+        (parentTitle && parentTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0));
     const resourcePlugins = compilation.config.plugins
       .filter((plugin) => {
         return plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin;
@@ -110,44 +115,44 @@ async function mergeContentIntoLayout(
 
     if (hasActiveFrontmatterTitle) {
       const text =
-        pageTitle && pageTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0
-          ? pageTitle.rawText
-          : appTitle.rawText;
+        childTitle && childTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0
+          ? childTitle.rawText
+          : parentTitle.rawText;
       title = text.replace(activeFrontmatterTitleKey, matchingRoute.title || matchingRoute.label);
     } else {
       title = matchingRoute.title
         ? matchingRoute.title
-        : pageTitle && pageTitle.rawText
-          ? pageTitle.rawText
-          : appTitle && appTitle.rawText
-            ? appTitle.rawText
+        : childTitle && childTitle.rawText
+          ? childTitle.rawText
+          : parentTitle && parentTitle.rawText
+            ? parentTitle.rawText
             : "";
     }
 
-    console.log("TITLE!!!!!", { matchingRoute, title, pageTitle, appTitle });
-
     const mergedHtml =
-      pageRoot && pageRoot.querySelector("html") && pageRoot.querySelector("html")?.rawAttrs !== ""
-        ? `<html ${pageRoot.querySelector("html").rawAttrs}>`
-        : layoutRoot &&
-            layoutRoot.querySelector("html") &&
-            layoutRoot.querySelector("html")?.rawAttrs !== ""
-          ? `<html ${layoutRoot.querySelector("html").rawAttrs}>`
+      childRoot &&
+      childRoot.querySelector("html") &&
+      childRoot.querySelector("html")?.rawAttrs !== ""
+        ? `<html ${childRoot.querySelector("html").rawAttrs}>`
+        : parentRoot &&
+            parentRoot.querySelector("html") &&
+            parentRoot.querySelector("html")?.rawAttrs !== ""
+          ? `<html ${parentRoot.querySelector("html").rawAttrs}>`
           : "<html>";
 
     const mergedMeta = [
-      ...layoutRoot.querySelectorAll("head meta"),
-      ...[...((pageRoot && pageRoot.querySelectorAll("head meta")) || [])],
+      ...parentRoot.querySelectorAll("head meta"),
+      ...[...((childRoot && childRoot.querySelectorAll("head meta")) || [])],
     ].join("\n");
 
     const mergedLinks = [
-      ...layoutRoot.querySelectorAll("head link"),
-      ...[...((pageRoot && pageRoot.querySelectorAll("head link")) || [])],
+      ...parentRoot.querySelectorAll("head link"),
+      ...[...((childRoot && childRoot.querySelectorAll("head link")) || [])],
     ].join("\n");
 
     const mergedStyles = [
-      ...layoutRoot.querySelectorAll("head style"),
-      ...[...((pageRoot && pageRoot.querySelectorAll("head style")) || [])],
+      ...parentRoot.querySelectorAll("head style"),
+      ...[...((childRoot && childRoot.querySelectorAll("head style")) || [])],
       ...(
         await asyncFilter(customImports, async (resource) => {
           const [href] = resource.split(" ");
@@ -179,8 +184,8 @@ async function mergeContentIntoLayout(
     ].join("\n");
 
     const mergedScripts = [
-      ...layoutRoot.querySelectorAll("head script"),
-      ...[...((pageRoot && pageRoot.querySelectorAll("head script")) || [])],
+      ...parentRoot.querySelectorAll("head script"),
+      ...[...((childRoot && childRoot.querySelectorAll("head script")) || [])],
       ...(
         await asyncFilter(customImports, async (resource) => {
           const [src] = resource.split(" ");
@@ -215,25 +220,15 @@ async function mergeContentIntoLayout(
       outletType === "content"
         ? /<content-outlet><\/content-outlet>/
         : /<page-outlet><\/page-outlet>/;
-    // TODO document this crazy thing too...
     const finalBody =
-      appBody && appBody.match(outletRegex)
-        ? appBody.replace(outletRegex, pageBody ?? pageContents)
-        : pageRoot.querySelector("html") && pageBody
-          ? pageBody
-          : !pageRoot.querySelector("html")
-            ? pageContents
+      parentBody && parentBody.match(outletRegex)
+        ? parentBody.replace(outletRegex, childBody ?? childContents)
+        : childRoot.querySelector("html") && childBody
+          ? childBody
+          : !childRoot.querySelector("html")
+            ? childContents
             : "";
 
-    console.log("FINAL MERGED CONTENTS ===>", {
-      outletType,
-      outletRegex,
-      pageContents,
-      appBody,
-      pageBody,
-      finalBody,
-      title,
-    });
     mergedContents = `<!DOCTYPE html>
       ${mergedHtml}
         <head>
@@ -253,18 +248,14 @@ async function mergeContentIntoLayout(
   return mergedContents;
 }
 
-// merges provided page content into a page level layout
-// TODO document this function and params
-// TODO do we absolutely need to pass matchingRoute?
-// TODO better name for this?
+// merges provided page content into a page layout
+// optionally using an already acquired SSR layout to avoid executing an SSR route worker
 async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout) {
-  console.log("getPageLayout ???", { pageContents, matchingRoute });
   const { context } = compilation;
-  const { layoutsDir, userLayoutsDir, pagesDir } = context;
-  const { layout, pageHref, route } = matchingRoute;
+  const { layoutsDir, userLayoutsDir } = context;
+  const { layout, route } = matchingRoute;
   const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, "page");
   const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, layout);
-  // const extension = pageHref?.split(".")?.pop();
   const is404Page = route.endsWith("/404/");
   const hasCustomStaticLayout = await checkResourceExists(
     new URL(`./${layout}.html`, userLayoutsDir),
@@ -276,43 +267,26 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
     new URL(`./${layout}.ts`, userLayoutsDir),
   );
   const hasPageLayout = await checkResourceExists(new URL("./page.html", userLayoutsDir));
-  const hasCustom404Page = await checkResourceExists(new URL("./404.html", pagesDir));
-  // const isHtmlPage = extension === "html" && (await checkResourceExists(new URL(pageHref)));
+
   let layoutContents;
 
-  console.log({
-    is404Page,
-    hasCustom404Page,
-    pageHref,
-    layout,
-    hasCustomStaticLayout,
-    hasCustomDynamicLayout,
-    hasCustomDynamicTypeScriptLayout,
-  });
-  // TODO document all these conditions
   if (ssrLayout) {
-    console.log("EXISTING SSR LAYOUT ALREADY PROVIDED");
+    // use existing layout from SSR rendering
     layoutContents = ssrLayout;
   } else if (layout && (customPluginPageLayouts.length > 0 || hasCustomStaticLayout)) {
-    console.log("hasCustomStaticLayout / customPluginPageLayouts / layout", { pageHref, layout });
-    // use a custom layout, usually from markdown frontmatter
+    // has a custom layout from markdown frontmatter or context plugin
     layoutContents =
       customPluginPageLayouts.length > 0
         ? await fs.readFile(new URL(`./${layout}.html`, customPluginPageLayouts[0]), "utf-8")
         : await fs.readFile(new URL(`./${layout}.html`, userLayoutsDir), "utf-8");
   } else if (customPluginDefaultPageLayouts.length > 0 || (!is404Page && hasPageLayout)) {
-    console.log("HAS LAYOUT customPluginDefaultPageLayouts", { pageHref, layout });
-    // else look for default page layout from the user
-    // and 404 pages should be their own "top level" layout
+    // has a dynamic default page layout from context plugin
     layoutContents =
       customPluginDefaultPageLayouts.length > 0
         ? await fs.readFile(new URL("./page.html", customPluginDefaultPageLayouts[0]), "utf-8")
         : await fs.readFile(new URL("./page.html", userLayoutsDir), "utf-8");
-    // } else if(layoutContents) {
-    //   // console.log('HAS LAYOUT CONTENTS', { pageHref, layout });
-    //   mergedContents = layoutContents;
   } else if ((hasCustomDynamicLayout || hasCustomDynamicTypeScriptLayout) && !is404Page) {
-    console.log("CUSTOM DYNAMIC LAYOUT", { pageHref, layout });
+    // has a dynamic page layout
     const routeModuleLocationUrl = hasCustomDynamicLayout
       ? new URL(`./${layout}.js`, userLayoutsDir)
       : new URL(`./${layout}.ts`, userLayoutsDir);
@@ -324,10 +298,8 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
       const worker = new Worker(new URL("./ssr-route-worker.js", import.meta.url));
 
       worker.on("message", (result) => {
-        console.log("???????????", { result });
         if (result.body) {
           layoutContents = result.body;
-          console.log("SSR layout", { pageHref, layoutContents });
         }
         resolve();
       });
@@ -344,40 +316,25 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
         compilation: JSON.stringify(compilation),
       });
     });
-    // } else if (is404Page) {
-    //   // TODO treat 404 like any other page when no longer providing default content, not just HTML
-    //   // then 404 page content can just come from html plugin processing
-    //   console.log({ is404Page, hasCustom404Page })
-    //   const pathUrl = hasCustom404Page
-    //     ? new URL("./404.html", pagesDir)
-    //     : new URL("./404.html", layoutsDir);
-
-    //   layoutContents = await fs.readFile(pathUrl, "utf-8");
   } else if (!pageContents) {
-    console.log("DEFAULT GWD page.html fallback");
     // fallback to using Greenwood's stock page layout
-    // TODO do we even want this?
+    // do we even want this?
     // https://github.com/ProjectEvergreen/greenwood/issues/1271
     layoutContents = await fs.readFile(new URL("./page.html", layoutsDir), "utf-8");
   }
 
   const mergedContents = await mergeContentIntoLayout(
     "content",
-    pageContents,
     layoutContents,
+    pageContents,
     compilation,
     matchingRoute,
   );
 
-  console.log("MERGED PAGE LAYOUT + CONTENTS", { layoutContents, mergedContents });
-
   return mergedContents;
 }
 
-// merges provided page + layout contents into an app level layout
-// TODO document this function and params
-// TODO do we absolutely need to pass matchingRoute?
-// TODO better name for this?
+// merges provided page + app layout contents into an app level layout
 async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
   const { layoutsDir, userLayoutsDir } = compilation.context;
   const userStaticAppLayoutUrl = new URL("./app.html", userLayoutsDir);
@@ -434,13 +391,11 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
 
   mergedLayoutContents = await mergeContentIntoLayout(
     "page",
-    pageLayoutContents,
     appLayoutContents,
+    pageLayoutContents,
     compilation,
     matchingRoute,
   );
-
-  console.log("MERGED APP LAYOUT + CONTENTS", { appLayoutContents, mergedLayoutContents });
 
   return mergedLayoutContents;
 }
