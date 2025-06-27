@@ -65,6 +65,7 @@ async function mergeContentIntoLayout(
   let mergedContents = "";
 
   if (!parentRoot.valid || !childRoot.valid) {
+    console.error("ERROR: Invalid HTML detected");
     const invalidContents = !childRoot.valid ? childContents : parentContents;
     const validContents = childRoot.valid
       ? childContents
@@ -318,7 +319,7 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
     });
   } else if (!pageContents) {
     // fallback to using Greenwood's stock page layout
-    // do we even want this?
+    // TODO do we even want this?
     // https://github.com/ProjectEvergreen/greenwood/issues/1271
     layoutContents = await fs.readFile(new URL("./page.html", layoutsDir), "utf-8");
   }
@@ -379,6 +380,8 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
     });
   }
 
+  // TODO do we even want a default app.html layout?
+  // https://github.com/ProjectEvergreen/greenwood/issues/1271
   let appLayoutContents =
     customAppLayoutsFromPlugins.length > 0
       ? await fs.readFile(new URL("./app.html", customAppLayoutsFromPlugins[0]), "utf-8")

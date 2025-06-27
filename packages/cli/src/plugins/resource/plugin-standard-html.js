@@ -187,9 +187,9 @@ class StandardHtmlResource {
 
     html = await getGreenwoodScripts(html, this.compilation);
 
+    // clean up any empty placeholder content-outlet
     // TODO do we even want this?
     // https://github.com/ProjectEvergreen/greenwood/issues/1271
-    // clean up any empty placeholder content-outlet
     if (html.indexOf("<content-outlet></content-outlet>") > 0) {
       html = html.replace("<content-outlet></content-outlet>", "");
     }
